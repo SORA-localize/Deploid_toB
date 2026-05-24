@@ -1,11 +1,167 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
-	<Welcome />
+  <section class="hero container">
+    <span class="mono section-label">01 — Concept</span>
+    <h1>
+      ヒューマノイド導入を検討するあなたへ。<br />
+      最初に見るべき情報を、ここに。
+    </h1>
+    <p class="lede">
+      日本のtoB事業者がヒューマノイドの導入を検討するとき、<br />
+      機種比較・調達・安全・運用までを体系的に理解できる入口メディア。
+    </p>
+    <p class="cta">
+      <a href="/guide/decision-variables" class="cta-primary">
+        旗艦ガイドを読む →
+      </a>
+    </p>
+  </section>
+
+  <hr />
+
+  <section class="container three-up">
+    <span class="mono section-label">02 — What this site solves</span>
+    <ul class="cards">
+      <li>
+        <h3>そもそも要るのか？</h3>
+        <p>
+          人型である必要性、できること・できないことの期待値を、現場運用の目線で整理します。
+        </p>
+      </li>
+      <li>
+        <h3>どの機種を見ればいい？</h3>
+        <p>
+          スペック比較に留まらず、国内入手可否・代理店・調達形態を含めた「日本のバイヤー判断軸」で整理します。
+        </p>
+      </li>
+      <li>
+        <h3>導入実務はどう進める？</h3>
+        <p>
+          コスト・安全・設置・保守・体制・ROIまで、意思決定変数の全体像を１枚に。
+        </p>
+      </li>
+    </ul>
+  </section>
+
+  <hr />
+
+  <section class="container flagship">
+    <span class="mono section-label">03 — Flagship guide</span>
+    <h2>意思決定変数の地図</h2>
+    <p>
+      ヒューマノイド導入を判断する前に押さえるべき変数を、調達形態・TCO・安全/法規・運用体制・ベンダー継続性まで体系化した、当サイトの旗艦記事。
+    </p>
+    <p>
+      <a href="/guide/decision-variables">ガイドを開く →</a>
+    </p>
+  </section>
+
+  <hr />
+
+  <section class="container transparency">
+    <span class="mono section-label">04 — Roadmap</span>
+    <h2>何を作っているか</h2>
+    <p>
+      本サイトは2026年5月に始動した黎明期メディアです。MVPでは旗艦ガイドとAbout/相談窓口のみ公開しており、機種カタログ・業種逆引き・一次取材レポートは順次拡張予定。<br />
+      "これから感"を隠さず、構築過程ごと記録していきます。
+    </p>
+  </section>
+
+  <hr />
+
+  <section class="container author">
+    <span class="mono section-label">05 — Author</span>
+    <h2>運営者から一言</h2>
+    <p>
+      ヒューマノイドの社会実装に人生を賭けて取り組んでいます。スペック比較は世界中の誰でも作れる。日本のtoB事業者が"導入を決めた時、最初に開く場所"を作ることが、このサイトの仕事です。
+    </p>
+    <p>
+      <a href="/about">詳しくはAboutへ →</a>
+    </p>
+  </section>
+
+  <hr />
+
+  <section class="container final-cta">
+    <span class="mono section-label">06 — Stay updated</span>
+    <h2>更新通知を受け取る</h2>
+    <p>
+      新しい旗艦ガイド・機種レコード・一次取材レポートをまとめてお届けします。<br />
+      <em>※ 購読フォームは仕上げ段階で接続予定。</em>
+    </p>
+    <p>
+      <a href="/contact">相談・お問い合わせはこちら →</a>
+    </p>
+  </section>
 </Layout>
+
+<style>
+  .hero {
+    padding-block: 5rem 4rem;
+  }
+  .lede {
+    font-size: 1.1rem;
+    color: var(--fg-muted);
+    max-width: 54ch;
+  }
+  .cta {
+    margin-top: 2rem;
+  }
+  .cta-primary {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.85rem 1.4rem;
+    border: 1px solid var(--fg);
+    text-decoration: none;
+    color: var(--fg);
+  }
+  .cta-primary:hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .three-up {
+    padding-block: 3rem;
+  }
+  .cards {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  .cards li {
+    border-top: 1px solid var(--fg);
+    padding-top: 1.2rem;
+  }
+  .cards h3 {
+    margin-top: 0;
+  }
+  .cards p {
+    color: var(--fg-muted);
+    font-size: 0.97rem;
+  }
+  .flagship,
+  .transparency,
+  .author,
+  .final-cta {
+    padding-block: 2.5rem;
+  }
+  em {
+    font-style: normal;
+    color: var(--fg-muted);
+    font-size: 0.9rem;
+  }
+  @media (max-width: 720px) {
+    .cards {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+</style>
