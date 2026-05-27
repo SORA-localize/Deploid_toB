@@ -1,10 +1,11 @@
-export const metadata = { title: '比較' };
+import { CompareClient } from '@/components/CompareClient';
+import { getManufacturers, getRobots } from '@/lib/data';
+
+export const metadata = {
+  title: '比較',
+  description: '候補のヒューマノイド機種を、導入判断変数で横並びに比較できます。',
+};
 
 export default function ComparePage() {
-  return (
-    <main className="mx-auto max-w-7xl px-6 py-12">
-      <h1 className="text-2xl font-semibold text-foreground">比較</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Figma から復元予定（3ペイン）。</p>
-    </main>
-  );
+  return <CompareClient robots={getRobots()} manufacturers={getManufacturers()} />;
 }
