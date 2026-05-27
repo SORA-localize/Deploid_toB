@@ -4,62 +4,76 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this project is
 
-日本のtoB事業者向け「ヒューマノイド導入の入口」メディア（Astro静的サイト）。
-**6/10ロボスタに名刺代わりで間に合わせる**ことが当面のゴール。一人運営・残り約2.5週間（2026-05-24時点）。
+日本のtoB事業者向け「ヒューマノイド導入判断ポータル」（**Next.js**）。サイト名は **Deploid**。
+機種(robots)・メーカー(manufacturers)・用途(use-cases)・導入ガイド(guides)・記事(reports)を、スペック表ではなく「買い手が導入を判断するための変数」で整理する。
 
 **GitHub**: `SORA-localize/Deploid_toB`
-**デプロイ先**: Cloudflare Pages（`*.pages.dev` サブドメイン、当面は無料サブドメインで運用）
+**デプロイ先**: Vercel（Next.js との相性が第一候補）
+
+> 旧経緯：このリポジトリは元々 Astro 静的サイトとして始まったが、Figma Make で生成した React UI をベースに **Next.js へ移行済み**。`astro.config.mjs` や `src/styles/global.css` など旧Astro残骸が一部残るが、現行実装は Next.js（App Router）。
 
 ## Source of truth: the design docs
 
-このリポジトリの**設計と意思決定は親ディレクトリの2本のMarkdownに集約されている**。コードを書く前に必ず参照する：
+設計と意思決定は `docs/planning/` のドキュメント群に集約されている。コードを書く前に必ず参照する：
 
-- `../humanoid_media_IA_v1.md` — 情報設計（ナビ・ページ役割・**Content Collections設計案（§10で型定義済み）**・MVPスコープ§13）
-- `../humanoid_media_build_notes_v1.md` — 構築メモ（スタック・公開フロー・AIの使い方・**"AI感"を消すデザインルール§5**・TODO§7）
+- `docs/planning/README.md` — ドキュメント地図（迷ったらまずこれ。矛盾時の優先順位もここ）
+- `docs/planning/figma_ui_restoration_plan_v1.md` — **現在進行中の作業計画**（Figma UIをNext.jsへ復元するフェーズ手順）
+- `docs/planning/nextjs_pre_migration_decisions_v1.md` — 技術決定（スタック・URL命名・UIトークン）
+- `docs/planning/humanoid_media_IA_v1.md` — 情報設計（ナビ・各ページの役割・書くべき内容）
+- `docs/planning/humanoid_data_management_guide_v1.md` — データ運用（コレクションの役割・命名・出典）
+- `docs/planning/nextjs_data_types_v1.ts` — **データ型の真実源**（`data/types.ts` はこれと一致させる）
 
-ページ構成・スキーマ・コピー方針で迷ったら**まず上記を読む**。コードからは推論できない判断基準（なぜこの4ページか／何を作らないか／なぜCloudflare Pagesか）がここにある。
+ページ構成・スキーマ・コピー方針で迷ったら**まず上記を読む**。コードからは推論できない判断基準（なぜこのページ構成か／何を作らないか／なぜNext.js+Vercelか）がここにある。
 
-## MVPスコープ（厳守）
+## 現在の作業（厳守）
 
-**作る4ページのみ**：`/` / `/about` / `/guide/[slug]`（旗艦記事1本） / `/contact`
+`docs/planning/figma_ui_restoration_plan_v1.md` に従い、**堅牢なデータ層の上にFigma Make版のUIを復元する**。
 
-**意図的に作らない**（IA §13）：services、works/実績、`/robots`一覧＋フィルタ、業種逆引き、ニュース連投。
-→ 「空の棚を作らない」が原則。コレクション**スキーマだけ**先に定義し、中身は `guides` × 1〜2 と任意で `robots` × 1 のみ。
+- **データ層（`data/` `lib/`）は完成度が高い。作り直すのはUI層のみ。**
+- 優先順位：**Home → ロボット → メーカー → 比較**（公開情報で作り切れる4領域を先に）
+- スタイリングは **Tailwind CSS**。Figmaの `className` を流用し、トークンで余白・幅・色を一元管理
+- ブランド名は **`Deploid` を維持**（Figmaの仮名 "Humanoid Robot Portal" に戻さない）
+- 1フェーズごとに `npm run build` を通し、`git diff --stat` を確認してから次へ
 
-スコープ外の機能を追加する前に必ずユーザーに確認すること。
+スコープや方針を変える前に必ずユーザーに確認すること。
 
 ## Commands
 
 | Command | Action |
 |---|---|
 | `npm install` | 依存導入 |
-| `npm run dev` | `localhost:4321` で開発サーバ |
-| `npm run build` | `./dist/` に本番ビルド |
-| `npm run preview` | ビルド結果のローカルプレビュー |
-| `npx astro sync` | Content Collectionsの型生成（`src/content.config.ts` 変更後に必須） |
-| `npm run astro -- --help` | Astro CLIヘルプ |
+| `npm run dev` | `localhost:3000` で開発サーバ（Next.js） |
+| `npm run build` | 本番ビルド（`.next/`、SSG） |
+| `npm run start` | ビルド結果をローカルで起動 |
 
-テストランナー・lint・型チェックの設定はまだ無い（追加時はユーザーに確認）。
+`astro:dev` / `astro:build` スクリプトは旧残骸（使わない）。テストランナー・lint・型チェックの設定はまだ無い（追加時はユーザーに確認）。
 
 ## Architecture notes
 
-- **Astro v6.3.7**（`package.json` で `astro: ^6.3.7`、Node `>=22.12.0`）。Content Collections は **v5/6現行API**（`src/content.config.ts` ＋ `glob()` ローダー）を使う。旧式の `src/content/config.ts` ＋ `type: 'content'` は使わない（IA §9）。
-- 現状は **Astro公式 "basics" テンプレのまま**。`src/pages/index.astro` / `src/components/Welcome.astro` / `src/layouts/Layout.astro` は雛形なので、本実装で置き換える前提。
-- 旗艦記事「意思決定変数の地図」は `src/content/guides/decision-variables.md` に置く（IA §11にfrontmatterサンプル）。
-- 本文描画は **`import { render } from 'astro:content'` → `const { Content } = await render(entry)`**（v5+のAPI。`entry.render()` は旧式で使わない）。
+- **Next.js 16 + React 19 + TypeScript**（App Router）。Node `>=22.12.0`。
+- ルートは `src/app/`：`/` `/robots` `/robots/[slug]` `/manufacturers` `/manufacturers/[slug]` `/compare` `/guides` `/guides/[slug]` `/use-cases` `/use-cases/[slug]` `/reports` `/reports/[slug]` `/about` `/contact`。
+- 詳細ページは `generateStaticParams` でSSG。
+- **データ層**：
+  - `data/*.ts` … 配列データのみ（`robots` `manufacturers` `guides` `useCases` `reports`）。`data/types.ts` が型定義。
+  - `lib/data.ts` … 取得・filter・slug lookup・関連取得。**ページからは `data/*.ts` を直接検索せず `lib/data.ts` 経由で呼ぶ**（CMS移行時に呼び出し形を変えないため）。
+  - `lib/labels.ts` … enumトークン→日本語ラベル変換。
+- **共通レイアウト**：`src/app/layout.tsx`（Header / main / Footer）。実際に使われるCSSは `src/app/globals.css`。
+- 注意：`src/styles/global.css` は**どこからもimportされていない旧Astro孤児ファイル**。Next.js実装では `src/app/globals.css` を使う。
+
+## URL・命名規約
+
+- 公開URLの識別子は **`slug`**（旧Figmaの `id` は使わない）。
+- **`/reports`**（`/posts` ではない）、**`/use-cases`**（`/industries` ではない）。
+- collection名は複数形・英語（`robots` `manufacturers` `guides` `useCases` `reports`）。
 
 ## デザイン方針（"AI感"回避）
 
 build_notes §5 が**強制ルール**。違反するとサイトの存在意義（"質と本気度の証明"）が崩れる：
 
 - **禁止**：紫〜青のグラデ・ヒーロー、中央寄せ巨大見出し＋角丸ボタン2個、アイコン付き角丸カード3枚の特徴セクション、過剰な角丸/シャドウ/グラスモーフィズム、中身のないAIイラスト/3D
-- **やる**：ほぼモノクロ＋アクセント1色（**グラデ禁止**）、強いタイポ階層、モノスペースのセクションラベル（例 `// 01 CATALOG`）、左揃え・グリッド規律、意図的な非対称、本物のデータと出典明記
-- **錨**：参考サイト = `whichhumanoid.ai`（UI）／`humanoidintel.ai`（メニュー）／`humanoidapplications.com`（用途導線）。実装時は必ず参考と並べて見比べる。「いい感じに作って」は禁句。
-
-## デプロイ
-
-Cloudflare Pages でGitHub連携 → pushで自動デプロイ（build_notes §6-3）。フレームワーク `Astro`、ビルド `npm run build`、出力 `dist`、必要なら `NODE_VERSION=22` を環境変数に。
+- **やる**：ほぼモノクロ＋アクセント1色（**グラデ禁止**）、強いタイポ階層、モノスペースのセクションラベル、左揃え・グリッド規律、本物のデータと出典明記
+- Figma Make版のneutral/矩形UIはこの方針と整合する。復元時はFigma構造を基準にしつつ、グラデ・過剰な角丸は持ち込まない。
 
 ## 機種データの扱い
 
-スペック数値・価格・代理店情報は**必ず一次出典で裏取り**し、`sources: [...]` に URL を残す（AI生成値の混入を防ぐ）。`updated:` は実確認日。
+スペック数値・価格・代理店情報は**必ず一次出典で裏取り**し、`sources: [...]`（`Source[]`：url / checkedAt / reliability 等）に残す（AI生成値の混入を防ぐ）。不明な値はハードコードせず **`要確認`** と表示する。Figmaの産業ロボット寄りの仮スペックはそのまま移植しない。
