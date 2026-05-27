@@ -1,10 +1,12 @@
-export const metadata = { title: 'ロボット' };
+import { RobotsBrowser } from '@/components/RobotsBrowser';
+import { getManufacturers, getRobots } from '@/lib/data';
+
+export const metadata = {
+  title: 'ロボット',
+  description:
+    'ヒューマノイド機種のカタログ。メーカー、国内入手性、提供段階で絞り込み、導入判断に必要な変数で比較できます。',
+};
 
 export default function RobotsPage() {
-  return (
-    <main className="mx-auto max-w-7xl px-6 py-12">
-      <h1 className="text-2xl font-semibold text-foreground">ロボット</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Figma から復元予定（一覧 + RobotCard）。</p>
-    </main>
-  );
+  return <RobotsBrowser robots={getRobots()} manufacturers={getManufacturers()} />;
 }
