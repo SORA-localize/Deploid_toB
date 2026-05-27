@@ -5,6 +5,7 @@ import type {
   GuideStage,
   JapanAvailability,
   JapanPresence,
+  MobilityType,
   ProcurementModel,
   Reliability,
   ReportType,
@@ -44,6 +45,13 @@ export const procurementLabels: Record<ProcurementModel, string> = {
   'partner-program': '提携/実証',
   'not-for-sale': '一般販売なし',
   inquiry: '問い合わせ',
+};
+
+export const mobilityLabels: Record<MobilityType, string> = {
+  biped: '二足',
+  wheeled: '車輪',
+  hybrid: 'ハイブリッド',
+  stationary: '据置',
 };
 
 export const companyTypeLabels: Record<CompanyType, string> = {
