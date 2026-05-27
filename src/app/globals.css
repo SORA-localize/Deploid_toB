@@ -1,11 +1,84 @@
+@import "tailwindcss";
+
+/* =====================================================================
+   Figma Make デザイントークン (Tailwind v4)
+   FigmaのclassName（bg-background / text-foreground / border-border 等）が
+   そのまま使えるように、Figma版 theme.css のトークンを移植。
+   neutral基調・矩形(--radius:0)・アクセント1色(#0d7c66)。
+   ===================================================================== */
+:root {
+  --font-size: 16px;
+  --background: #fafafa;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --primary: #0a0a0a;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #0a0a0a;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #0d7c66;
+  --accent-foreground: #fafafa;
+  --destructive: #991b1b;
+  --destructive-foreground: #ffffff;
+  --border: #e5e5e5;
+  --input: transparent;
+  --input-background: #ffffff;
+  --ring: #a3a3a3;
+  --radius: 0rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* =====================================================================
+   レガシー素のCSS（暫定）
+   現行ページ/コンポーネントが使っているクラス。復元フェーズで
+   Figma構造のTailwindに置き換わり次第、ここは段階的に削除する。
+   今回(Phase 1)の補正: 背景グラデ撤去 / radius 0(矩形) / グラス除去。
+   ===================================================================== */
 :root {
   --bg: #ffffff;
   --fg: #111111;
-  --muted: #666666;
+  --ink-muted: #666666;
   --subtle: #f5f5f2;
-  --line: #deded8;
-  --accent: #111111;
-  --radius: 18px;
+  --line: #e5e5e5;
   --max: 1180px;
 }
 
@@ -22,9 +95,6 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 18% 0%, rgba(0, 0, 0, 0.06), transparent 28rem),
-    linear-gradient(180deg, #ffffff 0%, #fafaf7 100%);
 }
 
 a {
@@ -45,8 +115,7 @@ a {
 
 .header {
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(18px);
+  background: #ffffff;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -70,7 +139,7 @@ a {
   display: flex;
   align-items: center;
   gap: 18px;
-  color: var(--muted);
+  color: var(--ink-muted);
   font-size: 0.92rem;
   white-space: nowrap;
 }
@@ -88,7 +157,7 @@ a {
 }
 
 .eyebrow {
-  color: var(--muted);
+  color: var(--ink-muted);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -106,7 +175,7 @@ a {
 
 .lead {
   max-width: 760px;
-  color: var(--muted);
+  color: var(--ink-muted);
   font-size: clamp(1.05rem, 2vw, 1.35rem);
   line-height: 1.75;
 }
@@ -125,7 +194,7 @@ a {
   min-height: 46px;
   padding: 0 18px;
   border: 1px solid var(--fg);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--fg);
   color: white;
   font-weight: 700;
@@ -168,7 +237,7 @@ a {
   min-height: 100%;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.76);
+  background: #ffffff;
   padding: 22px;
   transition: border-color 160ms ease, transform 160ms ease;
 }
@@ -186,7 +255,7 @@ a {
 
 .card p,
 .muted {
-  color: var(--muted);
+  color: var(--ink-muted);
   line-height: 1.65;
 }
 
@@ -203,8 +272,8 @@ a {
   min-height: 28px;
   padding: 0 10px;
   border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--muted);
+  border-radius: var(--radius);
+  color: var(--ink-muted);
   font-size: 0.78rem;
   background: white;
 }
@@ -243,14 +312,14 @@ a {
 .table th {
   background: var(--subtle);
   font-size: 0.85rem;
-  color: var(--muted);
+  color: var(--ink-muted);
 }
 
 .footer {
   margin-top: 70px;
   padding: 36px 0;
   border-top: 1px solid var(--line);
-  color: var(--muted);
+  color: var(--ink-muted);
 }
 
 @media (max-width: 860px) {
