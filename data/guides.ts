@@ -1,0 +1,42 @@
+import type { Guide } from './types';
+
+export const guides: Guide[] = [
+  {
+    slug: 'decision-variables',
+    title: 'ヒューマノイド導入で最初に押さえる意思決定変数',
+    titleJa: '意思決定変数の地図',
+    summary: '価格、調達、保守、安全、PoC、国内可否をどう見るべきかを整理する旗艦ガイド。',
+    publishStatus: 'published',
+    updatedAt: '2026-05-27',
+    reliability: 'reported',
+    sources: [],
+    description:
+      '知識ゼロの担当者が、機種比較に入る前に理解しておくべき判断軸をまとめる。',
+    stage: 'evaluate',
+    order: 1,
+    topics: ['Decision Variables', 'TCO', 'Safety', 'Procurement'],
+    targetReaders: ['新規事業担当', '製造DX担当', '設備企画担当'],
+    readingTimeMinutes: 12,
+    checklistItems: ['国内サポートを確認したか', 'PoCの成功条件を決めたか', '安全責任の分界を決めたか'],
+    relatedRobotSlugs: ['unitree-g1', 'figure-02'],
+    relatedUseCaseSlugs: ['warehouse-picking', 'factory-inspection'],
+    relatedReportSlugs: ['bmw-figure-deployment'],
+  },
+  {
+    slug: 'poc-planning',
+    title: 'PoC計画策定ガイド',
+    summary: 'ヒューマノイド導入の実証実験で、失敗しやすい条件と評価項目を先に決めるためのガイド。',
+    publishStatus: 'published',
+    updatedAt: '2026-05-27',
+    reliability: 'reported',
+    sources: [],
+    description: 'PoCを単なるデモで終わらせないためのKPI、現場条件、エスカレーション設計を整理する。',
+    stage: 'act',
+    order: 2,
+    topics: ['PoC', 'KPI', 'Operations'],
+    targetReaders: ['現場責任者', '事業開発担当', '技術企画担当'],
+    readingTimeMinutes: 10,
+    relatedRobotSlugs: ['figure-02'],
+    relatedUseCaseSlugs: ['warehouse-picking'],
+  },
+];

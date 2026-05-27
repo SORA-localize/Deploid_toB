@@ -1,0 +1,66 @@
+import type { Manufacturer } from './types';
+
+export const manufacturers: Manufacturer[] = [
+  {
+    slug: 'unitree',
+    name: 'Unitree Robotics',
+    nameJa: 'ユニツリー・ロボティクス',
+    companyType: 'manufacturer',
+    companyStatus: 'active',
+    country: 'China',
+    hqCity: 'Hangzhou',
+    foundedYear: 2016,
+    website: 'https://www.unitree.com/',
+    summary: '四足歩行ロボットで知られ、G1/H1などのヒューマノイドも展開する中国メーカー。',
+    publishStatus: 'published',
+    updatedAt: '2026-05-27',
+    reliability: 'official',
+    sources: [
+      {
+        title: 'Unitree Robotics official website',
+        url: 'https://www.unitree.com/',
+        publisher: 'Unitree Robotics',
+        checkedAt: '2026-05-27',
+        reliability: 'official',
+      },
+    ],
+    description:
+      '研究・教育・PoC用途で比較対象に入りやすいメーカー。日本で検討する場合は、販売経路、保守、交換部品、初期トレーニングの確認が重要。',
+    japanPresence: 'distributor',
+    distributorNote: '国内販売・サポート窓口は案件ごとに確認する。',
+    supportNote: '国内代理店のサポート範囲、部品在庫、初期設定支援を確認する。',
+    procurementNote: '公開価格と実導入条件が異なる可能性があるため、構成ごとに見積確認が必要。',
+    vendorRiskNote: '研究・PoC向け評価と、本番運用向け評価を分ける。',
+    robotSlugs: ['unitree-g1'],
+  },
+  {
+    slug: 'figure-ai',
+    name: 'Figure AI',
+    companyType: 'manufacturer',
+    companyStatus: 'active',
+    country: 'USA',
+    hqCity: 'Sunnyvale',
+    website: 'https://www.figure.ai/',
+    summary: 'BMW工場での実証で注目される汎用ヒューマノイド開発企業。',
+    publishStatus: 'published',
+    updatedAt: '2026-05-27',
+    reliability: 'official',
+    sources: [
+      {
+        title: 'Figure AI official website',
+        url: 'https://www.figure.ai/',
+        publisher: 'Figure AI',
+        checkedAt: '2026-05-27',
+        reliability: 'official',
+      },
+    ],
+    description:
+      '製造現場での汎用ヒューマノイド活用を強く打ち出す企業。現時点では一般販売よりもパートナー企業との実証が中心。',
+    japanPresence: 'unknown',
+    distributorNote: '日本での正式販売・保守体制は要確認。',
+    supportNote: '導入可能性はパートナーシップや実証条件に左右される。',
+    procurementNote: '一般販売ではなく、実証・提携ベースでの接点が中心と考える。',
+    vendorRiskNote: '大型資金調達企業だが、量産・外販条件は継続確認が必要。',
+    robotSlugs: ['figure-02'],
+  },
+];
