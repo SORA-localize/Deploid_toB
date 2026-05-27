@@ -1,8 +1,5 @@
-import Link from 'next/link';
+import { getGuideBySlug, getGuides } from '@/lib/data';
 import { notFound } from 'next/navigation';
-import { SourceList } from '@/components/Cards';
-import { getGuideBySlug, getGuides, getRelatedRobots, getRelatedUseCases } from '@/lib/data';
-import { guideStageLabels } from '@/lib/labels';
 
 export function generateStaticParams() {
   return getGuides().map((guide) => ({ slug: guide.slug }));
@@ -11,50 +8,12 @@ export function generateStaticParams() {
 export default async function GuideDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const guide = getGuideBySlug(slug);
-
-  if (!guide) {
-    notFound();
-  }
-
-  const robots = getRelatedRobots(guide.relatedRobotSlugs);
-  const useCases = getRelatedUseCases(guide.relatedUseCaseSlugs);
+  if (!guide) notFound();
 
   return (
-    <section className="hero">
-      <div className="container">
-        <span className="eyebrow">{guideStageLabels[guide.stage]}</span>
-        <h1 className="page-title">{guide.titleJa ?? guide.title}</h1>
-        <p className="lead">{guide.description}</p>
-        <div className="detail-grid section">
-          <article className="panel">
-            <h2>このガイドで見ること</h2>
-            <p>{guide.summary}</p>
-            <h2>チェックリスト</h2>
-            <ul>
-              {(guide.checklistItems ?? []).map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-            <h2>出典</h2>
-            <SourceList sources={guide.sources} />
-          </article>
-          <aside className="panel">
-            <h2>関連</h2>
-            <div className="meta">
-              {robots.map((robot) => (
-                <Link className="pill" href={`/robots/${robot.slug}`} key={robot.slug}>
-                  {robot.nameJa ?? robot.name}
-                </Link>
-              ))}
-              {useCases.map((useCase) => (
-                <Link className="pill" href={`/use-cases/${useCase.slug}`} key={useCase.slug}>
-                  {useCase.titleJa ?? useCase.title}
-                </Link>
-              ))}
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
+    <main className="mx-auto max-w-7xl px-6 py-12">
+      <h1 className="text-2xl font-semibold text-foreground">{guide.titleJa ?? guide.title}</h1>
+      <p className="mt-2 text-sm text-muted-foreground">Figma から復元予定。</p>
+    </main>
   );
 }

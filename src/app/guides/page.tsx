@@ -1,25 +1,10 @@
-import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { GuideCard } from '@/components/Cards';
-import { getGuides } from '@/lib/data';
-
-export const metadata = {
-  title: 'ガイド',
-};
+export const metadata = { title: 'ガイド' };
 
 export default function GuidesPage() {
   return (
-    <section className="hero">
-      <div className="container">
-        <Breadcrumbs items={[{ label: 'ガイド' }]} />
-        <span className="eyebrow">Guides</span>
-        <h1 className="page-title">ガイド</h1>
-        <p className="lead">知る、判断する、動く。導入検討を前に進めるための常設ガイドです。</p>
-        <div className="grid two section">
-          {getGuides().map((guide) => (
-            <GuideCard key={guide.slug} guide={guide} />
-          ))}
-        </div>
-      </div>
-    </section>
+    <main className="mx-auto max-w-7xl px-6 py-12">
+      <h1 className="text-2xl font-semibold text-foreground">ガイド</h1>
+      <p className="mt-2 text-sm text-muted-foreground">Figma から復元予定。</p>
+    </main>
   );
 }
