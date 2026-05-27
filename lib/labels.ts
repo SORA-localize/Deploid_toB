@@ -1,5 +1,6 @@
 import type {
   BuyerReadiness,
+  CompanyStatus,
   CompanyType,
   DeploymentStage,
   GuideStage,
@@ -60,6 +61,13 @@ export const companyTypeLabels: Record<CompanyType, string> = {
   integrator: 'SIer',
   'ai-os': 'AI/OS',
   research: '研究組織',
+};
+
+export const companyStatusLabels: Record<CompanyStatus, string> = {
+  active: '稼働中',
+  stealth: 'ステルス',
+  acquired: '買収済み',
+  inactive: '非活動',
 };
 
 export const japanPresenceLabels: Record<JapanPresence, string> = {

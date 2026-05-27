@@ -1,10 +1,12 @@
-export const metadata = { title: 'メーカー' };
+import { ManufacturersBrowser } from '@/components/ManufacturersBrowser';
+import { getManufacturers, getRobots } from '@/lib/data';
+
+export const metadata = {
+  title: 'メーカー',
+  description:
+    'ヒューマノイド開発企業・代理店のディレクトリ。国・区分・ステータスで絞り込み、日本での供給体制を確認できます。',
+};
 
 export default function ManufacturersPage() {
-  return (
-    <main className="mx-auto max-w-7xl px-6 py-12">
-      <h1 className="text-2xl font-semibold text-foreground">メーカー</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Figma から復元予定。</p>
-    </main>
-  );
+  return <ManufacturersBrowser manufacturers={getManufacturers()} robots={getRobots()} />;
 }
