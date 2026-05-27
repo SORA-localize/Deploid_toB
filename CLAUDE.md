@@ -27,13 +27,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 現在の作業（厳守）
 
-`docs/planning/figma_ui_restoration_plan_v1.md` に従い、**堅牢なデータ層の上にFigma Make版のUIを復元する**。
+`docs/planning/figma_ui_restoration_plan_v1.md`（v2 / Option C）に従う。**堅牢なデータ層の上に、Figma UIを逐語コピーで載せ直す。**
 
+- **核心ルール：Figmaのマークアップは逐語コピー。再解釈・restyle・独自UIは禁止。差分はバグ。**（UI実装が2回ゴミ化した原因がこれ）
+  - そのままコピー：構造・`className`(Tailwind)・**列構造**・カード解剖・インタラクション
+  - 機械的置換のみ：`react-router`→`next/link`/`usePathname`/`params`、`id`→`slug`、`mockData`→`@/lib/data`、`/posts`→`/reports`、`/industries`→`/use-cases`
+  - 内容差し替え：brand=`Deploid`、Figmaの仮スペック→自データ＋無ければ `要確認`
 - **データ層（`data/` `lib/`）は完成度が高い。作り直すのはUI層のみ。**
+- まず **Phase 1 でこれまでの再現UIをクリーンに削ぎ落とす**（globals.cssをTailwind+Figmaトークンのみに、レガシー独自クラス/トークンと簡易カードを撤去）。その後にFigma逐語コピー。
 - 優先順位：**Home → ロボット → メーカー → 比較**（公開情報で作り切れる4領域を先に）
-- スタイリングは **Tailwind CSS**。Figmaの `className` を流用し、トークンで余白・幅・色を一元管理
-- ブランド名は **`Deploid` を維持**（Figmaの仮名 "Humanoid Robot Portal" に戻さない）
-- 1フェーズごとに `npm run build` を通し、`git diff --stat` を確認してから次へ
+- 1フェーズごとに `npm run build` を通し、Figma原本と構造差分が無いか並べて確認、`git diff --stat` を見てから次へ。
 
 スコープや方針を変える前に必ずユーザーに確認すること。
 
