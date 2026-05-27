@@ -1,10 +1,12 @@
-export const metadata = { title: 'ガイド' };
+import { GuidesBrowser } from '@/components/GuidesBrowser';
+import { getGuides } from '@/lib/data';
+
+export const metadata = {
+  title: 'ガイド',
+  description:
+    'ヒューマノイド導入を知る・判断する・動くで理解する常設ガイド。調達・TCO・安全・PoC・ベンダー評価を体系化。',
+};
 
 export default function GuidesPage() {
-  return (
-    <main className="mx-auto max-w-7xl px-6 py-12">
-      <h1 className="text-2xl font-semibold text-foreground">ガイド</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Figma から復元予定。</p>
-    </main>
-  );
+  return <GuidesBrowser guides={getGuides()} />;
 }
