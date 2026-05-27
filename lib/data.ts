@@ -59,6 +59,14 @@ export function getReportsForRobot(slug: string) {
   return getReports().filter((report) => report.relatedRobotSlugs.includes(slug));
 }
 
+export function getReportsForUseCase(slug: string) {
+  return getReports().filter((report) => report.relatedUseCaseSlugs.includes(slug));
+}
+
+export function getReportsForManufacturer(slug: string) {
+  return getReports().filter((report) => report.relatedManufacturerSlugs.includes(slug));
+}
+
 export function getManufacturerForRobot(manufacturerSlug: string) {
   return getManufacturerBySlug(manufacturerSlug);
 }
