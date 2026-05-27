@@ -1,3 +1,4 @@
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { GuideCard } from '@/components/Cards';
 import { getGuides } from '@/lib/data';
 
@@ -9,6 +10,7 @@ export default function GuidesPage() {
   return (
     <section className="hero">
       <div className="container">
+        <Breadcrumbs items={[{ label: 'ガイド' }]} />
         <span className="eyebrow">Guides</span>
         <h1 className="page-title">ガイド</h1>
         <p className="lead">知る、判断する、動く。導入検討を前に進めるための常設ガイドです。</p>

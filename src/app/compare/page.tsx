@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { getManufacturerForRobot, getRobots } from '@/lib/data';
 import {
   buyerReadinessLabels,
@@ -17,6 +18,7 @@ export default function ComparePage() {
   return (
     <section className="hero">
       <div className="container">
+        <Breadcrumbs items={[{ label: '比較' }]} />
         <span className="eyebrow">Compare</span>
         <h1 className="page-title">比較</h1>
         <p className="lead">カードを並べるだけでなく、買い手が最初に確認すべき導入判断変数を横並びで見ます。</p>
