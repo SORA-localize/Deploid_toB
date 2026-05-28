@@ -3,13 +3,30 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import './globals.css';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: 'Deploid | ヒューマノイド導入判断ポータル',
     template: '%s | Deploid',
   },
   description:
     '日本のtoB事業者向けに、ヒューマノイドロボットの機種、メーカー、用途、導入ガイド、記事を整理する導入判断ポータル。',
+  openGraph: {
+    type: 'website',
+    locale: 'ja_JP',
+    siteName: 'Deploid',
+    title: 'Deploid | ヒューマノイド導入判断ポータル',
+    description:
+      '日本のtoB事業者向けに、ヒューマノイドロボットの導入判断に必要な変数を整理する情報基盤。',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Deploid | ヒューマノイド導入判断ポータル',
+    description:
+      '日本のtoB事業者向けに、ヒューマノイドロボットの導入判断に必要な変数を整理する情報基盤。',
+  },
 };
 
 // Figma Layout.tsx を逐語移植（Outlet → children）。
