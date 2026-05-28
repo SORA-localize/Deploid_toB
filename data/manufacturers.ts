@@ -84,12 +84,12 @@ export const manufacturers: Manufacturer[] = [
       },
     ],
     description:
-      'テキサスを拠点とするヒューマノイド開発企業。製造ライン・物流向けの二足ロボット Apollo を開発し、Mercedes-Benz での実証が公表されている。日本での販売経路はまだ整っていない。',
+      'テキサス（オースティン）を拠点とするヒューマノイド開発企業。製造ライン・物流向けの二足ロボット Apollo を開発する。Mercedes-Benz と商用契約のもとベルリンの Digital Factory Campus で実証が進んでおり、量産は EMS 大手 Jabil と提携、AI 周りでは Google DeepMind と連携している。報道ベースでは累計 935M USD を調達、企業評価額は約 5B USD と伝えられる。日本での販売経路はまだ整っていない。',
     japanPresence: 'unknown',
     distributorNote: '日本での販売窓口は要確認。',
     supportNote: '実証・提携ベースの接点が中心と考える。',
     procurementNote: '一般販売は限定的。実証パートナーとしての接点が主。',
-    vendorRiskNote: 'スタートアップ。資金状況・量産計画・販売条件は継続確認が必要。',
+    vendorRiskNote: '大型調達済みで注目度は高いが、日本への展開時期・条件は継続確認が必要。',
   },
   {
     slug: 'agility-robotics',

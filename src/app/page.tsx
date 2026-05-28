@@ -1,9 +1,27 @@
 import Link from 'next/link';
-import { ArrowRight, Bot, Building2, BookOpen } from 'lucide-react';
-import { getGuideBySlug, getGuides } from '@/lib/data';
+import { ArrowRight, Bot, Building2, BookOpen, Calendar } from 'lucide-react';
+import { RobotCard } from '@/components/RobotCard';
+import {
+  getGuideBySlug,
+  getGuides,
+  getManufacturerForRobot,
+  getReports,
+  getRobots,
+} from '@/lib/data';
+import { reportTypeLabels } from '@/lib/labels';
 
 export default function HomePage() {
   const featured = getGuideBySlug('decision-variables') ?? getGuides()[0];
+
+  // 注目ロボット：更新日の新しい順に3件
+  const featuredRobots = [...getRobots()]
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    .slice(0, 3);
+
+  // 最新記事：公開日の新しい順に3件
+  const latestReports = [...getReports()]
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
+    .slice(0, 3);
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12">
@@ -74,6 +92,74 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
+
+      {featuredRobots.length > 0 && (
+        <section className="py-16 border-b border-neutral-200">
+          <div className="flex items-end justify-between mb-8">
+            <h2 className="text-2xl font-semibold text-neutral-900">注目ロボット</h2>
+            <Link
+              href="/robots"
+              className="inline-flex items-center gap-1 text-sm text-neutral-600 hover:text-neutral-900"
+            >
+              すべて見る
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 gap-6">
+            {featuredRobots.map((robot) => (
+              <RobotCard
+                key={robot.slug}
+                robot={robot}
+                manufacturerName={getManufacturerForRobot(robot.manufacturerSlug)?.name}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {latestReports.length > 0 && (
+        <section className="py-16 border-b border-neutral-200">
+          <div className="flex items-end justify-between mb-8">
+            <h2 className="text-2xl font-semibold text-neutral-900">最新記事</h2>
+            <Link
+              href="/reports"
+              className="inline-flex items-center gap-1 text-sm text-neutral-600 hover:text-neutral-900"
+            >
+              すべて見る
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 gap-6">
+            {latestReports.map((report) => (
+              <Link
+                key={report.slug}
+                href={`/reports/${report.slug}`}
+                className="border border-neutral-200 bg-white p-6 hover:border-neutral-400 transition-colors"
+              >
+                <div className="flex items-center gap-3 mb-3 text-xs text-neutral-500">
+                  <span className="px-2 py-0.5 bg-neutral-100 text-neutral-700 border border-neutral-200">
+                    {reportTypeLabels[report.type]}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {report.publishedAt}
+                  </span>
+                </div>
+                <h3 className="font-semibold text-neutral-900 mb-2 leading-tight">
+                  {report.titleJa ?? report.title}
+                </h3>
+                <p className="text-sm text-neutral-600 mb-3 leading-relaxed line-clamp-3">
+                  {report.summary}
+                </p>
+                <span className="inline-flex items-center gap-1 text-sm text-neutral-900">
+                  続きを読む
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {featured && (
         <section className="py-16 border-b border-neutral-200">
