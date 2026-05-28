@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { Markdown } from '@/components/Markdown';
 import {
   getRelatedGuides,
   getRelatedManufacturers,
@@ -38,7 +39,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const guides = getRelatedGuides(report.relatedGuideSlugs ?? []);
   const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
   const hasBody = (report.body ?? '').trim().length > 0;
-  const bodyParagraphs = hasBody ? report.body!.split(/\n\n+/) : [];
   const hasRelated =
     robots.length > 0 || manufacturers.length > 0 || useCases.length > 0 || guides.length > 0;
 
@@ -85,13 +85,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
               {hasBody && (
                 <div className="border border-neutral-300 bg-white p-6">
-                  <div className="text-sm text-neutral-700 leading-relaxed space-y-4">
-                    {bodyParagraphs.map((p, i) => (
-                      <p key={i} className="whitespace-pre-line">
-                        {p}
-                      </p>
-                    ))}
-                  </div>
+                  <Markdown source={report.body!} />
                 </div>
               )}
 

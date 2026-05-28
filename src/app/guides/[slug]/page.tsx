@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { Markdown } from '@/components/Markdown';
 import {
   getGuideBySlug,
   getGuides,
@@ -34,7 +35,6 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
   const useCases = getRelatedUseCases(guide.relatedUseCaseSlugs);
   const hasChecklist = (guide.checklistItems ?? []).length > 0;
   const hasBody = (guide.body ?? '').trim().length > 0;
-  const bodyParagraphs = hasBody ? guide.body!.split(/\n\n+/) : [];
 
   const toc = [
     { label: 'Overview', href: '#overview' },
@@ -132,13 +132,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
               {hasBody && (
                 <div id="body" className="border border-neutral-300 bg-white p-6 scroll-mt-6">
-                  <div className="text-sm text-neutral-700 leading-relaxed space-y-4">
-                    {bodyParagraphs.map((p, i) => (
-                      <p key={i} className="whitespace-pre-line">
-                        {p}
-                      </p>
-                    ))}
-                  </div>
+                  <Markdown source={guide.body!} />
                 </div>
               )}
 
