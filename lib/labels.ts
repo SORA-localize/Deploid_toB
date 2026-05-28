@@ -4,6 +4,7 @@ import type {
   CompanyType,
   DeploymentStage,
   GuideStage,
+  ImageRole,
   JapanAvailability,
   JapanPresence,
   MobilityType,
@@ -12,6 +13,26 @@ import type {
   ReportType,
   UseCaseMaturity,
 } from '@/data/types';
+
+/** 詳細ページのカルーセルで固定表示する画像スロットの順序。 */
+export const imageRoleOrder: ImageRole[] = [
+  'hero',
+  'side',
+  'inOperation',
+  'scale',
+  'endEffector',
+  'mobility',
+];
+
+/** カルーセルのempty state（写真未投入時のラベル）と、タブ表記。 */
+export const imageRoleLabels: Record<ImageRole, string> = {
+  hero: 'MAIN IMAGE',
+  side: 'SIDE VIEW',
+  inOperation: 'IN OPERATION',
+  scale: 'SCALE REFERENCE',
+  endEffector: 'END EFFECTOR',
+  mobility: 'MOBILITY DETAIL',
+};
 
 export const buyerReadinessLabels: Record<BuyerReadiness, string> = {
   'initial-adoption': '初期導入向き',

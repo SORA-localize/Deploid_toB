@@ -31,6 +31,16 @@ export interface ImageAsset {
   sourceUrl?: string;
 }
 
+/** ロボットの画像スロット。詳細ページのカルーセルで6スロット固定で使う。
+ *  写真が無いスロットは empty state（役割名のラベル）になる。 */
+export type ImageRole =
+  | 'hero'         // 全身正面
+  | 'side'         // 側面
+  | 'inOperation'  // 稼働中（実環境）
+  | 'scale'        // スケール比較（人/物）
+  | 'endEffector'  // ハンド・把持部
+  | 'mobility';    // 脚・足・車輪
+
 export interface SeoFields {
   metaTitle?: string;
   metaDescription?: string;
@@ -159,6 +169,8 @@ export interface Robot extends BaseRecord {
   supportNote?: string;
   safetyNote?: string;
   vendorRiskNote?: string;
+  /** 役割別の参考画像（詳細ページのカルーセル）。hero が未設定なら BaseRecord.heroImage を hero に昇格して使う。 */
+  images?: Partial<Record<ImageRole, ImageAsset>>;
   // 関連は逆向き(UseCase.candidateRobotSlugs / Guide.relatedRobotSlugs /
   // Report.relatedRobotSlugs)で導出する。
   comparison: ComparisonProfile;

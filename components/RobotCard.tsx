@@ -50,16 +50,15 @@ export function RobotCard({
 
       <Link href={`/robots/${robot.slug}`}>
         <div className="aspect-[4/3] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-xs text-neutral-500 overflow-hidden">
-          {robot.heroImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={robot.heroImage.src}
-              alt={robot.heroImage.alt}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            '[ ROBOT IMAGE ]'
-          )}
+          {(() => {
+            const hero = robot.images?.hero ?? robot.heroImage;
+            return hero ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={hero.src} alt={hero.alt} className="h-full w-full object-cover" />
+            ) : (
+              '[ MAIN IMAGE ]'
+            );
+          })()}
         </div>
         <div className="p-4">
           <div className="flex items-start justify-between mb-2">

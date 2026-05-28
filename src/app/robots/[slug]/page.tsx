@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { RobotImageCarousel } from '@/components/RobotImageCarousel';
 import {
   getManufacturerForRobot,
   getReportsForRobot,
@@ -126,19 +127,8 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           <p className="text-sm text-neutral-600 leading-relaxed max-w-3xl">{robot.description}</p>
         </div>
 
-        <div className="mb-12 border border-neutral-300">
-          {robot.heroImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={robot.heroImage.src}
-              alt={robot.heroImage.alt}
-              className="w-full aspect-[16/9] object-cover"
-            />
-          ) : (
-            <div className="aspect-[16/9] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-xs text-neutral-500">
-              [ ROBOT IMAGE ]
-            </div>
-          )}
+        <div className="mb-12">
+          <RobotImageCarousel images={robot.images} fallbackHero={robot.heroImage} />
         </div>
 
         <div id="specs" className="border border-neutral-300 bg-neutral-50 mb-12 scroll-mt-6">
