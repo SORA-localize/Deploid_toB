@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ChevronRight, Star } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
-import { deploymentStageLabels, mobilityLabels } from '@/lib/labels';
+import { deploymentStageLabels, mobilityLabels, TBD_LABEL } from '@/lib/labels';
 
 interface RobotCardProps {
   robot: Robot;
@@ -15,8 +15,6 @@ interface RobotCardProps {
   onFavoriteToggle?: (slug: string) => void;
 }
 
-const TBD = '要確認';
-
 export function RobotCard({
   robot,
   manufacturerName,
@@ -26,14 +24,14 @@ export function RobotCard({
   onFavoriteToggle,
 }: RobotCardProps) {
   const { specs } = robot;
-  const payload = specs.payloadKg != null ? `${specs.payloadKg} kg` : TBD;
-  const runtime = specs.runtimeMin != null ? `約${specs.runtimeMin} 分` : TBD;
-  const height = specs.heightCm != null ? `${specs.heightCm} cm` : TBD;
-  const weight = specs.weightKg != null ? `${specs.weightKg} kg` : TBD;
+  const payload = specs.payloadKg != null ? `${specs.payloadKg} kg` : TBD_LABEL;
+  const runtime = specs.runtimeMin != null ? `約${specs.runtimeMin} 分` : TBD_LABEL;
+  const height = specs.heightCm != null ? `${specs.heightCm} cm` : TBD_LABEL;
+  const weight = specs.weightKg != null ? `${specs.weightKg} kg` : TBD_LABEL;
   const status = deploymentStageLabels[robot.deploymentStage];
   const statusReady =
     robot.deploymentStage === 'production' || robot.deploymentStage === 'limited-production';
-  const estCost = robot.priceNote ?? TBD;
+  const estCost = robot.priceNote ?? TBD_LABEL;
 
   return (
     <div className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-neutral-500 transition-colors relative">

@@ -8,12 +8,12 @@ import { EmptyState } from '@/components/EmptyState';
 import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { TagChip } from '@/components/TagChip';
 import type { Guide, GuideStage } from '@/data/types';
+import { guideStageOrder } from '@/lib/display';
 import { guideStageLabels } from '@/lib/labels';
 
-const stageOrder: GuideStage[] = ['learn', 'evaluate', 'act'];
 const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
   { value: 'all', label: 'All' },
-  ...stageOrder.map((value) => ({ value, label: guideStageLabels[value] })),
+  ...guideStageOrder.map((value) => ({ value, label: guideStageLabels[value] })),
 ];
 
 export function GuidesBrowser({ guides }: { guides: Guide[] }) {
@@ -96,7 +96,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
           </div>
         )}
 
-        {stageOrder.map((s) => {
+        {guideStageOrder.map((s) => {
           const items = filtered.filter((g) => g.stage === s);
           if (items.length === 0) return null;
           return (

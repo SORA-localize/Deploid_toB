@@ -9,35 +9,13 @@ import {
   getUseCaseBySlug,
   getUseCases,
 } from '@/lib/data';
-import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
-import type { Capability, OperatingEnvironment, UseCaseCapabilityNotes } from '@/data/types';
-
-const envLabels: Record<OperatingEnvironment, string> = {
-  'indoor-controlled': '屋内（管理環境）',
-  'indoor-semi-controlled': '屋内（半管理環境）',
-  outdoor: '屋外',
-  mixed: '混在環境',
-  hazardous: '危険環境',
-};
-
-const capLabels: Record<Capability, string> = {
-  mobility: '移動',
-  manipulation: 'マニピュレーション',
-  perception: '知覚',
-  autonomy: '自律',
-  communication: 'コミュニケーション',
-  'data-capture': 'データ取得',
-  integration: '連携',
-};
-
-const capNoteLabels: Array<[keyof UseCaseCapabilityNotes, string]> = [
-  ['mobility', '移動'],
-  ['manipulation', 'マニピュレーション'],
-  ['perception', '知覚'],
-  ['autonomy', '自律 / 遠隔操作'],
-  ['communication', 'コミュニケーション'],
-  ['integration', '連携'],
-];
+import {
+  buyerReadinessLabels,
+  capabilityLabels,
+  maturityLabels,
+  operatingEnvironmentLabels,
+  useCaseCapabilityNoteLabels,
+} from '@/lib/labels';
 
 export function generateStaticParams() {
   return getUseCases().map((u) => ({ slug: u.slug }));
@@ -90,12 +68,12 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
             </div>
             <div>
               <span className="text-neutral-500">環境: </span>
-              <span className="font-medium text-neutral-900">{envLabels[useCase.environment]}</span>
+              <span className="font-medium text-neutral-900">{operatingEnvironmentLabels[useCase.environment]}</span>
             </div>
             <div>
               <span className="text-neutral-500">必要能力: </span>
               <span className="font-medium text-neutral-900">
-                {useCase.requiredCapabilities.map((c) => capLabels[c]).join(', ')}
+                {useCase.requiredCapabilities.map((c) => capabilityLabels[c]).join(', ')}
               </span>
             </div>
           </div>
@@ -141,7 +119,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
               <div className="border border-neutral-300 bg-white p-6">
                 <h2 className="text-lg font-semibold text-neutral-900 mb-5">必要なロボット能力</h2>
                 <div className="space-y-4">
-                  {capNoteLabels.map(([key, label]) => {
+                  {useCaseCapabilityNoteLabels.map(([key, label]) => {
                     const note = useCase.capabilityNotes[key];
                     if (!note) return null;
                     return (

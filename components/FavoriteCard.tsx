@@ -4,8 +4,7 @@ import Link from 'next/link';
 import { X } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
-
-const TBD = '要確認';
+import { TBD_LABEL } from '@/lib/labels';
 
 interface FavoriteCardProps {
   robot: Robot;
@@ -20,8 +19,8 @@ export function FavoriteCard({
   manufacturerLogo,
   onRemove,
 }: FavoriteCardProps) {
-  const payload = robot.specs.payloadKg != null ? `${robot.specs.payloadKg} kg` : TBD;
-  const runtime = robot.specs.runtimeMin != null ? `約${robot.specs.runtimeMin} 分` : TBD;
+  const payload = robot.specs.payloadKg != null ? `${robot.specs.payloadKg} kg` : TBD_LABEL;
+  const runtime = robot.specs.runtimeMin != null ? `約${robot.specs.runtimeMin} 分` : TBD_LABEL;
 
   return (
     <div className="border border-neutral-300 bg-white p-3">

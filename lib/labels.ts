@@ -1,5 +1,6 @@
 import type {
   BuyerReadiness,
+  Capability,
   CompanyStatus,
   CompanyType,
   DeploymentStage,
@@ -8,11 +9,16 @@ import type {
   JapanAvailability,
   JapanPresence,
   MobilityType,
+  OperatingEnvironment,
   ProcurementModel,
   Reliability,
   ReportType,
+  RobotCategory,
   UseCaseMaturity,
+  UseCaseCapabilityNotes,
 } from '@/data/types';
+
+export const TBD_LABEL = '要確認';
 
 /** 詳細ページのカルーセルで固定表示する画像スロットの順序。 */
 export const imageRoleOrder: ImageRole[] = [
@@ -48,6 +54,14 @@ export const deploymentStageLabels: Record<DeploymentStage, string> = {
   production: '本番運用',
   'internal-use': '社内利用中心',
   discontinued: '終了',
+};
+
+export const robotCategoryLabels: Record<RobotCategory, string> = {
+  humanoid: 'ヒューマノイド',
+  'general-purpose-robot': '汎用ロボット',
+  'upper-body-humanoid': '上半身型',
+  'mobile-manipulator': '移動マニピュレータ',
+  other: 'その他',
 };
 
 export const japanAvailabilityLabels: Record<JapanAvailability, string> = {
@@ -121,6 +135,33 @@ export const maturityLabels: Record<UseCaseMaturity, string> = {
   'pilot-phase': 'Pilot Phase',
   'production-ready': 'Production Ready',
 };
+
+export const operatingEnvironmentLabels: Record<OperatingEnvironment, string> = {
+  'indoor-controlled': '屋内（管理環境）',
+  'indoor-semi-controlled': '屋内（半管理環境）',
+  outdoor: '屋外',
+  mixed: '混在環境',
+  hazardous: '危険環境',
+};
+
+export const capabilityLabels: Record<Capability, string> = {
+  mobility: '移動',
+  manipulation: 'マニピュレーション',
+  perception: '知覚',
+  autonomy: '自律',
+  communication: 'コミュニケーション',
+  'data-capture': 'データ取得',
+  integration: '連携',
+};
+
+export const useCaseCapabilityNoteLabels: Array<[keyof UseCaseCapabilityNotes, string]> = [
+  ['mobility', '移動'],
+  ['manipulation', 'マニピュレーション'],
+  ['perception', '知覚'],
+  ['autonomy', '自律 / 遠隔操作'],
+  ['communication', 'コミュニケーション'],
+  ['integration', '連携'],
+];
 
 export const reliabilityLabels: Record<Reliability, string> = {
   verified: '直接確認',

@@ -7,12 +7,10 @@ import { RobotCard } from '@/components/RobotCard';
 import {
   getManufacturerBySlug,
   getManufacturers,
-  getReports,
+  getReportsForManufacturer,
   getRobotsByManufacturerSlug,
 } from '@/lib/data';
-import { companyTypeLabels, japanPresenceLabels } from '@/lib/labels';
-
-const TBD = '要確認';
+import { companyTypeLabels, japanPresenceLabels, TBD_LABEL } from '@/lib/labels';
 
 export function generateStaticParams() {
   return getManufacturers().map((manufacturer) => ({ slug: manufacturer.slug }));
@@ -36,9 +34,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
   if (!manufacturer) notFound();
 
   const robots = getRobotsByManufacturerSlug(manufacturer.slug);
-  const reports = getReports().filter((r) =>
-    r.relatedManufacturerSlugs.includes(manufacturer.slug),
-  );
+  const reports = getReportsForManufacturer(manufacturer.slug);
 
   return (
     <div className="min-h-screen bg-white">
@@ -97,7 +93,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
               </div>
               <div className="flex justify-between py-2 border-b border-neutral-300">
                 <dt className="text-neutral-500">設立</dt>
-                <dd className="text-neutral-900">{manufacturer.foundedYear ?? TBD}</dd>
+                <dd className="text-neutral-900">{manufacturer.foundedYear ?? TBD_LABEL}</dd>
               </div>
               <div className="flex justify-between py-2 border-b border-neutral-300">
                 <dt className="text-neutral-500">取扱機種</dt>

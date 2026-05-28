@@ -8,18 +8,9 @@ import { FilterSelect } from '@/components/FilterSelect';
 import { RobotCard } from '@/components/RobotCard';
 import { SearchInput } from '@/components/SearchInput';
 import type { Manufacturer, Robot } from '@/data/types';
-import { japanAvailabilityLabels } from '@/lib/labels';
+import { isPreReleaseDeploymentStage } from '@/lib/display';
+import { japanAvailabilityLabels, robotCategoryLabels } from '@/lib/labels';
 import { matchesQuery } from '@/lib/search';
-
-const categoryLabels: Record<string, string> = {
-  humanoid: 'ヒューマノイド',
-  'general-purpose-robot': '汎用ロボット',
-  'upper-body-humanoid': '上半身型',
-  'mobile-manipulator': '移動マニピュレータ',
-  other: 'その他',
-};
-
-const PRE_RELEASE_STAGES = ['concept', 'prototype'];
 
 interface RobotsBrowserProps {
   robots: Robot[];
@@ -44,7 +35,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   const typeOptions = useMemo(
     () => [
       { value: 'all', label: 'All Types' },
-      ...types.map((value) => ({ value, label: categoryLabels[value] ?? value })),
+      ...types.map((value) => ({ value, label: robotCategoryLabels[value] })),
     ],
     [types],
   );
@@ -73,7 +64,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         const typeOk = type === 'all' || r.category === type;
         const mfgOk = mfg === 'all' || r.manufacturerSlug === mfg;
         const availOk = avail === 'all' || r.japanAvailability === avail;
-        const isPre = PRE_RELEASE_STAGES.includes(r.deploymentStage);
+        const isPre = isPreReleaseDeploymentStage(r.deploymentStage);
         const releaseOk = release === 'active' ? !isPre : isPre;
         const queryOk = matchesQuery(query, [
           r.nameJa,

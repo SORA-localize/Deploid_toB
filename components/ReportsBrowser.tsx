@@ -9,22 +9,13 @@ import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { SearchInput } from '@/components/SearchInput';
 import { TagChip } from '@/components/TagChip';
 import type { Report, ReportType } from '@/data/types';
+import { reportTypeOrder } from '@/lib/display';
 import { reportTypeLabels } from '@/lib/labels';
 import { matchesQuery } from '@/lib/search';
 
-const typeOrder: ReportType[] = [
-  'analysis',
-  'deployment-report',
-  'interview',
-  'event-report',
-  'policy-update',
-  'case-study',
-  'news-brief',
-];
-
 const typeOptions: Array<{ value: 'all' | ReportType; label: string }> = [
   { value: 'all', label: 'All' },
-  ...typeOrder.map((value) => ({ value, label: reportTypeLabels[value] })),
+  ...reportTypeOrder.map((value) => ({ value, label: reportTypeLabels[value] })),
 ];
 
 export function ReportsBrowser({ reports }: { reports: Report[] }) {

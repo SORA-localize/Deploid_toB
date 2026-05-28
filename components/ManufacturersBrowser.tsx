@@ -10,10 +10,8 @@ import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
 import { TagChip } from '@/components/TagChip';
 import type { Manufacturer, Robot } from '@/data/types';
-import { companyStatusLabels, companyTypeLabels, japanPresenceLabels } from '@/lib/labels';
+import { companyStatusLabels, companyTypeLabels, japanPresenceLabels, TBD_LABEL } from '@/lib/labels';
 import { matchesQuery } from '@/lib/search';
-
-const TBD = '要確認';
 
 interface ManufacturersBrowserProps {
   manufacturers: Manufacturer[];
@@ -165,7 +163,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                     </div>
                     <div className="flex justify-between py-1.5">
                       <span className="text-neutral-500">設立</span>
-                      <span className="text-neutral-900">{manufacturer.foundedYear ?? TBD}</span>
+                      <span className="text-neutral-900">{manufacturer.foundedYear ?? TBD_LABEL}</span>
                     </div>
                   </div>
 

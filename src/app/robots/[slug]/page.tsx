@@ -18,18 +18,9 @@ import {
   mobilityLabels,
   procurementLabels,
   reliabilityLabels,
+  robotCategoryLabels,
+  TBD_LABEL,
 } from '@/lib/labels';
-import type { RobotCategory } from '@/data/types';
-
-const TBD = '要確認';
-
-const categoryLabels: Record<RobotCategory, string> = {
-  humanoid: 'ヒューマノイド',
-  'general-purpose-robot': '汎用ロボット',
-  'upper-body-humanoid': '上半身型',
-  'mobile-manipulator': '移動マニピュレータ',
-  other: 'その他',
-};
 
 const sections = [
   { label: 'Overview', href: '#overview' },
@@ -69,29 +60,29 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
   const prev = idx > 0 ? all[idx - 1] : null;
   const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
 
-  const num = (v: number | undefined, unit = '') => (v != null ? `${v}${unit}` : TBD);
+  const num = (v: number | undefined, unit = '') => (v != null ? `${v}${unit}` : TBD_LABEL);
 
   const specRows: Array<[string, string]> = [
     ['メーカー', manufacturer?.name ?? robot.manufacturerSlug],
-    ['カテゴリ', categoryLabels[robot.category]],
-    ['移動方式', specs.mobility ? mobilityLabels[specs.mobility] : TBD],
+    ['カテゴリ', robotCategoryLabels[robot.category]],
+    ['移動方式', specs.mobility ? mobilityLabels[specs.mobility] : TBD_LABEL],
     ['身長', num(specs.heightCm, ' cm')],
     ['重量', num(specs.weightKg, ' kg')],
     ['ペイロード', num(specs.payloadKg, ' kg')],
-    ['稼働時間', specs.runtimeMin != null ? `約${specs.runtimeMin} 分` : TBD],
+    ['稼働時間', specs.runtimeMin != null ? `約${specs.runtimeMin} 分` : TBD_LABEL],
     ['速度', num(specs.speedMps, ' m/s')],
     ['自由度', num(specs.dof, ' DoF')],
-    ['防塵防水', specs.ipRating ?? TBD],
+    ['防塵防水', specs.ipRating ?? TBD_LABEL],
   ];
 
   const decisionRows: Array<[string, string]> = [
     ['導入段階', deploymentStageLabels[robot.deploymentStage]],
     ['実務ラベル', buyerReadinessLabels[robot.buyerReadiness]],
     ['日本での入手性', japanAvailabilityLabels[robot.japanAvailability]],
-    ['調達形態', robot.procurementModels.map((m) => procurementLabels[m]).join(' / ') || TBD],
-    ['参考価格', robot.priceNote ?? TBD],
-    ['安全性', robot.safetyNote ?? TBD],
-    ['継続性リスク', robot.vendorRiskNote ?? TBD],
+    ['調達形態', robot.procurementModels.map((m) => procurementLabels[m]).join(' / ') || TBD_LABEL],
+    ['参考価格', robot.priceNote ?? TBD_LABEL],
+    ['安全性', robot.safetyNote ?? TBD_LABEL],
+    ['継続性リスク', robot.vendorRiskNote ?? TBD_LABEL],
   ];
 
   return (
