@@ -8,13 +8,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "astro:dev": "astro dev",
-    "astro:build": "astro build",
-    "deploy": "next build"
+    "start": "next start"
   },
   "dependencies": {
-    "astro": "^6.3.7",
     "lucide-react": "^0.487.0",
     "next": "^16.2.6",
     "react": "^19.2.6",
@@ -26,7 +22,6 @@
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "tailwindcss": "^4.1.12",
-    "typescript": "^6.0.3",
-    "wrangler": "^4.94.0"
+    "typescript": "^6.0.3"
   }
 }

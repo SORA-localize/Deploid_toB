@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **GitHub**: `SORA-localize/Deploid_toB`
 **デプロイ先**: Vercel（Next.js との相性が第一候補）
 
-> 旧経緯：このリポジトリは元々 Astro 静的サイトとして始まったが、Figma Make で生成した React UI をベースに **Next.js へ移行済み**。`astro.config.mjs` や `src/styles/global.css` など旧Astro残骸が一部残るが、現行実装は Next.js（App Router）。
+> 旧経緯：このリポジトリは元々 Astro 静的サイトとして始まったが、Figma Make で生成した React UI をベースに **Next.js へ移行済み**。旧Astro残骸（`src/pages/*.astro` `astro.config.mjs` `src/content.config.ts` 等）は撤去済み。現行実装は Next.js（App Router）のみ。
 
 ## Source of truth: the design docs
 
@@ -49,7 +49,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `npm run build` | 本番ビルド（`.next/`、SSG） |
 | `npm run start` | ビルド結果をローカルで起動 |
 
-`astro:dev` / `astro:build` スクリプトは旧残骸（使わない）。テストランナー・lint・型チェックの設定はまだ無い（追加時はユーザーに確認）。
+テストランナー・lint・型チェックの設定はまだ無い（追加時はユーザーに確認）。
 
 ## Architecture notes
 
@@ -60,8 +60,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `data/*.ts` … 配列データのみ（`robots` `manufacturers` `guides` `useCases` `reports`）。`data/types.ts` が型定義。
   - `lib/data.ts` … 取得・filter・slug lookup・関連取得。**ページからは `data/*.ts` を直接検索せず `lib/data.ts` 経由で呼ぶ**（CMS移行時に呼び出し形を変えないため）。
   - `lib/labels.ts` … enumトークン→日本語ラベル変換。
-- **共通レイアウト**：`src/app/layout.tsx`（Header / main / Footer）。実際に使われるCSSは `src/app/globals.css`。
-- 注意：`src/styles/global.css` は**どこからもimportされていない旧Astro孤児ファイル**。Next.js実装では `src/app/globals.css` を使う。
+- **共通レイアウト**：`src/app/layout.tsx`（Header / main / Footer）。CSSは `src/app/globals.css`（Tailwind v4 + Figmaトークン）。
 
 ## URL・命名規約
 
