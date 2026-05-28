@@ -4,8 +4,10 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, MapPin } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { SearchInput } from '@/components/SearchInput';
 import type { Manufacturer, Robot } from '@/data/types';
 import { companyStatusLabels, companyTypeLabels, japanPresenceLabels } from '@/lib/labels';
+import { matchesQuery } from '@/lib/search';
 
 const TBD = '要確認';
 
@@ -18,6 +20,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
   const [country, setCountry] = useState('all');
   const [type, setType] = useState('all');
   const [status, setStatus] = useState('all');
+  const [query, setQuery] = useState('');
 
   const countries = useMemo(
     () => Array.from(new Set(manufacturers.map((m) => m.country))),
@@ -38,7 +41,20 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
     (m) =>
       (country === 'all' || m.country === country) &&
       (type === 'all' || m.companyType === type) &&
-      (status === 'all' || m.companyStatus === status),
+      (status === 'all' || m.companyStatus === status) &&
+      matchesQuery(query, [
+        m.nameJa,
+        m.name,
+        m.country,
+        m.hqCity,
+        m.summary,
+        m.description,
+        m.distributorNote,
+        m.supportNote,
+        m.procurementNote,
+        m.vendorRiskNote,
+        ...robots.filter((robot) => robot.manufacturerSlug === m.slug).map((robot) => robot.name),
+      ]),
   );
 
   return (
@@ -51,6 +67,14 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           <p className="text-sm text-neutral-600 max-w-3xl">
             ヒューマノイドの開発企業・代理店のディレクトリ。国・区分・ステータスで絞り込み、日本での供給体制を確認できます。
           </p>
+        </div>
+
+        <div className="mb-6 max-w-2xl">
+          <SearchInput
+            value={query}
+            onChange={setQuery}
+            placeholder="メーカー名・地域・取扱機種で検索"
+          />
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-8">

@@ -3,8 +3,10 @@
 import { useMemo, useState } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { RobotCard } from '@/components/RobotCard';
+import { SearchInput } from '@/components/SearchInput';
 import type { Manufacturer, Robot } from '@/data/types';
 import { japanAvailabilityLabels } from '@/lib/labels';
+import { matchesQuery } from '@/lib/search';
 
 const categoryLabels: Record<string, string> = {
   humanoid: 'ヒューマノイド',
@@ -26,6 +28,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   const [mfg, setMfg] = useState('all');
   const [avail, setAvail] = useState('all');
   const [release, setRelease] = useState<'active' | 'pre'>('active');
+  const [query, setQuery] = useState('');
 
   const manufacturerName = (slug: string) =>
     manufacturers.find((m) => m.slug === slug)?.name ?? slug;
@@ -45,9 +48,22 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         const availOk = avail === 'all' || r.japanAvailability === avail;
         const isPre = PRE_RELEASE_STAGES.includes(r.deploymentStage);
         const releaseOk = release === 'active' ? !isPre : isPre;
-        return typeOk && mfgOk && availOk && releaseOk;
+        const queryOk = matchesQuery(query, [
+          r.nameJa,
+          r.name,
+          manufacturerName(r.manufacturerSlug),
+          r.summary,
+          r.description,
+          r.distributorJapan,
+          r.supportNote,
+          r.safetyNote,
+          r.vendorRiskNote,
+          ...r.comparison.bestFit,
+          ...r.comparison.strengths,
+        ]);
+        return typeOk && mfgOk && availOk && releaseOk && queryOk;
       });
-  }, [robots, type, mfg, avail, release]);
+  }, [robots, type, mfg, avail, release, query, manufacturers]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -59,6 +75,14 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           <p className="text-sm text-neutral-600 max-w-3xl">
             導入判断に必要なヒューマノイド機種のカタログ。メーカー、国内入手性、提供段階で絞り込み、現場に合う候補を探せます。
           </p>
+        </div>
+
+        <div className="mb-6 max-w-2xl">
+          <SearchInput
+            value={query}
+            onChange={setQuery}
+            placeholder="機種名・メーカー・用途キーワードで検索"
+          />
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-8">

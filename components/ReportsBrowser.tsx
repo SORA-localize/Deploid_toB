@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Calendar, Search } from 'lucide-react';
+import { ArrowRight, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { SearchInput } from '@/components/SearchInput';
 import type { Report, ReportType } from '@/data/types';
 import { reportTypeLabels } from '@/lib/labels';
+import { matchesQuery } from '@/lib/search';
 
 const typeOrder: ReportType[] = [
   'analysis',
@@ -27,16 +29,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
   const filtered = reports.filter((r) => {
     if (type !== 'all' && r.type !== type) return false;
     if (topic && !r.tags.includes(topic)) return false;
-    if (query) {
-      const q = query.toLowerCase();
-      const hit =
-        (r.titleJa ?? '').toLowerCase().includes(q) ||
-        r.title.toLowerCase().includes(q) ||
-        r.summary.toLowerCase().includes(q) ||
-        r.whyItMatters.toLowerCase().includes(q) ||
-        r.tags.some((t) => t.toLowerCase().includes(q));
-      if (!hit) return false;
-    }
+    if (!matchesQuery(query, [r.titleJa, r.title, r.summary, r.whyItMatters, ...r.tags])) return false;
     return true;
   });
 
@@ -71,16 +64,13 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
           </div>
 
           <div className="mb-4">
-            <div className="relative max-w-xl">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-              <input
-                type="text"
-                placeholder="タイトル・トピック・キーワードで検索"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-neutral-300 bg-white text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-500"
-              />
-            </div>
+            <SearchInput
+              value={query}
+              onChange={setQuery}
+              placeholder="タイトル・トピック・キーワードで検索"
+              className="max-w-xl"
+              inputClassName="py-2.5"
+            />
           </div>
 
           {topics.length > 0 && (

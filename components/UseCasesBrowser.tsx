@@ -2,10 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Search } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { SearchInput } from '@/components/SearchInput';
 import type { UseCase } from '@/data/types';
 import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
+import { matchesQuery } from '@/lib/search';
 
 function maturityClass(level: UseCase['maturityLevel']) {
   if (level === 'production-ready') return 'bg-green-50 text-green-800 border-green-200';
@@ -32,15 +34,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
   const tasks = useMemo(() => Array.from(new Set(useCases.flatMap((u) => u.taskTags))), [useCases]);
 
   const filtered = useCases.filter((u) => {
-    if (query) {
-      const q = query.toLowerCase();
-      const hit =
-        (u.titleJa ?? '').toLowerCase().includes(q) ||
-        u.title.toLowerCase().includes(q) ||
-        (u.subtitle ?? '').toLowerCase().includes(q) ||
-        u.taskTags.some((t) => t.toLowerCase().includes(q));
-      if (!hit) return false;
-    }
+    if (!matchesQuery(query, [u.titleJa, u.title, u.subtitle, ...u.taskTags])) return false;
     if (industry && !u.industryTags.includes(industry)) return false;
     if (task && !u.taskTags.includes(task)) return false;
     return true;
@@ -61,16 +55,11 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
           </p>
 
           <div className="max-w-2xl mb-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-              <input
-                type="text"
-                placeholder="自動化したい作業は？"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-neutral-300 bg-white text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-500"
-              />
-            </div>
+            <SearchInput
+              value={query}
+              onChange={setQuery}
+              placeholder="自動化したい作業は？"
+            />
           </div>
 
           <div className="flex gap-2 mb-4">
