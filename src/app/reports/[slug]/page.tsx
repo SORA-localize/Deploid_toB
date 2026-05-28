@@ -1,8 +1,28 @@
-import { getReportBySlug, getReports } from '@/lib/data';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ArrowRight, Calendar, User } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
+import {
+  getRelatedGuides,
+  getRelatedManufacturers,
+  getRelatedRobots,
+  getRelatedUseCases,
+  getReportBySlug,
+  getReports,
+} from '@/lib/data';
+import { reportTypeLabels, reliabilityLabels } from '@/lib/labels';
 
 export function generateStaticParams() {
   return getReports().map((report) => ({ slug: report.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const report = getReportBySlug(slug);
+  return {
+    title: report ? (report.titleJa ?? report.title) : 'Report',
+    description: report?.summary,
+  };
 }
 
 export default async function ReportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -10,10 +30,161 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const report = getReportBySlug(slug);
   if (!report) notFound();
 
+  const robots = getRelatedRobots(report.relatedRobotSlugs);
+  const manufacturers = getRelatedManufacturers(report.relatedManufacturerSlugs);
+  const useCases = getRelatedUseCases(report.relatedUseCaseSlugs);
+  const guides = getRelatedGuides(report.relatedGuideSlugs ?? []);
+  const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
+  const hasRelated =
+    robots.length > 0 || manufacturers.length > 0 || useCases.length > 0 || guides.length > 0;
+
   return (
-    <main className="mx-auto max-w-7xl px-6 py-12">
-      <h1 className="text-2xl font-semibold text-foreground">{report.titleJa ?? report.title}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Figma から復元予定。</p>
-    </main>
+    <div className="min-h-screen bg-neutral-100">
+      <div className="border-b border-neutral-300 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-6">
+          <Breadcrumbs
+            items={[{ label: 'Reports', path: '/reports' }, { label: report.titleJa ?? report.title }]}
+          />
+          <div className="text-xs uppercase tracking-wider text-neutral-500 font-medium mb-3">
+            {reportTypeLabels[report.type]}
+          </div>
+          <h1 className="text-3xl font-semibold text-neutral-900 mb-4 leading-tight max-w-4xl">
+            {report.titleJa ?? report.title}
+          </h1>
+          <p className="text-sm text-neutral-700 leading-relaxed max-w-3xl mb-5">{report.summary}</p>
+          <div className="flex items-center gap-5 text-xs text-neutral-600 pb-5 border-b border-neutral-200 flex-wrap">
+            <span className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              {report.publishedAt}
+            </span>
+            <span className="px-2.5 py-1 bg-neutral-100 text-neutral-800 border border-neutral-200 font-medium">
+              {reportTypeLabels[report.type]}
+            </span>
+            {report.author && (
+              <span className="flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5" />
+                {report.author}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-6 py-8">
+        <div className="grid grid-cols-12 gap-6">
+          <div className="col-span-12 lg:col-span-8">
+            <div className="space-y-6">
+              <div className="border-l-4 border-neutral-900 bg-white p-5">
+                <p className="text-xs font-semibold text-neutral-900 mb-1">Why it matters</p>
+                <p className="text-sm text-neutral-700 leading-relaxed">{report.whyItMatters}</p>
+              </div>
+
+              {hasTakeaways && (
+                <div className="border border-neutral-300 bg-white p-6">
+                  <h2 className="text-lg font-semibold text-neutral-900 mb-4">Key Takeaways</h2>
+                  <ul className="space-y-2 text-sm text-neutral-700">
+                    {(report.keyTakeaways ?? []).map((item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <span className="text-neutral-500">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="border border-neutral-300 bg-white p-6">
+                <h2 className="text-lg font-semibold text-neutral-900 mb-4">Resources / 出典</h2>
+                {report.sources.length === 0 ? (
+                  <p className="text-xs text-neutral-500">出典は本文作成時に追加予定です。</p>
+                ) : (
+                  <ul className="space-y-2 text-xs">
+                    {report.sources.map((source) => (
+                      <li key={source.url}>
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-neutral-900 hover:text-neutral-600 underline"
+                        >
+                          {source.title}
+                        </a>
+                        <span className="text-neutral-500">
+                          {source.publisher ? ` / ${source.publisher}` : ''} / 確認 {source.checkedAt}{' '}
+                          / {reliabilityLabels[source.reliability]}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="col-span-12 lg:col-span-4">
+            <div className="sticky top-6 space-y-4">
+              {hasRelated && (
+                <div className="border border-neutral-300 bg-white p-4">
+                  <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
+                    関連
+                  </h3>
+                  <nav className="space-y-2">
+                    {robots.map((r) => (
+                      <Link
+                        key={r.slug}
+                        href={`/robots/${r.slug}`}
+                        className="block text-xs text-neutral-700 hover:text-neutral-900 py-1.5 border-b border-neutral-100"
+                      >
+                        {r.nameJa ?? r.name}
+                      </Link>
+                    ))}
+                    {manufacturers.map((m) => (
+                      <Link
+                        key={m.slug}
+                        href={`/manufacturers/${m.slug}`}
+                        className="block text-xs text-neutral-700 hover:text-neutral-900 py-1.5 border-b border-neutral-100"
+                      >
+                        {m.nameJa ?? m.name}
+                      </Link>
+                    ))}
+                    {useCases.map((u) => (
+                      <Link
+                        key={u.slug}
+                        href={`/use-cases/${u.slug}`}
+                        className="block text-xs text-neutral-700 hover:text-neutral-900 py-1.5 border-b border-neutral-100"
+                      >
+                        {u.titleJa ?? u.title}
+                      </Link>
+                    ))}
+                    {guides.map((g) => (
+                      <Link
+                        key={g.slug}
+                        href={`/guides/${g.slug}`}
+                        className="block text-xs text-neutral-700 hover:text-neutral-900 py-1.5 border-b border-neutral-100"
+                      >
+                        {g.titleJa ?? g.title}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+              )}
+
+              <div className="border border-neutral-300 bg-neutral-50 p-4">
+                <h3 className="text-xs font-semibold text-neutral-900 mb-2">情報提供・取材相談</h3>
+                <p className="text-xs text-neutral-600 mb-3 leading-relaxed">
+                  導入事例や一次情報の提供、取材のご相談はこちら。
+                </p>
+                <Link
+                  href="/contact"
+                  className="block w-full px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium uppercase tracking-wider transition-colors text-center"
+                >
+                  お問い合わせ
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
