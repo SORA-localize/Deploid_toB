@@ -3,6 +3,10 @@ import { manufacturers } from '@/data/manufacturers';
 import { reports } from '@/data/reports';
 import { robots } from '@/data/robots';
 import { useCases } from '@/data/useCases';
+import { runValidationInDev } from './validate';
+
+// dev時のみ：参照整合（存在しないslug参照・双方向のズレ・slug重複）をconsoleで通知
+runValidationInDev();
 
 const published = <T extends { publishStatus: string }>(items: T[]) =>
   items.filter((item) => item.publishStatus === 'published');

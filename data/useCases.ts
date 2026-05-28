@@ -35,7 +35,6 @@ export const useCases: UseCase[] = [
     japanDeploymentConditions: '労働安全、現場オペレーション、国内保守、夜間対応の確認が必要。',
     candidateRobotSlugs: ['figure-02'],
     relatedGuideSlugs: ['decision-variables', 'poc-planning'],
-    relatedReportSlugs: ['bmw-figure-deployment'],
   },
   {
     slug: 'factory-inspection',

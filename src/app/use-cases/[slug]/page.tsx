@@ -46,9 +46,11 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const u = getUseCaseBySlug(slug);
+  const seo = u?.seo;
   return {
-    title: u ? (u.titleJa ?? u.title) : 'Use Case',
-    description: u?.subtitle ?? u?.summary,
+    title: seo?.metaTitle ?? (u ? (u.titleJa ?? u.title) : 'Use Case'),
+    description: seo?.metaDescription ?? u?.subtitle ?? u?.summary,
+    robots: seo?.noindex ? { index: false, follow: false } : undefined,
   };
 }
 

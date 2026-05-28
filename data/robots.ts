@@ -36,9 +36,6 @@ export const robots: Robot[] = [
     supportNote: '日本語サポート、初期設定、部品交換、現地対応の有無を確認する。',
     safetyNote: '人と同じ空間で稼働させる場合、リスクアセスメントと運用ルール設計が前提。',
     vendorRiskNote: 'PoC/研究用途と本番運用用途で評価軸を分ける。',
-    useCaseSlugs: ['research-development', 'demo-exhibition'],
-    guideSlugs: ['decision-variables'],
-    reportSlugs: ['unitree-market-note'],
     comparison: {
       strengths: ['価格訴求', '研究・PoC用途で検討しやすい', '比較対象として情報収集しやすい'],
       constraints: ['本番運用では安全設計と保守体制の確認が必要', '用途によっては稼働時間と作業速度が制約になる'],
@@ -77,9 +74,6 @@ export const robots: Robot[] = [
     supportNote: '日本での販売、保守、現地対応体制は要確認。',
     safetyNote: '製造現場での利用は、実証範囲、作業分離、停止手順、責任分界の設計が必要。',
     vendorRiskNote: '技術進展は速いが、外部企業が購入できる条件は未確定要素が大きい。',
-    useCaseSlugs: ['warehouse-picking', 'factory-inspection'],
-    guideSlugs: ['decision-variables', 'poc-planning'],
-    reportSlugs: ['bmw-figure-deployment'],
     comparison: {
       strengths: ['製造現場での実証文脈が強い', '汎用作業の方向性が明確', '市場注目度が高い'],
       constraints: ['一般販売可否が不明', '日本での導入窓口が見えにくい', '価格・納期・保守条件が不透明'],

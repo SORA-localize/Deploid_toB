@@ -81,9 +81,8 @@ export interface Manufacturer extends BaseRecord {
   supportNote?: string;
   procurementNote?: string;
   vendorRiskNote?: string;
-  robotSlugs: Slug[];
-  handledRobotSlugs?: Slug[];
-  relatedReportSlugs?: Slug[];
+  // 関連は逆向き(Robot.manufacturerSlug / Report.relatedManufacturerSlugs)で導出する。
+  // robotSlugs / handledRobotSlugs / relatedReportSlugs は持たない。
 }
 
 export type RobotCategory =
@@ -160,9 +159,8 @@ export interface Robot extends BaseRecord {
   supportNote?: string;
   safetyNote?: string;
   vendorRiskNote?: string;
-  useCaseSlugs: Slug[];
-  guideSlugs?: Slug[];
-  reportSlugs?: Slug[];
+  // 関連は逆向き(UseCase.candidateRobotSlugs / Guide.relatedRobotSlugs /
+  // Report.relatedRobotSlugs)で導出する。
   comparison: ComparisonProfile;
 }
 
@@ -178,9 +176,11 @@ export interface Guide extends BaseRecord {
   targetReaders: string[];
   readingTimeMinutes?: number;
   checklistItems?: string[];
+  /** 記事本文（Markdown）。空ならガイド本文セクションは描画されない。 */
+  body?: string;
   relatedRobotSlugs: Slug[];
   relatedUseCaseSlugs: Slug[];
-  relatedReportSlugs?: Slug[];
+  // 関連reportsは Report.relatedGuideSlugs で逆引きする。
 }
 
 export type UseCaseMaturity = 'early-stage' | 'pilot-phase' | 'production-ready';
@@ -235,7 +235,7 @@ export interface UseCase extends BaseRecord {
   japanDeploymentConditions: string;
   candidateRobotSlugs: Slug[];
   relatedGuideSlugs: Slug[];
-  relatedReportSlugs?: Slug[];
+  // 関連reportsは Report.relatedUseCaseSlugs で逆引きする。
 }
 
 export type ReportType =
@@ -256,6 +256,8 @@ export interface Report extends BaseRecord {
   tags: string[];
   whyItMatters: string;
   keyTakeaways?: string[];
+  /** 記事本文（Markdown）。空ならレポート本文セクションは描画されない。 */
+  body?: string;
   featured?: boolean;
   relatedRobotSlugs: Slug[];
   relatedManufacturerSlugs: Slug[];

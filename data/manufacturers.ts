@@ -31,7 +31,6 @@ export const manufacturers: Manufacturer[] = [
     supportNote: '国内代理店のサポート範囲、部品在庫、初期設定支援を確認する。',
     procurementNote: '公開価格と実導入条件が異なる可能性があるため、構成ごとに見積確認が必要。',
     vendorRiskNote: '研究・PoC向け評価と、本番運用向け評価を分ける。',
-    robotSlugs: ['unitree-g1'],
   },
   {
     slug: 'figure-ai',
@@ -61,6 +60,5 @@ export const manufacturers: Manufacturer[] = [
     supportNote: '導入可能性はパートナーシップや実証条件に左右される。',
     procurementNote: '一般販売ではなく、実証・提携ベースでの接点が中心と考える。',
     vendorRiskNote: '大型資金調達企業だが、量産・外販条件は継続確認が必要。',
-    robotSlugs: ['figure-02'],
   },
 ];

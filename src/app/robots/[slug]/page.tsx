@@ -44,9 +44,11 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const robot = getRobotBySlug(slug);
+  const seo = robot?.seo;
   return {
-    title: robot ? (robot.nameJa ?? robot.name) : 'Robot',
-    description: robot?.summary,
+    title: seo?.metaTitle ?? (robot ? (robot.nameJa ?? robot.name) : 'Robot'),
+    description: seo?.metaDescription ?? robot?.summary,
+    robots: seo?.noindex ? { index: false, follow: false } : undefined,
   };
 }
 

@@ -17,9 +17,11 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const guide = getGuideBySlug(slug);
+  const seo = guide?.seo;
   return {
-    title: guide ? (guide.titleJa ?? guide.title) : 'Guide',
-    description: guide?.summary,
+    title: seo?.metaTitle ?? (guide ? (guide.titleJa ?? guide.title) : 'Guide'),
+    description: seo?.metaDescription ?? guide?.summary,
+    robots: seo?.noindex ? { index: false, follow: false } : undefined,
   };
 }
 
@@ -31,9 +33,12 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
   const robots = getRelatedRobots(guide.relatedRobotSlugs);
   const useCases = getRelatedUseCases(guide.relatedUseCaseSlugs);
   const hasChecklist = (guide.checklistItems ?? []).length > 0;
+  const hasBody = (guide.body ?? '').trim().length > 0;
+  const bodyParagraphs = hasBody ? guide.body!.split(/\n\n+/) : [];
 
   const toc = [
     { label: 'Overview', href: '#overview' },
+    ...(hasBody ? [{ label: 'Body', href: '#body' }] : []),
     ...(hasChecklist ? [{ label: 'Checklist', href: '#checklist' }] : []),
     ...(robots.length > 0 ? [{ label: 'Related Robots', href: '#related-robots' }] : []),
     ...(useCases.length > 0 ? [{ label: 'Related Use Cases', href: '#related-use-cases' }] : []),
@@ -124,6 +129,18 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
                 <h2 className="text-lg font-semibold text-neutral-900 mb-4">Overview</h2>
                 <p className="text-sm text-neutral-700 leading-relaxed">{guide.description}</p>
               </div>
+
+              {hasBody && (
+                <div id="body" className="border border-neutral-300 bg-white p-6 scroll-mt-6">
+                  <div className="text-sm text-neutral-700 leading-relaxed space-y-4">
+                    {bodyParagraphs.map((p, i) => (
+                      <p key={i} className="whitespace-pre-line">
+                        {p}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {hasChecklist && (
                 <div id="checklist" className="border border-neutral-300 bg-neutral-50 p-6 scroll-mt-6">

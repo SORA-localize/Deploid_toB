@@ -19,9 +19,11 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const report = getReportBySlug(slug);
+  const seo = report?.seo;
   return {
-    title: report ? (report.titleJa ?? report.title) : 'Report',
-    description: report?.summary,
+    title: seo?.metaTitle ?? (report ? (report.titleJa ?? report.title) : 'Report'),
+    description: seo?.metaDescription ?? report?.summary,
+    robots: seo?.noindex ? { index: false, follow: false } : undefined,
   };
 }
 
@@ -35,6 +37,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const useCases = getRelatedUseCases(report.relatedUseCaseSlugs);
   const guides = getRelatedGuides(report.relatedGuideSlugs ?? []);
   const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
+  const hasBody = (report.body ?? '').trim().length > 0;
+  const bodyParagraphs = hasBody ? report.body!.split(/\n\n+/) : [];
   const hasRelated =
     robots.length > 0 || manufacturers.length > 0 || useCases.length > 0 || guides.length > 0;
 
@@ -78,6 +82,18 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 <p className="text-xs font-semibold text-neutral-900 mb-1">Why it matters</p>
                 <p className="text-sm text-neutral-700 leading-relaxed">{report.whyItMatters}</p>
               </div>
+
+              {hasBody && (
+                <div className="border border-neutral-300 bg-white p-6">
+                  <div className="text-sm text-neutral-700 leading-relaxed space-y-4">
+                    {bodyParagraphs.map((p, i) => (
+                      <p key={i} className="whitespace-pre-line">
+                        {p}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {hasTakeaways && (
                 <div className="border border-neutral-300 bg-white p-6">

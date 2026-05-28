@@ -20,9 +20,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const manufacturer = getManufacturerBySlug(slug);
+  const seo = manufacturer?.seo;
   return {
-    title: manufacturer ? (manufacturer.nameJa ?? manufacturer.name) : 'Manufacturer',
-    description: manufacturer?.description,
+    title:
+      seo?.metaTitle ?? (manufacturer ? (manufacturer.nameJa ?? manufacturer.name) : 'Manufacturer'),
+    description: seo?.metaDescription ?? manufacturer?.description,
+    robots: seo?.noindex ? { index: false, follow: false } : undefined,
   };
 }
 

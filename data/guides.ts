@@ -20,7 +20,6 @@ export const guides: Guide[] = [
     checklistItems: ['国内サポートを確認したか', 'PoCの成功条件を決めたか', '安全責任の分界を決めたか'],
     relatedRobotSlugs: ['unitree-g1', 'figure-02'],
     relatedUseCaseSlugs: ['warehouse-picking', 'factory-inspection'],
-    relatedReportSlugs: ['bmw-figure-deployment'],
   },
   {
     slug: 'poc-planning',
