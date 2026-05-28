@@ -16,7 +16,7 @@
 - [ ] （任意）独自ドメイン接続
 
 ## 2. コンテンツの実投入（最優先・サイトの存在意義）
-- [ ] **旗艦ガイド `decision-variables` の `body` を書く**（`data/guides.ts`）
+- [ ] **メインのガイド `decision-variables` の `body` を書く**（`data/guides.ts`）
   - 「意思決定変数の地図」本文。型に追加済みの `body?: string` に Markdown 段落を入れる。空行で段落分け
 - [ ] `poc-planning` の `body` も書く（任意・余力で）
 - [ ] ロボット 3〜4 件追加（出典付き）：例 Unitree H1、Tesla Optimus、Apptronik Apollo、1X Neo 等。`data/robots.ts`
@@ -48,6 +48,6 @@
 
 ## 推奨着手順
 1. **Vercel デプロイで公開（数分）**
-2. **旗艦ガイドの `body` を書く**（数時間〜半日：これがサイトの「質と本気度」の証拠）
+2. **メインのガイドの `body` を書く**（数時間〜半日：これがサイトの「質と本気度」の証拠）
 3. **favicon / OGP / sitemap / robots.ts**（30分〜1時間）
 4. ロボット/メーカーを追加して件数を厚くする
