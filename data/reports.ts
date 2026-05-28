@@ -16,7 +16,8 @@ export const reports: Report[] = [
     whyItMatters:
       '製造現場で完遂された実証としては最も明確な公開事例の1つ。作業選定（板金パーツの装着）、評価KPI（精度・サイクル時間）、稼働形態（10時間シフト×週5）、世代交代のスピード、いずれも日本企業がヒューマノイドのPoCを設計する際の比較基準になる。',
     keyTakeaways: [
-      'BMW公式発表ベース：11ヶ月稼働で約30,000台のBMW X3生産に貢献、約90,000パーツを搬送、サイクル84秒・精度99%以上',
+      'Figure公式発表ベース：11ヶ月稼働で30,000台超のBMW X3生産に貢献、90,000点超の部品をロード',
+      'サイクル84秒・配置精度99%以上は、実績値ではなくFigureが定義したKPI要求／目標値として扱う',
       '実証完遂を機にFigure 02は退役、後継Figure 03へ移行 — 世代交代のスピードはベンダー継続性リスクとして必ず織り込む',
       'PoCの作業範囲を狭く・固定化（同じ部品の同じ動作）したことが定量結果に直結している',
       '実証完了 ≠ 一般販売可能。Figure はまだ外部企業への販売条件を公表していない',
@@ -55,7 +56,7 @@ export const reports: Report[] = [
     title: 'Agility Digit passes 100,000 totes at GXO under RaaS contract',
     titleJa: 'Agility Digit、GXOの倉庫で10万トート搬送達成（商用 RaaS の先行事例）',
     type: 'deployment-report',
-    summary: 'Agility Robotics の Digit が、GXO ジョージア州 Flowery Branch 拠点での RaaS 契約による商用稼働で累計10万トート搬送を達成した。買い切りではなく「成果に対する支払い」モデルの先行例。',
+    summary: 'Agility Robotics の Digit が、GXO ジョージア州 Flowery Branch 拠点での RaaS 契約による商用稼働で累計10万トート搬送を達成した。買い切りではなく「サービスとして導入する」モデルの先行例。',
     publishStatus: 'published',
     updatedAt: '2026-05-28',
     reliability: 'reported',
@@ -63,10 +64,10 @@ export const reports: Report[] = [
     author: 'Deploid Research',
     tags: ['logistics', 'raas', 'agility', 'gxo'],
     whyItMatters:
-      'ヒューマノイドの商用導入で「機体を買う」のではなく「稼働量・サービスに対して払う」契約形態（RaaS）が量的成果を出した稀有な例。買い切りに対する代替形態として、調達形態の議論に直接インパクトを持つ。',
+      'ヒューマノイドの商用導入で「機体を買う」のではなく「ロボットをサービスとして導入する」契約形態（RaaS）が量的成果を出した稀有な例。買い切りに対する代替形態として、調達形態の議論に直接インパクトを持つ。',
     keyTakeaways: [
       '累計10万トート以上の搬送をGXO拠点で達成（Agility公式発表）',
-      '契約形態は RaaS — 顧客は機体を所有せず、Agility に稼働対価を支払う',
+      '契約形態は RaaS と公表。ただし価格・課金単位・SLAなど詳細条件は未公表',
       'タスクは物流倉庫の構造化された環境（トート搬送・AMR連携）で、現状のヒューマノイドが最も成立しやすい領域',
       '日本では同等の RaaS 契約・国内サービス窓口は未確認',
     ],
@@ -117,8 +118,22 @@ export const reports: Report[] = [
     relatedGuideSlugs: ['decision-variables'],
     sources: [
       {
-        title: '1X Home Robots',
-        url: 'https://www.1x.tech/',
+        title: 'NEO Home Robot | Order Today',
+        url: 'https://www.1x.tech/discover/neo-home-robot',
+        publisher: '1X Technologies',
+        checkedAt: '2026-05-28',
+        reliability: 'official',
+      },
+      {
+        title: 'Order NEO',
+        url: 'https://www.1x.tech/order',
+        publisher: '1X Technologies',
+        checkedAt: '2026-05-28',
+        reliability: 'official',
+      },
+      {
+        title: '1X Raises $23.5M in Series A2 Funding led by OpenAI',
+        url: 'https://www.1x.tech/discover/1x-rasies-23-5m-in-series-a2-funding-led-by-open-ai',
         publisher: '1X Technologies',
         checkedAt: '2026-05-28',
         reliability: 'official',
@@ -127,10 +142,10 @@ export const reports: Report[] = [
   },
   {
     slug: 'apptronik-mercedes-commercial',
-    title: 'Apptronik and Mercedes-Benz move from pilot to commercial agreement',
-    titleJa: 'Apptronik、Mercedes-Benz と商用契約。製造現場でのヒューマノイド本格導入が一歩前進',
+    title: 'Apptronik and Mercedes-Benz test Apollo under a commercial agreement',
+    titleJa: 'Apptronik、Mercedes-Benz と商用契約下で Apollo を検証',
     type: 'analysis',
-    summary: 'Apptronik と Mercedes-Benz は Apollo の試験運用から商用契約へ移行。ベルリンの Digital Factory Campus を中心にパーツ搬送・初期品質検査などのタスクを展開。',
+    summary: 'Apptronik と Mercedes-Benz は Apollo の商用契約のもと、ベルリンの Digital Factory Campus を中心にパーツ搬送・初期品質検査などのタスクを検証している。',
     publishStatus: 'published',
     updatedAt: '2026-05-28',
     reliability: 'reported',
@@ -138,12 +153,12 @@ export const reports: Report[] = [
     author: 'Deploid Research',
     tags: ['manufacturing', 'apptronik', 'mercedes-benz', 'commercial'],
     whyItMatters:
-      '欧州自動車大手が「実証フェーズ」を超えて商用契約に移ったことは、ヒューマノイドが部分的にとはいえ「買い物」になり始めたシグナル。供給側でも EMS 大手 Jabil との量産提携、Google DeepMind との AI 連携など、産業導入を見据えた体制が並行して整いつつある。',
+      '欧州自動車大手が商用契約の枠組みでヒューマノイドを実工場環境に入れて検証していることは、PoCから調達・運用設計へ論点が移り始めたシグナル。供給側でも EMS 大手 Jabil との量産提携、Google DeepMind との AI 連携など、産業導入を見据えた体制が並行して整いつつある。',
     keyTakeaways: [
-      'Mercedes-Benz Digital Factory Campus（ベルリン）を中心に、複数の欧州拠点でApolloを展開',
+      'Mercedes-Benz Digital Factory Campus（ベルリン）を中心に、Apolloの自律運用に向けた検証が進む',
       'タスクは部品搬送、初期品質検査、組立補助の3カテゴリが中心',
       '量産パートナーに EMS 大手 Jabil、AI 周りに Google DeepMind を採用',
-      '日本での販売・サポートは未確認。本格導入の参照例として動向を追う価値がある',
+      '日本での販売・サポートは未確認。導入検討の参照例として動向を追う価値がある',
     ],
     relatedRobotSlugs: ['apptronik-apollo'],
     relatedManufacturerSlugs: ['apptronik'],
@@ -152,8 +167,22 @@ export const reports: Report[] = [
     sources: [
       {
         title: 'Apptronik and Mercedes-Benz Enter Commercial Agreement',
-        url: 'https://www.prnewswire.com/news-releases/apptronik-and-mercedes-benz-enter-commercial-agreement-that-will-pilot-apptroniks-apollo-humanoid-robot-in-mercedes-benz-manufacturing-facilities-302089972.html',
-        publisher: 'PR Newswire',
+        url: 'https://apptronik.com/news-collection/apptronik-and-mercedes-benz-enter-commercial-agreement',
+        publisher: 'Apptronik',
+        checkedAt: '2026-05-28',
+        reliability: 'official',
+      },
+      {
+        title: 'Apptronik and Jabil Collaborate to Scale Production',
+        url: 'https://apptronik.com/news-collection/apptronik-and-jabil-collaborate-to-scale-production',
+        publisher: 'Apptronik',
+        checkedAt: '2026-05-28',
+        reliability: 'official',
+      },
+      {
+        title: 'Apptronik Closes Over $935 Million Series A',
+        url: 'https://apptronik.com/news-collection/apptronik-closes-over-935-million-series-a',
+        publisher: 'Apptronik',
         checkedAt: '2026-05-28',
         reliability: 'official',
       },

@@ -4,7 +4,10 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { EmptyState } from '@/components/EmptyState';
+import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { SearchInput } from '@/components/SearchInput';
+import { TagChip } from '@/components/TagChip';
 import type { Report, ReportType } from '@/data/types';
 import { reportTypeLabels } from '@/lib/labels';
 import { matchesQuery } from '@/lib/search';
@@ -19,12 +22,21 @@ const typeOrder: ReportType[] = [
   'news-brief',
 ];
 
+const typeOptions: Array<{ value: 'all' | ReportType; label: string }> = [
+  { value: 'all', label: 'All' },
+  ...typeOrder.map((value) => ({ value, label: reportTypeLabels[value] })),
+];
+
 export function ReportsBrowser({ reports }: { reports: Report[] }) {
   const [type, setType] = useState<'all' | ReportType>('all');
   const [topic, setTopic] = useState<string | null>(null);
   const [query, setQuery] = useState('');
 
   const topics = useMemo(() => Array.from(new Set(reports.flatMap((r) => r.tags))), [reports]);
+  const topicOptions = useMemo(
+    () => topics.map((value) => ({ value, label: value })),
+    [topics],
+  );
 
   const filtered = reports.filter((r) => {
     if (type !== 'all' && r.type !== type) return false;
@@ -47,21 +59,13 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
             市場動向・導入レポート・政策・取材・分析を、買い手の意思決定に必要な観点で整理する一次情報ハブ。
           </p>
 
-          <div className="flex flex-wrap gap-2 mb-4">
-            {(['all', ...typeOrder] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setType(t)}
-                className={`px-3 py-1.5 text-xs border transition-colors ${
-                  type === t
-                    ? 'bg-neutral-900 text-white border-neutral-900'
-                    : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-500'
-                }`}
-              >
-                {t === 'all' ? 'All' : reportTypeLabels[t]}
-              </button>
-            ))}
-          </div>
+          <FilterChipGroup
+            options={typeOptions}
+            value={type}
+            onChange={setType}
+            ariaLabel="Report type"
+            className="mb-4"
+          />
 
           <div className="mb-4">
             <SearchInput
@@ -74,21 +78,14 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
           </div>
 
           {topics.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {topics.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTopic(topic === t ? null : t)}
-                  className={`px-3 py-1.5 text-xs border transition-colors ${
-                    topic === t
-                      ? 'bg-neutral-900 text-white border-neutral-900'
-                      : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-500'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
+            <FilterChipGroup
+              options={topicOptions}
+              value={topic}
+              onChange={setTopic}
+              allowDeselect
+              onClear={() => setTopic(null)}
+              ariaLabel="Report topics"
+            />
           )}
         </div>
       </div>
@@ -114,9 +111,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                     <Calendar className="w-3.5 h-3.5" />
                     {featured.publishedAt}
                   </span>
-                  <span className="px-2 py-0.5 bg-neutral-100 text-neutral-800 border border-neutral-200">
-                    {reportTypeLabels[featured.type]}
-                  </span>
+                  <TagChip className="text-neutral-800">{reportTypeLabels[featured.type]}</TagChip>
                 </div>
                 <Link
                   href={`/reports/${featured.slug}`}
@@ -141,9 +136,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-0.5 text-xs bg-neutral-100 text-neutral-700 border border-neutral-200">
-                          {reportTypeLabels[report.type]}
-                        </span>
+                        <TagChip>{reportTypeLabels[report.type]}</TagChip>
                         <span className="text-xs text-neutral-500">{report.publishedAt}</span>
                       </div>
                       <h4 className="font-semibold text-neutral-900 mb-2 leading-tight">
@@ -154,12 +147,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                       </p>
                       <div className="flex gap-2 flex-wrap">
                         {report.tags.slice(0, 3).map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-2 py-0.5 text-xs bg-neutral-100 text-neutral-700 border border-neutral-200"
-                          >
-                            {tag}
-                          </span>
+                          <TagChip key={tag}>{tag}</TagChip>
                         ))}
                       </div>
                     </div>
@@ -170,9 +158,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
             </div>
 
             {filtered.length === 0 && (
-              <div className="border border-neutral-300 bg-white p-8 text-center text-sm text-neutral-600">
-                条件に合う記事がありません。
-              </div>
+              <EmptyState message="条件に合う記事がありません。" />
             )}
           </div>
 

@@ -4,16 +4,27 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { EmptyState } from '@/components/EmptyState';
+import { FilterChipGroup } from '@/components/FilterChipGroup';
+import { TagChip } from '@/components/TagChip';
 import type { Guide, GuideStage } from '@/data/types';
 import { guideStageLabels } from '@/lib/labels';
 
 const stageOrder: GuideStage[] = ['learn', 'evaluate', 'act'];
+const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
+  { value: 'all', label: 'All' },
+  ...stageOrder.map((value) => ({ value, label: guideStageLabels[value] })),
+];
 
 export function GuidesBrowser({ guides }: { guides: Guide[] }) {
   const [stage, setStage] = useState<'all' | GuideStage>('all');
   const [topic, setTopic] = useState<string | null>(null);
 
   const topics = useMemo(() => Array.from(new Set(guides.flatMap((g) => g.topics))), [guides]);
+  const topicOptions = useMemo(
+    () => topics.map((value) => ({ value, label: value })),
+    [topics],
+  );
   const featured = guides.find((g) => g.order === 1) ?? guides[0];
 
   const filtered = guides.filter(
@@ -30,37 +41,23 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
             ヒューマノイド導入を「知る・判断する・動く」で理解するための常設ガイド。調達・TCO・安全・PoC・ベンダー評価を体系的に整理します。
           </p>
 
-          <div className="flex items-center gap-2 mb-4">
-            {(['all', ...stageOrder] as const).map((s) => (
-              <button
-                key={s}
-                onClick={() => setStage(s)}
-                className={`px-4 py-2.5 text-xs font-medium uppercase tracking-wide transition-colors ${
-                  stage === s
-                    ? 'bg-neutral-900 text-white'
-                    : 'bg-white border border-neutral-300 text-neutral-700 hover:border-neutral-500'
-                }`}
-              >
-                {s === 'all' ? 'All' : guideStageLabels[s]}
-              </button>
-            ))}
-          </div>
+          <FilterChipGroup
+            options={stageOptions}
+            value={stage}
+            onChange={setStage}
+            ariaLabel="Guide stage"
+            className="mb-4"
+            buttonClassName="px-4 py-2.5 text-xs font-medium uppercase tracking-wide"
+          />
 
-          <div className="flex flex-wrap gap-2">
-            {topics.map((t) => (
-              <button
-                key={t}
-                onClick={() => setTopic(topic === t ? null : t)}
-                className={`px-3 py-1.5 text-xs border transition-colors ${
-                  topic === t
-                    ? 'bg-neutral-900 text-white border-neutral-900'
-                    : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-500'
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
+          <FilterChipGroup
+            options={topicOptions}
+            value={topic}
+            onChange={setTopic}
+            allowDeselect
+            onClear={() => setTopic(null)}
+            ariaLabel="Guide topics"
+          />
         </div>
       </div>
 
@@ -84,9 +81,9 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
                   {featured.readingTimeMinutes} min
                 </span>
               )}
-              <span className="px-2 py-1 bg-neutral-100 text-neutral-800 border border-neutral-200 font-medium">
+              <TagChip className="py-1 text-neutral-800 font-medium">
                 {guideStageLabels[featured.stage]}
-              </span>
+              </TagChip>
             </div>
             <p className="text-sm text-neutral-700 mb-6 leading-relaxed">{featured.summary}</p>
             <Link
@@ -129,12 +126,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
                         </div>
                         <div className="flex gap-2 flex-wrap">
                           {guide.topics.slice(0, 3).map((t) => (
-                            <span
-                              key={t}
-                              className="px-2 py-0.5 text-xs bg-neutral-100 text-neutral-700 border border-neutral-200"
-                            >
-                              {t}
-                            </span>
+                            <TagChip key={t}>{t}</TagChip>
                           ))}
                         </div>
                       </div>
@@ -148,9 +140,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
         })}
 
         {filtered.length === 0 && (
-          <div className="border border-neutral-300 bg-white p-8 text-center text-sm text-neutral-600">
-            条件に合うガイドがありません。
-          </div>
+          <EmptyState message="条件に合うガイドがありません。" />
         )}
       </div>
     </div>

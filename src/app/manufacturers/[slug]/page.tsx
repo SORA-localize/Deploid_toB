@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronRight, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { RobotCard } from '@/components/RobotCard';
 import {
   getManufacturerBySlug,
@@ -58,7 +59,12 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
               </span>
             </div>
             <h1 className="text-3xl font-semibold text-neutral-900 mb-4">
-              {manufacturer.nameJa ?? manufacturer.name}
+              <ManufacturerLogoName
+                name={manufacturer.nameJa ?? manufacturer.name}
+                logo={manufacturer.logo}
+                frameClassName="h-9 w-9"
+                imageClassName="h-7 w-7"
+              />
             </h1>
             <p className="text-sm text-neutral-700 leading-relaxed mb-6">{manufacturer.description}</p>
             <div className="flex gap-4 text-xs flex-wrap">
@@ -133,7 +139,12 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
           {robots.length > 0 ? (
             <div className="grid grid-cols-3 gap-6">
               {robots.map((robot) => (
-                <RobotCard key={robot.slug} robot={robot} manufacturerName={manufacturer.name} />
+                <RobotCard
+                  key={robot.slug}
+                  robot={robot}
+                  manufacturerName={manufacturer.name}
+                  manufacturerLogo={manufacturer.logo}
+                />
               ))}
             </div>
           ) : (

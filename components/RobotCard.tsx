@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import { ChevronRight, Star } from 'lucide-react';
-import type { Robot } from '@/data/types';
+import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
+import type { ImageAsset, Robot } from '@/data/types';
 import { deploymentStageLabels, mobilityLabels } from '@/lib/labels';
 
 interface RobotCardProps {
   robot: Robot;
   manufacturerName?: string;
+  manufacturerLogo?: ImageAsset;
   showFavorite?: boolean;
   isFavorite?: boolean;
   onFavoriteToggle?: (slug: string) => void;
@@ -18,6 +20,7 @@ const TBD = '要確認';
 export function RobotCard({
   robot,
   manufacturerName,
+  manufacturerLogo,
   showFavorite = false,
   isFavorite = false,
   onFavoriteToggle,
@@ -69,7 +72,13 @@ export function RobotCard({
               </span>
             )}
           </div>
-          <p className="text-xs text-neutral-500 mb-1">{manufacturerName ?? robot.manufacturerSlug}</p>
+          <ManufacturerLogoName
+            name={manufacturerName ?? robot.manufacturerSlug}
+            logo={manufacturerLogo}
+            className="mb-1 text-xs text-neutral-500"
+            frameClassName="h-4 w-4"
+            imageClassName="h-3 w-3"
+          />
           <p className="text-xs text-neutral-600 mb-4 leading-relaxed line-clamp-2">{robot.summary}</p>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-4">
             <div>

@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, Star, X } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { RobotCard } from '@/components/RobotCard';
 import { FavoriteCard } from '@/components/FavoriteCard';
+import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
+import { RobotCard } from '@/components/RobotCard';
 import type { Manufacturer, Robot } from '@/data/types';
 
 interface CompareClientProps {
@@ -20,8 +21,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   const selectedRobots = robots.filter((r) => selectedSlugs.includes(r.slug));
   const favoriteRobots = robots.filter((r) => favoriteSlugs.includes(r.slug));
 
-  const manufacturerName = (slug: string) =>
-    manufacturers.find((m) => m.slug === slug)?.name ?? slug;
+  const manufacturerFor = (slug: string) => manufacturers.find((m) => m.slug === slug);
 
   const addRobot = (slug: string) => {
     if (selectedSlugs.length < 9 && !selectedSlugs.includes(slug)) {
@@ -83,9 +83,13 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                         onClick={() => toggleManufacturer(manufacturer.slug)}
                         className="w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-100 transition-colors text-left"
                       >
-                        <span className="text-sm font-medium text-neutral-900">
-                          {manufacturer.nameJa ?? manufacturer.name}
-                        </span>
+                        <ManufacturerLogoName
+                          name={manufacturer.nameJa ?? manufacturer.name}
+                          logo={manufacturer.logo}
+                          className="text-sm font-medium text-neutral-900"
+                          frameClassName="h-5 w-5"
+                          imageClassName="h-4 w-4"
+                        />
                         {isExpanded ? (
                           <ChevronDown className="w-4 h-4 text-neutral-500" />
                         ) : (
@@ -174,24 +178,28 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
             ) : (
               <div className="border border-neutral-300 bg-white p-6">
                 <div className="grid grid-cols-3 gap-6">
-                  {selectedRobots.map((robot) => (
-                    <div key={robot.slug} className="relative">
-                      <button
-                        onClick={() => removeRobot(robot.slug)}
-                        className="absolute -top-2 -right-2 z-10 p-1.5 bg-white border border-neutral-300 hover:bg-neutral-100 transition-colors rounded-full"
-                        title="比較から外す"
-                      >
-                        <X className="w-3 h-3 text-neutral-600" />
-                      </button>
-                      <RobotCard
-                        robot={robot}
-                        manufacturerName={manufacturerName(robot.manufacturerSlug)}
-                        showFavorite
-                        isFavorite={favoriteSlugs.includes(robot.slug)}
-                        onFavoriteToggle={toggleFavorite}
-                      />
-                    </div>
-                  ))}
+                  {selectedRobots.map((robot) => {
+                    const manufacturer = manufacturerFor(robot.manufacturerSlug);
+                    return (
+                      <div key={robot.slug} className="relative">
+                        <button
+                          onClick={() => removeRobot(robot.slug)}
+                          className="absolute -top-2 -right-2 z-10 p-1.5 bg-white border border-neutral-300 hover:bg-neutral-100 transition-colors rounded-full"
+                          title="比較から外す"
+                        >
+                          <X className="w-3 h-3 text-neutral-600" />
+                        </button>
+                        <RobotCard
+                          robot={robot}
+                          manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                          manufacturerLogo={manufacturer?.logo}
+                          showFavorite
+                          isFavorite={favoriteSlugs.includes(robot.slug)}
+                          onFavoriteToggle={toggleFavorite}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -217,14 +225,18 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {favoriteRobots.map((robot) => (
-                      <FavoriteCard
-                        key={robot.slug}
-                        robot={robot}
-                        manufacturerName={manufacturerName(robot.manufacturerSlug)}
-                        onRemove={toggleFavorite}
-                      />
-                    ))}
+                    {favoriteRobots.map((robot) => {
+                      const manufacturer = manufacturerFor(robot.manufacturerSlug);
+                      return (
+                        <FavoriteCard
+                          key={robot.slug}
+                          robot={robot}
+                          manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                          manufacturerLogo={manufacturer?.logo}
+                          onRemove={toggleFavorite}
+                        />
+                      );
+                    })}
                   </div>
                 )}
               </div>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { RobotImageCarousel } from '@/components/RobotImageCarousel';
 import {
   getManufacturerForRobot,
@@ -123,6 +124,19 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
         />
 
         <div id="overview" className="mb-8 scroll-mt-6">
+          {manufacturer && (
+            <Link
+              href={`/manufacturers/${manufacturer.slug}`}
+              className="mb-3 inline-flex text-xs text-neutral-500 hover:text-neutral-900"
+            >
+              <ManufacturerLogoName
+                name={manufacturer.name}
+                logo={manufacturer.logo}
+                frameClassName="h-5 w-5"
+                imageClassName="h-4 w-4"
+              />
+            </Link>
+          )}
           <h1 className="text-3xl font-semibold text-neutral-900 mb-3">{robot.nameJa ?? robot.name}</h1>
           <p className="text-sm text-neutral-600 leading-relaxed max-w-3xl">{robot.description}</p>
         </div>

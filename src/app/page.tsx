@@ -106,13 +106,17 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-3 gap-6">
-            {featuredRobots.map((robot) => (
-              <RobotCard
-                key={robot.slug}
-                robot={robot}
-                manufacturerName={getManufacturerForRobot(robot.manufacturerSlug)?.name}
-              />
-            ))}
+            {featuredRobots.map((robot) => {
+              const manufacturer = getManufacturerForRobot(robot.manufacturerSlug);
+              return (
+                <RobotCard
+                  key={robot.slug}
+                  robot={robot}
+                  manufacturerName={manufacturer?.name}
+                  manufacturerLogo={manufacturer?.logo}
+                />
+              );
+            })}
           </div>
         </section>
       )}

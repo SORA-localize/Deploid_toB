@@ -2,17 +2,24 @@
 
 import Link from 'next/link';
 import { X } from 'lucide-react';
-import type { Robot } from '@/data/types';
+import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
+import type { ImageAsset, Robot } from '@/data/types';
 
 const TBD = '要確認';
 
 interface FavoriteCardProps {
   robot: Robot;
   manufacturerName?: string;
+  manufacturerLogo?: ImageAsset;
   onRemove: (slug: string) => void;
 }
 
-export function FavoriteCard({ robot, manufacturerName, onRemove }: FavoriteCardProps) {
+export function FavoriteCard({
+  robot,
+  manufacturerName,
+  manufacturerLogo,
+  onRemove,
+}: FavoriteCardProps) {
   const payload = robot.specs.payloadKg != null ? `${robot.specs.payloadKg} kg` : TBD;
   const runtime = robot.specs.runtimeMin != null ? `約${robot.specs.runtimeMin} 分` : TBD;
 
@@ -31,7 +38,13 @@ export function FavoriteCard({ robot, manufacturerName, onRemove }: FavoriteCard
           <X className="w-3 h-3" />
         </button>
       </div>
-      <p className="text-xs text-neutral-500 mb-2">{manufacturerName ?? robot.manufacturerSlug}</p>
+      <ManufacturerLogoName
+        name={manufacturerName ?? robot.manufacturerSlug}
+        logo={manufacturerLogo}
+        className="mb-2 text-xs text-neutral-500"
+        frameClassName="h-4 w-4"
+        imageClassName="h-3 w-3"
+      />
       <dl className="space-y-1 text-xs">
         <div className="flex justify-between">
           <dt className="text-neutral-500">ペイロード</dt>

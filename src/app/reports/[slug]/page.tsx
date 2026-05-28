@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { Markdown } from '@/components/Markdown';
 import {
   getRelatedGuides,
@@ -154,7 +155,12 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                         href={`/manufacturers/${m.slug}`}
                         className="block text-xs text-neutral-700 hover:text-neutral-900 py-1.5 border-b border-neutral-100"
                       >
-                        {m.nameJa ?? m.name}
+                        <ManufacturerLogoName
+                          name={m.nameJa ?? m.name}
+                          logo={m.logo}
+                          frameClassName="h-4 w-4"
+                          imageClassName="h-3 w-3"
+                        />
                       </Link>
                     ))}
                     {useCases.map((u) => (

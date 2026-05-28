@@ -4,7 +4,11 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, MapPin } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { EmptyState } from '@/components/EmptyState';
+import { FilterSelect } from '@/components/FilterSelect';
+import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
+import { TagChip } from '@/components/TagChip';
 import type { Manufacturer, Robot } from '@/data/types';
 import { companyStatusLabels, companyTypeLabels, japanPresenceLabels } from '@/lib/labels';
 import { matchesQuery } from '@/lib/search';
@@ -33,6 +37,24 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
   const statuses = useMemo(
     () => Array.from(new Set(manufacturers.map((m) => m.companyStatus))),
     [manufacturers],
+  );
+  const countryOptions = useMemo(
+    () => [{ value: 'all', label: 'All Regions' }, ...countries.map((value) => ({ value, label: value }))],
+    [countries],
+  );
+  const typeOptions = useMemo(
+    () => [
+      { value: 'all', label: 'All Types' },
+      ...types.map((value) => ({ value, label: companyTypeLabels[value] })),
+    ],
+    [types],
+  );
+  const statusOptions = useMemo(
+    () => [
+      { value: 'all', label: 'All Status' },
+      ...statuses.map((value) => ({ value, label: companyStatusLabels[value] })),
+    ],
+    [statuses],
   );
 
   const robotCount = (slug: string) => robots.filter((r) => r.manufacturerSlug === slug).length;
@@ -78,57 +100,31 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-8">
-          <div>
-            <label className="block text-xs uppercase tracking-wide text-neutral-500 mb-2">ORIGIN COUNTRY</label>
-            <select
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-neutral-500"
-            >
-              <option value="all">All Regions</option>
-              {countries.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs uppercase tracking-wide text-neutral-500 mb-2">COMPANY TYPE</label>
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-neutral-500"
-            >
-              <option value="all">All Types</option>
-              {types.map((t) => (
-                <option key={t} value={t}>
-                  {companyTypeLabels[t]}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs uppercase tracking-wide text-neutral-500 mb-2">STATUS</label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-neutral-500"
-            >
-              <option value="all">All Status</option>
-              {statuses.map((s) => (
-                <option key={s} value={s}>
-                  {companyStatusLabels[s]}
-                </option>
-              ))}
-            </select>
-          </div>
+          <FilterSelect
+            id="manufacturer-country"
+            label="ORIGIN COUNTRY"
+            value={country}
+            onChange={setCountry}
+            options={countryOptions}
+          />
+          <FilterSelect
+            id="manufacturer-type"
+            label="COMPANY TYPE"
+            value={type}
+            onChange={setType}
+            options={typeOptions}
+          />
+          <FilterSelect
+            id="manufacturer-status"
+            label="STATUS"
+            value={status}
+            onChange={setStatus}
+            options={statusOptions}
+          />
         </div>
 
         {filtered.length === 0 ? (
-          <div className="border border-neutral-300 bg-neutral-50 p-16 text-center text-sm text-neutral-500">
-            条件に合うメーカーがありません。
-          </div>
+          <EmptyState message="条件に合うメーカーがありません。" variant="muted" size="large" />
         ) : (
           <div className="grid grid-cols-3 gap-4">
             {filtered.map((manufacturer) => (
@@ -138,12 +134,17 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-neutral-900 tracking-tight">
-                      {manufacturer.name.toUpperCase()}
+                    <h2 className="min-w-0 text-xl font-semibold text-neutral-900 tracking-tight">
+                      <ManufacturerLogoName
+                        name={manufacturer.name.toUpperCase()}
+                        logo={manufacturer.logo}
+                        frameClassName="h-7 w-7"
+                        imageClassName="h-5 w-5"
+                      />
                     </h2>
-                    <span className="text-xs px-2 py-1 border border-neutral-400 text-neutral-700 whitespace-nowrap">
+                    <TagChip className="py-1 border-neutral-400 whitespace-nowrap">
                       {companyTypeLabels[manufacturer.companyType]}
-                    </span>
+                    </TagChip>
                   </div>
 
                   <div className="space-y-2 text-xs mb-6">

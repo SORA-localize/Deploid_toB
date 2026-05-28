@@ -4,21 +4,29 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { EmptyState } from '@/components/EmptyState';
+import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { SearchInput } from '@/components/SearchInput';
+import { TagChip } from '@/components/TagChip';
 import type { UseCase } from '@/data/types';
 import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
 import { matchesQuery } from '@/lib/search';
 
-function maturityClass(level: UseCase['maturityLevel']) {
-  if (level === 'production-ready') return 'bg-green-50 text-green-800 border-green-200';
-  if (level === 'pilot-phase') return 'bg-amber-50 text-amber-800 border-amber-200';
-  return 'bg-neutral-50 text-neutral-700 border-neutral-200';
+const modeOptions: Array<{ value: 'industry' | 'task'; label: string }> = [
+  { value: 'industry', label: '業種で探す' },
+  { value: 'task', label: 'タスクで探す' },
+];
+
+function maturityTone(level: UseCase['maturityLevel']) {
+  if (level === 'production-ready') return 'success';
+  if (level === 'pilot-phase') return 'warning';
+  return 'neutral';
 }
 
-function readinessClass(r: UseCase['buyerReadiness']) {
-  if (r === 'initial-adoption') return 'bg-blue-50 text-blue-800 border-blue-200';
-  if (r === 'requires-poc') return 'bg-amber-50 text-amber-800 border-amber-200';
-  return 'bg-neutral-50 text-neutral-700 border-neutral-200';
+function readinessTone(r: UseCase['buyerReadiness']) {
+  if (r === 'initial-adoption') return 'info';
+  if (r === 'requires-poc') return 'warning';
+  return 'neutral';
 }
 
 export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
@@ -32,6 +40,11 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
     [useCases],
   );
   const tasks = useMemo(() => Array.from(new Set(useCases.flatMap((u) => u.taskTags))), [useCases]);
+  const chipOptions = useMemo(
+    () => (mode === 'industry' ? industries : tasks).map((value) => ({ value, label: value })),
+    [mode, industries, tasks],
+  );
+  const selectedChip = mode === 'industry' ? industry : task;
 
   const filtered = useCases.filter((u) => {
     if (!matchesQuery(query, [u.titleJa, u.title, u.subtitle, ...u.taskTags])) return false;
@@ -62,51 +75,23 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
             />
           </div>
 
-          <div className="flex gap-2 mb-4">
-            <button
-              onClick={() => setMode('industry')}
-              className={`px-4 py-2 text-sm border transition-colors ${
-                mode === 'industry'
-                  ? 'bg-neutral-900 text-white border-neutral-900'
-                  : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-500'
-              }`}
-            >
-              業種で探す
-            </button>
-            <button
-              onClick={() => setMode('task')}
-              className={`px-4 py-2 text-sm border transition-colors ${
-                mode === 'task'
-                  ? 'bg-neutral-900 text-white border-neutral-900'
-                  : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-500'
-              }`}
-            >
-              タスクで探す
-            </button>
-          </div>
+          <FilterChipGroup
+            options={modeOptions}
+            value={mode}
+            onChange={setMode}
+            ariaLabel="Use case search mode"
+            className="mb-4"
+            buttonClassName="px-4 py-2 text-sm"
+          />
 
-          <div className="flex flex-wrap gap-2">
-            {(mode === 'industry' ? industries : tasks).map((chip) => {
-              const selected = mode === 'industry' ? industry === chip : task === chip;
-              return (
-                <button
-                  key={chip}
-                  onClick={() =>
-                    mode === 'industry'
-                      ? setIndustry(industry === chip ? null : chip)
-                      : setTask(task === chip ? null : chip)
-                  }
-                  className={`px-3 py-1.5 text-xs border transition-colors ${
-                    selected
-                      ? 'bg-neutral-900 text-white border-neutral-900'
-                      : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-500'
-                  }`}
-                >
-                  {chip}
-                </button>
-              );
-            })}
-          </div>
+          <FilterChipGroup
+            options={chipOptions}
+            value={selectedChip}
+            onChange={(value) => (mode === 'industry' ? setIndustry(value) : setTask(value))}
+            allowDeselect
+            onClear={() => (mode === 'industry' ? setIndustry(null) : setTask(null))}
+            ariaLabel={mode === 'industry' ? 'Industry tags' : 'Task tags'}
+          />
         </div>
       </div>
 
@@ -125,16 +110,14 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                 >
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     {u.industryTags[0] && (
-                      <span className="px-2 py-0.5 text-xs bg-neutral-100 text-neutral-700 border border-neutral-200">
-                        {u.industryTags[0]}
-                      </span>
+                      <TagChip>{u.industryTags[0]}</TagChip>
                     )}
-                    <span className={`px-2 py-0.5 text-xs border ${maturityClass(u.maturityLevel)}`}>
+                    <TagChip tone={maturityTone(u.maturityLevel)}>
                       {maturityLabels[u.maturityLevel]}
-                    </span>
-                    <span className={`px-2 py-0.5 text-xs border ${readinessClass(u.buyerReadiness)}`}>
+                    </TagChip>
+                    <TagChip tone={readinessTone(u.buyerReadiness)}>
                       {buyerReadinessLabels[u.buyerReadiness]}
-                    </span>
+                    </TagChip>
                   </div>
                   <h4 className="text-lg font-semibold text-neutral-900 mb-2">{u.titleJa ?? u.title}</h4>
                   <p className="text-sm text-neutral-700 mb-3 leading-relaxed">{u.subtitle ?? u.summary}</p>
@@ -163,16 +146,14 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     {u.industryTags[0] && (
-                      <span className="px-2 py-0.5 text-xs bg-neutral-100 text-neutral-700 border border-neutral-200">
-                        {u.industryTags[0]}
-                      </span>
+                      <TagChip>{u.industryTags[0]}</TagChip>
                     )}
-                    <span className={`px-2 py-0.5 text-xs border ${maturityClass(u.maturityLevel)}`}>
+                    <TagChip tone={maturityTone(u.maturityLevel)}>
                       {maturityLabels[u.maturityLevel]}
-                    </span>
-                    <span className={`px-2 py-0.5 text-xs border ${readinessClass(u.buyerReadiness)}`}>
+                    </TagChip>
+                    <TagChip tone={readinessTone(u.buyerReadiness)}>
                       {buyerReadinessLabels[u.buyerReadiness]}
-                    </span>
+                    </TagChip>
                   </div>
                   <h4 className="font-semibold text-neutral-900 mb-2">{u.titleJa ?? u.title}</h4>
                   <p className="text-xs text-neutral-600 mb-2 leading-relaxed line-clamp-1">
@@ -180,12 +161,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                   </p>
                   <div className="flex gap-2 mb-2 flex-wrap">
                     {u.taskTags.slice(0, 3).map((t) => (
-                      <span
-                        key={t}
-                        className="px-2 py-0.5 text-xs bg-neutral-100 text-neutral-700 border border-neutral-200"
-                      >
-                        {t}
-                      </span>
+                      <TagChip key={t}>{t}</TagChip>
                     ))}
                   </div>
                   <div className="text-xs text-neutral-600">
@@ -199,9 +175,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
         </div>
 
         {filtered.length === 0 && (
-          <div className="border border-neutral-300 bg-white p-8 text-center text-sm text-neutral-600">
-            条件に合う用途がありません。
-          </div>
+          <EmptyState message="条件に合う用途がありません。" />
         )}
       </div>
     </div>

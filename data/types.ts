@@ -84,6 +84,7 @@ export interface Manufacturer extends BaseRecord {
   hqCity?: string;
   foundedYear?: number;
   website: string;
+  logo?: ImageAsset;
   contactUrl?: string;
   description: string;
   japanPresence: JapanPresence;
