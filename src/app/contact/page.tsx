@@ -1,13 +1,11 @@
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { ContactForm } from '@/components/ContactForm';
 
 export const metadata = {
   title: 'お問い合わせ',
   description:
     'ロボット情報の修正、メーカー・代理店の掲載相談、取材相談、導入検討の相談を受け付けています。',
 };
-
-// TODO: 公開前に実際の連絡先（メールアドレス / Formspree 等）に差し替える。
-const CONTACT_EMAIL = 'hello@example.com';
 
 const inquiries = [
   {
@@ -61,17 +59,12 @@ export default function ContactPage() {
 
       <section className="py-12">
         <div className="border border-neutral-200 bg-white p-8">
-          <h2 className="text-xl font-semibold text-neutral-900 mb-3">連絡方法</h2>
-          <p className="text-neutral-600 mb-6 max-w-3xl leading-relaxed">
+          <h2 className="text-xl font-semibold text-neutral-900 mb-3">お問い合わせフォーム</h2>
+          <p className="text-neutral-600 mb-8 max-w-3xl leading-relaxed">
             現時点では販売している製品はありません。導入判断の整理や情報の正確性向上のための窓口です。
-            下記よりメールでご連絡ください。
+            下記フォームよりご連絡ください。
           </p>
-          <a
-            href={`mailto:${CONTACT_EMAIL}`}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white hover:bg-neutral-700 transition-colors text-sm"
-          >
-            メールで連絡する
-          </a>
+          <ContactForm />
         </div>
       </section>
     </div>
