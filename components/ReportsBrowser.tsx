@@ -18,10 +18,11 @@ import {
   matchesTag,
   normalizeTagKey,
 } from '@/lib/tags';
+import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 
 const typeOptions: Array<{ value: 'all' | ReportType; label: string }> = [
-  { value: 'all', label: 'All' },
+  { value: 'all', label: uiText.common.all },
   ...reportTypeOrder.map((value) => ({ value, label: reportTypeLabels[value] })),
 ];
 
@@ -54,8 +55,8 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
     <div className="min-h-screen bg-neutral-100">
       <div className="border-b border-neutral-300 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-8">
-          <Breadcrumbs items={[{ label: 'Reports' }]} />
-          <h1 className="text-2xl font-semibold text-neutral-900 mb-3">Reports</h1>
+          <Breadcrumbs items={[{ label: uiText.reports.breadcrumb }]} />
+          <h1 className="text-2xl font-semibold text-neutral-900 mb-3">{uiText.reports.title}</h1>
           <p className="text-sm text-neutral-600 max-w-3xl mb-6 leading-relaxed">
             市場動向・導入レポート・政策・取材・分析を、買い手の意思決定に必要な観点で整理する一次情報ハブ。
           </p>
@@ -64,7 +65,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
             options={typeOptions}
             value={type}
             onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType })}
-            ariaLabel="Report type"
+            ariaLabel={uiText.filters.reportType}
             className="mb-4"
           />
 
@@ -85,7 +86,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
               onChange={(nextTopic) => updateParams({ tag: nextTopic })}
               allowDeselect
               onClear={() => updateParams({ tag: null })}
-              ariaLabel="Report topics"
+              ariaLabel={uiText.filters.reportTopics}
             />
           )}
         </div>
@@ -97,14 +98,16 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
             {featured && !active && (
               <div className="border border-neutral-300 bg-white p-6 mb-6">
                 <div className="text-xs uppercase tracking-wider text-neutral-500 font-medium mb-3 pb-2 border-b border-neutral-200">
-                  Featured Report
+                  {uiText.reports.featured}
                 </div>
                 <h2 className="text-xl font-semibold text-neutral-900 mb-3 leading-tight">
                   {featured.titleJa ?? featured.title}
                 </h2>
                 <p className="text-sm text-neutral-700 mb-4 leading-relaxed">{featured.summary}</p>
                 <div className="border-l-4 border-neutral-900 bg-neutral-50 p-4 mb-4">
-                  <p className="text-xs font-semibold text-neutral-900 mb-1">Why it matters</p>
+                  <p className="text-xs font-semibold text-neutral-900 mb-1">
+                    {uiText.reports.whyItMatters}
+                  </p>
                   <p className="text-sm text-neutral-700 leading-relaxed">{featured.whyItMatters}</p>
                 </div>
                 <div className="flex items-center gap-4 text-xs text-neutral-600 mb-4">
@@ -118,14 +121,14 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                   href={`/reports/${featured.slug}`}
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium uppercase tracking-wider transition-colors"
                 >
-                  Read Report
+                  {uiText.reports.read}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             )}
 
             <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-wider mb-4 px-1">
-              Latest
+              {uiText.common.latest}
             </h3>
             <div className="space-y-2">
               {(active ? filtered : latest).map((report) => (

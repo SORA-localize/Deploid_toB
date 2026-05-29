@@ -11,6 +11,7 @@ import type { Manufacturer, Robot } from '@/data/types';
 import { isPreReleaseDeploymentStage } from '@/lib/display';
 import { japanAvailabilityLabels, robotCategoryLabels } from '@/lib/labels';
 import { createRobotSearchDocument, matchesSearchDocument } from '@/lib/search';
+import { uiText } from '@/lib/uiText';
 
 interface RobotsBrowserProps {
   robots: Robot[];
@@ -47,14 +48,14 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   );
   const typeOptions = useMemo(
     () => [
-      { value: 'all', label: 'All Types' },
+      { value: 'all', label: uiText.common.allTypes },
       ...types.map((value) => ({ value, label: robotCategoryLabels[value] })),
     ],
     [types],
   );
   const manufacturerOptions = useMemo(
     () => [
-      { value: 'all', label: 'All Manufacturers' },
+      { value: 'all', label: uiText.common.allManufacturers },
       ...manufacturers.map((manufacturer) => ({
         value: manufacturer.slug,
         label: manufacturer.name,
@@ -64,7 +65,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   );
   const availabilityOptions = useMemo(
     () => [
-      { value: 'all', label: 'All Status' },
+      { value: 'all', label: uiText.common.allStatus },
       ...avails.map((value) => ({ value, label: japanAvailabilityLabels[value] })),
     ],
     [avails],
@@ -91,17 +92,17 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   );
   const filtered = release === 'active' ? activeRobots : preReleaseRobots;
   const releaseOptions: Array<{ value: 'active' | 'pre'; label: string }> = [
-    { value: 'active', label: `[ ${activeRobots.length} ACTIVE MODELS ]` },
-    { value: 'pre', label: `[ ${preReleaseRobots.length} PRE-RELEASE ]` },
+    { value: 'active', label: uiText.robots.activeModels(activeRobots.length) },
+    { value: 'pre', label: uiText.robots.preReleaseModels(preReleaseRobots.length) },
   ];
 
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-7xl px-6 py-12">
-        <Breadcrumbs items={[{ label: 'Robots' }]} />
+        <Breadcrumbs items={[{ label: uiText.robots.breadcrumb }]} />
 
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-neutral-900 mb-2">Robots</h1>
+          <h1 className="text-2xl font-semibold text-neutral-900 mb-2">{uiText.robots.title}</h1>
           <p className="text-sm text-neutral-600 max-w-3xl">
             導入判断に必要なヒューマノイド機種のカタログ。メーカー、国内入手性、提供段階で絞り込み、現場に合う候補を探せます。
           </p>
@@ -118,21 +119,21 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         <div className="grid grid-cols-1 gap-4 mb-8 md:grid-cols-3">
           <FilterSelect
             id="robot-type"
-            label="ROBOT TYPE"
+            label={uiText.filters.robotType}
             value={type}
             onChange={setType}
             options={typeOptions}
           />
           <FilterSelect
             id="robot-manufacturer"
-            label="MANUFACTURER"
+            label={uiText.filters.manufacturer}
             value={mfg}
             onChange={setMfg}
             options={manufacturerOptions}
           />
           <FilterSelect
             id="robot-availability"
-            label="AVAILABILITY"
+            label={uiText.filters.availability}
             value={avail}
             onChange={setAvail}
             options={availabilityOptions}
@@ -144,10 +145,10 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             options={releaseOptions}
             value={release}
             onChange={setRelease}
-            ariaLabel="Release status"
+            ariaLabel={uiText.filters.releaseStatus}
             buttonClassName="px-3 py-1.5 text-xs uppercase tracking-wide"
           />
-          <div className="text-xs text-neutral-500">Sort by: Latest Release</div>
+          <div className="text-xs text-neutral-500">{uiText.robots.sortByLatestRelease}</div>
         </div>
 
         {filtered.length === 0 ? (

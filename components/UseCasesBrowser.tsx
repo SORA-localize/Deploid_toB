@@ -18,6 +18,7 @@ import {
   matchesTag,
   normalizeTagKey,
 } from '@/lib/tags';
+import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 
 type UseCaseSearchMode = 'industry' | 'task';
@@ -84,8 +85,8 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
     <div className="min-h-screen bg-neutral-100">
       <div className="border-b border-neutral-300 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-8">
-          <Breadcrumbs items={[{ label: 'Use Cases' }]} />
-          <h1 className="text-2xl font-semibold text-neutral-900 mb-3">用途から探す</h1>
+          <Breadcrumbs items={[{ label: uiText.useCases.breadcrumb }]} />
+          <h1 className="text-2xl font-semibold text-neutral-900 mb-3">{uiText.useCases.title}</h1>
           <p className="text-sm text-neutral-600 max-w-3xl mb-6 leading-relaxed">
             業種・ワークフロー・タスクから、現実的なヒューマノイドの適用機会を探します。ベンダー名ではなく、現場の課題から始めます。
           </p>
@@ -102,7 +103,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
             options={modeOptions}
             value={mode}
             onChange={handleModeChange}
-            ariaLabel="Use case search mode"
+            ariaLabel={uiText.filters.useCaseMode}
             className="mb-4"
             buttonClassName="px-4 py-2 text-sm"
           />
@@ -121,7 +122,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                 ? updateParams({ industry: null })
                 : updateParams({ task: null, mode: 'task' })
             }
-            ariaLabel={mode === 'industry' ? 'Industry tags' : 'Task tags'}
+            ariaLabel={mode === 'industry' ? uiText.filters.industryTags : uiText.filters.taskTags}
           />
         </div>
       </div>
@@ -130,7 +131,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
         {featured.length > 0 && !active && (
           <div className="mb-8">
             <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-wider mb-4 px-1">
-              Featured Opportunity Areas
+              {uiText.useCases.featured}
             </h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {featured.map((u) => (
@@ -152,7 +153,9 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                   </div>
                   <h4 className="text-lg font-semibold text-neutral-900 mb-2">{u.titleJa ?? u.title}</h4>
                   <p className="text-sm text-neutral-700 mb-3 leading-relaxed">{u.subtitle ?? u.summary}</p>
-                  <div className="text-xs text-neutral-600">{u.candidateRobotSlugs.length} candidate robots</div>
+                  <div className="text-xs text-neutral-600">
+                    {uiText.useCases.candidateRobots(u.candidateRobotSlugs.length)}
+                  </div>
                 </Link>
               ))}
             </div>
@@ -160,9 +163,11 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
         )}
 
         <div className="flex items-center justify-between mb-4 px-1">
-          <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-wider">All Use Cases</h3>
+          <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-wider">
+            {uiText.useCases.all}
+          </h3>
           <span className="text-xs text-neutral-600">
-            {filtered.length} results{active && ' (filtered)'}
+            {uiText.common.results(filtered.length, Boolean(active))}
           </span>
         </div>
 
@@ -196,7 +201,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                     ))}
                   </div>
                   <div className="text-xs text-neutral-600">
-                    {u.candidateRobotSlugs.length} candidate robots
+                    {uiText.useCases.candidateRobots(u.candidateRobotSlugs.length)}
                   </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-neutral-400 flex-shrink-0 mt-1" />

@@ -13,6 +13,7 @@ import {
   getReports,
 } from '@/lib/data';
 import { reportTypeLabels, reliabilityLabels } from '@/lib/labels';
+import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
   return getReports().map((report) => ({ slug: report.slug }));
@@ -48,7 +49,10 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
       <div className="border-b border-neutral-300 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-6">
           <Breadcrumbs
-            items={[{ label: 'Reports', path: '/reports' }, { label: report.titleJa ?? report.title }]}
+            items={[
+              { label: uiText.reports.breadcrumb, path: '/reports' },
+              { label: report.titleJa ?? report.title },
+            ]}
           />
           <div className="text-xs uppercase tracking-wider text-neutral-500 font-medium mb-3">
             {reportTypeLabels[report.type]}
@@ -80,7 +84,9 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           <div className="col-span-12 lg:col-span-8">
             <div className="space-y-6">
               <div className="border-l-4 border-neutral-900 bg-white p-5">
-                <p className="text-xs font-semibold text-neutral-900 mb-1">Why it matters</p>
+                <p className="text-xs font-semibold text-neutral-900 mb-1">
+                  {uiText.reports.whyItMatters}
+                </p>
                 <p className="text-sm text-neutral-700 leading-relaxed">{report.whyItMatters}</p>
               </div>
 
@@ -92,7 +98,9 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
               {hasTakeaways && (
                 <div className="border border-neutral-300 bg-white p-6">
-                  <h2 className="text-lg font-semibold text-neutral-900 mb-4">Key Takeaways</h2>
+                  <h2 className="text-lg font-semibold text-neutral-900 mb-4">
+                    {uiText.reports.keyTakeaways}
+                  </h2>
                   <ul className="space-y-2 text-sm text-neutral-700">
                     {(report.keyTakeaways ?? []).map((item) => (
                       <li key={item} className="flex items-start gap-2">
@@ -105,7 +113,9 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               )}
 
               <div className="border border-neutral-300 bg-white p-6">
-                <h2 className="text-lg font-semibold text-neutral-900 mb-4">Resources / 出典</h2>
+                <h2 className="text-lg font-semibold text-neutral-900 mb-4">
+                  {uiText.common.resources}
+                </h2>
                 {report.sources.length === 0 ? (
                   <p className="text-xs text-neutral-500">出典は本文作成時に追加予定です。</p>
                 ) : (

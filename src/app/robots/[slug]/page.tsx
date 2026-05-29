@@ -21,13 +21,14 @@ import {
   robotCategoryLabels,
   TBD_LABEL,
 } from '@/lib/labels';
+import { uiText } from '@/lib/uiText';
 
 const sections = [
-  { label: 'Overview', href: '#overview' },
-  { label: 'Specifications', href: '#specs' },
-  { label: 'Decision', href: '#decision' },
-  { label: 'Applications', href: '#applications' },
-  { label: 'Resources', href: '#sources' },
+  { label: uiText.common.overview, href: '#overview' },
+  { label: uiText.robots.specifications, href: '#specs' },
+  { label: uiText.robots.decision, href: '#decision' },
+  { label: uiText.robots.applications, href: '#applications' },
+  { label: uiText.common.resources, href: '#sources' },
 ];
 
 export function generateStaticParams() {
@@ -106,7 +107,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
       <div className="mx-auto max-w-7xl px-6 py-12">
         <Breadcrumbs
           items={[
-            { label: 'Robots', path: '/robots' },
+            { label: uiText.robots.breadcrumb, path: '/robots' },
             ...(manufacturer
               ? [{ label: manufacturer.name, path: `/manufacturers/${manufacturer.slug}` }]
               : []),
@@ -138,7 +139,9 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
         <div id="specs" className="border border-neutral-300 bg-neutral-50 mb-12 scroll-mt-6">
           <div className="px-6 py-4 border-b border-neutral-300 bg-white">
-            <h2 className="text-sm font-semibold text-neutral-900">Technical Specifications</h2>
+            <h2 className="text-sm font-semibold text-neutral-900">
+              {uiText.robots.technicalSpecifications}
+            </h2>
           </div>
           <div className="p-6">
             <table className="w-full text-xs">
@@ -174,7 +177,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
         <div id="applications" className="border border-neutral-300 bg-neutral-50 mb-12 scroll-mt-6">
           <div className="px-6 py-4 border-b border-neutral-300 bg-white">
-            <h2 className="text-sm font-semibold text-neutral-900">Application Notes</h2>
+            <h2 className="text-sm font-semibold text-neutral-900">{uiText.robots.applications}</h2>
           </div>
           <div className="p-6">
             <p className="text-xs text-neutral-700 leading-relaxed mb-4">{robot.summary}</p>
@@ -231,7 +234,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
         <div id="sources" className="border border-neutral-300 bg-neutral-50 scroll-mt-6">
           <div className="px-6 py-4 border-b border-neutral-300 bg-white">
-            <h2 className="text-sm font-semibold text-neutral-900">Resources / 出典</h2>
+            <h2 className="text-sm font-semibold text-neutral-900">{uiText.common.resources}</h2>
           </div>
           <div className="p-6">
             {robot.sources.length === 0 ? (

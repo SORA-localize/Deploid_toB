@@ -16,6 +16,7 @@ import {
   operatingEnvironmentLabels,
   useCaseCapabilityNoteLabels,
 } from '@/lib/labels';
+import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
   return getUseCases().map((u) => ({ slug: u.slug }));
@@ -47,7 +48,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
         <div className="mx-auto max-w-7xl px-6 py-6">
           <Breadcrumbs
             items={[
-              { label: 'Use Cases', path: '/use-cases' },
+              { label: uiText.useCases.breadcrumb, path: '/use-cases' },
               { label: useCase.titleJa ?? useCase.title },
             ]}
           />
@@ -79,7 +80,9 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
           </div>
 
           <div className="border border-neutral-300 bg-neutral-50 p-5">
-            <h2 className="text-sm font-semibold text-neutral-900 mb-4">At a Glance</h2>
+            <h2 className="text-sm font-semibold text-neutral-900 mb-4">
+              {uiText.useCases.atAGlance}
+            </h2>
             <div className="grid grid-cols-1 gap-4 text-xs md:grid-cols-3">
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-2 flex items-center gap-1.5">
@@ -109,7 +112,9 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
           <div className="col-span-12 lg:col-span-8">
             <div className="space-y-6">
               <div className="border border-neutral-300 bg-white p-6">
-                <h2 className="text-lg font-semibold text-neutral-900 mb-4">Overview</h2>
+                <h2 className="text-lg font-semibold text-neutral-900 mb-4">
+                  {uiText.common.overview}
+                </h2>
                 <p className="text-sm text-neutral-700 leading-relaxed">{useCase.overview}</p>
               </div>
               <div className="border border-neutral-300 bg-white p-6">
@@ -170,7 +175,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                           href="/compare"
                           className="inline-block w-full px-3 py-2 border border-neutral-300 hover:border-neutral-500 text-xs text-center uppercase tracking-wider transition-colors"
                         >
-                          Compare
+                          {uiText.compare.compare}
                         </Link>
                       </div>
                     ))}

@@ -6,6 +6,7 @@ import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
 import { deploymentStageLabels, mobilityLabels, TBD_LABEL } from '@/lib/labels';
 import { getDisplayableAsset } from '@/lib/media';
+import { uiText } from '@/lib/uiText';
 
 interface RobotCardProps {
   robot: Robot;
@@ -60,7 +61,7 @@ export function RobotCard({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={hero.src} alt={hero.alt} className="h-full w-full object-contain" />
             ) : (
-              '[ MAIN IMAGE ]'
+              uiText.robots.mainImageMissing
             );
           })()}
         </div>
@@ -110,7 +111,9 @@ export function RobotCard({
             </div>
           </dl>
           <div className="flex items-center justify-between pt-3 border-t border-neutral-300">
-            <span className="text-xs uppercase tracking-wide text-neutral-700">View Details</span>
+            <span className="text-xs uppercase tracking-wide text-neutral-700">
+              {uiText.common.viewDetails}
+            </span>
             <ChevronRight className="w-4 h-4 text-neutral-500" />
           </div>
         </div>

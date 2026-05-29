@@ -12,6 +12,7 @@ import {
 } from '@/lib/data';
 import { guideStageLabels, reliabilityLabels } from '@/lib/labels';
 import { getTagLabel } from '@/lib/tags';
+import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
   return getGuides().map((guide) => ({ slug: guide.slug }));
@@ -39,12 +40,12 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
   const hasBody = (guide.body ?? '').trim().length > 0;
 
   const toc = [
-    { label: 'Overview', href: '#overview' },
-    ...(hasBody ? [{ label: 'Body', href: '#body' }] : []),
-    ...(hasChecklist ? [{ label: 'Checklist', href: '#checklist' }] : []),
-    ...(robots.length > 0 ? [{ label: 'Related Robots', href: '#related-robots' }] : []),
-    ...(useCases.length > 0 ? [{ label: 'Related Use Cases', href: '#related-use-cases' }] : []),
-    { label: 'Resources', href: '#sources' },
+    { label: uiText.common.overview, href: '#overview' },
+    ...(hasBody ? [{ label: uiText.guides.body, href: '#body' }] : []),
+    ...(hasChecklist ? [{ label: uiText.guides.checklist, href: '#checklist' }] : []),
+    ...(robots.length > 0 ? [{ label: uiText.guides.relatedRobots, href: '#related-robots' }] : []),
+    ...(useCases.length > 0 ? [{ label: uiText.guides.relatedUseCases, href: '#related-use-cases' }] : []),
+    { label: uiText.common.resources, href: '#sources' },
   ];
 
   return (
@@ -52,7 +53,10 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
       <div className="border-b border-neutral-300 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-6">
           <Breadcrumbs
-            items={[{ label: 'Guides', path: '/guides' }, { label: guide.titleJa ?? guide.title }]}
+            items={[
+              { label: uiText.guides.breadcrumb, path: '/guides' },
+              { label: guide.titleJa ?? guide.title },
+            ]}
           />
           <div className="text-xs uppercase tracking-wider text-neutral-500 font-medium mb-3">
             {guide.topics[0] ? getTagLabel(guide.topics[0]) : null}
@@ -64,12 +68,12 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           <div className="flex items-center gap-5 text-xs text-neutral-600 mb-4 pb-5 border-b border-neutral-200 flex-wrap">
             <span className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
-              Updated {guide.updatedAt}
+              {uiText.common.updated} {guide.updatedAt}
             </span>
             {guide.readingTimeMinutes && (
               <span className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5" />
-                {guide.readingTimeMinutes} min
+                {uiText.common.readingMinutes(guide.readingTimeMinutes)}
               </span>
             )}
             <TagChip className="py-1 text-neutral-800 font-medium">
@@ -99,7 +103,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
             <div className="sticky top-6">
               <div className="border border-neutral-300 bg-white p-4">
                 <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
-                  Contents
+                  {uiText.common.contents}
                 </h3>
                 <nav className="space-y-1">
                   {toc.map((item) => (
@@ -114,7 +118,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
                 </nav>
                 <div className="mt-4 pt-3 border-t border-neutral-200">
                   <Link href="/guides" className="text-xs text-neutral-600 hover:text-neutral-900">
-                    ← Back to all guides
+                    ← {uiText.guides.backToAll}
                   </Link>
                 </div>
               </div>
@@ -125,7 +129,9 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           <div className="col-span-12 lg:col-span-7">
             <div className="space-y-6">
               <div id="overview" className="border border-neutral-300 bg-white p-6 scroll-mt-6">
-                <h2 className="text-lg font-semibold text-neutral-900 mb-4">Overview</h2>
+                <h2 className="text-lg font-semibold text-neutral-900 mb-4">
+                  {uiText.common.overview}
+                </h2>
                 <p className="text-sm text-neutral-700 leading-relaxed">{guide.description}</p>
               </div>
 
@@ -151,7 +157,9 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
               {robots.length > 0 && (
                 <div id="related-robots" className="border border-neutral-300 bg-white p-6 scroll-mt-6">
-                  <h2 className="text-lg font-semibold text-neutral-900 mb-4">Related Robots</h2>
+                  <h2 className="text-lg font-semibold text-neutral-900 mb-4">
+                    {uiText.guides.relatedRobots}
+                  </h2>
                   <div className="space-y-3">
                     {robots.map((robot) => (
                       <Link
@@ -176,7 +184,9 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
               {useCases.length > 0 && (
                 <div id="related-use-cases" className="border border-neutral-300 bg-white p-6 scroll-mt-6">
-                  <h2 className="text-lg font-semibold text-neutral-900 mb-4">Related Use Cases</h2>
+                  <h2 className="text-lg font-semibold text-neutral-900 mb-4">
+                    {uiText.guides.relatedUseCases}
+                  </h2>
                   <div className="flex flex-wrap gap-2">
                     {useCases.map((useCase) => (
                       <Link
@@ -192,7 +202,9 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
               )}
 
               <div id="sources" className="border border-neutral-300 bg-white p-6 scroll-mt-6">
-                <h2 className="text-lg font-semibold text-neutral-900 mb-4">Resources / 出典</h2>
+                <h2 className="text-lg font-semibold text-neutral-900 mb-4">
+                  {uiText.common.resources}
+                </h2>
                 {guide.sources.length === 0 ? (
                   <p className="text-xs text-neutral-500">出典は本文作成時に追加予定です。</p>
                 ) : (
@@ -224,7 +236,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
             <div className="sticky top-6 space-y-4">
               <div className="border border-neutral-300 bg-white p-4">
                 <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
-                  Decision Summary
+                  {uiText.guides.decisionSummary}
                 </h3>
                 {guide.targetReaders.length > 0 && (
                   <div className="mb-4 pb-4 border-b border-neutral-200">
@@ -236,13 +248,13 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
                   href="/compare"
                   className="block w-full px-4 py-2.5 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium uppercase tracking-wider text-center transition-colors"
                 >
-                  Compare Candidate Robots
+                  {uiText.guides.compareCandidateRobots}
                 </Link>
               </div>
 
               <div className="border border-neutral-300 bg-white p-4">
                 <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
-                  Related Paths
+                  {uiText.guides.relatedPaths}
                 </h3>
                 <nav className="space-y-2">
                   <Link

@@ -11,6 +11,7 @@ import {
   getRobotsByManufacturerSlug,
 } from '@/lib/data';
 import { companyTypeLabels, japanPresenceLabels, TBD_LABEL } from '@/lib/labels';
+import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
   return getManufacturers().map((manufacturer) => ({ slug: manufacturer.slug }));
@@ -41,7 +42,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
         <Breadcrumbs
           items={[
-            { label: 'Manufacturers', path: '/manufacturers' },
+            { label: uiText.manufacturers.breadcrumb, path: '/manufacturers' },
             { label: manufacturer.nameJa ?? manufacturer.name },
           ]}
         />
@@ -49,7 +50,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
         <div className="grid grid-cols-1 gap-8 mb-12 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="mb-2 text-xs uppercase tracking-wide text-neutral-500 flex items-center gap-2 flex-wrap">
-              <span>[ MANUFACTURER PROFILE ]</span>
+              <span>{uiText.manufacturers.profile}</span>
               <span className="px-2 py-0.5 border border-neutral-400 text-neutral-700">
                 {companyTypeLabels[manufacturer.companyType]}
               </span>
@@ -83,7 +84,9 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
           </div>
 
           <div className="border border-neutral-300 bg-neutral-50 p-4 sm:p-6">
-            <h3 className="text-sm font-semibold text-neutral-900 mb-4">Fact Sheet</h3>
+            <h3 className="text-sm font-semibold text-neutral-900 mb-4">
+              {uiText.manufacturers.factSheet}
+            </h3>
             <dl className="space-y-3 text-xs">
               <div className="flex justify-between gap-4 py-2 border-b border-neutral-300">
                 <dt className="text-neutral-500">所在地</dt>
@@ -112,13 +115,13 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
                 className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white border border-neutral-300 hover:bg-neutral-50 text-xs uppercase tracking-wide text-neutral-900"
               >
                 <ExternalLink className="w-3 h-3" />
-                WEBSITE
+                {uiText.common.website}
               </a>
               <Link
                 href="/contact"
                 className="flex-1 text-center px-3 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs uppercase tracking-wide"
               >
-                CONTACT
+                {uiText.common.contact}
               </Link>
             </div>
           </div>
@@ -128,7 +131,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
           <div className="flex items-center justify-between gap-4 mb-6">
             <h2 className="text-xl font-semibold text-neutral-900">取扱機種</h2>
             <span className="px-3 py-1.5 bg-neutral-100 border border-neutral-300 text-neutral-700 text-xs uppercase tracking-wide whitespace-nowrap">
-              [ {robots.length} MODELS ]
+              {uiText.manufacturers.models(robots.length)}
             </span>
           </div>
 

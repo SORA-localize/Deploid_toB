@@ -12,6 +12,7 @@ import { TagChip } from '@/components/TagChip';
 import type { Manufacturer, Robot } from '@/data/types';
 import { companyStatusLabels, companyTypeLabels, japanPresenceLabels, TBD_LABEL } from '@/lib/labels';
 import { createManufacturerSearchDocument, matchesSearchDocument } from '@/lib/search';
+import { uiText } from '@/lib/uiText';
 
 interface ManufacturersBrowserProps {
   manufacturers: Manufacturer[];
@@ -62,19 +63,22 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
     [manufacturers],
   );
   const countryOptions = useMemo(
-    () => [{ value: 'all', label: 'All Regions' }, ...countries.map((value) => ({ value, label: value }))],
+    () => [
+      { value: 'all', label: uiText.common.allRegions },
+      ...countries.map((value) => ({ value, label: value })),
+    ],
     [countries],
   );
   const typeOptions = useMemo(
     () => [
-      { value: 'all', label: 'All Types' },
+      { value: 'all', label: uiText.common.allTypes },
       ...types.map((value) => ({ value, label: companyTypeLabels[value] })),
     ],
     [types],
   );
   const statusOptions = useMemo(
     () => [
-      { value: 'all', label: 'All Status' },
+      { value: 'all', label: uiText.common.allStatus },
       ...statuses.map((value) => ({ value, label: companyStatusLabels[value] })),
     ],
     [statuses],
@@ -93,10 +97,12 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-7xl px-6 py-12">
-        <Breadcrumbs items={[{ label: 'Manufacturers' }]} />
+        <Breadcrumbs items={[{ label: uiText.manufacturers.breadcrumb }]} />
 
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-neutral-900 mb-2">Manufacturers</h1>
+          <h1 className="text-2xl font-semibold text-neutral-900 mb-2">
+            {uiText.manufacturers.title}
+          </h1>
           <p className="text-sm text-neutral-600 max-w-3xl">
             ヒューマノイドの開発企業・代理店のディレクトリ。国・区分・ステータスで絞り込み、日本での供給体制を確認できます。
           </p>
@@ -113,21 +119,21 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
         <div className="grid grid-cols-1 gap-4 mb-8 md:grid-cols-3">
           <FilterSelect
             id="manufacturer-country"
-            label="ORIGIN COUNTRY"
+            label={uiText.filters.country}
             value={country}
             onChange={setCountry}
             options={countryOptions}
           />
           <FilterSelect
             id="manufacturer-type"
-            label="COMPANY TYPE"
+            label={uiText.filters.companyType}
             value={type}
             onChange={setType}
             options={typeOptions}
           />
           <FilterSelect
             id="manufacturer-status"
-            label="STATUS"
+            label={uiText.filters.status}
             value={status}
             onChange={setStatus}
             options={statusOptions}
@@ -184,7 +190,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                     href={`/manufacturers/${manufacturer.slug}`}
                     className="flex items-center justify-between w-full px-4 py-2 bg-white border border-neutral-300 hover:bg-neutral-50 transition-colors text-xs uppercase tracking-wide text-neutral-900"
                   >
-                    <span>VIEW FULL PROFILE</span>
+                    <span>{uiText.common.viewProfile}</span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>

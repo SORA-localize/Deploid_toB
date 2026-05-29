@@ -7,6 +7,7 @@ import { FavoriteCard } from '@/components/FavoriteCard';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { RobotCard } from '@/components/RobotCard';
 import type { Manufacturer, Robot } from '@/data/types';
+import { uiText } from '@/lib/uiText';
 
 interface CompareClientProps {
   robots: Robot[];
@@ -52,10 +53,10 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 sm:py-12">
-        <Breadcrumbs items={[{ label: 'Compare' }]} />
+        <Breadcrumbs items={[{ label: uiText.compare.breadcrumb }]} />
 
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-neutral-900 mb-2">Compare</h1>
+          <h1 className="text-2xl font-semibold text-neutral-900 mb-2">{uiText.compare.title}</h1>
           <p className="text-sm text-neutral-600 max-w-3xl">
             左のメニューから機種を選んで比較します。右パネルで気になる機種をお気に入り登録できます。
           </p>
@@ -67,7 +68,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
             <div className="border border-neutral-300 bg-neutral-50 xl:sticky xl:top-6">
               <div className="px-4 py-3 border-b border-neutral-300 bg-white">
                 <h2 className="text-xs font-semibold text-neutral-900 uppercase tracking-wide">
-                  Manufacturers
+                  {uiText.compare.manufacturers}
                 </h2>
               </div>
               <div className="divide-y divide-neutral-300 max-h-80 overflow-y-auto xl:max-h-[calc(100vh-200px)]">
@@ -143,7 +144,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
           <div className="min-w-0">
             <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-xs uppercase tracking-wide text-neutral-500">
-                COMPARISON SHEET ({selectedSlugs.length}/9)
+                {uiText.compare.comparisonSheet(selectedSlugs.length, 9)}
               </span>
               {selectedSlugs.length > 0 && (
                 <button
@@ -152,7 +153,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   onClick={() => setSelectedSlugs([])}
                   className="text-xs text-neutral-500 hover:text-neutral-900 uppercase tracking-wide"
                 >
-                  Clear All
+                  {uiText.common.clearAll}
                 </button>
               )}
             </div>
@@ -222,7 +223,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
               <div className="px-4 py-3 border-b border-neutral-300 bg-white flex items-center gap-2">
                 <Star className="w-4 h-4 text-yellow-500" />
                 <h2 className="text-xs font-semibold text-neutral-900 uppercase tracking-wide">
-                  Favorites
+                  {uiText.compare.favorites}
                 </h2>
               </div>
               <div className="p-4 max-h-80 overflow-y-auto xl:max-h-[calc(100vh-200px)]">

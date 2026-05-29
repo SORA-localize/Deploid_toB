@@ -33,12 +33,12 @@ export const imageRoleOrder: ImageRole[] = [
 
 /** カルーセルのempty state（写真未投入時のラベル）と、タブ表記。 */
 export const imageRoleLabels: Record<ImageRole, string> = {
-  hero: 'MAIN IMAGE',
-  side: 'SIDE VIEW',
-  inOperation: 'IN OPERATION',
-  scale: 'SCALE REFERENCE',
-  endEffector: 'END EFFECTOR',
-  mobility: 'MOBILITY DETAIL',
+  hero: 'メイン画像',
+  side: '側面',
+  inOperation: '稼働シーン',
+  scale: 'サイズ比較',
+  endEffector: 'ハンド・把持部',
+  mobility: '移動機構',
 };
 
 export const buyerReadinessLabels: Record<BuyerReadiness, string> = {
@@ -132,9 +132,9 @@ export const reportTypeLabels: Record<ReportType, string> = {
 };
 
 export const maturityLabels: Record<UseCaseMaturity, string> = {
-  'early-stage': 'Early Stage',
-  'pilot-phase': 'Pilot Phase',
-  'production-ready': 'Production Ready',
+  'early-stage': '初期検討',
+  'pilot-phase': 'PoC・実証',
+  'production-ready': '実運用候補',
 };
 
 export const operatingEnvironmentLabels: Record<OperatingEnvironment, string> = {

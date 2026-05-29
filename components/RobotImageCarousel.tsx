@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { ImageAsset, ImageRole } from '@/data/types';
 import { imageRoleLabels, imageRoleOrder } from '@/lib/labels';
 import { getDisplayableAsset } from '@/lib/media';
+import { uiText } from '@/lib/uiText';
 
 interface RobotImageCarouselProps {
   images?: Partial<Record<ImageRole, ImageAsset>>;
@@ -35,14 +36,14 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
         <button
           onClick={() => setIdx((i) => (i - 1 + slots.length) % slots.length)}
           className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/90 hover:bg-white border border-neutral-300 transition-colors"
-          aria-label="Previous image"
+          aria-label="前の画像"
         >
           <ChevronLeft className="w-4 h-4 text-neutral-700" />
         </button>
         <button
           onClick={() => setIdx((i) => (i + 1) % slots.length)}
           className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/90 hover:bg-white border border-neutral-300 transition-colors"
-          aria-label="Next image"
+          aria-label="次の画像"
         >
           <ChevronRight className="w-4 h-4 text-neutral-700" />
         </button>
@@ -72,12 +73,12 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
 
       {img?.credit && (
         <div className="px-3 py-2 border-t border-neutral-300 text-[10px] text-neutral-500">
-          Credit: {img.credit}
+          {uiText.common.credit}: {img.credit}
           {img.sourceUrl && (
             <>
               {' '}
               <a href={img.sourceUrl} target="_blank" rel="noreferrer" className="underline">
-                source
+                {uiText.common.source}
               </a>
             </>
           )}

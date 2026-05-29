@@ -11,10 +11,11 @@ import type { Guide, GuideStage } from '@/data/types';
 import { guideStageOrder } from '@/lib/display';
 import { guideStageLabels } from '@/lib/labels';
 import { getGuideTopicOptions, getTagLabel, matchesTag, normalizeTagKey } from '@/lib/tags';
+import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 
 const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
-  { value: 'all', label: 'All' },
+  { value: 'all', label: uiText.common.all },
   ...guideStageOrder.map((value) => ({ value, label: guideStageLabels[value] })),
 ];
 
@@ -36,8 +37,8 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
     <div className="min-h-screen bg-neutral-100">
       <div className="border-b border-neutral-300 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-8">
-          <Breadcrumbs items={[{ label: 'Guides' }]} />
-          <h1 className="text-2xl font-semibold text-neutral-900 mb-3">Guides</h1>
+          <Breadcrumbs items={[{ label: uiText.guides.breadcrumb }]} />
+          <h1 className="text-2xl font-semibold text-neutral-900 mb-3">{uiText.guides.title}</h1>
           <p className="text-sm text-neutral-600 max-w-3xl mb-6 leading-relaxed">
             ヒューマノイド導入を「知る・判断する・動く」で理解するための常設ガイド。調達・TCO・安全・PoC・ベンダー評価を体系的に整理します。
           </p>
@@ -46,7 +47,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
             options={stageOptions}
             value={stage}
             onChange={(nextStage) => updateParams({ stage: nextStage === 'all' ? null : nextStage })}
-            ariaLabel="Guide stage"
+            ariaLabel={uiText.filters.guideStage}
             className="mb-4"
             buttonClassName="px-4 py-2.5 text-xs font-medium uppercase tracking-wide"
           />
@@ -57,7 +58,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
             onChange={(nextTopic) => updateParams({ topic: nextTopic })}
             allowDeselect
             onClear={() => updateParams({ topic: null })}
-            ariaLabel="Guide topics"
+            ariaLabel={uiText.filters.guideTopics}
           />
         </div>
       </div>
@@ -66,7 +67,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
         {featured && stage === 'all' && !topic && (
           <div className="border border-neutral-300 bg-white p-6 mb-6">
             <div className="text-xs uppercase tracking-wider text-neutral-500 font-medium mb-3 pb-2 border-b border-neutral-200">
-              Featured Guide
+              {uiText.guides.featured}
             </div>
             <h2 className="text-xl font-semibold text-neutral-900 mb-3 leading-tight">
               {featured.titleJa ?? featured.title}
@@ -79,7 +80,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
               {featured.readingTimeMinutes && (
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5" />
-                  {featured.readingTimeMinutes} min
+                  {uiText.common.readingMinutes(featured.readingTimeMinutes)}
                 </span>
               )}
               <TagChip className="py-1 text-neutral-800 font-medium">
@@ -91,7 +92,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
               href={`/guides/${featured.slug}`}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium uppercase tracking-wider transition-colors"
             >
-              Read Guide
+              {uiText.guides.read}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -120,9 +121,11 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
                         <p className="text-xs text-neutral-600 mb-3 leading-relaxed">{guide.summary}</p>
                         <div className="flex items-center gap-4 text-xs text-neutral-500 mb-2">
                           <span>{guide.updatedAt}</span>
-                          {guide.readingTimeMinutes && <span>{guide.readingTimeMinutes} min</span>}
+                          {guide.readingTimeMinutes && (
+                            <span>{uiText.common.readingMinutes(guide.readingTimeMinutes)}</span>
+                          )}
                           {guide.relatedRobotSlugs.length > 0 && (
-                            <span>{guide.relatedRobotSlugs.length} robots</span>
+                            <span>{uiText.guides.relatedRobotsCount(guide.relatedRobotSlugs.length)}</span>
                           )}
                         </div>
                         <div className="flex gap-2 flex-wrap">
