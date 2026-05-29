@@ -2,8 +2,7 @@
 
 import type { FormEvent } from 'react';
 import { useForm, ValidationError } from '@formspree/react';
-
-const inquiryTypes = ['情報提供・修正', '掲載相談', '取材相談', '導入相談', 'その他'];
+import { contactInquiryTypeLabels, contactInquiryTypeOrder } from '@/lib/labels';
 const formspreeFormId = process.env.NEXT_PUBLIC_FORMSPREE_FORM_ID?.trim();
 const missingFormspreeFormId = 'missing-formspree-form-id';
 
@@ -83,12 +82,12 @@ export function ContactForm() {
           <select
             id="inquiryType"
             name="inquiryType"
-            defaultValue={inquiryTypes[3]}
+            defaultValue="adoption-consultation"
             className="w-full px-3 py-2 border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-neutral-500"
           >
-            {inquiryTypes.map((t) => (
-              <option key={t} value={t}>
-                {t}
+            {contactInquiryTypeOrder.map((type) => (
+              <option key={type} value={contactInquiryTypeLabels[type]}>
+                {contactInquiryTypeLabels[type]}
               </option>
             ))}
           </select>

@@ -3,6 +3,7 @@ import type {
   Capability,
   CompanyStatus,
   CompanyType,
+  ContactInquiryType,
   DeploymentStage,
   GuideStage,
   ImageRole,
@@ -169,3 +170,19 @@ export const reliabilityLabels: Record<Reliability, string> = {
   reported: '報道/調査',
   estimated: '推定',
 };
+
+export const contactInquiryTypeLabels: Record<ContactInquiryType, string> = {
+  'data-correction': '情報提供・修正',
+  'listing-request': '掲載相談',
+  'interview-request': '取材相談',
+  'adoption-consultation': '導入相談',
+  'other': 'その他',
+};
+
+export const contactInquiryTypeOrder: ContactInquiryType[] = [
+  'data-correction',
+  'listing-request',
+  'interview-request',
+  'adoption-consultation',
+  'other',
+];
