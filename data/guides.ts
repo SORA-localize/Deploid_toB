@@ -139,7 +139,12 @@ export const guides: Guide[] = [
 
 「ヒューマノイドを入れたい」という意思決定から始めると、適合しない作業に無理やり機体を当てることになる。逆に「現場のこの作業を、人型である意味があるか」から問い直すと、選択肢が広がる。`,
     relatedRobotSlugs: ['unitree-g1', 'figure-02'],
-    relatedUseCaseSlugs: ['warehouse-picking', 'factory-inspection'],
+    relatedUseCaseSlugs: [
+      'warehouse-picking',
+      'factory-inspection',
+      'research-development',
+      'demo-exhibition',
+    ],
   },
   {
     slug: 'poc-planning',

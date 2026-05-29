@@ -1,12 +1,13 @@
 // 参照整合チェック。dev起動時に lib/data.ts から1度だけ呼ばれ、
 // 「存在しないslugを参照している」「双方向リンクが片側だけ」「slug重複」を
 // console に出す。本番では走らない。
-import { guides } from '@/data/guides';
-import { manufacturers } from '@/data/manufacturers';
-import { reports } from '@/data/reports';
-import { robots } from '@/data/robots';
-import type { ImageAsset, RightsStatus } from '@/data/types';
-import { useCases } from '@/data/useCases';
+import { guides } from '../data/guides.ts';
+import { manufacturers } from '../data/manufacturers.ts';
+import { reports } from '../data/reports.ts';
+import { robots } from '../data/robots.ts';
+import type { ImageAsset, RightsStatus } from '../data/types.ts';
+import { useCases } from '../data/useCases.ts';
+import { isRegisteredTag, normalizeTagKey, type TagKind } from './tagRegistry.ts';
 
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
 const referenceDisplayStatuses = new Set<RightsStatus>([
@@ -76,11 +77,26 @@ export function validateData(): string[] {
   const checkTagDuplicates = (kind: string, owner: string, field: string, values: readonly string[]) => {
     const seen = new Set<string>();
     for (const value of values) {
-      const key = value.trim().toLowerCase().replace(/[\s_]+/g, '-');
+      const key = normalizeTagKey(value);
       if (seen.has(key)) {
         issues.push(`[tag-duplicate] ${kind} "${owner}".${field} に正規化後の重複があります: ${value}`);
       }
       seen.add(key);
+    }
+  };
+
+  const checkTags = (
+    kind: string,
+    owner: string,
+    field: string,
+    tagKind: TagKind,
+    values: readonly string[],
+  ) => {
+    checkTagDuplicates(kind, owner, field, values);
+    for (const value of values) {
+      if (!isRegisteredTag(tagKind, value)) {
+        issues.push(`[tag-unknown] ${kind} "${owner}".${field} に未登録タグがあります: ${value}`);
+      }
     }
   };
 
@@ -115,7 +131,7 @@ export function validateData(): string[] {
 
   for (const g of guides) {
     checkDate('guide', g.slug, 'updatedAt', g.updatedAt);
-    checkTagDuplicates('guide', g.slug, 'topics', g.topics);
+    checkTags('guide', g.slug, 'topics', 'guide-topic', g.topics);
     g.relatedRobotSlugs.forEach((s) => check('guide', g.slug, 'relatedRobotSlugs', s, robotSlugs));
     g.relatedUseCaseSlugs.forEach((s) =>
       check('guide', g.slug, 'relatedUseCaseSlugs', s, useCaseSlugs),
@@ -124,8 +140,8 @@ export function validateData(): string[] {
 
   for (const u of useCases) {
     checkDate('useCase', u.slug, 'updatedAt', u.updatedAt);
-    checkTagDuplicates('useCase', u.slug, 'industryTags', u.industryTags);
-    checkTagDuplicates('useCase', u.slug, 'taskTags', u.taskTags);
+    checkTags('useCase', u.slug, 'industryTags', 'industry', u.industryTags);
+    checkTags('useCase', u.slug, 'taskTags', 'task', u.taskTags);
     u.candidateRobotSlugs.forEach((s) =>
       check('useCase', u.slug, 'candidateRobotSlugs', s, robotSlugs),
     );
@@ -138,7 +154,7 @@ export function validateData(): string[] {
     checkDate('report', rep.slug, 'updatedAt', rep.updatedAt);
     checkDate('report', rep.slug, 'publishedAt', rep.publishedAt);
     checkRequiredSources('report', rep.slug, rep.sources);
-    checkTagDuplicates('report', rep.slug, 'tags', rep.tags);
+    checkTags('report', rep.slug, 'tags', 'report', rep.tags);
     rep.relatedRobotSlugs.forEach((s) =>
       check('report', rep.slug, 'relatedRobotSlugs', s, robotSlugs),
     );

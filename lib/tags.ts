@@ -1,6 +1,12 @@
 import type { Guide, Report, UseCase } from '@/data/types';
+import {
+  getAnyRegisteredTag,
+  getRegisteredTag,
+  normalizeTagKey,
+  type TagKind,
+} from '@/lib/tagRegistry';
 
-export type TagKind = 'report' | 'guide-topic' | 'industry' | 'task';
+export { normalizeTagKey, type TagKind };
 
 export interface TagOption {
   value: string;
@@ -9,12 +15,9 @@ export interface TagOption {
   count: number;
 }
 
-export function normalizeTagKey(value: string) {
-  return value.trim().toLowerCase().replace(/[\s_]+/g, '-');
-}
-
-export function getTagLabel(value: string) {
-  return value.trim();
+export function getTagLabel(value: string, kind?: TagKind) {
+  if (kind) return getRegisteredTag(kind, value)?.label ?? value.trim();
+  return getAnyRegisteredTag(value)?.label ?? value.trim();
 }
 
 export function matchesTag(values: readonly string[], selected: string | null | undefined) {
@@ -49,7 +52,7 @@ function toTagOptions(values: readonly string[], kind: TagKind): TagOption[] {
 
     options.set(key, {
       value: key,
-      label: getTagLabel(value),
+      label: getTagLabel(value, kind),
       kind,
       count: 1,
     });
