@@ -36,7 +36,7 @@
 
 ## 4. 仕上げ（任意）
 - [ ] `body` を Markdown でちゃんと描画したい → `react-markdown` 追加（依存は軽量）
-- [ ] ロボット詳細に複数画像ギャラリー → 型に `images?: ImageAsset[]` を追加、`react-slick` または静的グリッド
+- [x] ロボット詳細に複数画像ギャラリー → `Robot.images?: Partial<Record<ImageRole, ImageAsset>>` と静的カルーセルで対応済み
 - [ ] `archived` ステータスの扱い分岐（現状 `published 以外` は非表示）
 - [ ] CMS 接続（件数が増えてから）：Sanity または microCMS。`types.ts` と整合するスキーマを CMS 側に作り、`lib/data.ts` の取得部だけ差し替え
 

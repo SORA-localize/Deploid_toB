@@ -13,6 +13,8 @@ Primary files:
 - `refactor_search_tags_phase1_audit_v1.md`: Phase 1 audit findings and prioritized implementation targets for the refactor/search/tag plan
 - `refactor_search_tags_phase3_5_recovery_plan_v1.md`: follow-up recovery plan before returning from Phase 3 to Phase 4 tag foundations
 - `refactor_search_tags_phase9_final_audit_v1.md`: final audit results after the UI/search/tag/env refactor phases
+- `ui_architecture_and_development_policy_v1.md`: current UI structure, component responsibilities, and future UI development policy
+- `design_system_v1.md`: visual design system, layout rules, component patterns, and UI acceptance checklist
 - `humanoid_platform_tech_stack_v1.md`: technology stack decision
 - `humanoid_data_model_policy_v1.md`: data model policy and quality rules
 - `humanoid_data_management_guide_v1.md`: data operation guide

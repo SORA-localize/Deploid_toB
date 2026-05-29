@@ -24,6 +24,7 @@
 |---|---:|---|
 | `NEXT_PUBLIC_SITE_URL` | No | sitemap / metadata 用の公開URL。未設定時は `http://localhost:3000` |
 | `NEXT_PUBLIC_FORMSPREE_FORM_ID` | Yes | Contactフォーム送信用のFormspree form ID。未設定時はフォームを送信不可にする |
+| `NEXT_PUBLIC_MEDIA_USAGE_POLICY` | No | 画像・ロゴの表示ポリシー。未設定時は `reference-attributed`。厳格運用時は `commercial-strict` |
 
 Vercelでは Project Settings の Environment Variables に設定する。
 
@@ -44,3 +45,4 @@ docs/planning/  # 設計・意思決定ドキュメント
 
 - 公開 URL 識別子は `slug`。`/reports`（≠`/posts`）、`/use-cases`（≠`/industries`）。
 - 機種スペック・価格・代理店情報は一次出典で裏取りし `sources`（`Source[]`）に残す。不明値は `要確認`。
+- 画像・ロゴは `ImageAsset.rights` を必ず持たせる。初期運用では `reference-attributed` を許容し、商用許諾が取れたら `commercial-permitted` に更新する。

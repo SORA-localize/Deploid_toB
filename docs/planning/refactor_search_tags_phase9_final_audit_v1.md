@@ -143,12 +143,9 @@ HTTP 200を確認したページ:
 
 ### 3.2 画像・ロゴ権利ゲート
 
-media rights policy は追加済みだが、`rights.status` をデータモデルに実装し、`canDisplayAsset(asset)` で未許諾画像・ロゴを非表示にする処理はまだ入っていない。
+後続整理で `ImageAsset.rights` と `lib/media.ts` の表示ゲートを追加済み。
 
-現状は、登録済みの `heroImage`, `Robot.images`, `Manufacturer.logo` が表示される。公開運用・public demo前には、次のどちらかが必要。
-
-- `commercial-permitted` など商用公開に耐える素材だけに差し替える。
-- `rights` metadata と表示ゲートを実装する。
+現状の外部画像・ロゴは `reference-attributed` として初期MVP表示を許容している。営業・広告・商用色が強い公開運用へ移す場合は、`NEXT_PUBLIC_MEDIA_USAGE_POLICY=commercial-strict` に切り替え、`commercial-permitted` 以上の素材だけ表示する。
 
 ### 3.3 手動ビジュアル確認
 
