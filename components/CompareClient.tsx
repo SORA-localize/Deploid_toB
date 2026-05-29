@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, Star, X } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { ComparisonRobotPanel } from '@/components/ComparisonRobotPanel';
 import { FavoriteCard } from '@/components/FavoriteCard';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
-import { RobotCard } from '@/components/RobotCard';
 import type { Manufacturer, Robot } from '@/data/types';
 import { uiText } from '@/lib/uiText';
 
@@ -159,7 +159,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
             </div>
 
             {selectedRobots.length === 0 ? (
-              <div className="border border-neutral-300 bg-neutral-50 p-8 text-center sm:p-16">
+              <div className="flex min-h-[22rem] items-center justify-center border border-neutral-300 bg-neutral-50 p-8 text-center sm:p-16">
                 <div className="max-w-md mx-auto">
                   <div className="w-16 h-16 bg-neutral-200 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg
@@ -186,30 +186,20 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                 </div>
               </div>
             ) : (
-              <div className="border border-neutral-300 bg-white p-4 sm:p-6">
+              <div className="border border-neutral-300 bg-neutral-50 p-3 sm:p-4">
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                   {selectedRobots.map((robot) => {
                     const manufacturer = manufacturerFor(robot.manufacturerSlug);
                     return (
-                      <div key={robot.slug} className="relative">
-                        <button
-                          type="button"
-                          aria-label={`${robot.nameJa ?? robot.name} を比較から外す`}
-                          onClick={() => removeRobot(robot.slug)}
-                          className="absolute -top-2 -right-2 z-10 p-1.5 bg-white border border-neutral-300 hover:bg-neutral-100 transition-colors rounded-full"
-                          title="比較から外す"
-                        >
-                          <X className="w-3 h-3 text-neutral-600" />
-                        </button>
-                        <RobotCard
-                          robot={robot}
-                          manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
-                          manufacturerLogo={manufacturer?.logo}
-                          showFavorite
-                          isFavorite={favoriteSlugs.includes(robot.slug)}
-                          onFavoriteToggle={toggleFavorite}
-                        />
-                      </div>
+                      <ComparisonRobotPanel
+                        key={robot.slug}
+                        robot={robot}
+                        manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                        manufacturerLogo={manufacturer?.logo}
+                        isFavorite={favoriteSlugs.includes(robot.slug)}
+                        onFavoriteToggle={toggleFavorite}
+                        onRemove={removeRobot}
+                      />
                     );
                   })}
                 </div>
