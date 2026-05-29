@@ -3,6 +3,7 @@
 import type { FormEvent } from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 import { contactInquiryTypeOptions } from '@/lib/labels';
+import { FormSelect } from '@/components/FormSelect';
 const formspreeFormId = process.env.NEXT_PUBLIC_FORMSPREE_FORM_ID?.trim();
 const missingFormspreeFormId = 'missing-formspree-form-id';
 
@@ -76,23 +77,13 @@ export function ContactForm() {
           <ValidationError prefix="Email" field="email" errors={state.errors} className="mt-1 text-xs text-red-700" />
         </div>
 
-        <div>
-          <label htmlFor="inquiryType" className="block text-xs font-medium text-neutral-900 mb-2">
-            ご相談の種別
-          </label>
-          <select
-            id="inquiryType"
-            name="inquiryType"
-            defaultValue="導入相談"
-            className="w-full px-3 py-2 border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-neutral-500"
-          >
-            {contactInquiryTypeOptions.map(({ value, label }) => (
-              <option key={value} value={label}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <FormSelect
+          id="inquiryType"
+          name="inquiryType"
+          label="ご相談の種別"
+          options={contactInquiryTypeOptions}
+          defaultValue="adoption-consultation"
+        />
 
         <div>
           <label htmlFor="message" className="block text-xs font-medium text-neutral-900 mb-2">
