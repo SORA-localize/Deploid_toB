@@ -10,6 +10,12 @@ import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
 import { TagChip } from '@/components/TagChip';
 import type { Manufacturer, Robot } from '@/data/types';
+import {
+  companyStatusOrder,
+  companyTypeOrder,
+  manufacturerCountryOrder,
+  sortByDisplayOrder,
+} from '@/lib/display';
 import { companyStatusLabels, companyTypeLabels, japanPresenceLabels, TBD_LABEL } from '@/lib/labels';
 import { createManufacturerSearchDocument, matchesSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
@@ -51,15 +57,27 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
   );
 
   const countries = useMemo(
-    () => Array.from(new Set(manufacturers.map((m) => m.country))),
+    () =>
+      sortByDisplayOrder(
+        Array.from(new Set(manufacturers.map((m) => m.country))),
+        manufacturerCountryOrder,
+      ),
     [manufacturers],
   );
   const types = useMemo(
-    () => Array.from(new Set(manufacturers.map((m) => m.companyType))),
+    () =>
+      sortByDisplayOrder(
+        Array.from(new Set(manufacturers.map((m) => m.companyType))),
+        companyTypeOrder,
+      ),
     [manufacturers],
   );
   const statuses = useMemo(
-    () => Array.from(new Set(manufacturers.map((m) => m.companyStatus))),
+    () =>
+      sortByDisplayOrder(
+        Array.from(new Set(manufacturers.map((m) => m.companyStatus))),
+        companyStatusOrder,
+      ),
     [manufacturers],
   );
   const countryOptions = useMemo(

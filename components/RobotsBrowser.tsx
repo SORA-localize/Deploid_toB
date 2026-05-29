@@ -8,7 +8,12 @@ import { FilterSelect } from '@/components/FilterSelect';
 import { RobotCard } from '@/components/RobotCard';
 import { SearchInput } from '@/components/SearchInput';
 import type { Manufacturer, Robot } from '@/data/types';
-import { isPreReleaseDeploymentStage } from '@/lib/display';
+import {
+  isPreReleaseDeploymentStage,
+  japanAvailabilityOrder,
+  robotCategoryOrder,
+  sortByDisplayOrder,
+} from '@/lib/display';
 import { japanAvailabilityLabels, robotCategoryLabels } from '@/lib/labels';
 import { createRobotSearchDocument, matchesSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
@@ -41,9 +46,16 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   );
   const manufacturerFor = (slug: string) => manufacturerBySlug.get(slug);
 
-  const types = useMemo(() => Array.from(new Set(robots.map((r) => r.category))), [robots]);
+  const types = useMemo(
+    () => sortByDisplayOrder(Array.from(new Set(robots.map((r) => r.category))), robotCategoryOrder),
+    [robots],
+  );
   const avails = useMemo(
-    () => Array.from(new Set(robots.map((r) => r.japanAvailability))),
+    () =>
+      sortByDisplayOrder(
+        Array.from(new Set(robots.map((r) => r.japanAvailability))),
+        japanAvailabilityOrder,
+      ),
     [robots],
   );
   const typeOptions = useMemo(
