@@ -11,11 +11,10 @@ import { TagChip } from '@/components/TagChip';
 import type { Report, ReportType } from '@/data/types';
 import { reportTypeOrder } from '@/lib/display';
 import { reportTypeLabels } from '@/lib/labels';
-import { matchesQuery } from '@/lib/search';
+import { createReportSearchDocument, matchesSearchDocument } from '@/lib/search';
 import {
   getReportTagOptions,
   getTagLabel,
-  getTagSearchValues,
   matchesTag,
   normalizeTagKey,
 } from '@/lib/tags';
@@ -35,17 +34,15 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
   const query = getParam('q') ?? '';
 
   const topicOptions = useMemo(() => getReportTagOptions(reports), [reports]);
+  const searchDocuments = useMemo(
+    () => new Map(reports.map((report) => [report.slug, createReportSearchDocument(report)])),
+    [reports],
+  );
 
   const filtered = reports.filter((r) => {
     if (type !== 'all' && r.type !== type) return false;
     if (!matchesTag(r.tags, topic)) return false;
-    if (!matchesQuery(query, [
-      r.titleJa,
-      r.title,
-      r.summary,
-      r.whyItMatters,
-      ...getTagSearchValues(r.tags),
-    ])) return false;
+    if (!matchesSearchDocument(query, searchDocuments.get(r.slug))) return false;
     return true;
   });
 

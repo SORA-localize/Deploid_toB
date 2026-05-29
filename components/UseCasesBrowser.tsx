@@ -10,10 +10,9 @@ import { SearchInput } from '@/components/SearchInput';
 import { TagChip } from '@/components/TagChip';
 import type { UseCase } from '@/data/types';
 import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
-import { matchesQuery } from '@/lib/search';
+import { createUseCaseSearchDocument, matchesSearchDocument } from '@/lib/search';
 import {
   getTagLabel,
-  getTagSearchValues,
   getUseCaseIndustryTagOptions,
   getUseCaseTaskTagOptions,
   matchesTag,
@@ -56,6 +55,10 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
     () => (mode === 'industry' ? industries : tasks),
     [mode, industries, tasks],
   );
+  const searchDocuments = useMemo(
+    () => new Map(useCases.map((useCase) => [useCase.slug, createUseCaseSearchDocument(useCase)])),
+    [useCases],
+  );
   const selectedChip = mode === 'industry' ? industry : task;
 
   const handleModeChange = (nextMode: UseCaseSearchMode) => {
@@ -67,13 +70,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
   };
 
   const filtered = useCases.filter((u) => {
-    if (!matchesQuery(query, [
-      u.titleJa,
-      u.title,
-      u.subtitle,
-      u.summary,
-      ...getTagSearchValues([...u.industryTags, ...u.taskTags]),
-    ])) return false;
+    if (!matchesSearchDocument(query, searchDocuments.get(u.slug))) return false;
     if (!matchesTag(u.industryTags, industry)) return false;
     if (!matchesTag(u.taskTags, task)) return false;
     return true;

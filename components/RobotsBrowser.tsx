@@ -10,7 +10,7 @@ import { SearchInput } from '@/components/SearchInput';
 import type { Manufacturer, Robot } from '@/data/types';
 import { isPreReleaseDeploymentStage } from '@/lib/display';
 import { japanAvailabilityLabels, robotCategoryLabels } from '@/lib/labels';
-import { matchesQuery } from '@/lib/search';
+import { createRobotSearchDocument, matchesSearchDocument } from '@/lib/search';
 
 interface RobotsBrowserProps {
   robots: Robot[];
@@ -24,8 +24,21 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   const [release, setRelease] = useState<'active' | 'pre'>('active');
   const [query, setQuery] = useState('');
 
-  const manufacturerFor = (slug: string) => manufacturers.find((m) => m.slug === slug);
-  const manufacturerName = (slug: string) => manufacturerFor(slug)?.name ?? slug;
+  const manufacturerBySlug = useMemo(
+    () => new Map(manufacturers.map((manufacturer) => [manufacturer.slug, manufacturer])),
+    [manufacturers],
+  );
+  const searchDocuments = useMemo(
+    () =>
+      new Map(
+        robots.map((robot) => [
+          robot.slug,
+          createRobotSearchDocument(robot, manufacturerBySlug.get(robot.manufacturerSlug)),
+        ]),
+      ),
+    [robots, manufacturerBySlug],
+  );
+  const manufacturerFor = (slug: string) => manufacturerBySlug.get(slug);
 
   const types = useMemo(() => Array.from(new Set(robots.map((r) => r.category))), [robots]);
   const avails = useMemo(
@@ -64,22 +77,10 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         const typeOk = type === 'all' || r.category === type;
         const mfgOk = mfg === 'all' || r.manufacturerSlug === mfg;
         const availOk = avail === 'all' || r.japanAvailability === avail;
-        const queryOk = matchesQuery(query, [
-          r.nameJa,
-          r.name,
-          manufacturerName(r.manufacturerSlug),
-          r.summary,
-          r.description,
-          r.distributorJapan,
-          r.supportNote,
-          r.safetyNote,
-          r.vendorRiskNote,
-          ...r.comparison.bestFit,
-          ...r.comparison.strengths,
-        ]);
+        const queryOk = matchesSearchDocument(query, searchDocuments.get(r.slug));
         return typeOk && mfgOk && availOk && queryOk;
       });
-  }, [robots, type, mfg, avail, query, manufacturers]);
+  }, [robots, type, mfg, avail, query, searchDocuments]);
   const activeRobots = useMemo(
     () => releaseCandidates.filter((robot) => !isPreReleaseDeploymentStage(robot.deploymentStage)),
     [releaseCandidates],

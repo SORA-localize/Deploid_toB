@@ -11,7 +11,7 @@ import { SearchInput } from '@/components/SearchInput';
 import { TagChip } from '@/components/TagChip';
 import type { Manufacturer, Robot } from '@/data/types';
 import { companyStatusLabels, companyTypeLabels, japanPresenceLabels, TBD_LABEL } from '@/lib/labels';
-import { matchesQuery } from '@/lib/search';
+import { createManufacturerSearchDocument, matchesSearchDocument } from '@/lib/search';
 
 interface ManufacturersBrowserProps {
   manufacturers: Manufacturer[];
@@ -23,6 +23,31 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
   const [type, setType] = useState('all');
   const [status, setStatus] = useState('all');
   const [query, setQuery] = useState('');
+
+  const robotsByManufacturer = useMemo(() => {
+    const byManufacturer = new Map<string, Robot[]>();
+
+    robots.forEach((robot) => {
+      const existing = byManufacturer.get(robot.manufacturerSlug) ?? [];
+      existing.push(robot);
+      byManufacturer.set(robot.manufacturerSlug, existing);
+    });
+
+    return byManufacturer;
+  }, [robots]);
+  const searchDocuments = useMemo(
+    () =>
+      new Map(
+        manufacturers.map((manufacturer) => [
+          manufacturer.slug,
+          createManufacturerSearchDocument(
+            manufacturer,
+            robotsByManufacturer.get(manufacturer.slug) ?? [],
+          ),
+        ]),
+      ),
+    [manufacturers, robotsByManufacturer],
+  );
 
   const countries = useMemo(
     () => Array.from(new Set(manufacturers.map((m) => m.country))),
@@ -55,26 +80,14 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
     [statuses],
   );
 
-  const robotCount = (slug: string) => robots.filter((r) => r.manufacturerSlug === slug).length;
+  const robotCount = (slug: string) => robotsByManufacturer.get(slug)?.length ?? 0;
 
   const filtered = manufacturers.filter(
     (m) =>
       (country === 'all' || m.country === country) &&
       (type === 'all' || m.companyType === type) &&
       (status === 'all' || m.companyStatus === status) &&
-      matchesQuery(query, [
-        m.nameJa,
-        m.name,
-        m.country,
-        m.hqCity,
-        m.summary,
-        m.description,
-        m.distributorNote,
-        m.supportNote,
-        m.procurementNote,
-        m.vendorRiskNote,
-        ...robots.filter((robot) => robot.manufacturerSlug === m.slug).map((robot) => robot.name),
-      ]),
+      matchesSearchDocument(query, searchDocuments.get(m.slug)),
   );
 
   return (
