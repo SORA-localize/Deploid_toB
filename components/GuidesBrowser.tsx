@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -10,7 +10,8 @@ import { TagChip } from '@/components/TagChip';
 import type { Guide, GuideStage } from '@/data/types';
 import { guideStageOrder } from '@/lib/display';
 import { guideStageLabels } from '@/lib/labels';
-import { getGuideTopicOptions, getTagLabel, matchesTag } from '@/lib/tags';
+import { getGuideTopicOptions, getTagLabel, matchesTag, normalizeTagKey } from '@/lib/tags';
+import { useUrlFilters } from '@/lib/useUrlFilters';
 
 const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
   { value: 'all', label: 'All' },
@@ -18,8 +19,11 @@ const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
 ];
 
 export function GuidesBrowser({ guides }: { guides: Guide[] }) {
-  const [stage, setStage] = useState<'all' | GuideStage>('all');
-  const [topic, setTopic] = useState<string | null>(null);
+  const { getParam, updateParams } = useUrlFilters();
+  const stageParam = getParam('stage');
+  const stage = stageParam && guideStageOrder.includes(stageParam as GuideStage) ? stageParam as GuideStage : 'all';
+  const topicParam = getParam('topic');
+  const topic = topicParam ? normalizeTagKey(topicParam) : null;
 
   const topicOptions = useMemo(() => getGuideTopicOptions(guides), [guides]);
   const featured = guides.find((g) => g.order === 1) ?? guides[0];
@@ -41,7 +45,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
           <FilterChipGroup
             options={stageOptions}
             value={stage}
-            onChange={setStage}
+            onChange={(nextStage) => updateParams({ stage: nextStage === 'all' ? null : nextStage })}
             ariaLabel="Guide stage"
             className="mb-4"
             buttonClassName="px-4 py-2.5 text-xs font-medium uppercase tracking-wide"
@@ -50,9 +54,9 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
           <FilterChipGroup
             options={topicOptions}
             value={topic}
-            onChange={setTopic}
+            onChange={(nextTopic) => updateParams({ topic: nextTopic })}
             allowDeselect
-            onClear={() => setTopic(null)}
+            onClear={() => updateParams({ topic: null })}
             ariaLabel="Guide topics"
           />
         </div>

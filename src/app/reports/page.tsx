@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { ReportsBrowser } from '@/components/ReportsBrowser';
 import { getReports } from '@/lib/data';
 
@@ -8,5 +9,9 @@ export const metadata = {
 };
 
 export default function ReportsPage() {
-  return <ReportsBrowser reports={getReports()} />;
+  return (
+    <Suspense fallback={null}>
+      <ReportsBrowser reports={getReports()} />
+    </Suspense>
+  );
 }

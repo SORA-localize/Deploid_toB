@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { UseCasesBrowser } from '@/components/UseCasesBrowser';
 import { getUseCases } from '@/lib/data';
 
@@ -8,5 +9,9 @@ export const metadata = {
 };
 
 export default function UseCasesPage() {
-  return <UseCasesBrowser useCases={getUseCases()} />;
+  return (
+    <Suspense fallback={null}>
+      <UseCasesBrowser useCases={getUseCases()} />
+    </Suspense>
+  );
 }

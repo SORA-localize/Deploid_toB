@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -12,7 +12,14 @@ import type { Report, ReportType } from '@/data/types';
 import { reportTypeOrder } from '@/lib/display';
 import { reportTypeLabels } from '@/lib/labels';
 import { matchesQuery } from '@/lib/search';
-import { getReportTagOptions, getTagLabel, getTagSearchValues, matchesTag } from '@/lib/tags';
+import {
+  getReportTagOptions,
+  getTagLabel,
+  getTagSearchValues,
+  matchesTag,
+  normalizeTagKey,
+} from '@/lib/tags';
+import { useUrlFilters } from '@/lib/useUrlFilters';
 
 const typeOptions: Array<{ value: 'all' | ReportType; label: string }> = [
   { value: 'all', label: 'All' },
@@ -20,9 +27,12 @@ const typeOptions: Array<{ value: 'all' | ReportType; label: string }> = [
 ];
 
 export function ReportsBrowser({ reports }: { reports: Report[] }) {
-  const [type, setType] = useState<'all' | ReportType>('all');
-  const [topic, setTopic] = useState<string | null>(null);
-  const [query, setQuery] = useState('');
+  const { getParam, updateParams } = useUrlFilters();
+  const typeParam = getParam('type');
+  const type = typeParam && reportTypeOrder.includes(typeParam as ReportType) ? typeParam as ReportType : 'all';
+  const topicParam = getParam('tag');
+  const topic = topicParam ? normalizeTagKey(topicParam) : null;
+  const query = getParam('q') ?? '';
 
   const topicOptions = useMemo(() => getReportTagOptions(reports), [reports]);
 
@@ -56,7 +66,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
           <FilterChipGroup
             options={typeOptions}
             value={type}
-            onChange={setType}
+            onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType })}
             ariaLabel="Report type"
             className="mb-4"
           />
@@ -64,7 +74,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
           <div className="mb-4">
             <SearchInput
               value={query}
-              onChange={setQuery}
+              onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
               placeholder="タイトル・トピック・キーワードで検索"
               className="max-w-xl"
               inputClassName="py-2.5"
@@ -75,9 +85,9 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
             <FilterChipGroup
               options={topicOptions}
               value={topic}
-              onChange={setTopic}
+              onChange={(nextTopic) => updateParams({ tag: nextTopic })}
               allowDeselect
-              onClear={() => setTopic(null)}
+              onClear={() => updateParams({ tag: null })}
               ariaLabel="Report topics"
             />
           )}

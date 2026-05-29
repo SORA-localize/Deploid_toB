@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -17,7 +17,9 @@ import {
   getUseCaseIndustryTagOptions,
   getUseCaseTaskTagOptions,
   matchesTag,
+  normalizeTagKey,
 } from '@/lib/tags';
+import { useUrlFilters } from '@/lib/useUrlFilters';
 
 type UseCaseSearchMode = 'industry' | 'task';
 
@@ -39,10 +41,14 @@ function readinessTone(r: UseCase['buyerReadiness']) {
 }
 
 export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
-  const [mode, setMode] = useState<UseCaseSearchMode>('industry');
-  const [industry, setIndustry] = useState<string | null>(null);
-  const [task, setTask] = useState<string | null>(null);
-  const [query, setQuery] = useState('');
+  const { getParam, updateParams } = useUrlFilters();
+  const modeParam = getParam('mode');
+  const industryParam = getParam('industry');
+  const taskParam = getParam('task');
+  const mode: UseCaseSearchMode = modeParam === 'task' || (taskParam && modeParam !== 'industry') ? 'task' : 'industry';
+  const industry = mode === 'industry' && industryParam ? normalizeTagKey(industryParam) : null;
+  const task = mode === 'task' && taskParam ? normalizeTagKey(taskParam) : null;
+  const query = getParam('q') ?? '';
 
   const industries = useMemo(() => getUseCaseIndustryTagOptions(useCases), [useCases]);
   const tasks = useMemo(() => getUseCaseTaskTagOptions(useCases), [useCases]);
@@ -53,12 +59,11 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
   const selectedChip = mode === 'industry' ? industry : task;
 
   const handleModeChange = (nextMode: UseCaseSearchMode) => {
-    setMode(nextMode);
-    if (nextMode === 'industry') {
-      setTask(null);
-    } else {
-      setIndustry(null);
-    }
+    updateParams({
+      mode: nextMode === 'task' ? 'task' : null,
+      industry: null,
+      task: null,
+    });
   };
 
   const filtered = useCases.filter((u) => {
@@ -91,7 +96,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
           <div className="max-w-2xl mb-6">
             <SearchInput
               value={query}
-              onChange={setQuery}
+              onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
               placeholder="自動化したい作業は？"
             />
           </div>
@@ -108,9 +113,17 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
           <FilterChipGroup
             options={chipOptions}
             value={selectedChip}
-            onChange={(value) => (mode === 'industry' ? setIndustry(value) : setTask(value))}
+            onChange={(value) =>
+              mode === 'industry'
+                ? updateParams({ mode: null, industry: value, task: null })
+                : updateParams({ mode: 'task', industry: null, task: value })
+            }
             allowDeselect
-            onClear={() => (mode === 'industry' ? setIndustry(null) : setTask(null))}
+            onClear={() =>
+              mode === 'industry'
+                ? updateParams({ industry: null })
+                : updateParams({ task: null, mode: 'task' })
+            }
             ariaLabel={mode === 'industry' ? 'Industry tags' : 'Task tags'}
           />
         </div>

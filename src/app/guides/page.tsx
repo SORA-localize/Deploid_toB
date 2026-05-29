@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { GuidesBrowser } from '@/components/GuidesBrowser';
 import { getGuides } from '@/lib/data';
 
@@ -8,5 +9,9 @@ export const metadata = {
 };
 
 export default function GuidesPage() {
-  return <GuidesBrowser guides={getGuides()} />;
+  return (
+    <Suspense fallback={null}>
+      <GuidesBrowser guides={getGuides()} />
+    </Suspense>
+  );
 }
