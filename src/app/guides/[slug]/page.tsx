@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
+import { ArticleToc } from '@/components/ArticleToc';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Markdown } from '@/components/Markdown';
+import { RelatedLinkList } from '@/components/RelatedLinkList';
+import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
 import {
   getGuideBySlug,
@@ -10,7 +13,7 @@ import {
   getRelatedRobots,
   getRelatedUseCases,
 } from '@/lib/data';
-import { guideStageLabels, reliabilityLabels } from '@/lib/labels';
+import { guideStageLabels } from '@/lib/labels';
 import { getTagLabel } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
 
@@ -47,6 +50,15 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
     ...(useCases.length > 0 ? [{ label: uiText.guides.relatedUseCases, href: '#related-use-cases' }] : []),
     { label: uiText.common.resources, href: '#sources' },
   ];
+  const relatedRobotItems = robots.map((robot) => ({
+    href: `/robots/${robot.slug}`,
+    title: robot.nameJa ?? robot.name,
+    description: robot.summary,
+  }));
+  const relatedUseCaseItems = useCases.map((useCase) => ({
+    href: `/use-cases/${useCase.slug}`,
+    title: useCase.titleJa ?? useCase.title,
+  }));
 
   return (
     <div className="min-h-screen bg-neutral-100">
@@ -100,29 +112,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
         <div className="grid grid-cols-12 gap-6">
           {/* TOC */}
           <div className="col-span-2 hidden lg:block">
-            <div className="sticky top-6">
-              <div className="border border-neutral-300 bg-white p-4">
-                <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
-                  {uiText.common.contents}
-                </h3>
-                <nav className="space-y-1">
-                  {toc.map((item) => (
-                    <a
-                      key={item.href}
-                      href={item.href}
-                      className="block text-xs text-neutral-700 hover:text-neutral-900 py-1.5 px-2 -mx-2 hover:bg-neutral-50 transition-colors"
-                    >
-                      {item.label}
-                    </a>
-                  ))}
-                </nav>
-                <div className="mt-4 pt-3 border-t border-neutral-200">
-                  <Link href="/guides" className="text-xs text-neutral-600 hover:text-neutral-900">
-                    ← {uiText.guides.backToAll}
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <ArticleToc items={toc} backHref="/guides" backLabel={uiText.guides.backToAll} />
           </div>
 
           {/* Content */}
@@ -156,78 +146,22 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
               )}
 
               {robots.length > 0 && (
-                <div id="related-robots" className="border border-neutral-300 bg-white p-6 scroll-mt-6">
-                  <h2 className="text-lg font-semibold text-neutral-900 mb-4">
-                    {uiText.guides.relatedRobots}
-                  </h2>
-                  <div className="space-y-3">
-                    {robots.map((robot) => (
-                      <Link
-                        key={robot.slug}
-                        href={`/robots/${robot.slug}`}
-                        className="block p-4 border border-neutral-300 hover:border-neutral-500 transition-colors"
-                      >
-                        <div className="flex justify-between items-start gap-4">
-                          <div className="flex-1">
-                            <div className="font-semibold text-neutral-900 mb-1">
-                              {robot.nameJa ?? robot.name}
-                            </div>
-                            <p className="text-sm text-neutral-700 line-clamp-2">{robot.summary}</p>
-                          </div>
-                          <ArrowRight className="w-5 h-5 text-neutral-400 flex-shrink-0" />
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+                <RelatedLinkList
+                  id="related-robots"
+                  title={uiText.guides.relatedRobots}
+                  items={relatedRobotItems}
+                />
               )}
 
               {useCases.length > 0 && (
-                <div id="related-use-cases" className="border border-neutral-300 bg-white p-6 scroll-mt-6">
-                  <h2 className="text-lg font-semibold text-neutral-900 mb-4">
-                    {uiText.guides.relatedUseCases}
-                  </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {useCases.map((useCase) => (
-                      <Link
-                        key={useCase.slug}
-                        href={`/use-cases/${useCase.slug}`}
-                        className="text-xs px-3 py-1.5 bg-white border border-neutral-300 hover:border-neutral-500 transition-colors text-neutral-700"
-                      >
-                        {useCase.titleJa ?? useCase.title}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+                <RelatedLinkList
+                  id="related-use-cases"
+                  title={uiText.guides.relatedUseCases}
+                  items={relatedUseCaseItems}
+                />
               )}
 
-              <div id="sources" className="border border-neutral-300 bg-white p-6 scroll-mt-6">
-                <h2 className="text-lg font-semibold text-neutral-900 mb-4">
-                  {uiText.common.resources}
-                </h2>
-                {guide.sources.length === 0 ? (
-                  <p className="text-xs text-neutral-500">出典は本文作成時に追加予定です。</p>
-                ) : (
-                  <ul className="space-y-2 text-xs">
-                    {guide.sources.map((source) => (
-                      <li key={source.url}>
-                        <a
-                          href={source.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-neutral-900 hover:text-neutral-600 underline"
-                        >
-                          {source.title}
-                        </a>
-                        <span className="text-neutral-500">
-                          {source.publisher ? ` / ${source.publisher}` : ''} / 確認 {source.checkedAt}{' '}
-                          / {reliabilityLabels[source.reliability]}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              <SourceList sources={guide.sources} />
             </div>
           </div>
 
