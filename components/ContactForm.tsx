@@ -82,7 +82,7 @@ export function ContactForm() {
           <select
             id="inquiryType"
             name="inquiryType"
-            defaultValue="adoption-consultation"
+            defaultValue={contactInquiryTypeLabels['adoption-consultation']}
             className="w-full px-3 py-2 border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-neutral-500"
           >
             {contactInquiryTypeOrder.map((type) => (
