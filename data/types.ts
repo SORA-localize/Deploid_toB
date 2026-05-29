@@ -24,11 +24,38 @@ export interface Source {
   note?: string;
 }
 
+export type RightsStatus =
+  | 'own'
+  | 'licensed'
+  | 'commercial-permitted'
+  | 'reference-attributed'
+  | 'permission-requested'
+  | 'prototype-only'
+  | 'blocked';
+
+export type MediaSourceType =
+  | 'own'
+  | 'manufacturer-official'
+  | 'partner-official'
+  | 'press-release'
+  | 'third-party'
+  | 'unknown';
+
+export interface RightsMeta {
+  status: RightsStatus;
+  sourceType: MediaSourceType;
+  checkedAt: ISODate;
+  rightsHolder?: string;
+  licenseUrl?: string;
+  permissionNote?: string;
+}
+
 export interface ImageAsset {
   src: string;
   alt: string;
   credit?: string;
   sourceUrl?: string;
+  rights: RightsMeta;
 }
 
 /** ロボットの画像スロット。詳細ページのカルーセルで6スロット固定で使う。

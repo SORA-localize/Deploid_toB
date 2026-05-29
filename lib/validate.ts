@@ -5,7 +5,14 @@ import { guides } from '@/data/guides';
 import { manufacturers } from '@/data/manufacturers';
 import { reports } from '@/data/reports';
 import { robots } from '@/data/robots';
+import type { ImageAsset, RightsStatus } from '@/data/types';
 import { useCases } from '@/data/useCases';
+
+const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
+const referenceDisplayStatuses = new Set<RightsStatus>([
+  'reference-attributed',
+  'permission-requested',
+]);
 
 export function validateData(): string[] {
   const issues: string[] = [];
@@ -18,6 +25,62 @@ export function validateData(): string[] {
   const check = (kind: string, owner: string, field: string, slug: string, set: Set<string>) => {
     if (!set.has(slug)) {
       issues.push(`[missing] ${kind} "${owner}".${field} -> "${slug}" は存在しません`);
+    }
+  };
+
+  const checkDate = (kind: string, owner: string, field: string, value: string | undefined) => {
+    if (value && !isoDatePattern.test(value)) {
+      issues.push(`[date] ${kind} "${owner}".${field} は YYYY-MM-DD 形式にしてください: ${value}`);
+    }
+  };
+
+  const checkRequiredSources = (
+    kind: string,
+    owner: string,
+    sources: readonly { checkedAt: string }[],
+  ) => {
+    if (sources.length === 0) {
+      issues.push(`[source-empty] ${kind} "${owner}".sources が空です`);
+    }
+    sources.forEach((source, index) => {
+      checkDate(kind, owner, `sources[${index}].checkedAt`, source.checkedAt);
+    });
+  };
+
+  const checkImageAsset = (
+    kind: string,
+    owner: string,
+    field: string,
+    asset: ImageAsset | undefined,
+  ) => {
+    if (!asset) return;
+    if (!asset.alt.trim()) issues.push(`[image-alt] ${kind} "${owner}".${field}.alt が空です`);
+    if (!asset.rights) {
+      issues.push(`[image-rights] ${kind} "${owner}".${field}.rights が未設定です`);
+      return;
+    }
+
+    checkDate(kind, owner, `${field}.rights.checkedAt`, asset.rights.checkedAt);
+
+    if (referenceDisplayStatuses.has(asset.rights.status)) {
+      if (!asset.credit) issues.push(`[image-credit] ${kind} "${owner}".${field}.credit が未設定です`);
+      if (!asset.sourceUrl) {
+        issues.push(`[image-source] ${kind} "${owner}".${field}.sourceUrl が未設定です`);
+      }
+      if (!asset.rights.rightsHolder) {
+        issues.push(`[image-rights-holder] ${kind} "${owner}".${field}.rights.rightsHolder が未設定です`);
+      }
+    }
+  };
+
+  const checkTagDuplicates = (kind: string, owner: string, field: string, values: readonly string[]) => {
+    const seen = new Set<string>();
+    for (const value of values) {
+      const key = value.trim().toLowerCase().replace(/[\s_]+/g, '-');
+      if (seen.has(key)) {
+        issues.push(`[tag-duplicate] ${kind} "${owner}".${field} に正規化後の重複があります: ${value}`);
+      }
+      seen.add(key);
     }
   };
 
@@ -36,9 +99,23 @@ export function validateData(): string[] {
 
   for (const r of robots) {
     check('robot', r.slug, 'manufacturerSlug', r.manufacturerSlug, manufacturerSlugs);
+    checkDate('robot', r.slug, 'updatedAt', r.updatedAt);
+    checkRequiredSources('robot', r.slug, r.sources);
+    checkImageAsset('robot', r.slug, 'heroImage', r.heroImage);
+    Object.entries(r.images ?? {}).forEach(([role, image]) =>
+      checkImageAsset('robot', r.slug, `images.${role}`, image),
+    );
+  }
+
+  for (const m of manufacturers) {
+    checkDate('manufacturer', m.slug, 'updatedAt', m.updatedAt);
+    checkRequiredSources('manufacturer', m.slug, m.sources);
+    checkImageAsset('manufacturer', m.slug, 'logo', m.logo);
   }
 
   for (const g of guides) {
+    checkDate('guide', g.slug, 'updatedAt', g.updatedAt);
+    checkTagDuplicates('guide', g.slug, 'topics', g.topics);
     g.relatedRobotSlugs.forEach((s) => check('guide', g.slug, 'relatedRobotSlugs', s, robotSlugs));
     g.relatedUseCaseSlugs.forEach((s) =>
       check('guide', g.slug, 'relatedUseCaseSlugs', s, useCaseSlugs),
@@ -46,6 +123,9 @@ export function validateData(): string[] {
   }
 
   for (const u of useCases) {
+    checkDate('useCase', u.slug, 'updatedAt', u.updatedAt);
+    checkTagDuplicates('useCase', u.slug, 'industryTags', u.industryTags);
+    checkTagDuplicates('useCase', u.slug, 'taskTags', u.taskTags);
     u.candidateRobotSlugs.forEach((s) =>
       check('useCase', u.slug, 'candidateRobotSlugs', s, robotSlugs),
     );
@@ -55,6 +135,10 @@ export function validateData(): string[] {
   }
 
   for (const rep of reports) {
+    checkDate('report', rep.slug, 'updatedAt', rep.updatedAt);
+    checkDate('report', rep.slug, 'publishedAt', rep.publishedAt);
+    checkRequiredSources('report', rep.slug, rep.sources);
+    checkTagDuplicates('report', rep.slug, 'tags', rep.tags);
     rep.relatedRobotSlugs.forEach((s) =>
       check('report', rep.slug, 'relatedRobotSlugs', s, robotSlugs),
     );

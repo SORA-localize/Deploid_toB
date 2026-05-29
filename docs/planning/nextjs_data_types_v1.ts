@@ -24,12 +24,49 @@ export interface Source {
   note?: string;
 }
 
+export type RightsStatus =
+  | 'own'
+  | 'licensed'
+  | 'commercial-permitted'
+  | 'reference-attributed'
+  | 'permission-requested'
+  | 'prototype-only'
+  | 'blocked';
+
+export type MediaSourceType =
+  | 'own'
+  | 'manufacturer-official'
+  | 'partner-official'
+  | 'press-release'
+  | 'third-party'
+  | 'unknown';
+
+export interface RightsMeta {
+  status: RightsStatus;
+  sourceType: MediaSourceType;
+  checkedAt: ISODate;
+  rightsHolder?: string;
+  licenseUrl?: string;
+  permissionNote?: string;
+}
+
 export interface ImageAsset {
   src: string;
   alt: string;
   credit?: string;
   sourceUrl?: string;
+  rights: RightsMeta;
 }
+
+/** ロボットの画像スロット。詳細ページのカルーセルで6スロット固定で使う。
+ *  写真が無いスロットは empty state（役割名のラベル）になる。 */
+export type ImageRole =
+  | 'hero'         // 全身正面
+  | 'side'         // 側面
+  | 'inOperation'  // 稼働中（実環境）
+  | 'scale'        // スケール比較（人/物）
+  | 'endEffector'  // ハンド・把持部
+  | 'mobility';    // 脚・足・車輪
 
 export interface SeoFields {
   metaTitle?: string;
@@ -74,6 +111,7 @@ export interface Manufacturer extends BaseRecord {
   hqCity?: string;
   foundedYear?: number;
   website: string;
+  logo?: ImageAsset;
   contactUrl?: string;
   description: string;
   japanPresence: JapanPresence;
@@ -81,9 +119,8 @@ export interface Manufacturer extends BaseRecord {
   supportNote?: string;
   procurementNote?: string;
   vendorRiskNote?: string;
-  robotSlugs: Slug[];
-  handledRobotSlugs?: Slug[];
-  relatedReportSlugs?: Slug[];
+  // 関連は逆向き(Robot.manufacturerSlug / Report.relatedManufacturerSlugs)で導出する。
+  // robotSlugs / handledRobotSlugs / relatedReportSlugs は持たない。
 }
 
 export type RobotCategory =
@@ -160,9 +197,10 @@ export interface Robot extends BaseRecord {
   supportNote?: string;
   safetyNote?: string;
   vendorRiskNote?: string;
-  useCaseSlugs: Slug[];
-  guideSlugs?: Slug[];
-  reportSlugs?: Slug[];
+  /** 役割別の参考画像（詳細ページのカルーセル）。hero が未設定なら BaseRecord.heroImage を hero に昇格して使う。 */
+  images?: Partial<Record<ImageRole, ImageAsset>>;
+  // 関連は逆向き(UseCase.candidateRobotSlugs / Guide.relatedRobotSlugs /
+  // Report.relatedRobotSlugs)で導出する。
   comparison: ComparisonProfile;
 }
 
@@ -178,9 +216,11 @@ export interface Guide extends BaseRecord {
   targetReaders: string[];
   readingTimeMinutes?: number;
   checklistItems?: string[];
+  /** 記事本文（Markdown）。空ならガイド本文セクションは描画されない。 */
+  body?: string;
   relatedRobotSlugs: Slug[];
   relatedUseCaseSlugs: Slug[];
-  relatedReportSlugs?: Slug[];
+  // 関連reportsは Report.relatedGuideSlugs で逆引きする。
 }
 
 export type UseCaseMaturity = 'early-stage' | 'pilot-phase' | 'production-ready';
@@ -235,7 +275,7 @@ export interface UseCase extends BaseRecord {
   japanDeploymentConditions: string;
   candidateRobotSlugs: Slug[];
   relatedGuideSlugs: Slug[];
-  relatedReportSlugs?: Slug[];
+  // 関連reportsは Report.relatedUseCaseSlugs で逆引きする。
 }
 
 export type ReportType =
@@ -256,6 +296,8 @@ export interface Report extends BaseRecord {
   tags: string[];
   whyItMatters: string;
   keyTakeaways?: string[];
+  /** 記事本文（Markdown）。空ならレポート本文セクションは描画されない。 */
+  body?: string;
   featured?: boolean;
   relatedRobotSlugs: Slug[];
   relatedManufacturerSlugs: Slug[];
