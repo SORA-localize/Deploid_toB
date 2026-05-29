@@ -171,18 +171,10 @@ export const reliabilityLabels: Record<Reliability, string> = {
   estimated: '推定',
 };
 
-export const contactInquiryTypeLabels: Record<ContactInquiryType, string> = {
-  'data-correction': '情報提供・修正',
-  'listing-request': '掲載相談',
-  'interview-request': '取材相談',
-  'adoption-consultation': '導入相談',
-  'other': 'その他',
-};
-
-export const contactInquiryTypeOrder: ContactInquiryType[] = [
-  'data-correction',
-  'listing-request',
-  'interview-request',
-  'adoption-consultation',
-  'other',
+export const contactInquiryTypeOptions: ReadonlyArray<{ value: ContactInquiryType; label: string }> = [
+  { value: 'data-correction',       label: '情報提供・修正' },
+  { value: 'listing-request',       label: '掲載相談' },
+  { value: 'interview-request',     label: '取材相談' },
+  { value: 'adoption-consultation', label: '導入相談' },
+  { value: 'other',                 label: 'その他' },
 ];
