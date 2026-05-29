@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, Bot, Building2, BookOpen, Calendar } from 'lucide-react';
 import { RobotCard } from '@/components/RobotCard';
+import { TagChip } from '@/components/TagChip';
 import {
   getGuideBySlug,
   getGuides,
@@ -54,7 +55,7 @@ export default function HomePage() {
 
       <section className="py-16 border-b border-neutral-200">
         <h2 className="text-2xl font-semibold text-neutral-900 mb-8">主要コンテンツ</h2>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <Link href="/robots" className="border border-neutral-200 p-6 hover:border-neutral-400 transition-colors bg-white">
             <Bot className="w-8 h-8 text-neutral-700 mb-4" />
             <h3 className="font-semibold text-neutral-900 mb-2">ロボット</h3>
@@ -105,7 +106,7 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featuredRobots.map((robot) => {
               const manufacturer = getManufacturerForRobot(robot.manufacturerSlug);
               return (
@@ -133,7 +134,7 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {latestReports.map((report) => (
               <Link
                 key={report.slug}
@@ -141,9 +142,9 @@ export default function HomePage() {
                 className="border border-neutral-200 bg-white p-6 hover:border-neutral-400 transition-colors"
               >
                 <div className="flex items-center gap-3 mb-3 text-xs text-neutral-500">
-                  <span className="px-2 py-0.5 bg-neutral-100 text-neutral-700 border border-neutral-200">
+                  <TagChip>
                     {reportTypeLabels[report.type]}
-                  </span>
+                  </TagChip>
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
                     {report.publishedAt}
@@ -187,12 +188,9 @@ export default function HomePage() {
               </div>
               <div className="flex gap-2 mt-4">
                 {featured.topics.slice(0, 3).map((topic) => (
-                  <span
-                    key={topic}
-                    className="px-3 py-1 text-xs bg-neutral-100 text-neutral-700 border border-neutral-200"
-                  >
+                  <TagChip key={topic} className="py-1">
                     {topic}
-                  </span>
+                  </TagChip>
                 ))}
               </div>
             </div>

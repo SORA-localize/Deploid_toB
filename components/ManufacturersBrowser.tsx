@@ -97,7 +97,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 gap-4 mb-8 md:grid-cols-3">
           <FilterSelect
             id="manufacturer-country"
             label="ORIGIN COUNTRY"
@@ -124,7 +124,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
         {filtered.length === 0 ? (
           <EmptyState message="条件に合うメーカーがありません。" variant="muted" size="large" />
         ) : (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((manufacturer) => (
               <div
                 key={manufacturer.slug}

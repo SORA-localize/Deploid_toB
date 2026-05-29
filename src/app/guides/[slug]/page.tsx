@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Markdown } from '@/components/Markdown';
+import { TagChip } from '@/components/TagChip';
 import {
   getGuideBySlug,
   getGuides,
@@ -70,9 +71,9 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
                 {guide.readingTimeMinutes} min
               </span>
             )}
-            <span className="px-2.5 py-1 bg-neutral-100 text-neutral-800 border border-neutral-200 font-medium">
+            <TagChip className="py-1 text-neutral-800 font-medium">
               {guideStageLabels[guide.stage]}
-            </span>
+            </TagChip>
             {guide.targetReaders.length > 0 && (
               <span className="flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5" />
@@ -82,12 +83,9 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           </div>
           <div className="flex gap-2 flex-wrap">
             {guide.topics.map((topic) => (
-              <span
-                key={topic}
-                className="px-3 py-1 text-xs bg-white text-neutral-700 border border-neutral-300"
-              >
+              <TagChip key={topic} className="py-1 bg-white border-neutral-300">
                 {topic}
-              </span>
+              </TagChip>
             ))}
           </div>
         </div>

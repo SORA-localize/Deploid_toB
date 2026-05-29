@@ -12,7 +12,9 @@ import type { UseCase } from '@/data/types';
 import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
 import { matchesQuery } from '@/lib/search';
 
-const modeOptions: Array<{ value: 'industry' | 'task'; label: string }> = [
+type UseCaseSearchMode = 'industry' | 'task';
+
+const modeOptions: Array<{ value: UseCaseSearchMode; label: string }> = [
   { value: 'industry', label: '業種で探す' },
   { value: 'task', label: 'タスクで探す' },
 ];
@@ -30,7 +32,7 @@ function readinessTone(r: UseCase['buyerReadiness']) {
 }
 
 export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
-  const [mode, setMode] = useState<'industry' | 'task'>('industry');
+  const [mode, setMode] = useState<UseCaseSearchMode>('industry');
   const [industry, setIndustry] = useState<string | null>(null);
   const [task, setTask] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -45,6 +47,15 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
     [mode, industries, tasks],
   );
   const selectedChip = mode === 'industry' ? industry : task;
+
+  const handleModeChange = (nextMode: UseCaseSearchMode) => {
+    setMode(nextMode);
+    if (nextMode === 'industry') {
+      setTask(null);
+    } else {
+      setIndustry(null);
+    }
+  };
 
   const filtered = useCases.filter((u) => {
     if (!matchesQuery(query, [u.titleJa, u.title, u.subtitle, ...u.taskTags])) return false;
@@ -78,7 +89,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
           <FilterChipGroup
             options={modeOptions}
             value={mode}
-            onChange={setMode}
+            onChange={handleModeChange}
             ariaLabel="Use case search mode"
             className="mb-4"
             buttonClassName="px-4 py-2 text-sm"

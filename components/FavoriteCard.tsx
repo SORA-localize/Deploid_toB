@@ -31,6 +31,8 @@ export function FavoriteCard({
           </h4>
         </Link>
         <button
+          type="button"
+          aria-label={`${robot.nameJa ?? robot.name} をお気に入りから外す`}
           onClick={() => onRemove(robot.slug)}
           className="text-neutral-400 hover:text-neutral-900 flex-shrink-0"
         >

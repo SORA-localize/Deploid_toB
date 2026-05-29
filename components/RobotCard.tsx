@@ -37,6 +37,8 @@ export function RobotCard({
     <div className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-neutral-500 transition-colors relative">
       {showFavorite && (
         <button
+          type="button"
+          aria-label={`${robot.nameJa ?? robot.name} を${isFavorite ? 'お気に入りから外す' : 'お気に入りに追加する'}`}
           onClick={(e) => {
             e.preventDefault();
             onFavoriteToggle?.(robot.slug);

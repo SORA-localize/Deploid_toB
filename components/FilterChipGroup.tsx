@@ -29,13 +29,14 @@ export function FilterChipGroup<T extends string>({
   buttonClassName = defaultButtonClassName,
 }: FilterChipGroupProps<T>) {
   return (
-    <div className={`flex flex-wrap gap-2 ${className}`} aria-label={ariaLabel}>
+    <div className={`flex flex-wrap gap-2 ${className}`} role="group" aria-label={ariaLabel}>
       {options.map((option) => {
         const selected = value === option.value;
         return (
           <button
             key={option.value}
             type="button"
+            aria-pressed={selected}
             onClick={() => {
               if (selected && allowDeselect) {
                 onClear?.();

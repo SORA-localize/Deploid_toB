@@ -57,15 +57,13 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
     [avails],
   );
 
-  const filtered = useMemo(() => {
+  const releaseCandidates = useMemo(() => {
     return [...robots]
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
       .filter((r) => {
         const typeOk = type === 'all' || r.category === type;
         const mfgOk = mfg === 'all' || r.manufacturerSlug === mfg;
         const availOk = avail === 'all' || r.japanAvailability === avail;
-        const isPre = isPreReleaseDeploymentStage(r.deploymentStage);
-        const releaseOk = release === 'active' ? !isPre : isPre;
         const queryOk = matchesQuery(query, [
           r.nameJa,
           r.name,
@@ -79,12 +77,21 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           ...r.comparison.bestFit,
           ...r.comparison.strengths,
         ]);
-        return typeOk && mfgOk && availOk && releaseOk && queryOk;
+        return typeOk && mfgOk && availOk && queryOk;
       });
-  }, [robots, type, mfg, avail, release, query, manufacturers]);
+  }, [robots, type, mfg, avail, query, manufacturers]);
+  const activeRobots = useMemo(
+    () => releaseCandidates.filter((robot) => !isPreReleaseDeploymentStage(robot.deploymentStage)),
+    [releaseCandidates],
+  );
+  const preReleaseRobots = useMemo(
+    () => releaseCandidates.filter((robot) => isPreReleaseDeploymentStage(robot.deploymentStage)),
+    [releaseCandidates],
+  );
+  const filtered = release === 'active' ? activeRobots : preReleaseRobots;
   const releaseOptions: Array<{ value: 'active' | 'pre'; label: string }> = [
-    { value: 'active', label: `[ ${filtered.length} ACTIVE MODELS ]` },
-    { value: 'pre', label: 'PRE-RELEASE' },
+    { value: 'active', label: `[ ${activeRobots.length} ACTIVE MODELS ]` },
+    { value: 'pre', label: `[ ${preReleaseRobots.length} PRE-RELEASE ]` },
   ];
 
   return (
@@ -107,7 +114,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 gap-4 mb-8 md:grid-cols-3">
           <FilterSelect
             id="robot-type"
             label="ROBOT TYPE"
@@ -149,7 +156,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             size="large"
           />
         ) : (
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((robot) => {
               const manufacturer = manufacturerFor(robot.manufacturerSlug);
               return (

@@ -80,6 +80,8 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   return (
                     <div key={manufacturer.slug}>
                       <button
+                        type="button"
+                        aria-expanded={isExpanded}
                         onClick={() => toggleManufacturer(manufacturer.slug)}
                         className="w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-100 transition-colors text-left"
                       >
@@ -102,7 +104,9 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                             const isSelected = selectedSlugs.includes(robot.slug);
                             return (
                               <button
+                                type="button"
                                 key={robot.slug}
+                                aria-pressed={isSelected}
                                 onClick={() =>
                                   isSelected ? removeRobot(robot.slug) : addRobot(robot.slug)
                                 }
@@ -141,6 +145,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
               </span>
               {selectedSlugs.length > 0 && (
                 <button
+                  type="button"
                   onClick={() => setSelectedSlugs([])}
                   className="text-xs text-neutral-500 hover:text-neutral-900 uppercase tracking-wide"
                 >
@@ -183,6 +188,8 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                     return (
                       <div key={robot.slug} className="relative">
                         <button
+                          type="button"
+                          aria-label={`${robot.nameJa ?? robot.name} を比較から外す`}
                           onClick={() => removeRobot(robot.slug)}
                           className="absolute -top-2 -right-2 z-10 p-1.5 bg-white border border-neutral-300 hover:bg-neutral-100 transition-colors rounded-full"
                           title="比較から外す"
