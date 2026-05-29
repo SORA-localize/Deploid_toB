@@ -450,7 +450,7 @@ Phase 6で作る最小仕様:
 
 問題:
 
-- `components/ContactForm.tsx` で `useForm('mgoqrrkb')` が直書き
+- `components/ContactForm.tsx` で Formspree ID が直書き
 - secretではない可能性が高いが、環境ごとの差し替えがしにくい
 - `docs/planning/publish_todo_v1.md` にもフォームIDが記載されている
 
@@ -608,4 +608,3 @@ Phase 2でまだやらない:
 - この監査結果をコミットする
 - GitHubにpushする
 - 次の作業は Phase 2 の小型UI共通コンポーネント化から開始する
-

@@ -16,6 +16,17 @@
 | `npm run build` | 本番ビルド（SSG） |
 | `npm run start` | ビルド結果をローカル起動 |
 
+## 環境変数
+
+ローカルでは `.env.example` を参考に `.env.local` を作る。実際の値はコミットしない。
+
+| Variable | Required | 用途 |
+|---|---:|---|
+| `NEXT_PUBLIC_SITE_URL` | No | sitemap / metadata 用の公開URL。未設定時は `http://localhost:3000` |
+| `NEXT_PUBLIC_FORMSPREE_FORM_ID` | Yes | Contactフォーム送信用のFormspree form ID。未設定時はフォームを送信不可にする |
+
+Vercelでは Project Settings の Environment Variables に設定する。
+
 ## 構成
 
 ```text

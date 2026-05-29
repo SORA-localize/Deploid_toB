@@ -4,7 +4,7 @@
 
 ## 0. 直近の状況（チェック済み）
 - [x] `main` に全成果をマージ・push 済み
-- [x] Formspree 接続、メール到達確認済み（フォームID `mgoqrrkb`）
+- [x] Formspree 接続、メール到達確認済み（フォームIDは `NEXT_PUBLIC_FORMSPREE_FORM_ID` で管理）
 - [x] データモデル監査の 4 点（body / seo / 関係正規化 / 参照整合）反映済み
 - [x] 旧Astro残骸 撤去済み
 
