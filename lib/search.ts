@@ -15,7 +15,7 @@ import {
   capabilityLabels,
   maturityLabels,
 } from '@/lib/labels';
-import { getTagSearchValues } from '@/lib/tags';
+import { getTagLabel, getTagSearchValues, normalizeTagKey } from '@/lib/tags';
 
 export type SearchCollection = 'robots' | 'manufacturers' | 'reports' | 'guides' | 'useCases';
 export type SearchPrimitive = string | number | null | undefined;
@@ -27,7 +27,13 @@ export interface SearchDocument {
   title: string;
   url: string;
   fields: string[];
-  tags: string[];
+  tags: SearchDocumentTag[];
+}
+
+export interface SearchDocumentTag {
+  value: string;
+  label: string;
+  searchValues: string[];
 }
 
 interface SearchDocumentInput {
@@ -75,6 +81,24 @@ function uniqueSearchValues(values: readonly SearchValueInput[]) {
   return Array.from(unique.values());
 }
 
+function createSearchDocumentTags(tags: readonly string[]) {
+  const searchTags = new Map<string, SearchDocumentTag>();
+
+  tags.forEach((tag) => {
+    const value = normalizeTagKey(tag);
+    if (!value || searchTags.has(value)) return;
+
+    const label = getTagLabel(tag);
+    searchTags.set(value, {
+      value,
+      label,
+      searchValues: uniqueSearchValues([value, label]),
+    });
+  });
+
+  return Array.from(searchTags.values());
+}
+
 export function createSearchDocument({
   id,
   collection,
@@ -83,13 +107,15 @@ export function createSearchDocument({
   fields,
   tags = [],
 }: SearchDocumentInput): SearchDocument {
+  const searchTags = createSearchDocumentTags(tags);
+
   return {
     id,
     collection,
     title,
     url,
-    fields: uniqueSearchValues([id, title, url, fields, getTagSearchValues(tags)]),
-    tags: uniqueSearchValues([tags]),
+    fields: uniqueSearchValues([id, title, fields, getTagSearchValues(tags)]),
+    tags: searchTags,
   };
 }
 
