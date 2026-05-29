@@ -24,7 +24,53 @@ Last reviewed: 2026-05-29
 
 ---
 
-## 2. 対象範囲
+## 2. デモ利用の現実的な線引き
+
+広告を載せない、個人が作る、カンファレンスで紹介する、という事情はリスクを下げる要素にはなる。ただし、それだけで第三者画像・ロゴの利用が自由になるわけではない。
+
+特に、次の状態は私的利用ではなく公開利用に近い。
+
+- インターネット上のURLで誰でも見られる。
+- カンファレンスの登壇画面で映す。
+- 登壇動画が録画・配信・アーカイブされる。
+- スライドやスクリーンショットが配布・SNS投稿される。
+- デモサイトをQRコードやURLで参加者に渡す。
+
+このサイトでは、デモ段階を以下に分けて扱う。
+
+| phase | 想定 | 画像・ロゴの扱い |
+|---|---|---|
+| `local-prototype` | 自分のPCだけでUI検証する | 怪しい画像を仮置きしてもよいが、公開・録画・配布しない |
+| `restricted-demo` | 少人数に一時的に見せる、URL非公開、noindex、パスワード付き | 未許諾画像は原則避ける。使う場合も `prototype-only` として明示し、録画・配布しない |
+| `conference-demo` | カンファレンス登壇や公開デモで紹介する | 実質公開に近い。許諾済み、CC等のライセンス確認済み、自作画像、またはメーカー提供画像に寄せる |
+| `public-demo` | 誰でもアクセスできるデモURL | 本番扱い。未許諾画像・ロゴは出さない |
+| `production` | 継続運用、SEO、問い合わせ導線あり | `own`, `licensed`, `official-permitted` のみ表示 |
+
+結論：
+
+- `local-prototype` では Humanoid Hub, Humanoid Guide, Humanoid-robots.io などを参考にした見た目検証をしてよい。
+- `conference-demo` では、怪しい画像をそのまま出すのは避ける。どうしても必要なら、録画・配布されない一時デモに限定し、未許諾であることを内部管理する。
+- `public-demo` では、広告なしでも本番と同じ権利基準にする。
+
+リファレンスサイトの読み方：
+
+- Humanoid Hub は、メーカー提供素材を前提にしている可能性が高い。参考にすべきは「メーカー提供画像として管理する」運用であって、画像URLを真似ることではない。
+- Humanoid Guide や Humanoid-robots.io は、メーカー画像にクレジットを付けているが、外部から許諾有無は確認できない。見た目や情報設計の参考にはできるが、権利根拠にはしない。
+- IEEE Spectrum / ROBOTS Guide やTech系メディアは、媒体としての取材・プレス提供・編集利用の関係で画像を使っている可能性がある。個人サイトが同じ条件とは限らない。
+- 販売店サイトは、販売契約や代理店関係に基づいてメーカー画像を使っている可能性がある。独立リファレンスサイトの根拠にはしない。
+
+カンファレンス紹介用の現実解：
+
+1. まずは画像なしでも成立するUIにする。
+2. メーカー名はテキスト表示を基本にする。
+3. 画像が必要な箇所は、許諾済み・CC等のライセンス確認済み・自作図解・メーカー提供画像を優先する。
+4. 未許諾の公式画像を使う場合は `local-prototype` か `restricted-demo` に閉じる。
+5. 登壇資料や録画に残る画面では、未許諾画像を映さない。
+6. デモURLを公開する場合は `public-demo` とみなし、未許諾画像を非表示にする。
+
+---
+
+## 3. 対象範囲
 
 このポリシーは以下を対象にする。
 
@@ -42,7 +88,7 @@ Last reviewed: 2026-05-29
 
 ---
 
-## 3. 権利ステータス
+## 4. 権利ステータス
 
 画像・ロゴ・動画・PDF・引用ブロックなど、第三者コンテンツの可能性があるものには、次のどれかの状態を付ける。
 
@@ -52,6 +98,8 @@ Last reviewed: 2026-05-29
 | `licensed` | 有償/無償ライセンスがあり、Web公開条件を満たす | 可 |
 | `official-permitted` | 公式素材で、利用条件上このサイトで使える | 可 |
 | `press-editorial` | press kit等で報道・編集用途に限定 | 個別判断。一般公開DBでは原則避ける |
+| `prototype-only` | UI検証用の仮置き。権利未確認 | 公開不可。ローカルまたは限定デモのみ |
+| `demo-restricted` | カンファレンス前の限定デモ等で一時利用を検討する素材 | 原則公開不可。録画・配布・公開URLでは使わない |
 | `permission-requested` | 許諾依頼中 | 不可 |
 | `permission-required` | 許諾が必要だが未取得 | 不可 |
 | `blocked` | 利用不可、または条件に合わない | 不可 |
@@ -63,9 +111,9 @@ Last reviewed: 2026-05-29
 
 ---
 
-## 4. 画像利用ルール
+## 5. 画像利用ルール
 
-### 4.1 使ってよい候補
+### 5.1 使ってよい候補
 
 優先順位：
 
@@ -75,7 +123,7 @@ Last reviewed: 2026-05-29
 4. 公式media kit / press kitで、このサイトの用途が許可されている素材。
 5. メーカーから書面で許諾を得た素材。
 
-### 4.2 避けるもの
+### 5.2 避けるもの
 
 使わない：
 
@@ -87,7 +135,7 @@ Last reviewed: 2026-05-29
 - 出典不明のWikimedia以外の転載画像。
 - `CC BY-NC` など非商用限定ライセンスの素材。
 
-### 4.3 表示時のルール
+### 5.3 表示時のルール
 
 - 画像の近くに `Photo: 権利者名` または `Image: 権利者名` を表示する。
 - `sourceUrl` は情報源リンクであり、許諾証跡ではない。別途 `rights` を持つ。
@@ -97,7 +145,7 @@ Last reviewed: 2026-05-29
 
 ---
 
-## 5. ロゴ・商標ルール
+## 6. ロゴ・商標ルール
 
 メーカー名や製品名は、事実説明としてテキストで使うことを基本にする。
 
@@ -114,9 +162,9 @@ Last reviewed: 2026-05-29
 
 ---
 
-## 6. 文章・引用ルール
+## 7. 文章・引用ルール
 
-### 6.1 要約・分析
+### 7.1 要約・分析
 
 外部記事や公式発表を使う場合、本文は以下の形にする。
 
@@ -126,7 +174,7 @@ Last reviewed: 2026-05-29
 - 数字、日付、会社名、製品名は出典を残す。
 - 推測・解釈は「推定」「報道ベース」「公式未確認」と分ける。
 
-### 6.2 引用
+### 7.2 引用
 
 引用は例外的に使う。
 
@@ -147,7 +195,7 @@ Last reviewed: 2026-05-29
 
 ---
 
-## 7. データモデルへの追加案
+## 8. データモデルへの追加案
 
 現在の `ImageAsset` は `credit` と `sourceUrl` だけなので、権利管理には足りない。次のような型を追加する。
 
@@ -157,13 +205,27 @@ export type RightsStatus =
   | 'licensed'
   | 'official-permitted'
   | 'press-editorial'
+  | 'prototype-only'
+  | 'demo-restricted'
   | 'permission-requested'
   | 'permission-required'
   | 'blocked'
   | 'unknown';
 
+export type AssetSourceType =
+  | 'own'
+  | 'manufacturer-provided'
+  | 'official-site'
+  | 'press-kit'
+  | 'wikimedia'
+  | 'stock'
+  | 'third-party-media'
+  | 'reference-site'
+  | 'unknown';
+
 export interface RightsMeta {
   status: RightsStatus;
+  sourceType: AssetSourceType;
   rightsHolder?: string;
   licenseName?: string;
   licenseUrl?: string;
@@ -200,13 +262,13 @@ export interface ContentRightsReview {
 
 ---
 
-## 8. 公開ゲート
+## 9. 公開ゲート
 
 公開前チェックは次の順に行う。
 
 1. `publishStatus: 'published'` のレコードだけ対象にする。
 2. `heroImage`, `images`, `logo` の `rights.status` を確認する。
-3. `unknown`, `permission-required`, `permission-requested`, `blocked` は公開ページで非表示にする。
+3. `unknown`, `prototype-only`, `demo-restricted`, `permission-required`, `permission-requested`, `blocked` は公開ページで非表示にする。
 4. `press-editorial` は初期設定では非表示にする。
 5. `body` に長い引用、スクリーンショット、外部画像がないか確認する。
 6. `sources` が空の重要コンテンツは公開しない。
@@ -222,9 +284,28 @@ export function canDisplayAsset(asset?: ImageAsset) {
 }
 ```
 
+デモ用の例外ゲート：
+
+```ts
+const restrictedDemoStatuses: RightsStatus[] = [
+  'own',
+  'licensed',
+  'official-permitted',
+  'press-editorial',
+  'demo-restricted',
+  'prototype-only',
+];
+
+export function canDisplayAssetInRestrictedDemo(asset?: ImageAsset) {
+  return Boolean(asset?.rights && restrictedDemoStatuses.includes(asset.rights.status));
+}
+```
+
+ただし `canDisplayAssetInRestrictedDemo` は、パスワード付き・noindex・録画なし・資料配布なしの限定デモだけで使う。本番・公開デモ・登壇録画に映る画面では使わない。
+
 ---
 
-## 9. 現状のリスク監査
+## 10. 現状のリスク監査
 
 現時点で追加対応が必要な項目：
 
@@ -235,11 +316,13 @@ export function canDisplayAsset(asset?: ImageAsset) {
   - `credit` と `sourceUrl` はあるが、商用Web再掲載の許諾状態がない。
   - 一部URLは404/403になっており、技術的にも不安定。
   - 公開用には `rights.status` を追加し、未許諾なら非表示にする。
+  - デモ用に残す場合も `prototype-only` または `demo-restricted` として扱い、公開URLでは出さない。
 
 - `data/manufacturers.ts` の `Manufacturer.logo`
   - ロゴは商標リスクがある。
   - 現在は公式ロゴ/ファビコンを表示しているが、ブランドガイドラインや許諾確認がない。
   - 公開用にはテキスト名表示を基本にし、ロゴは `official-permitted` 以外非表示にする。
+  - カンファレンス資料では、メーカー名テキストだけで足りるならロゴを使わない。
 
 ### 中リスク
 
@@ -269,7 +352,7 @@ export function canDisplayAsset(asset?: ImageAsset) {
 
 ---
 
-## 10. 運用フロー
+## 11. 運用フロー
 
 新しいロボット・メーカー・記事を追加するとき：
 
@@ -281,6 +364,14 @@ export function canDisplayAsset(asset?: ImageAsset) {
 6. 本文は自分の言葉で書く。
 7. 直接引用は短く、必要な場合だけにする。
 8. 公開前に `sources` と `rights` をレビューする。
+
+デモ版を作るとき：
+
+1. `NEXT_PUBLIC_ASSET_MODE=prototype | restricted-demo | public` のような表示モードを決める。
+2. `public` では `canDisplayAsset` だけ使う。
+3. `restricted-demo` では、URL非公開、noindex、パスワード、録画なし、資料配布なしを条件にする。
+4. `prototype` ではローカル実行に閉じる。スクリーンショットをSNSや資料に載せない。
+5. 登壇・録画・配布がある場合は `public` と同じ扱いにする。
 
 許諾依頼時に確認する項目：
 
@@ -296,7 +387,7 @@ export function canDisplayAsset(asset?: ImageAsset) {
 
 ---
 
-## 11. 参考資料
+## 12. 参考資料
 
 - 文化庁: 著作権について知っておきたい大切なこと  
   https://www.bunka.go.jp/seisaku/chosakuken/taisetsu/index.html
@@ -324,7 +415,7 @@ export function canDisplayAsset(asset?: ImageAsset) {
 
 ---
 
-## 12. 一言まとめ
+## 13. 一言まとめ
 
 このサイトでは、出典管理と権利管理を分ける。
 
@@ -332,3 +423,8 @@ export function canDisplayAsset(asset?: ImageAsset) {
 `rights` は「その素材をこのサイトで使ってよいか」。
 
 この2つを混ぜると、クレジットを書いたから使えるという危険な状態になる。公開運用では、未許諾素材を表示しない設計を先に入れる。
+
+デモ版で一時的に見た目を作ることと、公開サイトで継続表示することも分ける。
+
+`prototype-only` は「今だけUIを見るための仮置き」。
+`public-demo` と `production` は、広告の有無にかかわらず公開利用として扱う。
