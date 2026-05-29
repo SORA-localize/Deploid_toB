@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <footer className="border-t border-neutral-200 bg-neutral-50 mt-24">
       <div className="mx-auto max-w-7xl px-6 py-12">
-        <div className="grid grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-4">
           <div>
             <h3 className="text-sm font-semibold text-neutral-900 mb-4">コンテンツ</h3>
             <ul className="space-y-2 text-sm">
@@ -43,6 +43,9 @@ export function Footer() {
         <div className="pt-8 border-t border-neutral-200">
           <p className="text-sm text-neutral-500">
             © 2026 Deploid. 本サイトは情報提供を目的としており、特定の製品やサービスを推奨するものではありません。
+          </p>
+          <p className="mt-3 text-xs text-neutral-500 leading-relaxed">
+            掲載画像・ロゴには出典を明記した参照用途のものを含みます。権利者からの修正・削除依頼はお問い合わせよりご連絡ください。
           </p>
         </div>
       </div>

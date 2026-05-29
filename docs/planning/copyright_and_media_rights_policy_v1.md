@@ -155,19 +155,15 @@ Last reviewed: 2026-05-29
 |---|---|---|
 | `own` | 自分で制作・撮影し、必要な許諾も取れている | 可 |
 | `licensed` | 有償/無償ライセンスがあり、Web公開条件を満たす | 可 |
-| `official-permitted` | 公式素材で、利用条件上このサイトで使える | 可 |
 | `commercial-permitted` | 公式素材・第三者素材について、商用Web掲載が明示的に許可されている | 可 |
-| `press-editorial` | press kit等で報道・編集用途に限定 | 個別判断。一般公開DBでは原則避ける |
+| `reference-attributed` | 出典・権利者を明記し、参照用途として初期公開する。商用再掲載の明示許可は未取得 | 初期MVPでは可。ただし削除依頼に即応し、将来は許諾取得へ移行 |
+| `permission-requested` | 許諾依頼中。表示条件は `reference-attributed` と同じだが、交渉状態を区別する | 初期MVPでは可。拒否・条件不一致なら即 `blocked` |
 | `prototype-only` | UI検証用の仮置き。権利未確認 | 公開不可。ローカルまたは限定デモのみ |
-| `demo-restricted` | カンファレンス前の限定デモ等で一時利用を検討する素材 | 原則公開不可。録画・配布・公開URLでは使わない |
-| `permission-requested` | 許諾依頼中 | 不可 |
-| `permission-required` | 許諾が必要だが未取得 | 不可 |
 | `blocked` | 利用不可、または条件に合わない | 不可 |
-| `unknown` | 権利未確認 | 不可 |
 
-公開ページに出してよいのは、原則 `own`, `licensed`, `commercial-permitted` のみ。`official-permitted` は、商用利用可否が明確でない場合は `commercial-permitted` に昇格させない。
+本サイトの初期MVPでは、リファレンスサイトと同様に出典明記ベースの `reference-attributed` を許容する。ただし、これは許諾取得済みを意味しない。メーカー交渉・削除依頼対応・将来の厳格化に備えて、コード上は `rights.status` と表示ゲートで必ず管理する。
 
-`press-editorial` は、報道記事としての文脈・利用条件・広告や収益化の有無・地域条件を確認できる場合だけ例外扱いにする。個人運営で守りを固めるなら、`press-editorial` も非表示にする。
+営業資料、広告、協賛表示、公式提携のように見える画面、または商用色が強い運用へ移す場合は、`NEXT_PUBLIC_MEDIA_USAGE_POLICY=commercial-strict` に切り替え、`own`, `licensed`, `commercial-permitted` のみ表示する。
 
 ---
 
@@ -256,48 +252,35 @@ Last reviewed: 2026-05-29
 
 ---
 
-## 9. データモデルへの追加案
+## 9. データモデル
 
-現在の `ImageAsset` は `credit` と `sourceUrl` だけなので、権利管理には足りない。次のような型を追加する。
+現在の実装では `data/types.ts` の `ImageAsset` に `rights` を必須で持たせる。
 
 ```ts
 export type RightsStatus =
   | 'own'
   | 'licensed'
-  | 'official-permitted'
   | 'commercial-permitted'
-  | 'press-editorial'
-  | 'prototype-only'
-  | 'demo-restricted'
+  | 'reference-attributed'
   | 'permission-requested'
-  | 'permission-required'
-  | 'blocked'
-  | 'unknown';
+  | 'prototype-only'
+  | 'blocked';
 
-export type AssetSourceType =
+export type MediaSourceType =
   | 'own'
-  | 'manufacturer-provided'
-  | 'official-site'
-  | 'press-kit'
-  | 'wikimedia'
-  | 'stock'
-  | 'third-party-media'
-  | 'reference-site'
+  | 'manufacturer-official'
+  | 'partner-official'
+  | 'press-release'
+  | 'third-party'
   | 'unknown';
 
 export interface RightsMeta {
   status: RightsStatus;
-  sourceType: AssetSourceType;
-  rightsHolder?: string;
-  licenseName?: string;
-  licenseUrl?: string;
-  permissionUrl?: string;
-  permissionNote?: string;
-  allowedUses?: string[];
-  prohibitedUses?: string[];
+  sourceType: MediaSourceType;
   checkedAt: ISODate;
-  expiresAt?: ISODate;
-  riskNote?: string;
+  rightsHolder?: string;
+  licenseUrl?: string;
+  permissionNote?: string;
 }
 
 export interface ImageAsset {
@@ -305,8 +288,7 @@ export interface ImageAsset {
   alt: string;
   credit?: string;
   sourceUrl?: string;
-  rights?: RightsMeta;
-  fit?: 'contain' | 'cover';
+  rights: RightsMeta;
 }
 ```
 
@@ -330,41 +312,34 @@ export interface ContentRightsReview {
 
 1. `publishStatus: 'published'` のレコードだけ対象にする。
 2. `heroImage`, `images`, `logo` の `rights.status` を確認する。
-3. `unknown`, `prototype-only`, `demo-restricted`, `permission-required`, `permission-requested`, `blocked` は公開ページで非表示にする。
-4. `press-editorial` は初期設定では非表示にする。
+3. 表示は `lib/media.ts` の `canDisplayAsset(asset)` を通す。
+4. `prototype-only`, `blocked`, `rights` 未設定は非表示にする。
 5. `body` に長い引用、スクリーンショット、外部画像がないか確認する。
 6. `sources` が空の重要コンテンツは公開しない。
 7. SEO文言が外部コピーや過度な商標利用になっていないか確認する。
 
-実装では、表示コンポーネント側に `canDisplayAsset(asset)` を置き、未許諾画像はプレースホルダーにする。
+表示ポリシーは環境変数で切り替える。
+
+| `NEXT_PUBLIC_MEDIA_USAGE_POLICY` | 表示されるstatus | 用途 |
+|---|---|---|
+| `reference-attributed` | `own`, `licensed`, `commercial-permitted`, `reference-attributed`, `permission-requested` | 初期MVPの公開運用 |
+| `commercial-strict` | `own`, `licensed`, `commercial-permitted` | 営業・広告・商用色が強い運用 |
+| `prototype` | `commercial-strict` + `reference-attributed`, `permission-requested`, `prototype-only` | ローカルUI確認用 |
 
 ```ts
-const publicImageStatuses: RightsStatus[] = ['own', 'licensed', 'commercial-permitted'];
-
-export function canDisplayAsset(asset?: ImageAsset) {
-  return Boolean(asset?.rights && publicImageStatuses.includes(asset.rights.status));
-}
-```
-
-デモ用の例外ゲート：
-
-```ts
-const restrictedDemoStatuses: RightsStatus[] = [
-  'own',
-  'licensed',
-  'commercial-permitted',
-  'official-permitted',
-  'press-editorial',
-  'demo-restricted',
-  'prototype-only',
+const commercialStatuses: RightsStatus[] = ['own', 'licensed', 'commercial-permitted'];
+const referenceStatuses: RightsStatus[] = [
+  ...commercialStatuses,
+  'reference-attributed',
+  'permission-requested',
 ];
 
-export function canDisplayAssetInRestrictedDemo(asset?: ImageAsset) {
-  return Boolean(asset?.rights && restrictedDemoStatuses.includes(asset.rights.status));
+export function canDisplayAsset(asset?: ImageAsset) {
+  return Boolean(asset?.rights && referenceStatuses.includes(asset.rights.status));
 }
 ```
 
-ただし `canDisplayAssetInRestrictedDemo` は、パスワード付き・noindex・録画なし・資料配布なしの限定デモだけで使う。本番・公開デモ・登壇・商談・営業資料・将来のビジネス導線に映る画面では使わない。
+`prototype` はローカル実行・限定確認だけで使う。スクリーンショットをSNSや営業資料に載せる画面では使わない。
 
 ---
 
@@ -376,15 +351,16 @@ export function canDisplayAssetInRestrictedDemo(asset?: ImageAsset) {
 
 - `data/robots.ts` の `Robot.images`
   - Unitree, Figure/BMW, Apptronik, Agility, 1X の公式画像/CDN画像を参照している。
-  - `credit` と `sourceUrl` はあるが、商用Web再掲載の許諾状態がない。
+  - `rights.status: 'reference-attributed'` として管理済み。
+  - 商用Web再掲載の明示許可は未確認なので、メーカー交渉後に `commercial-permitted` へ昇格させる。
   - 一部URLは404/403になっており、技術的にも不安定。
-  - 公開用には `rights.status` を追加し、`commercial-permitted` でなければ非表示にする。
-  - デモ用に残す場合も `prototype-only` または `demo-restricted` として扱い、公開URLでは出さない。
+  - 厳格運用では `NEXT_PUBLIC_MEDIA_USAGE_POLICY=commercial-strict` に切り替える。
 
 - `data/manufacturers.ts` の `Manufacturer.logo`
   - ロゴは商標リスクがある。
-  - 現在は公式ロゴ/ファビコンを表示しているが、ブランドガイドラインや許諾確認がない。
-  - 公開用にはテキスト名表示を基本にし、ロゴは `commercial-permitted` 以外非表示にする。
+  - `rights.status: 'reference-attributed'` として管理済み。
+  - ブランドガイドラインや許諾確認は未完了。
+  - 厳格運用では `commercial-permitted` 以外は非表示になり、テキスト名表示にフォールバックする。
   - カンファレンス資料では、メーカー名テキストだけで足りるならロゴを使わない。
 
 ### 中リスク
@@ -423,18 +399,17 @@ export function canDisplayAssetInRestrictedDemo(asset?: ImageAsset) {
 2. 画像やロゴを使う必要があるか判断する。
 3. 必要なら、公式media kit、ブランドガイドライン、利用規約、ライセンスを確認する。
 4. `rights.status` を入れる。
-5. `unknown`, `official-permitted`, `press-editorial`, `permission-required` の素材は商用公開ページに出さない。商用利用可が明示されたら `commercial-permitted` に更新する。
+5. 出典明記で初期公開する素材は `reference-attributed`、許諾依頼中は `permission-requested`、商用利用可が明示されたら `commercial-permitted` に更新する。
 6. 本文は自分の言葉で書く。
 7. 直接引用は短く、必要な場合だけにする。
 8. 公開前に `sources` と `rights` をレビューする。
 
-デモ版を作るとき：
+表示ポリシーを切り替えるとき：
 
-1. `NEXT_PUBLIC_ASSET_MODE=prototype | restricted-demo | public` のような表示モードを決める。
-2. `public` では `canDisplayAsset` だけ使う。
-3. `restricted-demo` では、URL非公開、noindex、パスワード、録画なし、資料配布なしを条件にする。
-4. `prototype` ではローカル実行に閉じる。スクリーンショットをSNSや資料に載せない。
-5. 登壇・録画・配布・営業・商談・公開URL・将来の広告/送客/問い合わせ導線がある場合は `public` と同じ扱いにする。
+1. 初期MVPは `NEXT_PUBLIC_MEDIA_USAGE_POLICY=reference-attributed` を使う。
+2. 営業・広告・商用色が強くなったら `commercial-strict` に切り替える。
+3. `prototype` はローカル実行に閉じる。スクリーンショットをSNSや資料に載せない。
+4. 登壇・録画・配布・営業・商談・公開URL・将来の広告/送客/問い合わせ導線がある場合は `prototype` を使わない。
 
 許諾依頼時に確認する項目：
 

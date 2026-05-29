@@ -1,4 +1,5 @@
 import type { ImageAsset } from '@/data/types';
+import { getDisplayableAsset } from '@/lib/media';
 
 interface ManufacturerLogoNameProps {
   name: string;
@@ -17,16 +18,18 @@ export function ManufacturerLogoName({
   imageClassName = 'h-4 w-4',
   textClassName = '',
 }: ManufacturerLogoNameProps) {
+  const displayLogo = getDisplayableAsset(logo);
+
   return (
     <span className={`flex min-w-0 items-center gap-1.5 ${className}`}>
-      {logo?.src && (
+      {displayLogo && (
         <span
           className={`inline-flex shrink-0 items-center justify-center border border-neutral-200 bg-white ${frameClassName}`}
-          title={logo.credit}
+          title={displayLogo.credit}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={logo.src}
+            src={displayLogo.src}
             alt=""
             aria-hidden="true"
             loading="lazy"

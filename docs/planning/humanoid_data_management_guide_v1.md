@@ -112,7 +112,6 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 例：
 
 - `Robot.manufacturerSlug`
-- `Robot.useCaseSlugs`
 - `UseCase.candidateRobotSlugs`
 - `Report.relatedRobotSlugs`
 
@@ -202,6 +201,7 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 - 報道は `reported` として扱う
 - 推定値は `estimated` として扱う
 - AIが生成した推測値を事実として混ぜない
+- 画像・ロゴは `credit` / `sourceUrl` だけでなく `rights` を必ず持たせる
 
 ---
 
@@ -288,7 +288,6 @@ export const robots: Robot[] = [
     supportNote: '導入前に日本語サポート、保守部品、初期トレーニングの範囲を確認する。',
     safetyNote: '人と同じ作業空間で使う場合は、現場ごとのリスクアセスメントが必要。',
     vendorRiskNote: '研究・PoC用途と本番運用用途で評価軸を分ける。',
-    useCaseSlugs: ['research-development', 'demo-exhibition'],
     comparison: {
       strengths: ['価格訴求', '研究用途で検討しやすい'],
       constraints: ['本番運用では保守と安全設計の確認が必要'],
@@ -308,7 +307,7 @@ export const robots: Robot[] = [
 - `sources` が空ではない
 - `checkedAt` が入っている
 - 推定値に `estimated` が付いている
-- 画像に `alt` と出典がある
+- 画像に `alt`, `credit`, `sourceUrl`, `rights` がある
 - robotは `japanAvailability` が入っている
 - useCaseは `candidateRobotSlugs` と `relatedGuideSlugs` が入っている
 - reportは `whyItMatters` が入っている

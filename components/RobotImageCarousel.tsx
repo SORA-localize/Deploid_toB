@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { ImageAsset, ImageRole } from '@/data/types';
 import { imageRoleLabels, imageRoleOrder } from '@/lib/labels';
+import { getDisplayableAsset } from '@/lib/media';
 
 interface RobotImageCarouselProps {
   images?: Partial<Record<ImageRole, ImageAsset>>;
@@ -18,7 +19,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
 
   const slots = imageRoleOrder;
   const current = slots[idx];
-  const img = resolved[current];
+  const img = getDisplayableAsset(resolved[current]);
 
   return (
     <div className="border border-neutral-300 overflow-hidden bg-white">
@@ -49,7 +50,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
 
       <div className="flex border-t border-neutral-300 overflow-x-auto">
         {slots.map((role, i) => {
-          const hasImage = Boolean(resolved[role]);
+          const hasImage = Boolean(getDisplayableAsset(resolved[role]));
           return (
             <button
               key={role}

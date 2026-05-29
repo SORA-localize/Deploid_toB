@@ -5,6 +5,7 @@ import { ChevronRight, Star } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
 import { deploymentStageLabels, mobilityLabels, TBD_LABEL } from '@/lib/labels';
+import { getDisplayableAsset } from '@/lib/media';
 
 interface RobotCardProps {
   robot: Robot;
@@ -54,7 +55,7 @@ export function RobotCard({
       <Link href={`/robots/${robot.slug}`}>
         <div className="aspect-[4/3] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-xs text-neutral-500 overflow-hidden">
           {(() => {
-            const hero = robot.images?.hero ?? robot.heroImage;
+            const hero = getDisplayableAsset(robot.images?.hero ?? robot.heroImage);
             return hero ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={hero.src} alt={hero.alt} className="h-full w-full object-contain" />
