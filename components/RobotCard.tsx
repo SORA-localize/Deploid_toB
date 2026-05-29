@@ -57,7 +57,7 @@ export function RobotCard({
             const hero = robot.images?.hero ?? robot.heroImage;
             return hero ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={hero.src} alt={hero.alt} className="h-full w-full object-cover" />
+              <img src={hero.src} alt={hero.alt} className="h-full w-full object-contain" />
             ) : (
               '[ MAIN IMAGE ]'
             );

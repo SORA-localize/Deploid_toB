@@ -26,7 +26,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
         <div className="aspect-[16/9] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-xs text-neutral-500 tracking-widest">
           {img ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={img.src} alt={img.alt} className="w-full h-full object-cover" />
+            <img src={img.src} alt={img.alt} className="w-full h-full object-contain" />
           ) : (
             <span>[ {imageRoleLabels[current]} ]</span>
           )}
