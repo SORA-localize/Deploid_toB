@@ -33,29 +33,31 @@ export function ContactForm() {
       )}
 
       <fieldset
-        disabled={!formEnabled || state.submitting}
+        disabled={state.submitting}
         className="m-0 space-y-5 border-0 p-0 disabled:opacity-60"
       >
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="name" className="block text-xs font-medium text-neutral-900 mb-2">
-              お名前
+              お名前 <span className="text-neutral-400">（必須）</span>
             </label>
             <input
               id="name"
               type="text"
               name="name"
+              required
               className="w-full px-3 py-2 border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-neutral-500"
             />
           </div>
           <div>
             <label htmlFor="company" className="block text-xs font-medium text-neutral-900 mb-2">
-              会社名・組織名
+              会社名・組織名 <span className="text-neutral-400">（必須）</span>
             </label>
             <input
               id="company"
               type="text"
               name="company"
+              required
               className="w-full px-3 py-2 border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-neutral-500"
             />
           </div>
