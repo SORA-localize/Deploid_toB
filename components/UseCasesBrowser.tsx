@@ -130,7 +130,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
       <div className="mx-auto max-w-7xl px-6 py-8">
         {featured.length > 0 && !active && (
           <div className="mb-8">
-            <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-wider mb-4 px-1">
+            <h3 className="text-sm font-semibold text-neutral-900 mb-4 px-1">
               {uiText.useCases.featured}
             </h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -163,7 +163,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
         )}
 
         <div className="flex items-center justify-between mb-4 px-1">
-          <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-wider">
+          <h3 className="text-sm font-semibold text-neutral-900">
             {uiText.useCases.all}
           </h3>
           <span className="text-xs text-neutral-600">
@@ -192,7 +192,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                     </TagChip>
                   </div>
                   <h4 className="font-semibold text-neutral-900 mb-2">{u.titleJa ?? u.title}</h4>
-                  <p className="text-xs text-neutral-600 mb-2 leading-relaxed line-clamp-1">
+                  <p className="text-xs text-neutral-600 mb-2 leading-relaxed line-clamp-2">
                     {u.subtitle ?? u.summary}
                   </p>
                   <div className="flex gap-2 mb-2 flex-wrap">

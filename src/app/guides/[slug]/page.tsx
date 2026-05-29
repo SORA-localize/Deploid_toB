@@ -70,7 +70,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
               { label: guide.titleJa ?? guide.title },
             ]}
           />
-          <div className="text-xs uppercase tracking-wider text-neutral-500 font-medium mb-3">
+          <div className="text-xs text-neutral-500 font-medium mb-3">
             {guide.topics[0] ? getTagLabel(guide.topics[0]) : null}
           </div>
           <h1 className="text-3xl font-semibold text-neutral-900 mb-4 leading-tight max-w-4xl">
@@ -169,7 +169,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           <div className="col-span-12 lg:col-span-3">
             <div className="sticky top-6 space-y-4">
               <div className="border border-neutral-300 bg-white p-4">
-                <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
+                <h3 className="text-xs font-semibold text-neutral-900 mb-3 pb-2 border-b border-neutral-200">
                   {uiText.guides.decisionSummary}
                 </h3>
                 {guide.targetReaders.length > 0 && (
@@ -180,14 +180,14 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
                 )}
                 <Link
                   href="/compare"
-                  className="block w-full px-4 py-2.5 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium uppercase tracking-wider text-center transition-colors"
+                  className="block w-full px-4 py-2.5 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium text-center transition-colors"
                 >
                   {uiText.guides.compareCandidateRobots}
                 </Link>
               </div>
 
               <div className="border border-neutral-300 bg-white p-4">
-                <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
+                <h3 className="text-xs font-semibold text-neutral-900 mb-3 pb-2 border-b border-neutral-200">
                   {uiText.guides.relatedPaths}
                 </h3>
                 <nav className="space-y-2">

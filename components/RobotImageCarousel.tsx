@@ -25,7 +25,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
   return (
     <div className="border border-neutral-300 overflow-hidden bg-white">
       <div className="relative">
-        <div className="aspect-[16/9] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-xs text-neutral-500 tracking-widest">
+        <div className="aspect-[16/9] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-xs text-neutral-500">
           {img ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={img.src} alt={img.alt} className="w-full h-full object-contain" />
@@ -56,7 +56,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
             <button
               key={role}
               onClick={() => setIdx(i)}
-              className={`flex-1 min-w-fit whitespace-nowrap px-3 py-2 text-[10px] uppercase tracking-widest border-r border-neutral-300 last:border-r-0 transition-colors ${
+              className={`flex-1 min-w-fit whitespace-nowrap px-3 py-2 text-[11px] border-r border-neutral-300 last:border-r-0 transition-colors ${
                 i === idx
                   ? 'bg-neutral-900 text-white'
                   : hasImage

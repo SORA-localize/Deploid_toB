@@ -181,7 +181,7 @@ export default function HomePage() {
                 </div>
                 <Link
                   href={`/guides/${featured.slug}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 border border-neutral-300 text-neutral-900 hover:bg-neutral-50 transition-colors whitespace-nowrap ml-6"
+                  className="inline-flex items-center gap-2 px-4 py-2 border border-neutral-300 text-neutral-900 hover:bg-neutral-50 transition-colors ml-6"
                 >
                   続きを読む
                   <ArrowRight className="w-4 h-4" />

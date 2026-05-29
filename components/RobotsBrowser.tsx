@@ -174,7 +174,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
               updateParams({ release: nextRelease === 'active' ? null : nextRelease })
             }
             ariaLabel={uiText.filters.releaseStatus}
-            buttonClassName="px-3 py-1.5 text-xs uppercase tracking-wide"
+            buttonClassName="px-3 py-1.5 text-xs"
           />
           <div className="text-xs text-neutral-500">{uiText.robots.sortByLatestRelease}</div>
         </div>

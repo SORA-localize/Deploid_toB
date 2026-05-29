@@ -90,7 +90,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
     <div className="min-h-screen bg-white">
       <div className="border-b border-neutral-300">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="flex items-center gap-6 py-4 text-xs uppercase tracking-wide overflow-x-auto">
+          <div className="flex items-center gap-6 py-4 text-xs overflow-x-auto">
             {sections.map((item) => (
               <a
                 key={item.href}
@@ -266,7 +266,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           {prev ? (
             <Link
               href={`/robots/${prev.slug}`}
-              className="inline-flex items-center gap-2 text-xs uppercase tracking-wide text-neutral-500 hover:text-neutral-900"
+              className="inline-flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900"
             >
               <ChevronLeft className="w-4 h-4" />
               {prev.nameJa ?? prev.name}
@@ -277,7 +277,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           {next ? (
             <Link
               href={`/robots/${next.slug}`}
-              className="inline-flex items-center gap-2 text-xs uppercase tracking-wide text-neutral-500 hover:text-neutral-900"
+              className="inline-flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900"
             >
               {next.nameJa ?? next.name}
               <ChevronRight className="w-4 h-4" />

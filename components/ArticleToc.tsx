@@ -16,7 +16,7 @@ export function ArticleToc({ items, backHref, backLabel }: ArticleTocProps) {
   return (
     <div className="sticky top-6">
       <div className="border border-neutral-300 bg-white p-4">
-        <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
+        <h3 className="text-xs font-semibold text-neutral-900 mb-3 pb-2 border-b border-neutral-200">
           {uiText.common.contents}
         </h3>
         <nav className="space-y-1">

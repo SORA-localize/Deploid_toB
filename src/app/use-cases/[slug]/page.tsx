@@ -154,7 +154,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
           <div className="col-span-12 lg:col-span-4">
             <div className="sticky top-6 space-y-4">
               <div className="border border-neutral-300 bg-white p-4">
-                <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
+                <h3 className="text-xs font-semibold text-neutral-900 mb-3 pb-2 border-b border-neutral-200">
                   候補ロボット
                 </h3>
                 {candidateRobots.length === 0 ? (
@@ -173,7 +173,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                         </p>
                         <Link
                           href="/compare"
-                          className="inline-block w-full px-3 py-2 border border-neutral-300 hover:border-neutral-500 text-xs text-center uppercase tracking-wider transition-colors"
+                          className="inline-block w-full px-3 py-2 border border-neutral-300 hover:border-neutral-500 text-xs text-center transition-colors"
                         >
                           {uiText.compare.compare}
                         </Link>
@@ -185,7 +185,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
 
               {(guides.length > 0 || reports.length > 0) && (
                 <div className="border border-neutral-300 bg-white p-4">
-                  <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
+                  <h3 className="text-xs font-semibold text-neutral-900 mb-3 pb-2 border-b border-neutral-200">
                     関連
                   </h3>
                   <nav className="space-y-2">
@@ -218,7 +218,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                 </p>
                 <Link
                   href="/contact"
-                  className="block w-full px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium uppercase tracking-wider transition-colors text-center"
+                  className="block w-full px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium transition-colors text-center"
                 >
                   相談する
                 </Link>

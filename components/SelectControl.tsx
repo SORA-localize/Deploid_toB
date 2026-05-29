@@ -28,7 +28,7 @@ export function SelectControl({
   options,
   onChange,
   className = '',
-  labelClassName = 'mb-2 block text-xs uppercase tracking-wide text-neutral-500',
+  labelClassName = 'mb-2 block text-xs text-neutral-500',
   buttonClassName = 'w-full flex items-center justify-between border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-neutral-500 focus:outline-none text-left',
   listClassName = 'absolute z-10 w-full border border-neutral-300 bg-white mt-px max-h-60 overflow-y-auto',
   required = false,

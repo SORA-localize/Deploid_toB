@@ -49,7 +49,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
             onChange={(nextStage) => updateParams({ stage: nextStage === 'all' ? null : nextStage })}
             ariaLabel={uiText.filters.guideStage}
             className="mb-4"
-            buttonClassName="px-4 py-2.5 text-xs font-medium uppercase tracking-wide"
+            buttonClassName="px-4 py-2.5 text-xs font-medium"
           />
 
           <FilterChipGroup
@@ -66,7 +66,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
       <div className="mx-auto max-w-7xl px-6 py-8">
         {featured && stage === 'all' && !topic && (
           <div className="border border-neutral-300 bg-white p-6 mb-6">
-            <div className="text-xs uppercase tracking-wider text-neutral-500 font-medium mb-3 pb-2 border-b border-neutral-200">
+            <div className="text-xs text-neutral-500 font-medium mb-3 pb-2 border-b border-neutral-200">
               {uiText.guides.featured}
             </div>
             <h2 className="text-xl font-semibold text-neutral-900 mb-3 leading-tight">
@@ -90,7 +90,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
             <p className="text-sm text-neutral-700 mb-6 leading-relaxed">{featured.summary}</p>
             <Link
               href={`/guides/${featured.slug}`}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium uppercase tracking-wider transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium transition-colors"
             >
               {uiText.guides.read}
               <ArrowRight className="w-4 h-4" />
@@ -103,7 +103,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
           if (items.length === 0) return null;
           return (
             <div key={s} className="mb-6">
-              <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-wider mb-3 px-1">
+              <h3 className="text-sm font-semibold text-neutral-900 mb-3 px-1">
                 {guideStageLabels[s]}
               </h3>
               <div className="space-y-2">

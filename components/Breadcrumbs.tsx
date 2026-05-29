@@ -14,7 +14,7 @@ interface BreadcrumbsProps {
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
     <nav className="flex items-center gap-2 text-xs mb-6">
-      <Link href="/" className="text-neutral-500 hover:text-neutral-900 uppercase tracking-wide">
+      <Link href="/" className="text-neutral-500 hover:text-neutral-900">
         {uiText.common.home}
       </Link>
       {items.map((item, index) => (
@@ -23,12 +23,12 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
           {item.path ? (
             <Link
               href={item.path}
-              className="text-neutral-500 hover:text-neutral-900 uppercase tracking-wide"
+              className="text-neutral-500 hover:text-neutral-900"
             >
               {item.label}
             </Link>
           ) : (
-            <span className="text-neutral-900 uppercase tracking-wide">{item.label}</span>
+            <span className="text-neutral-900">{item.label}</span>
           )}
         </div>
       ))}

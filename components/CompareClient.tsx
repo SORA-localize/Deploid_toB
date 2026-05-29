@@ -67,7 +67,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
           <div className="min-w-0">
             <div className="border border-neutral-300 bg-neutral-50 xl:sticky xl:top-6">
               <div className="px-4 py-3 border-b border-neutral-300 bg-white">
-                <h2 className="text-xs font-semibold text-neutral-900 uppercase tracking-wide">
+                <h2 className="text-xs font-semibold text-neutral-900">
                   {uiText.compare.manufacturers}
                 </h2>
               </div>
@@ -143,7 +143,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
           {/* Main Content - Comparison Sheet */}
           <div className="min-w-0">
             <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="text-xs uppercase tracking-wide text-neutral-500">
+              <span className="text-xs text-neutral-500">
                 {uiText.compare.comparisonSheet(selectedSlugs.length, 9)}
               </span>
               {selectedSlugs.length > 0 && (
@@ -151,7 +151,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   type="button"
                   aria-label="比較シートを空にする"
                   onClick={() => setSelectedSlugs([])}
-                  className="text-xs text-neutral-500 hover:text-neutral-900 uppercase tracking-wide"
+                  className="text-xs text-neutral-500 hover:text-neutral-900"
                 >
                   {uiText.common.clearAll}
                 </button>
@@ -212,7 +212,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
             <div className="border border-neutral-300 bg-neutral-50 xl:sticky xl:top-6">
               <div className="px-4 py-3 border-b border-neutral-300 bg-white flex items-center gap-2">
                 <Star className="w-4 h-4 text-yellow-500" />
-                <h2 className="text-xs font-semibold text-neutral-900 uppercase tracking-wide">
+                <h2 className="text-xs font-semibold text-neutral-900">
                   {uiText.compare.favorites}
                 </h2>
               </div>

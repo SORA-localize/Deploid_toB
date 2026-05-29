@@ -111,7 +111,7 @@ export function RobotCard({
             </div>
           </dl>
           <div className="flex items-center justify-between pt-3 border-t border-neutral-300">
-            <span className="text-xs uppercase tracking-wide text-neutral-700">
+            <span className="text-xs text-neutral-700">
               {uiText.common.viewDetails}
             </span>
             <ChevronRight className="w-4 h-4 text-neutral-500" />

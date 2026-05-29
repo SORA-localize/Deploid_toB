@@ -183,7 +183,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
               >
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
-                    <h2 className="min-w-0 text-xl font-semibold text-neutral-900 tracking-tight">
+                    <h2 className="min-w-0 text-xl font-semibold text-neutral-900">
                       <ManufacturerLogoName
                         name={manufacturer.name.toUpperCase()}
                         logo={manufacturer.logo}
@@ -220,7 +220,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
 
                   <Link
                     href={`/manufacturers/${manufacturer.slug}`}
-                    className="flex items-center justify-between w-full px-4 py-2 bg-white border border-neutral-300 hover:bg-neutral-50 transition-colors text-xs uppercase tracking-wide text-neutral-900"
+                    className="flex items-center justify-between w-full px-4 py-2 bg-white border border-neutral-300 hover:bg-neutral-50 transition-colors text-xs text-neutral-900"
                   >
                     <span>{uiText.common.viewProfile}</span>
                     <ChevronRight className="w-4 h-4" />

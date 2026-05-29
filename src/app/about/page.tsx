@@ -10,17 +10,17 @@ export const metadata = {
 
 const values = [
   {
-    label: 'Mission',
+    label: 'ミッション',
     title: '導入判断の最初の入口をつくる',
     body: '機種名やニュースではなく、調達・保守・安全・用途適合・PoC設計まで、買い手が判断に使う変数で整理します。',
   },
   {
-    label: 'Problem',
+    label: '課題',
     title: '既存情報は買い手目線で体系化されていない',
     body: 'メーカー発表やスペック表は揃っても、「うちに要るか・国内で導入できるか・何から始めるか」に答える構造が不足しています。',
   },
   {
-    label: 'Policy',
+    label: '方針',
     title: '出典と確認日を残す',
     body: '公式情報・報道・推定を混ぜず、信頼度（reliability）と確認日をデータとして残します。AIの推測値を事実として扱いません。',
   },
@@ -36,10 +36,10 @@ const roadmap = [
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-12">
-      <Breadcrumbs items={[{ label: 'About' }]} />
+      <Breadcrumbs items={[{ label: '会社概要' }]} />
 
       <section className="py-12 border-b border-neutral-200">
-        <p className="font-mono text-xs uppercase tracking-widest text-neutral-500 mb-4">About Deploid</p>
+        <p className="text-xs text-neutral-500 mb-4">Deploidについて</p>
         <h1 className="text-3xl font-semibold text-neutral-900 mb-4 max-w-3xl leading-tight">
           ヒューマノイド導入の、最初の判断材料をつくる。
         </h1>
@@ -52,7 +52,7 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {values.map((v) => (
             <div key={v.label} className="border border-neutral-200 bg-white p-6">
-              <p className="font-mono text-xs uppercase tracking-widest text-neutral-500 mb-3">{v.label}</p>
+              <p className="text-xs text-neutral-500 mb-3">{v.label}</p>
               <h3 className="font-semibold text-neutral-900 mb-2">{v.title}</h3>
               <p className="text-sm text-neutral-600 leading-relaxed">{v.body}</p>
             </div>

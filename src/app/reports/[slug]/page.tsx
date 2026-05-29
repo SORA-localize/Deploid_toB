@@ -54,7 +54,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               { label: report.titleJa ?? report.title },
             ]}
           />
-          <div className="text-xs uppercase tracking-wider text-neutral-500 font-medium mb-3">
+          <div className="text-xs text-neutral-500 font-medium mb-3">
             {reportTypeLabels[report.type]}
           </div>
           <h1 className="text-3xl font-semibold text-neutral-900 mb-4 leading-tight max-w-4xl">
@@ -146,7 +146,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             <div className="sticky top-6 space-y-4">
               {hasRelated && (
                 <div className="border border-neutral-300 bg-white p-4">
-                  <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
+                  <h3 className="text-xs font-semibold text-neutral-900 mb-3 pb-2 border-b border-neutral-200">
                     関連
                   </h3>
                   <nav className="space-y-2">
@@ -202,7 +202,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 </p>
                 <Link
                   href="/contact"
-                  className="block w-full px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium uppercase tracking-wider transition-colors text-center"
+                  className="block w-full px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium transition-colors text-center"
                 >
                   お問い合わせ
                 </Link>

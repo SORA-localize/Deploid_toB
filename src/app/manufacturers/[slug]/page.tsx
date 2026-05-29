@@ -49,7 +49,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
         <div className="grid grid-cols-1 gap-8 mb-12 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="mb-2 text-xs uppercase tracking-wide text-neutral-500 flex items-center gap-2 flex-wrap">
+            <div className="mb-2 text-xs text-neutral-500 flex items-center gap-2 flex-wrap">
               <span>{uiText.manufacturers.profile}</span>
               <span className="px-2 py-0.5 border border-neutral-400 text-neutral-700">
                 {companyTypeLabels[manufacturer.companyType]}
@@ -112,14 +112,14 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
                 href={manufacturer.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white border border-neutral-300 hover:bg-neutral-50 text-xs uppercase tracking-wide text-neutral-900"
+                className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white border border-neutral-300 hover:bg-neutral-50 text-xs text-neutral-900"
               >
                 <ExternalLink className="w-3 h-3" />
                 {uiText.common.website}
               </a>
               <Link
                 href="/contact"
-                className="flex-1 text-center px-3 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs uppercase tracking-wide"
+                className="flex-1 text-center px-3 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs"
               >
                 {uiText.common.contact}
               </Link>
@@ -130,7 +130,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
         <div>
           <div className="flex items-center justify-between gap-4 mb-6">
             <h2 className="text-xl font-semibold text-neutral-900">取扱機種</h2>
-            <span className="px-3 py-1.5 bg-neutral-100 border border-neutral-300 text-neutral-700 text-xs uppercase tracking-wide whitespace-nowrap">
+            <span className="px-3 py-1.5 bg-neutral-100 border border-neutral-300 text-neutral-700 text-xs whitespace-nowrap">
               {uiText.manufacturers.models(robots.length)}
             </span>
           </div>

@@ -97,7 +97,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
           <div className="col-span-12 lg:col-span-8">
             {featured && !active && (
               <div className="border border-neutral-300 bg-white p-6 mb-6">
-                <div className="text-xs uppercase tracking-wider text-neutral-500 font-medium mb-3 pb-2 border-b border-neutral-200">
+                <div className="text-xs text-neutral-500 font-medium mb-3 pb-2 border-b border-neutral-200">
                   {uiText.reports.featured}
                 </div>
                 <h2 className="text-xl font-semibold text-neutral-900 mb-3 leading-tight">
@@ -119,7 +119,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                 </div>
                 <Link
                   href={`/reports/${featured.slug}`}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium uppercase tracking-wider transition-colors"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium transition-colors"
                 >
                   {uiText.reports.read}
                   <ArrowRight className="w-4 h-4" />
@@ -127,7 +127,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
               </div>
             )}
 
-            <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-wider mb-4 px-1">
+            <h3 className="text-sm font-semibold text-neutral-900 mb-4 px-1">
               {uiText.common.latest}
             </h3>
             <div className="space-y-2">
@@ -169,7 +169,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
           <div className="col-span-12 lg:col-span-4">
             <div className="sticky top-6 space-y-4">
               <div className="border border-neutral-300 bg-white p-4">
-                <h3 className="text-xs font-semibold text-neutral-900 uppercase tracking-wider mb-3 pb-2 border-b border-neutral-200">
+                <h3 className="text-xs font-semibold text-neutral-900 mb-3 pb-2 border-b border-neutral-200">
                   関連ツール
                 </h3>
                 <nav className="space-y-2">
@@ -204,7 +204,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                 </p>
                 <Link
                   href="/contact"
-                  className="block w-full px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium uppercase tracking-wider transition-colors text-center"
+                  className="block w-full px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium transition-colors text-center"
                 >
                   お問い合わせ
                 </Link>
