@@ -51,7 +51,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-[1800px] px-6 py-12">
+      <div className="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 sm:py-12">
         <Breadcrumbs items={[{ label: 'Compare' }]} />
 
         <div className="mb-8">
@@ -61,16 +61,16 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
           </p>
         </div>
 
-        <div className="flex gap-6">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[16rem_minmax(0,1fr)_16rem]">
           {/* Left Sidebar - Manufacturer Menu */}
-          <div className="w-64 flex-shrink-0">
-            <div className="border border-neutral-300 bg-neutral-50 sticky top-6">
+          <div className="min-w-0">
+            <div className="border border-neutral-300 bg-neutral-50 xl:sticky xl:top-6">
               <div className="px-4 py-3 border-b border-neutral-300 bg-white">
                 <h2 className="text-xs font-semibold text-neutral-900 uppercase tracking-wide">
                   Manufacturers
                 </h2>
               </div>
-              <div className="divide-y divide-neutral-300 max-h-[calc(100vh-200px)] overflow-y-auto">
+              <div className="divide-y divide-neutral-300 max-h-80 overflow-y-auto xl:max-h-[calc(100vh-200px)]">
                 {manufacturers.map((manufacturer) => {
                   const manufacturerRobots = robots.filter(
                     (r) => r.manufacturerSlug === manufacturer.slug,
@@ -81,6 +81,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                     <div key={manufacturer.slug}>
                       <button
                         type="button"
+                        aria-label={`${manufacturer.nameJa ?? manufacturer.name}の機種一覧を${isExpanded ? '閉じる' : '開く'}`}
                         aria-expanded={isExpanded}
                         onClick={() => toggleManufacturer(manufacturer.slug)}
                         className="w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-100 transition-colors text-left"
@@ -106,6 +107,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                               <button
                                 type="button"
                                 key={robot.slug}
+                                aria-label={`${robot.nameJa ?? robot.name}を${isSelected ? '比較から外す' : '比較に追加する'}`}
                                 aria-pressed={isSelected}
                                 onClick={() =>
                                   isSelected ? removeRobot(robot.slug) : addRobot(robot.slug)
@@ -138,14 +140,15 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
           </div>
 
           {/* Main Content - Comparison Sheet */}
-          <div className="flex-1 min-w-0">
-            <div className="mb-4 flex items-center justify-between">
+          <div className="min-w-0">
+            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-xs uppercase tracking-wide text-neutral-500">
                 COMPARISON SHEET ({selectedSlugs.length}/9)
               </span>
               {selectedSlugs.length > 0 && (
                 <button
                   type="button"
+                  aria-label="比較シートを空にする"
                   onClick={() => setSelectedSlugs([])}
                   className="text-xs text-neutral-500 hover:text-neutral-900 uppercase tracking-wide"
                 >
@@ -155,10 +158,11 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
             </div>
 
             {selectedRobots.length === 0 ? (
-              <div className="border border-neutral-300 bg-neutral-50 p-16 text-center">
+              <div className="border border-neutral-300 bg-neutral-50 p-8 text-center sm:p-16">
                 <div className="max-w-md mx-auto">
                   <div className="w-16 h-16 bg-neutral-200 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg
+                      aria-hidden="true"
                       className="w-8 h-8 text-neutral-400"
                       fill="none"
                       stroke="currentColor"
@@ -181,8 +185,8 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                 </div>
               </div>
             ) : (
-              <div className="border border-neutral-300 bg-white p-6">
-                <div className="grid grid-cols-3 gap-6">
+              <div className="border border-neutral-300 bg-white p-4 sm:p-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                   {selectedRobots.map((robot) => {
                     const manufacturer = manufacturerFor(robot.manufacturerSlug);
                     return (
@@ -213,15 +217,15 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
           </div>
 
           {/* Right Sidebar - Favorites */}
-          <div className="w-64 flex-shrink-0">
-            <div className="border border-neutral-300 bg-neutral-50 sticky top-6">
+          <div className="min-w-0">
+            <div className="border border-neutral-300 bg-neutral-50 xl:sticky xl:top-6">
               <div className="px-4 py-3 border-b border-neutral-300 bg-white flex items-center gap-2">
                 <Star className="w-4 h-4 text-yellow-500" />
                 <h2 className="text-xs font-semibold text-neutral-900 uppercase tracking-wide">
                   Favorites
                 </h2>
               </div>
-              <div className="p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+              <div className="p-4 max-h-80 overflow-y-auto xl:max-h-[calc(100vh-200px)]">
                 {favoriteRobots.length === 0 ? (
                   <div className="text-center py-8">
                     <Star className="w-8 h-8 text-neutral-300 mx-auto mb-3" />

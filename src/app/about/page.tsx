@@ -49,7 +49,7 @@ export default function AboutPage() {
       </section>
 
       <section className="py-12 border-b border-neutral-200">
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {values.map((v) => (
             <div key={v.label} className="border border-neutral-200 bg-white p-6">
               <p className="font-mono text-xs uppercase tracking-widest text-neutral-500 mb-3">{v.label}</p>
@@ -62,7 +62,7 @@ export default function AboutPage() {
 
       <section className="py-12 border-b border-neutral-200">
         <h2 className="text-2xl font-semibold text-neutral-900 mb-8">ロードマップ</h2>
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {roadmap.map((r) => (
             <div key={r.step} className="flex gap-4 border border-neutral-200 bg-white p-5">
               <div className="flex-shrink-0 w-12 h-12 border-2 border-neutral-900 flex items-center justify-center">

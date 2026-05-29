@@ -80,7 +80,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
 
           <div className="border border-neutral-300 bg-neutral-50 p-5">
             <h2 className="text-sm font-semibold text-neutral-900 mb-4">At a Glance</h2>
-            <div className="grid md:grid-cols-3 gap-4 text-xs">
+            <div className="grid grid-cols-1 gap-4 text-xs md:grid-cols-3">
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-2 flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-green-700" />

@@ -38,7 +38,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-7xl px-6 py-12">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
         <Breadcrumbs
           items={[
             { label: 'Manufacturers', path: '/manufacturers' },
@@ -46,15 +46,15 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
           ]}
         />
 
-        <div className="grid grid-cols-3 gap-8 mb-12">
-          <div className="col-span-2">
-            <div className="mb-2 text-xs uppercase tracking-wide text-neutral-500 flex items-center gap-2">
+        <div className="grid grid-cols-1 gap-8 mb-12 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <div className="mb-2 text-xs uppercase tracking-wide text-neutral-500 flex items-center gap-2 flex-wrap">
               <span>[ MANUFACTURER PROFILE ]</span>
               <span className="px-2 py-0.5 border border-neutral-400 text-neutral-700">
                 {companyTypeLabels[manufacturer.companyType]}
               </span>
             </div>
-            <h1 className="text-3xl font-semibold text-neutral-900 mb-4">
+            <h1 className="text-2xl font-semibold text-neutral-900 mb-4 sm:text-3xl">
               <ManufacturerLogoName
                 name={manufacturer.nameJa ?? manufacturer.name}
                 logo={manufacturer.logo}
@@ -82,29 +82,29 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
             </div>
           </div>
 
-          <div className="border border-neutral-300 bg-neutral-50 p-6">
+          <div className="border border-neutral-300 bg-neutral-50 p-4 sm:p-6">
             <h3 className="text-sm font-semibold text-neutral-900 mb-4">Fact Sheet</h3>
             <dl className="space-y-3 text-xs">
-              <div className="flex justify-between py-2 border-b border-neutral-300">
+              <div className="flex justify-between gap-4 py-2 border-b border-neutral-300">
                 <dt className="text-neutral-500">所在地</dt>
-                <dd className="text-neutral-900">
+                <dd className="text-right text-neutral-900">
                   {manufacturer.hqCity ? `${manufacturer.hqCity}, ${manufacturer.country}` : manufacturer.country}
                 </dd>
               </div>
-              <div className="flex justify-between py-2 border-b border-neutral-300">
+              <div className="flex justify-between gap-4 py-2 border-b border-neutral-300">
                 <dt className="text-neutral-500">設立</dt>
-                <dd className="text-neutral-900">{manufacturer.foundedYear ?? TBD_LABEL}</dd>
+                <dd className="text-right text-neutral-900">{manufacturer.foundedYear ?? TBD_LABEL}</dd>
               </div>
-              <div className="flex justify-between py-2 border-b border-neutral-300">
+              <div className="flex justify-between gap-4 py-2 border-b border-neutral-300">
                 <dt className="text-neutral-500">取扱機種</dt>
-                <dd className="text-neutral-900">{robots.length}</dd>
+                <dd className="text-right text-neutral-900">{robots.length}</dd>
               </div>
-              <div className="flex justify-between py-2">
+              <div className="flex justify-between gap-4 py-2">
                 <dt className="text-neutral-500">日本での体制</dt>
-                <dd className="text-neutral-900">{japanPresenceLabels[manufacturer.japanPresence]}</dd>
+                <dd className="text-right text-neutral-900">{japanPresenceLabels[manufacturer.japanPresence]}</dd>
               </div>
             </dl>
-            <div className="flex gap-2 mt-6">
+            <div className="flex flex-col gap-2 mt-6 sm:flex-row">
               <a
                 href={manufacturer.website}
                 target="_blank"
@@ -125,15 +125,15 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between gap-4 mb-6">
             <h2 className="text-xl font-semibold text-neutral-900">取扱機種</h2>
-            <span className="px-3 py-1.5 bg-neutral-100 border border-neutral-300 text-neutral-700 text-xs uppercase tracking-wide">
+            <span className="px-3 py-1.5 bg-neutral-100 border border-neutral-300 text-neutral-700 text-xs uppercase tracking-wide whitespace-nowrap">
               [ {robots.length} MODELS ]
             </span>
           </div>
 
           {robots.length > 0 ? (
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {robots.map((robot) => (
                 <RobotCard
                   key={robot.slug}
@@ -158,15 +158,15 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
                 <Link
                   key={report.slug}
                   href={`/reports/${report.slug}`}
-                  className="flex items-start gap-3 p-3 bg-white border border-neutral-300 hover:border-neutral-500 transition-colors"
+                  className="flex flex-col gap-3 p-3 bg-white border border-neutral-300 hover:border-neutral-500 transition-colors sm:flex-row sm:items-start"
                 >
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-medium text-neutral-900 mb-1">
                       {report.titleJa ?? report.title}
                     </h4>
                     <p className="text-xs text-neutral-600">{report.summary}</p>
                   </div>
-                  <div className="text-xs text-neutral-500 whitespace-nowrap">{report.publishedAt}</div>
+                  <div className="text-xs text-neutral-500 sm:whitespace-nowrap">{report.publishedAt}</div>
                   <ChevronRight className="w-4 h-4 text-neutral-500 mt-1 flex-shrink-0" />
                 </Link>
               ))}
