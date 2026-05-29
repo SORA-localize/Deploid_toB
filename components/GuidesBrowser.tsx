@@ -10,6 +10,7 @@ import { TagChip } from '@/components/TagChip';
 import type { Guide, GuideStage } from '@/data/types';
 import { guideStageOrder } from '@/lib/display';
 import { guideStageLabels } from '@/lib/labels';
+import { getGuideTopicOptions, getTagLabel, matchesTag } from '@/lib/tags';
 
 const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
   { value: 'all', label: 'All' },
@@ -20,15 +21,11 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
   const [stage, setStage] = useState<'all' | GuideStage>('all');
   const [topic, setTopic] = useState<string | null>(null);
 
-  const topics = useMemo(() => Array.from(new Set(guides.flatMap((g) => g.topics))), [guides]);
-  const topicOptions = useMemo(
-    () => topics.map((value) => ({ value, label: value })),
-    [topics],
-  );
+  const topicOptions = useMemo(() => getGuideTopicOptions(guides), [guides]);
   const featured = guides.find((g) => g.order === 1) ?? guides[0];
 
   const filtered = guides.filter(
-    (g) => (stage === 'all' || g.stage === stage) && (!topic || g.topics.includes(topic)),
+    (g) => (stage === 'all' || g.stage === stage) && matchesTag(g.topics, topic),
   );
 
   return (
@@ -126,7 +123,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
                         </div>
                         <div className="flex gap-2 flex-wrap">
                           {guide.topics.slice(0, 3).map((t) => (
-                            <TagChip key={t}>{t}</TagChip>
+                            <TagChip key={t}>{getTagLabel(t)}</TagChip>
                           ))}
                         </div>
                       </div>

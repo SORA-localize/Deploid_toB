@@ -12,6 +12,7 @@ import type { Report, ReportType } from '@/data/types';
 import { reportTypeOrder } from '@/lib/display';
 import { reportTypeLabels } from '@/lib/labels';
 import { matchesQuery } from '@/lib/search';
+import { getReportTagOptions, getTagLabel, getTagSearchValues, matchesTag } from '@/lib/tags';
 
 const typeOptions: Array<{ value: 'all' | ReportType; label: string }> = [
   { value: 'all', label: 'All' },
@@ -23,16 +24,18 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
   const [topic, setTopic] = useState<string | null>(null);
   const [query, setQuery] = useState('');
 
-  const topics = useMemo(() => Array.from(new Set(reports.flatMap((r) => r.tags))), [reports]);
-  const topicOptions = useMemo(
-    () => topics.map((value) => ({ value, label: value })),
-    [topics],
-  );
+  const topicOptions = useMemo(() => getReportTagOptions(reports), [reports]);
 
   const filtered = reports.filter((r) => {
     if (type !== 'all' && r.type !== type) return false;
-    if (topic && !r.tags.includes(topic)) return false;
-    if (!matchesQuery(query, [r.titleJa, r.title, r.summary, r.whyItMatters, ...r.tags])) return false;
+    if (!matchesTag(r.tags, topic)) return false;
+    if (!matchesQuery(query, [
+      r.titleJa,
+      r.title,
+      r.summary,
+      r.whyItMatters,
+      ...getTagSearchValues(r.tags),
+    ])) return false;
     return true;
   });
 
@@ -68,7 +71,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
             />
           </div>
 
-          {topics.length > 0 && (
+          {topicOptions.length > 0 && (
             <FilterChipGroup
               options={topicOptions}
               value={topic}
@@ -138,7 +141,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                       </p>
                       <div className="flex gap-2 flex-wrap">
                         {report.tags.slice(0, 3).map((tag) => (
-                          <TagChip key={tag}>{tag}</TagChip>
+                          <TagChip key={tag}>{getTagLabel(tag)}</TagChip>
                         ))}
                       </div>
                     </div>

@@ -11,6 +11,13 @@ import { TagChip } from '@/components/TagChip';
 import type { UseCase } from '@/data/types';
 import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
 import { matchesQuery } from '@/lib/search';
+import {
+  getTagLabel,
+  getTagSearchValues,
+  getUseCaseIndustryTagOptions,
+  getUseCaseTaskTagOptions,
+  matchesTag,
+} from '@/lib/tags';
 
 type UseCaseSearchMode = 'industry' | 'task';
 
@@ -37,13 +44,10 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
   const [task, setTask] = useState<string | null>(null);
   const [query, setQuery] = useState('');
 
-  const industries = useMemo(
-    () => Array.from(new Set(useCases.flatMap((u) => u.industryTags))),
-    [useCases],
-  );
-  const tasks = useMemo(() => Array.from(new Set(useCases.flatMap((u) => u.taskTags))), [useCases]);
+  const industries = useMemo(() => getUseCaseIndustryTagOptions(useCases), [useCases]);
+  const tasks = useMemo(() => getUseCaseTaskTagOptions(useCases), [useCases]);
   const chipOptions = useMemo(
-    () => (mode === 'industry' ? industries : tasks).map((value) => ({ value, label: value })),
+    () => (mode === 'industry' ? industries : tasks),
     [mode, industries, tasks],
   );
   const selectedChip = mode === 'industry' ? industry : task;
@@ -58,9 +62,15 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
   };
 
   const filtered = useCases.filter((u) => {
-    if (!matchesQuery(query, [u.titleJa, u.title, u.subtitle, ...u.taskTags])) return false;
-    if (industry && !u.industryTags.includes(industry)) return false;
-    if (task && !u.taskTags.includes(task)) return false;
+    if (!matchesQuery(query, [
+      u.titleJa,
+      u.title,
+      u.subtitle,
+      u.summary,
+      ...getTagSearchValues([...u.industryTags, ...u.taskTags]),
+    ])) return false;
+    if (!matchesTag(u.industryTags, industry)) return false;
+    if (!matchesTag(u.taskTags, task)) return false;
     return true;
   });
 
@@ -121,7 +131,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                 >
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     {u.industryTags[0] && (
-                      <TagChip>{u.industryTags[0]}</TagChip>
+                      <TagChip>{getTagLabel(u.industryTags[0])}</TagChip>
                     )}
                     <TagChip tone={maturityTone(u.maturityLevel)}>
                       {maturityLabels[u.maturityLevel]}
@@ -157,7 +167,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     {u.industryTags[0] && (
-                      <TagChip>{u.industryTags[0]}</TagChip>
+                      <TagChip>{getTagLabel(u.industryTags[0])}</TagChip>
                     )}
                     <TagChip tone={maturityTone(u.maturityLevel)}>
                       {maturityLabels[u.maturityLevel]}
@@ -172,7 +182,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                   </p>
                   <div className="flex gap-2 mb-2 flex-wrap">
                     {u.taskTags.slice(0, 3).map((t) => (
-                      <TagChip key={t}>{t}</TagChip>
+                      <TagChip key={t}>{getTagLabel(t)}</TagChip>
                     ))}
                   </div>
                   <div className="text-xs text-neutral-600">

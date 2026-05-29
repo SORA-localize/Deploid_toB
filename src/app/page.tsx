@@ -10,6 +10,7 @@ import {
   getRobots,
 } from '@/lib/data';
 import { reportTypeLabels } from '@/lib/labels';
+import { getTagLabel } from '@/lib/tags';
 
 export default function HomePage() {
   const featured = getGuideBySlug('decision-variables') ?? getGuides()[0];
@@ -189,7 +190,7 @@ export default function HomePage() {
               <div className="flex gap-2 mt-4">
                 {featured.topics.slice(0, 3).map((topic) => (
                   <TagChip key={topic} className="py-1">
-                    {topic}
+                    {getTagLabel(topic)}
                   </TagChip>
                 ))}
               </div>
