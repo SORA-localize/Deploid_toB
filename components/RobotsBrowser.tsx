@@ -1,13 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { FilterSelect } from '@/components/FilterSelect';
 import { RobotCard } from '@/components/RobotCard';
 import { SearchInput } from '@/components/SearchInput';
-import type { Manufacturer, Robot } from '@/data/types';
+import type { JapanAvailability, Manufacturer, Robot, RobotCategory } from '@/data/types';
 import {
   isPreReleaseDeploymentStage,
   japanAvailabilityOrder,
@@ -17,6 +17,7 @@ import {
 import { japanAvailabilityLabels, robotCategoryLabels } from '@/lib/labels';
 import { createRobotSearchDocument, matchesSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
+import { useUrlFilters } from '@/lib/useUrlFilters';
 
 interface RobotsBrowserProps {
   robots: Robot[];
@@ -24,11 +25,7 @@ interface RobotsBrowserProps {
 }
 
 export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
-  const [type, setType] = useState('all');
-  const [mfg, setMfg] = useState('all');
-  const [avail, setAvail] = useState('all');
-  const [release, setRelease] = useState<'active' | 'pre'>('active');
-  const [query, setQuery] = useState('');
+  const { getParam, updateParams } = useUrlFilters();
 
   const manufacturerBySlug = useMemo(
     () => new Map(manufacturers.map((manufacturer) => [manufacturer.slug, manufacturer])),
@@ -58,6 +55,19 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
       ),
     [robots],
   );
+  const typeParam = getParam('type');
+  const type =
+    typeParam && types.includes(typeParam as RobotCategory) ? typeParam as RobotCategory : 'all';
+  const manufacturerParam = getParam('manufacturer');
+  const mfg = manufacturerParam && manufacturerBySlug.has(manufacturerParam) ? manufacturerParam : 'all';
+  const availabilityParam = getParam('availability');
+  const avail =
+    availabilityParam && avails.includes(availabilityParam as JapanAvailability)
+      ? availabilityParam as JapanAvailability
+      : 'all';
+  const release = getParam('release') === 'pre' ? 'pre' : 'active';
+  const query = getParam('q') ?? '';
+
   const typeOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allTypes },
@@ -123,7 +133,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         <div className="mb-6 max-w-2xl">
           <SearchInput
             value={query}
-            onChange={setQuery}
+            onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
             placeholder="機種名・メーカー・用途キーワードで検索"
           />
         </div>
@@ -133,21 +143,25 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             id="robot-type"
             label={uiText.filters.robotType}
             value={type}
-            onChange={setType}
+            onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType })}
             options={typeOptions}
           />
           <FilterSelect
             id="robot-manufacturer"
             label={uiText.filters.manufacturer}
             value={mfg}
-            onChange={setMfg}
+            onChange={(nextMfg) =>
+              updateParams({ manufacturer: nextMfg === 'all' ? null : nextMfg })
+            }
             options={manufacturerOptions}
           />
           <FilterSelect
             id="robot-availability"
             label={uiText.filters.availability}
             value={avail}
-            onChange={setAvail}
+            onChange={(nextAvail) =>
+              updateParams({ availability: nextAvail === 'all' ? null : nextAvail })
+            }
             options={availabilityOptions}
           />
         </div>
@@ -156,7 +170,9 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           <FilterChipGroup
             options={releaseOptions}
             value={release}
-            onChange={setRelease}
+            onChange={(nextRelease) =>
+              updateParams({ release: nextRelease === 'active' ? null : nextRelease })
+            }
             ariaLabel={uiText.filters.releaseStatus}
             buttonClassName="px-3 py-1.5 text-xs uppercase tracking-wide"
           />

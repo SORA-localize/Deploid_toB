@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { ManufacturersBrowser } from '@/components/ManufacturersBrowser';
 import { getManufacturers, getRobots } from '@/lib/data';
 
@@ -8,5 +9,9 @@ export const metadata = {
 };
 
 export default function ManufacturersPage() {
-  return <ManufacturersBrowser manufacturers={getManufacturers()} robots={getRobots()} />;
+  return (
+    <Suspense fallback={null}>
+      <ManufacturersBrowser manufacturers={getManufacturers()} robots={getRobots()} />
+    </Suspense>
+  );
 }

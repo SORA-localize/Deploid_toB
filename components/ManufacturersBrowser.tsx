@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { ChevronRight, MapPin } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -9,7 +9,7 @@ import { FilterSelect } from '@/components/FilterSelect';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
 import { TagChip } from '@/components/TagChip';
-import type { Manufacturer, Robot } from '@/data/types';
+import type { CompanyStatus, CompanyType, Manufacturer, Robot } from '@/data/types';
 import {
   companyStatusOrder,
   companyTypeOrder,
@@ -19,6 +19,7 @@ import {
 import { companyStatusLabels, companyTypeLabels, japanPresenceLabels, TBD_LABEL } from '@/lib/labels';
 import { createManufacturerSearchDocument, matchesSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
+import { useUrlFilters } from '@/lib/useUrlFilters';
 
 interface ManufacturersBrowserProps {
   manufacturers: Manufacturer[];
@@ -26,10 +27,7 @@ interface ManufacturersBrowserProps {
 }
 
 export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBrowserProps) {
-  const [country, setCountry] = useState('all');
-  const [type, setType] = useState('all');
-  const [status, setStatus] = useState('all');
-  const [query, setQuery] = useState('');
+  const { getParam, updateParams } = useUrlFilters();
 
   const robotsByManufacturer = useMemo(() => {
     const byManufacturer = new Map<string, Robot[]>();
@@ -80,6 +78,18 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
       ),
     [manufacturers],
   );
+  const countryParam = getParam('country');
+  const country = countryParam && countries.includes(countryParam) ? countryParam : 'all';
+  const typeParam = getParam('type');
+  const type =
+    typeParam && types.includes(typeParam as CompanyType) ? typeParam as CompanyType : 'all';
+  const statusParam = getParam('status');
+  const status =
+    statusParam && statuses.includes(statusParam as CompanyStatus)
+      ? statusParam as CompanyStatus
+      : 'all';
+  const query = getParam('q') ?? '';
+
   const countryOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allRegions },
@@ -129,7 +139,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
         <div className="mb-6 max-w-2xl">
           <SearchInput
             value={query}
-            onChange={setQuery}
+            onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
             placeholder="メーカー名・地域・取扱機種で検索"
           />
         </div>
@@ -139,21 +149,25 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
             id="manufacturer-country"
             label={uiText.filters.country}
             value={country}
-            onChange={setCountry}
+            onChange={(nextCountry) =>
+              updateParams({ country: nextCountry === 'all' ? null : nextCountry })
+            }
             options={countryOptions}
           />
           <FilterSelect
             id="manufacturer-type"
             label={uiText.filters.companyType}
             value={type}
-            onChange={setType}
+            onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType })}
             options={typeOptions}
           />
           <FilterSelect
             id="manufacturer-status"
             label={uiText.filters.status}
             value={status}
-            onChange={setStatus}
+            onChange={(nextStatus) =>
+              updateParams({ status: nextStatus === 'all' ? null : nextStatus })
+            }
             options={statusOptions}
           />
         </div>
