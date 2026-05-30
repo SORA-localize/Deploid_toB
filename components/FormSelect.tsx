@@ -13,6 +13,7 @@ interface FormSelectProps {
   defaultValue?: string;
   required?: boolean;
   className?: string;
+  includeLabelField?: boolean;
 }
 
 export function FormSelect({
@@ -23,6 +24,7 @@ export function FormSelect({
   defaultValue,
   required = false,
   className = '',
+  includeLabelField = true,
 }: FormSelectProps) {
   const initial = options.find((option) => option.value === defaultValue) ?? options[0];
   const [selectedValue, setSelectedValue] = useState(initial?.value ?? '');
@@ -30,7 +32,10 @@ export function FormSelect({
 
   return (
     <>
-      <input type="hidden" name={name} value={selected?.label ?? ''} required={required} />
+      <input type="hidden" name={name} value={selectedValue} required={required} />
+      {includeLabelField && (
+        <input type="hidden" name={`${name}Label`} value={selected?.label ?? ''} />
+      )}
       <SelectControl
         id={id}
         label={label}

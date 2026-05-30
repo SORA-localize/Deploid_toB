@@ -190,7 +190,7 @@ export default function HomePage() {
               <div className="flex gap-2 mt-4">
                 {featured.topics.slice(0, 3).map((topic) => (
                   <TagChip key={topic} className="py-1">
-                    {getTagLabel(topic)}
+                    {getTagLabel(topic, 'guide-topic')}
                   </TagChip>
                 ))}
               </div>

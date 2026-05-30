@@ -18,6 +18,7 @@ import {
   matchesTag,
   normalizeTagKey,
 } from '@/lib/tags';
+import { isOneOf } from '@/lib/typeGuards';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 
@@ -29,7 +30,7 @@ const typeOptions: Array<{ value: 'all' | ReportType; label: string }> = [
 export function ReportsBrowser({ reports }: { reports: Report[] }) {
   const { getParam, updateParams } = useUrlFilters();
   const typeParam = getParam('type');
-  const type = typeParam && reportTypeOrder.includes(typeParam as ReportType) ? typeParam as ReportType : 'all';
+  const type = isOneOf(typeParam, reportTypeOrder) ? typeParam : 'all';
   const topicParam = getParam('tag');
   const topic = topicParam ? normalizeTagKey(topicParam) : null;
   const query = getParam('q') ?? '';
@@ -73,7 +74,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
             <SearchInput
               value={query}
               onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
-              placeholder="タイトル・トピック・キーワードで検索"
+              placeholder={uiText.searchPlaceholders.reports}
               className="max-w-xl"
               inputClassName="py-2.5"
             />
@@ -151,7 +152,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                       </p>
                       <div className="flex gap-2 flex-wrap">
                         {report.tags.slice(0, 3).map((tag) => (
-                          <TagChip key={tag}>{getTagLabel(tag)}</TagChip>
+                          <TagChip key={tag}>{getTagLabel(tag, 'report')}</TagChip>
                         ))}
                       </div>
                     </div>
@@ -162,7 +163,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
             </div>
 
             {filtered.length === 0 && (
-              <EmptyState message="条件に合う記事がありません。" />
+              <EmptyState message={uiText.emptyStates.reports} />
             )}
           </div>
 

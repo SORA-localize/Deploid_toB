@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { ChevronRight, Star } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
-import { deploymentStageLabels, TBD_LABEL } from '@/lib/labels';
 import { getDisplayableAsset } from '@/lib/media';
+import { getRobotCardSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
 interface RobotCardProps {
@@ -25,15 +25,9 @@ export function RobotCard({
   isFavorite = false,
   onFavoriteToggle,
 }: RobotCardProps) {
-  const { specs } = robot;
-  const payload = specs.payloadKg != null ? `${specs.payloadKg} kg` : TBD_LABEL;
-  const runtime = specs.runtimeMin != null ? `約${specs.runtimeMin} 分` : TBD_LABEL;
-  const height = specs.heightCm != null ? `${specs.heightCm} cm` : TBD_LABEL;
-  const weight = specs.weightKg != null ? `${specs.weightKg} kg` : TBD_LABEL;
-  const status = deploymentStageLabels[robot.deploymentStage];
+  const specRows = getRobotCardSpecRows(robot);
   const statusReady =
     robot.deploymentStage === 'production' || robot.deploymentStage === 'limited-production';
-  const estCost = robot.priceNote ?? TBD_LABEL;
 
   return (
     <div className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-neutral-500 transition-colors relative">
@@ -78,32 +72,20 @@ export function RobotCard({
           />
           <p className="text-xs text-neutral-600 mb-4 leading-relaxed line-clamp-2">{robot.summary}</p>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-4">
-            <div>
-              <dt className="text-neutral-500">ペイロード</dt>
-              <dd className="text-neutral-900 font-medium">{payload}</dd>
-            </div>
-            <div>
-              <dt className="text-neutral-500">稼働時間</dt>
-              <dd className="text-neutral-900 font-medium">{runtime}</dd>
-            </div>
-            <div>
-              <dt className="text-neutral-500">身長</dt>
-              <dd className="text-neutral-900 font-medium">{height}</dd>
-            </div>
-            <div>
-              <dt className="text-neutral-500">重量</dt>
-              <dd className="text-neutral-900 font-medium">{weight}</dd>
-            </div>
-            <div>
-              <dt className="text-neutral-500">ステータス</dt>
-              <dd className={statusReady ? 'text-green-700 font-medium' : 'text-neutral-900 font-medium'}>
-                {status}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-neutral-500">参考価格</dt>
-              <dd className="text-neutral-900 font-medium">{estCost}</dd>
-            </div>
+            {specRows.map((row) => (
+              <div key={row.label}>
+                <dt className="text-neutral-500">{row.label}</dt>
+                <dd
+                  className={
+                    row.label === 'ステータス' && statusReady
+                      ? 'text-green-700 font-medium'
+                      : 'text-neutral-900 font-medium'
+                  }
+                >
+                  {row.value}
+                </dd>
+              </div>
+            ))}
           </dl>
           <div className="flex items-center justify-between pt-3 border-t border-neutral-300">
             <span className="text-xs text-neutral-700">

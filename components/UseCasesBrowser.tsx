@@ -95,7 +95,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
             <SearchInput
               value={query}
               onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
-              placeholder="自動化したい作業は？"
+              placeholder={uiText.searchPlaceholders.useCases}
             />
           </div>
 
@@ -142,7 +142,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                 >
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     {u.industryTags[0] && (
-                      <TagChip>{getTagLabel(u.industryTags[0])}</TagChip>
+                      <TagChip>{getTagLabel(u.industryTags[0], 'industry')}</TagChip>
                     )}
                     <TagChip tone={maturityTone(u.maturityLevel)}>
                       {maturityLabels[u.maturityLevel]}
@@ -182,7 +182,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     {u.industryTags[0] && (
-                      <TagChip>{getTagLabel(u.industryTags[0])}</TagChip>
+                      <TagChip>{getTagLabel(u.industryTags[0], 'industry')}</TagChip>
                     )}
                     <TagChip tone={maturityTone(u.maturityLevel)}>
                       {maturityLabels[u.maturityLevel]}
@@ -197,7 +197,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                   </p>
                   <div className="flex gap-2 mb-2 flex-wrap">
                     {u.taskTags.slice(0, 3).map((t) => (
-                      <TagChip key={t}>{getTagLabel(t)}</TagChip>
+                      <TagChip key={t}>{getTagLabel(t, 'task')}</TagChip>
                     ))}
                   </div>
                   <div className="text-xs text-neutral-600">
@@ -211,7 +211,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
         </div>
 
         {filtered.length === 0 && (
-          <EmptyState message="条件に合う用途がありません。" />
+          <EmptyState message={uiText.emptyStates.useCases} />
         )}
       </div>
     </div>

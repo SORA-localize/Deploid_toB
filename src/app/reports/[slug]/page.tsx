@@ -4,6 +4,7 @@ import { ArrowRight, Calendar, User } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { Markdown } from '@/components/Markdown';
+import { SourceList } from '@/components/SourceList';
 import {
   getRelatedGuides,
   getRelatedManufacturers,
@@ -12,7 +13,7 @@ import {
   getReportBySlug,
   getReports,
 } from '@/lib/data';
-import { reportTypeLabels, reliabilityLabels } from '@/lib/labels';
+import { reportTypeLabels } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
@@ -112,33 +113,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 </div>
               )}
 
-              <div className="border border-neutral-300 bg-white p-6">
-                <h2 className="text-lg font-semibold text-neutral-900 mb-4">
-                  {uiText.common.resources}
-                </h2>
-                {report.sources.length === 0 ? (
-                  <p className="text-xs text-neutral-500">出典は本文作成時に追加予定です。</p>
-                ) : (
-                  <ul className="space-y-2 text-xs">
-                    {report.sources.map((source) => (
-                      <li key={source.url}>
-                        <a
-                          href={source.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-neutral-900 hover:text-neutral-600 underline"
-                        >
-                          {source.title}
-                        </a>
-                        <span className="text-neutral-500">
-                          {source.publisher ? ` / ${source.publisher}` : ''} / 確認 {source.checkedAt}{' '}
-                          / {reliabilityLabels[source.reliability]}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              <SourceList sources={report.sources} />
             </div>
           </div>
 

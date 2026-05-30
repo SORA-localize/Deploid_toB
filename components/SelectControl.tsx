@@ -41,6 +41,7 @@ export function SelectControl({
   const listId = `${id}-list`;
 
   const selectedOption = options.find((option) => option.value === value) ?? options[0];
+  const activeOptionId = open && focusedIndex >= 0 ? `${id}-option-${focusedIndex}` : undefined;
 
   useEffect(() => {
     if (!open) return;
@@ -110,6 +111,7 @@ export function SelectControl({
           aria-expanded={open}
           aria-haspopup="listbox"
           aria-controls={listId}
+          aria-activedescendant={activeOptionId}
           aria-required={required || undefined}
           onKeyDown={handleKeyDown}
           onClick={() => setOpen((current) => !current)}
@@ -137,6 +139,7 @@ export function SelectControl({
               const isFocused = index === focusedIndex;
               return (
                 <li
+                  id={`${id}-option-${index}`}
                   key={option.value}
                   role="option"
                   aria-selected={isSelected}

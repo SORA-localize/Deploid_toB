@@ -7,17 +7,21 @@ interface SourceListProps {
   title?: string;
   sources: readonly Source[];
   emptyMessage?: string;
+  className?: string;
+  titleClassName?: string;
 }
 
 export function SourceList({
   id = 'sources',
   title = uiText.common.resources,
   sources,
-  emptyMessage = '出典は本文作成時に追加予定です。',
+  emptyMessage = uiText.emptyStates.sources,
+  className = 'border border-neutral-300 bg-white p-6 scroll-mt-6',
+  titleClassName = 'text-lg font-semibold text-neutral-900 mb-4',
 }: SourceListProps) {
   return (
-    <div id={id} className="border border-neutral-300 bg-white p-6 scroll-mt-6">
-      <h2 className="text-lg font-semibold text-neutral-900 mb-4">{title}</h2>
+    <div id={id} className={className}>
+      <h2 className={titleClassName}>{title}</h2>
       {sources.length === 0 ? (
         <p className="text-xs text-neutral-500">{emptyMessage}</p>
       ) : (

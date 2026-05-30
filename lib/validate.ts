@@ -7,6 +7,13 @@ import { reports } from '../data/reports.ts';
 import { robots } from '../data/robots.ts';
 import type { ImageAsset, RightsStatus } from '../data/types.ts';
 import { useCases } from '../data/useCases.ts';
+import {
+  companyStatusOrder,
+  companyTypeOrder,
+  japanAvailabilityOrder,
+  manufacturerCountryOrder,
+  robotCategoryOrder,
+} from './display.ts';
 import { isRegisteredTag, normalizeTagKey, type TagKind } from './tagRegistry.ts';
 
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -112,6 +119,41 @@ export function validateData(): string[] {
   dup('guides', guides);
   dup('useCases', useCases);
   dup('reports', reports);
+
+  const checkOrderCoverage = (
+    name: string,
+    values: readonly string[],
+    order: readonly string[],
+  ) => {
+    const orderSet = new Set(order);
+    Array.from(new Set(values)).forEach((value) => {
+      if (!orderSet.has(value)) {
+        issues.push(`[order-missing] ${name} の表示順に "${value}" がありません`);
+      }
+    });
+  };
+
+  checkOrderCoverage('robot.category', robots.map((robot) => robot.category), robotCategoryOrder);
+  checkOrderCoverage(
+    'robot.japanAvailability',
+    robots.map((robot) => robot.japanAvailability),
+    japanAvailabilityOrder,
+  );
+  checkOrderCoverage(
+    'manufacturer.country',
+    manufacturers.map((manufacturer) => manufacturer.country),
+    manufacturerCountryOrder,
+  );
+  checkOrderCoverage(
+    'manufacturer.companyType',
+    manufacturers.map((manufacturer) => manufacturer.companyType),
+    companyTypeOrder,
+  );
+  checkOrderCoverage(
+    'manufacturer.companyStatus',
+    manufacturers.map((manufacturer) => manufacturer.companyStatus),
+    companyStatusOrder,
+  );
 
   for (const r of robots) {
     check('robot', r.slug, 'manufacturerSlug', r.manufacturerSlug, manufacturerSlugs);

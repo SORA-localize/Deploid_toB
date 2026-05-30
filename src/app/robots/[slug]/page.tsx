@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { RobotImageCarousel } from '@/components/RobotImageCarousel';
+import { SourceList } from '@/components/SourceList';
 import {
   getManufacturerForRobot,
   getReportsForRobot,
@@ -11,16 +12,7 @@ import {
   getRobots,
   getUseCasesForRobot,
 } from '@/lib/data';
-import {
-  buyerReadinessLabels,
-  deploymentStageLabels,
-  japanAvailabilityLabels,
-  mobilityLabels,
-  procurementLabels,
-  reliabilityLabels,
-  robotCategoryLabels,
-  TBD_LABEL,
-} from '@/lib/labels';
+import { getRobotDetailDecisionRows, getRobotDetailSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
 const sections = [
@@ -54,37 +46,14 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
   const manufacturer = getManufacturerForRobot(robot.manufacturerSlug);
   const useCases = getUseCasesForRobot(robot.slug);
   const reports = getReportsForRobot(robot.slug);
-  const { specs } = robot;
 
   const all = getRobots();
   const idx = all.findIndex((r) => r.slug === robot.slug);
   const prev = idx > 0 ? all[idx - 1] : null;
   const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
 
-  const num = (v: number | undefined, unit = '') => (v != null ? `${v}${unit}` : TBD_LABEL);
-
-  const specRows: Array<[string, string]> = [
-    ['メーカー', manufacturer?.name ?? robot.manufacturerSlug],
-    ['カテゴリ', robotCategoryLabels[robot.category]],
-    ['移動方式', specs.mobility ? mobilityLabels[specs.mobility] : TBD_LABEL],
-    ['身長', num(specs.heightCm, ' cm')],
-    ['重量', num(specs.weightKg, ' kg')],
-    ['ペイロード', num(specs.payloadKg, ' kg')],
-    ['稼働時間', specs.runtimeMin != null ? `約${specs.runtimeMin} 分` : TBD_LABEL],
-    ['速度', num(specs.speedMps, ' m/s')],
-    ['自由度', num(specs.dof, ' DoF')],
-    ['防塵防水', specs.ipRating ?? TBD_LABEL],
-  ];
-
-  const decisionRows: Array<[string, string]> = [
-    ['導入段階', deploymentStageLabels[robot.deploymentStage]],
-    ['実務ラベル', buyerReadinessLabels[robot.buyerReadiness]],
-    ['日本での入手性', japanAvailabilityLabels[robot.japanAvailability]],
-    ['調達形態', robot.procurementModels.map((m) => procurementLabels[m]).join(' / ') || TBD_LABEL],
-    ['参考価格', robot.priceNote ?? TBD_LABEL],
-    ['安全性', robot.safetyNote ?? TBD_LABEL],
-    ['継続性リスク', robot.vendorRiskNote ?? TBD_LABEL],
-  ];
+  const specRows = getRobotDetailSpecRows(robot, manufacturer);
+  const decisionRows = getRobotDetailDecisionRows(robot);
 
   return (
     <div className="min-h-screen bg-white">
@@ -146,10 +115,10 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           <div className="p-6">
             <table className="w-full text-xs">
               <tbody className="divide-y divide-neutral-300">
-                {specRows.map(([k, v]) => (
-                  <tr key={k}>
-                    <td className="py-3 text-neutral-500 w-1/3">{k}</td>
-                    <td className="py-3 text-neutral-900 font-medium">{v}</td>
+                {specRows.map((row) => (
+                  <tr key={row.label}>
+                    <td className="py-3 text-neutral-500 w-1/3">{row.label}</td>
+                    <td className="py-3 text-neutral-900 font-medium">{row.value}</td>
                   </tr>
                 ))}
               </tbody>
@@ -164,10 +133,10 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           <div className="p-6">
             <table className="w-full text-xs">
               <tbody className="divide-y divide-neutral-300">
-                {decisionRows.map(([k, v]) => (
-                  <tr key={k}>
-                    <td className="py-3 text-neutral-500 w-1/3">{k}</td>
-                    <td className="py-3 text-neutral-900 font-medium">{v}</td>
+                {decisionRows.map((row) => (
+                  <tr key={row.label}>
+                    <td className="py-3 text-neutral-500 w-1/3">{row.label}</td>
+                    <td className="py-3 text-neutral-900 font-medium">{row.value}</td>
                   </tr>
                 ))}
               </tbody>
@@ -232,35 +201,11 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           </div>
         </div>
 
-        <div id="sources" className="border border-neutral-300 bg-neutral-50 scroll-mt-6">
-          <div className="px-6 py-4 border-b border-neutral-300 bg-white">
-            <h2 className="text-sm font-semibold text-neutral-900">{uiText.common.resources}</h2>
-          </div>
-          <div className="p-6">
-            {robot.sources.length === 0 ? (
-              <p className="text-xs text-neutral-500">出典は本文作成時に追加予定です。</p>
-            ) : (
-              <ul className="space-y-2 text-xs">
-                {robot.sources.map((source) => (
-                  <li key={source.url}>
-                    <a
-                      href={source.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-neutral-900 hover:text-neutral-600 underline"
-                    >
-                      {source.title}
-                    </a>
-                    <span className="text-neutral-500">
-                      {source.publisher ? ` / ${source.publisher}` : ''} / 確認 {source.checkedAt} /{' '}
-                      {reliabilityLabels[source.reliability]}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
+        <SourceList
+          sources={robot.sources}
+          className="border border-neutral-300 bg-neutral-50 p-6 scroll-mt-6"
+          titleClassName="text-sm font-semibold text-neutral-900 mb-4"
+        />
 
         <div className="flex items-center justify-between mt-12 pt-6 border-t border-neutral-300">
           {prev ? (

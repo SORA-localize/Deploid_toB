@@ -6,6 +6,7 @@
  * types from `data/types.ts`. CMS-specific schemas should be derived from
  * this file later, not the other way around.
  */
+import type { TagValue } from '@/lib/tagRegistry';
 
 export type Slug = string;
 export type ISODate = string;
@@ -206,9 +207,9 @@ export interface Robot extends BaseRecord {
   // 関連は逆向き(UseCase.candidateRobotSlugs / Guide.relatedRobotSlugs /
   // Report.relatedRobotSlugs)で導出する。
   /** 業種タグ（lib/tagRegistry.ts の kind:'industry' のvalue）。未設定=調査中扱い。 */
-  industryTags?: string[];
+  industryTags?: TagValue<'industry'>[];
   /** タスクタグ（lib/tagRegistry.ts の kind:'task' のvalue）。未設定=調査中扱い。 */
-  taskTags?: string[];
+  taskTags?: TagValue<'task'>[];
   comparison: ComparisonProfile;
 }
 
@@ -220,7 +221,7 @@ export interface Guide extends BaseRecord {
   description: string;
   stage: GuideStage;
   order: number;
-  topics: string[];
+  topics: TagValue<'guide-topic'>[];
   targetReaders: string[];
   readingTimeMinutes?: number;
   checklistItems?: string[];
@@ -272,8 +273,8 @@ export interface UseCase extends BaseRecord {
   buyerReadiness: BuyerReadiness;
   environment: OperatingEnvironment;
   requiredCapabilities: Capability[];
-  industryTags: string[];
-  taskTags: string[];
+  industryTags: TagValue<'industry'>[];
+  taskTags: TagValue<'task'>[];
   atAGlance: UseCaseAtAGlance;
   overview: string;
   whyItMatters: string;
@@ -301,7 +302,7 @@ export interface Report extends BaseRecord {
   type: ReportType;
   publishedAt: ISODate;
   author?: string;
-  tags: string[];
+  tags: TagValue<'report'>[];
   whyItMatters: string;
   keyTakeaways?: string[];
   /** 記事本文（Markdown）。空ならレポート本文セクションは描画されない。 */

@@ -24,6 +24,20 @@ export const uiText = {
     results: (count: number, filtered: boolean) =>
       filtered ? `${count}件（絞り込み中）` : `${count}件`,
   },
+  searchPlaceholders: {
+    robots: '機種名・メーカー・用途キーワードで検索',
+    manufacturers: 'メーカー名・地域・取扱機種で検索',
+    reports: 'タイトル・トピック・キーワードで検索',
+    useCases: '自動化したい作業は？',
+  },
+  emptyStates: {
+    robots: '条件に合う機種がありません。フィルタを調整してください。',
+    manufacturers: '条件に合うメーカーがありません。',
+    reports: '条件に合う記事がありません。',
+    guides: '条件に合うガイドがありません。',
+    useCases: '条件に合う用途がありません。',
+    sources: '出典は本文作成時に追加予定です。',
+  },
   filters: {
     robotType: 'ロボット分類',
     manufacturer: 'メーカー',

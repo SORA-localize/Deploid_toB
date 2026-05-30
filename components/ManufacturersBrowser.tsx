@@ -9,16 +9,14 @@ import { FilterSelect } from '@/components/FilterSelect';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
 import { TagChip } from '@/components/TagChip';
-import type { CompanyStatus, CompanyType, Manufacturer, Robot } from '@/data/types';
+import type { Manufacturer, Robot } from '@/data/types';
 import {
-  companyStatusOrder,
-  companyTypeOrder,
-  manufacturerCountryOrder,
-  sortByDisplayOrder,
-  sortManufacturers,
-} from '@/lib/display';
+  filterManufacturers,
+  getManufacturerFilterOptions,
+  groupRobotsByManufacturer,
+  normalizeManufacturerFilters,
+} from '@/lib/manufacturerFilters';
 import { companyStatusLabels, companyTypeLabels, japanPresenceLabels, TBD_LABEL } from '@/lib/labels';
-import { createManufacturerSearchDocument, matchesSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 
@@ -30,100 +28,49 @@ interface ManufacturersBrowserProps {
 export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBrowserProps) {
   const { getParam, updateParams } = useUrlFilters();
 
-  const robotsByManufacturer = useMemo(() => {
-    const byManufacturer = new Map<string, Robot[]>();
-    robots.forEach((robot) => {
-      const existing = byManufacturer.get(robot.manufacturerSlug) ?? [];
-      existing.push(robot);
-      byManufacturer.set(robot.manufacturerSlug, existing);
-    });
-    return byManufacturer;
-  }, [robots]);
-
-  const searchDocuments = useMemo(
+  const robotsByManufacturer = useMemo(() => groupRobotsByManufacturer(robots), [robots]);
+  const filterOptions = useMemo(() => getManufacturerFilterOptions(manufacturers), [manufacturers]);
+  const filters = useMemo(
     () =>
-      new Map(
-        manufacturers.map((manufacturer) => [
-          manufacturer.slug,
-          createManufacturerSearchDocument(
-            manufacturer,
-            robotsByManufacturer.get(manufacturer.slug) ?? [],
-          ),
-        ]),
-      ),
-    [manufacturers, robotsByManufacturer],
+      normalizeManufacturerFilters({
+        country: getParam('country'),
+        type: getParam('type'),
+        status: getParam('status'),
+        query: getParam('q'),
+        countries: filterOptions.countries,
+        types: filterOptions.types,
+        statuses: filterOptions.statuses,
+      }),
+    [filterOptions, getParam],
   );
-
-  const countries = useMemo(
-    () =>
-      sortByDisplayOrder(
-        Array.from(new Set(manufacturers.map((m) => m.country))),
-        manufacturerCountryOrder,
-      ),
-    [manufacturers],
-  );
-  const types = useMemo(
-    () =>
-      sortByDisplayOrder(
-        Array.from(new Set(manufacturers.map((m) => m.companyType))),
-        companyTypeOrder,
-      ),
-    [manufacturers],
-  );
-  const statuses = useMemo(
-    () =>
-      sortByDisplayOrder(
-        Array.from(new Set(manufacturers.map((m) => m.companyStatus))),
-        companyStatusOrder,
-      ),
-    [manufacturers],
-  );
-
-  const countryParam = getParam('country');
-  const country = countryParam && countries.includes(countryParam) ? countryParam : 'all';
-  const typeParam = getParam('type');
-  const type =
-    typeParam && types.includes(typeParam as CompanyType) ? typeParam as CompanyType : 'all';
-  const statusParam = getParam('status');
-  const status =
-    statusParam && statuses.includes(statusParam as CompanyStatus)
-      ? statusParam as CompanyStatus
-      : 'all';
-  const query = getParam('q') ?? '';
 
   const countryOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allRegions },
-      ...countries.map((value) => ({ value, label: value })),
+      ...filterOptions.countries.map((value) => ({ value, label: value })),
     ],
-    [countries],
+    [filterOptions.countries],
   );
   const typeOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allTypes },
-      ...types.map((value) => ({ value, label: companyTypeLabels[value] })),
+      ...filterOptions.types.map((value) => ({ value, label: companyTypeLabels[value] })),
     ],
-    [types],
+    [filterOptions.types],
   );
   const statusOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allStatus },
-      ...statuses.map((value) => ({ value, label: companyStatusLabels[value] })),
+      ...filterOptions.statuses.map((value) => ({ value, label: companyStatusLabels[value] })),
     ],
-    [statuses],
+    [filterOptions.statuses],
   );
   const robotCount = (slug: string) => robotsByManufacturer.get(slug)?.length ?? 0;
 
-  const filtered = useMemo(() => {
-    const base = manufacturers.filter(
-      (m) =>
-        (country === 'all' || m.country === country) &&
-        (type === 'all' || m.companyType === type) &&
-        (status === 'all' || m.companyStatus === status) &&
-        matchesSearchDocument(query, searchDocuments.get(m.slug)),
-    );
-    return sortManufacturers(base, 'japan');
-  }, [manufacturers, country, type, status, query, searchDocuments]);
+  const filtered = useMemo(
+    () => filterManufacturers({ manufacturers, robotsByManufacturer, filters }),
+    [manufacturers, robotsByManufacturer, filters],
+  );
 
   return (
     <div className="min-h-screen bg-white">
@@ -141,9 +88,9 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
 
         <div className="mb-6 max-w-2xl">
           <SearchInput
-            value={query}
+            value={filters.query}
             onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
-            placeholder="メーカー名・地域・取扱機種で検索"
+            placeholder={uiText.searchPlaceholders.manufacturers}
           />
         </div>
 
@@ -151,7 +98,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           <FilterSelect
             id="manufacturer-country"
             label={uiText.filters.country}
-            value={country}
+            value={filters.country}
             onChange={(nextCountry) =>
               updateParams({ country: nextCountry === 'all' ? null : nextCountry })
             }
@@ -160,14 +107,14 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           <FilterSelect
             id="manufacturer-type"
             label={uiText.filters.companyType}
-            value={type}
+            value={filters.type}
             onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType })}
             options={typeOptions}
           />
           <FilterSelect
             id="manufacturer-status"
             label={uiText.filters.status}
-            value={status}
+            value={filters.status}
             onChange={(nextStatus) =>
               updateParams({ status: nextStatus === 'all' ? null : nextStatus })
             }
@@ -176,11 +123,17 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
         </div>
 
         <p className="mb-6 text-xs text-neutral-500">
-          {uiText.common.results(filtered.length, country !== 'all' || type !== 'all' || status !== 'all' || query !== '')}
+          {uiText.common.results(
+            filtered.length,
+            filters.country !== 'all' ||
+              filters.type !== 'all' ||
+              filters.status !== 'all' ||
+              filters.query !== '',
+          )}
         </p>
 
         {filtered.length === 0 ? (
-          <EmptyState message="条件に合うメーカーがありません。" variant="muted" size="large" />
+          <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((manufacturer) => (

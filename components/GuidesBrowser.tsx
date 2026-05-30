@@ -11,6 +11,7 @@ import type { Guide, GuideStage } from '@/data/types';
 import { guideStageOrder } from '@/lib/display';
 import { guideStageLabels } from '@/lib/labels';
 import { getGuideTopicOptions, getTagLabel, matchesTag, normalizeTagKey } from '@/lib/tags';
+import { isOneOf } from '@/lib/typeGuards';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 
@@ -22,7 +23,7 @@ const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
 export function GuidesBrowser({ guides }: { guides: Guide[] }) {
   const { getParam, updateParams } = useUrlFilters();
   const stageParam = getParam('stage');
-  const stage = stageParam && guideStageOrder.includes(stageParam as GuideStage) ? stageParam as GuideStage : 'all';
+  const stage = isOneOf(stageParam, guideStageOrder) ? stageParam : 'all';
   const topicParam = getParam('topic');
   const topic = topicParam ? normalizeTagKey(topicParam) : null;
 
@@ -130,7 +131,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
                         </div>
                         <div className="flex gap-2 flex-wrap">
                           {guide.topics.slice(0, 3).map((t) => (
-                            <TagChip key={t}>{getTagLabel(t)}</TagChip>
+                            <TagChip key={t}>{getTagLabel(t, 'guide-topic')}</TagChip>
                           ))}
                         </div>
                       </div>
@@ -144,7 +145,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
         })}
 
         {filtered.length === 0 && (
-          <EmptyState message="条件に合うガイドがありません。" />
+          <EmptyState message={uiText.emptyStates.guides} />
         )}
       </div>
     </div>

@@ -3,13 +3,8 @@
 import { Star, X } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
-import {
-  deploymentStageLabels,
-  japanAvailabilityLabels,
-  mobilityLabels,
-  procurementLabels,
-  TBD_LABEL,
-} from '@/lib/labels';
+import { TBD_LABEL } from '@/lib/labels';
+import { getComparisonDecisionRows, getComparisonSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
 interface ComparisonRobotPanelProps {
@@ -19,10 +14,6 @@ interface ComparisonRobotPanelProps {
   isFavorite: boolean;
   onFavoriteToggle: (slug: string) => void;
   onRemove: (slug: string) => void;
-}
-
-function joinOrFallback(values: string[]) {
-  return values.length > 0 ? values.join(' / ') : TBD_LABEL;
 }
 
 function CompactList({ items }: { items: string[] }) {
@@ -48,23 +39,8 @@ export function ComparisonRobotPanel({
   onFavoriteToggle,
   onRemove,
 }: ComparisonRobotPanelProps) {
-  const { specs } = robot;
-  const specRows = [
-    ['身長', specs.heightCm != null ? `${specs.heightCm} cm` : TBD_LABEL],
-    ['重量', specs.weightKg != null ? `${specs.weightKg} kg` : TBD_LABEL],
-    ['ペイロード', specs.payloadKg != null ? `${specs.payloadKg} kg` : TBD_LABEL],
-    ['稼働時間', specs.runtimeMin != null ? `約${specs.runtimeMin} 分` : TBD_LABEL],
-    ['移動方式', specs.mobility ? mobilityLabels[specs.mobility] : TBD_LABEL],
-  ];
-  const decisionRows = [
-    [uiText.compare.deploymentStage, deploymentStageLabels[robot.deploymentStage]],
-    [uiText.compare.japanAvailability, japanAvailabilityLabels[robot.japanAvailability]],
-    [
-      uiText.compare.procurement,
-      joinOrFallback(robot.procurementModels.map((model) => procurementLabels[model])),
-    ],
-    [uiText.compare.price, robot.priceNote ?? TBD_LABEL],
-  ];
+  const specRows = getComparisonSpecRows(robot);
+  const decisionRows = getComparisonDecisionRows(robot);
 
   return (
     <article className="flex h-full flex-col border border-neutral-300 bg-white">
@@ -117,10 +93,10 @@ export function ComparisonRobotPanel({
             {uiText.compare.decisionFactors}
           </h4>
           <dl className="space-y-1.5 text-xs">
-            {decisionRows.map(([label, value]) => (
-              <div key={label} className="flex justify-between gap-3 border-b border-neutral-200 pb-1.5">
-                <dt className="shrink-0 text-neutral-500">{label}</dt>
-                <dd className="text-right font-medium text-neutral-900">{value}</dd>
+            {decisionRows.map((row) => (
+              <div key={row.label} className="flex justify-between gap-3 border-b border-neutral-200 pb-1.5">
+                <dt className="shrink-0 text-neutral-500">{row.label}</dt>
+                <dd className="text-right font-medium text-neutral-900">{row.value}</dd>
               </div>
             ))}
           </dl>
@@ -129,10 +105,10 @@ export function ComparisonRobotPanel({
         <section>
           <h4 className="mb-2 text-xs font-semibold text-neutral-900">{uiText.compare.keySpecs}</h4>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
-            {specRows.map(([label, value]) => (
-              <div key={label} className="flex justify-between gap-2 border-b border-neutral-200 pb-1">
-                <dt className="text-neutral-500">{label}</dt>
-                <dd className="font-medium text-neutral-900">{value}</dd>
+            {specRows.map((row) => (
+              <div key={row.label} className="flex justify-between gap-2 border-b border-neutral-200 pb-1">
+                <dt className="text-neutral-500">{row.label}</dt>
+                <dd className="font-medium text-neutral-900">{row.value}</dd>
               </div>
             ))}
           </dl>

@@ -71,6 +71,9 @@ export const tagRegistry = [
   { kind: 'report', value: 'research', label: '研究' },
 ] as const satisfies readonly TagRegistryEntry[];
 
+export type RegisteredTag = (typeof tagRegistry)[number];
+export type TagValue<K extends TagKind> = Extract<RegisteredTag, { kind: K }>['value'];
+
 const tagByKindAndKey = new Map(
   tagRegistry.map((entry) => [`${entry.kind}:${normalizeTagKey(entry.value)}`, entry]),
 );

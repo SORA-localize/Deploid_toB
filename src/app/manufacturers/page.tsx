@@ -6,6 +6,9 @@ export const metadata = {
   title: 'メーカー',
   description:
     'ヒューマノイド開発企業・代理店のディレクトリ。国・区分・ステータスで絞り込み、日本での供給体制を確認できます。',
+  alternates: {
+    canonical: '/manufacturers',
+  },
 };
 
 export default function ManufacturersPage() {

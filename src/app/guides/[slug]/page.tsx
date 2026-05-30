@@ -71,7 +71,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
             ]}
           />
           <div className="text-xs text-neutral-500 font-medium mb-3">
-            {guide.topics[0] ? getTagLabel(guide.topics[0]) : null}
+            {guide.topics[0] ? getTagLabel(guide.topics[0], 'guide-topic') : null}
           </div>
           <h1 className="text-3xl font-semibold text-neutral-900 mb-4 leading-tight max-w-4xl">
             {guide.titleJa ?? guide.title}
@@ -101,7 +101,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           <div className="flex gap-2 flex-wrap">
             {guide.topics.map((topic) => (
               <TagChip key={topic} className="py-1 bg-white border-neutral-300">
-                {getTagLabel(topic)}
+                {getTagLabel(topic, 'guide-topic')}
               </TagChip>
             ))}
           </div>
