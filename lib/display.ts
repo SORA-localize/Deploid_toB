@@ -115,19 +115,19 @@ export function sortRobots(robots: Robot[], sort: RobotSortKey): Robot[] {
   return [...robots].sort((a, b) => {
     if (sort === 'stage') {
       const stageDiff =
-        (stageIndex.get(a.deploymentStage) ?? 99) -
-        (stageIndex.get(b.deploymentStage) ?? 99);
+        (stageIndex.get(a.deploymentStage) ?? Number.MAX_SAFE_INTEGER) -
+        (stageIndex.get(b.deploymentStage) ?? Number.MAX_SAFE_INTEGER);
       if (stageDiff !== 0) return stageDiff;
       const availDiff =
-        (availIndex.get(a.japanAvailability) ?? 99) -
-        (availIndex.get(b.japanAvailability) ?? 99);
+        (availIndex.get(a.japanAvailability) ?? Number.MAX_SAFE_INTEGER) -
+        (availIndex.get(b.japanAvailability) ?? Number.MAX_SAFE_INTEGER);
       if (availDiff !== 0) return availDiff;
       return a.name.localeCompare(b.name, 'en');
     }
     if (sort === 'japan') {
       const availDiff =
-        (availIndex.get(a.japanAvailability) ?? 99) -
-        (availIndex.get(b.japanAvailability) ?? 99);
+        (availIndex.get(a.japanAvailability) ?? Number.MAX_SAFE_INTEGER) -
+        (availIndex.get(b.japanAvailability) ?? Number.MAX_SAFE_INTEGER);
       if (availDiff !== 0) return availDiff;
       return a.name.localeCompare(b.name, 'en');
     }
@@ -149,8 +149,8 @@ export function sortManufacturers(
   return [...manufacturers].sort((a, b) => {
     if (sort === 'japan') {
       const presenceDiff =
-        (presenceIndex.get(a.japanPresence) ?? 99) -
-        (presenceIndex.get(b.japanPresence) ?? 99);
+        (presenceIndex.get(a.japanPresence) ?? Number.MAX_SAFE_INTEGER) -
+        (presenceIndex.get(b.japanPresence) ?? Number.MAX_SAFE_INTEGER);
       if (presenceDiff !== 0) return presenceDiff;
       return a.name.localeCompare(b.name, 'en');
     }
