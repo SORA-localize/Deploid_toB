@@ -205,6 +205,10 @@ export interface Robot extends BaseRecord {
   images?: Partial<Record<ImageRole, ImageAsset>>;
   // 関連は逆向き(UseCase.candidateRobotSlugs / Guide.relatedRobotSlugs /
   // Report.relatedRobotSlugs)で導出する。
+  /** 業種タグ（lib/tagRegistry.ts の kind:'industry' のvalue）。未設定=調査中扱い。 */
+  industryTags?: string[];
+  /** タスクタグ（lib/tagRegistry.ts の kind:'task' のvalue）。未設定=調査中扱い。 */
+  taskTags?: string[];
   comparison: ComparisonProfile;
 }
 
