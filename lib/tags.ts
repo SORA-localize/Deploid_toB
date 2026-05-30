@@ -1,4 +1,4 @@
-import type { Guide, Report, UseCase } from '@/data/types';
+import type { Guide, Report, Robot, UseCase } from '@/data/types';
 import {
   getAnyRegisteredTag,
   getRegisteredTag,
@@ -85,6 +85,20 @@ export function getUseCaseIndustryTagOptions(useCases: readonly UseCase[]) {
 export function getUseCaseTaskTagOptions(useCases: readonly UseCase[]) {
   return toTagOptions(
     useCases.flatMap((useCase) => useCase.taskTags),
+    'task',
+  );
+}
+
+export function getRobotIndustryTagOptions(robots: readonly Robot[]) {
+  return toTagOptions(
+    robots.flatMap((robot) => robot.industryTags ?? []),
+    'industry',
+  );
+}
+
+export function getRobotTaskTagOptions(robots: readonly Robot[]) {
+  return toTagOptions(
+    robots.flatMap((robot) => robot.taskTags ?? []),
     'task',
   );
 }
