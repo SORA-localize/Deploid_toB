@@ -38,13 +38,16 @@ export function Header() {
                   key={item.path}
                   href={item.path}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`px-3 py-2 text-sm transition-colors ${
+                  className={`relative px-3 py-2 text-sm transition-all duration-200 ${
                     isActive
                       ? 'text-neutral-900 font-medium'
                       : 'text-neutral-600 hover:text-neutral-900'
                   }`}
                 >
                   {item.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-accent" />
+                  )}
                 </Link>
               );
             })}

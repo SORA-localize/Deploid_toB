@@ -30,7 +30,7 @@ export function RobotCard({
     robot.deploymentStage === 'production' || robot.deploymentStage === 'limited-production';
 
   return (
-    <div className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-neutral-500 transition-colors relative">
+    <div className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-neutral-400 hover:-translate-y-1 hover:shadow-md transition-all duration-200 relative">
       {showFavorite && (
         <button
           type="button"

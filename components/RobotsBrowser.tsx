@@ -89,7 +89,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-7xl px-6 py-12">
+      <div className="mx-auto max-w-7xl px-6 py-12 min-h-[60vh]">
         <Breadcrumbs items={[{ label: uiText.robots.breadcrumb }]} />
 
         <div className="mb-8">

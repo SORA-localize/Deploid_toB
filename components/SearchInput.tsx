@@ -29,7 +29,7 @@ export function SearchInput({
         placeholder={placeholder}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className={`w-full border border-neutral-300 bg-white py-3 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none ${inputClassName}`}
+        className={`w-full border border-neutral-300 bg-white py-3 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 transition-all focus:border-accent focus:ring-2 focus:ring-accent focus:ring-offset-1 focus:outline-none ${inputClassName}`}
       />
     </div>
   );

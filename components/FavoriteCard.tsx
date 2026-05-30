@@ -23,7 +23,7 @@ export function FavoriteCard({
   const runtime = robot.specs.runtimeMin != null ? `約${robot.specs.runtimeMin} 分` : TBD_LABEL;
 
   return (
-    <div className="border border-neutral-300 bg-white p-3">
+    <div className="border border-neutral-300 bg-white p-3 hover:border-neutral-400 hover:shadow-sm transition-all duration-200">
       <div className="flex items-start justify-between gap-2 mb-2">
         <Link href={`/robots/${robot.slug}`} className="flex-1 min-w-0">
           <h4 className="text-xs font-semibold text-neutral-900 truncate">

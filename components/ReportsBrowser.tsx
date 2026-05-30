@@ -93,7 +93,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-6 py-8 min-h-[60vh]">
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12 lg:col-span-8">
             {featured && !active && (

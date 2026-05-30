@@ -71,7 +71,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   {uiText.compare.manufacturers}
                 </h2>
               </div>
-              <div className="divide-y divide-neutral-300 max-h-80 overflow-y-auto xl:max-h-[calc(100vh-200px)]">
+              <div className="divide-y divide-neutral-300 max-h-80 overflow-y-auto overscroll-contain xl:max-h-[calc(100vh-200px)]">
                 {manufacturers.map((manufacturer) => {
                   const manufacturerRobots = robots.filter(
                     (r) => r.manufacturerSlug === manufacturer.slug,
@@ -216,7 +216,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   {uiText.compare.favorites}
                 </h2>
               </div>
-              <div className="p-4 max-h-80 overflow-y-auto xl:max-h-[calc(100vh-200px)]">
+              <div className="p-4 max-h-80 overflow-y-auto overscroll-contain xl:max-h-[calc(100vh-200px)]">
                 {favoriteRobots.length === 0 ? (
                   <div className="text-center py-8">
                     <Star className="w-8 h-8 text-neutral-300 mx-auto mb-3" />

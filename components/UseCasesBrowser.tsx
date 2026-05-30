@@ -127,7 +127,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-6 py-8 min-h-[60vh]">
         {featured.length > 0 && !active && (
           <div className="mb-8">
             <h3 className="text-sm font-semibold text-neutral-900 mb-4 px-1">

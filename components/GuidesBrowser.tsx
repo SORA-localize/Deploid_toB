@@ -64,7 +64,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-6 py-8 min-h-[60vh]">
         {featured && stage === 'all' && !topic && (
           <div className="border border-neutral-300 bg-white p-6 mb-6">
             <div className="text-xs text-neutral-500 font-medium mb-3 pb-2 border-b border-neutral-200">

@@ -29,8 +29,8 @@ export function SelectControl({
   onChange,
   className = '',
   labelClassName = 'mb-2 block text-xs text-neutral-500',
-  buttonClassName = 'w-full flex items-center justify-between border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-neutral-500 focus:outline-none text-left',
-  listClassName = 'absolute z-10 w-full border border-neutral-300 bg-white mt-px max-h-80 overflow-y-auto',
+  buttonClassName = 'w-full flex items-center justify-between border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-accent focus:ring-2 focus:ring-accent focus:ring-offset-1 focus:outline-none text-left transition-all',
+  listClassName = 'absolute z-10 w-full border border-neutral-300 bg-white mt-px max-h-80 overflow-y-auto overscroll-contain shadow-lg animate-in fade-in zoom-in-95 duration-100',
   required = false,
 }: SelectControlProps) {
   const [open, setOpen] = useState(false);
