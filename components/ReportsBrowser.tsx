@@ -11,11 +11,11 @@ import { TagChip } from '@/components/TagChip';
 import type { Report, ReportType } from '@/data/types';
 import { reportTypeOrder } from '@/lib/display';
 import { reportTypeLabels } from '@/lib/labels';
-import { createReportSearchDocument, matchesSearchDocument } from '@/lib/search';
+import { filterReports } from '@/lib/reportFilters';
+import { createReportSearchDocument } from '@/lib/search';
 import {
   getReportTagOptions,
   getTagLabel,
-  matchesTag,
   normalizeTagKey,
 } from '@/lib/tags';
 import { isOneOf } from '@/lib/typeGuards';
@@ -29,11 +29,17 @@ const typeOptions: Array<{ value: 'all' | ReportType; label: string }> = [
 
 export function ReportsBrowser({ reports }: { reports: Report[] }) {
   const { getParam, updateParams } = useUrlFilters();
-  const typeParam = getParam('type');
-  const type = isOneOf(typeParam, reportTypeOrder) ? typeParam : 'all';
-  const topicParam = getParam('tag');
-  const topic = topicParam ? normalizeTagKey(topicParam) : null;
-  const query = getParam('q') ?? '';
+  
+  const filters = useMemo(() => {
+    const typeParam = getParam('type');
+    const topicParam = getParam('tag');
+    const queryParam = getParam('q') ?? '';
+    return {
+      type: isOneOf(typeParam, reportTypeOrder) ? typeParam : ('all' as const),
+      topic: topicParam ? normalizeTagKey(topicParam) : null,
+      query: queryParam,
+    };
+  }, [getParam]);
 
   const topicOptions = useMemo(() => getReportTagOptions(reports), [reports]);
   const searchDocuments = useMemo(
@@ -41,16 +47,14 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
     [reports],
   );
 
-  const filtered = reports.filter((r) => {
-    if (type !== 'all' && r.type !== type) return false;
-    if (!matchesTag(r.tags, topic)) return false;
-    if (!matchesSearchDocument(query, searchDocuments.get(r.slug))) return false;
-    return true;
-  });
+  const filtered = useMemo(
+    () => filterReports({ reports, searchDocuments, filters }),
+    [reports, searchDocuments, filters],
+  );
 
   const featured = reports.find((r) => r.featured);
   const latest = filtered.filter((r) => !r.featured);
-  const active = type !== 'all' || topic || query;
+  const active = filters.type !== 'all' || filters.topic || filters.query;
 
   return (
     <div className="min-h-screen bg-neutral-100">
@@ -64,7 +68,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
 
           <FilterChipGroup
             options={typeOptions}
-            value={type}
+            value={filters.type}
             onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType })}
             ariaLabel={uiText.filters.reportType}
             className="mb-4"
@@ -72,7 +76,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
 
           <div className="mb-4">
             <SearchInput
-              value={query}
+              value={filters.query}
               onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
               placeholder={uiText.searchPlaceholders.reports}
               className="max-w-xl"
@@ -83,7 +87,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
           {topicOptions.length > 0 && (
             <FilterChipGroup
               options={topicOptions}
-              value={topic}
+              value={filters.topic}
               onChange={(nextTopic) => updateParams({ tag: nextTopic })}
               allowDeselect
               onClear={() => updateParams({ tag: null })}
@@ -171,43 +175,43 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
             <div className="sticky top-6 space-y-4">
               <div className="border border-neutral-300 bg-white p-4">
                 <h3 className="text-xs font-semibold text-neutral-900 mb-3 pb-2 border-b border-neutral-200">
-                  関連ツール
+                  {uiText.comparison.relatedTools}
                 </h3>
                 <nav className="space-y-2">
                   <Link
                     href="/guides"
                     className="flex items-center justify-between text-xs text-neutral-700 hover:text-neutral-900 py-1.5 border-b border-neutral-100"
                   >
-                    <span>導入ガイドを読む</span>
+                    <span>{uiText.guides.title}</span>
                     <ArrowRight className="w-3 h-3" />
                   </Link>
                   <Link
                     href="/use-cases"
                     className="flex items-center justify-between text-xs text-neutral-700 hover:text-neutral-900 py-1.5 border-b border-neutral-100"
                   >
-                    <span>用途から探す</span>
+                    <span>{uiText.useCases.title}</span>
                     <ArrowRight className="w-3 h-3" />
                   </Link>
                   <Link
                     href="/compare"
                     className="flex items-center justify-between text-xs text-neutral-700 hover:text-neutral-900 py-1.5"
                   >
-                    <span>候補機種を比較</span>
+                    <span>{uiText.compare.title}</span>
                     <ArrowRight className="w-3 h-3" />
                   </Link>
                 </nav>
               </div>
 
               <div className="border border-neutral-300 bg-neutral-50 p-4">
-                <h3 className="text-xs font-semibold text-neutral-900 mb-2">情報提供・取材相談</h3>
+                <h3 className="text-xs font-semibold text-neutral-900 mb-2">{uiText.comparison.contactConsultation}</h3>
                 <p className="text-xs text-neutral-600 mb-3 leading-relaxed">
-                  導入事例や一次情報の提供、取材のご相談はこちら。
+                  {uiText.comparison.contactDescription}
                 </p>
                 <Link
                   href="/contact"
                   className="block w-full px-4 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs font-medium transition-colors text-center"
                 >
-                  お問い合わせ
+                  {uiText.common.contact}
                 </Link>
               </div>
             </div>

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { CompareClient } from '@/components/CompareClient';
 import { getManufacturers, getRobots } from '@/lib/data';
 
@@ -7,5 +8,9 @@ export const metadata = {
 };
 
 export default function ComparePage() {
-  return <CompareClient robots={getRobots()} manufacturers={getManufacturers()} />;
+  return (
+    <Suspense fallback={null}>
+      <CompareClient robots={getRobots()} manufacturers={getManufacturers()} />
+    </Suspense>
+  );
 }

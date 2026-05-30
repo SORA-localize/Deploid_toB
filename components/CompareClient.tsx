@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ChevronDown, ChevronRight, Star, X } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ComparisonRobotPanel } from '@/components/ComparisonRobotPanel';
@@ -8,6 +8,7 @@ import { FavoriteCard } from '@/components/FavoriteCard';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { Manufacturer, Robot } from '@/data/types';
 import { uiText } from '@/lib/uiText';
+import { useUrlFilters } from '@/lib/useUrlFilters';
 
 interface CompareClientProps {
   robots: Robot[];
@@ -15,23 +16,42 @@ interface CompareClientProps {
 }
 
 export function CompareClient({ robots, manufacturers }: CompareClientProps) {
-  const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
+  const { getParam, updateParams } = useUrlFilters();
   const [favoriteSlugs, setFavoriteSlugs] = useState<string[]>([]);
   const [expandedManufacturers, setExpandedManufacturers] = useState<string[]>([]);
 
-  const selectedRobots = robots.filter((r) => selectedSlugs.includes(r.slug));
-  const favoriteRobots = robots.filter((r) => favoriteSlugs.includes(r.slug));
+  // URL parameters for selected robots (e.g., ?compare=slug1,slug2)
+  const compareParam = getParam('compare');
+  const selectedSlugs = useMemo(
+    () => (compareParam ? compareParam.split(',').filter(Boolean) : []),
+    [compareParam],
+  );
+
+  const selectedRobots = useMemo(
+    () => robots.filter((r) => selectedSlugs.includes(r.slug)),
+    [robots, selectedSlugs],
+  );
+  const favoriteRobots = useMemo(
+    () => robots.filter((r) => favoriteSlugs.includes(r.slug)),
+    [robots, favoriteSlugs],
+  );
 
   const manufacturerFor = (slug: string) => manufacturers.find((m) => m.slug === slug);
 
   const addRobot = (slug: string) => {
     if (selectedSlugs.length < 9 && !selectedSlugs.includes(slug)) {
-      setSelectedSlugs([...selectedSlugs, slug]);
+      const nextSlugs = [...selectedSlugs, slug];
+      updateParams({ compare: nextSlugs.join(',') }, 'replace');
     }
   };
 
   const removeRobot = (slug: string) => {
-    setSelectedSlugs(selectedSlugs.filter((s) => s !== slug));
+    const nextSlugs = selectedSlugs.filter((s) => s !== slug);
+    updateParams({ compare: nextSlugs.length > 0 ? nextSlugs.join(',') : null }, 'replace');
+  };
+
+  const clearAll = () => {
+    updateParams({ compare: null }, 'replace');
   };
 
   const toggleFavorite = (slug: string) => {
@@ -82,7 +102,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                     <div key={manufacturer.slug}>
                       <button
                         type="button"
-                        aria-label={`${manufacturer.nameJa ?? manufacturer.name}の機種一覧を${isExpanded ? '閉じる' : '開く'}`}
+                        aria-label={uiText.comparison.toggleAria(manufacturer.nameJa ?? manufacturer.name, isExpanded)}
                         aria-expanded={isExpanded}
                         onClick={() => toggleManufacturer(manufacturer.slug)}
                         className="w-full px-4 py-3 flex items-center justify-between hover:bg-neutral-100 transition-colors text-left"
@@ -108,7 +128,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                               <button
                                 type="button"
                                 key={robot.slug}
-                                aria-label={`${robot.nameJa ?? robot.name}を${isSelected ? '比較から外す' : '比較に追加する'}`}
+                                aria-label={isSelected ? uiText.comparison.removeAria(robot.nameJa ?? robot.name) : uiText.comparison.addAria(robot.nameJa ?? robot.name)}
                                 aria-pressed={isSelected}
                                 onClick={() =>
                                   isSelected ? removeRobot(robot.slug) : addRobot(robot.slug)
@@ -149,8 +169,8 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
               {selectedSlugs.length > 0 && (
                 <button
                   type="button"
-                  aria-label="比較シートを空にする"
-                  onClick={() => setSelectedSlugs([])}
+                  aria-label={uiText.comparison.clearAria}
+                  onClick={clearAll}
                   className="text-xs text-neutral-500 hover:text-neutral-900"
                 >
                   {uiText.common.clearAll}
@@ -178,10 +198,10 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                     </svg>
                   </div>
                   <h3 className="text-sm font-semibold text-neutral-900 mb-2">
-                    比較シートに機種がありません
+                    {uiText.comparison.emptyTitle}
                   </h3>
                   <p className="text-xs text-neutral-500">
-                    左のメニューから機種を選ぶと比較シートに追加されます。最大9機種まで横並びで比較できます。
+                    {uiText.comparison.emptyDescription}
                   </p>
                 </div>
               </div>
@@ -220,9 +240,9 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                 {favoriteRobots.length === 0 ? (
                   <div className="text-center py-8">
                     <Star className="w-8 h-8 text-neutral-300 mx-auto mb-3" />
-                    <p className="text-xs text-neutral-500 mb-1">お気に入りはまだありません</p>
+                    <p className="text-xs text-neutral-500 mb-1">{uiText.favorites.empty}</p>
                     <p className="text-xs text-neutral-400">
-                      カードの星アイコンでお気に入りに追加できます
+                      {uiText.favorites.emptySub}
                     </p>
                   </div>
                 ) : (

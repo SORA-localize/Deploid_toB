@@ -30,16 +30,18 @@ export function RobotCard({
     robot.deploymentStage === 'production' || robot.deploymentStage === 'limited-production';
 
   return (
-    <div className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-neutral-400 hover:-translate-y-1 hover:shadow-md transition-all duration-200 relative">
+    <div className="group border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-neutral-400 hover:-translate-y-1 hover:shadow-md transition-all duration-200 relative flex flex-col h-full">
+      {/* Favorite Button: Higher z-index to be clickable over the Link */}
       {showFavorite && (
         <button
           type="button"
-          aria-label={`${robot.nameJa ?? robot.name} を${isFavorite ? 'お気に入りから外す' : 'お気に入りに追加する'}`}
+          aria-label={isFavorite ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name) : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)}
           onClick={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             onFavoriteToggle?.(robot.slug);
           }}
-          className="absolute top-3 right-3 z-10 p-2 bg-white/90 hover:bg-white border border-neutral-300 transition-colors"
+          className="absolute top-3 right-3 z-20 p-2 bg-white/90 hover:bg-white border border-neutral-300 transition-colors"
         >
           <Star
             className={`w-4 h-4 ${isFavorite ? 'fill-yellow-500 text-yellow-500' : 'text-neutral-400'}`}
@@ -47,7 +49,11 @@ export function RobotCard({
         </button>
       )}
 
-      <Link href={`/robots/${robot.slug}`}>
+      {/* Main Link: Use absolute positioning for the entire card hit area without nesting the button */}
+      <Link href={`/robots/${robot.slug}`} className="flex flex-col h-full">
+        {/* Click overlay for a11y: this makes the whole card clickable for mouse users without nesting button inside a link */}
+        <span className="absolute inset-0 z-10" aria-hidden="true" />
+        
         <div className="aspect-[4/3] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-xs text-neutral-500 overflow-hidden">
           {(() => {
             const hero = getDisplayableAsset(robot.images?.hero ?? robot.heroImage);
@@ -59,7 +65,7 @@ export function RobotCard({
             );
           })()}
         </div>
-        <div className="p-4">
+        <div className="p-4 flex-1 flex flex-col">
           <div className="flex items-start justify-between mb-2">
             <h3 className="font-semibold text-neutral-900">{robot.nameJa ?? robot.name}</h3>
           </div>
@@ -87,7 +93,7 @@ export function RobotCard({
               </div>
             ))}
           </dl>
-          <div className="flex items-center justify-between pt-3 border-t border-neutral-300">
+          <div className="mt-auto flex items-center justify-between pt-3 border-t border-neutral-300">
             <span className="text-xs text-neutral-700">
               {uiText.common.viewDetails}
             </span>

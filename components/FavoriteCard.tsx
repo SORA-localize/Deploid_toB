@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
 import { TBD_LABEL } from '@/lib/labels';
+import { uiText } from '@/lib/uiText';
 
 interface FavoriteCardProps {
   robot: Robot;
@@ -20,7 +21,7 @@ export function FavoriteCard({
   onRemove,
 }: FavoriteCardProps) {
   const payload = robot.specs.payloadKg != null ? `${robot.specs.payloadKg} kg` : TBD_LABEL;
-  const runtime = robot.specs.runtimeMin != null ? `約${robot.specs.runtimeMin} 分` : TBD_LABEL;
+  const runtime = robot.specs.runtimeMin != null ? uiText.favorites.runtimeValue(robot.specs.runtimeMin) : TBD_LABEL;
 
   return (
     <div className="border border-neutral-300 bg-white p-3 hover:border-neutral-400 hover:shadow-sm transition-all duration-200">
@@ -32,7 +33,7 @@ export function FavoriteCard({
         </Link>
         <button
           type="button"
-          aria-label={`${robot.nameJa ?? robot.name} をお気に入りから外す`}
+          aria-label={uiText.favorites.ariaRemove(robot.nameJa ?? robot.name)}
           onClick={() => onRemove(robot.slug)}
           className="text-neutral-400 hover:text-neutral-900 flex-shrink-0"
         >
@@ -48,11 +49,11 @@ export function FavoriteCard({
       />
       <dl className="space-y-1 text-xs">
         <div className="flex justify-between">
-          <dt className="text-neutral-500">ペイロード</dt>
+          <dt className="text-neutral-500">{uiText.favorites.payload}</dt>
           <dd className="text-neutral-900 font-medium">{payload}</dd>
         </div>
         <div className="flex justify-between">
-          <dt className="text-neutral-500">稼働時間</dt>
+          <dt className="text-neutral-500">{uiText.favorites.runtime}</dt>
           <dd className="text-neutral-900 font-medium">{runtime}</dd>
         </div>
       </dl>

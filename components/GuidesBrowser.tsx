@@ -9,8 +9,9 @@ import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { TagChip } from '@/components/TagChip';
 import type { Guide, GuideStage } from '@/data/types';
 import { guideStageOrder } from '@/lib/display';
+import { filterGuides } from '@/lib/guideFilters';
 import { guideStageLabels } from '@/lib/labels';
-import { getGuideTopicOptions, getTagLabel, matchesTag, normalizeTagKey } from '@/lib/tags';
+import { getGuideTopicOptions, getTagLabel, normalizeTagKey } from '@/lib/tags';
 import { isOneOf } from '@/lib/typeGuards';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
@@ -22,16 +23,22 @@ const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
 
 export function GuidesBrowser({ guides }: { guides: Guide[] }) {
   const { getParam, updateParams } = useUrlFilters();
-  const stageParam = getParam('stage');
-  const stage = isOneOf(stageParam, guideStageOrder) ? stageParam : 'all';
-  const topicParam = getParam('topic');
-  const topic = topicParam ? normalizeTagKey(topicParam) : null;
+  
+  const filters = useMemo(() => {
+    const stageParam = getParam('stage');
+    const topicParam = getParam('topic');
+    return {
+      stage: isOneOf(stageParam, guideStageOrder) ? stageParam : ('all' as const),
+      topic: topicParam ? normalizeTagKey(topicParam) : null,
+    };
+  }, [getParam]);
 
   const topicOptions = useMemo(() => getGuideTopicOptions(guides), [guides]);
   const featured = guides.find((g) => g.order === 1) ?? guides[0];
 
-  const filtered = guides.filter(
-    (g) => (stage === 'all' || g.stage === stage) && matchesTag(g.topics, topic),
+  const filtered = useMemo(
+    () => filterGuides({ guides, filters }),
+    [guides, filters],
   );
 
   return (
@@ -46,7 +53,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
 
           <FilterChipGroup
             options={stageOptions}
-            value={stage}
+            value={filters.stage}
             onChange={(nextStage) => updateParams({ stage: nextStage === 'all' ? null : nextStage })}
             ariaLabel={uiText.filters.guideStage}
             className="mb-4"
@@ -55,7 +62,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
 
           <FilterChipGroup
             options={topicOptions}
-            value={topic}
+            value={filters.topic}
             onChange={(nextTopic) => updateParams({ topic: nextTopic })}
             allowDeselect
             onClear={() => updateParams({ topic: null })}
@@ -65,7 +72,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
       </div>
 
       <div className="mx-auto max-w-7xl px-6 py-8 min-h-[60vh]">
-        {featured && stage === 'all' && !topic && (
+        {featured && filters.stage === 'all' && !filters.topic && (
           <div className="border border-neutral-300 bg-white p-6 mb-6">
             <div className="text-xs text-neutral-500 font-medium mb-3 pb-2 border-b border-neutral-200">
               {uiText.guides.featured}

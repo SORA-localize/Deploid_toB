@@ -4,12 +4,14 @@ import type { FormEvent } from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 import { contactInquiryTypeOptions } from '@/lib/labels';
 import { FormSelect } from '@/components/FormSelect';
-const formspreeFormId = process.env.NEXT_PUBLIC_FORMSPREE_FORM_ID?.trim();
+import { uiText } from '@/lib/uiText';
+import { env } from '@/lib/env';
+
 const missingFormspreeFormId = 'missing-formspree-form-id';
 
 export function ContactForm() {
-  const formEnabled = Boolean(formspreeFormId);
-  const [state, handleSubmit] = useForm(formspreeFormId ?? missingFormspreeFormId);
+  const formEnabled = Boolean(env.formspreeFormId);
+  const [state, handleSubmit] = useForm(env.formspreeFormId ?? missingFormspreeFormId);
   const handleFormSubmit = formEnabled
     ? handleSubmit
     : (event: FormEvent<HTMLFormElement>) => event.preventDefault();
@@ -17,9 +19,9 @@ export function ContactForm() {
   if (formEnabled && state.succeeded) {
     return (
       <div className="border border-neutral-300 bg-neutral-50 p-6">
-        <h3 className="text-sm font-semibold text-neutral-900 mb-2">送信しました</h3>
+        <h3 className="text-sm font-semibold text-neutral-900 mb-2">{uiText.contact.successTitle}</h3>
         <p className="text-sm text-neutral-600 leading-relaxed">
-          お問い合わせありがとうございます。内容を確認のうえ折り返しご連絡します。
+          {uiText.contact.successMessage}
         </p>
       </div>
     );
@@ -29,7 +31,7 @@ export function ContactForm() {
     <form onSubmit={handleFormSubmit} className="space-y-5 max-w-2xl">
       {!formEnabled && (
         <div className="border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900" role="status">
-          お問い合わせフォームは現在準備中です。設定完了後に送信できます。
+          {uiText.contact.formPending}
         </div>
       )}
 
@@ -40,7 +42,7 @@ export function ContactForm() {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="name" className="block text-xs font-medium text-neutral-900 mb-2">
-              お名前
+              {uiText.contact.name}
             </label>
             <input
               id="name"
@@ -51,7 +53,7 @@ export function ContactForm() {
           </div>
           <div>
             <label htmlFor="company" className="block text-xs font-medium text-neutral-900 mb-2">
-              会社名・組織名 <span className="text-neutral-400">（必須）</span>
+              {uiText.contact.company} <span className="text-neutral-400">{uiText.contact.required}</span>
             </label>
             <input
               id="company"
@@ -65,7 +67,7 @@ export function ContactForm() {
 
         <div>
           <label htmlFor="email" className="block text-xs font-medium text-neutral-900 mb-2">
-            メールアドレス <span className="text-neutral-400">（必須）</span>
+            {uiText.contact.email} <span className="text-neutral-400">{uiText.contact.required}</span>
           </label>
           <input
             id="email"
@@ -80,14 +82,14 @@ export function ContactForm() {
         <FormSelect
           id="inquiryType"
           name="inquiryType"
-          label="ご相談の種別"
+          label={uiText.contact.inquiryType}
           options={contactInquiryTypeOptions}
           defaultValue="adoption-consultation"
         />
 
         <div>
           <label htmlFor="message" className="block text-xs font-medium text-neutral-900 mb-2">
-            内容 <span className="text-neutral-400">（必須）</span>
+            {uiText.contact.message} <span className="text-neutral-400">{uiText.contact.required}</span>
           </label>
           <textarea
             id="message"
@@ -106,7 +108,7 @@ export function ContactForm() {
           disabled={!formEnabled || state.submitting}
           className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
         >
-          {!formEnabled ? 'フォーム設定待ち' : state.submitting ? '送信中…' : '送信する'}
+          {!formEnabled ? uiText.contact.setupPending : state.submitting ? uiText.contact.submitting : uiText.contact.submit}
         </button>
       </fieldset>
     </form>
