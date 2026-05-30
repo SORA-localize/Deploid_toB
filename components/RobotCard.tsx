@@ -31,7 +31,7 @@ export function RobotCard({
 
   return (
     <div className="group border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-neutral-400 hover:-translate-y-1 hover:shadow-md transition-all duration-200 relative flex flex-col h-full">
-      {/* Favorite Button: Higher z-index to be clickable over the Link */}
+      {/* 1. Favorite Button: Highest z-index to be clickable */}
       {showFavorite && (
         <button
           type="button"
@@ -41,7 +41,7 @@ export function RobotCard({
             e.stopPropagation();
             onFavoriteToggle?.(robot.slug);
           }}
-          className="absolute top-3 right-3 z-20 p-2 bg-white/90 hover:bg-white border border-neutral-300 transition-colors"
+          className="absolute top-3 right-3 z-30 p-2 bg-white/90 hover:bg-white border border-neutral-300 transition-colors"
         >
           <Star
             className={`w-4 h-4 ${isFavorite ? 'fill-yellow-500 text-yellow-500' : 'text-neutral-400'}`}
@@ -49,11 +49,8 @@ export function RobotCard({
         </button>
       )}
 
-      {/* Main Link: Use absolute positioning for the entire card hit area without nesting the button */}
-      <Link href={`/robots/${robot.slug}`} className="flex flex-col h-full">
-        {/* Click overlay for a11y: this makes the whole card clickable for mouse users without nesting button inside a link */}
-        <span className="absolute inset-0 z-10" aria-hidden="true" />
-        
+      {/* 2. Card Content: Mid z-index to allow text selection */}
+      <div className="relative z-20 flex flex-col h-full pointer-events-none">
         <div className="aspect-[4/3] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-xs text-neutral-500 overflow-hidden">
           {(() => {
             const hero = getDisplayableAsset(robot.images?.hero ?? robot.heroImage);
@@ -67,32 +64,38 @@ export function RobotCard({
         </div>
         <div className="p-4 flex-1 flex flex-col">
           <div className="flex items-start justify-between mb-2">
-            <h3 className="font-semibold text-neutral-900">{robot.nameJa ?? robot.name}</h3>
+            <h3 className="font-semibold text-neutral-900 pointer-events-auto">
+              <Link href={`/robots/${robot.slug}`} className="hover:underline">
+                {robot.nameJa ?? robot.name}
+              </Link>
+            </h3>
           </div>
-          <ManufacturerLogoName
-            name={manufacturerName ?? robot.manufacturerSlug}
-            logo={manufacturerLogo}
-            className="mb-1 text-xs text-neutral-500"
-            frameClassName="h-4 w-4"
-            imageClassName="h-3 w-3"
-          />
-          <p className="text-xs text-neutral-600 mb-4 leading-relaxed line-clamp-2">{robot.summary}</p>
-          <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-4">
-            {specRows.map((row) => (
-              <div key={row.label}>
-                <dt className="text-neutral-500">{row.label}</dt>
-                <dd
-                  className={
-                    row.label === 'ステータス' && statusReady
-                      ? 'text-green-700 font-medium'
-                      : 'text-neutral-900 font-medium'
-                  }
-                >
-                  {row.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
+          <div className="pointer-events-auto">
+            <ManufacturerLogoName
+              name={manufacturerName ?? robot.manufacturerSlug}
+              logo={manufacturerLogo}
+              className="mb-1 text-xs text-neutral-500"
+              frameClassName="h-4 w-4"
+              imageClassName="h-3 w-3"
+            />
+            <p className="text-xs text-neutral-600 mb-4 leading-relaxed line-clamp-2">{robot.summary}</p>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-4">
+              {specRows.map((row) => (
+                <div key={row.label}>
+                  <dt className="text-neutral-500">{row.label}</dt>
+                  <dd
+                    className={
+                      row.label === 'ステータス' && statusReady
+                        ? 'text-green-700 font-medium'
+                        : 'text-neutral-900 font-medium'
+                    }
+                  >
+                    {row.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
           <div className="mt-auto flex items-center justify-between pt-3 border-t border-neutral-300">
             <span className="text-xs text-neutral-700">
               {uiText.common.viewDetails}
@@ -100,7 +103,15 @@ export function RobotCard({
             <ChevronRight className="w-4 h-4 text-neutral-500" />
           </div>
         </div>
-      </Link>
+      </div>
+
+      {/* 3. Global Link Overlay: Lowest z-index, only for background clicks */}
+      <Link 
+        href={`/robots/${robot.slug}`} 
+        className="absolute inset-0 z-10" 
+        aria-hidden="true"
+        tabIndex={-1}
+      />
     </div>
   );
 }

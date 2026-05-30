@@ -69,7 +69,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
           <FilterChipGroup
             options={typeOptions}
             value={filters.type}
-            onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType })}
+            onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType }, 'replace')}
             ariaLabel={uiText.filters.reportType}
             className="mb-4"
           />
@@ -88,9 +88,9 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
             <FilterChipGroup
               options={topicOptions}
               value={filters.topic}
-              onChange={(nextTopic) => updateParams({ tag: nextTopic })}
+              onChange={(nextTopic) => updateParams({ tag: nextTopic }, 'replace')}
               allowDeselect
-              onClear={() => updateParams({ tag: null })}
+              onClear={() => updateParams({ tag: null }, 'replace')}
               ariaLabel={uiText.filters.reportTopics}
             />
           )}

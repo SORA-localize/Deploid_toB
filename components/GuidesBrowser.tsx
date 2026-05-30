@@ -54,7 +54,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
           <FilterChipGroup
             options={stageOptions}
             value={filters.stage}
-            onChange={(nextStage) => updateParams({ stage: nextStage === 'all' ? null : nextStage })}
+            onChange={(nextStage) => updateParams({ stage: nextStage === 'all' ? null : nextStage }, 'replace')}
             ariaLabel={uiText.filters.guideStage}
             className="mb-4"
             buttonClassName="px-4 py-2.5 text-xs font-medium"
@@ -63,9 +63,9 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
           <FilterChipGroup
             options={topicOptions}
             value={filters.topic}
-            onChange={(nextTopic) => updateParams({ topic: nextTopic })}
+            onChange={(nextTopic) => updateParams({ topic: nextTopic }, 'replace')}
             allowDeselect
-            onClear={() => updateParams({ topic: null })}
+            onClear={() => updateParams({ topic: null }, 'replace')}
             ariaLabel={uiText.filters.guideTopics}
           />
         </div>

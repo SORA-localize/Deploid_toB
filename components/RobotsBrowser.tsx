@@ -112,28 +112,28 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             id="robot-industry"
             label={uiText.filters.industry}
             value={filters.industry ?? 'all'}
-            onChange={(v) => updateParams({ industry: v === 'all' ? null : v })}
+            onChange={(v) => updateParams({ industry: v === 'all' ? null : v }, 'replace')}
             options={industryOptions}
           />
           <FilterSelect
             id="robot-task"
             label={uiText.filters.task}
             value={filters.task ?? 'all'}
-            onChange={(v) => updateParams({ task: v === 'all' ? null : v })}
+            onChange={(v) => updateParams({ task: v === 'all' ? null : v }, 'replace')}
             options={taskOptions}
           />
           <FilterSelect
             id="robot-manufacturer"
             label={uiText.filters.manufacturer}
             value={filters.manufacturer}
-            onChange={(v) => updateParams({ manufacturer: v === 'all' ? null : v })}
+            onChange={(v) => updateParams({ manufacturer: v === 'all' ? null : v }, 'replace')}
             options={manufacturerOptions}
           />
           <FilterSelect
             id="robot-availability"
             label={uiText.filters.availability}
             value={filters.availability}
-            onChange={(v) => updateParams({ availability: v === 'all' ? null : v })}
+            onChange={(v) => updateParams({ availability: v === 'all' ? null : v }, 'replace')}
             options={availabilityOptions}
           />
         </div>
@@ -143,7 +143,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             options={releaseOptions}
             value={filters.release}
             onChange={(nextRelease) =>
-              updateParams({ release: nextRelease === 'active' ? null : nextRelease })
+              updateParams({ release: nextRelease === 'active' ? null : nextRelease }, 'replace')
             }
             ariaLabel={uiText.filters.releaseStatus}
             buttonClassName="px-3 py-1.5 text-xs"
