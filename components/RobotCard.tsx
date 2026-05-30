@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ChevronRight, Star } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
-import { deploymentStageLabels, mobilityLabels, TBD_LABEL } from '@/lib/labels';
+import { deploymentStageLabels, TBD_LABEL } from '@/lib/labels';
 import { getDisplayableAsset } from '@/lib/media';
 import { uiText } from '@/lib/uiText';
 
@@ -68,11 +68,6 @@ export function RobotCard({
         <div className="p-4">
           <div className="flex items-start justify-between mb-2">
             <h3 className="font-semibold text-neutral-900">{robot.nameJa ?? robot.name}</h3>
-            {specs.mobility && (
-              <span className="text-xs px-2 py-0.5 bg-neutral-200 text-neutral-700">
-                {mobilityLabels[specs.mobility]}
-              </span>
-            )}
           </div>
           <ManufacturerLogoName
             name={manufacturerName ?? robot.manufacturerSlug}
