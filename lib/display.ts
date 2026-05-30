@@ -40,7 +40,15 @@ export const companyStatusOrder: CompanyStatus[] = [
   'inactive',
 ];
 
-export const manufacturerCountryOrder = ['Japan', 'USA', 'China', 'Norway'] as const;
+export const manufacturerCountryOrder = [
+  'Japan',
+  'USA',
+  'China',
+  'Germany',
+  'Canada',
+  'Spain',
+  'Norway',
+] as const;
 
 export const guideStageOrder: GuideStage[] = ['learn', 'evaluate', 'act'];
 

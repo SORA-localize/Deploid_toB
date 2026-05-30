@@ -78,10 +78,12 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   const manufacturerOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allManufacturers },
-      ...manufacturers.map((manufacturer) => ({
-        value: manufacturer.slug,
-        label: manufacturer.name,
-      })),
+      ...[...manufacturers]
+        .sort((a, b) => a.name.localeCompare(b.name, 'en'))
+        .map((manufacturer) => ({
+          value: manufacturer.slug,
+          label: manufacturer.name,
+        })),
     ],
     [manufacturers],
   );
