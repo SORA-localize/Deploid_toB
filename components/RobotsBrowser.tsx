@@ -13,6 +13,8 @@ import {
   japanAvailabilityOrder,
   robotCategoryOrder,
   sortByDisplayOrder,
+  sortRobots,
+  type RobotSortKey,
 } from '@/lib/display';
 import { japanAvailabilityLabels, robotCategoryLabels } from '@/lib/labels';
 import { createRobotSearchDocument, matchesSearchDocument } from '@/lib/search';
@@ -55,6 +57,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
       ),
     [robots],
   );
+
   const typeParam = getParam('type');
   const type =
     typeParam && types.includes(typeParam as RobotCategory) ? typeParam as RobotCategory : 'all';
@@ -67,6 +70,9 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
       : 'all';
   const release = getParam('release') === 'pre' ? 'pre' : 'active';
   const query = getParam('q') ?? '';
+  const sortParam = getParam('sort');
+  const sort: RobotSortKey =
+    sortParam === 'japan' || sortParam === 'name' ? sortParam : 'stage';
 
   const typeOptions = useMemo(
     () => [
@@ -94,18 +100,23 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
     ],
     [avails],
   );
+  const sortOptions: Array<{ value: RobotSortKey; label: string }> = [
+    { value: 'stage', label: uiText.robots.sortStage },
+    { value: 'japan', label: uiText.robots.sortJapan },
+    { value: 'name',  label: uiText.robots.sortName },
+  ];
 
   const releaseCandidates = useMemo(() => {
-    return [...robots]
-      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-      .filter((r) => {
-        const typeOk = type === 'all' || r.category === type;
-        const mfgOk = mfg === 'all' || r.manufacturerSlug === mfg;
-        const availOk = avail === 'all' || r.japanAvailability === avail;
-        const queryOk = matchesSearchDocument(query, searchDocuments.get(r.slug));
-        return typeOk && mfgOk && availOk && queryOk;
-      });
-  }, [robots, type, mfg, avail, query, searchDocuments]);
+    const filtered = robots.filter((r) => {
+      const typeOk = type === 'all' || r.category === type;
+      const mfgOk = mfg === 'all' || r.manufacturerSlug === mfg;
+      const availOk = avail === 'all' || r.japanAvailability === avail;
+      const queryOk = matchesSearchDocument(query, searchDocuments.get(r.slug));
+      return typeOk && mfgOk && availOk && queryOk;
+    });
+    return sortRobots(filtered, sort);
+  }, [robots, type, mfg, avail, query, sort, searchDocuments]);
+
   const activeRobots = useMemo(
     () => releaseCandidates.filter((robot) => !isPreReleaseDeploymentStage(robot.deploymentStage)),
     [releaseCandidates],
@@ -178,7 +189,16 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             ariaLabel={uiText.filters.releaseStatus}
             buttonClassName="px-3 py-1.5 text-xs"
           />
-          <div className="text-xs text-neutral-500">{uiText.robots.sortLabel}</div>
+          <FilterSelect
+            id="robot-sort"
+            label={uiText.robots.sortLabel}
+            value={sort}
+            onChange={(nextSort) =>
+              updateParams({ sort: nextSort === 'stage' ? null : nextSort })
+            }
+            options={sortOptions}
+            className="w-40"
+          />
         </div>
 
         {filtered.length === 0 ? (
