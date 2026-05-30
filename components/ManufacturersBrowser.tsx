@@ -16,7 +16,6 @@ import {
   manufacturerCountryOrder,
   sortByDisplayOrder,
   sortManufacturers,
-  type ManufacturerSortKey,
 } from '@/lib/display';
 import { companyStatusLabels, companyTypeLabels, japanPresenceLabels, TBD_LABEL } from '@/lib/labels';
 import { createManufacturerSearchDocument, matchesSearchDocument } from '@/lib/search';
@@ -91,9 +90,6 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
       ? statusParam as CompanyStatus
       : 'all';
   const query = getParam('q') ?? '';
-  const sortParam = getParam('sort');
-  const sort: ManufacturerSortKey =
-    sortParam === 'name' || sortParam === 'founded' ? sortParam : 'japan';
 
   const countryOptions = useMemo(
     () => [
@@ -116,12 +112,6 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
     ],
     [statuses],
   );
-  const sortOptions: Array<{ value: ManufacturerSortKey; label: string }> = [
-    { value: 'japan',   label: uiText.manufacturers.sortJapan },
-    { value: 'name',    label: uiText.manufacturers.sortName },
-    { value: 'founded', label: uiText.manufacturers.sortFounded },
-  ];
-
   const robotCount = (slug: string) => robotsByManufacturer.get(slug)?.length ?? 0;
 
   const filtered = useMemo(() => {
@@ -132,8 +122,8 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
         (status === 'all' || m.companyStatus === status) &&
         matchesSearchDocument(query, searchDocuments.get(m.slug)),
     );
-    return sortManufacturers(base, sort);
-  }, [manufacturers, country, type, status, query, sort, searchDocuments]);
+    return sortManufacturers(base, 'japan');
+  }, [manufacturers, country, type, status, query, searchDocuments]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -185,21 +175,9 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           />
         </div>
 
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-xs text-neutral-500">
-            {uiText.common.results(filtered.length, country !== 'all' || type !== 'all' || status !== 'all' || query !== '')}
-          </p>
-          <FilterSelect
-            id="manufacturer-sort"
-            label={uiText.manufacturers.sortLabel}
-            value={sort}
-            onChange={(nextSort) =>
-              updateParams({ sort: nextSort === 'japan' ? null : nextSort })
-            }
-            options={sortOptions}
-            className="w-40"
-          />
-        </div>
+        <p className="mb-6 text-xs text-neutral-500">
+          {uiText.common.results(filtered.length, country !== 'all' || type !== 'all' || status !== 'all' || query !== '')}
+        </p>
 
         {filtered.length === 0 ? (
           <EmptyState message="条件に合うメーカーがありません。" variant="muted" size="large" />
