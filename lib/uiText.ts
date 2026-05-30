@@ -52,6 +52,10 @@ export const uiText = {
     technicalSpecifications: '技術仕様',
     decision: '導入判断',
     applications: '用途メモ',
+    sortStage: '導入フェーズ順',
+    sortJapan: '日本対応順',
+    sortName: '名前順',
+    sortLabel: '並び替え',
   },
   manufacturers: {
     breadcrumb: 'メーカー',
@@ -59,6 +63,10 @@ export const uiText = {
     profile: 'メーカープロフィール',
     factSheet: '基本情報',
     models: (count: number) => `${count}件の取扱機種`,
+    sortJapan: '日本対応順',
+    sortName: '名前順',
+    sortFounded: '設立年順',
+    sortLabel: '並び替え',
   },
   guides: {
     breadcrumb: 'ガイド',

@@ -90,6 +90,8 @@ export const robots: Robot[] = [
     supportNote: '日本語サポート、初期設定、部品交換、現地対応の有無を確認する。',
     safetyNote: '人と同じ空間で稼働させる場合、リスクアセスメントと運用ルール設計が前提。',
     vendorRiskNote: 'PoC/研究用途と本番運用用途で評価軸を分ける。',
+    industryTags: ['research', 'education'],
+    taskTags: ['r-and-d', 'material-handling'],
     comparison: {
       strengths: ['価格訴求', '研究・PoC用途で検討しやすい', '比較対象として情報収集しやすい'],
       constraints: ['本番運用では安全設計と保守体制の確認が必要', '用途によっては稼働時間と作業速度が制約になる'],
@@ -183,6 +185,8 @@ export const robots: Robot[] = [
     supportNote: '日本での販売、保守、現地対応体制は未公表。',
     safetyNote: '製造現場での利用は、実証範囲、作業分離、停止手順、責任分界の設計が必要。',
     vendorRiskNote: '世代交代が早い領域。F.02 は実証実績を残したが、検討対象としては後継 F.03 の動向を見るのが現実的。',
+    industryTags: ['manufacturing'],
+    taskTags: ['assembly', 'material-handling', 'quality-inspection'],
     comparison: {
       strengths: ['BMW Spartanburg で11ヶ月の実証完遂', '汎用作業の方向性が明確', '量産自動車工程での貢献実績'],
       constraints: ['一般販売条件が確認できない', '日本での導入窓口が確認できない', '世代交代により後継機種へ移行中'],
@@ -253,6 +257,8 @@ export const robots: Robot[] = [
     supportNote: '日本語サポート、保守、消耗品の供給条件を購入前に確認する。',
     safetyNote: '研究用途中心の販売。産業安全規格(ISO 10218等)への適合は別途確認が必要。',
     vendorRiskNote: '量産・販売は比較的安定。日本でのサポートは代理店経由が前提。',
+    industryTags: ['research', 'education'],
+    taskTags: ['r-and-d'],
     comparison: {
       strengths: ['価格訴求', 'フルサイズで歩行性能の比較対象になりやすい', '研究機関での先行導入実績'],
       constraints: ['産業安全認証は別途必要', '本格運用に必要な保守体制は要確認', '稼働時間が短いケースがある'],
@@ -352,6 +358,8 @@ export const robots: Robot[] = [
     supportNote: '実証フェーズ。サポート体制は提携ごとに個別設計される想定。',
     safetyNote: '人協働を前提とする設計だが、具体的な認証状況は要確認。',
     vendorRiskNote: 'スタートアップ。資金状況・量産計画は継続確認が必要。',
+    industryTags: ['manufacturing', 'logistics'],
+    taskTags: ['assembly', 'material-handling'],
     comparison: {
       strengths: ['製造現場文脈での実証実績', '人と協働する設計コンセプト', 'パートナーシップで先行情報を得やすい'],
       constraints: ['一般販売がまだ整っていない', '日本での販売・保守経路が見えにくい', '価格・納期が不透明'],
@@ -429,6 +437,8 @@ export const robots: Robot[] = [
     supportNote: '北米中心の展開。日本での保守体制・部品供給は要確認。',
     safetyNote: '物流・倉庫の比較的構造化された環境での運用を前提とした設計。',
     vendorRiskNote: '物流分野で先行するが、日本での体制は要確認。',
+    industryTags: ['logistics'],
+    taskTags: ['material-handling', 'picking'],
     comparison: {
       strengths: ['物流・搬送タスクで先行', 'RaaS の商用契約実績', '実運用事例が公表されている'],
       constraints: ['日本の販売・保守経路が要確認', 'タスク特化型のため適用領域は限定的', '汎用組立等への適用はまだ未確認'],
@@ -514,6 +524,8 @@ export const robots: Robot[] = [
     supportNote: '出荷前段階。サポート体制は出荷時点で再確認する。',
     safetyNote: '家庭利用も想定する設計のため、産業現場の運用には別途リスクアセスメントが必要。',
     vendorRiskNote: 'OpenAI 出資で注目度は高いが、量産・出荷スケジュール・国内対応は要確認。',
+    industryTags: ['research'],
+    taskTags: ['r-and-d'],
     comparison: {
       strengths: ['OpenAI 出資による注目度', '家庭・業務両用の設計コンセプト', '生成AIとの統合への期待'],
       constraints: ['出荷段階の手前', 'toB 側の運用要件はまだ未整理', '日本での導入経路は不透明'],
@@ -556,6 +568,8 @@ export const robots: Robot[] = [
     supportNote: '日本での販売・保守体制は未確認。',
     safetyNote: '製造現場での利用は、実証範囲・作業分離・停止手順・責任分界の設計が必要。',
     vendorRiskNote: '世代交代が早い。F.03 の商業条件は継続確認が必要。',
+    industryTags: ['manufacturing'],
+    taskTags: ['assembly', 'material-handling', 'quality-inspection'],
     comparison: {
       strengths: ['BMW 実証の実績（F.02 を継承）', '軽量化と稼働時間向上', '汎用製造タスクへの方向性が明確'],
       constraints: ['一般販売条件が未確認', '日本での販売・保守経路が見えない', '実証先が限定的'],
@@ -601,6 +615,8 @@ export const robots: Robot[] = [
     supportNote: '国内代理店経由での保守・部品供給条件を事前に確認する。',
     safetyNote: '産業安全規格（ISO 10218 等）への適合は別途確認が必要。',
     vendorRiskNote: 'H1 からの世代交代期。国内サポート体制の成熟を見ながら導入を検討する。',
+    industryTags: ['research'],
+    taskTags: ['r-and-d', 'material-handling'],
     comparison: {
       strengths: ['H1 比でペイロード増加', '31 DOF で関節自由度が高い', '国内代理店（TechShare）経由での問い合わせ窓口あり'],
       constraints: ['本番運用では安全認証の確認が必要', '国内価格・サポート条件は要確認', '稼働時間3時間は用途によって制約になる'],
@@ -646,6 +662,8 @@ export const robots: Robot[] = [
     supportNote: 'Spot 向けで国内保守実績はあるが、Atlas 向けは要確認。',
     safetyNote: '大型・高出力機のため、設置環境設計・フェンシング・停止手順の策定が必須。',
     vendorRiskNote: 'Hyundai 傘下で財務基盤は安定。一般向け外販条件は2027年以降に確認が必要。',
+    industryTags: ['research', 'manufacturing'],
+    taskTags: ['r-and-d', 'material-handling', 'assembly'],
     comparison: {
       strengths: ['業界最高水準の動的バランス制御', '高ペイロード・広リーチ', 'IP67 対応', 'Hyundai による財務基盤'],
       constraints: ['2026年出荷は特定顧客向けのみ', '日本展開時期・価格が未確定', '大型・重量（90kg）のため設置設計が必要'],
@@ -688,6 +706,8 @@ export const robots: Robot[] = [
     supportNote: '外部販売開始前のため保守体制は要確認。',
     safetyNote: '現時点では自社工場内のみの運用。外部向け安全認証の状況は要確認。',
     vendorRiskNote: 'Tesla の製造・AI・バッテリー資産は強みだが、外販条件・時期は流動的。',
+    industryTags: ['manufacturing'],
+    taskTags: ['assembly', 'material-handling', 'quality-inspection'],
     comparison: {
       strengths: ['Tesla の製造・AI・バッテリー開発力', '自社工場での量産実績が蓄積中', '将来的な低価格目標'],
       constraints: ['外部販売は未開始', '日本展開計画は未確認', '自動車向けブランドとロボット事業の優先度'],
@@ -730,6 +750,8 @@ export const robots: Robot[] = [
     supportNote: '日本での保守体制は要確認。',
     safetyNote: '製造現場での利用は作業分離・停止手順の設計が必要。',
     vendorRiskNote: 'スタートアップ。量産体制・財務状況は継続確認が必要。',
+    industryTags: ['manufacturing', 'logistics'],
+    taskTags: ['assembly', 'material-handling', 'picking'],
     comparison: {
       strengths: ['汎用AI「Carbon」との統合', '多様な製造タスクへの適応性', 'Magna との実証実績'],
       constraints: ['一般販売未整備', '日本での導入経路が不透明', '量産体制は未成熟'],
@@ -774,6 +796,8 @@ export const robots: Robot[] = [
     supportNote: '日本での保守体制・部品供給は要確認。',
     safetyNote: '産業現場での運用は安全規格への適合確認が前提。',
     vendorRiskNote: '量産実績は業界最多水準だが、日本での保守・サポート体制は成熟途上。',
+    industryTags: ['manufacturing', 'logistics'],
+    taskTags: ['assembly', 'material-handling'],
     comparison: {
       strengths: ['世界最多の量産・出荷実績', '高ペイロード（15kg）', '速度性能（3.3m/s）'],
       constraints: ['日本正規代理店が要確認', '稼働時間2時間は連続運用に制約', '日本での保守実績はこれから'],
@@ -819,6 +843,8 @@ export const robots: Robot[] = [
     supportNote: '国内代理店経由での保守・サポート条件を確認する。',
     safetyNote: '製造現場での導入実績はあるが、具体的な安全認証の状況は要確認。',
     vendorRiskNote: '量産実績は豊富だが、日本での保守実績はこれから積み上がる段階。',
+    industryTags: ['manufacturing'],
+    taskTags: ['quality-inspection', 'material-handling', 'assembly'],
     comparison: {
       strengths: ['BYD・Foxconn 等での量産現場導入実績', '52 DOF・高い手先自由度', '日本に代理店あり'],
       constraints: ['導入価格は問い合わせ制で不透明', '日本での保守実績はまだ少ない', '稼働時間2時間（歩行）は連続運用に制約'],
@@ -863,6 +889,8 @@ export const robots: Robot[] = [
     supportNote: '日本正規代理店は未確認。公式サイトより直接問い合わせ。',
     safetyNote: '産業現場での利用は安全規格適合の確認が必要。',
     vendorRiskNote: 'リハビリロボットの実績はあるが、ヒューマノイドとしての量産実績は積み上げ中。',
+    industryTags: ['healthcare-care', 'research'],
+    taskTags: ['physical-assistance', 'r-and-d'],
     comparison: {
       strengths: ['53 DOF の高い関節自由度', 'リハビリ分野での実証背景', '介護・医療ユースケースへの適性'],
       constraints: ['片腕ペイロード 3kg（全伸長時）と軽め', '日本代理店は未確認', '産業向けとしての導入事例は限定的'],
@@ -905,6 +933,8 @@ export const robots: Robot[] = [
     supportNote: '日本介護施設を対象市場に明記しているが、正規代理店は未確認。公式サイトより問い合わせを推奨。',
     safetyNote: '介護施設での使用は人との接触リスクアセスメントと規制確認が必要。',
     vendorRiskNote: '介護向けの実証はこれから。導入前に試験運用と評価が必要。',
+    industryTags: ['healthcare-care', 'research'],
+    taskTags: ['physical-assistance', 'r-and-d'],
     comparison: {
       strengths: ['介護・リハビリ向け設計コンセプト', '日本市場を明示したポジショニング', 'ホットスワップ対応の稼働時間'],
       constraints: ['日本代理店は未確認', 'pilot 段階で導入実績は限定的', '安全規制・資格要件の確認が必要'],
@@ -957,6 +987,8 @@ export const robots: Robot[] = [
     supportNote: '国内代理店経由での保守・サポート条件を確認する。',
     safetyNote: '研究・教育用途が中心。産業現場の本番運用には別途リスクアセスメントが必要。',
     vendorRiskNote: '設立間もないが、国内代理店網が整っており、問い合わせ・購入ハードルは低い。',
+    industryTags: ['manufacturing', 'logistics', 'hospitality'],
+    taskTags: ['material-handling', 'customer-service'],
     comparison: {
       strengths: ['国内正規代理店があり購入しやすい', '小型・軽量（118cm・30kg）で設置場所を選ばない', 'RoboCup 優勝で技術実績あり'],
       constraints: ['ペイロード 5kg は産業重作業には不向き', '速度 0.97m/s は低速', '産業安全認証は別途確認が必要'],
@@ -998,6 +1030,8 @@ export const robots: Robot[] = [
     supportNote: '産業用ロボットの保守網を持つ。ヒューマノイドとしての保守条件は要確認。',
     safetyNote: '試作段階のため、産業利用には安全規格への適合確認が必須。',
     vendorRiskNote: '財務・製造基盤は安定した大企業だが、ヒューマノイドの商業化時期は未定。',
+    industryTags: ['public-sector', 'construction-infrastructure'],
+    taskTags: ['disaster-response', 'inspection'],
     comparison: {
       strengths: ['国産メーカーで問い合わせしやすい', '産業用ロボット大手の信頼性・保守網', '日本の産業現場への適合を念頭に設計'],
       constraints: ['商業販売時期・価格が未定', 'prototype 段階で実導入はできない', '現時点では情報収集・関係構築が主な接点'],
@@ -1048,6 +1082,8 @@ export const robots: Robot[] = [
     supportNote: '国内代理店経由でのサポート体制を確認する。欧州本社との連携サポートになるため、対応リードタイムを事前に合意する。',
     safetyNote: '産業環境への導入にあたっては安全規格（ISO 10218等）への適合確認が必要。',
     vendorRiskNote: '2026年後半出荷予定のため現時点では実機未納品。量産・保守体制の成熟度は出荷開始後に要確認。',
+    industryTags: ['manufacturing', 'logistics'],
+    taskTags: ['assembly', 'material-handling'],
     comparison: {
       strengths: ['日本唯一の正規代理店あり、国内問い合わせが容易', 'デュアルバッテリーで 6〜8h 連続稼働（多シフト運用想定）', '全関節フォース・トルクセンサ＋人工皮膚でハンドリング精度が高い', 'Bosch・AWS との産業パートナーシップ'],
       constraints: ['2026年後半出荷予定でまだ実機未納品', '欧州製のため中国製競合と比べ高価格帯', 'DOF・ペイロードの公式仕様が未確定部分あり'],
@@ -1100,6 +1136,8 @@ export const robots: Robot[] = [
     supportNote: '国内サポート体制は未整備。保守・部品調達の対応を事前に確認する。',
     safetyNote: '産業現場での本番利用には安全規格への適合確認が必要。',
     vendorRiskNote: '創業2年での量産達成は実績として評価できる。国際展開・アフターサービスの成熟度は今後の確認事項。',
+    industryTags: ['logistics', 'manufacturing'],
+    taskTags: ['material-handling', 'picking', 'assembly'],
     comparison: {
       strengths: ['量産開始済みで実機が存在する', '片腕 15kg ペイロードで重量物ハンドリングに対応', '約 8h バッテリーで多シフト運用が可能', '電気＋油圧ハイブリッドで力仕事に強い'],
       constraints: ['歩行速度 1.0m/s は低速', '日本向け販売・サポートチャネルが未整備', '国際価格に大きなばらつきあり、正式見積もり必須'],
@@ -1150,6 +1188,8 @@ export const robots: Robot[] = [
     supportNote: '国内代理店・サポート体制なし。導入検討の場合は本社への直接問い合わせが起点。',
     safetyNote: '産業現場での利用には安全規格への適合確認が必要。',
     vendorRiskNote: '量産・調達実績は堅調。Huawei 依存エコシステムおよび国際展開の成熟度は要確認。',
+    industryTags: ['research', 'education'],
+    taskTags: ['r-and-d'],
     comparison: {
       strengths: ['量産ライン稼働済みで出荷実績あり', '自動車・家電など複数業種での導入事例', 'Huawei AI 統合によるビジョン・言語処理の活用'],
       constraints: ['技術仕様の多くが非公開（ペイロード・バッテリー等）', '日本向け販売・サポートチャネルが未整備', 'Huawei エコシステムへの依存度が高い'],
@@ -1201,6 +1241,8 @@ export const robots: Robot[] = [
     supportNote: '欧州本社への直接問い合わせが必要。日本国内の保守・サポートリードタイムは要確認。',
     safetyNote: '研究用プラットフォームのため、産業現場への転用には別途リスクアセスメントと安全設計が必要。',
     vendorRiskNote: '創業20年の老舗で技術・財務基盤は安定。ただし産業量産への転用は想定外のプラットフォーム。',
+    industryTags: ['research', 'education'],
+    taskTags: ['r-and-d'],
     comparison: {
       strengths: ['全関節トルクセンサで業界最高クラスの力制御精度', '2017年から世界中の研究機関での導入実績', 'ROS/ROS2 完全対応でオープンソース研究コミュニティとの相性が良い', '創業20年の安定企業'],
       constraints: ['歩行バッテリーが 1.5h で多シフト運用は不向き', '95kg と重く設置・搬入に制約', '歩行速度 0.83m/s は低速', '価格が数千万円規模で研究機関以外には非現実的'],
@@ -1252,6 +1294,8 @@ export const robots: Robot[] = [
     supportNote: '国内代理店経由での購入・サポートが可能。保守・修理条件は TechShare に確認する。',
     safetyNote: '研究・教育向けプラットフォーム。産業現場での使用には別途安全設計が必要。',
     vendorRiskNote: '親会社 Unitree は四足・ヒューマノイドで量産実績あり。R1 は新機種のため長期サポート体制は要確認。',
+    industryTags: ['logistics', 'retail', 'hospitality'],
+    taskTags: ['material-handling', 'customer-service', 'shelf-stocking'],
     comparison: {
       strengths: ['R1 Air $4,900 は量産二足ヒューマノイドとして世界最安水準', '国内代理店 TechShare 経由で入手可能', '軽量（25kg）で設置・搬入が容易', '宙返り・側転など高い運動性能'],
       constraints: ['産業ペイロード用途には設計されていない（ペイロード ~3kg）', '稼働時間は約 1h と短い', '20〜26DOF はフルスペック機と比べ少ない'],
@@ -1297,6 +1341,8 @@ export const robots: Robot[] = [
     supportNote: '国内代理店・サポート体制は未確認。導入検討は本社への直接問い合わせから始める。',
     safetyNote: '高ペイロード・高トルク機のため、産業現場での安全規格への適合確認が特に重要。',
     vendorRiskNote: 'Agibot は 2026年3月時点で累計出荷 1万台超・業界最多出荷メーカー。A2-Max は出荷前の段階のため、量産体制・保守条件は出荷開始後に確認。',
+    industryTags: ['manufacturing'],
+    taskTags: ['assembly', 'material-handling'],
     comparison: {
       strengths: ['40kg バイマニュアルペイロードで重量物搬送に対応', '67DOF・腰3軸で多様な作業姿勢を実現', '親機 A2 との高い互換性（ソフトウェア・エコシステム）', 'Agibot は業界最多出荷実績'],
       constraints: ['2026年5月時点では出荷前（Coming Soon）', '重量 85kg で設置・搬入に制約', '日本向け販売・サポートチャネルが未整備', 'DOF 数に出典間で差異あり（要確認）'],
@@ -1342,6 +1388,8 @@ export const robots: Robot[] = [
     supportNote: '日本向け正式代理店は未確認。UBTECH へ直接問い合わせが起点。',
     safetyNote: '産業現場への本番導入には安全規格（ISO 10218等）への適合確認が必要。',
     vendorRiskNote: '親会社 UBTECH は Walker S2 の量産・受注実績を持つ。S1 の長期サポート方針は要確認。',
+    industryTags: ['manufacturing'],
+    taskTags: ['quality-inspection', 'material-handling'],
     comparison: {
       strengths: ['41DOF で多様なタスクに対応', '片腕 15kg ペイロードで実作業が可能', 'ROSA 2.0 + LLM プランニングで柔軟なタスク対応', 'Zeekr・NIO・BYD 工場での試験実績'],
       constraints: ['S2 の自律電池交換（24/7 稼働）には対応しない', '日本向け公式代理店が未確認', '価格非公開で比較検討しにくい'],
@@ -1393,6 +1441,8 @@ export const robots: Robot[] = [
     supportNote: '国内代理店経由での購入・サポートが可能。日本語対応体制は 2026年上半期に整備中と報道あり。',
     safetyNote: '教育・研究向けプラットフォーム。産業現場での使用には別途リスクアセスメントが必要。',
     vendorRiskNote: '設立間もないが量産・国内代理店体制は整備中。CES 2026 での即完売は需要の高さを示す。',
+    industryTags: ['manufacturing', 'logistics'],
+    taskTags: ['material-handling', 'assembly'],
     comparison: {
       strengths: ['国内正規代理店（Tohasen / 帝華機械）経由で入手可能', '95cm・19.5kg で設置・搬入が容易', '3グレードで用途に応じた選択が可能', 'RoboCup 2025 KidSize 優勝の技術実績'],
       constraints: ['95cm・22DOF は産業重作業には不向き', 'EDU/Pro で 80分稼働は短め', 'プロ仕様の価格は問い合わせ制'],
@@ -1436,6 +1486,8 @@ export const robots: Robot[] = [
     supportNote: '欧州本社への直接問い合わせが起点。日本語対応・国内サポートのリードタイムは要確認。',
     safetyNote: '研究用プラットフォーム。産業現場への転用には別途安全設計が必要。',
     vendorRiskNote: '創業20年の PAL Robotics が提供する安定した研究機。TALOS と同様に産業量産への転用は想定外。',
+    industryTags: ['logistics', 'retail'],
+    taskTags: ['material-handling', 'picking', 'shelf-stocking'],
     comparison: {
       strengths: ['TALOS（95kg）比で 38kg と大幅に軽量・扱いやすい', '強化学習・RL 研究に最適化された設計', 'ROS/ROS2 完全対応', '4時間バッテリーで長時間実験が可能'],
       constraints: ['価格非公開・研究機関向け個別見積もりのみ', '日本向け正式代理店が未確認', '産業用途には設計されていない'],
