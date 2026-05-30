@@ -72,26 +72,37 @@ export function getRobotDetailDecisionRows(robot: Robot): DisplayRow[] {
   ];
 }
 
-export function getComparisonSpecRows(robot: Robot): DisplayRow[] {
+export function getComparisonCoreRows(robot: Robot): DisplayRow[] {
   const { specs } = robot;
 
+  let japanSupport = japanAvailabilityLabels[robot.japanAvailability];
+  if (robot.japanAvailability === 'distributor-japan' && robot.distributorJapan) {
+    japanSupport = `代理店あり (${robot.distributorJapan})`;
+  } else if (robot.japanAvailability === 'official-japan') {
+    japanSupport = '国内正規販売';
+  }
+
   return [
-    { label: '身長', value: formatNumber(specs.heightCm, ' cm') },
-    { label: '重量', value: formatNumber(specs.weightKg, ' kg') },
-    { label: 'ペイロード', value: formatNumber(specs.payloadKg, ' kg') },
+    { label: uiText.compare.price, value: robot.priceNote ?? TBD_LABEL },
+    { label: uiText.comparison.japanSupport, value: japanSupport },
+    { label: uiText.compare.deploymentStage, value: deploymentStageLabels[robot.deploymentStage] },
+    { label: '可搬重量', value: formatNumber(specs.payloadKg, ' kg') },
     { label: '稼働時間', value: formatRuntime(specs.runtimeMin) },
-    { label: '移動方式', value: specs.mobility ? mobilityLabels[specs.mobility] : TBD_LABEL },
   ];
 }
 
-export function getComparisonDecisionRows(robot: Robot): DisplayRow[] {
+export function getComparisonDetailRows(robot: Robot): DisplayRow[] {
+  const { specs } = robot;
+
+  const height = formatNumber(specs.heightCm, 'cm');
+  const weight = formatNumber(specs.weightKg, 'kg');
+  const dimensions = (specs.heightCm != null || specs.weightKg != null) ? `${height} / ${weight}` : TBD_LABEL;
+
   return [
-    { label: uiText.compare.deploymentStage, value: deploymentStageLabels[robot.deploymentStage] },
-    { label: uiText.compare.japanAvailability, value: japanAvailabilityLabels[robot.japanAvailability] },
-    {
-      label: uiText.compare.procurement,
-      value: joinOrFallback(robot.procurementModels.map((model) => procurementLabels[model])),
-    },
-    { label: uiText.compare.price, value: robot.priceNote ?? TBD_LABEL },
+    { label: uiText.comparison.dimensions, value: dimensions },
+    { label: '自由度', value: formatNumber(specs.dof, ' DoF') },
+    { label: '移動方式', value: specs.mobility ? mobilityLabels[specs.mobility] : TBD_LABEL },
+    { label: '防塵防水', value: specs.ipRating ?? TBD_LABEL },
   ];
 }
+

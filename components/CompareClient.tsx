@@ -10,6 +10,8 @@ import type { Manufacturer, Robot } from '@/data/types';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 
+import { useFavorites } from '@/lib/useFavorites';
+
 interface CompareClientProps {
   robots: Robot[];
   manufacturers: Manufacturer[];
@@ -17,23 +19,25 @@ interface CompareClientProps {
 
 export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   const { getParam, updateParams } = useUrlFilters();
-  const [favoriteSlugs, setFavoriteSlugs] = useState<string[]>([]);
+  const { favorites, toggleFavorite, isMounted } = useFavorites();
   const [expandedManufacturers, setExpandedManufacturers] = useState<string[]>([]);
 
   // URL parameters for selected robots (e.g., ?compare=slug1,slug2)
   const compareParam = getParam('compare');
-  const selectedSlugs = useMemo(
-    () => (compareParam ? compareParam.split(',').filter(Boolean) : []),
-    [compareParam],
-  );
+  const selectedSlugs = useMemo(() => {
+    if (!compareParam) return [];
+    // Strict validation: Only return slugs that exist in the robots array
+    const validSlugs = new Set(robots.map(r => r.slug));
+    return compareParam.split(',').filter(slug => validSlugs.has(slug));
+  }, [compareParam, robots]);
 
   const selectedRobots = useMemo(
     () => robots.filter((r) => selectedSlugs.includes(r.slug)),
     [robots, selectedSlugs],
   );
   const favoriteRobots = useMemo(
-    () => robots.filter((r) => favoriteSlugs.includes(r.slug)),
-    [robots, favoriteSlugs],
+    () => robots.filter((r) => favorites.includes(r.slug)),
+    [robots, favorites],
   );
 
   const manufacturerFor = (slug: string) => manufacturers.find((m) => m.slug === slug);
@@ -52,14 +56,6 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
 
   const clearAll = () => {
     updateParams({ compare: null }, 'replace');
-  };
-
-  const toggleFavorite = (slug: string) => {
-    if (favoriteSlugs.includes(slug)) {
-      setFavoriteSlugs(favoriteSlugs.filter((s) => s !== slug));
-    } else {
-      setFavoriteSlugs([...favoriteSlugs, slug]);
-    }
   };
 
   const toggleManufacturer = (slug: string) => {
@@ -216,7 +212,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                         robot={robot}
                         manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
                         manufacturerLogo={manufacturer?.logo}
-                        isFavorite={favoriteSlugs.includes(robot.slug)}
+                        isFavorite={isMounted ? favorites.includes(robot.slug) : false}
                         onFavoriteToggle={toggleFavorite}
                         onRemove={removeRobot}
                       />
@@ -237,7 +233,11 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                 </h2>
               </div>
               <div className="p-4 max-h-80 overflow-y-auto overscroll-contain xl:max-h-[calc(100vh-200px)]">
-                {favoriteRobots.length === 0 ? (
+                {!isMounted ? (
+                  <div className="text-center py-8">
+                    {/* Render a skeleton or nothing to prevent FOUC */}
+                  </div>
+                ) : favoriteRobots.length === 0 ? (
                   <div className="text-center py-8">
                     <Star className="w-8 h-8 text-neutral-300 mx-auto mb-3" />
                     <p className="text-xs text-neutral-500 mb-1">{uiText.favorites.empty}</p>

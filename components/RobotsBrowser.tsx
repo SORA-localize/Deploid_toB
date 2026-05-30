@@ -16,6 +16,7 @@ import {
 } from '@/lib/robotFilters';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
+import { useFavorites } from '@/lib/useFavorites';
 
 interface RobotsBrowserProps {
   robots: Robot[];
@@ -24,6 +25,7 @@ interface RobotsBrowserProps {
 
 export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   const { getParam, updateParams } = useUrlFilters();
+  const { favorites, toggleFavorite, isMounted } = useFavorites();
 
   const manufacturerBySlug = useMemo(
     () => new Map(manufacturers.map((manufacturer) => [manufacturer.slug, manufacturer])),
@@ -166,6 +168,9 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
                   robot={robot}
                   manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
                   manufacturerLogo={manufacturer?.logo}
+                  showFavorite={isMounted}
+                  isFavorite={favorites.includes(robot.slug)}
+                  onFavoriteToggle={toggleFavorite}
                 />
               );
             })}
