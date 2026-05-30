@@ -178,7 +178,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             ariaLabel={uiText.filters.releaseStatus}
             buttonClassName="px-3 py-1.5 text-xs"
           />
-          <div className="text-xs text-neutral-500">{uiText.robots.sortByLatestRelease}</div>
+          <div className="text-xs text-neutral-500">{uiText.robots.sortLabel}</div>
         </div>
 
         {filtered.length === 0 ? (
