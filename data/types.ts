@@ -121,6 +121,8 @@ export interface Manufacturer extends BaseRecord {
   vendorRiskNote?: string;
   // 関連は逆向き(Robot.manufacturerSlug / Report.relatedManufacturerSlugs)で導出する。
   // robotSlugs / handledRobotSlugs / relatedReportSlugs は持たない。
+  /** 将来の掲載提携・有料スポンサード枠のための優先順位。値が小さいほど上位。未設定は非スポンサード扱い。 */
+  featuredRank?: number;
 }
 
 export type RobotCategory =
@@ -187,6 +189,8 @@ export interface Robot extends BaseRecord {
   manufacturerSlug: Slug;
   category: RobotCategory;
   description: string;
+  /** 将来の掲載提携・有料スポンサード枠のための優先順位。値が小さいほど上位。未設定は非スポンサード扱い。 */
+  featuredRank?: number;
   deploymentStage: DeploymentStage;
   buyerReadiness: BuyerReadiness;
   specs: RobotSpecs;
