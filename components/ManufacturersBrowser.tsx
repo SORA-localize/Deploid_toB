@@ -15,6 +15,8 @@ import {
   companyTypeOrder,
   manufacturerCountryOrder,
   sortByDisplayOrder,
+  sortManufacturers,
+  type ManufacturerSortKey,
 } from '@/lib/display';
 import { companyStatusLabels, companyTypeLabels, japanPresenceLabels, TBD_LABEL } from '@/lib/labels';
 import { createManufacturerSearchDocument, matchesSearchDocument } from '@/lib/search';
@@ -31,15 +33,14 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
 
   const robotsByManufacturer = useMemo(() => {
     const byManufacturer = new Map<string, Robot[]>();
-
     robots.forEach((robot) => {
       const existing = byManufacturer.get(robot.manufacturerSlug) ?? [];
       existing.push(robot);
       byManufacturer.set(robot.manufacturerSlug, existing);
     });
-
     return byManufacturer;
   }, [robots]);
+
   const searchDocuments = useMemo(
     () =>
       new Map(
@@ -78,6 +79,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
       ),
     [manufacturers],
   );
+
   const countryParam = getParam('country');
   const country = countryParam && countries.includes(countryParam) ? countryParam : 'all';
   const typeParam = getParam('type');
@@ -89,6 +91,9 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
       ? statusParam as CompanyStatus
       : 'all';
   const query = getParam('q') ?? '';
+  const sortParam = getParam('sort');
+  const sort: ManufacturerSortKey =
+    sortParam === 'name' || sortParam === 'founded' ? sortParam : 'japan';
 
   const countryOptions = useMemo(
     () => [
@@ -111,16 +116,24 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
     ],
     [statuses],
   );
+  const sortOptions: Array<{ value: ManufacturerSortKey; label: string }> = [
+    { value: 'japan',   label: uiText.manufacturers.sortJapan },
+    { value: 'name',    label: uiText.manufacturers.sortName },
+    { value: 'founded', label: uiText.manufacturers.sortFounded },
+  ];
 
   const robotCount = (slug: string) => robotsByManufacturer.get(slug)?.length ?? 0;
 
-  const filtered = manufacturers.filter(
-    (m) =>
-      (country === 'all' || m.country === country) &&
-      (type === 'all' || m.companyType === type) &&
-      (status === 'all' || m.companyStatus === status) &&
-      matchesSearchDocument(query, searchDocuments.get(m.slug)),
-  );
+  const filtered = useMemo(() => {
+    const base = manufacturers.filter(
+      (m) =>
+        (country === 'all' || m.country === country) &&
+        (type === 'all' || m.companyType === type) &&
+        (status === 'all' || m.companyStatus === status) &&
+        matchesSearchDocument(query, searchDocuments.get(m.slug)),
+    );
+    return sortManufacturers(base, sort);
+  }, [manufacturers, country, type, status, query, sort, searchDocuments]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -172,6 +185,22 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           />
         </div>
 
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-xs text-neutral-500">
+            {uiText.common.results(filtered.length, country !== 'all' || type !== 'all' || status !== 'all' || query !== '')}
+          </p>
+          <FilterSelect
+            id="manufacturer-sort"
+            label={uiText.manufacturers.sortLabel}
+            value={sort}
+            onChange={(nextSort) =>
+              updateParams({ sort: nextSort === 'japan' ? null : nextSort })
+            }
+            options={sortOptions}
+            className="w-40"
+          />
+        </div>
+
         {filtered.length === 0 ? (
           <EmptyState message="条件に合うメーカーがありません。" variant="muted" size="large" />
         ) : (
@@ -201,7 +230,9 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                       <span className="text-neutral-500">所在地</span>
                       <span className="text-neutral-900 flex items-center gap-1">
                         <MapPin className="w-3 h-3" />
-                        {manufacturer.hqCity ? `${manufacturer.hqCity}, ${manufacturer.country}` : manufacturer.country}
+                        {manufacturer.hqCity
+                          ? `${manufacturer.hqCity}, ${manufacturer.country}`
+                          : manufacturer.country}
                       </span>
                     </div>
                     <div className="flex justify-between py-1.5 border-b border-neutral-300">
@@ -210,11 +241,15 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                     </div>
                     <div className="flex justify-between py-1.5 border-b border-neutral-300">
                       <span className="text-neutral-500">日本での体制</span>
-                      <span className="text-neutral-900">{japanPresenceLabels[manufacturer.japanPresence]}</span>
+                      <span className="text-neutral-900">
+                        {japanPresenceLabels[manufacturer.japanPresence]}
+                      </span>
                     </div>
                     <div className="flex justify-between py-1.5">
                       <span className="text-neutral-500">設立</span>
-                      <span className="text-neutral-900">{manufacturer.foundedYear ?? TBD_LABEL}</span>
+                      <span className="text-neutral-900">
+                        {manufacturer.foundedYear ?? TBD_LABEL}
+                      </span>
                     </div>
                   </div>
 
