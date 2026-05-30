@@ -48,13 +48,13 @@ export const buyerReadinessLabels: Record<BuyerReadiness, string> = {
 };
 
 export const deploymentStageLabels: Record<DeploymentStage, string> = {
-  concept: '構想段階',
-  prototype: '試作段階',
-  pilot: 'PoC / 実証',
-  'limited-production': '限定生産',
-  production: '本番運用',
-  'internal-use': '社内利用中心',
-  discontinued: '終了',
+  concept:              '構想段階',
+  prototype:            '試作段階',
+  pilot:                '実証展開中',
+  'limited-production': '限定販売中',
+  production:           '量産・商用化',
+  'internal-use':       '自社利用のみ',
+  discontinued:         '生産終了',
 };
 
 export const robotCategoryLabels: Record<RobotCategory, string> = {
@@ -66,12 +66,12 @@ export const robotCategoryLabels: Record<RobotCategory, string> = {
 };
 
 export const japanAvailabilityLabels: Record<JapanAvailability, string> = {
-  'official-japan': '日本正式展開',
+  'official-japan':    '国内正規販売あり',
   'distributor-japan': '国内代理店あり',
-  'inquiry-required': '問い合わせ確認',
-  'import-only': '輸入前提',
-  unavailable: '国内不可',
-  unknown: '要確認',
+  'inquiry-required':  '要問い合わせ',
+  'import-only':       '個人輸入のみ',
+  unavailable:         '国内未対応',
+  unknown:             '情報なし',
 };
 
 export const procurementLabels: Record<ProcurementModel, string> = {
