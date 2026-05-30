@@ -119,6 +119,7 @@ export interface Manufacturer extends BaseRecord {
   supportNote?: string;
   procurementNote?: string;
   vendorRiskNote?: string;
+  featuredRank?: number;
   // 関連は逆向き(Robot.manufacturerSlug / Report.relatedManufacturerSlugs)で導出する。
   // robotSlugs / handledRobotSlugs / relatedReportSlugs は持たない。
 }
@@ -199,6 +200,11 @@ export interface Robot extends BaseRecord {
   vendorRiskNote?: string;
   /** 役割別の参考画像（詳細ページのカルーセル）。hero が未設定なら BaseRecord.heroImage を hero に昇格して使う。 */
   images?: Partial<Record<ImageRole, ImageAsset>>;
+  featuredRank?: number;
+  /** 業種タグ（lib/tagRegistry.ts の kind:'industry' のvalue）。未設定=調査中扱い。 */
+  industryTags?: string[];
+  /** タスクタグ（lib/tagRegistry.ts の kind:'task' のvalue）。未設定=調査中扱い。 */
+  taskTags?: string[];
   // 関連は逆向き(UseCase.candidateRobotSlugs / Guide.relatedRobotSlugs /
   // Report.relatedRobotSlugs)で導出する。
   comparison: ComparisonProfile;
