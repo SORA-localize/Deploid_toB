@@ -15,7 +15,7 @@ import {
   capabilityLabels,
   maturityLabels,
 } from '@/lib/labels';
-import { getTagLabel, getTagSearchValues, normalizeTagKey } from '@/lib/tags';
+import { getTagLabel, getTagSearchValues, normalizeTagKey, type TagKind } from '@/lib/tags';
 
 export type SearchCollection = 'robots' | 'manufacturers' | 'reports' | 'guides' | 'useCases';
 export type SearchPrimitive = string | number | null | undefined;
@@ -33,8 +33,11 @@ export interface SearchDocument {
 export interface SearchDocumentTag {
   value: string;
   label: string;
+  kind?: TagKind;
   searchValues: string[];
 }
+
+export type SearchDocumentTagInput = string | { value: string; kind?: TagKind };
 
 interface SearchDocumentInput {
   id: string;
@@ -42,7 +45,7 @@ interface SearchDocumentInput {
   title: string;
   url: string;
   fields: readonly SearchValueInput[];
-  tags?: readonly string[];
+  tags?: readonly SearchDocumentTagInput[];
 }
 
 export function normalizeSearchText(value: SearchPrimitive) {
@@ -81,17 +84,35 @@ function uniqueSearchValues(values: readonly SearchValueInput[]) {
   return Array.from(unique.values());
 }
 
-function createSearchDocumentTags(tags: readonly string[]) {
+function getSearchDocumentTagValue(tag: SearchDocumentTagInput) {
+  return typeof tag === 'string' ? tag : tag.value;
+}
+
+function getSearchDocumentTagKind(tag: SearchDocumentTagInput) {
+  return typeof tag === 'string' ? undefined : tag.kind;
+}
+
+function getSearchDocumentTagSearchValues(tags: readonly SearchDocumentTagInput[]) {
+  return tags.flatMap((tag) =>
+    getTagSearchValues([getSearchDocumentTagValue(tag)], getSearchDocumentTagKind(tag)),
+  );
+}
+
+function createSearchDocumentTags(tags: readonly SearchDocumentTagInput[]) {
   const searchTags = new Map<string, SearchDocumentTag>();
 
   tags.forEach((tag) => {
-    const value = normalizeTagKey(tag);
-    if (!value || searchTags.has(value)) return;
+    const rawValue = getSearchDocumentTagValue(tag);
+    const kind = getSearchDocumentTagKind(tag);
+    const value = normalizeTagKey(rawValue);
+    const key = `${kind ?? 'any'}:${value}`;
+    if (!value || searchTags.has(key)) return;
 
-    const label = getTagLabel(tag);
-    searchTags.set(value, {
+    const label = getTagLabel(rawValue, kind);
+    searchTags.set(key, {
       value,
       label,
+      kind,
       searchValues: uniqueSearchValues([value, label]),
     });
   });
@@ -114,7 +135,7 @@ export function createSearchDocument({
     collection,
     title,
     url,
-    fields: uniqueSearchValues([id, title, fields, getTagSearchValues(tags)]),
+    fields: uniqueSearchValues([id, title, fields, getSearchDocumentTagSearchValues(tags)]),
     tags: searchTags,
   };
 }
@@ -146,6 +167,8 @@ export function createRobotSearchDocument(robot: Robot, manufacturer?: Manufactu
       robot.buyerReadiness,
       robot.japanAvailability,
       ...robot.procurementModels,
+      ...(robot.industryTags ?? []).map((value) => ({ value, kind: 'industry' as const })),
+      ...(robot.taskTags ?? []).map((value) => ({ value, kind: 'task' as const })),
     ],
     fields: [
       robot.nameJa,
@@ -217,7 +240,7 @@ export function createReportSearchDocument(report: Report) {
     collection: 'reports',
     title: report.titleJa ?? report.title,
     url: `/reports/${report.slug}`,
-    tags: report.tags,
+    tags: report.tags.map((value) => ({ value, kind: 'report' as const })),
     fields: [
       report.titleJa,
       report.title,
@@ -237,7 +260,7 @@ export function createGuideSearchDocument(guide: Guide) {
     collection: 'guides',
     title: guide.titleJa ?? guide.title,
     url: `/guides/${guide.slug}`,
-    tags: guide.topics,
+    tags: guide.topics.map((value) => ({ value, kind: 'guide-topic' as const })),
     fields: [
       guide.titleJa,
       guide.title,
@@ -257,7 +280,10 @@ export function createUseCaseSearchDocument(useCase: UseCase) {
     collection: 'useCases',
     title: useCase.titleJa ?? useCase.title,
     url: `/use-cases/${useCase.slug}`,
-    tags: [...useCase.industryTags, ...useCase.taskTags],
+    tags: [
+      ...useCase.industryTags.map((value) => ({ value, kind: 'industry' as const })),
+      ...useCase.taskTags.map((value) => ({ value, kind: 'task' as const })),
+    ],
     fields: [
       useCase.titleJa,
       useCase.title,

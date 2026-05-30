@@ -2,6 +2,7 @@ import type { Guide, Report, Robot, UseCase } from '@/data/types';
 import {
   getAnyRegisteredTag,
   getRegisteredTag,
+  getTagDisplayIndex,
   normalizeTagKey,
   type TagKind,
 } from '@/lib/tagRegistry';
@@ -26,10 +27,10 @@ export function matchesTag(values: readonly string[], selected: string | null | 
   return values.some((value) => normalizeTagKey(value) === selectedKey);
 }
 
-export function getTagSearchValues(values: readonly string[]) {
+export function getTagSearchValues(values: readonly string[], kind?: TagKind) {
   const searchValues = new Set<string>();
   values.forEach((value) => {
-    const label = getTagLabel(value);
+    const label = getTagLabel(value, kind);
     const key = normalizeTagKey(value);
     if (label) searchValues.add(label);
     if (key) searchValues.add(key);
@@ -58,7 +59,11 @@ function toTagOptions(values: readonly string[], kind: TagKind): TagOption[] {
     });
   });
 
-  return Array.from(options.values());
+  return Array.from(options.values()).sort((a, b) => {
+    const orderDiff = getTagDisplayIndex(kind, a.value) - getTagDisplayIndex(kind, b.value);
+    if (orderDiff !== 0) return orderDiff;
+    return a.label.localeCompare(b.label, 'ja');
+  });
 }
 
 export function getReportTagOptions(reports: readonly Report[]) {

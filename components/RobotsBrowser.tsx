@@ -20,6 +20,7 @@ import {
   getRobotIndustryTagOptions,
   getRobotTaskTagOptions,
   matchesTag,
+  normalizeTagKey,
 } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
@@ -56,10 +57,11 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
     [robots],
   );
 
-  const industryParam = getParam('industry');
-  const taskParam = getParam('task');
+  const rawIndustryParam = getParam('industry');
+  const rawTaskParam = getParam('task');
   const manufacturerParam = getParam('manufacturer');
-  const mfg = manufacturerParam && manufacturerBySlug.has(manufacturerParam) ? manufacturerParam : 'all';
+  const manufacturerFilter =
+    manufacturerParam && manufacturerBySlug.has(manufacturerParam) ? manufacturerParam : 'all';
   const availabilityParam = getParam('availability');
   const avail =
     availabilityParam && avails.includes(availabilityParam as JapanAvailability)
@@ -68,19 +70,30 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   const release = getParam('release') === 'pre' ? 'pre' : 'active';
   const query = getParam('q') ?? '';
 
+  const robotIndustryOptions = useMemo(() => getRobotIndustryTagOptions(robots), [robots]);
+  const robotTaskOptions = useMemo(() => getRobotTaskTagOptions(robots), [robots]);
+  const industryParam = rawIndustryParam ? normalizeTagKey(rawIndustryParam) : null;
+  const taskParam = rawTaskParam ? normalizeTagKey(rawTaskParam) : null;
+  const industry =
+    industryParam && robotIndustryOptions.some((option) => option.value === industryParam)
+      ? industryParam
+      : null;
+  const task =
+    taskParam && robotTaskOptions.some((option) => option.value === taskParam) ? taskParam : null;
+
   const industryOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allIndustries },
-      ...getRobotIndustryTagOptions(robots).map((opt) => ({ value: opt.value, label: opt.label })),
+      ...robotIndustryOptions.map((opt) => ({ value: opt.value, label: opt.label })),
     ],
-    [robots],
+    [robotIndustryOptions],
   );
   const taskOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allTasks },
-      ...getRobotTaskTagOptions(robots).map((opt) => ({ value: opt.value, label: opt.label })),
+      ...robotTaskOptions.map((opt) => ({ value: opt.value, label: opt.label })),
     ],
-    [robots],
+    [robotTaskOptions],
   );
   const manufacturerOptions = useMemo(
     () => [
@@ -101,15 +114,15 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
 
   const releaseCandidates = useMemo(() => {
     const filtered = robots.filter((r) => {
-      const industryOk = matchesTag(r.industryTags ?? [], industryParam);
-      const taskOk = matchesTag(r.taskTags ?? [], taskParam);
-      const mfgOk = mfg === 'all' || r.manufacturerSlug === mfg;
+      const industryOk = matchesTag(r.industryTags ?? [], industry);
+      const taskOk = matchesTag(r.taskTags ?? [], task);
+      const mfgOk = manufacturerFilter === 'all' || r.manufacturerSlug === manufacturerFilter;
       const availOk = avail === 'all' || r.japanAvailability === avail;
       const queryOk = matchesSearchDocument(query, searchDocuments.get(r.slug));
       return industryOk && taskOk && mfgOk && availOk && queryOk;
     });
     return sortRobots(filtered, 'stage');
-  }, [robots, industryParam, taskParam, mfg, avail, query, searchDocuments]);
+  }, [robots, industry, task, manufacturerFilter, avail, query, searchDocuments]);
 
   const activeRobots = useMemo(
     () => releaseCandidates.filter((r) => !isPreReleaseDeploymentStage(r.deploymentStage)),
@@ -149,21 +162,21 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           <FilterSelect
             id="robot-industry"
             label={uiText.filters.industry}
-            value={industryParam ?? 'all'}
+            value={industry ?? 'all'}
             onChange={(v) => updateParams({ industry: v === 'all' ? null : v })}
             options={industryOptions}
           />
           <FilterSelect
             id="robot-task"
             label={uiText.filters.task}
-            value={taskParam ?? 'all'}
+            value={task ?? 'all'}
             onChange={(v) => updateParams({ task: v === 'all' ? null : v })}
             options={taskOptions}
           />
           <FilterSelect
             id="robot-manufacturer"
             label={uiText.filters.manufacturer}
-            value={mfg}
+            value={manufacturerFilter}
             onChange={(v) => updateParams({ manufacturer: v === 'all' ? null : v })}
             options={manufacturerOptions}
           />

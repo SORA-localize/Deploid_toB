@@ -117,6 +117,8 @@ export function validateData(): string[] {
     check('robot', r.slug, 'manufacturerSlug', r.manufacturerSlug, manufacturerSlugs);
     checkDate('robot', r.slug, 'updatedAt', r.updatedAt);
     checkRequiredSources('robot', r.slug, r.sources);
+    checkTags('robot', r.slug, 'industryTags', 'industry', r.industryTags ?? []);
+    checkTags('robot', r.slug, 'taskTags', 'task', r.taskTags ?? []);
     checkImageAsset('robot', r.slug, 'heroImage', r.heroImage);
     Object.entries(r.images ?? {}).forEach(([role, image]) =>
       checkImageAsset('robot', r.slug, `images.${role}`, image),
