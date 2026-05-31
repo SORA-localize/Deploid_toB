@@ -118,13 +118,17 @@ export function ComparisonRobotPanel({
         </button>
       </div>
 
-      {/* 3. Swappable Content Area (Natural Height) */}
-      <div className="flex-1 flex flex-col bg-white">
-        
-        {/* BASIC VIEW */}
-        {activeTab === 'basic' && (
-          <div role="tabpanel" className="flex flex-col h-full animate-in fade-in duration-200">
-            {/* Thumbnail */}
+      {/* 3. Swappable Content Area (Height locked to Basic View) */}
+      <div className="flex-1 flex flex-col bg-white relative">
+
+        {/* BASIC VIEW (Always rendered for height, visually hidden when not active) */}
+        <div 
+          role="tabpanel" 
+          className={`flex flex-col h-full transition-opacity duration-200 ${
+            activeTab === 'basic' ? 'opacity-100' : 'opacity-0 invisible pointer-events-none'
+          }`}
+        >
+          {/* Thumbnail (Shrink-0 to prevent distortion) */}
             <div className="aspect-[4/3] w-full bg-white border-b border-neutral-200 flex items-center justify-center text-xs text-neutral-500 overflow-hidden shrink-0">
               {hero ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -148,11 +152,10 @@ export function ComparisonRobotPanel({
               </dl>
             </div>
           </div>
-        )}
 
-        {/* DETAILED VIEW */}
+        {/* DETAILED VIEW (Absolute overlay, scrolls internally) */}
         {activeTab === 'detailed' && (
-          <div role="tabpanel" className="flex flex-col h-full animate-in fade-in duration-200 p-3 gap-6">
+          <div role="tabpanel" className="absolute inset-0 overflow-y-auto overscroll-contain bg-white flex flex-col animate-in fade-in duration-200 p-3 gap-6">
             {/* Technical Specs */}
             <section>
               <h4 className="mb-3 text-xs font-semibold text-neutral-900 pb-2 border-b border-neutral-200">
