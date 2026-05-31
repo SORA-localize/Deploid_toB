@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Star, X } from 'lucide-react';
+import { Star, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
 import { TBD_LABEL } from '@/lib/labels';
@@ -15,6 +15,8 @@ interface ComparisonRobotPanelProps {
   isFavorite: boolean;
   onFavoriteToggle: (slug: string) => void;
   onRemove: (slug: string) => void;
+  onMoveLeft?: () => void;
+  onMoveRight?: () => void;
 }
 
 function CompactList({ items }: { items: string[] }) {
@@ -39,6 +41,8 @@ export function ComparisonRobotPanel({
   isFavorite,
   onFavoriteToggle,
   onRemove,
+  onMoveLeft,
+  onMoveRight,
 }: ComparisonRobotPanelProps) {
   const [activeTab, setActiveTab] = useState<'basic' | 'detailed'>('basic');
   const coreRows = getComparisonCoreRows(robot);
@@ -46,30 +50,52 @@ export function ComparisonRobotPanel({
   const hero = robot.images?.hero ?? robot.heroImage;
 
   return (
-    <article className="flex h-full flex-col border border-neutral-300 bg-white">
-      {/* 1. Header & Context (Always Visible) */}
-      <div className="border-b border-neutral-300 bg-neutral-50 p-4 flex flex-col gap-4">
+    <article className="flex flex-col border border-neutral-300 bg-white h-[65vh] min-h-[500px] max-h-[800px] shrink-0 relative">
+      {/* 1. Header (Always Visible) */}
+      <div className="border-b border-neutral-300 bg-neutral-50 p-4 flex flex-col gap-4 shrink-0">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-neutral-900">{robot.nameJa ?? robot.name}</h3>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm font-semibold text-neutral-900 truncate" title={robot.nameJa ?? robot.name}>
+              {robot.nameJa ?? robot.name}
+            </h3>
             <ManufacturerLogoName
               name={manufacturerName ?? robot.manufacturerSlug}
               logo={manufacturerLogo}
               className="mt-1 text-xs text-neutral-500"
-              frameClassName="h-4 w-4"
+              frameClassName="h-4 w-4 shrink-0"
               imageClassName="h-3 w-3"
             />
           </div>
           <div className="flex shrink-0 items-center gap-1">
+            {onMoveLeft && (
+              <button
+                type="button"
+                aria-label={uiText.comparison.moveLeftAria(robot.nameJa ?? robot.name)}
+                onClick={onMoveLeft}
+                className="border border-neutral-300 bg-white p-1 hover:bg-neutral-100 transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4 text-neutral-500" />
+              </button>
+            )}
+            {onMoveRight && (
+              <button
+                type="button"
+                aria-label={uiText.comparison.moveRightAria(robot.nameJa ?? robot.name)}
+                onClick={onMoveRight}
+                className="border border-neutral-300 bg-white p-1 hover:bg-neutral-100 transition-colors"
+              >
+                <ChevronRight className="h-4 w-4 text-neutral-500" />
+              </button>
+            )}
             <button
               type="button"
               aria-label={isFavorite ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name) : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)}
               aria-pressed={isFavorite}
               onClick={() => onFavoriteToggle(robot.slug)}
-              className="border border-neutral-300 bg-white p-1.5 hover:bg-neutral-100 transition-colors"
+              className="border border-neutral-300 bg-white p-1 hover:bg-neutral-100 transition-colors ml-1"
             >
               <Star
-                className={`h-3.5 w-3.5 ${
+                className={`h-4 w-4 ${
                   isFavorite ? 'fill-yellow-500 text-yellow-500' : 'text-neutral-500'
                 }`}
               />
@@ -78,21 +104,20 @@ export function ComparisonRobotPanel({
               type="button"
               aria-label={uiText.comparison.removeAria(robot.nameJa ?? robot.name)}
               onClick={() => onRemove(robot.slug)}
-              className="border border-neutral-300 bg-white p-1.5 hover:bg-neutral-100 transition-colors"
+              className="border border-neutral-300 bg-white p-1 hover:bg-neutral-100 transition-colors"
             >
-              <X className="h-3.5 w-3.5 text-neutral-600" />
+              <X className="h-4 w-4 text-neutral-600" />
             </button>
           </div>
         </div>
-        <p className="text-xs leading-relaxed text-neutral-700 line-clamp-4 min-h-[4.5rem]">
-          {robot.summary}
-        </p>
       </div>
 
-      {/* 2. In-Card Tabs (Flip Toggle) */}
-      <div className="flex border-b border-neutral-200">
+      {/* 2. Accessible In-Card Tabs (Flip Toggle) */}
+      <div className="flex border-b border-neutral-200 shrink-0" role="tablist">
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'basic'}
           onClick={() => setActiveTab('basic')}
           className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors ${
             activeTab === 'basic'
@@ -100,10 +125,12 @@ export function ComparisonRobotPanel({
               : 'bg-neutral-50 text-neutral-500 hover:text-neutral-900 border-b-2 border-transparent'
           }`}
         >
-          {uiText.comparison.coreVariables}
+          {uiText.comparison.tabBasic}
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'detailed'}
           onClick={() => setActiveTab('detailed')}
           className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors border-l border-neutral-200 ${
             activeTab === 'detailed'
@@ -111,18 +138,18 @@ export function ComparisonRobotPanel({
               : 'bg-neutral-50 text-neutral-500 hover:text-neutral-900 border-b-2 border-transparent'
           }`}
         >
-          {uiText.comparison.detailedData}
+          {uiText.comparison.tabDetailed}
         </button>
       </div>
 
-      {/* 3. Swappable Content Area (Rigid Container) */}
-      <div className="flex flex-1 flex-col relative bg-white">
+      {/* 3. Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto overscroll-contain bg-white pb-4 relative">
         
         {/* BASIC VIEW */}
         {activeTab === 'basic' && (
-          <div className="flex flex-col h-full animate-in fade-in duration-200">
-            {/* Thumbnail */}
-            <div className="aspect-[4/3] bg-white border-b border-neutral-200 flex items-center justify-center text-xs text-neutral-500 overflow-hidden shrink-0">
+          <div role="tabpanel" className="flex flex-col animate-in fade-in duration-200">
+            {/* Thumbnail (Shrink-0 to prevent distortion) */}
+            <div className="aspect-[4/3] w-full bg-white border-b border-neutral-200 flex items-center justify-center text-xs text-neutral-500 overflow-hidden shrink-0">
               {hero ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={hero.src} alt={hero.alt} className="h-full w-full object-contain" />
@@ -131,13 +158,20 @@ export function ComparisonRobotPanel({
               )}
             </div>
             
+            {/* Context Summary */}
+            <div className="p-4 border-b border-neutral-100">
+              <p className="text-xs leading-relaxed text-neutral-700">
+                {robot.summary}
+              </p>
+            </div>
+
             {/* Core Variables */}
-            <div className="p-4 mt-auto">
+            <div className="p-4">
               <dl className="space-y-2 text-xs">
                 {coreRows.map((row) => (
-                  <div key={row.label} className="flex justify-between gap-3">
+                  <div key={row.label} className="flex justify-between gap-3 border-b border-neutral-50 pb-1.5 last:border-0 last:pb-0">
                     <dt className="shrink-0 text-neutral-500">{row.label}</dt>
-                    <dd className="text-right font-medium text-neutral-900 truncate" title={row.value}>
+                    <dd className="text-right font-medium text-neutral-900 break-words max-w-[65%]">
                       {row.value}
                     </dd>
                   </div>
@@ -149,40 +183,49 @@ export function ComparisonRobotPanel({
 
         {/* DETAILED VIEW */}
         {activeTab === 'detailed' && (
-          <div className="flex flex-col h-full animate-in fade-in duration-200">
-            <div className="p-4 flex flex-col gap-6 overflow-y-auto">
-              {/* Technical Specs */}
-              <section>
-                <dl className="space-y-2 text-xs">
-                  {detailRows.map((row) => (
-                    <div key={row.label} className="flex justify-between gap-2 border-b border-neutral-200/50 pb-1.5">
-                      <dt className="shrink-0 text-neutral-500">{row.label}</dt>
-                      <dd className="text-right font-medium text-neutral-900 truncate" title={row.value}>{row.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </section>
+          <div role="tabpanel" className="flex flex-col animate-in fade-in duration-200 p-4 gap-6">
+            {/* Technical Specs */}
+            <section>
+              <h4 className="mb-3 text-xs font-semibold text-neutral-900 pb-2 border-b border-neutral-200">
+                {uiText.comparison.detailedData}
+              </h4>
+              <dl className="space-y-2 text-xs">
+                {detailRows.map((row) => (
+                  <div key={row.label} className="flex justify-between gap-2 border-b border-neutral-100 pb-1.5 last:border-0 last:pb-0">
+                    <dt className="shrink-0 text-neutral-500">{row.label}</dt>
+                    <dd className="text-right font-medium text-neutral-900 break-words max-w-[65%]">{row.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
 
-              {/* Qualitative Data */}
-              <section className="space-y-4">
+            {/* Qualitative Data (Type Safety Guards) */}
+            <section className="space-y-4">
+              {robot.comparison.bestFit.length > 0 && (
                 <div>
                   <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.bestFit}</h4>
                   <CompactList items={robot.comparison.bestFit} />
                 </div>
+              )}
+              {robot.comparison.notFit.length > 0 && (
                 <div>
                   <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.notFit}</h4>
                   <CompactList items={robot.comparison.notFit} />
                 </div>
+              )}
+              {robot.comparison.strengths.length > 0 && (
                 <div>
                   <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.strengths}</h4>
                   <CompactList items={robot.comparison.strengths} />
                 </div>
+              )}
+              {robot.comparison.constraints.length > 0 && (
                 <div>
                   <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.constraints}</h4>
                   <CompactList items={robot.comparison.constraints} />
                 </div>
-              </section>
-            </div>
+              )}
+            </section>
           </div>
         )}
 

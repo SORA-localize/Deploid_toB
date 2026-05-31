@@ -47,7 +47,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   const manufacturerFor = (slug: string) => manufacturers.find((m) => m.slug === slug);
 
   const addRobot = (slug: string) => {
-    if (selectedSlugs.length < 9 && !selectedSlugs.includes(slug)) {
+    if (selectedSlugs.length < 20 && !selectedSlugs.includes(slug)) {
       const nextSlugs = [...selectedSlugs, slug];
       updateParams({ compare: nextSlugs.join(',') }, 'replace');
     }
@@ -56,6 +56,24 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   const removeRobot = (slug: string) => {
     const nextSlugs = selectedSlugs.filter((s) => s !== slug);
     updateParams({ compare: nextSlugs.length > 0 ? nextSlugs.join(',') : null }, 'replace');
+  };
+
+  const moveRobotLeft = (slug: string) => {
+    const index = selectedSlugs.indexOf(slug);
+    if (index > 0) {
+      const nextSlugs = [...selectedSlugs];
+      [nextSlugs[index - 1], nextSlugs[index]] = [nextSlugs[index], nextSlugs[index - 1]];
+      updateParams({ compare: nextSlugs.join(',') }, 'replace');
+    }
+  };
+
+  const moveRobotRight = (slug: string) => {
+    const index = selectedSlugs.indexOf(slug);
+    if (index !== -1 && index < selectedSlugs.length - 1) {
+      const nextSlugs = [...selectedSlugs];
+      [nextSlugs[index], nextSlugs[index + 1]] = [nextSlugs[index + 1], nextSlugs[index]];
+      updateParams({ compare: nextSlugs.join(',') }, 'replace');
+    }
   };
 
   const clearAll = () => {
@@ -133,7 +151,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                                 onClick={() =>
                                   isSelected ? removeRobot(robot.slug) : addRobot(robot.slug)
                                 }
-                                disabled={!isSelected && selectedSlugs.length >= 9}
+                                disabled={!isSelected && selectedSlugs.length >= 20}
                                 className="w-full px-6 py-2 text-left text-xs hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-between group"
                               >
                                 <span
@@ -164,7 +182,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
           <div className="min-w-0">
             <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-xs text-neutral-500">
-                {uiText.compare.comparisonSheet(selectedSlugs.length, 9)}
+                {uiText.compare.comparisonSheet(selectedSlugs.length, 20)}
               </span>
               {selectedSlugs.length > 0 && (
                 <button
@@ -207,19 +225,22 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
               </div>
             ) : (
               <div className="border border-neutral-300 bg-neutral-50 p-3 sm:p-4">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                  {selectedRobots.map((robot) => {
+                <div className="flex gap-6 overflow-x-auto pb-4 overscroll-contain snap-x">
+                  {selectedRobots.map((robot, index) => {
                     const manufacturer = manufacturerFor(robot.manufacturerSlug);
                     return (
-                      <ComparisonRobotPanel
-                        key={robot.slug}
-                        robot={robot}
-                        manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
-                        manufacturerLogo={manufacturer?.logo}
-                        isFavorite={isMounted ? favorites.includes(robot.slug) : false}
-                        onFavoriteToggle={toggleFavorite}
-                        onRemove={removeRobot}
-                      />
+                      <div key={robot.slug} className="snap-start shrink-0 w-[320px]">
+                        <ComparisonRobotPanel
+                          robot={robot}
+                          manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                          manufacturerLogo={manufacturer?.logo}
+                          isFavorite={isMounted ? favorites.includes(robot.slug) : false}
+                          onFavoriteToggle={toggleFavorite}
+                          onRemove={removeRobot}
+                          onMoveLeft={index > 0 ? () => moveRobotLeft(robot.slug) : undefined}
+                          onMoveRight={index < selectedRobots.length - 1 ? () => moveRobotRight(robot.slug) : undefined}
+                        />
+                      </div>
                     );
                   })}
                 </div>
