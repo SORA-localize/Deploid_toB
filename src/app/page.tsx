@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, Bot, Building2, BookOpen, Calendar } from 'lucide-react';
+import { BudouXText } from '@/components/BudouXText';
 import { RobotCard } from '@/components/RobotCard';
 import { TagChip } from '@/components/TagChip';
 import {
@@ -29,12 +30,11 @@ export default function HomePage() {
     <div className="mx-auto max-w-7xl px-6 py-12">
       <section className="py-16 border-b border-neutral-200">
         <div className="max-w-3xl">
-          <h1 className="text-4xl font-semibold text-neutral-900 mb-4">
-            日本企業のためのヒューマノイドロボット導入ポータル
+          <h1 className="text-4xl font-semibold text-neutral-900 mb-4 leading-tight">
+            <BudouXText text="日本企業のためのヒューマノイドロボット導入ポータル" className="break-keep" />
           </h1>
-          <p className="text-lg text-neutral-600 mb-8">
-            製造業・物流・建設業向けに、ヒューマノイドロボットの選定から導入までを支援する情報基盤です。
-            技術検証、調達プロセス、国内サポート体制を網羅的に解説します。
+          <p className="text-lg text-neutral-600 mb-8 leading-relaxed">
+            <BudouXText text="製造業・物流・建設業向けに、ヒューマノイドロボットの選定から導入までを支援する情報基盤です。技術検証、調達プロセス、国内サポート体制を網羅的に解説します。" className="break-keep" />
           </p>
           <div className="flex gap-4">
             <Link
