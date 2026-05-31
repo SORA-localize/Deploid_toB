@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Star, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, X } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
 import { TBD_LABEL } from '@/lib/labels';
@@ -15,8 +15,6 @@ interface ComparisonRobotPanelProps {
   isFavorite: boolean;
   onFavoriteToggle: (slug: string) => void;
   onRemove: (slug: string) => void;
-  onMoveLeft?: () => void;
-  onMoveRight?: () => void;
 }
 
 function CompactList({ items }: { items: string[] }) {
@@ -41,8 +39,6 @@ export function ComparisonRobotPanel({
   isFavorite,
   onFavoriteToggle,
   onRemove,
-  onMoveLeft,
-  onMoveRight,
 }: ComparisonRobotPanelProps) {
   const [activeTab, setActiveTab] = useState<'basic' | 'detailed'>('basic');
   const coreRows = getComparisonCoreRows(robot);
@@ -50,9 +46,9 @@ export function ComparisonRobotPanel({
   const hero = robot.images?.hero ?? robot.heroImage;
 
   return (
-    <article className="flex flex-col border border-neutral-300 bg-white h-[65vh] min-h-[500px] max-h-[800px] shrink-0 relative">
+    <article className="flex flex-col border border-neutral-300 bg-white h-full relative">
       {/* 1. Header (Always Visible) */}
-      <div className="border-b border-neutral-300 bg-neutral-50 p-4 flex flex-col gap-4 shrink-0">
+      <div className="border-b border-neutral-300 bg-neutral-50 p-3 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <h3 className="text-sm font-semibold text-neutral-900 truncate" title={robot.nameJa ?? robot.name}>
@@ -67,32 +63,12 @@ export function ComparisonRobotPanel({
             />
           </div>
           <div className="flex shrink-0 items-center gap-1">
-            {onMoveLeft && (
-              <button
-                type="button"
-                aria-label={uiText.comparison.moveLeftAria(robot.nameJa ?? robot.name)}
-                onClick={onMoveLeft}
-                className="border border-neutral-300 bg-white p-1 hover:bg-neutral-100 transition-colors"
-              >
-                <ChevronLeft className="h-4 w-4 text-neutral-500" />
-              </button>
-            )}
-            {onMoveRight && (
-              <button
-                type="button"
-                aria-label={uiText.comparison.moveRightAria(robot.nameJa ?? robot.name)}
-                onClick={onMoveRight}
-                className="border border-neutral-300 bg-white p-1 hover:bg-neutral-100 transition-colors"
-              >
-                <ChevronRight className="h-4 w-4 text-neutral-500" />
-              </button>
-            )}
             <button
               type="button"
               aria-label={isFavorite ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name) : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)}
               aria-pressed={isFavorite}
               onClick={() => onFavoriteToggle(robot.slug)}
-              className="border border-neutral-300 bg-white p-1 hover:bg-neutral-100 transition-colors ml-1"
+              className="border border-neutral-300 bg-white p-1 hover:bg-neutral-100 transition-colors"
             >
               <Star
                 className={`h-4 w-4 ${
@@ -113,7 +89,7 @@ export function ComparisonRobotPanel({
       </div>
 
       {/* 2. Accessible In-Card Tabs (Flip Toggle) */}
-      <div className="flex border-b border-neutral-200 shrink-0" role="tablist">
+      <div className="flex border-b border-neutral-200 bg-white" role="tablist">
         <button
           type="button"
           role="tab"
@@ -142,13 +118,13 @@ export function ComparisonRobotPanel({
         </button>
       </div>
 
-      {/* 3. Scrollable Content Area */}
-      <div className="flex-1 overflow-y-auto overscroll-contain bg-white pb-4 relative">
+      {/* 3. Swappable Content Area (Natural Height) */}
+      <div className="flex-1 flex flex-col bg-white">
         
         {/* BASIC VIEW */}
         {activeTab === 'basic' && (
-          <div role="tabpanel" className="flex flex-col animate-in fade-in duration-200">
-            {/* Thumbnail (Shrink-0 to prevent distortion) */}
+          <div role="tabpanel" className="flex flex-col h-full animate-in fade-in duration-200">
+            {/* Thumbnail */}
             <div className="aspect-[4/3] w-full bg-white border-b border-neutral-200 flex items-center justify-center text-xs text-neutral-500 overflow-hidden shrink-0">
               {hero ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -158,15 +134,8 @@ export function ComparisonRobotPanel({
               )}
             </div>
             
-            {/* Context Summary */}
-            <div className="p-4 border-b border-neutral-100">
-              <p className="text-xs leading-relaxed text-neutral-700">
-                {robot.summary}
-              </p>
-            </div>
-
-            {/* Core Variables */}
-            <div className="p-4">
+            {/* Core Variables (mt-auto ensures they anchor nicely if the card is stretched by a neighbor) */}
+            <div className="p-3 mt-auto">
               <dl className="space-y-2 text-xs">
                 {coreRows.map((row) => (
                   <div key={row.label} className="flex justify-between gap-3 border-b border-neutral-50 pb-1.5 last:border-0 last:pb-0">
@@ -183,7 +152,7 @@ export function ComparisonRobotPanel({
 
         {/* DETAILED VIEW */}
         {activeTab === 'detailed' && (
-          <div role="tabpanel" className="flex flex-col animate-in fade-in duration-200 p-4 gap-6">
+          <div role="tabpanel" className="flex flex-col h-full animate-in fade-in duration-200 p-3 gap-6">
             {/* Technical Specs */}
             <section>
               <h4 className="mb-3 text-xs font-semibold text-neutral-900 pb-2 border-b border-neutral-200">
@@ -199,8 +168,8 @@ export function ComparisonRobotPanel({
               </dl>
             </section>
 
-            {/* Qualitative Data (Type Safety Guards) */}
-            <section className="space-y-4">
+            {/* Qualitative Data */}
+            <section className="space-y-4 mb-2">
               {robot.comparison.bestFit.length > 0 && (
                 <div>
                   <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.bestFit}</h4>

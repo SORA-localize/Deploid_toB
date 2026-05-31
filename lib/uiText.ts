@@ -169,7 +169,5 @@ export const uiText = {
     viewModeDetailed: '詳細表示',
     tabBasic: '基本',
     tabDetailed: '詳細',
-    moveLeftAria: (name: string) => `${name}を左へ移動`,
-    moveRightAria: (name: string) => `${name}を右へ移動`,
   },
 } as const;

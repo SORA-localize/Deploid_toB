@@ -58,24 +58,6 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
     updateParams({ compare: nextSlugs.length > 0 ? nextSlugs.join(',') : null }, 'replace');
   };
 
-  const moveRobotLeft = (slug: string) => {
-    const index = selectedSlugs.indexOf(slug);
-    if (index > 0) {
-      const nextSlugs = [...selectedSlugs];
-      [nextSlugs[index - 1], nextSlugs[index]] = [nextSlugs[index], nextSlugs[index - 1]];
-      updateParams({ compare: nextSlugs.join(',') }, 'replace');
-    }
-  };
-
-  const moveRobotRight = (slug: string) => {
-    const index = selectedSlugs.indexOf(slug);
-    if (index !== -1 && index < selectedSlugs.length - 1) {
-      const nextSlugs = [...selectedSlugs];
-      [nextSlugs[index], nextSlugs[index + 1]] = [nextSlugs[index + 1], nextSlugs[index]];
-      updateParams({ compare: nextSlugs.join(',') }, 'replace');
-    }
-  };
-
   const clearAll = () => {
     updateParams({ compare: null }, 'replace');
   };
@@ -225,22 +207,19 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
               </div>
             ) : (
               <div className="border border-neutral-300 bg-neutral-50 p-3 sm:p-4">
-                <div className="flex gap-6 overflow-x-auto pb-4 overscroll-contain snap-x">
-                  {selectedRobots.map((robot, index) => {
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  {selectedRobots.map((robot) => {
                     const manufacturer = manufacturerFor(robot.manufacturerSlug);
                     return (
-                      <div key={robot.slug} className="snap-start shrink-0 w-[320px]">
-                        <ComparisonRobotPanel
-                          robot={robot}
-                          manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
-                          manufacturerLogo={manufacturer?.logo}
-                          isFavorite={isMounted ? favorites.includes(robot.slug) : false}
-                          onFavoriteToggle={toggleFavorite}
-                          onRemove={removeRobot}
-                          onMoveLeft={index > 0 ? () => moveRobotLeft(robot.slug) : undefined}
-                          onMoveRight={index < selectedRobots.length - 1 ? () => moveRobotRight(robot.slug) : undefined}
-                        />
-                      </div>
+                      <ComparisonRobotPanel
+                        key={robot.slug}
+                        robot={robot}
+                        manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                        manufacturerLogo={manufacturer?.logo}
+                        isFavorite={isMounted ? favorites.includes(robot.slug) : false}
+                        onFavoriteToggle={toggleFavorite}
+                        onRemove={removeRobot}
+                      />
                     );
                   })}
                 </div>
