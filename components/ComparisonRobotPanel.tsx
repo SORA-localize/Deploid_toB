@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Star, X } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
@@ -14,7 +15,6 @@ interface ComparisonRobotPanelProps {
   isFavorite: boolean;
   onFavoriteToggle: (slug: string) => void;
   onRemove: (slug: string) => void;
-  viewMode: 'simple' | 'detailed';
 }
 
 function CompactList({ items }: { items: string[] }) {
@@ -39,15 +39,15 @@ export function ComparisonRobotPanel({
   isFavorite,
   onFavoriteToggle,
   onRemove,
-  viewMode,
 }: ComparisonRobotPanelProps) {
+  const [activeTab, setActiveTab] = useState<'basic' | 'detailed'>('basic');
   const coreRows = getComparisonCoreRows(robot);
   const detailRows = getComparisonDetailRows(robot);
   const hero = robot.images?.hero ?? robot.heroImage;
 
   return (
     <article className="flex h-full flex-col border border-neutral-300 bg-white">
-      {/* 1. Header & Context */}
+      {/* 1. Header & Context (Always Visible) */}
       <div className="border-b border-neutral-300 bg-neutral-50 p-4 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -66,7 +66,7 @@ export function ComparisonRobotPanel({
               aria-label={isFavorite ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name) : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)}
               aria-pressed={isFavorite}
               onClick={() => onFavoriteToggle(robot.slug)}
-              className="border border-neutral-300 bg-white p-1.5 hover:bg-neutral-100"
+              className="border border-neutral-300 bg-white p-1.5 hover:bg-neutral-100 transition-colors"
             >
               <Star
                 className={`h-3.5 w-3.5 ${
@@ -78,69 +78,92 @@ export function ComparisonRobotPanel({
               type="button"
               aria-label={uiText.comparison.removeAria(robot.nameJa ?? robot.name)}
               onClick={() => onRemove(robot.slug)}
-              className="border border-neutral-300 bg-white p-1.5 hover:bg-neutral-100"
+              className="border border-neutral-300 bg-white p-1.5 hover:bg-neutral-100 transition-colors"
             >
               <X className="h-3.5 w-3.5 text-neutral-600" />
             </button>
           </div>
         </div>
-        
-        {/* Thumbnail Image */}
-        <div className="aspect-[4/3] bg-white border border-neutral-200 flex items-center justify-center text-xs text-neutral-500 overflow-hidden">
-          {hero ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={hero.src} alt={hero.alt} className="h-full w-full object-contain" />
-          ) : (
-            uiText.robots.mainImageMissing
-          )}
-        </div>
-
-        {/* Layout Stabilizer: Fixed min-height and line clamp for summary */}
         <p className="text-xs leading-relaxed text-neutral-700 line-clamp-4 min-h-[4.5rem]">
           {robot.summary}
         </p>
       </div>
 
-      {/* 2. Core Variables (Anchored to top of this flex container) */}
-      <div className="flex flex-1 flex-col">
-        <div className="p-4">
-          <h4 className="mb-3 text-xs font-semibold text-neutral-900 pb-2 border-b border-neutral-200">
-            {uiText.comparison.coreVariables}
-          </h4>
-          <dl className="space-y-2 text-xs">
-            {coreRows.map((row) => (
-              <div key={row.label} className="flex justify-between gap-3">
-                <dt className="shrink-0 text-neutral-500">{row.label}</dt>
-                {/* CSS Truncate to ensure long notes don't break the layout, Title attribute preserves data on hover */}
-                <dd className="text-right font-medium text-neutral-900 truncate" title={row.value}>
-                  {row.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+      {/* 2. In-Card Tabs (Flip Toggle) */}
+      <div className="flex border-b border-neutral-200">
+        <button
+          type="button"
+          onClick={() => setActiveTab('basic')}
+          className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors ${
+            activeTab === 'basic'
+              ? 'bg-white text-neutral-900 border-b-2 border-accent'
+              : 'bg-neutral-50 text-neutral-500 hover:text-neutral-900 border-b-2 border-transparent'
+          }`}
+        >
+          {uiText.comparison.coreVariables}
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('detailed')}
+          className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors border-l border-neutral-200 ${
+            activeTab === 'detailed'
+              ? 'bg-white text-neutral-900 border-b-2 border-accent'
+              : 'bg-neutral-50 text-neutral-500 hover:text-neutral-900 border-b-2 border-transparent'
+          }`}
+        >
+          {uiText.comparison.detailedData}
+        </button>
+      </div>
 
-        {/* 3. Detailed Data (Rendered only in detailed mode) */}
-        {viewMode === 'detailed' && (
-          <div className="mt-auto border-t border-neutral-200 bg-neutral-50 p-4">
-            <h4 className="mb-4 text-xs font-semibold text-neutral-900 flex items-center justify-center gap-2">
-              <span className="w-full h-px bg-neutral-200"></span>
-              <span className="shrink-0 text-neutral-500">{uiText.comparison.detailedData}</span>
-              <span className="w-full h-px bg-neutral-200"></span>
-            </h4>
+      {/* 3. Swappable Content Area (Rigid Container) */}
+      <div className="flex flex-1 flex-col relative bg-white">
+        
+        {/* BASIC VIEW */}
+        {activeTab === 'basic' && (
+          <div className="flex flex-col h-full animate-in fade-in duration-200">
+            {/* Thumbnail */}
+            <div className="aspect-[4/3] bg-white border-b border-neutral-200 flex items-center justify-center text-xs text-neutral-500 overflow-hidden shrink-0">
+              {hero ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={hero.src} alt={hero.alt} className="h-full w-full object-contain" />
+              ) : (
+                uiText.robots.mainImageMissing
+              )}
+            </div>
             
-            <div className="flex flex-col gap-6">
+            {/* Core Variables */}
+            <div className="p-4 mt-auto">
+              <dl className="space-y-2 text-xs">
+                {coreRows.map((row) => (
+                  <div key={row.label} className="flex justify-between gap-3">
+                    <dt className="shrink-0 text-neutral-500">{row.label}</dt>
+                    <dd className="text-right font-medium text-neutral-900 truncate" title={row.value}>
+                      {row.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        )}
+
+        {/* DETAILED VIEW */}
+        {activeTab === 'detailed' && (
+          <div className="flex flex-col h-full animate-in fade-in duration-200">
+            <div className="p-4 flex flex-col gap-6 overflow-y-auto">
+              {/* Technical Specs */}
               <section>
                 <dl className="space-y-2 text-xs">
                   {detailRows.map((row) => (
-                    <div key={row.label} className="flex justify-between gap-2 border-b border-neutral-200/50 pb-1">
-                      <dt className="text-neutral-500">{row.label}</dt>
-                      <dd className="font-medium text-neutral-900 text-right">{row.value}</dd>
+                    <div key={row.label} className="flex justify-between gap-2 border-b border-neutral-200/50 pb-1.5">
+                      <dt className="shrink-0 text-neutral-500">{row.label}</dt>
+                      <dd className="text-right font-medium text-neutral-900 truncate" title={row.value}>{row.value}</dd>
                     </div>
                   ))}
                 </dl>
               </section>
 
+              {/* Qualitative Data */}
               <section className="space-y-4">
                 <div>
                   <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.bestFit}</h4>
@@ -162,6 +185,7 @@ export function ComparisonRobotPanel({
             </div>
           </div>
         )}
+
       </div>
     </article>
   );

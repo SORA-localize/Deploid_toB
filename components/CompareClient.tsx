@@ -162,53 +162,20 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
 
           {/* Main Content - Comparison Sheet */}
           <div className="min-w-0">
-            <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-xs text-neutral-500">
                 {uiText.compare.comparisonSheet(selectedSlugs.length, 9)}
               </span>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                {/* Accessible Segmented Control for View Mode */}
-                <fieldset className="flex items-center bg-neutral-100 p-1 rounded-sm border border-neutral-200">
-                  <legend className="sr-only">表示モード</legend>
-                  <label className="relative cursor-pointer">
-                    <input
-                      type="radio"
-                      name="viewMode"
-                      value="simple"
-                      checked={viewMode === 'simple'}
-                      onChange={() => updateParams({ view: null }, 'replace')}
-                      className="sr-only peer"
-                    />
-                    <span className="block px-3 py-1 text-xs font-medium text-neutral-500 peer-checked:bg-white peer-checked:text-neutral-900 peer-checked:shadow-sm rounded-sm transition-all">
-                      {uiText.comparison.viewModeSimple}
-                    </span>
-                  </label>
-                  <label className="relative cursor-pointer">
-                    <input
-                      type="radio"
-                      name="viewMode"
-                      value="detailed"
-                      checked={viewMode === 'detailed'}
-                      onChange={() => updateParams({ view: 'detailed' }, 'replace')}
-                      className="sr-only peer"
-                    />
-                    <span className="block px-3 py-1 text-xs font-medium text-neutral-500 peer-checked:bg-white peer-checked:text-neutral-900 peer-checked:shadow-sm rounded-sm transition-all">
-                      {uiText.comparison.viewModeDetailed}
-                    </span>
-                  </label>
-                </fieldset>
-
-                {selectedSlugs.length > 0 && (
-                  <button
-                    type="button"
-                    aria-label={uiText.comparison.clearAria}
-                    onClick={clearAll}
-                    className="text-xs text-neutral-500 hover:text-neutral-900"
-                  >
-                    {uiText.common.clearAll}
-                  </button>
-                )}
-              </div>
+              {selectedSlugs.length > 0 && (
+                <button
+                  type="button"
+                  aria-label={uiText.comparison.clearAria}
+                  onClick={clearAll}
+                  className="text-xs text-neutral-500 hover:text-neutral-900"
+                >
+                  {uiText.common.clearAll}
+                </button>
+              )}
             </div>
 
             {selectedRobots.length === 0 ? (
@@ -252,7 +219,6 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                         isFavorite={isMounted ? favorites.includes(robot.slug) : false}
                         onFavoriteToggle={toggleFavorite}
                         onRemove={removeRobot}
-                        viewMode={viewMode}
                       />
                     );
                   })}
