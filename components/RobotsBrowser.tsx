@@ -168,7 +168,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
                   robot={robot}
                   manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
                   manufacturerLogo={manufacturer?.logo}
-                  showFavorite={isMounted}
+                  showFavorite={true}
                   isFavorite={favorites.includes(robot.slug)}
                   onFavoriteToggle={toggleFavorite}
                 />
