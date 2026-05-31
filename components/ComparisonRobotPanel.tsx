@@ -68,11 +68,11 @@ export function ComparisonRobotPanel({
               aria-label={isFavorite ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name) : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)}
               aria-pressed={isFavorite}
               onClick={() => onFavoriteToggle(robot.slug)}
-              className="border border-neutral-300 bg-white p-1 hover:bg-neutral-100 transition-colors"
+              className="p-1.5 hover:bg-neutral-100 rounded-sm transition-colors text-neutral-400 hover:text-neutral-900"
             >
               <Star
                 className={`h-4 w-4 ${
-                  isFavorite ? 'fill-yellow-500 text-yellow-500' : 'text-neutral-500'
+                  isFavorite ? 'fill-yellow-500 text-yellow-500' : 'currentColor'
                 }`}
               />
             </button>
@@ -80,9 +80,9 @@ export function ComparisonRobotPanel({
               type="button"
               aria-label={uiText.comparison.removeAria(robot.nameJa ?? robot.name)}
               onClick={() => onRemove(robot.slug)}
-              className="border border-neutral-300 bg-white p-1 hover:bg-neutral-100 transition-colors"
+              className="p-1.5 hover:bg-neutral-100 rounded-sm transition-colors text-neutral-400 hover:text-neutral-900"
             >
-              <X className="h-4 w-4 text-neutral-600" />
+              <X className="h-4 w-4" />
             </button>
           </div>
         </div>

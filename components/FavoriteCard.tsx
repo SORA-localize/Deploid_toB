@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { X } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
-import { TBD_LABEL } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
 
 interface FavoriteCardProps {
@@ -12,6 +11,7 @@ interface FavoriteCardProps {
   manufacturerName?: string;
   manufacturerLogo?: ImageAsset;
   onRemove: (slug: string) => void;
+  onSelect?: (slug: string) => void;
 }
 
 export function FavoriteCard({
@@ -19,23 +19,29 @@ export function FavoriteCard({
   manufacturerName,
   manufacturerLogo,
   onRemove,
+  onSelect,
 }: FavoriteCardProps) {
-  const payload = robot.specs.payloadKg != null ? `${robot.specs.payloadKg} kg` : TBD_LABEL;
-  const runtime = robot.specs.runtimeMin != null ? uiText.favorites.runtimeValue(robot.specs.runtimeMin) : TBD_LABEL;
-
   return (
     <div className="border border-neutral-300 bg-white p-3 hover:border-neutral-400 hover:shadow-sm transition-all duration-200">
       <div className="flex items-start justify-between gap-2 mb-2">
-        <Link href={`/robots/${robot.slug}`} className="flex-1 min-w-0">
-          <h4 className="text-xs font-semibold text-neutral-900 truncate">
-            {robot.nameJa ?? robot.name}
-          </h4>
-        </Link>
+        {onSelect ? (
+          <button onClick={() => onSelect(robot.slug)} className="flex-1 min-w-0 text-left hover:underline">
+            <h4 className="text-xs font-semibold text-neutral-900 truncate">
+              {robot.nameJa ?? robot.name}
+            </h4>
+          </button>
+        ) : (
+          <Link href={`/robots/${robot.slug}`} className="flex-1 min-w-0 hover:underline">
+            <h4 className="text-xs font-semibold text-neutral-900 truncate">
+              {robot.nameJa ?? robot.name}
+            </h4>
+          </Link>
+        )}
         <button
           type="button"
           aria-label={uiText.favorites.ariaRemove(robot.nameJa ?? robot.name)}
           onClick={() => onRemove(robot.slug)}
-          className="text-neutral-400 hover:text-neutral-900 flex-shrink-0"
+          className="text-neutral-400 hover:text-neutral-900 flex-shrink-0 p-1 -m-1 rounded-sm hover:bg-neutral-100"
         >
           <X className="w-3 h-3" />
         </button>
@@ -43,20 +49,10 @@ export function FavoriteCard({
       <ManufacturerLogoName
         name={manufacturerName ?? robot.manufacturerSlug}
         logo={manufacturerLogo}
-        className="mb-2 text-xs text-neutral-500"
+        className="text-xs text-neutral-500"
         frameClassName="h-4 w-4"
         imageClassName="h-3 w-3"
       />
-      <dl className="space-y-1 text-xs">
-        <div className="flex justify-between">
-          <dt className="text-neutral-500">{uiText.favorites.payload}</dt>
-          <dd className="text-neutral-900 font-medium">{payload}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-neutral-500">{uiText.favorites.runtime}</dt>
-          <dd className="text-neutral-900 font-medium">{runtime}</dd>
-        </div>
-      </dl>
     </div>
   );
 }

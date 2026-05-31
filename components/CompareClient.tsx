@@ -53,6 +53,28 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
     }
   };
 
+  const handleFavoriteSelect = (slug: string) => {
+    if (!selectedSlugs.includes(slug)) {
+      addRobot(slug);
+      // Wait for DOM to update with the new card before scrolling
+      setTimeout(() => {
+        const el = document.getElementById(`compare-card-${slug}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+          el.classList.add('ring-2', 'ring-accent', 'ring-offset-2');
+          setTimeout(() => el.classList.remove('ring-2', 'ring-accent', 'ring-offset-2'), 1500);
+        }
+      }, 100);
+    } else {
+      const el = document.getElementById(`compare-card-${slug}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        el.classList.add('ring-2', 'ring-accent', 'ring-offset-2');
+        setTimeout(() => el.classList.remove('ring-2', 'ring-accent', 'ring-offset-2'), 1500);
+      }
+    }
+  };
+
   const removeRobot = (slug: string) => {
     const nextSlugs = selectedSlugs.filter((s) => s !== slug);
     updateParams({ compare: nextSlugs.length > 0 ? nextSlugs.join(',') : null }, 'replace');
@@ -211,15 +233,16 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   {selectedRobots.map((robot) => {
                     const manufacturer = manufacturerFor(robot.manufacturerSlug);
                     return (
-                      <ComparisonRobotPanel
-                        key={robot.slug}
-                        robot={robot}
-                        manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
-                        manufacturerLogo={manufacturer?.logo}
-                        isFavorite={isMounted ? favorites.includes(robot.slug) : false}
-                        onFavoriteToggle={toggleFavorite}
-                        onRemove={removeRobot}
-                      />
+                      <div key={robot.slug} id={`compare-card-${robot.slug}`} className="transition-shadow duration-500 rounded-sm">
+                        <ComparisonRobotPanel
+                          robot={robot}
+                          manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                          manufacturerLogo={manufacturer?.logo}
+                          isFavorite={isMounted ? favorites.includes(robot.slug) : false}
+                          onFavoriteToggle={toggleFavorite}
+                          onRemove={removeRobot}
+                        />
+                      </div>
                     );
                   })}
                 </div>
@@ -260,6 +283,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                           manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
                           manufacturerLogo={manufacturer?.logo}
                           onRemove={toggleFavorite}
+                          onSelect={handleFavoriteSelect}
                         />
                       );
                     })}
