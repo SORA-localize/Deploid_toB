@@ -162,9 +162,10 @@ export const uiText = {
     contactConsultation: '情報提供・取材相談',
     contactDescription: '導入事例や一次情報の提供、取材のご相談はこちら。',
     coreVariables: '基本スペックと比較軸',
-    detailedData: 'さらに詳しい技術仕様・強み',
-    detailedDataAria: (name: string, expanded: boolean) => `${name}の詳細データを${expanded ? '閉じる' : '開く'}`,
+    detailedData: '詳細データ',
     japanSupport: '国内対応',
     dimensions: '外形寸法',
+    viewModeSimple: '簡易表示',
+    viewModeDetailed: '詳細表示',
   },
 } as const;

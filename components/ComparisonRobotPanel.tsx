@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronDown, Star, X } from 'lucide-react';
+import { Star, X } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
 import { TBD_LABEL } from '@/lib/labels';
@@ -15,6 +14,7 @@ interface ComparisonRobotPanelProps {
   isFavorite: boolean;
   onFavoriteToggle: (slug: string) => void;
   onRemove: (slug: string) => void;
+  viewMode: 'simple' | 'detailed';
 }
 
 function CompactList({ items }: { items: string[] }) {
@@ -39,11 +39,10 @@ export function ComparisonRobotPanel({
   isFavorite,
   onFavoriteToggle,
   onRemove,
+  viewMode,
 }: ComparisonRobotPanelProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
   const coreRows = getComparisonCoreRows(robot);
   const detailRows = getComparisonDetailRows(robot);
-  const accordionId = `accordion-content-${robot.slug}`;
   const hero = robot.images?.hero ?? robot.heroImage;
 
   return (
@@ -102,7 +101,7 @@ export function ComparisonRobotPanel({
         </p>
       </div>
 
-      {/* 2. Core Variables (Anchored to top of this flex container, but since parent is flex-col h-full, this area fills remaining space) */}
+      {/* 2. Core Variables (Anchored to top of this flex container) */}
       <div className="flex flex-1 flex-col">
         <div className="p-4">
           <h4 className="mb-3 text-xs font-semibold text-neutral-900 pb-2 border-b border-neutral-200">
@@ -112,71 +111,57 @@ export function ComparisonRobotPanel({
             {coreRows.map((row) => (
               <div key={row.label} className="flex justify-between gap-3">
                 <dt className="shrink-0 text-neutral-500">{row.label}</dt>
-                <dd className="text-right font-medium text-neutral-900">{row.value}</dd>
+                {/* CSS Truncate to ensure long notes don't break the layout, Title attribute preserves data on hover */}
+                <dd className="text-right font-medium text-neutral-900 truncate" title={row.value}>
+                  {row.value}
+                </dd>
               </div>
             ))}
           </dl>
         </div>
 
-        {/* mt-auto pushes the accordion to the bottom, aligning all accordions in a row */}
-        <div className="mt-auto border-t border-neutral-200">
-          <button
-            type="button"
-            aria-expanded={isExpanded}
-            aria-controls={accordionId}
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="flex w-full items-center justify-between px-4 py-3 text-xs font-medium text-neutral-900 hover:bg-neutral-50 transition-colors"
-          >
-            <span>{uiText.comparison.detailedData}</span>
-            <ChevronDown
-              className={`h-4 w-4 text-neutral-500 transition-transform duration-200 ${
-                isExpanded ? 'rotate-180' : ''
-              }`}
-            />
-          </button>
-          
-          {/* Custom Accessible Accordion with CSS Grid transition */}
-          <div
-            id={accordionId}
-            className={`grid transition-all duration-200 ease-in-out ${
-              isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-            }`}
-          >
-            <div className="overflow-hidden bg-neutral-50">
-              <div className="p-4 flex flex-col gap-6">
-                <section>
-                  <dl className="space-y-2 text-xs">
-                    {detailRows.map((row) => (
-                      <div key={row.label} className="flex justify-between gap-2 border-b border-neutral-200/50 pb-1">
-                        <dt className="text-neutral-500">{row.label}</dt>
-                        <dd className="font-medium text-neutral-900">{row.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </section>
+        {/* 3. Detailed Data (Rendered only in detailed mode) */}
+        {viewMode === 'detailed' && (
+          <div className="mt-auto border-t border-neutral-200 bg-neutral-50 p-4">
+            <h4 className="mb-4 text-xs font-semibold text-neutral-900 flex items-center justify-center gap-2">
+              <span className="w-full h-px bg-neutral-200"></span>
+              <span className="shrink-0 text-neutral-500">{uiText.comparison.detailedData}</span>
+              <span className="w-full h-px bg-neutral-200"></span>
+            </h4>
+            
+            <div className="flex flex-col gap-6">
+              <section>
+                <dl className="space-y-2 text-xs">
+                  {detailRows.map((row) => (
+                    <div key={row.label} className="flex justify-between gap-2 border-b border-neutral-200/50 pb-1">
+                      <dt className="text-neutral-500">{row.label}</dt>
+                      <dd className="font-medium text-neutral-900 text-right">{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
 
-                <section className="space-y-4">
-                  <div>
-                    <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.bestFit}</h4>
-                    <CompactList items={robot.comparison.bestFit} />
-                  </div>
-                  <div>
-                    <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.notFit}</h4>
-                    <CompactList items={robot.comparison.notFit} />
-                  </div>
-                  <div>
-                    <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.strengths}</h4>
-                    <CompactList items={robot.comparison.strengths} />
-                  </div>
-                  <div>
-                    <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.constraints}</h4>
-                    <CompactList items={robot.comparison.constraints} />
-                  </div>
-                </section>
-              </div>
+              <section className="space-y-4">
+                <div>
+                  <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.bestFit}</h4>
+                  <CompactList items={robot.comparison.bestFit} />
+                </div>
+                <div>
+                  <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.notFit}</h4>
+                  <CompactList items={robot.comparison.notFit} />
+                </div>
+                <div>
+                  <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.strengths}</h4>
+                  <CompactList items={robot.comparison.strengths} />
+                </div>
+                <div>
+                  <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.constraints}</h4>
+                  <CompactList items={robot.comparison.constraints} />
+                </div>
+              </section>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </article>
   );
