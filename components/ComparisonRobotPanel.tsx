@@ -44,6 +44,7 @@ export function ComparisonRobotPanel({
   const coreRows = getComparisonCoreRows(robot);
   const detailRows = getComparisonDetailRows(robot);
   const accordionId = `accordion-content-${robot.slug}`;
+  const hero = robot.images?.hero ?? robot.heroImage;
 
   return (
     <article className="flex h-full flex-col border border-neutral-300 bg-white">
@@ -84,6 +85,17 @@ export function ComparisonRobotPanel({
             </button>
           </div>
         </div>
+        
+        {/* Thumbnail Image */}
+        <div className="aspect-[4/3] bg-white border border-neutral-200 flex items-center justify-center text-xs text-neutral-500 overflow-hidden">
+          {hero ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={hero.src} alt={hero.alt} className="h-full w-full object-contain" />
+          ) : (
+            uiText.robots.mainImageMissing
+          )}
+        </div>
+
         {/* Layout Stabilizer: Fixed min-height and line clamp for summary */}
         <p className="text-xs leading-relaxed text-neutral-700 line-clamp-4 min-h-[4.5rem]">
           {robot.summary}
