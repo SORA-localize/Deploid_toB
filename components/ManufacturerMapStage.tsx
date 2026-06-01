@@ -5,19 +5,19 @@ import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent }
 import Link from 'next/link';
 import { ArrowRight, Building2 } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
-import { ManufacturerMapCopy, region, type ManufacturerMarker } from '@/components/ManufacturerMapCopy';
+import { ManufacturerMapCopy, region, type MapPoint } from '@/components/ManufacturerMapCopy';
 
 interface ManufacturerMapStageProps {
   svgMap: string;
-  markers: ManufacturerMarker[];
+  points: MapPoint[];
   heading: string;
   subcopy: string;
 }
 
-const AUTO_SPEED = 0.18; // px/frame ≈ 10px/s（従来の約半分）
+const AUTO_SPEED = 0.18; // px/frame ≈ 10px/s
 const RESUME_DELAY_MS = 2500;
+const DWELL_MS = 1500; // 自動ハイライトの最小保持時間（密集地でも切替が速すぎないように）
 
-// ロゴ（ワードマーク）。src無し・読み込み失敗時はプレースホルダー。白チップ上に置く前提。
 function Wordmark({ src }: { src?: string }) {
   const [failed, setFailed] = useState(false);
   if (!src || failed) {
@@ -35,10 +35,10 @@ function Wordmark({ src }: { src?: string }) {
   );
 }
 
-export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: ManufacturerMapStageProps) {
+export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: ManufacturerMapStageProps) {
   const stageRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
-  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [copies, setCopies] = useState(3);
 
   const panX = useRef(0);
@@ -52,37 +52,41 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
   const reduceMotion = useRef(false);
   const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafId = useRef<number | null>(null);
-  // activeSlug の最新値をrAF内から参照するためのミラー
-  const activeSlugRef = useRef<string | null>(null);
+  const activeIdRef = useRef<string | null>(null);
+  const lastSwitch = useRef(0);
 
-  const setActive = useCallback((slug: string | null) => {
-    activeSlugRef.current = slug;
-    setActiveSlug(slug);
+  const setActive = useCallback((id: string | null) => {
+    activeIdRef.current = id;
+    setActiveId(id);
   }, []);
 
-  // 自動回転中、ステージ中央に最も近いマーカーを「ホバー相当」でアクティブにする（スクロールと同期）。
+  // 自動回転中、ステージ中央に最も近い点を「ホバー相当」でアクティブにする（スクロールと同期）。
   const syncAutoActive = () => {
     const cw = copyW.current;
     const sw = stageW.current;
-    if (cw <= 0 || sw <= 0 || markers.length === 0) return;
+    if (cw <= 0 || sw <= 0 || points.length === 0) return;
     const target = sw / 2;
-    let bestSlug: string | null = null;
+    let bestId: string | null = null;
     let bestDist = Infinity;
-    for (const m of markers) {
-      const baseX = (m.leftPct / 100) * cw;
-      // baseX + panX を中央 target に最も近いインスタンス位置へ寄せる
+    for (const p of points) {
+      const baseX = (p.leftPct / 100) * cw;
       let x = (((baseX + panX.current) % cw) + cw) % cw;
       while (x < target - cw / 2) x += cw;
       while (x > target + cw / 2) x -= cw;
       const dist = Math.abs(x - target);
       if (dist < bestDist) {
         bestDist = dist;
-        bestSlug = m.slug;
+        bestId = p.id;
       }
     }
-    // 中央から一定範囲に入っている時だけハイライト（離れていれば消す）
-    const candidate = bestDist <= cw * 0.05 ? bestSlug : null;
-    if (candidate !== activeSlugRef.current) setActive(candidate);
+    const candidate = bestDist <= cw * 0.05 ? bestId : null;
+    if (candidate !== activeIdRef.current) {
+      const now = performance.now();
+      if (now - lastSwitch.current >= DWELL_MS) {
+        lastSwitch.current = now;
+        setActive(candidate);
+      }
+    }
   };
 
   const applyTransform = () => {
@@ -105,7 +109,6 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
     }, RESUME_DELAY_MS);
   };
 
-  // 寸法測定：copyW=高さ×2、ビューポートを覆うコピー枚数
   useEffect(() => {
     reduceMotion.current =
       typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -129,14 +132,13 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
     return () => ro?.disconnect();
   }, []);
 
-  // 自動回転（無操作時・reduced-motion以外）
   useEffect(() => {
     const tick = () => {
       if (!interacting.current && !reduceMotion.current && copyW.current > 0) {
         panX.current -= AUTO_SPEED;
         wrap();
         applyTransform();
-        syncAutoActive(); // スクロールに同期して中央のメーカーをハイライト
+        syncAutoActive();
       }
       rafId.current = requestAnimationFrame(tick);
     };
@@ -146,7 +148,6 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
     };
   }, []);
 
-  // ドラッグはwindowで追従（pointer captureを使わない＝マーカーのクリックを壊さない）
   useEffect(() => {
     const move = (e: PointerEvent) => {
       if (!dragging.current) return;
@@ -188,9 +189,9 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
     scheduleResume();
   };
   const onActivate = useCallback(
-    (slug: string) => {
+    (id: string) => {
       interacting.current = true;
-      setActive(slug);
+      setActive(id);
     },
     [setActive],
   );
@@ -199,8 +200,9 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
     if (dragMoved.current) e.preventDefault();
   }, []);
 
-  const active = markers.find((m) => m.slug === activeSlug) ?? null;
-  const ar = active ? region(active.country) : null;
+  const active = points.find((p) => p.id === activeId) ?? null;
+  const ar = active ? region(active.members[0].country) : null;
+  const isCluster = !!active && active.members.length > 1;
 
   return (
     <div
@@ -215,8 +217,8 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
           <ManufacturerMapCopy
             key={k}
             svgMap={svgMap}
-            markers={markers}
-            activeSlug={activeSlug}
+            points={points}
+            activeId={activeId}
             ariaHidden={k !== 0}
             reduceMotion={reduceMotion.current}
             onActivate={onActivate}
@@ -269,25 +271,53 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
         </Link>
       </div>
 
-      {/* 情報カード（左下） */}
+      {/* 情報カード（左下）。単独＝1社、クラスタ＝複数社を縦スタック */}
       {active && ar && (
         <div
-          key={active.slug}
+          key={active.id}
           className="manufacturer-card-enter pointer-events-none absolute bottom-0 left-0 z-10 m-6 max-w-[62%]"
         >
-          <div className="flex items-center text-xs">
-            <span className="pr-2 text-neutral-200">
-              {ar.name}
-              <span className="ml-1 font-mono text-[10px] text-neutral-400">{ar.a3}</span>
-            </span>
-            <span className="border-l border-neutral-600 px-2 font-medium text-white">{active.name}</span>
-            <span className="border-l border-neutral-600 pl-2 text-neutral-400">
-              {active.foundedYear ?? '—'}
-            </span>
-          </div>
-          <div className="mt-2 inline-flex items-center bg-white px-2.5 py-1.5">
-            <Wordmark src={active.logoSrc} />
-          </div>
+          {isCluster ? (
+            <>
+              <p className="mb-1 text-xs text-neutral-200">
+                {ar.name}
+                <span className="ml-1 font-mono text-[10px] text-neutral-400">{ar.a3}</span>
+                <span className="ml-2 text-neutral-400">{active.members.length}社</span>
+              </p>
+              <ul className="text-xs">
+                {active.members.map((m) => (
+                  <li
+                    key={m.slug}
+                    className="flex items-baseline gap-2 border-t border-neutral-700 py-1 first:border-t-0"
+                  >
+                    <span className="font-medium text-white">{m.name}</span>
+                    <span className="font-mono text-[10px] text-neutral-400">
+                      {m.foundedYear ?? '—'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center text-xs">
+                <span className="pr-2 text-neutral-200">
+                  {ar.name}
+                  <span className="ml-1 font-mono text-[10px] text-neutral-400">{ar.a3}</span>
+                </span>
+                <span className="border-l border-neutral-600 px-2 font-medium text-white">
+                  {active.members[0].name}
+                </span>
+                <span className="border-l border-neutral-600 pl-2 text-neutral-400">
+                  {active.members[0].foundedYear ?? '—'}
+                </span>
+              </div>
+              <div className="mt-2 inline-flex items-center bg-white px-2.5 py-1.5">
+                <Wordmark src={active.members[0].logoSrc} />
+              </div>
+            </>
+          )}
+
           {active.arcs.length > 0 && (
             <p className="mt-2 max-w-xs text-[11px] leading-snug">
               <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">

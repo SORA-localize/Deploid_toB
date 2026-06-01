@@ -1,6 +1,6 @@
 import DottedMap from 'dotted-map';
 import { ManufacturerMapStage } from '@/components/ManufacturerMapStage';
-import type { ManufacturerMarker } from '@/components/ManufacturerMapCopy';
+import type { MapPoint } from '@/components/ManufacturerMapCopy';
 
 export interface ManufacturerDeploymentInput {
   lat: number;
@@ -28,10 +28,10 @@ interface ManufacturerWorldMapProps {
   subcopy: string;
 }
 
-// 同一/近接座標のドットが重ならない範囲で最小限だけ離す（実座標になるべく近づける）。
+// 近接する本社は反発で動かさず「クラスタ（1点に集約）」する＝座標精度を保ちつつ重なり回避。
 // 投影後のSVG座標空間で処理（map.image は縦横が等倍pxなので等方的に扱える）。
-const HQ_MIN = 1.9; // HQドット同士の最小間隔（SVG単位, height=100基準）。小さいほど実座標に忠実。
-const ARC_END_MIN = 2.6; // 導入先ドット/ラベルが HQドットに被らないための最小距離。
+const CLUSTER_DIST = 1.5; // この距離(SVG単位, height=100基準)未満の本社は同一クラスタにまとめる（≒同一都市のみ）。
+const ARC_END_MIN = 2.6; // 導入先ドットがクラスタ点に被らないための最小距離。
 
 type Pt = { x: number; y: number };
 
@@ -118,33 +118,55 @@ export function ManufacturerWorldMap({ manufacturers, heading, subcopy }: Manufa
     })
     .filter((p): p is { input: ManufacturerMapInput; x: number; y: number } => p !== null);
 
-  deOverlap(projected, HQ_MIN);
-  const hqPoints: Pt[] = projected.map((p) => ({ x: p.x, y: p.y }));
+  // 近接する本社を1クラスタに集約（貪欲・centroid更新）。座標は本社の実値から動かさない。
+  type Cluster = { x: number; y: number; items: typeof projected };
+  const clusters: Cluster[] = [];
+  for (const p of projected) {
+    let placed = false;
+    for (const c of clusters) {
+      if (Math.hypot(p.x - c.x, p.y - c.y) < CLUSTER_DIST) {
+        c.items.push(p);
+        c.x = c.items.reduce((s, it) => s + it.x, 0) / c.items.length;
+        c.y = c.items.reduce((s, it) => s + it.y, 0) / c.items.length;
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) clusters.push({ x: p.x, y: p.y, items: [p] });
+  }
 
-  const markers: ManufacturerMarker[] = projected
-    .map(({ input, x, y }) => {
-      const hq = toPct(x, y);
-      // 導入先を投影 → HQドット群に被らないよう離す
-      const ends = (input.deployments ?? []).flatMap((d) => {
-        const pin = map.getPin({ lat: d.lat, lng: d.lng });
-        if (!pin) return [];
-        return [{ x: pin.x, y: pin.y, customer: d.customer, status: d.status }];
-      });
-      pushAway(ends, hqPoints, ARC_END_MIN);
+  const pointPositions: Pt[] = clusters.map((c) => ({ x: c.x, y: c.y }));
+
+  const points: MapPoint[] = clusters
+    .map((c) => {
+      const ctr = toPct(c.x, c.y);
+      // クラスタ内全社の導入先を投影 → クラスタ点群に被らないよう離す
+      const ends = c.items.flatMap((it) =>
+        (it.input.deployments ?? []).flatMap((d) => {
+          const pin = map.getPin({ lat: d.lat, lng: d.lng });
+          if (!pin) return [];
+          return [{ x: pin.x, y: pin.y, customer: d.customer, status: d.status }];
+        }),
+      );
+      pushAway(ends, pointPositions, ARC_END_MIN);
       const arcs = ends.map((e) => {
         const end = toPct(e.x, e.y);
         return { leftPct: end.leftPct, topPct: end.topPct, customer: e.customer, status: e.status };
       });
+      const members = c.items.map((it) => ({
+        slug: it.input.slug,
+        name: it.input.name,
+        country: it.input.country,
+        foundedYear: it.input.foundedYear,
+        logoSrc: it.input.logoSrc,
+      }));
       return {
-        slug: input.slug,
-        name: input.name,
-        country: input.country,
-        foundedYear: input.foundedYear,
-        logoSrc: input.logoSrc,
-        leftPct: hq.leftPct,
-        topPct: hq.topPct,
+        id: members.map((m) => m.slug).join('+'),
+        leftPct: ctr.leftPct,
+        topPct: ctr.topPct,
+        members,
         arcs,
-      } satisfies ManufacturerMarker;
+      } satisfies MapPoint;
     })
     .sort((a, b) => a.leftPct - b.leftPct);
 
@@ -154,7 +176,7 @@ export function ManufacturerWorldMap({ manufacturers, heading, subcopy }: Manufa
     <section className="relative w-full border-b border-neutral-200">
       <ManufacturerMapStage
         svgMap={svgDataUri}
-        markers={markers}
+        points={points}
         heading={heading}
         subcopy={subcopy}
       />
