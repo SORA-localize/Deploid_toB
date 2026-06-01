@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { ArrowRight, Bot, Building2, BookOpen, Calendar } from 'lucide-react';
-import { BudouXText } from '@/components/BudouXText';
 import { ManufacturerWorldMap } from '@/components/ManufacturerWorldMap';
 import { RobotCard } from '@/components/RobotCard';
 import { TagChip } from '@/components/TagChip';
@@ -53,46 +52,14 @@ export default function HomePage() {
     .slice(0, 3);
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
-      <section className="py-16 border-b border-neutral-200">
-        <div className="max-w-3xl">
-          <h1 className="text-4xl font-semibold text-neutral-900 mb-4 leading-tight">
-            <BudouXText text="日本企業のためのヒューマノイドロボット導入ポータル" className="break-keep" />
-          </h1>
-          <p className="text-lg text-neutral-600 mb-8 leading-relaxed">
-            <BudouXText text="製造業・物流・建設業向けに、ヒューマノイドロボットの選定から導入までを支援する情報基盤です。技術検証、調達プロセス、国内サポート体制を網羅的に解説します。" className="break-keep" />
-          </p>
-          <div className="flex gap-4">
-            <Link
-              href="/guides"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white hover:bg-neutral-700 transition-colors"
-            >
-              導入ガイドを読む
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/robots"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-neutral-300 text-neutral-900 hover:bg-neutral-50 transition-colors"
-            >
-              ロボット一覧
-            </Link>
-          </div>
-        </div>
-      </section>
+    <>
+      <ManufacturerWorldMap
+        manufacturers={mapPoints}
+        heading="日本企業のためのヒューマノイドロボット導入ポータル"
+        subcopy="製造業・物流・建設業向けに、ヒューマノイドロボットの選定から導入までを支援する情報基盤です。技術検証、調達プロセス、国内サポート体制を網羅的に解説します。"
+      />
 
-      {mapPoints.length > 0 && (
-        <section className="py-16 border-b border-neutral-200">
-          <p className="font-mono text-xs uppercase tracking-wider text-neutral-500 mb-2">
-            Global Manufacturers
-          </p>
-          <h2 className="text-2xl font-semibold text-neutral-900 mb-2">主要メーカーの所在地</h2>
-          <p className="text-sm text-neutral-600 mb-8 max-w-2xl">
-            掲載中のヒューマノイド開発企業の本社所在地。地点にカーソルを合わせると企業名と日本市場での対応状況を表示します。
-          </p>
-          <ManufacturerWorldMap manufacturers={mapPoints} />
-        </section>
-      )}
-
+      <div className="mx-auto max-w-7xl px-6 py-12">
       <section className="py-16 border-b border-neutral-200">
         <h2 className="text-2xl font-semibold text-neutral-900 mb-8">主要コンテンツ</h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -254,6 +221,7 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

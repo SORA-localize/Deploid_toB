@@ -1,5 +1,6 @@
 import DottedMap from 'dotted-map';
-import { ManufacturerMapOverlay, type ManufacturerMarker } from '@/components/ManufacturerMapOverlay';
+import { ManufacturerMapStage } from '@/components/ManufacturerMapStage';
+import type { ManufacturerMarker } from '@/components/ManufacturerMapCopy';
 
 export interface ManufacturerDeploymentInput {
   lat: number;
@@ -23,6 +24,8 @@ export interface ManufacturerMapInput {
 
 interface ManufacturerWorldMapProps {
   manufacturers: ManufacturerMapInput[];
+  heading: string;
+  subcopy: string;
 }
 
 // 同一/近接座標のドットが重ならない範囲で最小限だけ離す（実座標になるべく近づける）。
@@ -92,7 +95,7 @@ function pushAway(movable: Pt[], fixed: Pt[], minDist: number) {
 // Server Component。dotted-map（背景SVG生成＋getPin投影）はビルド時に実行され、
 // クライアントへは静的SVGと算出済みの座標のみを渡す。
 // 操作（ホバー/フォーカス/自動デモ）と弧アニメは子のクライアントコンポーネントが担当する。
-export function ManufacturerWorldMap({ manufacturers }: ManufacturerWorldMapProps) {
+export function ManufacturerWorldMap({ manufacturers, heading, subcopy }: ManufacturerWorldMapProps) {
   const map = new DottedMap({ height: 100, grid: 'diagonal' });
   const { width, height } = map.image;
 
@@ -145,18 +148,16 @@ export function ManufacturerWorldMap({ manufacturers }: ManufacturerWorldMapProp
     })
     .sort((a, b) => a.leftPct - b.leftPct);
 
-  return (
-    <div className="relative w-full aspect-[2/1] select-none overflow-hidden bg-neutral-950">
-      {/* 背景：点描世界地図（モノクロ・ダーク）。装飾なので操作対象外 */}
-      <img
-        src={`data:image/svg+xml;utf8,${encodeURIComponent(svgMap)}`}
-        alt=""
-        aria-hidden="true"
-        draggable={false}
-        className="pointer-events-none h-full w-full object-contain opacity-90 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
-      />
+  const svgDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(svgMap)}`;
 
-      <ManufacturerMapOverlay markers={markers} />
-    </div>
+  return (
+    <section className="relative w-full border-b border-neutral-200">
+      <ManufacturerMapStage
+        svgMap={svgDataUri}
+        markers={markers}
+        heading={heading}
+        subcopy={subcopy}
+      />
+    </section>
   );
 }

@@ -1,0 +1,267 @@
+'use client';
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react';
+import Link from 'next/link';
+import { ArrowRight, Building2 } from 'lucide-react';
+import { BudouXText } from '@/components/BudouXText';
+import { ManufacturerMapCopy, region, type ManufacturerMarker } from '@/components/ManufacturerMapCopy';
+
+interface ManufacturerMapStageProps {
+  svgMap: string;
+  markers: ManufacturerMarker[];
+  heading: string;
+  subcopy: string;
+}
+
+const AUTO_SPEED = 0.35; // px/frame ≈ 20px/s
+const RESUME_DELAY_MS = 2500;
+
+// ロゴ（ワードマーク）。src無し・読み込み失敗時はプレースホルダー。白チップ上に置く前提。
+function Wordmark({ src }: { src?: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!src || failed) {
+    return <Building2 className="h-5 w-5 text-neutral-300" aria-hidden="true" />;
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt=""
+      aria-hidden="true"
+      onError={() => setFailed(true)}
+      className="h-6 w-auto max-w-[150px] object-contain"
+    />
+  );
+}
+
+export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: ManufacturerMapStageProps) {
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  const [copies, setCopies] = useState(3);
+
+  const panX = useRef(0);
+  const copyW = useRef(0);
+  const dragging = useRef(false);
+  const dragMoved = useRef(false);
+  const startX = useRef(0);
+  const startPan = useRef(0);
+  const interacting = useRef(false);
+  const reduceMotion = useRef(false);
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rafId = useRef<number | null>(null);
+
+  const applyTransform = () => {
+    if (trackRef.current) trackRef.current.style.transform = `translateX(${panX.current}px)`;
+  };
+  const wrap = () => {
+    const cw = copyW.current;
+    if (cw > 0) panX.current = (((panX.current % cw) + cw) % cw) - cw;
+  };
+  const clearResume = () => {
+    if (resumeTimer.current) {
+      clearTimeout(resumeTimer.current);
+      resumeTimer.current = null;
+    }
+  };
+  const scheduleResume = () => {
+    clearResume();
+    resumeTimer.current = setTimeout(() => {
+      interacting.current = false;
+    }, RESUME_DELAY_MS);
+  };
+
+  // 寸法測定：copyW=高さ×2、ビューポートを覆うコピー枚数
+  useEffect(() => {
+    reduceMotion.current =
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const measure = () => {
+      const s = stageRef.current;
+      if (!s) return;
+      const h = s.clientHeight;
+      const w = s.clientWidth;
+      copyW.current = h * 2;
+      setCopies(Math.max(3, Math.ceil(w / (h * 2)) + 1));
+      wrap();
+      applyTransform();
+    };
+    measure();
+    let ro: ResizeObserver | undefined;
+    if (stageRef.current) {
+      ro = new ResizeObserver(measure);
+      ro.observe(stageRef.current);
+    }
+    return () => ro?.disconnect();
+  }, []);
+
+  // 自動回転（無操作時・reduced-motion以外）
+  useEffect(() => {
+    const tick = () => {
+      if (!interacting.current && !reduceMotion.current && copyW.current > 0) {
+        panX.current -= AUTO_SPEED;
+        wrap();
+        applyTransform();
+      }
+      rafId.current = requestAnimationFrame(tick);
+    };
+    rafId.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+    };
+  }, []);
+
+  // ドラッグはwindowで追従（pointer captureを使わない＝マーカーのクリックを壊さない）
+  useEffect(() => {
+    const move = (e: PointerEvent) => {
+      if (!dragging.current) return;
+      const dx = e.clientX - startX.current;
+      if (Math.abs(dx) > 6) dragMoved.current = true;
+      panX.current = startPan.current + dx;
+      wrap();
+      applyTransform();
+    };
+    const up = () => {
+      if (dragging.current) {
+        dragging.current = false;
+        scheduleResume();
+      }
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      clearResume();
+    };
+  }, []);
+
+  const onPointerDown = (e: ReactPointerEvent) => {
+    dragging.current = true;
+    dragMoved.current = false;
+    interacting.current = true;
+    clearResume();
+    startX.current = e.clientX;
+    startPan.current = panX.current;
+  };
+  const onStageEnter = () => {
+    interacting.current = true;
+    clearResume();
+  };
+  const onStageLeave = () => {
+    setActiveSlug(null);
+    scheduleResume();
+  };
+  const onActivate = useCallback((slug: string) => {
+    interacting.current = true;
+    setActiveSlug(slug);
+  }, []);
+  const onClear = useCallback(() => setActiveSlug(null), []);
+  const onLinkClick = useCallback((e: ReactMouseEvent) => {
+    if (dragMoved.current) e.preventDefault();
+  }, []);
+
+  const active = markers.find((m) => m.slug === activeSlug) ?? null;
+  const ar = active ? region(active.country) : null;
+
+  return (
+    <div
+      ref={stageRef}
+      className="relative h-[clamp(440px,82vh,880px)] w-full cursor-grab touch-pan-y select-none overflow-hidden bg-neutral-950 active:cursor-grabbing"
+      onPointerDown={onPointerDown}
+      onPointerEnter={onStageEnter}
+      onPointerLeave={onStageLeave}
+    >
+      <div ref={trackRef} className="flex h-full will-change-transform">
+        {Array.from({ length: copies }).map((_, k) => (
+          <ManufacturerMapCopy
+            key={k}
+            svgMap={svgMap}
+            markers={markers}
+            activeSlug={activeSlug}
+            ariaHidden={k !== 0}
+            reduceMotion={reduceMotion.current}
+            onActivate={onActivate}
+            onClear={onClear}
+            onLinkClick={onLinkClick}
+          />
+        ))}
+      </div>
+
+      {/* 可読性スクリム（機能的・モノクロ） */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-neutral-950/85 via-neutral-950/20 to-transparent"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-neutral-950/80 to-transparent"
+      />
+
+      {/* 見出し（左上） */}
+      <div className="pointer-events-none absolute left-0 top-0 max-w-2xl p-6 md:p-10">
+        <p className="mb-3 font-mono text-xs uppercase tracking-wider text-neutral-400">
+          Global Humanoid Portal
+        </p>
+        <h1 className="mb-4 text-3xl font-semibold leading-tight text-white md:text-4xl">
+          <BudouXText text={heading} className="break-keep" />
+        </h1>
+        <p className="max-w-xl text-sm leading-relaxed text-neutral-300 md:text-base">
+          <BudouXText text={subcopy} className="break-keep" />
+        </p>
+      </div>
+
+      {/* CTA（右下） */}
+      <div
+        className="absolute bottom-0 right-0 flex flex-wrap justify-end gap-3 p-6 md:p-8"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        <Link
+          href="/guides"
+          className="inline-flex items-center gap-2 bg-white px-5 py-3 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-200"
+        >
+          導入ガイドを読む
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+        <Link
+          href="/robots"
+          className="inline-flex items-center gap-2 border border-white/30 px-5 py-3 text-sm text-white transition-colors hover:bg-white/10"
+        >
+          ロボット一覧
+        </Link>
+      </div>
+
+      {/* 情報カード（左下） */}
+      {active && ar && (
+        <div
+          key={active.slug}
+          className="manufacturer-card-enter pointer-events-none absolute bottom-0 left-0 z-10 m-6 max-w-[62%]"
+        >
+          <div className="flex items-center text-xs">
+            <span className="pr-2 text-neutral-200">
+              {ar.name}
+              <span className="ml-1 font-mono text-[10px] text-neutral-400">{ar.a3}</span>
+            </span>
+            <span className="border-l border-neutral-600 px-2 font-medium text-white">{active.name}</span>
+            <span className="border-l border-neutral-600 pl-2 text-neutral-400">
+              {active.foundedYear ?? '—'}
+            </span>
+          </div>
+          <div className="mt-2 inline-flex items-center bg-white px-2.5 py-1.5">
+            <Wordmark src={active.logoSrc} />
+          </div>
+          {active.arcs.length > 0 && (
+            <p className="mt-2 max-w-xs text-[11px] leading-snug">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">
+                Deployments
+              </span>{' '}
+              <span className="text-neutral-200">
+                {active.arcs.map((a) => a.customer).join(' · ')}
+              </span>
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
