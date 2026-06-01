@@ -14,7 +14,7 @@ interface ManufacturerMapStageProps {
   subcopy: string;
 }
 
-const AUTO_SPEED = 0.35; // px/frame ≈ 20px/s
+const AUTO_SPEED = 0.18; // px/frame ≈ 10px/s（従来の約半分）
 const RESUME_DELAY_MS = 2500;
 
 // ロゴ（ワードマーク）。src無し・読み込み失敗時はプレースホルダー。白チップ上に置く前提。
