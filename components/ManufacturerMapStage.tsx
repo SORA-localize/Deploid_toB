@@ -18,10 +18,15 @@ const AUTO_SPEED = 0.18; // px/frame ≈ 10px/s
 const RESUME_DELAY_MS = 2500;
 const DWELL_MS = 1500; // 自動ハイライトの最小保持時間（密集地でも切替が速すぎないように）
 
-function Wordmark({ src }: { src?: string }) {
+function Wordmark({ src, compact }: { src?: string; compact?: boolean }) {
   const [failed, setFailed] = useState(false);
   if (!src || failed) {
-    return <Building2 className="h-5 w-5 text-neutral-300" aria-hidden="true" />;
+    return (
+      <Building2
+        className={`${compact ? 'h-3.5 w-3.5' : 'h-5 w-5'} text-neutral-300`}
+        aria-hidden="true"
+      />
+    );
   }
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -30,7 +35,7 @@ function Wordmark({ src }: { src?: string }) {
       alt=""
       aria-hidden="true"
       onError={() => setFailed(true)}
-      className="h-6 w-auto max-w-[150px] object-contain"
+      className={`${compact ? 'h-4 max-w-[88px]' : 'h-6 max-w-[150px]'} w-auto object-contain`}
     />
   );
 }
@@ -279,17 +284,19 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
         >
           {isCluster ? (
             <>
-              <p className="mb-1 text-xs text-neutral-200">
-                {ar.name}
-                <span className="ml-1 font-mono text-[10px] text-neutral-400">{ar.a3}</span>
+              <p className="mb-1 text-xs">
+                <span className="font-mono text-[11px] text-neutral-400">{ar.a3}</span>
                 <span className="ml-2 text-neutral-400">{active.members.length}社</span>
               </p>
               <ul className="text-xs">
                 {active.members.map((m) => (
                   <li
                     key={m.slug}
-                    className="flex items-baseline gap-2 border-t border-neutral-700 py-1 first:border-t-0"
+                    className="flex items-center gap-2 border-t border-neutral-700 py-1.5 first:border-t-0"
                   >
+                    <span className="inline-flex h-6 w-12 items-center justify-center bg-white">
+                      <Wordmark src={m.logoSrc} compact />
+                    </span>
                     <span className="font-medium text-white">{m.name}</span>
                     <span className="font-mono text-[10px] text-neutral-400">
                       {m.foundedYear ?? '—'}
@@ -301,10 +308,7 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
           ) : (
             <>
               <div className="flex items-center text-xs">
-                <span className="pr-2 text-neutral-200">
-                  {ar.name}
-                  <span className="ml-1 font-mono text-[10px] text-neutral-400">{ar.a3}</span>
-                </span>
+                <span className="pr-2 font-mono text-[11px] text-neutral-400">{ar.a3}</span>
                 <span className="border-l border-neutral-600 px-2 font-medium text-white">
                   {active.members[0].name}
                 </span>
