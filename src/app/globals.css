@@ -122,6 +122,53 @@
     }
   }
 
+  /* Home ワールドマップ：ドットの登場アニメ（一度だけ・地域順に段階表示）。
+     常時アニメではなく初回に一度だけ動いて静止する。 */
+  @keyframes manufacturerDotEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.4);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .manufacturer-dot-enter {
+    opacity: 0;
+    animation: manufacturerDotEnter 0.5s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .manufacturer-dot-enter {
+      opacity: 1;
+      animation: none;
+    }
+  }
+
+  /* Home ワールドマップ：ホバー/自動デモ時の情報カードが出る時の微フェード。 */
+  @keyframes manufacturerCardEnter {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .manufacturer-card-enter {
+    animation: manufacturerCardEnter 0.16s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .manufacturer-card-enter {
+      animation: none;
+    }
+  }
+
   h1 {
     font-size: var(--text-2xl);
     font-weight: var(--font-weight-medium);

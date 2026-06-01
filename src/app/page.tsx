@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, Bot, Building2, BookOpen, Calendar } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
-import { ManufacturerMap } from '@/components/ManufacturerMap';
+import { ManufacturerWorldMap } from '@/components/ManufacturerWorldMap';
 import { RobotCard } from '@/components/RobotCard';
 import { TagChip } from '@/components/TagChip';
 import {
@@ -11,8 +11,10 @@ import {
   getManufacturerForRobot,
   getReports,
   getRobots,
+  getRobotsByManufacturerSlug,
 } from '@/lib/data';
 import { japanPresenceLabels, reportTypeLabels } from '@/lib/labels';
+import { getDisplayableAsset } from '@/lib/media';
 import { getTagLabel } from '@/lib/tags';
 
 export default function HomePage() {
@@ -23,6 +25,15 @@ export default function HomePage() {
       return [];
     }
 
+    // 代表機種：画像があるものを優先、無ければ先頭。カードの2段目に使う。
+    const robots = getRobotsByManufacturerSlug(manufacturer.slug);
+    const repRobot =
+      robots.find((robot) => getDisplayableAsset(robot.images?.hero ?? robot.heroImage)) ??
+      robots[0];
+    const repRobotImage = repRobot
+      ? getDisplayableAsset(repRobot.images?.hero ?? repRobot.heroImage)
+      : undefined;
+
     return [{
       slug: manufacturer.slug,
       name: manufacturer.nameJa ?? manufacturer.name,
@@ -30,6 +41,9 @@ export default function HomePage() {
       presenceLabel: japanPresenceLabels[manufacturer.japanPresence],
       lat: manufacturer.headquarters.lat,
       lng: manufacturer.headquarters.lng,
+      logoSrc: getDisplayableAsset(manufacturer.logo)?.src,
+      robotName: repRobot ? (repRobot.nameJa ?? repRobot.name) : undefined,
+      robotImageSrc: repRobotImage?.src,
     }];
   });
 
@@ -72,10 +86,15 @@ export default function HomePage() {
       </section>
 
       {mapPoints.length > 0 && (
-        <section className="-mx-6 border-b border-neutral-200 bg-neutral-950 px-6 py-10 text-white">
-          <div className="mx-auto max-w-7xl">
-            <ManufacturerMap points={mapPoints} />
-          </div>
+        <section className="py-16 border-b border-neutral-200">
+          <p className="font-mono text-xs uppercase tracking-wider text-neutral-500 mb-2">
+            Global Manufacturers
+          </p>
+          <h2 className="text-2xl font-semibold text-neutral-900 mb-2">主要メーカーの所在地</h2>
+          <p className="text-sm text-neutral-600 mb-8 max-w-2xl">
+            掲載中のヒューマノイド開発企業の本社所在地。地点にカーソルを合わせると企業名と日本市場での対応状況を表示します。
+          </p>
+          <ManufacturerWorldMap manufacturers={mapPoints} />
         </section>
       )}
 

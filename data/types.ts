@@ -316,6 +316,37 @@ export interface Report extends BaseRecord {
   relatedGuideSlugs?: Slug[];
 }
 
+export type DeploymentStatus =
+  | 'announced' // 発表のみ
+  | 'pilot' // 実証・PoC
+  | 'production' // 本番運用
+  | 'ended' // 終了
+  | 'unknown';
+
+/**
+ * 実在の導入事例。Homeワールドマップの「メーカーHQ→導入先」arc 描画の根拠データ。
+ * 所在地・導入主体・段階は必ず一次/信頼できる二次出典で裏取りし sources に残す（AI生成値の混入防止）。
+ * location は導入拠点のおおよその座標（番地レベルは不要）。
+ */
+export interface DeploymentSite extends BaseRecord {
+  /** arc 始点＝メーカー（data/manufacturers.ts の slug） */
+  manufacturerSlug: Slug;
+  /** 導入機種（data/robots.ts の slug、判明していれば） */
+  robotSlug?: Slug;
+  /** 導入先の企業/組織名（例: BMW、GXO） */
+  customer: string;
+  /** 拠点名（例: Spartanburg Plant） */
+  siteName?: string;
+  /** 導入先の国 */
+  country: string;
+  /** arc 終点＝導入拠点のおおよその座標 */
+  location: { lat: number; lng: number };
+  /** 導入の段階 */
+  status: DeploymentStatus;
+  /** 開始/発表時期（YYYY または YYYY-MM） */
+  startedAt?: ISODate;
+}
+
 export type ContactInquiryType =
   | 'data-correction'
   | 'listing-request'

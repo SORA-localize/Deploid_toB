@@ -1,3 +1,4 @@
+import { deployments } from '@/data/deployments';
 import { guides } from '@/data/guides';
 import { manufacturers } from '@/data/manufacturers';
 import { reports } from '@/data/reports';
@@ -21,6 +22,14 @@ export function getRobotBySlug(slug: string) {
 
 export function getManufacturers() {
   return published(manufacturers);
+}
+
+export function getDeployments() {
+  return published(deployments);
+}
+
+export function getDeploymentsForManufacturer(slug: string) {
+  return getDeployments().filter((deployment) => deployment.manufacturerSlug === slug);
 }
 
 export function getManufacturerBySlug(slug: string) {

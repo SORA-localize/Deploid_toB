@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { siteUrl } from '@/lib/site';
-import 'maplibre-gl/dist/maplibre-gl.css';
 import './globals.css';
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
