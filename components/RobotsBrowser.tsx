@@ -25,7 +25,7 @@ interface RobotsBrowserProps {
 
 export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   const { getParam, updateParams } = useUrlFilters();
-  const { favorites, toggleFavorite, isMounted } = useFavorites();
+  const { favorites, toggleFavorite } = useFavorites();
 
   const manufacturerBySlug = useMemo(
     () => new Map(manufacturers.map((manufacturer) => [manufacturer.slug, manufacturer])),
@@ -102,7 +102,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         </div>
 
         <div className="mb-6 max-w-2xl">
-            <SearchInput
+          <SearchInput
             value={filters.query}
             onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
             placeholder={uiText.searchPlaceholders.robots}
@@ -114,28 +114,28 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             id="robot-industry"
             label={uiText.filters.industry}
             value={filters.industry ?? 'all'}
-            onChange={(v) => updateParams({ industry: v === 'all' ? null : v }, 'replace')}
+            onChange={(v) => updateParams({ industry: v === 'all' ? null : v })}
             options={industryOptions}
           />
           <FilterSelect
             id="robot-task"
             label={uiText.filters.task}
             value={filters.task ?? 'all'}
-            onChange={(v) => updateParams({ task: v === 'all' ? null : v }, 'replace')}
+            onChange={(v) => updateParams({ task: v === 'all' ? null : v })}
             options={taskOptions}
           />
           <FilterSelect
             id="robot-manufacturer"
             label={uiText.filters.manufacturer}
             value={filters.manufacturer}
-            onChange={(v) => updateParams({ manufacturer: v === 'all' ? null : v }, 'replace')}
+            onChange={(v) => updateParams({ manufacturer: v === 'all' ? null : v })}
             options={manufacturerOptions}
           />
           <FilterSelect
             id="robot-availability"
             label={uiText.filters.availability}
             value={filters.availability}
-            onChange={(v) => updateParams({ availability: v === 'all' ? null : v }, 'replace')}
+            onChange={(v) => updateParams({ availability: v === 'all' ? null : v })}
             options={availabilityOptions}
           />
         </div>
@@ -145,7 +145,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             options={releaseOptions}
             value={filters.release}
             onChange={(nextRelease) =>
-              updateParams({ release: nextRelease === 'active' ? null : nextRelease }, 'replace')
+              updateParams({ release: nextRelease === 'active' ? null : nextRelease })
             }
             ariaLabel={uiText.filters.releaseStatus}
             buttonClassName="px-3 py-1.5 text-xs"

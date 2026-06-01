@@ -67,7 +67,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
       mode: nextMode === 'task' ? 'task' : null,
       industry: null,
       task: null,
-    }, 'replace');
+    });
   };
 
   const filtered = useCases.filter((u) => {
@@ -113,14 +113,14 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
             value={selectedChip}
             onChange={(value) =>
               mode === 'industry'
-                ? updateParams({ mode: null, industry: value, task: null }, 'replace')
-                : updateParams({ mode: 'task', industry: null, task: value }, 'replace')
+                ? updateParams({ mode: null, industry: value, task: null })
+                : updateParams({ mode: 'task', industry: null, task: value })
             }
             allowDeselect
             onClear={() =>
               mode === 'industry'
-                ? updateParams({ industry: null }, 'replace')
-                : updateParams({ task: null, mode: 'task' }, 'replace')
+                ? updateParams({ industry: null })
+                : updateParams({ task: null, mode: 'task' })
             }
             ariaLabel={mode === 'industry' ? uiText.filters.industryTags : uiText.filters.taskTags}
           />

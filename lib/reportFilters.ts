@@ -1,5 +1,5 @@
 import type { Report, ReportType } from '@/data/types';
-import { matchesSearchDocument } from '@/lib/search';
+import { matchesSearchDocument, type SearchDocument } from '@/lib/search';
 import { matchesTag } from '@/lib/tags';
 
 export function filterReports({
@@ -8,7 +8,7 @@ export function filterReports({
   filters,
 }: {
   reports: readonly Report[];
-  searchDocuments: Map<string, any>;
+  searchDocuments: Map<string, SearchDocument>;
   filters: {
     type: ReportType | 'all';
     topic: string | null;

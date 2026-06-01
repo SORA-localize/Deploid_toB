@@ -29,7 +29,7 @@ const typeOptions: Array<{ value: 'all' | ReportType; label: string }> = [
 
 export function ReportsBrowser({ reports }: { reports: Report[] }) {
   const { getParam, updateParams } = useUrlFilters();
-  
+
   const filters = useMemo(() => {
     const typeParam = getParam('type');
     const topicParam = getParam('tag');
@@ -69,7 +69,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
           <FilterChipGroup
             options={typeOptions}
             value={filters.type}
-            onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType }, 'replace')}
+            onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType })}
             ariaLabel={uiText.filters.reportType}
             className="mb-4"
           />
@@ -88,9 +88,9 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
             <FilterChipGroup
               options={topicOptions}
               value={filters.topic}
-              onChange={(nextTopic) => updateParams({ tag: nextTopic }, 'replace')}
+              onChange={(nextTopic) => updateParams({ tag: nextTopic })}
               allowDeselect
-              onClear={() => updateParams({ tag: null }, 'replace')}
+              onClear={() => updateParams({ tag: null })}
               ariaLabel={uiText.filters.reportTopics}
             />
           )}

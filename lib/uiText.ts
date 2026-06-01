@@ -153,7 +153,8 @@ export const uiText = {
   },
   comparison: {
     emptyTitle: '比較シートに機種がありません',
-    emptyDescription: '左のメニューから機種を選ぶと比較シートに追加されます。最大9機種まで横並びで比較できます。',
+    emptyDescription: (max: number) =>
+      `左のメニューから機種を選ぶと比較シートに追加されます。最大${max}機種まで横並びで比較できます。`,
     clearAria: '比較シートを空にする',
     toggleAria: (name: string, expanded: boolean) => `${name}の機種一覧を${expanded ? '閉じる' : '開く'}`,
     addAria: (name: string) => `${name}を比較に追加する`,
@@ -165,8 +166,6 @@ export const uiText = {
     detailedData: '詳細データ',
     japanSupport: '国内対応',
     dimensions: '外形寸法',
-    viewModeSimple: '簡易表示',
-    viewModeDetailed: '詳細表示',
     tabBasic: '基本',
     tabDetailed: '詳細',
   },

@@ -9,8 +9,9 @@ import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { Manufacturer, Robot } from '@/data/types';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
-
 import { useFavorites } from '@/lib/useFavorites';
+
+const MAX_COMPARE_ROBOTS = 9;
 
 interface CompareClientProps {
   robots: Robot[];
@@ -22,18 +23,22 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   const { favorites, toggleFavorite, isMounted } = useFavorites();
   const [expandedManufacturers, setExpandedManufacturers] = useState<string[]>([]);
 
-  // URL parameters for selected robots (e.g., ?compare=slug1,slug2)
   const compareParam = getParam('compare');
   const selectedSlugs = useMemo(() => {
     if (!compareParam) return [];
-    // Strict validation: Only return slugs that exist in the robots array
-    const validSlugs = new Set(robots.map(r => r.slug));
-    return compareParam.split(',').filter(slug => validSlugs.has(slug));
-  }, [compareParam, robots]);
+    const validSlugs = new Set(robots.map((robot) => robot.slug));
+    const seen = new Set<string>();
 
-  // URL parameter for view mode
-  const viewModeParam = getParam('view');
-  const viewMode = viewModeParam === 'detailed' ? 'detailed' : 'simple';
+    return compareParam
+      .split(',')
+      .map((slug) => slug.trim())
+      .filter((slug) => {
+        if (!validSlugs.has(slug) || seen.has(slug)) return false;
+        seen.add(slug);
+        return true;
+      })
+      .slice(0, MAX_COMPARE_ROBOTS);
+  }, [compareParam, robots]);
 
   const selectedRobots = useMemo(
     () => robots.filter((r) => selectedSlugs.includes(r.slug)),
@@ -47,41 +52,36 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   const manufacturerFor = (slug: string) => manufacturers.find((m) => m.slug === slug);
 
   const addRobot = (slug: string) => {
-    if (selectedSlugs.length < 20 && !selectedSlugs.includes(slug)) {
+    if (selectedSlugs.length < MAX_COMPARE_ROBOTS && !selectedSlugs.includes(slug)) {
       const nextSlugs = [...selectedSlugs, slug];
-      updateParams({ compare: nextSlugs.join(',') }, 'replace');
+      updateParams({ compare: nextSlugs.join(',') });
     }
+  };
+
+  const highlightRobot = (slug: string) => {
+    const el = document.getElementById(`compare-card-${slug}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    el.classList.add('ring-2', 'ring-accent', 'ring-offset-2');
+    setTimeout(() => el.classList.remove('ring-2', 'ring-accent', 'ring-offset-2'), 1500);
   };
 
   const handleFavoriteSelect = (slug: string) => {
     if (!selectedSlugs.includes(slug)) {
       addRobot(slug);
-      // Wait for DOM to update with the new card before scrolling
-      setTimeout(() => {
-        const el = document.getElementById(`compare-card-${slug}`);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-          el.classList.add('ring-2', 'ring-accent', 'ring-offset-2');
-          setTimeout(() => el.classList.remove('ring-2', 'ring-accent', 'ring-offset-2'), 1500);
-        }
-      }, 100);
+      setTimeout(() => highlightRobot(slug), 100);
     } else {
-      const el = document.getElementById(`compare-card-${slug}`);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-        el.classList.add('ring-2', 'ring-accent', 'ring-offset-2');
-        setTimeout(() => el.classList.remove('ring-2', 'ring-accent', 'ring-offset-2'), 1500);
-      }
+      highlightRobot(slug);
     }
   };
 
   const removeRobot = (slug: string) => {
     const nextSlugs = selectedSlugs.filter((s) => s !== slug);
-    updateParams({ compare: nextSlugs.length > 0 ? nextSlugs.join(',') : null }, 'replace');
+    updateParams({ compare: nextSlugs.length > 0 ? nextSlugs.join(',') : null });
   };
 
   const clearAll = () => {
-    updateParams({ compare: null }, 'replace');
+    updateParams({ compare: null });
   };
 
   const toggleManufacturer = (slug: string) => {
@@ -150,12 +150,16 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                               <button
                                 type="button"
                                 key={robot.slug}
-                                aria-label={isSelected ? uiText.comparison.removeAria(robot.nameJa ?? robot.name) : uiText.comparison.addAria(robot.nameJa ?? robot.name)}
+                                aria-label={
+                                  isSelected
+                                    ? uiText.comparison.removeAria(robot.nameJa ?? robot.name)
+                                    : uiText.comparison.addAria(robot.nameJa ?? robot.name)
+                                }
                                 aria-pressed={isSelected}
                                 onClick={() =>
                                   isSelected ? removeRobot(robot.slug) : addRobot(robot.slug)
                                 }
-                                disabled={!isSelected && selectedSlugs.length >= 20}
+                                disabled={!isSelected && selectedSlugs.length >= MAX_COMPARE_ROBOTS}
                                 className="w-full px-6 py-2 text-left text-xs hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-between group"
                               >
                                 <span
@@ -186,7 +190,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
           <div className="min-w-0">
             <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-xs text-neutral-500">
-                {uiText.compare.comparisonSheet(selectedSlugs.length, 20)}
+                {uiText.compare.comparisonSheet(selectedSlugs.length, MAX_COMPARE_ROBOTS)}
               </span>
               {selectedSlugs.length > 0 && (
                 <button
@@ -223,7 +227,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                     {uiText.comparison.emptyTitle}
                   </h3>
                   <p className="text-xs text-neutral-500">
-                    {uiText.comparison.emptyDescription}
+                    {uiText.comparison.emptyDescription(MAX_COMPARE_ROBOTS)}
                   </p>
                 </div>
               </div>
@@ -233,7 +237,11 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   {selectedRobots.map((robot) => {
                     const manufacturer = manufacturerFor(robot.manufacturerSlug);
                     return (
-                      <div key={robot.slug} id={`compare-card-${robot.slug}`} className="transition-shadow duration-500 rounded-sm">
+                      <div
+                        key={robot.slug}
+                        id={`compare-card-${robot.slug}`}
+                        className="transition-shadow duration-500 rounded-sm"
+                      >
                         <ComparisonRobotPanel
                           robot={robot}
                           manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
@@ -261,9 +269,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
               </div>
               <div className="p-4 max-h-80 overflow-y-auto overscroll-contain xl:max-h-[calc(100vh-200px)]">
                 {!isMounted ? (
-                  <div className="text-center py-8">
-                    {/* Render a skeleton or nothing to prevent FOUC */}
-                  </div>
+                  <div className="text-center py-8" aria-hidden="true" />
                 ) : favoriteRobots.length === 0 ? (
                   <div className="text-center py-8">
                     <Star className="w-8 h-8 text-neutral-300 mx-auto mb-3" />

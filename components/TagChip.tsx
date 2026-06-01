@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 type TagChipTone = 'neutral' | 'success' | 'warning' | 'info';
 
-interface TagChipProps<K extends TagKind = any> {
+interface TagChipProps<K extends TagKind = TagKind> {
   children?: ReactNode;
   kind?: K;
   value?: TagValue<K> | string;
@@ -18,15 +18,15 @@ const toneClasses: Record<TagChipTone, string> = {
   info: 'border-blue-200 bg-blue-50 text-blue-800',
 };
 
-export function TagChip<K extends TagKind>({ 
-  children, 
-  kind, 
-  value, 
-  tone = 'neutral', 
-  className = '' 
+export function TagChip<K extends TagKind = TagKind>({
+  children,
+  kind,
+  value,
+  tone = 'neutral',
+  className = '',
 }: TagChipProps<K>) {
   const displayLabel = value && kind ? getRegisteredTag(kind, value)?.label ?? value : children;
-  
+
   return (
     <span className={`inline-flex items-center border px-2 py-0.5 text-xs ${toneClasses[tone]} ${className}`}>
       {displayLabel}

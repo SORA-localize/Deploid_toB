@@ -23,7 +23,7 @@ const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
 
 export function GuidesBrowser({ guides }: { guides: Guide[] }) {
   const { getParam, updateParams } = useUrlFilters();
-  
+
   const filters = useMemo(() => {
     const stageParam = getParam('stage');
     const topicParam = getParam('topic');
@@ -54,7 +54,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
           <FilterChipGroup
             options={stageOptions}
             value={filters.stage}
-            onChange={(nextStage) => updateParams({ stage: nextStage === 'all' ? null : nextStage }, 'replace')}
+            onChange={(nextStage) => updateParams({ stage: nextStage === 'all' ? null : nextStage })}
             ariaLabel={uiText.filters.guideStage}
             className="mb-4"
             buttonClassName="px-4 py-2.5 text-xs font-medium"
@@ -63,9 +63,9 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
           <FilterChipGroup
             options={topicOptions}
             value={filters.topic}
-            onChange={(nextTopic) => updateParams({ topic: nextTopic }, 'replace')}
+            onChange={(nextTopic) => updateParams({ topic: nextTopic })}
             allowDeselect
-            onClear={() => updateParams({ topic: null }, 'replace')}
+            onClear={() => updateParams({ topic: null })}
             ariaLabel={uiText.filters.guideTopics}
           />
         </div>

@@ -105,4 +105,3 @@ export function getComparisonDetailRows(robot: Robot): DisplayRow[] {
     { label: '防塵防水', value: specs.ipRating ?? TBD_LABEL },
   ];
 }
-

@@ -23,23 +23,21 @@ export function FavoriteCard({
 }: FavoriteCardProps) {
   return (
     <div className="relative group border border-neutral-300 bg-white p-3 hover:border-neutral-400 hover:shadow-sm transition-all duration-200">
-      
-      {/* 1. Main Clickable Overlay (Stretches to fill the card) */}
       {onSelect ? (
-        <button 
-          onClick={() => onSelect(robot.slug)} 
+        <button
+          type="button"
+          onClick={() => onSelect(robot.slug)}
           className="absolute inset-0 z-10 w-full h-full cursor-pointer rounded-sm"
           aria-label={robot.nameJa ?? robot.name}
         />
       ) : (
-        <Link 
-          href={`/robots/${robot.slug}`} 
+        <Link
+          href={`/robots/${robot.slug}`}
           className="absolute inset-0 z-10 w-full h-full cursor-pointer rounded-sm"
           aria-label={robot.nameJa ?? robot.name}
         />
       )}
 
-      {/* 2. Visual Content (pointer-events-none so it doesn't block the overlay click) */}
       <div className="relative z-0 pointer-events-none">
         <div className="flex items-start justify-between gap-2 mb-2">
           <div className="flex-1 min-w-0">
@@ -57,7 +55,6 @@ export function FavoriteCard({
         />
       </div>
 
-      {/* 3. Remove Button (Higher z-index, restores pointer events, stops propagation) */}
       <button
         type="button"
         aria-label={uiText.favorites.ariaRemove(robot.nameJa ?? robot.name)}

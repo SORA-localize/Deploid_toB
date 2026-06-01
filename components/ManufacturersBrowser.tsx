@@ -100,7 +100,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
             label={uiText.filters.country}
             value={filters.country}
             onChange={(nextCountry) =>
-              updateParams({ country: nextCountry === 'all' ? null : nextCountry }, 'replace')
+              updateParams({ country: nextCountry === 'all' ? null : nextCountry })
             }
             options={countryOptions}
           />
@@ -108,7 +108,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
             id="manufacturer-type"
             label={uiText.filters.companyType}
             value={filters.type}
-            onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType }, 'replace')}
+            onChange={(nextType) => updateParams({ type: nextType === 'all' ? null : nextType })}
             options={typeOptions}
           />
           <FilterSelect
@@ -116,7 +116,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
             label={uiText.filters.status}
             value={filters.status}
             onChange={(nextStatus) =>
-              updateParams({ status: nextStatus === 'all' ? null : nextStatus }, 'replace')
+              updateParams({ status: nextStatus === 'all' ? null : nextStatus })
             }
             options={statusOptions}
           />

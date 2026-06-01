@@ -4,32 +4,33 @@ import { useState, useEffect, useCallback } from 'react';
 
 const FAVORITES_KEY = 'deploid_favorites';
 
+function parseFavorites(value: string | null) {
+  if (!value) return [];
+
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed)
+      ? Array.from(new Set(parsed.filter((item): item is string => typeof item === 'string')))
+      : [];
+  } catch (error) {
+    console.warn('Failed to parse favorites from localStorage', error);
+    return [];
+  }
+}
+
 export function useFavorites() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Initialize from localStorage on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(FAVORITES_KEY);
-      if (stored) {
-        setFavorites(JSON.parse(stored));
-      }
-    } catch (e) {
-      console.warn('Failed to parse favorites from localStorage', e);
-    }
+    setFavorites(parseFavorites(localStorage.getItem(FAVORITES_KEY)));
     setIsMounted(true);
   }, []);
 
-  // Listen for changes from other tabs
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === FAVORITES_KEY && e.newValue) {
-        try {
-          setFavorites(JSON.parse(e.newValue));
-        } catch (e) {
-          console.warn('Failed to parse favorites from storage event', e);
-        }
+      if (e.key === FAVORITES_KEY) {
+        setFavorites(parseFavorites(e.newValue));
       }
     };
 
@@ -42,13 +43,13 @@ export function useFavorites() {
       const next = prev.includes(slug)
         ? prev.filter((s) => s !== slug)
         : [...prev, slug];
-      
+
       try {
         localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
-      } catch (e) {
-        console.warn('Failed to save favorites to localStorage', e);
+      } catch (error) {
+        console.warn('Failed to save favorites to localStorage', error);
       }
-      
+
       return next;
     });
   }, []);

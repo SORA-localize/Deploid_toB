@@ -31,11 +31,14 @@ export function RobotCard({
 
   return (
     <div className="group border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-neutral-400 hover:-translate-y-1 hover:shadow-md transition-all duration-200 relative flex flex-col h-full">
-      {/* 1. Favorite Button: Highest z-index to be clickable */}
       {showFavorite && (
         <button
           type="button"
-          aria-label={isFavorite ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name) : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)}
+          aria-label={
+            isFavorite
+              ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name)
+              : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)
+          }
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -44,12 +47,13 @@ export function RobotCard({
           className="absolute top-3 right-3 z-30 p-2 bg-white/90 hover:bg-white border border-neutral-300 transition-colors"
         >
           <Star
-            className={`w-4 h-4 ${isFavorite ? 'fill-yellow-500 text-yellow-500' : 'text-neutral-400'}`}
+            className={`w-4 h-4 ${
+              isFavorite ? 'fill-yellow-500 text-yellow-500' : 'text-neutral-400'
+            }`}
           />
         </button>
       )}
 
-      {/* 2. Card Content: Mid z-index to allow text selection */}
       <div className="relative z-20 flex flex-col h-full pointer-events-none">
         <div className="aspect-[4/3] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-xs text-neutral-500 overflow-hidden">
           {(() => {
@@ -78,7 +82,9 @@ export function RobotCard({
               frameClassName="h-4 w-4"
               imageClassName="h-3 w-3"
             />
-            <p className="text-xs text-neutral-600 mb-4 leading-relaxed line-clamp-2">{robot.summary}</p>
+            <p className="text-xs text-neutral-600 mb-4 leading-relaxed line-clamp-2">
+              {robot.summary}
+            </p>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-4">
               {specRows.map((row) => (
                 <div key={row.label}>
@@ -105,10 +111,9 @@ export function RobotCard({
         </div>
       </div>
 
-      {/* 3. Global Link Overlay: Lowest z-index, only for background clicks */}
-      <Link 
-        href={`/robots/${robot.slug}`} 
-        className="absolute inset-0 z-10" 
+      <Link
+        href={`/robots/${robot.slug}`}
+        className="absolute inset-0 z-10"
         aria-hidden="true"
         tabIndex={-1}
       />
