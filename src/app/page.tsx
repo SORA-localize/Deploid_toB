@@ -1,20 +1,37 @@
 import Link from 'next/link';
 import { ArrowRight, Bot, Building2, BookOpen, Calendar } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
+import { ManufacturerMap } from '@/components/ManufacturerMap';
 import { RobotCard } from '@/components/RobotCard';
 import { TagChip } from '@/components/TagChip';
 import {
   getGuideBySlug,
   getGuides,
+  getManufacturers,
   getManufacturerForRobot,
   getReports,
   getRobots,
 } from '@/lib/data';
-import { reportTypeLabels } from '@/lib/labels';
+import { japanPresenceLabels, reportTypeLabels } from '@/lib/labels';
 import { getTagLabel } from '@/lib/tags';
 
 export default function HomePage() {
   const featured = getGuideBySlug('decision-variables') ?? getGuides()[0];
+  const manufacturers = getManufacturers();
+  const mapPoints = manufacturers.flatMap((manufacturer) => {
+    if (!manufacturer.headquarters) {
+      return [];
+    }
+
+    return [{
+      slug: manufacturer.slug,
+      name: manufacturer.nameJa ?? manufacturer.name,
+      country: manufacturer.country,
+      presenceLabel: japanPresenceLabels[manufacturer.japanPresence],
+      lat: manufacturer.headquarters.lat,
+      lng: manufacturer.headquarters.lng,
+    }];
+  });
 
   // 注目ロボット：更新日の新しい順に3件
   const featuredRobots = [...getRobots()]
@@ -53,6 +70,14 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {mapPoints.length > 0 && (
+        <section className="-mx-6 border-b border-neutral-200 bg-neutral-950 px-6 py-10 text-white">
+          <div className="mx-auto max-w-7xl">
+            <ManufacturerMap points={mapPoints} />
+          </div>
+        </section>
+      )}
 
       <section className="py-16 border-b border-neutral-200">
         <h2 className="text-2xl font-semibold text-neutral-900 mb-8">主要コンテンツ</h2>

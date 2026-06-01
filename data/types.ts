@@ -110,6 +110,8 @@ export interface Manufacturer extends BaseRecord {
   companyStatus: CompanyStatus;
   country: string;
   hqCity?: string;
+  /** 本社のおおよその座標。Homeのワールドマップ描画用（任意・装飾用途）。 */
+  headquarters?: { lat: number; lng: number };
   foundedYear?: number;
   website: string;
   logo?: ImageAsset;
