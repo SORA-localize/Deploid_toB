@@ -4,8 +4,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Building2 } from 'lucide-react';
-import { BudouXText } from '@/components/BudouXText';
+import { EncryptedText } from '@/components/ui/encrypted-text';
 import { ManufacturerMapCopy, region, type MapPoint } from '@/components/ManufacturerMapCopy';
+import React from 'react';
 
 interface ManufacturerMapStageProps {
   svgMap: string;
@@ -209,6 +210,9 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
   const ar = active ? region(active.members[0].country) : null;
   const isCluster = !!active && active.members.length > 1;
 
+  const headingLines = heading.split('\n');
+  const subcopyLines = subcopy.split('\n');
+
   return (
     <div
       ref={stageRef}
@@ -251,11 +255,27 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
               GLOBAL HUMANOID. PORTAL
             </p>
             <h1 className="mb-4 text-3xl font-semibold leading-tight text-white md:text-5xl">
-              <BudouXText text={heading} className="break-keep" />
+              {headingLines.map((line, i) => (
+                <EncryptedText
+                  key={i}
+                  text={line}
+                  revealDelayMs={40}
+                  flipDelayMs={40}
+                  className="block"
+                />
+              ))}
             </h1>
-            <p className="max-w-xl text-sm leading-relaxed text-neutral-300 md:text-base">
-              <BudouXText text={subcopy} className="break-keep" />
-            </p>
+            <div className="max-w-xl text-sm leading-relaxed text-neutral-300 md:text-base">
+              {subcopyLines.map((line, i) => (
+                <EncryptedText
+                  key={i}
+                  text={line}
+                  revealDelayMs={30}
+                  flipDelayMs={30}
+                  className="block"
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -292,56 +312,56 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
               key={active.id}
               className="manufacturer-card-enter max-w-[92%] lg:max-w-[62%]"
             >
-          {isCluster ? (
-            <>
-              <p className="mb-1 text-xs">
-                <span className="font-mono text-[11px] text-neutral-400">{ar.a3}</span>
-                <span className="ml-2 text-neutral-400">{active.members.length}社</span>
-              </p>
-              <ul className="text-xs">
-                {active.members.map((m) => (
-                  <li
-                    key={m.slug}
-                    className="flex items-center gap-2 border-t border-neutral-700 py-1.5 first:border-t-0"
-                  >
-                    <span className="inline-flex h-6 w-12 items-center justify-center bg-white">
-                      <Wordmark src={m.logoSrc} compact />
+              {isCluster ? (
+                <>
+                  <p className="mb-1 text-xs">
+                    <span className="font-mono text-[11px] text-neutral-400">{ar.a3}</span>
+                    <span className="ml-2 text-neutral-400">{active.members.length}社</span>
+                  </p>
+                  <ul className="text-xs">
+                    {active.members.map((m) => (
+                      <li
+                        key={m.slug}
+                        className="flex items-center gap-2 border-t border-neutral-700 py-1.5 first:border-t-0"
+                      >
+                        <span className="inline-flex h-6 w-12 items-center justify-center bg-white">
+                          <Wordmark src={m.logoSrc} compact />
+                        </span>
+                        <span className="font-medium text-white">{m.name}</span>
+                        <span className="font-mono text-[10px] text-neutral-400">
+                          {m.foundedYear ?? '—'}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center text-xs">
+                    <span className="pr-2 font-mono text-[11px] text-neutral-400">{ar.a3}</span>
+                    <span className="border-l border-neutral-600 px-2 font-medium text-white">
+                      {active.members[0].name}
                     </span>
-                    <span className="font-medium text-white">{m.name}</span>
-                    <span className="font-mono text-[10px] text-neutral-400">
-                      {m.foundedYear ?? '—'}
+                    <span className="border-l border-neutral-600 pl-2 text-neutral-400">
+                      {active.members[0].foundedYear ?? '—'}
                     </span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center text-xs">
-                <span className="pr-2 font-mono text-[11px] text-neutral-400">{ar.a3}</span>
-                <span className="border-l border-neutral-600 px-2 font-medium text-white">
-                  {active.members[0].name}
-                </span>
-                <span className="border-l border-neutral-600 pl-2 text-neutral-400">
-                  {active.members[0].foundedYear ?? '—'}
-                </span>
-              </div>
-              <div className="mt-2 inline-flex items-center bg-white px-2.5 py-1.5">
-                <Wordmark src={active.members[0].logoSrc} />
-              </div>
-            </>
-          )}
+                  </div>
+                  <div className="mt-2 inline-flex items-center bg-white px-2.5 py-1.5">
+                    <Wordmark src={active.members[0].logoSrc} />
+                  </div>
+                </>
+              )}
 
-          {active.arcs.length > 0 && (
-            <p className="mt-2 max-w-xs text-[11px] leading-snug">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">
-                Deployments
-              </span>{' '}
-              <span className="text-neutral-200">
-                {active.arcs.map((a) => a.customer).join(' · ')}
-              </span>
-            </p>
-          )}
+              {active.arcs.length > 0 && (
+                <p className="mt-2 max-w-xs text-[11px] leading-snug">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">
+                    Deployments
+                  </span>{' '}
+                  <span className="text-neutral-200">
+                    {active.arcs.map((a) => a.customer).join(' · ')}
+                  </span>
+                </p>
+              )}
             </div>
           </div>
         </div>
