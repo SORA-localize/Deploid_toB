@@ -8,6 +8,7 @@ import {
   robotCategoryLabels,
   TBD_LABEL,
 } from '@/lib/labels';
+import { getTagLabel } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
 
 export interface DisplayRow {
@@ -20,7 +21,7 @@ export function formatNumber(value: number | undefined, unit = '') {
 }
 
 export function formatRuntime(value: number | undefined) {
-  return value != null ? `約${value} 分` : TBD_LABEL;
+  return value != null ? `約${value}分` : TBD_LABEL;
 }
 
 export function joinOrFallback(values: readonly string[]) {
@@ -29,14 +30,20 @@ export function joinOrFallback(values: readonly string[]) {
 
 export function getRobotCardSpecRows(robot: Robot): DisplayRow[] {
   const { specs } = robot;
+  const size = specs.heightCm != null || specs.weightKg != null
+    ? `${formatNumber(specs.heightCm, 'cm')} / ${formatNumber(specs.weightKg, 'kg')}`
+    : TBD_LABEL;
+  const primaryIndustry = robot.industryTags?.[0]
+    ? getTagLabel(robot.industryTags[0], 'industry')
+    : TBD_LABEL;
 
   return [
-    { label: 'ペイロード', value: formatNumber(specs.payloadKg, ' kg') },
-    { label: '稼働時間', value: formatRuntime(specs.runtimeMin) },
-    { label: '身長', value: formatNumber(specs.heightCm, ' cm') },
-    { label: '重量', value: formatNumber(specs.weightKg, ' kg') },
-    { label: 'ステータス', value: deploymentStageLabels[robot.deploymentStage] },
-    { label: '参考価格', value: robot.priceNote ?? TBD_LABEL },
+    { label: '国内', value: japanAvailabilityLabels[robot.japanAvailability] },
+    { label: '段階', value: deploymentStageLabels[robot.deploymentStage] },
+    { label: '用途', value: primaryIndustry },
+    { label: 'サイズ', value: size },
+    { label: '稼働', value: formatRuntime(specs.runtimeMin) },
+    { label: '可搬', value: formatNumber(specs.payloadKg, 'kg') },
   ];
 }
 

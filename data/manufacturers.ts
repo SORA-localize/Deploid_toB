@@ -12,6 +12,7 @@ export const manufacturers: Manufacturer[] = [
     headquarters: { lat: 30.27, lng: 120.15 },
     foundedYear: 2016,
     website: 'https://www.unitree.com/',
+    contactUrl: 'https://techshare.co.jp/product/unitree/g1/',
     logo: {
       src: 'https://www.unitree.com/images/0079f8938336436e955ea3a98c4e1e59.svg',
       alt: 'Unitree Robotics logo',
@@ -37,13 +38,48 @@ export const manufacturers: Manufacturer[] = [
         checkedAt: '2026-05-27',
         reliability: 'official',
       },
+      {
+        title: 'Unitree G1 product page',
+        url: 'https://www.unitree.com/g1/',
+        publisher: 'Unitree Robotics',
+        checkedAt: '2026-06-01',
+        reliability: 'official',
+      },
+      {
+        title: 'Unitree G1 2次開発できる小型ヒューマノイドロボット',
+        url: 'https://techshare.co.jp/product/unitree/g1/',
+        publisher: 'TechShare',
+        checkedAt: '2026-06-01',
+        reliability: 'official',
+      },
+      {
+        title: 'Unitree – TOHASEN.COM Products',
+        url: 'https://tohasen.com/robot/unitree/',
+        publisher: 'Tohasen Robotics',
+        checkedAt: '2026-06-01',
+        reliability: 'official',
+      },
     ],
     description:
       '研究・教育・PoC用途で比較対象に入りやすいメーカー。日本で検討する場合は、販売経路、保守、交換部品、初期トレーニングの確認が重要。',
     japanPresence: 'distributor',
-    distributorNote: '国内販売・サポート窓口は案件ごとに確認する。',
-    supportNote: '国内代理店のサポート範囲、部品在庫、初期設定支援を確認する。',
-    procurementNote: '公開価格と実導入条件が異なる可能性があるため、構成ごとに見積確認が必要。',
+    domesticDistributors: [
+      {
+        name: 'TechShare',
+        website: 'https://techshare.co.jp/product/unitree/g1/',
+        sourceUrl: 'https://techshare.co.jp/product/unitree/g1/',
+        checkedAt: '2026-06-01',
+      },
+      {
+        name: 'Tohasen Robotics',
+        website: 'https://tohasen.com/robot/unitree/',
+        sourceUrl: 'https://tohasen.com/robot/unitree/',
+        checkedAt: '2026-06-01',
+      },
+    ],
+    distributorNote: 'TechShare',
+    supportNote: 'TechShareのUnitreeチームが問い合わせ窓口。国内サポート範囲、部品在庫、現地対応は見積時に確認する。',
+    procurementNote: 'G1はBasic/R&D系の複数モデル。国内価格・納期・保証は構成ごとに代理店へ見積確認する。',
     vendorRiskNote: '研究・PoC向け評価と、本番運用向け評価を分ける。',
   },
   {
@@ -417,10 +453,40 @@ export const manufacturers: Manufacturer[] = [
         checkedAt: '2026-05-30',
         reliability: 'official',
       },
+      {
+        title: 'Walker S2',
+        url: 'https://ga-robotics.co.jp/products/walker-s2/',
+        publisher: 'GA Robotics',
+        checkedAt: '2026-06-01',
+        reliability: 'official',
+      },
+      {
+        title: 'UAC、UBTECHのヒューマノイドロボット製品の取り扱いを開始',
+        url: 'https://uac.co.jp/news/uac%E3%80%81ubtech%E3%81%AE%E3%83%92%E3%83%A5%E3%83%BC%E3%83%9E%E3%83%8E%E3%82%A4%E3%83%89%E3%83%AD%E3%83%9C%E3%83%83%E3%83%88%E8%A3%BD%E5%93%81%E3%81%AE%E5%8F%96%E3%82%8A%E6%89%B1%E3%81%84%E3%82%92/',
+        publisher: 'UAC',
+        checkedAt: '2026-06-01',
+        reliability: 'official',
+      },
     ],
     description:
       'Walker S2 が BYD・Geely・FAW-VW・Foxconn 等の製造現場に導入されており、量産実績が積み上がっている。日本では GA Robotics および UAC（ユーエーシー）が取扱いを開始。',
     japanPresence: 'distributor',
+    domesticDistributors: [
+      {
+        name: 'GA Robotics',
+        website: 'https://ga-robotics.co.jp/products/walker-s2/',
+        sourceUrl: 'https://ga-robotics.co.jp/products/walker-s2/',
+        checkedAt: '2026-06-01',
+      },
+      {
+        name: 'UAC株式会社',
+        website:
+          'https://uac.co.jp/news/uac%E3%80%81ubtech%E3%81%AE%E3%83%92%E3%83%A5%E3%83%BC%E3%83%9E%E3%83%8E%E3%82%A4%E3%83%89%E3%83%AD%E3%83%9C%E3%83%83%E3%83%88%E8%A3%BD%E5%93%81%E3%81%AE%E5%8F%96%E3%82%8A%E6%89%B1%E3%81%84%E3%82%92/',
+        sourceUrl:
+          'https://uac.co.jp/news/uac%E3%80%81ubtech%E3%81%AE%E3%83%92%E3%83%A5%E3%83%BC%E3%83%9E%E3%83%8E%E3%82%A4%E3%83%89%E3%83%AD%E3%83%9C%E3%83%83%E3%83%88%E8%A3%BD%E5%93%81%E3%81%AE%E5%8F%96%E3%82%8A%E6%89%B1%E3%81%84%E3%82%92/',
+        checkedAt: '2026-06-01',
+      },
+    ],
     distributorNote: 'GA Robotics（2026年春販売予定）・UAC株式会社（2026年1月取扱開始）が国内窓口。',
     supportNote: '日本代理店経由での保守・サポート条件を確認する。',
     procurementNote: '価格は問い合わせ制。代理店経由で見積を取得する。',
@@ -480,16 +546,39 @@ export const manufacturers: Manufacturer[] = [
         reliability: 'official',
       },
       {
-        title: 'Tohasen Robotics – Booster Robotics 正規代理店契約',
-        url: 'https://www.tohasen-robotics.com/',
+        title: 'Tohasen Robotics、Booster Robotics社と日本国内における正規代理店契約を締結',
+        url: 'https://www.tohasen-robotics.com/news/tohasen-robotics%E3%80%81booster-robotics%E7%A4%BE%E3%81%A8%E6%97%A5%E6%9C%AC%E5%9B%BD%E5%86%85%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%AD%A3%E8%A6%8F%E4%BB%A3%E7%90%86%E5%BA%97%E5%A5%91%E7%B4%84/',
         publisher: 'Tohasen Robotics',
         checkedAt: '2026-05-30',
         reliability: 'official',
+      },
+      {
+        title: 'ヒューマノイドロボット「K1」、「T1」 帝華機械',
+        url: 'https://mono.ipros.com/product/detail/2001602661/',
+        publisher: 'イプロスものづくり',
+        checkedAt: '2026-06-01',
+        reliability: 'reported',
       },
     ],
     description:
       '研究・教育・PoC向けの小型ヒューマノイド T1 を販売。日本では帝華機械株式会社・Tohasen Robotics株式会社が正規代理店として契約済みで、国内問い合わせ・購入が可能。',
     japanPresence: 'distributor',
+    domesticDistributors: [
+      {
+        name: '帝華機械株式会社',
+        website: 'https://www.teika-machine.co.jp/',
+        sourceUrl: 'https://mono.ipros.com/product/detail/2001602661/',
+        checkedAt: '2026-06-01',
+      },
+      {
+        name: 'Tohasen Robotics',
+        website:
+          'https://www.tohasen-robotics.com/news/tohasen-robotics%E3%80%81booster-robotics%E7%A4%BE%E3%81%A8%E6%97%A5%E6%9C%AC%E5%9B%BD%E5%86%85%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%AD%A3%E8%A6%8F%E4%BB%A3%E7%90%86%E5%BA%97%E5%A5%91%E7%B4%84/',
+        sourceUrl:
+          'https://www.tohasen-robotics.com/news/tohasen-robotics%E3%80%81booster-robotics%E7%A4%BE%E3%81%A8%E6%97%A5%E6%9C%AC%E5%9B%BD%E5%86%85%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%AD%A3%E8%A6%8F%E4%BB%A3%E7%90%86%E5%BA%97%E5%A5%91%E7%B4%84/',
+        checkedAt: '2026-06-01',
+      },
+    ],
     distributorNote: '帝華機械株式会社（teika-machine.co.jp）・Tohasen Robotics株式会社（tohasen-robotics.com）が正規代理店。',
     supportNote: '国内代理店経由での保守・サポート条件を確認する。',
     procurementNote: '本体価格は公開あり。国内価格・保守費用は代理店に要確認。',
@@ -560,6 +649,14 @@ export const manufacturers: Manufacturer[] = [
     description:
       'David Reger 氏が2019年に設立したドイツのAIロボット企業。産業・サービス向けのコグニティブ・ヒューマノイド 4NE-1 を開発。Bosch・AWS とのパートナーシップや Neuraverse クラウド基盤を持つ。2024年 Series B で約1.2億ユーロを調達。日本では日栄機工株式会社が唯一の正規代理店として問い合わせ窓口を担う。',
     japanPresence: 'distributor',
+    domesticDistributors: [
+      {
+        name: '日栄機工株式会社',
+        website: 'https://nichieikikou.co.jp/neura-robotics-japan/',
+        sourceUrl: 'https://nichieikikou.co.jp/neura-robotics-japan/',
+        checkedAt: '2026-06-01',
+      },
+    ],
     distributorNote: '日栄機工株式会社（nichieikikou.co.jp）が日本唯一の正規代理店として問い合わせ・販売を担当。',
     supportNote: '国内代理店経由での保守条件を確認する。欧州本社との連携サポートになるため、対応範囲・リードタイムを事前に確認する。',
     procurementNote: 'ウェブサイトで払い戻し可能なデポジット（€100）による予約受付中。実購入価格・条件は日栄機工に要確認。',

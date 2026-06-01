@@ -1,11 +1,13 @@
 import type { Manufacturer, Robot } from '@/data/types';
 import {
-  companyStatusOrder,
-  companyTypeOrder,
   manufacturerCountryOrder,
   sortByDisplayOrder,
   sortManufacturers,
 } from '@/lib/display';
+import {
+  getManufacturerConsultationRoute,
+  manufacturerConsultationRouteOrder,
+} from '@/lib/manufacturerDisplay';
 import { createManufacturerSearchDocument, matchesSearchDocument } from '@/lib/search';
 import { isOneOf } from '@/lib/typeGuards';
 
@@ -27,38 +29,26 @@ export function getManufacturerFilterOptions(manufacturers: readonly Manufacture
       Array.from(new Set(manufacturers.map((manufacturer) => manufacturer.country))),
       manufacturerCountryOrder,
     ),
-    types: sortByDisplayOrder(
-      Array.from(new Set(manufacturers.map((manufacturer) => manufacturer.companyType))),
-      companyTypeOrder,
-    ),
-    statuses: sortByDisplayOrder(
-      Array.from(new Set(manufacturers.map((manufacturer) => manufacturer.companyStatus))),
-      companyStatusOrder,
-    ),
+    consultationRoutes: manufacturerConsultationRouteOrder,
   };
 }
 
 export function normalizeManufacturerFilters({
   country,
-  type,
-  status,
+  consultationRoute,
   query,
   countries,
-  types,
-  statuses,
+  consultationRoutes,
 }: {
   country: string | null | undefined;
-  type: string | null | undefined;
-  status: string | null | undefined;
+  consultationRoute: string | null | undefined;
   query: string | null | undefined;
   countries: readonly string[];
-  types: readonly Manufacturer['companyType'][];
-  statuses: readonly Manufacturer['companyStatus'][];
+  consultationRoutes: readonly ReturnType<typeof getManufacturerConsultationRoute>[];
 }) {
   return {
     country: country && countries.includes(country) ? country : 'all',
-    type: isOneOf(type, types) ? type : 'all',
-    status: isOneOf(status, statuses) ? status : 'all',
+    consultationRoute: isOneOf(consultationRoute, consultationRoutes) ? consultationRoute : 'all',
     query: query ?? '',
   };
 }
@@ -84,8 +74,12 @@ export function filterManufacturers({
 
   const base = manufacturers.filter((manufacturer) => {
     if (filters.country !== 'all' && manufacturer.country !== filters.country) return false;
-    if (filters.type !== 'all' && manufacturer.companyType !== filters.type) return false;
-    if (filters.status !== 'all' && manufacturer.companyStatus !== filters.status) return false;
+    if (
+      filters.consultationRoute !== 'all' &&
+      getManufacturerConsultationRoute(manufacturer) !== filters.consultationRoute
+    ) {
+      return false;
+    }
     return matchesSearchDocument(filters.query, searchDocuments.get(manufacturer.slug));
   });
 

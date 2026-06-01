@@ -44,11 +44,11 @@ export function RobotCard({
             e.stopPropagation();
             onFavoriteToggle?.(robot.slug);
           }}
-          className="absolute top-3 right-3 z-30 p-2 bg-white/90 hover:bg-white border border-neutral-300 transition-colors"
+          className="absolute top-3 right-3 z-30 p-1 text-neutral-400 transition-colors hover:text-neutral-700"
         >
           <Star
             className={`w-4 h-4 ${
-              isFavorite ? 'fill-yellow-500 text-yellow-500' : 'text-neutral-400'
+              isFavorite ? 'fill-yellow-500 text-yellow-500' : ''
             }`}
           />
         </button>
@@ -82,16 +82,13 @@ export function RobotCard({
               frameClassName="h-4 w-4"
               imageClassName="h-3 w-3"
             />
-            <p className="text-xs text-neutral-600 mb-4 leading-relaxed line-clamp-2">
-              {robot.summary}
-            </p>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-4">
               {specRows.map((row) => (
                 <div key={row.label}>
                   <dt className="text-neutral-500">{row.label}</dt>
                   <dd
                     className={
-                      row.label === 'ステータス' && statusReady
+                      row.label === '段階' && statusReady
                         ? 'text-green-700 font-medium'
                         : 'text-neutral-900 font-medium'
                     }

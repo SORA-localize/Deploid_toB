@@ -103,6 +103,14 @@ export type JapanPresence =
   | 'none'
   | 'unknown';
 
+export interface DomesticDistributor {
+  name: string;
+  website?: string;
+  sourceUrl?: string;
+  checkedAt?: ISODate;
+  note?: string;
+}
+
 export interface Manufacturer extends BaseRecord {
   name: string;
   nameJa?: string;
@@ -118,6 +126,7 @@ export interface Manufacturer extends BaseRecord {
   contactUrl?: string;
   description: string;
   japanPresence: JapanPresence;
+  domesticDistributors?: DomesticDistributor[];
   distributorNote?: string;
   supportNote?: string;
   procurementNote?: string;

@@ -42,6 +42,18 @@ export function validateData(): string[] {
     }
   };
 
+  const checkUrl = (kind: string, owner: string, field: string, value: string | undefined) => {
+    if (!value) return;
+    try {
+      const url = new URL(value);
+      if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+        issues.push(`[url] ${kind} "${owner}".${field} は http(s) URL にしてください: ${value}`);
+      }
+    } catch {
+      issues.push(`[url] ${kind} "${owner}".${field} はURL形式にしてください: ${value}`);
+    }
+  };
+
   const checkRequiredSources = (
     kind: string,
     owner: string,
@@ -171,6 +183,15 @@ export function validateData(): string[] {
     checkDate('manufacturer', m.slug, 'updatedAt', m.updatedAt);
     checkRequiredSources('manufacturer', m.slug, m.sources);
     checkImageAsset('manufacturer', m.slug, 'logo', m.logo);
+    m.domesticDistributors?.forEach((distributor, index) => {
+      const field = `domesticDistributors[${index}]`;
+      if (!distributor.name.trim()) {
+        issues.push(`[required] manufacturer "${m.slug}".${field}.name が空です`);
+      }
+      checkUrl('manufacturer', m.slug, `${field}.website`, distributor.website);
+      checkUrl('manufacturer', m.slug, `${field}.sourceUrl`, distributor.sourceUrl);
+      checkDate('manufacturer', m.slug, `${field}.checkedAt`, distributor.checkedAt);
+    });
   }
 
   for (const g of guides) {

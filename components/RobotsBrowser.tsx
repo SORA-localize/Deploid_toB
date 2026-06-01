@@ -3,7 +3,6 @@
 import { useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { EmptyState } from '@/components/EmptyState';
-import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { FilterSelect } from '@/components/FilterSelect';
 import { RobotCard } from '@/components/RobotCard';
 import { SearchInput } from '@/components/SearchInput';
@@ -140,16 +139,25 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           />
         </div>
 
-        <div className="mb-6">
-          <FilterChipGroup
-            options={releaseOptions}
-            value={filters.release}
-            onChange={(nextRelease) =>
-              updateParams({ release: nextRelease === 'active' ? null : nextRelease })
-            }
-            ariaLabel={uiText.filters.releaseStatus}
-            buttonClassName="px-3 py-1.5 text-xs"
-          />
+        <div className="mb-6 flex items-center gap-2 text-xs" role="group" aria-label={uiText.filters.releaseStatus}>
+          {releaseOptions.map((option, index) => {
+            const selected = filters.release === option.value;
+            return (
+              <span key={option.value} className="inline-flex items-center gap-2">
+                {index > 0 && <span className="text-neutral-300">/</span>}
+                <button
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => updateParams({ release: option.value === 'active' ? null : option.value })}
+                  className={`text-xs font-normal leading-normal transition-colors ${
+                    selected ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-800'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              </span>
+            );
+          })}
         </div>
 
         {filtered.length === 0 ? (

@@ -10,7 +10,8 @@ import {
   getReportsForManufacturer,
   getRobotsByManufacturerSlug,
 } from '@/lib/data';
-import { companyTypeLabels, japanPresenceLabels, TBD_LABEL } from '@/lib/labels';
+import { TBD_LABEL } from '@/lib/labels';
+import { getDomesticDistributorDisplay } from '@/lib/manufacturerDisplay';
 import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
@@ -36,6 +37,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
   const robots = getRobotsByManufacturerSlug(manufacturer.slug);
   const reports = getReportsForManufacturer(manufacturer.slug);
+  const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
 
   return (
     <div className="min-h-screen bg-white">
@@ -50,10 +52,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
         <div className="grid grid-cols-1 gap-8 mb-12 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="mb-2 text-xs text-neutral-500 flex items-center gap-2 flex-wrap">
-              <span>{uiText.manufacturers.profile}</span>
-              <span className="px-2 py-0.5 border border-neutral-400 text-neutral-700">
-                {companyTypeLabels[manufacturer.companyType]}
-              </span>
+              <span>プロフィール</span>
             </div>
             <h1 className="text-2xl font-semibold text-neutral-900 mb-4 sm:text-3xl">
               <ManufacturerLogoName
@@ -65,9 +64,9 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
             </h1>
             <p className="text-sm text-neutral-700 leading-relaxed mb-6">{manufacturer.description}</p>
             <div className="flex gap-4 text-xs flex-wrap">
-              {manufacturer.distributorNote && (
+              {domesticDistributor.hasDistributor && (
                 <div className="px-3 py-1.5 bg-neutral-100 border border-neutral-300 text-neutral-700">
-                  代理店: {manufacturer.distributorNote}
+                  国内代理店: {domesticDistributor.label}
                 </div>
               )}
               {manufacturer.supportNote && (
@@ -103,8 +102,32 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
                 <dd className="text-right text-neutral-900">{robots.length}</dd>
               </div>
               <div className="flex justify-between gap-4 py-2">
-                <dt className="text-neutral-500">日本での体制</dt>
-                <dd className="text-right text-neutral-900">{japanPresenceLabels[manufacturer.japanPresence]}</dd>
+                <dt className="text-neutral-500">国内代理店</dt>
+                <dd className="text-right text-neutral-900">
+                  {domesticDistributor.hasDistributor ? (
+                    <span className="inline-flex flex-col items-end gap-1">
+                      {domesticDistributor.distributors.map((distributor) =>
+                        distributor.website ? (
+                          <a
+                            key={distributor.name}
+                            href={distributor.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline underline-offset-4 hover:text-neutral-600"
+                          >
+                            {distributor.name}
+                          </a>
+                        ) : (
+                          <span key={distributor.name}>{distributor.name}</span>
+                        ),
+                      )}
+                    </span>
+                  ) : (
+                    <Link href="/contact" className="text-accent-blue-pale hover:text-accent-blue-pale-hover">
+                      問い合わせ
+                    </Link>
+                  )}
+                </dd>
               </div>
             </dl>
             <div className="flex flex-col gap-2 mt-6 sm:flex-row">

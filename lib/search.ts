@@ -222,6 +222,11 @@ export function createManufacturerSearchDocument(
       manufacturer.contactUrl,
       manufacturer.summary,
       manufacturer.description,
+      manufacturer.domesticDistributors?.map((distributor) => [
+        distributor.name,
+        distributor.website,
+        distributor.note,
+      ]),
       manufacturer.distributorNote,
       manufacturer.supportNote,
       manufacturer.procurementNote,
