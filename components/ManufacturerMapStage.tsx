@@ -244,44 +244,54 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
       />
 
       {/* 見出し（左上） */}
-      <div className="pointer-events-none absolute left-0 top-0 max-w-2xl p-6 md:p-10">
-        <p className="mb-3 font-mono text-xs uppercase tracking-wider text-neutral-400">
-          Global Humanoid Portal
-        </p>
-        <h1 className="mb-4 text-3xl font-semibold leading-tight text-white md:text-4xl">
-          <BudouXText text={heading} className="break-keep" />
-        </h1>
-        <p className="max-w-xl text-sm leading-relaxed text-neutral-300 md:text-base">
-          <BudouXText text={subcopy} className="break-keep" />
-        </p>
+      <div className="pointer-events-none absolute inset-0">
+        <div className="mx-auto h-full max-w-[1440px] px-4 pt-10 md:px-8 md:pt-16">
+          <div className="max-w-2xl">
+            <p className="mb-3 font-mono text-xs uppercase tracking-wider text-neutral-400">
+              GLOBAL HUMANOID. PORTAL
+            </p>
+            <h1 className="mb-4 text-3xl font-semibold leading-tight text-white md:text-5xl">
+              <BudouXText text={heading} className="break-keep" />
+            </h1>
+            <p className="max-w-xl text-sm leading-relaxed text-neutral-300 md:text-base">
+              <BudouXText text={subcopy} className="break-keep" />
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* CTA（右下） */}
-      <div
-        className="absolute bottom-0 right-0 flex flex-wrap justify-end gap-3 p-6 md:p-8"
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <Link
-          href="/guides"
-          className="inline-flex items-center gap-2 bg-white px-5 py-3 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-200"
-        >
-          導入ガイドを読む
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-        <Link
-          href="/robots"
-          className="inline-flex items-center gap-2 border border-white/30 px-5 py-3 text-sm text-white transition-colors hover:bg-white/10"
-        >
-          ロボット一覧
-        </Link>
+      <div className="absolute inset-x-0 bottom-0">
+        <div className="mx-auto max-w-[1440px] px-4 pb-6 md:px-8 md:pb-10">
+          <div
+            className="flex flex-wrap justify-end gap-3"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <Link
+              href="/guides"
+              className="inline-flex items-center gap-2 bg-white px-4 py-3 text-xs font-medium text-neutral-900 transition-colors hover:bg-neutral-200 sm:px-6 sm:py-4 sm:text-sm"
+            >
+              導入ガイドを読む
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/robots"
+              className="inline-flex items-center gap-2 border border-white/30 px-4 py-3 text-xs text-white transition-colors hover:bg-white/10 sm:px-6 sm:py-4 sm:text-sm"
+            >
+              ロボット一覧
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* 情報カード（左下）。単独＝1社、クラスタ＝複数社を縦スタック */}
       {active && ar && (
-        <div
-          key={active.id}
-          className="manufacturer-card-enter pointer-events-none absolute bottom-0 left-0 z-10 m-6 max-w-[62%]"
-        >
+        <div className="pointer-events-none absolute inset-x-0 bottom-24 lg:bottom-0">
+          <div className="mx-auto max-w-[1440px] px-4 pb-4 md:px-8 md:pb-10">
+            <div
+              key={active.id}
+              className="manufacturer-card-enter max-w-[92%] lg:max-w-[62%]"
+            >
           {isCluster ? (
             <>
               <p className="mb-1 text-xs">
@@ -332,6 +342,8 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
               </span>
             </p>
           )}
+            </div>
+          </div>
         </div>
       )}
     </div>

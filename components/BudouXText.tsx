@@ -17,8 +17,8 @@ interface BudouXTextProps {
 export function BudouXText({ text, className = '' }: BudouXTextProps) {
   if (!text) return null;
 
-  // 1. Parse text into safe array of strings (No dangerouslySetInnerHTML)
-  const chunks = parseJapaneseText(text);
+  // 1. Split by newline to support hard breaks
+  const lines = text.split('\n');
 
   return (
     <span className={`inline-block ${className}`}>
@@ -27,11 +27,15 @@ export function BudouXText({ text, className = '' }: BudouXTextProps) {
 
       {/* 3. Visual Presentation: Hidden from screen readers to prevent stuttering */}
       <span aria-hidden="true">
-        {chunks.map((chunk, index) => (
-          <React.Fragment key={index}>
-            {chunk}
-            {/* Insert zero-width space after each chunk except the last one */}
-            {index < chunks.length - 1 && <wbr />}
+        {lines.map((line, lineIndex) => (
+          <React.Fragment key={lineIndex}>
+            {parseJapaneseText(line).map((chunk, chunkIndex, chunks) => (
+              <React.Fragment key={chunkIndex}>
+                {chunk}
+                {chunkIndex < chunks.length - 1 && <wbr />}
+              </React.Fragment>
+            ))}
+            {lineIndex < lines.length - 1 && <br />}
           </React.Fragment>
         ))}
       </span>

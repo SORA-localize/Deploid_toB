@@ -85,7 +85,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-7xl px-6 py-12">
+      <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-12">
         <Breadcrumbs items={[{ label: uiText.manufacturers.breadcrumb }]} />
 
         <div className="mb-8">

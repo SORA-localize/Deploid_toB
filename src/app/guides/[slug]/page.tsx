@@ -63,7 +63,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
   return (
     <div className="min-h-screen bg-neutral-100">
       <div className="border-b border-neutral-300 bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-6">
+        <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-6">
           <Breadcrumbs
             items={[
               { label: uiText.guides.breadcrumb, path: '/guides' },
@@ -108,7 +108,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-8">
         <div className="grid grid-cols-12 gap-6">
           {/* TOC */}
           <div className="col-span-2 hidden lg:block">

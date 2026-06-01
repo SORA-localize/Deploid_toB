@@ -44,7 +44,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
   return (
     <div className="min-h-screen bg-neutral-100">
       <div className="border-b border-neutral-300 bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-8">
+        <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-8">
           <Breadcrumbs items={[{ label: uiText.guides.breadcrumb }]} />
           <h1 className="text-2xl font-semibold text-neutral-900 mb-3">{uiText.guides.title}</h1>
           <p className="text-sm text-neutral-600 max-w-3xl mb-6 leading-relaxed">
@@ -71,7 +71,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-8 min-h-[60vh]">
+      <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-8 min-h-[60vh]">
         {featured && filters.stage === 'all' && !filters.topic && (
           <div className="border border-neutral-300 bg-white p-6 mb-6">
             <div className="text-xs text-neutral-500 font-medium mb-3 pb-2 border-b border-neutral-200">

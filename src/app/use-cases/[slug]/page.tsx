@@ -45,7 +45,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
   return (
     <div className="min-h-screen bg-neutral-100">
       <div className="border-b border-neutral-300 bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-6">
+        <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-6">
           <Breadcrumbs
             items={[
               { label: uiText.useCases.breadcrumb, path: '/use-cases' },
@@ -107,7 +107,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-8">
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12 lg:col-span-8">
             <div className="space-y-6">

@@ -59,7 +59,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
   return (
     <div className="min-h-screen bg-neutral-100">
       <div className="border-b border-neutral-300 bg-white">
-        <div className="mx-auto max-w-7xl px-6 py-8">
+        <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-8">
           <Breadcrumbs items={[{ label: uiText.reports.breadcrumb }]} />
           <h1 className="text-2xl font-semibold text-neutral-900 mb-3">{uiText.reports.title}</h1>
           <p className="text-sm text-neutral-600 max-w-3xl mb-6 leading-relaxed">
@@ -97,7 +97,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-8 min-h-[60vh]">
+      <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-8 min-h-[60vh]">
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12 lg:col-span-8">
             {featured && !active && (

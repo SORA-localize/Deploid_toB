@@ -55,11 +55,11 @@ export default function HomePage() {
     <>
       <ManufacturerWorldMap
         manufacturers={mapPoints}
-        heading="日本企業のためのヒューマノイドロボット導入ポータル"
-        subcopy="製造業・物流・建設業向けに、ヒューマノイドロボットの選定から導入までを支援する情報基盤です。技術検証、調達プロセス、国内サポート体制を網羅的に解説します。"
+        heading={"日本の未来を\nヒューマノイドと共に切り拓く。"}
+        subcopy={"技術の理解から調達の実務まで、実装に必要なプロセスをすべて体系化。\n職種を問わず、社会実装に挑むすべての人が参照できる実践ガイドです。"}
       />
 
-      <div className="mx-auto max-w-7xl px-6 py-12">
+      <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-12">
       <section className="py-16 border-b border-neutral-200">
         <h2 className="text-2xl font-semibold text-neutral-900 mb-8">主要コンテンツ</h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
