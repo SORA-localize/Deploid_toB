@@ -43,6 +43,7 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
 
   const panX = useRef(0);
   const copyW = useRef(0);
+  const stageW = useRef(0);
   const dragging = useRef(false);
   const dragMoved = useRef(false);
   const startX = useRef(0);
@@ -51,6 +52,38 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
   const reduceMotion = useRef(false);
   const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafId = useRef<number | null>(null);
+  // activeSlug の最新値をrAF内から参照するためのミラー
+  const activeSlugRef = useRef<string | null>(null);
+
+  const setActive = useCallback((slug: string | null) => {
+    activeSlugRef.current = slug;
+    setActiveSlug(slug);
+  }, []);
+
+  // 自動回転中、ステージ中央に最も近いマーカーを「ホバー相当」でアクティブにする（スクロールと同期）。
+  const syncAutoActive = () => {
+    const cw = copyW.current;
+    const sw = stageW.current;
+    if (cw <= 0 || sw <= 0 || markers.length === 0) return;
+    const target = sw / 2;
+    let bestSlug: string | null = null;
+    let bestDist = Infinity;
+    for (const m of markers) {
+      const baseX = (m.leftPct / 100) * cw;
+      // baseX + panX を中央 target に最も近いインスタンス位置へ寄せる
+      let x = (((baseX + panX.current) % cw) + cw) % cw;
+      while (x < target - cw / 2) x += cw;
+      while (x > target + cw / 2) x -= cw;
+      const dist = Math.abs(x - target);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestSlug = m.slug;
+      }
+    }
+    // 中央から一定範囲に入っている時だけハイライト（離れていれば消す）
+    const candidate = bestDist <= cw * 0.05 ? bestSlug : null;
+    if (candidate !== activeSlugRef.current) setActive(candidate);
+  };
 
   const applyTransform = () => {
     if (trackRef.current) trackRef.current.style.transform = `translateX(${panX.current}px)`;
@@ -82,6 +115,7 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
       const h = s.clientHeight;
       const w = s.clientWidth;
       copyW.current = h * 2;
+      stageW.current = w;
       setCopies(Math.max(3, Math.ceil(w / (h * 2)) + 1));
       wrap();
       applyTransform();
@@ -102,6 +136,7 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
         panX.current -= AUTO_SPEED;
         wrap();
         applyTransform();
+        syncAutoActive(); // スクロールに同期して中央のメーカーをハイライト
       }
       rafId.current = requestAnimationFrame(tick);
     };
@@ -149,14 +184,17 @@ export function ManufacturerMapStage({ svgMap, markers, heading, subcopy }: Manu
     clearResume();
   };
   const onStageLeave = () => {
-    setActiveSlug(null);
+    setActive(null);
     scheduleResume();
   };
-  const onActivate = useCallback((slug: string) => {
-    interacting.current = true;
-    setActiveSlug(slug);
-  }, []);
-  const onClear = useCallback(() => setActiveSlug(null), []);
+  const onActivate = useCallback(
+    (slug: string) => {
+      interacting.current = true;
+      setActive(slug);
+    },
+    [setActive],
+  );
+  const onClear = useCallback(() => setActive(null), [setActive]);
   const onLinkClick = useCallback((e: ReactMouseEvent) => {
     if (dragMoved.current) e.preventDefault();
   }, []);
