@@ -11,9 +11,9 @@ import {
   getManufacturerForRobot,
   getReports,
   getRobots,
-  getRobotsByManufacturerSlug,
+  getDeploymentsForManufacturer,
 } from '@/lib/data';
-import { japanPresenceLabels, reportTypeLabels } from '@/lib/labels';
+import { reportTypeLabels } from '@/lib/labels';
 import { getDisplayableAsset } from '@/lib/media';
 import { getTagLabel } from '@/lib/tags';
 
@@ -25,25 +25,20 @@ export default function HomePage() {
       return [];
     }
 
-    // 代表機種：画像があるものを優先、無ければ先頭。カードの2段目に使う。
-    const robots = getRobotsByManufacturerSlug(manufacturer.slug);
-    const repRobot =
-      robots.find((robot) => getDisplayableAsset(robot.images?.hero ?? robot.heroImage)) ??
-      robots[0];
-    const repRobotImage = repRobot
-      ? getDisplayableAsset(repRobot.images?.hero ?? repRobot.heroImage)
-      : undefined;
-
     return [{
       slug: manufacturer.slug,
       name: manufacturer.nameJa ?? manufacturer.name,
       country: manufacturer.country,
-      presenceLabel: japanPresenceLabels[manufacturer.japanPresence],
       lat: manufacturer.headquarters.lat,
       lng: manufacturer.headquarters.lng,
+      foundedYear: manufacturer.foundedYear,
       logoSrc: getDisplayableAsset(manufacturer.logo)?.src,
-      robotName: repRobot ? (repRobot.nameJa ?? repRobot.name) : undefined,
-      robotImageSrc: repRobotImage?.src,
+      deployments: getDeploymentsForManufacturer(manufacturer.slug).map((d) => ({
+        lat: d.location.lat,
+        lng: d.location.lng,
+        customer: d.customer,
+        status: d.status,
+      })),
     }];
   });
 

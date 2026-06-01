@@ -169,6 +169,22 @@
     }
   }
 
+  /* Home ワールドマップ：導入事例の弧（実線）の上を光のセグメントが HQ→導入先 へ流れる。
+     pathLength="1" 正規化。dasharray=短い光+残り で、dashoffset を動かして移動を表現。 */
+  @keyframes manufacturerArcFlow {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .manufacturer-arc-flow {
+    stroke-dasharray: 0.12 0.88;
+    animation: manufacturerArcFlow 1.6s linear infinite;
+  }
+
   h1 {
     font-size: var(--text-2xl);
     font-weight: var(--font-weight-medium);
