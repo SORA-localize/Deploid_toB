@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { ArrowRight, Bot, Building2, BookOpen, Calendar } from 'lucide-react';
+import { ArrowRight, Calendar } from 'lucide-react';
+import { HomeContentNavigator } from '@/components/HomeContentNavigator';
 import { ManufacturerWorldMap } from '@/components/ManufacturerWorldMap';
 import { RobotCard } from '@/components/RobotCard';
 import { TagChip } from '@/components/TagChip';
@@ -46,6 +47,26 @@ export default function HomePage() {
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
     .slice(0, 3);
 
+  const robotPreviewAssets = featuredRobots.flatMap((robot) => {
+    const asset = getDisplayableAsset(robot.images?.hero ?? robot.heroImage);
+    return asset ? [{ src: asset.src, alt: asset.alt, label: robot.name }] : [];
+  });
+
+  const manufacturerPreviewAssets = manufacturers.flatMap((manufacturer) => {
+    const asset = getDisplayableAsset(manufacturer.logo);
+    return asset ? [{ src: asset.src, alt: asset.alt, label: manufacturer.nameJa ?? manufacturer.name }] : [];
+  }).slice(0, 7);
+
+  const guidePreviewAssets = featuredRobots.flatMap((robot) => {
+    const asset = getDisplayableAsset(
+      robot.images?.inOperation ??
+      robot.images?.scale ??
+      robot.images?.hero ??
+      robot.heroImage,
+    );
+    return asset ? [{ src: asset.src, alt: asset.alt, label: robot.name }] : [];
+  });
+
   // 最新記事：公開日の新しい順に3件
   const latestReports = [...getReports()]
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
@@ -60,46 +81,11 @@ export default function HomePage() {
       />
 
       <div className="site-container py-12">
-      <section className="py-16 border-b border-neutral-200">
-        <h2 className="text-2xl font-semibold text-neutral-900 mb-8">主要コンテンツ</h2>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <Link href="/robots" className="border border-neutral-200 p-6 hover:border-neutral-400 transition-colors bg-white">
-            <Bot className="w-8 h-8 text-neutral-700 mb-4" />
-            <h3 className="font-semibold text-neutral-900 mb-2">ロボット</h3>
-            <p className="text-sm text-neutral-600 mb-4">
-              主要なヒューマノイド機種の詳細スペックと導入可能性を、導入判断軸で評価。
-            </p>
-            <span className="text-sm text-neutral-900 inline-flex items-center gap-1">
-              詳しく見る
-              <ArrowRight className="w-4 h-4" />
-            </span>
-          </Link>
-
-          <Link href="/manufacturers" className="border border-neutral-200 p-6 hover:border-neutral-400 transition-colors bg-white">
-            <Building2 className="w-8 h-8 text-neutral-700 mb-4" />
-            <h3 className="font-semibold text-neutral-900 mb-2">メーカー</h3>
-            <p className="text-sm text-neutral-600 mb-4">
-              ヒューマノイド開発企業・代理店の事業概要と日本市場での対応状況。
-            </p>
-            <span className="text-sm text-neutral-900 inline-flex items-center gap-1">
-              詳しく見る
-              <ArrowRight className="w-4 h-4" />
-            </span>
-          </Link>
-
-          <Link href="/guides" className="border border-neutral-200 p-6 hover:border-neutral-400 transition-colors bg-white">
-            <BookOpen className="w-8 h-8 text-neutral-700 mb-4" />
-            <h3 className="font-semibold text-neutral-900 mb-2">導入ガイド</h3>
-            <p className="text-sm text-neutral-600 mb-4">
-              調達プロセス、技術評価基準、法規制対応など、導入検討に必要な実務知識を体系的に整理。
-            </p>
-            <span className="text-sm text-neutral-900 inline-flex items-center gap-1">
-              詳しく見る
-              <ArrowRight className="w-4 h-4" />
-            </span>
-          </Link>
-        </div>
-      </section>
+      <HomeContentNavigator
+        robotAssets={robotPreviewAssets}
+        manufacturerAssets={manufacturerPreviewAssets}
+        guideAssets={guidePreviewAssets}
+      />
 
       {featuredRobots.length > 0 && (
         <section className="py-16 border-b border-neutral-200">
