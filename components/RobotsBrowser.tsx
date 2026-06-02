@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect';
@@ -87,6 +87,8 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
     { value: 'active', label: uiText.robots.activeModels(activeRobots.length) },
     { value: 'pre', label: uiText.robots.preReleaseModels(preReleaseRobots.length) },
   ];
+
+  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen bg-white">
@@ -179,6 +181,9 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
                   showFavorite={true}
                   isFavorite={favorites.includes(robot.slug)}
                   onFavoriteToggle={toggleFavorite}
+                  dimmed={hoveredSlug !== null && hoveredSlug !== robot.slug}
+                  onHoverStart={() => setHoveredSlug(robot.slug)}
+                  onHoverEnd={() => setHoveredSlug(null)}
                 />
               );
             })}

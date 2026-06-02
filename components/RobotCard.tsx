@@ -2,11 +2,14 @@
 
 import Link from 'next/link';
 import { ChevronRight, Star, CameraOff } from 'lucide-react';
+import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
+import { useRef } from 'react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
 import { getDisplayableAsset } from '@/lib/media';
 import { getRobotCardSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
+import { cn } from '@/lib/utils';
 
 interface RobotCardProps {
   robot: Robot;
@@ -15,7 +18,14 @@ interface RobotCardProps {
   showFavorite?: boolean;
   isFavorite?: boolean;
   onFavoriteToggle?: (slug: string) => void;
+  dimmed?: boolean;
+  onHoverStart?: () => void;
+  onHoverEnd?: () => void;
 }
+
+const TILT_MAX = 5;
+const TILT_SPRING = { stiffness: 300, damping: 28 } as const;
+const GLOW_SPRING = { stiffness: 180, damping: 22 } as const;
 
 export function RobotCard({
   robot,
@@ -24,13 +34,86 @@ export function RobotCard({
   showFavorite = false,
   isFavorite = false,
   onFavoriteToggle,
+  dimmed = false,
+  onHoverStart,
+  onHoverEnd,
 }: RobotCardProps) {
   const specRows = getRobotCardSpecRows(robot);
   const statusReady =
     robot.deploymentStage === 'production' || robot.deploymentStage === 'limited-production';
 
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const normX = useMotionValue(0.5);
+  const normY = useMotionValue(0.5);
+
+  const rawRotateX = useTransform(normY, [0, 1], [TILT_MAX, -TILT_MAX]);
+  const rawRotateY = useTransform(normX, [0, 1], [-TILT_MAX, TILT_MAX]);
+
+  const rotateX = useSpring(rawRotateX, TILT_SPRING);
+  const rotateY = useSpring(rawRotateY, TILT_SPRING);
+  const glowOpacity = useSpring(0, GLOW_SPRING);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    normX.set((e.clientX - rect.left) / rect.width);
+    normY.set((e.clientY - rect.top) / rect.height);
+  };
+
+  const handleMouseEnter = () => {
+    glowOpacity.set(1);
+    onHoverStart?.();
+  };
+
+  const handleMouseLeave = () => {
+    normX.set(0.5);
+    normY.set(0.5);
+    glowOpacity.set(0);
+    onHoverEnd?.();
+  };
+
   return (
-    <div className="group border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-neutral-400 hover:-translate-y-1 hover:shadow-md transition-all duration-200 relative flex flex-col h-full">
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      animate={{
+        scale: dimmed ? 0.98 : 1,
+        opacity: dimmed ? 0.4 : 1,
+        filter: dimmed ? 'grayscale(0.5) blur(1px)' : 'grayscale(0) blur(0px)',
+      }}
+      style={{
+        rotateX,
+        rotateY,
+        transformPerspective: 1000,
+      }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className={cn(
+        "group relative flex flex-col h-full overflow-hidden border transition-colors duration-300",
+        "border-neutral-200 bg-white",
+        "hover:border-neutral-400 hover:shadow-lg",
+        dimmed && "pointer-events-none"
+      )}
+    >
+      {/* Glow effect */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-30"
+        style={{
+          opacity: glowOpacity,
+          background: 'radial-gradient(circle at center, rgba(0,0,0,0.03) 0%, transparent 70%)',
+        }}
+      />
+
+      {/* Shimmer sweep */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 left-0 z-30 w-[100%] -translate-x-full -skew-x-12 bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-[200%]"
+      />
+
       {showFavorite && (
         <button
           type="button"
@@ -44,7 +127,7 @@ export function RobotCard({
             e.stopPropagation();
             onFavoriteToggle?.(robot.slug);
           }}
-          className="absolute top-3 right-3 z-30 p-1 text-neutral-400 transition-colors hover:text-neutral-700"
+          className="absolute top-3 right-3 z-40 p-1 text-neutral-400 transition-colors hover:text-neutral-700 pointer-events-auto"
         >
           <Star
             className={`w-4 h-4 ${
@@ -116,12 +199,18 @@ export function RobotCard({
         </div>
       </div>
 
+      {/* Accent bottom line */}
+      <div
+        aria-hidden="true"
+        className="absolute bottom-0 left-0 z-40 h-[2px] w-0 bg-neutral-900 transition-all duration-500 group-hover:w-full pointer-events-none"
+      />
+
       <Link
         href={`/robots/${robot.slug}`}
         className="absolute inset-0 z-10"
         aria-hidden="true"
         tabIndex={-1}
       />
-    </div>
+    </motion.div>
   );
 }

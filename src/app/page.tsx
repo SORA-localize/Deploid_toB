@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, Calendar } from 'lucide-react';
+import { FeaturedRobotsGrid } from '@/components/FeaturedRobotsGrid';
 import { HomeContentNavigator } from '@/components/HomeContentNavigator';
 import { ManufacturerWorldMap } from '@/components/ManufacturerWorldMap';
 import { RobotCard } from '@/components/RobotCard';
@@ -72,6 +73,10 @@ export default function HomePage() {
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
     .slice(0, 3);
 
+  const manufacturerBySlug = Object.fromEntries(
+    manufacturers.map((m) => [m.slug, m])
+  );
+
   return (
     <>
       <ManufacturerWorldMap
@@ -88,31 +93,10 @@ export default function HomePage() {
       />
 
       {featuredRobots.length > 0 && (
-        <section className="py-16 border-b border-neutral-200">
-          <div className="flex items-end justify-between mb-8">
-            <h2 className="text-2xl font-semibold text-neutral-900">注目ロボット</h2>
-            <Link
-              href="/robots"
-              className="inline-flex items-center gap-1 text-sm text-neutral-600 hover:text-neutral-900"
-            >
-              すべて見る
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredRobots.map((robot) => {
-              const manufacturer = getManufacturerForRobot(robot.manufacturerSlug);
-              return (
-                <RobotCard
-                  key={robot.slug}
-                  robot={robot}
-                  manufacturerName={manufacturer?.name}
-                  manufacturerLogo={manufacturer?.logo}
-                />
-              );
-            })}
-          </div>
-        </section>
+        <FeaturedRobotsGrid
+          robots={featuredRobots}
+          manufacturerBySlug={manufacturerBySlug}
+        />
       )}
 
       {latestReports.length > 0 && (

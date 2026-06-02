@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ChevronRight, ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
+import { ManufacturerRobotsGrid } from '@/components/ManufacturerRobotsGrid';
 import { RobotCard } from '@/components/RobotCard';
 import {
   getManufacturerBySlug,
@@ -151,6 +152,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
         </div>
 
         <div>
+
           <div className="flex items-center justify-between gap-4 mb-6">
             <h2 className="text-xl font-semibold text-neutral-900">取扱機種</h2>
             <span className="px-3 py-1.5 bg-neutral-100 border border-neutral-300 text-neutral-700 text-xs whitespace-nowrap">
@@ -158,23 +160,12 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
             </span>
           </div>
 
-          {robots.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {robots.map((robot) => (
-                <RobotCard
-                  key={robot.slug}
-                  robot={robot}
-                  manufacturerName={manufacturer.name}
-                  manufacturerLogo={manufacturer.logo}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="border border-neutral-200 bg-white p-8 text-center">
-              <p className="text-neutral-500">このメーカーの機種情報は準備中です</p>
-            </div>
-          )}
+          <ManufacturerRobotsGrid
+            robots={robots}
+            manufacturer={manufacturer}
+          />
         </div>
+
 
         {reports.length > 0 && (
           <div className="mt-12 border border-neutral-300 bg-neutral-50 p-6">
