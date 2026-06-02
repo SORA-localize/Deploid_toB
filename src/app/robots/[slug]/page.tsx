@@ -58,7 +58,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
   return (
     <div className="min-h-screen bg-white">
       <div className="border-b border-neutral-300">
-        <div className="mx-auto max-w-[1440px] px-4 md:px-8">
+        <div className="site-container">
           <div className="flex items-center gap-6 py-4 text-xs overflow-x-auto">
             {sections.map((item) => (
               <a
@@ -73,7 +73,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
         </div>
       </div>
 
-      <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-12">
+      <div className="site-container py-12">
         <Breadcrumbs
           items={[
             { label: uiText.robots.breadcrumb, path: '/robots' },

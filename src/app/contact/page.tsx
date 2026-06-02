@@ -32,7 +32,7 @@ const inquiries = [
 
 export default function ContactPage() {
   return (
-    <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-12">
+    <div className="site-container py-12">
       <Breadcrumbs items={[{ label: 'お問い合わせ' }]} />
 
       <section className="py-12 border-b border-neutral-200">

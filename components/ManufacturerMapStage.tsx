@@ -249,7 +249,7 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
 
       {/* 見出し（左上） */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="mx-auto h-full max-w-[1440px] px-4 pt-10 md:px-8 md:pt-16">
+        <div className="site-container h-full pt-10 md:pt-16">
           <div className="max-w-2xl">
             <p className="mb-3 font-mono text-xs uppercase tracking-wider text-neutral-400">
               GLOBAL HUMANOID. PORTAL
@@ -259,8 +259,8 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
                 <EncryptedText
                   key={i}
                   text={line}
-                  revealDelayMs={40}
-                  flipDelayMs={40}
+                  revealDelayMs={30}
+                  flipDelayMs={30}
                   className="block"
                 />
               ))}
@@ -270,8 +270,8 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
                 <EncryptedText
                   key={i}
                   text={line}
-                  revealDelayMs={30}
-                  flipDelayMs={30}
+                  revealDelayMs={20}
+                  flipDelayMs={20}
                   className="block"
                 />
               ))}
@@ -282,7 +282,7 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
 
       {/* CTA（右下） */}
       <div className="absolute inset-x-0 bottom-0">
-        <div className="mx-auto max-w-[1440px] px-4 pb-6 md:px-8 md:pb-10">
+        <div className="site-container pb-6 md:pb-10">
           <div
             className="flex flex-wrap justify-end gap-3"
             onPointerDown={(e) => e.stopPropagation()}
@@ -307,7 +307,7 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
       {/* 情報カード（左下）。単独＝1社、クラスタ＝複数社を縦スタック */}
       {active && ar && (
         <div className="pointer-events-none absolute inset-x-0 bottom-24 lg:bottom-0">
-          <div className="mx-auto max-w-[1440px] px-4 pb-4 md:px-8 md:pb-10">
+          <div className="site-container pb-4 md:pb-10">
             <div
               key={active.id}
               className="manufacturer-card-enter max-w-[92%] lg:max-w-[62%]"

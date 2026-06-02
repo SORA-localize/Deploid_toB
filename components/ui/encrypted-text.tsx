@@ -54,6 +54,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
   encryptedClassName,
   revealedClassName,
 }) => {
+  const [isMounted, setIsMounted] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true });
 
@@ -66,7 +67,11 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
   );
 
   useEffect(() => {
-    if (!isInView) return;
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isInView || !isMounted) return;
 
     // Reset state for a fresh animation whenever dependencies change
     const initial = text
@@ -122,7 +127,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isInView, text, revealDelayMs, charset, flipDelayMs]);
+  }, [isInView, isMounted, text, revealDelayMs, charset, flipDelayMs]);
 
   if (!text) return null;
 
@@ -135,17 +140,20 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
     >
       {text.split("").map((char, index) => {
         const isRevealed = index < revealCount;
-        const displayChar = isRevealed
+
+        // Fix Hydration: Render the original character until mounted on the client.
+        const displayChar = !isMounted
           ? char
-          : char === " "
-            ? " "
-            : (scrambleCharsRef.current[index] ??
-              generateRandomCharacter(charset));
+          : isRevealed
+            ? char
+            : char === " "
+              ? " "
+              : (scrambleCharsRef.current[index] ?? generateRandomCharacter(charset));
 
         return (
           <span
             key={index}
-            className={cn(isRevealed ? revealedClassName : encryptedClassName)}
+            className={cn(isRevealed || !isMounted ? revealedClassName : encryptedClassName)}
           >
             {displayChar}
           </span>

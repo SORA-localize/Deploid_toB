@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 
 export function Header() {
@@ -20,9 +20,26 @@ export function Header() {
     { label: 'お問い合わせ', path: '/contact' },
   ];
 
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    const closeMenuOnDesktop = () => {
+      if (mediaQuery.matches) setIsMenuOpen(false);
+    };
+
+    closeMenuOnDesktop();
+    mediaQuery.addEventListener('change', closeMenuOnDesktop);
+    return () => mediaQuery.removeEventListener('change', closeMenuOnDesktop);
+  }, [isMenuOpen]);
+
   return (
     <header className="border-b border-neutral-200 bg-neutral-50">
-      <div className="mx-auto max-w-[1440px] px-4 md:px-8">
+      <div className="site-container">
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/"
@@ -77,7 +94,7 @@ export function Header() {
       </div>
       {isMenuOpen && (
         <nav id="site-mobile-navigation" className="border-t border-neutral-200 lg:hidden">
-          <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-x-4 gap-y-1 px-4 py-3 md:px-8">
+          <div className="site-container grid grid-cols-2 gap-x-4 gap-y-1 py-3">
             {navItems.map((item) => {
               const isActive = pathname === item.path ||
                 (item.path !== '/' && pathname.startsWith(item.path));

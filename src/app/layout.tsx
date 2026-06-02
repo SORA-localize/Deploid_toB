@@ -3,10 +3,10 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { siteUrl } from '@/lib/site';
 import './globals.css';
-import { Inter } from "next/font/google";
+import { Inter, Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 // Figma Layout.tsx を逐語移植（Outlet → children）。
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja" className={cn("font-sans", inter.variable)}>
+    <html lang="ja" className={cn("font-sans", geist.variable)}>
       <body>
         <div className="min-h-screen bg-neutral-50 flex flex-col">
           <Header />

@@ -55,11 +55,11 @@ export default function HomePage() {
     <>
       <ManufacturerWorldMap
         manufacturers={mapPoints}
-        heading={"日本の未来を\nヒューマノイドと共に切り拓く。"}
+        heading={"日本の未来を\nヒューマノイドと共に\n切り開く。"}
         subcopy={"技術の理解から調達の実務まで、実装に必要なプロセスをすべて体系化。\n職種を問わず、社会実装に挑むすべての人が参照できる実践ガイドです。"}
       />
 
-      <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-12">
+      <div className="site-container py-12">
       <section className="py-16 border-b border-neutral-200">
         <h2 className="text-2xl font-semibold text-neutral-900 mb-8">主要コンテンツ</h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">

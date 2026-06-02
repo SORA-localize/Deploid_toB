@@ -48,7 +48,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   return (
     <div className="min-h-screen bg-neutral-100">
       <div className="border-b border-neutral-300 bg-white">
-        <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-6">
+        <div className="site-container py-6">
           <Breadcrumbs
             items={[
               { label: uiText.reports.breadcrumb, path: '/reports' },
@@ -80,7 +80,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
         </div>
       </div>
 
-      <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-8">
+      <div className="site-container py-8">
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12 lg:col-span-8">
             <div className="space-y-6">

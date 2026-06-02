@@ -41,7 +41,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-[1440px] px-4 py-8 md:px-8 sm:py-12">
+      <div className="site-container py-8 sm:py-12">
         <Breadcrumbs
           items={[
             { label: uiText.manufacturers.breadcrumb, path: '/manufacturers' },

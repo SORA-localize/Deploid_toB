@@ -35,7 +35,7 @@ const roadmap = [
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-12">
+    <div className="site-container py-12">
       <Breadcrumbs items={[{ label: '会社概要' }]} />
 
       <section className="py-12 border-b border-neutral-200">
