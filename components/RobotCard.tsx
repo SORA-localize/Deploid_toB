@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronRight, Star } from 'lucide-react';
+import { ChevronRight, Star, CameraOff } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
 import { getDisplayableAsset } from '@/lib/media';
@@ -55,14 +55,22 @@ export function RobotCard({
       )}
 
       <div className="relative z-20 flex flex-col h-full pointer-events-none">
-        <div className="aspect-[4/3] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-xs text-neutral-500 overflow-hidden">
+        <div className="aspect-[4/3] bg-neutral-100 flex flex-col items-center justify-center text-neutral-400 overflow-hidden border-b border-neutral-200">
           {(() => {
             const hero = getDisplayableAsset(robot.images?.hero ?? robot.heroImage);
             return hero ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={hero.src} alt={hero.alt} className="h-full w-full object-contain" />
             ) : (
-              uiText.robots.mainImageMissing
+              <>
+                <CameraOff className="w-8 h-8 mb-2 opacity-20" />
+                <span className="text-[10px] uppercase tracking-widest font-medium opacity-60">
+                  {uiText.robots.imageRequested}
+                </span>
+                <span className="text-[10px] mt-0.5 opacity-40">
+                  {uiText.robots.mainImageMissing}
+                </span>
+              </>
             );
           })()}
         </div>

@@ -1,3 +1,4 @@
+import { CameraOff } from 'lucide-react';
 import type { ImageAsset } from '@/data/types';
 import { getDisplayableAsset } from '@/lib/media';
 
@@ -21,7 +22,6 @@ export function ManufacturerLogoName({
   showPlaceholder = true,
 }: ManufacturerLogoNameProps) {
   const displayLogo = getDisplayableAsset(logo);
-  const fallback = name.trim().slice(0, 2).toUpperCase();
 
   return (
     <span className={`flex min-w-0 items-center gap-1.5 ${className}`}>
@@ -43,9 +43,10 @@ export function ManufacturerLogoName({
       ) : showPlaceholder ? (
         <span
           aria-hidden="true"
-          className={`inline-flex shrink-0 items-center justify-center border border-neutral-300 bg-white text-[10px] font-semibold text-neutral-500 ${frameClassName}`}
+          className={`inline-flex shrink-0 items-center justify-center border border-neutral-200 bg-neutral-50 text-neutral-300 ${frameClassName}`}
+          title="Official logo requested"
         >
-          {fallback}
+          <CameraOff className="h-2.5 w-2.5" />
         </span>
       ) : null}
       <span className={`min-w-0 truncate ${textClassName}`}>{name}</span>

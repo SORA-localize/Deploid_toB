@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CameraOff } from 'lucide-react';
 import type { ImageAsset, ImageRole } from '@/data/types';
 import { imageRoleLabels, imageRoleOrder } from '@/lib/labels';
 import { getDisplayableAsset } from '@/lib/media';
@@ -25,12 +25,20 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
   return (
     <div className="border border-neutral-300 overflow-hidden bg-white">
       <div className="relative">
-        <div className="aspect-[16/9] bg-gradient-to-br from-neutral-200 to-neutral-300 flex items-center justify-center text-xs text-neutral-500">
+        <div className="aspect-[16/9] bg-neutral-100 flex flex-col items-center justify-center text-neutral-400 overflow-hidden">
           {img ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={img.src} alt={img.alt} className="w-full h-full object-contain" />
           ) : (
-            <span>[ {imageRoleLabels[current]} ]</span>
+            <>
+              <CameraOff className="w-12 h-12 mb-3 opacity-15" />
+              <span className="text-[11px] uppercase tracking-[0.2em] font-medium opacity-60">
+                {uiText.robots.imageRequested}
+              </span>
+              <span className="text-[11px] mt-1 opacity-40">
+                {imageRoleLabels[current]} {uiText.robots.mainImageMissing}
+              </span>
+            </>
           )}
         </div>
         <button
