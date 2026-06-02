@@ -43,15 +43,20 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/"
-            className="min-w-0 text-neutral-900 transition-colors hover:text-neutral-700"
+            className="flex min-w-0 items-center gap-3 text-neutral-900 transition-opacity hover:opacity-75"
             onClick={() => setIsMenuOpen(false)}
+            aria-label="Deploid ホームへ"
           >
-            <div className="flex items-baseline gap-2">
-              <span className="font-semibold text-lg">Deploid</span>
-              <span className="hidden text-xs font-medium uppercase tracking-wider text-neutral-500 sm:inline">
-                ヒューマノイド導入実務ガイド
-              </span>
-            </div>
+            <img
+              src="/brand/deploid-logo.png"
+              alt="Deploid"
+              className="h-8 w-auto shrink-0"
+              width={760}
+              height={306}
+            />
+            <span className="hidden whitespace-nowrap text-xs font-medium text-neutral-500 sm:inline">
+              ヒューマノイド導入支援サイト
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">
