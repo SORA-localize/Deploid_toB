@@ -46,8 +46,8 @@ export function FilterChipGroup<T extends string>({
             }}
             className={`${buttonClassName} border transition-colors ${
               selected
-                ? 'border-neutral-900 bg-neutral-900 text-white'
-                : 'border-neutral-300 bg-white text-neutral-700 hover:border-neutral-500'
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border bg-card text-foreground hover:border-foreground/40'
             }`}
           >
             {option.label}

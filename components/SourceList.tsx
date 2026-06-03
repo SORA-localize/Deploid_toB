@@ -16,14 +16,14 @@ export function SourceList({
   title = uiText.common.resources,
   sources,
   emptyMessage = uiText.emptyStates.sources,
-  className = 'border border-neutral-300 bg-white p-6 scroll-mt-6',
-  titleClassName = 'text-lg font-semibold text-neutral-900 mb-4',
+  className = 'border border-border bg-card p-6 scroll-mt-6',
+  titleClassName = 'text-lg font-semibold text-foreground mb-4',
 }: SourceListProps) {
   return (
     <div id={id} className={className}>
       <h2 className={titleClassName}>{title}</h2>
       {sources.length === 0 ? (
-        <p className="text-xs text-neutral-500">{emptyMessage}</p>
+        <p className="text-xs text-muted-foreground">{emptyMessage}</p>
       ) : (
         <ul className="space-y-2 text-xs">
           {sources.map((source) => (
@@ -32,11 +32,11 @@ export function SourceList({
                 href={source.url}
                 target="_blank"
                 rel="noreferrer"
-                className="text-neutral-900 hover:text-neutral-600 underline"
+                className="text-foreground hover:text-muted-foreground underline"
               >
                 {source.title}
               </a>
-              <span className="text-neutral-500">
+              <span className="text-muted-foreground">
                 {source.publisher ? ` / ${source.publisher}` : ''} / 確認 {source.checkedAt}{' '}
                 / {reliabilityLabels[source.reliability]}
               </span>

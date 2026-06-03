@@ -27,7 +27,9 @@ export function ManufacturerLogoName({
     <span className={`flex min-w-0 items-center gap-1.5 ${className}`}>
       {displayLogo ? (
         <span
-          className={`inline-flex shrink-0 items-center justify-center border border-neutral-200 bg-white ${frameClassName}`}
+          // ロゴは白背景前提のものが多いため、フレームは意図的に白の
+          // メディアバックプレートとして残す（ページ/カード面には使わない）。
+          className={`inline-flex shrink-0 items-center justify-center border border-border bg-white ${frameClassName}`}
           title={displayLogo.credit}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -43,7 +45,7 @@ export function ManufacturerLogoName({
       ) : showPlaceholder ? (
         <span
           aria-hidden="true"
-          className={`inline-flex shrink-0 items-center justify-center border border-neutral-200 bg-neutral-50 text-neutral-300 ${frameClassName}`}
+          className={`inline-flex shrink-0 items-center justify-center border border-border bg-muted text-muted-foreground/70 ${frameClassName}`}
           title="Official logo requested"
         >
           <CameraOff className="h-2.5 w-2.5" />

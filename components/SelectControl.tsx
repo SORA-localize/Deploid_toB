@@ -28,9 +28,9 @@ export function SelectControl({
   options,
   onChange,
   className = '',
-  labelClassName = 'mb-2 block text-xs text-neutral-500',
-  buttonClassName = 'w-full flex items-center justify-between border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-accent focus:ring-2 focus:ring-accent focus:ring-offset-1 focus:outline-none text-left transition-all',
-  listClassName = 'absolute z-50 w-full border border-neutral-300 bg-white mt-px max-h-80 overflow-y-auto overscroll-contain shadow-lg animate-in fade-in zoom-in-95 duration-100',
+  labelClassName = 'mb-2 block text-xs text-muted-foreground',
+  buttonClassName = 'w-full flex items-center justify-between border border-border bg-input-background px-3 py-2 text-sm text-foreground focus:border-ring focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:outline-none text-left transition-all',
+  listClassName = 'absolute z-50 w-full border border-border bg-popover text-popover-foreground mt-px max-h-80 overflow-y-auto overscroll-contain shadow-lg animate-in fade-in zoom-in-95 duration-100',
   required = false,
 }: SelectControlProps) {
   const [open, setOpen] = useState(false);
@@ -121,7 +121,7 @@ export function SelectControl({
           <ChevronDown
             size={14}
             aria-hidden="true"
-            className={`shrink-0 text-neutral-500 transition-transform ${open ? 'rotate-180' : ''}`}
+            className={`shrink-0 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`}
           />
         </button>
 
@@ -150,10 +150,10 @@ export function SelectControl({
                   onMouseEnter={() => setFocusedIndex(index)}
                   className={`px-3 py-2 text-sm cursor-pointer select-none ${
                     isSelected
-                      ? 'bg-neutral-900 text-white'
+                      ? 'bg-primary text-primary-foreground'
                       : isFocused
-                        ? 'bg-neutral-100 text-neutral-900'
-                        : 'text-neutral-900 hover:bg-neutral-50'
+                        ? 'bg-muted text-foreground'
+                        : 'text-popover-foreground hover:bg-muted'
                   }`}
                 >
                   {option.label}

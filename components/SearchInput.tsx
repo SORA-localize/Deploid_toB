@@ -21,7 +21,7 @@ export function SearchInput({
 }: SearchInputProps) {
   return (
     <div className={`relative ${className}`}>
-      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <input
         type="search"
         aria-label={ariaLabel ?? placeholder}
@@ -29,7 +29,7 @@ export function SearchInput({
         placeholder={placeholder}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className={`w-full border border-neutral-300 bg-white py-3 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 transition-all focus:border-accent focus:ring-2 focus:ring-accent focus:ring-offset-1 focus:outline-none ${inputClassName}`}
+        className={`w-full border border-border bg-input-background py-3 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-ring focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:outline-none ${inputClassName}`}
       />
     </div>
   );

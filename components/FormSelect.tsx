@@ -43,8 +43,8 @@ export function FormSelect({
         options={options}
         onChange={setSelectedValue}
         className={className}
-        labelClassName="block text-xs font-medium text-neutral-900 mb-2"
-        buttonClassName="w-full flex items-center justify-between px-3 py-2 border border-neutral-300 bg-white text-sm text-neutral-900 focus:outline-none focus:border-neutral-500 text-left"
+        labelClassName="block text-xs font-medium text-foreground mb-2"
+        buttonClassName="w-full flex items-center justify-between px-3 py-2 border border-border bg-input-background text-sm text-foreground focus:outline-none focus:border-ring text-left"
         required={required}
       />
     </>
