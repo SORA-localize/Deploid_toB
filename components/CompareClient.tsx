@@ -130,6 +130,11 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
     return nextItems;
   }, [robotBySlug, selectedRobots, sheetPreview]);
 
+  // 挿入プレビュー中だけ Framer Motion の layout を有効化する。
+  // シート内の並べ替えは dnd-kit が transform で整列アニメを担うため、
+  // ここで layout を併用すると同じカードを二重にアニメートしてガクつく。
+  const isInsertionPreviewing = sheetPreview !== null;
+
   const manufacturerFor = (slug: string) => manufacturers.find((m) => m.slug === slug);
   const activeDragRobot = activeDrag ? robotBySlug.get(activeDrag.slug) : undefined;
   const activeDragManufacturer = activeDragRobot
@@ -487,7 +492,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                             return (
                               <motion.div
                                 key={robot.slug}
-                                layout
+                                layout={isInsertionPreviewing}
                                 transition={SHEET_LAYOUT_TRANSITION}
                                 className="h-full"
                               >
