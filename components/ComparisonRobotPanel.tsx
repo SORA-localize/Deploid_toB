@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { Star, X } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
+import type { CompareCardDragHandleProps } from '@/components/SortableCompareCard';
 import type { ImageAsset, Robot } from '@/data/types';
 import { TBD_LABEL } from '@/lib/labels';
 import { getComparisonCoreRows, getComparisonDetailRows } from '@/lib/robotDisplay';
@@ -16,6 +17,7 @@ interface ComparisonRobotPanelProps {
   isFavorite: boolean;
   onFavoriteToggle: (slug: string) => void;
   onRemove: (slug: string) => void;
+  dragHandleProps?: CompareCardDragHandleProps;
 }
 
 function CompactList({ items }: { items: string[] }) {
@@ -40,6 +42,7 @@ export function ComparisonRobotPanel({
   isFavorite,
   onFavoriteToggle,
   onRemove,
+  dragHandleProps,
 }: ComparisonRobotPanelProps) {
   const [activeTab, setActiveTab] = useState<'basic' | 'detailed'>('basic');
   const coreRows = getComparisonCoreRows(robot);
@@ -59,7 +62,17 @@ export function ComparisonRobotPanel({
     <article className="flex flex-col border border-border bg-card text-card-foreground h-full relative">
       <div className="border-b border-border bg-muted p-3 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
+          <div
+            className={`min-w-0 flex-1 rounded-sm ${
+              dragHandleProps
+                ? 'cursor-grab touch-none select-none active:cursor-grabbing'
+                : ''
+            }`}
+            aria-label={dragHandleProps ? uiText.comparison.reorderAria(robot.nameJa ?? robot.name) : undefined}
+            title={dragHandleProps ? uiText.comparison.reorderHint : undefined}
+            {...dragHandleProps?.attributes}
+            {...dragHandleProps?.listeners}
+          >
             <h3
               className="text-sm font-semibold text-foreground truncate"
               title={robot.nameJa ?? robot.name}
@@ -115,8 +128,8 @@ export function ComparisonRobotPanel({
           onKeyDown={handleTabKeyDown}
           className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors ${
             activeTab === 'basic'
-              ? 'bg-card text-foreground border-b-2 border-primary'
-              : 'bg-muted text-muted-foreground hover:text-foreground border-b-2 border-transparent'
+              ? 'bg-card text-foreground border-b-2 border-b-primary'
+              : 'bg-muted text-muted-foreground hover:text-foreground border-b-2 border-b-transparent'
           }`}
         >
           {uiText.comparison.tabBasic}
@@ -129,10 +142,10 @@ export function ComparisonRobotPanel({
           aria-controls={detailedPanelId}
           onClick={() => setActiveTab('detailed')}
           onKeyDown={handleTabKeyDown}
-          className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors border-l border-border ${
+          className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors border-l border-l-border ${
             activeTab === 'detailed'
-              ? 'bg-card text-foreground border-b-2 border-primary'
-              : 'bg-muted text-muted-foreground hover:text-foreground border-b-2 border-transparent'
+              ? 'bg-card text-foreground border-b-2 border-b-primary'
+              : 'bg-muted text-muted-foreground hover:text-foreground border-b-2 border-b-transparent'
           }`}
         >
           {uiText.comparison.tabDetailed}
@@ -229,7 +242,6 @@ export function ComparisonRobotPanel({
             </section>
           </div>
         )}
-
       </div>
     </article>
   );

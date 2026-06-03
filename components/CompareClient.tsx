@@ -277,28 +277,31 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
             ) : (
               <div className="border border-border bg-muted p-3 sm:p-4">
                 <DndContext
+                  id="compare-sortable"
                   sensors={sensors}
                   collisionDetection={closestCenter}
                   onDragEnd={handleDragEnd}
                 >
                   <SortableContext items={selectedSlugs} strategy={rectSortingStrategy}>
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                       {selectedRobots.map((robot) => {
                         const manufacturer = manufacturerFor(robot.manufacturerSlug);
                         return (
                           <SortableCompareCard
                             key={robot.slug}
                             slug={robot.slug}
-                            name={robot.nameJa ?? robot.name}
                           >
-                            <ComparisonRobotPanel
-                              robot={robot}
-                              manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
-                              manufacturerLogo={manufacturer?.logo}
-                              isFavorite={isMounted ? favorites.includes(robot.slug) : false}
-                              onFavoriteToggle={toggleFavorite}
-                              onRemove={removeRobot}
-                            />
+                            {(dragHandleProps) => (
+                              <ComparisonRobotPanel
+                                robot={robot}
+                                manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                                manufacturerLogo={manufacturer?.logo}
+                                isFavorite={isMounted ? favorites.includes(robot.slug) : false}
+                                onFavoriteToggle={toggleFavorite}
+                                onRemove={removeRobot}
+                                dragHandleProps={dragHandleProps}
+                              />
+                            )}
                           </SortableCompareCard>
                         );
                       })}

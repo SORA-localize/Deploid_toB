@@ -24,6 +24,39 @@ export function formatRuntime(value: number | undefined) {
   return value != null ? `約${value}分` : TBD_LABEL;
 }
 
+function formatComparisonPriceStatus(robot: Robot) {
+  const note = robot.priceNote?.trim();
+  const normalizedNote = note?.toLowerCase() ?? '';
+
+  if (robot.procurementModels.includes('not-for-sale')) return '一般販売なし';
+  if (!note) return TBD_LABEL;
+  if (/価格は?非公開|価格未公開|未公表|未発表|問い合わせ制|公開価格なし/.test(note)) {
+    return '問い合わせ';
+  }
+  if (/[$＄€￥¥]|usd|eur|円|公開価格|参考価格|約\s*[0-9]/i.test(normalizedNote)) {
+    return '公開価格あり';
+  }
+  if (/問い合わせ|要確認/.test(note)) return '問い合わせ';
+
+  return TBD_LABEL;
+}
+
+function formatComparisonPayloadStatus(value: number | undefined) {
+  if (value == null) return TBD_LABEL;
+  if (value < 5) return '小型（5kg未満）';
+  if (value < 15) return '標準（5〜15kg）';
+  if (value < 30) return '高可搬（15〜30kg）';
+  return '重量級（30kg以上）';
+}
+
+function formatComparisonRuntimeStatus(value: number | undefined) {
+  if (value == null) return TBD_LABEL;
+  if (value < 90) return '短時間（90分未満）';
+  if (value < 180) return '標準（90〜180分）';
+  if (value < 360) return '長時間（3〜6時間）';
+  return '超長時間（6時間以上）';
+}
+
 export function joinOrFallback(values: readonly string[]) {
   return values.length > 0 ? values.join(' / ') : TBD_LABEL;
 }
@@ -82,19 +115,12 @@ export function getRobotDetailDecisionRows(robot: Robot): DisplayRow[] {
 export function getComparisonCoreRows(robot: Robot): DisplayRow[] {
   const { specs } = robot;
 
-  let japanSupport = japanAvailabilityLabels[robot.japanAvailability];
-  if (robot.japanAvailability === 'distributor-japan' && robot.distributorJapan) {
-    japanSupport = `代理店あり (${robot.distributorJapan})`;
-  } else if (robot.japanAvailability === 'official-japan') {
-    japanSupport = '国内正規販売';
-  }
-
   return [
-    { label: uiText.compare.price, value: robot.priceNote ?? TBD_LABEL },
-    { label: uiText.comparison.japanSupport, value: japanSupport },
+    { label: uiText.compare.price, value: formatComparisonPriceStatus(robot) },
+    { label: uiText.comparison.japanSupport, value: japanAvailabilityLabels[robot.japanAvailability] },
     { label: uiText.compare.deploymentStage, value: deploymentStageLabels[robot.deploymentStage] },
-    { label: '可搬重量', value: formatNumber(specs.payloadKg, ' kg') },
-    { label: '稼働時間', value: formatRuntime(specs.runtimeMin) },
+    { label: '可搬重量', value: formatComparisonPayloadStatus(specs.payloadKg) },
+    { label: '稼働時間', value: formatComparisonRuntimeStatus(specs.runtimeMin) },
   ];
 }
 
