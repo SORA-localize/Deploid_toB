@@ -41,14 +41,26 @@ export function getDndItemId(source: CompareDragSource, slug: string) {
   return `${dndPrefixBySource[source]}-${slug}`;
 }
 
+// シートカードの droppable id (sheet-{slug})。列 (sheet-column) は除外する。
+const isSheetCardId = (id: string | number) =>
+  id !== compareColumnIds.sheet && String(id).startsWith(`${dndPrefixBySource.sheet}-`);
+
 export const compareCollisionDetection: CollisionDetection = (args) => {
   const pointerCollisions = pointerWithin(args);
-  const collisions = pointerCollisions.length > 0 ? pointerCollisions : closestCenter(args);
-  const sheetCardCollisions = collisions.filter(({ id }) =>
-    String(id).startsWith(`${dndPrefixBySource.sheet}-`),
-  );
 
-  return sheetCardCollisions.length > 0 ? sheetCardCollisions : collisions;
+  // 1) ポインタが乗っているシートカードを最優先(挿入位置を厳密に決めるため)。
+  const pointerSheetCards = pointerCollisions.filter(({ id }) => isSheetCardId(id));
+  if (pointerSheetCards.length > 0) return pointerSheetCards;
+
+  // 2) シート列(カード間の隙間を含む)の上なら、最も近いシートカードに寄せる。
+  //    これにより隙間でも over がカードになり、挿入位置が先頭に固定されない。
+  if (pointerCollisions.some(({ id }) => id === compareColumnIds.sheet)) {
+    const closestSheetCards = closestCenter(args).filter(({ id }) => isSheetCardId(id));
+    if (closestSheetCards.length > 0) return closestSheetCards;
+  }
+
+  // 3) それ以外(メニュー/お気に入り列、空のシート等)は通常判定。
+  return pointerCollisions.length > 0 ? pointerCollisions : closestCenter(args);
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {

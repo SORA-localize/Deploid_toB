@@ -205,21 +205,46 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
     commitOrder([]);
   };
 
-  const getSheetPreviewPlacement = (
+  // over しているカードの「前/後ろ」どちらに差し込むかをポインタ(ドラッグ中の
+  // 矩形中心)とカード中心の位置関係で判定する。これで任意位置に挿入できる。
+  const isInsertedAfterOver = (
+    active: DragOverEvent['active'],
+    over: NonNullable<DragOverEvent['over']>,
+  ): boolean => {
+    const activeRect = active.rect.current.translated;
+    const overRect = over.rect;
+    if (!activeRect) return false;
+
+    const overMidX = overRect.left + overRect.width / 2;
+    const overMidY = overRect.top + overRect.height / 2;
+    const activeMidX = activeRect.left + activeRect.width / 2;
+    const activeMidY = activeRect.top + activeRect.height / 2;
+
+    if (activeMidY > overMidY + overRect.height / 2) return true; // 明確に下の行
+    if (activeMidY < overMidY - overRect.height / 2) return false; // 明確に上の行
+    return activeMidX > overMidX; // 同じ行付近なら左右で判定
+  };
+
+  const getSheetInsertionPreview = (
     activeData: CompareRobotDragData | null,
     dropData: CompareDropData | null,
+    active: DragOverEvent['active'],
+    over: DragOverEvent['over'],
   ): SheetPreviewPlacement | null => {
     if (!activeData || !dropData || dropData.target !== 'sheet') return null;
     if (activeData.source === 'sheet') return null;
     if (orderedSlugs.includes(activeData.slug)) return null;
     if (orderedSlugs.length >= MAX_COMPARE_ROBOTS) return null;
 
-    const index =
-      dropData.dropType === 'sheet-card' ? orderedSlugs.indexOf(dropData.slug) : orderedSlugs.length;
-    return {
-      slug: activeData.slug,
-      index: index >= 0 ? index : orderedSlugs.length,
-    };
+    // 既定は末尾(空シート/列の上)。カードの上ならポインタ位置で前後を決める。
+    let index = orderedSlugs.length;
+    if (dropData.dropType === 'sheet-card') {
+      const cardIndex = orderedSlugs.indexOf(dropData.slug);
+      if (cardIndex >= 0) {
+        index = over ? cardIndex + (isInsertedAfterOver(active, over) ? 1 : 0) : cardIndex;
+      }
+    }
+    return { slug: activeData.slug, index };
   };
 
   const handleDragStart = ({ active }: DragStartEvent) => {
@@ -232,18 +257,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
     const activeData = getRobotDragData(active.data.current);
     const dropData = getDropData(over?.data.current);
     setActiveDropTarget(dropData?.target ?? null);
-    setSheetPreview((current) => {
-      if (
-        current &&
-        activeData?.slug === current.slug &&
-        dropData?.target === 'sheet' &&
-        dropData.dropType === 'column'
-      ) {
-        return current;
-      }
-
-      return getSheetPreviewPlacement(activeData, dropData);
-    });
+    setSheetPreview(getSheetInsertionPreview(activeData, dropData, active, over));
   };
 
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
@@ -275,11 +289,9 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
         return;
       }
 
-      const insertIndex =
-        dropData.dropType === 'sheet-card' ? orderedSlugs.indexOf(dropData.slug) : undefined;
-      const normalizedInsertIndex =
-        typeof insertIndex === 'number' && insertIndex >= 0 ? insertIndex : undefined;
-      if (insertRobot(activeData.slug, normalizedInsertIndex)) {
+      // プレビューと同じ計算で着地indexを決め、見た目と一致させる。
+      const placement = getSheetInsertionPreview(activeData, dropData, active, over);
+      if (placement && insertRobot(activeData.slug, placement.index)) {
         setTimeout(() => highlightRobot(activeData.slug), 100);
       }
       return;
