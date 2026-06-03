@@ -161,6 +161,7 @@ export const uiText = {
     clearAria: '比較シートを空にする',
     toggleAria: (name: string, expanded: boolean) => `${name}の機種一覧を${expanded ? '閉じる' : '開く'}`,
     addAria: (name: string) => `${name}を比較に追加する`,
+    addToSheet: 'ここに追加',
     removeAria: (name: string) => `${name}を比較から外す`,
     reorderAria: (name: string) => `${name}の比較順を並び替える`,
     reorderHint: 'ドラッグまたはキーボードで並び替え',
