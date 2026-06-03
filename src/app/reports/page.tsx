@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { ReportsBrowser } from '@/components/ReportsBrowser';
 import { getReports } from '@/lib/data';
 
@@ -10,7 +11,7 @@ export const metadata = {
 
 export default function ReportsPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageSuspenseFallback />}>
       <ReportsBrowser reports={getReports()} />
     </Suspense>
   );

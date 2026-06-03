@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { RobotsBrowser } from '@/components/RobotsBrowser';
 import { getManufacturers, getRobots } from '@/lib/data';
 
@@ -13,7 +14,7 @@ export const metadata = {
 
 export default function RobotsPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageSuspenseFallback />}>
       <RobotsBrowser robots={getRobots()} manufacturers={getManufacturers()} />
     </Suspense>
   );

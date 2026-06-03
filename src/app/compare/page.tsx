@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { CompareClient } from '@/components/CompareClient';
+import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { getManufacturers, getRobots } from '@/lib/data';
 
 export const metadata = {
@@ -9,7 +10,7 @@ export const metadata = {
 
 export default function ComparePage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageSuspenseFallback />}>
       <CompareClient robots={getRobots()} manufacturers={getManufacturers()} />
     </Suspense>
   );
