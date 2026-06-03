@@ -1,68 +1,91 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
+import { flushSync } from 'react-dom';
 import { useTheme } from 'next-themes';
-import { Monitor, Sun, Moon } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 
-const modes = [
-  { value: 'system', label: 'システム設定に合わせる', icon: Monitor },
-  { value: 'light', label: 'ライトモード', icon: Sun },
-  { value: 'dark', label: 'ダークモード', icon: Moon },
-] as const;
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (callback: () => void) => { ready: Promise<void> };
+};
 
-export function ThemeModeToggle() {
-  const { theme, setTheme } = useTheme();
+export function ThemeModeToggle({ className = '' }: { className?: string }) {
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // マウント前はテーマが解決できないため、レイアウトシフトを避けて同寸の
-  // 無効化プレースホルダを描画する。
+  const isDark = mounted && resolvedTheme === 'dark';
+  const label = isDark ? 'ライトモードに切り替える' : 'ダークモードに切り替える';
+
+  const toggle = (event: MouseEvent<HTMLButtonElement>) => {
+    const next = isDark ? 'light' : 'dark';
+    const doc = document as ViewTransitionDocument;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // View Transitions 非対応 or モーション抑制時は即時切替にフォールバック。
+    if (!doc.startViewTransition || prefersReducedMotion) {
+      setTheme(next);
+      return;
+    }
+
+    // クリックしたアイコンの中心を起点に、画面の四隅まで届く半径を求める。
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y),
+    );
+
+    const transition = doc.startViewTransition(() => {
+      flushSync(() => setTheme(next));
+    });
+
+    transition.ready.then(() => {
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${endRadius}px at ${x}px ${y}px)`,
+          ],
+        },
+        {
+          duration: 480,
+          easing: 'ease-in-out',
+          pseudoElement: '::view-transition-new(root)',
+        },
+      );
+    });
+  };
+
+  // マウント前はテーマ未解決。レイアウトシフトを避ける同寸プレースホルダ。
   if (!mounted) {
     return (
-      <div
-        className="inline-flex h-9 border border-border bg-card"
+      <span
+        className={`inline-flex h-9 w-9 items-center justify-center ${className}`}
         aria-hidden="true"
       >
-        {modes.map((mode) => (
-          <span key={mode.value} className="inline-flex h-full w-9 items-center justify-center">
-            <mode.icon className="h-4 w-4 text-muted-foreground" />
-          </span>
-        ))}
-      </div>
+        <Sun className="h-5 w-5 text-muted-foreground" />
+      </span>
     );
   }
 
-  const active = theme ?? 'system';
+  const Icon = isDark ? Moon : Sun;
 
   return (
-    <div
-      className="inline-flex h-9 border border-border bg-card text-muted-foreground"
-      role="group"
-      aria-label="テーマモード"
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={label}
+      title={label}
+      className={`inline-flex h-9 w-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground ${className}`}
     >
-      {modes.map((mode) => {
-        const isActive = active === mode.value;
-        return (
-          <button
-            key={mode.value}
-            type="button"
-            aria-pressed={isActive}
-            aria-label={mode.label}
-            title={mode.label}
-            onClick={() => setTheme(mode.value)}
-            className={`inline-flex h-full w-9 items-center justify-center transition-colors ${
-              isActive
-                ? 'bg-primary text-primary-foreground'
-                : 'hover:bg-muted hover:text-foreground'
-            }`}
-          >
-            <mode.icon className="h-4 w-4" />
-          </button>
-        );
-      })}
-    </div>
+      {/* アイコンは固有の view-transition-name を持ち、同じ位置で回転しながら
+          太陽⇄月に入れ替わる（演出は globals.css のキーフレーム）。 */}
+      <Icon className="h-5 w-5" style={{ viewTransitionName: 'theme-toggle-icon' }} />
+    </button>
   );
 }

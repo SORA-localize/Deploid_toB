@@ -277,3 +277,50 @@
   --sidebar-ring: oklch(0.556 0 0);
   --card-spotlight: rgba(255, 255, 255, 0.06);
 }
+
+/* =====================================================================
+   テーマ切替の View Transition（ThemeModeToggle）
+   - ルート：JS で clip-path の円を制御するため、既定のクロスフェードを無効化。
+     新テーマを上に重ね、アイコン起点の同心円で出現させる。
+   - アイコン：固有名で別レイヤー化し、同じ位置で回転しながら太陽⇄月に入替。
+   ===================================================================== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 0;
+}
+::view-transition-new(root) {
+  z-index: 1;
+}
+
+::view-transition-old(theme-toggle-icon) {
+  animation: theme-icon-out 0.42s ease-in-out both;
+}
+::view-transition-new(theme-toggle-icon) {
+  animation: theme-icon-in 0.42s ease-in-out both;
+  z-index: 2;
+}
+
+@keyframes theme-icon-out {
+  to {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.35);
+  }
+}
+@keyframes theme-icon-in {
+  from {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
