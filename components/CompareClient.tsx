@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -81,7 +81,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   );
 
   const compareParam = getParam('compare');
-  const selectedSlugs = useMemo(() => {
+  const urlSelectedSlugs = useMemo(() => {
     if (!compareParam) return [];
     const validSlugs = new Set(robots.map((robot) => robot.slug));
     const seen = new Set<string>();
@@ -97,25 +97,37 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
       .slice(0, MAX_COMPARE_ROBOTS);
   }, [compareParam, robots]);
 
+  // 並べ替え順の真実源はこの local state。URL は commitOrder で副作用同期する。
+  // こうしないと onDragEnd 時に URL 遷移(非同期)を待つ間、dnd-kit が一旦
+  // 元の順序へ戻してから整列し直すため、ドロップ時に「元位置へ戻る」違和感が出る。
+  const [orderedSlugs, setOrderedSlugs] = useState<string[]>(urlSelectedSlugs);
+  useEffect(() => {
+    // 共有リンク/戻る・進む等で URL が外部から変わった時だけ local を追従させる。
+    // 自分の操作で書き換えた場合は値が一致するので no-op。
+    setOrderedSlugs((prev) =>
+      prev.join(',') === urlSelectedSlugs.join(',') ? prev : urlSelectedSlugs,
+    );
+  }, [urlSelectedSlugs]);
+
   const robotBySlug = useMemo(
     () => new Map(robots.map((robot) => [robot.slug, robot])),
     [robots],
   );
   const selectedRobots = useMemo(
     () =>
-      selectedSlugs.flatMap((slug) => {
+      orderedSlugs.flatMap((slug) => {
         const robot = robotBySlug.get(slug);
         return robot ? [robot] : [];
       }),
-    [robotBySlug, selectedSlugs],
+    [robotBySlug, orderedSlugs],
   );
   const favoriteRobots = useMemo(
     () => robots.filter((r) => favorites.includes(r.slug)),
     [robots, favorites],
   );
   const sheetItemIds = useMemo(
-    () => selectedSlugs.map((slug) => getDndItemId('sheet', slug)),
-    [selectedSlugs],
+    () => orderedSlugs.map((slug) => getDndItemId('sheet', slug)),
+    [orderedSlugs],
   );
   const sheetPreviewItems = useMemo<SheetPreviewItem[]>(() => {
     const baseItems: SheetPreviewItem[] = selectedRobots.map((robot) => ({ type: 'robot', robot }));
@@ -141,24 +153,29 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
     ? manufacturerFor(activeDragRobot.manufacturerSlug)
     : undefined;
 
-  const addRobot = (slug: string) => {
-    if (selectedSlugs.length >= MAX_COMPARE_ROBOTS || selectedSlugs.includes(slug)) return false;
+  // 並び順を local state へ即時反映し、URL も同じ値へ同期する(共有・履歴用)。
+  const commitOrder = (nextSlugs: string[], mode: 'push' | 'replace' = 'push') => {
+    setOrderedSlugs(nextSlugs);
+    updateParams({ compare: nextSlugs.length > 0 ? nextSlugs.join(',') : null }, mode);
+  };
 
-    const nextSlugs = [...selectedSlugs, slug];
-    updateParams({ compare: nextSlugs.join(',') });
+  const addRobot = (slug: string) => {
+    if (orderedSlugs.length >= MAX_COMPARE_ROBOTS || orderedSlugs.includes(slug)) return false;
+
+    commitOrder([...orderedSlugs, slug]);
     return true;
   };
 
   const insertRobot = (slug: string, index?: number) => {
-    if (selectedSlugs.length >= MAX_COMPARE_ROBOTS || selectedSlugs.includes(slug)) return false;
+    if (orderedSlugs.length >= MAX_COMPARE_ROBOTS || orderedSlugs.includes(slug)) return false;
 
     const insertIndex =
       typeof index === 'number'
-        ? Math.max(0, Math.min(index, selectedSlugs.length))
-        : selectedSlugs.length;
-    const nextSlugs = [...selectedSlugs];
+        ? Math.max(0, Math.min(index, orderedSlugs.length))
+        : orderedSlugs.length;
+    const nextSlugs = [...orderedSlugs];
     nextSlugs.splice(insertIndex, 0, slug);
-    updateParams({ compare: nextSlugs.join(',') });
+    commitOrder(nextSlugs);
     return true;
   };
 
@@ -171,7 +188,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   };
 
   const handleFavoriteSelect = (slug: string) => {
-    if (!selectedSlugs.includes(slug)) {
+    if (!orderedSlugs.includes(slug)) {
       if (addRobot(slug)) {
         setTimeout(() => highlightRobot(slug), 100);
       }
@@ -181,12 +198,11 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   };
 
   const removeRobot = (slug: string) => {
-    const nextSlugs = selectedSlugs.filter((s) => s !== slug);
-    updateParams({ compare: nextSlugs.length > 0 ? nextSlugs.join(',') : null });
+    commitOrder(orderedSlugs.filter((s) => s !== slug));
   };
 
   const clearAll = () => {
-    updateParams({ compare: null });
+    commitOrder([]);
   };
 
   const getSheetPreviewPlacement = (
@@ -195,14 +211,14 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   ): SheetPreviewPlacement | null => {
     if (!activeData || !dropData || dropData.target !== 'sheet') return null;
     if (activeData.source === 'sheet') return null;
-    if (selectedSlugs.includes(activeData.slug)) return null;
-    if (selectedSlugs.length >= MAX_COMPARE_ROBOTS) return null;
+    if (orderedSlugs.includes(activeData.slug)) return null;
+    if (orderedSlugs.length >= MAX_COMPARE_ROBOTS) return null;
 
     const index =
-      dropData.dropType === 'sheet-card' ? selectedSlugs.indexOf(dropData.slug) : selectedSlugs.length;
+      dropData.dropType === 'sheet-card' ? orderedSlugs.indexOf(dropData.slug) : orderedSlugs.length;
     return {
       slug: activeData.slug,
-      index: index >= 0 ? index : selectedSlugs.length,
+      index: index >= 0 ? index : orderedSlugs.length,
     };
   };
 
@@ -244,24 +260,23 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
       dropData.dropType === 'sheet-card' &&
       activeData.slug !== dropData.slug
     ) {
-      const oldIndex = selectedSlugs.indexOf(activeData.slug);
-      const newIndex = selectedSlugs.indexOf(dropData.slug);
+      const oldIndex = orderedSlugs.indexOf(activeData.slug);
+      const newIndex = orderedSlugs.indexOf(dropData.slug);
       if (oldIndex < 0 || newIndex < 0) return;
 
-      const nextSlugs = arrayMove(selectedSlugs, oldIndex, newIndex);
-      updateParams({ compare: nextSlugs.join(',') }, 'replace');
+      commitOrder(arrayMove(orderedSlugs, oldIndex, newIndex), 'replace');
       return;
     }
 
     if (dropData.target === 'sheet') {
       if (activeData.source === 'sheet') return;
-      if (selectedSlugs.includes(activeData.slug)) {
+      if (orderedSlugs.includes(activeData.slug)) {
         highlightRobot(activeData.slug);
         return;
       }
 
       const insertIndex =
-        dropData.dropType === 'sheet-card' ? selectedSlugs.indexOf(dropData.slug) : undefined;
+        dropData.dropType === 'sheet-card' ? orderedSlugs.indexOf(dropData.slug) : undefined;
       const normalizedInsertIndex =
         typeof insertIndex === 'number' && insertIndex >= 0 ? insertIndex : undefined;
       if (insertRobot(activeData.slug, normalizedInsertIndex)) {
@@ -373,9 +388,9 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                             {isExpanded && (
                               <div className="bg-card border-t border-border">
                                 {manufacturerRobots.map((robot) => {
-                                  const isSelected = selectedSlugs.includes(robot.slug);
+                                  const isSelected = orderedSlugs.includes(robot.slug);
                                   const isDisabled =
-                                    !isSelected && selectedSlugs.length >= MAX_COMPARE_ROBOTS;
+                                    !isSelected && orderedSlugs.length >= MAX_COMPARE_ROBOTS;
                                   return (
                                     <DraggableMenuRobotButton
                                       key={robot.slug}
@@ -403,9 +418,9 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
             <div className="min-w-0">
               <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-xs text-muted-foreground">
-                  {uiText.compare.comparisonSheet(selectedSlugs.length, MAX_COMPARE_ROBOTS)}
+                  {uiText.compare.comparisonSheet(orderedSlugs.length, MAX_COMPARE_ROBOTS)}
                 </span>
-                {selectedSlugs.length > 0 && (
+                {orderedSlugs.length > 0 && (
                   <button
                     type="button"
                     aria-label={uiText.comparison.clearAria}
