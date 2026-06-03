@@ -1,11 +1,27 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
 import { ChevronDown, ChevronRight, Star, X } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ComparisonRobotPanel } from '@/components/ComparisonRobotPanel';
 import { FavoriteCard } from '@/components/FavoriteCard';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
+import { SortableCompareCard } from '@/components/SortableCompareCard';
 import type { Manufacturer, Robot } from '@/data/types';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
@@ -22,6 +38,12 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   const { getParam, updateParams } = useUrlFilters();
   const { favorites, toggleFavorite, isMounted } = useFavorites();
   const [expandedManufacturers, setExpandedManufacturers] = useState<string[]>([]);
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   const compareParam = getParam('compare');
   const selectedSlugs = useMemo(() => {
@@ -40,9 +62,17 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
       .slice(0, MAX_COMPARE_ROBOTS);
   }, [compareParam, robots]);
 
+  const robotBySlug = useMemo(
+    () => new Map(robots.map((robot) => [robot.slug, robot])),
+    [robots],
+  );
   const selectedRobots = useMemo(
-    () => robots.filter((r) => selectedSlugs.includes(r.slug)),
-    [robots, selectedSlugs],
+    () =>
+      selectedSlugs.flatMap((slug) => {
+        const robot = robotBySlug.get(slug);
+        return robot ? [robot] : [];
+      }),
+    [robotBySlug, selectedSlugs],
   );
   const favoriteRobots = useMemo(
     () => robots.filter((r) => favorites.includes(r.slug)),
@@ -82,6 +112,19 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
 
   const clearAll = () => {
     updateParams({ compare: null });
+  };
+
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+
+    const activeSlug = String(active.id);
+    const overSlug = String(over.id);
+    const oldIndex = selectedSlugs.indexOf(activeSlug);
+    const newIndex = selectedSlugs.indexOf(overSlug);
+    if (oldIndex < 0 || newIndex < 0) return;
+
+    const nextSlugs = arrayMove(selectedSlugs, oldIndex, newIndex);
+    updateParams({ compare: nextSlugs.join(',') }, 'replace');
   };
 
   const toggleManufacturer = (slug: string) => {
@@ -233,27 +276,35 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
               </div>
             ) : (
               <div className="border border-border bg-muted p-3 sm:p-4">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                  {selectedRobots.map((robot) => {
-                    const manufacturer = manufacturerFor(robot.manufacturerSlug);
-                    return (
-                      <div
-                        key={robot.slug}
-                        id={`compare-card-${robot.slug}`}
-                        className="transition-shadow duration-500 rounded-sm"
-                      >
-                        <ComparisonRobotPanel
-                          robot={robot}
-                          manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
-                          manufacturerLogo={manufacturer?.logo}
-                          isFavorite={isMounted ? favorites.includes(robot.slug) : false}
-                          onFavoriteToggle={toggleFavorite}
-                          onRemove={removeRobot}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext items={selectedSlugs} strategy={rectSortingStrategy}>
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                      {selectedRobots.map((robot) => {
+                        const manufacturer = manufacturerFor(robot.manufacturerSlug);
+                        return (
+                          <SortableCompareCard
+                            key={robot.slug}
+                            slug={robot.slug}
+                            name={robot.nameJa ?? robot.name}
+                          >
+                            <ComparisonRobotPanel
+                              robot={robot}
+                              manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                              manufacturerLogo={manufacturer?.logo}
+                              isFavorite={isMounted ? favorites.includes(robot.slug) : false}
+                              onFavoriteToggle={toggleFavorite}
+                              onRemove={removeRobot}
+                            />
+                          </SortableCompareCard>
+                        );
+                      })}
+                    </div>
+                  </SortableContext>
+                </DndContext>
               </div>
             )}
           </div>
