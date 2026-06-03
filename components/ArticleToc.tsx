@@ -40,8 +40,8 @@ export function ArticleToc({ items, backHref, backLabel }: ArticleTocProps) {
 
   return (
     <div className="sticky top-6">
-      <div className="border border-neutral-300 bg-white p-4">
-        <h3 className="text-xs font-semibold text-neutral-900 mb-3 pb-2 border-b border-neutral-200">
+      <div className="border border-border bg-card p-4">
+        <h3 className="text-xs font-semibold text-foreground mb-3 pb-2 border-b border-border">
           {uiText.common.contents}
         </h3>
         <nav className="space-y-1">
@@ -54,8 +54,8 @@ export function ArticleToc({ items, backHref, backLabel }: ArticleTocProps) {
                 href={item.href}
                 className={`block text-xs py-1.5 px-2 -mx-2 transition-all duration-200 ${
                   isActive
-                    ? 'text-accent font-semibold bg-accent/5 border-l-2 border-accent'
-                    : 'text-neutral-700 hover:text-neutral-900 hover:bg-neutral-50'
+                    ? 'text-foreground font-semibold bg-muted border-l-2 border-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
               >
                 {item.label}
@@ -63,8 +63,8 @@ export function ArticleToc({ items, backHref, backLabel }: ArticleTocProps) {
             );
           })}
         </nav>
-        <div className="mt-4 pt-3 border-t border-neutral-200">
-          <Link href={backHref} className="text-xs text-neutral-600 hover:text-neutral-900">
+        <div className="mt-4 pt-3 border-t border-border">
+          <Link href={backHref} className="text-xs text-muted-foreground hover:text-foreground">
             ← {backLabel}
           </Link>
         </div>

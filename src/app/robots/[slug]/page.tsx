@@ -56,15 +56,15 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
   const decisionRows = getRobotDetailDecisionRows(robot);
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="border-b border-neutral-300">
+    <div className="min-h-screen bg-background">
+      <div className="border-b border-border">
         <div className="site-container">
           <div className="flex items-center gap-6 py-4 text-xs overflow-x-auto">
             {sections.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="whitespace-nowrap pb-4 border-b-2 border-transparent text-neutral-500 hover:text-neutral-900 transition-colors"
+                className="whitespace-nowrap pb-4 border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors"
               >
                 {item.label}
               </a>
@@ -88,7 +88,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           {manufacturer && (
             <Link
               href={`/manufacturers/${manufacturer.slug}`}
-              className="mb-3 inline-flex text-xs text-neutral-500 hover:text-neutral-900"
+              className="mb-3 inline-flex text-xs text-muted-foreground hover:text-foreground"
             >
               <ManufacturerLogoName
                 name={manufacturer.name}
@@ -98,27 +98,27 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               />
             </Link>
           )}
-          <h1 className="text-3xl font-semibold text-neutral-900 mb-3">{robot.nameJa ?? robot.name}</h1>
-          <p className="text-sm text-neutral-600 leading-relaxed max-w-3xl">{robot.description}</p>
+          <h1 className="text-3xl font-semibold text-foreground mb-3">{robot.nameJa ?? robot.name}</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">{robot.description}</p>
         </div>
 
         <div className="mb-12">
           <RobotImageCarousel images={robot.images} fallbackHero={robot.heroImage} />
         </div>
 
-        <div id="specs" className="border border-neutral-300 bg-neutral-50 mb-12 scroll-mt-6">
-          <div className="px-6 py-4 border-b border-neutral-300 bg-white">
-            <h2 className="text-sm font-semibold text-neutral-900">
+        <div id="specs" className="border border-border bg-muted mb-12 scroll-mt-6">
+          <div className="px-6 py-4 border-b border-border bg-card">
+            <h2 className="text-sm font-semibold text-foreground">
               {uiText.robots.technicalSpecifications}
             </h2>
           </div>
           <div className="p-6">
             <table className="w-full text-xs">
-              <tbody className="divide-y divide-neutral-300">
+              <tbody className="divide-y divide-border">
                 {specRows.map((row) => (
                   <tr key={row.label}>
-                    <td className="py-3 text-neutral-500 w-1/3">{row.label}</td>
-                    <td className="py-3 text-neutral-900 font-medium">{row.value}</td>
+                    <td className="py-3 text-muted-foreground w-1/3">{row.label}</td>
+                    <td className="py-3 text-foreground font-medium">{row.value}</td>
                   </tr>
                 ))}
               </tbody>
@@ -126,17 +126,17 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           </div>
         </div>
 
-        <div id="decision" className="border border-neutral-300 bg-neutral-50 mb-12 scroll-mt-6">
-          <div className="px-6 py-4 border-b border-neutral-300 bg-white">
-            <h2 className="text-sm font-semibold text-neutral-900">導入判断</h2>
+        <div id="decision" className="border border-border bg-muted mb-12 scroll-mt-6">
+          <div className="px-6 py-4 border-b border-border bg-card">
+            <h2 className="text-sm font-semibold text-foreground">導入判断</h2>
           </div>
           <div className="p-6">
             <table className="w-full text-xs">
-              <tbody className="divide-y divide-neutral-300">
+              <tbody className="divide-y divide-border">
                 {decisionRows.map((row) => (
                   <tr key={row.label}>
-                    <td className="py-3 text-neutral-500 w-1/3">{row.label}</td>
-                    <td className="py-3 text-neutral-900 font-medium">{row.value}</td>
+                    <td className="py-3 text-muted-foreground w-1/3">{row.label}</td>
+                    <td className="py-3 text-foreground font-medium">{row.value}</td>
                   </tr>
                 ))}
               </tbody>
@@ -144,19 +144,19 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           </div>
         </div>
 
-        <div id="applications" className="border border-neutral-300 bg-neutral-50 mb-12 scroll-mt-6">
-          <div className="px-6 py-4 border-b border-neutral-300 bg-white">
-            <h2 className="text-sm font-semibold text-neutral-900">{uiText.robots.applications}</h2>
+        <div id="applications" className="border border-border bg-muted mb-12 scroll-mt-6">
+          <div className="px-6 py-4 border-b border-border bg-card">
+            <h2 className="text-sm font-semibold text-foreground">{uiText.robots.applications}</h2>
           </div>
           <div className="p-6">
-            <p className="text-xs text-neutral-700 leading-relaxed mb-4">{robot.summary}</p>
+            <p className="text-xs text-foreground/80 leading-relaxed mb-4">{robot.summary}</p>
             {robot.comparison.bestFit.length > 0 && (
               <div className="space-y-2 mb-4">
-                <h3 className="text-xs font-semibold text-neutral-900">向く用途</h3>
-                <ul className="text-xs text-neutral-700 space-y-1">
+                <h3 className="text-xs font-semibold text-foreground">向く用途</h3>
+                <ul className="text-xs text-foreground/80 space-y-1">
                   {robot.comparison.bestFit.map((item) => (
                     <li key={item} className="flex items-start gap-2">
-                      <span className="text-neutral-500">•</span>
+                      <span className="text-muted-foreground">•</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -165,11 +165,11 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
             )}
             {robot.comparison.constraints.length > 0 && (
               <div className="space-y-2 mb-4">
-                <h3 className="text-xs font-semibold text-neutral-900">制約</h3>
-                <ul className="text-xs text-neutral-700 space-y-1">
+                <h3 className="text-xs font-semibold text-foreground">制約</h3>
+                <ul className="text-xs text-foreground/80 space-y-1">
                   {robot.comparison.constraints.map((item) => (
                     <li key={item} className="flex items-start gap-2">
-                      <span className="text-neutral-500">•</span>
+                      <span className="text-muted-foreground">•</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -182,7 +182,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
                   <Link
                     key={useCase.slug}
                     href={`/use-cases/${useCase.slug}`}
-                    className="text-xs px-3 py-1 bg-white border border-neutral-300 hover:border-neutral-500 transition-colors text-neutral-700"
+                    className="text-xs px-3 py-1 bg-card border border-border hover:border-foreground/40 transition-colors text-foreground/80"
                   >
                     {useCase.titleJa ?? useCase.title}
                   </Link>
@@ -191,7 +191,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
                   <Link
                     key={report.slug}
                     href={`/reports/${report.slug}`}
-                    className="text-xs px-3 py-1 bg-white border border-neutral-300 hover:border-neutral-500 transition-colors text-neutral-700"
+                    className="text-xs px-3 py-1 bg-card border border-border hover:border-foreground/40 transition-colors text-foreground/80"
                   >
                     {report.titleJa ?? report.title}
                   </Link>
@@ -203,15 +203,15 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
         <SourceList
           sources={robot.sources}
-          className="border border-neutral-300 bg-neutral-50 p-6 scroll-mt-6"
-          titleClassName="text-sm font-semibold text-neutral-900 mb-4"
+          className="border border-border bg-muted p-6 scroll-mt-6"
+          titleClassName="text-sm font-semibold text-foreground mb-4"
         />
 
-        <div className="flex items-center justify-between mt-12 pt-6 border-t border-neutral-300">
+        <div className="flex items-center justify-between mt-12 pt-6 border-t border-border">
           {prev ? (
             <Link
               href={`/robots/${prev.slug}`}
-              className="inline-flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900"
+              className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
             >
               <ChevronLeft className="w-4 h-4" />
               {prev.nameJa ?? prev.name}
@@ -222,7 +222,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           {next ? (
             <Link
               href={`/robots/${next.slug}`}
-              className="inline-flex items-center gap-2 text-xs text-neutral-500 hover:text-neutral-900"
+              className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
             >
               {next.nameJa ?? next.name}
               <ChevronRight className="w-4 h-4" />

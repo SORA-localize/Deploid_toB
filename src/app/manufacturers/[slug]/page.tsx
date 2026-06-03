@@ -41,7 +41,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
   const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <div className="site-container py-8 sm:py-12">
         <Breadcrumbs
           items={[
@@ -52,10 +52,10 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
         <div className="grid grid-cols-1 gap-8 mb-12 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="mb-2 text-xs text-neutral-500 flex items-center gap-2 flex-wrap">
+            <div className="mb-2 text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
               <span>プロフィール</span>
             </div>
-            <h1 className="text-2xl font-semibold text-neutral-900 mb-4 sm:text-3xl">
+            <h1 className="text-2xl font-semibold text-foreground mb-4 sm:text-3xl">
               <ManufacturerLogoName
                 name={manufacturer.nameJa ?? manufacturer.name}
                 logo={manufacturer.logo}
@@ -63,48 +63,48 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
                 imageClassName="h-7 w-7"
               />
             </h1>
-            <p className="text-sm text-neutral-700 leading-relaxed mb-6">{manufacturer.description}</p>
+            <p className="text-sm text-foreground/80 leading-relaxed mb-6">{manufacturer.description}</p>
             <div className="flex gap-4 text-xs flex-wrap">
               {domesticDistributor.hasDistributor && (
-                <div className="px-3 py-1.5 bg-neutral-100 border border-neutral-300 text-neutral-700">
+                <div className="px-3 py-1.5 bg-muted border border-border text-foreground/80">
                   国内代理店: {domesticDistributor.label}
                 </div>
               )}
               {manufacturer.supportNote && (
-                <div className="px-3 py-1.5 bg-neutral-100 border border-neutral-300 text-neutral-700">
+                <div className="px-3 py-1.5 bg-muted border border-border text-foreground/80">
                   サポート: {manufacturer.supportNote}
                 </div>
               )}
               {manufacturer.vendorRiskNote && (
-                <div className="px-3 py-1.5 bg-neutral-100 border border-neutral-300 text-neutral-700">
+                <div className="px-3 py-1.5 bg-muted border border-border text-foreground/80">
                   継続性: {manufacturer.vendorRiskNote}
                 </div>
               )}
             </div>
           </div>
 
-          <div className="border border-neutral-300 bg-neutral-50 p-4 sm:p-6">
-            <h3 className="text-sm font-semibold text-neutral-900 mb-4">
+          <div className="border border-border bg-muted p-4 sm:p-6">
+            <h3 className="text-sm font-semibold text-foreground mb-4">
               {uiText.manufacturers.factSheet}
             </h3>
             <dl className="space-y-3 text-xs">
-              <div className="flex justify-between gap-4 py-2 border-b border-neutral-300">
-                <dt className="text-neutral-500">所在地</dt>
-                <dd className="text-right text-neutral-900">
+              <div className="flex justify-between gap-4 py-2 border-b border-border">
+                <dt className="text-muted-foreground">所在地</dt>
+                <dd className="text-right text-foreground">
                   {manufacturer.hqCity ? `${manufacturer.hqCity}, ${manufacturer.country}` : manufacturer.country}
                 </dd>
               </div>
-              <div className="flex justify-between gap-4 py-2 border-b border-neutral-300">
-                <dt className="text-neutral-500">設立</dt>
-                <dd className="text-right text-neutral-900">{manufacturer.foundedYear ?? TBD_LABEL}</dd>
+              <div className="flex justify-between gap-4 py-2 border-b border-border">
+                <dt className="text-muted-foreground">設立</dt>
+                <dd className="text-right text-foreground">{manufacturer.foundedYear ?? TBD_LABEL}</dd>
               </div>
-              <div className="flex justify-between gap-4 py-2 border-b border-neutral-300">
-                <dt className="text-neutral-500">取扱機種</dt>
-                <dd className="text-right text-neutral-900">{robots.length}</dd>
+              <div className="flex justify-between gap-4 py-2 border-b border-border">
+                <dt className="text-muted-foreground">取扱機種</dt>
+                <dd className="text-right text-foreground">{robots.length}</dd>
               </div>
               <div className="flex justify-between gap-4 py-2">
-                <dt className="text-neutral-500">国内代理店</dt>
-                <dd className="text-right text-neutral-900">
+                <dt className="text-muted-foreground">国内代理店</dt>
+                <dd className="text-right text-foreground">
                   {domesticDistributor.hasDistributor ? (
                     <span className="inline-flex flex-col items-end gap-1">
                       {domesticDistributor.distributors.map((distributor) =>
@@ -114,7 +114,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
                             href={distributor.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="underline underline-offset-4 hover:text-neutral-600"
+                            className="underline underline-offset-4 hover:text-muted-foreground"
                           >
                             {distributor.name}
                           </a>
@@ -136,14 +136,14 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
                 href={manufacturer.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-white border border-neutral-300 hover:bg-neutral-50 text-xs text-neutral-900"
+                className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-card border border-border hover:bg-muted text-xs text-foreground"
               >
                 <ExternalLink className="w-3 h-3" />
                 {uiText.common.website}
               </a>
               <Link
                 href="/contact"
-                className="flex-1 text-center px-3 py-2 bg-neutral-900 text-white hover:bg-neutral-700 text-xs"
+                className="flex-1 text-center px-3 py-2 bg-primary text-primary-foreground hover:bg-primary/90 text-xs"
               >
                 {uiText.common.contact}
               </Link>
@@ -154,8 +154,8 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
         <div>
 
           <div className="flex items-center justify-between gap-4 mb-6">
-            <h2 className="text-xl font-semibold text-neutral-900">取扱機種</h2>
-            <span className="px-3 py-1.5 bg-neutral-100 border border-neutral-300 text-neutral-700 text-xs whitespace-nowrap">
+            <h2 className="text-xl font-semibold text-foreground">取扱機種</h2>
+            <span className="px-3 py-1.5 bg-muted border border-border text-foreground/80 text-xs whitespace-nowrap">
               {uiText.manufacturers.models(robots.length)}
             </span>
           </div>
@@ -168,23 +168,23 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
 
         {reports.length > 0 && (
-          <div className="mt-12 border border-neutral-300 bg-neutral-50 p-6">
-            <h3 className="text-lg font-semibold text-neutral-900 mb-4">関連レポート</h3>
+          <div className="mt-12 border border-border bg-muted p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">関連レポート</h3>
             <div className="space-y-3">
               {reports.map((report) => (
                 <Link
                   key={report.slug}
                   href={`/reports/${report.slug}`}
-                  className="flex flex-col gap-3 p-3 bg-white border border-neutral-300 hover:border-neutral-500 transition-colors sm:flex-row sm:items-start"
+                  className="flex flex-col gap-3 p-3 bg-card border border-border hover:border-foreground/40 transition-colors sm:flex-row sm:items-start"
                 >
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-medium text-neutral-900 mb-1">
+                    <h4 className="text-sm font-medium text-foreground mb-1">
                       {report.titleJa ?? report.title}
                     </h4>
-                    <p className="text-xs text-neutral-600">{report.summary}</p>
+                    <p className="text-xs text-muted-foreground">{report.summary}</p>
                   </div>
-                  <div className="text-xs text-neutral-500 sm:whitespace-nowrap">{report.publishedAt}</div>
-                  <ChevronRight className="w-4 h-4 text-neutral-500 mt-1 flex-shrink-0" />
+                  <div className="text-xs text-muted-foreground sm:whitespace-nowrap">{report.publishedAt}</div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground mt-1 flex-shrink-0" />
                 </Link>
               ))}
             </div>

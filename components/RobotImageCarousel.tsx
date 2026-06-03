@@ -23,9 +23,9 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
   const img = getDisplayableAsset(resolved[current]);
 
   return (
-    <div className="border border-neutral-300 overflow-hidden bg-white">
+    <div className="border border-border overflow-hidden bg-card">
       <div className="relative">
-        <div className="aspect-[16/9] bg-neutral-100 flex flex-col items-center justify-center text-neutral-400 overflow-hidden">
+        <div className="aspect-[16/9] bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden">
           {img ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={img.src} alt={img.alt} className="w-full h-full object-contain" />
@@ -43,33 +43,33 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
         </div>
         <button
           onClick={() => setIdx((i) => (i - 1 + slots.length) % slots.length)}
-          className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-white/90 hover:bg-white border border-neutral-300 transition-colors"
+          className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-card/90 hover:bg-card border border-border transition-colors"
           aria-label="前の画像"
         >
-          <ChevronLeft className="w-4 h-4 text-neutral-700" />
+          <ChevronLeft className="w-4 h-4 text-foreground" />
         </button>
         <button
           onClick={() => setIdx((i) => (i + 1) % slots.length)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-white/90 hover:bg-white border border-neutral-300 transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-card/90 hover:bg-card border border-border transition-colors"
           aria-label="次の画像"
         >
-          <ChevronRight className="w-4 h-4 text-neutral-700" />
+          <ChevronRight className="w-4 h-4 text-foreground" />
         </button>
       </div>
 
-      <div className="flex border-t border-neutral-300 overflow-x-auto">
+      <div className="flex border-t border-border overflow-x-auto">
         {slots.map((role, i) => {
           const hasImage = Boolean(getDisplayableAsset(resolved[role]));
           return (
             <button
               key={role}
               onClick={() => setIdx(i)}
-              className={`flex-1 min-w-fit whitespace-nowrap px-3 py-2 text-[11px] border-r border-neutral-300 last:border-r-0 transition-colors ${
+              className={`flex-1 min-w-fit whitespace-nowrap px-3 py-2 text-[11px] border-r border-border last:border-r-0 transition-colors ${
                 i === idx
-                  ? 'bg-neutral-900 text-white'
+                  ? 'bg-primary text-primary-foreground'
                   : hasImage
-                    ? 'bg-white text-neutral-700 hover:bg-neutral-100'
-                    : 'bg-neutral-50 text-neutral-400 hover:bg-neutral-100'
+                    ? 'bg-card text-foreground hover:bg-muted'
+                    : 'bg-muted text-muted-foreground/70 hover:bg-muted'
               }`}
               title={hasImage ? undefined : '未投入'}
             >
@@ -80,7 +80,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
       </div>
 
       {img?.credit && (
-        <div className="px-3 py-2 border-t border-neutral-300 text-[10px] text-neutral-500">
+        <div className="px-3 py-2 border-t border-border text-[10px] text-muted-foreground">
           {uiText.common.credit}: {img.credit}
           {img.sourceUrl && (
             <>

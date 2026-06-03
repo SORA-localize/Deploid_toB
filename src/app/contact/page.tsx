@@ -35,32 +35,32 @@ export default function ContactPage() {
     <div className="site-container py-12">
       <Breadcrumbs items={[{ label: 'お問い合わせ' }]} />
 
-      <section className="py-12 border-b border-neutral-200">
-        <p className="text-xs text-neutral-500 mb-4">お問い合わせ</p>
-        <h1 className="text-3xl font-semibold text-neutral-900 mb-4 max-w-3xl leading-tight">
+      <section className="py-12 border-b border-border">
+        <p className="text-xs text-muted-foreground mb-4">お問い合わせ</p>
+        <h1 className="text-3xl font-semibold text-foreground mb-4 max-w-3xl leading-tight">
           情報提供・掲載相談・導入相談
         </h1>
-        <p className="text-lg text-neutral-600 max-w-3xl leading-relaxed">
+        <p className="text-lg text-muted-foreground max-w-3xl leading-relaxed">
           ロボット情報の修正、メーカー・代理店の掲載相談、取材相談、導入検討に関する相談を受け付けています。
         </p>
       </section>
 
-      <section className="py-12 border-b border-neutral-200">
+      <section className="py-12 border-b border-border">
         <div className="grid sm:grid-cols-2 gap-6">
           {inquiries.map((q) => (
-            <div key={q.label} className="border border-neutral-200 bg-white p-6">
-              <p className="text-xs text-neutral-500 mb-3">{q.label}</p>
-              <h3 className="font-semibold text-neutral-900 mb-2">{q.title}</h3>
-              <p className="text-sm text-neutral-600 leading-relaxed">{q.body}</p>
+            <div key={q.label} className="border border-border bg-card p-6">
+              <p className="text-xs text-muted-foreground mb-3">{q.label}</p>
+              <h3 className="font-semibold text-foreground mb-2">{q.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{q.body}</p>
             </div>
           ))}
         </div>
       </section>
 
       <section className="py-12">
-        <div className="border border-neutral-200 bg-white p-8">
-          <h2 className="text-xl font-semibold text-neutral-900 mb-3">お問い合わせフォーム</h2>
-          <p className="text-neutral-600 mb-8 max-w-3xl leading-relaxed">
+        <div className="border border-border bg-card p-8">
+          <h2 className="text-xl font-semibold text-foreground mb-3">お問い合わせフォーム</h2>
+          <p className="text-muted-foreground mb-8 max-w-3xl leading-relaxed">
             現時点では販売している製品はありません。導入判断の整理や情報の正確性向上のための窓口です。
             下記フォームよりご連絡ください。
           </p>
