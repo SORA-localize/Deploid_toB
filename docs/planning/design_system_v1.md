@@ -39,16 +39,20 @@ Deploid は、ヒューマノイド導入を検討する事業者向けの buyer
 - procurement intelligence
 - source-aware
 
-現在の実装方針：
+> **更新 2026-06-03（実装と同期）**：色は Tailwind の素の `neutral-*` から **Radix Colors ベースの semantic token** に移行済み。真実源は `src/app/globals.css`（`--background`/`--foreground`/`--border`/`--primary` …）と `lib/visualSemantics.ts`（tone → class 変換）。以下および §3 の `neutral-*` / `green-*` 等の直値は**歴史的記述**で、現行コードは下記 token を使う。neutral基調＋アクセント1色という方針自体は不変。
+>
+> - 中立スケール = Radix **slate**（`--background`=slate-1, `--foreground`=slate-12, `--border`=slate-6, `--muted-foreground`=slate-11）
+> - アクセント1色 = Radix **jade**（`--primary`/`--brand`=jade-9, `--ring`=jade-8）
+> - semantic tone（`lib/visualSemantics.ts`）: `neutral`/`brand`/`info`(blue)/`success`(grass)/`warning`(amber)/`danger`(ruby)/`unknown`/`favorite`(yellow)。`tone-*-bg` / `tone-*-border` / `tone-*-text` として適用。
+> - ダークモードは `next-themes` + Radix `*-dark` スケールで対応。
+> - 角丸は token 化（`--radius`）。原則は最小限・矩形基調を維持。
+> - **例外カテゴリ（意図的）**：トップのヒーロー帯とメーカー世界地図は、token に依らず黒背景・白文字の直書きを許容する。演出上の例外であり、一覧・比較・詳細などの業務UIには持ち込まない。
 
-- 背景は `neutral-50` / `neutral-100` / `white`
-- テキストは `neutral-900` を主軸
-- 補助テキストは `neutral-600` / `neutral-500`
-- 枠線は `neutral-200` / `neutral-300`
-- CTAは `neutral-900` 塗り
-- 成功・警告・情報だけ `green` / `amber` / `blue` を限定使用
-- 角丸は基本なし
-- 影は使わない
+現在の実装方針（neutral基調・矩形・低装飾）：
+
+- 背景・テキスト・枠線・CTAは上記 semantic token を使う（旧 `neutral-*` 直値は使わない）
+- 成功・警告・情報・危険は `lib/visualSemantics.ts` の tone 経由で限定使用
+- 角丸は最小限、影は原則なし
 
 ---
 
@@ -71,7 +75,7 @@ Deploid は、ヒューマノイド導入を検討する事業者向けの buyer
 | Warning | `amber-50`, `amber-700`, `amber-900` |
 | Info | `blue-50`, `blue-700`, `blue-800` |
 
-`src/app/globals.css` にはFigma由来のCSS変数があるが、実装ではTailwindのneutral scaleを主に使う。新しい色を足す場合は、この文書に用途を追加する。
+> **更新 2026-06-03**：上の表は歴史的記述。現行は `src/app/globals.css` の semantic token（Radix slate/jade ベース）と `lib/visualSemantics.ts` の tone を真実源とする。新しい色や用途を足す場合は、まず `globals.css` の token か `visualSemantics.ts` の tone を増やし、必要なら本表も更新する（個別ページに色を直書きしない）。
 
 ### Typography
 

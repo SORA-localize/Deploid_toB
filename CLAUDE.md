@@ -60,7 +60,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `data/*.ts` … 配列データのみ（`robots` `manufacturers` `guides` `useCases` `reports`）。`data/types.ts` が型定義。
   - `lib/data.ts` … 取得・filter・slug lookup・関連取得。**ページからは `data/*.ts` を直接検索せず `lib/data.ts` 経由で呼ぶ**（CMS移行時に呼び出し形を変えないため）。
   - `lib/labels.ts` … enumトークン→日本語ラベル変換。
-- **共通レイアウト**：`src/app/layout.tsx`（Header / main / Footer）。CSSは `src/app/globals.css`（Tailwind v4 + Figmaトークン）。
+  - `lib/visualSemantics.ts` … enum/状態→semantic tone→class 変換（色の真実源の一つ）。
+- **共通レイアウト**：`src/app/layout.tsx`（Header / main / Footer）。CSSは `src/app/globals.css`（Tailwind v4 + **Radix Colors ベースの semantic token**。slate=中立 / jade=アクセント。ダークモードは `next-themes`）。
 
 ## URL・命名規約
 
@@ -75,6 +76,8 @@ build_notes §5 が**強制ルール**。違反するとサイトの存在意義
 - **禁止**：紫〜青のグラデ・ヒーロー、中央寄せ巨大見出し＋角丸ボタン2個、アイコン付き角丸カード3枚の特徴セクション、過剰な角丸/シャドウ/グラスモーフィズム、中身のないAIイラスト/3D
 - **やる**：ほぼモノクロ＋アクセント1色（**グラデ禁止**）、強いタイポ階層、モノスペースのセクションラベル、左揃え・グリッド規律、本物のデータと出典明記
 - Figma Make版のneutral/矩形UIはこの方針と整合する。復元時はFigma構造を基準にしつつ、グラデ・過剰な角丸は持ち込まない。
+- 色は直書きせず `src/app/globals.css` の token と `lib/visualSemantics.ts` の tone を使う（詳細は `docs/planning/design_system_v1.md`）。
+- **例外カテゴリ（意図的・グラデ禁止は維持）**：トップのヒーロー帯とメーカー世界地図のみ、黒背景・白文字の直書きを許容する。演出上の例外で、一覧・比較・詳細などの業務UIには持ち込まない。
 
 ## 機種データの扱い
 

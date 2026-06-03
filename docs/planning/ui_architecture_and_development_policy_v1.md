@@ -34,14 +34,16 @@ UI開発方針とデザインシステムは別文書にする。
 - Form: `@formspree/react`
 - データ: `data/*.ts` の静的データ、取得は `lib/data.ts`
 - CMS/DB: 未導入
-- UIライブラリ: shadcn/ui 等は未導入。現状は独自Tailwindコンポーネント。
+- 色/トークン: **Radix Colors** ベースの semantic token（`src/app/globals.css` + `lib/visualSemantics.ts`）。ダークモードは `next-themes`。
+- UIライブラリ: 全面的なUIフレームワークは未導入。ただし shadcn 由来の薄い部品を `components/ui/` に限定的に持つ（現状 `encrypted-text` 程度）。大半は独自Tailwindコンポーネント。
+- アニメーション: `motion`（旧 framer-motion）。`motion/react` に一本化。
 
 ### 既存UIの方向性
 
 現状のUIは、Figma Make UI復元方針を出発点にしつつ、現在は以下の方向に整理されている。
 
-- neutral基調
-- 角丸なし
+- neutral基調（Radix slate）＋アクセント1色（Radix jade）
+- 角丸は最小限（`--radius` token 化。原則は矩形基調）
 - 枠線で情報単位を区切る
 - カード型だが装飾は薄い
 - buyer intelligence / B2B調査ツール寄り
@@ -78,6 +80,8 @@ UI開発方針とデザインシステムは別文書にする。
 | メディア表示可否 | `lib/media.ts` |
 | 共通UI部品 | `components/*.tsx` |
 | ページ構成 | `src/app/**/page.tsx` |
+| 色トークン | `src/app/globals.css`（Radix slate/jade ベースの CSS 変数） |
+| semantic tone | `lib/visualSemantics.ts`（enum/状態 → tone → class） |
 | 視覚ルール | `design_system_v1.md` |
 
 古いFigma復元計画は歴史的な参照として残す。今後の実装判断は、現在の実装とこの文書、`design_system_v1.md` を優先する。
