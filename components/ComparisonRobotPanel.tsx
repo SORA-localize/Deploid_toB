@@ -193,7 +193,7 @@ export function ComparisonRobotPanel({
             id={detailedPanelId}
             role="tabpanel"
             aria-labelledby={detailedTabId}
-            className="absolute inset-0 overflow-y-auto overscroll-contain bg-card flex flex-col p-3 gap-6"
+            className="absolute inset-0 overflow-y-auto overscroll-contain bg-card flex flex-col p-3 gap-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             <section>
               <h4 className="mb-3 text-xs font-semibold text-foreground pb-2 border-b border-border">
