@@ -6,11 +6,13 @@ import {
   DndContext,
   DragOverlay,
   KeyboardSensor,
+  pointerWithin,
   PointerSensor,
   useDraggable,
   useDroppable,
   useSensor,
   useSensors,
+  type CollisionDetection,
   type DragEndEvent,
   type DragOverEvent,
   type DragStartEvent,
@@ -73,6 +75,16 @@ function getDndItemId(source: CompareDragSource, slug: string) {
   return `${dndPrefixBySource[source]}-${slug}`;
 }
 
+const compareCollisionDetection: CollisionDetection = (args) => {
+  const pointerCollisions = pointerWithin(args);
+  const collisions = pointerCollisions.length > 0 ? pointerCollisions : closestCenter(args);
+  const sheetCardCollisions = collisions.filter(({ id }) =>
+    String(id).startsWith(`${dndPrefixBySource.sheet}-`),
+  );
+
+  return sheetCardCollisions.length > 0 ? sheetCardCollisions : collisions;
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
@@ -125,37 +137,26 @@ interface CompareClientProps {
   manufacturers: Manufacturer[];
 }
 
-interface CompareDroppableColumnProps {
+interface CompareDroppableAreaProps {
   id: string;
   target: CompareDropTarget;
   isHighlighted: boolean;
-  children: ReactNode;
-  className?: string;
+  children: (state: {
+    setNodeRef: (element: HTMLElement | null) => void;
+    isActive: boolean;
+  }) => ReactNode;
 }
 
-function CompareDroppableColumn({
+function CompareDroppableArea({
   id,
   target,
   isHighlighted,
   children,
-  className,
-}: CompareDroppableColumnProps) {
+}: CompareDroppableAreaProps) {
   const data: CompareColumnDropData = { type: 'column', target, dropType: 'column' };
   const { setNodeRef, isOver } = useDroppable({ id, data });
-  const isActive = isOver || isHighlighted;
 
-  return (
-    <div
-      ref={setNodeRef}
-      className={cn(
-        'rounded-sm transition-[box-shadow,outline-color] duration-200',
-        isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
+  return children({ setNodeRef, isActive: isOver || isHighlighted });
 }
 
 interface DraggableMenuRobotButtonProps {
@@ -356,6 +357,19 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
     return true;
   };
 
+  const insertRobot = (slug: string, index?: number) => {
+    if (selectedSlugs.length >= MAX_COMPARE_ROBOTS || selectedSlugs.includes(slug)) return false;
+
+    const insertIndex =
+      typeof index === 'number'
+        ? Math.max(0, Math.min(index, selectedSlugs.length))
+        : selectedSlugs.length;
+    const nextSlugs = [...selectedSlugs];
+    nextSlugs.splice(insertIndex, 0, slug);
+    updateParams({ compare: nextSlugs.join(',') });
+    return true;
+  };
+
   const highlightRobot = (slug: string) => {
     const el = document.getElementById(`compare-card-${slug}`);
     if (!el) return;
@@ -421,9 +435,19 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
         highlightRobot(activeData.slug);
         return;
       }
-      if (addRobot(activeData.slug)) {
+
+      const insertIndex =
+        dropData.dropType === 'sheet-card' ? selectedSlugs.indexOf(dropData.slug) : undefined;
+      const normalizedInsertIndex =
+        typeof insertIndex === 'number' && insertIndex >= 0 ? insertIndex : undefined;
+      if (insertRobot(activeData.slug, normalizedInsertIndex)) {
         setTimeout(() => highlightRobot(activeData.slug), 100);
       }
+      return;
+    }
+
+    if (dropData.target === 'menu' && activeData.source === 'sheet') {
+      removeRobot(activeData.slug);
       return;
     }
 
@@ -462,7 +486,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
         <DndContext
           id="compare-three-column"
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={compareCollisionDetection}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
@@ -470,84 +494,88 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
         >
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[16rem_minmax(0,1fr)_16rem]">
             {/* Left Sidebar - Manufacturer Menu */}
-            <CompareDroppableColumn
-              id={compareColumnIds.menu}
-              target="menu"
-              isHighlighted={activeDropTarget === 'menu'}
-              className="min-w-0"
-            >
-              <div className="border border-border bg-muted xl:sticky xl:top-6">
-                <div className="px-4 py-3 border-b border-border bg-card">
-                  <h2 className="text-xs font-semibold text-foreground">
-                    {uiText.compare.manufacturers}
-                  </h2>
-                </div>
-                <div className="divide-y divide-border max-h-80 overflow-y-auto overscroll-contain xl:max-h-[calc(100vh-200px)]">
-                  {manufacturers.map((manufacturer) => {
-                    const manufacturerRobots = robots.filter(
-                      (r) => r.manufacturerSlug === manufacturer.slug,
-                    );
-                    const isExpanded = expandedManufacturers.includes(manufacturer.slug);
+            <div className="min-w-0">
+              <CompareDroppableArea
+                id={compareColumnIds.menu}
+                target="menu"
+                isHighlighted={activeDropTarget === 'menu'}
+              >
+                {({ setNodeRef, isActive }) => (
+                  <div
+                    ref={setNodeRef}
+                    className={cn(
+                      'border border-border bg-muted transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-6',
+                      isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
+                    )}
+                  >
+                    <div className="px-4 py-3 border-b border-border bg-card">
+                      <h2 className="text-xs font-semibold text-foreground">
+                        {uiText.compare.manufacturers}
+                      </h2>
+                    </div>
+                    <div className="divide-y divide-border max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden xl:max-h-[calc(100vh-200px)]">
+                      {manufacturers.map((manufacturer) => {
+                        const manufacturerRobots = robots.filter(
+                          (r) => r.manufacturerSlug === manufacturer.slug,
+                        );
+                        const isExpanded = expandedManufacturers.includes(manufacturer.slug);
 
-                    return (
-                      <div key={manufacturer.slug}>
-                        <button
-                          type="button"
-                          aria-label={uiText.comparison.toggleAria(
-                            manufacturer.nameJa ?? manufacturer.name,
-                            isExpanded,
-                          )}
-                          aria-expanded={isExpanded}
-                          onClick={() => toggleManufacturer(manufacturer.slug)}
-                          className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted transition-colors text-left"
-                        >
-                          <ManufacturerLogoName
-                            name={manufacturer.nameJa ?? manufacturer.name}
-                            logo={manufacturer.logo}
-                            className="text-sm font-medium text-foreground"
-                            frameClassName="h-5 w-5"
-                            imageClassName="h-4 w-4"
-                          />
-                          {isExpanded ? (
-                            <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                          )}
-                        </button>
-                        {isExpanded && (
-                          <div className="bg-card border-t border-border">
-                            {manufacturerRobots.map((robot) => {
-                              const isSelected = selectedSlugs.includes(robot.slug);
-                              const isDisabled =
-                                !isSelected && selectedSlugs.length >= MAX_COMPARE_ROBOTS;
-                              return (
-                                <DraggableMenuRobotButton
-                                  key={robot.slug}
-                                  robot={robot}
-                                  isSelected={isSelected}
-                                  isDisabled={isDisabled}
-                                  onClick={() =>
-                                    isSelected ? removeRobot(robot.slug) : addRobot(robot.slug)
-                                  }
-                                />
-                              );
-                            })}
+                        return (
+                          <div key={manufacturer.slug}>
+                            <button
+                              type="button"
+                              aria-label={uiText.comparison.toggleAria(
+                                manufacturer.nameJa ?? manufacturer.name,
+                                isExpanded,
+                              )}
+                              aria-expanded={isExpanded}
+                              onClick={() => toggleManufacturer(manufacturer.slug)}
+                              className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted transition-colors text-left"
+                            >
+                              <ManufacturerLogoName
+                                name={manufacturer.nameJa ?? manufacturer.name}
+                                logo={manufacturer.logo}
+                                className="text-sm font-medium text-foreground"
+                                frameClassName="h-5 w-5"
+                                imageClassName="h-4 w-4"
+                              />
+                              {isExpanded ? (
+                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                              )}
+                            </button>
+                            {isExpanded && (
+                              <div className="bg-card border-t border-border">
+                                {manufacturerRobots.map((robot) => {
+                                  const isSelected = selectedSlugs.includes(robot.slug);
+                                  const isDisabled =
+                                    !isSelected && selectedSlugs.length >= MAX_COMPARE_ROBOTS;
+                                  return (
+                                    <DraggableMenuRobotButton
+                                      key={robot.slug}
+                                      robot={robot}
+                                      isSelected={isSelected}
+                                      isDisabled={isDisabled}
+                                      onClick={() =>
+                                        isSelected ? removeRobot(robot.slug) : addRobot(robot.slug)
+                                      }
+                                    />
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </CompareDroppableColumn>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </CompareDroppableArea>
+            </div>
 
             {/* Main Content - Comparison Sheet */}
-            <CompareDroppableColumn
-              id={compareColumnIds.sheet}
-              target="sheet"
-              isHighlighted={activeDropTarget === 'sheet'}
-              className="min-w-0"
-            >
+            <div className="min-w-0">
               <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-xs text-muted-foreground">
                   {uiText.compare.comparisonSheet(selectedSlugs.length, MAX_COMPARE_ROBOTS)}
@@ -564,119 +592,150 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                 )}
               </div>
 
-              {selectedRobots.length === 0 ? (
-                <div className="flex min-h-[22rem] items-center justify-center border border-border bg-muted p-8 text-center sm:p-16">
-                  <div className="max-w-md mx-auto">
-                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg
-                        aria-hidden="true"
-                        className="w-8 h-8 text-muted-foreground/70"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-sm font-semibold text-foreground mb-2">
-                      {uiText.comparison.emptyTitle}
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      {uiText.comparison.emptyDescription(MAX_COMPARE_ROBOTS)}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="border border-border bg-muted p-3 sm:p-4">
-                  <SortableContext items={sheetItemIds} strategy={rectSortingStrategy}>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                      {selectedRobots.map((robot) => {
-                        const manufacturer = manufacturerFor(robot.manufacturerSlug);
-                        return (
-                          <SortableCompareCard
-                            key={robot.slug}
-                            slug={robot.slug}
-                            id={getDndItemId('sheet', robot.slug)}
-                            data={{
-                              type: 'robot',
-                              source: 'sheet',
-                              target: 'sheet',
-                              dropType: 'sheet-card',
-                              slug: robot.slug,
-                            }}
+              <CompareDroppableArea
+                id={compareColumnIds.sheet}
+                target="sheet"
+                isHighlighted={activeDropTarget === 'sheet'}
+              >
+                {({ setNodeRef, isActive }) =>
+                  selectedRobots.length === 0 ? (
+                    <div
+                      ref={setNodeRef}
+                      className={cn(
+                        'flex min-h-[22rem] items-center justify-center border border-border bg-muted p-8 text-center transition-[box-shadow,outline-color] duration-200 sm:p-16',
+                        isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
+                      )}
+                    >
+                      <div className="max-w-md mx-auto">
+                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                          <svg
+                            aria-hidden="true"
+                            className="w-8 h-8 text-muted-foreground/70"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
                           >
-                            {(dragHandleProps) => (
-                              <ComparisonRobotPanel
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={1.5}
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                            />
+                          </svg>
+                        </div>
+                        <h3 className="text-sm font-semibold text-foreground mb-2">
+                          {uiText.comparison.emptyTitle}
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          {uiText.comparison.emptyDescription(MAX_COMPARE_ROBOTS)}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      ref={setNodeRef}
+                      className={cn(
+                        'border border-border bg-muted p-3 transition-[box-shadow,outline-color] duration-200 sm:p-4',
+                        isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
+                      )}
+                    >
+                      <SortableContext items={sheetItemIds} strategy={rectSortingStrategy}>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                          {selectedRobots.map((robot) => {
+                            const manufacturer = manufacturerFor(robot.manufacturerSlug);
+                            return (
+                              <SortableCompareCard
+                                key={robot.slug}
+                                slug={robot.slug}
+                                id={getDndItemId('sheet', robot.slug)}
+                                data={{
+                                  type: 'robot',
+                                  source: 'sheet',
+                                  target: 'sheet',
+                                  dropType: 'sheet-card',
+                                  slug: robot.slug,
+                                }}
+                              >
+                                {(dragHandleProps) => (
+                                  <ComparisonRobotPanel
+                                    robot={robot}
+                                    manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                                    manufacturerLogo={manufacturer?.logo}
+                                    isFavorite={
+                                      isMounted ? favorites.includes(robot.slug) : false
+                                    }
+                                    onFavoriteToggle={toggleFavorite}
+                                    onRemove={removeRobot}
+                                    dragHandleProps={dragHandleProps}
+                                  />
+                                )}
+                              </SortableCompareCard>
+                            );
+                          })}
+                        </div>
+                      </SortableContext>
+                    </div>
+                  )
+                }
+              </CompareDroppableArea>
+            </div>
+
+            {/* Right Sidebar - Favorites */}
+            <div className="min-w-0">
+              <CompareDroppableArea
+                id={compareColumnIds.favorite}
+                target="favorite"
+                isHighlighted={activeDropTarget === 'favorite'}
+              >
+                {({ setNodeRef, isActive }) => (
+                  <div
+                    ref={setNodeRef}
+                    className={cn(
+                      'border border-border bg-muted transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-6',
+                      isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
+                    )}
+                  >
+                    <div className="px-4 py-3 border-b border-border bg-card flex items-center gap-2">
+                      <Star className="w-4 h-4 text-yellow-500" />
+                      <h2 className="text-xs font-semibold text-foreground">
+                        {uiText.compare.favorites}
+                      </h2>
+                    </div>
+                    <div className="p-4 max-h-80 overflow-y-auto overscroll-contain xl:max-h-[calc(100vh-200px)]">
+                      {!isMounted ? (
+                        <div className="text-center py-8" aria-hidden="true" />
+                      ) : favoriteRobots.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Star className="w-8 h-8 text-muted-foreground/70 mx-auto mb-3" />
+                          <p className="text-xs text-muted-foreground mb-1">
+                            {uiText.favorites.empty}
+                          </p>
+                          <p className="text-xs text-muted-foreground/70">
+                            {uiText.favorites.emptySub}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {favoriteRobots.map((robot) => {
+                            const manufacturer = manufacturerFor(robot.manufacturerSlug);
+                            return (
+                              <DraggableFavoriteCard
+                                key={robot.slug}
                                 robot={robot}
                                 manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
                                 manufacturerLogo={manufacturer?.logo}
-                                isFavorite={isMounted ? favorites.includes(robot.slug) : false}
-                                onFavoriteToggle={toggleFavorite}
-                                onRemove={removeRobot}
-                                dragHandleProps={dragHandleProps}
+                                onRemove={toggleFavorite}
+                                onSelect={handleFavoriteSelect}
                               />
-                            )}
-                          </SortableCompareCard>
-                        );
-                      })}
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                  </SortableContext>
-                </div>
-              )}
-            </CompareDroppableColumn>
-
-            {/* Right Sidebar - Favorites */}
-            <CompareDroppableColumn
-              id={compareColumnIds.favorite}
-              target="favorite"
-              isHighlighted={activeDropTarget === 'favorite'}
-              className="min-w-0"
-            >
-              <div className="border border-border bg-muted xl:sticky xl:top-6">
-                <div className="px-4 py-3 border-b border-border bg-card flex items-center gap-2">
-                  <Star className="w-4 h-4 text-yellow-500" />
-                  <h2 className="text-xs font-semibold text-foreground">
-                    {uiText.compare.favorites}
-                  </h2>
-                </div>
-                <div className="p-4 max-h-80 overflow-y-auto overscroll-contain xl:max-h-[calc(100vh-200px)]">
-                  {!isMounted ? (
-                    <div className="text-center py-8" aria-hidden="true" />
-                  ) : favoriteRobots.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Star className="w-8 h-8 text-muted-foreground/70 mx-auto mb-3" />
-                      <p className="text-xs text-muted-foreground mb-1">
-                        {uiText.favorites.empty}
-                      </p>
-                      <p className="text-xs text-muted-foreground/70">
-                        {uiText.favorites.emptySub}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {favoriteRobots.map((robot) => {
-                        const manufacturer = manufacturerFor(robot.manufacturerSlug);
-                        return (
-                          <DraggableFavoriteCard
-                            key={robot.slug}
-                            robot={robot}
-                            manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
-                            manufacturerLogo={manufacturer?.logo}
-                            onRemove={toggleFavorite}
-                            onSelect={handleFavoriteSelect}
-                          />
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CompareDroppableColumn>
+                  </div>
+                )}
+              </CompareDroppableArea>
+            </div>
           </div>
 
           <DragOverlay>
