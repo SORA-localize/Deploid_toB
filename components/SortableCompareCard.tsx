@@ -1,7 +1,11 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import type { DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core';
+import type {
+  DraggableAttributes,
+  DraggableSyntheticListeners,
+  UniqueIdentifier,
+} from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -13,10 +17,13 @@ export interface CompareCardDragHandleProps {
 
 interface SortableCompareCardProps {
   slug: string;
+  id?: UniqueIdentifier;
+  data?: Record<string, unknown>;
   children: (dragHandleProps: CompareCardDragHandleProps) => ReactNode;
 }
 
-export function SortableCompareCard({ slug, children }: SortableCompareCardProps) {
+export function SortableCompareCard({ slug, id, data, children }: SortableCompareCardProps) {
+  const sortableId = id ?? slug;
   const {
     attributes,
     listeners,
@@ -24,7 +31,7 @@ export function SortableCompareCard({ slug, children }: SortableCompareCardProps
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: slug });
+  } = useSortable({ id: sortableId, data });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -33,7 +40,7 @@ export function SortableCompareCard({ slug, children }: SortableCompareCardProps
   };
 
   return (
-    <div ref={setNodeRef} style={style} className={isDragging ? 'relative opacity-80' : 'relative'}>
+    <div ref={setNodeRef} style={style} className={isDragging ? 'relative opacity-40' : 'relative'}>
       <div
         id={`compare-card-${slug}`}
         className="rounded-sm transition-shadow duration-500"
