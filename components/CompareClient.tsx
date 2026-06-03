@@ -1,18 +1,13 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  closestCenter,
   DndContext,
   DragOverlay,
   KeyboardSensor,
-  pointerWithin,
   PointerSensor,
-  useDraggable,
-  useDroppable,
   useSensor,
   useSensors,
-  type CollisionDetection,
   type DragEndEvent,
   type DragOverEvent,
   type DragStartEvent,
@@ -23,14 +18,30 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { ChevronDown, ChevronRight, Star, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import {
+  CompareDragOverlayCard,
+  CompareDroppableArea,
+  CompareInsertionPreviewCard,
+  DraggableFavoriteCard,
+  DraggableMenuRobotButton,
+} from '@/components/compare/CompareParts';
 import { ComparisonRobotPanel } from '@/components/ComparisonRobotPanel';
-import { FavoriteCard } from '@/components/FavoriteCard';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SortableCompareCard } from '@/components/SortableCompareCard';
 import type { Manufacturer, Robot } from '@/data/types';
+import {
+  compareCollisionDetection,
+  compareColumnIds,
+  getDndItemId,
+  getDropData,
+  getRobotDragData,
+  type CompareDropData,
+  type CompareDropTarget,
+  type CompareRobotDragData,
+} from '@/lib/compare/dnd';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 import { useFavorites } from '@/lib/useFavorites';
@@ -39,230 +50,9 @@ import { cn } from '@/lib/utils';
 const MAX_COMPARE_ROBOTS = 9;
 const SHEET_LAYOUT_TRANSITION = { type: 'spring', stiffness: 360, damping: 34 } as const;
 
-type CompareDragSource = 'menu' | 'sheet' | 'favorite';
-type CompareDropTarget = 'menu' | 'sheet' | 'favorite';
-
-interface CompareRobotDragData extends Record<string, unknown> {
-  type: 'robot';
-  slug: string;
-  source: CompareDragSource;
-  target?: CompareDropTarget;
-  dropType?: 'sheet-card';
-}
-
-interface CompareColumnDropData extends Record<string, unknown> {
-  type: 'column';
-  target: CompareDropTarget;
-  dropType: 'column';
-}
-
-type CompareDropData =
-  | { target: CompareDropTarget; dropType: 'column'; slug?: undefined }
-  | { target: CompareDropTarget; dropType: 'sheet-card'; slug: string };
-
-const compareColumnIds = {
-  menu: 'menu-column',
-  sheet: 'sheet-column',
-  favorite: 'fav-column',
-} as const satisfies Record<CompareDropTarget, string>;
-
-const dndPrefixBySource = {
-  menu: 'menu',
-  sheet: 'sheet',
-  favorite: 'fav',
-} as const satisfies Record<CompareDragSource, string>;
-
-function getDndItemId(source: CompareDragSource, slug: string) {
-  return `${dndPrefixBySource[source]}-${slug}`;
-}
-
-const compareCollisionDetection: CollisionDetection = (args) => {
-  const pointerCollisions = pointerWithin(args);
-  const collisions = pointerCollisions.length > 0 ? pointerCollisions : closestCenter(args);
-  const sheetCardCollisions = collisions.filter(({ id }) =>
-    String(id).startsWith(`${dndPrefixBySource.sheet}-`),
-  );
-
-  return sheetCardCollisions.length > 0 ? sheetCardCollisions : collisions;
-};
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-function getRobotDragData(value: unknown): CompareRobotDragData | null {
-  if (!isRecord(value)) return null;
-  if (value.type !== 'robot') return null;
-  if (typeof value.slug !== 'string') return null;
-  if (value.source !== 'menu' && value.source !== 'sheet' && value.source !== 'favorite') {
-    return null;
-  }
-
-  return {
-    type: 'robot',
-    slug: value.slug,
-    source: value.source,
-    target:
-      value.target === 'menu' || value.target === 'sheet' || value.target === 'favorite'
-        ? value.target
-        : undefined,
-    dropType: value.dropType === 'sheet-card' ? value.dropType : undefined,
-  };
-}
-
-function getDropData(value: unknown): CompareDropData | null {
-  if (!isRecord(value)) return null;
-
-  if (
-    value.type === 'column' &&
-    value.dropType === 'column' &&
-    (value.target === 'menu' || value.target === 'sheet' || value.target === 'favorite')
-  ) {
-    return { target: value.target, dropType: 'column' };
-  }
-
-  if (
-    value.type === 'robot' &&
-    value.dropType === 'sheet-card' &&
-    value.target === 'sheet' &&
-    typeof value.slug === 'string'
-  ) {
-    return { target: 'sheet', dropType: 'sheet-card', slug: value.slug };
-  }
-
-  return null;
-}
-
 interface CompareClientProps {
   robots: Robot[];
   manufacturers: Manufacturer[];
-}
-
-interface CompareDroppableAreaProps {
-  id: string;
-  target: CompareDropTarget;
-  isHighlighted: boolean;
-  children: (state: {
-    setNodeRef: (element: HTMLElement | null) => void;
-    isActive: boolean;
-  }) => ReactNode;
-}
-
-function CompareDroppableArea({
-  id,
-  target,
-  isHighlighted,
-  children,
-}: CompareDroppableAreaProps) {
-  const data: CompareColumnDropData = { type: 'column', target, dropType: 'column' };
-  const { setNodeRef, isOver } = useDroppable({ id, data });
-
-  return children({ setNodeRef, isActive: isOver || isHighlighted });
-}
-
-interface DraggableMenuRobotButtonProps {
-  robot: Robot;
-  isSelected: boolean;
-  isDisabled: boolean;
-  onClick: () => void;
-}
-
-function DraggableMenuRobotButton({
-  robot,
-  isSelected,
-  isDisabled,
-  onClick,
-}: DraggableMenuRobotButtonProps) {
-  const data: CompareRobotDragData = { type: 'robot', source: 'menu', slug: robot.slug };
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: getDndItemId('menu', robot.slug),
-    data,
-    disabled: isDisabled,
-  });
-
-  return (
-    <button
-      ref={setNodeRef}
-      type="button"
-      {...attributes}
-      {...listeners}
-      aria-label={
-        isSelected
-          ? uiText.comparison.removeAria(robot.nameJa ?? robot.name)
-          : uiText.comparison.addAria(robot.nameJa ?? robot.name)
-      }
-      aria-pressed={isSelected}
-      onClick={onClick}
-      disabled={isDisabled}
-      className={cn(
-        'group flex w-full items-center justify-between gap-3 px-6 py-2.5 text-left text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-        isSelected
-          ? 'bg-primary/10 text-foreground hover:bg-primary/15'
-          : 'text-foreground/80 hover:bg-muted',
-      )}
-      style={{ opacity: isDragging ? 0.35 : undefined }}
-    >
-      <span
-        className={cn(
-          'min-w-0 flex-1 truncate',
-          isSelected ? 'font-semibold text-foreground' : 'text-foreground/80',
-        )}
-      >
-        {robot.nameJa ?? robot.name}
-      </span>
-      <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
-        {isSelected && (
-          <X className="h-3.5 w-3.5 text-foreground/60 group-hover:text-foreground" />
-        )}
-      </span>
-    </button>
-  );
-}
-
-interface DraggableFavoriteCardProps {
-  robot: Robot;
-  manufacturerName?: string;
-  manufacturerLogo?: Manufacturer['logo'];
-  onRemove: (slug: string) => void;
-  onSelect: (slug: string) => void;
-}
-
-function DraggableFavoriteCard({
-  robot,
-  manufacturerName,
-  manufacturerLogo,
-  onRemove,
-  onSelect,
-}: DraggableFavoriteCardProps) {
-  const data: CompareRobotDragData = { type: 'robot', source: 'favorite', slug: robot.slug };
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: getDndItemId('favorite', robot.slug),
-    data,
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      aria-label={uiText.comparison.addAria(robot.nameJa ?? robot.name)}
-      className={cn('rounded-sm transition-opacity', isDragging && 'opacity-40')}
-    >
-      <FavoriteCard
-        robot={robot}
-        manufacturerName={manufacturerName}
-        manufacturerLogo={manufacturerLogo}
-        onRemove={onRemove}
-        onSelect={onSelect}
-      />
-    </div>
-  );
-}
-
-interface CompareDragOverlayCardProps {
-  robot: Robot;
-  manufacturerName?: string;
-  manufacturerLogo?: Manufacturer['logo'];
 }
 
 interface SheetPreviewPlacement {
@@ -273,67 +63,6 @@ interface SheetPreviewPlacement {
 type SheetPreviewItem =
   | { type: 'robot'; robot: Robot }
   | { type: 'preview'; robot: Robot };
-
-function CompareDragOverlayCard({
-  robot,
-  manufacturerName,
-  manufacturerLogo,
-}: CompareDragOverlayCardProps) {
-  return (
-    <motion.div
-      initial={{ opacity: 0.85, scale: 0.96 }}
-      animate={{ opacity: 1, scale: 1.03 }}
-      transition={{ duration: 0.16, ease: 'easeOut' }}
-      className="pointer-events-none w-56 rounded-sm border border-ring bg-card p-3 text-card-foreground shadow-2xl"
-    >
-      <h3 className="truncate text-sm font-semibold" title={robot.nameJa ?? robot.name}>
-        {robot.nameJa ?? robot.name}
-      </h3>
-      <ManufacturerLogoName
-        name={manufacturerName ?? robot.manufacturerSlug}
-        logo={manufacturerLogo}
-        className="mt-1 text-xs text-muted-foreground"
-        frameClassName="h-4 w-4 shrink-0"
-        imageClassName="h-3 w-3"
-      />
-    </motion.div>
-  );
-}
-
-function CompareInsertionPreviewCard({
-  robot,
-  manufacturerName,
-  manufacturerLogo,
-}: CompareDragOverlayCardProps) {
-  return (
-    <article
-      className="pointer-events-none flex h-full min-h-[26rem] flex-col border border-dashed border-ring bg-card/70 text-card-foreground opacity-65 shadow-sm"
-      aria-hidden="true"
-    >
-      <div className="border-b border-border bg-muted/80 p-3">
-        <h3 className="truncate text-sm font-semibold text-foreground" title={robot.nameJa ?? robot.name}>
-          {robot.nameJa ?? robot.name}
-        </h3>
-        <ManufacturerLogoName
-          name={manufacturerName ?? robot.manufacturerSlug}
-          logo={manufacturerLogo}
-          className="mt-1 text-xs text-muted-foreground"
-          frameClassName="h-4 w-4 shrink-0"
-          imageClassName="h-3 w-3"
-        />
-      </div>
-      <div className="border-b border-border bg-card px-3 py-2 text-center text-xs font-medium text-muted-foreground">
-        {uiText.comparison.addToSheet}
-      </div>
-      <div className="aspect-[4/3] border-b border-border bg-muted/80" />
-      <div className="mt-auto space-y-2 p-3">
-        <div className="h-3 w-24 bg-muted" />
-        <div className="h-3 w-full bg-muted" />
-        <div className="h-3 w-4/5 bg-muted" />
-      </div>
-    </article>
-  );
-}
 
 export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   const { getParam, updateParams } = useUrlFilters();
