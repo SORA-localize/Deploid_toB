@@ -8,7 +8,6 @@ import type {
 } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { cn } from '@/lib/utils';
 
 export interface CompareCardDragHandleProps {
   attributes: DraggableAttributes;
@@ -36,17 +35,17 @@ export function SortableCompareCard({ slug, id, data, children }: SortableCompar
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    // アクティブカードはポインタに1:1で追従させたいので transition を切る。
-    // 周囲カードの整列アニメは dnd-kit の transition に任せる。
-    transition: isDragging ? 'none' : transition,
-    zIndex: isDragging ? 30 : undefined,
+    transition,
+    zIndex: isDragging ? 20 : undefined,
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="relative">
+    // ドラッグ中は元の位置に薄いプレースホルダとして残り、着地点を示す。
+    // 実際に持ち上がって動くカードは DragOverlay 側が描画する。
+    <div ref={setNodeRef} style={style} className={isDragging ? 'relative opacity-40' : 'relative'}>
       <div
         id={`compare-card-${slug}`}
-        className={cn('rounded-sm transition-shadow duration-200', isDragging && 'shadow-2xl')}
+        className="rounded-sm transition-shadow duration-500"
       >
         {children({ attributes, listeners, isDragging })}
       </div>

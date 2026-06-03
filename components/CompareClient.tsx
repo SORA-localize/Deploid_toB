@@ -591,17 +591,33 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
           </div>
 
           {/*
-            シート内並べ替え(source='sheet')ではオーバーレイを使わず、本物の
-            カードがそのままポインタに追従して動く(一体感のため)。メニュー/
-            お気に入りからの挿入ドラッグだけ、小カードのプレビューを表示する。
+            持ち上げ中のカードを描画する層。元カードは SortableCompareCard 側で
+            薄いプレースホルダとして残り、着地点を示す。
+            - シート内並べ替え(source='sheet'): 実物大の忠実なカードを持ち上げる
+              (ミニカードが別々に飛ぶ違和感を避けるため)。DragOverlay は元ノードと
+              同じ寸法で描画されるので h-full のパネルがそのまま収まる。
+            - メニュー/お気に入りからの挿入: リスト行を掴む場面なので小カード。
           */}
           <DragOverlay>
-            {activeDrag && activeDrag.source !== 'sheet' && activeDragRobot ? (
-              <CompareDragOverlayCard
-                robot={activeDragRobot}
-                manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerSlug}
-                manufacturerLogo={activeDragManufacturer?.logo}
-              />
+            {activeDrag && activeDragRobot ? (
+              activeDrag.source === 'sheet' ? (
+                <div className="h-full shadow-2xl">
+                  <ComparisonRobotPanel
+                    robot={activeDragRobot}
+                    manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerSlug}
+                    manufacturerLogo={activeDragManufacturer?.logo}
+                    isFavorite={isMounted ? favorites.includes(activeDragRobot.slug) : false}
+                    onFavoriteToggle={() => {}}
+                    onRemove={() => {}}
+                  />
+                </div>
+              ) : (
+                <CompareDragOverlayCard
+                  robot={activeDragRobot}
+                  manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerSlug}
+                  manufacturerLogo={activeDragManufacturer?.logo}
+                />
+              )
             ) : null}
           </DragOverlay>
         </DndContext>
