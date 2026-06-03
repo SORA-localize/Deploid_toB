@@ -93,8 +93,8 @@ export function RobotCard({
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
         "group relative flex flex-col h-full overflow-hidden border transition-colors duration-300",
-        "border-neutral-200 bg-white",
-        "hover:border-neutral-400 hover:shadow-lg",
+        "border-border bg-card text-card-foreground",
+        "hover:border-ring hover:shadow-lg",
         dimmed && "pointer-events-none"
       )}
     >
@@ -104,7 +104,7 @@ export function RobotCard({
         className="pointer-events-none absolute inset-0 z-30"
         style={{
           opacity: glowOpacity,
-          background: 'radial-gradient(circle at center, rgba(0,0,0,0.03) 0%, transparent 70%)',
+          background: 'radial-gradient(circle at center, var(--card-spotlight) 0%, transparent 70%)',
         }}
       />
 
@@ -127,7 +127,7 @@ export function RobotCard({
             e.stopPropagation();
             onFavoriteToggle?.(robot.slug);
           }}
-          className="absolute top-3 right-3 z-40 p-1 text-neutral-400 transition-colors hover:text-neutral-700 pointer-events-auto"
+          className="absolute top-3 right-3 z-40 p-1 text-muted-foreground transition-colors hover:text-foreground pointer-events-auto"
         >
           <Star
             className={`w-4 h-4 ${
@@ -138,7 +138,7 @@ export function RobotCard({
       )}
 
       <div className="relative z-20 flex flex-col h-full pointer-events-none">
-        <div className="aspect-[4/3] bg-neutral-100 flex flex-col items-center justify-center text-neutral-400 overflow-hidden border-b border-neutral-200">
+        <div className="aspect-[4/3] bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden border-b border-border">
           {(() => {
             const hero = getDisplayableAsset(robot.images?.hero ?? robot.heroImage);
             return hero ? (
@@ -159,29 +159,31 @@ export function RobotCard({
         </div>
         <div className="p-4 flex-1 flex flex-col">
           <div className="flex items-start justify-between mb-2">
-            <h3 className="font-semibold text-neutral-900 pointer-events-auto">
+            <h3 className="font-semibold text-card-foreground">
               <Link href={`/robots/${robot.slug}`} className="hover:underline">
                 {robot.nameJa ?? robot.name}
               </Link>
             </h3>
           </div>
-          <div className="pointer-events-auto">
-            <ManufacturerLogoName
-              name={manufacturerName ?? robot.manufacturerSlug}
-              logo={manufacturerLogo}
-              className="mb-1 text-xs text-neutral-500"
-              frameClassName="h-4 w-4"
-              imageClassName="h-3 w-3"
-            />
+          <div>
+            <div className="inline-block pointer-events-auto">
+              <ManufacturerLogoName
+                name={manufacturerName ?? robot.manufacturerSlug}
+                logo={manufacturerLogo}
+                className="mb-1 text-xs text-muted-foreground"
+                frameClassName="h-4 w-4"
+                imageClassName="h-3 w-3"
+              />
+            </div>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-4">
               {specRows.map((row) => (
                 <div key={row.label}>
-                  <dt className="text-neutral-500">{row.label}</dt>
+                  <dt className="text-muted-foreground">{row.label}</dt>
                   <dd
                     className={
                       row.label === '段階' && statusReady
-                        ? 'text-green-700 font-medium'
-                        : 'text-neutral-900 font-medium'
+                        ? 'text-green-700 dark:text-green-400 font-medium'
+                        : 'text-card-foreground font-medium'
                     }
                   >
                     {row.value}
@@ -190,11 +192,11 @@ export function RobotCard({
               ))}
             </dl>
           </div>
-          <div className="mt-auto flex items-center justify-between pt-3 border-t border-neutral-300">
-            <span className="text-xs text-neutral-700">
+          <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">
+            <span className="text-xs text-muted-foreground">
               {uiText.common.viewDetails}
             </span>
-            <ChevronRight className="w-4 h-4 text-neutral-500" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </div>
         </div>
       </div>
@@ -202,7 +204,7 @@ export function RobotCard({
       {/* Accent bottom line */}
       <div
         aria-hidden="true"
-        className="absolute bottom-0 left-0 z-40 h-[2px] w-0 bg-neutral-900 transition-all duration-500 group-hover:w-full pointer-events-none"
+        className="absolute bottom-0 left-0 z-40 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full pointer-events-none"
       />
 
       <Link

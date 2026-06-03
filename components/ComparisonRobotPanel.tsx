@@ -19,13 +19,13 @@ interface ComparisonRobotPanelProps {
 }
 
 function CompactList({ items }: { items: string[] }) {
-  if (items.length === 0) return <p className="text-xs text-neutral-500">{TBD_LABEL}</p>;
+  if (items.length === 0) return <p className="text-xs text-muted-foreground">{TBD_LABEL}</p>;
 
   return (
-    <ul className="space-y-1 text-xs text-neutral-700">
+    <ul className="space-y-1 text-xs text-foreground">
       {items.map((item) => (
         <li key={item} className="flex gap-1.5">
-          <span className="text-neutral-400 shrink-0">•</span>
+          <span className="text-muted-foreground/70 shrink-0">•</span>
           <span>{item}</span>
         </li>
       ))}
@@ -56,12 +56,12 @@ export function ComparisonRobotPanel({
   };
 
   return (
-    <article className="flex flex-col border border-neutral-300 bg-white h-full relative">
-      <div className="border-b border-neutral-300 bg-neutral-50 p-3 flex flex-col gap-4">
+    <article className="flex flex-col border border-border bg-card text-card-foreground h-full relative">
+      <div className="border-b border-border bg-muted p-3 flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <h3
-              className="text-sm font-semibold text-neutral-900 truncate"
+              className="text-sm font-semibold text-foreground truncate"
               title={robot.nameJa ?? robot.name}
             >
               {robot.nameJa ?? robot.name}
@@ -69,7 +69,7 @@ export function ComparisonRobotPanel({
             <ManufacturerLogoName
               name={manufacturerName ?? robot.manufacturerSlug}
               logo={manufacturerLogo}
-              className="mt-1 text-xs text-neutral-500"
+              className="mt-1 text-xs text-muted-foreground"
               frameClassName="h-4 w-4 shrink-0"
               imageClassName="h-3 w-3"
             />
@@ -84,7 +84,7 @@ export function ComparisonRobotPanel({
               }
               aria-pressed={isFavorite}
               onClick={() => onFavoriteToggle(robot.slug)}
-              className="p-1.5 hover:bg-neutral-100 rounded-sm transition-colors text-neutral-400 hover:text-neutral-900"
+              className="p-1.5 hover:bg-muted rounded-sm transition-colors text-muted-foreground hover:text-foreground"
             >
               <Star
                 className={`h-4 w-4 ${
@@ -96,7 +96,7 @@ export function ComparisonRobotPanel({
               type="button"
               aria-label={uiText.comparison.removeAria(robot.nameJa ?? robot.name)}
               onClick={() => onRemove(robot.slug)}
-              className="p-1.5 hover:bg-neutral-100 rounded-sm transition-colors text-neutral-400 hover:text-neutral-900"
+              className="p-1.5 hover:bg-muted rounded-sm transition-colors text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />
             </button>
@@ -104,7 +104,7 @@ export function ComparisonRobotPanel({
         </div>
       </div>
 
-      <div className="flex border-b border-neutral-200 bg-white" role="tablist">
+      <div className="flex border-b border-border bg-card" role="tablist">
         <button
           id={basicTabId}
           type="button"
@@ -115,8 +115,8 @@ export function ComparisonRobotPanel({
           onKeyDown={handleTabKeyDown}
           className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors ${
             activeTab === 'basic'
-              ? 'bg-white text-neutral-900 border-b-2 border-accent'
-              : 'bg-neutral-50 text-neutral-500 hover:text-neutral-900 border-b-2 border-transparent'
+              ? 'bg-card text-foreground border-b-2 border-primary'
+              : 'bg-muted text-muted-foreground hover:text-foreground border-b-2 border-transparent'
           }`}
         >
           {uiText.comparison.tabBasic}
@@ -129,17 +129,17 @@ export function ComparisonRobotPanel({
           aria-controls={detailedPanelId}
           onClick={() => setActiveTab('detailed')}
           onKeyDown={handleTabKeyDown}
-          className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors border-l border-neutral-200 ${
+          className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors border-l border-border ${
             activeTab === 'detailed'
-              ? 'bg-white text-neutral-900 border-b-2 border-accent'
-              : 'bg-neutral-50 text-neutral-500 hover:text-neutral-900 border-b-2 border-transparent'
+              ? 'bg-card text-foreground border-b-2 border-primary'
+              : 'bg-muted text-muted-foreground hover:text-foreground border-b-2 border-transparent'
           }`}
         >
           {uiText.comparison.tabDetailed}
         </button>
       </div>
 
-      <div className="flex-1 flex flex-col bg-white relative">
+      <div className="flex-1 flex flex-col bg-card relative">
         <div
           id={basicPanelId}
           role="tabpanel"
@@ -149,7 +149,7 @@ export function ComparisonRobotPanel({
             activeTab === 'basic' ? 'opacity-100' : 'opacity-0 invisible pointer-events-none'
           }`}
         >
-          <div className="aspect-[4/3] w-full bg-white border-b border-neutral-200 flex items-center justify-center text-xs text-neutral-500 overflow-hidden shrink-0">
+          <div className="aspect-[4/3] w-full bg-muted border-b border-border flex items-center justify-center text-xs text-muted-foreground overflow-hidden shrink-0">
             {hero ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={hero.src} alt={hero.alt} className="h-full w-full object-contain" />
@@ -163,10 +163,10 @@ export function ComparisonRobotPanel({
               {coreRows.map((row) => (
                 <div
                   key={row.label}
-                  className="flex justify-between gap-3 border-b border-neutral-50 pb-1.5 last:border-0 last:pb-0"
+                  className="flex justify-between gap-3 border-b border-border pb-1.5 last:border-0 last:pb-0"
                 >
-                  <dt className="shrink-0 text-neutral-500">{row.label}</dt>
-                  <dd className="text-right font-medium text-neutral-900 break-words max-w-[65%]">
+                  <dt className="shrink-0 text-muted-foreground">{row.label}</dt>
+                  <dd className="text-right font-medium text-foreground break-words max-w-[65%]">
                     {row.value}
                   </dd>
                 </div>
@@ -180,20 +180,20 @@ export function ComparisonRobotPanel({
             id={detailedPanelId}
             role="tabpanel"
             aria-labelledby={detailedTabId}
-            className="absolute inset-0 overflow-y-auto overscroll-contain bg-white flex flex-col p-3 gap-6"
+            className="absolute inset-0 overflow-y-auto overscroll-contain bg-card flex flex-col p-3 gap-6"
           >
             <section>
-              <h4 className="mb-3 text-xs font-semibold text-neutral-900 pb-2 border-b border-neutral-200">
+              <h4 className="mb-3 text-xs font-semibold text-foreground pb-2 border-b border-border">
                 {uiText.comparison.detailedData}
               </h4>
               <dl className="space-y-2 text-xs">
                 {detailRows.map((row) => (
                   <div
                     key={row.label}
-                    className="flex justify-between gap-2 border-b border-neutral-100 pb-1.5 last:border-0 last:pb-0"
+                    className="flex justify-between gap-2 border-b border-border pb-1.5 last:border-0 last:pb-0"
                   >
-                    <dt className="shrink-0 text-neutral-500">{row.label}</dt>
-                    <dd className="text-right font-medium text-neutral-900 break-words max-w-[65%]">
+                    <dt className="shrink-0 text-muted-foreground">{row.label}</dt>
+                    <dd className="text-right font-medium text-foreground break-words max-w-[65%]">
                       {row.value}
                     </dd>
                   </div>
@@ -204,25 +204,25 @@ export function ComparisonRobotPanel({
             <section className="space-y-4 mb-2">
               {robot.comparison.bestFit.length > 0 && (
                 <div>
-                  <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.bestFit}</h4>
+                  <h4 className="mb-1 text-xs font-semibold text-foreground">{uiText.compare.bestFit}</h4>
                   <CompactList items={robot.comparison.bestFit} />
                 </div>
               )}
               {robot.comparison.notFit.length > 0 && (
                 <div>
-                  <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.notFit}</h4>
+                  <h4 className="mb-1 text-xs font-semibold text-foreground">{uiText.compare.notFit}</h4>
                   <CompactList items={robot.comparison.notFit} />
                 </div>
               )}
               {robot.comparison.strengths.length > 0 && (
                 <div>
-                  <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.strengths}</h4>
+                  <h4 className="mb-1 text-xs font-semibold text-foreground">{uiText.compare.strengths}</h4>
                   <CompactList items={robot.comparison.strengths} />
                 </div>
               )}
               {robot.comparison.constraints.length > 0 && (
                 <div>
-                  <h4 className="mb-1 text-xs font-semibold text-neutral-900">{uiText.compare.constraints}</h4>
+                  <h4 className="mb-1 text-xs font-semibold text-foreground">{uiText.compare.constraints}</h4>
                   <CompactList items={robot.comparison.constraints} />
                 </div>
               )}

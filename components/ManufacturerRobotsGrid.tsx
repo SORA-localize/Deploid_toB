@@ -15,8 +15,8 @@ export function ManufacturerRobotsGrid({ robots, manufacturer }: ManufacturerRob
 
   if (robots.length === 0) {
     return (
-      <div className="border border-neutral-200 bg-white p-8 text-center">
-        <p className="text-neutral-500">このメーカーの機種情報は準備中です</p>
+      <div className="border border-border bg-card p-8 text-center">
+        <p className="text-muted-foreground">このメーカーの機種情報は準備中です</p>
       </div>
     );
   }

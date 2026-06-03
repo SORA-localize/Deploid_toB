@@ -15,12 +15,12 @@ export function FeaturedRobotsGrid({ robots, manufacturerBySlug }: FeaturedRobot
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
 
   return (
-    <section className="py-16 border-b border-neutral-200">
+    <section className="py-16 border-b border-border">
       <div className="flex items-end justify-between mb-8">
-        <h2 className="text-2xl font-semibold text-neutral-900">注目ロボット</h2>
+        <h2 className="text-2xl font-semibold text-foreground">注目ロボット</h2>
         <Link
           href="/robots"
-          className="inline-flex items-center gap-1 text-sm text-neutral-600 hover:text-neutral-900"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           すべて見る
           <ArrowRight className="w-4 h-4" />
