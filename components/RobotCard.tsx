@@ -10,6 +10,10 @@ import { getDisplayableAsset } from '@/lib/media';
 import { getRobotCardSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { cn } from '@/lib/utils';
+import {
+  getDeploymentStageTone,
+  getVisualToneTextClassName,
+} from '@/lib/visualSemantics';
 
 interface RobotCardProps {
   robot: Robot;
@@ -39,8 +43,7 @@ export function RobotCard({
   onHoverEnd,
 }: RobotCardProps) {
   const specRows = getRobotCardSpecRows(robot);
-  const statusReady =
-    robot.deploymentStage === 'production' || robot.deploymentStage === 'limited-production';
+  const deploymentStageTone = getDeploymentStageTone(robot.deploymentStage);
 
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -131,7 +134,7 @@ export function RobotCard({
         >
           <Star
             className={`w-4 h-4 ${
-              isFavorite ? 'fill-yellow-500 text-yellow-500' : ''
+              isFavorite ? 'fill-favorite text-favorite' : ''
             }`}
           />
         </button>
@@ -180,11 +183,12 @@ export function RobotCard({
                 <div key={row.label}>
                   <dt className="text-muted-foreground">{row.label}</dt>
                   <dd
-                    className={
-                      row.label === '段階' && statusReady
-                        ? 'text-green-700 dark:text-green-400 font-medium'
-                        : 'text-card-foreground font-medium'
-                    }
+                    className={cn(
+                      'font-medium',
+                      row.label === '段階'
+                        ? getVisualToneTextClassName(deploymentStageTone)
+                        : 'text-card-foreground',
+                    )}
                   >
                     {row.value}
                   </dd>

@@ -101,7 +101,7 @@ export function ComparisonRobotPanel({
             >
               <Star
                 className={`h-4 w-4 ${
-                  isFavorite ? 'fill-yellow-500 text-yellow-500' : 'currentColor'
+                  isFavorite ? 'fill-favorite text-favorite' : 'currentColor'
                 }`}
               />
             </button>

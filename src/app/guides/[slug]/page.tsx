@@ -16,6 +16,7 @@ import {
 import { guideStageLabels } from '@/lib/labels';
 import { getTagLabel } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
+import { getGuideStageTone } from '@/lib/visualSemantics';
 
 export function generateStaticParams() {
   return getGuides().map((guide) => ({ slug: guide.slug }));
@@ -88,7 +89,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
                 {uiText.common.readingMinutes(guide.readingTimeMinutes)}
               </span>
             )}
-            <TagChip className="py-1 text-foreground font-medium">
+            <TagChip tone={getGuideStageTone(guide.stage)} className="py-1 font-medium">
               {guideStageLabels[guide.stage]}
             </TagChip>
             {guide.targetReaders.length > 0 && (
@@ -100,9 +101,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           </div>
           <div className="flex gap-2 flex-wrap">
             {guide.topics.map((topic) => (
-              <TagChip key={topic} className="py-1 bg-card border-border">
-                {getTagLabel(topic, 'guide-topic')}
-              </TagChip>
+              <TagChip key={topic} kind="guide-topic" value={topic} className="py-1" />
             ))}
           </div>
         </div>

@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { Markdown } from '@/components/Markdown';
 import { SourceList } from '@/components/SourceList';
+import { TagChip } from '@/components/TagChip';
 import {
   getRelatedGuides,
   getRelatedManufacturers,
@@ -15,6 +16,7 @@ import {
 } from '@/lib/data';
 import { reportTypeLabels } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
+import { getReportTypeTone } from '@/lib/visualSemantics';
 
 export function generateStaticParams() {
   return getReports().map((report) => ({ slug: report.slug }));
@@ -67,9 +69,9 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               <Calendar className="w-3.5 h-3.5" />
               {report.publishedAt}
             </span>
-            <span className="px-2.5 py-1 bg-muted text-foreground border border-border font-medium">
+            <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
               {reportTypeLabels[report.type]}
-            </span>
+            </TagChip>
             {report.author && (
               <span className="flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5" />

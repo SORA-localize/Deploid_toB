@@ -6,6 +6,8 @@ import { contactInquiryTypeOptions } from '@/lib/labels';
 import { FormSelect } from '@/components/FormSelect';
 import { uiText } from '@/lib/uiText';
 import { env } from '@/lib/env';
+import { cn } from '@/lib/utils';
+import { getVisualToneClassName } from '@/lib/visualSemantics';
 
 const missingFormspreeFormId = 'missing-formspree-form-id';
 
@@ -18,7 +20,7 @@ export function ContactForm() {
 
   if (formEnabled && state.succeeded) {
     return (
-      <div className="border border-border bg-muted p-6">
+      <div className={cn('border p-6', getVisualToneClassName('success'))}>
         <h3 className="text-sm font-semibold text-foreground mb-2">{uiText.contact.successTitle}</h3>
         <p className="text-sm text-muted-foreground leading-relaxed">
           {uiText.contact.successMessage}
@@ -30,7 +32,7 @@ export function ContactForm() {
   return (
     <form onSubmit={handleFormSubmit} className="space-y-5 max-w-2xl">
       {!formEnabled && (
-        <div className="border border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-900/70 dark:bg-amber-950/35 dark:text-amber-300 p-4 text-sm" role="status">
+        <div className={cn('border p-4 text-sm', getVisualToneClassName('warning'))} role="status">
           {uiText.contact.formPending}
         </div>
       )}
@@ -76,7 +78,7 @@ export function ContactForm() {
             required
             className="w-full px-3 py-2 border border-border bg-input-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring"
           />
-          <ValidationError prefix="Email" field="email" errors={state.errors} className="mt-1 text-xs text-red-700 dark:text-red-400" />
+          <ValidationError prefix="Email" field="email" errors={state.errors} className="mt-1 text-xs text-tone-danger-text" />
         </div>
 
         <FormSelect
@@ -98,10 +100,10 @@ export function ContactForm() {
             required
             className="w-full px-3 py-2 border border-border bg-input-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring"
           />
-          <ValidationError prefix="Message" field="message" errors={state.errors} className="mt-1 text-xs text-red-700 dark:text-red-400" />
+          <ValidationError prefix="Message" field="message" errors={state.errors} className="mt-1 text-xs text-tone-danger-text" />
         </div>
 
-        <ValidationError errors={state.errors} className="text-xs text-red-700 dark:text-red-400" />
+        <ValidationError errors={state.errors} className="text-xs text-tone-danger-text" />
 
         <button
           type="submit"

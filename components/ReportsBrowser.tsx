@@ -13,14 +13,11 @@ import { reportTypeOrder } from '@/lib/display';
 import { reportTypeLabels } from '@/lib/labels';
 import { filterReports } from '@/lib/reportFilters';
 import { createReportSearchDocument } from '@/lib/search';
-import {
-  getReportTagOptions,
-  getTagLabel,
-  normalizeTagKey,
-} from '@/lib/tags';
+import { getReportTagOptions, normalizeTagKey } from '@/lib/tags';
 import { isOneOf } from '@/lib/typeGuards';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
+import { getReportTypeTone } from '@/lib/visualSemantics';
 
 const typeOptions: Array<{ value: 'all' | ReportType; label: string }> = [
   { value: 'all', label: uiText.common.all },
@@ -120,7 +117,9 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                     <Calendar className="w-3.5 h-3.5" />
                     {featured.publishedAt}
                   </span>
-                  <TagChip className="text-foreground">{reportTypeLabels[featured.type]}</TagChip>
+                  <TagChip tone={getReportTypeTone(featured.type)}>
+                    {reportTypeLabels[featured.type]}
+                  </TagChip>
                 </div>
                 <Link
                   href={`/reports/${featured.slug}`}
@@ -145,7 +144,9 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <TagChip>{reportTypeLabels[report.type]}</TagChip>
+                        <TagChip tone={getReportTypeTone(report.type)}>
+                          {reportTypeLabels[report.type]}
+                        </TagChip>
                         <span className="text-xs text-muted-foreground">{report.publishedAt}</span>
                       </div>
                       <h4 className="font-semibold text-foreground mb-2 leading-tight">
@@ -156,7 +157,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                       </p>
                       <div className="flex gap-2 flex-wrap">
                         {report.tags.slice(0, 3).map((tag) => (
-                          <TagChip key={tag}>{getTagLabel(tag, 'report')}</TagChip>
+                          <TagChip key={tag} kind="report" value={tag} />
                         ))}
                       </div>
                     </div>

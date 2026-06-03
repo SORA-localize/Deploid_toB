@@ -11,10 +11,11 @@ import type { Guide, GuideStage } from '@/data/types';
 import { guideStageOrder } from '@/lib/display';
 import { filterGuides } from '@/lib/guideFilters';
 import { guideStageLabels } from '@/lib/labels';
-import { getGuideTopicOptions, getTagLabel, normalizeTagKey } from '@/lib/tags';
+import { getGuideTopicOptions, normalizeTagKey } from '@/lib/tags';
 import { isOneOf } from '@/lib/typeGuards';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
+import { getGuideStageTone } from '@/lib/visualSemantics';
 
 const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
   { value: 'all', label: uiText.common.all },
@@ -91,7 +92,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
                   {uiText.common.readingMinutes(featured.readingTimeMinutes)}
                 </span>
               )}
-              <TagChip className="py-1 text-foreground font-medium">
+              <TagChip tone={getGuideStageTone(featured.stage)} className="py-1 font-medium">
                 {guideStageLabels[featured.stage]}
               </TagChip>
             </div>
@@ -138,7 +139,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
                         </div>
                         <div className="flex gap-2 flex-wrap">
                           {guide.topics.slice(0, 3).map((t) => (
-                            <TagChip key={t}>{getTagLabel(t, 'guide-topic')}</TagChip>
+                            <TagChip key={t} kind="guide-topic" value={t} />
                           ))}
                         </div>
                       </div>

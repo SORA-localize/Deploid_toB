@@ -5,6 +5,12 @@ export const alt = 'Deploid — Humanoid Robot Buyer Portal';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
+const ogColors = {
+  background: '#fcfcfd',
+  foreground: '#1c2024',
+  brand: '#29a383',
+} as const;
+
 // Next.js が build 時に都度生成する OGP 画像。
 // 日本語フォントを edge runtime で同梱するのは重いので、ここでは英語表記中心。
 export default function Image() {
@@ -17,8 +23,8 @@ export default function Image() {
           display: 'flex',
           flexDirection: 'column',
           padding: 80,
-          background: '#fafafa',
-          color: '#0a0a0a',
+          background: ogColors.background,
+          color: ogColors.foreground,
           fontFamily: 'system-ui, sans-serif',
         }}
       >
@@ -28,7 +34,7 @@ export default function Image() {
           A B2B portal for humanoid robot procurement decisions in Japan.
         </div>
         <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ width: 16, height: 16, background: '#0d7c66' }} />
+          <div style={{ width: 16, height: 16, background: ogColors.brand }} />
           <div style={{ fontSize: 20, opacity: 0.7 }}>deploid</div>
         </div>
       </div>

@@ -12,7 +12,6 @@ import type { UseCase } from '@/data/types';
 import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
 import { createUseCaseSearchDocument, matchesSearchDocument } from '@/lib/search';
 import {
-  getTagLabel,
   getUseCaseIndustryTagOptions,
   getUseCaseTaskTagOptions,
   matchesTag,
@@ -20,6 +19,10 @@ import {
 } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
+import {
+  getBuyerReadinessTone,
+  getUseCaseMaturityTone,
+} from '@/lib/visualSemantics';
 
 type UseCaseSearchMode = 'industry' | 'task';
 
@@ -27,18 +30,6 @@ const modeOptions: Array<{ value: UseCaseSearchMode; label: string }> = [
   { value: 'industry', label: '業種で探す' },
   { value: 'task', label: 'タスクで探す' },
 ];
-
-function maturityTone(level: UseCase['maturityLevel']) {
-  if (level === 'production-ready') return 'success';
-  if (level === 'pilot-phase') return 'warning';
-  return 'neutral';
-}
-
-function readinessTone(r: UseCase['buyerReadiness']) {
-  if (r === 'initial-adoption') return 'info';
-  if (r === 'requires-poc') return 'warning';
-  return 'neutral';
-}
 
 export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
   const { getParam, updateParams } = useUrlFilters();
@@ -142,12 +133,12 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                 >
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     {u.industryTags[0] && (
-                      <TagChip>{getTagLabel(u.industryTags[0], 'industry')}</TagChip>
+                      <TagChip kind="industry" value={u.industryTags[0]} />
                     )}
-                    <TagChip tone={maturityTone(u.maturityLevel)}>
+                    <TagChip tone={getUseCaseMaturityTone(u.maturityLevel)}>
                       {maturityLabels[u.maturityLevel]}
                     </TagChip>
-                    <TagChip tone={readinessTone(u.buyerReadiness)}>
+                    <TagChip tone={getBuyerReadinessTone(u.buyerReadiness)}>
                       {buyerReadinessLabels[u.buyerReadiness]}
                     </TagChip>
                   </div>
@@ -182,12 +173,12 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     {u.industryTags[0] && (
-                      <TagChip>{getTagLabel(u.industryTags[0], 'industry')}</TagChip>
+                      <TagChip kind="industry" value={u.industryTags[0]} />
                     )}
-                    <TagChip tone={maturityTone(u.maturityLevel)}>
+                    <TagChip tone={getUseCaseMaturityTone(u.maturityLevel)}>
                       {maturityLabels[u.maturityLevel]}
                     </TagChip>
-                    <TagChip tone={readinessTone(u.buyerReadiness)}>
+                    <TagChip tone={getBuyerReadinessTone(u.buyerReadiness)}>
                       {buyerReadinessLabels[u.buyerReadiness]}
                     </TagChip>
                   </div>
@@ -197,7 +188,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                   </p>
                   <div className="flex gap-2 mb-2 flex-wrap">
                     {u.taskTags.slice(0, 3).map((t) => (
-                      <TagChip key={t}>{getTagLabel(t, 'task')}</TagChip>
+                      <TagChip key={t} kind="task" value={t} />
                     ))}
                   </div>
                   <div className="text-xs text-muted-foreground">

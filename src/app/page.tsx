@@ -16,7 +16,7 @@ import {
 } from '@/lib/data';
 import { reportTypeLabels } from '@/lib/labels';
 import { getDisplayableAsset } from '@/lib/media';
-import { getTagLabel } from '@/lib/tags';
+import { getReportTypeTone } from '@/lib/visualSemantics';
 
 export default function HomePage() {
   const featured = getGuideBySlug('decision-variables') ?? getGuides()[0];
@@ -119,7 +119,7 @@ export default function HomePage() {
                 className="border border-border bg-card p-6 hover:border-ring transition-colors"
               >
                 <div className="flex items-center gap-3 mb-3 text-xs text-muted-foreground">
-                  <TagChip>
+                  <TagChip tone={getReportTypeTone(report.type)}>
                     {reportTypeLabels[report.type]}
                   </TagChip>
                   <span className="flex items-center gap-1">
@@ -165,9 +165,7 @@ export default function HomePage() {
               </div>
               <div className="flex gap-2 mt-4">
                 {featured.topics.slice(0, 3).map((topic) => (
-                  <TagChip key={topic} className="py-1">
-                    {getTagLabel(topic, 'guide-topic')}
-                  </TagChip>
+                  <TagChip key={topic} kind="guide-topic" value={topic} className="py-1" />
                 ))}
               </div>
             </div>

@@ -1,6 +1,8 @@
 import type { Source } from '@/data/types';
 import { reliabilityLabels } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
+import { cn } from '@/lib/utils';
+import { getReliabilityTone, getVisualToneClassName } from '@/lib/visualSemantics';
 
 interface SourceListProps {
   id?: string;
@@ -38,7 +40,14 @@ export function SourceList({
               </a>
               <span className="text-muted-foreground">
                 {source.publisher ? ` / ${source.publisher}` : ''} / 確認 {source.checkedAt}{' '}
-                / {reliabilityLabels[source.reliability]}
+              </span>
+              <span
+                className={cn(
+                  'ml-1 inline-flex border px-1.5 py-0.5 text-[10px] font-medium',
+                  getVisualToneClassName(getReliabilityTone(source.reliability)),
+                )}
+              >
+                {reliabilityLabels[source.reliability]}
               </span>
             </li>
           ))}

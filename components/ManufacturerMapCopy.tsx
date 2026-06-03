@@ -159,7 +159,7 @@ export function ManufacturerMapCopy({
             <span className="relative flex h-8 w-8 items-center justify-center">
               <span
                 aria-hidden="true"
-                className={`absolute rounded-full border border-[#0d7c66] transition-all duration-300 ease-out ${
+                className={`absolute rounded-full border border-map-accent transition-all duration-300 ease-out ${
                   isActive
                     ? `${isCluster ? 'h-8 w-8' : 'h-6 w-6'} opacity-70`
                     : 'h-3 w-3 opacity-0'
@@ -169,7 +169,7 @@ export function ManufacturerMapCopy({
                 <span
                   aria-hidden="true"
                   className={`flex items-center justify-center rounded-full text-[9px] font-medium leading-none transition-all duration-200 ease-out ${
-                    isActive ? 'h-5 w-5 bg-[#0d7c66] text-white' : 'h-4 w-4 bg-neutral-200 text-neutral-900'
+                    isActive ? 'h-5 w-5 bg-map-accent text-map-accent-foreground' : 'h-4 w-4 bg-neutral-200 text-neutral-900'
                   }`}
                 >
                   {p.members.length}
@@ -178,7 +178,7 @@ export function ManufacturerMapCopy({
                 <span
                   aria-hidden="true"
                   className={`h-2 w-2 rounded-full transition-all duration-200 ease-out ${
-                    isActive ? 'scale-150 bg-[#0d7c66]' : 'bg-neutral-300'
+                    isActive ? 'scale-150 bg-map-accent' : 'bg-neutral-300'
                   }`}
                 />
               )}
