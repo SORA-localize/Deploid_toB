@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import { siteUrl } from '@/lib/site';
 import './globals.css';
-import { Inter, Geist } from "next/font/google";
+import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
@@ -44,13 +45,15 @@ export const metadata: Metadata = {
 // Figma Layout.tsx を逐語移植（Outlet → children）。
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja" className={cn("font-sans", geist.variable)}>
+    <html lang="ja" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
       <body>
-        <div className="min-h-screen bg-neutral-50 flex flex-col">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <div className="min-h-screen bg-background text-foreground flex flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

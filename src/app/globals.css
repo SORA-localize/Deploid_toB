@@ -105,7 +105,7 @@
   }
 
   *:focus-visible {
-    @apply outline-none ring-2 ring-accent ring-offset-2;
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 
   body {
@@ -255,8 +255,10 @@
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
+  --input-background: oklch(0.205 0 0);
   --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);

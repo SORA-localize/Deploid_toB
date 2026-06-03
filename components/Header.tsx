@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { ThemeModeToggle } from '@/components/ThemeModeToggle';
 
 export function Header() {
   const pathname = usePathname() ?? '';
@@ -38,12 +39,12 @@ export function Header() {
   }, [isMenuOpen]);
 
   return (
-    <header className="border-b border-neutral-200 bg-neutral-50">
+    <header className="border-b border-border bg-background">
       <div className="site-container">
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/"
-            className="flex min-w-0 items-center gap-3 text-neutral-900 transition-opacity hover:opacity-75"
+            className="flex min-w-0 items-center gap-3 text-foreground transition-opacity hover:opacity-75"
             onClick={() => setIsMenuOpen(false)}
             aria-label="Deploid ホームへ"
           >
@@ -54,40 +55,43 @@ export function Header() {
               width={760}
               height={306}
             />
-            <span className="hidden whitespace-nowrap text-xs font-medium text-neutral-500 sm:inline">
+            <span className="hidden whitespace-nowrap text-xs font-medium text-muted-foreground sm:inline">
               ヒューマノイド導入支援サイト
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
-            {navItems.map((item) => {
-              const isActive = pathname === item.path ||
-                              (item.path !== '/' && pathname.startsWith(item.path));
+          <div className="hidden items-center gap-2 lg:flex">
+            <nav className="flex items-center gap-1">
+              {navItems.map((item) => {
+                const isActive = pathname === item.path ||
+                                (item.path !== '/' && pathname.startsWith(item.path));
 
-              return (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  aria-current={isActive ? 'page' : undefined}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`relative px-3 py-2 text-sm transition-all duration-200 ${
-                    isActive
-                      ? 'text-neutral-900 font-medium'
-                      : 'text-neutral-600 hover:text-neutral-900'
-                  }`}
-                >
-                  {item.label}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-accent" />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    aria-current={isActive ? 'page' : undefined}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`relative px-3 py-2 text-sm transition-all duration-200 ${
+                      isActive
+                        ? 'text-foreground font-medium'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {item.label}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary" />
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+            <ThemeModeToggle />
+          </div>
 
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center text-neutral-700 transition-colors hover:text-neutral-950 lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center text-muted-foreground transition-colors hover:text-foreground lg:hidden"
             aria-label={isMenuOpen ? 'ナビゲーションを閉じる' : 'ナビゲーションを開く'}
             aria-expanded={isMenuOpen}
             aria-controls="site-mobile-navigation"
@@ -98,7 +102,7 @@ export function Header() {
         </div>
       </div>
       {isMenuOpen && (
-        <nav id="site-mobile-navigation" className="border-t border-neutral-200 lg:hidden">
+        <nav id="site-mobile-navigation" className="border-t border-border lg:hidden">
           <div className="site-container grid grid-cols-2 gap-x-4 gap-y-1 py-3">
             {navItems.map((item) => {
               const isActive = pathname === item.path ||
@@ -111,13 +115,17 @@ export function Header() {
                   aria-current={isActive ? 'page' : undefined}
                   onClick={() => setIsMenuOpen(false)}
                   className={`py-2 text-sm transition-colors ${
-                    isActive ? 'font-medium text-neutral-900' : 'text-neutral-600 hover:text-neutral-900'
+                    isActive ? 'font-medium text-foreground' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {item.label}
                 </Link>
               );
             })}
+          </div>
+          <div className="site-container flex items-center justify-between border-t border-border py-3">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">テーマ</span>
+            <ThemeModeToggle />
           </div>
         </nav>
       )}
