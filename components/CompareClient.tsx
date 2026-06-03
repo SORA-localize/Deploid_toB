@@ -203,20 +203,29 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                                   isSelected ? removeRobot(robot.slug) : addRobot(robot.slug)
                                 }
                                 disabled={!isSelected && selectedSlugs.length >= MAX_COMPARE_ROBOTS}
-                                className="w-full px-6 py-2 text-left text-xs hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-between group"
+                                className={`group flex w-full items-center justify-between gap-3 px-6 py-2.5 text-left text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                                  isSelected
+                                    ? 'bg-primary/10 text-foreground hover:bg-primary/15'
+                                    : 'text-foreground/80 hover:bg-muted'
+                                }`}
                               >
                                 <span
-                                  className={
+                                  className={`min-w-0 flex-1 truncate ${
                                     isSelected
-                                      ? 'text-foreground font-medium'
+                                      ? 'font-semibold text-foreground'
                                       : 'text-foreground/80'
-                                  }
+                                  }`}
                                 >
                                   {robot.nameJa ?? robot.name}
                                 </span>
-                                {isSelected && (
-                                  <X className="w-3 h-3 text-muted-foreground/70 group-hover:text-foreground" />
-                                )}
+                                <span
+                                  className="flex h-4 w-4 shrink-0 items-center justify-center"
+                                  aria-hidden="true"
+                                >
+                                  {isSelected && (
+                                    <X className="h-3.5 w-3.5 text-foreground/60 group-hover:text-foreground" />
+                                  )}
+                                </span>
                               </button>
                             );
                           })}
