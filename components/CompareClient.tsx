@@ -590,8 +590,13 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
             </div>
           </div>
 
+          {/*
+            シート内並べ替え(source='sheet')ではオーバーレイを使わず、本物の
+            カードがそのままポインタに追従して動く(一体感のため)。メニュー/
+            お気に入りからの挿入ドラッグだけ、小カードのプレビューを表示する。
+          */}
           <DragOverlay>
-            {activeDragRobot ? (
+            {activeDrag && activeDrag.source !== 'sheet' && activeDragRobot ? (
               <CompareDragOverlayCard
                 robot={activeDragRobot}
                 manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerSlug}

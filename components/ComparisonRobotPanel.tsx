@@ -60,19 +60,19 @@ export function ComparisonRobotPanel({
 
   return (
     <article className="flex flex-col border border-border bg-card text-card-foreground h-full relative">
-      <div className="border-b border-border bg-muted p-3 flex flex-col gap-4">
+      <div
+        className={`border-b border-border bg-muted p-3 flex flex-col gap-4 ${
+          dragHandleProps
+            ? 'cursor-grab touch-none select-none active:cursor-grabbing'
+            : ''
+        }`}
+        aria-label={dragHandleProps ? uiText.comparison.reorderAria(robot.nameJa ?? robot.name) : undefined}
+        title={dragHandleProps ? uiText.comparison.reorderHint : undefined}
+        {...dragHandleProps?.attributes}
+        {...dragHandleProps?.listeners}
+      >
         <div className="flex items-start justify-between gap-3">
-          <div
-            className={`min-w-0 flex-1 rounded-sm ${
-              dragHandleProps
-                ? 'cursor-grab touch-none select-none active:cursor-grabbing'
-                : ''
-            }`}
-            aria-label={dragHandleProps ? uiText.comparison.reorderAria(robot.nameJa ?? robot.name) : undefined}
-            title={dragHandleProps ? uiText.comparison.reorderHint : undefined}
-            {...dragHandleProps?.attributes}
-            {...dragHandleProps?.listeners}
-          >
+          <div className="min-w-0 flex-1">
             <h3
               className="text-sm font-semibold text-foreground truncate"
               title={robot.nameJa ?? robot.name}
@@ -96,6 +96,7 @@ export function ComparisonRobotPanel({
                   : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)
               }
               aria-pressed={isFavorite}
+              onPointerDown={(event) => event.stopPropagation()}
               onClick={() => onFavoriteToggle(robot.slug)}
               className="p-1.5 hover:bg-muted rounded-sm transition-colors text-muted-foreground hover:text-foreground"
             >
@@ -108,6 +109,7 @@ export function ComparisonRobotPanel({
             <button
               type="button"
               aria-label={uiText.comparison.removeAria(robot.nameJa ?? robot.name)}
+              onPointerDown={(event) => event.stopPropagation()}
               onClick={() => onRemove(robot.slug)}
               className="p-1.5 hover:bg-muted rounded-sm transition-colors text-muted-foreground hover:text-foreground"
             >
