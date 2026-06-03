@@ -91,13 +91,13 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <div className="site-container py-12 min-h-[60vh]">
         <Breadcrumbs items={[{ label: uiText.robots.breadcrumb }]} />
 
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-neutral-900 mb-2">{uiText.robots.title}</h1>
-          <p className="text-sm text-neutral-600 max-w-3xl">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">{uiText.robots.title}</h1>
+          <p className="text-sm text-muted-foreground max-w-3xl">
             導入判断に必要なヒューマノイド機種のカタログ。業種・タスク・メーカー・国内入手性で絞り込み、現場に合う候補を探せます。
           </p>
         </div>
@@ -146,13 +146,13 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             const selected = filters.release === option.value;
             return (
               <span key={option.value} className="inline-flex items-center gap-2">
-                {index > 0 && <span className="text-neutral-300">/</span>}
+                {index > 0 && <span className="text-muted-foreground/70">/</span>}
                 <button
                   type="button"
                   aria-pressed={selected}
                   onClick={() => updateParams({ release: option.value === 'active' ? null : option.value })}
                   className={`text-xs font-normal leading-normal transition-colors ${
-                    selected ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-800'
+                    selected ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {option.label}

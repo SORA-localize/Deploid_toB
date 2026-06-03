@@ -84,13 +84,13 @@ export function HomeContentNavigator({
   const transition = shouldReduceMotion ? { duration: 0 } : { duration: 0.42, ease: 'easeOut' as const };
 
   return (
-    <section className="border-b border-neutral-200 py-16">
+    <section className="border-b border-border py-16">
       <div className="mb-8 flex items-end justify-between gap-6">
-        <h2 className="text-2xl font-semibold text-neutral-900">主要コンテンツ</h2>
+        <h2 className="text-2xl font-semibold text-foreground">主要コンテンツ</h2>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(420px,1.15fr)] lg:items-stretch">
-        <div className="divide-y divide-neutral-200 border-y border-neutral-200">
+        <div className="divide-y divide-border border-y border-border">
           {items.map((item) => {
             const Icon = item.icon;
             const isActive = item.key === activeItem.key;
@@ -101,25 +101,25 @@ export function HomeContentNavigator({
                 href={item.href}
                 onFocus={() => setActiveKey(item.key)}
                 onMouseEnter={() => setActiveKey(item.key)}
-                className="group block py-6 outline-none transition-colors hover:bg-neutral-50/70 focus-visible:bg-neutral-50"
+                className="group block py-6 outline-none transition-colors hover:bg-muted/70 focus-visible:bg-muted"
               >
                 <div className="grid gap-4 px-1 sm:grid-cols-[2rem_1fr] sm:px-0">
                   <Icon
                     aria-hidden="true"
                     className={`mt-1 h-7 w-7 transition-colors ${
-                      isActive ? 'text-neutral-950' : 'text-neutral-400 group-hover:text-neutral-700'
+                      isActive ? 'text-foreground' : 'text-muted-foreground/70 group-hover:text-foreground'
                     }`}
                   />
                   <div className="min-w-0">
                     <div className="flex items-baseline justify-between gap-4">
-                      <h3 className="text-lg font-semibold text-neutral-900">{item.title}</h3>
-                      <span className="hidden whitespace-nowrap text-[11px] uppercase tracking-[0.16em] text-neutral-400 sm:inline">
+                      <h3 className="text-lg font-semibold text-foreground">{item.title}</h3>
+                      <span className="hidden whitespace-nowrap text-[11px] uppercase tracking-[0.16em] text-muted-foreground/70 sm:inline">
                         {item.stat}
                       </span>
                     </div>
-                    <p className="mt-2 max-w-xl text-sm leading-6 text-neutral-600">{item.description}</p>
-                    <span className="mt-5 inline-flex items-center gap-2 text-sm text-neutral-900">
-                      <span className="border-b border-neutral-900 pb-0.5 leading-none transition-colors group-hover:border-neutral-500 group-hover:text-neutral-600">
+                    <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">{item.description}</p>
+                    <span className="mt-5 inline-flex items-center gap-2 text-sm text-foreground">
+                      <span className="border-b border-foreground pb-0.5 leading-none transition-colors group-hover:border-foreground/40 group-hover:text-muted-foreground">
                         {item.action}
                       </span>
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -131,6 +131,8 @@ export function HomeContentNavigator({
           })}
         </div>
 
+        {/* 右プレビューはテーマに依らず意図的なダークなメディア面（画像の上に暗い
+            オーバーレイを敷く演出）。ロゴグリッドの白バックプレートも意図的に残す。 */}
         <div className="relative min-h-[360px] overflow-hidden bg-neutral-950 text-white lg:min-h-[440px]">
           <AnimatePresence mode="wait">
             <motion.div

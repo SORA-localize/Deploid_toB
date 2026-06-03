@@ -100,12 +100,12 @@ export default function HomePage() {
       )}
 
       {latestReports.length > 0 && (
-        <section className="py-16 border-b border-neutral-200">
+        <section className="py-16 border-b border-border">
           <div className="flex items-end justify-between mb-8">
-            <h2 className="text-2xl font-semibold text-neutral-900">最新記事</h2>
+            <h2 className="text-2xl font-semibold text-foreground">最新記事</h2>
             <Link
               href="/reports"
-              className="inline-flex items-center gap-1 text-sm text-neutral-600 hover:text-neutral-900"
+              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
             >
               すべて見る
               <ArrowRight className="w-4 h-4" />
@@ -116,9 +116,9 @@ export default function HomePage() {
               <Link
                 key={report.slug}
                 href={`/reports/${report.slug}`}
-                className="border border-neutral-200 bg-white p-6 hover:border-neutral-400 transition-colors"
+                className="border border-border bg-card p-6 hover:border-ring transition-colors"
               >
-                <div className="flex items-center gap-3 mb-3 text-xs text-neutral-500">
+                <div className="flex items-center gap-3 mb-3 text-xs text-muted-foreground">
                   <TagChip>
                     {reportTypeLabels[report.type]}
                   </TagChip>
@@ -127,13 +127,13 @@ export default function HomePage() {
                     {report.publishedAt}
                   </span>
                 </div>
-                <h3 className="font-semibold text-neutral-900 mb-2 leading-tight">
+                <h3 className="font-semibold text-foreground mb-2 leading-tight">
                   {report.titleJa ?? report.title}
                 </h3>
-                <p className="text-sm text-neutral-600 mb-3 leading-relaxed line-clamp-3">
+                <p className="text-sm text-muted-foreground mb-3 leading-relaxed line-clamp-3">
                   {report.summary}
                 </p>
-                <span className="inline-flex items-center gap-1 text-sm text-neutral-900">
+                <span className="inline-flex items-center gap-1 text-sm text-foreground">
                   続きを読む
                   <ArrowRight className="w-4 h-4" />
                 </span>
@@ -144,20 +144,20 @@ export default function HomePage() {
       )}
 
       {featured && (
-        <section className="py-16 border-b border-neutral-200">
-          <h2 className="text-2xl font-semibold text-neutral-900 mb-8">注目の導入ガイド</h2>
-          <div className="border border-neutral-200 bg-white">
+        <section className="py-16 border-b border-border">
+          <h2 className="text-2xl font-semibold text-foreground mb-8">注目の導入ガイド</h2>
+          <div className="border border-border bg-card">
             <div className="p-8">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-xl font-semibold text-neutral-900 mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {featured.titleJa ?? featured.title}
                   </h3>
-                  <p className="text-neutral-600">{featured.summary}</p>
+                  <p className="text-muted-foreground">{featured.summary}</p>
                 </div>
                 <Link
                   href={`/guides/${featured.slug}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 border border-neutral-300 text-neutral-900 hover:bg-neutral-50 transition-colors ml-6"
+                  className="inline-flex items-center gap-2 px-4 py-2 border border-border text-foreground hover:bg-muted transition-colors ml-6"
                 >
                   続きを読む
                   <ArrowRight className="w-4 h-4" />
@@ -176,15 +176,15 @@ export default function HomePage() {
       )}
 
       <section className="py-16">
-        <div className="border border-neutral-200 bg-white p-8">
-          <h2 className="text-xl font-semibold text-neutral-900 mb-4">このサイトについて</h2>
-          <p className="text-neutral-600 mb-6 max-w-3xl">
+        <div className="border border-border bg-card p-8">
+          <h2 className="text-xl font-semibold text-foreground mb-4">このサイトについて</h2>
+          <p className="text-muted-foreground mb-6 max-w-3xl">
             本ポータルは、日本企業の設備投資担当者・技術責任者を対象に、ヒューマノイドロボット導入に関する客観的な情報を提供します。
             特定メーカーの販売促進を目的とせず、導入判断に必要な技術情報・調達プロセス・リスク評価の枠組みを提示します。
           </p>
           <Link
             href="/about"
-            className="inline-flex items-center gap-2 text-neutral-900 hover:text-neutral-700"
+            className="inline-flex items-center gap-2 text-foreground hover:text-foreground/80"
           >
             詳しく見る
             <ArrowRight className="w-4 h-4" />

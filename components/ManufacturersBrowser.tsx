@@ -84,15 +84,15 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <div className="site-container py-12">
         <Breadcrumbs items={[{ label: uiText.manufacturers.breadcrumb }]} />
 
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-neutral-900 mb-2">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">
             {uiText.manufacturers.title}
           </h1>
-          <p className="text-sm text-neutral-600 max-w-3xl">
+          <p className="text-sm text-muted-foreground max-w-3xl">
             ヒューマノイド開発企業のディレクトリ。地域と相談ルートから、日本で検討しやすい企業を確認できます。
           </p>
         </div>
@@ -126,7 +126,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           />
         </div>
 
-        <p className="mb-6 text-xs text-neutral-500">
+        <p className="mb-6 text-xs text-muted-foreground">
           {uiText.common.results(
             filtered.length,
             filters.country !== 'all' || filters.consultationRoute !== 'all' || filters.query !== '',
@@ -143,15 +143,15 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
               const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
 
               return (
-                <div key={manufacturer.slug} className="border border-neutral-300 bg-neutral-50 overflow-hidden">
+                <div key={manufacturer.slug} className="border border-border bg-card overflow-hidden">
                   <div className="p-6">
                     <div className="flex items-start justify-between gap-4 mb-5">
-                      <h2 className="min-w-0 text-xl font-semibold text-neutral-900">
+                      <h2 className="min-w-0 text-xl font-semibold text-foreground">
                         <a
                           href={manufacturer.website}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group inline-flex min-w-0 items-center gap-1 text-neutral-900 hover:text-neutral-600"
+                          className="group inline-flex min-w-0 items-center gap-1 text-foreground hover:text-muted-foreground"
                         >
                           <ManufacturerLogoName
                             name={manufacturer.nameJa ?? manufacturer.name}
@@ -166,26 +166,26 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                     </div>
 
                     <div className="space-y-2 text-xs mb-6">
-                      <div className="flex justify-between py-1.5 border-b border-neutral-300">
-                        <span className="text-neutral-500">設立</span>
-                        <span className="ml-4 text-right text-neutral-900">
+                      <div className="flex justify-between py-1.5 border-b border-border">
+                        <span className="text-muted-foreground">設立</span>
+                        <span className="ml-4 text-right text-foreground">
                           {getManufacturerEstablishedRegionLabel(manufacturer)}
                         </span>
                       </div>
-                      <div className="flex justify-between py-1.5 border-b border-neutral-300">
-                        <span className="text-neutral-500">代表機種</span>
-                        <span className="ml-4 truncate text-right text-neutral-900">
+                      <div className="flex justify-between py-1.5 border-b border-border">
+                        <span className="text-muted-foreground">代表機種</span>
+                        <span className="ml-4 truncate text-right text-foreground">
                           {getRepresentativeRobotLabel(manufacturerRobots)}
                         </span>
                       </div>
-                      <div className="flex justify-between py-1.5 border-b border-neutral-300">
-                        <span className="text-neutral-500">相談ルート</span>
-                        <span className="ml-4 text-right text-neutral-900">
+                      <div className="flex justify-between py-1.5 border-b border-border">
+                        <span className="text-muted-foreground">相談ルート</span>
+                        <span className="ml-4 text-right text-foreground">
                           {manufacturerConsultationRouteLabels[consultationRoute]}
                         </span>
                       </div>
                       <div className="flex justify-between py-1.5">
-                        <span className="text-neutral-500">国内代理店</span>
+                        <span className="text-muted-foreground">国内代理店</span>
                         {domesticDistributor.hasDistributor ? (
                           <div className="relative ml-4 text-right" data-distributor-menu>
                             {domesticDistributor.distributors.length === 1 ? (
@@ -194,12 +194,12 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                                   href={domesticDistributor.distributors[0].website}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-xs font-normal leading-normal text-neutral-900 hover:text-neutral-600"
+                                  className="text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
                                 >
                                   {domesticDistributor.label}
                                 </a>
                               ) : (
-                                <span className="text-xs font-normal leading-normal text-neutral-900">
+                                <span className="text-xs font-normal leading-normal text-foreground">
                                   {domesticDistributor.label}
                                 </span>
                               )
@@ -209,7 +209,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                                   type="button"
                                   aria-expanded={openDistributorSlug === manufacturer.slug}
                                   aria-haspopup="menu"
-                                  className="text-xs font-normal leading-normal text-neutral-900 hover:text-neutral-600"
+                                  className="text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
                                   onClick={() =>
                                     setOpenDistributorSlug((current) =>
                                       current === manufacturer.slug ? null : manufacturer.slug,
@@ -221,7 +221,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                                 {openDistributorSlug === manufacturer.slug &&
                                   domesticDistributor.distributors.length > 1 && (
                                     <div
-                                      className="absolute right-0 top-6 z-10 min-w-44 border border-neutral-300 bg-white p-2 text-left shadow-sm"
+                                      className="absolute right-0 top-6 z-10 min-w-44 border border-border bg-popover text-popover-foreground p-2 text-left shadow-sm"
                                       role="menu"
                                     >
                                       {domesticDistributor.distributors.map((distributor) =>
@@ -232,7 +232,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             role="menuitem"
-                                            className="block py-1 text-xs font-normal text-neutral-900 hover:text-neutral-600"
+                                            className="block py-1 text-xs font-normal text-foreground hover:text-muted-foreground"
                                           >
                                             {distributor.name}
                                           </a>
@@ -240,7 +240,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                                           <div
                                             key={distributor.name}
                                             role="menuitem"
-                                            className="py-1 text-xs font-normal text-neutral-900"
+                                            className="py-1 text-xs font-normal text-foreground"
                                           >
                                             {distributor.name}
                                           </div>
@@ -264,7 +264,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
 
                     <Link
                       href={`/manufacturers/${manufacturer.slug}`}
-                      className="ml-auto flex w-fit border-b border-neutral-900 pb-0.5 text-xs leading-none text-neutral-900 transition-colors hover:border-neutral-500 hover:text-neutral-600"
+                      className="ml-auto flex w-fit border-b border-foreground pb-0.5 text-xs leading-none text-foreground transition-colors hover:border-foreground/40 hover:text-muted-foreground"
                     >
                       <span>{uiText.common.viewProfile}</span>
                     </Link>

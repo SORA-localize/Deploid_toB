@@ -82,12 +82,12 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
   const active = industry || task || query;
 
   return (
-    <div className="min-h-screen bg-neutral-100">
-      <div className="border-b border-neutral-300 bg-white">
+    <div className="min-h-screen bg-background">
+      <div className="border-b border-border bg-card">
         <div className="site-container py-8">
           <Breadcrumbs items={[{ label: uiText.useCases.breadcrumb }]} />
-          <h1 className="text-2xl font-semibold text-neutral-900 mb-3">{uiText.useCases.title}</h1>
-          <p className="text-sm text-neutral-600 max-w-3xl mb-6 leading-relaxed">
+          <h1 className="text-2xl font-semibold text-foreground mb-3">{uiText.useCases.title}</h1>
+          <p className="text-sm text-muted-foreground max-w-3xl mb-6 leading-relaxed">
             業種・ワークフロー・タスクから、現実的なヒューマノイドの適用機会を探します。ベンダー名ではなく、現場の課題から始めます。
           </p>
 
@@ -130,7 +130,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
       <div className="site-container py-8 min-h-[60vh]">
         {featured.length > 0 && !active && (
           <div className="mb-8">
-            <h3 className="text-sm font-semibold text-neutral-900 mb-4 px-1">
+            <h3 className="text-sm font-semibold text-foreground mb-4 px-1">
               {uiText.useCases.featured}
             </h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -138,7 +138,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                 <Link
                   key={u.slug}
                   href={`/use-cases/${u.slug}`}
-                  className="border border-neutral-300 bg-white p-6 hover:border-neutral-500 transition-colors block"
+                  className="border border-border bg-card p-6 hover:border-foreground/40 transition-colors block"
                 >
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     {u.industryTags[0] && (
@@ -151,9 +151,9 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                       {buyerReadinessLabels[u.buyerReadiness]}
                     </TagChip>
                   </div>
-                  <h4 className="text-lg font-semibold text-neutral-900 mb-2">{u.titleJa ?? u.title}</h4>
-                  <p className="text-sm text-neutral-700 mb-3 leading-relaxed">{u.subtitle ?? u.summary}</p>
-                  <div className="text-xs text-neutral-600">
+                  <h4 className="text-lg font-semibold text-foreground mb-2">{u.titleJa ?? u.title}</h4>
+                  <p className="text-sm text-foreground/80 mb-3 leading-relaxed">{u.subtitle ?? u.summary}</p>
+                  <div className="text-xs text-muted-foreground">
                     {uiText.useCases.candidateRobots(u.candidateRobotSlugs.length)}
                   </div>
                 </Link>
@@ -163,10 +163,10 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
         )}
 
         <div className="flex items-center justify-between mb-4 px-1">
-          <h3 className="text-sm font-semibold text-neutral-900">
+          <h3 className="text-sm font-semibold text-foreground">
             {uiText.useCases.all}
           </h3>
-          <span className="text-xs text-neutral-600">
+          <span className="text-xs text-muted-foreground">
             {uiText.common.results(filtered.length, Boolean(active))}
           </span>
         </div>
@@ -176,7 +176,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
             <Link
               key={u.slug}
               href={`/use-cases/${u.slug}`}
-              className="block border border-neutral-300 bg-white p-4 hover:border-neutral-500 transition-colors"
+              className="block border border-border bg-card p-4 hover:border-foreground/40 transition-colors"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
@@ -191,8 +191,8 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                       {buyerReadinessLabels[u.buyerReadiness]}
                     </TagChip>
                   </div>
-                  <h4 className="font-semibold text-neutral-900 mb-2">{u.titleJa ?? u.title}</h4>
-                  <p className="text-xs text-neutral-600 mb-2 leading-relaxed line-clamp-2">
+                  <h4 className="font-semibold text-foreground mb-2">{u.titleJa ?? u.title}</h4>
+                  <p className="text-xs text-muted-foreground mb-2 leading-relaxed line-clamp-2">
                     {u.subtitle ?? u.summary}
                   </p>
                   <div className="flex gap-2 mb-2 flex-wrap">
@@ -200,11 +200,11 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                       <TagChip key={t}>{getTagLabel(t, 'task')}</TagChip>
                     ))}
                   </div>
-                  <div className="text-xs text-neutral-600">
+                  <div className="text-xs text-muted-foreground">
                     {uiText.useCases.candidateRobots(u.candidateRobotSlugs.length)}
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-neutral-400 flex-shrink-0 mt-1" />
+                <ArrowRight className="w-4 h-4 text-muted-foreground/70 flex-shrink-0 mt-1" />
               </div>
             </Link>
           ))}
