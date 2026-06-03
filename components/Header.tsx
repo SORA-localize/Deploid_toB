@@ -51,7 +51,7 @@ export function Header() {
             <img
               src="/brand/deploid-logo.png"
               alt="Deploid"
-              className="h-8 w-auto shrink-0"
+              className="h-8 w-auto shrink-0 dark:brightness-0 dark:invert"
               width={760}
               height={306}
             />
