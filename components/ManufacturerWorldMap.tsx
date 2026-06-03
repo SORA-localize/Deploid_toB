@@ -173,7 +173,7 @@ export function ManufacturerWorldMap({ manufacturers, heading, subcopy }: Manufa
   const svgDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(svgMap)}`;
 
   return (
-    <section className="relative w-full border-b border-neutral-200">
+    <section className="relative w-full border-b border-border">
       <ManufacturerMapStage
         svgMap={svgDataUri}
         points={points}
