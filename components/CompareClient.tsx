@@ -325,7 +325,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 sm:py-12">
+      <div className="site-container py-12">
         <Breadcrumbs items={[{ label: uiText.compare.breadcrumb }]} />
 
         <div className="mb-8">
