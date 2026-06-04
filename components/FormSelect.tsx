@@ -1,9 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { SelectControl, type SelectControlOption } from '@/components/SelectControl';
-
-export type FormSelectOption = SelectControlOption;
+export type FormSelectOption = { value: string; label: string };
 
 interface FormSelectProps {
   id: string;
@@ -13,7 +10,6 @@ interface FormSelectProps {
   defaultValue?: string;
   required?: boolean;
   className?: string;
-  includeLabelField?: boolean;
 }
 
 export function FormSelect({
@@ -24,29 +20,25 @@ export function FormSelect({
   defaultValue,
   required = false,
   className = '',
-  includeLabelField = true,
 }: FormSelectProps) {
-  const initial = options.find((option) => option.value === defaultValue) ?? options[0];
-  const [selectedValue, setSelectedValue] = useState(initial?.value ?? '');
-  const selected = options.find((option) => option.value === selectedValue) ?? initial;
-
   return (
-    <>
-      <input type="hidden" name={name} value={selectedValue} required={required} />
-      {includeLabelField && (
-        <input type="hidden" name={`${name}Label`} value={selected?.label ?? ''} />
-      )}
-      <SelectControl
+    <div className={className}>
+      <label htmlFor={id} className="block text-xs font-medium text-foreground mb-2">
+        {label}
+      </label>
+      <select
         id={id}
-        label={label}
-        value={selectedValue}
-        options={options}
-        onChange={setSelectedValue}
-        className={className}
-        labelClassName="block text-xs font-medium text-foreground mb-2"
-        buttonClassName="w-full flex items-center justify-between px-3 py-2 border border-border bg-input-background text-sm text-foreground focus:outline-none focus:border-ring text-left"
+        name={name}
+        defaultValue={defaultValue ?? options[0]?.value}
         required={required}
-      />
-    </>
+        className="w-full px-3 py-2 border border-border bg-input-background text-sm text-foreground focus:outline-none focus:border-ring focus:ring-2 focus:ring-ring focus:ring-offset-1 appearance-none"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
