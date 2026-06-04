@@ -39,7 +39,7 @@ export function Header() {
   }, [isMenuOpen]);
 
   return (
-    <header className="border-b border-border bg-background">
+    <header className="relative border-b border-border bg-background">
       <div className="site-container">
         <div className="flex h-16 items-center justify-between">
           <Link
@@ -102,32 +102,42 @@ export function Header() {
         </div>
       </div>
       {isMenuOpen && (
-        <nav id="site-mobile-navigation" className="border-t border-border lg:hidden">
-          <div className="site-container grid grid-cols-2 gap-x-4 gap-y-1 py-3">
-            {navItems.map((item) => {
-              const isActive = pathname === item.path ||
-                (item.path !== '/' && pathname.startsWith(item.path));
+        <>
+          <div
+            className="fixed inset-0 z-40 lg:hidden"
+            aria-hidden="true"
+            onClick={() => setIsMenuOpen(false)}
+          />
+          <nav
+            id="site-mobile-navigation"
+            className="absolute top-full left-0 right-0 z-50 border-b border-border bg-background shadow-md lg:hidden"
+          >
+            <div className="site-container grid grid-cols-2 gap-x-4 gap-y-1 py-3">
+              {navItems.map((item) => {
+                const isActive = pathname === item.path ||
+                  (item.path !== '/' && pathname.startsWith(item.path));
 
-              return (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  aria-current={isActive ? 'page' : undefined}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`py-2 text-sm transition-colors ${
-                    isActive ? 'font-medium text-foreground' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-          <div className="site-container flex items-center justify-between border-t border-border py-3">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">テーマ</span>
-            <ThemeModeToggle />
-          </div>
-        </nav>
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    aria-current={isActive ? 'page' : undefined}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`py-2 text-sm transition-colors ${
+                      isActive ? 'font-medium text-foreground' : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="site-container flex items-center justify-between border-t border-border py-3">
+              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">テーマ</span>
+              <ThemeModeToggle />
+            </div>
+          </nav>
+        </>
       )}
     </header>
   );
