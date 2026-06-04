@@ -117,8 +117,8 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               <tbody className="divide-y divide-border">
                 {specRows.map((row) => (
                   <tr key={row.label}>
-                    <td className="py-3 text-muted-foreground w-1/3">{row.label}</td>
-                    <td className="py-3 text-foreground font-medium">{row.value}</td>
+                    <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">{row.label}</td>
+                    <td className="py-3 text-foreground font-medium align-top">{row.value}</td>
                   </tr>
                 ))}
               </tbody>
@@ -135,8 +135,8 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               <tbody className="divide-y divide-border">
                 {decisionRows.map((row) => (
                   <tr key={row.label}>
-                    <td className="py-3 text-muted-foreground w-1/3">{row.label}</td>
-                    <td className="py-3 text-foreground font-medium">{row.value}</td>
+                    <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">{row.label}</td>
+                    <td className="py-3 text-foreground font-medium align-top">{row.value}</td>
                   </tr>
                 ))}
               </tbody>

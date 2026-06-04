@@ -344,7 +344,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[16rem_minmax(0,1fr)_16rem]">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_16rem]">
             {/* Left Sidebar - Manufacturer Menu */}
             <div className="min-w-0">
               <CompareDroppableArea
@@ -427,7 +427,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
             </div>
 
             {/* Main Content - Comparison Sheet */}
-            <div className="min-w-0">
+            <div className="min-w-0 md:row-span-2 xl:row-span-1">
               <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-xs text-muted-foreground">
                   {uiText.compare.comparisonSheet(orderedSlugs.length, MAX_COMPARE_ROBOTS)}

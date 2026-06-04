@@ -216,7 +216,7 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
   return (
     <div
       ref={stageRef}
-      className="relative h-[clamp(440px,82vh,880px)] w-full cursor-grab touch-pan-y select-none overflow-hidden bg-neutral-950 active:cursor-grabbing"
+      className="relative h-[clamp(320px,75vh,880px)] w-full cursor-grab touch-pan-y select-none overflow-hidden bg-neutral-950 active:cursor-grabbing"
       onPointerDown={onPointerDown}
       onPointerEnter={onStageEnter}
       onPointerLeave={onStageLeave}
