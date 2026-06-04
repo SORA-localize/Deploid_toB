@@ -325,13 +325,13 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 sm:py-12">
+      <div className="site-container py-12">
         <Breadcrumbs items={[{ label: uiText.compare.breadcrumb }]} />
 
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-foreground mb-2">{uiText.compare.title}</h1>
           <p className="text-sm text-muted-foreground max-w-3xl">
-            左のメニューから機種を選んで比較します。右パネルで気になる機種をお気に入り登録できます。
+            左のメニューからロボットを選んで比較します。右パネルで気になるロボットをお気に入り登録できます。
           </p>
         </div>
 
@@ -344,7 +344,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[16rem_minmax(0,1fr)_16rem]">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_16rem]">
             {/* Left Sidebar - Manufacturer Menu */}
             <div className="min-w-0">
               <CompareDroppableArea
@@ -427,7 +427,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
             </div>
 
             {/* Main Content - Comparison Sheet */}
-            <div className="min-w-0">
+            <div className="min-w-0 md:row-span-2 xl:row-span-1">
               <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-xs text-muted-foreground">
                   {uiText.compare.comparisonSheet(orderedSlugs.length, MAX_COMPARE_ROBOTS)}

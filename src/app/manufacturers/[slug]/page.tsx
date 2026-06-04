@@ -99,7 +99,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
                 <dd className="text-right text-foreground">{manufacturer.foundedYear ?? TBD_LABEL}</dd>
               </div>
               <div className="flex justify-between gap-4 py-2 border-b border-border">
-                <dt className="text-muted-foreground">取扱機種</dt>
+                <dt className="text-muted-foreground">取扱ロボット</dt>
                 <dd className="text-right text-foreground">{robots.length}</dd>
               </div>
               <div className="flex justify-between gap-4 py-2">
@@ -154,7 +154,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
         <div>
 
           <div className="flex items-center justify-between gap-4 mb-6">
-            <h2 className="text-xl font-semibold text-foreground">取扱機種</h2>
+            <h2 className="text-xl font-semibold text-foreground">取扱ロボット</h2>
             <span className="px-3 py-1.5 bg-muted border border-border text-foreground/80 text-xs whitespace-nowrap">
               {uiText.manufacturers.models(robots.length)}
             </span>
@@ -169,7 +169,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
         {reports.length > 0 && (
           <div className="mt-12 border border-border bg-muted p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">関連レポート</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">関連記事</h3>
             <div className="space-y-3">
               {reports.map((report) => (
                 <Link

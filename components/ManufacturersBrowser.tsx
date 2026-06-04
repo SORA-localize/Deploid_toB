@@ -136,7 +136,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
         {filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((manufacturer) => {
               const manufacturerRobots = robotsByManufacturer.get(manufacturer.slug) ?? [];
               const consultationRoute = getManufacturerConsultationRoute(manufacturer);
@@ -173,7 +173,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                         </span>
                       </div>
                       <div className="flex justify-between py-1.5 border-b border-border">
-                        <span className="text-muted-foreground">代表機種</span>
+                        <span className="text-muted-foreground">代表ロボット</span>
                         <span className="ml-4 truncate text-right text-foreground">
                           {getRepresentativeRobotLabel(manufacturerRobots)}
                         </span>

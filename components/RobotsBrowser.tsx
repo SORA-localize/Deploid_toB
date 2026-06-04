@@ -98,7 +98,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-foreground mb-2">{uiText.robots.title}</h1>
           <p className="text-sm text-muted-foreground max-w-3xl">
-            導入判断に必要なヒューマノイド機種のカタログ。業種・タスク・メーカー・国内入手性で絞り込み、現場に合う候補を探せます。
+            導入判断に必要なヒューマノイドロボットのカタログ。業種・タスク・メーカー・国内入手性で絞り込み、現場に合う候補を探せます。
           </p>
         </div>
 
@@ -169,7 +169,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             size="large"
           />
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((robot) => {
               const manufacturer = manufacturerBySlug.get(robot.manufacturerSlug);
               return (

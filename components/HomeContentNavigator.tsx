@@ -45,7 +45,7 @@ export function HomeContentNavigator({
         key: 'robots',
         title: 'ロボット',
         href: '/robots',
-        description: '機種ごとの仕様、販売状況、国内相談ルートを比較する。',
+        description: 'ロボットごとの仕様、販売状況、国内相談ルートを比較する。',
         stat: '仕様 / 価格 / 国内相談',
         action: 'ロボットを見る',
         icon: Bot,
@@ -56,8 +56,8 @@ export function HomeContentNavigator({
         key: 'manufacturers',
         title: 'メーカー',
         href: '/manufacturers',
-        description: '開発企業の所在地、代表機種、国内代理店を把握する。',
-        stat: '所在地 / 代表機種 / 国内代理店',
+        description: '開発企業の所在地、代表ロボット、国内代理店を把握する。',
+        stat: '所在地 / 代表ロボット / 国内代理店',
         action: 'メーカーを見る',
         icon: Building2,
         assets: manufacturerAssets,
@@ -133,7 +133,7 @@ export function HomeContentNavigator({
 
         {/* 右プレビューはテーマに依らず意図的なダークなメディア面（画像の上に暗い
             オーバーレイを敷く演出）。ロゴグリッドの白バックプレートも意図的に残す。 */}
-        <div className="relative min-h-[360px] overflow-hidden bg-neutral-950 text-white lg:min-h-[440px]">
+        <div className="relative min-h-[220px] overflow-hidden bg-neutral-950 text-white md:min-h-[320px] lg:min-h-[440px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeItem.key}

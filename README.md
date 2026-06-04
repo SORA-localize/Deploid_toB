@@ -1,6 +1,6 @@
 # Deploid
 
-日本のtoB事業者向け「ヒューマノイド導入判断ポータル」。機種・メーカー・用途・導入ガイド・記事を、スペック表ではなく「買い手が導入を判断するための変数」で整理する。
+日本のtoB事業者向け「ヒューマノイド導入判断ポータル」。ロボット・メーカー・用途・導入ガイド・記事を、スペック表ではなく「買い手が導入を判断するための変数」で整理する。
 
 - **スタック**: Next.js 16 (App Router) / React 19 / TypeScript / Tailwind CSS v4
 - **デプロイ**: Vercel
@@ -44,5 +44,5 @@ docs/planning/  # 設計・意思決定ドキュメント
 ## 規約
 
 - 公開 URL 識別子は `slug`。`/reports`（≠`/posts`）、`/use-cases`（≠`/industries`）。
-- 機種スペック・価格・代理店情報は一次出典で裏取りし `sources`（`Source[]`）に残す。不明値は `要確認`。
+- ロボットスペック・価格・代理店情報は一次出典で裏取りし `sources`（`Source[]`）に残す。不明値は `要確認`。
 - 画像・ロゴは `ImageAsset.rights` を必ず持たせる。初期運用では `reference-attributed` を許容し、商用許諾が取れたら `commercial-permitted` に更新する。

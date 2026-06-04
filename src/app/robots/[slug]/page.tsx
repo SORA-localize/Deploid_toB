@@ -57,7 +57,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="border-b border-border">
+      <div className="sticky top-0 z-30 border-b border-border bg-background">
         <div className="site-container">
           <div className="flex items-center gap-6 py-4 text-xs overflow-x-auto">
             {sections.map((item) => (
@@ -117,8 +117,8 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               <tbody className="divide-y divide-border">
                 {specRows.map((row) => (
                   <tr key={row.label}>
-                    <td className="py-3 text-muted-foreground w-1/3">{row.label}</td>
-                    <td className="py-3 text-foreground font-medium">{row.value}</td>
+                    <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">{row.label}</td>
+                    <td className="py-3 text-foreground font-medium align-top">{row.value}</td>
                   </tr>
                 ))}
               </tbody>
@@ -135,8 +135,8 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               <tbody className="divide-y divide-border">
                 {decisionRows.map((row) => (
                   <tr key={row.label}>
-                    <td className="py-3 text-muted-foreground w-1/3">{row.label}</td>
-                    <td className="py-3 text-foreground font-medium">{row.value}</td>
+                    <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">{row.label}</td>
+                    <td className="py-3 text-foreground font-medium align-top">{row.value}</td>
                   </tr>
                 ))}
               </tbody>

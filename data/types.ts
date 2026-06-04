@@ -340,7 +340,7 @@ export type DeploymentStatus =
 export interface DeploymentSite extends BaseRecord {
   /** arc 始点＝メーカー（data/manufacturers.ts の slug） */
   manufacturerSlug: Slug;
-  /** 導入機種（data/robots.ts の slug、判明していれば） */
+  /** 導入ロボット（data/robots.ts の slug、判明していれば） */
   robotSlug?: Slug;
   /** 導入先の企業/組織名（例: BMW、GXO） */
   customer: string;
