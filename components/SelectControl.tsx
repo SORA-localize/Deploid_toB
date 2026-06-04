@@ -44,7 +44,7 @@ export function SelectControl({
         >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="min-w-(--radix-select-trigger-width)">
+        <SelectContent position="popper" className="min-w-(--radix-select-trigger-width)">
           {options.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
