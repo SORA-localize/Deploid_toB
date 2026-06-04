@@ -133,7 +133,7 @@ export function HomeContentNavigator({
 
         {/* 右プレビューはテーマに依らず意図的なダークなメディア面（画像の上に暗い
             オーバーレイを敷く演出）。ロゴグリッドの白バックプレートも意図的に残す。 */}
-        <div className="relative min-h-[360px] overflow-hidden bg-neutral-950 text-white lg:min-h-[440px]">
+        <div className="relative min-h-[220px] overflow-hidden bg-neutral-950 text-white md:min-h-[320px] lg:min-h-[440px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeItem.key}

@@ -91,7 +91,7 @@ export function Header() {
 
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center text-muted-foreground transition-colors hover:text-foreground lg:hidden"
+            className="inline-flex h-12 w-12 items-center justify-center text-muted-foreground transition-colors hover:text-foreground lg:hidden"
             aria-label={isMenuOpen ? 'ナビゲーションを閉じる' : 'ナビゲーションを開く'}
             aria-expanded={isMenuOpen}
             aria-controls="site-mobile-navigation"
