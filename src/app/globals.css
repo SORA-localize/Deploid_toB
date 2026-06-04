@@ -216,7 +216,6 @@
   }
 
   html {
-    scrollbar-gutter: stable;
     scroll-behavior: smooth;
     font-size: var(--font-size);
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
