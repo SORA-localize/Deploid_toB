@@ -173,7 +173,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
                         </span>
                       </div>
                       <div className="flex justify-between py-1.5 border-b border-border">
-                        <span className="text-muted-foreground">代表機種</span>
+                        <span className="text-muted-foreground">代表ロボット</span>
                         <span className="ml-4 truncate text-right text-foreground">
                           {getRepresentativeRobotLabel(manufacturerRobots)}
                         </span>

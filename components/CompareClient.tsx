@@ -331,7 +331,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-foreground mb-2">{uiText.compare.title}</h1>
           <p className="text-sm text-muted-foreground max-w-3xl">
-            左のメニューから機種を選んで比較します。右パネルで気になる機種をお気に入り登録できます。
+            左のメニューからロボットを選んで比較します。右パネルで気になるロボットをお気に入り登録できます。
           </p>
         </div>
 

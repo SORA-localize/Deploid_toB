@@ -5,7 +5,7 @@ import { getManufacturers, getRobots } from '@/lib/data';
 
 export const metadata = {
   title: '比較',
-  description: '候補のヒューマノイド機種を、導入判断変数で横並びに比較できます。',
+  description: '候補のヒューマノイドロボットを、導入判断変数で横並びに比較できます。',
 };
 
 export default function ComparePage() {

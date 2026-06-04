@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     template: '%s | Deploid',
   },
   description:
-    '日本のtoB事業者向けに、ヒューマノイドロボットの機種、メーカー、用途、導入ガイド、記事を整理する導入判断ポータル。',
+    '日本のtoB事業者向けに、ヒューマノイドロボット、メーカー、用途、導入ガイド、記事を整理する導入判断ポータル。',
   icons: {
     icon: [
       { url: '/brand/deploid-symbol-square.png', type: 'image/png', sizes: '512x512' },

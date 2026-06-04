@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this project is
 
 日本のtoB事業者向け「ヒューマノイド導入判断ポータル」（**Next.js**）。サイト名は **Deploid**。
-機種(robots)・メーカー(manufacturers)・用途(use-cases)・導入ガイド(guides)・記事(reports)を、スペック表ではなく「買い手が導入を判断するための変数」で整理する。
+ロボット(robots)・メーカー(manufacturers)・用途(use-cases)・導入ガイド(guides)・記事(reports)を、スペック表ではなく「買い手が導入を判断するための変数」で整理する。
 
 **GitHub**: `SORA-localize/Deploid_toB`
 **デプロイ先**: Vercel（Next.js との相性が第一候補）
@@ -79,6 +79,6 @@ build_notes §5 が**強制ルール**。違反するとサイトの存在意義
 - 色は直書きせず `src/app/globals.css` の token と `lib/visualSemantics.ts` の tone を使う（詳細は `docs/planning/design_system_v1.md`）。
 - **例外カテゴリ（意図的・グラデ禁止は維持）**：トップのヒーロー帯とメーカー世界地図のみ、黒背景・白文字の直書きを許容する。演出上の例外で、一覧・比較・詳細などの業務UIには持ち込まない。
 
-## 機種データの扱い
+## ロボットデータの扱い
 
 スペック数値・価格・代理店情報は**必ず一次出典で裏取り**し、`sources: [...]`（`Source[]`：url / checkedAt / reliability 等）に残す（AI生成値の混入を防ぐ）。不明な値はハードコードせず **`要確認`** と表示する。Figmaの産業ロボット寄りの仮スペックはそのまま移植しない。
