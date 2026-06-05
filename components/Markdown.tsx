@@ -1,10 +1,11 @@
 import ReactMarkdown from 'react-markdown';
+import { cn } from '@/lib/utils';
 
 // 本文(body)を neutral 矩形の系統に合わせて描画する共通コンポーネント。
 // 見出し・段落・リスト・引用・リンク・強調にだけスタイルを当てる（最小限）。
-export function Markdown({ source }: { source: string }) {
+export function Markdown({ source, className }: { source: string; className?: string }) {
   return (
-    <div className="text-sm leading-relaxed text-foreground">
+    <div className={cn('text-base leading-[1.75] text-foreground', className)}>
       <ReactMarkdown
         components={{
           h1: ({ children }) => (
@@ -16,14 +17,14 @@ export function Markdown({ source }: { source: string }) {
           h3: ({ children }) => (
             <h3 className="mt-5 mb-2 text-base font-semibold text-foreground">{children}</h3>
           ),
-          p: ({ children }) => <p className="mb-3">{children}</p>,
+          p: ({ children }) => <p className="mb-4">{children}</p>,
           ul: ({ children }) => (
-            <ul className="mb-3 list-disc space-y-1 pl-5">{children}</ul>
+            <ul className="mb-4 list-disc space-y-1.5 pl-5">{children}</ul>
           ),
           ol: ({ children }) => (
-            <ol className="mb-3 list-decimal space-y-1 pl-5">{children}</ol>
+            <ol className="mb-4 list-decimal space-y-1.5 pl-5">{children}</ol>
           ),
-          li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+          li: ({ children }) => <li className="leading-[1.75]">{children}</li>,
           a: ({ children, href }) => (
             <a
               href={href}
