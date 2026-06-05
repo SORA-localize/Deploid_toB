@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect';
@@ -88,8 +88,6 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
     { value: 'pre', label: uiText.robots.preReleaseModels(preReleaseRobots.length) },
   ];
 
-  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
-
   return (
     <div className="min-h-screen bg-background">
       <div className="site-container py-12 min-h-[60vh]">
@@ -169,7 +167,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             size="large"
           />
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="robot-card-grid grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((robot) => {
               const manufacturer = manufacturerBySlug.get(robot.manufacturerSlug);
               return (
@@ -181,9 +179,6 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
                   showFavorite={true}
                   isFavorite={favorites.includes(robot.slug)}
                   onFavoriteToggle={toggleFavorite}
-                  dimmed={hoveredSlug !== null && hoveredSlug !== robot.slug}
-                  onHoverStart={() => setHoveredSlug(robot.slug)}
-                  onHoverEnd={() => setHoveredSlug(null)}
                 />
               );
             })}

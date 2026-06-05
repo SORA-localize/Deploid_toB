@@ -1,51 +1,47 @@
 import Link from 'next/link';
+import { footerNavItems, footerNotice } from '@/lib/siteNavigation';
 
 export function Footer() {
+  const year = new Date().getFullYear();
+
   return (
     <footer className="border-t border-border bg-background">
-      <div className="site-container py-12">
-        <div className="grid grid-cols-1 gap-8 mb-12 md:grid-cols-4">
-          <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4">コンテンツ</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/robots" className="text-muted-foreground hover:text-foreground">ロボット一覧</Link></li>
-              <li><Link href="/manufacturers" className="text-muted-foreground hover:text-foreground">メーカー一覧</Link></li>
-              <li><Link href="/guides" className="text-muted-foreground hover:text-foreground">導入ガイド</Link></li>
-              <li><Link href="/use-cases" className="text-muted-foreground hover:text-foreground">用途から探す</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4">ツール</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/compare" className="text-muted-foreground hover:text-foreground">ロボット比較</Link></li>
-              <li><Link href="/reports" className="text-muted-foreground hover:text-foreground">記事</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4">会社情報</h3>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/about" className="text-muted-foreground hover:text-foreground">サイトについて</Link></li>
-              <li><Link href="/contact" className="text-muted-foreground hover:text-foreground">お問い合わせ</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4">更新情報</h3>
-            <p className="text-sm text-muted-foreground mb-3">最新の業界動向と導入事例を配信</p>
-            <Link
-              href="/contact"
-              className="inline-block px-4 py-2 text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-            >
-              お問い合わせ
-            </Link>
-          </div>
+      <div className="site-container py-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <Link
+            href="/"
+            className="inline-flex w-fit items-center transition-opacity hover:opacity-75"
+            aria-label="Deploid ホームへ"
+          >
+            <img
+              src="/brand/deploid-logo.png"
+              alt="Deploid"
+              className="h-6 w-auto dark:brightness-0 dark:invert"
+              width={760}
+              height={306}
+            />
+          </Link>
+
+          <nav
+            className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground"
+            aria-label="フッターナビゲーション"
+          >
+            {footerNavItems.map((item) => (
+              <Link
+                key={item.path}
+                href={item.path}
+                className="underline-offset-4 transition-colors hover:text-foreground hover:underline"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
-        <div className="pt-8 border-t border-border">
-          <p className="text-sm text-muted-foreground">
-            © 2026 Deploid. 本サイトは情報提供を目的としており、特定の製品やサービスを推奨するものではありません。
-          </p>
-          <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-            掲載画像・ロゴには出典を明記した参照用途のものを含みます。権利者からの修正・削除依頼はお問い合わせよりご連絡ください。
+        <div className="mt-4 flex flex-col gap-2 border-t border-border pt-3 text-[11px] leading-relaxed text-muted-foreground md:flex-row md:items-start md:justify-between">
+          <p className="shrink-0">© {year} Deploid</p>
+          <p className="max-w-4xl md:text-right">
+            {footerNotice}
           </p>
         </div>
       </div>

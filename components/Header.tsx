@@ -5,21 +5,11 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { ThemeModeToggle } from '@/components/ThemeModeToggle';
+import { siteNavItems } from '@/lib/siteNavigation';
 
 export function Header() {
   const pathname = usePathname() ?? '';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const navItems = [
-    { label: 'ロボット', path: '/robots' },
-    { label: 'メーカー', path: '/manufacturers' },
-    { label: '比較', path: '/compare' },
-    { label: 'ガイド', path: '/guides' },
-    { label: '用途から探す', path: '/use-cases' },
-    { label: '記事', path: '/reports' },
-    { label: '会社概要', path: '/about' },
-    { label: 'お問い合わせ', path: '/contact' },
-  ];
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -62,7 +52,7 @@ export function Header() {
 
           <div className="hidden items-center gap-2 lg:flex">
             <nav className="flex items-center gap-1">
-              {navItems.map((item) => {
+              {siteNavItems.map((item) => {
                 const isActive = pathname === item.path ||
                                 (item.path !== '/' && pathname.startsWith(item.path));
 
@@ -113,7 +103,7 @@ export function Header() {
             className="absolute top-full left-0 right-0 z-50 border-b border-border bg-background shadow-md lg:hidden"
           >
             <div className="site-container grid grid-cols-2 gap-x-4 gap-y-1 py-3">
-              {navItems.map((item) => {
+              {siteNavItems.map((item) => {
                 const isActive = pathname === item.path ||
                   (item.path !== '/' && pathname.startsWith(item.path));
 

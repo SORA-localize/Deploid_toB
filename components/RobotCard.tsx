@@ -22,9 +22,6 @@ interface RobotCardProps {
   showFavorite?: boolean;
   isFavorite?: boolean;
   onFavoriteToggle?: (slug: string) => void;
-  dimmed?: boolean;
-  onHoverStart?: () => void;
-  onHoverEnd?: () => void;
 }
 
 const TILT_MAX = 5;
@@ -38,9 +35,6 @@ export function RobotCard({
   showFavorite = false,
   isFavorite = false,
   onFavoriteToggle,
-  dimmed = false,
-  onHoverStart,
-  onHoverEnd,
 }: RobotCardProps) {
   const specRows = getRobotCardSpecRows(robot);
   const deploymentStageTone = getDeploymentStageTone(robot.deploymentStage);
@@ -67,14 +61,12 @@ export function RobotCard({
 
   const handleMouseEnter = () => {
     glowOpacity.set(1);
-    onHoverStart?.();
   };
 
   const handleMouseLeave = () => {
     normX.set(0.5);
     normY.set(0.5);
     glowOpacity.set(0);
-    onHoverEnd?.();
   };
 
   return (
@@ -83,11 +75,6 @@ export function RobotCard({
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      animate={{
-        scale: dimmed ? 0.98 : 1,
-        opacity: dimmed ? 0.4 : 1,
-        filter: dimmed ? 'grayscale(0.5) blur(1px)' : 'grayscale(0) blur(0px)',
-      }}
       style={{
         rotateX,
         rotateY,
@@ -95,10 +82,9 @@ export function RobotCard({
       }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
-        "group relative flex flex-col h-full overflow-hidden border transition-colors duration-300",
+        "robot-card group relative flex flex-col h-full overflow-hidden border transition-[border-color,box-shadow,filter,opacity] duration-300",
         "border-border bg-card text-card-foreground",
         "hover:border-ring hover:shadow-lg",
-        dimmed && "pointer-events-none"
       )}
     >
       {/* Glow effect */}

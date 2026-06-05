@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { RobotCard } from '@/components/RobotCard';
@@ -12,8 +11,6 @@ interface FeaturedRobotsGridProps {
 }
 
 export function FeaturedRobotsGrid({ robots, manufacturerBySlug }: FeaturedRobotsGridProps) {
-  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
-
   return (
     <section className="py-16 border-b border-border">
       <div className="flex items-end justify-between mb-8">
@@ -26,7 +23,7 @@ export function FeaturedRobotsGrid({ robots, manufacturerBySlug }: FeaturedRobot
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="robot-card-grid grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {robots.map((robot) => {
           const manufacturer = manufacturerBySlug[robot.manufacturerSlug];
           return (
@@ -35,9 +32,6 @@ export function FeaturedRobotsGrid({ robots, manufacturerBySlug }: FeaturedRobot
               robot={robot}
               manufacturerName={manufacturer?.name}
               manufacturerLogo={manufacturer?.logo}
-              dimmed={hoveredSlug !== null && hoveredSlug !== robot.slug}
-              onHoverStart={() => setHoveredSlug(robot.slug)}
-              onHoverEnd={() => setHoveredSlug(null)}
             />
           );
         })}

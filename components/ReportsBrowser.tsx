@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState';
 import { NewsFeatureCard } from '@/components/NewsFeatureCard';
 import { NewsCard } from '@/components/NewsCard';
@@ -9,13 +10,23 @@ import { ReportsHeader } from '@/components/ReportsHeader';
 import { CardHoverEffect } from '@/components/ui/card-hover-effect';
 import type { Report } from '@/data/types';
 import { filterReports } from '@/lib/reportFilters';
+import {
+  getReportPageCount,
+  getReportPageItems,
+  getReportPaginationPages,
+  normalizeReportPageParam,
+  REPORT_PAGE_PARAM,
+} from '@/lib/reportPagination';
 import { getReportIndexPlacementReports } from '@/lib/reportPlacements';
 import { createReportSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
 import { useActiveReportCategory } from '@/lib/useActiveReportCategory';
+import { useUrlFilters } from '@/lib/useUrlFilters';
+import { cn } from '@/lib/utils';
 
 export function ReportsBrowser({ reports }: { reports: Report[] }) {
   const activeCategory = useActiveReportCategory();
+  const { getParam, updateParams } = useUrlFilters();
 
   const sorted = useMemo(
     () => [...reports].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
@@ -41,18 +52,31 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
       }),
     [sorted, searchDocuments, activeCategory],
   );
+  const pageCount = getReportPageCount(gridReports.length);
+  const activePage = useMemo(
+    () => normalizeReportPageParam(getParam(REPORT_PAGE_PARAM), pageCount),
+    [getParam, pageCount],
+  );
+  const paginatedReports = useMemo(
+    () => getReportPageItems(gridReports, activePage),
+    [gridReports, activePage],
+  );
+  const paginationPages = useMemo(
+    () => getReportPaginationPages(activePage, pageCount),
+    [activePage, pageCount],
+  );
+
+  const updatePage = (page: number) => {
+    updateParams({
+      [REPORT_PAGE_PARAM]: page <= 1 ? null : String(page),
+    });
+  };
 
   return (
-    // App Shell: ビューポート残高を占有し、記事エリアのみスクロール
-    <div
-      className="flex flex-col overflow-hidden bg-background"
-      style={{ height: 'calc(100dvh - var(--header-h))' }}
-    >
-      {/* ── カテゴリタブ（上部固定） ── */}
+    <div className="bg-background">
       <ReportsHeader />
 
-      {/* ── スクロール可能コンテンツエリア ── */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain">
+      <div>
 
         {/* ── ヒーロー + フィーチャー枠（すべてタブのみ） ── */}
         {activeCategory === 'all' && heroReports.length > 0 && (
@@ -91,11 +115,57 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
           {gridReports.length === 0 ? (
             <EmptyState message={uiText.emptyStates.reports} />
           ) : (
-            <CardHoverEffect className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {gridReports.map((r) => (
-                <NewsCard key={r.slug} report={r} />
-              ))}
-            </CardHoverEffect>
+            <div className="space-y-5">
+              <CardHoverEffect className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {paginatedReports.map((r) => (
+                  <NewsCard key={r.slug} report={r} />
+                ))}
+              </CardHoverEffect>
+
+              {pageCount > 1 && (
+                <nav
+                  className="flex items-center justify-center gap-3 pt-1"
+                  aria-label="記事一覧のページネーション"
+                >
+                  <button
+                    type="button"
+                    onClick={() => updatePage(activePage - 1)}
+                    disabled={activePage === 1}
+                    className="inline-flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-35"
+                    aria-label="前のページ"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+
+                  {paginationPages.map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      onClick={() => updatePage(page)}
+                      aria-current={activePage === page ? 'page' : undefined}
+                      className={cn(
+                        'inline-flex h-8 min-w-6 items-center justify-center px-1 text-xs font-medium transition-colors',
+                        activePage === page
+                          ? 'text-foreground underline decoration-2 underline-offset-4'
+                          : 'text-muted-foreground hover:text-foreground',
+                      )}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() => updatePage(activePage + 1)}
+                    disabled={activePage === pageCount}
+                    className="inline-flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-35"
+                    aria-label="次のページ"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </nav>
+              )}
+            </div>
           )}
         </div>
 
