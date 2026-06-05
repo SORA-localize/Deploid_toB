@@ -16,18 +16,18 @@ export function ActiveFilterChips({ chips }: ActiveFilterChipsProps) {
   if (chips.length === 0) return null;
 
   return (
-    <div className="site-container pb-2 flex flex-wrap items-center gap-1.5">
+    <div className="ml-auto flex flex-wrap items-center gap-2">
       <span className="text-xs text-muted-foreground shrink-0">選択中:</span>
       {chips.map((chip) => (
         <button
           key={chip.key}
           type="button"
           onClick={chip.onRemove}
-          className="inline-flex items-center gap-1 border border-border px-2 py-0.5 text-xs text-foreground transition-colors hover:border-foreground/40 hover:text-muted-foreground"
+          className="inline-flex items-center gap-0.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
           aria-label={`${chip.label} を解除`}
         >
           {chip.label}
-          <X className="h-3 w-3 shrink-0" />
+          <X className="h-2.5 w-2.5 shrink-0" />
         </button>
       ))}
     </div>

@@ -26,7 +26,7 @@ export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeade
 
   return (
     <div className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
-      <div className="site-container">
+      <div className="site-container flex items-center">
         <PageTabBar
           tabs={tabs}
           activeValue={activeRelease}
@@ -35,8 +35,8 @@ export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeade
           }
           ariaLabel="リリースステータスで絞り込む"
         />
+        <ActiveFilterChips chips={activeChips} />
       </div>
-      <ActiveFilterChips chips={activeChips} />
     </div>
   );
 }
