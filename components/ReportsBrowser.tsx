@@ -6,6 +6,7 @@ import { NewsFeatureCard } from '@/components/NewsFeatureCard';
 import { NewsCard } from '@/components/NewsCard';
 import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
 import { ReportsHeader } from '@/components/ReportsHeader';
+import { CardHoverEffect } from '@/components/ui/card-hover-effect';
 import type { Report } from '@/data/types';
 import { filterReports } from '@/lib/reportFilters';
 import { getReportIndexPlacementReports } from '@/lib/reportPlacements';
@@ -90,11 +91,11 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
           {gridReports.length === 0 ? (
             <EmptyState message={uiText.emptyStates.reports} />
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <CardHoverEffect className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {gridReports.map((r) => (
                 <NewsCard key={r.slug} report={r} />
               ))}
-            </div>
+            </CardHoverEffect>
           )}
         </div>
 
