@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { EmptyState } from '@/components/EmptyState';
+import { ManufacturersHeader } from '@/components/ManufacturersHeader';
 import { FilterSelect } from '@/components/FilterSelect';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
@@ -71,6 +72,18 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
     [manufacturers, robotsByManufacturer, filters],
   );
 
+  const activeChips = useMemo(() => {
+    const chips: import('@/components/ActiveFilterChips').ActiveFilterChip[] = [];
+    if (filters.country !== 'all') {
+      chips.push({ key: 'country', label: filters.country, onRemove: () => updateParams({ country: null }) });
+    }
+    if (filters.consultationRoute !== 'all') {
+      const label = manufacturerConsultationRouteLabels[filters.consultationRoute as keyof typeof manufacturerConsultationRouteLabels] ?? filters.consultationRoute;
+      chips.push({ key: 'consultationRoute', label, onRemove: () => updateParams({ route: null }) });
+    }
+    return chips;
+  }, [filters, updateParams]);
+
   useEffect(() => {
     function closeDistributorMenu(event: PointerEvent) {
       if (event.target instanceof Element && event.target.closest('[data-distributor-menu]')) {
@@ -85,9 +98,10 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="site-container py-12">
-        <Breadcrumbs items={[{ label: uiText.manufacturers.breadcrumb }]} />
+      <ManufacturersHeader activeChips={activeChips} />
 
+      <div className="site-container py-8">
+        <Breadcrumbs items={[{ label: uiText.manufacturers.breadcrumb }]} />
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-foreground mb-2">
             {uiText.manufacturers.title}
@@ -105,7 +119,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 relative z-40">
+        <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2">
           <FilterSelect
             id="manufacturer-country"
             label={uiText.filters.region}
