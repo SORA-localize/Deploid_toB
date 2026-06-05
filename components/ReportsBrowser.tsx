@@ -67,13 +67,9 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* ── ページタイトル・説明 ── */}
-      <div className="site-container py-8">
+      {/* ── パンくず ── */}
+      <div className="site-container pt-6 pb-4">
         <Breadcrumbs items={[{ label: uiText.reports.breadcrumb }]} />
-        <h1 className="text-2xl font-semibold text-foreground mb-2">{uiText.reports.title}</h1>
-        <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
-          ヒューマノイド関連の最新情報ハブ。技術・ビジネス・導入事例・政策・エンタメの軸で整理する一次情報。
-        </p>
       </div>
 
       {/* ── HERO ── */}
