@@ -70,7 +70,6 @@ Deploid は、ヒューマノイド導入を検討する事業者向けの buyer
 | Border subtle | `border-neutral-200` |
 | Primary action | `bg-neutral-900 text-white` |
 | Primary action hover | `hover:bg-neutral-700` |
-| Tag neutral | `border-neutral-200 bg-neutral-100 text-neutral-700` |
 | Success | `green-50`, `green-700`, `green-800` |
 | Warning | `amber-50`, `amber-700`, `amber-900` |
 | Info | `blue-50`, `blue-700`, `blue-800` |
@@ -273,6 +272,7 @@ tones：
 - searchはページ内filterとして扱う。
 - URL共有したいfilterだけ `useUrlFilters`。
 - chip buttonは `aria-pressed`。
+- **選択中インジケーター（ActiveFilterChips）はプレーンテキスト**。border/background/shadow を付けない。`text-muted-foreground hover:text-foreground` のみ。TagChip とは別物。
 
 ### Forms
 
