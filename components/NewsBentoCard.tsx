@@ -12,9 +12,11 @@ interface NewsBentoCardProps {
   className?: string;
   /** 大カード（画像大きく・タイトル大きく） */
   featured?: boolean;
+  /** カード自体が flex-1 で高さが決まる場合、画像を可変にする */
+  fillHeight?: boolean;
 }
 
-export function NewsBentoCard({ report, className, featured = false }: NewsBentoCardProps) {
+export function NewsBentoCard({ report, className, featured = false, fillHeight = false }: NewsBentoCardProps) {
   const heroSrc = report.heroImage?.src;
 
   return (
@@ -25,7 +27,10 @@ export function NewsBentoCard({ report, className, featured = false }: NewsBento
       )}
     >
       {/* 画像 */}
-      <div className={cn('overflow-hidden bg-muted', featured ? 'h-48 md:h-56' : 'h-32')}>
+      <div className={cn(
+        'overflow-hidden bg-muted',
+        fillHeight ? 'flex-1 min-h-0' : featured ? 'h-48 md:h-56' : 'h-32',
+      )}>
         {heroSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

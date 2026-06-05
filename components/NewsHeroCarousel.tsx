@@ -65,8 +65,8 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
         {/* リッチなインジケーター */}
         <ProgressIndicators count={reports.length} />
 
-        {/* style={{ height: '100%' }} は SliderContainer の outer overflow-hidden div に伝播させるため必要 */}
-        <SliderContainer className="cursor-grab active:cursor-grabbing" style={{ height: '100%' }}>
+        {/* outer overflow-hidden div に height:100% を渡し、inner flex div に h-full を渡すことで高さチェーンを繋ぐ */}
+        <SliderContainer className="cursor-grab active:cursor-grabbing h-full" style={{ height: '100%' }}>
           {reports.map((report) => (
             <Slider key={report.slug} className="w-full h-full">
               <Link href={`/reports/${report.slug}`} className="group block relative w-full h-full overflow-hidden">

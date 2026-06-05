@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { EmptyState } from '@/components/EmptyState';
+import { NewsBentoCard } from '@/components/NewsBentoCard';
 import { NewsCard } from '@/components/NewsCard';
 import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
 import { ReportsHeader, CATEGORY_TABS } from '@/components/ReportsHeader';
@@ -59,6 +60,11 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
         {/* ── ヒーロー + サイドカード（すべてタブのみ） ── */}
         {activeCategory === 'all' && carouselReports.length > 0 && (
           <div className="site-container py-6">
+            {/*
+              グリッドの行高さはカルーセルの aspect-ratio で決まる。
+              右列は grid の stretch 整列（デフォルト）でその高さに伸び、
+              h-full + flex-col で 2 枚のカードに均等分配する。
+            */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
 
               {/* 左: カルーセル (2/3) */}
@@ -69,11 +75,11 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                 />
               </div>
 
-              {/* 右: サイドカード2件 (1/3) */}
+              {/* 右: フィーチャーカード 2 件 (1/3)、hero と同じ高さを flex で 2 等分 */}
               {sideReports.length > 0 && (
-                <div className="hidden lg:flex flex-col gap-4">
+                <div className="hidden lg:flex flex-col gap-4 h-full">
                   {sideReports.map((r) => (
-                    <NewsCard key={r.slug} report={r} className="flex-1" />
+                    <NewsBentoCard key={r.slug} report={r} className="flex-1 min-h-0" fillHeight />
                   ))}
                 </div>
               )}
