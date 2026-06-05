@@ -1,11 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { ActiveFilterChips, type ActiveFilterChip } from '@/components/ActiveFilterChips';
 import { PageTabBar, type PageTab } from '@/components/PageTabBar';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
+import { GLOBAL_HEADER_HEIGHT } from '@/lib/siteLayout';
 
 interface RobotsHeaderProps {
   activeCount: number;
@@ -16,6 +17,14 @@ interface RobotsHeaderProps {
 export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeaderProps) {
   const { getParam, updateParams } = useUrlFilters();
   const activeRelease = getParam('release') === 'pre' ? 'pre' : 'active';
+  const [isStuck, setIsStuck] = useState(false);
+
+  useEffect(() => {
+    function onScroll() { setIsStuck(window.scrollY >= GLOBAL_HEADER_HEIGHT); }
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const tabs = useMemo<readonly PageTab<'active' | 'pre'>[]>(
     () => [
@@ -38,14 +47,16 @@ export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeade
         />
         <div className="ml-auto flex items-center gap-3 pl-4">
           <ActiveFilterChips chips={activeChips} />
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
-            aria-label="ページ先頭に戻る"
-          >
-            <ArrowUp className="h-3.5 w-3.5" />
-          </button>
+          {isStuck && (
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="shrink-0 text-primary transition-colors hover:text-brand-hover"
+              aria-label="ページ先頭に戻る"
+            >
+              <ArrowUp className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
       </div>
     </div>
