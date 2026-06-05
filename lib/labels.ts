@@ -13,6 +13,7 @@ import type {
   OperatingEnvironment,
   ProcurementModel,
   Reliability,
+  ReportCategory,
   ReportType,
   RobotCategory,
   UseCaseMaturity,
@@ -129,6 +130,16 @@ export const reportTypeLabels: Record<ReportType, string> = {
   'policy-update': '政策/規制',
   'case-study': '事例',
   'news-brief': 'ニュースメモ',
+  'tech-update': 'テックアップデート',
+  'market-analysis': '市場分析',
+};
+
+export const reportCategoryLabels: Record<ReportCategory, string> = {
+  tech: '技術',
+  business: 'ビジネス',
+  deployment: '導入事例',
+  policy: '政策・規制',
+  entertainment: 'エンタメ',
 };
 
 export const maturityLabels: Record<UseCaseMaturity, string> = {

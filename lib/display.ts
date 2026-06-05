@@ -82,6 +82,8 @@ export const reportTypeOrder: ReportType[] = [
   'policy-update',
   'case-study',
   'news-brief',
+  'tech-update',
+  'market-analysis',
 ];
 
 const preReleaseDeploymentStages: DeploymentStage[] = ['concept', 'prototype'];
