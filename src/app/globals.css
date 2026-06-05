@@ -25,6 +25,7 @@
    tokenの中身をRadix 12-step scaleへ寄せる。
    ===================================================================== */
 :root {
+  --header-h: 4rem;
   --font-size: 16px;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
