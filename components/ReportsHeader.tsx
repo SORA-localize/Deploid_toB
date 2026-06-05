@@ -13,7 +13,7 @@ export function ReportsHeader() {
   const { updateParams } = useUrlFilters();
 
   return (
-    <div className="shrink-0 border-b border-border bg-background">
+    <div className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
       <div className="site-container pt-4 pb-2">
         <Breadcrumbs items={[{ label: uiText.reports.breadcrumb }]} />
       </div>

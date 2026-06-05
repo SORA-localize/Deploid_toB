@@ -73,16 +73,10 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
   };
 
   return (
-    // App Shell: ビューポート残高を占有し、記事エリアのみスクロール
-    <div
-      className="flex flex-col overflow-hidden bg-background"
-      style={{ height: 'calc(100dvh - var(--header-h))' }}
-    >
-      {/* ── カテゴリタブ（上部固定） ── */}
+    <div className="bg-background">
       <ReportsHeader />
 
-      {/* ── スクロール可能コンテンツエリア ── */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain">
+      <div>
 
         {/* ── ヒーロー + フィーチャー枠（すべてタブのみ） ── */}
         {activeCategory === 'all' && heroReports.length > 0 && (
@@ -130,14 +124,14 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
 
               {pageCount > 1 && (
                 <nav
-                  className="flex items-center justify-center gap-1 pt-1"
+                  className="flex items-center justify-center gap-3 pt-1"
                   aria-label="記事一覧のページネーション"
                 >
                   <button
                     type="button"
                     onClick={() => updatePage(activePage - 1)}
                     disabled={activePage === 1}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                    className="inline-flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-35"
                     aria-label="前のページ"
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -150,10 +144,10 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                       onClick={() => updatePage(page)}
                       aria-current={activePage === page ? 'page' : undefined}
                       className={cn(
-                        'inline-flex h-8 min-w-8 items-center justify-center rounded-lg border px-2 text-xs font-medium transition-colors',
+                        'inline-flex h-8 min-w-6 items-center justify-center px-1 text-xs font-medium transition-colors',
                         activePage === page
-                          ? 'border-foreground bg-foreground text-background'
-                          : 'border-border text-muted-foreground hover:border-foreground/40 hover:text-foreground',
+                          ? 'text-foreground underline decoration-2 underline-offset-4'
+                          : 'text-muted-foreground hover:text-foreground',
                       )}
                     >
                       {page}
@@ -164,7 +158,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
                     type="button"
                     onClick={() => updatePage(activePage + 1)}
                     disabled={activePage === pageCount}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                    className="inline-flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-35"
                     aria-label="次のページ"
                   >
                     <ChevronRight className="h-4 w-4" />
