@@ -167,7 +167,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             size="large"
           />
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="robot-card-grid grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((robot) => {
               const manufacturer = manufacturerBySlug.get(robot.manufacturerSlug);
               return (

@@ -23,7 +23,7 @@ export function FeaturedRobotsGrid({ robots, manufacturerBySlug }: FeaturedRobot
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="robot-card-grid grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {robots.map((robot) => {
           const manufacturer = manufacturerBySlug[robot.manufacturerSlug];
           return (

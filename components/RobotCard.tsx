@@ -82,7 +82,7 @@ export function RobotCard({
       }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
-        "group relative flex flex-col h-full overflow-hidden border transition-colors duration-300",
+        "robot-card group relative flex flex-col h-full overflow-hidden border transition-[border-color,box-shadow,filter,opacity] duration-300",
         "border-border bg-card text-card-foreground",
         "hover:border-ring hover:shadow-lg",
       )}
