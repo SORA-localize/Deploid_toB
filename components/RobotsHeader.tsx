@@ -1,6 +1,5 @@
 'use client';
 
-import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 import { cn } from '@/lib/utils';
@@ -23,9 +22,6 @@ export function RobotsHeader({ activeCount, preCount }: RobotsHeaderProps) {
 
   return (
     <div className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
-      <div className="site-container pt-4 pb-2">
-        <Breadcrumbs items={[{ label: uiText.robots.breadcrumb }]} />
-      </div>
       <div className="site-container">
         <div
           className="flex flex-wrap gap-0"
@@ -42,7 +38,7 @@ export function RobotsHeader({ activeCount, preCount }: RobotsHeaderProps) {
                 updateParams({ release: tab.value === 'active' ? null : tab.value })
               }
               className={cn(
-                'px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px',
+                'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
                 activeRelease === tab.value
                   ? 'border-foreground text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-foreground',

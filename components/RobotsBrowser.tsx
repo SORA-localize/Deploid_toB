@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect';
 import { RobotCard } from '@/components/RobotCard';
@@ -88,6 +89,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
       <RobotsHeader activeCount={activeRobots.length} preCount={preReleaseRobots.length} />
 
       <div className="site-container py-8 min-h-[60vh]">
+        <Breadcrumbs items={[{ label: uiText.robots.breadcrumb }]} />
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-foreground mb-2">{uiText.robots.title}</h1>
           <p className="text-sm text-muted-foreground max-w-3xl">
