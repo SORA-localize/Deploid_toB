@@ -107,7 +107,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 relative z-40">
+        <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2">
           <FilterSelect
             id="manufacturer-country"
             label={uiText.filters.region}
