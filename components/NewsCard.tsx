@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'motion/react';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import { TagChip } from '@/components/TagChip';
 import type { Report } from '@/data/types';
@@ -18,17 +17,12 @@ export function NewsCard({ report, className }: NewsCardProps) {
   const heroSrc = report.heroImage?.src;
 
   return (
-    <motion.div
-      whileHover={{ y: -2 }}
-      transition={{ duration: 0.15, ease: 'easeOut' }}
-      className={cn('group relative flex flex-col overflow-hidden border border-border bg-card', className)}
+    <div
+      className={cn(
+        'group relative flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors duration-200 hover:border-foreground/30',
+        className,
+      )}
     >
-      {/* Shimmer sweep */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-full -translate-x-full -skew-x-12 bg-linear-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[200%]"
-      />
-
       {/* 画像エリア */}
       <div className="aspect-video overflow-hidden bg-muted">
         {heroSrc ? (
@@ -90,6 +84,6 @@ export function NewsCard({ report, className }: NewsCardProps) {
       />
 
       <Link href={`/reports/${report.slug}`} className="absolute inset-0 z-20" aria-hidden="true" tabIndex={-1} />
-    </motion.div>
+    </div>
   );
 }

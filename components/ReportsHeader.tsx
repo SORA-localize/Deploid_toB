@@ -1,29 +1,15 @@
 'use client';
 
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { reportCategoryLabels } from '@/lib/labels';
+import { REPORT_CATEGORY_TABS } from '@/lib/reportCategories';
 import { uiText } from '@/lib/uiText';
+import { useActiveReportCategory } from '@/lib/useActiveReportCategory';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 import { cn } from '@/lib/utils';
-import type { ReportCategory } from '@/data/types';
-import { useMemo } from 'react';
-
-export const CATEGORY_TABS: Array<{ value: ReportCategory | 'all'; label: string }> = [
-  { value: 'all', label: 'すべて' },
-  { value: 'tech', label: reportCategoryLabels.tech },
-  { value: 'business', label: reportCategoryLabels.business },
-  { value: 'deployment', label: reportCategoryLabels.deployment },
-  { value: 'policy', label: reportCategoryLabels.policy },
-  { value: 'entertainment', label: reportCategoryLabels.entertainment },
-];
 
 export function ReportsHeader() {
-  const { getParam, updateParams } = useUrlFilters();
-
-  const activeCategory = useMemo<ReportCategory | 'all'>(() => {
-    const p = getParam('category');
-    return (CATEGORY_TABS.find((t) => t.value === p)?.value ?? 'all') as ReportCategory | 'all';
-  }, [getParam]);
+  const activeCategory = useActiveReportCategory();
+  const { updateParams } = useUrlFilters();
 
   return (
     <div className="shrink-0 border-b border-border bg-background">
@@ -36,7 +22,7 @@ export function ReportsHeader() {
           role="tablist"
           aria-label="カテゴリで絞り込む"
         >
-          {CATEGORY_TABS.map((tab) => (
+          {REPORT_CATEGORY_TABS.map((tab) => (
             <button
               key={tab.value}
               type="button"

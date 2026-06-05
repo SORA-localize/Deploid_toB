@@ -316,10 +316,14 @@ export type ReportCategory =
   | 'policy'
   | 'entertainment';
 
+export type ReportContentKind = 'editorial' | 'sample' | 'sponsored';
+
 export interface Report extends BaseRecord {
   title: string;
   titleJa?: string;
   type: ReportType;
+  /** editorial が通常記事。sample はUI確認用公開データとして sources 空を許容する。 */
+  contentKind?: ReportContentKind;
   publishedAt: ISODate;
   author?: string;
   tags: TagValue<'report'>[];
@@ -336,6 +340,26 @@ export interface Report extends BaseRecord {
   relatedManufacturerSlugs: Slug[];
   relatedUseCaseSlugs: Slug[];
   relatedGuideSlugs?: Slug[];
+}
+
+export type ReportPlacementSurface = 'reports-index';
+export type ReportPlacementSlot = 'hero' | 'feature';
+export type ReportPlacementKind = 'editorial' | 'sample' | 'sponsored' | 'house';
+
+export interface ReportPlacementSponsor {
+  name: string;
+  url?: string;
+  disclosure?: string;
+  campaignId?: string;
+}
+
+export interface ReportPlacement {
+  surface: ReportPlacementSurface;
+  slot: ReportPlacementSlot;
+  reportSlug: Slug;
+  order: number;
+  kind?: ReportPlacementKind;
+  sponsor?: ReportPlacementSponsor;
 }
 
 export type DeploymentStatus =

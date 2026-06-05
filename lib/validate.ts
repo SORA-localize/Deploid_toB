@@ -3,6 +3,7 @@
 // console に出す。本番では走らない。
 import { guides } from '../data/guides.ts';
 import { manufacturers } from '../data/manufacturers.ts';
+import { reportPlacements } from '../data/reportPlacements.ts';
 import { reports } from '../data/reports.ts';
 import { robots } from '../data/robots.ts';
 import type { ImageAsset, RightsStatus } from '../data/types.ts';
@@ -58,8 +59,10 @@ export function validateData(): string[] {
     kind: string,
     owner: string,
     sources: readonly { checkedAt: string }[],
+    options: { requireNonEmpty?: boolean } = {},
   ) => {
-    if (sources.length === 0) {
+    const requireNonEmpty = options.requireNonEmpty ?? true;
+    if (requireNonEmpty && sources.length === 0) {
       issues.push(`[source-empty] ${kind} "${owner}".sources が空です`);
     }
     sources.forEach((source, index) => {
@@ -218,7 +221,9 @@ export function validateData(): string[] {
   for (const rep of reports) {
     checkDate('report', rep.slug, 'updatedAt', rep.updatedAt);
     checkDate('report', rep.slug, 'publishedAt', rep.publishedAt);
-    checkRequiredSources('report', rep.slug, rep.sources);
+    checkRequiredSources('report', rep.slug, rep.sources, {
+      requireNonEmpty: rep.publishStatus === 'published' && rep.contentKind !== 'sample',
+    });
     checkTags('report', rep.slug, 'tags', 'report', rep.tags);
     rep.relatedRobotSlugs.forEach((s) =>
       check('report', rep.slug, 'relatedRobotSlugs', s, robotSlugs),
@@ -232,6 +237,35 @@ export function validateData(): string[] {
     (rep.relatedGuideSlugs ?? []).forEach((s) =>
       check('report', rep.slug, 'relatedGuideSlugs', s, guideSlugs),
     );
+  }
+
+  const placementOrders = new Set<string>();
+  const placementReports = new Set<string>();
+  for (const placement of reportPlacements) {
+    const owner = `${placement.surface}.${placement.slot}.${placement.order}`;
+    check('reportPlacement', owner, 'reportSlug', placement.reportSlug, reportSlugs);
+
+    const orderKey = `${placement.surface}:${placement.slot}:${placement.order}`;
+    if (placementOrders.has(orderKey)) {
+      issues.push(`[duplicate] reportPlacement order 重複: ${orderKey}`);
+    }
+    placementOrders.add(orderKey);
+
+    const reportKey = `${placement.surface}:${placement.slot}:${placement.reportSlug}`;
+    if (placementReports.has(reportKey)) {
+      issues.push(`[duplicate] reportPlacement report 重複: ${reportKey}`);
+    }
+    placementReports.add(reportKey);
+
+    if (placement.kind === 'sponsored' && !placement.sponsor?.name.trim()) {
+      issues.push(`[required] reportPlacement "${owner}".sponsor.name が空です`);
+    }
+    if (placement.sponsor) {
+      if (!placement.sponsor.name.trim()) {
+        issues.push(`[required] reportPlacement "${owner}".sponsor.name が空です`);
+      }
+      checkUrl('reportPlacement', owner, 'sponsor.url', placement.sponsor.url);
+    }
   }
 
   // Bidirectional consistency: Guide <-> UseCase（両側ともUIで使うため整合が必要）
@@ -259,7 +293,6 @@ export function validateData(): string[] {
   // 余談: report.relatedGuideSlugs があるならガイドが知らなくても警告しない
   // (片方向リレーション。reportが主、guideは知らなくていい設計)
 
-  void reportSlugs;
   return issues;
 }
 
