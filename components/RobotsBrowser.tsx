@@ -1,10 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect';
 import { RobotCard } from '@/components/RobotCard';
+import { RobotsHeader } from '@/components/RobotsHeader';
 import { SearchInput } from '@/components/SearchInput';
 import type { Manufacturer, Robot } from '@/data/types';
 import { japanAvailabilityLabels } from '@/lib/labels';
@@ -83,16 +83,11 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
     () => filterRobots({ robots, manufacturers, filters }),
     [robots, manufacturers, filters],
   );
-  const releaseOptions: Array<{ value: 'active' | 'pre'; label: string }> = [
-    { value: 'active', label: uiText.robots.activeModels(activeRobots.length) },
-    { value: 'pre', label: uiText.robots.preReleaseModels(preReleaseRobots.length) },
-  ];
-
   return (
     <div className="min-h-screen bg-background">
-      <div className="site-container py-12 min-h-[60vh]">
-        <Breadcrumbs items={[{ label: uiText.robots.breadcrumb }]} />
+      <RobotsHeader activeCount={activeRobots.length} preCount={preReleaseRobots.length} />
 
+      <div className="site-container py-8 min-h-[60vh]">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-foreground mb-2">{uiText.robots.title}</h1>
           <p className="text-sm text-muted-foreground max-w-3xl">
@@ -137,27 +132,6 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             onChange={(v) => updateParams({ availability: v === 'all' ? null : v })}
             options={availabilityOptions}
           />
-        </div>
-
-        <div className="mb-6 flex items-center gap-2 text-xs" role="group" aria-label={uiText.filters.releaseStatus}>
-          {releaseOptions.map((option, index) => {
-            const selected = filters.release === option.value;
-            return (
-              <span key={option.value} className="inline-flex items-center gap-2">
-                {index > 0 && <span className="text-muted-foreground/70">/</span>}
-                <button
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => updateParams({ release: option.value === 'active' ? null : option.value })}
-                  className={`text-xs font-normal leading-normal transition-colors ${
-                    selected ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              </span>
-            );
-          })}
         </div>
 
         {filtered.length === 0 ? (

@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { EmptyState } from '@/components/EmptyState';
+import { ManufacturersHeader } from '@/components/ManufacturersHeader';
 import { FilterSelect } from '@/components/FilterSelect';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
@@ -85,9 +85,9 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="site-container py-12">
-        <Breadcrumbs items={[{ label: uiText.manufacturers.breadcrumb }]} />
+      <ManufacturersHeader />
 
+      <div className="site-container py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-foreground mb-2">
             {uiText.manufacturers.title}
