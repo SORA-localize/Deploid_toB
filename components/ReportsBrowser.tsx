@@ -5,20 +5,15 @@ import { EmptyState } from '@/components/EmptyState';
 import { NewsBentoCard } from '@/components/NewsBentoCard';
 import { NewsCard } from '@/components/NewsCard';
 import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
-import { ReportsHeader, CATEGORY_TABS } from '@/components/ReportsHeader';
-import type { Report, ReportCategory } from '@/data/types';
+import { ReportsHeader } from '@/components/ReportsHeader';
+import type { Report } from '@/data/types';
 import { filterReports } from '@/lib/reportFilters';
 import { createReportSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
-import { useUrlFilters } from '@/lib/useUrlFilters';
+import { useActiveReportCategory } from '@/lib/useActiveReportCategory';
 
 export function ReportsBrowser({ reports }: { reports: Report[] }) {
-  const { getParam } = useUrlFilters();
-
-  const activeCategory = useMemo<ReportCategory | 'all'>(() => {
-    const p = getParam('category');
-    return (CATEGORY_TABS.find((t) => t.value === p)?.value ?? 'all') as ReportCategory | 'all';
-  }, [getParam]);
+  const activeCategory = useActiveReportCategory();
 
   const sorted = useMemo(
     () => [...reports].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),

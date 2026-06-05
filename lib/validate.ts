@@ -58,8 +58,10 @@ export function validateData(): string[] {
     kind: string,
     owner: string,
     sources: readonly { checkedAt: string }[],
+    options: { requireNonEmpty?: boolean } = {},
   ) => {
-    if (sources.length === 0) {
+    const requireNonEmpty = options.requireNonEmpty ?? true;
+    if (requireNonEmpty && sources.length === 0) {
       issues.push(`[source-empty] ${kind} "${owner}".sources が空です`);
     }
     sources.forEach((source, index) => {
@@ -218,7 +220,9 @@ export function validateData(): string[] {
   for (const rep of reports) {
     checkDate('report', rep.slug, 'updatedAt', rep.updatedAt);
     checkDate('report', rep.slug, 'publishedAt', rep.publishedAt);
-    checkRequiredSources('report', rep.slug, rep.sources);
+    checkRequiredSources('report', rep.slug, rep.sources, {
+      requireNonEmpty: rep.publishStatus === 'published',
+    });
     checkTags('report', rep.slug, 'tags', 'report', rep.tags);
     rep.relatedRobotSlugs.forEach((s) =>
       check('report', rep.slug, 'relatedRobotSlugs', s, robotSlugs),
