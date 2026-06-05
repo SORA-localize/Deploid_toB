@@ -305,7 +305,16 @@ export type ReportType =
   | 'event-report'
   | 'policy-update'
   | 'case-study'
-  | 'news-brief';
+  | 'news-brief'
+  | 'tech-update'
+  | 'market-analysis';
+
+export type ReportCategory =
+  | 'tech'
+  | 'business'
+  | 'deployment'
+  | 'policy'
+  | 'entertainment';
 
 export interface Report extends BaseRecord {
   title: string;
@@ -319,6 +328,10 @@ export interface Report extends BaseRecord {
   /** 記事本文（Markdown）。空ならレポート本文セクションは描画されない。 */
   body?: string;
   featured?: boolean;
+  /** タブ中レイヤー。未設定時は type から inferCategoryFromType で自動推定。 */
+  category?: ReportCategory;
+  /** 目安読了時間（分）。未設定時は非表示。 */
+  readingTimeMin?: number;
   relatedRobotSlugs: Slug[];
   relatedManufacturerSlugs: Slug[];
   relatedUseCaseSlugs: Slug[];

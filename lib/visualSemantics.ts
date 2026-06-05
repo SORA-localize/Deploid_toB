@@ -147,6 +147,8 @@ export const reportTypeTones = {
   'policy-update': 'warning',
   'case-study': 'success',
   'news-brief': 'neutral',
+  'tech-update': 'info',
+  'market-analysis': 'brand',
 } as const satisfies Record<ReportType, VisualTone>;
 
 export const useCaseMaturityTones = {
