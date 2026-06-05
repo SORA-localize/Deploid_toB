@@ -16,7 +16,7 @@ export function ActiveFilterChips({ chips }: ActiveFilterChipsProps) {
   if (chips.length === 0) return null;
 
   return (
-    <div className="ml-auto flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <span className="text-xs text-muted-foreground shrink-0">選択中:</span>
       {chips.map((chip) => (
         <button

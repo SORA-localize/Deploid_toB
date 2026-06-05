@@ -6,7 +6,6 @@ import { EmptyState } from '@/components/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect';
 import { RobotCard } from '@/components/RobotCard';
 import { RobotsHeader } from '@/components/RobotsHeader';
-import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { SearchInput } from '@/components/SearchInput';
 import type { Manufacturer, Robot } from '@/data/types';
 import { japanAvailabilityLabels } from '@/lib/labels';
@@ -163,7 +162,6 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           />
         </div>
 
-        <ScrollToTopButton />
         {filtered.length === 0 ? (
           <EmptyState
             message={uiText.emptyStates.robots}

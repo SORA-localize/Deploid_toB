@@ -6,7 +6,6 @@ import { ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { EmptyState } from '@/components/EmptyState';
 import { ManufacturersHeader } from '@/components/ManufacturersHeader';
-import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { FilterSelect } from '@/components/FilterSelect';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
@@ -148,7 +147,6 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           )}
         </p>
 
-        <ScrollToTopButton />
         {filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
         ) : (
