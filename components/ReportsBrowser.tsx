@@ -55,7 +55,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
       <ReportsHeader />
 
       {/* ── スクロール可能コンテンツエリア ── */}
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain">
 
         {/* ── ヒーロー + サイドカード（すべてタブのみ） ── */}
         {activeCategory === 'all' && carouselReports.length > 0 && (
