@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { ActiveFilterChips, type ActiveFilterChip } from '@/components/ActiveFilterChips';
 import { PageTabBar, type PageTab } from '@/components/PageTabBar';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
@@ -8,9 +9,10 @@ import { useUrlFilters } from '@/lib/useUrlFilters';
 interface RobotsHeaderProps {
   activeCount: number;
   preCount: number;
+  activeChips: ActiveFilterChip[];
 }
 
-export function RobotsHeader({ activeCount, preCount }: RobotsHeaderProps) {
+export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeaderProps) {
   const { getParam, updateParams } = useUrlFilters();
   const activeRelease = getParam('release') === 'pre' ? 'pre' : 'active';
 
@@ -34,6 +36,7 @@ export function RobotsHeader({ activeCount, preCount }: RobotsHeaderProps) {
           ariaLabel="リリースステータスで絞り込む"
         />
       </div>
+      <ActiveFilterChips chips={activeChips} />
     </div>
   );
 }

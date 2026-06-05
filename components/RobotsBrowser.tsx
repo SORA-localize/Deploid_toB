@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { FilterSelect } from '@/components/FilterSelect';
 import { RobotCard } from '@/components/RobotCard';
 import { RobotsHeader } from '@/components/RobotsHeader';
+import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { SearchInput } from '@/components/SearchInput';
 import type { Manufacturer, Robot } from '@/data/types';
 import { japanAvailabilityLabels } from '@/lib/labels';
@@ -84,9 +85,35 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
     () => filterRobots({ robots, manufacturers, filters }),
     [robots, manufacturers, filters],
   );
+
+  const activeChips = useMemo(() => {
+    const chips = [];
+    if (filters.industry) {
+      const label = filterOptions.industries.find((o) => o.value === filters.industry)?.label ?? filters.industry;
+      chips.push({ key: 'industry', label, onRemove: () => updateParams({ industry: null }) });
+    }
+    if (filters.task) {
+      const label = filterOptions.tasks.find((o) => o.value === filters.task)?.label ?? filters.task;
+      chips.push({ key: 'task', label, onRemove: () => updateParams({ task: null }) });
+    }
+    if (filters.manufacturer !== 'all') {
+      const label = manufacturers.find((m) => m.slug === filters.manufacturer)?.name ?? filters.manufacturer;
+      chips.push({ key: 'manufacturer', label, onRemove: () => updateParams({ manufacturer: null }) });
+    }
+    if (filters.availability !== 'all') {
+      const label = japanAvailabilityLabels[filters.availability as keyof typeof japanAvailabilityLabels] ?? filters.availability;
+      chips.push({ key: 'availability', label, onRemove: () => updateParams({ availability: null }) });
+    }
+    return chips;
+  }, [filters, filterOptions, manufacturers, updateParams]);
+
   return (
     <div className="min-h-screen bg-background">
-      <RobotsHeader activeCount={activeRobots.length} preCount={preReleaseRobots.length} />
+      <RobotsHeader
+        activeCount={activeRobots.length}
+        preCount={preReleaseRobots.length}
+        activeChips={activeChips}
+      />
 
       <div className="site-container py-8 min-h-[60vh]">
         <Breadcrumbs items={[{ label: uiText.robots.breadcrumb }]} />
@@ -136,6 +163,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           />
         </div>
 
+        <ScrollToTopButton />
         {filtered.length === 0 ? (
           <EmptyState
             message={uiText.emptyStates.robots}

@@ -6,6 +6,7 @@ import { ExternalLink } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { EmptyState } from '@/components/EmptyState';
 import { ManufacturersHeader } from '@/components/ManufacturersHeader';
+import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { FilterSelect } from '@/components/FilterSelect';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
@@ -72,6 +73,18 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
     [manufacturers, robotsByManufacturer, filters],
   );
 
+  const activeChips = useMemo(() => {
+    const chips = [];
+    if (filters.country !== 'all') {
+      chips.push({ key: 'country', label: filters.country, onRemove: () => updateParams({ country: null }) });
+    }
+    if (filters.consultationRoute !== 'all') {
+      const label = manufacturerConsultationRouteLabels[filters.consultationRoute as keyof typeof manufacturerConsultationRouteLabels] ?? filters.consultationRoute;
+      chips.push({ key: 'consultationRoute', label, onRemove: () => updateParams({ route: null }) });
+    }
+    return chips;
+  }, [filters, updateParams]);
+
   useEffect(() => {
     function closeDistributorMenu(event: PointerEvent) {
       if (event.target instanceof Element && event.target.closest('[data-distributor-menu]')) {
@@ -86,7 +99,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
 
   return (
     <div className="min-h-screen bg-background">
-      <ManufacturersHeader />
+      <ManufacturersHeader activeChips={activeChips} />
 
       <div className="site-container py-8">
         <Breadcrumbs items={[{ label: uiText.manufacturers.breadcrumb }]} />
@@ -135,6 +148,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           )}
         </p>
 
+        <ScrollToTopButton />
         {filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
         ) : (
