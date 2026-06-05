@@ -1,9 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { RobotCard } from '@/components/RobotCard';
 import type { Robot, Manufacturer } from '@/data/types';
-import { uiText } from '@/lib/uiText';
 
 interface ManufacturerRobotsGridProps {
   robots: Robot[];
@@ -11,8 +9,6 @@ interface ManufacturerRobotsGridProps {
 }
 
 export function ManufacturerRobotsGrid({ robots, manufacturer }: ManufacturerRobotsGridProps) {
-  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null);
-
   if (robots.length === 0) {
     return (
       <div className="border border-border bg-card p-8 text-center">
@@ -29,9 +25,6 @@ export function ManufacturerRobotsGrid({ robots, manufacturer }: ManufacturerRob
           robot={robot}
           manufacturerName={manufacturer.name}
           manufacturerLogo={manufacturer.logo}
-          dimmed={hoveredSlug !== null && hoveredSlug !== robot.slug}
-          onHoverStart={() => setHoveredSlug(robot.slug)}
-          onHoverEnd={() => setHoveredSlug(null)}
         />
       ))}
     </div>
