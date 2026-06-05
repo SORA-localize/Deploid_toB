@@ -2,12 +2,13 @@
 
 import { useMemo } from 'react';
 import { EmptyState } from '@/components/EmptyState';
-import { NewsBentoCard } from '@/components/NewsBentoCard';
+import { NewsFeatureCard } from '@/components/NewsFeatureCard';
 import { NewsCard } from '@/components/NewsCard';
 import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
 import { ReportsHeader } from '@/components/ReportsHeader';
 import type { Report } from '@/data/types';
 import { filterReports } from '@/lib/reportFilters';
+import { getReportIndexPlacementReports } from '@/lib/reportPlacements';
 import { createReportSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
 import { useActiveReportCategory } from '@/lib/useActiveReportCategory';
@@ -20,10 +21,10 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
     [reports],
   );
 
-  // カルーセル: 最新5件
-  const carouselReports = useMemo(() => sorted.slice(0, 5), [sorted]);
-  // サイドカード: その次の2件
-  const sideReports = useMemo(() => sorted.slice(5, 7), [sorted]);
+  const { heroReports, featureReports } = useMemo(
+    () => getReportIndexPlacementReports(sorted),
+    [sorted],
+  );
 
   const searchDocuments = useMemo(
     () => new Map(reports.map((r) => [r.slug, createReportSearchDocument(r)])),
@@ -52,29 +53,30 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
       {/* ── スクロール可能コンテンツエリア ── */}
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain">
 
-        {/* ── ヒーロー + サイドカード（すべてタブのみ） ── */}
-        {activeCategory === 'all' && carouselReports.length > 0 && (
+        {/* ── ヒーロー + フィーチャー枠（すべてタブのみ） ── */}
+        {activeCategory === 'all' && heroReports.length > 0 && (
           <div className="site-container py-6">
             {/*
+              表示対象は data/reportPlacements.ts の掲載枠で制御する。
               グリッドの行高さはカルーセルの aspect-ratio で決まる。
               右列は grid の stretch 整列（デフォルト）でその高さに伸び、
-              h-full + flex-col で 2 枚のカードに均等分配する。
+              h-full + flex-col でフィーチャー枠に均等分配する。
             */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
 
               {/* 左: カルーセル (2/3) */}
               <div className="lg:col-span-2">
                 <NewsHeroCarousel
-                  reports={carouselReports}
+                  reports={heroReports}
                   className="aspect-[16/9] w-full"
                 />
               </div>
 
-              {/* 右: フィーチャーカード 2 件 (1/3)、hero と同じ高さを flex で 2 等分 */}
-              {sideReports.length > 0 && (
+              {/* 右: フィーチャー枠 (1/3)、hero と同じ高さに揃える */}
+              {featureReports.length > 0 && (
                 <div className="hidden lg:flex flex-col gap-4 h-full">
-                  {sideReports.map((r) => (
-                    <NewsBentoCard key={r.slug} report={r} className="flex-1 min-h-0" fillHeight />
+                  {featureReports.map((r) => (
+                    <NewsFeatureCard key={r.slug} report={r} className="flex-1 min-h-0" />
                   ))}
                 </div>
               )}
