@@ -87,7 +87,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   );
 
   const activeChips = useMemo(() => {
-    const chips = [];
+    const chips: import('@/components/ActiveFilterChips').ActiveFilterChip[] = [];
     if (filters.industry) {
       const label = filterOptions.industries.find((o) => o.value === filters.industry)?.label ?? filters.industry;
       chips.push({ key: 'industry', label, onRemove: () => updateParams({ industry: null }) });

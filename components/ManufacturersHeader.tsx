@@ -1,3 +1,5 @@
+'use client';
+
 import { ActiveFilterChips, type ActiveFilterChip } from '@/components/ActiveFilterChips';
 import { uiText } from '@/lib/uiText';
 

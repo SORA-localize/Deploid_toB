@@ -74,7 +74,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
   );
 
   const activeChips = useMemo(() => {
-    const chips = [];
+    const chips: import('@/components/ActiveFilterChips').ActiveFilterChip[] = [];
     if (filters.country !== 'all') {
       chips.push({ key: 'country', label: filters.country, onRemove: () => updateParams({ country: null }) });
     }
