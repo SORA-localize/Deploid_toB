@@ -1,12 +1,13 @@
 'use client';
 
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { ActiveFilterChips, type ActiveFilterChip } from '@/components/ActiveFilterChips';
 import { PageTabBar, type PageTab } from '@/components/PageTabBar';
+import { StickyPageHeader } from '@/components/StickyPageHeader';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
-import { GLOBAL_HEADER_HEIGHT } from '@/lib/siteLayout';
+import { useStickyScroll } from '@/lib/useStickyScroll';
 
 interface RobotsHeaderProps {
   activeCount: number;
@@ -17,14 +18,7 @@ interface RobotsHeaderProps {
 export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeaderProps) {
   const { getParam, updateParams } = useUrlFilters();
   const activeRelease = getParam('release') === 'pre' ? 'pre' : 'active';
-  const [isStuck, setIsStuck] = useState(false);
-
-  useEffect(() => {
-    function onScroll() { setIsStuck(window.scrollY >= GLOBAL_HEADER_HEIGHT); }
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  const isStuck = useStickyScroll();
 
   const tabs = useMemo<readonly PageTab<'active' | 'pre'>[]>(
     () => [
@@ -35,7 +29,7 @@ export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeade
   );
 
   return (
-    <div className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+    <StickyPageHeader>
       <div className="site-container flex items-center">
         <PageTabBar
           tabs={tabs}
@@ -59,6 +53,6 @@ export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeade
           )}
         </div>
       </div>
-    </div>
+    </StickyPageHeader>
   );
 }

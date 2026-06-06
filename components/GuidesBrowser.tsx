@@ -74,7 +74,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
 
       <div className="site-container py-8 min-h-[60vh]">
         {featured && filters.stage === 'all' && !filters.topic && (
-          <div className="border border-border bg-card p-6 mb-6">
+          <div className="card-data p-6 mb-6">
             <div className="text-xs text-muted-foreground font-medium mb-3 pb-2 border-b border-border">
               {uiText.guides.featured}
             </div>

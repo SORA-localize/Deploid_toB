@@ -1,6 +1,7 @@
 'use client';
 
 import { PageTabBar } from '@/components/PageTabBar';
+import { StickyPageHeader } from '@/components/StickyPageHeader';
 import { REPORT_CATEGORY_TABS } from '@/lib/reportCategories';
 import { uiText } from '@/lib/uiText';
 import { useActiveReportCategory } from '@/lib/useActiveReportCategory';
@@ -12,7 +13,7 @@ export function ReportsHeader() {
   const { updateParams } = useUrlFilters();
 
   return (
-    <div className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+    <StickyPageHeader>
       <div className="site-container">
         <PageTabBar
           tabs={REPORT_CATEGORY_TABS}
@@ -26,6 +27,6 @@ export function ReportsHeader() {
           ariaLabel={uiText.reports.breadcrumb}
         />
       </div>
-    </div>
+    </StickyPageHeader>
   );
 }
