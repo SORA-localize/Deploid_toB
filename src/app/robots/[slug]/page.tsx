@@ -57,7 +57,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="sticky top-0 z-30 border-b border-border bg-background">
+      <div className="sticky top-[var(--header-h)] z-30 border-b border-border bg-background">
         <div className="site-container">
           <div className="flex items-center gap-6 py-4 text-xs overflow-x-auto">
             {sections.map((item) => (
@@ -84,7 +84,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           ]}
         />
 
-        <div id="overview" className="mb-8 scroll-mt-6">
+        <div id="overview" className="mb-8 scroll-mt-site-header">
           {manufacturer && (
             <Link
               href={`/manufacturers/${manufacturer.slug}`}
@@ -106,7 +106,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           <RobotImageCarousel images={robot.images} fallbackHero={robot.heroImage} />
         </div>
 
-        <div id="specs" className="border border-border bg-muted mb-12 scroll-mt-6">
+        <div id="specs" className="border border-border bg-muted mb-12 scroll-mt-site-header">
           <div className="px-6 py-4 border-b border-border bg-card">
             <h2 className="text-sm font-semibold text-foreground">
               {uiText.robots.technicalSpecifications}
@@ -126,7 +126,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           </div>
         </div>
 
-        <div id="decision" className="border border-border bg-muted mb-12 scroll-mt-6">
+        <div id="decision" className="border border-border bg-muted mb-12 scroll-mt-site-header">
           <div className="px-6 py-4 border-b border-border bg-card">
             <h2 className="text-sm font-semibold text-foreground">導入判断</h2>
           </div>
@@ -144,7 +144,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           </div>
         </div>
 
-        <div id="applications" className="border border-border bg-muted mb-12 scroll-mt-6">
+        <div id="applications" className="border border-border bg-muted mb-12 scroll-mt-site-header">
           <div className="px-6 py-4 border-b border-border bg-card">
             <h2 className="text-sm font-semibold text-foreground">{uiText.robots.applications}</h2>
           </div>
@@ -203,7 +203,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
         <SourceList
           sources={robot.sources}
-          className="border border-border bg-muted p-6 scroll-mt-6"
+          className="border border-border bg-muted p-6 scroll-mt-site-header"
           titleClassName="text-sm font-semibold text-foreground mb-4"
         />
 

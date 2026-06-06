@@ -28,8 +28,19 @@ export function Header() {
     return () => mediaQuery.removeEventListener('change', closeMenuOnDesktop);
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isMenuOpen]);
+
   return (
-    <header className="relative border-b border-border bg-background">
+    <header className="sticky top-0 z-40 border-b border-border bg-background">
       <div className="site-container">
         <div className="flex h-16 items-center justify-between">
           <Link

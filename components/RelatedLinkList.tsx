@@ -15,7 +15,7 @@ interface RelatedLinkListProps {
 
 export function RelatedLinkList({ id, title, items }: RelatedLinkListProps) {
   return (
-    <div id={id} className="border border-border bg-card p-6 scroll-mt-6">
+    <div id={id} className="border border-border bg-card p-6 scroll-mt-site-header">
       <h2 className="text-lg font-semibold text-foreground mb-4">{title}</h2>
       <div className="space-y-3">
         {items.map((item) => (

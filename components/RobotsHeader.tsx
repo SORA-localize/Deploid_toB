@@ -5,6 +5,7 @@ import { ArrowUp } from 'lucide-react';
 import { ActiveFilterChips, type ActiveFilterChip } from '@/components/ActiveFilterChips';
 import { PageTabBar, type PageTab } from '@/components/PageTabBar';
 import { StickyPageHeader } from '@/components/StickyPageHeader';
+import { scrollToPageTop } from '@/lib/scroll';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 import { useStickyScroll } from '@/lib/useStickyScroll';
@@ -29,7 +30,7 @@ export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeade
   );
 
   return (
-    <StickyPageHeader>
+    <StickyPageHeader visible={isStuck}>
       <div className="site-container flex items-center">
         <PageTabBar
           tabs={tabs}
@@ -41,16 +42,14 @@ export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeade
         />
         <div className="ml-auto flex items-center gap-3 pl-4">
           <ActiveFilterChips chips={activeChips} />
-          {isStuck && (
-            <button
-              type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="shrink-0 text-primary transition-colors hover:text-brand-hover"
-              aria-label="ページ先頭に戻る"
-            >
-              <ArrowUp className="h-3.5 w-3.5" />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={scrollToPageTop}
+            className="shrink-0 text-primary transition-colors hover:text-brand-hover"
+            aria-label="ページ先頭に戻る"
+          >
+            <ArrowUp className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
     </StickyPageHeader>

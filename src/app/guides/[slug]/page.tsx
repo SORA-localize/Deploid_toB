@@ -117,7 +117,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           {/* Content */}
           <div className="col-span-12 lg:col-span-7">
             <div className="space-y-6">
-              <div id="overview" className="border border-border bg-card p-6 scroll-mt-6">
+              <div id="overview" className="border border-border bg-card p-6 scroll-mt-site-header">
                 <h2 className="text-lg font-semibold text-foreground mb-4">
                   {uiText.common.overview}
                 </h2>
@@ -125,13 +125,13 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
               </div>
 
               {hasBody && (
-                <div id="body" className="border border-border bg-card p-6 scroll-mt-6">
+                <div id="body" className="border border-border bg-card p-6 scroll-mt-site-header">
                   <Markdown source={guide.body!} />
                 </div>
               )}
 
               {hasChecklist && (
-                <div id="checklist" className="border border-border bg-muted p-6 scroll-mt-6">
+                <div id="checklist" className="border border-border bg-muted p-6 scroll-mt-site-header">
                   <h3 className="text-sm font-semibold text-foreground mb-4">チェックリスト</h3>
                   <ul className="space-y-2 text-sm text-foreground/80">
                     {(guide.checklistItems ?? []).map((item) => (
@@ -166,7 +166,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
           {/* Decision Summary */}
           <div className="col-span-12 lg:col-span-3">
-            <div className="sticky top-6 space-y-4">
+            <div className="sticky top-site-header-gap space-y-4">
               <div className="border border-border bg-card p-4">
                 <h3 className="text-xs font-semibold text-foreground mb-3 pb-2 border-b border-border">
                   {uiText.guides.decisionSummary}

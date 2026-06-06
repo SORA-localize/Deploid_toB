@@ -356,7 +356,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   <div
                     ref={setNodeRef}
                     className={cn(
-                      'border border-border bg-muted transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-6',
+                      'border border-border bg-muted transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
                       isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                     )}
                   >
@@ -570,7 +570,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   <div
                     ref={setNodeRef}
                     className={cn(
-                      'border border-border bg-muted transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-6',
+                      'border border-border bg-muted transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
                       isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                     )}
                   >

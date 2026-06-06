@@ -50,8 +50,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <div className="min-h-screen bg-background text-foreground flex flex-col">
+            <a
+              href="#main-content"
+              className="absolute left-4 top-4 z-50 -translate-y-20 rounded bg-background px-4 py-2 text-sm font-medium text-foreground ring-1 ring-border transition-transform focus:translate-y-0"
+            >
+              コンテンツへスキップ
+            </a>
             <Header />
-            <main className="flex-1">{children}</main>
+            <main id="main-content" tabIndex={-1} className="flex-1 outline-none">{children}</main>
             <Footer />
           </div>
         </ThemeProvider>

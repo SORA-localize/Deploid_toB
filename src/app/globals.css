@@ -380,6 +380,14 @@
   .card-editorial:hover {
     @apply border-foreground/30;
   }
+
+  .scroll-mt-site-header {
+    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+  }
+
+  .top-site-header-gap {
+    top: calc(var(--header-h) + 1.5rem);
+  }
 }
 
 .dark {

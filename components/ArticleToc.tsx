@@ -39,7 +39,7 @@ export function ArticleToc({ items, backHref, backLabel }: ArticleTocProps) {
   }, [items]);
 
   return (
-    <div className="sticky top-6">
+    <div className="sticky top-site-header-gap">
       <div className="border border-border bg-card p-4">
         <h3 className="text-xs font-semibold text-foreground mb-3 pb-2 border-b border-border">
           {uiText.common.contents}

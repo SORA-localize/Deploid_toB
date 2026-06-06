@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { footerNavItems, footerNotice } from '@/lib/siteNavigation';
 
 export function Footer() {
@@ -43,6 +44,10 @@ export function Footer() {
           <p className="max-w-4xl md:text-right">
             {footerNotice}
           </p>
+        </div>
+
+        <div className="mt-3 flex justify-end">
+          <ScrollToTopButton />
         </div>
       </div>
     </footer>

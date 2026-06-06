@@ -129,7 +129,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           <div className="col-span-12 space-y-6 lg:col-span-7">
 
             {/* なぜ重要か */}
-            <div id="why" className="scroll-mt-6 border-l-4 border-primary bg-card p-5">
+            <div id="why" className="scroll-mt-site-header border-l-4 border-primary bg-card p-5">
               <p className="mb-2 text-xs font-semibold text-foreground">
                 {uiText.reports.whyItMatters}
               </p>
@@ -138,7 +138,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
             {/* 要点（TL;DR） */}
             {hasTakeaways && (
-              <div id="takeaways" className="scroll-mt-6 border border-border bg-card p-6">
+              <div id="takeaways" className="scroll-mt-site-header border border-border bg-card p-6">
                 <h2 className="mb-4 text-base font-semibold text-foreground">
                   {uiText.reports.keyTakeaways}
                 </h2>
@@ -155,14 +155,14 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
             {/* 本文 */}
             {hasBody && (
-              <div id="body" className="scroll-mt-6 border border-border bg-card p-6 md:p-8">
+              <div id="body" className="scroll-mt-site-header border border-border bg-card p-6 md:p-8">
                 <Markdown source={report.body!} />
               </div>
             )}
 
             {/* 関連リンク */}
             {hasRelated && (
-              <div id="related" className="scroll-mt-6 border border-border bg-card p-6">
+              <div id="related" className="scroll-mt-site-header border border-border bg-card p-6">
                 <h2 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
                   関連
                 </h2>
@@ -217,14 +217,14 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             )}
 
             {/* 出典 */}
-            <div id="sources" className="scroll-mt-6">
+            <div id="sources" className="scroll-mt-site-header">
               <SourceList sources={report.sources} />
             </div>
           </div>
 
           {/* サイドバー（右） */}
           <div className="col-span-12 lg:col-span-3">
-            <div className="sticky top-6 space-y-4">
+            <div className="sticky top-site-header-gap space-y-4">
               <div className="border border-border bg-muted p-4">
                 <h3 className="mb-2 text-xs font-semibold text-foreground">
                   情報提供・取材相談

@@ -152,7 +152,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
           </div>
 
           <div className="col-span-12 lg:col-span-4">
-            <div className="sticky top-6 space-y-4">
+            <div className="sticky top-site-header-gap space-y-4">
               <div className="border border-border bg-card p-4">
                 <h3 className="text-xs font-semibold text-foreground mb-3 pb-2 border-b border-border">
                   候補ロボット
