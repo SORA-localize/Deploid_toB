@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { HeaderStickyBarSlot } from '@/components/StickyPageHeader';
 import { ThemeModeToggle } from '@/components/ThemeModeToggle';
 import { siteNavItems } from '@/lib/siteNavigation';
 
@@ -40,7 +41,7 @@ export function Header() {
   }, [isMenuOpen]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background">
+    <header className="sticky top-0 z-40 border-b border-border bg-background relative">
       <div className="site-container">
         <div className="flex h-16 items-center justify-between">
           <Link
@@ -140,6 +141,7 @@ export function Header() {
           </nav>
         </>
       )}
+      <HeaderStickyBarSlot />
     </header>
   );
 }
