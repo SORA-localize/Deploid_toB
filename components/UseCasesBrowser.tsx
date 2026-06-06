@@ -129,7 +129,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                 <Link
                   key={u.slug}
                   href={`/use-cases/${u.slug}`}
-                  className="border border-border bg-card p-6 hover:border-foreground/40 transition-colors block"
+                  className="card-data block p-6"
                 >
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
                     {u.industryTags[0] && (
@@ -167,7 +167,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
             <Link
               key={u.slug}
               href={`/use-cases/${u.slug}`}
-              className="block border border-border bg-card p-4 hover:border-foreground/40 transition-colors"
+              className="card-data block p-4"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">

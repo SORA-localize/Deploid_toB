@@ -1,0 +1,161 @@
+'use client';
+
+import Link from 'next/link';
+import { ExternalLink } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
+import type { Manufacturer, Robot } from '@/data/types';
+import {
+  getDomesticDistributorDisplay,
+  getManufacturerEstablishedRegionLabel,
+  getManufacturerConsultationRoute,
+  getRepresentativeRobotLabel,
+  manufacturerConsultationRouteLabels,
+} from '@/lib/manufacturerDisplay';
+import { uiText } from '@/lib/uiText';
+
+interface ManufacturerCardProps {
+  manufacturer: Manufacturer;
+  robots: Robot[];
+}
+
+export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const consultationRoute = getManufacturerConsultationRoute(manufacturer);
+  const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    function onPointerDown(event: PointerEvent) {
+      if (event.target instanceof Element && event.target.closest('[data-distributor-menu]')) return;
+      setIsMenuOpen(false);
+    }
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [isMenuOpen]);
+
+  return (
+    <div className="card-data overflow-hidden">
+      <div className="p-6">
+        <div className="flex items-start justify-between gap-4 mb-5">
+          <h2 className="min-w-0 text-xl font-semibold text-foreground">
+            <a
+              href={manufacturer.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex min-w-0 items-center gap-1 text-foreground hover:text-muted-foreground"
+            >
+              <ManufacturerLogoName
+                name={manufacturer.nameJa ?? manufacturer.name}
+                logo={manufacturer.logo}
+                frameClassName="h-10 w-10"
+                imageClassName="h-7 w-7"
+                textClassName="leading-tight"
+              />
+              <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-45 transition-opacity group-hover:opacity-80" />
+            </a>
+          </h2>
+        </div>
+
+        <div className="space-y-2 text-xs mb-6">
+          <div className="flex justify-between py-1.5 border-b border-border">
+            <span className="text-muted-foreground">設立</span>
+            <span className="ml-4 text-right text-foreground">
+              {getManufacturerEstablishedRegionLabel(manufacturer)}
+            </span>
+          </div>
+          <div className="flex justify-between py-1.5 border-b border-border">
+            <span className="text-muted-foreground">代表ロボット</span>
+            <span className="ml-4 truncate text-right text-foreground">
+              {getRepresentativeRobotLabel(robots)}
+            </span>
+          </div>
+          <div className="flex justify-between py-1.5 border-b border-border">
+            <span className="text-muted-foreground">相談ルート</span>
+            <span className="ml-4 text-right text-foreground">
+              {manufacturerConsultationRouteLabels[consultationRoute]}
+            </span>
+          </div>
+          <div className="flex justify-between py-1.5">
+            <span className="text-muted-foreground">国内代理店</span>
+            {domesticDistributor.hasDistributor ? (
+              <div className="relative ml-4 text-right" data-distributor-menu>
+                {domesticDistributor.distributors.length === 1 ? (
+                  domesticDistributor.distributors[0].website ? (
+                    <a
+                      href={domesticDistributor.distributors[0].website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
+                    >
+                      {domesticDistributor.label}
+                    </a>
+                  ) : (
+                    <span className="text-xs font-normal leading-normal text-foreground">
+                      {domesticDistributor.label}
+                    </span>
+                  )
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      aria-expanded={isMenuOpen}
+                      aria-haspopup="menu"
+                      className="text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
+                      onClick={() => setIsMenuOpen((v) => !v)}
+                    >
+                      {domesticDistributor.label}
+                    </button>
+                    {isMenuOpen && domesticDistributor.distributors.length > 1 && (
+                      <div
+                        className="absolute right-0 top-6 z-10 min-w-44 border border-border bg-popover text-popover-foreground p-2 text-left shadow-sm"
+                        role="menu"
+                      >
+                        {domesticDistributor.distributors.map((distributor) =>
+                          distributor.website ? (
+                            <a
+                              key={distributor.name}
+                              href={distributor.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              role="menuitem"
+                              className="block py-1 text-xs font-normal text-foreground hover:text-muted-foreground"
+                            >
+                              {distributor.name}
+                            </a>
+                          ) : (
+                            <div
+                              key={distributor.name}
+                              role="menuitem"
+                              className="py-1 text-xs font-normal text-foreground"
+                            >
+                              {distributor.name}
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/contact"
+                className="ml-4 text-right text-xs font-normal text-accent-blue-pale hover:text-accent-blue-pale-hover"
+              >
+                {domesticDistributor.label}
+              </Link>
+            )}
+          </div>
+        </div>
+
+        <Link
+          href={`/manufacturers/${manufacturer.slug}`}
+          className="ml-auto flex w-fit border-b border-foreground pb-0.5 text-xs leading-none text-foreground transition-colors hover:border-foreground/40 hover:text-muted-foreground"
+        >
+          <span>{uiText.common.viewProfile}</span>
+        </Link>
+      </div>
+    </div>
+  );
+}

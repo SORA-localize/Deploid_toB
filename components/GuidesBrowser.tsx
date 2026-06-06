@@ -120,7 +120,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
                   <Link
                     key={guide.slug}
                     href={`/guides/${guide.slug}`}
-                    className="block border border-border bg-card p-4 hover:border-foreground/40 transition-colors"
+                    className="card-data block p-4"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">

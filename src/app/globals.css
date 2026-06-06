@@ -364,6 +364,22 @@
   .site-container {
     @apply mx-auto max-w-[1680px] px-4 md:px-8;
   }
+
+  /* カタログ・業務系カード（ロボット・メーカー・ガイド・ユースケース） */
+  .card-data {
+    @apply border border-border bg-card transition-colors duration-200;
+  }
+  .card-data:hover {
+    @apply border-ring;
+  }
+
+  /* 記事・メディア系カード（NewsCard） */
+  .card-editorial {
+    @apply rounded-lg border border-border bg-card transition-colors duration-200 overflow-hidden;
+  }
+  .card-editorial:hover {
+    @apply border-foreground/30;
+  }
 }
 
 .dark {

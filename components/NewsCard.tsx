@@ -19,7 +19,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
   return (
     <div
       className={cn(
-        'group relative flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card transition-colors duration-200 hover:border-foreground/30',
+        'card-editorial group relative flex h-full flex-col',
         className,
       )}
     >

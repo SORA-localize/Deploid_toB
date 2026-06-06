@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { EmptyState } from '@/components/EmptyState';
-import { FilterSelect } from '@/components/FilterSelect';
+import { SelectControl } from '@/components/SelectControl';
 import { RobotCard } from '@/components/RobotCard';
 import { RobotsHeader } from '@/components/RobotsHeader';
 import { SearchInput } from '@/components/SearchInput';
@@ -133,28 +133,28 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         </div>
 
         <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 xl:grid-cols-4">
-          <FilterSelect
+          <SelectControl
             id="robot-industry"
             label={uiText.filters.industry}
             value={filters.industry ?? 'all'}
             onChange={(v) => updateParams({ industry: v === 'all' ? null : v })}
             options={industryOptions}
           />
-          <FilterSelect
+          <SelectControl
             id="robot-task"
             label={uiText.filters.task}
             value={filters.task ?? 'all'}
             onChange={(v) => updateParams({ task: v === 'all' ? null : v })}
             options={taskOptions}
           />
-          <FilterSelect
+          <SelectControl
             id="robot-manufacturer"
             label={uiText.filters.manufacturer}
             value={filters.manufacturer}
             onChange={(v) => updateParams({ manufacturer: v === 'all' ? null : v })}
             options={manufacturerOptions}
           />
-          <FilterSelect
+          <SelectControl
             id="robot-availability"
             label={uiText.filters.availability}
             value={filters.availability}

@@ -22,7 +22,7 @@ export function FavoriteCard({
   onSelect,
 }: FavoriteCardProps) {
   return (
-    <div className="relative group border border-border bg-card p-3 hover:border-ring hover:shadow-sm transition-all duration-200">
+    <div className="card-data relative group p-3">
       {onSelect ? (
         <button
           type="button"

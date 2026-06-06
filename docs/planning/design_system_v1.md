@@ -117,9 +117,21 @@ Deploid は、ヒューマノイド導入を検討する事業者向けの buyer
 
 ### Radius / Shadow
 
-- Radius: 原則なし。
 - Shadow: 原則なし。
 - 例外: 比較削除ボタンのような小さな浮遊操作だけ、既存の `rounded-full` は許容。
+
+**カードの角丸・hover ルール（コンテンツ種別で使い分け）**
+
+| 種別 | クラス | rounded | hover border |
+|---|---|---|---|
+| カタログ・業務系（ロボット・メーカー・ガイド・ユースケース） | `.card-data` | なし（矩形） | `border-ring`（jade） |
+| 記事・メディア系 | `.card-editorial` | `rounded-lg` | `border-foreground/30` |
+| hero/featured カルーセル（NewsFeatureCard, NewsHeroCarousel） | — | `rounded-xl` | `border-foreground/30` |
+| 小 UI パーツ（タグ・ラベル） | — | `rounded-sm` | — |
+| floating ボタン | — | `rounded-full` | — |
+
+- 実装: `src/app/globals.css @layer components` の `.card-data` / `.card-editorial` を使う。
+- RobotCard は motion アニメーション専用実装のため例外（`hover:border-ring hover:shadow-lg` + glow を維持）。
 
 ---
 
