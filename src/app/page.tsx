@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { ArrowRight, Calendar } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { FeaturedRobotsGrid } from '@/components/FeaturedRobotsGrid';
 import { HomeContentNavigator } from '@/components/HomeContentNavigator';
 import { ManufacturerWorldMap } from '@/components/ManufacturerWorldMap';
+import { NewsCard } from '@/components/NewsCard';
 import { RobotCard } from '@/components/RobotCard';
 import { TagChip } from '@/components/TagChip';
 import {
@@ -14,9 +15,8 @@ import {
   getRobots,
   getDeploymentsForManufacturer,
 } from '@/lib/data';
-import { reportTypeLabels } from '@/lib/labels';
 import { getDisplayableAsset } from '@/lib/media';
-import { getReportTypeTone } from '@/lib/visualSemantics';
+import { getReportIndexPlacementReports } from '@/lib/reportPlacements';
 
 export default function HomePage() {
   const featured = getGuideBySlug('decision-variables') ?? getGuides()[0];
@@ -68,10 +68,9 @@ export default function HomePage() {
     return asset ? [{ src: asset.src, alt: asset.alt, label: robot.name }] : [];
   });
 
-  // 最新記事：公開日の新しい順に3件
-  const latestReports = [...getReports()]
-    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
-    .slice(0, 3);
+  // reports-index hero キュレーションの先頭4件をホームに流用
+  const { heroReports } = getReportIndexPlacementReports(getReports());
+  const latestReports = heroReports.slice(0, 4);
 
   const manufacturerBySlug = Object.fromEntries(
     manufacturers.map((m) => [m.slug, m])
@@ -111,33 +110,9 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {latestReports.map((report) => (
-              <Link
-                key={report.slug}
-                href={`/reports/${report.slug}`}
-                className="border border-border bg-card p-6 hover:border-ring transition-colors"
-              >
-                <div className="flex items-center gap-3 mb-3 text-xs text-muted-foreground">
-                  <TagChip tone={getReportTypeTone(report.type)}>
-                    {reportTypeLabels[report.type]}
-                  </TagChip>
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    {report.publishedAt}
-                  </span>
-                </div>
-                <h3 className="font-semibold text-foreground mb-2 leading-tight">
-                  {report.titleJa ?? report.title}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-3 leading-relaxed line-clamp-3">
-                  {report.summary}
-                </p>
-                <span className="inline-flex items-center gap-1 text-sm text-foreground">
-                  続きを読む
-                  <ArrowRight className="w-4 h-4" />
-                </span>
-              </Link>
+              <NewsCard key={report.slug} report={report} />
             ))}
           </div>
         </section>
