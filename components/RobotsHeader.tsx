@@ -1,14 +1,13 @@
 'use client';
 
 import { useMemo } from 'react';
-import { ArrowUp } from 'lucide-react';
 import { ActiveFilterChips, type ActiveFilterChip } from '@/components/ActiveFilterChips';
 import { PageTabBar, type PageTab } from '@/components/PageTabBar';
+import { ScrollToTopIconButton } from '@/components/ScrollToTopIconButton';
 import { StickyPageHeader } from '@/components/StickyPageHeader';
-import { scrollToPageTop } from '@/lib/scroll';
+import { useHeaderStickyBarVisibility } from '@/lib/useHeaderStickyBarVisibility';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
-import { useStickyScroll } from '@/lib/useStickyScroll';
 
 interface RobotsHeaderProps {
   activeCount: number;
@@ -19,7 +18,7 @@ interface RobotsHeaderProps {
 export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeaderProps) {
   const { getParam, updateParams } = useUrlFilters();
   const activeRelease = getParam('release') === 'pre' ? 'pre' : 'active';
-  const isStuck = useStickyScroll();
+  const isStuck = useHeaderStickyBarVisibility();
 
   const tabs = useMemo<readonly PageTab<'active' | 'pre'>[]>(
     () => [
@@ -42,14 +41,7 @@ export function RobotsHeader({ activeCount, preCount, activeChips }: RobotsHeade
         />
         <div className="ml-auto flex items-center gap-3 pl-4">
           <ActiveFilterChips chips={activeChips} />
-          <button
-            type="button"
-            onClick={scrollToPageTop}
-            className="shrink-0 text-primary transition-colors hover:text-brand-hover"
-            aria-label="ページ先頭に戻る"
-          >
-            <ArrowUp className="h-3.5 w-3.5" />
-          </button>
+          <ScrollToTopIconButton />
         </div>
       </div>
     </StickyPageHeader>

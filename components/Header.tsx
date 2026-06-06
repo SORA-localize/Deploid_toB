@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import { HeaderStickyBarSlot } from '@/components/StickyPageHeader';
+import { HeaderStickyBarSlot } from '@/components/HeaderChrome';
 import { ThemeModeToggle } from '@/components/ThemeModeToggle';
 import { siteNavItems } from '@/lib/siteNavigation';
 

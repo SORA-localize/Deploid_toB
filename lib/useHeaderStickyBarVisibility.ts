@@ -29,12 +29,12 @@ function getGlobalHeaderHeight() {
   return GLOBAL_HEADER_HEIGHT;
 }
 
-export function useStickyScroll() {
-  const [isStuck, setIsStuck] = useState(false);
+export function useHeaderStickyBarVisibility() {
+  const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
     let globalHeaderHeight = getGlobalHeaderHeight();
     function onScroll() {
-      setIsStuck((current) => {
+      setIsVisible((current) => {
         const showAt = globalHeaderHeight + SHOW_AFTER_HEADER_OFFSET;
         const hideAt = Math.max(0, globalHeaderHeight - HIDE_BEFORE_HEADER_OFFSET);
 
@@ -58,5 +58,5 @@ export function useStickyScroll() {
       window.removeEventListener('resize', onResize);
     };
   }, []);
-  return isStuck;
+  return isVisible;
 }
