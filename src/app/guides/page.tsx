@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { ComingSoonOverlay } from '@/components/ComingSoonOverlay';
 import { GuidesBrowser } from '@/components/GuidesBrowser';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { getGuides } from '@/lib/data';
@@ -11,8 +12,10 @@ export const metadata = {
 
 export default function GuidesPage() {
   return (
-    <Suspense fallback={<PageSuspenseFallback />}>
-      <GuidesBrowser guides={getGuides()} />
-    </Suspense>
+    <ComingSoonOverlay>
+      <Suspense fallback={<PageSuspenseFallback />}>
+        <GuidesBrowser guides={getGuides()} />
+      </Suspense>
+    </ComingSoonOverlay>
   );
 }

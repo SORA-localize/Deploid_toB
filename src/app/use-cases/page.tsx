@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { ComingSoonOverlay } from '@/components/ComingSoonOverlay';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { UseCasesBrowser } from '@/components/UseCasesBrowser';
 import { getUseCases } from '@/lib/data';
@@ -11,8 +12,10 @@ export const metadata = {
 
 export default function UseCasesPage() {
   return (
-    <Suspense fallback={<PageSuspenseFallback />}>
-      <UseCasesBrowser useCases={getUseCases()} />
-    </Suspense>
+    <ComingSoonOverlay>
+      <Suspense fallback={<PageSuspenseFallback />}>
+        <UseCasesBrowser useCases={getUseCases()} />
+      </Suspense>
+    </ComingSoonOverlay>
   );
 }
