@@ -181,9 +181,36 @@
 - Header と下段 bar の DOM 構造変更
 - scroll/resize の新しい測定ロジック追加
 - URL param、filter state、tab state の設計変更
-- `RobotsHeader` / `ManufacturersHeader` / `ReportsHeader` の大きな汎用 component 化
+- URL param 名や pagination reset まで共通 component に押し込む汎用化
 - Guides / UseCases への sticky bar 展開
 - `HeaderChromeProvider` の複数 slot 対応
+
+---
+
+## 追加方針: Contextual page header の共通化
+
+`RobotsHeader` / `ManufacturersHeader` / `ReportsHeader` には、以下の重複が残っている。
+
+- `useHeaderStickyBarVisibility()` の呼び出し
+- `StickyPageHeader visible={...}` の wrapper
+- `site-container flex items-center` の下段 bar レイアウト
+- 右側の `ActiveFilterChips` + `ScrollToTopIconButton`
+
+一方で、以下はページ固有の責務として残す。
+
+- Robots: `release` URL param の読み書き、販売中/開発中件数の tab label
+- Reports: `category` URL param の読み書き、pagination reset
+- Manufacturers: title label
+
+したがって、共通化は `ContextualPageHeader` を追加して、下段 bar の枠と右側 action だけを集約する。
+
+```tsx
+<ContextualPageHeader activeChips={activeChips}>
+  <PageTabBar ... />
+</ContextualPageHeader>
+```
+
+この方針なら、実際の重複は減らしつつ、URL state や domain-specific tab の意味を共通部品へ漏らさない。
 
 ---
 
@@ -200,6 +227,7 @@
 | `components/ManufacturersHeader.tsx` | top button と hook import を置換 |
 | `components/ReportsHeader.tsx` | top button と hook import を置換 |
 | `lib/useStickyScroll.ts` | hook rename、必要ならファイル名 rename |
+| `components/ContextualPageHeader.tsx` | 下段 bar の枠、表示判定、右側 action を集約 |
 
 ### 新規作成する可能性
 
@@ -227,10 +255,11 @@
 3. `StickyPageHeader.tsx` を registration 専用にする
 4. sticky bar 用 top button を小さく共通化する
 5. `useStickyScroll` を `useHeaderStickyBarVisibility` に rename する
-6. `rg` で旧 import / 旧 symbol が残っていないことを確認する
-7. `git diff --check`
-8. `npm run build`
-9. `npm run validate:data`
+6. `ContextualPageHeader` を追加し、3つの page header から wrapper 重複を削る
+7. `rg` で旧 import / 旧 symbol が残っていないことを確認する
+8. `git diff --check`
+9. `npm run build`
+10. `npm run validate:data`
 
 ---
 
@@ -242,7 +271,7 @@
 | Header mobile menu と下段 slot の stacking が変わる | 中 | slot の className と DOM位置は維持し、手動確認 |
 | rename で import 漏れが出る | 低 | `rg "useStickyScroll|HeaderStickyBarSlot|ArrowUp"` で確認 |
 | top button 共通化で aria-label が変わる | 低 | 既存の「ページ先頭に戻る」を維持 |
-| 抽象化しすぎて domain header が読みにくくなる | 低 | 今回は top button 以外の大きな共通化をしない |
+| 抽象化しすぎて domain header が読みにくくなる | 中 | URL state と tab label 生成は各 page header に残す |
 
 ---
 
