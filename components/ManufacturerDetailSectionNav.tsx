@@ -25,7 +25,7 @@ export function ManufacturerDetailSectionNav({
       className={cn(
         'flex min-w-0 items-center overflow-x-auto text-xs',
         variant === 'inline'
-          ? 'gap-0 border border-border bg-card'
+          ? 'gap-5 border-b border-border'
           : 'gap-5',
         className,
       )}
@@ -37,7 +37,7 @@ export function ManufacturerDetailSectionNav({
           className={cn(
             'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap font-medium transition-colors hover:text-foreground',
             variant === 'inline'
-              ? 'border-r border-border px-4 py-3 text-muted-foreground last:border-r-0'
+              ? 'py-3 text-muted-foreground'
               : 'text-muted-foreground',
           )}
         >

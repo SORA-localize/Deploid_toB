@@ -4,10 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ManufacturerDetailHero } from '@/components/ManufacturerDetailHero';
 import { ManufacturerDetailSection } from '@/components/ManufacturerDetailSection';
-import {
-  ManufacturerDetailSectionNav,
-  type ManufacturerDetailSectionLink,
-} from '@/components/ManufacturerDetailSectionNav';
+import type { ManufacturerDetailSectionLink } from '@/components/ManufacturerDetailSectionNav';
 import { ManufacturerDetailStickyHeader } from '@/components/ManufacturerDetailStickyHeader';
 import { ManufacturerFactSheet } from '@/components/ManufacturerFactSheet';
 import { ManufacturerProcurementPanel } from '@/components/ManufacturerProcurementPanel';
@@ -74,13 +71,6 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
         <ManufacturerDetailHero manufacturer={manufacturer} robots={robots} />
 
-        <div className="py-6">
-          <ManufacturerDetailSectionNav
-            sections={sections}
-            ariaLabel={uiText.manufacturers.sectionNavAria}
-          />
-        </div>
-
         <ManufacturerFactSheet manufacturer={manufacturer} robotCount={robots.length} />
 
         <ManufacturerDetailSection
@@ -88,7 +78,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
           eyebrow={uiText.manufacturers.robotsSection}
           title={uiText.manufacturers.robotsSection}
           action={
-            <span className="px-3 py-1.5 bg-muted border border-border text-foreground/80 text-xs whitespace-nowrap">
+            <span className="text-xs text-muted-foreground whitespace-nowrap">
               {uiText.manufacturers.models(robots.length)}
             </span>
           }
@@ -112,7 +102,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
                 <Link
                   key={report.slug}
                   href={`/reports/${report.slug}`}
-                  className="flex flex-col gap-3 p-3 bg-card border border-border hover:border-foreground/40 transition-colors sm:flex-row sm:items-start"
+                  className="flex flex-col gap-3 border-b border-border py-4 transition-colors hover:border-foreground/40 sm:flex-row sm:items-start"
                 >
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-medium text-foreground mb-1">
@@ -131,7 +121,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
         <div className="py-12">
           <SourceList
             sources={manufacturer.sources}
-            className="border border-border bg-card p-6 scroll-mt-site-header"
+            className="scroll-mt-site-header"
             titleClassName="text-sm font-semibold text-foreground mb-4"
           />
         </div>

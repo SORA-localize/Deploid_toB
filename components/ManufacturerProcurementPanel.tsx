@@ -79,21 +79,19 @@ export function ManufacturerProcurementPanel({ manufacturer }: ManufacturerProcu
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-x-10 sm:grid-cols-2">
           {notes.length > 0 ? (
             notes.map(({ label, body, Icon }) => (
-              <article key={label} className="border border-border bg-card p-5">
+              <article key={label} className="border-b border-border py-4">
                 <div className="mb-3 flex items-center gap-2">
-                  <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center border border-border bg-muted text-muted-foreground">
-                    <Icon className="h-4 w-4" />
-                  </span>
+                  <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <h3 className="text-sm font-semibold text-foreground">{label}</h3>
                 </div>
                 <p className="text-xs leading-relaxed text-foreground/80">{body}</p>
               </article>
             ))
           ) : (
-            <article className="border border-border bg-card p-5 sm:col-span-2">
+            <article className="border-b border-border py-4 sm:col-span-2">
               <p className="text-sm font-semibold text-foreground">
                 {uiText.manufacturers.procurementConsultation}
               </p>
@@ -104,22 +102,22 @@ export function ManufacturerProcurementPanel({ manufacturer }: ManufacturerProcu
           )}
         </div>
 
-        <aside className="self-start border border-border bg-muted p-5">
+        <aside className="self-start lg:border-l lg:border-border lg:pl-6">
           <p className="mb-4 text-sm font-semibold text-foreground">
             {uiText.manufacturers.consultationRoute}
           </p>
           <dl className="divide-y divide-border text-xs">
-            <div className="flex justify-between gap-4 py-3">
-              <dt className="text-muted-foreground">{uiText.manufacturers.consultationRoute}</dt>
-              <dd className="text-right text-foreground">
+            <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3 py-3">
+              <dt className="text-muted-foreground">{uiText.manufacturers.consultationRoute}:</dt>
+              <dd className="min-w-0 text-foreground">
                 {manufacturerConsultationRouteLabels[consultationRoute]}
               </dd>
             </div>
-            <div className="flex justify-between gap-4 py-3">
-              <dt className="text-muted-foreground">{uiText.manufacturers.domesticDistributors}</dt>
-              <dd className="text-right text-foreground">
+            <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3 py-3">
+              <dt className="text-muted-foreground">{uiText.manufacturers.domesticDistributors}:</dt>
+              <dd className="min-w-0 text-foreground">
                 {domesticDistributor.hasDistributor ? (
-                  <span className="inline-flex flex-col items-end gap-1">
+                  <span className="inline-flex flex-col items-start gap-1">
                     {domesticDistributor.distributors.map((distributor) =>
                       distributor.website ? (
                         <a
@@ -127,7 +125,7 @@ export function ManufacturerProcurementPanel({ manufacturer }: ManufacturerProcu
                           href={distributor.website}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center justify-end gap-1 underline underline-offset-4 hover:text-muted-foreground"
+                          className="inline-flex items-center gap-1 underline underline-offset-4 hover:text-muted-foreground"
                         >
                           <span>{distributor.name}</span>
                           <ExternalLink className="h-3 w-3" />
@@ -149,19 +147,23 @@ export function ManufacturerProcurementPanel({ manufacturer }: ManufacturerProcu
               href={contactHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              className="mt-5 inline-flex min-h-8 items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
             >
               <MessageSquare className="h-4 w-4 shrink-0" />
-              <span className="min-w-0 truncate">{uiText.manufacturers.officialContact}</span>
+              <span className="min-w-0 border-b border-foreground pb-0.5">
+                {uiText.manufacturers.officialContact}
+              </span>
               <ExternalLink className="h-3.5 w-3.5 shrink-0" />
             </a>
           ) : (
             <Link
               href={contactHref}
-              className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              className="mt-5 inline-flex min-h-8 items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
             >
               <MessageSquare className="h-4 w-4 shrink-0" />
-              <span className="min-w-0 truncate">{uiText.manufacturers.consultDeploid}</span>
+              <span className="min-w-0 border-b border-foreground pb-0.5">
+                {uiText.manufacturers.consultDeploid}
+              </span>
             </Link>
           )}
         </aside>

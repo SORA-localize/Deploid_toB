@@ -58,7 +58,7 @@ export function ManufacturerFactSheet({ manufacturer, robotCount }: Manufacturer
     {
       label: uiText.manufacturers.domesticDistributors,
       value: domesticDistributor.hasDistributor ? (
-        <span className="inline-flex flex-col items-end gap-1">
+        <span className="inline-flex flex-col items-start gap-1">
           {domesticDistributor.distributors.map((distributor) =>
             distributor.website ? (
               <a
@@ -66,7 +66,7 @@ export function ManufacturerFactSheet({ manufacturer, robotCount }: Manufacturer
                 href={distributor.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-end gap-1 underline underline-offset-4 hover:text-muted-foreground"
+                className="inline-flex items-center gap-1 underline underline-offset-4 hover:text-muted-foreground"
               >
                 <span>{distributor.name}</span>
                 <ExternalLink className="h-3 w-3" />
@@ -97,7 +97,7 @@ export function ManufacturerFactSheet({ manufacturer, robotCount }: Manufacturer
           href={manufacturer.website}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-end gap-1 underline underline-offset-4 hover:text-muted-foreground"
+          className="inline-flex items-center gap-1 underline underline-offset-4 hover:text-muted-foreground"
         >
           <span className="min-w-0 break-all">{manufacturer.website}</span>
           <ExternalLink className="h-3 w-3 shrink-0" />
@@ -117,24 +117,22 @@ export function ManufacturerFactSheet({ manufacturer, robotCount }: Manufacturer
             {uiText.manufacturers.factSheet}
           </h2>
         </div>
-        <span className="w-fit border border-border bg-muted px-3 py-1.5 text-xs text-foreground/80">
+        <span className="w-fit text-xs text-muted-foreground">
           {uiText.manufacturers.models(robotCount)}
         </span>
       </div>
 
-      <div className="border border-border bg-card">
-        <dl className="grid grid-cols-1 md:grid-cols-2">
-          {rows.map((row) => (
-            <div
-              key={row.label}
-              className="grid grid-cols-[8rem_minmax(0,1fr)] gap-4 border-b border-border p-4 text-xs last:border-b-0 md:[&:nth-last-child(-n+2)]:border-b-0 md:[&:nth-child(even)]:border-l"
-            >
-              <dt className="text-muted-foreground">{row.label}</dt>
-              <dd className="min-w-0 text-right font-medium text-foreground">{row.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
+      <dl className="grid grid-cols-1 gap-x-10 md:grid-cols-2">
+        {rows.map((row) => (
+          <div
+            key={row.label}
+            className="grid grid-cols-[8rem_minmax(0,1fr)] gap-4 border-b border-border py-3 text-xs"
+          >
+            <dt className="text-muted-foreground">{row.label}:</dt>
+            <dd className="min-w-0 font-medium text-foreground">{row.value}</dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }
