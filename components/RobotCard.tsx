@@ -126,13 +126,13 @@ export function RobotCard({
         </button>
       )}
 
-      <div className="relative z-20 flex flex-col h-full pointer-events-none">
-        <div className="aspect-[4/3] bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden border-b border-border">
+      <div className="relative z-20 flex flex-row md:flex-col h-full pointer-events-none">
+        <div className="w-20 flex-none self-stretch border-r border-border md:w-auto md:aspect-[4/3] md:border-r-0 md:border-b bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden">
           {(() => {
             const hero = getDisplayableAsset(robot.images?.hero ?? robot.heroImage);
             return hero ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={hero.src} alt={hero.alt} className="h-full w-full object-contain" />
+              <img src={hero.src} alt={hero.alt} className="h-full w-full object-cover md:object-contain" />
             ) : (
               <>
                 <CameraOff className="w-8 h-8 mb-2 opacity-20" />
@@ -146,7 +146,7 @@ export function RobotCard({
             );
           })()}
         </div>
-        <div className="p-4 flex-1 flex flex-col">
+        <div className="p-3 md:p-4 flex-1 flex flex-col min-w-0">
           <div className="flex items-start justify-between mb-2">
             <h3 className="font-semibold text-card-foreground">
               <Link href={`/robots/${robot.slug}`} className="hover:underline">
@@ -155,7 +155,7 @@ export function RobotCard({
             </h3>
           </div>
           <div>
-            <div className="inline-block pointer-events-auto">
+            <div className="inline-block pointer-events-none md:pointer-events-auto">
               <ManufacturerLogoName
                 name={manufacturerName ?? robot.manufacturerSlug}
                 logo={manufacturerLogo}
@@ -164,9 +164,9 @@ export function RobotCard({
                 imageClassName="h-3 w-3"
               />
             </div>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs mb-4">
+            <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 text-xs mb-0 md:mb-4">
               {specRows.map((row) => (
-                <div key={row.label}>
+                <div key={row.label} className={row.label === '段階' ? undefined : 'hidden md:block'}>
                   <dt className="text-muted-foreground">{row.label}</dt>
                   <dd
                     className={cn(
@@ -182,7 +182,7 @@ export function RobotCard({
               ))}
             </dl>
           </div>
-          <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">
+          <div className="mt-auto hidden md:flex items-center justify-between pt-3 border-t border-border">
             <span className="text-xs text-muted-foreground">
               {uiText.common.viewDetails}
             </span>
