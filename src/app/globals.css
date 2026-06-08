@@ -423,14 +423,16 @@
   --card-spotlight: color-mix(in srgb, var(--jade-9) 20%, transparent);
 }
 
-.robot-card-grid:has(.robot-card:hover) .robot-card {
-  opacity: 0.4;
-  filter: grayscale(0.5) blur(1px);
-}
+@media (hover: hover) {
+  .robot-card-grid:has(.robot-card:hover) .robot-card {
+    opacity: 0.4;
+    filter: grayscale(0.5) blur(1px);
+  }
 
-.robot-card-grid:has(.robot-card:hover) .robot-card:hover {
-  opacity: 1;
-  filter: grayscale(0) blur(0);
+  .robot-card-grid:has(.robot-card:hover) .robot-card:hover {
+    opacity: 1;
+    filter: grayscale(0) blur(0);
+  }
 }
 
 /* =====================================================================

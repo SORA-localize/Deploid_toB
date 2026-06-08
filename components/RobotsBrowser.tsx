@@ -115,16 +115,16 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         activeChips={activeChips}
       />
 
-      <div className="site-container py-8 min-h-[60vh]">
+      <div className="site-container py-5 min-h-[60vh]">
         <Breadcrumbs items={[{ label: uiText.robots.breadcrumb }]} />
-        <div className="mb-8">
+        <div className="mb-5">
           <h1 className="text-2xl font-semibold text-foreground mb-2">{uiText.robots.title}</h1>
           <p className="text-sm text-muted-foreground max-w-3xl">
             導入判断に必要なヒューマノイドロボットのカタログ。業種・タスク・メーカー・国内入手性で絞り込み、現場に合う候補を探せます。
           </p>
         </div>
 
-        <div className="mb-6 max-w-2xl">
+        <div className="mb-4 max-w-2xl">
           <SearchInput
             value={filters.query}
             onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
@@ -132,7 +132,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 mb-5 sm:grid-cols-2 xl:grid-cols-4">
           <SelectControl
             id="robot-industry"
             label={uiText.filters.industry}
@@ -170,7 +170,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             size="large"
           />
         ) : (
-          <div className="robot-card-grid grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((robot) => {
               const manufacturer = manufacturerBySlug.get(robot.manufacturerSlug);
               return (

@@ -84,12 +84,12 @@ export function HomeContentNavigator({
   const transition = shouldReduceMotion ? { duration: 0 } : { duration: 0.42, ease: 'easeOut' as const };
 
   return (
-    <section className="border-b border-border py-16">
-      <div className="mb-8 flex items-end justify-between gap-6">
+    <section className="border-b border-border py-8 sm:py-12">
+      <div className="mb-5 flex items-end justify-between gap-6">
         <h2 className="text-2xl font-semibold text-foreground">主要コンテンツ</h2>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(420px,1.15fr)] lg:items-stretch">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(420px,1.15fr)] lg:items-stretch">
         <div className="divide-y divide-border border-y border-border">
           {items.map((item) => {
             const Icon = item.icon;

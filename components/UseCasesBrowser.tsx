@@ -75,7 +75,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b border-border bg-card">
-        <div className="site-container py-8">
+        <div className="site-container py-5">
           <Breadcrumbs items={[{ label: uiText.useCases.breadcrumb }]} />
           <h1 className="text-2xl font-semibold text-foreground mb-3">{uiText.useCases.title}</h1>
           <p className="text-sm text-muted-foreground max-w-3xl mb-6 leading-relaxed">
@@ -118,9 +118,9 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
         </div>
       </div>
 
-      <div className="site-container py-8 min-h-[60vh]">
+      <div className="site-container py-5 min-h-[60vh]">
         {featured.length > 0 && !active && (
-          <div className="mb-8">
+          <div className="mb-5">
             <h3 className="text-sm font-semibold text-foreground mb-4 px-1">
               {uiText.useCases.featured}
             </h3>

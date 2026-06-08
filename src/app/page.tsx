@@ -84,7 +84,7 @@ export default function HomePage() {
         subcopy={"技術の理解から調達の実務まで、実装に必要なプロセスをすべて体系化。\n職種を問わず、社会実装に挑むすべての人が参照できる実践ガイドです。"}
       />
 
-      <div className="site-container py-12">
+      <div className="site-container py-6 sm:py-10">
       <HomeContentNavigator
         robotAssets={robotPreviewAssets}
         manufacturerAssets={manufacturerPreviewAssets}
@@ -99,8 +99,8 @@ export default function HomePage() {
       )}
 
       {latestReports.length > 0 && (
-        <section className="py-16 border-b border-border">
-          <div className="flex items-end justify-between mb-8">
+        <section className="py-8 sm:py-12 border-b border-border">
+          <div className="flex items-end justify-between mb-5">
             <h2 className="text-2xl font-semibold text-foreground">最新記事</h2>
             <Link
               href="/reports"
@@ -110,7 +110,7 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {latestReports.map((report) => (
               <NewsCard key={report.slug} report={report} />
             ))}
@@ -119,10 +119,10 @@ export default function HomePage() {
       )}
 
       {featured && (
-        <section className="py-16 border-b border-border">
-          <h2 className="text-2xl font-semibold text-foreground mb-8">注目の導入ガイド</h2>
+        <section className="py-8 sm:py-12 border-b border-border">
+          <h2 className="text-2xl font-semibold text-foreground mb-5">注目の導入ガイド</h2>
           <div className="border border-border bg-card">
-            <div className="p-8">
+            <div className="p-5 sm:p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">
@@ -148,8 +148,8 @@ export default function HomePage() {
         </section>
       )}
 
-      <section className="py-16">
-        <div className="border border-border bg-card p-8">
+      <section className="py-8 sm:py-12">
+        <div className="border border-border bg-card p-5 sm:p-6">
           <h2 className="text-xl font-semibold text-foreground mb-4">このサイトについて</h2>
           <p className="text-muted-foreground mb-6 max-w-3xl">
             本ポータルは、日本企業の設備投資担当者・技術責任者を対象に、ヒューマノイドロボット導入に関する客観的な情報を提供します。

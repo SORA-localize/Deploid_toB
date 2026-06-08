@@ -19,12 +19,12 @@ export function NewsCard({ report, className }: NewsCardProps) {
   return (
     <div
       className={cn(
-        'card-editorial group relative flex h-full flex-col',
+        'card-editorial group relative flex h-full flex-row sm:flex-col',
         className,
       )}
     >
       {/* 画像エリア */}
-      <div className="aspect-video overflow-hidden bg-muted">
+      <div className="w-24 flex-none self-stretch border-r border-border overflow-hidden bg-muted sm:w-auto sm:aspect-video sm:border-r-0">
         {heroSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -42,7 +42,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
       </div>
 
       {/* テキストエリア */}
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex flex-1 flex-col p-3 sm:p-4 min-w-0">
         <div className="mb-2 flex items-center gap-2">
           <TagChip tone={getReportTypeTone(report.type)} className="text-[10px]">
             {reportTypeLabels[report.type]}
@@ -63,7 +63,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
           {report.titleJa ?? report.title}
         </h3>
 
-        <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+        <p className="mb-3 hidden line-clamp-2 text-xs leading-relaxed text-muted-foreground sm:block">
           {report.summary}
         </p>
 

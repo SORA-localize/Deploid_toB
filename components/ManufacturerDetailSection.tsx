@@ -23,9 +23,9 @@ export function ManufacturerDetailSection({
   return (
     <section
       id={id}
-      className={cn('scroll-mt-site-header border-b border-border py-12', className)}
+      className={cn('scroll-mt-site-header border-b border-border py-8', className)}
     >
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-3xl">
           {eyebrow && (
             <p className="mb-2 text-xs font-medium text-muted-foreground">{eyebrow}</p>
