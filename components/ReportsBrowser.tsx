@@ -80,7 +80,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
 
         {/* ── ヒーロー + フィーチャー枠（すべてタブのみ） ── */}
         {activeCategory === 'all' && heroReports.length > 0 && (
-          <div className="site-container py-6">
+          <div className="site-container py-4">
             {/*
               表示対象は data/reportPlacements.ts の掲載枠で制御する。
               グリッドの行高さはカルーセルの aspect-ratio で決まる。
@@ -111,12 +111,12 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
         )}
 
         {/* ── 記事グリッド ── */}
-        <div className="site-container py-6">
+        <div className="site-container py-4">
           {gridReports.length === 0 ? (
             <EmptyState message={uiText.emptyStates.reports} />
           ) : (
-            <div className="space-y-5">
-              <CardHoverEffect className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="space-y-3">
+              <CardHoverEffect className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-stretch">
                 {paginatedReports.map((r) => (
                   <NewsCard key={r.slug} report={r} />
                 ))}

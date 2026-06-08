@@ -35,10 +35,10 @@ const roadmap = [
 
 export default function AboutPage() {
   return (
-    <div className="site-container py-12">
+    <div className="site-container py-6 sm:py-10">
       <Breadcrumbs items={[{ label: '会社概要' }]} />
 
-      <section className="py-12 border-b border-border">
+      <section className="py-8 border-b border-border">
         <p className="text-xs text-muted-foreground mb-4">Deploidについて</p>
         <h1 className="text-3xl font-semibold text-foreground mb-4 max-w-3xl leading-tight">
           ヒューマノイド導入の、最初の判断材料をつくる。
@@ -48,7 +48,7 @@ export default function AboutPage() {
         </p>
       </section>
 
-      <section className="py-12 border-b border-border">
+      <section className="py-8 border-b border-border">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {values.map((v) => (
             <div key={v.label} className="border border-border bg-card p-6">
@@ -60,7 +60,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="py-12 border-b border-border">
+      <section className="py-8 border-b border-border">
         <h2 className="text-2xl font-semibold text-foreground mb-8">ロードマップ</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {roadmap.map((r) => (
@@ -77,7 +77,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="py-12">
+      <section className="py-8">
         <div className="border border-border bg-card p-8">
           <h2 className="text-xl font-semibold text-foreground mb-4">運営とお問い合わせ</h2>
           <p className="text-muted-foreground mb-6 max-w-3xl leading-relaxed">

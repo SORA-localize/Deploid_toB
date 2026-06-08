@@ -12,8 +12,8 @@ interface FeaturedRobotsGridProps {
 
 export function FeaturedRobotsGrid({ robots, manufacturerBySlug }: FeaturedRobotsGridProps) {
   return (
-    <section className="py-16 border-b border-border">
-      <div className="flex items-end justify-between mb-8">
+    <section className="py-8 sm:py-12 border-b border-border">
+      <div className="flex items-end justify-between mb-5">
         <h2 className="text-2xl font-semibold text-foreground">注目ロボット</h2>
         <Link
           href="/robots"
@@ -23,7 +23,7 @@ export function FeaturedRobotsGrid({ robots, manufacturerBySlug }: FeaturedRobot
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="robot-card-grid grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {robots.map((robot) => {
           const manufacturer = manufacturerBySlug[robot.manufacturerSlug];
           return (

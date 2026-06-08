@@ -45,7 +45,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b border-border bg-card">
-        <div className="site-container py-8">
+        <div className="site-container py-5">
           <Breadcrumbs items={[{ label: uiText.guides.breadcrumb }]} />
           <h1 className="text-2xl font-semibold text-foreground mb-3">{uiText.guides.title}</h1>
           <p className="text-sm text-muted-foreground max-w-3xl mb-6 leading-relaxed">
@@ -72,7 +72,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
         </div>
       </div>
 
-      <div className="site-container py-8 min-h-[60vh]">
+      <div className="site-container py-5 min-h-[60vh]">
         {featured && filters.stage === 'all' && !filters.topic && (
           <div className="card-data p-6 mb-6">
             <div className="text-xs text-muted-foreground font-medium mb-3 pb-2 border-b border-border">

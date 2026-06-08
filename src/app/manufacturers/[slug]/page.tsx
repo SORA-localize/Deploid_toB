@@ -63,7 +63,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
         ariaLabel={uiText.manufacturers.sectionNavAria}
       />
 
-      <div className="site-container py-8 sm:py-12">
+      <div className="site-container py-5 sm:py-8">
         <Breadcrumbs
           items={[
             { label: uiText.manufacturers.breadcrumb, path: '/manufacturers' },
@@ -105,7 +105,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
           </ManufacturerDetailSection>
         )}
 
-        <div className="py-12">
+        <div className="py-8">
           <SourceList
             sources={manufacturer.sources}
             className="scroll-mt-site-header"
