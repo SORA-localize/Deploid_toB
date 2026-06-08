@@ -35,15 +35,24 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
   }, [isMenuOpen]);
 
   return (
-    <div className="card-data overflow-hidden">
-      <div className="p-6">
+    <div className="card-data relative overflow-hidden">
+      {/* カード全体を詳細ページへのリンクに（マウス用の便宜リンク。
+          キーボード/SRは下部の「プロフィールを見る」を正規導線とする）。
+          内側の外部HPリンク・代理店リンク/メニューは pointer-events-auto で温存。 */}
+      <Link
+        href={`/manufacturers/${manufacturer.slug}`}
+        aria-hidden="true"
+        tabIndex={-1}
+        className="absolute inset-0"
+      />
+      <div className="relative z-10 p-6 pointer-events-none">
         <div className="flex items-start justify-between gap-4 mb-5">
           <h2 className="min-w-0 text-xl font-semibold text-foreground">
             <a
               href={manufacturer.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex min-w-0 items-center gap-1 text-foreground hover:text-muted-foreground"
+              className="group pointer-events-auto inline-flex min-w-0 items-center gap-1 text-foreground hover:text-muted-foreground"
             >
               <ManufacturerLogoName
                 name={manufacturer.nameJa ?? manufacturer.name}
@@ -79,7 +88,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
           <div className="flex justify-between py-1.5">
             <span className="text-muted-foreground">国内代理店</span>
             {domesticDistributor.hasDistributor ? (
-              <div className="relative ml-4 text-right" data-distributor-menu>
+              <div className="relative ml-4 text-right pointer-events-auto" data-distributor-menu>
                 {domesticDistributor.distributors.length === 1 ? (
                   domesticDistributor.distributors[0].website ? (
                     <a
@@ -141,7 +150,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
             ) : (
               <Link
                 href="/contact"
-                className="ml-4 text-right text-xs font-normal text-accent-blue-pale hover:text-accent-blue-pale-hover"
+                className="pointer-events-auto ml-4 text-right text-xs font-normal text-accent-blue-pale hover:text-accent-blue-pale-hover"
               >
                 {domesticDistributor.label}
               </Link>
@@ -151,7 +160,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
 
         <Link
           href={`/manufacturers/${manufacturer.slug}`}
-          className="ml-auto flex w-fit border-b border-foreground pb-0.5 text-xs leading-none text-foreground transition-colors hover:border-foreground/40 hover:text-muted-foreground"
+          className="pointer-events-auto ml-auto flex w-fit border-b border-foreground pb-0.5 text-xs leading-none text-foreground transition-colors hover:border-foreground/40 hover:text-muted-foreground"
         >
           <span>{uiText.common.viewProfile}</span>
         </Link>
