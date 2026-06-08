@@ -68,7 +68,7 @@ export const uiText = {
     specifications: '仕様',
     technicalSpecifications: '技術仕様',
     decision: '導入判断',
-    applications: '用途メモ',
+    applications: '用途・適用範囲',
   },
   manufacturers: {
     breadcrumb: 'メーカー',

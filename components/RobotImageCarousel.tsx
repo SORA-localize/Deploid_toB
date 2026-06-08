@@ -9,7 +9,6 @@ import { uiText } from '@/lib/uiText';
 
 interface RobotImageCarouselProps {
   images?: Partial<Record<ImageRole, ImageAsset>>;
-  /** BaseRecord.heroImage を hero スロットへ後方互換でフォールバック */
   fallbackHero?: ImageAsset;
 }
 
@@ -24,39 +23,59 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
 
   return (
     <div className="border border-border overflow-hidden bg-card">
-      <div className="relative">
-        <div className="aspect-[16/9] bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden">
-          {img ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={img.src} alt={img.alt} className="w-full h-full object-contain" />
-          ) : (
-            <>
-              <CameraOff className="w-12 h-12 mb-3 opacity-15" />
-              <span className="text-[11px] uppercase tracking-[0.2em] font-medium opacity-60">
-                {uiText.robots.imageRequested}
-              </span>
-              <span className="text-[11px] mt-1 opacity-40">
-                {imageRoleLabels[current]} {uiText.robots.mainImageMissing}
-              </span>
-            </>
-          )}
-        </div>
+      {/* 固定高さ + ぼかし背景コンテナ */}
+      <div className="relative h-[420px] overflow-hidden bg-muted">
+
+        {/* ── 背景層：拡大ぼかし ─────────────────────────── */}
+        {img && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={img.src}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none select-none absolute inset-0 h-full w-full scale-110 object-cover blur-2xl brightness-75 saturate-150"
+          />
+        )}
+
+        {/* ── 前景層：メイン画像 ─────────────────────────── */}
+        {img ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={img.src}
+            alt={img.alt}
+            className="relative z-10 h-full w-full object-contain"
+            loading="lazy"
+          />
+        ) : (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-muted-foreground">
+            <CameraOff className="w-10 h-10 mb-3 opacity-20" />
+            <span className="text-[11px] uppercase tracking-[0.2em] font-medium opacity-60">
+              {uiText.robots.imageRequested}
+            </span>
+            <span className="text-[11px] mt-1 opacity-40">
+              {imageRoleLabels[current]} {uiText.robots.mainImageMissing}
+            </span>
+          </div>
+        )}
+
+        {/* ── 前後ボタン ─────────────────────────────────── */}
         <button
           onClick={() => setIdx((i) => (i - 1 + slots.length) % slots.length)}
-          className="absolute left-3 top-1/2 -translate-y-1/2 p-2 bg-card/90 hover:bg-card border border-border transition-colors"
+          className="absolute left-3 top-1/2 z-20 -translate-y-1/2 p-2 bg-black/30 hover:bg-black/50 backdrop-blur-sm border border-white/20 transition-colors"
           aria-label="前の画像"
         >
-          <ChevronLeft className="w-4 h-4 text-foreground" />
+          <ChevronLeft className="w-4 h-4 text-white" />
         </button>
         <button
           onClick={() => setIdx((i) => (i + 1) % slots.length)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-card/90 hover:bg-card border border-border transition-colors"
+          className="absolute right-3 top-1/2 z-20 -translate-y-1/2 p-2 bg-black/30 hover:bg-black/50 backdrop-blur-sm border border-white/20 transition-colors"
           aria-label="次の画像"
         >
-          <ChevronRight className="w-4 h-4 text-foreground" />
+          <ChevronRight className="w-4 h-4 text-white" />
         </button>
       </div>
 
+      {/* ── スロットタブ ───────────────────────────────── */}
       <div className="flex border-t border-border overflow-x-auto">
         {slots.map((role, i) => {
           const hasImage = Boolean(getDisplayableAsset(resolved[role]));
@@ -69,7 +88,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
                   ? 'bg-primary text-primary-foreground'
                   : hasImage
                     ? 'bg-card text-foreground hover:bg-muted'
-                    : 'bg-muted text-muted-foreground/70 hover:bg-muted'
+                    : 'bg-muted text-muted-foreground/60 hover:bg-muted'
               }`}
               title={hasImage ? undefined : '未投入'}
             >
@@ -79,6 +98,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
         })}
       </div>
 
+      {/* ── クレジット ─────────────────────────────────── */}
       {img?.credit && (
         <div className="px-3 py-2 border-t border-border text-[10px] text-muted-foreground">
           {uiText.common.credit}: {img.credit}
