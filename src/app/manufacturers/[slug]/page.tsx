@@ -1,6 +1,4 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ManufacturerDetailHero } from '@/components/ManufacturerDetailHero';
 import { ManufacturerDetailSection } from '@/components/ManufacturerDetailSection';
@@ -9,11 +7,13 @@ import { ManufacturerDetailStickyHeader } from '@/components/ManufacturerDetailS
 import { ManufacturerFactSheet } from '@/components/ManufacturerFactSheet';
 import { ManufacturerProcurementPanel } from '@/components/ManufacturerProcurementPanel';
 import { ManufacturerRobotsGrid } from '@/components/ManufacturerRobotsGrid';
+import { NewsCard } from '@/components/NewsCard';
 import { SourceList } from '@/components/SourceList';
 import {
   getManufacturerBySlug,
   getManufacturers,
   getReportsForManufacturer,
+  getReports,
   getRobotsByManufacturerSlug,
 } from '@/lib/data';
 import { uiText } from '@/lib/uiText';
@@ -41,14 +41,18 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
   const robots = getRobotsByManufacturerSlug(manufacturer.slug);
   const reports = getReportsForManufacturer(manufacturer.slug);
+  const sampleReports = getReports()
+    .filter((report) => report.contentKind === 'sample')
+    .slice(0, 3);
+  const displayedReports = reports.length > 0 ? reports : sampleReports;
   const sections: ManufacturerDetailSectionLink[] = [
     { label: uiText.common.overview, href: '#overview' },
     { label: uiText.manufacturers.factSheet, href: '#facts' },
     { label: uiText.manufacturers.robotsSection, href: '#robots', count: robots.length },
-    { label: uiText.manufacturers.procurementConsultation, href: '#procurement' },
-    ...(reports.length > 0
-      ? [{ label: uiText.manufacturers.relatedReports, href: '#reports', count: reports.length }]
+    ...(displayedReports.length > 0
+      ? [{ label: uiText.manufacturers.relatedReports, href: '#reports', count: displayedReports.length }]
       : []),
+    { label: uiText.manufacturers.procurementConsultation, href: '#procurement' },
     { label: uiText.common.resources, href: '#sources', count: manufacturer.sources.length },
   ];
   const manufacturerName = manufacturer.nameJa ?? manufacturer.name;
@@ -89,34 +93,21 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
           />
         </ManufacturerDetailSection>
 
-        <ManufacturerProcurementPanel manufacturer={manufacturer} />
-
-        {reports.length > 0 && (
+        {displayedReports.length > 0 && (
           <ManufacturerDetailSection
             id="reports"
             eyebrow={uiText.manufacturers.relatedReports}
             title={uiText.manufacturers.relatedReports}
           >
-            <div className="space-y-3">
-              {reports.map((report) => (
-                <Link
-                  key={report.slug}
-                  href={`/reports/${report.slug}`}
-                  className="flex flex-col gap-3 border-b border-border py-4 transition-colors hover:border-foreground/40 sm:flex-row sm:items-start"
-                >
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-medium text-foreground mb-1">
-                      {report.titleJa ?? report.title}
-                    </h4>
-                    <p className="text-xs text-muted-foreground">{report.summary}</p>
-                  </div>
-                  <div className="text-xs text-muted-foreground sm:whitespace-nowrap">{report.publishedAt}</div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground mt-1 flex-shrink-0" />
-                </Link>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {displayedReports.map((report) => (
+                <NewsCard key={report.slug} report={report} />
               ))}
             </div>
           </ManufacturerDetailSection>
         )}
+
+        <ManufacturerProcurementPanel manufacturer={manufacturer} />
 
         <div className="py-12">
           <SourceList
