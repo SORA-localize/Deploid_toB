@@ -74,7 +74,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
         />
 
         {/* #overview — グリッド外・全幅 */}
-        <div id="overview" className="mt-6 mb-6 scroll-mt-[112px]">
+        <div id="overview" className="mt-6 mb-6 scroll-mt-site-header">
           {manufacturer && (
             <Link
               href={`/manufacturers/${manufacturer.slug}`}
@@ -103,41 +103,35 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           <div className="min-w-0">
 
             {/* Image carousel */}
-            <div className="mb-10">
+            <div className="mb-0">
               <RobotImageCarousel images={robot.images} fallbackHero={robot.heroImage} />
             </div>
 
             {/* #decision ── バイヤー向け情報を上位に */}
-            <div id="decision" className="border border-border bg-muted mb-8 scroll-mt-[112px]">
-              <div className="px-6 py-4 border-b border-border bg-card">
-                <h2 className="text-sm font-semibold text-foreground">導入判断</h2>
-              </div>
-              <div className="p-6">
-                <table className="w-full text-xs">
-                  <tbody className="divide-y divide-border">
-                    {decisionRows.map((row) => (
-                      <tr key={row.label}>
-                        <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">
-                          {row.label}
-                        </td>
-                        <td className="py-3 text-foreground font-medium align-top">
-                          {row.value}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            <div id="decision" className="mt-8 py-8 border-b border-border scroll-mt-site-header">
+              <h2 className="text-sm font-semibold text-foreground mb-4">導入判断</h2>
+              <table className="w-full text-xs">
+                <tbody className="divide-y divide-border">
+                  {decisionRows.map((row) => (
+                    <tr key={row.label}>
+                      <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">
+                        {row.label}
+                      </td>
+                      <td className="py-3 text-foreground font-medium align-top">
+                        {row.value}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
             {/* #applications */}
-            <div id="applications" className="border border-border bg-muted mb-8 scroll-mt-[112px]">
-              <div className="px-6 py-4 border-b border-border bg-card">
-                <h2 className="text-sm font-semibold text-foreground">
-                  {uiText.robots.applications}
-                </h2>
-              </div>
-              <div className="p-6 space-y-4">
+            <div id="applications" className="py-8 border-b border-border scroll-mt-site-header">
+              <h2 className="text-sm font-semibold text-foreground mb-4">
+                {uiText.robots.applications}
+              </h2>
+              <div className="space-y-4">
                 {robot.comparison.bestFit.length > 0 && (
                   <div>
                     <h3 className="text-xs font-semibold text-foreground mb-2">向く用途</h3>
@@ -178,12 +172,12 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
                   </div>
                 )}
                 {(useCases.length > 0 || reports.length > 0) && (
-                  <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+                  <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
                     {useCases.map((useCase) => (
                       <Link
                         key={useCase.slug}
                         href={`/use-cases/${useCase.slug}`}
-                        className="text-xs px-3 py-1 bg-card border border-border hover:border-foreground/40 transition-colors text-foreground/80"
+                        className="text-xs px-3 py-1 border border-border hover:border-foreground/40 transition-colors text-foreground/80"
                       >
                         {useCase.titleJa ?? useCase.title}
                       </Link>
@@ -192,7 +186,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
                       <Link
                         key={report.slug}
                         href={`/reports/${report.slug}`}
-                        className="text-xs px-3 py-1 bg-card border border-border hover:border-foreground/40 transition-colors text-foreground/80"
+                        className="text-xs px-3 py-1 border border-border hover:border-foreground/40 transition-colors text-foreground/80"
                       >
                         {report.titleJa ?? report.title}
                       </Link>
@@ -202,41 +196,37 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               </div>
             </div>
 
-            {/* #specs ── 技術スペックは読みたい人向けに後半へ */}
-            <div id="specs" className="border border-border bg-muted mb-8 scroll-mt-[112px]">
-              <div className="px-6 py-4 border-b border-border bg-card">
-                <h2 className="text-sm font-semibold text-foreground">
-                  {uiText.robots.technicalSpecifications}
-                </h2>
-              </div>
-              <div className="p-6">
-                <table className="w-full text-xs">
-                  <tbody className="divide-y divide-border">
-                    {specRows.map((row) => (
-                      <tr key={row.label}>
-                        <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">
-                          {row.label}
-                        </td>
-                        <td className="py-3 text-foreground font-medium align-top">
-                          {row.value}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            {/* #specs */}
+            <div id="specs" className="py-8 border-b border-border scroll-mt-site-header">
+              <h2 className="text-sm font-semibold text-foreground mb-4">
+                {uiText.robots.technicalSpecifications}
+              </h2>
+              <table className="w-full text-xs">
+                <tbody className="divide-y divide-border">
+                  {specRows.map((row) => (
+                    <tr key={row.label}>
+                      <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">
+                        {row.label}
+                      </td>
+                      <td className="py-3 text-foreground font-medium align-top">
+                        {row.value}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
             {/* #sources */}
             <SourceList
               id="sources"
               sources={robot.sources}
-              className="border border-border bg-muted p-6 scroll-mt-[112px]"
+              className="py-8 border-b border-border scroll-mt-site-header"
               titleClassName="text-sm font-semibold text-foreground mb-4"
             />
 
             {/* prev / next */}
-            <div className="flex items-center justify-between mt-10 pt-6 border-t border-border">
+            <div className="flex items-center justify-between mt-6 pt-0">
               {prev ? (
                 <Link
                   href={`/robots/${prev.slug}`}

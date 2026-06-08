@@ -36,7 +36,7 @@ export function ManufacturerDetailHero({ manufacturer, robots }: ManufacturerDet
 
   return (
     <section id="overview" className="scroll-mt-site-header border-b border-border pb-10">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_24rem]">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_24rem] items-start">
         <div className="min-w-0">
           <p className="mb-3 text-xs font-medium text-muted-foreground">
             {uiText.manufacturers.profile}
