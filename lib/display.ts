@@ -67,7 +67,9 @@ export const manufacturerCountryOrder = [
   'USA',
   'China',
   'Germany',
+  'France',
   'Canada',
+  'Israel',
   'Spain',
   'Norway',
 ] as const;
