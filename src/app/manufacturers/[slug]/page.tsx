@@ -5,7 +5,6 @@ import { ManufacturerDetailSection } from '@/components/ManufacturerDetailSectio
 import type { ManufacturerDetailSectionLink } from '@/components/ManufacturerDetailSectionNav';
 import { ManufacturerDetailStickyHeader } from '@/components/ManufacturerDetailStickyHeader';
 import { ManufacturerFactSheet } from '@/components/ManufacturerFactSheet';
-import { ManufacturerProcurementPanel } from '@/components/ManufacturerProcurementPanel';
 import { ManufacturerRobotsGrid } from '@/components/ManufacturerRobotsGrid';
 import { NewsCard } from '@/components/NewsCard';
 import { SourceList } from '@/components/SourceList';
@@ -52,7 +51,6 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
     ...(displayedReports.length > 0
       ? [{ label: uiText.manufacturers.relatedReports, href: '#reports', count: displayedReports.length }]
       : []),
-    { label: uiText.manufacturers.procurementConsultation, href: '#procurement' },
     { label: uiText.common.resources, href: '#sources', count: manufacturer.sources.length },
   ];
   const manufacturerName = manufacturer.nameJa ?? manufacturer.name;
@@ -106,8 +104,6 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
             </div>
           </ManufacturerDetailSection>
         )}
-
-        <ManufacturerProcurementPanel manufacturer={manufacturer} />
 
         <div className="py-12">
           <SourceList
