@@ -22,7 +22,7 @@ interface RobotImageCarouselProps {
 
 type Slide = {
   role: ImageRole;
-  asset: NonNullable<ReturnType<typeof getDisplayableAsset>>;
+  asset: ReturnType<typeof getDisplayableAsset> | null;
 };
 
 // 上部セグメント型のポジションインジケーター（選択中スロットを強調）
@@ -54,13 +54,15 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
   const resolved: Partial<Record<ImageRole, ImageAsset>> = { ...images };
   if (!resolved.hero && fallbackHero) resolved.hero = fallbackHero;
 
-  // 表示可能な画像があるスロットのみ（役割順）
-  const slides: Slide[] = imageRoleOrder
-    .map((role) => ({ role, asset: getDisplayableAsset(resolved[role]) }))
-    .filter((s): s is Slide => Boolean(s.asset));
+  // 全役割スロットを保持。画像が無いスロットは「申請中」プレースホルダーとして表示する
+  const slides: Slide[] = imageRoleOrder.map((role) => ({
+    role,
+    asset: getDisplayableAsset(resolved[role]) ?? null,
+  }));
+  const hasAnyImage = slides.some((s) => s.asset);
 
-  // 画像が1枚も無い場合はプレースホルダー
-  if (slides.length === 0) {
+  // 画像が1枚も無い場合はカルーセルにせず単一プレースホルダー
+  if (!hasAnyImage) {
     return (
       <div className="relative h-[420px] w-full overflow-hidden rounded-xl border border-border bg-muted">
         <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
@@ -86,31 +88,53 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
         >
           {slides.map(({ role, asset }) => (
             <Slider key={role} className="relative h-full w-full">
-              {/* 背景：拡大ぼかし（画像比率がバラついても余白を埋める） */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={asset.src}
-                alt=""
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 h-full w-full scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
-              />
-              {/* 前景：全身が欠けないよう contain */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={asset.src}
-                alt={asset.alt}
-                className="relative z-10 h-full w-full object-contain"
-              />
+              {asset ? (
+                <>
+                  {/* 背景：拡大ぼかし（画像比率がバラついても余白を埋める） */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={asset.src}
+                    alt=""
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 h-full w-full scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
+                  />
+                  {/* 前景：全身が欠けないよう contain */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={asset.src}
+                    alt={asset.alt}
+                    className="relative z-10 h-full w-full object-contain"
+                  />
+                </>
+              ) : (
+                /* 未投入スロット：申請中プレースホルダー */
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted text-muted-foreground">
+                  <CameraOff className="mb-3 h-9 w-9 opacity-20" />
+                  <span className="text-[11px] font-medium uppercase tracking-[0.2em] opacity-60">
+                    {uiText.robots.imageRequested}
+                  </span>
+                  <span className="mt-1 text-xs opacity-50">
+                    {uiText.robots.mainImageMissing}
+                  </span>
+                </div>
+              )}
 
               {/* 左上：役割ラベル */}
               <div className="absolute left-4 top-6 z-20">
-                <span className="inline-flex items-center rounded-sm bg-black/45 px-2.5 py-1 text-[11px] font-medium tracking-wide text-white backdrop-blur-sm">
+                <span
+                  className={cn(
+                    'inline-flex items-center rounded-sm px-2.5 py-1 text-[11px] font-medium tracking-wide backdrop-blur-sm',
+                    asset
+                      ? 'bg-black/45 text-white'
+                      : 'border border-border bg-background/70 text-muted-foreground',
+                  )}
+                >
                   {imageRoleLabels[role]}
                 </span>
               </div>
 
               {/* 右下：クレジット */}
-              {asset.credit && (
+              {asset?.credit && (
                 <div className="absolute bottom-3 right-4 z-20 rounded-sm bg-black/30 px-1.5 py-0.5 text-[10px] text-white/80 backdrop-blur-sm">
                   {uiText.common.credit}: {asset.credit}
                   {asset.sourceUrl && (
