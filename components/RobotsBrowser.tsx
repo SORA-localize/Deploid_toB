@@ -171,7 +171,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 mb-5 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 mb-5 sm:grid-cols-2 xl:grid-cols-4 max-w-4xl">
           <SelectControl
             id="robot-industry"
             label={uiText.filters.industry}
