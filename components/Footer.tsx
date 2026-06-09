@@ -24,7 +24,7 @@ export function Footer() {
           </Link>
 
           <nav
-            className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground"
+            className="flex flex-wrap gap-x-5 gap-y-3 text-xs text-muted-foreground"
             aria-label="フッターナビゲーション"
           >
             {footerNavItems.map((item) => (

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Popover as PopoverPrimitive } from 'radix-ui';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { Manufacturer, Robot } from '@/data/types';
 import {
@@ -20,19 +20,8 @@ interface ManufacturerCardProps {
 }
 
 export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const consultationRoute = getManufacturerConsultationRoute(manufacturer);
   const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
-
-  useEffect(() => {
-    if (!isMenuOpen) return;
-    function onPointerDown(event: PointerEvent) {
-      if (event.target instanceof Element && event.target.closest('[data-distributor-menu]')) return;
-      setIsMenuOpen(false);
-    }
-    document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
-  }, [isMenuOpen]);
 
   return (
     <div className="card-data relative overflow-hidden">
@@ -88,7 +77,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
           <div className="flex justify-between py-1.5">
             <span className="text-muted-foreground">国内代理店</span>
             {domesticDistributor.hasDistributor ? (
-              <div className="relative ml-2 sm:ml-4text-right pointer-events-auto" data-distributor-menu>
+              <div className="pointer-events-auto ml-2 sm:ml-4 text-right">
                 {domesticDistributor.distributors.length === 1 ? (
                   domesticDistributor.distributors[0].website ? (
                     <a
@@ -105,20 +94,20 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
                     </span>
                   )
                 ) : (
-                  <>
-                    <button
-                      type="button"
-                      aria-expanded={isMenuOpen}
-                      aria-haspopup="menu"
-                      className="text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
-                      onClick={() => setIsMenuOpen((v) => !v)}
-                    >
-                      {domesticDistributor.label}
-                    </button>
-                    {isMenuOpen && domesticDistributor.distributors.length > 1 && (
-                      <div
-                        className="absolute right-0 top-6 z-10 min-w-44 border border-border bg-popover text-popover-foreground p-2 text-left shadow-sm"
-                        role="menu"
+                  <PopoverPrimitive.Root>
+                    <PopoverPrimitive.Trigger asChild>
+                      <button
+                        type="button"
+                        className="text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
+                      >
+                        {domesticDistributor.label}
+                      </button>
+                    </PopoverPrimitive.Trigger>
+                    <PopoverPrimitive.Portal>
+                      <PopoverPrimitive.Content
+                        align="end"
+                        sideOffset={4}
+                        className="z-[var(--z-dropdown)] min-w-44 border border-border bg-popover text-popover-foreground p-2 shadow-sm"
                       >
                         {domesticDistributor.distributors.map((distributor) =>
                           distributor.website ? (
@@ -127,30 +116,25 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
                               href={distributor.website}
                               target="_blank"
                               rel="noopener noreferrer"
-                              role="menuitem"
                               className="block py-1 text-xs font-normal text-foreground hover:text-muted-foreground"
                             >
                               {distributor.name}
                             </a>
                           ) : (
-                            <div
-                              key={distributor.name}
-                              role="menuitem"
-                              className="py-1 text-xs font-normal text-foreground"
-                            >
+                            <div key={distributor.name} className="py-1 text-xs font-normal text-foreground">
                               {distributor.name}
                             </div>
                           ),
                         )}
-                      </div>
-                    )}
-                  </>
+                      </PopoverPrimitive.Content>
+                    </PopoverPrimitive.Portal>
+                  </PopoverPrimitive.Root>
                 )}
               </div>
             ) : (
               <Link
                 href="/contact"
-                className="pointer-events-auto ml-2 sm:ml-4text-right text-xs font-normal text-accent-blue-pale hover:text-accent-blue-pale-hover"
+                className="pointer-events-auto ml-2 sm:ml-4 text-right text-xs font-normal text-accent-blue-pale hover:text-accent-blue-pale-hover"
               >
                 {domesticDistributor.label}
               </Link>
