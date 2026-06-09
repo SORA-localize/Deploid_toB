@@ -199,7 +199,7 @@
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
   --radius-2xl: calc(var(--radius) * 1.8);
-  /* z-index 階層（Tailwind v4 は --z-* を utility 自動生成しないため、z-[var(--z-*)] で参照） */
+  /* z-index 階層（Tailwind v4 は --z-* を utility 自動生成しないため、z-[var(--z-header)] 形式で参照） */
   --z-overlay:  38;
   --z-header:   40;
   --z-dropdown: 50;
