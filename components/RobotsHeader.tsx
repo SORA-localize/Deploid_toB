@@ -34,16 +34,15 @@ export function RobotsHeader({
   return (
     <ContextualPageHeader activeChips={activeChips}>
       {isCrossReleaseMode ? (
-        <div className="flex flex-wrap items-center gap-2" aria-label={uiText.robots.crossReleaseCountsAria}>
-          <span className="border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground">
-            {uiText.robots.activeModels(activeCount)}
-          </span>
-          <span className="border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground">
-            {uiText.robots.preReleaseModels(preCount)}
-          </span>
-          <span className="w-full text-xs text-muted-foreground sm:w-auto">
-            {uiText.robots.filteredAcrossRelease}
-          </span>
+        <div className="flex flex-wrap gap-0" aria-label={uiText.robots.crossReleaseCountsAria}>
+          {tabs.map((tab) => (
+            <span
+              key={tab.value}
+              className="px-4 py-2 text-sm font-medium border-b-2 -mb-px border-transparent text-muted-foreground"
+            >
+              {tab.label}
+            </span>
+          ))}
         </div>
       ) : (
         <PageTabBar
