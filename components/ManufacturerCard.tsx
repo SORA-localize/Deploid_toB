@@ -58,19 +58,19 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
         <div className="space-y-2 text-xs mb-6">
           <div className="flex justify-between py-1.5 border-b border-border">
             <span className="text-muted-foreground">設立</span>
-            <span className="ml-4 text-right text-foreground">
+            <span className="ml-2 sm:ml-4 text-right text-foreground">
               {getManufacturerEstablishedRegionLabel(manufacturer)}
             </span>
           </div>
           <div className="flex justify-between py-1.5 border-b border-border">
             <span className="text-muted-foreground">代表ロボット</span>
-            <span className="ml-4 truncate text-right text-foreground">
+            <span className="ml-2 sm:ml-4 truncate text-right text-foreground">
               {getRepresentativeRobotLabel(robots)}
             </span>
           </div>
           <div className="flex justify-between py-1.5 border-b border-border">
             <span className="text-muted-foreground">相談ルート</span>
-            <span className="ml-4 text-right text-foreground">
+            <span className="ml-2 sm:ml-4 text-right text-foreground">
               {manufacturerConsultationRouteLabels[consultationRoute]}
             </span>
           </div>

@@ -74,7 +74,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           <div className="text-xs text-muted-foreground font-medium mb-3">
             {guide.topics[0] ? getTagLabel(guide.topics[0], 'guide-topic') : null}
           </div>
-          <h1 className="text-3xl font-semibold text-foreground mb-4 leading-tight max-w-4xl">
+          <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-4 leading-tight max-w-4xl">
             {guide.titleJa ?? guide.title}
           </h1>
           <p className="text-sm text-foreground/80 leading-relaxed max-w-3xl mb-5">{guide.summary}</p>

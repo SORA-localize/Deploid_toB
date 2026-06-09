@@ -109,7 +109,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
             {/* #decision ── バイヤー向け情報を上位に */}
             <div id="decision" className="mt-6 py-8 border-b border-border scroll-mt-site-header">
-              <h2 className="text-base font-semibold text-foreground mb-4">導入判断</h2>
+              <h2 className="text-lg font-semibold text-foreground mb-4">導入判断</h2>
               <div className="overflow-x-auto">
                 <table className="w-full max-w-3xl min-w-[320px] text-xs">
                   <tbody className="divide-y divide-border">
@@ -143,7 +143,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
             {/* #applications */}
             <div id="applications" className="py-8 border-b border-border scroll-mt-site-header">
-              <h2 className="text-base font-semibold text-foreground mb-4">
+              <h2 className="text-lg font-semibold text-foreground mb-4">
                 {uiText.robots.applications}
               </h2>
               <div className="space-y-4">
@@ -213,7 +213,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
             {/* #specs */}
             <div id="specs" className="py-8 border-b border-border scroll-mt-site-header">
-              <h2 className="text-base font-semibold text-foreground mb-4">
+              <h2 className="text-lg font-semibold text-foreground mb-4">
                 {uiText.robots.technicalSpecifications}
               </h2>
               <div className="overflow-x-auto">
