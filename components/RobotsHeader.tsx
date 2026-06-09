@@ -38,7 +38,7 @@ export function RobotsHeader({
           {tabs.map((tab) => (
             <span
               key={tab.value}
-              className="px-4 py-2 text-sm font-medium border-b-2 -mb-px border-transparent text-muted-foreground"
+              className="px-4 py-2 text-sm font-medium border-b-2 -mb-px cursor-default select-none border-border/60 text-muted-foreground"
             >
               {tab.label}
             </span>
