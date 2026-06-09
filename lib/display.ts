@@ -6,6 +6,7 @@ import type {
   JapanAvailability,
   JapanPresence,
   Manufacturer,
+  ReportSection,
   ReportType,
   Robot,
   RobotCategory,
@@ -86,6 +87,15 @@ export const reportTypeOrder: ReportType[] = [
   'news-brief',
   'tech-update',
   'market-analysis',
+];
+
+/** 記事タブ（section）の表示順。完全性は reportSectionLabels(Record) と validate の diff で担保。 */
+export const reportSectionOrder: ReportSection[] = [
+  'deployment',
+  'business',
+  'tech',
+  'policy',
+  'entertainment',
 ];
 
 const preReleaseDeploymentStages: DeploymentStage[] = ['concept', 'prototype'];
