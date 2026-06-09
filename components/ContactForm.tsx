@@ -4,6 +4,8 @@ import type { FormEvent } from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 import { contactInquiryTypeOptions } from '@/lib/labels';
 import { FormSelect } from '@/components/FormSelect';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { uiText } from '@/lib/uiText';
 import { env } from '@/lib/env';
 import { cn } from '@/lib/utils';
@@ -46,23 +48,21 @@ export function ContactForm() {
             <label htmlFor="name" className="block text-xs font-medium text-foreground mb-2">
               {uiText.contact.name}
             </label>
-            <input
+            <Input
               id="name"
               type="text"
               name="name"
-              className="w-full px-3 py-2 border border-border bg-input-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring"
             />
           </div>
           <div>
             <label htmlFor="company" className="block text-xs font-medium text-foreground mb-2">
               {uiText.contact.company} <span className="text-muted-foreground/70">{uiText.contact.required}</span>
             </label>
-            <input
+            <Input
               id="company"
               type="text"
               name="company"
               required
-              className="w-full px-3 py-2 border border-border bg-input-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring"
             />
           </div>
         </div>
@@ -71,12 +71,11 @@ export function ContactForm() {
           <label htmlFor="email" className="block text-xs font-medium text-foreground mb-2">
             {uiText.contact.email} <span className="text-muted-foreground/70">{uiText.contact.required}</span>
           </label>
-          <input
+          <Input
             id="email"
             type="email"
             name="email"
             required
-            className="w-full px-3 py-2 border border-border bg-input-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring"
           />
           <ValidationError prefix="Email" field="email" errors={state.errors} className="mt-1 text-xs text-tone-danger-text" />
         </div>
@@ -93,12 +92,11 @@ export function ContactForm() {
           <label htmlFor="message" className="block text-xs font-medium text-foreground mb-2">
             {uiText.contact.message} <span className="text-muted-foreground/70">{uiText.contact.required}</span>
           </label>
-          <textarea
+          <Textarea
             id="message"
             name="message"
             rows={6}
             required
-            className="w-full px-3 py-2 border border-border bg-input-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring"
           />
           <ValidationError prefix="Message" field="message" errors={state.errors} className="mt-1 text-xs text-tone-danger-text" />
         </div>
@@ -108,7 +106,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={!formEnabled || state.submitting}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+          className="inline-flex items-center gap-2 rounded-md px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
         >
           {!formEnabled ? uiText.contact.setupPending : state.submitting ? uiText.contact.submitting : uiText.contact.submit}
         </button>

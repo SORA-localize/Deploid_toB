@@ -24,6 +24,12 @@ export const uiText = {
     results: (count: number, filtered: boolean) =>
       filtered ? `${count}件（絞り込み中）` : `${count}件`,
   },
+  controls: {
+    clearSearch: '検索をクリア',
+    dropdownEmpty: '該当する選択肢がありません',
+    dropdownSearchAria: (label: string) => `${label}の選択肢を検索`,
+    dropdownSearchPlaceholder: (label: string) => `${label}を検索`,
+  },
   searchPlaceholders: {
     robots: 'ロボット名・メーカー・用途キーワードで検索',
     manufacturers: 'メーカー名・地域・取扱ロボットで検索',
