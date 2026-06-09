@@ -88,7 +88,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               />
             </Link>
           )}
-          <h1 className="text-3xl font-semibold text-foreground mb-3">
+          <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">
             {robot.nameJa ?? robot.name}
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -109,7 +109,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
             {/* #decision ── バイヤー向け情報を上位に */}
             <div id="decision" className="mt-8 py-8 border-b border-border scroll-mt-site-header">
-              <h2 className="text-sm font-semibold text-foreground mb-4">導入判断</h2>
+              <h2 className="text-base font-semibold text-foreground mb-4">導入判断</h2>
               <table className="w-full text-xs">
                 <tbody className="divide-y divide-border">
                   {decisionRows.map((row) => (
@@ -128,7 +128,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
             {/* #applications */}
             <div id="applications" className="py-8 border-b border-border scroll-mt-site-header">
-              <h2 className="text-sm font-semibold text-foreground mb-4">
+              <h2 className="text-base font-semibold text-foreground mb-4">
                 {uiText.robots.applications}
               </h2>
               <div className="space-y-4">
@@ -198,7 +198,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
             {/* #specs */}
             <div id="specs" className="py-8 border-b border-border scroll-mt-site-header">
-              <h2 className="text-sm font-semibold text-foreground mb-4">
+              <h2 className="text-base font-semibold text-foreground mb-4">
                 {uiText.robots.technicalSpecifications}
               </h2>
               <table className="w-full text-xs">

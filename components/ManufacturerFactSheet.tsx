@@ -113,7 +113,7 @@ export function ManufacturerFactSheet({ manufacturer, robotCount }: Manufacturer
           <p className="mb-2 text-xs font-medium text-muted-foreground">
             {uiText.manufacturers.companySummary}
           </p>
-          <h2 className="text-2xl font-semibold text-foreground">
+          <h2 className="text-xl font-semibold text-foreground">
             {uiText.manufacturers.factSheet}
           </h2>
         </div>

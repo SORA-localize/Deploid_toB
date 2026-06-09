@@ -163,7 +163,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             {/* 関連リンク */}
             {hasRelated && (
               <div id="related" className="scroll-mt-site-header border border-border bg-card p-6">
-                <h2 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
+                <h2 className="mb-4 border-b border-border pb-2 text-base font-semibold text-foreground">
                   関連
                 </h2>
                 <div className="space-y-2">

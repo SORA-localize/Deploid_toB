@@ -30,7 +30,7 @@ export function ManufacturerDetailSection({
           {eyebrow && (
             <p className="mb-2 text-xs font-medium text-muted-foreground">{eyebrow}</p>
           )}
-          <h2 className="text-2xl font-semibold text-foreground">{title}</h2>
+          <h2 className="text-xl font-semibold text-foreground">{title}</h2>
           {description && (
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{description}</p>
           )}
