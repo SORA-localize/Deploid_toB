@@ -88,7 +88,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
           <div className="flex justify-between py-1.5">
             <span className="text-muted-foreground">国内代理店</span>
             {domesticDistributor.hasDistributor ? (
-              <div className="relative ml-4 text-right pointer-events-auto" data-distributor-menu>
+              <div className="relative ml-2 sm:ml-4text-right pointer-events-auto" data-distributor-menu>
                 {domesticDistributor.distributors.length === 1 ? (
                   domesticDistributor.distributors[0].website ? (
                     <a
@@ -150,7 +150,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
             ) : (
               <Link
                 href="/contact"
-                className="pointer-events-auto ml-4 text-right text-xs font-normal text-accent-blue-pale hover:text-accent-blue-pale-hover"
+                className="pointer-events-auto ml-2 sm:ml-4text-right text-xs font-normal text-accent-blue-pale hover:text-accent-blue-pale-hover"
               >
                 {domesticDistributor.label}
               </Link>

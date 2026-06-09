@@ -373,10 +373,10 @@
 
   /* カタログ・業務系カード（ロボット・メーカー・ガイド・ユースケース） */
   .card-data {
-    @apply border border-border bg-card transition-colors duration-200;
+    @apply border border-border bg-card transition-[border-color,box-shadow] duration-200;
   }
   .card-data:hover {
-    @apply border-ring;
+    @apply border-ring shadow-sm;
   }
 
   /* 記事・メディア系カード（NewsCard） */
