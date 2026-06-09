@@ -64,7 +64,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
   // 画像が1枚も無い場合はカルーセルにせず単一プレースホルダー
   if (!hasAnyImage) {
     return (
-      <div className="relative h-[420px] w-full overflow-hidden rounded-xl border border-border bg-muted">
+      <div className="relative h-[280px] sm:h-[360px] md:h-[420px] w-full overflow-hidden rounded-xl border border-border bg-muted">
         <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
           <CameraOff className="mb-3 h-10 w-10 opacity-20" />
           <span className="text-[11px] font-medium uppercase tracking-[0.2em] opacity-60">
@@ -79,7 +79,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
 
   return (
     <div className="group/carousel relative w-full overflow-hidden rounded-xl border border-border bg-muted/30">
-      <Carousel options={{ loop: hasMultiple }} className="h-[420px] w-full">
+      <Carousel options={{ loop: hasMultiple }} className="h-[280px] sm:h-[360px] md:h-[420px] w-full">
         {hasMultiple && <SlotIndicators count={slides.length} />}
 
         <SliderContainer

@@ -52,7 +52,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
               { label: useCase.titleJa ?? useCase.title },
             ]}
           />
-          <h1 className="text-3xl font-semibold text-foreground mb-4 leading-tight">
+          <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-4 leading-tight">
             {useCase.titleJa ?? useCase.title}
           </h1>
           <p className="text-sm text-foreground/80 leading-relaxed max-w-3xl mb-5">
@@ -80,7 +80,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
           </div>
 
           <div className="border border-border bg-muted p-5">
-            <h2 className="text-sm font-semibold text-foreground mb-4">
+            <h2 className="text-base font-semibold text-foreground mb-4">
               {uiText.useCases.atAGlance}
             </h2>
             <div className="grid grid-cols-1 gap-4 text-xs md:grid-cols-3">

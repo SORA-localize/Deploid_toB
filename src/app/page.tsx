@@ -99,8 +99,8 @@ export default function HomePage() {
       )}
 
       {latestReports.length > 0 && (
-        <section className="py-8 sm:py-12 border-b border-border">
-          <div className="flex items-end justify-between mb-5">
+        <section className="py-8 sm:py-10 border-b border-border">
+          <div className="flex items-end justify-between mb-4">
             <h2 className="text-2xl font-semibold text-foreground">最新記事</h2>
             <Link
               href="/reports"
@@ -119,8 +119,8 @@ export default function HomePage() {
       )}
 
       {featured && (
-        <section className="py-8 sm:py-12 border-b border-border">
-          <h2 className="text-2xl font-semibold text-foreground mb-5">注目の導入ガイド</h2>
+        <section className="py-8 sm:py-10 border-b border-border">
+          <h2 className="text-2xl font-semibold text-foreground mb-4">注目の導入ガイド</h2>
           <div className="border border-border bg-card">
             <div className="p-5 sm:p-6">
               <div className="flex justify-between items-start mb-4">
@@ -148,7 +148,7 @@ export default function HomePage() {
         </section>
       )}
 
-      <section className="py-8 sm:py-12">
+      <section className="py-8 sm:py-10">
         <div className="border border-border bg-card p-5 sm:p-6">
           <h2 className="text-xl font-semibold text-foreground mb-4">このサイトについて</h2>
           <p className="text-muted-foreground mb-6 max-w-3xl">

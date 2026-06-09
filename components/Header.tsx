@@ -41,7 +41,7 @@ export function Header() {
   }, [isMenuOpen]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background relative">
+    <header className="sticky top-0 z-[var(--z-header)] border-b border-border bg-background relative">
       <div className="site-container">
         <div className="flex h-16 items-center justify-between">
           <Link
@@ -106,13 +106,13 @@ export function Header() {
       {isMenuOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 lg:hidden"
+            className="fixed inset-0 z-[var(--z-overlay)] lg:hidden"
             aria-hidden="true"
             onClick={() => setIsMenuOpen(false)}
           />
           <nav
             id="site-mobile-navigation"
-            className="absolute top-full left-0 right-0 z-50 border-b border-border bg-background shadow-md lg:hidden"
+            className="absolute top-full left-0 right-0 z-[var(--z-dropdown)] border-b border-border bg-background shadow-md lg:hidden"
           >
             <div className="site-container grid grid-cols-2 gap-x-4 gap-y-1 py-3">
               {siteNavItems.map((item) => {

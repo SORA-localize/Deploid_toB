@@ -92,7 +92,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           <div className="mb-3 text-xs font-medium text-muted-foreground">
             {reportTypeLabels[report.type]}
           </div>
-          <h1 className="mb-4 max-w-4xl text-3xl font-semibold leading-tight text-foreground">
+          <h1 className="mb-4 max-w-4xl text-2xl md:text-3xl font-semibold leading-tight text-foreground">
             {report.titleJa ?? report.title}
           </h1>
           <p className="mb-5 max-w-3xl text-sm leading-relaxed text-foreground/80">
@@ -139,7 +139,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             {/* 要点（TL;DR） */}
             {hasTakeaways && (
               <div id="takeaways" className="scroll-mt-site-header border border-border bg-card p-6">
-                <h2 className="mb-4 text-base font-semibold text-foreground">
+                <h2 className="mb-4 text-lg font-semibold text-foreground">
                   {uiText.reports.keyTakeaways}
                 </h2>
                 <ul className="space-y-2.5 text-sm text-foreground/80">
@@ -163,7 +163,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             {/* 関連リンク */}
             {hasRelated && (
               <div id="related" className="scroll-mt-site-header border border-border bg-card p-6">
-                <h2 className="mb-4 border-b border-border pb-2 text-sm font-semibold text-foreground">
+                <h2 className="mb-4 border-b border-border pb-2 text-lg font-semibold text-foreground">
                   関連
                 </h2>
                 <div className="space-y-2">
