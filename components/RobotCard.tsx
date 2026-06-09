@@ -131,8 +131,18 @@ export function RobotCard({
           {(() => {
             const hero = getDisplayableAsset(robot.images?.hero ?? robot.heroImage);
             return hero ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={hero.src} alt={hero.alt} className="h-full w-full object-cover md:object-contain" />
+              <div className="relative h-full w-full">
+                {/* ぼかし背景: 余白をニュートラルに埋める（透過画像入手後は自動で消える） */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={hero.src}
+                  alt=""
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 h-full w-full scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={hero.src} alt={hero.alt} className="relative z-10 h-full w-full object-contain" />
+              </div>
             ) : (
               <>
                 <CameraOff className="w-8 h-8 mb-2 opacity-20" />
