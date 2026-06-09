@@ -108,7 +108,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
             </div>
 
             {/* #decision ── バイヤー向け情報を上位に */}
-            <div id="decision" className="mt-8 py-8 border-b border-border scroll-mt-site-header">
+            <div id="decision" className="mt-6 py-8 border-b border-border scroll-mt-site-header">
               <h2 className="text-base font-semibold text-foreground mb-4">導入判断</h2>
               <table className="w-full text-xs">
                 <tbody className="divide-y divide-border">
