@@ -309,10 +309,15 @@ export type ReportType =
   | 'tech-update'
   | 'market-analysis';
 
-export type ReportCategory =
-  | 'tech'
-  | 'business'
+/**
+ * 記事のサブジェクト（何の話か）＝記事タブの分類。
+ * type（フォーマット：どう書かれたか）とは独立した軸で、記事ごとに編集者が明示指定する。
+ * UI専用の 'all' は含めない（lib/reportSections.ts の ReportSectionFilter 側で付与）。
+ */
+export type ReportSection =
   | 'deployment'
+  | 'business'
+  | 'tech'
   | 'policy'
   | 'entertainment';
 
@@ -332,8 +337,8 @@ export interface Report extends BaseRecord {
   /** 記事本文（Markdown）。空ならレポート本文セクションは描画されない。 */
   body?: string;
   featured?: boolean;
-  /** タブ中レイヤー。未設定時は type から inferCategoryFromType で自動推定。 */
-  category?: ReportCategory;
+  /** 記事タブの分類（サブジェクト）。type とは独立した必須フィールド。 */
+  section: ReportSection;
   /** 目安読了時間（分）。未設定時は非表示。 */
   readingTimeMin?: number;
   relatedRobotSlugs: Slug[];

@@ -13,8 +13,10 @@ import {
   companyTypeOrder,
   japanAvailabilityOrder,
   manufacturerCountryOrder,
+  reportSectionOrder,
   robotCategoryOrder,
 } from './display.ts';
+import { reportSectionLabels } from './labels.ts';
 import { isRegisteredTag, normalizeTagKey, type TagKind } from './tagRegistry.ts';
 
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -169,6 +171,25 @@ export function validateData(): string[] {
     manufacturers.map((manufacturer) => manufacturer.companyStatus),
     companyStatusOrder,
   );
+  checkOrderCoverage('report.section', reports.map((report) => report.section), reportSectionOrder);
+
+  // section の完全性チェック：reportSectionLabels(Record で union 全値を要求＝完全集合) と
+  // reportSectionOrder(表示順) の双方向 diff。order 配列の追加漏れ・余剰を実データ非依存で検出する。
+  {
+    const labelKeys = Object.keys(reportSectionLabels);
+    const orderSet = new Set<string>(reportSectionOrder);
+    const labelSet = new Set<string>(labelKeys);
+    labelKeys.forEach((key) => {
+      if (!orderSet.has(key)) {
+        issues.push(`[section-order] reportSectionOrder に "${key}" がありません（ラベルは定義済み）`);
+      }
+    });
+    reportSectionOrder.forEach((value) => {
+      if (!labelSet.has(value)) {
+        issues.push(`[section-order] reportSectionLabels に "${value}" がありません（表示順に存在）`);
+      }
+    });
+  }
 
   for (const r of robots) {
     check('robot', r.slug, 'manufacturerSlug', r.manufacturerSlug, manufacturerSlugs);

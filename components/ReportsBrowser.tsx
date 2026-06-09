@@ -20,12 +20,12 @@ import {
 import { getReportIndexPlacementReports } from '@/lib/reportPlacements';
 import { createReportSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
-import { useActiveReportCategory } from '@/lib/useActiveReportCategory';
+import { useActiveReportSection } from '@/lib/useActiveReportSection';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 import { cn } from '@/lib/utils';
 
 export function ReportsBrowser({ reports }: { reports: Report[] }) {
-  const activeCategory = useActiveReportCategory();
+  const activeSection = useActiveReportSection();
   const { getParam, updateParams } = useUrlFilters();
 
   const sorted = useMemo(
@@ -48,9 +48,9 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
       filterReports({
         reports: sorted,
         searchDocuments,
-        filters: { type: 'all', category: activeCategory, topic: null, query: '' },
+        filters: { type: 'all', section: activeSection, topic: null, query: '' },
       }),
-    [sorted, searchDocuments, activeCategory],
+    [sorted, searchDocuments, activeSection],
   );
   const pageCount = getReportPageCount(gridReports.length);
   const activePage = useMemo(
@@ -79,7 +79,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
       <div>
 
         {/* ── ヒーロー + フィーチャー枠（すべてタブのみ） ── */}
-        {activeCategory === 'all' && heroReports.length > 0 && (
+        {activeSection === 'all' && heroReports.length > 0 && (
           <div className="site-container py-4">
             {/*
               表示対象は data/reportPlacements.ts の掲載枠で制御する。
