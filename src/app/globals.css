@@ -26,6 +26,7 @@
    ===================================================================== */
 :root {
   --header-h: 4rem;
+  --sticky-bar-h: 2.5rem; /* ContextualPageHeader の高さ (py-2×2 + text-sm 行) */
   --font-size: 16px;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
@@ -388,11 +389,11 @@
   }
 
   .scroll-mt-site-header {
-    scroll-margin-top: calc(var(--header-h) + 1.5rem);
+    scroll-margin-top: calc(var(--header-h) + var(--sticky-bar-h) + 0.5rem);
   }
 
   .top-site-header-gap {
-    top: calc(var(--header-h) + 1.5rem);
+    top: calc(var(--header-h) + var(--sticky-bar-h) + 0.5rem);
   }
 }
 

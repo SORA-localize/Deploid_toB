@@ -22,7 +22,7 @@ export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps)
 
   return (
     <aside className="hidden lg:block">
-      <div className="sticky top-[calc(var(--header-h)+3rem)] space-y-5">
+      <div className="sticky top-site-header-gap space-y-5">
 
         {/* 基本スペック */}
         <div>
