@@ -109,7 +109,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
           <SourceList
             sources={manufacturer.sources}
             className="scroll-mt-site-header"
-            titleClassName="text-sm font-semibold text-foreground mb-4"
+            titleClassName="text-lg font-semibold text-foreground mb-4"
           />
         </div>
       </div>

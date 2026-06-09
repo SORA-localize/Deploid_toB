@@ -107,7 +107,7 @@ export function ManufacturerFactSheet({ manufacturer, robotCount }: Manufacturer
   ];
 
   return (
-    <section id="facts" className="scroll-mt-site-header py-12 border-b border-border">
+    <section id="facts" className="scroll-mt-site-header py-8 border-b border-border">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="mb-2 text-xs font-medium text-muted-foreground">

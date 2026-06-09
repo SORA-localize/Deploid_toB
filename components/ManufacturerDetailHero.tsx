@@ -41,7 +41,7 @@ export function ManufacturerDetailHero({ manufacturer, robots }: ManufacturerDet
           <p className="mb-3 text-xs font-medium text-muted-foreground">
             {uiText.manufacturers.profile}
           </p>
-          <h1 className="mb-5 text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
+          <h1 className="mb-5 text-2xl font-semibold leading-tight text-foreground md:text-3xl">
             <ManufacturerLogoName
               name={name}
               logo={manufacturer.logo}
@@ -64,7 +64,7 @@ export function ManufacturerDetailHero({ manufacturer, robots }: ManufacturerDet
           </div>
         </div>
 
-        <aside className="self-start lg:sticky lg:top-site-header-gap lg:border-l lg:border-border lg:pl-6">
+        <aside className="mt-6 border-t border-border pt-6 self-start lg:mt-0 lg:border-t-0 lg:pt-0 lg:sticky lg:top-site-header-gap lg:border-l lg:border-border lg:pl-6">
           <p className="mb-4 text-sm font-semibold text-foreground">
             {uiText.manufacturers.contactPanel}
           </p>

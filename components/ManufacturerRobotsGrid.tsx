@@ -1,5 +1,6 @@
 'use client';
 
+import { EmptyState } from '@/components/EmptyState';
 import { RobotCard } from '@/components/RobotCard';
 import type { Robot, Manufacturer } from '@/data/types';
 
@@ -10,11 +11,7 @@ interface ManufacturerRobotsGridProps {
 
 export function ManufacturerRobotsGrid({ robots, manufacturer }: ManufacturerRobotsGridProps) {
   if (robots.length === 0) {
-    return (
-      <div className="border border-border bg-card p-8 text-center">
-        <p className="text-muted-foreground">このメーカーのロボット情報は準備中です</p>
-      </div>
-    );
+    return <EmptyState message="このメーカーのロボット情報は準備中です" />;
   }
 
   return (
