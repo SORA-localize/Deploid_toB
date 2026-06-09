@@ -14,6 +14,7 @@ import {
   getRobotFilterOptions,
   normalizeRobotFilters,
 } from '@/lib/robotFilters';
+import { normalizeSearchText } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 import { useFavorites } from '@/lib/useFavorites';
@@ -84,6 +85,13 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
     () => filterRobots({ robots, manufacturers, filters }),
     [robots, manufacturers, filters],
   );
+  const hasActiveFilters =
+    normalizeSearchText(filters.query) !== '' ||
+    filters.industry !== null ||
+    filters.task !== null ||
+    filters.manufacturer !== 'all' ||
+    filters.availability !== 'all';
+  const crossReleaseTotal = activeRobots.length + preReleaseRobots.length;
 
   const activeChips = useMemo(() => {
     const chips: import('@/components/ActiveFilterChips').ActiveFilterChip[] = [];
@@ -106,6 +114,36 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
     return chips;
   }, [filters, filterOptions, manufacturers, updateParams]);
 
+  const renderRobotGrid = (items: readonly Robot[]) => (
+    <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {items.map((robot) => {
+        const manufacturer = manufacturerBySlug.get(robot.manufacturerSlug);
+        return (
+          <RobotCard
+            key={robot.slug}
+            robot={robot}
+            manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+            manufacturerLogo={manufacturer?.logo}
+            showFavorite={true}
+            isFavorite={favorites.includes(robot.slug)}
+            onFavoriteToggle={toggleFavorite}
+          />
+        );
+      })}
+    </div>
+  );
+
+  const renderRobotSection = (title: string, items: readonly Robot[]) => {
+    if (items.length === 0) return null;
+    return (
+      <section className="space-y-3">
+        <h2 className="px-1 text-sm font-semibold text-foreground">
+          {title}
+        </h2>
+        {renderRobotGrid(items)}
+      </section>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -113,6 +151,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         activeCount={activeRobots.length}
         preCount={preReleaseRobots.length}
         activeChips={activeChips}
+        isCrossReleaseMode={hasActiveFilters}
       />
 
       <div className="site-container py-5 min-h-[60vh]">
@@ -164,29 +203,36 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           />
         </div>
 
-        {filtered.length === 0 ? (
+        {hasActiveFilters && (
+          <p className="mb-4 px-1 text-xs text-muted-foreground">
+            {uiText.common.results(crossReleaseTotal, true)}
+          </p>
+        )}
+
+        {hasActiveFilters ? (
+          crossReleaseTotal === 0 ? (
+            <EmptyState
+              message={uiText.emptyStates.robots}
+              variant="muted"
+              size="large"
+            />
+          ) : (
+            <div className="space-y-8">
+              {renderRobotSection(uiText.robots.activeSection(activeRobots.length), activeRobots)}
+              {renderRobotSection(
+                uiText.robots.preReleaseSection(preReleaseRobots.length),
+                preReleaseRobots,
+              )}
+            </div>
+          )
+        ) : filtered.length === 0 ? (
           <EmptyState
             message={uiText.emptyStates.robots}
             variant="muted"
             size="large"
           />
         ) : (
-          <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filtered.map((robot) => {
-              const manufacturer = manufacturerBySlug.get(robot.manufacturerSlug);
-              return (
-                <RobotCard
-                  key={robot.slug}
-                  robot={robot}
-                  manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
-                  manufacturerLogo={manufacturer?.logo}
-                  showFavorite={true}
-                  isFavorite={favorites.includes(robot.slug)}
-                  onFavoriteToggle={toggleFavorite}
-                />
-              );
-            })}
-          </div>
+          renderRobotGrid(filtered)
         )}
       </div>
     </div>
