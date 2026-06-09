@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Activity, ChevronLeft, ChevronRight, CircleDollarSign, MapPin, ShieldCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { RobotImageCarousel } from '@/components/RobotImageCarousel';
@@ -110,20 +110,35 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
             {/* #decision ── バイヤー向け情報を上位に */}
             <div id="decision" className="mt-6 py-8 border-b border-border scroll-mt-site-header">
               <h2 className="text-base font-semibold text-foreground mb-4">導入判断</h2>
-              <table className="w-full text-xs">
-                <tbody className="divide-y divide-border">
-                  {decisionRows.map((row) => (
-                    <tr key={row.label}>
-                      <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">
-                        {row.label}
-                      </td>
-                      <td className="py-3 text-foreground font-medium align-top">
-                        {row.value}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="overflow-x-auto">
+                <table className="w-full max-w-3xl min-w-[320px] text-xs">
+                  <tbody className="divide-y divide-border">
+                    {decisionRows.map((row) => {
+                      const LabelIcon =
+                        row.label === '導入段階' ? Activity :
+                        row.label === '日本での入手性' ? MapPin :
+                        row.label === '参考価格' ? CircleDollarSign :
+                        row.label === '安全性' ? ShieldCheck :
+                        null;
+                      return (
+                        <tr key={row.label}>
+                          <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">
+                            {LabelIcon ? (
+                              <span className="inline-flex items-center gap-1.5">
+                                <LabelIcon className="w-3 h-3 shrink-0 opacity-60" />
+                                {row.label}
+                              </span>
+                            ) : row.label}
+                          </td>
+                          <td className="py-3 text-foreground font-medium align-top break-words">
+                            {row.value}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* #applications */}
@@ -201,20 +216,22 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               <h2 className="text-base font-semibold text-foreground mb-4">
                 {uiText.robots.technicalSpecifications}
               </h2>
-              <table className="w-full text-xs">
-                <tbody className="divide-y divide-border">
-                  {specRows.map((row) => (
-                    <tr key={row.label}>
-                      <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">
-                        {row.label}
-                      </td>
-                      <td className="py-3 text-foreground font-medium align-top">
-                        {row.value}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="overflow-x-auto">
+                <table className="w-full max-w-3xl min-w-[320px] text-xs">
+                  <tbody className="divide-y divide-border">
+                    {specRows.map((row) => (
+                      <tr key={row.label}>
+                        <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">
+                          {row.label}
+                        </td>
+                        <td className="py-3 text-foreground font-medium align-top break-words">
+                          {row.value}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* #sources */}
