@@ -29,11 +29,11 @@
   --font-size: 16px;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --background: var(--slate-1);
+  --background: var(--slate-2);
   --foreground: var(--slate-12);
-  --card: #ffffff;
+  --card: var(--slate-1);
   --card-foreground: var(--slate-12);
-  --popover: #ffffff;
+  --popover: var(--slate-1);
   --popover-foreground: var(--slate-12);
   --primary: var(--jade-9);
   --primary-foreground: #ffffff;
@@ -49,7 +49,7 @@
   --destructive-foreground: #ffffff;
   --border: var(--slate-6);
   --input: var(--slate-7);
-  --input-background: #ffffff;
+  --input-background: var(--slate-1);
   --ring: var(--jade-8);
   --radius: 0.625rem;
   --chart-1: var(--jade-9);
@@ -66,9 +66,9 @@
   --sidebar-border: var(--slate-6);
   --sidebar-ring: var(--jade-8);
 
-  --surface-subtle: var(--slate-2);
-  --surface-inset: var(--slate-3);
-  --surface-raised: #ffffff;
+  --surface-subtle: var(--slate-3);
+  --surface-inset: var(--slate-4);
+  --surface-raised: var(--slate-1);
   --border-subtle: var(--slate-5);
   --border-strong: var(--slate-8);
   --brand: var(--jade-9);

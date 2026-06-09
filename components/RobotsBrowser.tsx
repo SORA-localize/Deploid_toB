@@ -153,6 +153,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             value={filters.manufacturer}
             onChange={(v) => updateParams({ manufacturer: v === 'all' ? null : v })}
             options={manufacturerOptions}
+            searchable
           />
           <SelectControl
             id="robot-availability"
