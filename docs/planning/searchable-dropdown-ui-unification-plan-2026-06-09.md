@@ -71,8 +71,8 @@ These decisions must be treated as fixed inputs before implementation starts.
 |---|---|---|
 | Select implementation | Keep `components/ui/select.tsx` and Radix `Select` for non-searchable finite selects. Add searchable dropdown as opt-in only. | Avoid throwing away Radix keyboard, portal, and ARIA behavior for small/simple selects. |
 | `SelectControl` migration | Add a `searchable` path or separate searchable wrapper; do not convert all current `SelectControl` usages blindly. | Some filters have few options and do not need a searchable overlay. |
-| First searchable candidates | Start with high-option filters only, especially manufacturer-like lists. Leave low-option filters on Radix select. | Search adds value mainly when scanning long lists. |
-| `FormSelect` | Keep native `<select>` in this experiment. Only normalize visual tokens/radius if needed. | Native `name`, `defaultValue`, `required`, disabled fieldset behavior, and browser validation are safer for Formspree. |
+| First searchable candidates | Start with `/robots` manufacturer filter only. Other filters can opt in later only if they have 8 or more options and the isolated keyboard/focus/overlay checks have passed. | Search adds value mainly when scanning long lists, and one initial candidate keeps regression scope small. |
+| `FormSelect` / `/contact` | Keep native `<select>` in this experiment. Do not implement `SearchableDropdown` on the inquiry/contact form. Only normalize visual tokens/radius if needed. | Native `name`, `defaultValue`, `required`, disabled fieldset behavior, and browser validation are safer for Formspree. The inquiry type has only a small option set and does not need search. |
 | Control radius | Use `rounded-md` for interactive controls unless a component has a documented exception. Data cards remain rectangular. | Keeps controls modern without drifting into rounded marketing UI. |
 | Dropdown search matching | Match `label`, optional `description`, and optional `keywords` when supplied. | Allows useful search without duplicating business logic in the UI component. |
 | Few-option controls | Controls with fewer than 8 options stay non-searchable unless explicitly marked searchable. | Avoids unnecessary complexity and motion on simple filters. |
@@ -84,7 +84,7 @@ The SmoothUI `searchable-dropdown` code is a useful reference, but it must be ad
 
 Required changes:
 
-- Make the component controlled: `value`, `onValueChange`, and optional `defaultValue`.
+- Make the component controlled for this experiment: `value` and `onValueChange` are required. Do not add `defaultValue` in this pass.
 - Do not store selected item as the only source of truth inside the component.
 - Generate unique ARIA ids with `useId()` instead of fixed ids like `dropdown-items`.
 - Match the existing option shape used by `SelectControlOption`.
@@ -140,6 +140,7 @@ New or updated primitives:
   - Reusable controlled dropdown for finite option sets.
   - Inspired by SmoothUI, adapted to local tokens and accessibility requirements.
   - Accepts `items`, `value`, `onValueChange`, `placeholder`, `searchPlaceholder`, `emptyMessage`, `clearSearchLabel`, `className`.
+  - Does not accept `defaultValue` in this experiment; URL-backed filters use controlled state only.
   - Does not provide English user-facing defaults.
 
 - `components/ui/textarea.tsx`
@@ -162,7 +163,8 @@ Existing wrappers:
 - `components/FormSelect.tsx`
   - Keep native `<select>` in this experiment.
   - Normalize visual styling only if needed.
-  - Do not replace with `SearchableDropdown` unless native form validation, `name`, `defaultValue`, `required`, disabled fieldset behavior, initial value sync, and Formspree payload verification are explicitly implemented.
+  - Do not use `SearchableDropdown` on `/contact` in this experiment.
+  - Do not replace with a custom dropdown unless a future plan explicitly implements native form validation, `name`, `defaultValue`, `required`, disabled fieldset behavior, initial value sync, and Formspree payload verification.
 
 ## Scope
 
@@ -181,6 +183,7 @@ Do not do in this experiment:
 - Replace the whole shadcn/Radix setup.
 - Replace every Radix `Select` usage with a custom dropdown.
 - Replace native `FormSelect` during this experiment.
+- Add searchable dropdown behavior to `/contact`.
 - Remove full-text catalog search from listing pages.
 - Add unrelated animation libraries.
 - Change URL parameter names or filter semantics.
@@ -226,7 +229,7 @@ Do not do in this experiment:
 1. Keep the existing Radix `SelectControl` behavior as the default.
 2. Add a searchable path only through an explicit prop or a separate wrapper.
 3. Preserve the current `SelectControlOption` type and public props.
-4. First candidates are high-option filters only. Low-option filters remain Radix select.
+4. First candidate is only the `/robots` manufacturer filter. Low-option filters remain Radix select.
 5. Verify current URL filter pages require no caller changes unless a searchable opt-in prop is intentionally added:
    - `components/RobotsBrowser.tsx`
    - `components/ManufacturersBrowser.tsx`
