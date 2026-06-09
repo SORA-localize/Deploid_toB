@@ -49,15 +49,17 @@ export function useHeaderStickyBarSetter() {
 export function HeaderStickyBarSlot() {
   const stickyBar = useHeaderStickyBar();
   const visible = stickyBar?.visible ?? false;
-  const [mounted, setMounted] = useState(visible);
+  const [mounted, setMounted] = useState(false);
+  const [showing, setShowing] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setMounted(true);
-      return;
+      // One rAF: let browser paint the element at opacity-0 first, then trigger enter transition.
+      const raf = requestAnimationFrame(() => setShowing(true));
+      return () => cancelAnimationFrame(raf);
     }
-
-    // Keep the node around slightly longer than duration-300 so the exit transition can finish.
+    setShowing(false);
     const timer = window.setTimeout(() => setMounted(false), EXIT_DURATION_MS);
     return () => window.clearTimeout(timer);
   }, [visible]);
@@ -66,10 +68,10 @@ export function HeaderStickyBarSlot() {
 
   return (
     <div
-      aria-hidden={!visible}
-      inert={!visible ? true : undefined}
+      aria-hidden={!showing}
+      inert={!showing ? true : undefined}
       className={`absolute inset-x-0 top-full border-b border-border bg-background transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
-        visible ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-3 opacity-0'
+        showing ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'
       }`}
     >
       {stickyBar.content}
