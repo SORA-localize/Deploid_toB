@@ -214,7 +214,7 @@ ls node_modules/.bin/tsc   # → 存在
 | 22 | ドロップダウン focus trap/Escape なし | **ManufacturerCard の自前メニュー限定**（`:27-35,109-147`）。searchable-dropdown/Select は Radix で完備 |
 | 23 | Breadcrumbs gap モバイルで詰まる | `Breadcrumbs.tsx:16` `gap-2`（sm 分岐なし＝事実） |
 | 24 | ActiveFilterChips モバイル乱れ | `ActiveFilterChips.tsx:19` `flex flex-wrap items-center gap-2`（事実） |
-| 25 | z-index 競合 | `Header.tsx:44` z-40・`:115` z-50。全体で z-10(13回)/z-20(7)/z-30(3)/z-40(4)/z-50(5)。トークン化なし。**Tailwind v4 `@theme inline` に `--z-*` を置いても z-utility は自動生成されない（色/spacing 等の namespace のみ）。`z-[var(--z-*)]` 参照になる**点に注意（A7 の前提に補足必要） |
+| 25 | z-index 競合 | `Header.tsx:44` z-40・`:115` z-50。全体で z-10(13回)/z-20(7)/z-30(3)/z-40(4)/z-50(5)。トークン化なし。**Tailwind v4 `@theme inline` に `--z-*` を置いても z-utility は自動生成されない（色/spacing 等の namespace のみ）。`z-[var(--z-header)]` 形式で参照する**点に注意（A7 の前提に補足必要） |
 
 ---
 

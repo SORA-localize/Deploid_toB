@@ -1,0 +1,3 @@
+# Excluded from Tailwind v4 / oxide scanner (crates/ignore respects this file)
+# docs/ contains markdown with class-name-like patterns that would generate invalid CSS utilities
+docs/
