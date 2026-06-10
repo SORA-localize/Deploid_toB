@@ -47,7 +47,7 @@ import { useUrlFilters } from '@/lib/useUrlFilters';
 import { useFavorites } from '@/lib/useFavorites';
 import { cn } from '@/lib/utils';
 
-const MAX_COMPARE_ROBOTS = 9;
+const MAX_COMPARE_ROBOTS = 20;
 const SHEET_LAYOUT_TRANSITION = { type: 'spring', stiffness: 360, damping: 34 } as const;
 
 interface CompareClientProps {
