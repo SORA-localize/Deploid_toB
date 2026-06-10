@@ -10,16 +10,16 @@ interface PageListHeaderProps {
 
 export function PageListHeader({ title, description, className = 'mb-5', action }: PageListHeaderProps) {
   return (
-    <div className={cn('flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-6', className)}>
-      <div className="min-w-0 flex-1">
-        <h1 className="text-2xl font-semibold text-foreground mb-2">{title}</h1>
-        <p className="text-sm text-muted-foreground max-w-3xl leading-relaxed">{description}</p>
+    <div className={className}>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-6 mb-2">
+        <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
+        {action && (
+          <div className="shrink-0 w-full sm:w-96">
+            {action}
+          </div>
+        )}
       </div>
-      {action && (
-        <div className="shrink-0 w-full sm:w-96">
-          {action}
-        </div>
-      )}
+      <p className="text-sm text-muted-foreground max-w-3xl leading-relaxed">{description}</p>
     </div>
   );
 }
