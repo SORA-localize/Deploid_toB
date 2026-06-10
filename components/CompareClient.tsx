@@ -555,11 +555,11 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   <div
                     ref={setNodeRef}
                     className={cn(
-                      'border border-border bg-transparent transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
+                      'border border-border bg-card transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
                       isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                     )}
                   >
-                    <div className="px-4 py-3 border-b border-border-subtle bg-transparent flex items-center gap-2">
+                    <div className="px-4 py-3 border-b border-border-subtle flex items-center gap-2">
                       <Star className="w-4 h-4 text-favorite" />
                       <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {uiText.compare.favorites}

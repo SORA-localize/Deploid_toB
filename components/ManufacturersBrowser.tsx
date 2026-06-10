@@ -92,7 +92,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 mb-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 mb-5 sm:grid-cols-2 max-w-2xl">
           <SelectControl
             id="manufacturer-country"
             label={uiText.filters.region}
