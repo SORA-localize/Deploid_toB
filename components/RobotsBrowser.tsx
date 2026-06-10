@@ -157,15 +157,17 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
 
       <div className="site-container py-5 min-h-[60vh]">
         <Breadcrumbs items={[{ label: uiText.robots.breadcrumb }]} />
-        <PageListHeader title={uiText.robots.title} description={uiText.robots.description} />
-
-        <div className="mb-4 max-w-2xl">
-          <SearchInput
-            value={filters.query}
-            onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
-            placeholder={uiText.searchPlaceholders.robots}
-          />
-        </div>
+        <PageListHeader
+          title={uiText.robots.title}
+          description={uiText.robots.description}
+          action={
+            <SearchInput
+              value={filters.query}
+              onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
+              placeholder={uiText.searchPlaceholders.robots}
+            />
+          }
+        />
 
         <div className="grid grid-cols-1 gap-4 mb-5 sm:grid-cols-2 xl:grid-cols-4 max-w-4xl">
           <SelectControl
