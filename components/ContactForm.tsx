@@ -103,13 +103,22 @@ export function ContactForm() {
 
         <ValidationError errors={state.errors} className="text-xs text-tone-danger-text" />
 
-        <button
-          type="submit"
-          disabled={!formEnabled || state.submitting}
-          className="inline-flex items-center gap-2 rounded-md px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
-        >
-          {!formEnabled ? uiText.contact.setupPending : state.submitting ? uiText.contact.submitting : uiText.contact.submit}
-        </button>
+        <div className="flex flex-col gap-3">
+          <button
+            type="submit"
+            disabled={!formEnabled || state.submitting}
+            className="inline-flex items-center gap-2 rounded-md px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm w-fit"
+          >
+            {!formEnabled ? uiText.contact.setupPending : state.submitting ? uiText.contact.submitting : uiText.contact.submit}
+          </button>
+          <p className="text-xs text-muted-foreground">
+            送信により
+            <a href="/privacy" className="underline underline-offset-2 hover:text-foreground transition-colors mx-0.5">
+              プライバシーポリシー
+            </a>
+            に同意したものとみなします。
+          </p>
+        </div>
       </fieldset>
     </form>
   );

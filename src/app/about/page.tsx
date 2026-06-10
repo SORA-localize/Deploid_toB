@@ -81,10 +81,74 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <section className="py-8 border-b border-border">
+        <h2 className="text-xl font-semibold text-foreground mb-6">運営者情報</h2>
+        <dl className="divide-y divide-border">
+          {[
+            { label: '運営者', value: '桑島壮平' },
+            { label: '連絡先', value: 'sohei@deploid.net' },
+            { label: '公開開始', value: '2026年6月' },
+          ].map(({ label, value }) => (
+            <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
+              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">{label}</dt>
+              <dd className="text-sm text-foreground">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <section className="py-8 border-b border-border">
+        <h2 className="text-xl font-semibold text-foreground mb-6">出典・信頼度ポリシー</h2>
+        <p className="text-sm text-muted-foreground mb-6 max-w-3xl leading-relaxed">
+          各ロボット・メーカーのデータには、情報源の種別と確認日を記録しています。AIによる推測値をそのまま事実として掲載しません。
+        </p>
+        <dl className="divide-y divide-border">
+          {[
+            { label: 'official', title: '公式発表', body: 'メーカー公式サイト・プレスリリース・製品仕様書など一次資料に基づく情報。' },
+            { label: 'press', title: '報道・発表', body: '信頼性の高いメディア報道や展示会発表に基づく情報。公式確認は取れていないものを含む。' },
+            { label: 'estimated', title: '推計', body: '公開データからの計算・推計値。根拠を明示した上で掲載。' },
+            { label: '要確認', title: '未確認', body: '出典が取れておらず、正確性を保証できない項目。確認でき次第更新します。' },
+          ].map(({ label, title, body }) => (
+            <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
+              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">{label}</dt>
+              <dd>
+                <p className="text-sm font-semibold text-foreground mb-1">{title}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <section className="py-8 border-b border-border">
+        <h2 className="text-xl font-semibold text-foreground mb-6">掲載・画像方針</h2>
+        <dl className="divide-y divide-border">
+          {[
+            {
+              label: '掲載基準',
+              body: '公開情報をもとに導入判断に有用と判断したロボット・メーカーを掲載しています。特定メーカーとの商業的関係に基づく優遇掲載は行いません。',
+            },
+            {
+              label: '中立性',
+              body: '編集方針は「買い手がPoC判断をするのに必要な変数を整理すること」に置きます。メーカーからの掲載依頼は情報提供として扱い、内容の恣意的な変更は行いません。',
+            },
+            {
+              label: '画像・ロゴ',
+              body: '掲載している製品画像・ロゴの著作権・商標権は各メーカーに帰属します。情報提供・報道目的の参照用途として使用しており、出典を明記しています。修正・削除依頼はお問い合わせよりご連絡ください。',
+            },
+          ].map(({ label, body }) => (
+            <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
+              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">{label}</dt>
+              <dd className="text-sm text-muted-foreground leading-relaxed">{body}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
       <section className="py-8">
         <h2 className="text-xl font-semibold text-foreground mb-3">運営とお問い合わせ</h2>
         <p className="text-muted-foreground mb-6 max-w-3xl leading-relaxed">
-          現在は少人数で運営しています。掲載相談、情報提供・修正、取材相談、導入相談を受け付けています。
+          掲載相談、情報提供・修正、取材相談、導入相談を受け付けています。
           特定メーカーの販売促進を目的とせず、導入判断に必要な客観的な情報の整理を優先します。
         </p>
         <Link
