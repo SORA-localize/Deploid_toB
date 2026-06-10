@@ -50,7 +50,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const bodyHeadings = hasBody ? extractH2Headings(report.body!) : [];
 
   const toc = [
-    { label: uiText.reports.whyItMatters, href: '#why' },
     ...(hasTakeaways ? [{ label: uiText.reports.keyTakeaways, href: '#takeaways' }] : []),
     ...(hasBody
       ? [
@@ -191,23 +190,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           {/* メインコンテンツ */}
           <div className="col-span-12 space-y-6 lg:col-span-7">
 
-            {/* タグ（コンテンツカラム冒頭 — hero あり/なし 両バリアントで同一位置） */}
-            {report.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {report.tags.map((tag) => (
-                  <TagChip key={tag} kind="report" value={tag} className="py-1" />
-                ))}
-              </div>
-            )}
-
-            {/* なぜ重要か */}
-            <div id="why" className="scroll-mt-site-header border-l-4 border-primary bg-card p-5">
-              <p className="mb-2 text-xs font-semibold text-foreground">
-                {uiText.reports.whyItMatters}
-              </p>
-              <p className="text-sm leading-relaxed text-foreground/80">{report.whyItMatters}</p>
-            </div>
-
             {/* 要点（TL;DR） */}
             {hasTakeaways && (
               <div id="takeaways" className="scroll-mt-site-header border border-border bg-card p-6">
@@ -229,6 +211,20 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             {hasBody && (
               <div id="body" className="scroll-mt-site-header border border-border bg-card p-6 md:p-8">
                 <Markdown source={report.body!} />
+              </div>
+            )}
+
+            {/* タグゾーン（本文の下） */}
+            {report.tags.length > 0 && (
+              <div className="border border-border bg-card px-6 py-4">
+                <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  タグ
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {report.tags.map((tag) => (
+                    <TagChip key={tag} kind="report" value={tag} className="py-1" />
+                  ))}
+                </div>
               </div>
             )}
 
