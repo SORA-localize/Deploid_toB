@@ -17,7 +17,7 @@ export default function ContactPage() {
         <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-4 max-w-3xl leading-tight">
           情報提供・掲載相談・導入相談
         </h1>
-        <p className="text-lg text-muted-foreground max-w-3xl leading-relaxed">
+        <p className="text-sm text-muted-foreground max-w-3xl leading-relaxed">
           ロボット情報の修正、メーカー・代理店の掲載相談、取材相談、導入検討に関する相談を受け付けています。
         </p>
       </section>

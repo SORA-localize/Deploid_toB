@@ -35,7 +35,7 @@ export default function AboutPage() {
         <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-4 max-w-3xl leading-tight">
           国内ヒューマノイド導入の支援ポータルサイト
         </h1>
-        <p className="text-lg text-muted-foreground max-w-3xl leading-relaxed">
+        <p className="text-sm text-muted-foreground max-w-3xl leading-relaxed">
           Deploidは、ヒューマノイドロボットの導入を検討する企業のために、分かりやすく、正確な情報を提供いたします。製品の基本情報から、調達・保守・安全性・実務への適用など、導入判断に必要な情報を体系的に提供しております。
         </p>
       </section>
@@ -57,7 +57,7 @@ export default function AboutPage() {
       </section>
 
       <section className="py-8 border-b border-border">
-        <h2 className="text-xl font-semibold text-foreground mb-6">運営者情報</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-6">運営者情報</h2>
         <dl className="divide-y divide-border">
           <div className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0">
             <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">運営</dt>
@@ -82,7 +82,7 @@ export default function AboutPage() {
       </section>
 
       <section className="py-8 border-b border-border">
-        <h2 className="text-xl font-semibold text-foreground mb-6">出典・信頼度ポリシー</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-6">出典・信頼度ポリシー</h2>
         <p className="text-sm text-muted-foreground mb-6 max-w-3xl leading-relaxed">
           各ロボット・メーカーのデータには、情報源の種別と確認日を記録しています。AIによる推測値をそのまま事実として掲載しません。
         </p>
@@ -105,7 +105,7 @@ export default function AboutPage() {
       </section>
 
       <section className="py-8 border-b border-border">
-        <h2 className="text-xl font-semibold text-foreground mb-6">掲載・画像方針</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-6">掲載・画像方針</h2>
         <dl className="divide-y divide-border">
           {[
             {
@@ -130,7 +130,7 @@ export default function AboutPage() {
       </section>
 
       <section className="py-8">
-        <h2 className="text-xl font-semibold text-foreground mb-3">お問い合わせ</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-3">お問い合わせ</h2>
         <p className="text-muted-foreground max-w-3xl leading-relaxed">
           掲載相談、情報提供・修正、取材相談、導入相談を随時受け付けております。お問い合わせは
           <Link
