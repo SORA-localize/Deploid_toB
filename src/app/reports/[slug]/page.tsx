@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowRight, Calendar, User } from 'lucide-react';
+import { ArrowRight, Calendar, ChevronRight, User } from 'lucide-react';
 import { ArticleToc } from '@/components/ArticleToc';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
@@ -59,62 +59,106 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   return (
     <div className="min-h-screen bg-background">
 
-      {/* ── ヒーロー画像（全幅） ── */}
-      {report.heroImage && (
-        <div className="relative h-56 w-full overflow-hidden bg-muted sm:h-72 md:h-96">
+      {/* ── ヒーロー + ヘッダー（統合） ── */}
+      {report.heroImage ? (
+        // 画像あり: オーバーレイパターン（NewsHeroCarousel / NewsFeatureCard と同じ構造）
+        <div className="relative w-full overflow-hidden bg-muted min-h-[400px] sm:min-h-[500px] md:min-h-[580px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={report.heroImage.src}
             alt={report.heroImage.alt}
-            className="h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover"
           />
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"
+            className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent"
           />
           {report.heroImage.credit && (
-            <p className="absolute bottom-2 right-3 text-[10px] text-white/50">
+            <p className="absolute bottom-2 right-3 z-10 text-[10px] text-white/50">
               © {report.heroImage.credit}
             </p>
           )}
+
+          {/* breadcrumbs: 左上固定 */}
+          <div className="absolute top-0 left-0 right-0 z-10">
+            <div className="site-container pt-4 sm:pt-5">
+              <nav className="flex items-center gap-1 text-xs sm:gap-2">
+                <Link href="/" className="text-white/60 hover:text-white">{uiText.common.home}</Link>
+                <ChevronRight className="h-3 w-3 text-white/40" />
+                <Link href="/reports" className="text-white/60 hover:text-white">{uiText.reports.breadcrumb}</Link>
+                <ChevronRight className="h-3 w-3 text-white/40" />
+                <span className="line-clamp-1 text-white/80">{report.titleJa ?? report.title}</span>
+              </nav>
+            </div>
+          </div>
+
+          {/* タイトル・メタ情報: 下部 */}
+          <div className="absolute inset-0 z-10 flex flex-col justify-end">
+            <div className="site-container pb-8 sm:pb-10">
+              <div className="mb-2 text-xs font-medium text-white/70">
+                {reportTypeLabels[report.type]}
+              </div>
+              <h1 className="mb-3 text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white">
+                {report.titleJa ?? report.title}
+              </h1>
+              <p className="mb-4 text-sm sm:text-base leading-relaxed text-white/80">
+                {report.summary}
+              </p>
+              <div className="flex flex-wrap items-center gap-4 text-xs text-white/60">
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {report.publishedAt}
+                </span>
+                <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
+                  {reportTypeLabels[report.type]}
+                </TagChip>
+                {report.author && (
+                  <span className="flex items-center gap-1.5">
+                    <User className="h-3.5 w-3.5" />
+                    {report.author}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        // 画像なし: フラットヘッダー（現行スタイル維持）
+        <div className="border-b border-border bg-card">
+          <div className="site-container py-6">
+            <Breadcrumbs
+              items={[
+                { label: uiText.reports.breadcrumb, path: '/reports' },
+                { label: report.titleJa ?? report.title },
+              ]}
+            />
+            <div className="mb-3 text-xs font-medium text-muted-foreground">
+              {reportTypeLabels[report.type]}
+            </div>
+            <h1 className="mb-4 max-w-4xl text-2xl md:text-3xl font-semibold leading-tight text-foreground">
+              {report.titleJa ?? report.title}
+            </h1>
+            <p className="mb-5 max-w-3xl text-sm leading-relaxed text-foreground/80">
+              {report.summary}
+            </p>
+            <div className="flex flex-wrap items-center gap-5 border-b border-border pb-5 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5" />
+                {report.publishedAt}
+              </span>
+              <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
+                {reportTypeLabels[report.type]}
+              </TagChip>
+              {report.author && (
+                <span className="flex items-center gap-1.5">
+                  <User className="h-3.5 w-3.5" />
+                  {report.author}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       )}
-
-      {/* ── ヘッダー ── */}
-      <div className="border-b border-border bg-card">
-        <div className="site-container py-6">
-          <Breadcrumbs
-            items={[
-              { label: uiText.reports.breadcrumb, path: '/reports' },
-              { label: report.titleJa ?? report.title },
-            ]}
-          />
-          <div className="mb-3 text-xs font-medium text-muted-foreground">
-            {reportTypeLabels[report.type]}
-          </div>
-          <h1 className="mb-4 max-w-4xl text-2xl md:text-3xl font-semibold leading-tight text-foreground">
-            {report.titleJa ?? report.title}
-          </h1>
-          <p className="mb-5 max-w-3xl text-sm leading-relaxed text-foreground/80">
-            {report.summary}
-          </p>
-          <div className="flex flex-wrap items-center gap-5 border-b border-border pb-5 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <Calendar className="h-3.5 w-3.5" />
-              {report.publishedAt}
-            </span>
-            <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
-              {reportTypeLabels[report.type]}
-            </TagChip>
-            {report.author && (
-              <span className="flex items-center gap-1.5">
-                <User className="h-3.5 w-3.5" />
-                {report.author}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
 
       {/* ── 本文エリア ── */}
       <div className="site-container py-8">
