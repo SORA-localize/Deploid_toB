@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 
 export const metadata = {
@@ -16,7 +17,7 @@ export default function PrivacyPage() {
           個人情報の取り扱いについて
         </h1>
         <p className="text-sm text-muted-foreground max-w-3xl leading-relaxed">
-          Deploid（運営者：桑島壮平）は、お問い合わせフォームを通じて取得した個人情報を以下の方針に従って取り扱います。
+          Deploidは、お問い合わせフォームを通じて取得した個人情報を以下の方針に従って取り扱います。
         </p>
       </section>
 
@@ -47,16 +48,24 @@ export default function PrivacyPage() {
               label: '開示・訂正・削除',
               body: '個人情報の開示・訂正・削除のご要望は、下記の連絡先までご連絡ください。',
             },
-            {
-              label: '連絡先',
-              body: 'sohei@deploid.net（運営者：桑島壮平）',
-            },
           ].map(({ label, body }) => (
             <div key={label} className="grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
               <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5 shrink-0">{label}</dt>
               <dd className="text-sm text-muted-foreground leading-relaxed">{body}</dd>
             </div>
           ))}
+          <div className="grid grid-cols-1 md:grid-cols-[10rem_1fr] gap-2 md:gap-8 py-4">
+            <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5 shrink-0">連絡先</dt>
+            <dd className="text-sm text-muted-foreground leading-relaxed">
+              <Link
+                href="/contact"
+                className="text-tone-brand-text hover:text-tone-brand-solid underline underline-offset-2 transition-colors"
+              >
+                お問い合わせフォーム
+              </Link>
+              よりご連絡ください。
+            </dd>
+          </div>
         </dl>
       </section>
 
