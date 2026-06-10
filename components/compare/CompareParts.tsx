@@ -191,14 +191,12 @@ export function CompareInsertionPreviewCard({
           imageClassName="h-3 w-3"
         />
       </div>
-      <div className="border-b border-border-subtle bg-card px-3 py-2 text-center text-xs font-medium text-muted-foreground">
-        {uiText.comparison.addToSheet}
-      </div>
       <div className="aspect-[3/2] border-b border-border-subtle bg-muted/80" />
-      <div className="mt-auto space-y-2.5 p-3">
-        <div className="h-3 w-24 bg-muted" />
-        <div className="h-3 w-full bg-muted" />
-        <div className="h-3 w-4/5 bg-muted" />
+      <div className="mt-auto border-t border-border-subtle p-3">
+        <dl className="flex items-center justify-between gap-2">
+          <dt className="h-3 w-12 bg-muted rounded-sm" />
+          <dd className="h-3 w-20 bg-muted rounded-sm" />
+        </dl>
       </div>
     </article>
   );
