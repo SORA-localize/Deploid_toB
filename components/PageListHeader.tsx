@@ -16,7 +16,7 @@ export function PageListHeader({ title, description, className = 'mb-5', action 
         <p className="text-sm text-muted-foreground max-w-3xl leading-relaxed">{description}</p>
       </div>
       {action && (
-        <div className="shrink-0 w-full sm:w-64 sm:pt-1">
+        <div className="shrink-0 w-full sm:w-96 sm:pt-1">
           {action}
         </div>
       )}
