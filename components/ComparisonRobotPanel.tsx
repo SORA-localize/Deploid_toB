@@ -59,7 +59,7 @@ export function ComparisonRobotPanel({
   const cardImage = robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage;
 
   return (
-    <article className="relative aspect-[5/7] w-full overflow-hidden rounded-lg bg-muted text-card-foreground">
+    <article className="group relative aspect-[5/7] w-full overflow-hidden rounded-lg bg-muted text-card-foreground">
 
       {/* ── 画像レイヤー ── */}
       {cardImage ? (
@@ -77,7 +77,7 @@ export function ComparisonRobotPanel({
           <img
             src={cardImage.src}
             alt={cardImage.alt}
-            className="absolute inset-0 h-full w-full object-contain object-center transition-transform duration-300"
+            className="absolute inset-0 h-full w-full object-contain object-center transition-transform duration-300 group-hover:scale-[1.03]"
           />
         </>
       ) : (
@@ -85,6 +85,11 @@ export function ComparisonRobotPanel({
           <span className="text-xs text-muted-foreground">{uiText.robots.mainImageMissing}</span>
         </div>
       )}
+
+      {/* ── 左右ビネット + ホバー暗転オーバーレイ（pointer-events-none）── */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-10 bg-gradient-to-r from-black/25 to-transparent" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-10 bg-gradient-to-l from-black/25 to-transparent" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 z-[2] bg-black/0 transition-colors duration-300 group-hover:bg-black/20" aria-hidden="true" />
 
       {/* ── Popover trigger（画像全体を覆う z-0）── */}
       <PopoverPrimitive.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
@@ -219,7 +224,7 @@ export function ComparisonRobotPanel({
         <div className="flex min-w-0 flex-1 items-center gap-1.5">
           <GripVertical className="h-3.5 w-3.5 shrink-0 text-white/50" aria-hidden="true" />
           <h3
-            className="truncate text-xs font-semibold leading-tight text-white"
+            className="truncate text-sm font-semibold leading-tight text-white"
             title={robot.nameJa ?? robot.name}
           >
             {robot.nameJa ?? robot.name}
@@ -262,9 +267,11 @@ export function ComparisonRobotPanel({
         </div>
       </div>
 
-      {/* ── bottom overlay: メーカー名（z-10, pointer-events-none で Popover trigger に透過）── */}
-      <div className="pointer-events-none absolute bottom-0 inset-x-0 z-10 px-2.5 pb-2 bg-gradient-to-t from-black/50 to-transparent">
-        <p className="truncate text-right text-[10px] font-medium text-white/70">
+      {/* ── bottom overlay: メーカー名（ホバーで表示）── */}
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 z-10 px-2.5 pb-2
+                      bg-gradient-to-t from-black/60 to-transparent
+                      opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <p className="truncate text-right text-[11px] font-medium text-white/90">
           {manufacturerName ?? robot.manufacturerSlug}
         </p>
       </div>
