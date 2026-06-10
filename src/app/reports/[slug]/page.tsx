@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowRight, Calendar, ChevronRight, User } from 'lucide-react';
+import { Calendar, ChevronRight, Clock, User } from 'lucide-react';
 import { ArticleToc } from '@/components/ArticleToc';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { Markdown } from '@/components/Markdown';
+import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
 import {
@@ -16,6 +16,7 @@ import {
   getReports,
 } from '@/lib/data';
 import { reportTypeLabels } from '@/lib/labels';
+import { extractH2Headings } from '@/lib/markdownHeadings';
 import { uiText } from '@/lib/uiText';
 import { getReportTypeTone } from '@/lib/visualSemantics';
 
@@ -43,16 +44,26 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const manufacturers = getRelatedManufacturers(report.relatedManufacturerSlugs);
   const useCases = getRelatedUseCases(report.relatedUseCaseSlugs);
   const guides = getRelatedGuides(report.relatedGuideSlugs ?? []);
+
   const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
   const hasBody = (report.body ?? '').trim().length > 0;
-  const hasRelated =
-    robots.length > 0 || manufacturers.length > 0 || useCases.length > 0 || guides.length > 0;
+  const bodyHeadings = hasBody ? extractH2Headings(report.body!) : [];
 
   const toc = [
     { label: uiText.reports.whyItMatters, href: '#why' },
     ...(hasTakeaways ? [{ label: uiText.reports.keyTakeaways, href: '#takeaways' }] : []),
-    ...(hasBody ? [{ label: '本文', href: '#body' }] : []),
-    ...(hasRelated ? [{ label: '関連', href: '#related' }] : []),
+    ...(hasBody
+      ? [
+          { label: '本文', href: '#body' },
+          ...bodyHeadings.map((h) => ({ label: h.text, href: `#${h.id}` })),
+        ]
+      : []),
+    ...(robots.length > 0 ? [{ label: '関連ロボット', href: '#related-robots' }] : []),
+    ...(manufacturers.length > 0
+      ? [{ label: '関連メーカー', href: '#related-manufacturers' }]
+      : []),
+    ...(useCases.length > 0 ? [{ label: '関連用途', href: '#related-use-cases' }] : []),
+    ...(guides.length > 0 ? [{ label: '関連ガイド', href: '#related-guides' }] : []),
     { label: uiText.common.resources, href: '#sources' },
   ];
 
@@ -61,7 +72,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
       {/* ── ヒーロー + ヘッダー（統合） ── */}
       {report.heroImage ? (
-        // 画像あり: オーバーレイパターン（NewsHeroCarousel / NewsFeatureCard と同じ構造）
         <div className="relative w-full overflow-hidden bg-muted min-h-[400px] sm:min-h-[500px] md:min-h-[580px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -79,7 +89,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             </p>
           )}
 
-          {/* breadcrumbs: 左上固定 */}
           <div className="absolute top-0 left-0 right-0 z-10">
             <div className="site-container pt-4 sm:pt-5">
               <nav className="flex items-center gap-1 text-xs sm:gap-2">
@@ -92,7 +101,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             </div>
           </div>
 
-          {/* タイトル・メタ情報: 下部 */}
           <div className="absolute inset-0 z-10 flex flex-col justify-end">
             <div className="site-container pb-8 sm:pb-10">
               <div className="mb-2 text-xs font-medium text-white/70">
@@ -109,6 +117,12 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   <Calendar className="h-3.5 w-3.5" />
                   {report.publishedAt}
                 </span>
+                {report.readingTimeMin && (
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5" />
+                    {uiText.common.readingMinutes(report.readingTimeMin)}
+                  </span>
+                )}
                 <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
                   {reportTypeLabels[report.type]}
                 </TagChip>
@@ -123,7 +137,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           </div>
         </div>
       ) : (
-        // 画像なし: フラットヘッダー（現行スタイル維持）
         <div className="border-b border-border bg-card">
           <div className="site-container py-6">
             <Breadcrumbs
@@ -146,6 +159,12 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 <Calendar className="h-3.5 w-3.5" />
                 {report.publishedAt}
               </span>
+              {report.readingTimeMin && (
+                <span className="flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5" />
+                  {uiText.common.readingMinutes(report.readingTimeMin)}
+                </span>
+              )}
               <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
                 {reportTypeLabels[report.type]}
               </TagChip>
@@ -172,6 +191,15 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           {/* メインコンテンツ */}
           <div className="col-span-12 space-y-6 lg:col-span-7">
 
+            {/* タグ（コンテンツカラム冒頭 — hero あり/なし 両バリアントで同一位置） */}
+            {report.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {report.tags.map((tag) => (
+                  <TagChip key={tag} kind="report" value={tag} className="py-1" />
+                ))}
+              </div>
+            )}
+
             {/* なぜ重要か */}
             <div id="why" className="scroll-mt-site-header border-l-4 border-primary bg-card p-5">
               <p className="mb-2 text-xs font-semibold text-foreground">
@@ -197,67 +225,56 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               </div>
             )}
 
-            {/* 本文 */}
+            {/* 本文（Markdown） */}
             {hasBody && (
               <div id="body" className="scroll-mt-site-header border border-border bg-card p-6 md:p-8">
                 <Markdown source={report.body!} />
               </div>
             )}
 
-            {/* 関連リンク */}
-            {hasRelated && (
-              <div id="related" className="scroll-mt-site-header border border-border bg-card p-6">
-                <h2 className="mb-4 border-b border-border pb-2 text-lg font-semibold text-foreground">
-                  関連
-                </h2>
-                <div className="space-y-2">
-                  {robots.map((r) => (
-                    <Link
-                      key={r.slug}
-                      href={`/robots/${r.slug}`}
-                      className="flex items-center justify-between border-b border-border py-2 text-xs text-foreground/80 hover:text-foreground"
-                    >
-                      <span>{r.nameJa ?? r.name}</span>
-                      <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  ))}
-                  {manufacturers.map((m) => (
-                    <Link
-                      key={m.slug}
-                      href={`/manufacturers/${m.slug}`}
-                      className="flex items-center justify-between border-b border-border py-2 text-xs text-foreground/80 hover:text-foreground"
-                    >
-                      <ManufacturerLogoName
-                        name={m.nameJa ?? m.name}
-                        logo={m.logo}
-                        frameClassName="h-4 w-4"
-                        imageClassName="h-3 w-3"
-                      />
-                      <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  ))}
-                  {useCases.map((u) => (
-                    <Link
-                      key={u.slug}
-                      href={`/use-cases/${u.slug}`}
-                      className="flex items-center justify-between border-b border-border py-2 text-xs text-foreground/80 hover:text-foreground"
-                    >
-                      <span>{u.titleJa ?? u.title}</span>
-                      <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  ))}
-                  {guides.map((g) => (
-                    <Link
-                      key={g.slug}
-                      href={`/guides/${g.slug}`}
-                      className="flex items-center justify-between py-2 text-xs text-foreground/80 hover:text-foreground"
-                    >
-                      <span>{g.titleJa ?? g.title}</span>
-                      <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  ))}
-                </div>
-              </div>
+            {/* 関連（種別ごとに分割） */}
+            {robots.length > 0 && (
+              <RelatedLinkList
+                id="related-robots"
+                title="関連ロボット"
+                items={robots.map((r) => ({
+                  href: `/robots/${r.slug}`,
+                  title: r.nameJa ?? r.name,
+                  description: r.summary,
+                }))}
+              />
+            )}
+            {manufacturers.length > 0 && (
+              <RelatedLinkList
+                id="related-manufacturers"
+                title="関連メーカー"
+                items={manufacturers.map((m) => ({
+                  href: `/manufacturers/${m.slug}`,
+                  title: m.nameJa ?? m.name,
+                  description: m.summary,
+                }))}
+              />
+            )}
+            {useCases.length > 0 && (
+              <RelatedLinkList
+                id="related-use-cases"
+                title="関連用途"
+                items={useCases.map((u) => ({
+                  href: `/use-cases/${u.slug}`,
+                  title: u.titleJa ?? u.title,
+                }))}
+              />
+            )}
+            {guides.length > 0 && (
+              <RelatedLinkList
+                id="related-guides"
+                title="関連ガイド"
+                items={guides.map((g) => ({
+                  href: `/guides/${g.slug}`,
+                  title: g.titleJa ?? g.title,
+                  description: g.summary,
+                }))}
+              />
             )}
 
             {/* 出典 */}
@@ -300,7 +317,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                       className="flex items-center justify-between border-b border-border py-1.5 text-xs text-foreground/80 last:border-0 hover:text-foreground"
                     >
                       <span>{label}</span>
-                      <ArrowRight className="h-3 w-3" />
                     </Link>
                   ))}
                 </nav>
