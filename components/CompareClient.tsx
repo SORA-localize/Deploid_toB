@@ -21,6 +21,7 @@ import {
 import { ChevronDown, ChevronRight, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { EmptyState } from '@/components/EmptyState';
 import {
   CompareDragOverlayCard,
   CompareDroppableArea,
@@ -325,11 +326,13 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="site-container py-12">
+      <div className="site-container py-8">
         <Breadcrumbs items={[{ label: uiText.compare.breadcrumb }]} />
 
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-foreground mb-2">{uiText.compare.title}</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold leading-tight text-foreground mb-2">
+            {uiText.compare.title}
+          </h1>
           <p className="text-sm text-muted-foreground max-w-3xl">
             左のメニューからロボットを選んで比較します。右パネルで気になるロボットをお気に入り登録できます。
           </p>
@@ -361,7 +364,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                     )}
                   >
                     <div className="px-4 py-3 border-b border-border bg-card">
-                      <h2 className="text-xs font-semibold text-foreground">
+                      <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {uiText.compare.manufacturers}
                       </h2>
                     </div>
@@ -454,34 +457,17 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                     <div
                       ref={setNodeRef}
                       className={cn(
-                        'flex min-h-[22rem] items-center justify-center border border-border bg-muted p-8 text-center transition-[box-shadow,outline-color] duration-200 sm:p-16',
+                        'flex min-h-[22rem] items-center justify-center transition-[box-shadow,outline-color] duration-200',
                         isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                       )}
                     >
-                      <div className="max-w-md mx-auto">
-                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                          <svg
-                            aria-hidden="true"
-                            className="w-8 h-8 text-muted-foreground/70"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={1.5}
-                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                            />
-                          </svg>
-                        </div>
-                        <h3 className="text-sm font-semibold text-foreground mb-2">
-                          {uiText.comparison.emptyTitle}
-                        </h3>
-                        <p className="text-xs text-muted-foreground">
-                          {uiText.comparison.emptyDescription(MAX_COMPARE_ROBOTS)}
-                        </p>
-                      </div>
+                      <EmptyState
+                        message={uiText.comparison.emptyTitle}
+                        description={uiText.comparison.emptyDescription(MAX_COMPARE_ROBOTS)}
+                        variant="muted"
+                        size="large"
+                        className="w-full max-w-md"
+                      />
                     </div>
                   ) : (
                     <div
@@ -576,7 +562,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   >
                     <div className="px-4 py-3 border-b border-border bg-card flex items-center gap-2">
                       <Star className="w-4 h-4 text-favorite" />
-                      <h2 className="text-xs font-semibold text-foreground">
+                      <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {uiText.compare.favorites}
                       </h2>
                     </div>
@@ -584,15 +570,12 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                       {!isMounted ? (
                         <div className="text-center py-8" aria-hidden="true" />
                       ) : favoriteRobots.length === 0 ? (
-                        <div className="text-center py-8">
-                          <Star className="w-8 h-8 text-muted-foreground/70 mx-auto mb-3" />
-                          <p className="text-xs text-muted-foreground mb-1">
-                            {uiText.favorites.empty}
-                          </p>
-                          <p className="text-xs text-muted-foreground/70">
-                            {uiText.favorites.emptySub}
-                          </p>
-                        </div>
+                        <EmptyState
+                          message={uiText.favorites.empty}
+                          description={uiText.favorites.emptySub}
+                          variant="muted"
+                          icon={<Star className="w-8 h-8" />}
+                        />
                       ) : (
                         <div className="space-y-3">
                           {favoriteRobots.map((robot) => {
