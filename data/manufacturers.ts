@@ -1075,7 +1075,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     summary: '卓越した運動制御技術と「Android for androids」OSで急速に台頭する新星。',
-    publishStatus: 'draft',
+    publishStatus: 'published',
     updatedAt: '2026-06-02',
     reliability: 'official',
     sources: [
@@ -1127,7 +1127,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     summary: 'EV製造の資産を背景に、産業・家庭への大規模展開を狙う。',
-    publishStatus: 'draft',
+    publishStatus: 'published',
     updatedAt: '2026-06-02',
     reliability: 'official',
     sources: [
@@ -1270,7 +1270,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     summary: '世界最速クラス3.6m/sを誇る高機動ヒューマノイドの開発元。',
-    publishStatus: 'draft',
+    publishStatus: 'published',
     updatedAt: '2026-06-07',
     reliability: 'official',
     sources: [
@@ -1320,7 +1320,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     summary: 'Samsung出資・Mobileye傘下の次世代産業ヒューマノイドメーカー。',
-    publishStatus: 'draft',
+    publishStatus: 'published',
     updatedAt: '2026-06-07',
     reliability: 'official',
     sources: [

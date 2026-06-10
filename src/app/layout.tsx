@@ -68,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </ThemeProvider>
         <AnalyticsScripts
           gaMeasurementId={env.gaMeasurementId}
+          clarityProjectId={env.clarityProjectId}
           enabled={env.isVercelProduction || (env.isProd && !process.env.VERCEL_ENV)}
         />
         <Analytics />
