@@ -25,13 +25,6 @@ const values = [
   },
 ];
 
-const roadmap = [
-  { step: '01', title: '情報の体系化', body: 'ロボット・メーカー・用途・ガイド・記事を掲載。' },
-  { step: '02', title: '用途から探す', body: '業種・タスクなど実務起点で成立条件と候補を探せるように。' },
-  { step: '03', title: '一次取材・ハンズオン', body: '代理店デモや実機検証など、一次情報を記事として提供。' },
-  { step: '04', title: '相談・選定支援', body: 'PoC設計や選定支援など、実務側の導線へ拡張。※2026年6月現在は未対応' },
-];
-
 export default function AboutPage() {
   return (
     <div className="site-container py-8">
@@ -64,38 +57,27 @@ export default function AboutPage() {
       </section>
 
       <section className="py-8 border-b border-border">
-        <h2 className="text-xl font-semibold text-foreground mb-6">ロードマップ</h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {roadmap.map((r) => (
-            <div key={r.step} className="flex gap-4 border border-border bg-card p-5">
-              <div className="flex-shrink-0 w-12 h-12 border-2 border-foreground flex items-center justify-center">
-                <span className="text-xs font-semibold text-foreground">{r.step}</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">{r.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{r.body}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="py-8 border-b border-border">
         <h2 className="text-xl font-semibold text-foreground mb-6">運営者情報</h2>
-        <p className="text-sm text-muted-foreground mb-4 max-w-3xl leading-relaxed">
-          当サイトは個人（学生）による運営です。運営者の氏名・直通メールアドレスは公開しておらず、お問い合わせはサイトの問い合わせフォームをご利用ください。
-        </p>
         <dl className="divide-y divide-border">
-          {[
-            { label: '運営', value: 'Deploid（個人運営・学生）' },
-            { label: '連絡先', value: 'お問い合わせフォーム（https://deploid.net/contact）' },
-            { label: '公開開始', value: '2026年6月' },
-          ].map(({ label, value }) => (
-            <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">{label}</dt>
-              <dd className="text-sm text-foreground">{value}</dd>
-            </div>
-          ))}
+          <div className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0">
+            <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">運営</dt>
+            <dd className="text-sm text-foreground">Deploid（個人運営）</dd>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4">
+            <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">連絡先</dt>
+            <dd className="text-sm text-foreground">
+              <Link
+                href="/contact"
+                className="text-tone-brand-text hover:text-tone-brand-solid underline underline-offset-2 transition-colors"
+              >
+                お問い合わせフォーム
+              </Link>
+            </dd>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 last:pb-0">
+            <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">公開開始</dt>
+            <dd className="text-sm text-foreground">2026年6月</dd>
+          </div>
         </dl>
       </section>
 
