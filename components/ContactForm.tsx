@@ -22,7 +22,7 @@ export function ContactForm() {
 
   if (formEnabled && state.succeeded) {
     return (
-      <div className={cn('border p-6', getVisualToneClassName('success'))}>
+      <div className={cn('border p-6 max-w-2xl mx-auto', getVisualToneClassName('success'))}>
         <h3 className="text-sm font-semibold text-foreground mb-2">{uiText.contact.successTitle}</h3>
         <p className="text-sm text-muted-foreground leading-relaxed">
           {uiText.contact.successMessage}
@@ -32,7 +32,7 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleFormSubmit} className="space-y-5 max-w-2xl">
+    <form onSubmit={handleFormSubmit} className="space-y-5 max-w-2xl mx-auto">
       {!formEnabled && (
         <div className={cn('border p-4 text-sm', getVisualToneClassName('warning'))} role="status">
           {uiText.contact.formPending}
