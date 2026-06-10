@@ -1,21 +1,19 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Star, X } from 'lucide-react';
+import { ExternalLink, GripVertical, Star, X } from 'lucide-react';
 import { Popover as PopoverPrimitive } from 'radix-ui';
-import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { CompareCardDragHandleProps } from '@/components/SortableCompareCard';
 import type { ImageAsset, Robot } from '@/data/types';
-import { deploymentStageLabels, TBD_LABEL } from '@/lib/labels';
+import { TBD_LABEL } from '@/lib/labels';
 import { getComparisonCoreRows, getComparisonDetailRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
-import { getDeploymentStageTone } from '@/lib/visualSemantics';
-import { TagChip } from '@/components/TagChip';
 
 interface ComparisonRobotPanelProps {
   robot: Robot;
   manufacturerName?: string;
-  manufacturerLogo?: ImageAsset;
+  manufacturerLogo?: ImageAsset; // 現在未使用（呼び出し元変更を避けるため維持）
   isFavorite: boolean;
   onFavoriteToggle: (slug: string) => void;
   onRemove: (slug: string) => void;
@@ -39,7 +37,6 @@ function CompactList({ items }: { items: string[] }) {
 export function ComparisonRobotPanel({
   robot,
   manufacturerName,
-  manufacturerLogo,
   isFavorite,
   onFavoriteToggle,
   onRemove,
@@ -48,106 +45,56 @@ export function ComparisonRobotPanel({
   const coreRows = getComparisonCoreRows(robot);
   const detailRows = getComparisonDetailRows(robot);
 
-  // 透過PNG → hero の順でフォールバック
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
+  // pointer:fine（マウス）デバイスのみ D&D を有効化。useEffect でクライアント判定し SSR との mismatch を回避。
+  const [isPointerDevice, setIsPointerDevice] = useState(false);
+  useEffect(() => {
+    setIsPointerDevice(window.matchMedia('(pointer: fine)').matches);
+  }, []);
+
+  const canDrag = isPointerDevice && !!dragHandleProps;
+
+  // 透過 PNG → hero ロール → heroImage の順でフォールバック
   const cardImage = robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage;
 
   return (
-    <article className="flex flex-col border border-border bg-card text-card-foreground h-full relative">
+    <article className="relative aspect-[5/7] w-full overflow-hidden rounded-lg bg-muted text-card-foreground">
 
-      {/* ── ヘッダー（D&D ハンドル + keyboard sortable の入口）── */}
-      <div
-        className={`border-b border-border-subtle bg-muted px-3 py-2.5 flex items-start justify-between gap-3 ${
-          dragHandleProps
-            ? 'cursor-grab touch-none select-none active:cursor-grabbing'
-            : ''
-        }`}
-        aria-label={dragHandleProps ? uiText.comparison.reorderAria(robot.nameJa ?? robot.name) : undefined}
-        title={dragHandleProps ? uiText.comparison.reorderHint : undefined}
-        {...dragHandleProps?.attributes}
-        {...dragHandleProps?.listeners}
-      >
-        {/* 名前・メーカー */}
-        <div className="min-w-0 flex-1">
-          <h3
-            className="text-sm font-semibold text-foreground leading-tight truncate"
-            title={robot.nameJa ?? robot.name}
-          >
-            {robot.nameJa ?? robot.name}
-          </h3>
-          <ManufacturerLogoName
-            name={manufacturerName ?? robot.manufacturerSlug}
-            logo={manufacturerLogo}
-            className="mt-0.5 text-xs text-muted-foreground"
-            frameClassName="h-3.5 w-3.5 shrink-0"
-            imageClassName="h-2.5 w-2.5"
+      {/* ── 画像レイヤー ── */}
+      {cardImage ? (
+        <>
+          {/* blur 背景 */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={cardImage.src}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl brightness-75 saturate-150"
           />
+          {/* 前景 */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={cardImage.src}
+            alt={cardImage.alt}
+            className="absolute inset-0 h-full w-full object-contain object-center transition-transform duration-300"
+          />
+        </>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-xs text-muted-foreground">{uiText.robots.mainImageMissing}</span>
         </div>
-        {/* ★ ✕ */}
-        <div className="flex shrink-0 items-center gap-1">
-          <button
-            type="button"
-            aria-label={
-              isFavorite
-                ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name)
-                : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)
-            }
-            aria-pressed={isFavorite}
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => onFavoriteToggle(robot.slug)}
-            className="p-1 hover:bg-muted rounded-sm transition-colors text-muted-foreground hover:text-foreground"
-          >
-            <Star className={`h-3.5 w-3.5 ${isFavorite ? 'fill-favorite text-favorite' : ''}`} />
-          </button>
-          <button
-            type="button"
-            aria-label={uiText.comparison.removeAria(robot.nameJa ?? robot.name)}
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={() => onRemove(robot.slug)}
-            className="p-1 hover:bg-muted rounded-sm transition-colors text-muted-foreground hover:text-foreground"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      </div>
+      )}
 
-      {/* ── 画像エリア（Popover トリガー）── */}
-      <PopoverPrimitive.Root>
+      {/* ── Popover trigger（画像全体を覆う z-0）── */}
+      <PopoverPrimitive.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
         <PopoverPrimitive.Trigger asChild>
           <button
             type="button"
             aria-label={uiText.comparison.detailsAria(robot.nameJa ?? robot.name)}
             onPointerDown={(e) => e.stopPropagation()}
-            className="group relative flex-1 flex items-end justify-center bg-muted w-full
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
-                       min-h-[200px]"
-          >
-            {cardImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={cardImage.src}
-                alt={cardImage.alt}
-                className="w-full h-full object-contain object-bottom absolute inset-0
-                           transition-transform duration-300 group-hover:scale-[1.03]"
-              />
-            ) : (
-              <span className="text-xs text-muted-foreground z-10">
-                {uiText.robots.mainImageMissing}
-              </span>
-            )}
-            {/* ホバーオーバーレイ */}
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200"
-            />
-            <span
-              aria-hidden="true"
-              className="relative z-10 mb-2 rounded-sm bg-card/80 px-2 py-0.5 text-[10px]
-                         font-medium text-foreground opacity-0 group-hover:opacity-100
-                         transition-opacity duration-200 backdrop-blur-sm"
-            >
-              {uiText.comparison.detailsLabel}
-            </span>
-          </button>
+            className="absolute inset-0 z-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          />
         </PopoverPrimitive.Trigger>
 
         {/* ── Popover 詳細パネル ── */}
@@ -249,11 +196,77 @@ export function ComparisonRobotPanel({
         </PopoverPrimitive.Portal>
       </PopoverPrimitive.Root>
 
-      {/* ── deploymentStage バッジ ── */}
-      <div className="border-t border-border-subtle px-3 py-2 flex items-center gap-2">
-        <TagChip tone={getDeploymentStageTone(robot.deploymentStage)} className="text-[10px] py-0.5">
-          {deploymentStageLabels[robot.deploymentStage]}
-        </TagChip>
+      {/* ── top overlay: D&D ハンドル + 名前 + ★✕（z-10）── */}
+      {/*
+        overlay div の onClick が Popover を開く。デスクトップでは drag（6px以上移動）時は
+        click が発火しないため Popover が開かない。モバイルでも同じ onClick でカバーできる。
+        ★✕ の onClick は stopPropagation で overlay の onClick を止める。
+      */}
+      <div
+        onClick={() => setPopoverOpen(true)}
+        className={[
+          'absolute top-0 inset-x-0 z-10',
+          'flex items-start justify-between gap-2 px-2.5 pt-2 pb-8',
+          'bg-gradient-to-b from-black/60 to-transparent',
+          canDrag ? 'cursor-grab touch-none select-none active:cursor-grabbing' : '',
+        ].join(' ').trim()}
+        aria-label={canDrag ? uiText.comparison.reorderAria(robot.nameJa ?? robot.name) : undefined}
+        title={canDrag ? uiText.comparison.reorderHint : undefined}
+        {...(canDrag ? dragHandleProps!.attributes : {})}
+        {...(canDrag ? dragHandleProps!.listeners : {})}
+      >
+        {/* ドラッグアイコン + ロボット名 */}
+        <div className="flex min-w-0 flex-1 items-center gap-1.5">
+          <GripVertical className="h-3.5 w-3.5 shrink-0 text-white/50" aria-hidden="true" />
+          <h3
+            className="truncate text-xs font-semibold leading-tight text-white"
+            title={robot.nameJa ?? robot.name}
+          >
+            {robot.nameJa ?? robot.name}
+          </h3>
+        </div>
+
+        {/* ★ ✕ */}
+        <div className="flex shrink-0 items-center gap-0.5">
+          <button
+            type="button"
+            aria-label={
+              isFavorite
+                ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name)
+                : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)
+            }
+            aria-pressed={isFavorite}
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onFavoriteToggle(robot.slug);
+            }}
+            className="rounded-sm p-1 text-white/70 transition-colors hover:bg-white/20 hover:text-white
+                       focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+          >
+            <Star className={`h-3.5 w-3.5 ${isFavorite ? 'fill-favorite text-favorite' : ''}`} />
+          </button>
+          <button
+            type="button"
+            aria-label={uiText.comparison.removeAria(robot.nameJa ?? robot.name)}
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(robot.slug);
+            }}
+            className="rounded-sm p-1 text-white/70 transition-colors hover:bg-white/20 hover:text-white
+                       focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* ── bottom overlay: メーカー名（z-10, pointer-events-none で Popover trigger に透過）── */}
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 z-10 px-2.5 pb-2 bg-gradient-to-t from-black/50 to-transparent">
+        <p className="truncate text-right text-[10px] font-medium text-white/70">
+          {manufacturerName ?? robot.manufacturerSlug}
+        </p>
       </div>
 
     </article>

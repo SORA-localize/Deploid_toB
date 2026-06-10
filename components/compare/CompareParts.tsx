@@ -171,32 +171,32 @@ export function CompareDragOverlayCard({
 
 export function CompareInsertionPreviewCard({
   robot,
-  manufacturerName,
-  manufacturerLogo,
 }: CompareDragOverlayCardProps) {
   return (
     <article
-      className="pointer-events-none flex h-full flex-col border border-dashed border-ring bg-card/70 text-card-foreground opacity-60 shadow-sm"
+      className="pointer-events-none relative aspect-[5/7] w-full overflow-hidden
+                 rounded-lg border border-dashed border-ring bg-card/70 opacity-60"
       aria-hidden="true"
     >
-      <div className="border-b border-border-subtle bg-muted/80 p-3">
-        <h3 className="truncate text-sm font-semibold text-foreground" title={robot.nameJa ?? robot.name}>
-          {robot.nameJa ?? robot.name}
-        </h3>
-        <ManufacturerLogoName
-          name={manufacturerName ?? robot.manufacturerSlug}
-          logo={manufacturerLogo}
-          className="mt-1 text-xs text-muted-foreground"
-          frameClassName="h-4 w-4 shrink-0"
-          imageClassName="h-3 w-3"
-        />
+      {/* 画像エリアのスケルトン */}
+      <div className="absolute inset-0 bg-muted/80" />
+
+      {/* top overlay スケルトン */}
+      <div
+        className="absolute top-0 inset-x-0 z-10 flex items-center gap-2
+                   px-2.5 pt-2 pb-8
+                   bg-gradient-to-b from-black/40 to-transparent"
+      >
+        <div className="h-3 w-3 shrink-0 rounded-sm bg-white/20" />
+        <div className="h-3 w-[55%] rounded-sm bg-white/20" />
       </div>
-      <div className="aspect-[3/2] border-b border-border-subtle bg-muted/80" />
-      <div className="mt-auto border-t border-border-subtle p-3">
-        <dl className="flex items-center justify-between gap-2">
-          <dt className="h-3 w-12 bg-muted rounded-sm" />
-          <dd className="h-3 w-20 bg-muted rounded-sm" />
-        </dl>
+
+      {/* bottom overlay スケルトン */}
+      <div
+        className="absolute bottom-0 inset-x-0 z-10 flex justify-end px-2.5 pb-2
+                   bg-gradient-to-t from-black/30 to-transparent"
+      >
+        <div className="h-2.5 w-16 rounded-sm bg-white/20" />
       </div>
     </article>
   );
