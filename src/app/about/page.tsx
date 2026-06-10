@@ -1,36 +1,35 @@
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 
 export const metadata = {
   title: '会社概要',
   description:
-    'Deploidは、日本のtoB事業者がヒューマノイド導入を判断するための入口メディア。買い手目線の体系化と出典主義で、導入判断に必要な変数を整理します。',
+    'Deploidは、ヒューマノイドロボットの導入を検討する企業のために、分かりやすく、正確な情報を提供いたします。製品の基本情報から、調達・保守・安全性・実務への適用など、導入判断に必要な情報を体系的に提供しております。',
 };
 
 const values = [
   {
     label: 'ミッション',
-    title: '導入判断の最初の入口をつくる',
-    body: 'ロボット名やニュースではなく、調達・保守・安全・用途適合・PoC設計まで、買い手が判断に使う変数で整理します。',
+    title: '誰でも導入判断ができるように',
+    body: '欲しい情報を見つけやすく、比較しやすい形で整理し、導入の意思決定を誰もが出来るようにします。',
   },
   {
     label: '課題',
-    title: '既存情報は買い手目線で体系化されていない',
-    body: 'メーカー発表やスペック表は揃っても、「うちに要るか・国内で導入できるか・何から始めるか」に答える構造が不足しています。',
+    title: '実務で使える情報が散在している',
+    body: '1. 情報がメーカー発表・報道・仕様書に分散、2. 比較に必要な観点が統一されていない、3. 実運用や保守に関する現場視点が不足している、という点の整理をしています。',
   },
   {
     label: '方針',
-    title: '出典と確認日を残す',
-    body: '公式情報・報道・推定を混ぜず、信頼度（reliability）と確認日をデータとして残します。AIの推測値を事実として扱いません。',
+    title: '出典・透明性・実務性を優先する',
+    body: '出典と確認日を明示し、事実（公式情報）と推測（推計）を区別し、実務で使える比較軸と導線の提供を優先します。',
   },
 ];
 
 const roadmap = [
-  { step: '01', title: '公開情報の構造化', body: 'ロボット・メーカー・用途・ガイド・記事を導入判断軸で整理。' },
-  { step: '02', title: '用途からの逆引き', body: '業種ではなく作業・タスク起点で成立条件と候補を探せるように。' },
-  { step: '03', title: '一次取材・ハンズオン', body: '代理店デモや実機検証など、後発の一次情報で深さを出す。' },
-  { step: '04', title: '相談・選定支援', body: 'PoC設計や選定支援など、実務側の導線へ拡張。' },
+  { step: '01', title: '情報の体系化', body: 'ロボット・メーカー・用途・ガイド・記事を掲載。' },
+  { step: '02', title: '用途から探す', body: '業種・タスクなど実務起点で成立条件と候補を探せるように。' },
+  { step: '03', title: '一次取材・ハンズオン', body: '代理店デモや実機検証など、一次情報を記事として提供。' },
+  { step: '04', title: '相談・選定支援', body: 'PoC設計や選定支援など、実務側の導線へ拡張。※2026年6月現在は未対応' },
 ];
 
 export default function AboutPage() {
@@ -41,10 +40,10 @@ export default function AboutPage() {
       <section className="py-8 border-b border-border">
         <p className="text-xs text-muted-foreground mb-4">Deploidについて</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-4 max-w-3xl leading-tight">
-          ヒューマノイド導入の、最初の判断材料をつくる。
+          国内ヒューマノイド導入の支援ポータルサイト
         </h1>
         <p className="text-lg text-muted-foreground max-w-3xl leading-relaxed">
-          Deploidは、日本のtoB事業者がヒューマノイドロボットを検討するときに、ロボット名やニュースだけでなく、調達・保守・安全・用途適合・PoC設計まで見られる入口を目指す情報メディアです。
+          Deploidは、ヒューマノイドロボットの導入を検討する企業のために、分かりやすく、正確な情報を提供いたします。製品の基本情報から、調達・保守・安全性・実務への適用など、導入判断に必要な情報を体系的に提供しております。
         </p>
       </section>
 
@@ -83,10 +82,13 @@ export default function AboutPage() {
 
       <section className="py-8 border-b border-border">
         <h2 className="text-xl font-semibold text-foreground mb-6">運営者情報</h2>
+        <p className="text-sm text-muted-foreground mb-4 max-w-3xl leading-relaxed">
+          当サイトは個人（学生）による運営です。運営者の氏名・直通メールアドレスは公開しておらず、お問い合わせはサイトの問い合わせフォームをご利用ください。
+        </p>
         <dl className="divide-y divide-border">
           {[
-            { label: '運営者', value: '桑島壮平' },
-            { label: '連絡先', value: 'sohei@deploid.net' },
+            { label: '運営', value: 'Deploid（個人運営・学生）' },
+            { label: '連絡先', value: 'お問い合わせフォーム（https://deploid.net/contact）' },
             { label: '公開開始', value: '2026年6月' },
           ].map(({ label, value }) => (
             <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
@@ -126,11 +128,11 @@ export default function AboutPage() {
           {[
             {
               label: '掲載基準',
-              body: '公開情報をもとに導入判断に有用と判断したロボット・メーカーを掲載しています。特定メーカーとの商業的関係に基づく優遇掲載は行いません。',
+              body: '公開情報をもとに導入判断に有用と判断したロボット・メーカーを掲載しています。',
             },
             {
               label: '中立性',
-              body: '編集方針は「買い手がPoC判断をするのに必要な変数を整理すること」に置きます。メーカーからの掲載依頼は情報提供として扱い、内容の恣意的な変更は行いません。',
+              body: '事業者がPoC判断をするのに必要な変数を整理することを目的としています。メーカーからの情報提供や掲載依頼は歓迎しますが、掲載内容は編集基準に基づき客観性を担保します。必要に応じて出典や確認日を明示します。',
             },
             {
               label: '画像・ロゴ',
@@ -146,18 +148,17 @@ export default function AboutPage() {
       </section>
 
       <section className="py-8">
-        <h2 className="text-xl font-semibold text-foreground mb-3">運営とお問い合わせ</h2>
-        <p className="text-muted-foreground mb-6 max-w-3xl leading-relaxed">
-          掲載相談、情報提供・修正、取材相談、導入相談を受け付けています。
-          特定メーカーの販売促進を目的とせず、導入判断に必要な客観的な情報の整理を優先します。
+        <h2 className="text-xl font-semibold text-foreground mb-3">お問い合わせ</h2>
+        <p className="text-muted-foreground max-w-3xl leading-relaxed">
+          掲載相談、情報提供・修正、取材相談、導入相談を随時受け付けております。お問い合わせは
+          <Link
+            href="/contact"
+            className="text-tone-brand-text hover:text-tone-brand-solid underline underline-offset-2 transition-colors mx-0.5"
+          >
+            こちら
+          </Link>
+          から。
         </p>
-        <Link
-          href="/contact"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm"
-        >
-          お問い合わせ
-          <ArrowRight className="w-4 h-4" />
-        </Link>
       </section>
     </div>
   );
