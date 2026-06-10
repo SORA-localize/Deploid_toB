@@ -189,6 +189,8 @@ export const uiText = {
     emptyTitle: '比較シートにロボットがありません',
     emptyDescription: (max: number) =>
       `左のメニューからロボットを選ぶと比較シートに追加されます。最大${max}ロボットまで横並びで比較できます。`,
+    emptyAction: '左のメニューからロボットを追加しましょう。',
+    emptyHint: 'ドラッグ&ドロップ、お気に入り機能が利用可能です。',
     clearAria: '比較シートを空にする',
     toggleAria: (name: string, expanded: boolean) => `${name}のロボット一覧を${expanded ? '閉じる' : '開く'}`,
     addAria: (name: string) => `${name}を比較に追加する`,

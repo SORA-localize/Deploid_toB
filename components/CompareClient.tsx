@@ -21,7 +21,6 @@ import {
 import { ChevronDown, ChevronRight, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { EmptyState } from '@/components/EmptyState';
 import {
   CompareDragOverlayCard,
   CompareDroppableArea,
@@ -462,14 +461,21 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
 
                     <div className="min-h-[22rem]">
                       {selectedRobots.length === 0 && !sheetPreview ? (
-                        <div className="flex min-h-[22rem] items-center justify-center">
-                          <EmptyState
-                            message={uiText.comparison.emptyTitle}
-                            description={uiText.comparison.emptyDescription(MAX_COMPARE_ROBOTS)}
-                            variant="white"
-                            size="large"
-                            className="w-full max-w-md"
-                          />
+                        <div className="flex min-h-[22rem] items-center justify-center text-center">
+                          <div className="max-w-md">
+                            <p className="text-sm font-medium text-foreground">
+                              {uiText.comparison.emptyTitle}
+                            </p>
+                            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                              {uiText.comparison.emptyDescription(MAX_COMPARE_ROBOTS)}
+                            </p>
+                            <p className="mt-5 text-sm font-medium text-foreground">
+                              {uiText.comparison.emptyAction}
+                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              {uiText.comparison.emptyHint}
+                            </p>
+                          </div>
                         </div>
                       ) : (
                         <SortableContext items={sheetItemIds} strategy={rectSortingStrategy}>
@@ -566,12 +572,14 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                       {!isMounted ? (
                         <div className="text-center py-8" aria-hidden="true" />
                       ) : favoriteRobots.length === 0 ? (
-                        <EmptyState
-                          message={uiText.favorites.empty}
-                          description={uiText.favorites.emptySub}
-                          variant="muted"
-                          icon={<Star className="w-8 h-8" />}
-                        />
+                        <div className="py-8 text-center">
+                          <p className="text-xs font-medium text-muted-foreground">
+                            {uiText.favorites.empty}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground/70">
+                            {uiText.favorites.emptySub}
+                          </p>
+                        </div>
                       ) : (
                         <div className="space-y-3">
                           {favoriteRobots.map((robot) => {
