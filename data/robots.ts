@@ -235,6 +235,19 @@ export const robots: Robot[] = [
       },
     ],
     images: {
+      transparent: {
+        src: '/images/robots/agility-digit-transparent.png',
+        alt: 'Agility Digit 全身正面（背景透過）',
+        credit: 'Agility Robotics',
+        sourceUrl: 'https://www.agilityrobotics.com/',
+        rights: {
+          status: 'commercial-permitted',
+          sourceType: 'manufacturer-official',
+          rightsHolder: 'Agility Robotics',
+          checkedAt: '2026-06-11',
+          permissionNote: 'Agility Robotics 公式プレスキットより取得・rembg で背景除去',
+        },
+      },
       hero: {
         src: '/images/robots/agility-digit-hero.jpg',
         alt: 'Agility Digit 全身正面',

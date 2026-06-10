@@ -6,9 +6,11 @@ import { Popover as PopoverPrimitive } from 'radix-ui';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { CompareCardDragHandleProps } from '@/components/SortableCompareCard';
 import type { ImageAsset, Robot } from '@/data/types';
-import { japanAvailabilityLabels, TBD_LABEL } from '@/lib/labels';
+import { deploymentStageLabels, TBD_LABEL } from '@/lib/labels';
 import { getComparisonCoreRows, getComparisonDetailRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
+import { getDeploymentStageTone } from '@/lib/visualSemantics';
+import { TagChip } from '@/components/TagChip';
 
 interface ComparisonRobotPanelProps {
   robot: Robot;
@@ -22,7 +24,6 @@ interface ComparisonRobotPanelProps {
 
 function CompactList({ items }: { items: string[] }) {
   if (items.length === 0) return <p className="text-xs text-muted-foreground">{TBD_LABEL}</p>;
-
   return (
     <ul className="space-y-1 text-xs text-foreground">
       {items.map((item) => (
@@ -46,16 +47,16 @@ export function ComparisonRobotPanel({
 }: ComparisonRobotPanelProps) {
   const coreRows = getComparisonCoreRows(robot);
   const detailRows = getComparisonDetailRows(robot);
-  const hero = robot.images?.hero ?? robot.heroImage;
-  const distributorDisplay =
-    robot.distributorJapan ?? japanAvailabilityLabels[robot.japanAvailability];
+
+  // 透過PNG → hero の順でフォールバック
+  const cardImage = robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage;
 
   return (
     <article className="flex flex-col border border-border bg-card text-card-foreground h-full relative">
 
       {/* ── ヘッダー（D&D ハンドル + keyboard sortable の入口）── */}
       <div
-        className={`border-b border-border-subtle bg-muted p-3 flex flex-col gap-4 ${
+        className={`border-b border-border-subtle bg-muted px-3 py-2.5 flex items-start justify-between gap-3 ${
           dragHandleProps
             ? 'cursor-grab touch-none select-none active:cursor-grabbing'
             : ''
@@ -65,92 +66,91 @@ export function ComparisonRobotPanel({
         {...dragHandleProps?.attributes}
         {...dragHandleProps?.listeners}
       >
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <h3
-              className="text-sm font-semibold text-foreground truncate"
-              title={robot.nameJa ?? robot.name}
-            >
-              {robot.nameJa ?? robot.name}
-            </h3>
-            <ManufacturerLogoName
-              name={manufacturerName ?? robot.manufacturerSlug}
-              logo={manufacturerLogo}
-              className="mt-1 text-xs text-muted-foreground"
-              frameClassName="h-4 w-4 shrink-0"
-              imageClassName="h-3 w-3"
-            />
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <button
-              type="button"
-              aria-label={
-                isFavorite
-                  ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name)
-                  : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)
-              }
-              aria-pressed={isFavorite}
-              onPointerDown={(event) => event.stopPropagation()}
-              onClick={() => onFavoriteToggle(robot.slug)}
-              className="p-1.5 hover:bg-muted rounded-sm transition-colors text-muted-foreground hover:text-foreground"
-            >
-              <Star
-                className={`h-4 w-4 ${
-                  isFavorite ? 'fill-favorite text-favorite' : 'currentColor'
-                }`}
-              />
-            </button>
-            <button
-              type="button"
-              aria-label={uiText.comparison.removeAria(robot.nameJa ?? robot.name)}
-              onPointerDown={(event) => event.stopPropagation()}
-              onClick={() => onRemove(robot.slug)}
-              className="p-1.5 hover:bg-muted rounded-sm transition-colors text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+        {/* 名前・メーカー */}
+        <div className="min-w-0 flex-1">
+          <h3
+            className="text-sm font-semibold text-foreground leading-tight truncate"
+            title={robot.nameJa ?? robot.name}
+          >
+            {robot.nameJa ?? robot.name}
+          </h3>
+          <ManufacturerLogoName
+            name={manufacturerName ?? robot.manufacturerSlug}
+            logo={manufacturerLogo}
+            className="mt-0.5 text-xs text-muted-foreground"
+            frameClassName="h-3.5 w-3.5 shrink-0"
+            imageClassName="h-2.5 w-2.5"
+          />
+        </div>
+        {/* ★ ✕ */}
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            aria-label={
+              isFavorite
+                ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name)
+                : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)
+            }
+            aria-pressed={isFavorite}
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => onFavoriteToggle(robot.slug)}
+            className="p-1 hover:bg-muted rounded-sm transition-colors text-muted-foreground hover:text-foreground"
+          >
+            <Star className={`h-3.5 w-3.5 ${isFavorite ? 'fill-favorite text-favorite' : ''}`} />
+          </button>
+          <button
+            type="button"
+            aria-label={uiText.comparison.removeAria(robot.nameJa ?? robot.name)}
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => onRemove(robot.slug)}
+            className="p-1 hover:bg-muted rounded-sm transition-colors text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
 
-      {/* ── サムネ（Popover トリガー）── */}
+      {/* ── 画像エリア（Popover トリガー）── */}
       <PopoverPrimitive.Root>
         <PopoverPrimitive.Trigger asChild>
           <button
             type="button"
             aria-label={uiText.comparison.detailsAria(robot.nameJa ?? robot.name)}
-            onPointerDown={(event) => event.stopPropagation()}
-            className="group relative block w-full border-b border-border-subtle bg-muted
-                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            onPointerDown={(e) => e.stopPropagation()}
+            className="group relative flex-1 flex items-end justify-center bg-muted w-full
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+                       min-h-[200px]"
           >
-            <div className="aspect-[3/2] w-full overflow-hidden flex items-center justify-center text-xs text-muted-foreground">
-              {hero ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={hero.src}
-                  alt={hero.alt}
-                  className="h-full w-full object-contain transition-opacity duration-200 group-hover:opacity-80"
-                />
-              ) : (
-                uiText.robots.mainImageMissing
-              )}
-            </div>
-            {/* ホバーオーバーレイ（視覚的ヒントのみ） */}
+            {cardImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={cardImage.src}
+                alt={cardImage.alt}
+                className="w-full h-full object-contain object-bottom absolute inset-0
+                           transition-transform duration-300 group-hover:scale-[1.03]"
+              />
+            ) : (
+              <span className="text-xs text-muted-foreground z-10">
+                {uiText.robots.mainImageMissing}
+              </span>
+            )}
+            {/* ホバーオーバーレイ */}
             <div
               aria-hidden="true"
-              className="absolute inset-0 flex items-center justify-center
-                         bg-black/0 group-hover:bg-black/20 transition-colors duration-200"
+              className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200"
+            />
+            <span
+              aria-hidden="true"
+              className="relative z-10 mb-2 rounded-sm bg-card/80 px-2 py-0.5 text-[10px]
+                         font-medium text-foreground opacity-0 group-hover:opacity-100
+                         transition-opacity duration-200 backdrop-blur-sm"
             >
-              <span
-                className="rounded-sm bg-card/90 px-2.5 py-1 text-xs font-medium text-foreground
-                           opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              >
-                {uiText.comparison.detailsLabel}
-              </span>
-            </div>
+              {uiText.comparison.detailsLabel}
+            </span>
           </button>
         </PopoverPrimitive.Trigger>
 
+        {/* ── Popover 詳細パネル ── */}
         <PopoverPrimitive.Portal>
           <PopoverPrimitive.Content
             side="bottom"
@@ -162,62 +162,48 @@ export function ComparisonRobotPanel({
                        data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95
                        data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
           >
-            {/* Popover ヘッダー */}
             <div className="flex items-center justify-between gap-3 border-b border-border p-3">
               <h4 className="text-sm font-semibold text-foreground truncate">
                 {robot.nameJa ?? robot.name}
               </h4>
               <PopoverPrimitive.Close
                 aria-label={uiText.comparison.closeDetail}
-                className="shrink-0 p-1 text-muted-foreground hover:text-foreground
-                           rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="shrink-0 p-1 text-muted-foreground hover:text-foreground rounded-sm transition-colors
+                           focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <X className="h-4 w-4" />
               </PopoverPrimitive.Close>
             </div>
 
             <div className="p-3 space-y-5">
-              {/* コアスペック */}
               <section>
                 <h5 className="mb-2 text-xs font-semibold text-foreground pb-1.5 border-b border-border-subtle">
                   {uiText.comparison.coreVariables}
                 </h5>
                 <dl className="space-y-2 text-xs">
                   {coreRows.map((row) => (
-                    <div
-                      key={row.label}
-                      className="flex justify-between gap-3 border-b border-border-subtle pb-2 last:border-0 last:pb-0"
-                    >
+                    <div key={row.label} className="flex justify-between gap-3 border-b border-border-subtle pb-2 last:border-0 last:pb-0">
                       <dt className="shrink-0 text-muted-foreground">{row.label}</dt>
-                      <dd className="text-right font-medium text-foreground break-words max-w-[65%]">
-                        {row.value}
-                      </dd>
+                      <dd className="text-right font-medium text-foreground break-words max-w-[65%]">{row.value}</dd>
                     </div>
                   ))}
                 </dl>
               </section>
 
-              {/* 詳細データ */}
               <section>
                 <h5 className="mb-2 text-xs font-semibold text-foreground pb-1.5 border-b border-border-subtle">
                   {uiText.comparison.detailedData}
                 </h5>
                 <dl className="space-y-2 text-xs">
                   {detailRows.map((row) => (
-                    <div
-                      key={row.label}
-                      className="flex justify-between gap-3 border-b border-border-subtle pb-2 last:border-0 last:pb-0"
-                    >
+                    <div key={row.label} className="flex justify-between gap-3 border-b border-border-subtle pb-2 last:border-0 last:pb-0">
                       <dt className="shrink-0 text-muted-foreground">{row.label}</dt>
-                      <dd className="text-right font-medium text-foreground break-words max-w-[65%]">
-                        {row.value}
-                      </dd>
+                      <dd className="text-right font-medium text-foreground break-words max-w-[65%]">{row.value}</dd>
                     </div>
                   ))}
                 </dl>
               </section>
 
-              {/* 適合情報（データある項目のみ） */}
               {(robot.comparison.bestFit.length > 0 ||
                 robot.comparison.notFit.length > 0 ||
                 robot.comparison.strengths.length > 0 ||
@@ -250,7 +236,6 @@ export function ComparisonRobotPanel({
                 </section>
               )}
 
-              {/* 詳細ページリンク */}
               <Link
                 href={`/robots/${robot.slug}`}
                 className="flex items-center justify-between border border-border p-2.5 text-xs
@@ -264,12 +249,11 @@ export function ComparisonRobotPanel({
         </PopoverPrimitive.Portal>
       </PopoverPrimitive.Root>
 
-      {/* ── 代理店フッター ── */}
-      <div className="mt-auto border-t border-border-subtle p-3">
-        <dl className="flex items-center justify-between gap-2 text-xs">
-          <dt className="shrink-0 text-muted-foreground">{uiText.comparison.distributor}</dt>
-          <dd className="text-right font-medium text-foreground truncate">{distributorDisplay}</dd>
-        </dl>
+      {/* ── deploymentStage バッジ ── */}
+      <div className="border-t border-border-subtle px-3 py-2 flex items-center gap-2">
+        <TagChip tone={getDeploymentStageTone(robot.deploymentStage)} className="text-[10px] py-0.5">
+          {deploymentStageLabels[robot.deploymentStage]}
+        </TagChip>
       </div>
 
     </article>
