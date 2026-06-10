@@ -86,10 +86,8 @@ export function ComparisonRobotPanel({
         </div>
       )}
 
-      {/* ── 左右ビネット + ホバー暗転オーバーレイ（pointer-events-none）── */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-10 bg-gradient-to-r from-black/25 to-transparent" aria-hidden="true" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-10 bg-gradient-to-l from-black/25 to-transparent" aria-hidden="true" />
-      <div className="pointer-events-none absolute inset-0 z-[2] bg-black/0 transition-colors duration-300 group-hover:bg-black/20" aria-hidden="true" />
+      {/* ── ホバー暗転オーバーレイ（pointer-events-none）── */}
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-black/0 transition-colors duration-300 group-hover:bg-black/20" aria-hidden="true" />
 
       {/* ── Popover trigger（画像全体を覆う z-0）── */}
       <PopoverPrimitive.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
