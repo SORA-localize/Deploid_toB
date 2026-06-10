@@ -467,10 +467,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                               {uiText.comparison.emptyTitle}
                             </p>
                             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                              {uiText.comparison.emptyDescription(MAX_COMPARE_ROBOTS)}
-                            </p>
-                            <p className="mt-5 text-sm font-medium text-foreground">
-                              {uiText.comparison.emptyAction}
+                              {uiText.comparison.emptyDescription}
                             </p>
                             <p className="mt-1 text-xs text-muted-foreground">
                               {uiText.comparison.emptyHint}
