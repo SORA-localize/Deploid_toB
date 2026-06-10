@@ -82,15 +82,17 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
 
       <div className="site-container py-5">
         <Breadcrumbs items={[{ label: uiText.manufacturers.breadcrumb }]} />
-        <PageListHeader title={uiText.manufacturers.title} description={uiText.manufacturers.description} />
-
-        <div className="mb-4 max-w-2xl">
-          <SearchInput
-            value={filters.query}
-            onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
-            placeholder={uiText.searchPlaceholders.manufacturers}
-          />
-        </div>
+        <PageListHeader
+          title={uiText.manufacturers.title}
+          description={uiText.manufacturers.description}
+          action={
+            <SearchInput
+              value={filters.query}
+              onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
+              placeholder={uiText.searchPlaceholders.manufacturers}
+            />
+          }
+        />
 
         <div className="grid grid-cols-1 gap-4 mb-5 sm:grid-cols-2 max-w-2xl">
           <SelectControl

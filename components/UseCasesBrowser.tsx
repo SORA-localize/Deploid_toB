@@ -78,15 +78,18 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
       <div className="border-b border-border bg-card">
         <div className="site-container py-5">
           <Breadcrumbs items={[{ label: uiText.useCases.breadcrumb }]} />
-          <PageListHeader title={uiText.useCases.title} description={uiText.useCases.description} className="mb-6" />
-
-          <div className="max-w-2xl mb-6">
-            <SearchInput
-              value={query}
-              onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
-              placeholder={uiText.searchPlaceholders.useCases}
-            />
-          </div>
+          <PageListHeader
+            title={uiText.useCases.title}
+            description={uiText.useCases.description}
+            className="mb-6"
+            action={
+              <SearchInput
+                value={query}
+                onChange={(nextQuery) => updateParams({ q: nextQuery }, 'replace')}
+                placeholder={uiText.searchPlaceholders.useCases}
+              />
+            }
+          />
 
           <FilterChipGroup
             options={modeOptions}
