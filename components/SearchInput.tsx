@@ -68,6 +68,7 @@ export function SearchInput({
       inputClassName={inputClassName}
       placeholder={placeholder}
       value={draftValue}
+      variant="underline"
       onCompositionStart={() => {
         isComposingRef.current = true;
         clearPendingCommit();
