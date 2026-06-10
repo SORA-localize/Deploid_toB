@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ExternalLink, GripVertical, Star, X } from 'lucide-react';
-import { Popover as PopoverPrimitive } from 'radix-ui';
+import { Dialog as DialogPrimitive } from 'radix-ui';
 import type { CompareCardDragHandleProps } from '@/components/SortableCompareCard';
 import type { ImageAsset, Robot } from '@/data/types';
 import { TBD_LABEL } from '@/lib/labels';
@@ -89,43 +89,58 @@ export function ComparisonRobotPanel({
       {/* ── ホバー暗転オーバーレイ（pointer-events-none）── */}
       <div className="pointer-events-none absolute inset-0 z-[1] bg-black/0 transition-colors duration-300 group-hover:bg-black/20" aria-hidden="true" />
 
-      {/* ── Popover trigger（画像全体を覆う z-0）── */}
-      <PopoverPrimitive.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
-        <PopoverPrimitive.Trigger asChild>
+      {/* ── Dialog trigger（画像全体を覆う z-0）── */}
+      <DialogPrimitive.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
+        <DialogPrimitive.Trigger asChild>
           <button
             type="button"
             aria-label={uiText.comparison.detailsAria(robot.nameJa ?? robot.name)}
             onPointerDown={(e) => e.stopPropagation()}
             className="absolute inset-0 z-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
           />
-        </PopoverPrimitive.Trigger>
+        </DialogPrimitive.Trigger>
 
-        {/* ── Popover 詳細パネル ── */}
-        <PopoverPrimitive.Portal>
-          <PopoverPrimitive.Content
-            side="bottom"
-            align="start"
-            sideOffset={4}
-            collisionPadding={8}
-            className="z-[var(--z-dropdown)] w-[min(400px,90vw)] max-h-[80vh] overflow-y-auto
-                       border border-border bg-card text-card-foreground shadow-lg
-                       data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95
-                       data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+        {/* ── 右スライドイン詳細パネル ── */}
+        <DialogPrimitive.Portal>
+          {/* 背景オーバーレイ */}
+          <DialogPrimitive.Overlay
+            className="fixed inset-0 z-[var(--z-modal)] bg-black/30
+                       data-[state=open]:animate-in data-[state=open]:fade-in-0
+                       data-[state=closed]:animate-out data-[state=closed]:fade-out-0
+                       duration-300"
+          />
+          {/* 右パネル本体 */}
+          <DialogPrimitive.Content
+            className="fixed right-0 top-0 z-[var(--z-modal)] h-full w-[min(420px,90vw)]
+                       bg-card border-l border-border shadow-xl overflow-y-auto
+                       flex flex-col
+                       focus:outline-none
+                       data-[state=open]:animate-in data-[state=open]:slide-in-from-right
+                       data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right
+                       duration-300 ease-out"
           >
-            <div className="flex items-center justify-between gap-3 border-b border-border p-3">
+            {/* a11y 用 visually-hidden タイトル */}
+            <DialogPrimitive.Title className="sr-only">
+              {robot.nameJa ?? robot.name}
+            </DialogPrimitive.Title>
+
+            {/* パネルヘッダー */}
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3
+                            border-b border-border bg-card px-4 py-3">
               <h4 className="text-sm font-semibold text-foreground truncate">
                 {robot.nameJa ?? robot.name}
               </h4>
-              <PopoverPrimitive.Close
+              <DialogPrimitive.Close
                 aria-label={uiText.comparison.closeDetail}
-                className="shrink-0 p-1 text-muted-foreground hover:text-foreground rounded-sm transition-colors
+                className="shrink-0 p-1.5 text-muted-foreground hover:text-foreground rounded-sm transition-colors
                            focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <X className="h-4 w-4" />
-              </PopoverPrimitive.Close>
+              </DialogPrimitive.Close>
             </div>
 
-            <div className="p-3 space-y-5">
+            {/* パネル本文 */}
+            <div className="flex-1 px-4 py-4 space-y-6">
               <section>
                 <h5 className="mb-2 text-xs font-semibold text-foreground pb-1.5 border-b border-border-subtle">
                   {uiText.comparison.coreVariables}
@@ -195,9 +210,9 @@ export function ComparisonRobotPanel({
                 <ExternalLink className="h-3.5 w-3.5 shrink-0" />
               </Link>
             </div>
-          </PopoverPrimitive.Content>
-        </PopoverPrimitive.Portal>
-      </PopoverPrimitive.Root>
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
 
       {/* ── top overlay: D&D ハンドル + 名前 + ★✕（z-10）── */}
       {/*
