@@ -35,12 +35,12 @@ const roadmap = [
 
 export default function AboutPage() {
   return (
-    <div className="site-container py-6 sm:py-10">
+    <div className="site-container py-8">
       <Breadcrumbs items={[{ label: '会社概要' }]} />
 
       <section className="py-8 border-b border-border">
         <p className="text-xs text-muted-foreground mb-4">Deploidについて</p>
-        <h1 className="text-3xl font-semibold text-foreground mb-4 max-w-3xl leading-tight">
+        <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-4 max-w-3xl leading-tight">
           ヒューマノイド導入の、最初の判断材料をつくる。
         </h1>
         <p className="text-lg text-muted-foreground max-w-3xl leading-relaxed">
@@ -49,19 +49,23 @@ export default function AboutPage() {
       </section>
 
       <section className="py-8 border-b border-border">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <dl className="divide-y divide-border">
           {values.map((v) => (
-            <div key={v.label} className="border border-border bg-card p-6">
-              <p className="text-xs text-muted-foreground mb-3">{v.label}</p>
-              <h3 className="font-semibold text-foreground mb-2">{v.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{v.body}</p>
+            <div key={v.label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-5 first:pt-0 last:pb-0">
+              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">
+                {v.label}
+              </dt>
+              <dd>
+                <p className="font-semibold text-foreground mb-1">{v.title}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{v.body}</p>
+              </dd>
             </div>
           ))}
-        </div>
+        </dl>
       </section>
 
       <section className="py-8 border-b border-border">
-        <h2 className="text-2xl font-semibold text-foreground mb-8">ロードマップ</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-6">ロードマップ</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {roadmap.map((r) => (
             <div key={r.step} className="flex gap-4 border border-border bg-card p-5">
@@ -78,20 +82,18 @@ export default function AboutPage() {
       </section>
 
       <section className="py-8">
-        <div className="border border-border bg-card p-8">
-          <h2 className="text-xl font-semibold text-foreground mb-4">運営とお問い合わせ</h2>
-          <p className="text-muted-foreground mb-6 max-w-3xl leading-relaxed">
-            現在は少人数で運営しています。掲載相談、情報提供・修正、取材相談、導入相談を受け付けています。
-            特定メーカーの販売促進を目的とせず、導入判断に必要な客観的な情報の整理を優先します。
-          </p>
-          <Link
-            href="/contact"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm"
-          >
-            お問い合わせ
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
+        <h2 className="text-xl font-semibold text-foreground mb-3">運営とお問い合わせ</h2>
+        <p className="text-muted-foreground mb-6 max-w-3xl leading-relaxed">
+          現在は少人数で運営しています。掲載相談、情報提供・修正、取材相談、導入相談を受け付けています。
+          特定メーカーの販売促進を目的とせず、導入判断に必要な客観的な情報の整理を優先します。
+        </p>
+        <Link
+          href="/contact"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm"
+        >
+          お問い合わせ
+          <ArrowRight className="w-4 h-4" />
+        </Link>
       </section>
     </div>
   );
