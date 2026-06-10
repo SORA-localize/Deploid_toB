@@ -363,7 +363,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                       isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                     )}
                   >
-                    <div className="px-4 py-3 border-b border-border bg-card">
+                    <div className="px-4 py-3 border-b border-border-subtle bg-card">
                       <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {uiText.compare.manufacturers}
                       </h2>
@@ -431,7 +431,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
 
             {/* Main Content - Comparison Sheet */}
             <div className="min-w-0 md:row-span-2 xl:row-span-1">
-              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-xs text-muted-foreground">
                   {uiText.compare.comparisonSheet(orderedSlugs.length, MAX_COMPARE_ROBOTS)}
                 </span>
@@ -473,7 +473,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                     <div
                       ref={setNodeRef}
                       className={cn(
-                        'border border-border bg-muted p-3 transition-[box-shadow,outline-color] duration-200 sm:p-4',
+                        'p-2 transition-[box-shadow,outline-color] duration-200 sm:p-3',
                         isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                       )}
                     >
@@ -556,17 +556,17 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   <div
                     ref={setNodeRef}
                     className={cn(
-                      'border border-border bg-muted transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
+                      'border border-border bg-transparent transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
                       isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                     )}
                   >
-                    <div className="px-4 py-3 border-b border-border bg-card flex items-center gap-2">
+                    <div className="px-4 py-3 border-b border-border-subtle bg-transparent flex items-center gap-2">
                       <Star className="w-4 h-4 text-favorite" />
                       <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {uiText.compare.favorites}
                       </h2>
                     </div>
-                    <div className="p-4 max-h-80 overflow-y-auto overscroll-contain xl:max-h-[calc(100vh-200px)]">
+                    <div className="p-3 max-h-80 overflow-y-auto overscroll-contain xl:max-h-[calc(100vh-200px)]">
                       {!isMounted ? (
                         <div className="text-center py-8" aria-hidden="true" />
                       ) : favoriteRobots.length === 0 ? (

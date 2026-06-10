@@ -176,10 +176,10 @@ export function CompareInsertionPreviewCard({
 }: CompareDragOverlayCardProps) {
   return (
     <article
-      className="pointer-events-none flex h-full min-h-[26rem] flex-col border border-dashed border-ring bg-card/70 text-card-foreground opacity-65 shadow-sm"
+      className="pointer-events-none flex h-full flex-col border border-dashed border-ring bg-card/70 text-card-foreground opacity-60 shadow-sm"
       aria-hidden="true"
     >
-      <div className="border-b border-border bg-muted/80 p-3">
+      <div className="border-b border-border-subtle bg-muted/80 p-3">
         <h3 className="truncate text-sm font-semibold text-foreground" title={robot.nameJa ?? robot.name}>
           {robot.nameJa ?? robot.name}
         </h3>
@@ -191,11 +191,11 @@ export function CompareInsertionPreviewCard({
           imageClassName="h-3 w-3"
         />
       </div>
-      <div className="border-b border-border bg-card px-3 py-2 text-center text-xs font-medium text-muted-foreground">
+      <div className="border-b border-border-subtle bg-card px-3 py-2 text-center text-xs font-medium text-muted-foreground">
         {uiText.comparison.addToSheet}
       </div>
-      <div className="aspect-[4/3] border-b border-border bg-muted/80" />
-      <div className="mt-auto space-y-2 p-3">
+      <div className="aspect-[3/2] border-b border-border-subtle bg-muted/80" />
+      <div className="mt-auto space-y-2.5 p-3">
         <div className="h-3 w-24 bg-muted" />
         <div className="h-3 w-full bg-muted" />
         <div className="h-3 w-4/5 bg-muted" />

@@ -61,7 +61,7 @@ export function ComparisonRobotPanel({
   return (
     <article className="flex flex-col border border-border bg-card text-card-foreground h-full relative">
       <div
-        className={`border-b border-border bg-muted p-3 flex flex-col gap-4 ${
+        className={`border-b border-border-subtle bg-muted p-3 flex flex-col gap-4 ${
           dragHandleProps
             ? 'cursor-grab touch-none select-none active:cursor-grabbing'
             : ''
@@ -71,7 +71,7 @@ export function ComparisonRobotPanel({
         {...dragHandleProps?.attributes}
         {...dragHandleProps?.listeners}
       >
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
             <h3
               className="text-sm font-semibold text-foreground truncate"
@@ -87,7 +87,7 @@ export function ComparisonRobotPanel({
               imageClassName="h-3 w-3"
             />
           </div>
-          <div className="flex shrink-0 items-center gap-1">
+          <div className="flex shrink-0 items-center gap-2">
             <button
               type="button"
               aria-label={
@@ -119,7 +119,7 @@ export function ComparisonRobotPanel({
         </div>
       </div>
 
-      <div className="flex border-b border-border bg-card" role="tablist">
+      <div className="flex border-b border-border-subtle bg-card" role="tablist">
         <button
           id={basicTabId}
           type="button"
@@ -144,7 +144,7 @@ export function ComparisonRobotPanel({
           aria-controls={detailedPanelId}
           onClick={() => setActiveTab('detailed')}
           onKeyDown={handleTabKeyDown}
-          className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors border-l border-l-border ${
+          className={`flex-1 py-2.5 text-xs font-medium text-center transition-colors border-l border-l-border-subtle ${
             activeTab === 'detailed'
               ? 'bg-card text-foreground border-b-2 border-b-primary'
               : 'bg-muted text-muted-foreground hover:text-foreground border-b-2 border-b-transparent'
@@ -164,7 +164,7 @@ export function ComparisonRobotPanel({
             activeTab === 'basic' ? 'opacity-100' : 'opacity-0 invisible pointer-events-none'
           }`}
         >
-          <div className="aspect-[4/3] w-full bg-muted border-b border-border flex items-center justify-center text-xs text-muted-foreground overflow-hidden shrink-0">
+          <div className="aspect-[3/2] w-full bg-muted border-b border-border-subtle flex items-center justify-center text-xs text-muted-foreground overflow-hidden shrink-0">
             {hero ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={hero.src} alt={hero.alt} className="h-full w-full object-contain" />
@@ -174,11 +174,11 @@ export function ComparisonRobotPanel({
           </div>
 
           <div className="p-3 mt-auto">
-            <dl className="space-y-2 text-xs">
+            <dl className="space-y-2.5 text-xs">
               {coreRows.map((row) => (
                 <div
                   key={row.label}
-                  className="flex justify-between gap-3 border-b border-border pb-1.5 last:border-0 last:pb-0"
+                  className="flex justify-between gap-3 border-b border-border-subtle pb-2.5 last:border-0 last:pb-0"
                 >
                   <dt className="shrink-0 text-muted-foreground">{row.label}</dt>
                   <dd className="text-right font-medium text-foreground break-words max-w-[65%]">
@@ -195,17 +195,17 @@ export function ComparisonRobotPanel({
             id={detailedPanelId}
             role="tabpanel"
             aria-labelledby={detailedTabId}
-            className="absolute inset-0 overflow-y-auto overscroll-contain bg-card flex flex-col p-3 gap-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className="absolute inset-0 overflow-y-auto overscroll-contain bg-card flex flex-col p-3 gap-5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             <section>
-              <h4 className="mb-3 text-xs font-semibold text-foreground pb-2 border-b border-border">
+              <h4 className="mb-3 text-xs font-semibold text-foreground pb-2 border-b border-border-subtle">
                 {uiText.comparison.detailedData}
               </h4>
-              <dl className="space-y-2 text-xs">
+              <dl className="space-y-2.5 text-xs">
                 {detailRows.map((row) => (
                   <div
                     key={row.label}
-                    className="flex justify-between gap-2 border-b border-border pb-1.5 last:border-0 last:pb-0"
+                    className="flex justify-between gap-3 border-b border-border-subtle pb-2.5 last:border-0 last:pb-0"
                   >
                     <dt className="shrink-0 text-muted-foreground">{row.label}</dt>
                     <dd className="text-right font-medium text-foreground break-words max-w-[65%]">
