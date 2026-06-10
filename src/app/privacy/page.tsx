@@ -34,7 +34,7 @@ export default function PrivacyPage() {
             },
             {
               label: '外部サービス',
-              body: 'フォームの送受信にFormspree（formspree.io）を使用しています。送信されたデータはFormspreeのサーバーを経由します。Formspreeのプライバシーポリシーは同社のウェブサイトをご参照ください。',
+              body: 'フォームの送受信にFormspree（formspree.io）を使用しています。送信されたデータはFormspreeのサーバーを経由します。また、アクセス解析のためにGoogle Analytics 4を使用し、閲覧ページや流入元などの利用状況を計測します。各サービスのプライバシーポリシーは各社のウェブサイトをご参照ください。',
             },
             {
               label: '第三者提供',
