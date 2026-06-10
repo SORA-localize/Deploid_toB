@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { TagChip } from '@/components/TagChip';
@@ -47,10 +48,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
       <div className="border-b border-border bg-card">
         <div className="site-container py-5">
           <Breadcrumbs items={[{ label: uiText.guides.breadcrumb }]} />
-          <h1 className="text-2xl font-semibold text-foreground mb-3">{uiText.guides.title}</h1>
-          <p className="text-sm text-muted-foreground max-w-3xl mb-6 leading-relaxed">
-            ヒューマノイド導入を「知る・判断する・動く」で理解するための常設ガイド。調達・TCO・安全・PoC・ベンダー評価を体系的に整理します。
-          </p>
+          <PageListHeader title={uiText.guides.title} description={uiText.guides.description} className="mb-6" />
 
           <FilterChipGroup
             options={stageOptions}

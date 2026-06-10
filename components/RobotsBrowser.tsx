@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { SelectControl } from '@/components/SelectControl';
 import { RobotCard } from '@/components/RobotCard';
@@ -156,12 +157,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
 
       <div className="site-container py-5 min-h-[60vh]">
         <Breadcrumbs items={[{ label: uiText.robots.breadcrumb }]} />
-        <div className="mb-5">
-          <h1 className="text-2xl font-semibold text-foreground mb-2">{uiText.robots.title}</h1>
-          <p className="text-sm text-muted-foreground max-w-3xl">
-            導入判断に必要なヒューマノイドロボットのカタログ。業種・タスク・メーカー・国内入手性で絞り込み、現場に合う候補を探せます。
-          </p>
-        </div>
+        <PageListHeader title={uiText.robots.title} description={uiText.robots.description} />
 
         <div className="mb-4 max-w-2xl">
           <SearchInput

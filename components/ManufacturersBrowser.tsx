@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { ManufacturerCard } from '@/components/ManufacturerCard';
 import { ManufacturersHeader } from '@/components/ManufacturersHeader';
@@ -81,14 +82,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
 
       <div className="site-container py-5">
         <Breadcrumbs items={[{ label: uiText.manufacturers.breadcrumb }]} />
-        <div className="mb-5">
-          <h1 className="text-2xl font-semibold text-foreground mb-2">
-            {uiText.manufacturers.title}
-          </h1>
-          <p className="text-sm text-muted-foreground max-w-3xl">
-            ヒューマノイド開発企業のディレクトリ。地域と相談ルートから、日本で検討しやすい企業を確認できます。
-          </p>
-        </div>
+        <PageListHeader title={uiText.manufacturers.title} description={uiText.manufacturers.description} />
 
         <div className="mb-4 max-w-2xl">
           <SearchInput
