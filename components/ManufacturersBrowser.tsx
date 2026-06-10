@@ -101,6 +101,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
               updateParams({ country: nextCountry === 'all' ? null : nextCountry })
             }
             options={countryOptions}
+            searchable
           />
           <SelectControl
             id="manufacturer-consultation-route"
@@ -110,6 +111,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
               updateParams({ route: nextRoute === 'all' ? null : nextRoute })
             }
             options={consultationRouteOptions}
+            searchable
           />
         </div>
 
