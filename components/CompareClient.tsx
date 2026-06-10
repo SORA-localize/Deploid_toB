@@ -431,117 +431,113 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
 
             {/* Main Content - Comparison Sheet */}
             <div className="min-w-0 md:row-span-2 xl:row-span-1">
-              <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <span className="text-xs text-muted-foreground">
-                  {uiText.compare.comparisonSheet(orderedSlugs.length, MAX_COMPARE_ROBOTS)}
-                </span>
-                {orderedSlugs.length > 0 && (
-                  <button
-                    type="button"
-                    aria-label={uiText.comparison.clearAria}
-                    onClick={clearAll}
-                    className="text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    {uiText.common.clearAll}
-                  </button>
-                )}
-              </div>
-
               <CompareDroppableArea
                 id={compareColumnIds.sheet}
                 target="sheet"
                 isHighlighted={activeDropTarget === 'sheet'}
               >
-                {({ setNodeRef, isActive }) =>
-                  selectedRobots.length === 0 && !sheetPreview ? (
-                    <div
-                      ref={setNodeRef}
-                      className={cn(
-                        'flex min-h-[22rem] items-center justify-center transition-[box-shadow,outline-color] duration-200',
-                        isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
+                {({ setNodeRef, isActive }) => (
+                  <section
+                    ref={setNodeRef}
+                    className={cn(
+                      'border border-border-subtle bg-muted p-3 transition-[box-shadow,outline-color] duration-200',
+                      isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
+                    )}
+                  >
+                    <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {uiText.compare.comparisonSheet(orderedSlugs.length, MAX_COMPARE_ROBOTS)}
+                      </span>
+                      {orderedSlugs.length > 0 && (
+                        <button
+                          type="button"
+                          aria-label={uiText.comparison.clearAria}
+                          onClick={clearAll}
+                          className="text-xs text-muted-foreground hover:text-foreground"
+                        >
+                          {uiText.common.clearAll}
+                        </button>
                       )}
-                    >
-                      <EmptyState
-                        message={uiText.comparison.emptyTitle}
-                        description={uiText.comparison.emptyDescription(MAX_COMPARE_ROBOTS)}
-                        variant="muted"
-                        size="large"
-                        className="w-full max-w-md"
-                      />
                     </div>
-                  ) : (
-                    <div
-                      ref={setNodeRef}
-                      className={cn(
-                        'p-2 transition-[box-shadow,outline-color] duration-200 sm:p-3',
-                        isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
-                      )}
-                    >
-                      <SortableContext items={sheetItemIds} strategy={rectSortingStrategy}>
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                          {sheetPreviewItems.map((item) => {
-                            if (item.type === 'preview') {
-                              const manufacturer = manufacturerFor(item.robot.manufacturerSlug);
+
+                    <div className="min-h-[22rem]">
+                      {selectedRobots.length === 0 && !sheetPreview ? (
+                        <div className="flex min-h-[22rem] items-center justify-center">
+                          <EmptyState
+                            message={uiText.comparison.emptyTitle}
+                            description={uiText.comparison.emptyDescription(MAX_COMPARE_ROBOTS)}
+                            variant="white"
+                            size="large"
+                            className="w-full max-w-md"
+                          />
+                        </div>
+                      ) : (
+                        <SortableContext items={sheetItemIds} strategy={rectSortingStrategy}>
+                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                            {sheetPreviewItems.map((item) => {
+                              if (item.type === 'preview') {
+                                const manufacturer = manufacturerFor(item.robot.manufacturerSlug);
+                                return (
+                                  <motion.div
+                                    key={`sheet-preview-${item.robot.slug}`}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.96 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={SHEET_LAYOUT_TRANSITION}
+                                    className="h-full"
+                                  >
+                                    <CompareInsertionPreviewCard
+                                      robot={item.robot}
+                                      manufacturerName={manufacturer?.name ?? item.robot.manufacturerSlug}
+                                      manufacturerLogo={manufacturer?.logo}
+                                    />
+                                  </motion.div>
+                                );
+                              }
+
+                              const { robot } = item;
+                              const manufacturer = manufacturerFor(robot.manufacturerSlug);
                               return (
                                 <motion.div
-                                  key={`sheet-preview-${item.robot.slug}`}
-                                  layout
-                                  initial={{ opacity: 0, scale: 0.96 }}
-                                  animate={{ opacity: 1, scale: 1 }}
+                                  key={robot.slug}
+                                  layout={isInsertionPreviewing}
                                   transition={SHEET_LAYOUT_TRANSITION}
                                   className="h-full"
                                 >
-                                  <CompareInsertionPreviewCard
-                                    robot={item.robot}
-                                    manufacturerName={manufacturer?.name ?? item.robot.manufacturerSlug}
-                                    manufacturerLogo={manufacturer?.logo}
-                                  />
+                                  <SortableCompareCard
+                                    slug={robot.slug}
+                                    id={getDndItemId('sheet', robot.slug)}
+                                    data={{
+                                      type: 'robot',
+                                      source: 'sheet',
+                                      target: 'sheet',
+                                      dropType: 'sheet-card',
+                                      slug: robot.slug,
+                                    }}
+                                  >
+                                    {(dragHandleProps) => (
+                                      <ComparisonRobotPanel
+                                        robot={robot}
+                                        manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                                        manufacturerLogo={manufacturer?.logo}
+                                        isFavorite={
+                                          isMounted ? favorites.includes(robot.slug) : false
+                                        }
+                                        onFavoriteToggle={toggleFavorite}
+                                        onRemove={removeRobot}
+                                        dragHandleProps={dragHandleProps}
+                                      />
+                                    )}
+                                  </SortableCompareCard>
                                 </motion.div>
                               );
-                            }
-
-                            const { robot } = item;
-                            const manufacturer = manufacturerFor(robot.manufacturerSlug);
-                            return (
-                              <motion.div
-                                key={robot.slug}
-                                layout={isInsertionPreviewing}
-                                transition={SHEET_LAYOUT_TRANSITION}
-                                className="h-full"
-                              >
-                                <SortableCompareCard
-                                  slug={robot.slug}
-                                  id={getDndItemId('sheet', robot.slug)}
-                                  data={{
-                                    type: 'robot',
-                                    source: 'sheet',
-                                    target: 'sheet',
-                                    dropType: 'sheet-card',
-                                    slug: robot.slug,
-                                  }}
-                                >
-                                  {(dragHandleProps) => (
-                                    <ComparisonRobotPanel
-                                      robot={robot}
-                                      manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
-                                      manufacturerLogo={manufacturer?.logo}
-                                      isFavorite={
-                                        isMounted ? favorites.includes(robot.slug) : false
-                                      }
-                                      onFavoriteToggle={toggleFavorite}
-                                      onRemove={removeRobot}
-                                      dragHandleProps={dragHandleProps}
-                                    />
-                                  )}
-                                </SortableCompareCard>
-                              </motion.div>
-                            );
-                          })}
-                        </div>
-                      </SortableContext>
+                            })}
+                          </div>
+                        </SortableContext>
+                      )}
                     </div>
-                  )
-                }
+                  </section>
+                )}
               </CompareDroppableArea>
             </div>
 
