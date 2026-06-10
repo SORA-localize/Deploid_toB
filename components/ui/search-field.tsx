@@ -46,7 +46,7 @@ const SearchField = React.forwardRef<HTMLInputElement, SearchFieldProps>(
           disabled={disabled}
           onChange={(event) => onValueChange(event.target.value)}
           className={cn(
-            "w-full text-foreground outline-none transition-colors placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+            "w-full appearance-none text-foreground outline-none transition-colors placeholder:text-muted-foreground [&::-webkit-search-decoration]:hidden [&::-webkit-search-cancel-button]:hidden disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
             isUnderline
               ? "min-h-11 rounded-none border-0 border-b border-border bg-transparent py-3 pl-11 pr-10 text-sm focus-visible:border-ring focus-visible:ring-0"
               : "min-h-11 rounded-md border border-border bg-input-background py-3 pl-10 pr-10 text-sm focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:bg-input/50",
