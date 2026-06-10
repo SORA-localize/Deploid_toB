@@ -67,6 +67,7 @@ export const uiText = {
   robots: {
     breadcrumb: 'ロボット',
     title: 'ロボット',
+    description: '業種・タスク・メーカー・国内入手性で絞り込み、現場に合う候補を探せます。',
     activeModels: (count: number) => `販売中:${count}件`,
     preReleaseModels: (count: number) => `開発中:${count}件`,
     activeSection: (count: number) => `販売中・限定販売（${count}件）`,
@@ -83,6 +84,7 @@ export const uiText = {
   manufacturers: {
     breadcrumb: 'メーカー',
     title: 'メーカー',
+    description: '地域と国内の取り扱い状況から、日本で検討しやすいメーカーを確認できます。',
     profile: 'メーカープロフィール',
     factSheet: '基本情報',
     sectionNavAria: 'メーカー詳細セクション',
@@ -107,6 +109,7 @@ export const uiText = {
   guides: {
     breadcrumb: 'ガイド',
     title: 'ガイド',
+    description: '調達・TCO・安全・PoC・ベンダー評価を体系的に整理します。',
     featured: '注目ガイド',
     read: 'ガイドを読む',
     relatedRobots: '関連ロボット',
@@ -130,6 +133,7 @@ export const uiText = {
   useCases: {
     breadcrumb: '用途から探す',
     title: '用途から探す',
+    description: '業種・ワークフロー・タスクから、現実的なヒューマノイドの適用機会を探せます。',
     featured: '注目の適用領域',
     all: 'すべての用途',
     candidateRobots: (count: number) => `${count}件の候補ロボット`,
@@ -182,9 +186,9 @@ export const uiText = {
     runtimeValue: (min: number) => `約${min} 分`,
   },
   comparison: {
-    emptyTitle: '比較シートにロボットがありません',
-    emptyDescription: (max: number) =>
-      `左のメニューからロボットを選ぶと比較シートに追加されます。最大${max}ロボットまで横並びで比較できます。`,
+    emptyTitle: '比較シートにロボットがありません。',
+    emptyDescription: '左メニューから追加できます。',
+    emptyHint: 'ドラッグ&ドロップ・お気に入り機能に対応しています。',
     clearAria: '比較シートを空にする',
     toggleAria: (name: string, expanded: boolean) => `${name}のロボット一覧を${expanded ? '閉じる' : '開く'}`,
     addAria: (name: string) => `${name}を比較に追加する`,

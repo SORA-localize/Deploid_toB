@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { SearchInput } from '@/components/SearchInput';
@@ -77,10 +78,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
       <div className="border-b border-border bg-card">
         <div className="site-container py-5">
           <Breadcrumbs items={[{ label: uiText.useCases.breadcrumb }]} />
-          <h1 className="text-2xl font-semibold text-foreground mb-3">{uiText.useCases.title}</h1>
-          <p className="text-sm text-muted-foreground max-w-3xl mb-6 leading-relaxed">
-            業種・ワークフロー・タスクから、現実的なヒューマノイドの適用機会を探します。ベンダー名ではなく、現場の課題から始めます。
-          </p>
+          <PageListHeader title={uiText.useCases.title} description={uiText.useCases.description} className="mb-6" />
 
           <div className="max-w-2xl mb-6">
             <SearchInput

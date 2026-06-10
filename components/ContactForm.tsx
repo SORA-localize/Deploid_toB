@@ -22,7 +22,7 @@ export function ContactForm() {
 
   if (formEnabled && state.succeeded) {
     return (
-      <div className={cn('border p-6', getVisualToneClassName('success'))}>
+      <div className={cn('border p-6 max-w-2xl mx-auto', getVisualToneClassName('success'))}>
         <h3 className="text-sm font-semibold text-foreground mb-2">{uiText.contact.successTitle}</h3>
         <p className="text-sm text-muted-foreground leading-relaxed">
           {uiText.contact.successMessage}
@@ -32,7 +32,7 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleFormSubmit} className="space-y-5 max-w-2xl">
+    <form onSubmit={handleFormSubmit} className="space-y-5 max-w-2xl mx-auto">
       {!formEnabled && (
         <div className={cn('border p-4 text-sm', getVisualToneClassName('warning'))} role="status">
           {uiText.contact.formPending}
@@ -103,13 +103,22 @@ export function ContactForm() {
 
         <ValidationError errors={state.errors} className="text-xs text-tone-danger-text" />
 
-        <button
-          type="submit"
-          disabled={!formEnabled || state.submitting}
-          className="inline-flex items-center gap-2 rounded-md px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
-        >
-          {!formEnabled ? uiText.contact.setupPending : state.submitting ? uiText.contact.submitting : uiText.contact.submit}
-        </button>
+        <div className="flex flex-col gap-3">
+          <button
+            type="submit"
+            disabled={!formEnabled || state.submitting}
+            className="inline-flex items-center gap-2 rounded-md px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm w-fit"
+          >
+            {!formEnabled ? uiText.contact.setupPending : state.submitting ? uiText.contact.submitting : uiText.contact.submit}
+          </button>
+          <p className="text-xs text-muted-foreground">
+            送信により
+            <a href="/privacy" className="underline underline-offset-2 hover:text-foreground transition-colors mx-0.5">
+              プライバシーポリシー
+            </a>
+            に同意したものとみなします。
+          </p>
+        </div>
       </fieldset>
     </form>
   );

@@ -15,10 +15,13 @@ export const siteNavItems: SiteNavItem[] = [
   { label: 'お問い合わせ', path: '/contact' },
 ];
 
-export const footerNavItems = siteNavItems.map((item) => ({
-  ...item,
-  label: item.footerLabel ?? item.label,
-}));
+export const footerNavItems = [
+  ...siteNavItems.map((item) => ({
+    ...item,
+    label: item.footerLabel ?? item.label,
+  })),
+  { label: 'プライバシーポリシー', path: '/privacy' },
+];
 
 export const footerNotice =
   '本サイトは情報提供を目的としており、特定の製品やサービスを推奨するものではありません。掲載画像・ロゴには出典を明記した参照用途のものを含みます。権利者からの修正・削除依頼はお問い合わせよりご連絡ください。';

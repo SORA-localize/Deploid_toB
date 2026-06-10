@@ -4,6 +4,8 @@ import { Header } from '@/components/Header';
 import { HeaderChromeProvider } from '@/components/HeaderChrome';
 import { Footer } from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { AnalyticsScripts } from '@/components/AnalyticsScripts';
+import { env } from '@/lib/env';
 import { siteUrl } from '@/lib/site';
 import './globals.css';
 import { Geist } from "next/font/google";
@@ -64,6 +66,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </HeaderChromeProvider>
         </ThemeProvider>
+        <AnalyticsScripts
+          gaMeasurementId={env.gaMeasurementId}
+          enabled={env.isVercelProduction || (env.isProd && !process.env.VERCEL_ENV)}
+        />
         <Analytics />
       </body>
     </html>
