@@ -144,6 +144,12 @@
 
 ヘッダー帯（`.site-container.py-6`）はそのまま `site-container` でよい（幅より内容が先）。
 
+### use-cases の除外
+
+`use-cases/[slug]` は `lg:col-span-8/4` のため `max-w-[1600px]` にすると content 列が約 1000px 超になり、Editorial 可読幅として広すぎる。**site-container のまま維持**する。
+
+対象は `reports` と `guides` の2ページのみ。
+
 ### 変更ファイル（Part 2）
 
 | ファイル | 変更 |
@@ -151,7 +157,7 @@
 | `src/app/globals.css` | `.site-container-content` 追加（`.site-container` は変更しない） |
 | `reports/[slug]/page.tsx` | 本文エリア div のクラス変更 |
 | `guides/[slug]/page.tsx` | 本文エリア div のクラス変更 |
-| `use-cases/[slug]/page.tsx` | 本文エリア div のクラス変更 |
+| `use-cases/[slug]/page.tsx` | **変更しない**（site-container 維持） |
 
 ---
 
@@ -174,14 +180,33 @@
 </section>
 ```
 
-**SourceList（className 上書き）**:
+**SourceList（reports の場合 — wrapper 削除 + 直接置換）**:
+
+`SourceList` は `id` prop を持ちデフォルトで `id="sources"` を自ら付与する。
+現状の `reports/[slug]` は wrapper div にも `id="sources"` があり **重複 id** になっている。
+wrapper div を削除し、`SourceList` に直接 className を渡す。
+
 ```tsx
-// Before（デフォルト className = "border border-border bg-card p-6 scroll-mt-site-header"）
-<SourceList sources={...} />
+// Before（wrapper div が id="sources" / SourceList もデフォルトで id="sources" → 重複）
+<div id="sources" className="scroll-mt-site-header">
+  <SourceList sources={report.sources} />
+</div>
+
+// After（wrapper を削除。SourceList が id="sources" を保持する）
+<SourceList
+  sources={report.sources}
+  className="scroll-mt-site-header pt-6 border-t border-border"
+/>
+```
+
+**SourceList（guides の場合 — 直置きなので className 上書きのみ）**:
+```tsx
+// Before
+<SourceList sources={guide.sources} />
 
 // After
 <SourceList
-  sources={...}
+  sources={guide.sources}
   className="scroll-mt-site-header pt-6 border-t border-border"
 />
 ```
@@ -209,11 +234,12 @@
 ## フェーズ構成
 
 ```
-Phase 0 — design_system_v1.md に ## 6. デザインジャンル 追加         → commit
-Phase 1 — globals.css に .site-container-content 追加                → commit + 大画面目視確認
-Phase 2 — reports/[slug] 本文→ディバイダー + SourceList className     → commit
-Phase 3 — guides/[slug]  本文→ディバイダー + SourceList className     → commit
-Phase 4 — use-cases/[slug] 本文→ディバイダー                          → commit
+Phase 0 — design_system_v1.md に ## 6. デザインジャンル 追加                          → commit
+Phase 1 — globals.css に .site-container-content 追加
+          + reports/[slug] / guides/[slug] の本文エリアを site-container-content に置換 → commit + 大画面目視確認
+Phase 2 — reports/[slug] 本文→ディバイダー + SourceList 置換（wrapper 削除）           → commit
+Phase 3 — guides/[slug]  本文→ディバイダー + SourceList className 上書き               → commit
+Phase 4 — use-cases/[slug] 本文→ディバイダー                                           → commit
 ```
 
 各 Phase は独立コミット・独立ビルド確認。
@@ -242,9 +268,10 @@ npx tsc --noEmit
 ```
 
 Phase 1 後の手動確認:
-- [ ] 1920px で detail ページのコンテンツ幅が広がり、左右余白が減る
-- [ ] 1440px（ノートPC）で表示が変わらない
-- [ ] 一覧ページ（robots/reports）は変化なし
+- [ ] 1920px で `/reports/[slug]` / `/guides/[slug]` のコンテンツ幅が広がり、左右余白が減る
+- [ ] `/use-cases/[slug]` は変化なし（site-container 維持の確認）
+- [ ] 1440px（ノートPC）で reports/guides の表示が変わらない
+- [ ] 一覧ページ（robots/reports/guides）は変化なし
 
 Phase 2〜4 後の手動確認:
 - [ ] 本文セクションのボックスが消え、ディバイダーで区切られている
