@@ -205,5 +205,10 @@ export const uiText = {
     dimensions: '外形寸法',
     tabBasic: '基本',
     tabDetailed: '詳細',
+    distributor: '代理店',
+    detailsLabel: '詳細',
+    detailsAria: (name: string) => `${name}の詳細を確認する`,
+    closeDetail: '詳細を閉じる',
+    viewRobotPage: 'ロボット詳細ページへ',
   },
 } as const;

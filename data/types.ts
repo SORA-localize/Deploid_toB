@@ -63,6 +63,7 @@ export interface ImageAsset {
  *  写真が無いスロットは empty state（役割名のラベル）になる。 */
 export type ImageRole =
   | 'hero'         // 全身正面
+  | 'transparent'  // 背景透過・全身正面（カード用）
   | 'side'         // 側面
   | 'inOperation'  // 稼働中（実環境）
   | 'scale'        // スケール比較（人/物）

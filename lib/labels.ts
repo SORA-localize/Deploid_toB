@@ -25,6 +25,7 @@ export const TBD_LABEL = '要確認';
 /** 詳細ページのカルーセルで固定表示する画像スロットの順序。 */
 export const imageRoleOrder: ImageRole[] = [
   'hero',
+  'transparent',
   'side',
   'inOperation',
   'scale',
@@ -35,6 +36,7 @@ export const imageRoleOrder: ImageRole[] = [
 /** カルーセルのempty state（写真未投入時のラベル）と、タブ表記。 */
 export const imageRoleLabels: Record<ImageRole, string> = {
   hero: 'メイン画像',
+  transparent: '背景透過',
   side: '側面',
   inOperation: '稼働シーン',
   scale: 'サイズ比較',

@@ -45,7 +45,7 @@ export function SortableCompareCard({ slug, id, data, children }: SortableCompar
     <div ref={setNodeRef} style={style} className={isDragging ? 'relative opacity-40' : 'relative'}>
       <div
         id={`compare-card-${slug}`}
-        className="rounded-sm transition-shadow duration-500"
+        className="rounded-lg transition-shadow duration-500"
       >
         {children({ attributes, listeners, isDragging })}
       </div>
