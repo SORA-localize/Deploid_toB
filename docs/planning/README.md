@@ -19,6 +19,8 @@ Primary files:
 - `humanoid_platform_tech_stack_v1.md`: technology stack decision
 - `humanoid_data_model_policy_v1.md`: data model policy and quality rules
 - `humanoid_data_management_guide_v1.md`: data operation guide
+- `data-architecture-redesign-v1.md`: data structure redesign (id/slug separation, source-of-truth registries, specSchema, articles/news model, validate-as-build-gate, media placement, freshness, SEO, CMS migration path)
+- `data-maintenance-checklist-v1.md`: operational checklists for adding/updating records, slug changes, publish gates, and freshness review
 - `copyright_and_media_rights_policy_v1.md`: copyright, trademark, media rights, and publication gate policy
 
 Legacy Astro files in the repository are references only. New implementation work should follow the Next.js direction documented here.
