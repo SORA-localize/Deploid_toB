@@ -71,6 +71,7 @@ export const robots: Robot[] = [
     category: 'general-purpose-robot',
     summary: 'BMW Spartanburg での実証を完了。Figure AI は後継ロボット Figure 03 へ移行中。',
     publishStatus: 'archived',
+    supersededById: 'figure-03',
     updatedAt: '2026-05-28',
     reliability: 'official',
     sources: [

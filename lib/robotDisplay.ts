@@ -25,6 +25,12 @@ export function formatRuntime(value: number | undefined) {
   return value != null ? `約${value}分` : TBD_LABEL;
 }
 
+/** 関連欄での表示名。archived は「提供終了」を付けて状態を明示する（無言脱落させない。設計 §6.5-1） */
+export function getRobotRelatedTitle(robot: Robot): string {
+  const base = robot.nameJa ?? robot.name;
+  return robot.publishStatus === 'archived' ? `${base}（提供終了）` : base;
+}
+
 /** specSchema の kind/unit に従ってスペック値を整形する（未設定は「要確認」） */
 export function formatSpecValue(specs: RobotSpecs, key: SpecKey): string {
   const entry = getSpecEntry(key);

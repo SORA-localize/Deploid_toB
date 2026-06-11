@@ -286,6 +286,12 @@ export function validateData(): ValidationResult {
 
   for (const r of robots) {
     check('robot', r.slug, 'manufacturerId', r.manufacturerId, manufacturerIds);
+    if (r.supersededById) {
+      check('robot', r.slug, 'supersededById', r.supersededById, robotIds);
+      if (r.supersededById === r.id) {
+        errors.push(`[superseded-self] robot "${r.id}".supersededById が自分自身を指しています`);
+      }
+    }
     // specs のキーは lib/specSchema.ts 登録値のみ（型でも保証されるが、将来のCMS/JSON化に備えた実行時保証）
     Object.keys(r.specs).forEach((key) => {
       if (!isSpecKey(key)) {

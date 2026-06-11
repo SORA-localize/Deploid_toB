@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ManufacturerDetailHero } from '@/components/ManufacturerDetailHero';
 import { ManufacturerDetailSection } from '@/components/ManufacturerDetailSection';
@@ -9,7 +9,7 @@ import { ManufacturerRobotsGrid } from '@/components/ManufacturerRobotsGrid';
 import { NewsCard } from '@/components/NewsCard';
 import { SourceList } from '@/components/SourceList';
 import {
-  getManufacturerBySlug,
+  resolveManufacturerDetailBySlug,
   getManufacturers,
   getArticlesForManufacturer,
   getArticles,
@@ -23,7 +23,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const manufacturer = getManufacturerBySlug(slug);
+  const { record: manufacturer } = resolveManufacturerDetailBySlug(slug);
   const seo = manufacturer?.seo;
   return {
     title:
@@ -35,7 +35,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ManufacturerDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const manufacturer = getManufacturerBySlug(slug);
+  const { record: manufacturer, redirectTo } = resolveManufacturerDetailBySlug(slug);
+  if (redirectTo) permanentRedirect(`/manufacturers/${redirectTo}`);
   if (!manufacturer) notFound();
 
   const robots = getRobotsByManufacturerId(manufacturer.id);

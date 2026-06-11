@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Calendar, ChevronRight, Clock, User } from 'lucide-react';
 import { ArticleToc } from '@/components/ArticleToc';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -12,11 +12,12 @@ import {
   getRelatedManufacturers,
   getRelatedRobots,
   getRelatedUseCases,
-  getArticleBySlug,
   getArticles,
+  resolveArticleDetailBySlug,
 } from '@/lib/data';
 import { articleTypeLabels } from '@/lib/labels';
 import { extractH2Headings } from '@/lib/markdownHeadings';
+import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { getArticleTypeTone } from '@/lib/visualSemantics';
 
@@ -26,7 +27,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const report = getArticleBySlug(slug);
+  const { record: report } = resolveArticleDetailBySlug(slug);
   const seo = report?.seo;
   return {
     title: seo?.metaTitle ?? (report ? (report.titleJa ?? report.title) : 'Article'),
@@ -37,7 +38,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ReportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const report = getArticleBySlug(slug);
+  const { record: report, redirectTo } = resolveArticleDetailBySlug(slug);
+  if (redirectTo) permanentRedirect(`/reports/${redirectTo}`);
   if (!report) notFound();
 
   const robots = getRelatedRobots(report.relatedRobotIds);
@@ -236,7 +238,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   title="関連ロボット"
                   items={robots.map((r) => ({
                     href: `/robots/${r.slug}`,
-                    title: r.nameJa ?? r.name,
+                    title: getRobotRelatedTitle(r),
                     description: r.summary,
                   }))}
                 />

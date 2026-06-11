@@ -16,8 +16,56 @@ runValidationInDev();
 const published = <T extends { publishStatus: string }>(items: T[]) =>
   items.filter((item) => item.publishStatus === 'published');
 
+// archived は「提供終了」として詳細・関連欄に残す（無言で消さない。設計 §6.5-1）。
+// draft はどのサーフェスにも出さない。一覧・比較・sitemap は published のみ。
+const visibleInDetail = <T extends { publishStatus: string }>(items: T[]) =>
+  items.filter(
+    (item) => item.publishStatus === 'published' || item.publishStatus === 'archived',
+  );
+
+export interface SlugResolution<T> {
+  record?: T;
+  /** previousSlugs にヒットした場合の正規slug。呼び出し側（詳細ページ）が301する（設計 §3-3） */
+  redirectTo?: string;
+}
+
+const resolveBySlug = <T extends { slug: string; previousSlugs?: string[] }>(
+  records: T[],
+  slug: string,
+): SlugResolution<T> => {
+  const record = records.find((item) => item.slug === slug);
+  if (record) return { record };
+  const moved = records.find((item) => item.previousSlugs?.includes(slug));
+  return moved ? { redirectTo: moved.slug } : {};
+};
+
 export function getRobots() {
   return published(robots);
+}
+
+/** 詳細ページの対象（published + archived）。一覧・比較には使わない */
+export function getRobotsForDetail() {
+  return visibleInDetail(robots);
+}
+
+export function resolveRobotDetailBySlug(slug: string) {
+  return resolveBySlug(getRobotsForDetail(), slug);
+}
+
+export function resolveManufacturerDetailBySlug(slug: string) {
+  return resolveBySlug(getManufacturers(), slug);
+}
+
+export function resolveGuideDetailBySlug(slug: string) {
+  return resolveBySlug(getGuides(), slug);
+}
+
+export function resolveUseCaseDetailBySlug(slug: string) {
+  return resolveBySlug(getUseCases(), slug);
+}
+
+export function resolveArticleDetailBySlug(slug: string) {
+  return resolveBySlug(getArticles(), slug);
 }
 
 export function getRobotBySlug(slug: string) {
@@ -110,7 +158,8 @@ export function getManufacturerForRobot(manufacturerId: string) {
 
 export function getRelatedRobots(ids: string[]) {
   const idSet = new Set(ids);
-  return getRobots().filter((robot) => idSet.has(robot.id));
+  // archived も返す（関連欄から無言脱落させない。表示側が「提供終了」を付ける。設計 §6.5-1）
+  return getRobotsForDetail().filter((robot) => idSet.has(robot.id));
 }
 
 export function getRelatedManufacturers(ids: string[]) {

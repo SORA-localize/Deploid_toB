@@ -1,13 +1,13 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import {
   getRelatedGuides,
   getRelatedRobots,
   getArticlesForUseCase,
-  getUseCaseBySlug,
   getUseCases,
+  resolveUseCaseDetailBySlug,
 } from '@/lib/data';
 import {
   buyerReadinessLabels,
@@ -16,6 +16,7 @@ import {
   operatingEnvironmentLabels,
   useCaseCapabilityNoteLabels,
 } from '@/lib/labels';
+import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
@@ -24,7 +25,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const u = getUseCaseBySlug(slug);
+  const { record: u } = resolveUseCaseDetailBySlug(slug);
   const seo = u?.seo;
   return {
     title: seo?.metaTitle ?? (u ? (u.titleJa ?? u.title) : 'Use Case'),
@@ -35,7 +36,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function UseCaseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const useCase = getUseCaseBySlug(slug);
+  const { record: useCase, redirectTo } = resolveUseCaseDetailBySlug(slug);
+  if (redirectTo) permanentRedirect(`/use-cases/${redirectTo}`);
   if (!useCase) notFound();
 
   const candidateRobots = getRelatedRobots(useCase.candidateRobotIds);
@@ -163,7 +165,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                       <div key={robot.slug} className="border border-border p-3">
                         <Link href={`/robots/${robot.slug}`} className="block mb-2">
                           <h4 className="text-sm font-semibold text-foreground hover:text-foreground/80">
-                            {robot.nameJa ?? robot.name}
+                            {getRobotRelatedTitle(robot)}
                           </h4>
                         </Link>
                         <p className="text-xs text-foreground/80 mb-3 leading-relaxed line-clamp-2">
