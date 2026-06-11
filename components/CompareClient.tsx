@@ -367,7 +367,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                         {uiText.compare.manufacturers}
                       </h2>
                     </div>
-                    <div className="divide-y divide-border max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden xl:max-h-[calc(100vh-200px)]">
+                    <div className="max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden xl:max-h-[calc(100vh-200px)]">
                       {manufacturers.map((manufacturer) => {
                         const manufacturerRobots = robots.filter(
                           (r) => r.manufacturerSlug === manufacturer.slug,
@@ -384,7 +384,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                               )}
                               aria-expanded={isExpanded}
                               onClick={() => toggleManufacturer(manufacturer.slug)}
-                              className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted transition-colors text-left"
+                              className="w-full px-4 py-3 flex items-center justify-between bg-card hover:bg-muted transition-colors text-left"
                             >
                               <ManufacturerLogoName
                                 name={manufacturer.nameJa ?? manufacturer.name}
