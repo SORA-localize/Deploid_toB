@@ -188,11 +188,11 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           </div>
 
           {/* メインコンテンツ */}
-          <div className="col-span-12 space-y-6 lg:col-span-7">
+          <div className="col-span-12 lg:col-span-7">
 
             {/* 要点（TL;DR） */}
             {hasTakeaways && (
-              <div id="takeaways" className="scroll-mt-site-header border border-border bg-card p-6">
+              <section id="takeaways" className="scroll-mt-site-header border-b border-border pt-6 pb-8">
                 <h2 className="mb-4 text-lg font-semibold text-foreground">
                   {uiText.reports.keyTakeaways}
                 </h2>
@@ -204,19 +204,19 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                     </li>
                   ))}
                 </ul>
-              </div>
+              </section>
             )}
 
             {/* 本文（Markdown） */}
             {hasBody && (
-              <div id="body" className="scroll-mt-site-header border border-border bg-card p-6 md:p-8">
+              <section id="body" className="scroll-mt-site-header border-b border-border pt-6 pb-8">
                 <Markdown source={report.body!} />
-              </div>
+              </section>
             )}
 
             {/* タグゾーン（本文の下） */}
             {report.tags.length > 0 && (
-              <div className="border border-border bg-card px-6 py-4">
+              <section className="border-b border-border pt-6 pb-8">
                 <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   タグ
                 </p>
@@ -225,58 +225,67 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                     <TagChip key={tag} kind="report" value={tag} className="py-1" />
                   ))}
                 </div>
-              </div>
+              </section>
             )}
 
             {/* 関連（種別ごとに分割） */}
             {robots.length > 0 && (
-              <RelatedLinkList
-                id="related-robots"
-                title="関連ロボット"
-                items={robots.map((r) => ({
-                  href: `/robots/${r.slug}`,
-                  title: r.nameJa ?? r.name,
-                  description: r.summary,
-                }))}
-              />
+              <div className="mt-6">
+                <RelatedLinkList
+                  id="related-robots"
+                  title="関連ロボット"
+                  items={robots.map((r) => ({
+                    href: `/robots/${r.slug}`,
+                    title: r.nameJa ?? r.name,
+                    description: r.summary,
+                  }))}
+                />
+              </div>
             )}
             {manufacturers.length > 0 && (
-              <RelatedLinkList
-                id="related-manufacturers"
-                title="関連メーカー"
-                items={manufacturers.map((m) => ({
-                  href: `/manufacturers/${m.slug}`,
-                  title: m.nameJa ?? m.name,
-                  description: m.summary,
-                }))}
-              />
+              <div className="mt-6">
+                <RelatedLinkList
+                  id="related-manufacturers"
+                  title="関連メーカー"
+                  items={manufacturers.map((m) => ({
+                    href: `/manufacturers/${m.slug}`,
+                    title: m.nameJa ?? m.name,
+                    description: m.summary,
+                  }))}
+                />
+              </div>
             )}
             {useCases.length > 0 && (
-              <RelatedLinkList
-                id="related-use-cases"
-                title="関連用途"
-                items={useCases.map((u) => ({
-                  href: `/use-cases/${u.slug}`,
-                  title: u.titleJa ?? u.title,
-                }))}
-              />
+              <div className="mt-6">
+                <RelatedLinkList
+                  id="related-use-cases"
+                  title="関連用途"
+                  items={useCases.map((u) => ({
+                    href: `/use-cases/${u.slug}`,
+                    title: u.titleJa ?? u.title,
+                  }))}
+                />
+              </div>
             )}
             {guides.length > 0 && (
-              <RelatedLinkList
-                id="related-guides"
-                title="関連ガイド"
-                items={guides.map((g) => ({
-                  href: `/guides/${g.slug}`,
-                  title: g.titleJa ?? g.title,
-                  description: g.summary,
-                }))}
-              />
+              <div className="mt-6">
+                <RelatedLinkList
+                  id="related-guides"
+                  title="関連ガイド"
+                  items={guides.map((g) => ({
+                    href: `/guides/${g.slug}`,
+                    title: g.titleJa ?? g.title,
+                    description: g.summary,
+                  }))}
+                />
+              </div>
             )}
 
-            {/* 出典 */}
-            <div id="sources" className="scroll-mt-site-header">
-              <SourceList sources={report.sources} />
-            </div>
+            {/* 出典（wrapper div 削除 — SourceList が id="sources" を保持） */}
+            <SourceList
+              sources={report.sources}
+              className="scroll-mt-site-header mt-6 pt-6 border-t border-border"
+            />
           </div>
 
           {/* サイドバー（右） */}

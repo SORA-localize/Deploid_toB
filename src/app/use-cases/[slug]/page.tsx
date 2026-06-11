@@ -110,45 +110,43 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
       <div className="site-container py-8">
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12 lg:col-span-8">
-            <div className="space-y-6">
-              <div className="border border-border bg-card p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-4">
-                  {uiText.common.overview}
-                </h2>
-                <p className="text-sm text-foreground/80 leading-relaxed">{useCase.overview}</p>
+            <section className="border-b border-border pt-6 pb-8">
+              <h2 className="text-lg font-semibold text-foreground mb-4">
+                {uiText.common.overview}
+              </h2>
+              <p className="text-sm text-foreground/80 leading-relaxed">{useCase.overview}</p>
+            </section>
+            <section className="border-b border-border pt-6 pb-8">
+              <h2 className="text-lg font-semibold text-foreground mb-4">なぜ重要か</h2>
+              <p className="text-sm text-foreground/80 leading-relaxed">{useCase.whyItMatters}</p>
+            </section>
+            <section className="border-b border-border pt-6 pb-8">
+              <h2 className="text-lg font-semibold text-foreground mb-5">必要なロボット能力</h2>
+              <div className="space-y-4">
+                {useCaseCapabilityNoteLabels.map(([key, label]) => {
+                  const note = useCase.capabilityNotes[key];
+                  if (!note) return null;
+                  return (
+                    <div key={key}>
+                      <h3 className="text-sm font-semibold text-foreground mb-2">{label}</h3>
+                      <p className="text-sm text-foreground/80 leading-relaxed">{note}</p>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="border border-border bg-card p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-4">なぜ重要か</h2>
-                <p className="text-sm text-foreground/80 leading-relaxed">{useCase.whyItMatters}</p>
-              </div>
-              <div className="border border-border bg-card p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-5">必要なロボット能力</h2>
-                <div className="space-y-4">
-                  {useCaseCapabilityNoteLabels.map(([key, label]) => {
-                    const note = useCase.capabilityNotes[key];
-                    if (!note) return null;
-                    return (
-                      <div key={key}>
-                        <h3 className="text-sm font-semibold text-foreground mb-2">{label}</h3>
-                        <p className="text-sm text-foreground/80 leading-relaxed">{note}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="border border-border bg-card p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-4">環境要件</h2>
-                <p className="text-sm text-foreground/80 leading-relaxed">{useCase.environmentRequirements}</p>
-              </div>
-              <div className="border border-border bg-card p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-4">なぜ今は難しいか</h2>
-                <p className="text-sm text-foreground/80 leading-relaxed">{useCase.whyHardToday}</p>
-              </div>
-              <div className="border border-border bg-card p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-4">日本での導入条件</h2>
-                <p className="text-sm text-foreground/80 leading-relaxed">{useCase.japanDeploymentConditions}</p>
-              </div>
-            </div>
+            </section>
+            <section className="border-b border-border pt-6 pb-8">
+              <h2 className="text-lg font-semibold text-foreground mb-4">環境要件</h2>
+              <p className="text-sm text-foreground/80 leading-relaxed">{useCase.environmentRequirements}</p>
+            </section>
+            <section className="border-b border-border pt-6 pb-8">
+              <h2 className="text-lg font-semibold text-foreground mb-4">なぜ今は難しいか</h2>
+              <p className="text-sm text-foreground/80 leading-relaxed">{useCase.whyHardToday}</p>
+            </section>
+            <section className="pt-6 pb-8">
+              <h2 className="text-lg font-semibold text-foreground mb-4">日本での導入条件</h2>
+              <p className="text-sm text-foreground/80 leading-relaxed">{useCase.japanDeploymentConditions}</p>
+            </section>
           </div>
 
           <div className="col-span-12 lg:col-span-4">

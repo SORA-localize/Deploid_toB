@@ -116,52 +116,57 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
           {/* Content */}
           <div className="col-span-12 lg:col-span-7">
-            <div className="space-y-6">
-              <div id="overview" className="border border-border bg-card p-6 scroll-mt-site-header">
-                <h2 className="text-lg font-semibold text-foreground mb-4">
-                  {uiText.common.overview}
-                </h2>
-                <p className="text-sm text-foreground/80 leading-relaxed">{guide.description}</p>
-              </div>
+            <section id="overview" className="scroll-mt-site-header border-b border-border pt-6 pb-8">
+              <h2 className="text-lg font-semibold text-foreground mb-4">
+                {uiText.common.overview}
+              </h2>
+              <p className="text-sm text-foreground/80 leading-relaxed">{guide.description}</p>
+            </section>
 
-              {hasBody && (
-                <div id="body" className="border border-border bg-card p-6 scroll-mt-site-header">
-                  <Markdown source={guide.body!} />
-                </div>
-              )}
+            {hasBody && (
+              <section id="body" className="scroll-mt-site-header border-b border-border pt-6 pb-8">
+                <Markdown source={guide.body!} />
+              </section>
+            )}
 
-              {hasChecklist && (
-                <div id="checklist" className="border border-border bg-muted p-6 scroll-mt-site-header">
-                  <h3 className="text-sm font-semibold text-foreground mb-4">チェックリスト</h3>
-                  <ul className="space-y-2 text-sm text-foreground/80">
-                    {(guide.checklistItems ?? []).map((item) => (
-                      <li key={item} className="flex items-start gap-2">
-                        <span className="text-muted-foreground">□</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+            {hasChecklist && (
+              <section id="checklist" className="scroll-mt-site-header border-b border-border pt-6 pb-8">
+                <h3 className="text-sm font-semibold text-foreground mb-4">チェックリスト</h3>
+                <ul className="space-y-2 text-sm text-foreground/80">
+                  {(guide.checklistItems ?? []).map((item) => (
+                    <li key={item} className="flex items-start gap-2">
+                      <span className="text-muted-foreground">□</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
-              {robots.length > 0 && (
+            {robots.length > 0 && (
+              <div className="mt-6">
                 <RelatedLinkList
                   id="related-robots"
                   title={uiText.guides.relatedRobots}
                   items={relatedRobotItems}
                 />
-              )}
+              </div>
+            )}
 
-              {useCases.length > 0 && (
+            {useCases.length > 0 && (
+              <div className="mt-6">
                 <RelatedLinkList
                   id="related-use-cases"
                   title={uiText.guides.relatedUseCases}
                   items={relatedUseCaseItems}
                 />
-              )}
+              </div>
+            )}
 
-              <SourceList sources={guide.sources} />
-            </div>
+            <SourceList
+              sources={guide.sources}
+              className="scroll-mt-site-header mt-6 pt-6 border-t border-border"
+            />
           </div>
 
           {/* Decision Summary */}
