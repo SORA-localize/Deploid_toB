@@ -16,7 +16,7 @@ import {
   getDeploymentsForManufacturer,
 } from '@/lib/data';
 import { getDisplayableAsset } from '@/lib/media';
-import { getReportIndexPlacementReports } from '@/lib/reportPlacements';
+import { getHomeFeaturedReports } from '@/lib/reportPlacements';
 
 export default function HomePage() {
   const featured = getGuideBySlug('decision-variables') ?? getGuides()[0];
@@ -68,9 +68,7 @@ export default function HomePage() {
     return asset ? [{ src: asset.src, alt: asset.alt, label: robot.name }] : [];
   });
 
-  // reports-index hero キュレーションの先頭4件をホームに流用
-  const { heroReports } = getReportIndexPlacementReports(getReports());
-  const latestReports = heroReports.slice(0, 4);
+  const homeFeaturedReports = getHomeFeaturedReports(getReports());
 
   const manufacturerBySlug = Object.fromEntries(
     manufacturers.map((m) => [m.slug, m])
@@ -98,10 +96,10 @@ export default function HomePage() {
         />
       )}
 
-      {latestReports.length > 0 && (
+      {homeFeaturedReports.length > 0 && (
         <section className="py-8 sm:py-10 border-b border-border">
           <div className="flex items-end justify-between mb-4">
-            <h2 className="text-2xl font-semibold text-foreground">最新記事</h2>
+            <h2 className="text-2xl font-semibold text-foreground">注目記事</h2>
             <Link
               href="/reports"
               className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -111,7 +109,7 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {latestReports.map((report) => (
+            {homeFeaturedReports.map((report) => (
               <NewsFeatureCard
                 key={report.slug}
                 report={report}

@@ -2,6 +2,7 @@ import { reportIndexPlacementLimits, reportPlacements } from '@/data/reportPlace
 import type { Report, ReportPlacementSlot } from '@/data/types';
 
 const reportsIndexSurface = 'reports-index';
+const homeFeaturedReportLimit = 4;
 
 function sortReportsByPublishedAt(reports: readonly Report[]) {
   return [...reports].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
@@ -9,6 +10,50 @@ function sortReportsByPublishedAt(reports: readonly Report[]) {
 
 function getReportsBySlug(reports: readonly Report[]) {
   return new Map(reports.map((report) => [report.slug, report]));
+}
+
+function appendPlacedReports({
+  reportsBySlug,
+  selectedReports,
+  usedSlugs,
+  slot,
+  limit,
+}: {
+  reportsBySlug: Map<string, Report>;
+  selectedReports: Report[];
+  usedSlugs: Set<string>;
+  slot: ReportPlacementSlot;
+  limit: number;
+}) {
+  reportPlacements
+    .filter((placement) => placement.surface === reportsIndexSurface && placement.slot === slot)
+    .sort((a, b) => a.order - b.order)
+    .forEach((placement) => {
+      if (selectedReports.length >= limit || usedSlugs.has(placement.reportSlug)) return;
+      const report = reportsBySlug.get(placement.reportSlug);
+      if (!report) return;
+      selectedReports.push(report);
+      usedSlugs.add(report.slug);
+    });
+}
+
+function appendLatestReports({
+  sortedReports,
+  selectedReports,
+  usedSlugs,
+  limit,
+}: {
+  sortedReports: readonly Report[];
+  selectedReports: Report[];
+  usedSlugs: Set<string>;
+  limit: number;
+}) {
+  for (const report of sortedReports) {
+    if (selectedReports.length >= limit) break;
+    if (usedSlugs.has(report.slug)) continue;
+    selectedReports.push(report);
+    usedSlugs.add(report.slug);
+  }
 }
 
 function resolvePlacementSlot({
@@ -26,23 +71,8 @@ function resolvePlacementSlot({
   const reportsBySlug = getReportsBySlug(reports);
   const slotReports: Report[] = [];
 
-  reportPlacements
-    .filter((placement) => placement.surface === reportsIndexSurface && placement.slot === slot)
-    .sort((a, b) => a.order - b.order)
-    .forEach((placement) => {
-      if (slotReports.length >= limit || usedSlugs.has(placement.reportSlug)) return;
-      const report = reportsBySlug.get(placement.reportSlug);
-      if (!report) return;
-      slotReports.push(report);
-      usedSlugs.add(report.slug);
-    });
-
-  for (const report of sortedReports) {
-    if (slotReports.length >= limit) break;
-    if (usedSlugs.has(report.slug)) continue;
-    slotReports.push(report);
-    usedSlugs.add(report.slug);
-  }
+  appendPlacedReports({ reportsBySlug, selectedReports: slotReports, usedSlugs, slot, limit });
+  appendLatestReports({ sortedReports, selectedReports: slotReports, usedSlugs, limit });
 
   return slotReports;
 }
@@ -65,4 +95,34 @@ export function getReportIndexPlacementReports(reports: readonly Report[]) {
       slot: 'feature',
     }),
   };
+}
+
+export function getHomeFeaturedReports(reports: readonly Report[]) {
+  const sortedReports = sortReportsByPublishedAt(reports);
+  const reportsBySlug = getReportsBySlug(reports);
+  const selectedReports: Report[] = [];
+  const usedSlugs = new Set<string>();
+
+  appendPlacedReports({
+    reportsBySlug,
+    selectedReports,
+    usedSlugs,
+    slot: 'hero',
+    limit: homeFeaturedReportLimit,
+  });
+  appendPlacedReports({
+    reportsBySlug,
+    selectedReports,
+    usedSlugs,
+    slot: 'feature',
+    limit: homeFeaturedReportLimit,
+  });
+  appendLatestReports({
+    sortedReports,
+    selectedReports,
+    usedSlugs,
+    limit: homeFeaturedReportLimit,
+  });
+
+  return selectedReports;
 }
