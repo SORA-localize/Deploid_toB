@@ -73,24 +73,27 @@ export function DraggableMenuRobotButton({
       onClick={onClick}
       disabled={isDisabled}
       className={cn(
-        'group flex w-full items-center justify-between gap-3 px-6 py-2.5 text-left text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+        'group flex w-full items-center justify-between gap-3 py-1.5 pl-6 pr-3 text-left text-[11px] transition-colors disabled:cursor-not-allowed disabled:opacity-50',
         isSelected
-          ? 'bg-primary/10 text-foreground hover:bg-primary/15'
-          : 'text-foreground/80 hover:bg-muted',
+          ? 'text-primary hover:bg-muted/60'
+          : 'text-foreground/70 hover:bg-muted/60 hover:text-foreground',
       )}
       style={{ opacity: isDragging ? 0.35 : undefined }}
     >
+      <span aria-hidden="true" className="shrink-0 text-muted-foreground/60">
+        └
+      </span>
       <span
         className={cn(
           'min-w-0 flex-1 truncate',
-          isSelected ? 'font-semibold text-foreground' : 'text-foreground/80',
+          isSelected ? 'font-semibold text-primary' : 'text-foreground/70',
         )}
       >
         {robot.nameJa ?? robot.name}
       </span>
       <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
         {isSelected && (
-          <X className="h-3.5 w-3.5 text-foreground/60 group-hover:text-foreground" />
+          <X className="h-3.5 w-3.5 text-primary/70 group-hover:text-primary" />
         )}
       </span>
     </button>

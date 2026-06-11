@@ -127,7 +127,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
         {filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {filtered.map((manufacturer) => (
               <ManufacturerCard
                 key={manufacturer.slug}

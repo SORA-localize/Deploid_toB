@@ -116,7 +116,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   }, [filters, filterOptions, manufacturers, updateParams]);
 
   const renderRobotGrid = (items: readonly Robot[]) => (
-    <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       {items.map((robot) => {
         const manufacturer = manufacturerBySlug.get(robot.manufacturerSlug);
         return (

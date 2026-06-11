@@ -358,16 +358,16 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   <div
                     ref={setNodeRef}
                     className={cn(
-                      'border border-border bg-muted transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
+                      'border border-border transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
                       isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                     )}
                   >
-                    <div className="px-4 py-3 border-b border-border-subtle bg-card">
+                    <div className="px-4 py-3 border-b border-border-subtle">
                       <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {uiText.compare.manufacturers}
                       </h2>
                     </div>
-                    <div className="divide-y divide-border max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden xl:max-h-[calc(100vh-200px)]">
+                    <div className="max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden xl:max-h-[calc(100vh-200px)]">
                       {manufacturers.map((manufacturer) => {
                         const manufacturerRobots = robots.filter(
                           (r) => r.manufacturerSlug === manufacturer.slug,
@@ -384,12 +384,12 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                               )}
                               aria-expanded={isExpanded}
                               onClick={() => toggleManufacturer(manufacturer.slug)}
-                              className="w-full px-4 py-3 flex items-center justify-between hover:bg-muted transition-colors text-left"
+                              className="w-full px-4 py-3 flex items-center justify-between bg-card hover:bg-muted transition-colors text-left"
                             >
                               <ManufacturerLogoName
                                 name={manufacturer.nameJa ?? manufacturer.name}
                                 logo={manufacturer.logo}
-                                className="text-sm font-medium text-foreground"
+                                className="text-sm font-semibold text-foreground"
                                 frameClassName="h-5 w-5"
                                 imageClassName="h-4 w-4"
                               />
@@ -400,23 +400,25 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                               )}
                             </button>
                             {isExpanded && (
-                              <div className="bg-card border-t border-border">
-                                {manufacturerRobots.map((robot) => {
-                                  const isSelected = orderedSlugs.includes(robot.slug);
-                                  const isDisabled =
-                                    !isSelected && orderedSlugs.length >= MAX_COMPARE_ROBOTS;
-                                  return (
-                                    <DraggableMenuRobotButton
-                                      key={robot.slug}
-                                      robot={robot}
-                                      isSelected={isSelected}
-                                      isDisabled={isDisabled}
-                                      onClick={() =>
-                                        isSelected ? removeRobot(robot.slug) : addRobot(robot.slug)
-                                      }
-                                    />
-                                  );
-                                })}
+                              <div className="pb-2">
+                                <div>
+                                  {manufacturerRobots.map((robot) => {
+                                    const isSelected = orderedSlugs.includes(robot.slug);
+                                    const isDisabled =
+                                      !isSelected && orderedSlugs.length >= MAX_COMPARE_ROBOTS;
+                                    return (
+                                      <DraggableMenuRobotButton
+                                        key={robot.slug}
+                                        robot={robot}
+                                        isSelected={isSelected}
+                                        isDisabled={isDisabled}
+                                        onClick={() =>
+                                          isSelected ? removeRobot(robot.slug) : addRobot(robot.slug)
+                                        }
+                                      />
+                                    );
+                                  })}
+                                </div>
                               </div>
                             )}
                           </div>
