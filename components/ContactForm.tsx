@@ -77,7 +77,7 @@ export function ContactForm() {
             name="email"
             required
           />
-          <ValidationError prefix="Email" field="email" errors={state.errors} className="mt-1 text-xs text-tone-danger-text" />
+          <ValidationError prefix="Email" field="email" errors={state.errors} className="mt-1 text-xs text-destructive" />
         </div>
 
         <FormSelect
@@ -98,10 +98,10 @@ export function ContactForm() {
             rows={6}
             required
           />
-          <ValidationError prefix="Message" field="message" errors={state.errors} className="mt-1 text-xs text-tone-danger-text" />
+          <ValidationError prefix="Message" field="message" errors={state.errors} className="mt-1 text-xs text-destructive" />
         </div>
 
-        <ValidationError errors={state.errors} className="text-xs text-tone-danger-text" />
+        <ValidationError errors={state.errors} className="text-xs text-destructive" />
 
         <div className="flex flex-col gap-3">
           <button

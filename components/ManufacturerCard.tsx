@@ -134,7 +134,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
             ) : (
               <Link
                 href="/contact"
-                className="pointer-events-auto ml-2 sm:ml-4 text-right text-xs font-normal text-accent-blue-pale hover:text-accent-blue-pale-hover"
+                className="pointer-events-auto ml-2 sm:ml-4 text-right text-xs font-normal text-signal hover:text-signal/80"
               >
                 {domesticDistributor.label}
               </Link>

@@ -153,7 +153,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
                     <ul className="text-xs text-foreground/80 space-y-1">
                       {robot.comparison.bestFit.map((item) => (
                         <li key={item} className="flex items-start gap-2">
-                          <span className="text-jade-9 mt-0.5">+</span>
+                          <span className="mt-0.5 text-foreground">+</span>
                           <span>{item}</span>
                         </li>
                       ))}

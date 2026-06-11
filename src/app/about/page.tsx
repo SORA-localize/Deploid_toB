@@ -68,7 +68,7 @@ export default function AboutPage() {
             <dd className="text-sm text-foreground">
               <Link
                 href="/contact"
-                className="text-tone-brand-text hover:text-tone-brand-solid underline underline-offset-2 transition-colors"
+                className="text-signal hover:text-signal/80 underline underline-offset-2 transition-colors"
               >
                 お問い合わせフォーム
               </Link>
@@ -135,7 +135,7 @@ export default function AboutPage() {
           掲載相談、情報提供・修正、取材相談、導入相談を随時受け付けております。お問い合わせは
           <Link
             href="/contact"
-            className="text-tone-brand-text hover:text-tone-brand-solid underline underline-offset-2 transition-colors mx-0.5"
+            className="text-signal hover:text-signal/80 underline underline-offset-2 transition-colors mx-0.5"
           >
             こちら
           </Link>

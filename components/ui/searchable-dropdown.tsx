@@ -293,7 +293,7 @@ export function SearchableDropdown({
                       className={cn(
                         "flex min-h-10 w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-sm transition-colors outline-none disabled:pointer-events-none disabled:opacity-50",
                         active ? "bg-muted text-foreground" : "hover:bg-muted",
-                        selected && "font-medium text-brand"
+                        selected && "font-medium text-foreground"
                       )}
                     >
                       {item.icon && <span className="shrink-0">{item.icon}</span>}
@@ -306,7 +306,7 @@ export function SearchableDropdown({
                         )}
                       </span>
                       {selected && (
-                        <CheckIcon aria-hidden="true" className="h-4 w-4 shrink-0 text-brand" />
+                        <CheckIcon aria-hidden="true" className="h-4 w-4 shrink-0 text-foreground" />
                       )}
                     </button>
                   </li>

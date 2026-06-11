@@ -6,9 +6,9 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 const ogColors = {
-  background: '#fcfcfd',
+  background: '#ffffff',
   foreground: '#1c2024',
-  brand: '#29a383',
+  mark: '#1c2024',
 } as const;
 
 // Next.js が build 時に都度生成する OGP 画像。
@@ -34,7 +34,7 @@ export default function Image() {
           A B2B portal for humanoid robot procurement decisions in Japan.
         </div>
         <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ width: 16, height: 16, background: ogColors.brand }} />
+          <div style={{ width: 16, height: 16, background: ogColors.mark }} />
           <div style={{ fontSize: 20, opacity: 0.7 }}>deploid</div>
         </div>
       </div>

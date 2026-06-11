@@ -25,36 +25,36 @@ export type VisualTone =
   | 'favorite';
 
 export const visualToneSoftClassNames = {
-  neutral: 'border-tone-neutral-border bg-tone-neutral-bg text-tone-neutral-text',
-  brand: 'border-tone-brand-border bg-tone-brand-bg text-tone-brand-text',
-  info: 'border-tone-info-border bg-tone-info-bg text-tone-info-text',
-  success: 'border-tone-success-border bg-tone-success-bg text-tone-success-text',
-  warning: 'border-tone-warning-border bg-tone-warning-bg text-tone-warning-text',
-  danger: 'border-tone-danger-border bg-tone-danger-bg text-tone-danger-text',
-  unknown: 'border-tone-unknown-border bg-tone-unknown-bg text-tone-unknown-text',
-  favorite: 'border-tone-favorite-border bg-tone-favorite-bg text-tone-favorite-text',
+  neutral: 'border-border bg-muted text-muted-foreground',
+  brand: 'border-border bg-muted text-foreground',
+  info: 'border-border bg-muted text-foreground',
+  success: 'border-border bg-muted text-foreground',
+  warning: 'border-border bg-muted text-foreground',
+  danger: 'border-destructive/30 bg-destructive/5 text-destructive',
+  unknown: 'border-border bg-card text-muted-foreground',
+  favorite: 'border-border bg-muted text-foreground',
 } as const satisfies Record<VisualTone, string>;
 
 export const visualToneTextClassNames = {
-  neutral: 'text-tone-neutral-text',
-  brand: 'text-tone-brand-text',
-  info: 'text-tone-info-text',
-  success: 'text-tone-success-text',
-  warning: 'text-tone-warning-text',
-  danger: 'text-tone-danger-text',
-  unknown: 'text-tone-unknown-text',
-  favorite: 'text-tone-favorite-text',
+  neutral: 'text-muted-foreground',
+  brand: 'text-foreground',
+  info: 'text-foreground',
+  success: 'text-foreground',
+  warning: 'text-foreground',
+  danger: 'text-destructive',
+  unknown: 'text-muted-foreground',
+  favorite: 'text-foreground',
 } as const satisfies Record<VisualTone, string>;
 
 export const visualToneSolidClassNames = {
-  neutral: 'border-tone-neutral-text bg-tone-neutral-text text-background',
-  brand: 'border-tone-brand-solid bg-tone-brand-solid text-brand-foreground',
-  info: 'border-tone-info-solid bg-tone-info-solid text-white',
-  success: 'border-tone-success-solid bg-tone-success-solid text-white',
-  warning: 'border-tone-warning-solid bg-tone-warning-solid text-foreground',
-  danger: 'border-tone-danger-solid bg-tone-danger-solid text-white',
-  unknown: 'border-tone-unknown-text bg-tone-unknown-text text-background',
-  favorite: 'border-tone-favorite-solid bg-tone-favorite-solid text-foreground',
+  neutral: 'border-primary bg-primary text-primary-foreground',
+  brand: 'border-primary bg-primary text-primary-foreground',
+  info: 'border-primary bg-primary text-primary-foreground',
+  success: 'border-primary bg-primary text-primary-foreground',
+  warning: 'border-primary bg-primary text-primary-foreground',
+  danger: 'border-destructive bg-destructive text-destructive-foreground',
+  unknown: 'border-foreground bg-foreground text-background',
+  favorite: 'border-primary bg-primary text-primary-foreground',
 } as const satisfies Record<VisualTone, string>;
 
 export function getVisualToneClassName(tone: VisualTone) {

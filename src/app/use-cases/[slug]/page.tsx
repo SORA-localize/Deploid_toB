@@ -86,7 +86,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
             <div className="grid grid-cols-1 gap-4 text-xs md:grid-cols-3">
               <div>
                 <h3 className="font-semibold text-foreground mb-2 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-tone-success-text" />
+                  <CheckCircle2 className="w-4 h-4 text-foreground" />
                   向く条件
                 </h3>
                 <p className="text-foreground/80 leading-relaxed">{useCase.atAGlance.whereFits}</p>

@@ -38,7 +38,7 @@ function ProgressIndicators({ count }: { count: number }) {
         <div key={index} className="h-0.5 flex-1 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
           <div 
             className={cn(
-              "h-full bg-primary transition-all ease-linear",
+              "h-full bg-signal transition-all ease-linear",
             )}
             style={{
               // 現在のスライドなら 5秒かけて 100% へ、それ以外は 0% または 100% 固定
@@ -90,7 +90,7 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
                 <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 lg:p-12">
                   <div className="max-w-4xl space-y-3">
                     <div className="flex items-center gap-3">
-                      <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-sm">
+                      <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-signal text-signal-foreground rounded-sm">
                         {reportTypeLabels[report.type]}
                       </span>
                       <time className="text-xs text-white/60 font-mono">
@@ -98,11 +98,11 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
                       </time>
                     </div>
                     
-                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight transition-colors group-hover:text-signal line-clamp-2">
                       {report.titleJa || report.title}
                     </h2>
                     
-                    <p className="text-sm md:text-base text-white/80 line-clamp-2 max-w-2xl hidden md:block">
+                    <p className="text-sm md:text-base text-white/80 line-clamp-2 max-w-2xl hidden transition-colors group-hover:text-white md:block">
                       {report.summary}
                     </p>
                   </div>

@@ -562,7 +562,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                     )}
                   >
                     <div className="px-4 py-3 border-b border-border-subtle flex items-center gap-2">
-                      <Star className="w-4 h-4 text-favorite" />
+                      <Star className="w-4 h-4 fill-favorite text-favorite" />
                       <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {uiText.compare.favorites}
                       </h2>

@@ -59,7 +59,7 @@ export default function PrivacyPage() {
             <dd className="text-sm text-muted-foreground leading-relaxed">
               <Link
                 href="/contact"
-                className="text-tone-brand-text hover:text-tone-brand-solid underline underline-offset-2 transition-colors"
+                className="text-signal hover:text-signal/80 underline underline-offset-2 transition-colors"
               >
                 お問い合わせフォーム
               </Link>

@@ -77,7 +77,7 @@ export function ManufacturerFactSheet({ manufacturer, robotCount }: Manufacturer
           )}
         </span>
       ) : (
-        <Link href="/contact" className="text-accent-blue-pale hover:text-accent-blue-pale-hover">
+        <Link href="/contact" className="text-signal hover:text-signal/80">
           {domesticDistributor.label}
         </Link>
       ),

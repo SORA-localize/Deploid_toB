@@ -37,17 +37,17 @@ export function NewsFeatureCard({ report, className }: NewsFeatureCardProps) {
       <div className="absolute inset-0 flex flex-col justify-end p-5">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <span className="rounded-sm bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary-foreground">
+            <span className="rounded-sm bg-signal px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-signal-foreground">
               {reportTypeLabels[report.type]}
             </span>
             <time className="font-mono text-xs text-white/60">{report.publishedAt}</time>
           </div>
 
-          <h2 className="line-clamp-2 text-base font-bold leading-tight text-white transition-colors group-hover:text-primary">
+          <h2 className="line-clamp-2 text-base font-bold leading-tight text-white transition-colors group-hover:text-signal">
             {report.titleJa ?? report.title}
           </h2>
 
-          <p className="hidden line-clamp-2 text-xs leading-relaxed text-white/75 2xl:block">
+          <p className="hidden line-clamp-2 text-xs leading-relaxed text-white/75 transition-colors group-hover:text-white 2xl:block">
             {report.summary}
           </p>
         </div>
