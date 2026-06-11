@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { FeaturedRobotsGrid } from '@/components/FeaturedRobotsGrid';
 import { HomeContentNavigator } from '@/components/HomeContentNavigator';
 import { ManufacturerWorldMap } from '@/components/ManufacturerWorldMap';
-import { NewsCard } from '@/components/NewsCard';
+import { NewsFeatureCard } from '@/components/NewsFeatureCard';
 import { RobotCard } from '@/components/RobotCard';
 import { TagChip } from '@/components/TagChip';
 import {
@@ -112,7 +112,11 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {latestReports.map((report) => (
-              <NewsCard key={report.slug} report={report} />
+              <NewsFeatureCard
+                key={report.slug}
+                report={report}
+                className="min-h-[220px] sm:min-h-[240px] lg:min-h-[260px]"
+              />
             ))}
           </div>
         </section>
