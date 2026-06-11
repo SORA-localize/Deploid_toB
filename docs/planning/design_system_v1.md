@@ -422,6 +422,37 @@ UI文言：
 
 ---
 
+## 13. デザインジャンル
+
+**Editorial Broadsheet × Product Dashboard** のハイブリッド。
+
+### ゾーン定義
+
+| ゾーン | ジャンル | 代表 | 対象ページ |
+|---|---|---|---|
+| 読む場所 | Editorial Broadsheet | FT.com / Bloomberg | 詳細ページ本文（reports/guides/use-cases/[slug]） |
+| 操作する場所 | Product Dashboard | Linear / Vercel | 一覧・比較（robots/reports/guides/use-cases/compare） |
+
+### Editorial ゾーンのルール
+
+- セクションをボックスで囲まない（§3 Spacing「本文ブロックへ矩形背景を貼らない」参照）
+- 区切りは `border-b border-border` + 上下余白（`pt-6 pb-8`）のみ
+- 見出し + 余白 + 罫線で構造を出す
+- セクションごとに `bg-card` を塗らない
+
+### Dashboard ゾーンのルール
+
+- データ単位（ロボットカード・メーカーカード）には `.card-data` を使う
+- ナビゲーション要素（RelatedLinkList・サイドバーウィジェット）はボックスを維持する
+- 一覧ページのグリッドに `xl:grid-cols-4` まで使う（既実装）
+
+### 実装参照基準
+
+- `src/app/page.tsx`（ホーム）: Editorial ゾーンの参照基準（`section.border-b` によるセクション区切り）
+- `src/app/robots/[slug]/page.tsx`: 詳細ページの参照基準（`border-b + py-8` によるディバイダー設計、既実装）
+
+---
+
 ## 12. 一言まとめ
 
 Deploid のデザインシステムは、装飾ではなく判断のための道具である。
