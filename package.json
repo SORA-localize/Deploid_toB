@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/validate-data.mjs && next build",
     "start": "next start",
     "validate:data": "node scripts/validate-data.mjs"
   },

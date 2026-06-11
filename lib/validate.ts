@@ -26,8 +26,23 @@ const referenceDisplayStatuses = new Set<RightsStatus>([
   'permission-requested',
 ]);
 
-export function validateData(): string[] {
-  const issues: string[] = [];
+/** 鮮度warningの既定: sources の最新確認日がこの日数を超えたら再確認を促す（設計 §11.6） */
+const FRESHNESS_DAYS = 180;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/**
+ * 検証は2段階（設計 §10-1）:
+ * - errors: データとして壊れている。build を失敗させる（scripts/validate-data.mjs が exit 1）
+ * - warnings: 運用上の注意（未ローカル画像・鮮度切れ）。ログのみで build は通す
+ */
+export interface ValidationResult {
+  errors: string[];
+  warnings: string[];
+}
+
+export function validateData(): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
   // 参照整合は不変 id で取る（slug は可変URLであり外部キーではない）
   const robotIds = new Set(robots.map((r) => r.id));
   const manufacturerIds = new Set(manufacturers.map((m) => m.id));
@@ -37,13 +52,13 @@ export function validateData(): string[] {
 
   const check = (kind: string, owner: string, field: string, id: string, set: Set<string>) => {
     if (!set.has(id)) {
-      issues.push(`[missing] ${kind} "${owner}".${field} -> "${id}" は存在しません`);
+      errors.push(`[missing] ${kind} "${owner}".${field} -> "${id}" は存在しません`);
     }
   };
 
   const checkDate = (kind: string, owner: string, field: string, value: string | undefined) => {
     if (value && !isoDatePattern.test(value)) {
-      issues.push(`[date] ${kind} "${owner}".${field} は YYYY-MM-DD 形式にしてください: ${value}`);
+      errors.push(`[date] ${kind} "${owner}".${field} は YYYY-MM-DD 形式にしてください: ${value}`);
     }
   };
 
@@ -52,10 +67,10 @@ export function validateData(): string[] {
     try {
       const url = new URL(value);
       if (url.protocol !== 'https:' && url.protocol !== 'http:') {
-        issues.push(`[url] ${kind} "${owner}".${field} は http(s) URL にしてください: ${value}`);
+        errors.push(`[url] ${kind} "${owner}".${field} は http(s) URL にしてください: ${value}`);
       }
     } catch {
-      issues.push(`[url] ${kind} "${owner}".${field} はURL形式にしてください: ${value}`);
+      errors.push(`[url] ${kind} "${owner}".${field} はURL形式にしてください: ${value}`);
     }
   };
 
@@ -67,7 +82,7 @@ export function validateData(): string[] {
   ) => {
     const requireNonEmpty = options.requireNonEmpty ?? true;
     if (requireNonEmpty && sources.length === 0) {
-      issues.push(`[source-empty] ${kind} "${owner}".sources が空です`);
+      errors.push(`[source-empty] ${kind} "${owner}".sources が空です`);
     }
     sources.forEach((source, index) => {
       checkDate(kind, owner, `sources[${index}].checkedAt`, source.checkedAt);
@@ -81,21 +96,27 @@ export function validateData(): string[] {
     asset: ImageAsset | undefined,
   ) => {
     if (!asset) return;
-    if (!asset.alt.trim()) issues.push(`[image-alt] ${kind} "${owner}".${field}.alt が空です`);
+    // 外部ホットリンクは脆い（リンク切れ・403・権利リスク）。ローカル配置（public/）を促す（設計 §9-1）
+    if (!asset.src.trim()) {
+      warnings.push(`[image-empty] ${kind} "${owner}".${field}.src が空です（プレースホルダ表示になります）`);
+    } else if (!asset.src.startsWith('/')) {
+      warnings.push(`[image-remote] ${kind} "${owner}".${field}.src が外部URLです（public/ へのローカル化推奨）: ${asset.src}`);
+    }
+    if (!asset.alt.trim()) errors.push(`[image-alt] ${kind} "${owner}".${field}.alt が空です`);
     if (!asset.rights) {
-      issues.push(`[image-rights] ${kind} "${owner}".${field}.rights が未設定です`);
+      errors.push(`[image-rights] ${kind} "${owner}".${field}.rights が未設定です`);
       return;
     }
 
     checkDate(kind, owner, `${field}.rights.checkedAt`, asset.rights.checkedAt);
 
     if (referenceDisplayStatuses.has(asset.rights.status)) {
-      if (!asset.credit) issues.push(`[image-credit] ${kind} "${owner}".${field}.credit が未設定です`);
+      if (!asset.credit) errors.push(`[image-credit] ${kind} "${owner}".${field}.credit が未設定です`);
       if (!asset.sourceUrl) {
-        issues.push(`[image-source] ${kind} "${owner}".${field}.sourceUrl が未設定です`);
+        errors.push(`[image-source] ${kind} "${owner}".${field}.sourceUrl が未設定です`);
       }
       if (!asset.rights.rightsHolder) {
-        issues.push(`[image-rights-holder] ${kind} "${owner}".${field}.rights.rightsHolder が未設定です`);
+        errors.push(`[image-rights-holder] ${kind} "${owner}".${field}.rights.rightsHolder が未設定です`);
       }
     }
   };
@@ -105,7 +126,7 @@ export function validateData(): string[] {
     for (const value of values) {
       const key = normalizeTagKey(value);
       if (seen.has(key)) {
-        issues.push(`[tag-duplicate] ${kind} "${owner}".${field} に正規化後の重複があります: ${value}`);
+        errors.push(`[tag-duplicate] ${kind} "${owner}".${field} に正規化後の重複があります: ${value}`);
       }
       seen.add(key);
     }
@@ -121,10 +142,35 @@ export function validateData(): string[] {
     checkTagDuplicates(kind, owner, field, values);
     for (const value of values) {
       if (!isRegisteredTag(tagKind, value)) {
-        issues.push(`[tag-unknown] ${kind} "${owner}".${field} に未登録タグがあります: ${value}`);
+        errors.push(`[tag-unknown] ${kind} "${owner}".${field} に未登録タグがあります: ${value}`);
       }
     }
   };
+
+  // 鮮度チェック（warning）: nextReviewBy 超過、または最新 checkedAt が既定日数超（設計 §11.6）
+  const now = Date.now();
+  const checkFreshness = (
+    kind: string,
+    record: { id: string; publishStatus: string; nextReviewBy?: string; sources: readonly { checkedAt: string }[] },
+  ) => {
+    if (record.publishStatus !== 'published') return;
+    if (record.nextReviewBy) {
+      if (isoDatePattern.test(record.nextReviewBy) && Date.parse(record.nextReviewBy) < now) {
+        warnings.push(`[stale] ${kind} "${record.id}" の nextReviewBy (${record.nextReviewBy}) を過ぎています。再確認してください`);
+      }
+      return;
+    }
+    const newestCheckedAt = record.sources
+      .map((source) => Date.parse(source.checkedAt))
+      .filter((time) => !Number.isNaN(time))
+      .sort((a, b) => b - a)[0];
+    if (newestCheckedAt != null && now - newestCheckedAt > FRESHNESS_DAYS * MS_PER_DAY) {
+      const days = Math.floor((now - newestCheckedAt) / MS_PER_DAY);
+      warnings.push(`[stale] ${kind} "${record.id}" の最終確認から${days}日経過しています（既定${FRESHNESS_DAYS}日）`);
+    }
+  };
+  robots.forEach((r) => checkFreshness('robot', r));
+  manufacturers.forEach((m) => checkFreshness('manufacturer', m));
 
   // id / slug の一意性・文字種、previousSlugs の衝突。
   // id は不変の外部キー、slug は可変URL（設計: data-architecture-redesign-v1 §3）。
@@ -136,15 +182,15 @@ export function validateData(): string[] {
     const seenIds = new Set<string>();
     const seenSlugs = new Set<string>();
     for (const x of arr) {
-      if (seenIds.has(x.id)) issues.push(`[duplicate] ${name} にid重複: ${x.id}`);
+      if (seenIds.has(x.id)) errors.push(`[duplicate] ${name} にid重複: ${x.id}`);
       seenIds.add(x.id);
-      if (seenSlugs.has(x.slug)) issues.push(`[duplicate] ${name} にslug重複: ${x.slug}`);
+      if (seenSlugs.has(x.slug)) errors.push(`[duplicate] ${name} にslug重複: ${x.slug}`);
       seenSlugs.add(x.slug);
       if (!identifierPattern.test(x.id)) {
-        issues.push(`[id-format] ${name} "${x.id}" のidは小文字英数とハイフンのみにしてください`);
+        errors.push(`[id-format] ${name} "${x.id}" のidは小文字英数とハイフンのみにしてください`);
       }
       if (!identifierPattern.test(x.slug)) {
-        issues.push(`[slug-format] ${name} "${x.id}".slug は小文字英数とハイフンのみにしてください: ${x.slug}`);
+        errors.push(`[slug-format] ${name} "${x.id}".slug は小文字英数とハイフンのみにしてください: ${x.slug}`);
       }
     }
     // previousSlugs は「現slug」「他レコードのpreviousSlugs」と衝突してはならない（301の宛先が曖昧になる）
@@ -152,13 +198,13 @@ export function validateData(): string[] {
     for (const x of arr) {
       for (const prev of x.previousSlugs ?? []) {
         if (!identifierPattern.test(prev)) {
-          issues.push(`[slug-format] ${name} "${x.id}".previousSlugs は小文字英数とハイフンのみにしてください: ${prev}`);
+          errors.push(`[slug-format] ${name} "${x.id}".previousSlugs は小文字英数とハイフンのみにしてください: ${prev}`);
         }
         if (seenSlugs.has(prev)) {
-          issues.push(`[previous-slug] ${name} "${x.id}".previousSlugs "${prev}" が現存slugと衝突しています`);
+          errors.push(`[previous-slug] ${name} "${x.id}".previousSlugs "${prev}" が現存slugと衝突しています`);
         }
         if (allPrevious.has(prev)) {
-          issues.push(`[previous-slug] ${name} の previousSlugs "${prev}" が複数レコードで重複しています`);
+          errors.push(`[previous-slug] ${name} の previousSlugs "${prev}" が複数レコードで重複しています`);
         }
         allPrevious.add(prev);
       }
@@ -179,7 +225,7 @@ export function validateData(): string[] {
     const orderSet = new Set(order);
     Array.from(new Set(values)).forEach((value) => {
       if (!orderSet.has(value)) {
-        issues.push(`[order-missing] ${name} の表示順に "${value}" がありません`);
+        errors.push(`[order-missing] ${name} の表示順に "${value}" がありません`);
       }
     });
   };
@@ -215,12 +261,12 @@ export function validateData(): string[] {
     const labelSet = new Set<string>(labelKeys);
     labelKeys.forEach((key) => {
       if (!orderSet.has(key)) {
-        issues.push(`[section-order] reportSectionOrder に "${key}" がありません（ラベルは定義済み）`);
+        errors.push(`[section-order] reportSectionOrder に "${key}" がありません（ラベルは定義済み）`);
       }
     });
     reportSectionOrder.forEach((value) => {
       if (!labelSet.has(value)) {
-        issues.push(`[section-order] reportSectionLabels に "${value}" がありません（表示順に存在）`);
+        errors.push(`[section-order] reportSectionLabels に "${value}" がありません（表示順に存在）`);
       }
     });
   }
@@ -244,7 +290,7 @@ export function validateData(): string[] {
     m.domesticDistributors?.forEach((distributor, index) => {
       const field = `domesticDistributors[${index}]`;
       if (!distributor.name.trim()) {
-        issues.push(`[required] manufacturer "${m.slug}".${field}.name が空です`);
+        errors.push(`[required] manufacturer "${m.slug}".${field}.name が空です`);
       }
       checkUrl('manufacturer', m.slug, `${field}.website`, distributor.website);
       checkUrl('manufacturer', m.slug, `${field}.sourceUrl`, distributor.sourceUrl);
@@ -308,22 +354,22 @@ export function validateData(): string[] {
 
     const orderKey = `${placement.surface}:${placement.slot}:${placement.order}`;
     if (placementOrders.has(orderKey)) {
-      issues.push(`[duplicate] reportPlacement order 重複: ${orderKey}`);
+      errors.push(`[duplicate] reportPlacement order 重複: ${orderKey}`);
     }
     placementOrders.add(orderKey);
 
     const reportKey = `${placement.surface}:${placement.slot}:${placement.reportId}`;
     if (placementReports.has(reportKey)) {
-      issues.push(`[duplicate] reportPlacement report 重複: ${reportKey}`);
+      errors.push(`[duplicate] reportPlacement report 重複: ${reportKey}`);
     }
     placementReports.add(reportKey);
 
     if (placement.kind === 'sponsored' && !placement.sponsor?.name.trim()) {
-      issues.push(`[required] reportPlacement "${owner}".sponsor.name が空です`);
+      errors.push(`[required] reportPlacement "${owner}".sponsor.name が空です`);
     }
     if (placement.sponsor) {
       if (!placement.sponsor.name.trim()) {
-        issues.push(`[required] reportPlacement "${owner}".sponsor.name が空です`);
+        errors.push(`[required] reportPlacement "${owner}".sponsor.name が空です`);
       }
       checkUrl('reportPlacement', owner, 'sponsor.url', placement.sponsor.url);
     }
@@ -334,7 +380,7 @@ export function validateData(): string[] {
     for (const ucId of g.relatedUseCaseIds) {
       const uc = useCases.find((u) => u.id === ucId);
       if (uc && !uc.relatedGuideIds.includes(g.id)) {
-        issues.push(
+        errors.push(
           `[asymmetric] guide "${g.id}" は useCase "${ucId}" を参照しているが、逆向き(useCase.relatedGuideIds)に含まれていません`,
         );
       }
@@ -344,7 +390,7 @@ export function validateData(): string[] {
     for (const gId of u.relatedGuideIds) {
       const g = guides.find((x) => x.id === gId);
       if (g && !g.relatedUseCaseIds.includes(u.id)) {
-        issues.push(
+        errors.push(
           `[asymmetric] useCase "${u.id}" は guide "${gId}" を参照しているが、逆向き(guide.relatedUseCaseIds)に含まれていません`,
         );
       }
@@ -354,7 +400,7 @@ export function validateData(): string[] {
   // 余談: report.relatedGuideIds があるならガイドが知らなくても警告しない
   // (片方向リレーション。reportが主、guideは知らなくていい設計)
 
-  return issues;
+  return { errors, warnings };
 }
 
 let didRun = false;
@@ -362,13 +408,19 @@ export function runValidationInDev(): void {
   if (didRun) return;
   didRun = true;
   if (process.env.NODE_ENV === 'production') return;
-  const issues = validateData();
+  const { errors, warnings } = validateData();
   const total = robots.length + manufacturers.length + guides.length + useCases.length + reports.length;
-  if (issues.length === 0) {
+  if (errors.length === 0 && warnings.length === 0) {
     // eslint-disable-next-line no-console
     console.log(`[data] referential integrity: OK (${total} records)`);
-  } else {
+    return;
+  }
+  if (warnings.length > 0) {
     // eslint-disable-next-line no-console
-    console.warn(`[data] referential integrity issues (${issues.length}):\n` + issues.map((i) => '  - ' + i).join('\n'));
+    console.warn(`[data] warnings (${warnings.length}):\n` + warnings.map((i) => '  - ' + i).join('\n'));
+  }
+  if (errors.length > 0) {
+    // eslint-disable-next-line no-console
+    console.error(`[data] errors (${errors.length}) — build はゲートで失敗します:\n` + errors.map((i) => '  - ' + i).join('\n'));
   }
 }
