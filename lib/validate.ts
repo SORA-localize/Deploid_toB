@@ -18,6 +18,7 @@ import {
   robotCategoryOrder,
 } from './display.ts';
 import { reportSectionLabels } from './labels.ts';
+import { isSpecKey } from './specSchema.ts';
 import { isRegisteredTag, normalizeTagKey, type TagKind } from './tagRegistry.ts';
 
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -273,6 +274,12 @@ export function validateData(): ValidationResult {
 
   for (const r of robots) {
     check('robot', r.slug, 'manufacturerId', r.manufacturerId, manufacturerIds);
+    // specs のキーは lib/specSchema.ts 登録値のみ（型でも保証されるが、将来のCMS/JSON化に備えた実行時保証）
+    Object.keys(r.specs).forEach((key) => {
+      if (!isSpecKey(key)) {
+        errors.push(`[spec-unknown] robot "${r.id}".specs に未登録キーがあります: ${key}（lib/specSchema.ts に追加してください）`);
+      }
+    });
     checkDate('robot', r.slug, 'updatedAt', r.updatedAt);
     checkRequiredSources('robot', r.slug, r.sources);
     checkTags('robot', r.slug, 'industryTags', 'industry', r.industryTags ?? []);

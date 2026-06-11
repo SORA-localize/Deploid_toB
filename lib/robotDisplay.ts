@@ -1,4 +1,4 @@
-import type { Manufacturer, Robot } from '@/data/types';
+import type { Manufacturer, Robot, RobotSpecs } from '@/data/types';
 import {
   buyerReadinessLabels,
   deploymentStageLabels,
@@ -8,6 +8,7 @@ import {
   robotCategoryLabels,
   TBD_LABEL,
 } from '@/lib/labels';
+import { getSpecEntry, specSchema, type SpecKey } from '@/lib/specSchema';
 import { getTagLabel } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
 
@@ -22,6 +23,32 @@ export function formatNumber(value: number | undefined, unit = '') {
 
 export function formatRuntime(value: number | undefined) {
   return value != null ? `約${value}分` : TBD_LABEL;
+}
+
+/** specSchema の kind/unit に従ってスペック値を整形する（未設定は「要確認」） */
+export function formatSpecValue(specs: RobotSpecs, key: SpecKey): string {
+  const entry = getSpecEntry(key);
+  const raw = specs[key];
+  if (raw == null || raw === '') return TBD_LABEL;
+  switch (entry.kind) {
+    case 'mobility':
+      return mobilityLabels[raw as NonNullable<RobotSpecs['mobility']>];
+    case 'runtime':
+      return formatRuntime(raw as number);
+    case 'text':
+      return String(raw);
+    default:
+      return `${raw}${entry.unit}`;
+  }
+}
+
+/** specSchema 駆動のスペック行。項目の追加・並び・ラベルは specSchema 側で管理する */
+export function getSpecRows(specs: RobotSpecs, keys?: readonly SpecKey[]): DisplayRow[] {
+  const entries = keys ? keys.map((key) => getSpecEntry(key)) : specSchema;
+  return entries.map((entry) => ({
+    label: entry.label,
+    value: formatSpecValue(specs, entry.key),
+  }));
 }
 
 function formatComparisonPriceStatus(robot: Robot) {
@@ -81,19 +108,11 @@ export function getRobotCardSpecRows(robot: Robot): DisplayRow[] {
 }
 
 export function getRobotDetailSpecRows(robot: Robot, manufacturer?: Manufacturer): DisplayRow[] {
-  const { specs } = robot;
-
+  // メーカー/カテゴリは関連参照、スペック行は specSchema が正本（並び順も schema 準拠）
   return [
     { label: 'メーカー', value: manufacturer?.name ?? robot.manufacturerId },
     { label: 'カテゴリ', value: robotCategoryLabels[robot.category] },
-    { label: '移動方式', value: specs.mobility ? mobilityLabels[specs.mobility] : TBD_LABEL },
-    { label: '身長', value: formatNumber(specs.heightCm, ' cm') },
-    { label: '重量', value: formatNumber(specs.weightKg, ' kg') },
-    { label: 'ペイロード', value: formatNumber(specs.payloadKg, ' kg') },
-    { label: '稼働時間', value: formatRuntime(specs.runtimeMin) },
-    { label: '速度', value: formatNumber(specs.speedMps, ' m/s') },
-    { label: '自由度', value: formatNumber(specs.dof, ' DoF') },
-    { label: '防塵防水', value: specs.ipRating ?? TBD_LABEL },
+    ...getSpecRows(robot.specs),
   ];
 }
 
@@ -133,8 +152,7 @@ export function getComparisonDetailRows(robot: Robot): DisplayRow[] {
 
   return [
     { label: uiText.comparison.dimensions, value: dimensions },
-    { label: '自由度', value: formatNumber(specs.dof, ' DoF') },
-    { label: '移動方式', value: specs.mobility ? mobilityLabels[specs.mobility] : TBD_LABEL },
-    { label: '防塵防水', value: specs.ipRating ?? TBD_LABEL },
+    // 項目の選抜は比較UIの編集判断、ラベル・整形は specSchema 準拠
+    ...getSpecRows(specs, ['dof', 'mobility', 'ipRating']),
   ];
 }

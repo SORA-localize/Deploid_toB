@@ -6,6 +6,7 @@
  * types from `data/types.ts`. CMS-specific schemas should be derived from
  * this file later, not the other way around.
  */
+import type { RobotSpecsFromSchema } from '@/lib/specSchema';
 import type { TagValue } from '@/lib/tagRegistry';
 
 /** 不変の安定ID。外部キー・一意性・将来のCMSレコードキーに使う。発番後は二度と変えない。 */
@@ -187,16 +188,12 @@ export type ProcurementModel =
   | 'not-for-sale'
   | 'inquiry';
 
-export interface RobotSpecs {
-  heightCm?: number;
-  weightKg?: number;
-  payloadKg?: number;
-  runtimeMin?: number;
-  speedMps?: number;
-  dof?: number;
-  mobility?: MobilityType;
-  ipRating?: string;
-}
+/**
+ * スペック値。項目の定義（キー・ラベル・単位・グループ）の正本は lib/specSchema.ts。
+ * 項目追加は specSchema に1行追加すれば型・スペック表・validate が自動追従する（設計 §8）。
+ * 値は各ロボットに個別。不明値はキーごと省略する（UIが「要確認」を表示）。
+ */
+export type RobotSpecs = RobotSpecsFromSchema;
 
 export interface ComparisonProfile {
   strengths: string[];
