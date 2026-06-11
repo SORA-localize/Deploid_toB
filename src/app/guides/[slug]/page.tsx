@@ -38,8 +38,8 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
   const guide = getGuideBySlug(slug);
   if (!guide) notFound();
 
-  const robots = getRelatedRobots(guide.relatedRobotSlugs);
-  const useCases = getRelatedUseCases(guide.relatedUseCaseSlugs);
+  const robots = getRelatedRobots(guide.relatedRobotIds);
+  const useCases = getRelatedUseCases(guide.relatedUseCaseIds);
   const hasChecklist = (guide.checklistItems ?? []).length > 0;
   const hasBody = (guide.body ?? '').trim().length > 0;
 

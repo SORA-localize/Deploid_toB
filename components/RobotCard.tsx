@@ -167,7 +167,7 @@ export function RobotCard({
           <div>
             <div className="inline-block pointer-events-none md:pointer-events-auto">
               <ManufacturerLogoName
-                name={manufacturerName ?? robot.manufacturerSlug}
+                name={manufacturerName ?? robot.manufacturerId}
                 logo={manufacturerLogo}
                 className="mb-1 text-xs text-muted-foreground"
                 frameClassName="h-4 w-4"

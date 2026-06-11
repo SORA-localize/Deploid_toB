@@ -40,10 +40,10 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const report = getReportBySlug(slug);
   if (!report) notFound();
 
-  const robots = getRelatedRobots(report.relatedRobotSlugs);
-  const manufacturers = getRelatedManufacturers(report.relatedManufacturerSlugs);
-  const useCases = getRelatedUseCases(report.relatedUseCaseSlugs);
-  const guides = getRelatedGuides(report.relatedGuideSlugs ?? []);
+  const robots = getRelatedRobots(report.relatedRobotIds);
+  const manufacturers = getRelatedManufacturers(report.relatedManufacturerIds);
+  const useCases = getRelatedUseCases(report.relatedUseCaseIds);
+  const guides = getRelatedGuides(report.relatedGuideIds ?? []);
 
   const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
   const hasBody = (report.body ?? '').trim().length > 0;

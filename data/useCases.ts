@@ -44,8 +44,8 @@ export const useCases: UseCase[] = [
     environmentRequirements: '平坦な床、通信環境、充電スペース、作業エリア分離、緊急停止手順。',
     whyHardToday: '作業速度、把持精度、例外処理、バッテリー稼働時間が制約になりやすい。',
     japanDeploymentConditions: '労働安全、現場オペレーション、国内保守、夜間対応の確認が必要。',
-    candidateRobotSlugs: ['agility-digit', 'figure-03'],
-    relatedGuideSlugs: ['decision-variables', 'poc-planning'],
+    candidateRobotIds: ['agility-digit', 'figure-03'],
+    relatedGuideIds: ['decision-variables', 'poc-planning'],
   },
   {
     id: 'factory-inspection',
@@ -87,8 +87,8 @@ export const useCases: UseCase[] = [
     environmentRequirements: '通信環境、充電位置、巡回ルート、作業時間帯の分離。',
     whyHardToday: '複雑な現場での自律移動、微細な異常検知、長時間稼働が課題。',
     japanDeploymentConditions: '設備管理ルール、データ管理、保守対応、労働安全の整理が必要。',
-    candidateRobotSlugs: ['ubtech-walker-s2', 'tesla-optimus'],
-    relatedGuideSlugs: ['decision-variables'],
+    candidateRobotIds: ['ubtech-walker-s2', 'tesla-optimus'],
+    relatedGuideIds: ['decision-variables'],
   },
   {
     id: 'research-development',
@@ -129,8 +129,8 @@ export const useCases: UseCase[] = [
     environmentRequirements: '安全に試験できるスペース、技術者、保守予算。',
     whyHardToday: '研究目的と機体性能のミスマッチ、故障時の復旧、部品供給が課題。',
     japanDeploymentConditions: '輸入、保守、技適、研究室内安全ルールを確認する。',
-    candidateRobotSlugs: ['unitree-g1', 'pal-talos', 'booster-t1'],
-    relatedGuideSlugs: ['decision-variables'],
+    candidateRobotIds: ['unitree-g1', 'pal-talos', 'booster-t1'],
+    relatedGuideIds: ['decision-variables'],
   },
   {
     id: 'demo-exhibition',
@@ -171,7 +171,7 @@ export const useCases: UseCase[] = [
     environmentRequirements: '通信、充電、監視スタッフ、安全動線。',
     whyHardToday: '非定型会話、混雑時の安全確保、安定稼働が課題。',
     japanDeploymentConditions: 'イベント会場の安全ルールと保険条件を確認する。',
-    candidateRobotSlugs: ['unitree-r1', 'booster-k1'],
-    relatedGuideSlugs: ['decision-variables'],
+    candidateRobotIds: ['unitree-r1', 'booster-k1'],
+    relatedGuideIds: ['decision-variables'],
   },
 ];

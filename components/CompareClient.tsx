@@ -147,10 +147,10 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   // ここで layout を併用すると同じカードを二重にアニメートしてガクつく。
   const isInsertionPreviewing = sheetPreview !== null;
 
-  const manufacturerFor = (slug: string) => manufacturers.find((m) => m.slug === slug);
+  const manufacturerFor = (id: string) => manufacturers.find((m) => m.id === id);
   const activeDragRobot = activeDrag ? robotBySlug.get(activeDrag.slug) : undefined;
   const activeDragManufacturer = activeDragRobot
-    ? manufacturerFor(activeDragRobot.manufacturerSlug)
+    ? manufacturerFor(activeDragRobot.manufacturerId)
     : undefined;
 
   // 並び順を local state へ即時反映し、URL も同じ値へ同期する(共有・履歴用)。
@@ -370,7 +370,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                     <div className="max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden xl:max-h-[calc(100vh-200px)]">
                       {manufacturers.map((manufacturer) => {
                         const manufacturerRobots = robots.filter(
-                          (r) => r.manufacturerSlug === manufacturer.slug,
+                          (r) => r.manufacturerId === manufacturer.id,
                         );
                         const isExpanded = expandedManufacturers.includes(manufacturer.slug);
 
@@ -481,7 +481,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                             {sheetPreviewItems.map((item) => {
                               if (item.type === 'preview') {
-                                const manufacturer = manufacturerFor(item.robot.manufacturerSlug);
+                                const manufacturer = manufacturerFor(item.robot.manufacturerId);
                                 return (
                                   <motion.div
                                     key={`sheet-preview-${item.robot.slug}`}
@@ -493,7 +493,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                                   >
                                     <CompareInsertionPreviewCard
                                       robot={item.robot}
-                                      manufacturerName={manufacturer?.name ?? item.robot.manufacturerSlug}
+                                      manufacturerName={manufacturer?.name ?? item.robot.manufacturerId}
                                       manufacturerLogo={manufacturer?.logo}
                                     />
                                   </motion.div>
@@ -501,7 +501,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                               }
 
                               const { robot } = item;
-                              const manufacturer = manufacturerFor(robot.manufacturerSlug);
+                              const manufacturer = manufacturerFor(robot.manufacturerId);
                               return (
                                 <motion.div
                                   key={robot.slug}
@@ -523,7 +523,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                                     {(dragHandleProps) => (
                                       <ComparisonRobotPanel
                                         robot={robot}
-                                        manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                                        manufacturerName={manufacturer?.name ?? robot.manufacturerId}
                                         manufacturerLogo={manufacturer?.logo}
                                         isFavorite={
                                           isMounted ? favorites.includes(robot.slug) : false
@@ -582,12 +582,12 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                       ) : (
                         <div className="space-y-3">
                           {favoriteRobots.map((robot) => {
-                            const manufacturer = manufacturerFor(robot.manufacturerSlug);
+                            const manufacturer = manufacturerFor(robot.manufacturerId);
                             return (
                               <DraggableFavoriteCard
                                 key={robot.slug}
                                 robot={robot}
-                                manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                                manufacturerName={manufacturer?.name ?? robot.manufacturerId}
                                 manufacturerLogo={manufacturer?.logo}
                                 onRemove={toggleFavorite}
                                 onSelect={handleFavoriteSelect}
@@ -617,7 +617,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                 <div className="h-full shadow-2xl">
                   <ComparisonRobotPanel
                     robot={activeDragRobot}
-                    manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerSlug}
+                    manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerId}
                     manufacturerLogo={activeDragManufacturer?.logo}
                     isFavorite={isMounted ? favorites.includes(activeDragRobot.slug) : false}
                     onFavoriteToggle={() => {}}
@@ -627,7 +627,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
               ) : (
                 <CompareDragOverlayCard
                   robot={activeDragRobot}
-                  manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerSlug}
+                  manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerId}
                   manufacturerLogo={activeDragManufacturer?.logo}
                 />
               )

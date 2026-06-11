@@ -6,8 +6,12 @@ import { robots } from '@/data/robots';
 import { useCases } from '@/data/useCases';
 import { runValidationInDev } from './validate';
 
-// dev時のみ：参照整合（存在しないslug参照・双方向のズレ・slug重複）をconsoleで通知
+// dev時のみ：参照整合（存在しないid参照・双方向のズレ・id/slug重複）をconsoleで通知
 runValidationInDev();
+
+// 識別子の使い分け（設計: data-architecture-redesign-v1 §3）:
+// - 参照（*Id / *Ids）・お気に入り・比較は不変の id で解決する（get*ById / *For* 系）
+// - 公開URLのパス解決のみ可変の slug を使う（get*BySlug 系）
 
 const published = <T extends { publishStatus: string }>(items: T[]) =>
   items.filter((item) => item.publishStatus === 'published');
@@ -20,6 +24,10 @@ export function getRobotBySlug(slug: string) {
   return getRobots().find((robot) => robot.slug === slug);
 }
 
+export function getRobotById(id: string) {
+  return getRobots().find((robot) => robot.id === id);
+}
+
 export function getManufacturers() {
   return published(manufacturers);
 }
@@ -28,12 +36,16 @@ export function getDeployments() {
   return published(deployments);
 }
 
-export function getDeploymentsForManufacturer(slug: string) {
-  return getDeployments().filter((deployment) => deployment.manufacturerSlug === slug);
+export function getDeploymentsForManufacturer(manufacturerId: string) {
+  return getDeployments().filter((deployment) => deployment.manufacturerId === manufacturerId);
 }
 
 export function getManufacturerBySlug(slug: string) {
   return getManufacturers().find((manufacturer) => manufacturer.slug === slug);
+}
+
+export function getManufacturerById(id: string) {
+  return getManufacturers().find((manufacturer) => manufacturer.id === id);
 }
 
 export function getGuides() {
@@ -44,12 +56,20 @@ export function getGuideBySlug(slug: string) {
   return getGuides().find((guide) => guide.slug === slug);
 }
 
+export function getGuideById(id: string) {
+  return getGuides().find((guide) => guide.id === id);
+}
+
 export function getUseCases() {
   return published(useCases);
 }
 
 export function getUseCaseBySlug(slug: string) {
   return getUseCases().find((useCase) => useCase.slug === slug);
+}
+
+export function getUseCaseById(id: string) {
+  return getUseCases().find((useCase) => useCase.id === id);
 }
 
 export function getReports() {
@@ -60,46 +80,50 @@ export function getReportBySlug(slug: string) {
   return getReports().find((report) => report.slug === slug);
 }
 
-export function getRobotsByManufacturerSlug(slug: string) {
-  return getRobots().filter((robot) => robot.manufacturerSlug === slug);
+export function getReportById(id: string) {
+  return getReports().find((report) => report.id === id);
 }
 
-export function getUseCasesForRobot(slug: string) {
-  return getUseCases().filter((useCase) => useCase.candidateRobotSlugs.includes(slug));
+export function getRobotsByManufacturerId(manufacturerId: string) {
+  return getRobots().filter((robot) => robot.manufacturerId === manufacturerId);
 }
 
-export function getReportsForRobot(slug: string) {
-  return getReports().filter((report) => report.relatedRobotSlugs.includes(slug));
+export function getUseCasesForRobot(robotId: string) {
+  return getUseCases().filter((useCase) => useCase.candidateRobotIds.includes(robotId));
 }
 
-export function getReportsForUseCase(slug: string) {
-  return getReports().filter((report) => report.relatedUseCaseSlugs.includes(slug));
+export function getReportsForRobot(robotId: string) {
+  return getReports().filter((report) => report.relatedRobotIds.includes(robotId));
 }
 
-export function getReportsForManufacturer(slug: string) {
-  return getReports().filter((report) => report.relatedManufacturerSlugs.includes(slug));
+export function getReportsForUseCase(useCaseId: string) {
+  return getReports().filter((report) => report.relatedUseCaseIds.includes(useCaseId));
 }
 
-export function getManufacturerForRobot(manufacturerSlug: string) {
-  return getManufacturerBySlug(manufacturerSlug);
+export function getReportsForManufacturer(manufacturerId: string) {
+  return getReports().filter((report) => report.relatedManufacturerIds.includes(manufacturerId));
 }
 
-export function getRelatedRobots(slugs: string[]) {
-  const slugSet = new Set(slugs);
-  return getRobots().filter((robot) => slugSet.has(robot.slug));
+export function getManufacturerForRobot(manufacturerId: string) {
+  return getManufacturerById(manufacturerId);
 }
 
-export function getRelatedManufacturers(slugs: string[]) {
-  const slugSet = new Set(slugs);
-  return getManufacturers().filter((manufacturer) => slugSet.has(manufacturer.slug));
+export function getRelatedRobots(ids: string[]) {
+  const idSet = new Set(ids);
+  return getRobots().filter((robot) => idSet.has(robot.id));
 }
 
-export function getRelatedUseCases(slugs: string[]) {
-  const slugSet = new Set(slugs);
-  return getUseCases().filter((useCase) => slugSet.has(useCase.slug));
+export function getRelatedManufacturers(ids: string[]) {
+  const idSet = new Set(ids);
+  return getManufacturers().filter((manufacturer) => idSet.has(manufacturer.id));
 }
 
-export function getRelatedGuides(slugs: string[]) {
-  const slugSet = new Set(slugs);
-  return getGuides().filter((guide) => slugSet.has(guide.slug));
+export function getRelatedUseCases(ids: string[]) {
+  const idSet = new Set(ids);
+  return getUseCases().filter((useCase) => idSet.has(useCase.id));
+}
+
+export function getRelatedGuides(ids: string[]) {
+  const idSet = new Set(ids);
+  return getGuides().filter((guide) => idSet.has(guide.id));
 }

@@ -1,6 +1,6 @@
 // 参照整合チェック。dev起動時に lib/data.ts から1度だけ呼ばれ、
-// 「存在しないslugを参照している」「双方向リンクが片側だけ」「slug重複」を
-// console に出す。本番では走らない。
+// 「存在しないidを参照している」「双方向リンクが片側だけ」「id/slug重複」を
+// console に出す。`npm run validate:data`（scripts/validate-data.mjs）からも実行される。
 import { deployments } from '../data/deployments.ts';
 import { guides } from '../data/guides.ts';
 import { manufacturers } from '../data/manufacturers.ts';
@@ -28,15 +28,16 @@ const referenceDisplayStatuses = new Set<RightsStatus>([
 
 export function validateData(): string[] {
   const issues: string[] = [];
-  const robotSlugs = new Set(robots.map((r) => r.slug));
-  const manufacturerSlugs = new Set(manufacturers.map((m) => m.slug));
-  const guideSlugs = new Set(guides.map((g) => g.slug));
-  const useCaseSlugs = new Set(useCases.map((u) => u.slug));
-  const reportSlugs = new Set(reports.map((r) => r.slug));
+  // 参照整合は不変 id で取る（slug は可変URLであり外部キーではない）
+  const robotIds = new Set(robots.map((r) => r.id));
+  const manufacturerIds = new Set(manufacturers.map((m) => m.id));
+  const guideIds = new Set(guides.map((g) => g.id));
+  const useCaseIds = new Set(useCases.map((u) => u.id));
+  const reportIds = new Set(reports.map((r) => r.id));
 
-  const check = (kind: string, owner: string, field: string, slug: string, set: Set<string>) => {
-    if (!set.has(slug)) {
-      issues.push(`[missing] ${kind} "${owner}".${field} -> "${slug}" は存在しません`);
+  const check = (kind: string, owner: string, field: string, id: string, set: Set<string>) => {
+    if (!set.has(id)) {
+      issues.push(`[missing] ${kind} "${owner}".${field} -> "${id}" は存在しません`);
     }
   };
 
@@ -225,7 +226,7 @@ export function validateData(): string[] {
   }
 
   for (const r of robots) {
-    check('robot', r.slug, 'manufacturerSlug', r.manufacturerSlug, manufacturerSlugs);
+    check('robot', r.slug, 'manufacturerId', r.manufacturerId, manufacturerIds);
     checkDate('robot', r.slug, 'updatedAt', r.updatedAt);
     checkRequiredSources('robot', r.slug, r.sources);
     checkTags('robot', r.slug, 'industryTags', 'industry', r.industryTags ?? []);
@@ -254,9 +255,9 @@ export function validateData(): string[] {
   for (const g of guides) {
     checkDate('guide', g.slug, 'updatedAt', g.updatedAt);
     checkTags('guide', g.slug, 'topics', 'guide-topic', g.topics);
-    g.relatedRobotSlugs.forEach((s) => check('guide', g.slug, 'relatedRobotSlugs', s, robotSlugs));
-    g.relatedUseCaseSlugs.forEach((s) =>
-      check('guide', g.slug, 'relatedUseCaseSlugs', s, useCaseSlugs),
+    g.relatedRobotIds.forEach((s) => check('guide', g.slug, 'relatedRobotIds', s, robotIds));
+    g.relatedUseCaseIds.forEach((s) =>
+      check('guide', g.slug, 'relatedUseCaseIds', s, useCaseIds),
     );
   }
 
@@ -264,11 +265,11 @@ export function validateData(): string[] {
     checkDate('useCase', u.slug, 'updatedAt', u.updatedAt);
     checkTags('useCase', u.slug, 'industryTags', 'industry', u.industryTags);
     checkTags('useCase', u.slug, 'taskTags', 'task', u.taskTags);
-    u.candidateRobotSlugs.forEach((s) =>
-      check('useCase', u.slug, 'candidateRobotSlugs', s, robotSlugs),
+    u.candidateRobotIds.forEach((s) =>
+      check('useCase', u.slug, 'candidateRobotIds', s, robotIds),
     );
-    u.relatedGuideSlugs.forEach((s) =>
-      check('useCase', u.slug, 'relatedGuideSlugs', s, guideSlugs),
+    u.relatedGuideIds.forEach((s) =>
+      check('useCase', u.slug, 'relatedGuideIds', s, guideIds),
     );
   }
 
@@ -279,25 +280,31 @@ export function validateData(): string[] {
       requireNonEmpty: rep.publishStatus === 'published' && rep.contentKind !== 'sample',
     });
     checkTags('report', rep.slug, 'tags', 'report', rep.tags);
-    rep.relatedRobotSlugs.forEach((s) =>
-      check('report', rep.slug, 'relatedRobotSlugs', s, robotSlugs),
+    rep.relatedRobotIds.forEach((s) =>
+      check('report', rep.slug, 'relatedRobotIds', s, robotIds),
     );
-    rep.relatedManufacturerSlugs.forEach((s) =>
-      check('report', rep.slug, 'relatedManufacturerSlugs', s, manufacturerSlugs),
+    rep.relatedManufacturerIds.forEach((s) =>
+      check('report', rep.slug, 'relatedManufacturerIds', s, manufacturerIds),
     );
-    rep.relatedUseCaseSlugs.forEach((s) =>
-      check('report', rep.slug, 'relatedUseCaseSlugs', s, useCaseSlugs),
+    rep.relatedUseCaseIds.forEach((s) =>
+      check('report', rep.slug, 'relatedUseCaseIds', s, useCaseIds),
     );
-    (rep.relatedGuideSlugs ?? []).forEach((s) =>
-      check('report', rep.slug, 'relatedGuideSlugs', s, guideSlugs),
+    (rep.relatedGuideIds ?? []).forEach((s) =>
+      check('report', rep.slug, 'relatedGuideIds', s, guideIds),
     );
+  }
+
+  for (const d of deployments) {
+    check('deployment', d.id, 'manufacturerId', d.manufacturerId, manufacturerIds);
+    if (d.robotId) check('deployment', d.id, 'robotId', d.robotId, robotIds);
+    checkDate('deployment', d.id, 'updatedAt', d.updatedAt);
   }
 
   const placementOrders = new Set<string>();
   const placementReports = new Set<string>();
   for (const placement of reportPlacements) {
     const owner = `${placement.surface}.${placement.slot}.${placement.order}`;
-    check('reportPlacement', owner, 'reportSlug', placement.reportSlug, reportSlugs);
+    check('reportPlacement', owner, 'reportId', placement.reportId, reportIds);
 
     const orderKey = `${placement.surface}:${placement.slot}:${placement.order}`;
     if (placementOrders.has(orderKey)) {
@@ -305,7 +312,7 @@ export function validateData(): string[] {
     }
     placementOrders.add(orderKey);
 
-    const reportKey = `${placement.surface}:${placement.slot}:${placement.reportSlug}`;
+    const reportKey = `${placement.surface}:${placement.slot}:${placement.reportId}`;
     if (placementReports.has(reportKey)) {
       issues.push(`[duplicate] reportPlacement report 重複: ${reportKey}`);
     }
@@ -322,29 +329,29 @@ export function validateData(): string[] {
     }
   }
 
-  // Bidirectional consistency: Guide <-> UseCase（両側ともUIで使うため整合が必要）
+  // Bidirectional consistency: Guide <-> UseCase（両側ともUIで使うため整合が必要・id参照）
   for (const g of guides) {
-    for (const ucSlug of g.relatedUseCaseSlugs) {
-      const uc = useCases.find((u) => u.slug === ucSlug);
-      if (uc && !uc.relatedGuideSlugs.includes(g.slug)) {
+    for (const ucId of g.relatedUseCaseIds) {
+      const uc = useCases.find((u) => u.id === ucId);
+      if (uc && !uc.relatedGuideIds.includes(g.id)) {
         issues.push(
-          `[asymmetric] guide "${g.slug}" は useCase "${ucSlug}" を参照しているが、逆向き(useCase.relatedGuideSlugs)に含まれていません`,
+          `[asymmetric] guide "${g.id}" は useCase "${ucId}" を参照しているが、逆向き(useCase.relatedGuideIds)に含まれていません`,
         );
       }
     }
   }
   for (const u of useCases) {
-    for (const gSlug of u.relatedGuideSlugs) {
-      const g = guides.find((x) => x.slug === gSlug);
-      if (g && !g.relatedUseCaseSlugs.includes(u.slug)) {
+    for (const gId of u.relatedGuideIds) {
+      const g = guides.find((x) => x.id === gId);
+      if (g && !g.relatedUseCaseIds.includes(u.id)) {
         issues.push(
-          `[asymmetric] useCase "${u.slug}" は guide "${gSlug}" を参照しているが、逆向き(guide.relatedUseCaseSlugs)に含まれていません`,
+          `[asymmetric] useCase "${u.id}" は guide "${gId}" を参照しているが、逆向き(guide.relatedUseCaseIds)に含まれていません`,
         );
       }
     }
   }
 
-  // 余談: report.relatedGuideSlugs があるならガイドが知らなくても警告しない
+  // 余談: report.relatedGuideIds があるならガイドが知らなくても警告しない
   // (片方向リレーション。reportが主、guideは知らなくていい設計)
 
   return issues;

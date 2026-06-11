@@ -45,9 +45,9 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
   const robot = getRobotBySlug(slug);
   if (!robot) notFound();
 
-  const manufacturer = getManufacturerForRobot(robot.manufacturerSlug);
-  const useCases = getUseCasesForRobot(robot.slug);
-  const reports = getReportsForRobot(robot.slug);
+  const manufacturer = getManufacturerForRobot(robot.manufacturerId);
+  const useCases = getUseCasesForRobot(robot.id);
+  const reports = getReportsForRobot(robot.id);
 
   const all = getRobots();
   const idx = all.findIndex((r) => r.slug === robot.slug);

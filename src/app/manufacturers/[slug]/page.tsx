@@ -13,7 +13,7 @@ import {
   getManufacturers,
   getReportsForManufacturer,
   getReports,
-  getRobotsByManufacturerSlug,
+  getRobotsByManufacturerId,
 } from '@/lib/data';
 import { uiText } from '@/lib/uiText';
 
@@ -38,8 +38,8 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
   const manufacturer = getManufacturerBySlug(slug);
   if (!manufacturer) notFound();
 
-  const robots = getRobotsByManufacturerSlug(manufacturer.slug);
-  const reports = getReportsForManufacturer(manufacturer.slug);
+  const robots = getRobotsByManufacturerId(manufacturer.id);
+  const reports = getReportsForManufacturer(manufacturer.id);
   const sampleReports = getReports()
     .filter((report) => report.contentKind === 'sample')
     .slice(0, 3);

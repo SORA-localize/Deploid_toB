@@ -141,8 +141,8 @@ export interface Manufacturer extends BaseRecord {
   supportNote?: string;
   procurementNote?: string;
   vendorRiskNote?: string;
-  // 関連は逆向き(Robot.manufacturerSlug / Report.relatedManufacturerSlugs)で導出する。
-  // robotSlugs / handledRobotSlugs / relatedReportSlugs は持たない。
+  // 関連は逆向き(Robot.manufacturerId / Report.relatedManufacturerIds)で導出する。
+  // robotIds / handledRobotIds / relatedReportIds は持たない。
   /** 将来の掲載提携・有料スポンサード枠のための優先順位。値が小さいほど上位。未設定は非スポンサード扱い。 */
   featuredRank?: number;
 }
@@ -208,7 +208,7 @@ export interface ComparisonProfile {
 export interface Robot extends BaseRecord {
   name: string;
   nameJa?: string;
-  manufacturerSlug: Slug;
+  manufacturerId: Id;
   category: RobotCategory;
   description: string;
   /** 将来の掲載提携・有料スポンサード枠のための優先順位。値が小さいほど上位。未設定は非スポンサード扱い。 */
@@ -227,8 +227,8 @@ export interface Robot extends BaseRecord {
   vendorRiskNote?: string;
   /** 役割別の参考画像（詳細ページのカルーセル）。hero が未設定なら BaseRecord.heroImage を hero に昇格して使う。 */
   images?: Partial<Record<ImageRole, ImageAsset>>;
-  // 関連は逆向き(UseCase.candidateRobotSlugs / Guide.relatedRobotSlugs /
-  // Report.relatedRobotSlugs)で導出する。
+  // 関連は逆向き(UseCase.candidateRobotIds / Guide.relatedRobotIds /
+  // Report.relatedRobotIds)で導出する。
   /** 業種タグ（lib/tagRegistry.ts の kind:'industry' のvalue）。未設定=調査中扱い。 */
   industryTags?: TagValue<'industry'>[];
   /** タスクタグ（lib/tagRegistry.ts の kind:'task' のvalue）。未設定=調査中扱い。 */
@@ -250,9 +250,9 @@ export interface Guide extends BaseRecord {
   checklistItems?: string[];
   /** 記事本文（Markdown）。空ならガイド本文セクションは描画されない。 */
   body?: string;
-  relatedRobotSlugs: Slug[];
-  relatedUseCaseSlugs: Slug[];
-  // 関連reportsは Report.relatedGuideSlugs で逆引きする。
+  relatedRobotIds: Id[];
+  relatedUseCaseIds: Id[];
+  // 関連reportsは Report.relatedGuideIds で逆引きする。
 }
 
 export type UseCaseMaturity = 'early-stage' | 'pilot-phase' | 'production-ready';
@@ -305,9 +305,9 @@ export interface UseCase extends BaseRecord {
   environmentRequirements: string;
   whyHardToday: string;
   japanDeploymentConditions: string;
-  candidateRobotSlugs: Slug[];
-  relatedGuideSlugs: Slug[];
-  // 関連reportsは Report.relatedUseCaseSlugs で逆引きする。
+  candidateRobotIds: Id[];
+  relatedGuideIds: Id[];
+  // 関連reportsは Report.relatedUseCaseIds で逆引きする。
 }
 
 export type ReportType =
@@ -353,10 +353,10 @@ export interface Report extends BaseRecord {
   section: ReportSection;
   /** 目安読了時間（分）。未設定時は非表示。 */
   readingTimeMin?: number;
-  relatedRobotSlugs: Slug[];
-  relatedManufacturerSlugs: Slug[];
-  relatedUseCaseSlugs: Slug[];
-  relatedGuideSlugs?: Slug[];
+  relatedRobotIds: Id[];
+  relatedManufacturerIds: Id[];
+  relatedUseCaseIds: Id[];
+  relatedGuideIds?: Id[];
 }
 
 export type ReportPlacementSurface = 'reports-index';
@@ -373,7 +373,7 @@ export interface ReportPlacementSponsor {
 export interface ReportPlacement {
   surface: ReportPlacementSurface;
   slot: ReportPlacementSlot;
-  reportSlug: Slug;
+  reportId: Id;
   order: number;
   kind?: ReportPlacementKind;
   sponsor?: ReportPlacementSponsor;
@@ -392,10 +392,10 @@ export type DeploymentStatus =
  * location は導入拠点のおおよその座標（番地レベルは不要）。
  */
 export interface DeploymentSite extends BaseRecord {
-  /** arc 始点＝メーカー（data/manufacturers.ts の slug） */
-  manufacturerSlug: Slug;
-  /** 導入ロボット（data/robots.ts の slug、判明していれば） */
-  robotSlug?: Slug;
+  /** arc 始点＝メーカー（data/manufacturers.ts の id） */
+  manufacturerId: Id;
+  /** 導入ロボット（data/robots.ts の id、判明していれば） */
+  robotId?: Id;
   /** 導入先の企業/組織名（例: BMW、GXO） */
   customer: string;
   /** 拠点名（例: Spartanburg Plant） */

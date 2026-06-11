@@ -2,7 +2,7 @@ import type { DeploymentSite } from './types';
 
 /**
  * 実在する導入事例のみを、一次/信頼できる二次出典付きで追加する。
- * - manufacturerSlug / robotSlug は data/manufacturers.ts / data/robots.ts の既存 slug と一致させる。
+ * - manufacturerId / robotId は data/manufacturers.ts / data/robots.ts の既存 slug と一致させる。
  * - location は導入拠点のおおよその座標（公開情報で裏取り）。
  * - 不確かな事例は載せない（憶測でarcを引かない）。
  * 構造・記入ルール・サンプルは docs/planning/deployment_sites_research_prompt_2026-06-01.md を参照。
@@ -11,8 +11,8 @@ export const deployments: DeploymentSite[] = [
   {
     id: 'figure-bmw-spartanburg',
     slug: 'figure-bmw-spartanburg',
-    manufacturerSlug: 'figure-ai',
-    robotSlug: 'figure-02',
+    manufacturerId: 'figure-ai',
+    robotId: 'figure-02',
     customer: 'BMW Group',
     siteName: 'Plant Spartanburg',
     country: 'USA',
@@ -37,8 +37,8 @@ export const deployments: DeploymentSite[] = [
   {
     id: 'agility-amazon-sumner',
     slug: 'agility-amazon-sumner',
-    manufacturerSlug: 'agility-robotics',
-    robotSlug: 'agility-digit',
+    manufacturerId: 'agility-robotics',
+    robotId: 'agility-digit',
     customer: 'Amazon',
     siteName: 'Sumner Fulfillment Center',
     country: 'USA',
@@ -63,8 +63,8 @@ export const deployments: DeploymentSite[] = [
   {
     id: 'agility-gxo-flowery-branch',
     slug: 'agility-gxo-flowery-branch',
-    manufacturerSlug: 'agility-robotics',
-    robotSlug: 'agility-digit',
+    manufacturerId: 'agility-robotics',
+    robotId: 'agility-digit',
     customer: 'GXO Logistics',
     siteName: 'Flowery Branch facility',
     country: 'USA',
@@ -89,8 +89,8 @@ export const deployments: DeploymentSite[] = [
   {
     id: 'apptronik-mercedes-berlin',
     slug: 'apptronik-mercedes-berlin',
-    manufacturerSlug: 'apptronik',
-    robotSlug: 'apptronik-apollo',
+    manufacturerId: 'apptronik',
+    robotId: 'apptronik-apollo',
     customer: 'Mercedes-Benz',
     siteName: 'Berlin-Marienfelde plant',
     country: 'Germany',
@@ -115,8 +115,8 @@ export const deployments: DeploymentSite[] = [
   {
     id: 'sanctuary-canadian-tire-langley',
     slug: 'sanctuary-canadian-tire-langley',
-    manufacturerSlug: 'sanctuary-ai',
-    robotSlug: 'sanctuary-phoenix',
+    manufacturerId: 'sanctuary-ai',
+    robotId: 'sanctuary-phoenix',
     customer: 'Canadian Tire (Mark\'s)',
     siteName: 'Langley retail store',
     country: 'Canada',
@@ -141,8 +141,8 @@ export const deployments: DeploymentSite[] = [
   {
     id: 'ubtech-nio-hefei',
     slug: 'ubtech-nio-hefei',
-    manufacturerSlug: 'ubtech',
-    robotSlug: 'ubtech-walker-s1',
+    manufacturerId: 'ubtech',
+    robotId: 'ubtech-walker-s1',
     customer: 'NIO',
     siteName: 'Hefei F2 Plant',
     country: 'China',
@@ -167,8 +167,8 @@ export const deployments: DeploymentSite[] = [
   {
     id: 'tesla-optimus-fremont',
     slug: 'tesla-optimus-fremont',
-    manufacturerSlug: 'tesla',
-    robotSlug: 'tesla-optimus',
+    manufacturerId: 'tesla',
+    robotId: 'tesla-optimus',
     customer: 'Tesla',
     siteName: 'Fremont Factory',
     country: 'USA',
@@ -193,8 +193,8 @@ export const deployments: DeploymentSite[] = [
   {
     id: 'unitree-jal-haneda',
     slug: 'unitree-jal-haneda',
-    manufacturerSlug: 'unitree',
-    robotSlug: 'unitree-h1',
+    manufacturerId: 'unitree',
+    robotId: 'unitree-h1',
     customer: 'Japan Airlines (JAL)',
     siteName: 'Haneda Airport',
     country: 'Japan',

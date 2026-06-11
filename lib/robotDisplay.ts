@@ -84,7 +84,7 @@ export function getRobotDetailSpecRows(robot: Robot, manufacturer?: Manufacturer
   const { specs } = robot;
 
   return [
-    { label: 'メーカー', value: manufacturer?.name ?? robot.manufacturerSlug },
+    { label: 'メーカー', value: manufacturer?.name ?? robot.manufacturerId },
     { label: 'カテゴリ', value: robotCategoryLabels[robot.category] },
     { label: '移動方式', value: specs.mobility ? mobilityLabels[specs.mobility] : TBD_LABEL },
     { label: '身長', value: formatNumber(specs.heightCm, ' cm') },

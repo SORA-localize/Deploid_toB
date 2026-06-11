@@ -38,9 +38,9 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
   const useCase = getUseCaseBySlug(slug);
   if (!useCase) notFound();
 
-  const candidateRobots = getRelatedRobots(useCase.candidateRobotSlugs);
-  const guides = getRelatedGuides(useCase.relatedGuideSlugs);
-  const reports = getReportsForUseCase(useCase.slug);
+  const candidateRobots = getRelatedRobots(useCase.candidateRobotIds);
+  const guides = getRelatedGuides(useCase.relatedGuideIds);
+  const reports = getReportsForUseCase(useCase.id);
 
   return (
     <div className="min-h-screen bg-background">

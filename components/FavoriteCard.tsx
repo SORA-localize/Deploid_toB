@@ -47,7 +47,7 @@ export function FavoriteCard({
           </div>
         </div>
         <ManufacturerLogoName
-          name={manufacturerName ?? robot.manufacturerSlug}
+          name={manufacturerName ?? robot.manufacturerId}
           logo={manufacturerLogo}
           className="text-xs text-muted-foreground"
           frameClassName="h-4 w-4"

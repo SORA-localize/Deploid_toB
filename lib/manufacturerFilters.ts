@@ -15,9 +15,9 @@ export function groupRobotsByManufacturer(robots: readonly Robot[]) {
   const byManufacturer = new Map<string, Robot[]>();
 
   robots.forEach((robot) => {
-    const existing = byManufacturer.get(robot.manufacturerSlug) ?? [];
+    const existing = byManufacturer.get(robot.manufacturerId) ?? [];
     existing.push(robot);
-    byManufacturer.set(robot.manufacturerSlug, existing);
+    byManufacturer.set(robot.manufacturerId, existing);
   });
 
   return byManufacturer;
@@ -67,7 +67,7 @@ export function filterManufacturers({
       manufacturer.slug,
       createManufacturerSearchDocument(
         manufacturer,
-        robotsByManufacturer.get(manufacturer.slug) ?? [],
+        robotsByManufacturer.get(manufacturer.id) ?? [],
       ),
     ]),
   );

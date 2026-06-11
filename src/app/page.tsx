@@ -34,7 +34,7 @@ export default function HomePage() {
       lng: manufacturer.headquarters.lng,
       foundedYear: manufacturer.foundedYear,
       logoSrc: getDisplayableAsset(manufacturer.logo)?.src,
-      deployments: getDeploymentsForManufacturer(manufacturer.slug).map((d) => ({
+      deployments: getDeploymentsForManufacturer(manufacturer.id).map((d) => ({
         lat: d.location.lat,
         lng: d.location.lng,
         customer: d.customer,
@@ -72,8 +72,8 @@ export default function HomePage() {
   const { heroReports } = getReportIndexPlacementReports(getReports());
   const latestReports = heroReports.slice(0, 4);
 
-  const manufacturerBySlug = Object.fromEntries(
-    manufacturers.map((m) => [m.slug, m])
+  const manufacturerById = Object.fromEntries(
+    manufacturers.map((m) => [m.id, m])
   );
 
   return (
@@ -94,7 +94,7 @@ export default function HomePage() {
       {featuredRobots.length > 0 && (
         <FeaturedRobotsGrid
           robots={featuredRobots}
-          manufacturerBySlug={manufacturerBySlug}
+          manufacturerById={manufacturerById}
         />
       )}
 

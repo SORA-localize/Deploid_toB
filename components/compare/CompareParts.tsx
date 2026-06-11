@@ -162,7 +162,7 @@ export function CompareDragOverlayCard({
         {robot.nameJa ?? robot.name}
       </h3>
       <ManufacturerLogoName
-        name={manufacturerName ?? robot.manufacturerSlug}
+        name={manufacturerName ?? robot.manufacturerId}
         logo={manufacturerLogo}
         className="mt-1 text-xs text-muted-foreground"
         frameClassName="h-4 w-4 shrink-0"
