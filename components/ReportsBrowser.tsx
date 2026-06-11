@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState';
 import { NewsFeatureCard } from '@/components/NewsFeatureCard';
@@ -17,6 +17,7 @@ import {
   normalizeReportPageParam,
   REPORT_PAGE_PARAM,
 } from '@/lib/reportPagination';
+import { useReportsPerPage } from '@/lib/useReportsPerPage';
 import { getReportIndexPlacementReports } from '@/lib/reportPlacements';
 import { createReportSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
@@ -27,6 +28,8 @@ import { cn } from '@/lib/utils';
 export function ReportsBrowser({ reports }: { reports: Report[] }) {
   const activeSection = useActiveReportSection();
   const { getParam, updateParams } = useUrlFilters();
+  const perPage = useReportsPerPage();
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const sorted = useMemo(
     () => [...reports].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
@@ -52,14 +55,14 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
       }),
     [sorted, searchDocuments, activeSection],
   );
-  const pageCount = getReportPageCount(gridReports.length);
+  const pageCount = getReportPageCount(gridReports.length, perPage);
   const activePage = useMemo(
     () => normalizeReportPageParam(getParam(REPORT_PAGE_PARAM), pageCount),
     [getParam, pageCount],
   );
   const paginatedReports = useMemo(
-    () => getReportPageItems(gridReports, activePage),
-    [gridReports, activePage],
+    () => getReportPageItems(gridReports, activePage, perPage),
+    [gridReports, activePage, perPage],
   );
   const paginationPages = useMemo(
     () => getReportPaginationPages(activePage, pageCount),
@@ -70,6 +73,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
     updateParams({
       [REPORT_PAGE_PARAM]: page <= 1 ? null : String(page),
     });
+    gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
@@ -111,7 +115,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
         )}
 
         {/* ── 記事グリッド ── */}
-        <div className="site-container py-4">
+        <div ref={gridRef} className="site-container py-4 scroll-mt-site-header">
           {gridReports.length === 0 ? (
             <EmptyState message={uiText.emptyStates.reports} />
           ) : (

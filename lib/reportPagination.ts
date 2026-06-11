@@ -1,8 +1,8 @@
 export const REPORT_PAGE_PARAM = 'page';
-export const REPORTS_PER_PAGE = 8;
+export const REPORTS_PER_PAGE = 12; // xl (4列) × 3行 — responsive hook で上書きされる
 
-export function getReportPageCount(totalItems: number) {
-  return Math.max(1, Math.ceil(totalItems / REPORTS_PER_PAGE));
+export function getReportPageCount(totalItems: number, perPage = REPORTS_PER_PAGE) {
+  return Math.max(1, Math.ceil(totalItems / perPage));
 }
 
 export function normalizeReportPageParam(value: string | null, pageCount: number) {
@@ -11,9 +11,9 @@ export function normalizeReportPageParam(value: string | null, pageCount: number
   return Math.min(parsed, pageCount);
 }
 
-export function getReportPageItems<T>(items: readonly T[], page: number) {
-  const start = (page - 1) * REPORTS_PER_PAGE;
-  return items.slice(start, start + REPORTS_PER_PAGE);
+export function getReportPageItems<T>(items: readonly T[], page: number, perPage = REPORTS_PER_PAGE) {
+  const start = (page - 1) * perPage;
+  return items.slice(start, start + perPage);
 }
 
 export function getReportPaginationPages(currentPage: number, pageCount: number) {
