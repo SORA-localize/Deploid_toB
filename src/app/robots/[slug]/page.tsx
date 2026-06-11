@@ -9,7 +9,7 @@ import { RobotStickyAside } from '@/components/RobotStickyAside';
 import { SourceList } from '@/components/SourceList';
 import {
   getManufacturerForRobot,
-  getReportsForRobot,
+  getArticlesForRobot,
   getRobotBySlug,
   getRobots,
   getUseCasesForRobot,
@@ -47,7 +47,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
   const manufacturer = getManufacturerForRobot(robot.manufacturerId);
   const useCases = getUseCasesForRobot(robot.id);
-  const reports = getReportsForRobot(robot.id);
+  const reports = getArticlesForRobot(robot.id);
 
   const all = getRobots();
   const idx = all.findIndex((r) => r.slug === robot.slug);

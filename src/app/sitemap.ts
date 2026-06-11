@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import {
   getGuides,
   getManufacturers,
-  getReports,
+  getArticles,
   getRobots,
   getUseCases,
 } from '@/lib/data';
@@ -43,7 +43,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${base}/use-cases/${u.slug}`,
     lastModified: new Date(u.updatedAt),
   }));
-  const reportEntries: MetadataRoute.Sitemap = getReports().map((r) => ({
+  const reportEntries: MetadataRoute.Sitemap = getArticles().map((r) => ({
     url: `${base}/reports/${r.slug}`,
     lastModified: new Date(r.updatedAt),
   }));

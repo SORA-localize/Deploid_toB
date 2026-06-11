@@ -8,7 +8,7 @@ import type {
   JapanPresence,
   PublishStatus,
   Reliability,
-  ReportType,
+  ArticleType,
   RightsStatus,
   UseCaseMaturity,
 } from '@/data/types';
@@ -139,7 +139,7 @@ export const guideStageTones = {
   act: 'brand',
 } as const satisfies Record<GuideStage, VisualTone>;
 
-export const reportTypeTones = {
+export const articleTypeTones = {
   analysis: 'brand',
   'deployment-report': 'success',
   interview: 'info',
@@ -149,7 +149,7 @@ export const reportTypeTones = {
   'news-brief': 'neutral',
   'tech-update': 'info',
   'market-analysis': 'brand',
-} as const satisfies Record<ReportType, VisualTone>;
+} as const satisfies Record<ArticleType, VisualTone>;
 
 export const useCaseMaturityTones = {
   'early-stage': 'unknown',
@@ -166,7 +166,7 @@ export const deploymentStatusTones = {
 } as const satisfies Record<DeploymentStatus, VisualTone>;
 
 export const tagKindTones = {
-  report: 'neutral',
+  article: 'neutral',
   'guide-topic': 'brand',
   industry: 'info',
   task: 'neutral',
@@ -182,7 +182,7 @@ export const getJapanAvailabilityTone = (availability: JapanAvailability) =>
 export const getCompanyStatusTone = (status: CompanyStatus) => companyStatusTones[status];
 export const getJapanPresenceTone = (presence: JapanPresence) => japanPresenceTones[presence];
 export const getGuideStageTone = (stage: GuideStage) => guideStageTones[stage];
-export const getReportTypeTone = (type: ReportType) => reportTypeTones[type];
+export const getArticleTypeTone = (type: ArticleType) => articleTypeTones[type];
 export const getUseCaseMaturityTone = (maturity: UseCaseMaturity) =>
   useCaseMaturityTones[maturity];
 export const getDeploymentStatusTone = (status: DeploymentStatus) => deploymentStatusTones[status];

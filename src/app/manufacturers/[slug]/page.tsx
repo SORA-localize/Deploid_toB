@@ -11,8 +11,8 @@ import { SourceList } from '@/components/SourceList';
 import {
   getManufacturerBySlug,
   getManufacturers,
-  getReportsForManufacturer,
-  getReports,
+  getArticlesForManufacturer,
+  getArticles,
   getRobotsByManufacturerId,
 } from '@/lib/data';
 import { uiText } from '@/lib/uiText';
@@ -39,8 +39,8 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
   if (!manufacturer) notFound();
 
   const robots = getRobotsByManufacturerId(manufacturer.id);
-  const reports = getReportsForManufacturer(manufacturer.id);
-  const sampleReports = getReports()
+  const reports = getArticlesForManufacturer(manufacturer.id);
+  const sampleReports = getArticles()
     .filter((report) => report.contentKind === 'sample')
     .slice(0, 3);
   const displayedReports = reports.length > 0 ? reports : sampleReports;

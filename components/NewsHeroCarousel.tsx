@@ -1,7 +1,7 @@
 'use client';
 
-import type { Report } from '@/data/types';
-import { reportTypeLabels } from '@/lib/labels';
+import type { Article } from '@/data/types';
+import { articleTypeLabels } from '@/lib/labels';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { 
@@ -18,7 +18,7 @@ import Autoplay from 'embla-carousel-autoplay';
 import { useEffect, useState } from 'react';
 
 interface NewsHeroCarouselProps {
-  reports: Report[];
+  reports: Article[];
   className?: string;
 }
 
@@ -91,7 +91,7 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
                   <div className="max-w-4xl space-y-3">
                     <div className="flex items-center gap-3">
                       <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-primary text-primary-foreground rounded-sm">
-                        {reportTypeLabels[report.type]}
+                        {articleTypeLabels[report.type]}
                       </span>
                       <time className="text-xs text-white/60 font-mono">
                         {report.publishedAt}

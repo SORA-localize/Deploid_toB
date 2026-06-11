@@ -1,7 +1,7 @@
 import { deployments } from '@/data/deployments';
 import { guides } from '@/data/guides';
 import { manufacturers } from '@/data/manufacturers';
-import { reports } from '@/data/reports';
+import { articles } from '@/data/articles';
 import { robots } from '@/data/robots';
 import { useCases } from '@/data/useCases';
 import { runValidationInDev } from './validate';
@@ -72,16 +72,16 @@ export function getUseCaseById(id: string) {
   return getUseCases().find((useCase) => useCase.id === id);
 }
 
-export function getReports() {
-  return published(reports).sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+export function getArticles() {
+  return published(articles).sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }
 
-export function getReportBySlug(slug: string) {
-  return getReports().find((report) => report.slug === slug);
+export function getArticleBySlug(slug: string) {
+  return getArticles().find((article) => article.slug === slug);
 }
 
-export function getReportById(id: string) {
-  return getReports().find((report) => report.id === id);
+export function getArticleById(id: string) {
+  return getArticles().find((article) => article.id === id);
 }
 
 export function getRobotsByManufacturerId(manufacturerId: string) {
@@ -92,16 +92,16 @@ export function getUseCasesForRobot(robotId: string) {
   return getUseCases().filter((useCase) => useCase.candidateRobotIds.includes(robotId));
 }
 
-export function getReportsForRobot(robotId: string) {
-  return getReports().filter((report) => report.relatedRobotIds.includes(robotId));
+export function getArticlesForRobot(robotId: string) {
+  return getArticles().filter((article) => article.relatedRobotIds.includes(robotId));
 }
 
-export function getReportsForUseCase(useCaseId: string) {
-  return getReports().filter((report) => report.relatedUseCaseIds.includes(useCaseId));
+export function getArticlesForUseCase(useCaseId: string) {
+  return getArticles().filter((article) => article.relatedUseCaseIds.includes(useCaseId));
 }
 
-export function getReportsForManufacturer(manufacturerId: string) {
-  return getReports().filter((report) => report.relatedManufacturerIds.includes(manufacturerId));
+export function getArticlesForManufacturer(manufacturerId: string) {
+  return getArticles().filter((article) => article.relatedManufacturerIds.includes(manufacturerId));
 }
 
 export function getManufacturerForRobot(manufacturerId: string) {

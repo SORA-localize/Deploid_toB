@@ -4,20 +4,21 @@
 import { deployments } from '../data/deployments.ts';
 import { guides } from '../data/guides.ts';
 import { manufacturers } from '../data/manufacturers.ts';
-import { reportPlacements } from '../data/reportPlacements.ts';
-import { reports } from '../data/reports.ts';
+import { articlePlacements } from '../data/articlePlacements.ts';
+import { articles } from '../data/articles.ts';
 import { robots } from '../data/robots.ts';
 import type { ImageAsset, RightsStatus } from '../data/types.ts';
 import { useCases } from '../data/useCases.ts';
 import {
+  articleCategoryOrder,
+  articleSectionOrder,
   companyStatusOrder,
   companyTypeOrder,
   japanAvailabilityOrder,
   manufacturerCountryOrder,
-  reportSectionOrder,
   robotCategoryOrder,
 } from './display.ts';
-import { reportSectionLabels } from './labels.ts';
+import { articleCategoryLabels, articleSectionLabels } from './labels.ts';
 import { isSpecKey } from './specSchema.ts';
 import { isRegisteredTag, normalizeTagKey, type TagKind } from './tagRegistry.ts';
 
@@ -49,7 +50,7 @@ export function validateData(): ValidationResult {
   const manufacturerIds = new Set(manufacturers.map((m) => m.id));
   const guideIds = new Set(guides.map((g) => g.id));
   const useCaseIds = new Set(useCases.map((u) => u.id));
-  const reportIds = new Set(reports.map((r) => r.id));
+  const articleIds = new Set(articles.map((r) => r.id));
 
   const check = (kind: string, owner: string, field: string, id: string, set: Set<string>) => {
     if (!set.has(id)) {
@@ -215,7 +216,7 @@ export function validateData(): ValidationResult {
   dup('manufacturers', manufacturers);
   dup('guides', guides);
   dup('useCases', useCases);
-  dup('reports', reports);
+  dup('articles', articles);
   dup('deployments', deployments);
 
   const checkOrderCoverage = (
@@ -252,25 +253,36 @@ export function validateData(): ValidationResult {
     manufacturers.map((manufacturer) => manufacturer.companyStatus),
     companyStatusOrder,
   );
-  checkOrderCoverage('report.section', reports.map((report) => report.section), reportSectionOrder);
+  checkOrderCoverage('article.section', articles.map((article) => article.section), articleSectionOrder);
+  checkOrderCoverage(
+    'article.category',
+    articles.map((article) => article.category),
+    articleCategoryOrder,
+  );
 
-  // section の完全性チェック：reportSectionLabels(Record で union 全値を要求＝完全集合) と
-  // reportSectionOrder(表示順) の双方向 diff。order 配列の追加漏れ・余剰を実データ非依存で検出する。
-  {
-    const labelKeys = Object.keys(reportSectionLabels);
-    const orderSet = new Set<string>(reportSectionOrder);
+  // ラベル(Record で union 全値を要求＝完全集合) と表示順(order) の双方向 diff。
+  // order 配列の追加漏れ・余剰を実データ非依存で検出する。
+  const checkLabelOrderSync = (
+    name: string,
+    labels: Record<string, string>,
+    order: readonly string[],
+  ) => {
+    const labelKeys = Object.keys(labels);
+    const orderSet = new Set<string>(order);
     const labelSet = new Set<string>(labelKeys);
     labelKeys.forEach((key) => {
       if (!orderSet.has(key)) {
-        errors.push(`[section-order] reportSectionOrder に "${key}" がありません（ラベルは定義済み）`);
+        errors.push(`[${name}-order] 表示順に "${key}" がありません（ラベルは定義済み）`);
       }
     });
-    reportSectionOrder.forEach((value) => {
+    order.forEach((value) => {
       if (!labelSet.has(value)) {
-        errors.push(`[section-order] reportSectionLabels に "${value}" がありません（表示順に存在）`);
+        errors.push(`[${name}-order] ラベルに "${value}" がありません（表示順に存在）`);
       }
     });
-  }
+  };
+  checkLabelOrderSync('section', articleSectionLabels, articleSectionOrder);
+  checkLabelOrderSync('category', articleCategoryLabels, articleCategoryOrder);
 
   for (const r of robots) {
     check('robot', r.slug, 'manufacturerId', r.manufacturerId, manufacturerIds);
@@ -326,24 +338,24 @@ export function validateData(): ValidationResult {
     );
   }
 
-  for (const rep of reports) {
-    checkDate('report', rep.slug, 'updatedAt', rep.updatedAt);
-    checkDate('report', rep.slug, 'publishedAt', rep.publishedAt);
-    checkRequiredSources('report', rep.slug, rep.sources, {
-      requireNonEmpty: rep.publishStatus === 'published' && rep.contentKind !== 'sample',
+  for (const article of articles) {
+    checkDate('article', article.slug, 'updatedAt', article.updatedAt);
+    checkDate('article', article.slug, 'publishedAt', article.publishedAt);
+    checkRequiredSources('article', article.slug, article.sources, {
+      requireNonEmpty: article.publishStatus === 'published' && article.contentKind !== 'sample',
     });
-    checkTags('report', rep.slug, 'tags', 'report', rep.tags);
-    rep.relatedRobotIds.forEach((s) =>
-      check('report', rep.slug, 'relatedRobotIds', s, robotIds),
+    checkTags('article', article.slug, 'tags', 'article', article.tags);
+    article.relatedRobotIds.forEach((s) =>
+      check('article', article.slug, 'relatedRobotIds', s, robotIds),
     );
-    rep.relatedManufacturerIds.forEach((s) =>
-      check('report', rep.slug, 'relatedManufacturerIds', s, manufacturerIds),
+    article.relatedManufacturerIds.forEach((s) =>
+      check('article', article.slug, 'relatedManufacturerIds', s, manufacturerIds),
     );
-    rep.relatedUseCaseIds.forEach((s) =>
-      check('report', rep.slug, 'relatedUseCaseIds', s, useCaseIds),
+    article.relatedUseCaseIds.forEach((s) =>
+      check('article', article.slug, 'relatedUseCaseIds', s, useCaseIds),
     );
-    (rep.relatedGuideIds ?? []).forEach((s) =>
-      check('report', rep.slug, 'relatedGuideIds', s, guideIds),
+    (article.relatedGuideIds ?? []).forEach((s) =>
+      check('article', article.slug, 'relatedGuideIds', s, guideIds),
     );
   }
 
@@ -354,10 +366,10 @@ export function validateData(): ValidationResult {
   }
 
   const placementOrders = new Set<string>();
-  const placementReports = new Set<string>();
-  for (const placement of reportPlacements) {
+  const placementArticles = new Set<string>();
+  for (const placement of articlePlacements) {
     const owner = `${placement.surface}.${placement.slot}.${placement.order}`;
-    check('reportPlacement', owner, 'reportId', placement.reportId, reportIds);
+    check('articlePlacement', owner, 'reportId', placement.reportId, articleIds);
 
     const orderKey = `${placement.surface}:${placement.slot}:${placement.order}`;
     if (placementOrders.has(orderKey)) {
@@ -365,11 +377,11 @@ export function validateData(): ValidationResult {
     }
     placementOrders.add(orderKey);
 
-    const reportKey = `${placement.surface}:${placement.slot}:${placement.reportId}`;
-    if (placementReports.has(reportKey)) {
-      errors.push(`[duplicate] reportPlacement report 重複: ${reportKey}`);
+    const articleKey = `${placement.surface}:${placement.slot}:${placement.reportId}`;
+    if (placementArticles.has(articleKey)) {
+      errors.push(`[duplicate] reportPlacement report 重複: ${articleKey}`);
     }
-    placementReports.add(reportKey);
+    placementArticles.add(articleKey);
 
     if (placement.kind === 'sponsored' && !placement.sponsor?.name.trim()) {
       errors.push(`[required] reportPlacement "${owner}".sponsor.name が空です`);
@@ -378,7 +390,7 @@ export function validateData(): ValidationResult {
       if (!placement.sponsor.name.trim()) {
         errors.push(`[required] reportPlacement "${owner}".sponsor.name が空です`);
       }
-      checkUrl('reportPlacement', owner, 'sponsor.url', placement.sponsor.url);
+      checkUrl('articlePlacement', owner, 'sponsor.url', placement.sponsor.url);
     }
   }
 
@@ -416,7 +428,7 @@ export function runValidationInDev(): void {
   didRun = true;
   if (process.env.NODE_ENV === 'production') return;
   const { errors, warnings } = validateData();
-  const total = robots.length + manufacturers.length + guides.length + useCases.length + reports.length;
+  const total = robots.length + manufacturers.length + guides.length + useCases.length + articles.length;
   if (errors.length === 0 && warnings.length === 0) {
     // eslint-disable-next-line no-console
     console.log(`[data] referential integrity: OK (${total} records)`);

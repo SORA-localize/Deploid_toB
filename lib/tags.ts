@@ -1,4 +1,4 @@
-import type { Guide, Report, Robot, UseCase } from '@/data/types';
+import type { Guide, Article, Robot, UseCase } from '@/data/types';
 import {
   getAnyRegisteredTag,
   getRegisteredTag,
@@ -66,10 +66,10 @@ function toTagOptions(values: readonly string[], kind: TagKind): TagOption[] {
   });
 }
 
-export function getReportTagOptions(reports: readonly Report[]) {
+export function getArticleTagOptions(reports: readonly Article[]) {
   return toTagOptions(
     reports.flatMap((report) => report.tags),
-    'report',
+    'article',
   );
 }
 
@@ -113,12 +113,12 @@ export function getAllTagOptions({
   guides,
   useCases,
 }: {
-  reports?: readonly Report[];
+  reports?: readonly Article[];
   guides?: readonly Guide[];
   useCases?: readonly UseCase[];
 }) {
   return [
-    ...(reports ? getReportTagOptions(reports) : []),
+    ...(reports ? getArticleTagOptions(reports) : []),
     ...(guides ? getGuideTopicOptions(guides) : []),
     ...(useCases ? getUseCaseIndustryTagOptions(useCases) : []),
     ...(useCases ? getUseCaseTaskTagOptions(useCases) : []),

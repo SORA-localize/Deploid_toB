@@ -5,7 +5,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import {
   getRelatedGuides,
   getRelatedRobots,
-  getReportsForUseCase,
+  getArticlesForUseCase,
   getUseCaseBySlug,
   getUseCases,
 } from '@/lib/data';
@@ -40,7 +40,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
 
   const candidateRobots = getRelatedRobots(useCase.candidateRobotIds);
   const guides = getRelatedGuides(useCase.relatedGuideIds);
-  const reports = getReportsForUseCase(useCase.id);
+  const reports = getArticlesForUseCase(useCase.id);
 
   return (
     <div className="min-h-screen bg-background">

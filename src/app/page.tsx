@@ -11,12 +11,12 @@ import {
   getGuides,
   getManufacturers,
   getManufacturerForRobot,
-  getReports,
+  getArticles,
   getRobots,
   getDeploymentsForManufacturer,
 } from '@/lib/data';
 import { getDisplayableAsset } from '@/lib/media';
-import { getReportIndexPlacementReports } from '@/lib/reportPlacements';
+import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
 
 export default function HomePage() {
   const featured = getGuideBySlug('decision-variables') ?? getGuides()[0];
@@ -69,7 +69,7 @@ export default function HomePage() {
   });
 
   // reports-index hero キュレーションの先頭4件をホームに流用
-  const { heroReports } = getReportIndexPlacementReports(getReports());
+  const { heroReports } = getArticleIndexPlacementReports(getArticles());
   const latestReports = heroReports.slice(0, 4);
 
   const manufacturerById = Object.fromEntries(

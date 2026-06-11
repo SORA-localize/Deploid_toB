@@ -12,24 +12,24 @@ import {
   getRelatedManufacturers,
   getRelatedRobots,
   getRelatedUseCases,
-  getReportBySlug,
-  getReports,
+  getArticleBySlug,
+  getArticles,
 } from '@/lib/data';
-import { reportTypeLabels } from '@/lib/labels';
+import { articleTypeLabels } from '@/lib/labels';
 import { extractH2Headings } from '@/lib/markdownHeadings';
 import { uiText } from '@/lib/uiText';
-import { getReportTypeTone } from '@/lib/visualSemantics';
+import { getArticleTypeTone } from '@/lib/visualSemantics';
 
 export function generateStaticParams() {
-  return getReports().map((report) => ({ slug: report.slug }));
+  return getArticles().map((report) => ({ slug: report.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const report = getReportBySlug(slug);
+  const report = getArticleBySlug(slug);
   const seo = report?.seo;
   return {
-    title: seo?.metaTitle ?? (report ? (report.titleJa ?? report.title) : 'Report'),
+    title: seo?.metaTitle ?? (report ? (report.titleJa ?? report.title) : 'Article'),
     description: seo?.metaDescription ?? report?.summary,
     robots: seo?.noindex ? { index: false, follow: false } : undefined,
   };
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ReportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const report = getReportBySlug(slug);
+  const report = getArticleBySlug(slug);
   if (!report) notFound();
 
   const robots = getRelatedRobots(report.relatedRobotIds);
@@ -103,7 +103,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           <div className="absolute inset-0 z-10 flex flex-col justify-end">
             <div className="site-container pb-8 sm:pb-10">
               <div className="mb-2 text-xs font-medium text-white/70">
-                {reportTypeLabels[report.type]}
+                {articleTypeLabels[report.type]}
               </div>
               <h1 className="mb-3 text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white">
                 {report.titleJa ?? report.title}
@@ -122,8 +122,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                     {uiText.common.readingMinutes(report.readingTimeMin)}
                   </span>
                 )}
-                <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
-                  {reportTypeLabels[report.type]}
+                <TagChip tone={getArticleTypeTone(report.type)} className="py-1 font-medium">
+                  {articleTypeLabels[report.type]}
                 </TagChip>
                 {report.author && (
                   <span className="flex items-center gap-1.5">
@@ -145,7 +145,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               ]}
             />
             <div className="mb-3 text-xs font-medium text-muted-foreground">
-              {reportTypeLabels[report.type]}
+              {articleTypeLabels[report.type]}
             </div>
             <h1 className="mb-4 max-w-4xl text-2xl md:text-3xl font-semibold leading-tight text-foreground">
               {report.titleJa ?? report.title}
@@ -164,8 +164,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   {uiText.common.readingMinutes(report.readingTimeMin)}
                 </span>
               )}
-              <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
-                {reportTypeLabels[report.type]}
+              <TagChip tone={getArticleTypeTone(report.type)} className="py-1 font-medium">
+                {articleTypeLabels[report.type]}
               </TagChip>
               {report.author && (
                 <span className="flex items-center gap-1.5">
@@ -222,7 +222,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {report.tags.map((tag) => (
-                    <TagChip key={tag} kind="report" value={tag} className="py-1" />
+                    <TagChip key={tag} kind="article" value={tag} className="py-1" />
                   ))}
                 </div>
               </section>

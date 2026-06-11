@@ -142,7 +142,7 @@ export interface Manufacturer extends BaseRecord {
   supportNote?: string;
   procurementNote?: string;
   vendorRiskNote?: string;
-  // 関連は逆向き(Robot.manufacturerId / Report.relatedManufacturerIds)で導出する。
+  // 関連は逆向き(Robot.manufacturerId / Article.relatedManufacturerIds)で導出する。
   // robotIds / handledRobotIds / relatedReportIds は持たない。
   /** 将来の掲載提携・有料スポンサード枠のための優先順位。値が小さいほど上位。未設定は非スポンサード扱い。 */
   featuredRank?: number;
@@ -225,7 +225,7 @@ export interface Robot extends BaseRecord {
   /** 役割別の参考画像（詳細ページのカルーセル）。hero が未設定なら BaseRecord.heroImage を hero に昇格して使う。 */
   images?: Partial<Record<ImageRole, ImageAsset>>;
   // 関連は逆向き(UseCase.candidateRobotIds / Guide.relatedRobotIds /
-  // Report.relatedRobotIds)で導出する。
+  // Article.relatedRobotIds)で導出する。
   /** 業種タグ（lib/tagRegistry.ts の kind:'industry' のvalue）。未設定=調査中扱い。 */
   industryTags?: TagValue<'industry'>[];
   /** タスクタグ（lib/tagRegistry.ts の kind:'task' のvalue）。未設定=調査中扱い。 */
@@ -249,7 +249,7 @@ export interface Guide extends BaseRecord {
   body?: string;
   relatedRobotIds: Id[];
   relatedUseCaseIds: Id[];
-  // 関連reportsは Report.relatedGuideIds で逆引きする。
+  // 関連articlesは Article.relatedGuideIds で逆引きする。
 }
 
 export type UseCaseMaturity = 'early-stage' | 'pilot-phase' | 'production-ready';
@@ -304,10 +304,23 @@ export interface UseCase extends BaseRecord {
   japanDeploymentConditions: string;
   candidateRobotIds: Id[];
   relatedGuideIds: Id[];
-  // 関連reportsは Report.relatedUseCaseIds で逆引きする。
+  // 関連articlesは Article.relatedUseCaseIds で逆引きする。
 }
 
-export type ReportType =
+/**
+ * 記事種別の第一軸（設計 §7-1）。編集者が必ず1つ指定する主分類。
+ * ニュースメディアとしての役割（速報〜分析）を表す。
+ * type（フォーマット）・section（サブジェクト・タブ）は当面併存し、
+ * category へのUI一本化は別フェーズで判断する。
+ */
+export type ArticleCategory =
+  | 'news'           // 業界最新情報・発表まとめ（速報。whyItMatters 必須は他と同じ）
+  | 'interview'      // 取材記事・インタビュー
+  | 'company-report' // 企業レポート（動向・決算・戦略）
+  | 'analysis'       // 分析・市場考察・導入事例の読み解き
+  | 'policy';        // 政策・規制アップデート
+
+export type ArticleType =
   | 'analysis'
   | 'deployment-report'
   | 'interview'
@@ -321,33 +334,35 @@ export type ReportType =
 /**
  * 記事のサブジェクト（何の話か）＝記事タブの分類。
  * type（フォーマット：どう書かれたか）とは独立した軸で、記事ごとに編集者が明示指定する。
- * UI専用の 'all' は含めない（lib/reportSections.ts の ReportSectionFilter 側で付与）。
+ * UI専用の 'all' は含めない（lib/articleSections.ts の ArticleSectionFilter 側で付与）。
  */
-export type ReportSection =
+export type ArticleSection =
   | 'deployment'
   | 'business'
   | 'tech'
   | 'policy'
   | 'entertainment';
 
-export type ReportContentKind = 'editorial' | 'sample' | 'sponsored';
+export type ArticleContentKind = 'editorial' | 'sample' | 'sponsored';
 
-export interface Report extends BaseRecord {
+export interface Article extends BaseRecord {
   title: string;
   titleJa?: string;
-  type: ReportType;
+  /** 第一軸の記事種別（必須）。一覧の絞り込み・編集方針の基準になる。 */
+  category: ArticleCategory;
+  type: ArticleType;
   /** editorial が通常記事。sample はUI確認用公開データとして sources 空を許容する。 */
-  contentKind?: ReportContentKind;
+  contentKind?: ArticleContentKind;
   publishedAt: ISODate;
   author?: string;
-  tags: TagValue<'report'>[];
+  tags: TagValue<'article'>[];
   whyItMatters: string;
   keyTakeaways?: string[];
   /** 記事本文（Markdown）。空ならレポート本文セクションは描画されない。 */
   body?: string;
   featured?: boolean;
   /** 記事タブの分類（サブジェクト）。type とは独立した必須フィールド。 */
-  section: ReportSection;
+  section: ArticleSection;
   /** 目安読了時間（分）。未設定時は非表示。 */
   readingTimeMin?: number;
   relatedRobotIds: Id[];
@@ -356,24 +371,24 @@ export interface Report extends BaseRecord {
   relatedGuideIds?: Id[];
 }
 
-export type ReportPlacementSurface = 'reports-index';
-export type ReportPlacementSlot = 'hero' | 'feature';
-export type ReportPlacementKind = 'editorial' | 'sample' | 'sponsored' | 'house';
+export type ArticlePlacementSurface = 'reports-index';
+export type ArticlePlacementSlot = 'hero' | 'feature';
+export type ArticlePlacementKind = 'editorial' | 'sample' | 'sponsored' | 'house';
 
-export interface ReportPlacementSponsor {
+export interface ArticlePlacementSponsor {
   name: string;
   url?: string;
   disclosure?: string;
   campaignId?: string;
 }
 
-export interface ReportPlacement {
-  surface: ReportPlacementSurface;
-  slot: ReportPlacementSlot;
+export interface ArticlePlacement {
+  surface: ArticlePlacementSurface;
+  slot: ArticlePlacementSlot;
   reportId: Id;
   order: number;
-  kind?: ReportPlacementKind;
-  sponsor?: ReportPlacementSponsor;
+  kind?: ArticlePlacementKind;
+  sponsor?: ArticlePlacementSponsor;
 }
 
 export type DeploymentStatus =
@@ -419,5 +434,5 @@ export interface SiteData {
   manufacturers: Manufacturer[];
   guides: Guide[];
   useCases: UseCase[];
-  reports: Report[];
+  articles: Article[];
 }

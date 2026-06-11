@@ -1,13 +1,13 @@
-import type { ReportPlacement, ReportPlacementSlot } from './types';
+import type { ArticlePlacement, ArticlePlacementSlot } from './types';
 
-export const reportIndexPlacementLimits: Record<ReportPlacementSlot, number> = {
+export const articleIndexPlacementLimits: Record<ArticlePlacementSlot, number> = {
   hero: 5,
   feature: 2,
 };
 
 // Reports page curation slots. Sponsored placements should be represented here,
 // not embedded in presentation components.
-export const reportPlacements: ReportPlacement[] = [
+export const articlePlacements: ArticlePlacement[] = [
   {
     surface: 'reports-index',
     slot: 'hero',

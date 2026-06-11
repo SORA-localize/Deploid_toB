@@ -1,13 +1,13 @@
-import { reportIndexPlacementLimits, reportPlacements } from '@/data/reportPlacements';
-import type { Report, ReportPlacementSlot } from '@/data/types';
+import { articleIndexPlacementLimits, articlePlacements } from '@/data/articlePlacements';
+import type { Article, ArticlePlacementSlot } from '@/data/types';
 
 const reportsIndexSurface = 'reports-index';
 
-function sortReportsByPublishedAt(reports: readonly Report[]) {
+function sortReportsByPublishedAt(reports: readonly Article[]) {
   return [...reports].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }
 
-function getReportsById(reports: readonly Report[]) {
+function getArticlesById(reports: readonly Article[]) {
   return new Map(reports.map((report) => [report.id, report]));
 }
 
@@ -17,16 +17,16 @@ function resolvePlacementSlot({
   usedIds,
   slot,
 }: {
-  reports: readonly Report[];
-  sortedReports: readonly Report[];
+  reports: readonly Article[];
+  sortedReports: readonly Article[];
   usedIds: Set<string>;
-  slot: ReportPlacementSlot;
+  slot: ArticlePlacementSlot;
 }) {
-  const limit = reportIndexPlacementLimits[slot];
-  const reportsById = getReportsById(reports);
-  const slotReports: Report[] = [];
+  const limit = articleIndexPlacementLimits[slot];
+  const reportsById = getArticlesById(reports);
+  const slotReports: Article[] = [];
 
-  reportPlacements
+  articlePlacements
     .filter((placement) => placement.surface === reportsIndexSurface && placement.slot === slot)
     .sort((a, b) => a.order - b.order)
     .forEach((placement) => {
@@ -47,7 +47,7 @@ function resolvePlacementSlot({
   return slotReports;
 }
 
-export function getReportIndexPlacementReports(reports: readonly Report[]) {
+export function getArticleIndexPlacementReports(reports: readonly Article[]) {
   const sortedReports = sortReportsByPublishedAt(reports);
   const usedIds = new Set<string>();
 

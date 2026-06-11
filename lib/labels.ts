@@ -13,8 +13,9 @@ import type {
   OperatingEnvironment,
   ProcurementModel,
   Reliability,
-  ReportSection,
-  ReportType,
+  ArticleSection,
+  ArticleCategory,
+  ArticleType,
   RobotCategory,
   UseCaseMaturity,
   UseCaseCapabilityNotes,
@@ -124,7 +125,15 @@ export const guideStageLabels: Record<GuideStage, string> = {
   act: '動く',
 };
 
-export const reportTypeLabels: Record<ReportType, string> = {
+export const articleCategoryLabels: Record<ArticleCategory, string> = {
+  news: 'ニュース',
+  interview: 'インタビュー',
+  'company-report': '企業レポート',
+  analysis: '分析',
+  policy: '政策・規制',
+};
+
+export const articleTypeLabels: Record<ArticleType, string> = {
   analysis: '分析',
   'deployment-report': '導入レポート',
   interview: '取材',
@@ -136,7 +145,7 @@ export const reportTypeLabels: Record<ReportType, string> = {
   'market-analysis': '市場分析',
 };
 
-export const reportSectionLabels: Record<ReportSection, string> = {
+export const articleSectionLabels: Record<ArticleSection, string> = {
   deployment: '導入・事例',
   business: '市場・動向',
   tech: '技術・製品',

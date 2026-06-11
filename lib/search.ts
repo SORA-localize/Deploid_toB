@@ -1,4 +1,4 @@
-import type { Guide, Manufacturer, Report, Robot, UseCase } from '@/data/types';
+import type { Guide, Manufacturer, Article, Robot, UseCase } from '@/data/types';
 import {
   buyerReadinessLabels,
   companyStatusLabels,
@@ -10,7 +10,7 @@ import {
   mobilityLabels,
   operatingEnvironmentLabels,
   procurementLabels,
-  reportTypeLabels,
+  articleTypeLabels,
   robotCategoryLabels,
   capabilityLabels,
   maturityLabels,
@@ -239,13 +239,13 @@ export function createManufacturerSearchDocument(
   });
 }
 
-export function createReportSearchDocument(report: Report) {
+export function createReportSearchDocument(report: Article) {
   return createSearchDocument({
     id: report.slug,
     collection: 'reports',
     title: report.titleJa ?? report.title,
     url: `/reports/${report.slug}`,
-    tags: report.tags.map((value) => ({ value, kind: 'report' as const })),
+    tags: report.tags.map((value) => ({ value, kind: 'article' as const })),
     fields: [
       report.titleJa,
       report.title,
@@ -253,7 +253,7 @@ export function createReportSearchDocument(report: Report) {
       report.whyItMatters,
       report.author,
       report.publishedAt,
-      reportTypeLabels[report.type],
+      articleTypeLabels[report.type],
       report.keyTakeaways,
     ],
   });
