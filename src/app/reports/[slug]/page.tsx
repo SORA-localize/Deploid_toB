@@ -179,7 +179,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
       )}
 
       {/* ── 本文エリア ── */}
-      <div className="site-container py-8">
+      <div className="site-container-content py-8">
         <div className="grid grid-cols-12 gap-6">
 
           {/* TOC（左） */}

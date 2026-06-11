@@ -107,7 +107,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
         </div>
       </div>
 
-      <div className="site-container py-8">
+      <div className="site-container-content py-8">
         <div className="grid grid-cols-12 gap-6">
           {/* TOC */}
           <div className="col-span-2 hidden lg:block">
