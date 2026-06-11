@@ -61,7 +61,7 @@ export function ComparisonRobotPanel({
   return (
     <article className="group relative aspect-[5/7] w-full overflow-hidden rounded-lg bg-muted text-card-foreground">
 
-      {/* ── 画像レイヤー ── */}
+      {/* ── 画像レイヤー: blur 背景 < グラデーション < ロボット前景 < 操作UI ── */}
       {cardImage ? (
         <>
           {/* blur 背景 */}
@@ -70,24 +70,34 @@ export function ComparisonRobotPanel({
             src={cardImage.src}
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl brightness-75 saturate-150"
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full scale-110 object-cover blur-2xl brightness-75 saturate-150"
           />
           {/* 前景 */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={cardImage.src}
             alt={cardImage.alt}
-            className="absolute inset-0 h-full w-full object-contain object-center transition-transform duration-300 group-hover:scale-[1.03]"
+            className="pointer-events-none absolute inset-0 z-20 h-full w-full object-contain object-center transition-transform duration-300 group-hover:scale-[1.03]"
           />
         </>
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
           <span className="text-xs text-muted-foreground">{uiText.robots.mainImageMissing}</span>
         </div>
       )}
 
       {/* ── ホバー暗転オーバーレイ（pointer-events-none）── */}
       <div className="pointer-events-none absolute inset-0 z-[1] bg-black/0 transition-colors duration-300 group-hover:bg-black/20" aria-hidden="true" />
+
+      {/* ── 背景グラデーション: ロボット前景より下、テキストより下 ── */}
+      <div
+        className="pointer-events-none absolute top-0 inset-x-0 z-10 h-20 bg-gradient-to-b from-black/60 to-transparent"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute bottom-0 inset-x-0 z-10 h-16 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        aria-hidden="true"
+      />
 
       {/* ── Dialog trigger（画像全体を覆う z-0）── */}
       <DialogPrimitive.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
@@ -214,7 +224,7 @@ export function ComparisonRobotPanel({
         </DialogPrimitive.Portal>
       </DialogPrimitive.Root>
 
-      {/* ── top overlay: D&D ハンドル + 名前 + ★✕（z-10）── */}
+      {/* ── top overlay: D&D ハンドル + 名前 + ★✕（z-30）── */}
       {/*
         overlay div の onClick が Popover を開く。デスクトップでは drag（6px以上移動）時は
         click が発火しないため Popover が開かない。モバイルでも同じ onClick でカバーできる。
@@ -223,9 +233,8 @@ export function ComparisonRobotPanel({
       <div
         onClick={() => setPopoverOpen(true)}
         className={[
-          'absolute top-0 inset-x-0 z-10',
+          'absolute top-0 inset-x-0 z-30',
           'flex items-start justify-between gap-2 px-2.5 pt-2 pb-8',
-          'bg-gradient-to-b from-black/60 to-transparent',
           canDrag ? 'cursor-grab touch-none select-none active:cursor-grabbing' : '',
         ].join(' ').trim()}
         aria-label={canDrag ? uiText.comparison.reorderAria(robot.nameJa ?? robot.name) : undefined}
@@ -280,9 +289,8 @@ export function ComparisonRobotPanel({
         </div>
       </div>
 
-      {/* ── bottom overlay: メーカー名（ホバーで表示）── */}
-      <div className="pointer-events-none absolute bottom-0 inset-x-0 z-10 px-2.5 pb-2
-                      bg-gradient-to-t from-black/60 to-transparent
+      {/* ── bottom overlay: メーカー名（ホバーで表示 / z-30）── */}
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 z-30 px-2.5 pb-2
                       opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <p className="truncate text-right text-[11px] font-medium text-white/90">
           {manufacturerName ?? robot.manufacturerSlug}
