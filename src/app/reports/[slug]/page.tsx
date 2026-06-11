@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Calendar, ChevronRight, Clock, User } from 'lucide-react';
+import { Calendar, Clock, User } from 'lucide-react';
 import { ArticleToc } from '@/components/ArticleToc';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Markdown } from '@/components/Markdown';
@@ -48,6 +48,11 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
   const hasBody = (report.body ?? '').trim().length > 0;
   const bodyHeadings = hasBody ? extractH2Headings(report.body!) : [];
+  const reportTitle = report.titleJa ?? report.title;
+  const breadcrumbItems = [
+    { label: uiText.reports.breadcrumb, path: '/reports' },
+    { label: reportTitle },
+  ];
 
   const toc = [
     ...(hasTakeaways ? [{ label: uiText.reports.keyTakeaways, href: '#takeaways' }] : []),
@@ -71,84 +76,73 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
       {/* ── ヒーロー + ヘッダー（統合） ── */}
       {report.heroImage ? (
-        <div className="relative w-full overflow-hidden bg-muted min-h-[400px] sm:min-h-[500px] md:min-h-[580px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={report.heroImage.src}
-            alt={report.heroImage.alt}
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent"
-          />
-          {report.heroImage.credit && (
-            <p className="absolute bottom-2 right-3 z-10 text-[10px] text-white/50">
-              © {report.heroImage.credit}
-            </p>
-          )}
-
-          <div className="absolute top-0 left-0 right-0 z-10">
-            <div className="site-container pt-4 sm:pt-5">
-              <nav className="flex items-center gap-1 text-xs sm:gap-2">
-                <Link href="/" className="text-white/60 hover:text-white">{uiText.common.home}</Link>
-                <ChevronRight className="h-3 w-3 text-white/40" />
-                <Link href="/reports" className="text-white/60 hover:text-white">{uiText.reports.breadcrumb}</Link>
-                <ChevronRight className="h-3 w-3 text-white/40" />
-                <span className="line-clamp-1 text-white/80">{report.titleJa ?? report.title}</span>
-              </nav>
-            </div>
+        <header className="border-b border-border bg-background">
+          <div className="site-container pt-4 sm:pt-5">
+            <Breadcrumbs items={breadcrumbItems} />
           </div>
 
-          <div className="absolute inset-0 z-10 flex flex-col justify-end">
-            <div className="site-container pb-8 sm:pb-10">
-              <div className="mb-2 text-xs font-medium text-white/70">
-                {reportTypeLabels[report.type]}
-              </div>
-              <h1 className="mb-3 text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white">
-                {report.titleJa ?? report.title}
-              </h1>
-              <p className="mb-4 text-sm sm:text-base leading-relaxed text-white/80">
-                {report.summary}
-              </p>
-              <div className="flex flex-wrap items-center gap-4 text-xs text-white/60">
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {report.publishedAt}
-                </span>
-                {report.readingTimeMin && (
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5" />
-                    {uiText.common.readingMinutes(report.readingTimeMin)}
-                  </span>
-                )}
-                <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
-                  {reportTypeLabels[report.type]}
-                </TagChip>
-                {report.author && (
-                  <span className="flex items-center gap-1.5">
-                    <User className="h-3.5 w-3.5" />
-                    {report.author}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="border-b border-border bg-card">
-          <div className="site-container py-6">
-            <Breadcrumbs
-              items={[
-                { label: uiText.reports.breadcrumb, path: '/reports' },
-                { label: report.titleJa ?? report.title },
-              ]}
+          <figure className="relative overflow-hidden bg-muted min-h-[400px] sm:min-h-[500px] md:min-h-[580px]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={report.heroImage.src}
+              alt={report.heroImage.alt}
+              className="absolute inset-0 h-full w-full object-cover"
             />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent"
+            />
+            {report.heroImage.credit && (
+              <p className="pointer-events-none absolute bottom-2 right-3 z-10 text-[10px] text-white/50">
+                © {report.heroImage.credit}
+              </p>
+            )}
+
+            <div className="relative z-10 flex min-h-[400px] items-end sm:min-h-[500px] md:min-h-[580px]">
+              <div className="site-container pb-8 sm:pb-10">
+                <div className="mb-2 text-xs font-medium text-white/70">
+                  {reportTypeLabels[report.type]}
+                </div>
+                <h1 className="mb-3 text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white">
+                  {reportTitle}
+                </h1>
+                <p className="mb-4 text-sm sm:text-base leading-relaxed text-white/80">
+                  {report.summary}
+                </p>
+                <div className="flex flex-wrap items-center gap-4 text-xs text-white/60">
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {report.publishedAt}
+                  </span>
+                  {report.readingTimeMin && (
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5" />
+                      {uiText.common.readingMinutes(report.readingTimeMin)}
+                    </span>
+                  )}
+                  <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
+                    {reportTypeLabels[report.type]}
+                  </TagChip>
+                  {report.author && (
+                    <span className="flex items-center gap-1.5">
+                      <User className="h-3.5 w-3.5" />
+                      {report.author}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </figure>
+        </header>
+      ) : (
+        <header className="border-b border-border bg-card">
+          <div className="site-container py-6">
+            <Breadcrumbs items={breadcrumbItems} />
             <div className="mb-3 text-xs font-medium text-muted-foreground">
               {reportTypeLabels[report.type]}
             </div>
             <h1 className="mb-4 max-w-4xl text-2xl md:text-3xl font-semibold leading-tight text-foreground">
-              {report.titleJa ?? report.title}
+              {reportTitle}
             </h1>
             <p className="mb-5 max-w-3xl text-sm leading-relaxed text-foreground/80">
               {report.summary}
@@ -175,7 +169,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               )}
             </div>
           </div>
-        </div>
+        </header>
       )}
 
       {/* ── 本文エリア ── */}
