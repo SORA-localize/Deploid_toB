@@ -358,7 +358,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   <div
                     ref={setNodeRef}
                     className={cn(
-                      'border border-border transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
+                      'border border-border bg-card transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
                       isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                     )}
                   >
@@ -375,7 +375,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                         const isExpanded = expandedManufacturers.includes(manufacturer.slug);
 
                         return (
-                          <div key={manufacturer.slug}>
+                          <div key={manufacturer.slug} className="border-b border-border-subtle last:border-0">
                             <button
                               type="button"
                               aria-label={uiText.comparison.toggleAria(
@@ -441,7 +441,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   <section
                     ref={setNodeRef}
                     className={cn(
-                      'border border-border-subtle bg-muted p-3 transition-[box-shadow,outline-color] duration-200',
+                      'border border-border-subtle bg-surface-inset p-3 transition-[box-shadow,outline-color] duration-200',
                       isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                     )}
                   >

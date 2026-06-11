@@ -432,6 +432,7 @@
   --sidebar-border: var(--slate-6);
   --sidebar-ring: var(--jade-8);
   --surface-raised: var(--slate-2);
+  --surface-inset: var(--slate-2);
   --card-spotlight: color-mix(in srgb, var(--jade-9) 20%, transparent);
 }
 

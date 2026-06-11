@@ -70,7 +70,7 @@ export function ComparisonRobotPanel({
             src={cardImage.src}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-0 h-full w-full scale-110 object-cover blur-2xl brightness-75 saturate-150"
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full scale-110 object-cover blur-2xl brightness-[85] saturate-150"
           />
           {/* 前景 */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
