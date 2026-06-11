@@ -16,14 +16,15 @@ export interface CompareCardDragHandleProps {
 }
 
 interface SortableCompareCardProps {
-  slug: string;
-  id?: UniqueIdentifier;
+  /** ロボットの不変id（DOM要素id `compare-card-<id>` とハイライトに使う） */
+  robotId: string;
+  /** dnd-kit 用の識別子。未指定なら robotId を使う */
+  sortableId?: UniqueIdentifier;
   data?: Record<string, unknown>;
   children: (dragHandleProps: CompareCardDragHandleProps) => ReactNode;
 }
 
-export function SortableCompareCard({ slug, id, data, children }: SortableCompareCardProps) {
-  const sortableId = id ?? slug;
+export function SortableCompareCard({ robotId, sortableId, data, children }: SortableCompareCardProps) {
   const {
     attributes,
     listeners,
@@ -31,7 +32,7 @@ export function SortableCompareCard({ slug, id, data, children }: SortableCompar
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: sortableId, data });
+  } = useSortable({ id: sortableId ?? robotId, data });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -44,7 +45,7 @@ export function SortableCompareCard({ slug, id, data, children }: SortableCompar
     // 実際に持ち上がって動くカードは DragOverlay 側が描画する。
     <div ref={setNodeRef} style={style} className={isDragging ? 'relative opacity-40' : 'relative'}>
       <div
-        id={`compare-card-${slug}`}
+        id={`compare-card-${robotId}`}
         className="rounded-lg transition-shadow duration-500"
       >
         {children({ attributes, listeners, isDragging })}

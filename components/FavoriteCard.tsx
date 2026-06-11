@@ -10,8 +10,8 @@ interface FavoriteCardProps {
   robot: Robot;
   manufacturerName?: string;
   manufacturerLogo?: ImageAsset;
-  onRemove: (slug: string) => void;
-  onSelect?: (slug: string) => void;
+  onRemove: (id: string) => void;
+  onSelect?: (id: string) => void;
 }
 
 export function FavoriteCard({
@@ -26,7 +26,7 @@ export function FavoriteCard({
       {onSelect ? (
         <button
           type="button"
-          onClick={() => onSelect(robot.slug)}
+          onClick={() => onSelect(robot.id)}
           className="absolute inset-0 z-10 w-full h-full cursor-pointer rounded-sm"
           aria-label={robot.nameJa ?? robot.name}
         />
@@ -61,7 +61,7 @@ export function FavoriteCard({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          onRemove(robot.slug);
+          onRemove(robot.id);
         }}
         className="absolute top-2 right-2 z-20 text-muted-foreground hover:text-foreground flex-shrink-0 p-1 rounded-sm hover:bg-muted transition-colors cursor-pointer"
       >

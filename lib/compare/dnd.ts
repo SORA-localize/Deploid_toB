@@ -9,7 +9,7 @@ export type CompareDropTarget = 'menu' | 'sheet' | 'favorite';
 
 export interface CompareRobotDragData extends Record<string, unknown> {
   type: 'robot';
-  slug: string;
+  id: string;
   source: CompareDragSource;
   target?: CompareDropTarget;
   dropType?: 'sheet-card';
@@ -22,8 +22,8 @@ export interface CompareColumnDropData extends Record<string, unknown> {
 }
 
 export type CompareDropData =
-  | { target: CompareDropTarget; dropType: 'column'; slug?: undefined }
-  | { target: CompareDropTarget; dropType: 'sheet-card'; slug: string };
+  | { target: CompareDropTarget; dropType: 'column'; id?: undefined }
+  | { target: CompareDropTarget; dropType: 'sheet-card'; id: string };
 
 export const compareColumnIds = {
   menu: 'menu-column',
@@ -37,11 +37,11 @@ export const dndPrefixBySource = {
   favorite: 'fav',
 } as const satisfies Record<CompareDragSource, string>;
 
-export function getDndItemId(source: CompareDragSource, slug: string) {
-  return `${dndPrefixBySource[source]}-${slug}`;
+export function getDndItemId(source: CompareDragSource, id: string) {
+  return `${dndPrefixBySource[source]}-${id}`;
 }
 
-// シートカードの droppable id (sheet-{slug})。列 (sheet-column) は除外する。
+// シートカードの droppable id (sheet-{id})。列 (sheet-column) は除外する。
 const isSheetCardId = (id: string | number) =>
   id !== compareColumnIds.sheet && String(id).startsWith(`${dndPrefixBySource.sheet}-`);
 
@@ -70,14 +70,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 export function getRobotDragData(value: unknown): CompareRobotDragData | null {
   if (!isRecord(value)) return null;
   if (value.type !== 'robot') return null;
-  if (typeof value.slug !== 'string') return null;
+  if (typeof value.id !== 'string') return null;
   if (value.source !== 'menu' && value.source !== 'sheet' && value.source !== 'favorite') {
     return null;
   }
 
   return {
     type: 'robot',
-    slug: value.slug,
+    id: value.id,
     source: value.source,
     target:
       value.target === 'menu' || value.target === 'sheet' || value.target === 'favorite'
@@ -102,9 +102,9 @@ export function getDropData(value: unknown): CompareDropData | null {
     value.type === 'robot' &&
     value.dropType === 'sheet-card' &&
     value.target === 'sheet' &&
-    typeof value.slug === 'string'
+    typeof value.id === 'string'
   ) {
-    return { target: 'sheet', dropType: 'sheet-card', slug: value.slug };
+    return { target: 'sheet', dropType: 'sheet-card', id: value.id };
   }
 
   return null;

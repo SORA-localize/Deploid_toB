@@ -21,7 +21,7 @@ interface RobotCardProps {
   manufacturerLogo?: ImageAsset;
   showFavorite?: boolean;
   isFavorite?: boolean;
-  onFavoriteToggle?: (slug: string) => void;
+  onFavoriteToggle?: (id: string) => void;
 }
 
 const TILT_MAX = 5;
@@ -114,7 +114,7 @@ export function RobotCard({
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            onFavoriteToggle?.(robot.slug);
+            onFavoriteToggle?.(robot.id);
           }}
           className="absolute top-3 right-3 z-40 p-1 text-muted-foreground transition-colors hover:text-foreground pointer-events-auto"
         >

@@ -126,7 +126,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
             manufacturerName={manufacturer?.name ?? robot.manufacturerId}
             manufacturerLogo={manufacturer?.logo}
             showFavorite={true}
-            isFavorite={favorites.includes(robot.slug)}
+            isFavorite={favorites.includes(robot.id)}
             onFavoriteToggle={toggleFavorite}
           />
         );

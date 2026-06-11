@@ -51,9 +51,9 @@ export function DraggableMenuRobotButton({
   isDisabled,
   onClick,
 }: DraggableMenuRobotButtonProps) {
-  const data: CompareRobotDragData = { type: 'robot', source: 'menu', slug: robot.slug };
+  const data: CompareRobotDragData = { type: 'robot', source: 'menu', id: robot.id };
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: getDndItemId('menu', robot.slug),
+    id: getDndItemId('menu', robot.id),
     data,
     disabled: isDisabled,
   });
@@ -104,8 +104,8 @@ interface DraggableFavoriteCardProps {
   robot: Robot;
   manufacturerName?: string;
   manufacturerLogo?: Manufacturer['logo'];
-  onRemove: (slug: string) => void;
-  onSelect: (slug: string) => void;
+  onRemove: (id: string) => void;
+  onSelect: (id: string) => void;
 }
 
 export function DraggableFavoriteCard({
@@ -115,9 +115,9 @@ export function DraggableFavoriteCard({
   onRemove,
   onSelect,
 }: DraggableFavoriteCardProps) {
-  const data: CompareRobotDragData = { type: 'robot', source: 'favorite', slug: robot.slug };
+  const data: CompareRobotDragData = { type: 'robot', source: 'favorite', id: robot.id };
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: getDndItemId('favorite', robot.slug),
+    id: getDndItemId('favorite', robot.id),
     data,
   });
 
