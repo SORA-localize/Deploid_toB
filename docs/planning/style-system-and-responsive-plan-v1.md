@@ -140,7 +140,6 @@
 対象ページのトップレベル `site-container` を `site-container-content` に置換:
 - `reports/[slug]/page.tsx` — 本文エリアの `<div className="site-container py-8">`
 - `guides/[slug]/page.tsx` — 本文エリアの `<div className="site-container py-8">`
-- `use-cases/[slug]/page.tsx` — 本文エリアの `<div className="site-container py-8">`
 
 ヘッダー帯（`.site-container.py-6`）はそのまま `site-container` でよい（幅より内容が先）。
 
@@ -217,9 +216,38 @@ wrapper div を削除し、`SourceList` に直接 className を渡す。
 
 **At a glance（use-cases ヘッダー内）**: 変更なし。ヘッダーバンド内のデータ要約カードとして維持。
 
-### `space-y-6` の扱い
+### `space-y-6` と RelatedLinkList の間隔管理
 
-現在コンテンツカラムは `<div className="space-y-6">` でセクション間隔を管理している。ディバイダー化後はセクション自体が `pt-6 pb-8` を持つため、wrapper の `space-y-*` は不要になる。`space-y-6` を削除してフラットな構造にする。
+コンテンツカラムは現在 `<div className="space-y-6">` で全要素の間隔を管理している。ディバイダー化後は構造が混在する。
+
+**本文セクション（section 要素）**: 自身が `pt-6 pb-8` を持つため、wrapper の `space-y` は不要。
+
+**RelatedLinkList・SourceList（カード/ナビ要素）**: ボックス維持のため `pt-6 pb-8` を持たない。`space-y-6` が消えると前後のセクションと詰まる。
+
+対応方針: wrapper の `space-y-6` を削除し、RelatedLinkList と SourceList には個別に `mt-6` を追加する。
+
+```tsx
+// content column の wrapper
+<div className="col-span-12 lg:col-span-7">  {/* space-y-6 を削除 */}
+
+  <section id="takeaways" className="scroll-mt-site-header pt-6 pb-8 border-b border-border">
+    ...
+  </section>
+
+  <section id="body" className="scroll-mt-site-header pt-6 pb-8 border-b border-border">
+    ...
+  </section>
+
+  {/* カード群は mt-6 で間隔を確保 */}
+  {robots.length > 0 && (
+    <div className="mt-6">
+      <RelatedLinkList id="related-robots" ... />
+    </div>
+  )}
+
+  <SourceList className="scroll-mt-site-header mt-6 pt-6 border-t border-border" ... />
+</div>
+```
 
 ### 変更ファイル（Part 3）
 
