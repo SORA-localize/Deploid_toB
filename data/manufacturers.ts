@@ -2,6 +2,7 @@ import type { Manufacturer } from './types';
 
 export const manufacturers: Manufacturer[] = [
   {
+    id: 'unitree',
     slug: 'unitree',
     name: 'Unitree Robotics',
     nameJa: 'ユニツリー・ロボティクス',
@@ -80,6 +81,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '研究・PoC向け評価と、本番運用向け評価を分ける。',
   },
   {
+    id: 'figure-ai',
     slug: 'figure-ai',
     name: 'Figure AI',
     companyType: 'manufacturer',
@@ -141,6 +143,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '大型資金調達企業だが、量産・外販条件は継続確認が必要。',
   },
   {
+    id: 'apptronik',
     slug: 'apptronik',
     name: 'Apptronik',
     companyType: 'manufacturer',
@@ -203,6 +206,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '大型調達済みで注目度は高いが、日本への展開時期・条件は継続確認が必要。',
   },
   {
+    id: 'agility-robotics',
     slug: 'agility-robotics',
     name: 'Agility Robotics',
     companyType: 'manufacturer',
@@ -267,6 +271,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '物流分野で先行する一方、本格量産・国内対応の見通しは継続確認が必要。',
   },
   {
+    id: 'onex',
     slug: 'onex',
     name: '1X Technologies',
     nameJa: '1X',
@@ -330,6 +335,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '量産・出荷スケジュール・日本対応は継続確認が必要。',
   },
   {
+    id: 'boston-dynamics',
     slug: 'boston-dynamics',
     name: 'Boston Dynamics',
     companyType: 'manufacturer',
@@ -392,6 +398,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: 'Hyundai 傘下で財務基盤は安定。ただし Atlas の外販条件・価格は継続確認が必要。',
   },
   {
+    id: 'tesla',
     slug: 'tesla',
     name: 'Tesla',
     companyType: 'manufacturer',
@@ -447,6 +454,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '財務規模は大きいが、ロボット事業の量産・外販計画は流動的. 継続確認が必要。',
   },
   {
+    id: 'sanctuary-ai',
     slug: 'sanctuary-ai',
     name: 'Sanctuary AI',
     companyType: 'manufacturer',
@@ -502,6 +510,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: 'スタートアップ. 資金状況・量産計画は継続確認が必要。',
   },
   {
+    id: 'agibot',
     slug: 'agibot',
     name: 'AgiBot',
     companyType: 'manufacturer',
@@ -557,6 +566,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '量産実績は業界最多水準だが、日本での体制は継続確認が必要。',
   },
   {
+    id: 'ubtech',
     slug: 'ubtech',
     name: 'UBTECH Robotics',
     companyType: 'manufacturer',
@@ -626,6 +636,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '量産・販売実績は安定しているが、日本での保守実績はこれから積み上がる段階。',
   },
   {
+    id: 'fourier-intelligence',
     slug: 'fourier-intelligence',
     name: 'Fourier Intelligence',
     companyType: 'manufacturer',
@@ -681,6 +692,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '医療ロボットの実績はあるが、産業・介護向けヒューマノイドとしての量産実績は積み上げ中。',
   },
   {
+    id: 'booster-robotics',
     slug: 'booster-robotics',
     name: 'Booster Robotics',
     companyType: 'manufacturer',
@@ -750,6 +762,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '設立間もないが、量産・販売・国内代理店網は整いつつある。',
   },
   {
+    id: 'kawasaki-heavy-industries',
     slug: 'kawasaki-heavy-industries',
     name: '川崎重工業',
     nameJa: '川崎重工業株式会社',
@@ -806,6 +819,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '財務基盤は安定. ただしヒューマノイドの商業化時期は未確定。',
   },
   {
+    id: 'neura-robotics',
     slug: 'neura-robotics',
     name: 'NEURA Robotics',
     companyType: 'manufacturer',
@@ -876,6 +890,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '創業間もないが Series B 調達済み・Bosch との提携あり. 量産体制・サポートインフラの成熟度は要確認。',
   },
   {
+    id: 'kepler-robotics',
     slug: 'kepler-robotics',
     name: 'Kepler Robotics',
     nameJa: 'ケプラー・ロボティクス',
@@ -932,6 +947,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '創業2年で量産達成は実績として評価できる. 一方、国際サポート網・アフターサービスの成熟度は未知数。',
   },
   {
+    id: 'leju-robotics',
     slug: 'leju-robotics',
     name: 'Leju Robotics',
     nameJa: '乐聚机器人（レジュ・ロボティクス）',
@@ -988,6 +1004,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '量産実績・資金調達は堅調. Huawei 依存のエコシステムおよび国際展開の成熟度は別途確認。',
   },
   {
+    id: 'pal-robotics',
     slug: 'pal-robotics',
     name: 'PAL Robotics',
     companyType: 'manufacturer',
@@ -1043,6 +1060,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '創業20年の老舗で財務・技術基盤は安定. ただし産業量産向けではなく、研究・PoC用途に限定される。',
   },
   {
+    id: 'limx-dynamics',
     slug: 'limx-dynamics',
     name: 'LimX Dynamics',
     companyType: 'manufacturer',
@@ -1095,6 +1113,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '急速に成長中だが、国内での保守実績はない。',
   },
   {
+    id: 'xpeng-robotics',
     slug: 'xpeng-robotics',
     name: 'XPENG Robotics',
     companyType: 'manufacturer',
@@ -1147,6 +1166,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '母体のEV事業は安定しているが、ロボットの外販体制は構築中。',
   },
   {
+    id: 'engine-ai',
     slug: 'engine-ai',
     name: 'EngineAI',
     nameJa: 'エンジンAI',
@@ -1198,6 +1218,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '創業2年で大型調達済み・量産実績あり。国際サポート網・アフターサービスの成熟度は継続確認が必要。',
   },
   {
+    id: 'wandercraft',
     slug: 'wandercraft',
     name: 'Wandercraft',
     companyType: 'manufacturer',
@@ -1248,6 +1269,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '医療ロボット実績あり・大型調達済み・量産パートナーあり。日本向け展開時期と条件は未確定。',
   },
   {
+    id: 'robotera',
     slug: 'robotera',
     name: 'RobotEra',
     companyType: 'manufacturer',
@@ -1298,6 +1320,7 @@ export const manufacturers: Manufacturer[] = [
     vendorRiskNote: '高性能デモ実績はあるが、量産体制・国際展開の成熟度は継続確認が必要。',
   },
   {
+    id: 'mentee-robotics',
     slug: 'mentee-robotics',
     name: 'Mentee Robotics',
     companyType: 'manufacturer',

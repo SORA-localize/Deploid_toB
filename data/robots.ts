@@ -2,6 +2,7 @@ import type { Robot } from './types';
 
 export const robots: Robot[] = [
   {
+    id: 'unitree-g1',
     slug: 'unitree-g1',
     name: 'Unitree G1',
     nameJa: 'Unitree G1',
@@ -62,6 +63,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'figure-02',
     slug: 'figure-02',
     name: 'Figure 02',
     nameJa: 'Figure 02',
@@ -111,6 +113,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'unitree-h1',
     slug: 'unitree-h1',
     name: 'H1/H1-2',
     nameJa: 'H1/H1-2',
@@ -163,6 +166,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'apptronik-apollo',
     slug: 'apptronik-apollo',
     name: 'Apollo',
     nameJa: 'Apollo',
@@ -216,6 +220,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'agility-digit',
     slug: 'agility-digit',
     name: 'Digit',
     nameJa: 'Digit',
@@ -330,6 +335,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'onex-neo',
     slug: 'onex-neo',
     name: 'NEO',
     nameJa: 'NEO',
@@ -420,6 +426,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'figure-03',
     slug: 'figure-03',
     name: 'Figure 03',
     nameJa: 'Figure 03',
@@ -474,6 +481,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'unitree-h2',
     slug: 'unitree-h2',
     name: 'Unitree H2',
     nameJa: 'Unitree H2',
@@ -529,6 +537,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'boston-dynamics-atlas',
     slug: 'boston-dynamics-atlas',
     name: 'Atlas',
     nameJa: 'Atlas',
@@ -585,6 +594,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'tesla-optimus',
     slug: 'tesla-optimus',
     name: 'Optimus',
     nameJa: 'Optimus',
@@ -639,6 +649,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'sanctuary-phoenix',
     slug: 'sanctuary-phoenix',
     name: 'Phoenix',
     nameJa: 'Phoenix',
@@ -693,6 +704,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'agibot-a2',
     slug: 'agibot-a2',
     name: 'AgiBot A2',
     nameJa: 'AgiBot A2',
@@ -748,6 +760,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'ubtech-walker-s2',
     slug: 'ubtech-walker-s2',
     name: 'Walker S2',
     nameJa: 'Walker S2',
@@ -804,6 +817,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'fourier-gr2',
     slug: 'fourier-gr2',
     name: 'Fourier GR-2',
     nameJa: 'Fourier GR-2',
@@ -860,6 +874,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'fourier-gr3',
     slug: 'fourier-gr3',
     name: 'Fourier GR-3',
     nameJa: 'Fourier GR-3',
@@ -914,6 +929,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'booster-t1',
     slug: 'booster-t1',
     name: 'Booster T1',
     nameJa: 'Booster T1',
@@ -970,6 +986,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'kawasaki-kaleido',
     slug: 'kawasaki-kaleido',
     name: 'Kaleido',
     nameJa: 'Kaleido',
@@ -1018,6 +1035,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'neura-4ne-1',
     slug: 'neura-4ne-1',
     name: '4NE1',
     nameJa: '4NE1',
@@ -1072,6 +1090,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'kepler-k2',
     slug: 'kepler-k2',
     name: 'Forerunner K2',
     nameJa: 'Forerunner K2',
@@ -1128,6 +1147,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'leju-kuavo',
     slug: 'leju-kuavo',
     name: 'KUAVO 4Pro',
     nameJa: 'KUAVO 4Pro',
@@ -1182,6 +1202,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'pal-talos',
     slug: 'pal-talos',
     name: 'TALOS',
     nameJa: 'TALOS',
@@ -1238,6 +1259,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'unitree-r1',
     slug: 'unitree-r1',
     name: 'R1',
     nameJa: 'R1',
@@ -1292,6 +1314,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'agibot-a2-max',
     slug: 'agibot-a2-max',
     name: 'AgiBot A2 Ultra',
     nameJa: 'AgiBot A2 Ultra',
@@ -1348,6 +1371,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'ubtech-walker-s1',
     slug: 'ubtech-walker-s1',
     name: 'Walker S1',
     nameJa: 'Walker S1',
@@ -1404,6 +1428,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'booster-k1',
     slug: 'booster-k1',
     name: 'Booster K1',
     nameJa: 'Booster K1',
@@ -1458,6 +1483,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'pal-kangaroo',
     slug: 'pal-kangaroo',
     name: 'Kangaroo',
     nameJa: 'Kangaroo',
@@ -1513,6 +1539,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'limx-oli',
     slug: 'limx-oli',
     name: 'LimX Oli',
     nameJa: 'LimX Oli',
@@ -1561,6 +1588,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'limx-luna',
     slug: 'limx-luna',
     name: 'LimX Luna',
     nameJa: 'LimX Luna',
@@ -1609,6 +1637,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'xpeng-iron',
     slug: 'xpeng-iron',
     name: 'XPENG IRON',
     nameJa: 'XPENG IRON',
@@ -1658,6 +1687,7 @@ export const robots: Robot[] = [
   },
   // ── 既存メーカー追加モデル ──────────────────────────────
   {
+    id: 'tesla-optimus-gen3',
     slug: 'tesla-optimus-gen3',
     name: 'Optimus Gen 3',
     nameJa: 'Optimus Gen 3',
@@ -1722,6 +1752,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'agility-digit-v5',
     slug: 'agility-digit-v5',
     name: 'Digit v5',
     nameJa: 'Digit v5',
@@ -1777,6 +1808,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'fourier-gr1',
     slug: 'fourier-gr1',
     name: 'Fourier GR-1',
     nameJa: 'Fourier GR-1',
@@ -1834,6 +1866,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'agibot-a3',
     slug: 'agibot-a3',
     name: 'Expedition A3',
     nameJa: 'Expedition A3',
@@ -1883,6 +1916,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'ubtech-walker-x',
     slug: 'ubtech-walker-x',
     name: 'Walker X',
     nameJa: 'Walker X',
@@ -1935,6 +1969,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'neura-4ne1-mini',
     slug: 'neura-4ne1-mini',
     name: '4NE1 Mini',
     nameJa: '4NE1 Mini',
@@ -1975,6 +2010,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'kepler-k1',
     slug: 'kepler-k1',
     name: 'Forerunner K1',
     nameJa: 'Forerunner K1',
@@ -2017,6 +2053,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'leju-kuavo5',
     slug: 'leju-kuavo5',
     name: 'KUAVO-5',
     nameJa: 'KUAVO-5',
@@ -2063,6 +2100,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'limx-cl2',
     slug: 'limx-cl2',
     name: 'CL-2',
     nameJa: 'CL-2',
@@ -2103,6 +2141,7 @@ export const robots: Robot[] = [
   },
   // ── 新規メーカー ロボット ──────────────────────────────
   {
+    id: 'engineai-se01',
     slug: 'engineai-se01',
     name: 'SE01',
     nameJa: 'SE01',
@@ -2153,6 +2192,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'engineai-pm01',
     slug: 'engineai-pm01',
     name: 'PM01',
     nameJa: 'PM01',
@@ -2195,6 +2235,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'wandercraft-calvin',
     slug: 'wandercraft-calvin',
     name: 'Calvin-40',
     nameJa: 'Calvin-40',
@@ -2241,6 +2282,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'robotera-star1',
     slug: 'robotera-star1',
     name: 'STAR1',
     nameJa: 'STAR1',
@@ -2290,6 +2332,7 @@ export const robots: Robot[] = [
     },
   },
   {
+    id: 'mentee-menteebotv3',
     slug: 'mentee-menteebotv3',
     name: 'MenteeBot',
     nameJa: 'MenteeBot',
@@ -2341,6 +2384,7 @@ export const robots: Robot[] = [
   },
   // ── 追加ドラフト機 ──────────────────────────────────────────
   {
+    id: 'onex-eve',
     slug: 'onex-eve',
     name: 'Eve',
     nameJa: 'Eve',
@@ -2363,6 +2407,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['1X 技術背景'], constraints: ['詳細スペック要確認'], bestFit: ['産業用途調査'], notFit: ['即時調達'] },
   },
   {
+    id: 'agibot-a2-lite',
     slug: 'agibot-a2-lite',
     name: 'AgiBot A2 Lite',
     nameJa: 'AgiBot A2 Lite',
@@ -2385,6 +2430,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['AgiBot 量産実績', '軽量設計'], constraints: ['詳細スペック要確認'], bestFit: ['製造PoC'], notFit: ['重量物搬送'] },
   },
   {
+    id: 'agibot-x1',
     slug: 'agibot-x1',
     name: 'AgiBot X1',
     nameJa: 'AgiBot X1',
@@ -2407,6 +2453,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['AgiBot 量産実績'], constraints: ['詳細スペック要確認'], bestFit: ['製造・物流PoC'], notFit: ['即時調達'] },
   },
   {
+    id: 'agibot-x2',
     slug: 'agibot-x2',
     name: 'AgiBot X2',
     nameJa: 'AgiBot X2',
@@ -2429,6 +2476,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['AgiBot 量産実績', 'X1 からの改良'], constraints: ['詳細スペック要確認'], bestFit: ['製造・物流PoC'], notFit: ['即時調達'] },
   },
   {
+    id: 'agibot-x2-ultra',
     slug: 'agibot-x2-ultra',
     name: 'AgiBot X2 Ultra',
     nameJa: 'AgiBot X2 Ultra',
@@ -2451,6 +2499,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['AgiBot 量産実績', 'Ultra 上位スペック'], constraints: ['詳細スペック要確認'], bestFit: ['製造・物流PoC'], notFit: ['即時調達'] },
   },
   {
+    id: 'ubtech-walker-s',
     slug: 'ubtech-walker-s',
     name: 'Walker S',
     nameJa: 'Walker S',
@@ -2473,6 +2522,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['UBTECH 国内代理店あり', '製造現場実績'], constraints: ['詳細スペック要確認'], bestFit: ['製造PoC'], notFit: ['重作業本番運用'] },
   },
   {
+    id: 'ubtech-walker-c',
     slug: 'ubtech-walker-c',
     name: 'Walker C',
     nameJa: 'Walker C',
@@ -2495,6 +2545,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['UBTECH 国内代理店あり'], constraints: ['詳細スペック要確認'], bestFit: ['製造・物流PoC'], notFit: ['重作業本番運用'] },
   },
   {
+    id: 'ubtech-panda-robot',
     slug: 'ubtech-panda-robot',
     name: 'Panda Robot',
     nameJa: 'Panda Robot',
@@ -2517,6 +2568,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['UBTECH 国内代理店あり'], constraints: ['詳細スペック要確認'], bestFit: ['研究・接客PoC'], notFit: ['重作業本番運用'] },
   },
   {
+    id: 'fourier-gr3c',
     slug: 'fourier-gr3c',
     name: 'Fourier GR-3C',
     nameJa: 'Fourier GR-3C',
@@ -2539,6 +2591,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['GR-3 実績継承', '介護向けコンセプト'], constraints: ['詳細スペック要確認'], bestFit: ['介護施設PoC'], notFit: ['製造ライン'] },
   },
   {
+    id: 'engineai-t800',
     slug: 'engineai-t800',
     name: 'T800',
     nameJa: 'T800',
@@ -2561,6 +2614,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['EngineAI 低価格実績'], constraints: ['詳細スペック要確認'], bestFit: ['研究・PoC'], notFit: ['即時本番運用'] },
   },
   {
+    id: 'engineai-sa01',
     slug: 'engineai-sa01',
     name: 'SA01',
     nameJa: 'SA01',
@@ -2583,6 +2637,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['EngineAI 低価格実績'], constraints: ['詳細スペック要確認'], bestFit: ['研究・PoC'], notFit: ['即時本番運用'] },
   },
   {
+    id: 'robotera-l7',
     slug: 'robotera-l7',
     name: 'L7',
     nameJa: 'L7',
@@ -2605,6 +2660,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['STAR1 技術継承', '量産設計'], constraints: ['詳細スペック要確認', '国内代理店なし'], bestFit: ['製造・物流PoC'], notFit: ['近期国内調達'] },
   },
   {
+    id: 'robotera-q5',
     slug: 'robotera-q5',
     name: 'Q5',
     nameJa: 'Q5',
@@ -2627,6 +2683,7 @@ export const robots: Robot[] = [
     comparison: { strengths: ['RobotEra 技術背景'], constraints: ['詳細スペック要確認', '国内代理店なし'], bestFit: ['製造・物流PoC'], notFit: ['近期国内調達'] },
   },
   {
+    id: 'robotera-m7',
     slug: 'robotera-m7',
     name: 'M7',
     nameJa: 'M7',

@@ -9,6 +9,7 @@ import type { DeploymentSite } from './types';
  */
 export const deployments: DeploymentSite[] = [
   {
+    id: 'figure-bmw-spartanburg',
     slug: 'figure-bmw-spartanburg',
     manufacturerSlug: 'figure-ai',
     robotSlug: 'figure-02',
@@ -34,6 +35,7 @@ export const deployments: DeploymentSite[] = [
     ],
   },
   {
+    id: 'agility-amazon-sumner',
     slug: 'agility-amazon-sumner',
     manufacturerSlug: 'agility-robotics',
     robotSlug: 'agility-digit',
@@ -59,6 +61,7 @@ export const deployments: DeploymentSite[] = [
     ],
   },
   {
+    id: 'agility-gxo-flowery-branch',
     slug: 'agility-gxo-flowery-branch',
     manufacturerSlug: 'agility-robotics',
     robotSlug: 'agility-digit',
@@ -84,6 +87,7 @@ export const deployments: DeploymentSite[] = [
     ],
   },
   {
+    id: 'apptronik-mercedes-berlin',
     slug: 'apptronik-mercedes-berlin',
     manufacturerSlug: 'apptronik',
     robotSlug: 'apptronik-apollo',
@@ -109,6 +113,7 @@ export const deployments: DeploymentSite[] = [
     ],
   },
   {
+    id: 'sanctuary-canadian-tire-langley',
     slug: 'sanctuary-canadian-tire-langley',
     manufacturerSlug: 'sanctuary-ai',
     robotSlug: 'sanctuary-phoenix',
@@ -134,6 +139,7 @@ export const deployments: DeploymentSite[] = [
     ],
   },
   {
+    id: 'ubtech-nio-hefei',
     slug: 'ubtech-nio-hefei',
     manufacturerSlug: 'ubtech',
     robotSlug: 'ubtech-walker-s1',
@@ -159,6 +165,7 @@ export const deployments: DeploymentSite[] = [
     ],
   },
   {
+    id: 'tesla-optimus-fremont',
     slug: 'tesla-optimus-fremont',
     manufacturerSlug: 'tesla',
     robotSlug: 'tesla-optimus',
@@ -184,6 +191,7 @@ export const deployments: DeploymentSite[] = [
     ],
   },
   {
+    id: 'unitree-jal-haneda',
     slug: 'unitree-jal-haneda',
     manufacturerSlug: 'unitree',
     robotSlug: 'unitree-h1',

@@ -2,6 +2,7 @@ import type { Guide } from './types';
 
 export const guides: Guide[] = [
   {
+    id: 'decision-variables',
     slug: 'decision-variables',
     title: 'ヒューマノイド導入で最初に押さえる意思決定変数',
     titleJa: '意思決定変数の地図',
@@ -87,6 +88,7 @@ export const guides: Guide[] = [
     ],
   },
   {
+    id: 'poc-planning',
     slug: 'poc-planning',
     title: 'PoC計画策定ガイド',
     summary: 'ヒューマノイド導入の実証実験で、失敗しやすい条件と評価項目を先に決めるためのガイド。',

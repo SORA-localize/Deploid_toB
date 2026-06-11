@@ -1,6 +1,7 @@
 // 参照整合チェック。dev起動時に lib/data.ts から1度だけ呼ばれ、
 // 「存在しないslugを参照している」「双方向リンクが片側だけ」「slug重複」を
 // console に出す。本番では走らない。
+import { deployments } from '../data/deployments.ts';
 import { guides } from '../data/guides.ts';
 import { manufacturers } from '../data/manufacturers.ts';
 import { reportPlacements } from '../data/reportPlacements.ts';
@@ -124,11 +125,42 @@ export function validateData(): string[] {
     }
   };
 
-  const dup = <T extends { slug: string }>(name: string, arr: T[]) => {
-    const seen = new Set<string>();
+  // id / slug の一意性・文字種、previousSlugs の衝突。
+  // id は不変の外部キー、slug は可変URL（設計: data-architecture-redesign-v1 §3）。
+  const identifierPattern = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+  const dup = <T extends { id: string; slug: string; previousSlugs?: string[] }>(
+    name: string,
+    arr: T[],
+  ) => {
+    const seenIds = new Set<string>();
+    const seenSlugs = new Set<string>();
     for (const x of arr) {
-      if (seen.has(x.slug)) issues.push(`[duplicate] ${name} にslug重複: ${x.slug}`);
-      seen.add(x.slug);
+      if (seenIds.has(x.id)) issues.push(`[duplicate] ${name} にid重複: ${x.id}`);
+      seenIds.add(x.id);
+      if (seenSlugs.has(x.slug)) issues.push(`[duplicate] ${name} にslug重複: ${x.slug}`);
+      seenSlugs.add(x.slug);
+      if (!identifierPattern.test(x.id)) {
+        issues.push(`[id-format] ${name} "${x.id}" のidは小文字英数とハイフンのみにしてください`);
+      }
+      if (!identifierPattern.test(x.slug)) {
+        issues.push(`[slug-format] ${name} "${x.id}".slug は小文字英数とハイフンのみにしてください: ${x.slug}`);
+      }
+    }
+    // previousSlugs は「現slug」「他レコードのpreviousSlugs」と衝突してはならない（301の宛先が曖昧になる）
+    const allPrevious = new Set<string>();
+    for (const x of arr) {
+      for (const prev of x.previousSlugs ?? []) {
+        if (!identifierPattern.test(prev)) {
+          issues.push(`[slug-format] ${name} "${x.id}".previousSlugs は小文字英数とハイフンのみにしてください: ${prev}`);
+        }
+        if (seenSlugs.has(prev)) {
+          issues.push(`[previous-slug] ${name} "${x.id}".previousSlugs "${prev}" が現存slugと衝突しています`);
+        }
+        if (allPrevious.has(prev)) {
+          issues.push(`[previous-slug] ${name} の previousSlugs "${prev}" が複数レコードで重複しています`);
+        }
+        allPrevious.add(prev);
+      }
     }
   };
   dup('robots', robots);
@@ -136,6 +168,7 @@ export function validateData(): string[] {
   dup('guides', guides);
   dup('useCases', useCases);
   dup('reports', reports);
+  dup('deployments', deployments);
 
   const checkOrderCoverage = (
     name: string,

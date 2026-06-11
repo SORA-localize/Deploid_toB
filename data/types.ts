@@ -8,6 +8,9 @@
  */
 import type { TagValue } from '@/lib/tagRegistry';
 
+/** 不変の安定ID。外部キー・一意性・将来のCMSレコードキーに使う。発番後は二度と変えない。 */
+export type Id = string;
+/** 公開URLのパスセグメント。可変（変更時は旧値を previousSlugs に追記して301で保護）。 */
 export type Slug = string;
 export type ISODate = string;
 
@@ -77,12 +80,18 @@ export interface SeoFields {
 }
 
 export interface BaseRecord {
+  /** 不変ID。参照（*Id / *Ids）はすべてこれを指す。作成時は id === slug で発番する。 */
+  id: Id;
   slug: Slug;
+  /** slug変更時の旧slug（追記のみ）。詳細ページが301リダイレクト元として解決する。 */
+  previousSlugs?: Slug[];
   summary: string;
   publishStatus: PublishStatus;
   updatedAt: ISODate;
   reliability: Reliability;
   sources: Source[];
+  /** 次回事実確認の目安日。超過は validate が warning で知らせる（鮮度管理）。 */
+  nextReviewBy?: ISODate;
   heroImage?: ImageAsset;
   seo?: SeoFields;
 }
@@ -206,6 +215,8 @@ export interface Robot extends BaseRecord {
   featuredRank?: number;
   deploymentStage: DeploymentStage;
   buyerReadiness: BuyerReadiness;
+  /** 提供終了（archived）時の後継機。詳細・関連欄で「後継機: X」導線を出す。 */
+  supersededById?: Id;
   specs: RobotSpecs;
   procurementModels: ProcurementModel[];
   priceNote?: string;

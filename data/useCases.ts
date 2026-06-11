@@ -2,6 +2,7 @@ import type { UseCase } from './types';
 
 export const useCases: UseCase[] = [
   {
+    id: 'warehouse-picking',
     slug: 'warehouse-picking',
     title: 'Warehouse Picking',
     titleJa: '倉庫ピッキング',
@@ -47,6 +48,7 @@ export const useCases: UseCase[] = [
     relatedGuideSlugs: ['decision-variables', 'poc-planning'],
   },
   {
+    id: 'factory-inspection',
     slug: 'factory-inspection',
     title: 'Factory Inspection',
     titleJa: '工場巡回点検',
@@ -89,6 +91,7 @@ export const useCases: UseCase[] = [
     relatedGuideSlugs: ['decision-variables'],
   },
   {
+    id: 'research-development',
     slug: 'research-development',
     title: 'Research and Development',
     titleJa: '研究開発',
@@ -130,6 +133,7 @@ export const useCases: UseCase[] = [
     relatedGuideSlugs: ['decision-variables'],
   },
   {
+    id: 'demo-exhibition',
     slug: 'demo-exhibition',
     title: 'Demo and Exhibition',
     titleJa: '展示・デモ',
