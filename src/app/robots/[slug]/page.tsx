@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Activity, ChevronLeft, ChevronRight, CircleDollarSign, MapPin, ShieldCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { JsonLd } from '@/components/JsonLd';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { RobotImageCarousel } from '@/components/RobotImageCarousel';
 import { RobotDetailStickyHeader } from '@/components/RobotDetailStickyHeader';
@@ -16,6 +17,7 @@ import {
   getUseCasesForRobot,
   resolveRobotDetailBySlug,
 } from '@/lib/data';
+import { robotJsonLd } from '@/lib/jsonLd';
 import { getRobotDetailDecisionRows, getRobotDetailSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
@@ -36,10 +38,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const { record: robot } = resolveRobotDetailBySlug(slug);
   const seo = robot?.seo;
+  // archived（提供終了）は閲覧可能だが検索には載せない（§11.7）
+  const noindex = seo?.noindex || robot?.publishStatus === 'archived';
   return {
     title: seo?.metaTitle ?? (robot ? (robot.nameJa ?? robot.name) : 'Robot'),
     description: seo?.metaDescription ?? robot?.summary,
-    robots: seo?.noindex ? { index: false, follow: false } : undefined,
+    alternates: robot ? { canonical: `/robots/${robot.slug}` } : undefined,
+    robots: noindex ? { index: false, follow: false } : undefined,
   };
 }
 
@@ -64,6 +69,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={robotJsonLd(robot, manufacturer)} />
 
       <RobotDetailStickyHeader title={robot.nameJa ?? robot.name} sections={sections} />
 

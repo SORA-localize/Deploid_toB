@@ -1,5 +1,6 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { JsonLd } from '@/components/JsonLd';
 import { ManufacturerDetailHero } from '@/components/ManufacturerDetailHero';
 import { ManufacturerDetailSection } from '@/components/ManufacturerDetailSection';
 import type { ManufacturerDetailSectionLink } from '@/components/ManufacturerDetailSectionNav';
@@ -15,6 +16,7 @@ import {
   getArticles,
   getRobotsByManufacturerId,
 } from '@/lib/data';
+import { manufacturerJsonLd } from '@/lib/jsonLd';
 import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
@@ -29,6 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title:
       seo?.metaTitle ?? (manufacturer ? (manufacturer.nameJa ?? manufacturer.name) : 'Manufacturer'),
     description: seo?.metaDescription ?? manufacturer?.description,
+    alternates: manufacturer ? { canonical: `/manufacturers/${manufacturer.slug}` } : undefined,
     robots: seo?.noindex ? { index: false, follow: false } : undefined,
   };
 }
@@ -58,6 +61,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={manufacturerJsonLd(manufacturer)} />
       <ManufacturerDetailStickyHeader
         title={manufacturerName}
         sections={sections}

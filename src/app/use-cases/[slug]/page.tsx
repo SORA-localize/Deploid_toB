@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: seo?.metaTitle ?? (u ? (u.titleJa ?? u.title) : 'Use Case'),
     description: seo?.metaDescription ?? u?.subtitle ?? u?.summary,
+    alternates: u ? { canonical: `/use-cases/${u.slug}` } : undefined,
     robots: seo?.noindex ? { index: false, follow: false } : undefined,
   };
 }

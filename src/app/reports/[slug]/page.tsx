@@ -3,6 +3,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { Calendar, ChevronRight, Clock, User } from 'lucide-react';
 import { ArticleToc } from '@/components/ArticleToc';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { JsonLd } from '@/components/JsonLd';
 import { Markdown } from '@/components/Markdown';
 import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { SourceList } from '@/components/SourceList';
@@ -15,6 +16,7 @@ import {
   getArticles,
   resolveArticleDetailBySlug,
 } from '@/lib/data';
+import { articleJsonLd } from '@/lib/jsonLd';
 import { articleTypeLabels } from '@/lib/labels';
 import { extractH2Headings } from '@/lib/markdownHeadings';
 import { getRobotRelatedTitle } from '@/lib/robotDisplay';
@@ -29,10 +31,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const { record: report } = resolveArticleDetailBySlug(slug);
   const seo = report?.seo;
+  // sample（UI確認用データ）は検索に載せない（§11.9）
+  const noindex = seo?.noindex || report?.contentKind === 'sample';
   return {
     title: seo?.metaTitle ?? (report ? (report.titleJa ?? report.title) : 'Article'),
     description: seo?.metaDescription ?? report?.summary,
-    robots: seo?.noindex ? { index: false, follow: false } : undefined,
+    alternates: report ? { canonical: `/reports/${report.slug}` } : undefined,
+    robots: noindex ? { index: false, follow: false } : undefined,
   };
 }
 
@@ -70,6 +75,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={articleJsonLd(report)} />
 
       {/* ── ヒーロー + ヘッダー（統合） ── */}
       {report.heroImage ? (
