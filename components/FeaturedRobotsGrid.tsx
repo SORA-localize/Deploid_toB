@@ -7,10 +7,10 @@ import type { Robot, Manufacturer } from '@/data/types';
 
 interface FeaturedRobotsGridProps {
   robots: Robot[];
-  manufacturerBySlug: Record<string, Manufacturer | undefined>;
+  manufacturerById: Record<string, Manufacturer | undefined>;
 }
 
-export function FeaturedRobotsGrid({ robots, manufacturerBySlug }: FeaturedRobotsGridProps) {
+export function FeaturedRobotsGrid({ robots, manufacturerById }: FeaturedRobotsGridProps) {
   return (
     <section className="py-8 sm:py-12 border-b border-border">
       <div className="flex items-end justify-between mb-5">
@@ -25,7 +25,7 @@ export function FeaturedRobotsGrid({ robots, manufacturerBySlug }: FeaturedRobot
       </div>
       <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {robots.map((robot) => {
-          const manufacturer = manufacturerBySlug[robot.manufacturerSlug];
+          const manufacturer = manufacturerById[robot.manufacturerId];
           return (
             <RobotCard
               key={robot.slug}

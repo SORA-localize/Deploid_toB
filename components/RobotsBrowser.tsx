@@ -29,8 +29,8 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   const { getParam, updateParams } = useUrlFilters();
   const { favorites, toggleFavorite } = useFavorites();
 
-  const manufacturerBySlug = useMemo(
-    () => new Map(manufacturers.map((manufacturer) => [manufacturer.slug, manufacturer])),
+  const manufacturerById = useMemo(
+    () => new Map(manufacturers.map((manufacturer) => [manufacturer.id, manufacturer])),
     [manufacturers],
   );
   const filterOptions = useMemo(() => getRobotFilterOptions(robots), [robots]);
@@ -70,7 +70,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
       { value: 'all', label: uiText.common.allManufacturers },
       ...[...manufacturers]
         .sort((a, b) => a.name.localeCompare(b.name, 'en'))
-        .map((m) => ({ value: m.slug, label: m.name })),
+        .map((m) => ({ value: m.id, label: m.name })),
     ],
     [manufacturers],
   );
@@ -105,7 +105,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
       chips.push({ key: 'task', label, onRemove: () => updateParams({ task: null }) });
     }
     if (filters.manufacturer !== 'all') {
-      const label = manufacturers.find((m) => m.slug === filters.manufacturer)?.name ?? filters.manufacturer;
+      const label = manufacturers.find((m) => m.id === filters.manufacturer)?.name ?? filters.manufacturer;
       chips.push({ key: 'manufacturer', label, onRemove: () => updateParams({ manufacturer: null }) });
     }
     if (filters.availability !== 'all') {
@@ -118,15 +118,15 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   const renderRobotGrid = (items: readonly Robot[]) => (
     <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       {items.map((robot) => {
-        const manufacturer = manufacturerBySlug.get(robot.manufacturerSlug);
+        const manufacturer = manufacturerById.get(robot.manufacturerId);
         return (
           <RobotCard
             key={robot.slug}
             robot={robot}
-            manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+            manufacturerName={manufacturer?.name ?? robot.manufacturerId}
             manufacturerLogo={manufacturer?.logo}
             showFavorite={true}
-            isFavorite={favorites.includes(robot.slug)}
+            isFavorite={favorites.includes(robot.id)}
             onFavoriteToggle={toggleFavorite}
           />
         );

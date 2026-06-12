@@ -1,5 +1,6 @@
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { JsonLd } from '@/components/JsonLd';
 import { ManufacturerDetailHero } from '@/components/ManufacturerDetailHero';
 import { ManufacturerDetailSection } from '@/components/ManufacturerDetailSection';
 import type { ManufacturerDetailSectionLink } from '@/components/ManufacturerDetailSectionNav';
@@ -9,12 +10,13 @@ import { ManufacturerRobotsGrid } from '@/components/ManufacturerRobotsGrid';
 import { NewsCard } from '@/components/NewsCard';
 import { SourceList } from '@/components/SourceList';
 import {
-  getManufacturerBySlug,
+  resolveManufacturerDetailBySlug,
   getManufacturers,
-  getReportsForManufacturer,
-  getReports,
-  getRobotsByManufacturerSlug,
+  getArticlesForManufacturer,
+  getArticles,
+  getRobotsByManufacturerId,
 } from '@/lib/data';
+import { manufacturerJsonLd } from '@/lib/jsonLd';
 import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
@@ -23,24 +25,26 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const manufacturer = getManufacturerBySlug(slug);
+  const { record: manufacturer } = resolveManufacturerDetailBySlug(slug);
   const seo = manufacturer?.seo;
   return {
     title:
       seo?.metaTitle ?? (manufacturer ? (manufacturer.nameJa ?? manufacturer.name) : 'Manufacturer'),
     description: seo?.metaDescription ?? manufacturer?.description,
+    alternates: manufacturer ? { canonical: `/manufacturers/${manufacturer.slug}` } : undefined,
     robots: seo?.noindex ? { index: false, follow: false } : undefined,
   };
 }
 
 export default async function ManufacturerDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const manufacturer = getManufacturerBySlug(slug);
+  const { record: manufacturer, redirectTo } = resolveManufacturerDetailBySlug(slug);
+  if (redirectTo) permanentRedirect(`/manufacturers/${redirectTo}`);
   if (!manufacturer) notFound();
 
-  const robots = getRobotsByManufacturerSlug(manufacturer.slug);
-  const reports = getReportsForManufacturer(manufacturer.slug);
-  const sampleReports = getReports()
+  const robots = getRobotsByManufacturerId(manufacturer.id);
+  const reports = getArticlesForManufacturer(manufacturer.id);
+  const sampleReports = getArticles()
     .filter((report) => report.contentKind === 'sample')
     .slice(0, 3);
   const displayedReports = reports.length > 0 ? reports : sampleReports;
@@ -57,6 +61,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={manufacturerJsonLd(manufacturer)} />
       <ManufacturerDetailStickyHeader
         title={manufacturerName}
         sections={sections}

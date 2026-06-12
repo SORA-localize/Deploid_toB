@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import { TagChip } from '@/components/TagChip';
-import type { Report } from '@/data/types';
-import { reportTypeLabels } from '@/lib/labels';
-import { getReportTypeTone } from '@/lib/visualSemantics';
+import type { Article } from '@/data/types';
+import { articleTypeLabels } from '@/lib/labels';
+import { getArticleTypeTone } from '@/lib/visualSemantics';
 import { cn } from '@/lib/utils';
 
 interface NewsCardProps {
-  report: Report;
+  report: Article;
   className?: string;
 }
 
@@ -35,7 +35,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
         ) : (
           <div className="flex h-full items-center justify-center">
             <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/50">
-              {reportTypeLabels[report.type]}
+              {articleTypeLabels[report.type]}
             </span>
           </div>
         )}
@@ -44,8 +44,8 @@ export function NewsCard({ report, className }: NewsCardProps) {
       {/* テキストエリア */}
       <div className="flex flex-1 flex-col p-3 sm:p-4 min-w-0">
         <div className="mb-2 flex items-center gap-2">
-          <TagChip tone={getReportTypeTone(report.type)} className="text-[10px]">
-            {reportTypeLabels[report.type]}
+          <TagChip tone={getArticleTypeTone(report.type)} className="text-[10px]">
+            {articleTypeLabels[report.type]}
           </TagChip>
           <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
             <Calendar className="h-3 w-3" />
@@ -70,7 +70,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
         <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">
           <div className="flex flex-wrap gap-1">
             {report.tags.slice(0, 2).map((tag) => (
-              <TagChip key={tag} kind="report" value={tag} className="text-[10px]" />
+              <TagChip key={tag} kind="article" value={tag} className="text-[10px]" />
             ))}
           </div>
           <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />

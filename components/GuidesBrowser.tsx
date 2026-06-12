@@ -131,8 +131,8 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
                           {guide.readingTimeMinutes && (
                             <span>{uiText.common.readingMinutes(guide.readingTimeMinutes)}</span>
                           )}
-                          {guide.relatedRobotSlugs.length > 0 && (
-                            <span>{uiText.guides.relatedRobotsCount(guide.relatedRobotSlugs.length)}</span>
+                          {guide.relatedRobotIds.length > 0 && (
+                            <span>{uiText.guides.relatedRobotsCount(guide.relatedRobotIds.length)}</span>
                           )}
                         </div>
                         <div className="flex gap-2 flex-wrap">

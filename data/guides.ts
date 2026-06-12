@@ -2,6 +2,7 @@ import type { Guide } from './types';
 
 export const guides: Guide[] = [
   {
+    id: 'decision-variables',
     slug: 'decision-variables',
     title: 'ヒューマノイド導入で最初に押さえる意思決定変数',
     titleJa: '意思決定変数の地図',
@@ -78,8 +79,8 @@ export const guides: Guide[] = [
 率直に書く。これが買い手目線の信頼を取りに行く方法。**ヒューマノイドの強みは「人間用に設計された環境で、柔軟にタスクを切り替えられる」一点**。それが必要ない用途には、より適した選択肢がある。
 
 「ヒューマノイドを入れたい」という意思決定から始めると、適合しない作業に無理やり機体を当てることになる。逆に「現場のこの作業を、人型である意味があるか」から問い直すと、選択肢が広がる。`,
-    relatedRobotSlugs: ['unitree-g1', 'figure-03'],
-    relatedUseCaseSlugs: [
+    relatedRobotIds: ['unitree-g1', 'figure-03'],
+    relatedUseCaseIds: [
       'warehouse-picking',
       'factory-inspection',
       'research-development',
@@ -87,6 +88,7 @@ export const guides: Guide[] = [
     ],
   },
   {
+    id: 'poc-planning',
     slug: 'poc-planning',
     title: 'PoC計画策定ガイド',
     summary: 'ヒューマノイド導入の実証実験で、失敗しやすい条件と評価項目を先に決めるためのガイド。',
@@ -110,7 +112,7 @@ export const guides: Guide[] = [
     topics: ['poc', 'kpi', 'operations'],
     targetReaders: ['現場責任者', '事業開発担当', '技術企画担当'],
     readingTimeMinutes: 10,
-    relatedRobotSlugs: ['figure-03', 'agility-digit'],
-    relatedUseCaseSlugs: ['warehouse-picking'],
+    relatedRobotIds: ['figure-03', 'agility-digit'],
+    relatedUseCaseIds: ['warehouse-picking'],
   },
 ];

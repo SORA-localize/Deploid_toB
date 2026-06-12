@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
 import { ArticleToc } from '@/components/ArticleToc';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -8,12 +8,13 @@ import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
 import {
-  getGuideBySlug,
   getGuides,
   getRelatedRobots,
   getRelatedUseCases,
+  resolveGuideDetailBySlug,
 } from '@/lib/data';
 import { guideStageLabels } from '@/lib/labels';
+import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { getTagLabel } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
 import { getGuideStageTone } from '@/lib/visualSemantics';
@@ -24,22 +25,24 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const guide = getGuideBySlug(slug);
+  const { record: guide } = resolveGuideDetailBySlug(slug);
   const seo = guide?.seo;
   return {
     title: seo?.metaTitle ?? (guide ? (guide.titleJa ?? guide.title) : 'Guide'),
     description: seo?.metaDescription ?? guide?.summary,
+    alternates: guide ? { canonical: `/guides/${guide.slug}` } : undefined,
     robots: seo?.noindex ? { index: false, follow: false } : undefined,
   };
 }
 
 export default async function GuideDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const guide = getGuideBySlug(slug);
+  const { record: guide, redirectTo } = resolveGuideDetailBySlug(slug);
+  if (redirectTo) permanentRedirect(`/guides/${redirectTo}`);
   if (!guide) notFound();
 
-  const robots = getRelatedRobots(guide.relatedRobotSlugs);
-  const useCases = getRelatedUseCases(guide.relatedUseCaseSlugs);
+  const robots = getRelatedRobots(guide.relatedRobotIds);
+  const useCases = getRelatedUseCases(guide.relatedUseCaseIds);
   const hasChecklist = (guide.checklistItems ?? []).length > 0;
   const hasBody = (guide.body ?? '').trim().length > 0;
 
@@ -53,7 +56,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
   ];
   const relatedRobotItems = robots.map((robot) => ({
     href: `/robots/${robot.slug}`,
-    title: robot.nameJa ?? robot.name,
+    title: getRobotRelatedTitle(robot),
     description: robot.summary,
   }));
   const relatedUseCaseItems = useCases.map((useCase) => ({

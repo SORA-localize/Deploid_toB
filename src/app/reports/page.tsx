@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { ReportsBrowser } from '@/components/ReportsBrowser';
-import { getReports } from '@/lib/data';
+import { getArticles } from '@/lib/data';
 
 export const metadata = {
   title: '記事',
@@ -12,7 +12,7 @@ export const metadata = {
 export default function ReportsPage() {
   return (
     <Suspense fallback={<PageSuspenseFallback />}>
-      <ReportsBrowser reports={getReports()} />
+      <ReportsBrowser reports={getArticles()} />
     </Suspense>
   );
 }

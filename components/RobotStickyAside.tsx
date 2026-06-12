@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import type { Robot } from '@/data/types';
 import type { Manufacturer } from '@/data/types';
-import { formatNumber, formatRuntime } from '@/lib/robotDisplay';
-import { deploymentStageLabels, japanAvailabilityLabels, mobilityLabels, TBD_LABEL } from '@/lib/labels';
+import { getSpecRows } from '@/lib/robotDisplay';
+import { deploymentStageLabels, japanAvailabilityLabels } from '@/lib/labels';
 
 interface RobotStickyAsideProps {
   robot: Robot;
@@ -11,14 +11,14 @@ interface RobotStickyAsideProps {
 }
 
 export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps) {
-  const { specs } = robot;
-  const quickSpecs = [
-    { label: '身長',      value: formatNumber(specs.heightCm,  ' cm') },
-    { label: '重量',      value: formatNumber(specs.weightKg,  ' kg') },
-    { label: 'ペイロード', value: formatNumber(specs.payloadKg, ' kg') },
-    { label: '稼働時間',  value: formatRuntime(specs.runtimeMin) },
-    { label: '移動方式',  value: specs.mobility ? mobilityLabels[specs.mobility] : TBD_LABEL },
-  ];
+  // 項目の選抜はサイドバーの編集判断、ラベル・整形は specSchema 準拠
+  const quickSpecs = getSpecRows(robot.specs, [
+    'heightCm',
+    'weightKg',
+    'payloadKg',
+    'runtimeMin',
+    'mobility',
+  ]);
 
   return (
     <aside className="hidden lg:block">

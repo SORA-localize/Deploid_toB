@@ -6,8 +6,9 @@ import type {
   JapanAvailability,
   JapanPresence,
   Manufacturer,
-  ReportSection,
-  ReportType,
+  ArticleSection,
+  ArticleCategory,
+  ArticleType,
   Robot,
   RobotCategory,
 } from '@/data/types';
@@ -77,7 +78,7 @@ export const manufacturerCountryOrder = [
 
 export const guideStageOrder: GuideStage[] = ['learn', 'evaluate', 'act'];
 
-export const reportTypeOrder: ReportType[] = [
+export const articleTypeOrder: ArticleType[] = [
   'analysis',
   'deployment-report',
   'interview',
@@ -89,8 +90,17 @@ export const reportTypeOrder: ReportType[] = [
   'market-analysis',
 ];
 
-/** 記事タブ（section）の表示順。完全性は reportSectionLabels(Record) と validate の diff で担保。 */
-export const reportSectionOrder: ReportSection[] = [
+/** 記事種別（category・第一軸）の表示順。完全性は articleCategoryLabels(Record) と validate の diff で担保。 */
+export const articleCategoryOrder: ArticleCategory[] = [
+  'news',
+  'interview',
+  'company-report',
+  'analysis',
+  'policy',
+];
+
+/** 記事タブ（section）の表示順。完全性は articleSectionLabels(Record) と validate の diff で担保。 */
+export const articleSectionOrder: ArticleSection[] = [
   'deployment',
   'business',
   'tech',

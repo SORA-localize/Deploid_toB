@@ -56,7 +56,7 @@ interface CompareClientProps {
 }
 
 interface SheetPreviewPlacement {
-  slug: string;
+  id: string;
   index: number;
 }
 
@@ -81,17 +81,17 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   );
 
   const compareParam = getParam('compare');
-  const urlSelectedSlugs = useMemo(() => {
+  const urlSelectedIds = useMemo(() => {
     if (!compareParam) return [];
-    const validSlugs = new Set(robots.map((robot) => robot.slug));
+    const validIds = new Set(robots.map((robot) => robot.id));
     const seen = new Set<string>();
 
     return compareParam
       .split(',')
-      .map((slug) => slug.trim())
-      .filter((slug) => {
-        if (!validSlugs.has(slug) || seen.has(slug)) return false;
-        seen.add(slug);
+      .map((id) => id.trim())
+      .filter((id) => {
+        if (!validIds.has(id) || seen.has(id)) return false;
+        seen.add(id);
         return true;
       })
       .slice(0, MAX_COMPARE_ROBOTS);
@@ -100,105 +100,105 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   // 並べ替え順の真実源はこの local state。URL は commitOrder で副作用同期する。
   // こうしないと onDragEnd 時に URL 遷移(非同期)を待つ間、dnd-kit が一旦
   // 元の順序へ戻してから整列し直すため、ドロップ時に「元位置へ戻る」違和感が出る。
-  const [orderedSlugs, setOrderedSlugs] = useState<string[]>(urlSelectedSlugs);
+  const [orderedIds, setOrderedSlugs] = useState<string[]>(urlSelectedIds);
   useEffect(() => {
     // 共有リンク/戻る・進む等で URL が外部から変わった時だけ local を追従させる。
     // 自分の操作で書き換えた場合は値が一致するので no-op。
     setOrderedSlugs((prev) =>
-      prev.join(',') === urlSelectedSlugs.join(',') ? prev : urlSelectedSlugs,
+      prev.join(',') === urlSelectedIds.join(',') ? prev : urlSelectedIds,
     );
-  }, [urlSelectedSlugs]);
+  }, [urlSelectedIds]);
 
-  const robotBySlug = useMemo(
-    () => new Map(robots.map((robot) => [robot.slug, robot])),
+  const robotById = useMemo(
+    () => new Map(robots.map((robot) => [robot.id, robot])),
     [robots],
   );
   const selectedRobots = useMemo(
     () =>
-      orderedSlugs.flatMap((slug) => {
-        const robot = robotBySlug.get(slug);
+      orderedIds.flatMap((id) => {
+        const robot = robotById.get(id);
         return robot ? [robot] : [];
       }),
-    [robotBySlug, orderedSlugs],
+    [robotById, orderedIds],
   );
   const favoriteRobots = useMemo(
-    () => robots.filter((r) => favorites.includes(r.slug)),
+    () => robots.filter((r) => favorites.includes(r.id)),
     [robots, favorites],
   );
   const sheetItemIds = useMemo(
-    () => orderedSlugs.map((slug) => getDndItemId('sheet', slug)),
-    [orderedSlugs],
+    () => orderedIds.map((id) => getDndItemId('sheet', id)),
+    [orderedIds],
   );
   const sheetPreviewItems = useMemo<SheetPreviewItem[]>(() => {
     const baseItems: SheetPreviewItem[] = selectedRobots.map((robot) => ({ type: 'robot', robot }));
     if (!sheetPreview) return baseItems;
 
-    const previewRobot = robotBySlug.get(sheetPreview.slug);
+    const previewRobot = robotById.get(sheetPreview.id);
     if (!previewRobot) return baseItems;
 
     const nextItems = [...baseItems];
     const previewIndex = Math.max(0, Math.min(sheetPreview.index, nextItems.length));
     nextItems.splice(previewIndex, 0, { type: 'preview', robot: previewRobot });
     return nextItems;
-  }, [robotBySlug, selectedRobots, sheetPreview]);
+  }, [robotById, selectedRobots, sheetPreview]);
 
   // 挿入プレビュー中だけ Framer Motion の layout を有効化する。
   // シート内の並べ替えは dnd-kit が transform で整列アニメを担うため、
   // ここで layout を併用すると同じカードを二重にアニメートしてガクつく。
   const isInsertionPreviewing = sheetPreview !== null;
 
-  const manufacturerFor = (slug: string) => manufacturers.find((m) => m.slug === slug);
-  const activeDragRobot = activeDrag ? robotBySlug.get(activeDrag.slug) : undefined;
+  const manufacturerFor = (id: string) => manufacturers.find((m) => m.id === id);
+  const activeDragRobot = activeDrag ? robotById.get(activeDrag.id) : undefined;
   const activeDragManufacturer = activeDragRobot
-    ? manufacturerFor(activeDragRobot.manufacturerSlug)
+    ? manufacturerFor(activeDragRobot.manufacturerId)
     : undefined;
 
   // 並び順を local state へ即時反映し、URL も同じ値へ同期する(共有・履歴用)。
-  const commitOrder = (nextSlugs: string[], mode: 'push' | 'replace' = 'push') => {
-    setOrderedSlugs(nextSlugs);
-    updateParams({ compare: nextSlugs.length > 0 ? nextSlugs.join(',') : null }, mode);
+  const commitOrder = (nextIds: string[], mode: 'push' | 'replace' = 'push') => {
+    setOrderedSlugs(nextIds);
+    updateParams({ compare: nextIds.length > 0 ? nextIds.join(',') : null }, mode);
   };
 
-  const addRobot = (slug: string) => {
-    if (orderedSlugs.length >= MAX_COMPARE_ROBOTS || orderedSlugs.includes(slug)) return false;
+  const addRobot = (id: string) => {
+    if (orderedIds.length >= MAX_COMPARE_ROBOTS || orderedIds.includes(id)) return false;
 
-    commitOrder([...orderedSlugs, slug]);
+    commitOrder([...orderedIds, id]);
     return true;
   };
 
-  const insertRobot = (slug: string, index?: number) => {
-    if (orderedSlugs.length >= MAX_COMPARE_ROBOTS || orderedSlugs.includes(slug)) return false;
+  const insertRobot = (id: string, index?: number) => {
+    if (orderedIds.length >= MAX_COMPARE_ROBOTS || orderedIds.includes(id)) return false;
 
     const insertIndex =
       typeof index === 'number'
-        ? Math.max(0, Math.min(index, orderedSlugs.length))
-        : orderedSlugs.length;
-    const nextSlugs = [...orderedSlugs];
-    nextSlugs.splice(insertIndex, 0, slug);
-    commitOrder(nextSlugs);
+        ? Math.max(0, Math.min(index, orderedIds.length))
+        : orderedIds.length;
+    const nextIds = [...orderedIds];
+    nextIds.splice(insertIndex, 0, id);
+    commitOrder(nextIds);
     return true;
   };
 
-  const highlightRobot = (slug: string) => {
-    const el = document.getElementById(`compare-card-${slug}`);
+  const highlightRobot = (id: string) => {
+    const el = document.getElementById(`compare-card-${id}`);
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     el.classList.add('ring-2', 'ring-ring', 'ring-offset-2');
     setTimeout(() => el.classList.remove('ring-2', 'ring-ring', 'ring-offset-2'), 1500);
   };
 
-  const handleFavoriteSelect = (slug: string) => {
-    if (!orderedSlugs.includes(slug)) {
-      if (addRobot(slug)) {
-        setTimeout(() => highlightRobot(slug), 100);
+  const handleFavoriteSelect = (id: string) => {
+    if (!orderedIds.includes(id)) {
+      if (addRobot(id)) {
+        setTimeout(() => highlightRobot(id), 100);
       }
     } else {
-      highlightRobot(slug);
+      highlightRobot(id);
     }
   };
 
-  const removeRobot = (slug: string) => {
-    commitOrder(orderedSlugs.filter((s) => s !== slug));
+  const removeRobot = (id: string) => {
+    commitOrder(orderedIds.filter((s) => s !== id));
   };
 
   const clearAll = () => {
@@ -233,18 +233,18 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   ): SheetPreviewPlacement | null => {
     if (!activeData || !dropData || dropData.target !== 'sheet') return null;
     if (activeData.source === 'sheet') return null;
-    if (orderedSlugs.includes(activeData.slug)) return null;
-    if (orderedSlugs.length >= MAX_COMPARE_ROBOTS) return null;
+    if (orderedIds.includes(activeData.id)) return null;
+    if (orderedIds.length >= MAX_COMPARE_ROBOTS) return null;
 
     // 既定は末尾(空シート/列の上)。カードの上ならポインタ位置で前後を決める。
-    let index = orderedSlugs.length;
+    let index = orderedIds.length;
     if (dropData.dropType === 'sheet-card') {
-      const cardIndex = orderedSlugs.indexOf(dropData.slug);
+      const cardIndex = orderedIds.indexOf(dropData.id);
       if (cardIndex >= 0) {
         index = over ? cardIndex + (isInsertedAfterOver(active, over) ? 1 : 0) : cardIndex;
       }
     }
-    return { slug: activeData.slug, index };
+    return { id: activeData.id, index };
   };
 
   const handleDragStart = ({ active }: DragStartEvent) => {
@@ -272,39 +272,39 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
     if (
       activeData.source === 'sheet' &&
       dropData.dropType === 'sheet-card' &&
-      activeData.slug !== dropData.slug
+      activeData.id !== dropData.id
     ) {
-      const oldIndex = orderedSlugs.indexOf(activeData.slug);
-      const newIndex = orderedSlugs.indexOf(dropData.slug);
+      const oldIndex = orderedIds.indexOf(activeData.id);
+      const newIndex = orderedIds.indexOf(dropData.id);
       if (oldIndex < 0 || newIndex < 0) return;
 
-      commitOrder(arrayMove(orderedSlugs, oldIndex, newIndex), 'replace');
+      commitOrder(arrayMove(orderedIds, oldIndex, newIndex), 'replace');
       return;
     }
 
     if (dropData.target === 'sheet') {
       if (activeData.source === 'sheet') return;
-      if (orderedSlugs.includes(activeData.slug)) {
-        highlightRobot(activeData.slug);
+      if (orderedIds.includes(activeData.id)) {
+        highlightRobot(activeData.id);
         return;
       }
 
       // プレビューと同じ計算で着地indexを決め、見た目と一致させる。
       const placement = getSheetInsertionPreview(activeData, dropData, active, over);
-      if (placement && insertRobot(activeData.slug, placement.index)) {
-        setTimeout(() => highlightRobot(activeData.slug), 100);
+      if (placement && insertRobot(activeData.id, placement.index)) {
+        setTimeout(() => highlightRobot(activeData.id), 100);
       }
       return;
     }
 
     if (dropData.target === 'menu' && activeData.source === 'sheet') {
-      removeRobot(activeData.slug);
+      removeRobot(activeData.id);
       return;
     }
 
     if (dropData.target === 'favorite' && activeData.source === 'sheet') {
-      if (!favorites.includes(activeData.slug)) {
-        toggleFavorite(activeData.slug);
+      if (!favorites.includes(activeData.id)) {
+        toggleFavorite(activeData.id);
       }
     }
   };
@@ -315,11 +315,11 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
     setSheetPreview(null);
   };
 
-  const toggleManufacturer = (slug: string) => {
-    if (expandedManufacturers.includes(slug)) {
-      setExpandedManufacturers(expandedManufacturers.filter((s) => s !== slug));
+  const toggleManufacturer = (id: string) => {
+    if (expandedManufacturers.includes(id)) {
+      setExpandedManufacturers(expandedManufacturers.filter((s) => s !== id));
     } else {
-      setExpandedManufacturers([...expandedManufacturers, slug]);
+      setExpandedManufacturers([...expandedManufacturers, id]);
     }
   };
 
@@ -370,12 +370,12 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                     <div className="max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden xl:max-h-[calc(100vh-200px)]">
                       {manufacturers.map((manufacturer) => {
                         const manufacturerRobots = robots.filter(
-                          (r) => r.manufacturerSlug === manufacturer.slug,
+                          (r) => r.manufacturerId === manufacturer.id,
                         );
-                        const isExpanded = expandedManufacturers.includes(manufacturer.slug);
+                        const isExpanded = expandedManufacturers.includes(manufacturer.id);
 
                         return (
-                          <div key={manufacturer.slug} className="border-b border-border-subtle last:border-0">
+                          <div key={manufacturer.id} className="border-b border-border-subtle last:border-0">
                             <button
                               type="button"
                               aria-label={uiText.comparison.toggleAria(
@@ -383,7 +383,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                                 isExpanded,
                               )}
                               aria-expanded={isExpanded}
-                              onClick={() => toggleManufacturer(manufacturer.slug)}
+                              onClick={() => toggleManufacturer(manufacturer.id)}
                               className="w-full px-4 py-3 flex items-center justify-between bg-card hover:bg-muted transition-colors text-left"
                             >
                               <ManufacturerLogoName
@@ -403,17 +403,17 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                               <div className="pb-2">
                                 <div>
                                   {manufacturerRobots.map((robot) => {
-                                    const isSelected = orderedSlugs.includes(robot.slug);
+                                    const isSelected = orderedIds.includes(robot.id);
                                     const isDisabled =
-                                      !isSelected && orderedSlugs.length >= MAX_COMPARE_ROBOTS;
+                                      !isSelected && orderedIds.length >= MAX_COMPARE_ROBOTS;
                                     return (
                                       <DraggableMenuRobotButton
-                                        key={robot.slug}
+                                        key={robot.id}
                                         robot={robot}
                                         isSelected={isSelected}
                                         isDisabled={isDisabled}
                                         onClick={() =>
-                                          isSelected ? removeRobot(robot.slug) : addRobot(robot.slug)
+                                          isSelected ? removeRobot(robot.id) : addRobot(robot.id)
                                         }
                                       />
                                     );
@@ -447,9 +447,9 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                   >
                     <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <span className="text-xs font-medium text-muted-foreground">
-                        {uiText.compare.comparisonSheet(orderedSlugs.length, MAX_COMPARE_ROBOTS)}
+                        {uiText.compare.comparisonSheet(orderedIds.length, MAX_COMPARE_ROBOTS)}
                       </span>
-                      {orderedSlugs.length > 0 && (
+                      {orderedIds.length > 0 && (
                         <button
                           type="button"
                           aria-label={uiText.comparison.clearAria}
@@ -481,10 +481,10 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                             {sheetPreviewItems.map((item) => {
                               if (item.type === 'preview') {
-                                const manufacturer = manufacturerFor(item.robot.manufacturerSlug);
+                                const manufacturer = manufacturerFor(item.robot.manufacturerId);
                                 return (
                                   <motion.div
-                                    key={`sheet-preview-${item.robot.slug}`}
+                                    key={`sheet-preview-${item.robot.id}`}
                                     layout
                                     initial={{ opacity: 0, scale: 0.96 }}
                                     animate={{ opacity: 1, scale: 1 }}
@@ -493,7 +493,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                                   >
                                     <CompareInsertionPreviewCard
                                       robot={item.robot}
-                                      manufacturerName={manufacturer?.name ?? item.robot.manufacturerSlug}
+                                      manufacturerName={manufacturer?.name ?? item.robot.manufacturerId}
                                       manufacturerLogo={manufacturer?.logo}
                                     />
                                   </motion.div>
@@ -501,32 +501,32 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                               }
 
                               const { robot } = item;
-                              const manufacturer = manufacturerFor(robot.manufacturerSlug);
+                              const manufacturer = manufacturerFor(robot.manufacturerId);
                               return (
                                 <motion.div
-                                  key={robot.slug}
+                                  key={robot.id}
                                   layout={isInsertionPreviewing}
                                   transition={SHEET_LAYOUT_TRANSITION}
                                   className="h-full"
                                 >
                                   <SortableCompareCard
-                                    slug={robot.slug}
-                                    id={getDndItemId('sheet', robot.slug)}
+                                    robotId={robot.id}
+                                    sortableId={getDndItemId('sheet', robot.id)}
                                     data={{
                                       type: 'robot',
                                       source: 'sheet',
                                       target: 'sheet',
                                       dropType: 'sheet-card',
-                                      slug: robot.slug,
+                                      id: robot.id,
                                     }}
                                   >
                                     {(dragHandleProps) => (
                                       <ComparisonRobotPanel
                                         robot={robot}
-                                        manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                                        manufacturerName={manufacturer?.name ?? robot.manufacturerId}
                                         manufacturerLogo={manufacturer?.logo}
                                         isFavorite={
-                                          isMounted ? favorites.includes(robot.slug) : false
+                                          isMounted ? favorites.includes(robot.id) : false
                                         }
                                         onFavoriteToggle={toggleFavorite}
                                         onRemove={removeRobot}
@@ -582,12 +582,12 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                       ) : (
                         <div className="space-y-3">
                           {favoriteRobots.map((robot) => {
-                            const manufacturer = manufacturerFor(robot.manufacturerSlug);
+                            const manufacturer = manufacturerFor(robot.manufacturerId);
                             return (
                               <DraggableFavoriteCard
-                                key={robot.slug}
+                                key={robot.id}
                                 robot={robot}
-                                manufacturerName={manufacturer?.name ?? robot.manufacturerSlug}
+                                manufacturerName={manufacturer?.name ?? robot.manufacturerId}
                                 manufacturerLogo={manufacturer?.logo}
                                 onRemove={toggleFavorite}
                                 onSelect={handleFavoriteSelect}
@@ -617,9 +617,9 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                 <div className="h-full shadow-2xl">
                   <ComparisonRobotPanel
                     robot={activeDragRobot}
-                    manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerSlug}
+                    manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerId}
                     manufacturerLogo={activeDragManufacturer?.logo}
-                    isFavorite={isMounted ? favorites.includes(activeDragRobot.slug) : false}
+                    isFavorite={isMounted ? favorites.includes(activeDragRobot.id) : false}
                     onFavoriteToggle={() => {}}
                     onRemove={() => {}}
                   />
@@ -627,7 +627,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
               ) : (
                 <CompareDragOverlayCard
                   robot={activeDragRobot}
-                  manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerSlug}
+                  manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerId}
                   manufacturerLogo={activeDragManufacturer?.logo}
                 />
               )

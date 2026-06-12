@@ -293,7 +293,7 @@ export function ComparisonRobotPanel({
       <div className="pointer-events-none absolute bottom-0 inset-x-0 z-30 px-2.5 pb-2
                       opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <p className="truncate text-right text-[11px] font-medium text-white/90">
-          {manufacturerName ?? robot.manufacturerSlug}
+          {manufacturerName ?? robot.manufacturerId}
         </p>
       </div>
 

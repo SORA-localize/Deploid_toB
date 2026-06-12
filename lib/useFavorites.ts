@@ -38,11 +38,11 @@ export function useFavorites() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const toggleFavorite = useCallback((slug: string) => {
+  const toggleFavorite = useCallback((id: string) => {
     setFavorites((prev) => {
-      const next = prev.includes(slug)
-        ? prev.filter((s) => s !== slug)
-        : [...prev, slug];
+      const next = prev.includes(id)
+        ? prev.filter((s) => s !== id)
+        : [...prev, id];
 
       try {
         localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));

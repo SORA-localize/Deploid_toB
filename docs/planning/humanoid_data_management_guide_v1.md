@@ -28,7 +28,7 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 - `robots`
 - `guides`
 - `useCases`
-- `reports`
+- `articles`（公開URLは /reports）
 
 後回し：
 
@@ -82,19 +82,23 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 - 候補ロボットは何か
 - どのガイドを読むべきか
 
-### `reports`
+### `articles`（旧 `reports`。公開URLは `/reports` を維持）
 
-鮮度と判断材料。
+ヒューマノイド専門ニュースメディアの中身。鮮度と判断材料。
 
-- analysis
-- deployment-report
-- interview
-- event-report
-- policy-update
-- case-study
-- news-brief
+第一軸は **`category`**（必須。編集者が必ず1つ指定する）：
 
-ニュース速報ではなく、「買い手にとってなぜ重要か」を残す。
+- `news` … 業界最新情報・発表まとめ（速報）
+- `interview` … 取材記事・インタビュー
+- `company-report` … 企業レポート（動向・決算・戦略）
+- `analysis` … 分析・市場考察・導入事例の読み解き
+- `policy` … 政策・規制アップデート
+
+`type`（フォーマット）と `section`（タブ分類）は当面併存する。
+
+**速報（news）も扱う。ただし全記事で `whyItMatters`（買い手にとってなぜ重要か）が必須。**
+単なる転載速報にしないことで、専門メディアと導入判断ポータルを両立させる
+（経緯は `data-architecture-redesign-v1.md` §7-2）。
 
 ---
 
@@ -105,15 +109,15 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 - robot relates to many useCases
 - useCase has many candidate robots
 - guide relates to robots and useCases
-- report relates to robots, manufacturers, useCases, guides
+- article relates to robots, manufacturers, useCases, guides
 
-参照はすべて `slug` で行う。
+参照はすべて **不変の `id`** で行う（`slug` はURL専用で外部キーには使わない）。
 
 例：
 
-- `Robot.manufacturerSlug`
-- `UseCase.candidateRobotSlugs`
-- `Report.relatedRobotSlugs`
+- `Robot.manufacturerId`
+- `UseCase.candidateRobotIds`
+- `Article.relatedRobotIds`
 
 ---
 
@@ -131,7 +135,7 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 - `manufacturers`
 - `guides`
 - `useCases`
-- `reports`
+- `articles`（公開URLは /reports）
 
 使わない：
 
@@ -139,12 +143,15 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 - `industries`
 - `companies`
 
-### slug
+### id と slug（分離。詳細は `data-architecture-redesign-v1.md` §3）
 
-- 小文字
-- ハイフン区切り
-- 英数字ベース
-- 公開後はむやみに変えない
+| | `id` | `slug` |
+|---|---|---|
+| 役割 | 外部キー・一意性・お気に入り/比較の保存値 | 公開URLのパスのみ |
+| 可変性 | **不変（発番後は二度と変えない）** | 変更可 |
+| 作成時 | `id === slug` で発番 | idと同値で開始 |
+
+共通の文字種：小文字・ハイフン区切り・英数字（validate が機械チェック）。
 
 例：
 
@@ -152,6 +159,14 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 - `figure-02`
 - `warehouse-picking`
 - `decision-variables`
+
+**slug を変えるとき**（命名修正・URL変更）：
+
+1. 旧 slug を `previousSlugs` に追記（詳細ページが 301 リダイレクトする）
+2. `slug` を新値に更新
+3. `id` と参照（`*Id` / `*Ids`）は**触らない**
+
+手順の実行チェックリストは `data-maintenance-checklist-v1.md` §D。
 
 ### field名
 
@@ -165,7 +180,7 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 - `japanPresence`
 - `deploymentStage`
 - `buyerReadiness`
-- `candidateRobotSlugs`
+- `candidateRobotIds`
 
 ---
 
@@ -187,7 +202,7 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 
 - `robots`
 - `manufacturers`
-- `reports`
+- `articles`（公開URLは /reports）
 
 推奨：
 
@@ -213,24 +228,26 @@ Next.js初期実装ではCMSを接続しない。
 
 ```txt
 data/
-  types.ts
+  types.ts            ← 型（nextjs_data_types_v1.ts と一致させる）
   robots.ts
   manufacturers.ts
   guides.ts
   useCases.ts
-  reports.ts
+  deployments.ts
+  articles.ts
+  articlePlacements.ts
 lib/
-  robots.ts
-  manufacturers.ts
-  guides.ts
-  useCases.ts
-  reports.ts
+  data.ts             ← 取得・filter・id/slug lookup（ページはここ経由のみ）
+  validate.ts         ← 整合チェック（build ゲート）
+  specSchema.ts       ← スペック項目の正本
+  tagRegistry.ts      ← タグの正本
+  labels.ts / display.ts / visualSemantics.ts ← enumのラベル・順序・トーン
 ```
 
 ルール：
 
 - `data/*.ts` は配列データだけを持つ
-- `lib/*.ts` に取得・filter・slug lookupを書く
+- 取得・filter・lookup は `lib/data.ts` に書く（参照は id、URL解決のみ slug）
 - ページから `data/*.ts` を直接検索しない
 - CMS接続時もページ側の呼び出し形を変えない
 
@@ -239,12 +256,15 @@ lib/
 ## 9. データ追加フロー
 
 1. 公式ページ、press release、信頼できる報道を確認する
-2. slugを決める
+2. **id を発番する**（小文字・ハイフン・英数。発番後は不変。初期は `slug = id`）
 3. `publishStatus: 'draft'` でデータを作る
 4. `sources` に確認日と信頼度を入れる
-5. 関連slugが存在するか確認する
+5. 参照 id（`manufacturerId` / `related*Ids` 等）の存在を確認する（参照切れは build が失敗する）
 6. 一覧・詳細・比較で必要な最低項目が埋まっているか確認する
-7. 公開できる状態なら `publishStatus: 'published'` にする
+7. `npm run validate:data` が通ることを確認し、`publishStatus: 'published'` にする
+
+作業種別ごとの実行チェックリストは `data-maintenance-checklist-v1.md`
+（追加 / slug変更 / 提供終了 / 公開ゲート / 鮮度レビュー / デプロイ前）。
 
 ---
 
@@ -257,10 +277,11 @@ import type { Robot } from './types';
 
 export const robots: Robot[] = [
   {
+    id: 'unitree-g1',
     slug: 'unitree-g1',
     name: 'Unitree G1',
     nameJa: 'ユニツリー G1',
-    manufacturerSlug: 'unitree',
+    manufacturerId: 'unitree',
     category: 'humanoid',
     summary: '研究・開発用途から注目される小型ヒューマノイド。',
     publishStatus: 'draft',
@@ -302,15 +323,24 @@ export const robots: Robot[] = [
 
 ## 11. 公開前チェック
 
-- `slug` が重複していない
-- 関連slugが存在する
-- `sources` が空ではない
-- `checkedAt` が入っている
+機械チェック（**`npm run build` の前段で validate が走り、error があると build が失敗する**）：
+
+- `id` / `slug` が重複していない・文字種が正しい
+- 関連 id（`*Id` / `*Ids` / `supersededById`）が存在する
+- `sources` が空ではない（published のみ。sample 記事は除外）
+- 日付形式・URL形式・画像 `rights`・未登録タグ・specs の未登録キー
+
+warning（buildは通るが把握する）：
+
+- 画像が外部URL（未ローカル化）または空
+- 鮮度切れ（`nextReviewBy` 超過 or 最終確認から180日超）
+
+人の目で確認：
+
 - 推定値に `estimated` が付いている
-- 画像に `alt`, `credit`, `sourceUrl`, `rights` がある
 - robotは `japanAvailability` が入っている
-- useCaseは `candidateRobotSlugs` と `relatedGuideSlugs` が入っている
-- reportは `whyItMatters` が入っている
+- useCaseは `candidateRobotIds` と `relatedGuideIds` が入っている
+- articleは `category` と `whyItMatters` が入っている
 
 ---
 

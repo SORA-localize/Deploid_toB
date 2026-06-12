@@ -56,7 +56,7 @@ export const uiText = {
     releaseStatus: '公開状態',
     guideStage: 'ガイド段階',
     guideTopics: 'ガイドトピック',
-    reportType: '記事種別',
+    articleType: '記事種別',
     reportTopics: '記事トピック',
     useCaseMode: '用途の探し方',
     industryTags: '業種タグ',

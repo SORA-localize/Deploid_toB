@@ -1,49 +1,56 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Calendar, Clock, User } from 'lucide-react';
 import { ArticleToc } from '@/components/ArticleToc';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { JsonLd } from '@/components/JsonLd';
 import { Markdown } from '@/components/Markdown';
 import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
 import {
+  getArticles,
   getRelatedGuides,
   getRelatedManufacturers,
   getRelatedRobots,
   getRelatedUseCases,
-  getReportBySlug,
-  getReports,
+  resolveArticleDetailBySlug,
 } from '@/lib/data';
-import { reportTypeLabels } from '@/lib/labels';
+import { articleJsonLd } from '@/lib/jsonLd';
+import { articleTypeLabels } from '@/lib/labels';
 import { extractH2Headings } from '@/lib/markdownHeadings';
+import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
-import { getReportTypeTone } from '@/lib/visualSemantics';
+import { getArticleTypeTone } from '@/lib/visualSemantics';
 
 export function generateStaticParams() {
-  return getReports().map((report) => ({ slug: report.slug }));
+  return getArticles().map((report) => ({ slug: report.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const report = getReportBySlug(slug);
+  const { record: report } = resolveArticleDetailBySlug(slug);
   const seo = report?.seo;
+  // sample（UI確認用データ）は検索に載せない（§11.9）
+  const noindex = seo?.noindex || report?.contentKind === 'sample';
   return {
-    title: seo?.metaTitle ?? (report ? (report.titleJa ?? report.title) : 'Report'),
+    title: seo?.metaTitle ?? (report ? (report.titleJa ?? report.title) : 'Article'),
     description: seo?.metaDescription ?? report?.summary,
-    robots: seo?.noindex ? { index: false, follow: false } : undefined,
+    alternates: report ? { canonical: `/reports/${report.slug}` } : undefined,
+    robots: noindex ? { index: false, follow: false } : undefined,
   };
 }
 
 export default async function ReportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const report = getReportBySlug(slug);
+  const { record: report, redirectTo } = resolveArticleDetailBySlug(slug);
+  if (redirectTo) permanentRedirect(`/reports/${redirectTo}`);
   if (!report) notFound();
 
-  const robots = getRelatedRobots(report.relatedRobotSlugs);
-  const manufacturers = getRelatedManufacturers(report.relatedManufacturerSlugs);
-  const useCases = getRelatedUseCases(report.relatedUseCaseSlugs);
-  const guides = getRelatedGuides(report.relatedGuideSlugs ?? []);
+  const robots = getRelatedRobots(report.relatedRobotIds);
+  const manufacturers = getRelatedManufacturers(report.relatedManufacturerIds);
+  const useCases = getRelatedUseCases(report.relatedUseCaseIds);
+  const guides = getRelatedGuides(report.relatedGuideIds ?? []);
 
   const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
   const hasBody = (report.body ?? '').trim().length > 0;
@@ -73,6 +80,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={articleJsonLd(report)} />
 
       {/* ── ヒーロー + ヘッダー（統合） ── */}
       {report.heroImage ? (
@@ -101,7 +109,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             <div className="relative z-10 flex min-h-[400px] items-end sm:min-h-[500px] md:min-h-[580px]">
               <div className="site-container pb-8 sm:pb-10">
                 <div className="mb-2 text-xs font-medium text-white/70">
-                  {reportTypeLabels[report.type]}
+                  {articleTypeLabels[report.type]}
                 </div>
                 <h1 className="mb-3 text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white">
                   {reportTitle}
@@ -120,8 +128,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                       {uiText.common.readingMinutes(report.readingTimeMin)}
                     </span>
                   )}
-                  <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
-                    {reportTypeLabels[report.type]}
+                  <TagChip tone={getArticleTypeTone(report.type)} className="py-1 font-medium">
+                    {articleTypeLabels[report.type]}
                   </TagChip>
                   {report.author && (
                     <span className="flex items-center gap-1.5">
@@ -139,7 +147,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           <div className="site-container py-6">
             <Breadcrumbs items={breadcrumbItems} />
             <div className="mb-3 text-xs font-medium text-muted-foreground">
-              {reportTypeLabels[report.type]}
+              {articleTypeLabels[report.type]}
             </div>
             <h1 className="mb-4 max-w-4xl text-2xl md:text-3xl font-semibold leading-tight text-foreground">
               {reportTitle}
@@ -158,8 +166,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   {uiText.common.readingMinutes(report.readingTimeMin)}
                 </span>
               )}
-              <TagChip tone={getReportTypeTone(report.type)} className="py-1 font-medium">
-                {reportTypeLabels[report.type]}
+              <TagChip tone={getArticleTypeTone(report.type)} className="py-1 font-medium">
+                {articleTypeLabels[report.type]}
               </TagChip>
               {report.author && (
                 <span className="flex items-center gap-1.5">
@@ -230,7 +238,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   title="関連ロボット"
                   items={robots.map((r) => ({
                     href: `/robots/${r.slug}`,
-                    title: r.nameJa ?? r.name,
+                    title: getRobotRelatedTitle(r),
                     description: r.summary,
                   }))}
                 />

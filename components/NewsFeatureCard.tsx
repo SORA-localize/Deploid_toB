@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import type { Report } from '@/data/types';
-import { reportTypeLabels } from '@/lib/labels';
+import type { Article } from '@/data/types';
+import { articleTypeLabels } from '@/lib/labels';
 import { cn } from '@/lib/utils';
 
 interface NewsFeatureCardProps {
-  report: Report;
+  report: Article;
   className?: string;
 }
 
@@ -38,7 +38,7 @@ export function NewsFeatureCard({ report, className }: NewsFeatureCardProps) {
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <span className="rounded-sm bg-signal px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-signal-foreground">
-              {reportTypeLabels[report.type]}
+              {articleTypeLabels[report.type]}
             </span>
             <time className="font-mono text-xs text-white/60">{report.publishedAt}</time>
           </div>

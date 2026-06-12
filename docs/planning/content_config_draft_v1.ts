@@ -9,6 +9,9 @@
  */
 
 export type {
+  Article,
+  ArticleCategory,
+  ArticleType,
   BaseRecord,
   BuyerReadiness,
   Capability,
@@ -19,6 +22,7 @@ export type {
   DeploymentStage,
   Guide,
   GuideStage,
+  Id,
   ImageAsset,
   ISODate,
   JapanAvailability,
@@ -29,8 +33,6 @@ export type {
   ProcurementModel,
   PublishStatus,
   Reliability,
-  Report,
-  ReportType,
   Robot,
   RobotCategory,
   RobotSpecs,

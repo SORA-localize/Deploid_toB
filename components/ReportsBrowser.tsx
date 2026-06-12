@@ -8,27 +8,27 @@ import { NewsCard } from '@/components/NewsCard';
 import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
 import { ReportsHeader } from '@/components/ReportsHeader';
 import { CardHoverEffect } from '@/components/ui/card-hover-effect';
-import type { Report } from '@/data/types';
-import { filterReports } from '@/lib/reportFilters';
+import type { Article } from '@/data/types';
+import { filterArticles } from '@/lib/articleFilters';
 import {
-  getReportPageCount,
-  getReportPageItems,
-  getReportPaginationPages,
+  getArticlePageCount,
+  getArticlePageItems,
+  getArticlePaginationPages,
   normalizeReportPageParam,
-  REPORT_PAGE_PARAM,
-} from '@/lib/reportPagination';
-import { useReportsPerPage } from '@/lib/useReportsPerPage';
-import { getReportIndexPlacementReports } from '@/lib/reportPlacements';
+  ARTICLE_PAGE_PARAM,
+} from '@/lib/articlePagination';
+import { useArticlesPerPage } from '@/lib/useArticlesPerPage';
+import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
 import { createReportSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
-import { useActiveReportSection } from '@/lib/useActiveReportSection';
+import { useActiveArticleSection } from '@/lib/useActiveArticleSection';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 import { cn } from '@/lib/utils';
 
-export function ReportsBrowser({ reports }: { reports: Report[] }) {
-  const activeSection = useActiveReportSection();
+export function ReportsBrowser({ reports }: { reports: Article[] }) {
+  const activeSection = useActiveArticleSection();
   const { getParam, updateParams } = useUrlFilters();
-  const perPage = useReportsPerPage();
+  const perPage = useArticlesPerPage();
   const gridRef = useRef<HTMLDivElement>(null);
 
   const sorted = useMemo(
@@ -37,7 +37,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
   );
 
   const { heroReports, featureReports } = useMemo(
-    () => getReportIndexPlacementReports(sorted),
+    () => getArticleIndexPlacementReports(sorted),
     [sorted],
   );
 
@@ -48,30 +48,30 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
 
   const gridReports = useMemo(
     () =>
-      filterReports({
+      filterArticles({
         reports: sorted,
         searchDocuments,
         filters: { type: 'all', section: activeSection, topic: null, query: '' },
       }),
     [sorted, searchDocuments, activeSection],
   );
-  const pageCount = getReportPageCount(gridReports.length, perPage);
+  const pageCount = getArticlePageCount(gridReports.length, perPage);
   const activePage = useMemo(
-    () => normalizeReportPageParam(getParam(REPORT_PAGE_PARAM), pageCount),
+    () => normalizeReportPageParam(getParam(ARTICLE_PAGE_PARAM), pageCount),
     [getParam, pageCount],
   );
   const paginatedReports = useMemo(
-    () => getReportPageItems(gridReports, activePage, perPage),
+    () => getArticlePageItems(gridReports, activePage, perPage),
     [gridReports, activePage, perPage],
   );
   const paginationPages = useMemo(
-    () => getReportPaginationPages(activePage, pageCount),
+    () => getArticlePaginationPages(activePage, pageCount),
     [activePage, pageCount],
   );
 
   const updatePage = (page: number) => {
     updateParams({
-      [REPORT_PAGE_PARAM]: page <= 1 ? null : String(page),
+      [ARTICLE_PAGE_PARAM]: page <= 1 ? null : String(page),
     });
     gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -86,7 +86,7 @@ export function ReportsBrowser({ reports }: { reports: Report[] }) {
         {activeSection === 'all' && heroReports.length > 0 && (
           <div className="site-container py-4">
             {/*
-              表示対象は data/reportPlacements.ts の掲載枠で制御する。
+              表示対象は data/articlePlacements.ts の掲載枠で制御する。
               グリッドの行高さはカルーセルの aspect-ratio で決まる。
               右列は grid の stretch 整列（デフォルト）でその高さに伸び、
               h-full + flex-col でフィーチャー枠に均等分配する。

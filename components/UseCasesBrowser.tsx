@@ -146,7 +146,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                   <h4 className="text-lg font-semibold text-foreground mb-2">{u.titleJa ?? u.title}</h4>
                   <p className="text-sm text-foreground/80 mb-3 leading-relaxed">{u.subtitle ?? u.summary}</p>
                   <div className="text-xs text-muted-foreground">
-                    {uiText.useCases.candidateRobots(u.candidateRobotSlugs.length)}
+                    {uiText.useCases.candidateRobots(u.candidateRobotIds.length)}
                   </div>
                 </Link>
               ))}
@@ -193,7 +193,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
                     ))}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {uiText.useCases.candidateRobots(u.candidateRobotSlugs.length)}
+                    {uiText.useCases.candidateRobots(u.candidateRobotIds.length)}
                   </div>
                 </div>
                 <ArrowRight className="w-4 h-4 text-muted-foreground/70 flex-shrink-0 mt-1" />

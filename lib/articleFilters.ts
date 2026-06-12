@@ -1,17 +1,17 @@
-import type { Report, ReportSection, ReportType } from '@/data/types';
+import type { Article, ArticleSection, ArticleType } from '@/data/types';
 import { matchesSearchDocument, type SearchDocument } from '@/lib/search';
 import { matchesTag } from '@/lib/tags';
 
-export function filterReports({
+export function filterArticles({
   reports,
   searchDocuments,
   filters,
 }: {
-  reports: readonly Report[];
+  reports: readonly Article[];
   searchDocuments: Map<string, SearchDocument>;
   filters: {
-    type: ReportType | 'all';
-    section?: ReportSection | 'all';
+    type: ArticleType | 'all';
+    section?: ArticleSection | 'all';
     topic: string | null;
     query: string;
   };

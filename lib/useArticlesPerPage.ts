@@ -13,7 +13,7 @@ function getColsForViewport(width: number): number {
   return 1;
 }
 
-export function useReportsPerPage(): number {
+export function useArticlesPerPage(): number {
   const [perPage, setPerPage] = useState(ROWS_PER_PAGE * 4); // SSR/初期値: xl想定
 
   useEffect(() => {

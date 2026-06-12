@@ -11,12 +11,12 @@ import {
   getGuides,
   getManufacturers,
   getManufacturerForRobot,
-  getReports,
+  getArticles,
   getRobots,
   getDeploymentsForManufacturer,
 } from '@/lib/data';
 import { getDisplayableAsset } from '@/lib/media';
-import { getHomeFeaturedReports } from '@/lib/reportPlacements';
+import { getHomeFeaturedArticles } from '@/lib/articlePlacements';
 
 export default function HomePage() {
   const featured = getGuideBySlug('decision-variables') ?? getGuides()[0];
@@ -34,7 +34,7 @@ export default function HomePage() {
       lng: manufacturer.headquarters.lng,
       foundedYear: manufacturer.foundedYear,
       logoSrc: getDisplayableAsset(manufacturer.logo)?.src,
-      deployments: getDeploymentsForManufacturer(manufacturer.slug).map((d) => ({
+      deployments: getDeploymentsForManufacturer(manufacturer.id).map((d) => ({
         lat: d.location.lat,
         lng: d.location.lng,
         customer: d.customer,
@@ -68,10 +68,10 @@ export default function HomePage() {
     return asset ? [{ src: asset.src, alt: asset.alt, label: robot.name }] : [];
   });
 
-  const homeFeaturedReports = getHomeFeaturedReports(getReports());
+  const homeFeaturedReports = getHomeFeaturedArticles(getArticles());
 
-  const manufacturerBySlug = Object.fromEntries(
-    manufacturers.map((m) => [m.slug, m])
+  const manufacturerById = Object.fromEntries(
+    manufacturers.map((m) => [m.id, m])
   );
 
   return (
@@ -92,7 +92,7 @@ export default function HomePage() {
       {featuredRobots.length > 0 && (
         <FeaturedRobotsGrid
           robots={featuredRobots}
-          manufacturerBySlug={manufacturerBySlug}
+          manufacturerById={manufacturerById}
         />
       )}
 

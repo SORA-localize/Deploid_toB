@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Activity, ChevronLeft, ChevronRight, CircleDollarSign, MapPin, ShieldCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { JsonLd } from '@/components/JsonLd';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { RobotImageCarousel } from '@/components/RobotImageCarousel';
 import { RobotDetailStickyHeader } from '@/components/RobotDetailStickyHeader';
@@ -9,11 +10,14 @@ import { RobotStickyAside } from '@/components/RobotStickyAside';
 import { SourceList } from '@/components/SourceList';
 import {
   getManufacturerForRobot,
-  getReportsForRobot,
-  getRobotBySlug,
+  getArticlesForRobot,
+  getRobotById,
   getRobots,
+  getRobotsForDetail,
   getUseCasesForRobot,
+  resolveRobotDetailBySlug,
 } from '@/lib/data';
+import { robotJsonLd } from '@/lib/jsonLd';
 import { getRobotDetailDecisionRows, getRobotDetailSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
@@ -26,28 +30,34 @@ const sections = [
 ];
 
 export function generateStaticParams() {
-  return getRobots().map((robot) => ({ slug: robot.slug }));
+  // archived も詳細ページは残す（「提供終了」表示。一覧・比較には出ない）
+  return getRobotsForDetail().map((robot) => ({ slug: robot.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const robot = getRobotBySlug(slug);
+  const { record: robot } = resolveRobotDetailBySlug(slug);
   const seo = robot?.seo;
+  // archived（提供終了）は閲覧可能だが検索には載せない（§11.7）
+  const noindex = seo?.noindex || robot?.publishStatus === 'archived';
   return {
     title: seo?.metaTitle ?? (robot ? (robot.nameJa ?? robot.name) : 'Robot'),
     description: seo?.metaDescription ?? robot?.summary,
-    robots: seo?.noindex ? { index: false, follow: false } : undefined,
+    alternates: robot ? { canonical: `/robots/${robot.slug}` } : undefined,
+    robots: noindex ? { index: false, follow: false } : undefined,
   };
 }
 
 export default async function RobotDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const robot = getRobotBySlug(slug);
+  const { record: robot, redirectTo } = resolveRobotDetailBySlug(slug);
+  if (redirectTo) permanentRedirect(`/robots/${redirectTo}`);
   if (!robot) notFound();
 
-  const manufacturer = getManufacturerForRobot(robot.manufacturerSlug);
-  const useCases = getUseCasesForRobot(robot.slug);
-  const reports = getReportsForRobot(robot.slug);
+  const successor = robot.supersededById ? getRobotById(robot.supersededById) : undefined;
+  const manufacturer = getManufacturerForRobot(robot.manufacturerId);
+  const useCases = getUseCasesForRobot(robot.id);
+  const reports = getArticlesForRobot(robot.id);
 
   const all = getRobots();
   const idx = all.findIndex((r) => r.slug === robot.slug);
@@ -59,6 +69,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={robotJsonLd(robot, manufacturer)} />
 
       <RobotDetailStickyHeader title={robot.nameJa ?? robot.name} sections={sections} />
 
@@ -72,6 +83,25 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
             { label: robot.nameJa ?? robot.name },
           ]}
         />
+
+        {/* 提供終了通知（archived のみ）。旧モデル情報も判断材料として残す（設計 §6.5-2） */}
+        {robot.publishStatus === 'archived' && (
+          <div className="mt-6 border border-border bg-muted px-4 py-3 text-xs text-foreground/80">
+            <span className="font-semibold text-foreground">提供終了：</span>
+            この機種は現行ラインアップではありません。
+            {successor && (
+              <>
+                {' '}後継機:{' '}
+                <Link
+                  href={`/robots/${successor.slug}`}
+                  className="font-medium text-foreground underline underline-offset-2 hover:text-foreground/80"
+                >
+                  {successor.nameJa ?? successor.name}
+                </Link>
+              </>
+            )}
+          </div>
+        )}
 
         {/* #overview — グリッド外・全幅 */}
         <div id="overview" className="mt-6 mb-6 scroll-mt-site-header">

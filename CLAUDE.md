@@ -46,8 +46,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 |---|---|
 | `npm install` | 依存導入 |
 | `npm run dev` | `localhost:3000` で開発サーバ（Next.js） |
-| `npm run build` | 本番ビルド（`.next/`、SSG） |
+| `npm run build` | **前段でデータ検証**（error があると失敗）→ 本番ビルド（`.next/`、SSG） |
 | `npm run start` | ビルド結果をローカルで起動 |
+| `npm run validate:data` | データ検証のみ実行（error=buildを止める / warning=ログのみ） |
 
 テストランナー・lint・型チェックの設定はまだ無い（追加時はユーザーに確認）。
 
@@ -56,11 +57,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Next.js 16 + React 19 + TypeScript**（App Router）。Node `>=22.12.0`。
 - ルートは `src/app/`：`/` `/robots` `/robots/[slug]` `/manufacturers` `/manufacturers/[slug]` `/compare` `/guides` `/guides/[slug]` `/use-cases` `/use-cases/[slug]` `/reports` `/reports/[slug]` `/about` `/contact`。
 - 詳細ページは `generateStaticParams` でSSG。
-- **データ層**：
-  - `data/*.ts` … 配列データのみ（`robots` `manufacturers` `guides` `useCases` `reports`）。`data/types.ts` が型定義。
-  - `lib/data.ts` … 取得・filter・slug lookup・関連取得。**ページからは `data/*.ts` を直接検索せず `lib/data.ts` 経由で呼ぶ**（CMS移行時に呼び出し形を変えないため）。
-  - `lib/labels.ts` … enumトークン→日本語ラベル変換。
+- **データ層**（識別子モデル＝`data-architecture-redesign-v1.md`。**参照は不変 `id`、URLは可変 `slug`**）：
+  - `data/*.ts` … 配列データのみ（`robots` `manufacturers` `guides` `useCases` `deployments` `articles`＝旧reports）。`data/types.ts` が型定義。全レコードに不変 `id`（参照キー）と可変 `slug`（URL）。slug変更時は旧値を `previousSlugs` に追記（詳細ページが301）。
+  - `lib/data.ts` … 取得・filter・lookup・関連取得。参照解決は `get*ById` / `*For*` 系（id）、URL解決のみ `get*BySlug` / `resolve*DetailBySlug`（previousSlugs→301）。**ページからは `data/*.ts` を直接検索せず `lib/data.ts` 経由で呼ぶ**（CMS移行時に呼び出し形を変えないため）。
+  - `lib/validate.ts` … 整合チェック（id重複・参照切れ・未登録タグ等＝error で **build を失敗させる**。未ローカル画像・鮮度切れ＝warning）。`scripts/validate-data.mjs` が build 前段で実行。
+  - `lib/specSchema.ts` … スペック項目の正本（追加はここに1行→型・スペック表・validateが追従）。
+  - `lib/tagRegistry.ts` … タグの正本。`lib/labels.ts` … enumトークン→日本語ラベル変換。`lib/display.ts` … enum表示順。
   - `lib/visualSemantics.ts` … enum/状態→semantic tone→class 変換（色の真実源の一つ）。
+  - お気に入り（localStorage）・比較URL（`?compare=`）の保存値は **id**（slug変更に耐える）。
+  - 運用手順は `docs/planning/data-maintenance-checklist-v1.md`（追加・slug変更・提供終了・公開ゲート・鮮度レビュー）。
 - **共通レイアウト**：`src/app/layout.tsx`（Header / main / Footer）。CSSは `src/app/globals.css`（Tailwind v4 + **Radix Colors ベースの semantic token**。slate=中立 / jade=アクセント。ダークモードは `next-themes`）。
 
 ## URL・命名規約
