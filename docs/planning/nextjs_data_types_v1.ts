@@ -6,7 +6,12 @@
  * types from `data/types.ts`. CMS-specific schemas should be derived from
  * this file later, not the other way around.
  */
+import type { RobotSpecsFromSchema } from '@/lib/specSchema';
+import type { TagValue } from '@/lib/tagRegistry';
 
+/** 不変の安定ID。外部キー・一意性・将来のCMSレコードキーに使う。発番後は二度と変えない。 */
+export type Id = string;
+/** 公開URLのパスセグメント。可変（変更時は旧値を previousSlugs に追記して301で保護）。 */
 export type Slug = string;
 export type ISODate = string;
 
@@ -62,6 +67,7 @@ export interface ImageAsset {
  *  写真が無いスロットは empty state（役割名のラベル）になる。 */
 export type ImageRole =
   | 'hero'         // 全身正面
+  | 'transparent'  // 背景透過・全身正面（カード用）
   | 'side'         // 側面
   | 'inOperation'  // 稼働中（実環境）
   | 'scale'        // スケール比較（人/物）
@@ -75,12 +81,18 @@ export interface SeoFields {
 }
 
 export interface BaseRecord {
+  /** 不変ID。参照（*Id / *Ids）はすべてこれを指す。作成時は id === slug で発番する。 */
+  id: Id;
   slug: Slug;
+  /** slug変更時の旧slug（追記のみ）。詳細ページが301リダイレクト元として解決する。 */
+  previousSlugs?: Slug[];
   summary: string;
   publishStatus: PublishStatus;
   updatedAt: ISODate;
   reliability: Reliability;
   sources: Source[];
+  /** 次回事実確認の目安日。超過は validate が warning で知らせる（鮮度管理）。 */
+  nextReviewBy?: ISODate;
   heroImage?: ImageAsset;
   seo?: SeoFields;
 }
@@ -102,6 +114,14 @@ export type JapanPresence =
   | 'none'
   | 'unknown';
 
+export interface DomesticDistributor {
+  name: string;
+  website?: string;
+  sourceUrl?: string;
+  checkedAt?: ISODate;
+  note?: string;
+}
+
 export interface Manufacturer extends BaseRecord {
   name: string;
   nameJa?: string;
@@ -109,19 +129,23 @@ export interface Manufacturer extends BaseRecord {
   companyStatus: CompanyStatus;
   country: string;
   hqCity?: string;
+  /** 本社のおおよその座標。Homeのワールドマップ描画用（任意・装飾用途）。 */
+  headquarters?: { lat: number; lng: number };
   foundedYear?: number;
   website: string;
   logo?: ImageAsset;
   contactUrl?: string;
   description: string;
   japanPresence: JapanPresence;
+  domesticDistributors?: DomesticDistributor[];
   distributorNote?: string;
   supportNote?: string;
   procurementNote?: string;
   vendorRiskNote?: string;
+  // 関連は逆向き(Robot.manufacturerId / Article.relatedManufacturerIds)で導出する。
+  // robotIds / handledRobotIds / relatedReportIds は持たない。
+  /** 将来の掲載提携・有料スポンサード枠のための優先順位。値が小さいほど上位。未設定は非スポンサード扱い。 */
   featuredRank?: number;
-  // 関連は逆向き(Robot.manufacturerSlug / Report.relatedManufacturerSlugs)で導出する。
-  // robotSlugs / handledRobotSlugs / relatedReportSlugs は持たない。
 }
 
 export type RobotCategory =
@@ -164,16 +188,12 @@ export type ProcurementModel =
   | 'not-for-sale'
   | 'inquiry';
 
-export interface RobotSpecs {
-  heightCm?: number;
-  weightKg?: number;
-  payloadKg?: number;
-  runtimeMin?: number;
-  speedMps?: number;
-  dof?: number;
-  mobility?: MobilityType;
-  ipRating?: string;
-}
+/**
+ * スペック値。項目の定義（キー・ラベル・単位・グループ）の正本は lib/specSchema.ts。
+ * 項目追加は specSchema に1行追加すれば型・スペック表・validate が自動追従する（設計 §8）。
+ * 値は各ロボットに個別。不明値はキーごと省略する（UIが「要確認」を表示）。
+ */
+export type RobotSpecs = RobotSpecsFromSchema;
 
 export interface ComparisonProfile {
   strengths: string[];
@@ -185,11 +205,15 @@ export interface ComparisonProfile {
 export interface Robot extends BaseRecord {
   name: string;
   nameJa?: string;
-  manufacturerSlug: Slug;
+  manufacturerId: Id;
   category: RobotCategory;
   description: string;
+  /** 将来の掲載提携・有料スポンサード枠のための優先順位。値が小さいほど上位。未設定は非スポンサード扱い。 */
+  featuredRank?: number;
   deploymentStage: DeploymentStage;
   buyerReadiness: BuyerReadiness;
+  /** 提供終了（archived）時の後継機。詳細・関連欄で「後継機: X」導線を出す。 */
+  supersededById?: Id;
   specs: RobotSpecs;
   procurementModels: ProcurementModel[];
   priceNote?: string;
@@ -200,13 +224,12 @@ export interface Robot extends BaseRecord {
   vendorRiskNote?: string;
   /** 役割別の参考画像（詳細ページのカルーセル）。hero が未設定なら BaseRecord.heroImage を hero に昇格して使う。 */
   images?: Partial<Record<ImageRole, ImageAsset>>;
-  featuredRank?: number;
+  // 関連は逆向き(UseCase.candidateRobotIds / Guide.relatedRobotIds /
+  // Article.relatedRobotIds)で導出する。
   /** 業種タグ（lib/tagRegistry.ts の kind:'industry' のvalue）。未設定=調査中扱い。 */
-  industryTags?: string[];
+  industryTags?: TagValue<'industry'>[];
   /** タスクタグ（lib/tagRegistry.ts の kind:'task' のvalue）。未設定=調査中扱い。 */
-  taskTags?: string[];
-  // 関連は逆向き(UseCase.candidateRobotSlugs / Guide.relatedRobotSlugs /
-  // Report.relatedRobotSlugs)で導出する。
+  taskTags?: TagValue<'task'>[];
   comparison: ComparisonProfile;
 }
 
@@ -218,15 +241,15 @@ export interface Guide extends BaseRecord {
   description: string;
   stage: GuideStage;
   order: number;
-  topics: string[];
+  topics: TagValue<'guide-topic'>[];
   targetReaders: string[];
   readingTimeMinutes?: number;
   checklistItems?: string[];
   /** 記事本文（Markdown）。空ならガイド本文セクションは描画されない。 */
   body?: string;
-  relatedRobotSlugs: Slug[];
-  relatedUseCaseSlugs: Slug[];
-  // 関連reportsは Report.relatedGuideSlugs で逆引きする。
+  relatedRobotIds: Id[];
+  relatedUseCaseIds: Id[];
+  // 関連articlesは Article.relatedGuideIds で逆引きする。
 }
 
 export type UseCaseMaturity = 'early-stage' | 'pilot-phase' | 'production-ready';
@@ -270,8 +293,8 @@ export interface UseCase extends BaseRecord {
   buyerReadiness: BuyerReadiness;
   environment: OperatingEnvironment;
   requiredCapabilities: Capability[];
-  industryTags: string[];
-  taskTags: string[];
+  industryTags: TagValue<'industry'>[];
+  taskTags: TagValue<'task'>[];
   atAGlance: UseCaseAtAGlance;
   overview: string;
   whyItMatters: string;
@@ -279,36 +302,124 @@ export interface UseCase extends BaseRecord {
   environmentRequirements: string;
   whyHardToday: string;
   japanDeploymentConditions: string;
-  candidateRobotSlugs: Slug[];
-  relatedGuideSlugs: Slug[];
-  // 関連reportsは Report.relatedUseCaseSlugs で逆引きする。
+  candidateRobotIds: Id[];
+  relatedGuideIds: Id[];
+  // 関連articlesは Article.relatedUseCaseIds で逆引きする。
 }
 
-export type ReportType =
+/**
+ * 記事種別の第一軸（設計 §7-1）。編集者が必ず1つ指定する主分類。
+ * ニュースメディアとしての役割（速報〜分析）を表す。
+ * type（フォーマット）・section（サブジェクト・タブ）は当面併存し、
+ * category へのUI一本化は別フェーズで判断する。
+ */
+export type ArticleCategory =
+  | 'news'           // 業界最新情報・発表まとめ（速報。whyItMatters 必須は他と同じ）
+  | 'interview'      // 取材記事・インタビュー
+  | 'company-report' // 企業レポート（動向・決算・戦略）
+  | 'analysis'       // 分析・市場考察・導入事例の読み解き
+  | 'policy';        // 政策・規制アップデート
+
+export type ArticleType =
   | 'analysis'
   | 'deployment-report'
   | 'interview'
   | 'event-report'
   | 'policy-update'
   | 'case-study'
-  | 'news-brief';
+  | 'news-brief'
+  | 'tech-update'
+  | 'market-analysis';
 
-export interface Report extends BaseRecord {
+/**
+ * 記事のサブジェクト（何の話か）＝記事タブの分類。
+ * type（フォーマット：どう書かれたか）とは独立した軸で、記事ごとに編集者が明示指定する。
+ * UI専用の 'all' は含めない（lib/articleSections.ts の ArticleSectionFilter 側で付与）。
+ */
+export type ArticleSection =
+  | 'deployment'
+  | 'business'
+  | 'tech'
+  | 'policy'
+  | 'entertainment';
+
+export type ArticleContentKind = 'editorial' | 'sample' | 'sponsored';
+
+export interface Article extends BaseRecord {
   title: string;
   titleJa?: string;
-  type: ReportType;
+  /** 第一軸の記事種別（必須）。一覧の絞り込み・編集方針の基準になる。 */
+  category: ArticleCategory;
+  type: ArticleType;
+  /** editorial が通常記事。sample はUI確認用公開データとして sources 空を許容する。 */
+  contentKind?: ArticleContentKind;
   publishedAt: ISODate;
   author?: string;
-  tags: string[];
+  tags: TagValue<'article'>[];
   whyItMatters: string;
   keyTakeaways?: string[];
   /** 記事本文（Markdown）。空ならレポート本文セクションは描画されない。 */
   body?: string;
   featured?: boolean;
-  relatedRobotSlugs: Slug[];
-  relatedManufacturerSlugs: Slug[];
-  relatedUseCaseSlugs: Slug[];
-  relatedGuideSlugs?: Slug[];
+  /** 記事タブの分類（サブジェクト）。type とは独立した必須フィールド。 */
+  section: ArticleSection;
+  /** 目安読了時間（分）。未設定時は非表示。 */
+  readingTimeMin?: number;
+  relatedRobotIds: Id[];
+  relatedManufacturerIds: Id[];
+  relatedUseCaseIds: Id[];
+  relatedGuideIds?: Id[];
+}
+
+export type ArticlePlacementSurface = 'reports-index';
+export type ArticlePlacementSlot = 'hero' | 'feature';
+export type ArticlePlacementKind = 'editorial' | 'sample' | 'sponsored' | 'house';
+
+export interface ArticlePlacementSponsor {
+  name: string;
+  url?: string;
+  disclosure?: string;
+  campaignId?: string;
+}
+
+export interface ArticlePlacement {
+  surface: ArticlePlacementSurface;
+  slot: ArticlePlacementSlot;
+  reportId: Id;
+  order: number;
+  kind?: ArticlePlacementKind;
+  sponsor?: ArticlePlacementSponsor;
+}
+
+export type DeploymentStatus =
+  | 'announced' // 発表のみ
+  | 'pilot' // 実証・PoC
+  | 'production' // 本番運用
+  | 'ended' // 終了
+  | 'unknown';
+
+/**
+ * 実在の導入事例。Homeワールドマップの「メーカーHQ→導入先」arc 描画の根拠データ。
+ * 所在地・導入主体・段階は必ず一次/信頼できる二次出典で裏取りし sources に残す（AI生成値の混入防止）。
+ * location は導入拠点のおおよその座標（番地レベルは不要）。
+ */
+export interface DeploymentSite extends BaseRecord {
+  /** arc 始点＝メーカー（data/manufacturers.ts の id） */
+  manufacturerId: Id;
+  /** 導入ロボット（data/robots.ts の id、判明していれば） */
+  robotId?: Id;
+  /** 導入先の企業/組織名（例: BMW、GXO） */
+  customer: string;
+  /** 拠点名（例: Spartanburg Plant） */
+  siteName?: string;
+  /** 導入先の国 */
+  country: string;
+  /** arc 終点＝導入拠点のおおよその座標 */
+  location: { lat: number; lng: number };
+  /** 導入の段階 */
+  status: DeploymentStatus;
+  /** 開始/発表時期（YYYY または YYYY-MM） */
+  startedAt?: ISODate;
 }
 
 export type ContactInquiryType =
@@ -323,5 +434,5 @@ export interface SiteData {
   manufacturers: Manufacturer[];
   guides: Guide[];
   useCases: UseCase[];
-  reports: Report[];
+  articles: Article[];
 }

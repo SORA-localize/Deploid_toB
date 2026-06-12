@@ -547,3 +547,30 @@ Git型CMS（Keystatic想定）への到達手順。各段階で `npm run build` 
 設計確定後の実装は **§12 段階A（id 導入）から**。これは純粋な追加で最も安全。A完了→validate拡張→B（参照id化）の順。1段階ずつ build と git diff を確認して進める。
 
 > 本書は設計のみ。実装着手は別途指示を待つ。
+
+---
+
+## 16. 実装ステータス（2026-06-12 / branch: experiment/data-refactor）
+
+**実装済み**（各ステージ1コミット・build green）:
+
+| 項目 | 本書の節 |
+|---|---|
+| 段階A: 全114レコードに不変 `id` 導入（`previousSlugs` / `nextReviewBy` / `supersededById` フィールド含む） | §3, §12-A |
+| 段階B: 参照フィールドの id 化（`manufacturerId` / `*Ids` / `articleId`）・`lib/data.ts` の id 解決 | §3-2, §12-B |
+| validate のビルドゲート化（error=build失敗 / warning=ログ。`npm run build` 前段で実行） | §10-1 |
+| 段階C: `lib/specSchema.ts` 新設・`RobotSpecs` をスキーマ導出に（現行8項目を登録） | §8, §12-C |
+| 段階D: reports→articles 内部改称＋`category` 必須導入（UI挙動・/reports URL・コンポーネント名は不変） | §7, §12-D |
+| `previousSlugs` 301（permanentRedirect・5詳細ルート）・archived 可視化（提供終了表示）・`supersededById`（figure-02→figure-03） | §3-3, §6.5 |
+| お気に入り・比較URLの id 化（保存値は現状無変化） | §6.5-3 |
+| canonical・JSON-LD（Product / Organization / NewsArticle）・noindex（archived / sample） | §11.7 |
+| 鮮度 warning（`nextReviewBy` 超過 or checkedAt 180日超）・外部画像 warning | §11.6, §9-1 |
+
+**先送り（未実装）**:
+
+- 段階E（`content/<collection>/<id>` レコード個別ファイル化）・段階F（Keystatic接続）→ §12
+- 画像の実ローカル化作業（warning による可視化まで実施。ダウンロード・権利確認は別タスク）→ §9-1
+- specSchema への新項目追加（リーチ・把持力・充電時間等。登録は1行だが値の裏取りが別作業）→ §8-3
+- category への UI 一本化（タブ=section・バッジ=type は現状維持。置換は別フェーズ判断）→ §7-1
+- `/reports`→`/news` URL 変更（当面 /reports 維持）→ §7
+- フィールド単位 reliability・価格構造化 → §11.8
