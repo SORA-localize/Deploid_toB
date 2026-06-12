@@ -224,7 +224,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {report.tags.map((tag) => (
-                    <TagChip key={tag} kind="report" value={tag} className="py-1" />
+                    <TagChip key={tag} kind="article" value={tag} className="py-1" />
                   ))}
                 </div>
               </section>
