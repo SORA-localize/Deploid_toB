@@ -71,7 +71,7 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
             <Slider key={report.slug} className="w-full h-full">
               <Link href={`/reports/${report.slug}`} className="group block relative w-full h-full overflow-hidden">
                 {/* Background Image */}
-                {report.heroImage ? (
+                {report.heroImage?.src ? (
                   <img
                     src={report.heroImage.src}
                     alt={report.heroImage.alt}

@@ -83,7 +83,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
       <JsonLd data={articleJsonLd(report)} />
 
       {/* ── ヒーロー + ヘッダー（統合） ── */}
-      {report.heroImage ? (
+      {report.heroImage?.src ? (
         <header className="border-b border-border bg-background">
           <div className="site-container pt-4 sm:pt-5">
             <Breadcrumbs items={breadcrumbItems} />
