@@ -29,32 +29,4 @@ export const articlePlacements: ArticlePlacement[] = [
     order: 30,
     kind: 'editorial',
   },
-  {
-    surface: 'reports-index',
-    slot: 'hero',
-    articleId: 'sample-atlas-factory-demo',
-    order: 40,
-    kind: 'sample',
-  },
-  {
-    surface: 'reports-index',
-    slot: 'hero',
-    articleId: 'sample-tesla-optimus-production',
-    order: 50,
-    kind: 'sample',
-  },
-  {
-    surface: 'reports-index',
-    slot: 'feature',
-    articleId: 'sample-japan-robot-regulation',
-    order: 10,
-    kind: 'sample',
-  },
-  {
-    surface: 'reports-index',
-    slot: 'feature',
-    articleId: 'sample-unitree-viral',
-    order: 20,
-    kind: 'sample',
-  },
 ];
