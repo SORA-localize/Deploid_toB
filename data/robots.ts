@@ -23,7 +23,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.unitree.com/images/52688de58de044358e4792a5b7c1593d_2740x1720.jpg',
+        src: '',
         alt: 'Unitree G1 humanoid robot on the official product page',
         credit: 'Unitree Robotics',
         sourceUrl: 'https://www.unitree.com/g1/',
@@ -85,7 +85,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.bmwgroup.com/content/dam/grpw/websites/bmwgroup_com/company/produktion/bmw-group-werk-spartanburg/2024/Humanoid-Roboter/2024-Humanoid-Robots-01.jpg.grp-transform/large/2024-Humanoid-Robots-01.jpg',
+        src: '',
         alt: 'Figure humanoid robot at BMW Group Plant Spartanburg',
         credit: 'BMW Group / Figure AI',
         sourceUrl: 'https://www.bmwgroup.com/en/news/general/2024/humanoid-robots.html',
@@ -135,7 +135,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.unitree.com/images/da1ecbd360a64ac88f6040c6d0c7d667.png',
+        src: '',
         alt: 'Unitree H1',
         credit: 'Unitree Robotics',
         sourceUrl: 'https://www.unitree.com/h1/',
@@ -188,7 +188,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://cdn.prod.website-files.com/646de3abb3e62d339f089e28/64e49f4de3eef177a948c864_2%20trans%20edit%20standing.png',
+        src: '',
         alt: 'Apptronik Apollo',
         credit: 'Apptronik',
         sourceUrl: 'https://apptronik.com/apollo',
@@ -448,7 +448,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.bmwgroup.com/content/dam/grpw/websites/bmwgroup_com/company/produktion/bmw-group-werk-spartanburg/2024/Humanoid-Roboter/2024-Humanoid-Robots-01.jpg',
+        src: '',
         alt: 'Figure 03',
         credit: 'BMW Group / Figure AI',
         sourceUrl: 'https://www.figure.ai/news/production-at-bmw',
@@ -503,7 +503,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.unitree.com/images/da1ecbd360a64ac88f6040c6d0c7d667.png',
+        src: '',
         alt: 'Unitree H2',
         credit: 'Unitree Robotics',
         sourceUrl: 'https://shop.unitree.com/products/unitree-h2',
@@ -559,7 +559,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://bostondynamics.com/wp-content/uploads/2024/04/Electric-Atlas-Hero.jpg',
+        src: '',
         alt: 'Electric Atlas',
         credit: 'Boston Dynamics',
         sourceUrl: 'https://bostondynamics.com/products/atlas/',
@@ -616,7 +616,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://electrek.co/wp-content/uploads/sites/3/2023/12/Tesla-Optimus-Gen-2.jpg',
+        src: '',
         alt: 'Tesla Optimus',
         credit: 'Tesla',
         sourceUrl: 'https://electrek.co/2023/12/12/tesla-optimus-gen-2-humanoid-robot-unveiled/',
@@ -671,7 +671,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://images.squarespace-cdn.com/content/v1/66e8617ff9cbf43e43b040ef/1734368452145-Z9X8Y7W6V5U4T3S2R1Q0/Sanctuary_AI_Phoenix_Gen8_White_BG.jpg',
+        src: '',
         alt: 'Phoenix',
         credit: 'Sanctuary AI',
         sourceUrl: 'https://www.sanctuary.ai/media-kit',
@@ -726,7 +726,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.agibot.com/public/uploads/images/20240305/c90be9e1ef7663152038aafff7f456e0.jpg',
+        src: '',
         alt: 'AgiBot A2',
         credit: 'AgiBot',
         sourceUrl: 'https://www.agibot.com/en/news',
@@ -782,7 +782,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.ubtrobot.com/en/humanoid/products/walker-s2/images/banner.jpg',
+        src: '',
         alt: 'Walker S2',
         credit: 'UBTECH Robotics',
         sourceUrl: 'https://www.ubtrobot.com/en/humanoid/products/walker-s2',
@@ -839,7 +839,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.fftai.com/images/products/gr2.png',
+        src: '',
         alt: 'Fourier GR-2',
         credit: 'Fourier Intelligence',
         sourceUrl: 'https://www.fftai.com/products-gr2',
@@ -896,7 +896,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.fftai.com/images/products/gr3.png',
+        src: '',
         alt: 'Fourier GR-3',
         credit: 'Fourier Intelligence',
         sourceUrl: 'https://www.fftai.com/products-gr3',
@@ -951,7 +951,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.booster.tech/wp-content/uploads/2024/04/T1-standing.jpg',
+        src: '',
         alt: 'Booster T1',
         credit: 'Booster Robotics',
         sourceUrl: 'https://www.booster.tech/booster-t1/',
@@ -1008,7 +1008,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://global.kawasaki.com/en/corp/newsroom/news/detail/images/20251211_7502_1.jpg',
+        src: '',
         alt: 'RHP Kaleido',
         credit: 'Kawasaki Heavy Industries',
         sourceUrl: 'https://global.kawasaki.com/en/corp/newsroom/news/detail/?f=20251211_7502',
@@ -1057,7 +1057,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://neura-robotics.com/wp-content/uploads/2024/04/4NE1-hero.jpg',
+        src: '',
         alt: '4NE1',
         credit: 'NEURA Robotics',
         sourceUrl: 'https://neura-robotics.com/products/4ne1/',
@@ -1112,7 +1112,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.gotokepler.com/images/products/k2/banner.jpg',
+        src: '',
         alt: 'Forerunner K2',
         credit: 'Kepler Robotics',
         sourceUrl: 'https://www.gotokepler.com',
@@ -1169,7 +1169,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.lejurobot.com/images/products/kuavo/banner.jpg',
+        src: '',
         alt: 'KUAVO 4Pro',
         credit: 'Leju Robotics',
         sourceUrl: 'https://www.lejurobot.com',
@@ -1224,7 +1224,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://pal-robotics.com/wp-content/uploads/2023/05/Talos-banner.jpg',
+        src: '',
         alt: 'TALOS',
         credit: 'PAL Robotics',
         sourceUrl: 'https://pal-robotics.com/robot/talos/',
@@ -1281,7 +1281,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.unitree.com/images/da1ecbd360a64ac88f6040c6d0c7d667.png',
+        src: '',
         alt: 'R1',
         credit: 'Unitree Robotics',
         sourceUrl: 'https://www.unitree.com/R1/',
@@ -1336,7 +1336,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.agibot.com/img/products/A2_Max/A2_Max_1.png',
+        src: '',
         alt: 'AgiBot A2 Ultra',
         credit: 'AgiBot',
         sourceUrl: 'https://www.agibot.com/products/A2_Max',
@@ -1393,7 +1393,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.ubtrobot.com/en/humanoid/products/walker-s1/images/banner.jpg',
+        src: '',
         alt: 'Walker S1',
         credit: 'UBTECH Robotics',
         sourceUrl: 'https://www.ubtrobot.com/en/humanoid/products/walker-s1',
@@ -1450,7 +1450,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.booster.tech/wp-content/uploads/2024/04/K1-standing.jpg',
+        src: '',
         alt: 'Booster K1',
         credit: 'Booster Robotics',
         sourceUrl: 'https://www.booster.tech/booster-k1/',
@@ -1505,7 +1505,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://pal-robotics.com/wp-content/uploads/2023/05/Kangaroo-banner.jpg',
+        src: '',
         alt: 'Kangaroo',
         credit: 'PAL Robotics',
         sourceUrl: 'https://pal-robotics.com/robot/kangaroo/',
@@ -1561,7 +1561,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.limxdynamics.com/images/products/oli/image.png',
+        src: '',
         alt: 'LimX Oli',
         credit: 'LimX Dynamics',
         sourceUrl: 'https://www.limxdynamics.com/',
@@ -1610,7 +1610,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.limxdynamics.com/images/products/luna/image.png',
+        src: '',
         alt: 'LimX Luna',
         credit: 'LimX Dynamics',
         sourceUrl: 'https://www.limxdynamics.com/',
@@ -1659,7 +1659,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://static.cnevpost.com/2025/11/Xpeng-chairman-and-CEO-He-Xiaopeng-unveils-next-generation-Iron-humanoid-robot-at-2025-AI-Day.jpg',
+        src: '',
         alt: 'XPENG IRON',
         credit: 'XPENG',
         sourceUrl: 'https://www.xpeng.com/pressroom/image',
@@ -1716,7 +1716,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://electrek.co/wp-content/uploads/sites/3/2023/12/Tesla-Optimus-Gen-2.jpg',
+        src: '',
         alt: 'Tesla Optimus（参考画像：Gen 2ベース）',
         credit: 'Tesla',
         sourceUrl: 'https://www.tesla.com/optimus',
@@ -1774,7 +1774,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://cdn.prod.website-files.com/68d6ca150ffa11fdc25d7575/698c88da0a3bf08e257409ea_digit-profile.jpg',
+        src: '',
         alt: 'Agility Robotics Digit v5',
         credit: 'Agility Robotics',
         sourceUrl: 'https://www.agilityrobotics.com/',
@@ -1830,7 +1830,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.fftai.com/images/products/gr1.png',
+        src: '',
         alt: 'Fourier GR-1 humanoid robot',
         credit: 'Fourier Intelligence',
         sourceUrl: 'https://www.fftai.com/products-gr1',
@@ -1938,7 +1938,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: 'https://www.ubtrobot.com/en/humanoid/products/walker-x/images/banner.jpg',
+        src: '',
         alt: 'UBTECH Walker X humanoid robot',
         credit: 'UBTECH Robotics',
         sourceUrl: 'https://www.ubtrobot.com/en/humanoid/products/walker-x',

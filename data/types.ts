@@ -385,7 +385,7 @@ export interface ArticlePlacementSponsor {
 export interface ArticlePlacement {
   surface: ArticlePlacementSurface;
   slot: ArticlePlacementSlot;
-  reportId: Id;
+  articleId: Id;
   order: number;
   kind?: ArticlePlacementKind;
   sponsor?: ArticlePlacementSponsor;
