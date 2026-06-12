@@ -12,7 +12,7 @@ export const guides: Guide[] = [
     reliability: 'reported',
     sources: [],
     heroImage: {
-      src: 'https://bostondynamics.com/wp-content/uploads/2024/04/Electric-Atlas-Hero.jpg',
+      src: '',
       alt: 'Atlas robot reflecting decision variables',
       credit: 'Boston Dynamics',
       rights: {
@@ -97,7 +97,7 @@ export const guides: Guide[] = [
     reliability: 'reported',
     sources: [],
     heroImage: {
-      src: 'https://www.bmwgroup.com/content/dam/grpw/websites/bmwgroup_com/company/produktion/bmw-group-werk-spartanburg/2024/Humanoid-Roboter/2024-Humanoid-Robots-01.jpg.grp-transform/large/2024-Humanoid-Robots-01.jpg',
+      src: '',
       alt: 'PoC planning with Figure robot',
       credit: 'BMW Group / Figure AI',
       rights: {

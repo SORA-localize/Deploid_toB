@@ -29,8 +29,8 @@ function appendPlacedArticles({
     .filter((placement) => placement.surface === reportsIndexSurface && placement.slot === slot)
     .sort((a, b) => a.order - b.order)
     .forEach((placement) => {
-      if (selectedArticles.length >= limit || usedIds.has(placement.reportId)) return;
-      const article = articlesById.get(placement.reportId);
+      if (selectedArticles.length >= limit || usedIds.has(placement.articleId)) return;
+      const article = articlesById.get(placement.articleId);
       if (!article) return;
       selectedArticles.push(article);
       usedIds.add(article.id);

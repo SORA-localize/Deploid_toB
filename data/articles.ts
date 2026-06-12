@@ -17,7 +17,7 @@ export const articles: Article[] = [
     author: 'Deploid Research',
     tags: ['manufacturing', 'poc', 'figure', 'bmw'],
     heroImage: {
-      src: 'https://www.bmwgroup.com/content/dam/grpw/websites/bmwgroup_com/company/produktion/bmw-group-werk-spartanburg/2024/Humanoid-Roboter/2024-Humanoid-Robots-01.jpg.grp-transform/large/2024-Humanoid-Robots-01.jpg',
+      src: '',
       alt: 'Figure robot at BMW plant',
       credit: 'BMW Group / Figure AI',
       rights: {
@@ -95,7 +95,7 @@ Figure はまだ外部企業への販売条件・価格・調達経路を公表�
     author: 'Deploid Research',
     tags: ['logistics', 'raas', 'agility', 'gxo'],
     heroImage: {
-      src: 'https://cdn.prod.website-files.com/68d6ca150ffa11fdc25d7575/69a999a06089628d0de01c85_Digit.avif',
+      src: '',
       alt: 'Digit robot moving totes at GXO',
       credit: 'Agility Robotics',
       rights: {
@@ -142,7 +142,7 @@ Figure はまだ外部企業への販売条件・価格・調達経路を公表�
     author: 'Deploid Research',
     tags: ['1x', 'consumer', 'subscription'],
     heroImage: {
-      src: 'https://www.1x.tech/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fqka6yvsc%2Fproduction%2F1054db069547b8a970273c62fa96fb6ae1818e8a-3665x2062.webp%3Fq%3D100%26fit%3Dmax%26auto%3Dformat&w=3840&q=75',
+      src: '',
       alt: '1X NEO robot',
       credit: '1X Technologies',
       rights: {

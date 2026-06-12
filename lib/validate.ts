@@ -98,10 +98,8 @@ export function validateData(): ValidationResult {
     asset: ImageAsset | undefined,
   ) => {
     if (!asset) return;
-    // 外部ホットリンクは脆い（リンク切れ・403・権利リスク）。ローカル配置（public/）を促す（設計 §9-1）
-    if (!asset.src.trim()) {
-      warnings.push(`[image-empty] ${kind} "${owner}".${field}.src が空です（プレースホルダ表示になります）`);
-    } else if (!asset.src.startsWith('/')) {
+    if (!asset.src.trim()) return; // 空src = 未取得。警告・検証不要
+    if (!asset.src.startsWith('/')) {
       warnings.push(`[image-remote] ${kind} "${owner}".${field}.src が外部URLです（public/ へのローカル化推奨）: ${asset.src}`);
     }
     if (!asset.alt.trim()) errors.push(`[image-alt] ${kind} "${owner}".${field}.alt が空です`);
@@ -375,7 +373,7 @@ export function validateData(): ValidationResult {
   const placementArticles = new Set<string>();
   for (const placement of articlePlacements) {
     const owner = `${placement.surface}.${placement.slot}.${placement.order}`;
-    check('articlePlacement', owner, 'reportId', placement.reportId, articleIds);
+    check('articlePlacement', owner, 'articleId', placement.articleId, articleIds);
 
     const orderKey = `${placement.surface}:${placement.slot}:${placement.order}`;
     if (placementOrders.has(orderKey)) {
@@ -383,7 +381,7 @@ export function validateData(): ValidationResult {
     }
     placementOrders.add(orderKey);
 
-    const articleKey = `${placement.surface}:${placement.slot}:${placement.reportId}`;
+    const articleKey = `${placement.surface}:${placement.slot}:${placement.articleId}`;
     if (placementArticles.has(articleKey)) {
       errors.push(`[duplicate] reportPlacement report 重複: ${articleKey}`);
     }

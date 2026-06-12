@@ -15,7 +15,7 @@ export const manufacturers: Manufacturer[] = [
     website: 'https://www.unitree.com/',
     contactUrl: 'https://techshare.co.jp/product/unitree/g1/',
     logo: {
-      src: 'https://www.unitree.com/images/0079f8938336436e955ea3a98c4e1e59.svg',
+      src: '',
       alt: 'Unitree Robotics logo',
       credit: 'Unitree Robotics',
       sourceUrl: 'https://www.unitree.com/g1/',
@@ -27,7 +27,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://www.unitree.com/images/52688de58de044358e4792a5b7c1593d_2740x1720.jpg',
+      src: '',
       alt: 'Unitree G1 humanoid robot',
       credit: 'Unitree Robotics',
       sourceUrl: 'https://www.unitree.com/g1/',
@@ -91,7 +91,7 @@ export const manufacturers: Manufacturer[] = [
     headquarters: { lat: 37.37, lng: -122.04 },
     website: 'https://www.figure.ai/',
     logo: {
-      src: 'https://images.ctfassets.net/qx5k8y1u9drj/3ygvPaiOiIX62OhZ7oNO2h/d50ccd3bc449eab7ae098d87aa0cd040/figure-logo.svg',
+      src: '',
       alt: 'Figure AI logo',
       credit: 'Figure AI',
       sourceUrl: 'https://www.figure.ai/',
@@ -103,7 +103,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://www.bmwgroup.com/content/dam/grpw/websites/bmwgroup_com/company/produktion/bmw-group-werk-spartanburg/2024/Humanoid-Roboter/2024-Humanoid-Robots-01.jpg.grp-transform/large/2024-Humanoid-Robots-01.jpg',
+      src: '',
       alt: 'Figure humanoid robot at BMW factory',
       credit: 'BMW Group / Figure AI',
       sourceUrl: 'https://www.bmwgroup.com/en/news/general/2024/humanoid-robots.html',
@@ -154,7 +154,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2016,
     website: 'https://apptronik.com/',
     logo: {
-      src: 'https://cdn.prod.website-files.com/646de3abb3e62d339f089e28/668fd3c17a9f60d7e90ceee1_apptronik%20text%20logo.svg',
+      src: '',
       alt: 'Apptronik logo',
       credit: 'Apptronik',
       sourceUrl: 'https://apptronik.com/',
@@ -166,7 +166,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://cdn.prod.website-files.com/646de3abb3e62d339f089e28/64e49f4de3eef177a948c864_2%20trans%20edit%20standing.png',
+      src: '',
       alt: 'Apptronik Apollo humanoid robot',
       credit: 'Apptronik',
       sourceUrl: 'https://apptronik.com/apollo',
@@ -283,7 +283,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2014,
     website: 'https://www.1x.tech/',
     logo: {
-      src: 'https://www.1x.tech/icons/1xLogo.svg',
+      src: '',
       alt: '1X logo',
       credit: '1X Technologies',
       sourceUrl: 'https://www.1x.tech/',
@@ -295,7 +295,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://www.1x.tech/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fqka6yvsc%2Fproduction%2F1054db069547b8a970273c62fa96fb6ae1818e8a-3665x2062.webp%3Fq%3D100%26fit%3Dmax%26auto%3Dformat&w=3840&q=75',
+      src: '',
       alt: '1X NEO home robot',
       credit: '1X Technologies',
       sourceUrl: 'https://1x.tech/order',
@@ -346,7 +346,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 1992,
     website: 'https://bostondynamics.com/',
     logo: {
-      src: 'https://bostondynamics.com/wp-content/uploads/2023/03/Logo-v2.svg',
+      src: '',
       alt: 'Boston Dynamics logo',
       credit: 'Boston Dynamics',
       sourceUrl: 'https://bostondynamics.com/',
@@ -358,7 +358,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://bostondynamics.com/wp-content/uploads/2024/04/Electric-Atlas-Hero.jpg',
+      src: '',
       alt: 'Boston Dynamics Electric Atlas',
       credit: 'Boston Dynamics',
       sourceUrl: 'https://bostondynamics.com/products/atlas/',
@@ -409,7 +409,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2003,
     website: 'https://www.tesla.com/',
     logo: {
-      src: 'https://www.tesla.com/themes/custom/tesla_frontend/assets/img/logo.svg',
+      src: '',
       alt: 'Tesla logo',
       credit: 'Tesla',
       sourceUrl: 'https://www.tesla.com/',
@@ -421,7 +421,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://electrek.co/wp-content/uploads/sites/3/2023/12/Tesla-Optimus-Gen-2.jpg',
+      src: '',
       alt: 'Tesla Optimus Gen 2 humanoid robot',
       credit: 'Tesla / Electrek',
       sourceUrl: 'https://electrek.co/2023/12/12/tesla-optimus-gen-2-humanoid-robot-unveiled/',
@@ -465,7 +465,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2018,
     website: 'https://www.sanctuary.ai/',
     logo: {
-      src: 'https://www.sanctuary.ai/wp-content/themes/sanctuary/assets/images/logo.svg',
+      src: '',
       alt: 'Sanctuary AI logo',
       credit: 'Sanctuary AI',
       sourceUrl: 'https://www.sanctuary.ai/',
@@ -477,7 +477,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://images.squarespace-cdn.com/content/v1/66e8617ff9cbf43e43b040ef/1734368452145-Z9X8Y7W6V5U4T3S2R1Q0/Sanctuary_AI_Phoenix_Gen8_White_BG.jpg',
+      src: '',
       alt: 'Sanctuary AI Phoenix Gen 8 humanoid robot',
       credit: 'Sanctuary AI',
       sourceUrl: 'https://www.sanctuary.ai/media-kit',
@@ -521,7 +521,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2023,
     website: 'https://www.agibot.com/',
     logo: {
-      src: 'https://www.agibot.com/public/static/index/en/images/logo.png',
+      src: '',
       alt: 'AgiBot logo',
       credit: 'AgiBot',
       sourceUrl: 'https://www.agibot.com/',
@@ -533,7 +533,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://www.agibot.com/public/uploads/images/20240305/c90be9e1ef7663152038aafff7f456e0.jpg',
+      src: '',
       alt: 'AgiBot A2 humanoid robot',
       credit: 'AgiBot',
       sourceUrl: 'https://www.agibot.com/en/news',
@@ -577,7 +577,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2012,
     website: 'https://www.ubtrobot.com/',
     logo: {
-      src: 'https://www.ubtrobot.com/favicon.ico',
+      src: '',
       alt: 'UBTECH logo',
       credit: 'UBTECH',
       sourceUrl: 'https://www.ubtrobot.com/',
@@ -589,7 +589,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://www.ubtrobot.com/en/humanoid/products/walker-s2/images/banner.jpg',
+      src: '',
       alt: 'UBTECH Walker S2 humanoid robot',
       credit: 'UBTECH Robotics',
       sourceUrl: 'https://www.ubtrobot.com/en/humanoid/products/walker-s2',
@@ -647,7 +647,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2015,
     website: 'https://fftai.com/',
     logo: {
-      src: 'https://www.fftai.com/favicon.ico',
+      src: '',
       alt: 'Fourier logo',
       credit: 'Fourier Intelligence',
       sourceUrl: 'https://www.fftai.com/',
@@ -659,7 +659,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://www.fftai.com/images/products/gr3.png',
+      src: '',
       alt: 'Fourier GR-3 humanoid robot',
       credit: 'Fourier Intelligence',
       sourceUrl: 'https://www.fftai.com/products-gr3',
@@ -703,7 +703,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2023,
     website: 'https://www.booster.tech/',
     logo: {
-      src: 'https://www.booster.tech/favicon.ico',
+      src: '',
       alt: 'Booster Robotics logo',
       credit: 'Booster Robotics',
       sourceUrl: 'https://www.booster.tech/',
@@ -715,7 +715,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://www.booster.tech/wp-content/uploads/2024/04/T1-standing.jpg',
+      src: '',
       alt: 'Booster T1 humanoid robot',
       credit: 'Booster Robotics',
       sourceUrl: 'https://www.booster.tech/booster-t1/',
@@ -774,7 +774,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 1896,
     website: 'https://www.khi.co.jp/',
     logo: {
-      src: 'https://www.khi.co.jp/favicon.ico',
+      src: '',
       alt: 'Kawasaki logo',
       credit: 'Kawasaki',
       sourceUrl: 'https://www.khi.co.jp/',
@@ -786,7 +786,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://global.kawasaki.com/en/corp/newsroom/news/detail/images/20251211_7502_1.jpg',
+      src: '',
       alt: 'Kawasaki Kaleido 9 humanoid robot',
       credit: 'Kawasaki Heavy Industries',
       sourceUrl: 'https://global.kawasaki.com/en/corp/newsroom/news/detail/?f=20251211_7502',
@@ -830,7 +830,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2019,
     website: 'https://neura-robotics.com',
     logo: {
-      src: 'https://neura-robotics.com/wp-content/uploads/2025/05/neura_logo_white.svg',
+      src: '',
       alt: 'NEURA Robotics logo',
       credit: 'NEURA Robotics',
       sourceUrl: 'https://neura-robotics.com/',
@@ -842,7 +842,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://neura-robotics.com/wp-content/uploads/2024/04/4NE1-hero.jpg',
+      src: '',
       alt: 'NEURA 4NE-1 humanoid robot',
       credit: 'NEURA Robotics',
       sourceUrl: 'https://neura-robotics.com/products/4ne1/',
@@ -902,7 +902,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2023,
     website: 'https://www.gotokepler.com',
     logo: {
-      src: 'https://www.gotokepler.com/favicon.ico',
+      src: '',
       alt: 'Kepler Robotics logo',
       credit: 'Kepler Robotics',
       sourceUrl: 'https://www.gotokepler.com/',
@@ -914,7 +914,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://www.gotokepler.com/images/products/k2/banner.jpg',
+      src: '',
       alt: 'Kepler Forerunner K2 humanoid robot',
       credit: 'Kepler Robotics',
       sourceUrl: 'https://www.gotokepler.com',
@@ -959,7 +959,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2016,
     website: 'https://www.lejurobot.com',
     logo: {
-      src: 'https://www.lejurobot.com/favicon.ico',
+      src: '',
       alt: 'Leju Robotics logo',
       credit: 'Leju Robotics',
       sourceUrl: 'https://www.lejurobot.com/',
@@ -971,7 +971,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://www.lejurobot.com/images/products/kuavo/banner.jpg',
+      src: '',
       alt: 'Leju Kuavo humanoid robot',
       credit: 'Leju Robotics',
       sourceUrl: 'https://www.lejurobot.com',
@@ -1015,7 +1015,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2004,
     website: 'https://pal-robotics.com',
     logo: {
-      src: 'https://pal-robotics.com/wp-content/uploads/2023/05/PAL-Robotics-Logo.svg',
+      src: '',
       alt: 'PAL Robotics logo',
       credit: 'PAL Robotics',
       sourceUrl: 'https://pal-robotics.com/',
@@ -1027,7 +1027,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://pal-robotics.com/wp-content/uploads/2023/05/Talos-banner.jpg',
+      src: '',
       alt: 'PAL Robotics TALOS humanoid robot',
       credit: 'PAL Robotics',
       sourceUrl: 'https://pal-robotics.com/robot/talos/',
@@ -1069,7 +1069,7 @@ export const manufacturers: Manufacturer[] = [
     hqCity: 'Shenzhen',
     website: 'https://www.limxdynamics.com/',
     logo: {
-      src: 'https://www.limxdynamics.com/img/logo.png',
+      src: '',
       alt: 'LimX Dynamics logo',
       credit: 'LimX Dynamics',
       sourceUrl: 'https://www.limxdynamics.com/',
@@ -1081,7 +1081,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://www.limxdynamics.com/images/products/oli/image.png',
+      src: '',
       alt: 'LimX Oli humanoid robot',
       credit: 'LimX Dynamics',
       sourceUrl: 'https://www.limxdynamics.com/',
@@ -1122,7 +1122,7 @@ export const manufacturers: Manufacturer[] = [
     hqCity: 'Guangzhou',
     website: 'https://www.xpeng.com/',
     logo: {
-      src: 'https://ir.xiaopeng.com/sites/g/files/knoqqb75791/themes/site/nir_pid7769/dist/images/logo.svg',
+      src: '',
       alt: 'XPENG logo',
       credit: 'XPENG',
       sourceUrl: 'https://ir.xiaopeng.com/',
@@ -1134,7 +1134,7 @@ export const manufacturers: Manufacturer[] = [
       },
     },
     heroImage: {
-      src: 'https://static.cnevpost.com/2025/11/Xpeng-chairman-and-CEO-He-Xiaopeng-unveils-next-generation-Iron-humanoid-robot-at-2025-AI-Day.jpg',
+      src: '',
       alt: 'XPENG Iron humanoid robot',
       credit: 'XPENG / CnEVPost',
       sourceUrl: 'https://www.xpeng.com/pressroom/image',
@@ -1178,7 +1178,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2023,
     website: 'https://www.engineai.com.cn/',
     logo: {
-      src: 'https://www.engineai.com.cn/favicon.ico',
+      src: '',
       alt: 'EngineAI logo',
       credit: 'EngineAI',
       sourceUrl: 'https://www.engineai.com.cn/',
@@ -1229,7 +1229,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2012,
     website: 'https://www.wandercraft.eu/',
     logo: {
-      src: 'https://www.wandercraft.eu/favicon.ico',
+      src: '',
       alt: 'Wandercraft logo',
       credit: 'Wandercraft',
       sourceUrl: 'https://www.wandercraft.eu/',
@@ -1280,7 +1280,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2021,
     website: 'https://www.robotera.com/',
     logo: {
-      src: 'https://www.robotera.com/favicon.ico',
+      src: '',
       alt: 'RobotEra logo',
       credit: 'RobotEra',
       sourceUrl: 'https://www.robotera.com/',
@@ -1331,7 +1331,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2022,
     website: 'https://www.menteebot.com/',
     logo: {
-      src: 'https://www.menteebot.com/favicon.ico',
+      src: '',
       alt: 'Mentee Robotics logo',
       credit: 'Mentee Robotics',
       sourceUrl: 'https://www.menteebot.com/',

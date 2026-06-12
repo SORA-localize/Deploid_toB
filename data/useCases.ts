@@ -13,7 +13,7 @@ export const useCases: UseCase[] = [
     reliability: 'reported',
     sources: [],
     heroImage: {
-      src: 'https://cdn.prod.website-files.com/68d6ca150ffa11fdc25d7575/69a999a06089628d0de01c85_Digit.avif',
+      src: '',
       alt: 'Digit robot in a warehouse environment',
       credit: 'Agility Robotics',
       rights: {
@@ -58,7 +58,7 @@ export const useCases: UseCase[] = [
     reliability: 'reported',
     sources: [],
     heroImage: {
-      src: 'https://www.bmwgroup.com/content/dam/grpw/websites/bmwgroup_com/company/produktion/bmw-group-werk-spartanburg/2024/Humanoid-Roboter/2024-Humanoid-Robots-02.jpg.grp-transform/large/2024-Humanoid-Robots-02.jpg',
+      src: '',
       alt: 'Humanoid robot in a factory production line',
       credit: 'BMW Group / Figure AI',
       rights: {
@@ -101,7 +101,7 @@ export const useCases: UseCase[] = [
     reliability: 'reported',
     sources: [],
     heroImage: {
-      src: 'https://www.unitree.com/images/39d02ea5ef314413855ae4790812e9ff_1920x1080.jpg',
+      src: '',
       alt: 'Humanoid robot in a research lab setting',
       credit: 'Unitree Robotics',
       rights: {
@@ -143,7 +143,7 @@ export const useCases: UseCase[] = [
     reliability: 'reported',
     sources: [],
     heroImage: {
-      src: 'https://www.fftai.com/images/products/gr3.png',
+      src: '',
       alt: 'Humanoid robot at a conference or exhibition',
       credit: 'Fourier Intelligence',
       rights: {
