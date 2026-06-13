@@ -18,6 +18,16 @@
 | `npm run start` | ビルド結果をローカル起動 |
 | `npm run validate:data` | データ整合チェックのみ実行 |
 
+## ブランチ運用
+
+- `main`: 公開可能な安定版。Vercel本番に載せてよい状態だけを置く
+- `content/data-maintenance`: AIで記事追加、データ更新、出典補強を行う継続作業ブランチ
+- `fix/<issue>`: 表示崩れ、検証エラー、SEO設定などの小さな修正用
+- `experiment/<name>`: UI、導線、広告枠などの検証用。採用しない前提でいつでも捨てられるようにする
+
+通常のデータ・記事更新は `content/data-maintenance` で行い、`npm run validate:data` と必要に応じて `npm run build` を通してから `main` に戻す。
+大きめの変更は `content/<topic>` や `fix/<issue>` を `main` から切り、完了後に `main` へmergeする。
+
 ## 環境変数
 
 ローカルでは `.env.example` を参考に `.env.local` を作る。実際の値はコミットしない。
