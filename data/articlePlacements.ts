@@ -33,7 +33,7 @@ export const articlePlacements: ArticlePlacement[] = [
   {
     surface: 'reports-index',
     slot: 'hero',
-    articleId: 'boston-dynamics-atlas-electric',
+    articleId: 'boston-dynamics-atlas-hyundai-rmac-june2026',
     order: 30,
     kind: 'editorial',
   },
@@ -41,7 +41,7 @@ export const articlePlacements: ArticlePlacement[] = [
   {
     surface: 'reports-index',
     slot: 'feature',
-    articleId: 'unitree-g1-price-evaluation',
+    articleId: 'unitree-ipo-star-market-june2026',
     order: 10,
     kind: 'editorial',
   },
