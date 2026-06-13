@@ -12,15 +12,29 @@ export const articlePlacements: ArticlePlacement[] = [
   {
     surface: 'reports-index',
     slot: 'hero',
-    articleId: 'bmw-figure-deployment',
+    articleId: 'jal-haneda-unitree-pilot-2026',
+    order: 5,
+    kind: 'editorial',
+  },
+  {
+    surface: 'reports-index',
+    slot: 'hero',
+    articleId: 'figure-botq-production-milestone-2026',
     order: 10,
     kind: 'editorial',
   },
   {
     surface: 'reports-index',
     slot: 'hero',
-    articleId: 'boston-dynamics-atlas-electric',
+    articleId: 'bmw-figure-deployment',
     order: 20,
+    kind: 'editorial',
+  },
+  {
+    surface: 'reports-index',
+    slot: 'hero',
+    articleId: 'boston-dynamics-atlas-electric',
+    order: 30,
     kind: 'editorial',
   },
   // ── feature スロット（右カード列） ──
