@@ -94,35 +94,36 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           }
         />
 
-        <div className="grid grid-cols-1 gap-4 mb-5 sm:grid-cols-2 max-w-2xl">
-          <SelectControl
-            id="manufacturer-country"
-            label={uiText.filters.region}
-            value={filters.country}
-            onChange={(nextCountry) =>
-              updateParams({ country: nextCountry === 'all' ? null : nextCountry })
-            }
-            options={countryOptions}
-            searchable
-          />
-          <SelectControl
-            id="manufacturer-consultation-route"
-            label={uiText.filters.consultationRoute}
-            value={filters.consultationRoute}
-            onChange={(nextRoute) =>
-              updateParams({ route: nextRoute === 'all' ? null : nextRoute })
-            }
-            options={consultationRouteOptions}
-            searchable
-          />
+        <div className="sm:flex sm:items-end gap-4 mb-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 max-w-2xl sm:shrink-0">
+            <SelectControl
+              id="manufacturer-country"
+              label={uiText.filters.region}
+              value={filters.country}
+              onChange={(nextCountry) =>
+                updateParams({ country: nextCountry === 'all' ? null : nextCountry })
+              }
+              options={countryOptions}
+              searchable
+            />
+            <SelectControl
+              id="manufacturer-consultation-route"
+              label={uiText.filters.consultationRoute}
+              value={filters.consultationRoute}
+              onChange={(nextRoute) =>
+                updateParams({ route: nextRoute === 'all' ? null : nextRoute })
+              }
+              options={consultationRouteOptions}
+              searchable
+            />
+          </div>
+          <p className="mt-3 sm:mt-0 sm:ml-auto shrink-0 whitespace-nowrap text-xs text-muted-foreground text-right sm:text-left">
+            {uiText.common.results(
+              filtered.length,
+              filters.country !== 'all' || filters.consultationRoute !== 'all' || filters.query !== '',
+            )}
+          </p>
         </div>
-
-        <p className="mb-4 text-xs text-muted-foreground">
-          {uiText.common.results(
-            filtered.length,
-            filters.country !== 'all' || filters.consultationRoute !== 'all' || filters.query !== '',
-          )}
-        </p>
 
         {filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
