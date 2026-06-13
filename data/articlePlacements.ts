@@ -8,6 +8,7 @@ export const articleIndexPlacementLimits: Record<ArticlePlacementSlot, number> =
 // Reports page curation slots. Sponsored placements should be represented here,
 // not embedded in presentation components.
 export const articlePlacements: ArticlePlacement[] = [
+  // ── hero スロット（左カルーセル） ──
   {
     surface: 'reports-index',
     slot: 'hero',
@@ -18,15 +19,23 @@ export const articlePlacements: ArticlePlacement[] = [
   {
     surface: 'reports-index',
     slot: 'hero',
-    articleId: 'gxo-digit-100k-totes',
+    articleId: 'boston-dynamics-atlas-electric',
     order: 20,
+    kind: 'editorial',
+  },
+  // ── feature スロット（右カード列） ──
+  {
+    surface: 'reports-index',
+    slot: 'feature',
+    articleId: 'unitree-g1-price-evaluation',
+    order: 10,
     kind: 'editorial',
   },
   {
     surface: 'reports-index',
-    slot: 'hero',
+    slot: 'feature',
     articleId: 'onex-neo-preorder',
-    order: 30,
+    order: 20,
     kind: 'editorial',
   },
 ];
