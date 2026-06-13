@@ -12,7 +12,7 @@ export const deployments: DeploymentSite[] = [
     id: 'figure-bmw-spartanburg',
     slug: 'figure-bmw-spartanburg',
     manufacturerId: 'figure-ai',
-    robotId: 'figure-03',
+    robotId: 'figure-02',
     customer: 'BMW Group',
     siteName: 'Plant Spartanburg',
     country: 'USA',
