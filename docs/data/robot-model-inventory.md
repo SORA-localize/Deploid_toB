@@ -4,6 +4,7 @@
 > **スコープ**: 二足歩行・腕2本のヒューマノイドのみ（車輪式・脚のみは別途判断）  
 > **更新**: 2026-05-30  
 > **凡例 — DB列**: ✅ 掲載済 | ➕ 追加候補 | ⏸ 保留 | ❌ スコープ外
+> **運用メモ**: 現行の正本は `data/robots.ts`。参照は `id`、公開URLは `slug` を使う。A2 Ultra は互換性維持のため `id: agibot-a2-max`、公開slugは `agibot-a2-ultra`。
 
 ---
 
@@ -95,7 +96,7 @@
 |---|---|---|---|---|---|---|
 | RAISE A1 | 2023 | discontinued | 175cm | 53kg | 初号機。49DOF・80kgペイロード | ⏸ A1として追加検討 |
 | **A2** | 2024 | production | 175cm | 55kg | **40+DOF・19DOF手・106km歩行ギネス** | ✅ `agibot-a2` |
-| **A2-Max** | 2024 | production | 175cm | 85kg | **67DOF・40kgペイロード・重作業向け** | ➕ `agibot-a2-max` |
+| **A2 Ultra / A2-Max** | 2024 | production | 175cm | 85kg | **67DOF・40kgペイロード・重作業向け** | ✅ id `agibot-a2-max` / slug `agibot-a2-ultra` |
 | A2-W | 2024 | production | 175cm | ~55kg | A2の車輪バリアント | ❌ 車輪式 |
 | Lingxi X1 | 2024 | pilot | 130cm | 34kg | コンパクト・OSS公開 | ⏸ 追加検討 |
 | **Lingxi X2** | 2025 | production | 130cm | 33.8kg | **28DOF・自転車乗車可・量産中** | ➕ `agibot-x2` |
@@ -196,20 +197,20 @@
 
 ### A: 現行販売中・実績あり（すぐ追加）
 
-| slug候補 | メーカー | モデル | 理由 |
+| id候補 | メーカー | モデル | 理由 |
 |---|---|---|---|
 | `unitree-r1` | Unitree | R1 Air | $4,900・最安量産機・2026出荷 |
 | `agility-digit` | Agility | Digit v4 | Amazon/GXO実績・DB確認要 |
 | `apptronik-apollo` | Apptronik | Apollo | NASA系譜・量産中・DB確認要 |
 | `1x-neo` | 1X | NEO | $20K・ホーム向け・DB確認要 |
-| `agibot-a2-max` | Agibot | A2-Max | 67DOF・40kg重作業 |
+| `agibot-a2-max` | Agibot | A2 Ultra | 67DOF・40kg重作業。公開slugは `agibot-a2-ultra` |
 | `ubtech-walker-s1` | UBTECH | Walker S1 | S2の前世代・現役販売 |
 | `booster-k1` | Booster | K1 | $12,500・教育向け |
 | `pal-kangaroo` | PAL | Kangaroo | 軽量・商用販売中 |
 
 ### B: 追加価値あり・判断が必要
 
-| slug候補 | モデル | 判断ポイント |
+| id候補 | モデル | 判断ポイント |
 |---|---|---|
 | `fourier-gr1` | Fourier GR-1 | discontinued だが歴史的に重要 |
 | `agibot-x2` | Lingxi X2 | コンパクト・量産中だが130cm |
@@ -240,12 +241,11 @@ booster-t1 / kawasaki-kaleido / neura-4ne-1 / kepler-k2 / leju-kuavo / pal-talos
 　1X NEO（`onex-neo`）は**確認済みで掲載済み**。
 → 優先度Aの「DB確認要」3件は全てスキップ可。
 
-## 次に追加すべきもの（優先度A・未掲載のみ）
+## 次に追加すべきもの（優先度A・未掲載のみ、2026-05-30時点）
 
-| slug候補 | モデル | 根拠 |
+| id候補 | モデル | 根拠 |
 |---|---|---|
 | `unitree-r1` | Unitree R1 Air | $4,900・最安量産機・2026出荷中 |
-| `agibot-a2-max` | Agibot A2-Max | 67DOF・40kg重作業・現行販売 |
 | `ubtech-walker-s1` | UBTECH Walker S1 | S2の前世代・現役販売中 |
 | `booster-k1` | Booster K1 | $12,500・教育/競技向け・国内代理店確認要 |
 | `pal-kangaroo` | PAL Kangaroo | 軽量28DOF・商用販売中 |

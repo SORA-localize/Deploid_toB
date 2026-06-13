@@ -13,15 +13,16 @@
 1. [ ] 公式ページ / press release / 信頼できる報道で事実確認（一次出典優先）
 2. [ ] **id を発番**（小文字・ハイフン・英数。発番後は不変。例 `unitree-g1`）。初期は `slug = id`
 3. [ ] `publishStatus: 'draft'` で作成
-4. [ ] `manufacturerId` の参照先が存在する（自動：参照切れは build 失敗）
-5. [ ] `sources` に `checkedAt` と `reliability` を記入（手動）
-6. [ ] **公開ゲート必須項目**を充足（→ セクション F）
-7. [ ] `specs` を specSchema にある項目で記入。不明値は**省略**（要確認表示に任せる）
-8. [ ] 画像をローカル配置：`public/images/robots/<id>-<role>.<ext>`（外部ホットリンク禁止）
-9. [ ] 画像 `rights`（credit / sourceUrl / rights）を記入（自動：参照表示系は必須）
-10. [ ] industryTags / taskTags は tagRegistry の登録値のみ（自動：未登録は build 失敗）
-11. [ ] `nextReviewBy` を設定（価格含むなら短め）
-12. [ ] `npm run build` が通る → 問題なければ `publishStatus: 'published'`
+4. [ ] `name` / `nameJa` はモデル名を優先し、メーカー名を重複させない（例: `G1`、`A2 Ultra`）
+5. [ ] `manufacturerId` の参照先が存在する（自動：参照切れは build 失敗）
+6. [ ] `sources` に `checkedAt` と `reliability` を記入（手動）
+7. [ ] **公開ゲート必須項目**を充足（→ セクション F）
+8. [ ] `specs` を specSchema にある項目で記入。不明値は**省略**（要確認表示に任せる）
+9. [ ] 画像をローカル配置：`public/images/robots/<id>-<role>.<ext>`（外部ホットリンク禁止）
+10. [ ] 画像 `rights`（credit / sourceUrl / rights）を記入（自動：参照表示系は必須）
+11. [ ] industryTags / taskTags は tagRegistry の登録値のみ（自動：未登録は build 失敗）
+12. [ ] `nextReviewBy` を設定（価格含むなら短め）
+13. [ ] `npm run build` が通る → 問題なければ `publishStatus: 'published'`
 
 ## B. メーカー追加
 
@@ -53,9 +54,10 @@
 2. [ ] **旧 slug を `previousSlugs` に追記**（301リダイレクト元になる）
 3. [ ] `slug` を新値に更新
 4. [ ] `id` と全参照（`*Id` / `*Ids`）は**据え置き**（無改修）
-5. [ ] 自動：`previousSlugs` が現存 slug と衝突しないか（build チェック）
-6. [ ] 手動：旧URLが新URLへ 301 されるか確認
-7. [ ] 手動：お気に入り・比較が壊れないか（client状態は id 保持のため影響なし）
+5. [ ] 旧 slug と同じ slug の新規レコードを作らない（`previousSlugs` と現存 slug が衝突する）
+6. [ ] 自動：`previousSlugs` が現存 slug と衝突しないか（build チェック）
+7. [ ] 手動：旧URLが新URLへ 301 されるか確認
+8. [ ] 手動：お気に入り・比較が壊れないか（client状態は id 保持のため影響なし）
 
 ## E. レコードの提供終了 / 後継機（archive）
 
@@ -110,11 +112,20 @@
 
 ## I. タグ / enum / スペック項目を増やすとき
 
-- **タグ追加** → `lib/tagRegistry.ts` に1行 → 該当レコードに付与（未登録は build 失敗）
+- **タグ追加** → `lib/tagRegistry.ts` に1行 → 該当レコードに付与（未登録は build 失敗）。`value` は安定キー、`label` はUI表示用なので略称・自然な短縮表記でよい
 - **enum値追加** → 型 ＋ `lib/labels.ts`（ラベル）＋ `lib/display.ts`（順序）を更新（自動：順序網羅チェックあり）
 - **スペック項目追加** → `lib/specSchema.ts` に1行 → 該当ロボットの `specs` に値（型・スペック表・比較表が自動追従）
 
 > 原則：**正本は1箇所**。直書きで増やさない（§設計5）。
+
+---
+
+## J. 表示名 / ソート方針
+
+- ロボット名はモデル名を正本にする。メーカー名は `manufacturerId` から別表示されるため、`name` / `nameJa` にメーカー接頭辞を入れない
+- メーカー名・タグ名のUI表示は `lib/labels.ts` / `lib/tagRegistry.ts` の `label` を使う。表示用 `label` は略称でもよいが、検索・参照に使う `value` / `id` は変えない
+- ロボット一覧・メーカー一覧・比較候補の基本順は `lib/data.ts` の `getRobots()` / `getManufacturers()` がアルファベット順で決める
+- 手動で上位表示したい場合は配列順を変えず、既存の `featuredRank` やページ固有の明示ソートを使う
 
 ---
 

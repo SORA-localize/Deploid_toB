@@ -157,7 +157,7 @@
 - hqCity: `Shanghai`
 - website: `https://www.agibot.com/`
 - japanPresence: `unknown`
-- 代表機種: `agibot-a2`, `agibot-a2-max`
+- 代表機種: `agibot-a2`, `agibot-a2-max`（A2 Ultra。公開slugは `agibot-a2-ultra`）
 - description 下書き: 2025年に年間5,168台のヒューマノイドを出荷し、世界シェアトップクラスに。Aシリーズ(等身大)だけでなく、Xシリーズ(機動型)など多角的なラインナップを持つ。2026年には累計1万台を突破。
 - summary 下書き: 中国トップの出荷台数を誇る、実用量産化のトップランナー。
 - sources: [AgiBot Official](https://www.agibot.com/)
