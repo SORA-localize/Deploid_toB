@@ -60,7 +60,7 @@ const resultCount = hasActiveFilters ? crossReleaseTotal : filtered.length;
 
 ### 設計方針
 
-`max-w-*xl` を**フィルターグリッド側に残し**、外側ラッパーは `max-w` なし（site-container 全幅）にする。  
+`max-w-*xl` を**フィルターグリッド側に残し**、外側ラッパーは `max-w` なし（site-container 全幅）にする。
 件数に `ml-auto` を付けることで flex 文脈の残余スペースをすべて吸収し、コンテナ右端（= カードグリッド右辺）へ押し出す。
 
 ```
