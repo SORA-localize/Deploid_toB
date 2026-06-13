@@ -71,7 +71,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
         ]
       : []),
     ...(hasRelated ? [{ label: uiText.reports.relatedInfo, href: '#related' }] : []),
-    { label: uiText.common.resources, href: '#sources' },
   ];
 
   return (

@@ -53,7 +53,6 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
     ...(hasBody ? [{ label: uiText.guides.body, href: '#body' }] : []),
     ...(hasChecklist ? [{ label: uiText.guides.checklist, href: '#checklist' }] : []),
     ...(hasRelated ? [{ label: uiText.guides.relatedInfo, href: '#related' }] : []),
-    { label: uiText.common.resources, href: '#sources' },
   ];
   const relatedRobotItems = robots.map((robot) => ({
     href: `/robots/${robot.slug}`,
