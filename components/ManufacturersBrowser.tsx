@@ -94,8 +94,8 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
           }
         />
 
-        <div className="sm:flex sm:items-end sm:justify-between gap-4 mb-5 max-w-2xl">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:flex-1 sm:min-w-0">
+        <div className="sm:flex sm:items-end gap-4 mb-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 max-w-2xl sm:shrink-0">
             <SelectControl
               id="manufacturer-country"
               label={uiText.filters.region}
@@ -117,7 +117,7 @@ export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBro
               searchable
             />
           </div>
-          <p className="mt-3 sm:mt-0 shrink-0 whitespace-nowrap text-xs text-muted-foreground">
+          <p className="mt-3 sm:mt-0 sm:ml-auto shrink-0 whitespace-nowrap text-xs text-muted-foreground text-right sm:text-left">
             {uiText.common.results(
               filtered.length,
               filters.country !== 'all' || filters.consultationRoute !== 'all' || filters.query !== '',

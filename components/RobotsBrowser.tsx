@@ -170,8 +170,8 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           }
         />
 
-        <div className="xl:flex xl:items-end xl:justify-between gap-4 mb-5 max-w-4xl">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:flex-1 xl:min-w-0">
+        <div className="xl:flex xl:items-end gap-4 mb-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 max-w-4xl xl:shrink-0">
             <SelectControl
               id="robot-industry"
               label={uiText.filters.industry}
@@ -202,7 +202,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
               options={availabilityOptions}
             />
           </div>
-          <p className="mt-3 xl:mt-0 shrink-0 whitespace-nowrap px-1 text-xs text-muted-foreground">
+          <p className="mt-3 xl:mt-0 xl:ml-auto shrink-0 whitespace-nowrap px-1 text-xs text-muted-foreground text-right xl:text-left">
             {uiText.common.results(resultCount, hasActiveFilters)}
           </p>
         </div>
