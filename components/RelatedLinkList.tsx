@@ -11,12 +11,14 @@ interface RelatedLinkListProps {
   id: string;
   title: string;
   items: readonly RelatedLinkItem[];
+  titleLevel?: 'h2' | 'h3';
 }
 
-export function RelatedLinkList({ id, title, items }: RelatedLinkListProps) {
+export function RelatedLinkList({ id, title, items, titleLevel = 'h2' }: RelatedLinkListProps) {
+  const Heading = titleLevel;
   return (
     <div id={id} className="border border-border bg-card p-6 scroll-mt-site-header">
-      <h2 className="text-lg font-semibold text-foreground mb-4">{title}</h2>
+      <Heading className="text-lg font-semibold text-foreground mb-4">{title}</Heading>
       <div className="space-y-3">
         {items.map((item) => (
           <Link

@@ -235,7 +235,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   {robots.length > 0 && (
                     <RelatedLinkList
                       id="related-robots"
-                      title="関連ロボット"
+                      title={uiText.reports.relatedRobots}
+                      titleLevel="h3"
                       items={robots.map((r) => ({
                         href: `/robots/${r.slug}`,
                         title: getRobotRelatedTitle(r),
@@ -246,7 +247,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   {manufacturers.length > 0 && (
                     <RelatedLinkList
                       id="related-manufacturers"
-                      title="関連メーカー"
+                      title={uiText.reports.relatedManufacturers}
+                      titleLevel="h3"
                       items={manufacturers.map((m) => ({
                         href: `/manufacturers/${m.slug}`,
                         title: m.nameJa ?? m.name,
@@ -257,7 +259,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   {useCases.length > 0 && (
                     <RelatedLinkList
                       id="related-use-cases"
-                      title="関連用途"
+                      title={uiText.reports.relatedUseCases}
+                      titleLevel="h3"
                       items={useCases.map((u) => ({
                         href: `/use-cases/${u.slug}`,
                         title: u.titleJa ?? u.title,
@@ -267,7 +270,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   {guides.length > 0 && (
                     <RelatedLinkList
                       id="related-guides"
-                      title="関連ガイド"
+                      title={uiText.reports.relatedGuides}
+                      titleLevel="h3"
                       items={guides.map((g) => ({
                         href: `/guides/${g.slug}`,
                         title: g.titleJa ?? g.title,

@@ -157,6 +157,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
                     <RelatedLinkList
                       id="related-robots"
                       title={uiText.guides.relatedRobots}
+                      titleLevel="h3"
                       items={relatedRobotItems}
                     />
                   )}
@@ -164,6 +165,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
                     <RelatedLinkList
                       id="related-use-cases"
                       title={uiText.guides.relatedUseCases}
+                      titleLevel="h3"
                       items={relatedUseCaseItems}
                     />
                   )}

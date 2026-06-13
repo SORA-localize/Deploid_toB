@@ -132,6 +132,10 @@ export const uiText = {
     keyTakeaways: '要点',
     body: '本文',
     relatedInfo: '関連情報',
+    relatedRobots: '関連ロボット',
+    relatedManufacturers: '関連メーカー',
+    relatedUseCases: '関連用途',
+    relatedGuides: '関連ガイド',
   },
   useCases: {
     breadcrumb: '用途から探す',
