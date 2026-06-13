@@ -1,26 +1,51 @@
 # Planning Documents
 
-This directory contains the current planning source for the Next.js migration.
+Last cleaned: 2026-06-13
 
-Primary files:
+このディレクトリは、Deploid の現在有効な設計判断と運用方針を置く場所です。
+実装済みの一時計画や過去の移行計画は `docs/planning/archive/` に退避しています。
 
-- `nextjs_data_types_v1.ts`: source of truth for `data/types.ts`
-- `nextjs_pre_migration_decisions_v1.md`: URL, navigation, data, CMS, and UI decisions before migration
-- `nextjs_migration_guide_v1.md`: step-by-step Vite/Figma Make UI to Next.js migration guide
-- `figma_ui_restoration_plan_v1.md`: phase-based plan to restore Figma Make UI fidelity in the Next.js implementation
-- `ai_fullstack_development_guardrails_v1.md`: guardrails for AI-only web/full-stack implementation, self-audit phases, and fail-safes
-- `refactor_search_tags_execution_plan_v1.md`: phase plan for UI deduplication, data/helper cleanup, tag behavior, search improvements, and safety checks
-- `refactor_search_tags_phase1_audit_v1.md`: Phase 1 audit findings and prioritized implementation targets for the refactor/search/tag plan
-- `refactor_search_tags_phase3_5_recovery_plan_v1.md`: follow-up recovery plan before returning from Phase 3 to Phase 4 tag foundations
-- `refactor_search_tags_phase9_final_audit_v1.md`: final audit results after the UI/search/tag/env refactor phases
-- `ui_architecture_and_development_policy_v1.md`: current UI structure, component responsibilities, and future UI development policy
-- `design_system_v1.md`: visual design system, layout rules, component patterns, and UI acceptance checklist
-- `ui_content_structure_refactor_plan_v1.md`: phased plan for Japanese UI copy, filter taxonomy, URL state, compare UI, guide layout, tag validation, and AI-only implementation checks
-- `humanoid_platform_tech_stack_v1.md`: technology stack decision
-- `humanoid_data_model_policy_v1.md`: data model policy and quality rules
-- `humanoid_data_management_guide_v1.md`: data operation guide
-- `data-architecture-redesign-v1.md`: data structure redesign (id/slug separation, source-of-truth registries, specSchema, articles/news model, validate-as-build-gate, media placement, freshness, SEO, CMS migration path)
-- `data-maintenance-checklist-v1.md`: operational checklists for adding/updating records, slug changes, publish gates, and freshness review
-- `copyright_and_media_rights_policy_v1.md`: copyright, trademark, media rights, and publication gate policy
+## まず読むもの
 
-Legacy Astro files in the repository are references only. New implementation work should follow the Next.js direction documented here.
+- `../../ai_implementation_workflow_prompt.md` — AIに計画、実装、レビューを任せるときの共通手順
+- `../data/README.md` — AIでデータ追加・更新を行うときの入口
+- `data-maintenance-checklist-v1.md` — データ追加、slug変更、公開前確認、鮮度レビューの実行チェックリスト
+- `data-architecture-redesign-v1.md` — id/slug分離、参照設計、正本管理、CMS移行を見据えたデータ設計
+- `copyright_and_media_rights_policy_v1.md` — 画像、ロゴ、引用、出典、権利ステータスの運用方針
+- `design_system_v1.md` — 現行UIのデザイン原則、semantic token、カード/レイアウト方針
+
+## 現行の正本
+
+- データ型: `../../data/types.ts`
+- データ取得/関連解決: `../../lib/data.ts`
+- データ検証: `../../lib/validate.ts` と `../../scripts/validate-data.mjs`
+- タグ正本: `../../lib/tagRegistry.ts`
+- スペック項目正本: `../../lib/specSchema.ts`
+- enumラベル/表示順: `../../lib/labels.ts` と `../../lib/display.ts`
+- UI文言: `../../lib/uiText.ts`
+- 色・テーマtoken: `../../src/app/globals.css`
+- semantic tone: `../../lib/visualSemantics.ts`
+
+ページ実装から `data/*.ts` を直接検索せず、取得や関連解決は `lib/data.ts` 経由にします。
+
+## 現在残している設計文書
+
+- `ai_fullstack_development_guardrails_v1.md` — AI実装時の安全策と自己監査
+- `architecture_future_considerations_v1.md` — 将来検討
+- `copyright_and_media_rights_policy_v1.md` — 権利、引用、メディア利用
+- `data-architecture-redesign-v1.md` — データ構造設計
+- `data-maintenance-checklist-v1.md` — データ運用チェックリスト
+- `deployment_sites_research_prompt_2026-06-01.md` — 導入事例データ調査用プロンプト
+- `design_system_v1.md` — デザインシステム
+- `humanoid_data_management_guide_v1.md` — データ運用の背景説明
+- `humanoid_data_model_policy_v1.md` — データモデル設計指針
+- `humanoid_media_IA_v1.md` — 情報設計
+- `humanoid_media_build_notes_v1.md` — UI/コンテンツ品質メモ
+- `humanoid_mvp_scope_decision_v1.md` — MVPスコープ判断
+- `humanoid_platform_tech_stack_v1.md` — 技術スタック
+- `ui_architecture_and_development_policy_v1.md` — UI構造と開発方針
+
+## アーカイブ
+
+`docs/planning/archive/` は実装済み・履歴参照用の計画書置き場です。
+新しい実装判断では、まず現行コードと上記の正本を確認し、アーカイブ文書は経緯確認に限定して使います。

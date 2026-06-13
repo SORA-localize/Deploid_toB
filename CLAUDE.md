@@ -17,28 +17,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 設計と意思決定は `docs/planning/` のドキュメント群に集約されている。コードを書く前に必ず参照する：
 
 - `docs/planning/README.md` — ドキュメント地図（迷ったらまずこれ。矛盾時の優先順位もここ）
-- `docs/planning/figma_ui_restoration_plan_v1.md` — **現在進行中の作業計画**（Figma UIをNext.jsへ復元するフェーズ手順）
-- `docs/planning/nextjs_pre_migration_decisions_v1.md` — 技術決定（スタック・URL命名・UIトークン）
+- `ai_implementation_workflow_prompt.md` — AI実装・調査・レビューの共通ワークフロー
+- `docs/data/README.md` — AIでデータ追加・更新を行うときの入口
+- `docs/planning/data-maintenance-checklist-v1.md` — データ追加、slug変更、公開前確認、鮮度レビュー
+- `docs/planning/data-architecture-redesign-v1.md` — id/slug分離、参照設計、正本管理
+- `docs/planning/copyright_and_media_rights_policy_v1.md` — 画像、ロゴ、引用、出典、権利管理
+- `docs/planning/design_system_v1.md` — semantic token、カード/レイアウト方針
 - `docs/planning/humanoid_media_IA_v1.md` — 情報設計（ナビ・各ページの役割・書くべき内容）
 - `docs/planning/humanoid_data_management_guide_v1.md` — データ運用（コレクションの役割・命名・出典）
-- `docs/planning/nextjs_data_types_v1.ts` — **データ型の真実源**（`data/types.ts` はこれと一致させる）
 
 ページ構成・スキーマ・コピー方針で迷ったら**まず上記を読む**。コードからは推論できない判断基準（なぜこのページ構成か／何を作らないか／なぜNext.js+Vercelか）がここにある。
 
-## 現在の作業（厳守）
+## 現在の作業方針
 
-`docs/planning/figma_ui_restoration_plan_v1.md`（v2 / Option C）に従う。**堅牢なデータ層の上に、Figma UIを逐語コピーで載せ直す。**
+Next.js移行と主要UIリファクタは完了済み。今後の中心は、公開情報に基づくデータ/記事拡充、出典と権利の保守、SEO/計測/収益導線の小さな改善。
 
-- **核心ルール：Figmaのマークアップは逐語コピー。再解釈・restyle・独自UIは禁止。差分はバグ。**（UI実装が2回ゴミ化した原因がこれ）
-  - そのままコピー：構造・`className`(Tailwind)・**列構造**・カード解剖・インタラクション
-  - 機械的置換のみ：`react-router`→`next/link`/`usePathname`/`params`、`id`→`slug`、`mockData`→`@/lib/data`、`/posts`→`/reports`、`/industries`→`/use-cases`
-  - 内容差し替え：brand=`Deploid`、Figmaの仮スペック→自データ＋無ければ `要確認`
-- **データ層（`data/` `lib/`）は完成度が高い。作り直すのはUI層のみ。**
-- まず **Phase 1 でこれまでの再現UIをクリーンに削ぎ落とす**（globals.cssをTailwind+Figmaトークンのみに、レガシー独自クラス/トークンと簡易カードを撤去）。その後にFigma逐語コピー。
-- 優先順位：**Home → ロボット → メーカー → 比較**（公開情報で作り切れる4領域を先に）
-- 1フェーズごとに `npm run build` を通し、Figma原本と構造差分が無いか並べて確認、`git diff --stat` を見てから次へ。
-
-スコープや方針を変える前に必ずユーザーに確認すること。
+- 大きなUI作り直しではなく、既存の `data/` / `lib/` / component 責務に沿って最小変更する
+- guides / use-cases は一次情報が薄い間は慎重に扱い、薄いページを量産しない
+- データ追加は `docs/data/README.md` と `docs/planning/data-maintenance-checklist-v1.md` に従う
+- UI変更は `src/app/globals.css` のsemantic token、`lib/visualSemantics.ts`、既存componentを優先する
+- スコープや方針を変える前に必ずユーザーに確認する
 
 ## Commands
 
@@ -72,7 +70,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - 公開URLの識別子は **`slug`**（旧Figmaの `id` は使わない）。
 - **`/reports`**（`/posts` ではない）、**`/use-cases`**（`/industries` ではない）。
-- collection名は複数形・英語（`robots` `manufacturers` `guides` `useCases` `reports`）。
+- collection名は複数形・英語（`robots` `manufacturers` `guides` `useCases` `articles`）。記事の公開URLだけ `/reports` を維持する。
 
 ## デザイン方針（"AI感"回避）
 

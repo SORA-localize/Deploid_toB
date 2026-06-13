@@ -6,6 +6,7 @@
 - **デプロイ**: Vercel
 - **データ**: ローカル TS データ（`data/*.ts`）。将来 CMS 接続前提
 - **設計ドキュメント**: `docs/planning/`（まず `docs/planning/README.md`）
+- **データ追加ガイド**: `docs/data/README.md`
 
 ## コマンド
 
@@ -15,6 +16,7 @@
 | `npm run dev` | `localhost:3000` で開発サーバ |
 | `npm run build` | 本番ビルド（SSG） |
 | `npm run start` | ビルド結果をローカル起動 |
+| `npm run validate:data` | データ整合チェックのみ実行 |
 
 ## 環境変数
 
@@ -38,6 +40,7 @@ components/     # UI コンポーネント（Figma Make UI を逐語移植）
 data/           # 配列データ + types.ts（型の真実源）
 lib/            # data.ts（取得/filter/slug lookup）, labels.ts（enum→日本語）
 docs/planning/  # 設計・意思決定ドキュメント
+docs/data/      # データ追加・タグ運用メモ
 ```
 
 ページからは `data/*.ts` を直接検索せず、必ず `lib/data.ts` 経由で取得する（CMS 移行時に呼び出し形を変えないため）。
