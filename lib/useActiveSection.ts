@@ -63,11 +63,16 @@ function resolveActiveSectionId(ids: readonly string[], offset: number) {
     break;
   }
 
-  // ページ最下部に到達したとき、最後のsectionがactivation lineを超えられない場合に
-  // 最後のIDを返す（sourcesなど短い末尾セクションが active にならない問題を防ぐ）
+  // ページ最下部到達時、かつ通常ロジックがまだ先頭IDしか選んでいない（= どの section も
+  // activation line を通過していない）場合のみ末尾IDに fallback する。
+  // 途中の section（関連情報など）を activation line が通過した後に最下部に到達した場合は
+  // 通常ロジックの nextActiveId を優先し、誤って sources が active になるのを防ぐ。
   const viewportBottom = window.scrollY + window.innerHeight;
   const documentBottom = document.documentElement.scrollHeight;
-  if (viewportBottom >= documentBottom - PAGE_BOTTOM_TOLERANCE) {
+  if (
+    viewportBottom >= documentBottom - PAGE_BOTTOM_TOLERANCE &&
+    nextActiveId === (elements[0]?.id ?? '')
+  ) {
     return ids[ids.length - 1] ?? nextActiveId;
   }
 
