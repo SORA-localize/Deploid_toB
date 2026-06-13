@@ -383,7 +383,7 @@ export function canDisplayAsset(asset?: ImageAsset) {
 - `Source.title`, `url`, `publisher`
   - 出典表示として必要。ただし記事タイトルを大量に集めた一覧を独立コンテンツ化しない。
 
-- `tags`, `manufacturerSlug`, `product name`
+- `tags`, `manufacturerId`, `product name`
   - 会社名・製品名の事実表示は通常必要。ただしロゴ・装飾・提携表現は別リスク。
 
 - `public/favicon.svg`, `src/app/opengraph-image.tsx`

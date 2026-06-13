@@ -27,14 +27,17 @@ Last reviewed: 2026-06-13
 ## 基本ルール
 
 - 参照は `id` で結ぶ。`slug` は公開URL専用。slugを変えるときは `previousSlugs` に旧slugを追記する
+- `id` は発番後に変えない。命名修正では `slug` / `name` / `nameJa` だけを変える。例: A2 Ultra は `id: 'agibot-a2-max'`、公開slugは `agibot-a2-ultra`
 - 公式ページ、press release、信頼できる報道を確認し、`sources` に `url` / `checkedAt` / `reliability` を残す
 - AIの推測を事実として入れない。不明なスペックや価格は省略または要確認メモにする
 - 新規レコードは原則 `publishStatus: 'draft'` から作る
 - 記事は `category` と `whyItMatters` を必ず入れる
 - 画像・ロゴは `ImageAsset.rights` を必ず持たせる。外部ホットリンクは避け、可能なら `public/images/` にローカル配置する
-- タグは `lib/tagRegistry.ts` に登録済みの値を使う。新タグは先に登録する
+- タグは `lib/tagRegistry.ts` に登録済みの `value` を使う。`label` はUI表示用なので、短い略称や自然な日本語表記でよい
 - スペック項目は `lib/specSchema.ts` にあるキーだけを使う
 - ページから `data/*.ts` を直接検索しない。取得・関連解決は `lib/data.ts` 経由にする
+- ロボット名はメーカー名を重複させない。メーカー名は `manufacturerId` から別表示されるため、`Unitree G1` ではなく `G1` のようにモデル名を入れる
+- ロボット一覧・メーカー一覧の表示順は `lib/data.ts` の `getRobots()` / `getManufacturers()` がアルファベット順で決める。`data/*.ts` の配列順に依存しない
 
 ## AIに渡す作業手順
 

@@ -6,6 +6,7 @@ import { ExternalLink, GripVertical, Star, X } from 'lucide-react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import type { CompareCardDragHandleProps } from '@/components/SortableCompareCard';
 import type { ImageAsset, Robot } from '@/data/types';
+import { getDisplayableAsset } from '@/lib/media';
 import { TBD_LABEL } from '@/lib/labels';
 import { getComparisonCoreRows, getComparisonDetailRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
@@ -56,7 +57,7 @@ export function ComparisonRobotPanel({
   const canDrag = isPointerDevice && !!dragHandleProps;
 
   // 透過 PNG → hero ロール → heroImage の順でフォールバック
-  const cardImage = robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage;
+  const cardImage = getDisplayableAsset(robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage);
 
   return (
     <article className="group relative aspect-[5/7] w-full overflow-hidden rounded-lg bg-muted text-card-foreground">

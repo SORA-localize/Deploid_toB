@@ -38,8 +38,8 @@ interface DeploymentSite {
   reliability: 'verified' | 'official' | 'reported' | 'estimated'; // 事例全体の確度
   sources: Source[];            // 1件以上必須。一次出典(メーカー/顧客の公式)を最優先
   // --- 固有フィールド ---
-  manufacturerSlug: string;     // 下の「許可リスト」のいずれか（arc 始点）
-  robotSlug?: string;           // 下の「許可リスト」のいずれか。判明時のみ
+  manufacturerId: string;       // 下の「許可リスト」のいずれか（arc 始点）
+  robotId?: string;             // 下の「許可リスト」のいずれか。判明時のみ
   customer: string;             // 導入先の企業/組織名 例: 'BMW'
   siteName?: string;            // 拠点名 例: 'Spartanburg Plant'
   country: string;              // 導入先の国 例: 'USA'（英語表記、manufacturers.ts に合わせる）
@@ -48,12 +48,12 @@ interface DeploymentSite {
   startedAt?: string;           // 'YYYY' か 'YYYY-MM'
 }
 
-# manufacturerSlug 許可リスト（これ以外は使わない）
+# manufacturerId 許可リスト（これ以外は使わない）
 unitree, figure-ai, apptronik, agility-robotics, onex, boston-dynamics, tesla,
 sanctuary-ai, agibot, ubtech, fourier-intelligence, booster-robotics,
 kawasaki-heavy-industries, neura-robotics, kepler-robotics, leju-robotics, pal-robotics
 
-# robotSlug 許可リスト（判明時のみ。これ以外は使わない。不明なら robotSlug を省く）
+# robotId 許可リスト（判明時のみ。これ以外は使わない。不明なら robotId を省く）
 unitree-g1, unitree-h1, unitree-h2, unitree-r1, figure-02, figure-03,
 apptronik-apollo, agility-digit, onex-neo, boston-dynamics-atlas, tesla-optimus,
 sanctuary-phoenix, agibot-a2, agibot-a2-max, ubtech-walker-s1, ubtech-walker-s2,
@@ -87,8 +87,8 @@ data/deployments.ts の配列に貼れる形で、要素を列挙して出力す
 # サンプル（この粒度・形式で出力する。値は要検証の見本であり、必ず自分で裏取りすること）
 {
   slug: 'figure-bmw-spartanburg',
-  manufacturerSlug: 'figure-ai',
-  robotSlug: 'figure-02',
+  manufacturerId: 'figure-ai',
+  robotId: 'figure-02',
   customer: 'BMW',
   siteName: 'Spartanburg Plant',
   country: 'USA',
@@ -118,4 +118,4 @@ data/deployments.ts の配列に貼れる形で、要素を列挙して出力す
 - 返ってきた配列を `data/deployments.ts` に貼る。
 - `getDeploymentsForManufacturer()`（lib/data.ts 追加済み）で Home に渡し、Phase B で
   メーカーHQ→`location` への弧アニメ（クライアント・一度描いて静止 or hover連動）を実装する。
-- 参照整合（manufacturerSlug / robotSlug が実在するか）を確認してからマージ。
+- 参照整合（manufacturerId / robotId が実在するか）を確認してからマージ。

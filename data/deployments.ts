@@ -2,7 +2,7 @@ import type { DeploymentSite } from './types';
 
 /**
  * 実在する導入事例のみを、一次/信頼できる二次出典付きで追加する。
- * - manufacturerId / robotId は data/manufacturers.ts / data/robots.ts の既存 slug と一致させる。
+ * - manufacturerId / robotId は data/manufacturers.ts / data/robots.ts の既存 id と一致させる。
  * - location は導入拠点のおおよその座標（公開情報で裏取り）。
  * - 不確かな事例は載せない（憶測でarcを引かない）。
  * 構造・記入ルール・サンプルは docs/planning/deployment_sites_research_prompt_2026-06-01.md を参照。

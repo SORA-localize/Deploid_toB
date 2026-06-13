@@ -40,7 +40,7 @@ const resolveBySlug = <T extends { slug: string; previousSlugs?: string[] }>(
 };
 
 export function getRobots() {
-  return published(robots);
+  return published(robots).sort((a, b) => a.name.localeCompare(b.name, 'en'));
 }
 
 /** 詳細ページの対象（published + archived）。一覧・比較には使わない */
@@ -77,7 +77,7 @@ export function getRobotById(id: string) {
 }
 
 export function getManufacturers() {
-  return published(manufacturers);
+  return published(manufacturers).sort((a, b) => a.name.localeCompare(b.name, 'en'));
 }
 
 export function getDeployments() {
