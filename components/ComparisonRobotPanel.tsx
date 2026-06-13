@@ -56,7 +56,8 @@ export function ComparisonRobotPanel({
   const canDrag = isPointerDevice && !!dragHandleProps;
 
   // 透過 PNG → hero ロール → heroImage の順でフォールバック
-  const cardImage = robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage;
+  const _rawCardImage = robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage;
+  const cardImage = _rawCardImage?.src ? _rawCardImage : null;
 
   return (
     <article className="group relative aspect-[5/7] w-full overflow-hidden rounded-lg bg-muted text-card-foreground">
