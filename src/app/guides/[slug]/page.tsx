@@ -148,25 +148,33 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
             )}
 
             {hasRelated && (
-              <div id="related" className="scroll-mt-site-header mt-6 space-y-4">
-                {robots.length > 0 && (
-                  <RelatedLinkList
-                    id="related-robots"
-                    title={uiText.guides.relatedRobots}
-                    items={relatedRobotItems}
-                  />
-                )}
-                {useCases.length > 0 && (
-                  <RelatedLinkList
-                    id="related-use-cases"
-                    title={uiText.guides.relatedUseCases}
-                    items={relatedUseCaseItems}
-                  />
-                )}
-              </div>
+              <section id="related" className="scroll-mt-site-header mt-6 border-b border-border pb-8">
+                <h2 className="mb-4 text-lg font-semibold text-foreground">
+                  {uiText.guides.relatedInfo}
+                </h2>
+                <div className="space-y-4">
+                  {robots.length > 0 && (
+                    <RelatedLinkList
+                      id="related-robots"
+                      title={uiText.guides.relatedRobots}
+                      items={relatedRobotItems}
+                    />
+                  )}
+                  {useCases.length > 0 && (
+                    <RelatedLinkList
+                      id="related-use-cases"
+                      title={uiText.guides.relatedUseCases}
+                      items={relatedUseCaseItems}
+                    />
+                  )}
+                </div>
+              </section>
             )}
 
-            <SourceList sources={guide.sources} />
+            <SourceList
+              sources={guide.sources}
+              className="mt-6 border border-border bg-card p-6 scroll-mt-site-header"
+            />
           </div>
 
           {/* Decision Summary */}
