@@ -93,6 +93,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
     filters.manufacturer !== 'all' ||
     filters.availability !== 'all';
   const crossReleaseTotal = activeRobots.length + preReleaseRobots.length;
+  const resultCount = hasActiveFilters ? crossReleaseTotal : filtered.length;
 
   const activeChips = useMemo(() => {
     const chips: import('@/components/ActiveFilterChips').ActiveFilterChip[] = [];
@@ -169,43 +170,42 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
           }
         />
 
-        <div className="grid grid-cols-1 gap-4 mb-5 sm:grid-cols-2 xl:grid-cols-4 max-w-4xl">
-          <SelectControl
-            id="robot-industry"
-            label={uiText.filters.industry}
-            value={filters.industry ?? 'all'}
-            onChange={(v) => updateParams({ industry: v === 'all' ? null : v })}
-            options={industryOptions}
-          />
-          <SelectControl
-            id="robot-task"
-            label={uiText.filters.task}
-            value={filters.task ?? 'all'}
-            onChange={(v) => updateParams({ task: v === 'all' ? null : v })}
-            options={taskOptions}
-          />
-          <SelectControl
-            id="robot-manufacturer"
-            label={uiText.filters.manufacturer}
-            value={filters.manufacturer}
-            onChange={(v) => updateParams({ manufacturer: v === 'all' ? null : v })}
-            options={manufacturerOptions}
-            searchable
-          />
-          <SelectControl
-            id="robot-availability"
-            label={uiText.filters.availability}
-            value={filters.availability}
-            onChange={(v) => updateParams({ availability: v === 'all' ? null : v })}
-            options={availabilityOptions}
-          />
-        </div>
-
-        {hasActiveFilters && (
-          <p className="mb-4 px-1 text-xs text-muted-foreground">
-            {uiText.common.results(crossReleaseTotal, true)}
+        <div className="xl:flex xl:items-end xl:justify-between gap-4 mb-5 max-w-4xl">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:flex-1 xl:min-w-0">
+            <SelectControl
+              id="robot-industry"
+              label={uiText.filters.industry}
+              value={filters.industry ?? 'all'}
+              onChange={(v) => updateParams({ industry: v === 'all' ? null : v })}
+              options={industryOptions}
+            />
+            <SelectControl
+              id="robot-task"
+              label={uiText.filters.task}
+              value={filters.task ?? 'all'}
+              onChange={(v) => updateParams({ task: v === 'all' ? null : v })}
+              options={taskOptions}
+            />
+            <SelectControl
+              id="robot-manufacturer"
+              label={uiText.filters.manufacturer}
+              value={filters.manufacturer}
+              onChange={(v) => updateParams({ manufacturer: v === 'all' ? null : v })}
+              options={manufacturerOptions}
+              searchable
+            />
+            <SelectControl
+              id="robot-availability"
+              label={uiText.filters.availability}
+              value={filters.availability}
+              onChange={(v) => updateParams({ availability: v === 'all' ? null : v })}
+              options={availabilityOptions}
+            />
+          </div>
+          <p className="mt-3 xl:mt-0 shrink-0 whitespace-nowrap px-1 text-xs text-muted-foreground">
+            {uiText.common.results(resultCount, hasActiveFilters)}
           </p>
-        )}
+        </div>
 
         {hasActiveFilters ? (
           crossReleaseTotal === 0 ? (
