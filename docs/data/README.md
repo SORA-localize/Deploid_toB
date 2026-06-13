@@ -37,7 +37,7 @@ Last reviewed: 2026-06-13
 - スペック項目は `lib/specSchema.ts` にあるキーだけを使う
 - ページから `data/*.ts` を直接検索しない。取得・関連解決は `lib/data.ts` 経由にする
 - ロボット名はメーカー名を重複させない。メーカー名は `manufacturerId` から別表示されるため、`Unitree G1` ではなく `G1` のようにモデル名を入れる
-- ロボット一覧・メーカー一覧の表示順は `lib/data.ts` の `getRobots()` / `getManufacturers()` がアルファベット順で決める。`data/*.ts` の配列順に依存しない
+- ロボット一覧・メーカー一覧の表示順は表示側のフィルタ/ソート処理で決める。`data/*.ts` の配列順や `getRobots()` / `getManufacturers()` の返却順に依存しない
 
 ## AIに渡す作業手順
 

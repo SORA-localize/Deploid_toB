@@ -83,5 +83,5 @@ export function filterManufacturers({
     return matchesSearchDocument(filters.query, searchDocuments.get(manufacturer.slug));
   });
 
-  return sortManufacturers([...base], 'japan');
+  return sortManufacturers([...base], 'name');
 }

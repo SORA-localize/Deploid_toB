@@ -81,7 +81,7 @@ export function filterRobots({
     return matchesSearchDocument(filters.query, searchDocuments.get(robot.slug));
   });
 
-  const releaseCandidates = sortRobots([...filtered], 'stage');
+  const releaseCandidates = sortRobots([...filtered], 'name', manufacturers);
   const activeRobots = releaseCandidates.filter(
     (robot) => !isPreReleaseDeploymentStage(robot.deploymentStage),
   );

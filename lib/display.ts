@@ -132,9 +132,35 @@ export function sortByDisplayOrder<T extends string>(
 
 export type RobotSortKey = 'stage' | 'japan' | 'name';
 
-export function sortRobots(robots: Robot[], sort: RobotSortKey): Robot[] {
+function compareNames(a: string, b: string) {
+  return a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
+}
+
+function compareRobotCatalogNames(
+  a: Robot,
+  b: Robot,
+  manufacturerById?: Map<string, Manufacturer>,
+) {
+  const aManufacturer = manufacturerById?.get(a.manufacturerId)?.name ?? a.manufacturerId;
+  const bManufacturer = manufacturerById?.get(b.manufacturerId)?.name ?? b.manufacturerId;
+  const manufacturerDiff = compareNames(aManufacturer, bManufacturer);
+  if (manufacturerDiff !== 0) return manufacturerDiff;
+
+  const nameDiff = compareNames(a.name, b.name);
+  if (nameDiff !== 0) return nameDiff;
+  return compareNames(a.slug, b.slug);
+}
+
+export function sortRobots(
+  robots: Robot[],
+  sort: RobotSortKey,
+  manufacturers?: readonly Manufacturer[],
+): Robot[] {
   const stageIndex = new Map(deploymentStageOrder.map((s, i) => [s, i]));
   const availIndex = new Map(japanAvailabilityOrder.map((s, i) => [s, i]));
+  const manufacturerById = manufacturers
+    ? new Map(manufacturers.map((manufacturer) => [manufacturer.id, manufacturer]))
+    : undefined;
 
   return [...robots].sort((a, b) => {
     if (sort === 'stage') {
@@ -146,17 +172,17 @@ export function sortRobots(robots: Robot[], sort: RobotSortKey): Robot[] {
         (availIndex.get(a.japanAvailability) ?? Number.MAX_SAFE_INTEGER) -
         (availIndex.get(b.japanAvailability) ?? Number.MAX_SAFE_INTEGER);
       if (availDiff !== 0) return availDiff;
-      return a.name.localeCompare(b.name, 'en');
+      return compareRobotCatalogNames(a, b, manufacturerById);
     }
     if (sort === 'japan') {
       const availDiff =
         (availIndex.get(a.japanAvailability) ?? Number.MAX_SAFE_INTEGER) -
         (availIndex.get(b.japanAvailability) ?? Number.MAX_SAFE_INTEGER);
       if (availDiff !== 0) return availDiff;
-      return a.name.localeCompare(b.name, 'en');
+      return compareRobotCatalogNames(a, b, manufacturerById);
     }
     // 'name'
-    return a.name.localeCompare(b.name, 'en');
+    return compareRobotCatalogNames(a, b, manufacturerById);
   });
 }
 
@@ -176,15 +202,15 @@ export function sortManufacturers(
         (presenceIndex.get(a.japanPresence) ?? Number.MAX_SAFE_INTEGER) -
         (presenceIndex.get(b.japanPresence) ?? Number.MAX_SAFE_INTEGER);
       if (presenceDiff !== 0) return presenceDiff;
-      return a.name.localeCompare(b.name, 'en');
+      return compareNames(a.name, b.name);
     }
     if (sort === 'founded') {
       const aYear = a.foundedYear ?? 9999;
       const bYear = b.foundedYear ?? 9999;
       if (aYear !== bYear) return aYear - bYear;
-      return a.name.localeCompare(b.name, 'en');
+      return compareNames(a.name, b.name);
     }
     // 'name'
-    return a.name.localeCompare(b.name, 'en');
+    return compareNames(a.name, b.name);
   });
 }

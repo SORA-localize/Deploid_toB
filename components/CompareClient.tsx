@@ -46,6 +46,7 @@ import { uiText } from '@/lib/uiText';
 import { useUrlFilters } from '@/lib/useUrlFilters';
 import { useFavorites } from '@/lib/useFavorites';
 import { cn } from '@/lib/utils';
+import { sortManufacturers, sortRobots } from '@/lib/display';
 
 const MAX_COMPARE_ROBOTS = 20;
 const SHEET_LAYOUT_TRANSITION = { type: 'spring', stiffness: 360, damping: 34 } as const;
@@ -112,6 +113,10 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   const robotById = useMemo(
     () => new Map(robots.map((robot) => [robot.id, robot])),
     [robots],
+  );
+  const sortedManufacturers = useMemo(
+    () => sortManufacturers([...manufacturers], 'name'),
+    [manufacturers],
   );
   const selectedRobots = useMemo(
     () =>
@@ -368,9 +373,11 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                       </h2>
                     </div>
                     <div className="max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden xl:max-h-[calc(100vh-200px)]">
-                      {manufacturers.map((manufacturer) => {
-                        const manufacturerRobots = robots.filter(
-                          (r) => r.manufacturerId === manufacturer.id,
+                      {sortedManufacturers.map((manufacturer) => {
+                        const manufacturerRobots = sortRobots(
+                          robots.filter((r) => r.manufacturerId === manufacturer.id),
+                          'name',
+                          manufacturers,
                         );
                         const isExpanded = expandedManufacturers.includes(manufacturer.id);
 
