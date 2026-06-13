@@ -55,6 +55,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
   const hasBody = (report.body ?? '').trim().length > 0;
   const bodyHeadings = hasBody ? extractH2Headings(report.body!) : [];
+  const hasRelated = robots.length > 0 || manufacturers.length > 0 || useCases.length > 0 || guides.length > 0;
   const reportTitle = report.titleJa ?? report.title;
   const breadcrumbItems = [
     { label: uiText.reports.breadcrumb, path: '/reports' },
@@ -65,16 +66,11 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
     ...(hasTakeaways ? [{ label: uiText.reports.keyTakeaways, href: '#takeaways' }] : []),
     ...(hasBody
       ? [
-          { label: '本文', href: '#body' },
+          { label: uiText.reports.body, href: '#body' },
           ...bodyHeadings.map((h) => ({ label: h.text, href: `#${h.id}` })),
         ]
       : []),
-    ...(robots.length > 0 ? [{ label: '関連ロボット', href: '#related-robots' }] : []),
-    ...(manufacturers.length > 0
-      ? [{ label: '関連メーカー', href: '#related-manufacturers' }]
-      : []),
-    ...(useCases.length > 0 ? [{ label: '関連用途', href: '#related-use-cases' }] : []),
-    ...(guides.length > 0 ? [{ label: '関連ガイド', href: '#related-guides' }] : []),
+    ...(hasRelated ? [{ label: uiText.reports.relatedInfo, href: '#related' }] : []),
     { label: uiText.common.resources, href: '#sources' },
   ];
 
@@ -230,69 +226,61 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               </section>
             )}
 
-            {/* 関連（種別ごとに分割） */}
-            {robots.length > 0 && (
-              <div className="mt-6">
-                <RelatedLinkList
-                  id="related-robots"
-                  title="関連ロボット"
-                  items={robots.map((r) => ({
-                    href: `/robots/${r.slug}`,
-                    title: getRobotRelatedTitle(r),
-                    description: r.summary,
-                  }))}
-                />
-              </div>
-            )}
-            {manufacturers.length > 0 && (
-              <div className="mt-6">
-                <RelatedLinkList
-                  id="related-manufacturers"
-                  title="関連メーカー"
-                  items={manufacturers.map((m) => ({
-                    href: `/manufacturers/${m.slug}`,
-                    title: m.nameJa ?? m.name,
-                    description: m.summary,
-                  }))}
-                />
-              </div>
-            )}
-            {useCases.length > 0 && (
-              <div className="mt-6">
-                <RelatedLinkList
-                  id="related-use-cases"
-                  title="関連用途"
-                  items={useCases.map((u) => ({
-                    href: `/use-cases/${u.slug}`,
-                    title: u.titleJa ?? u.title,
-                  }))}
-                />
-              </div>
-            )}
-            {guides.length > 0 && (
-              <div className="mt-6">
-                <RelatedLinkList
-                  id="related-guides"
-                  title="関連ガイド"
-                  items={guides.map((g) => ({
-                    href: `/guides/${g.slug}`,
-                    title: g.titleJa ?? g.title,
-                    description: g.summary,
-                  }))}
-                />
+            {/* 関連情報（まとめて1つのscrollspy対象） */}
+            {hasRelated && (
+              <div id="related" className="scroll-mt-site-header mt-6 space-y-4">
+                {robots.length > 0 && (
+                  <RelatedLinkList
+                    id="related-robots"
+                    title="関連ロボット"
+                    items={robots.map((r) => ({
+                      href: `/robots/${r.slug}`,
+                      title: getRobotRelatedTitle(r),
+                      description: r.summary,
+                    }))}
+                  />
+                )}
+                {manufacturers.length > 0 && (
+                  <RelatedLinkList
+                    id="related-manufacturers"
+                    title="関連メーカー"
+                    items={manufacturers.map((m) => ({
+                      href: `/manufacturers/${m.slug}`,
+                      title: m.nameJa ?? m.name,
+                      description: m.summary,
+                    }))}
+                  />
+                )}
+                {useCases.length > 0 && (
+                  <RelatedLinkList
+                    id="related-use-cases"
+                    title="関連用途"
+                    items={useCases.map((u) => ({
+                      href: `/use-cases/${u.slug}`,
+                      title: u.titleJa ?? u.title,
+                    }))}
+                  />
+                )}
+                {guides.length > 0 && (
+                  <RelatedLinkList
+                    id="related-guides"
+                    title="関連ガイド"
+                    items={guides.map((g) => ({
+                      href: `/guides/${g.slug}`,
+                      title: g.titleJa ?? g.title,
+                      description: g.summary,
+                    }))}
+                  />
+                )}
               </div>
             )}
 
-            {/* 出典（wrapper div 削除 — SourceList が id="sources" を保持） */}
-            <SourceList
-              sources={report.sources}
-              className="scroll-mt-site-header mt-6 pt-6 border-t border-border"
-            />
+            <SourceList sources={report.sources} />
           </div>
 
           {/* サイドバー（右） */}
           <div className="col-span-12 lg:col-span-3">
-            <div className="sticky top-site-header-gap space-y-4">
+            <div className="lg:sticky lg:top-site-header-gap space-y-4">
               <div className="border border-border bg-muted p-4">
                 <h3 className="mb-2 text-xs font-semibold text-foreground">
                   情報提供・取材相談

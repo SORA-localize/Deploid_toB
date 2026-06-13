@@ -18,7 +18,7 @@ export function SourceList({
   title = uiText.common.resources,
   sources,
   emptyMessage = uiText.emptyStates.sources,
-  className = 'border border-border bg-card p-6 scroll-mt-site-header',
+  className = 'mt-6 border border-border bg-card p-6 scroll-mt-site-header',
   titleClassName = 'text-lg font-semibold text-foreground mb-4',
 }: SourceListProps) {
   return (

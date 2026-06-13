@@ -6,7 +6,6 @@ import { GLOBAL_HEADER_HEIGHT, GLOBAL_HEADER_HEIGHT_CSS_VARIABLE } from '@/lib/s
 const STICKY_BAR_HEIGHT_CSS_VARIABLE = '--sticky-bar-h';
 const ACTIVE_SECTION_EXTRA_OFFSET = 8;
 const STICKY_BAR_HEIGHT_FALLBACK = 40;
-const PAGE_BOTTOM_TOLERANCE = 2;
 
 function getCssLengthInPixels(variableName: string, fallback: number) {
   const rawValue = getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
@@ -61,20 +60,6 @@ function resolveActiveSectionId(ids: readonly string[], offset: number) {
     }
 
     break;
-  }
-
-  const viewportBottom = window.scrollY + window.innerHeight;
-  const documentBottom = document.documentElement.scrollHeight;
-
-  if (viewportBottom >= documentBottom - PAGE_BOTTOM_TOLERANCE) {
-    for (const element of elements) {
-      if (element.getBoundingClientRect().top < window.innerHeight) {
-        nextActiveId = element.id;
-        continue;
-      }
-
-      break;
-    }
   }
 
   return nextActiveId;

@@ -46,12 +46,13 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
   const hasChecklist = (guide.checklistItems ?? []).length > 0;
   const hasBody = (guide.body ?? '').trim().length > 0;
 
+  const hasRelated = robots.length > 0 || useCases.length > 0;
+
   const toc = [
     { label: uiText.common.overview, href: '#overview' },
     ...(hasBody ? [{ label: uiText.guides.body, href: '#body' }] : []),
     ...(hasChecklist ? [{ label: uiText.guides.checklist, href: '#checklist' }] : []),
-    ...(robots.length > 0 ? [{ label: uiText.guides.relatedRobots, href: '#related-robots' }] : []),
-    ...(useCases.length > 0 ? [{ label: uiText.guides.relatedUseCases, href: '#related-use-cases' }] : []),
+    ...(hasRelated ? [{ label: uiText.guides.relatedInfo, href: '#related' }] : []),
     { label: uiText.common.resources, href: '#sources' },
   ];
   const relatedRobotItems = robots.map((robot) => ({
@@ -146,35 +147,31 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
               </section>
             )}
 
-            {robots.length > 0 && (
-              <div className="mt-6">
-                <RelatedLinkList
-                  id="related-robots"
-                  title={uiText.guides.relatedRobots}
-                  items={relatedRobotItems}
-                />
+            {hasRelated && (
+              <div id="related" className="scroll-mt-site-header mt-6 space-y-4">
+                {robots.length > 0 && (
+                  <RelatedLinkList
+                    id="related-robots"
+                    title={uiText.guides.relatedRobots}
+                    items={relatedRobotItems}
+                  />
+                )}
+                {useCases.length > 0 && (
+                  <RelatedLinkList
+                    id="related-use-cases"
+                    title={uiText.guides.relatedUseCases}
+                    items={relatedUseCaseItems}
+                  />
+                )}
               </div>
             )}
 
-            {useCases.length > 0 && (
-              <div className="mt-6">
-                <RelatedLinkList
-                  id="related-use-cases"
-                  title={uiText.guides.relatedUseCases}
-                  items={relatedUseCaseItems}
-                />
-              </div>
-            )}
-
-            <SourceList
-              sources={guide.sources}
-              className="scroll-mt-site-header mt-6 pt-6 border-t border-border"
-            />
+            <SourceList sources={guide.sources} />
           </div>
 
           {/* Decision Summary */}
           <div className="col-span-12 lg:col-span-3">
-            <div className="sticky top-site-header-gap space-y-4">
+            <div className="lg:sticky lg:top-site-header-gap space-y-4">
               <div className="border border-border bg-card p-4">
                 <h3 className="text-xs font-semibold text-foreground mb-3 pb-2 border-b border-border">
                   {uiText.guides.decisionSummary}

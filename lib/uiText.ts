@@ -121,6 +121,7 @@ export const uiText = {
     backToAll: 'ガイド一覧へ戻る',
     body: '本文',
     checklist: 'チェックリスト',
+    relatedInfo: '関連情報',
   },
   reports: {
     breadcrumb: '記事',
@@ -129,6 +130,8 @@ export const uiText = {
     read: '記事を読む',
     whyItMatters: 'なぜ重要か',
     keyTakeaways: '要点',
+    body: '本文',
+    relatedInfo: '関連情報',
   },
   useCases: {
     breadcrumb: '用途から探す',
