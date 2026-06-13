@@ -62,6 +62,10 @@ const resultCount = hasActiveFilters ? crossReleaseTotal : filtered.length;
 
 ドロップダウンが1行に揃うブレークポイントで flex に切り替え、件数を右端に配置する。
 
+**配置の意図:** 件数はフィルター操作に紐づいた情報なので、「フィルター群の右端」に収める。`max-w-*xl` を外側ラッパーに移すことで件数もその幅内に入る（ページ全体の右端ではない）。これが意図した設計。
+
+**Select の幅への影響:** RobotsBrowser では4列 + 件数が `max-w-4xl`（896px）に収まるため、各 Select は現状より若干狭くなる。`SelectControl` は `w-full` + `truncate` の実装なので崩れない。窮屈に見える場合は `max-w-5xl` への拡張で対応可。
+
 | ページ | 1行揃う bp | 適用 |
 |---|---|---|
 | RobotsBrowser（4列） | `xl`（1280px） | `xl:flex xl:items-end xl:justify-between` |
