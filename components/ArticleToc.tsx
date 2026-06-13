@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
+import { useActiveSection } from '@/lib/useActiveSection';
 import { uiText } from '@/lib/uiText';
 
 export interface ArticleTocItem {
@@ -16,27 +17,8 @@ interface ArticleTocProps {
 }
 
 export function ArticleToc({ items, backHref, backLabel }: ArticleTocProps) {
-  const [activeId, setActiveId] = useState<string>('');
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntry = entries.find((entry) => entry.isIntersecting);
-        if (visibleEntry) {
-          setActiveId(visibleEntry.target.id);
-        }
-      },
-      { rootMargin: '-10% 0px -80% 0px' },
-    );
-
-    items.forEach((item) => {
-      const id = item.href.replace('#', '');
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
-
-    return () => observer.disconnect();
-  }, [items]);
+  const ids = useMemo(() => items.map((item) => item.href.replace('#', '')), [items]);
+  const activeId = useActiveSection(ids);
 
   return (
     <div className="sticky top-site-header-gap">
