@@ -290,9 +290,9 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
           {/* サイドバー（右） */}
           <div className="col-span-12 lg:col-span-3">
-            <div className="lg:sticky lg:top-site-header-gap space-y-4">
-              <div className="border border-border bg-muted p-4">
-                <h3 className="mb-2 text-xs font-semibold text-foreground">
+            <div className="lg:sticky top-site-header-gap space-y-6">
+              <section className="border-y border-border py-4">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   情報提供・取材相談
                 </h3>
                 <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
@@ -304,13 +304,13 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 >
                   お問い合わせ
                 </Link>
-              </div>
+              </section>
 
-              <div className="border border-border bg-card p-4">
-                <h3 className="mb-3 border-b border-border pb-2 text-xs font-semibold text-foreground">
+              <section className="border-y border-border py-4">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   関連ツール
                 </h3>
-                <nav className="space-y-2">
+                <nav className="divide-y divide-border">
                   {[
                     { href: '/robots', label: 'ロボットを探す' },
                     { href: '/compare', label: '機種を比較する' },
@@ -319,13 +319,13 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                     <Link
                       key={href}
                       href={href}
-                      className="flex items-center justify-between border-b border-border py-1.5 text-xs text-foreground/80 last:border-0 hover:text-foreground"
+                      className="flex items-center justify-between py-2 text-xs text-foreground/80 transition-colors hover:text-foreground"
                     >
                       <span>{label}</span>
                     </Link>
                   ))}
                 </nav>
-              </div>
+              </section>
             </div>
           </div>
         </div>

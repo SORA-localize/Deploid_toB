@@ -16,28 +16,32 @@ interface RelatedLinkListProps {
 
 export function RelatedLinkList({ id, title, items, titleLevel = 'h2' }: RelatedLinkListProps) {
   const Heading = titleLevel;
+  const headingId = `${id}-heading`;
+
   return (
-    <div id={id} className="border border-border bg-card p-6 scroll-mt-site-header">
-      <Heading className="text-lg font-semibold text-foreground mb-4">{title}</Heading>
-      <div className="space-y-3">
+    <section id={id} aria-labelledby={headingId} className="scroll-mt-site-header">
+      <Heading id={headingId} className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </Heading>
+      <div className="divide-y divide-border border-y border-border">
         {items.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className="block p-4 border border-border hover:border-foreground/40 transition-colors"
+            className="group flex items-start justify-between gap-4 py-4 transition-colors hover:bg-muted/50 focus-visible:bg-muted/50"
           >
-            <div className="flex justify-between items-start gap-4">
-              <div className="min-w-0 flex-1">
-                <div className="font-semibold text-foreground mb-1">{item.title}</div>
-                {item.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
-                )}
-              </div>
-              <ArrowRight className="w-5 h-5 text-muted-foreground/70 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <div className="mb-1 text-sm font-semibold text-foreground">{item.title}</div>
+              {item.description && (
+                <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.description}
+                </p>
+              )}
             </div>
+            <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
           </Link>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

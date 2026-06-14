@@ -64,7 +64,7 @@ export function ManufacturerDetailHero({ manufacturer, robots }: ManufacturerDet
           </div>
         </div>
 
-        <aside className="mt-6 border-t border-border pt-6 self-start lg:mt-0 lg:border-t-0 lg:pt-0 lg:sticky lg:top-site-header-gap lg:border-l lg:border-border lg:pl-6">
+        <aside className="mt-6 border-t border-border pt-6 self-start lg:mt-0 lg:border-t-0 lg:pt-0 lg:sticky top-site-header-gap lg:border-l lg:border-border lg:pl-6">
           <p className="mb-4 text-sm font-semibold text-foreground">
             {uiText.manufacturers.contactPanel}
           </p>

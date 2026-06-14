@@ -180,13 +180,13 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
           {/* Decision Summary */}
           <div className="col-span-12 lg:col-span-3">
-            <div className="lg:sticky lg:top-site-header-gap space-y-4">
-              <div className="border border-border bg-card p-4">
-                <h3 className="text-xs font-semibold text-foreground mb-3 pb-2 border-b border-border">
+            <div className="lg:sticky top-site-header-gap space-y-6">
+              <section className="border-y border-border py-4">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {uiText.guides.decisionSummary}
                 </h3>
                 {guide.targetReaders.length > 0 && (
-                  <div className="mb-4 pb-4 border-b border-border">
+                  <div className="mb-4 border-y border-border py-4">
                     <h4 className="text-xs font-semibold text-foreground mb-2">想定読者</h4>
                     <p className="text-xs text-foreground/80">{guide.targetReaders.join(' / ')}</p>
                   </div>
@@ -197,36 +197,36 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
                 >
                   {uiText.guides.compareCandidateRobots}
                 </Link>
-              </div>
+              </section>
 
-              <div className="border border-border bg-card p-4">
-                <h3 className="text-xs font-semibold text-foreground mb-3 pb-2 border-b border-border">
+              <section className="border-y border-border py-4">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {uiText.guides.relatedPaths}
                 </h3>
-                <nav className="space-y-2">
+                <nav className="divide-y divide-border">
                   <Link
                     href="/use-cases"
-                    className="flex items-center justify-between text-xs text-foreground/80 hover:text-foreground py-1.5 border-b border-border"
+                    className="group flex items-center justify-between py-2 text-xs text-foreground/80 transition-colors hover:text-foreground"
                   >
                     <span>用途から探す</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                   <Link
                     href="/reports"
-                    className="flex items-center justify-between text-xs text-foreground/80 hover:text-foreground py-1.5 border-b border-border"
+                    className="group flex items-center justify-between py-2 text-xs text-foreground/80 transition-colors hover:text-foreground"
                   >
                     <span>関連記事</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                   <Link
                     href="/contact"
-                    className="flex items-center justify-between text-xs text-foreground/80 hover:text-foreground py-1.5"
+                    className="group flex items-center justify-between py-2 text-xs text-foreground/80 transition-colors hover:text-foreground"
                   >
                     <span>相談する</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                 </nav>
-              </div>
+              </section>
             </div>
           </div>
         </div>
