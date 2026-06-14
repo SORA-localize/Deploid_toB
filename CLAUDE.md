@@ -24,7 +24,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `docs/planning/copyright_and_media_rights_policy_v1.md` — 画像、ロゴ、引用、出典、権利管理
 - `docs/planning/design_system_v1.md` — semantic token、カード/レイアウト方針
 - `docs/planning/humanoid_media_IA_v1.md` — 情報設計（ナビ・各ページの役割・書くべき内容）
-- `docs/planning/humanoid_data_management_guide_v1.md` — データ運用（コレクションの役割・命名・出典）
+- `docs/planning/humanoid_data_management_guide_v1.md` —（背景・非正本）データ運用の経緯。運用の正本は `docs/data/README.md` と `docs/planning/data-maintenance-checklist-v1.md`
 
 ページ構成・スキーマ・コピー方針で迷ったら**まず上記を読む**。コードからは推論できない判断基準（なぜこのページ構成か／何を作らないか／なぜNext.js+Vercelか）がここにある。
 

@@ -30,20 +30,29 @@ Last cleaned: 2026-06-13
 
 ## 現在残している設計文書
 
+### (a) 正本・現行
+
+新しい実装判断ではこちらを参照する。
+
 - `ai_fullstack_development_guardrails_v1.md` — AI実装時の安全策と自己監査
 - `architecture_future_considerations_v1.md` — 将来検討
 - `copyright_and_media_rights_policy_v1.md` — 権利、引用、メディア利用
-- `data-architecture-redesign-v1.md` — データ構造設計
-- `data-maintenance-checklist-v1.md` — データ運用チェックリスト
+- `data-architecture-redesign-v1.md` — データ構造設計（データ設計の正本）
+- `data-maintenance-checklist-v1.md` — データ運用チェックリスト（データ運用の正本）
 - `deployment_sites_research_prompt_2026-06-01.md` — 導入事例データ調査用プロンプト
 - `design_system_v1.md` — デザインシステム
-- `humanoid_data_management_guide_v1.md` — データ運用の背景説明
-- `humanoid_data_model_policy_v1.md` — データモデル設計指針
 - `humanoid_media_IA_v1.md` — 情報設計
 - `humanoid_media_build_notes_v1.md` — UI/コンテンツ品質メモ
 - `humanoid_mvp_scope_decision_v1.md` — MVPスコープ判断
 - `humanoid_platform_tech_stack_v1.md` — 技術スタック
 - `ui_architecture_and_development_policy_v1.md` — UI構造と開発方針
+
+### (b) 参照・背景（旧／非正本）
+
+経緯・背景の参照用。運用やデータ設計の**正本ではない**。データ運用の正本は `../data/README.md` と `data-maintenance-checklist-v1.md`、データ設計の正本は `data-architecture-redesign-v1.md`。
+
+- `humanoid_data_management_guide_v1.md` — データ運用の背景説明（旧ガイド）
+- `humanoid_data_model_policy_v1.md` — データモデル設計指針（旧。現行は data-architecture-redesign）
 
 ## アーカイブ
 

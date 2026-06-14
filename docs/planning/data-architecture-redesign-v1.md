@@ -242,7 +242,7 @@ placements     >── articles
 - 旧方針: 「reports は速報ではない」。
 - **新方針**: **速報（news）も扱う。ただし全記事に `whyItMatters`（買い手にとっての意味）を必須**とし、単なる転載速報にしない。
 - これにより「専門メディアとして速報を載せる」と「導入判断ポータルとしての付加価値」を両立させる。
-- `humanoid_data_management_guide_v1.md` の該当記述は実装フェーズで更新する。
+- `humanoid_data_management_guide_v1.md` の該当記述は参照用として残す（整合更新はしない。正本は本書）。
 
 ### 7-3. articles の主要フィールド（案）
 

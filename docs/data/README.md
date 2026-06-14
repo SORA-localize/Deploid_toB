@@ -16,6 +16,9 @@ Last reviewed: 2026-06-14
 - `data/articlePlacements.ts` — 記事タブ/home注目記事の掲載枠
 - `data/types.ts` — 型の正本
 
+各コレクションの追加・更新手順は `../planning/data-maintenance-checklist-v1.md` の対応セクション：
+robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / guides=L / useCases=M / deployments=N / articlePlacements=O。
+
 ## 事前に見るもの
 
 - `../../ai_implementation_workflow_prompt.md` — AI作業の共通手順

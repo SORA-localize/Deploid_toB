@@ -87,21 +87,41 @@
 
 ## F. 公開ゲート（draft → published 昇格時の必須項目）
 
-> 自動：error レベルで build をブロック（§設計10-1, 11.5）。
+> 「型必須」＝欠落すると `tsc` / build が落ちる（TypeScript 型で強制）。「自動」＝ validate が機械チェック（参照・タグ・日付・出典・画像・鮮度・順序・双方向対称）。
+> validate に汎用 publish-gate は無いため、必須フィールドの大半は型で担保される。
 
 **Robot**
 - [ ] id / slug / name / manufacturerId
 - [ ] summary / category / deploymentStage / buyerReadiness / japanAvailability
-- [ ] sources が空でない
+- [ ] sources が空でない（自動：常時必須）
 - [ ] 画像が未ローカル化なら warning（推奨：ローカル化）
 
 **Manufacturer**
 - [ ] id / slug / name / country / companyType / japanPresence
-- [ ] sources が空でない
+- [ ] sources が空でない（自動：常時必須）
 
 **Article**
 - [ ] id / slug / title / category / publishedAt / whyItMatters
-- [ ] sources が空でない（`contentKind:'sample'` を除く）
+- [ ] sources が空でない（自動：published かつ `contentKind:'sample'` 以外で必須）
+
+**Guide**
+- [ ] 型必須：id / slug / title / description / stage / order / topics / targetReaders / relatedRobotIds / relatedUseCaseIds
+- [ ] topics は `guide-topic` 登録タグ / relatedRobotIds は id 参照（自動）
+- [ ] relatedUseCaseIds と相手 useCase.relatedGuideIds が双方向に揃う（自動：非対称は build 失敗）
+- [ ] 出典（sources）は手動推奨（validate 未強制）
+
+**UseCase**
+- [ ] 型必須：id / slug / title / maturityLevel / buyerReadiness / environment / requiredCapabilities / atAGlance{3} / overview / whyItMatters / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobotIds / relatedGuideIds
+- [ ] industryTags・taskTags は登録タグ / candidateRobotIds は id 参照（自動）
+- [ ] relatedGuideIds と相手 guide.relatedUseCaseIds が双方向に揃う（自動）
+- [ ] 出典（sources）は手動推奨（validate 未強制）
+
+**Deployment**
+- [ ] 型必須：id / manufacturerId / customer / country / location{lat,lng} / status
+- [ ] manufacturerId・robotId（任意）は id 参照（自動）
+- [ ] sources が空でない（自動：常時必須）
+
+> ArticlePlacement は publishStatus を持たない設定データのため公開ゲート対象外（→ セクション O）。
 
 ---
 
@@ -165,8 +185,56 @@ AI側の実装手順:
 
 ---
 
+## L. ガイド（guides）追加 / 更新
+
+> robots/manufacturers（A/B）に準拠。id 発番 → `draft` → build ゲート → `published`。固有の罠は **guide↔useCase 双方向対称**。
+
+1. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
+2. [ ] 型必須：title / description / stage / order / topics / targetReaders / relatedRobotIds / relatedUseCaseIds
+3. [ ] `topics` は tagRegistry の `guide-topic` 登録値のみ（自動：未登録は build 失敗）
+4. [ ] `relatedRobotIds` は robot の **id** 参照（自動：参照切れは build 失敗）
+5. [ ] **双方向対称**：`relatedUseCaseIds` に入れた useCase 側の `relatedGuideIds` にも本ガイドの id を入れる（自動：片方向だけだと build 失敗）
+6. [ ] 出典（sources）は手動推奨（validate 未強制。一次情報があれば記入）
+7. [ ] `npm run build` 通過 → `published`
+
+## M. ユースケース（useCases）追加 / 更新
+
+> 一次情報が薄い間は薄いページを量産しない（CLAUDE.md 方針）。
+
+1. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
+2. [ ] 型必須：title / maturityLevel / buyerReadiness / environment / requiredCapabilities / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobotIds / relatedGuideIds
+3. [ ] `industryTags` / `taskTags` は登録タグのみ（自動）
+4. [ ] `candidateRobotIds` は robot の **id** 参照（自動）
+5. [ ] **双方向対称**：`relatedGuideIds` と相手 guide.`relatedUseCaseIds` を両方そろえる（自動）
+6. [ ] 出典（sources）は手動推奨（validate 未強制）
+7. [ ] build 通過 → `published`
+
+## N. 導入事例（deployments）追加 / 更新
+
+> Home ワールドマップの arc 根拠データ。所在地・主体・段階は一次/信頼できる二次出典で裏取り（AI生成値の混入防止）。
+
+1. [ ] id 発番、`publishStatus: 'draft'`
+2. [ ] 型必須：manufacturerId / customer / country / location{lat,lng} / status
+3. [ ] `manufacturerId`（arc 始点）・`robotId`（任意・判明時）は **id** 参照（自動：参照切れは build 失敗）
+4. [ ] **`sources` 必須**（自動：空だと build 失敗。2026-06 から validate 強制）
+5. [ ] `location` は拠点のおおよその座標（番地不要）、`startedAt` は YYYY または YYYY-MM
+6. [ ] build 通過 → `published`
+
+## O. 記事掲載枠（articlePlacements）追加 / 更新
+
+> 記事タブ／Home 注目記事の掲載枠。**BaseRecord ではない**（id/slug/publishStatus/sources を持たない設定データ）。
+
+1. [ ] `surface`（現状 `reports-index`）/ `slot`（`hero` | `feature`）/ `articleId` / `order` を指定
+2. [ ] `articleId` は article の **id** 参照（自動：参照切れは build 失敗）
+3. [ ] 同一 `surface:slot` 内で `order` 重複なし・同一記事の重複なし（自動）
+4. [ ] `kind: 'sponsored'` なら `sponsor.name` 必須・`sponsor.url` は形式チェック（自動）
+5. [ ] **掲載対象は published 記事にする**（validate は記事の存在のみ確認。draft 記事への枠付けは検出しない＝手動）
+6. [ ] build 通過
+
+---
+
 ## 関連ドキュメント
 
 - 設計の本体: `data-architecture-redesign-v1.md`
-- データ運用の旧ガイド: `humanoid_data_management_guide_v1.md`（本書と設計書の確定後に整合更新）
+- データ運用の旧ガイド（参照用）: `humanoid_data_management_guide_v1.md`（背景・経緯の参照。整合更新はしない。運用の正本は本書と `../data/README.md`）
 - 型の真実源: `nextjs_data_types_v1.ts` → `data/types.ts`
