@@ -180,16 +180,21 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
         <div className="grid grid-cols-12 gap-6">
 
           {/* TOC（左） */}
-          <div className="col-span-2 hidden lg:block">
+          <div className="col-span-2 hidden lg:row-span-2 lg:block">
             <ArticleToc items={toc} backHref="/reports" backLabel={uiText.reports.breadcrumb} />
           </div>
 
           {/* メインコンテンツ */}
-          <div className="col-span-12 lg:col-span-7">
+          <div className="col-span-12 lg:col-start-3 lg:col-span-7">
 
             {/* 要点（TL;DR） */}
             {hasTakeaways && (
-              <section id="takeaways" className="scroll-mt-site-header border-b border-border pt-6 pb-8">
+              <section
+                id="takeaways"
+                className={`scroll-mt-site-header pt-6 pb-8 ${
+                  hasBody ? 'border-b border-border' : ''
+                }`}
+              >
                 <h2 className="mb-4 text-lg font-semibold text-foreground">
                   {uiText.reports.keyTakeaways}
                 </h2>
@@ -206,27 +211,40 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
             {/* 本文（Markdown） */}
             {hasBody && (
-              <section id="body" className="scroll-mt-site-header border-b border-border pt-6 pb-8">
+              <section id="body" className="scroll-mt-site-header pt-6 pb-8">
                 <Markdown source={report.body!} />
               </section>
             )}
+          </div>
 
-            {/* タグゾーン（本文の下） */}
-            {report.tags.length > 0 && (
-              <section className="border-b border-border pt-6 pb-8">
-                <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  タグ
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {report.tags.map((tag) => (
-                    <TagChip key={tag} kind="article" value={tag} className="py-1" />
-                  ))}
-                </div>
-              </section>
-            )}
+          {/* 本文後のメタ・関連情報 */}
+          <div className="col-span-12 lg:col-start-3 lg:row-start-2 lg:col-span-7">
+            {/* 記事メタ（本文の終端） */}
+            <section className="border-y border-border py-6">
+              <div className="space-y-6">
+                {report.tags.length > 0 && (
+                  <div>
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      タグ
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {report.tags.map((tag) => (
+                        <TagChip key={tag} kind="article" value={tag} className="py-1" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <SourceList
+                  sources={report.sources}
+                  className="scroll-mt-site-header"
+                  titleClassName="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                />
+              </div>
+            </section>
 
             {hasRelated && (
-              <section id="related" className="scroll-mt-site-header mt-6 border-b border-border pb-8">
+              <section id="related" className="scroll-mt-site-header mt-12 border-t-2 border-border pt-8 pb-8">
                 <h2 className="mb-4 text-lg font-semibold text-foreground">
                   {uiText.reports.relatedInfo}
                 </h2>
@@ -281,15 +299,10 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 </div>
               </section>
             )}
-
-            <SourceList
-              sources={report.sources}
-              className="mt-6 border border-border bg-card p-6 scroll-mt-site-header"
-            />
           </div>
 
           {/* サイドバー（右） */}
-          <div className="col-span-12 lg:col-span-3">
+          <div className="col-span-12 lg:col-start-10 lg:row-start-2 lg:col-span-3">
             <div className="lg:sticky top-site-header-gap space-y-6">
               <section className="border-y border-border py-4">
                 <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">

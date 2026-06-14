@@ -119,7 +119,12 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
           {/* Content */}
           <div className="col-span-12 lg:col-span-7">
-            <section id="overview" className="scroll-mt-site-header border-b border-border pt-6 pb-8">
+            <section
+              id="overview"
+              className={`scroll-mt-site-header pt-6 pb-8 ${
+                hasBody || hasChecklist ? 'border-b border-border' : ''
+              }`}
+            >
               <h2 className="text-lg font-semibold text-foreground mb-4">
                 {uiText.common.overview}
               </h2>
@@ -127,13 +132,18 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
             </section>
 
             {hasBody && (
-              <section id="body" className="scroll-mt-site-header border-b border-border pt-6 pb-8">
+              <section
+                id="body"
+                className={`scroll-mt-site-header pt-6 pb-8 ${
+                  hasChecklist ? 'border-b border-border' : ''
+                }`}
+              >
                 <Markdown source={guide.body!} />
               </section>
             )}
 
             {hasChecklist && (
-              <section id="checklist" className="scroll-mt-site-header border-b border-border pt-6 pb-8">
+              <section id="checklist" className="scroll-mt-site-header pt-6 pb-8">
                 <h3 className="text-sm font-semibold text-foreground mb-4">チェックリスト</h3>
                 <ul className="space-y-2 text-sm text-foreground/80">
                   {(guide.checklistItems ?? []).map((item) => (
@@ -146,8 +156,14 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
               </section>
             )}
 
+            <SourceList
+              sources={guide.sources}
+              className="mt-10 border-y border-border py-6 scroll-mt-site-header"
+              titleClassName="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            />
+
             {hasRelated && (
-              <section id="related" className="scroll-mt-site-header mt-6 border-b border-border pb-8">
+              <section id="related" className="scroll-mt-site-header mt-12 border-t-2 border-border pt-8 pb-8">
                 <h2 className="mb-4 text-lg font-semibold text-foreground">
                   {uiText.guides.relatedInfo}
                 </h2>
@@ -171,11 +187,6 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
                 </div>
               </section>
             )}
-
-            <SourceList
-              sources={guide.sources}
-              className="mt-6 border border-border bg-card p-6 scroll-mt-site-header"
-            />
           </div>
 
           {/* Decision Summary */}
