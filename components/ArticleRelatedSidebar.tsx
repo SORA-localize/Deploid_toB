@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { useActiveSection } from '@/lib/useActiveSection';
+import { useSharedActiveSection } from '@/lib/activeSectionContext';
 import { cn } from '@/lib/utils';
 
 interface ArticleRelatedSidebarProps {
@@ -38,7 +38,7 @@ export function ArticleRelatedSidebar({
 }: ArticleRelatedSidebarProps) {
   const isDesktop = useDesktopLayout();
   const shouldTrackActiveSection = enabled && isDesktop && sectionIds.includes(revealId);
-  const activeId = useActiveSection(sectionIds, { enabled: shouldTrackActiveSection });
+  const activeId = useSharedActiveSection(sectionIds, { enabled: shouldTrackActiveSection });
   const visible = !enabled || (isDesktop && activeId === revealId);
 
   return (

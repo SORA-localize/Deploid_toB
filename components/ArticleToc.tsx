@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
-import { useActiveSection } from '@/lib/useActiveSection';
+import { useSharedActiveSection } from '@/lib/activeSectionContext';
 import { uiText } from '@/lib/uiText';
 
 export interface ArticleTocItem {
@@ -18,7 +18,7 @@ interface ArticleTocProps {
 
 export function ArticleToc({ items, backHref, backLabel }: ArticleTocProps) {
   const ids = useMemo(() => items.map((item) => item.href.replace('#', '')), [items]);
-  const activeId = useActiveSection(ids);
+  const activeId = useSharedActiveSection(ids);
 
   return (
     <div className="sticky top-site-header-gap">

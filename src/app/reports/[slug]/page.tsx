@@ -9,6 +9,7 @@ import { Markdown } from '@/components/Markdown';
 import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
+import { ActiveSectionProvider } from '@/lib/activeSectionContext';
 import {
   getArticles,
   getRelatedGuides,
@@ -223,6 +224,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
       {/* ── 本文エリア ── */}
       <div className="site-container-content py-8">
+        {/* scrollspy を1回だけ計算し、TOC と関連サイドバーで共有する */}
+        <ActiveSectionProvider ids={tocIds}>
         <div className="grid grid-cols-12 gap-6">
 
           {/* TOC（左） */}
@@ -362,6 +365,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             </ArticleRelatedSidebar>
           </div>
         </div>
+        </ActiveSectionProvider>
       </div>
     </div>
   );
