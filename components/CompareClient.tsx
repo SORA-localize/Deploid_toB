@@ -20,6 +20,7 @@ import {
 } from '@dnd-kit/sortable';
 import { ChevronDown, ChevronRight, Star } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import {
   CompareDragOverlayCard,
   CompareDroppableArea,
@@ -316,10 +317,12 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
   return (
     <div className="min-h-screen bg-background">
       <div className="site-container py-8">
+        <Breadcrumbs items={[{ label: uiText.compare.breadcrumb }]} />
+
         <div className="mb-8">
-          <h2 className="text-2xl md:text-3xl font-semibold leading-tight text-foreground mb-2">
-            インタラクティブ比較
-          </h2>
+          <h1 className="text-2xl md:text-3xl font-semibold leading-tight text-foreground mb-2">
+            {uiText.compare.title}
+          </h1>
           <p className="text-sm text-muted-foreground max-w-3xl">
             左のメニューからロボットを選んで比較します。右パネルで気になるロボットをお気に入り登録できます。
           </p>
