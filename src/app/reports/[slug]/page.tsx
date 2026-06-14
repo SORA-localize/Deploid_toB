@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Calendar, Clock, User } from 'lucide-react';
+import { ArticleRelatedSidebar } from '@/components/ArticleRelatedSidebar';
 import { ArticleToc } from '@/components/ArticleToc';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
@@ -42,6 +43,48 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
+function ReportSidebarContent() {
+  return (
+    <div className="space-y-6">
+      <section className="border-y border-border py-4">
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          情報提供・取材相談
+        </h3>
+        <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
+          導入事例や一次情報の提供、取材のご相談はこちら。
+        </p>
+        <Link
+          href="/contact"
+          className="block w-full bg-primary px-4 py-2 text-center text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+        >
+          お問い合わせ
+        </Link>
+      </section>
+
+      <section className="border-y border-border py-4">
+        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          関連ツール
+        </h3>
+        <nav className="divide-y divide-border">
+          {[
+            { href: '/robots', label: 'ロボットを探す' },
+            { href: '/compare', label: '機種を比較する' },
+            { href: '/guides', label: '導入ガイドを読む' },
+          ].map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="flex items-center justify-between py-2 text-xs text-foreground/80 transition-colors hover:text-foreground"
+            >
+              <span>{label}</span>
+            </Link>
+          ))}
+        </nav>
+      </section>
+    </div>
+  );
+}
+
 export default async function ReportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { record: report, redirectTo } = resolveArticleDetailBySlug(slug);
@@ -74,6 +117,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
       : []),
     ...(hasRelated ? [{ label: uiText.reports.relatedInfo, href: '#related' }] : []),
   ];
+  const tocIds = toc.map((item) => item.href.replace('#', ''));
 
   return (
     <div className="min-h-screen bg-background">
@@ -305,43 +349,17 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
           {/* サイドバー（右） */}
           <div className="col-span-12 lg:col-start-10 lg:row-start-2 lg:col-span-3">
-            <div className="lg:sticky top-site-header-gap space-y-6">
-              <section className="border-y border-border py-4">
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  情報提供・取材相談
-                </h3>
-                <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
-                  導入事例や一次情報の提供、取材のご相談はこちら。
-                </p>
-                <Link
-                  href="/contact"
-                  className="block w-full bg-primary px-4 py-2 text-center text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                >
-                  お問い合わせ
-                </Link>
-              </section>
-
-              <section className="border-y border-border py-4">
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  関連ツール
-                </h3>
-                <nav className="divide-y divide-border">
-                  {[
-                    { href: '/robots', label: 'ロボットを探す' },
-                    { href: '/compare', label: '機種を比較する' },
-                    { href: '/guides', label: '導入ガイドを読む' },
-                  ].map(({ href, label }) => (
-                    <Link
-                      key={href}
-                      href={href}
-                      className="flex items-center justify-between py-2 text-xs text-foreground/80 transition-colors hover:text-foreground"
-                    >
-                      <span>{label}</span>
-                    </Link>
-                  ))}
-                </nav>
-              </section>
+            <div className="lg:hidden">
+              <ReportSidebarContent />
             </div>
+            <ArticleRelatedSidebar
+              enabled={hasRelated}
+              revealId="related"
+              sectionIds={tocIds}
+              className="top-site-header-gap hidden lg:sticky lg:block"
+            >
+              <ReportSidebarContent />
+            </ArticleRelatedSidebar>
           </div>
         </div>
       </div>

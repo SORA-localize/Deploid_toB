@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 
 const PAGE_BOTTOM_TOLERANCE = 2;
 
+interface UseActiveSectionOptions {
+  enabled?: boolean;
+}
+
 function getScrollMarginTop(element: HTMLElement) {
   const scrollMarginTop = Number.parseFloat(getComputedStyle(element).scrollMarginTop);
   return Number.isFinite(scrollMarginTop) ? scrollMarginTop : 0;
@@ -48,8 +52,12 @@ function resolveActiveSectionId(ids: readonly string[]) {
   return nextActiveId;
 }
 
-export function useActiveSection(ids: readonly string[]): string {
+export function useActiveSection(
+  ids: readonly string[],
+  options: UseActiveSectionOptions = {},
+): string {
   const idsKey = useMemo(() => ids.join('|'), [ids]);
+  const enabled = options.enabled ?? true;
   const [activeId, setActiveId] = useState(ids[0] ?? '');
 
   useEffect(() => {
@@ -58,6 +66,10 @@ export function useActiveSection(ids: readonly string[]): string {
       return;
     }
     setActiveId(ids[0] ?? '');
+
+    if (!enabled) {
+      return;
+    }
 
     let rafId: number | null = null;
 
@@ -86,7 +98,7 @@ export function useActiveSection(ids: readonly string[]): string {
         window.cancelAnimationFrame(rafId);
       }
     };
-  }, [ids, idsKey]);
+  }, [enabled, ids, idsKey]);
 
   return activeId;
 }
