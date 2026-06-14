@@ -14,6 +14,7 @@
 :root {
   --header-h: 4rem;
   --sticky-bar-h: 2.5rem; /* ContextualPageHeader の高さ (py-2×2 + text-sm 行) */
+  --site-anchor-offset: calc(var(--header-h) + var(--sticky-bar-h) + 0.5rem);
   --font-size: 16px;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
@@ -287,11 +288,11 @@
   }
 
   .scroll-mt-site-header {
-    scroll-margin-top: calc(var(--header-h) + var(--sticky-bar-h) + 0.5rem);
+    scroll-margin-top: var(--site-anchor-offset);
   }
 
   .top-site-header-gap {
-    top: calc(var(--header-h) + var(--sticky-bar-h) + 0.5rem);
+    top: var(--site-anchor-offset);
   }
 }
 

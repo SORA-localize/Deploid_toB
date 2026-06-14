@@ -105,7 +105,7 @@ export function ReportsBrowser({ reports }: { reports: Article[] }) {
               {featureReports.length > 0 && (
                 <div className="hidden lg:flex flex-col gap-4 h-full">
                   {featureReports.map((r) => (
-                    <NewsFeatureCard key={r.slug} report={r} className="flex-1 min-h-0" />
+                    <NewsFeatureCard key={r.id} report={r} className="flex-1 min-h-0" />
                   ))}
                 </div>
               )}
@@ -122,7 +122,7 @@ export function ReportsBrowser({ reports }: { reports: Article[] }) {
             <div className="space-y-3">
               <CardHoverEffect className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 items-stretch">
                 {paginatedReports.map((r) => (
-                  <NewsCard key={r.slug} report={r} />
+                  <NewsCard key={r.id} report={r} />
                 ))}
               </CardHoverEffect>
 

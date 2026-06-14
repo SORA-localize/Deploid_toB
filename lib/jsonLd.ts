@@ -2,6 +2,7 @@
 // Robot=Product / Manufacturer=Organization / Article=NewsArticle。
 // 値はすべてレコードから導出する（直書きしない）。
 import type { Article, Manufacturer, Robot } from '@/data/types';
+import { getDisplayableAsset } from './media';
 import { siteUrl } from './site';
 
 const PUBLISHER = {
@@ -11,8 +12,7 @@ const PUBLISHER = {
 } as const;
 
 function imageSrc(robot: Robot): string | undefined {
-  const src = robot.images?.hero?.src ?? robot.heroImage?.src;
-  return src && src.trim() ? src : undefined;
+  return getDisplayableAsset(robot.images?.hero ?? robot.heroImage)?.src;
 }
 
 export function robotJsonLd(robot: Robot, manufacturer?: Manufacturer) {
@@ -32,7 +32,7 @@ export function robotJsonLd(robot: Robot, manufacturer?: Manufacturer) {
 }
 
 export function manufacturerJsonLd(manufacturer: Manufacturer) {
-  const logo = manufacturer.logo?.src;
+  const logo = getDisplayableAsset(manufacturer.logo)?.src;
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -48,6 +48,7 @@ export function manufacturerJsonLd(manufacturer: Manufacturer) {
 }
 
 export function articleJsonLd(article: Article) {
+  const image = getDisplayableAsset(article.heroImage)?.src;
   return {
     '@context': 'https://schema.org',
     // news は速報、その他は分析・解説（設計 §7-1 の category 軸に対応）
@@ -58,7 +59,7 @@ export function articleJsonLd(article: Article) {
     dateModified: article.updatedAt,
     url: `${siteUrl}/reports/${article.slug}`,
     mainEntityOfPage: `${siteUrl}/reports/${article.slug}`,
-    ...(article.heroImage?.src ? { image: article.heroImage.src } : {}),
+    ...(image ? { image } : {}),
     author: article.author
       ? { '@type': 'Organization', name: article.author }
       : PUBLISHER,

@@ -28,7 +28,7 @@ export function FeaturedRobotsGrid({ robots, manufacturerById }: FeaturedRobotsG
           const manufacturer = manufacturerById[robot.manufacturerId];
           return (
             <RobotCard
-              key={robot.slug}
+              key={robot.id}
               robot={robot}
               manufacturerName={manufacturer?.name}
               manufacturerLogo={manufacturer?.logo}

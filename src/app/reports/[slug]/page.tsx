@@ -19,6 +19,7 @@ import {
 import { articleJsonLd } from '@/lib/jsonLd';
 import { articleTypeLabels } from '@/lib/labels';
 import { extractH2Headings } from '@/lib/markdownHeadings';
+import { getDisplayableAsset } from '@/lib/media';
 import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { getArticleTypeTone } from '@/lib/visualSemantics';
@@ -55,6 +56,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
   const hasBody = (report.body ?? '').trim().length > 0;
   const bodyHeadings = hasBody ? extractH2Headings(report.body!) : [];
+  const heroImage = getDisplayableAsset(report.heroImage);
   const hasRelated = robots.length > 0 || manufacturers.length > 0 || useCases.length > 0 || guides.length > 0;
   const reportTitle = report.titleJa ?? report.title;
   const breadcrumbItems = [
@@ -78,7 +80,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
       <JsonLd data={articleJsonLd(report)} />
 
       {/* ── ヒーロー + ヘッダー（統合） ── */}
-      {report.heroImage?.src ? (
+      {heroImage ? (
         <header className="border-b border-border bg-background">
           <div className="site-container pt-4 sm:pt-5">
             <Breadcrumbs items={breadcrumbItems} />
@@ -87,17 +89,17 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           <figure className="relative overflow-hidden bg-muted min-h-[400px] sm:min-h-[500px] md:min-h-[580px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={report.heroImage.src}
-              alt={report.heroImage.alt}
+              src={heroImage.src}
+              alt={heroImage.alt}
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent"
             />
-            {report.heroImage.credit && (
+            {heroImage.credit && (
               <p className="pointer-events-none absolute bottom-2 right-3 z-10 text-[10px] text-white/50">
-                © {report.heroImage.credit}
+                © {heroImage.credit}
               </p>
             )}
 

@@ -1,48 +1,15 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { GLOBAL_HEADER_HEIGHT, GLOBAL_HEADER_HEIGHT_CSS_VARIABLE } from '@/lib/siteLayout';
 
-const STICKY_BAR_HEIGHT_CSS_VARIABLE = '--sticky-bar-h';
-const ACTIVE_SECTION_EXTRA_OFFSET = 8;
-const STICKY_BAR_HEIGHT_FALLBACK = 40;
 const PAGE_BOTTOM_TOLERANCE = 2;
 
-function getCssLengthInPixels(variableName: string, fallback: number) {
-  const rawValue = getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
-
-  if (rawValue.endsWith('rem')) {
-    const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
-    const remValue = Number.parseFloat(rawValue);
-    if (Number.isFinite(remValue) && Number.isFinite(rootFontSize)) {
-      return remValue * rootFontSize;
-    }
-  }
-
-  if (rawValue.endsWith('px')) {
-    const pxValue = Number.parseFloat(rawValue);
-    if (Number.isFinite(pxValue)) {
-      return pxValue;
-    }
-  }
-
-  return fallback;
+function getScrollMarginTop(element: HTMLElement) {
+  const scrollMarginTop = Number.parseFloat(getComputedStyle(element).scrollMarginTop);
+  return Number.isFinite(scrollMarginTop) ? scrollMarginTop : 0;
 }
 
-function getActiveSectionOffset() {
-  const globalHeaderHeight = getCssLengthInPixels(
-    GLOBAL_HEADER_HEIGHT_CSS_VARIABLE,
-    GLOBAL_HEADER_HEIGHT,
-  );
-  const stickyBarHeight = getCssLengthInPixels(
-    STICKY_BAR_HEIGHT_CSS_VARIABLE,
-    STICKY_BAR_HEIGHT_FALLBACK,
-  );
-
-  return globalHeaderHeight + stickyBarHeight + ACTIVE_SECTION_EXTRA_OFFSET;
-}
-
-function resolveActiveSectionId(ids: readonly string[], offset: number) {
+function resolveActiveSectionId(ids: readonly string[]) {
   const elements = ids
     .map((id) => document.getElementById(id))
     .filter((element): element is HTMLElement => element !== null);
@@ -51,6 +18,8 @@ function resolveActiveSectionId(ids: readonly string[], offset: number) {
     return ids[0] ?? '';
   }
 
+  // Anchorクリック時の停止位置と同じCSS scroll-margin-topをactive判定の基準にする。
+  const offset = getScrollMarginTop(elements[0]);
   const activationLine = offset + 1;
   let nextActiveId = elements[0].id;
 
@@ -90,12 +59,11 @@ export function useActiveSection(ids: readonly string[]): string {
     }
     setActiveId(ids[0] ?? '');
 
-    let offset = getActiveSectionOffset();
     let rafId: number | null = null;
 
     const updateActiveId = () => {
       rafId = null;
-      setActiveId(resolveActiveSectionId(ids, offset));
+      setActiveId(resolveActiveSectionId(ids));
     };
 
     const requestUpdate = () => {
@@ -104,7 +72,6 @@ export function useActiveSection(ids: readonly string[]): string {
     };
 
     const handleResize = () => {
-      offset = getActiveSectionOffset();
       requestUpdate();
     };
 

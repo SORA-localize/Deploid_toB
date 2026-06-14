@@ -5,6 +5,7 @@ import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import { TagChip } from '@/components/TagChip';
 import type { Article } from '@/data/types';
 import { articleTypeLabels } from '@/lib/labels';
+import { getDisplayableAsset } from '@/lib/media';
 import { getArticleTypeTone } from '@/lib/visualSemantics';
 import { cn } from '@/lib/utils';
 
@@ -14,7 +15,7 @@ interface NewsCardProps {
 }
 
 export function NewsCard({ report, className }: NewsCardProps) {
-  const heroSrc = report.heroImage?.src;
+  const hero = getDisplayableAsset(report.heroImage);
 
   return (
     <div
@@ -25,11 +26,11 @@ export function NewsCard({ report, className }: NewsCardProps) {
     >
       {/* 画像エリア */}
       <div className="w-20 flex-none self-stretch border-r border-border overflow-hidden bg-muted sm:w-28 md:w-auto md:aspect-video md:border-r-0">
-        {heroSrc ? (
+        {hero ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={heroSrc}
-            alt={report.heroImage?.alt ?? ''}
+            src={hero.src}
+            alt={hero.alt}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (

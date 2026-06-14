@@ -18,7 +18,7 @@ export function ManufacturerRobotsGrid({ robots, manufacturer }: ManufacturerRob
     <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {robots.map((robot) => (
         <RobotCard
-          key={robot.slug}
+          key={robot.id}
           robot={robot}
           manufacturerName={manufacturer.name}
           manufacturerLogo={manufacturer.logo}

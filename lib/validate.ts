@@ -345,6 +345,7 @@ export function validateData(): ValidationResult {
   for (const article of articles) {
     checkDate('article', article.slug, 'updatedAt', article.updatedAt);
     checkDate('article', article.slug, 'publishedAt', article.publishedAt);
+    checkImageAsset('article', article.slug, 'heroImage', article.heroImage);
     checkRequiredSources('article', article.slug, article.sources, {
       requireNonEmpty: article.publishStatus === 'published' && article.contentKind !== 'sample',
     });

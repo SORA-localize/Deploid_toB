@@ -111,7 +111,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {homeFeaturedReports.map((report) => (
               <NewsFeatureCard
-                key={report.slug}
+                key={report.id}
                 report={report}
                 className="min-h-[220px] sm:min-h-[240px] lg:min-h-[260px]"
               />

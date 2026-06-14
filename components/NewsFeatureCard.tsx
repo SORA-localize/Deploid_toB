@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Article } from '@/data/types';
 import { articleTypeLabels } from '@/lib/labels';
+import { getDisplayableAsset } from '@/lib/media';
 import { cn } from '@/lib/utils';
 
 interface NewsFeatureCardProps {
@@ -9,7 +10,7 @@ interface NewsFeatureCardProps {
 }
 
 export function NewsFeatureCard({ report, className }: NewsFeatureCardProps) {
-  const heroSrc = report.heroImage?.src;
+  const hero = getDisplayableAsset(report.heroImage);
 
   return (
     <Link
@@ -19,11 +20,11 @@ export function NewsFeatureCard({ report, className }: NewsFeatureCardProps) {
         className,
       )}
     >
-      {heroSrc ? (
+      {hero ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={heroSrc}
-          alt={report.heroImage?.alt ?? ''}
+          src={hero.src}
+          alt={hero.alt}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
         />
       ) : (

@@ -128,7 +128,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {featured.map((u) => (
                 <Link
-                  key={u.slug}
+                  key={u.id}
                   href={`/use-cases/${u.slug}`}
                   className="card-data block p-6"
                 >
@@ -166,7 +166,7 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
         <div className="space-y-3">
           {(active ? filtered : rest).map((u) => (
             <Link
-              key={u.slug}
+              key={u.id}
               href={`/use-cases/${u.slug}`}
               className="card-data block p-4"
             >

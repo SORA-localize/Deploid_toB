@@ -10,6 +10,7 @@ import { RobotStickyAside } from '@/components/RobotStickyAside';
 import { SourceList } from '@/components/SourceList';
 import {
   getManufacturerForRobot,
+  getManufacturers,
   getArticlesForRobot,
   getRobotById,
   getRobots,
@@ -18,6 +19,7 @@ import {
   resolveRobotDetailBySlug,
 } from '@/lib/data';
 import { robotJsonLd } from '@/lib/jsonLd';
+import { sortRobots } from '@/lib/display';
 import { getRobotDetailDecisionRows, getRobotDetailSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
@@ -59,8 +61,8 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
   const useCases = getUseCasesForRobot(robot.id);
   const reports = getArticlesForRobot(robot.id);
 
-  const all = getRobots();
-  const idx = all.findIndex((r) => r.slug === robot.slug);
+  const all = sortRobots(getRobots(), 'name', getManufacturers());
+  const idx = all.findIndex((r) => r.id === robot.id);
   const prev = idx > 0 ? all[idx - 1] : null;
   const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
 
@@ -220,7 +222,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
                   <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
                     {useCases.map((useCase) => (
                       <Link
-                        key={useCase.slug}
+                        key={useCase.id}
                         href={`/use-cases/${useCase.slug}`}
                         className="text-xs px-3 py-1 border border-border hover:border-foreground/40 transition-colors text-foreground/80"
                       >
@@ -229,7 +231,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
                     ))}
                     {reports.map((report) => (
                       <Link
-                        key={report.slug}
+                        key={report.id}
                         href={`/reports/${report.slug}`}
                         className="text-xs px-3 py-1 border border-border hover:border-foreground/40 transition-colors text-foreground/80"
                       >

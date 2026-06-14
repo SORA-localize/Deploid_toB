@@ -116,7 +116,7 @@ export function GuidesBrowser({ guides }: { guides: Guide[] }) {
               <div className="space-y-2">
                 {items.map((guide) => (
                   <Link
-                    key={guide.slug}
+                    key={guide.id}
                     href={`/guides/${guide.slug}`}
                     className="card-data block p-4"
                   >

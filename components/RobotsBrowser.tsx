@@ -122,7 +122,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         const manufacturer = manufacturerById.get(robot.manufacturerId);
         return (
           <RobotCard
-            key={robot.slug}
+            key={robot.id}
             robot={robot}
             manufacturerName={manufacturer?.name ?? robot.manufacturerId}
             manufacturerLogo={manufacturer?.logo}

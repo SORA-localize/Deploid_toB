@@ -169,7 +169,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                 ) : (
                   <div className="space-y-3">
                     {candidateRobots.map((robot) => (
-                      <div key={robot.slug} className="border border-border p-3">
+                      <div key={robot.id} className="border border-border p-3">
                         <Link href={`/robots/${robot.slug}`} className="block mb-2">
                           <h4 className="text-sm font-semibold text-foreground hover:text-foreground/80">
                             {getRobotRelatedTitle(robot)}
@@ -198,7 +198,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                   <nav className="space-y-2">
                     {guides.map((g) => (
                       <Link
-                        key={g.slug}
+                        key={g.id}
                         href={`/guides/${g.slug}`}
                         className="block text-xs text-foreground/80 hover:text-foreground py-1.5 border-b border-border"
                       >
@@ -207,7 +207,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                     ))}
                     {reports.map((r) => (
                       <Link
-                        key={r.slug}
+                        key={r.id}
                         href={`/reports/${r.slug}`}
                         className="block text-xs text-foreground/80 hover:text-foreground py-1.5 border-b border-border"
                       >

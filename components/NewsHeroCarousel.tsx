@@ -2,6 +2,7 @@
 
 import type { Article } from '@/data/types';
 import { articleTypeLabels } from '@/lib/labels';
+import { getDisplayableAsset } from '@/lib/media';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { 
@@ -67,49 +68,52 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
 
         {/* outer overflow-hidden div に height:100% を渡し、inner flex div に h-full を渡すことで高さチェーンを繋ぐ */}
         <SliderContainer className="cursor-grab active:cursor-grabbing h-full" style={{ height: '100%' }}>
-          {reports.map((report) => (
-            <Slider key={report.slug} className="w-full h-full">
-              <Link href={`/reports/${report.slug}`} className="group block relative w-full h-full overflow-hidden">
-                {/* Background Image */}
-                {report.heroImage?.src ? (
-                  <img
-                    src={report.heroImage.src}
-                    alt={report.heroImage.alt}
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-                    <span className="text-muted-foreground text-sm">No Image</span>
-                  </div>
-                )}
-
-                {/* Gradient Overlay: より深く、文字を読みやすく */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-
-                {/* Content Overlay */}
-                <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 lg:p-12">
-                  <div className="max-w-4xl space-y-3">
-                    <div className="flex items-center gap-3">
-                      <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-signal text-signal-foreground rounded-sm">
-                        {articleTypeLabels[report.type]}
-                      </span>
-                      <time className="text-xs text-white/60 font-mono">
-                        {report.publishedAt}
-                      </time>
+          {reports.map((report) => {
+            const hero = getDisplayableAsset(report.heroImage);
+            return (
+              <Slider key={report.id} className="w-full h-full">
+                <Link href={`/reports/${report.slug}`} className="group block relative w-full h-full overflow-hidden">
+                  {/* Background Image */}
+                  {hero ? (
+                    <img
+                      src={hero.src}
+                      alt={hero.alt}
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                      <span className="text-muted-foreground text-sm">No Image</span>
                     </div>
-                    
-                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight transition-colors group-hover:text-signal line-clamp-2">
-                      {report.titleJa || report.title}
-                    </h2>
-                    
-                    <p className="text-sm md:text-base text-white/80 line-clamp-2 max-w-2xl hidden transition-colors group-hover:text-white md:block">
-                      {report.summary}
-                    </p>
+                  )}
+
+                  {/* Gradient Overlay: より深く、文字を読みやすく */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+
+                  {/* Content Overlay */}
+                  <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 lg:p-12">
+                    <div className="max-w-4xl space-y-3">
+                      <div className="flex items-center gap-3">
+                        <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-signal text-signal-foreground rounded-sm">
+                          {articleTypeLabels[report.type]}
+                        </span>
+                        <time className="text-xs text-white/60 font-mono">
+                          {report.publishedAt}
+                        </time>
+                      </div>
+
+                      <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight transition-colors group-hover:text-signal line-clamp-2">
+                        {report.titleJa || report.title}
+                      </h2>
+
+                      <p className="text-sm md:text-base text-white/80 line-clamp-2 max-w-2xl hidden transition-colors group-hover:text-white md:block">
+                        {report.summary}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            </Slider>
-          ))}
+                </Link>
+              </Slider>
+            );
+          })}
         </SliderContainer>
 
         {/* Navigation Controls: ホバー時のみ表示してスッキリさせる */}

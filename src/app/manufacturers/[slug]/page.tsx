@@ -16,6 +16,7 @@ import {
   getArticles,
   getRobotsByManufacturerId,
 } from '@/lib/data';
+import { sortRobots } from '@/lib/display';
 import { manufacturerJsonLd } from '@/lib/jsonLd';
 import { uiText } from '@/lib/uiText';
 
@@ -42,7 +43,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
   if (redirectTo) permanentRedirect(`/manufacturers/${redirectTo}`);
   if (!manufacturer) notFound();
 
-  const robots = getRobotsByManufacturerId(manufacturer.id);
+  const robots = sortRobots(getRobotsByManufacturerId(manufacturer.id), 'name', [manufacturer]);
   const reports = getArticlesForManufacturer(manufacturer.id);
   const sampleReports = getArticles()
     .filter((report) => report.contentKind === 'sample')
@@ -104,7 +105,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {displayedReports.map((report) => (
-                <NewsCard key={report.slug} report={report} />
+                <NewsCard key={report.id} report={report} />
               ))}
             </div>
           </ManufacturerDetailSection>
