@@ -11,6 +11,7 @@ export const guides: Guide[] = [
     updatedAt: '2026-06-02',
     reliability: 'reported',
     sources: [],
+    seo: { noindex: true },
     heroImage: {
       src: '',
       alt: 'Atlas robot reflecting decision variables',
@@ -96,6 +97,7 @@ export const guides: Guide[] = [
     updatedAt: '2026-06-02',
     reliability: 'reported',
     sources: [],
+    seo: { noindex: true },
     heroImage: {
       src: '',
       alt: 'PoC planning with Figure robot',

@@ -60,7 +60,7 @@ export function CompareSummaryTable({ robots, manufacturers }: CompareSummaryTab
                 <tr key={robot.id}>
                   <td className="px-3 py-3 font-medium text-foreground">
                     <Link href={`/robots/${robot.slug}`} className="underline-offset-2 hover:underline">
-                      {robot.nameJa ?? robot.name}
+                      {robot.name}
                     </Link>
                   </td>
                   <td className="px-3 py-3 text-foreground/80">
@@ -69,7 +69,7 @@ export function CompareSummaryTable({ robots, manufacturers }: CompareSummaryTab
                         href={`/manufacturers/${manufacturer.slug}`}
                         className="underline-offset-2 hover:underline"
                       >
-                        {manufacturer.nameJa ?? manufacturer.name}
+                        {manufacturer.name}
                       </Link>
                     ) : (
                       robot.manufacturerId

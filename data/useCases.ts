@@ -12,6 +12,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-06-02',
     reliability: 'reported',
     sources: [],
+    seo: { noindex: true },
     heroImage: {
       src: '',
       alt: 'Digit robot in a warehouse environment',
@@ -57,6 +58,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-06-02',
     reliability: 'reported',
     sources: [],
+    seo: { noindex: true },
     heroImage: {
       src: '',
       alt: 'Humanoid robot in a factory production line',
@@ -100,6 +102,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-06-02',
     reliability: 'reported',
     sources: [],
+    seo: { noindex: true },
     heroImage: {
       src: '',
       alt: 'Humanoid robot in a research lab setting',
@@ -142,6 +145,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-06-02',
     reliability: 'reported',
     sources: [],
+    seo: { noindex: true },
     heroImage: {
       src: '',
       alt: 'Humanoid robot at a conference or exhibition',
