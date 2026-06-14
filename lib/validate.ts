@@ -368,6 +368,7 @@ export function validateData(): ValidationResult {
     check('deployment', d.id, 'manufacturerId', d.manufacturerId, manufacturerIds);
     if (d.robotId) check('deployment', d.id, 'robotId', d.robotId, robotIds);
     checkDate('deployment', d.id, 'updatedAt', d.updatedAt);
+    checkRequiredSources('deployment', d.id, d.sources);
   }
 
   const placementOrders = new Set<string>();
