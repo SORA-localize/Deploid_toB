@@ -127,8 +127,8 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
     [robotById, orderedIds],
   );
   const favoriteRobots = useMemo(
-    () => robots.filter((r) => favorites.includes(r.id)),
-    [robots, favorites],
+    () => sortRobots(robots.filter((r) => favorites.includes(r.id)), 'name', manufacturers),
+    [robots, favorites, manufacturers],
   );
   const sheetItemIds = useMemo(
     () => orderedIds.map((id) => getDndItemId('sheet', id)),
@@ -379,19 +379,27 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                           'name',
                           manufacturers,
                         );
-                        const isExpanded = expandedManufacturers.includes(manufacturer.id);
+                        const isEmpty = manufacturerRobots.length === 0;
+                        const isExpanded =
+                          !isEmpty && expandedManufacturers.includes(manufacturer.id);
 
                         return (
                           <div key={manufacturer.id} className="border-b border-border-subtle last:border-0">
                             <button
                               type="button"
+                              disabled={isEmpty}
                               aria-label={uiText.comparison.toggleAria(
                                 manufacturer.nameJa ?? manufacturer.name,
                                 isExpanded,
                               )}
-                              aria-expanded={isExpanded}
+                              aria-expanded={isEmpty ? undefined : isExpanded}
                               onClick={() => toggleManufacturer(manufacturer.id)}
-                              className="w-full px-4 py-3 flex items-center justify-between bg-card hover:bg-muted transition-colors text-left"
+                              className={cn(
+                                'w-full px-4 py-3 flex items-center justify-between transition-colors text-left',
+                                isEmpty
+                                  ? 'bg-card cursor-not-allowed opacity-50'
+                                  : 'bg-card hover:bg-muted',
+                              )}
                             >
                               <ManufacturerLogoName
                                 name={manufacturer.nameJa ?? manufacturer.name}
@@ -400,7 +408,11 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
                                 frameClassName="h-5 w-5"
                                 imageClassName="h-4 w-4"
                               />
-                              {isExpanded ? (
+                              {isEmpty ? (
+                                <span className="text-[10px] font-medium text-muted-foreground tabular-nums">
+                                  0
+                                </span>
+                              ) : isExpanded ? (
                                 <ChevronDown className="w-4 h-4 text-muted-foreground" />
                               ) : (
                                 <ChevronRight className="w-4 h-4 text-muted-foreground" />

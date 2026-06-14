@@ -16,8 +16,8 @@ interface ComparisonRobotPanelProps {
   manufacturerName?: string;
   manufacturerLogo?: ImageAsset; // 現在未使用（呼び出し元変更を避けるため維持）
   isFavorite: boolean;
-  onFavoriteToggle: (slug: string) => void;
-  onRemove: (slug: string) => void;
+  onFavoriteToggle: (id: string) => void;
+  onRemove: (id: string) => void;
   dragHandleProps?: CompareCardDragHandleProps;
 }
 
@@ -267,7 +267,7 @@ export function ComparisonRobotPanel({
             onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
-              onFavoriteToggle(robot.slug);
+              onFavoriteToggle(robot.id);
             }}
             className="rounded-sm p-1 text-white/70 transition-colors hover:bg-white/20 hover:text-white
                        focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
@@ -280,7 +280,7 @@ export function ComparisonRobotPanel({
             onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
-              onRemove(robot.slug);
+              onRemove(robot.id);
             }}
             className="rounded-sm p-1 text-white/70 transition-colors hover:bg-white/20 hover:text-white
                        focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
