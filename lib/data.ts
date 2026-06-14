@@ -5,6 +5,7 @@ import { articles } from '@/data/articles';
 import { robots } from '@/data/robots';
 import { useCases } from '@/data/useCases';
 import { runValidationInDev } from './validate';
+import { byArticlePublishedDesc } from '@/lib/display';
 
 // dev時のみ：参照整合（存在しないid参照・双方向のズレ・id/slug重複）をconsoleで通知
 runValidationInDev();
@@ -121,7 +122,7 @@ export function getUseCaseById(id: string) {
 }
 
 export function getArticles() {
-  return published(articles).sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  return published(articles).sort(byArticlePublishedDesc);
 }
 
 export function getArticleBySlug(slug: string) {

@@ -5,6 +5,7 @@ import type {
   GuideStage,
   JapanAvailability,
   JapanPresence,
+  Article,
   Manufacturer,
   ArticleSection,
   ArticleCategory,
@@ -130,7 +131,7 @@ export function sortByDisplayOrder<T extends string>(
 
 // ─── ロボット並び替え ────────────────────────────────────────────
 
-export type RobotSortKey = 'stage' | 'japan' | 'name';
+export type RobotSortKey = 'featured' | 'stage' | 'japan' | 'name';
 
 function compareNames(a: string, b: string) {
   return a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
@@ -163,6 +164,15 @@ export function sortRobots(
     : undefined;
 
   return [...robots].sort((a, b) => {
+    if (sort === 'featured') {
+      // featuredRank 昇順（未設定は最後）→ タイブレークは 'name' と完全同一。
+      // 値を入れていなければ 'name' と数学的に同じ並びになる。
+      const rankDiff =
+        (a.featuredRank ?? Number.POSITIVE_INFINITY) -
+        (b.featuredRank ?? Number.POSITIVE_INFINITY);
+      if (rankDiff !== 0) return rankDiff;
+      return compareRobotCatalogNames(a, b, manufacturerById);
+    }
     if (sort === 'stage') {
       const stageDiff =
         (stageIndex.get(a.deploymentStage) ?? Number.MAX_SAFE_INTEGER) -
@@ -185,6 +195,12 @@ export function sortRobots(
     return compareRobotCatalogNames(a, b, manufacturerById);
   });
 }
+
+// ─── 記事並び替え ────────────────────────────────────────────────
+
+/** 記事を公開日の新しい順に並べるコンパレータ（正本）。各所での直書きを禁止し本関数を使う。 */
+export const byArticlePublishedDesc = (a: Article, b: Article) =>
+  b.publishedAt.localeCompare(a.publishedAt);
 
 // ─── メーカー並び替え ────────────────────────────────────────────
 

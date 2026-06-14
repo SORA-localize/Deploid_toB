@@ -1,11 +1,12 @@
 import { articleIndexPlacementLimits, articlePlacements } from '@/data/articlePlacements';
 import type { Article, ArticlePlacementSlot } from '@/data/types';
+import { byArticlePublishedDesc } from '@/lib/display';
 
 const reportsIndexSurface = 'reports-index';
 const homeFeaturedArticleLimit = 4;
 
 function sortArticlesByPublishedAt(articles: readonly Article[]) {
-  return [...articles].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  return [...articles].sort(byArticlePublishedDesc);
 }
 
 function getArticlesById(articles: readonly Article[]) {

@@ -61,7 +61,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
   const useCases = getUseCasesForRobot(robot.id);
   const reports = getArticlesForRobot(robot.id);
 
-  const all = sortRobots(getRobots(), 'name', getManufacturers());
+  const all = sortRobots(getRobots(), 'featured', getManufacturers());
   const idx = all.findIndex((r) => r.id === robot.id);
   const prev = idx > 0 ? all[idx - 1] : null;
   const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;

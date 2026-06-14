@@ -10,6 +10,7 @@ import { ReportsHeader } from '@/components/ReportsHeader';
 import { CardHoverEffect } from '@/components/ui/card-hover-effect';
 import type { Article } from '@/data/types';
 import { filterArticles } from '@/lib/articleFilters';
+import { byArticlePublishedDesc } from '@/lib/display';
 import {
   getArticlePageCount,
   getArticlePageItems,
@@ -32,7 +33,7 @@ export function ReportsBrowser({ reports }: { reports: Article[] }) {
   const gridRef = useRef<HTMLDivElement>(null);
 
   const sorted = useMemo(
-    () => [...reports].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
+    () => [...reports].sort(byArticlePublishedDesc),
     [reports],
   );
 
