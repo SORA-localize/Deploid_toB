@@ -167,10 +167,10 @@ export function sortRobots(
     if (sort === 'featured') {
       // featuredRank 昇順（未設定は最後）→ タイブレークは 'name' と完全同一。
       // 値を入れていなければ 'name' と数学的に同じ並びになる。
-      const rankDiff =
-        (a.featuredRank ?? Number.POSITIVE_INFINITY) -
-        (b.featuredRank ?? Number.POSITIVE_INFINITY);
-      if (rankDiff !== 0) return rankDiff;
+      const aRank = a.featuredRank ?? Number.POSITIVE_INFINITY;
+      const bRank = b.featuredRank ?? Number.POSITIVE_INFINITY;
+      if (aRank < bRank) return -1;
+      if (aRank > bRank) return 1;
       return compareRobotCatalogNames(a, b, manufacturerById);
     }
     if (sort === 'stage') {

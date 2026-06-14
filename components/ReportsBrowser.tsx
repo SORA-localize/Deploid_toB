@@ -22,13 +22,18 @@ import { useArticlesPerPage } from '@/lib/useArticlesPerPage';
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
 import { createReportSearchDocument } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
-import { useActiveArticleSection } from '@/lib/useActiveArticleSection';
-import { useUrlFilters } from '@/lib/useUrlFilters';
+import type { ArticleSectionFilter } from '@/lib/articleSections';
+import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { cn } from '@/lib/utils';
 
-export function ReportsBrowser({ reports }: { reports: Article[] }) {
-  const activeSection = useActiveArticleSection();
-  const { getParam, updateParams } = useUrlFilters();
+interface ReportsBrowserProps {
+  reports: Article[];
+  activeSection: ArticleSectionFilter;
+  initialPageParam: string | null;
+}
+
+export function ReportsBrowser({ reports, activeSection, initialPageParam }: ReportsBrowserProps) {
+  const { updateParams } = useUrlParamUpdater();
   const perPage = useArticlesPerPage();
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -58,8 +63,8 @@ export function ReportsBrowser({ reports }: { reports: Article[] }) {
   );
   const pageCount = getArticlePageCount(gridReports.length, perPage);
   const activePage = useMemo(
-    () => normalizeReportPageParam(getParam(ARTICLE_PAGE_PARAM), pageCount),
-    [getParam, pageCount],
+    () => normalizeReportPageParam(initialPageParam, pageCount),
+    [initialPageParam, pageCount],
   );
   const paginatedReports = useMemo(
     () => getArticlePageItems(gridReports, activePage, perPage),
@@ -79,7 +84,7 @@ export function ReportsBrowser({ reports }: { reports: Article[] }) {
 
   return (
     <div className="bg-background">
-      <ReportsHeader />
+      <ReportsHeader activeSection={activeSection} />
 
       <div>
 

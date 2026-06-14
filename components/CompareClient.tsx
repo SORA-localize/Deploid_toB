@@ -20,7 +20,6 @@ import {
 } from '@dnd-kit/sortable';
 import { ChevronDown, ChevronRight, Star } from 'lucide-react';
 import { motion } from 'motion/react';
-import { Breadcrumbs } from '@/components/Breadcrumbs';
 import {
   CompareDragOverlayCard,
   CompareDroppableArea,
@@ -43,17 +42,18 @@ import {
   type CompareRobotDragData,
 } from '@/lib/compare/dnd';
 import { uiText } from '@/lib/uiText';
-import { useUrlFilters } from '@/lib/useUrlFilters';
+import { MAX_COMPARE_ROBOTS } from '@/lib/compareParams';
+import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { useFavorites } from '@/lib/useFavorites';
 import { cn } from '@/lib/utils';
 import { sortManufacturers, sortRobots } from '@/lib/display';
 
-const MAX_COMPARE_ROBOTS = 20;
 const SHEET_LAYOUT_TRANSITION = { type: 'spring', stiffness: 360, damping: 34 } as const;
 
 interface CompareClientProps {
   robots: Robot[];
   manufacturers: Manufacturer[];
+  selectedIds: string[];
 }
 
 interface SheetPreviewPlacement {
@@ -65,8 +65,8 @@ type SheetPreviewItem =
   | { type: 'robot'; robot: Robot }
   | { type: 'preview'; robot: Robot };
 
-export function CompareClient({ robots, manufacturers }: CompareClientProps) {
-  const { getParam, updateParams } = useUrlFilters();
+export function CompareClient({ robots, manufacturers, selectedIds }: CompareClientProps) {
+  const { updateParams } = useUrlParamUpdater();
   const { favorites, toggleFavorite, isMounted } = useFavorites();
   const [expandedManufacturers, setExpandedManufacturers] = useState<string[]>([]);
   const [activeDrag, setActiveDrag] = useState<CompareRobotDragData | null>(null);
@@ -81,22 +81,7 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
     }),
   );
 
-  const compareParam = getParam('compare');
-  const urlSelectedIds = useMemo(() => {
-    if (!compareParam) return [];
-    const validIds = new Set(robots.map((robot) => robot.id));
-    const seen = new Set<string>();
-
-    return compareParam
-      .split(',')
-      .map((id) => id.trim())
-      .filter((id) => {
-        if (!validIds.has(id) || seen.has(id)) return false;
-        seen.add(id);
-        return true;
-      })
-      .slice(0, MAX_COMPARE_ROBOTS);
-  }, [compareParam, robots]);
+  const urlSelectedIds = selectedIds;
 
   // 並べ替え順の真実源はこの local state。URL は commitOrder で副作用同期する。
   // こうしないと onDragEnd 時に URL 遷移(非同期)を待つ間、dnd-kit が一旦
@@ -331,12 +316,10 @@ export function CompareClient({ robots, manufacturers }: CompareClientProps) {
   return (
     <div className="min-h-screen bg-background">
       <div className="site-container py-8">
-        <Breadcrumbs items={[{ label: uiText.compare.breadcrumb }]} />
-
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-semibold leading-tight text-foreground mb-2">
-            {uiText.compare.title}
-          </h1>
+          <h2 className="text-2xl md:text-3xl font-semibold leading-tight text-foreground mb-2">
+            インタラクティブ比較
+          </h2>
           <p className="text-sm text-muted-foreground max-w-3xl">
             左のメニューからロボットを選んで比較します。右パネルで気になるロボットをお気に入り登録できます。
           </p>

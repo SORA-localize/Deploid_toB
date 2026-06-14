@@ -10,12 +10,11 @@ import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { TagChip } from '@/components/TagChip';
 import type { Guide, GuideStage } from '@/data/types';
 import { guideStageOrder } from '@/lib/display';
-import { filterGuides } from '@/lib/guideFilters';
+import { filterGuides, normalizeGuideFilters } from '@/lib/guideFilters';
 import { guideStageLabels } from '@/lib/labels';
-import { getGuideTopicOptions, normalizeTagKey } from '@/lib/tags';
-import { isOneOf } from '@/lib/typeGuards';
+import { getGuideTopicOptions } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
-import { useUrlFilters } from '@/lib/useUrlFilters';
+import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { getGuideStageTone } from '@/lib/visualSemantics';
 
 const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
@@ -23,17 +22,14 @@ const stageOptions: Array<{ value: 'all' | GuideStage; label: string }> = [
   ...guideStageOrder.map((value) => ({ value, label: guideStageLabels[value] })),
 ];
 
-export function GuidesBrowser({ guides }: { guides: Guide[] }) {
-  const { getParam, updateParams } = useUrlFilters();
+interface GuidesBrowserProps {
+  guides: Guide[];
+  initialFilters: ReturnType<typeof normalizeGuideFilters>;
+}
 
-  const filters = useMemo(() => {
-    const stageParam = getParam('stage');
-    const topicParam = getParam('topic');
-    return {
-      stage: isOneOf(stageParam, guideStageOrder) ? stageParam : ('all' as const),
-      topic: topicParam ? normalizeTagKey(topicParam) : null,
-    };
-  }, [getParam]);
+export function GuidesBrowser({ guides, initialFilters }: GuidesBrowserProps) {
+  const { updateParams } = useUrlParamUpdater();
+  const filters = initialFilters;
 
   const topicOptions = useMemo(() => getGuideTopicOptions(guides), [guides]);
   const featured = guides.find((g) => g.order === 1) ?? guides[0];

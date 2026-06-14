@@ -5,12 +5,13 @@ import type { ActiveFilterChip } from '@/components/ActiveFilterChips';
 import { ContextualPageHeader } from '@/components/ContextualPageHeader';
 import { PageTabBar, type PageTab } from '@/components/PageTabBar';
 import { uiText } from '@/lib/uiText';
-import { useUrlFilters } from '@/lib/useUrlFilters';
+import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 
 interface RobotsHeaderProps {
   activeCount: number;
   preCount: number;
   activeChips: ActiveFilterChip[];
+  activeRelease: 'active' | 'pre';
   isCrossReleaseMode?: boolean;
 }
 
@@ -18,10 +19,10 @@ export function RobotsHeader({
   activeCount,
   preCount,
   activeChips,
+  activeRelease,
   isCrossReleaseMode = false,
 }: RobotsHeaderProps) {
-  const { getParam, updateParams } = useUrlFilters();
-  const activeRelease = getParam('release') === 'pre' ? 'pre' : 'active';
+  const { updateParams } = useUrlParamUpdater();
 
   const tabs = useMemo<readonly PageTab<'active' | 'pre'>[]>(
     () => [

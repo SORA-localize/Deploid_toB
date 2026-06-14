@@ -1,7 +1,10 @@
-import { Suspense } from 'react';
-import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { RobotsBrowser } from '@/components/RobotsBrowser';
 import { getManufacturers, getRobots } from '@/lib/data';
+import {
+  getRobotFilterOptions,
+  normalizeRobotFilters,
+} from '@/lib/robotFilters';
+import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 
 export const metadata = {
   title: 'ロボット',
@@ -12,10 +15,40 @@ export const metadata = {
   },
 };
 
-export default function RobotsPage() {
+export default async function RobotsPage({
+  searchParams,
+}: {
+  searchParams: RouteSearchParams;
+}) {
+  const robots = getRobots();
+  const manufacturers = getManufacturers();
+  const params = await pickSearchParams(searchParams, [
+    'industry',
+    'task',
+    'manufacturer',
+    'availability',
+    'release',
+    'q',
+  ] as const);
+  const filterOptions = getRobotFilterOptions(robots);
+  const filters = normalizeRobotFilters({
+    industry: params.industry,
+    task: params.task,
+    manufacturer: params.manufacturer,
+    availability: params.availability,
+    release: params.release,
+    query: params.q,
+    manufacturers,
+    industryValues: filterOptions.industries.map((option) => option.value),
+    taskValues: filterOptions.tasks.map((option) => option.value),
+    availabilityValues: filterOptions.availabilityValues,
+  });
+
   return (
-    <Suspense fallback={<PageSuspenseFallback />}>
-      <RobotsBrowser robots={getRobots()} manufacturers={getManufacturers()} />
-    </Suspense>
+    <RobotsBrowser
+      robots={robots}
+      manufacturers={manufacturers}
+      initialFilters={filters}
+    />
   );
 }

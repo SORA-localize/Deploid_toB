@@ -11,36 +11,35 @@ import { SearchInput } from '@/components/SearchInput';
 import { TagChip } from '@/components/TagChip';
 import type { UseCase } from '@/data/types';
 import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
-import { createUseCaseSearchDocument, matchesSearchDocument } from '@/lib/search';
 import {
   getUseCaseIndustryTagOptions,
   getUseCaseTaskTagOptions,
-  matchesTag,
-  normalizeTagKey,
 } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
-import { useUrlFilters } from '@/lib/useUrlFilters';
+import {
+  getUseCaseFilterResult,
+  type UseCaseFilters,
+  type UseCaseSearchMode,
+} from '@/lib/useCaseFilters';
+import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import {
   getBuyerReadinessTone,
   getUseCaseMaturityTone,
 } from '@/lib/visualSemantics';
-
-type UseCaseSearchMode = 'industry' | 'task';
 
 const modeOptions: Array<{ value: UseCaseSearchMode; label: string }> = [
   { value: 'industry', label: '業種で探す' },
   { value: 'task', label: 'タスクで探す' },
 ];
 
-export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
-  const { getParam, updateParams } = useUrlFilters();
-  const modeParam = getParam('mode');
-  const industryParam = getParam('industry');
-  const taskParam = getParam('task');
-  const mode: UseCaseSearchMode = modeParam === 'task' || (taskParam && modeParam !== 'industry') ? 'task' : 'industry';
-  const industry = mode === 'industry' && industryParam ? normalizeTagKey(industryParam) : null;
-  const task = mode === 'task' && taskParam ? normalizeTagKey(taskParam) : null;
-  const query = getParam('q') ?? '';
+interface UseCasesBrowserProps {
+  useCases: UseCase[];
+  initialFilters: UseCaseFilters;
+}
+
+export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserProps) {
+  const { updateParams } = useUrlParamUpdater();
+  const { mode, industry, task, query } = initialFilters;
 
   const industries = useMemo(() => getUseCaseIndustryTagOptions(useCases), [useCases]);
   const tasks = useMemo(() => getUseCaseTaskTagOptions(useCases), [useCases]);
@@ -48,11 +47,10 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
     () => (mode === 'industry' ? industries : tasks),
     [mode, industries, tasks],
   );
-  const searchDocuments = useMemo(
-    () => new Map(useCases.map((useCase) => [useCase.slug, createUseCaseSearchDocument(useCase)])),
-    [useCases],
+  const { filtered, featured, rest, active, selectedChip } = useMemo(
+    () => getUseCaseFilterResult(useCases, initialFilters),
+    [useCases, initialFilters],
   );
-  const selectedChip = mode === 'industry' ? industry : task;
 
   const handleModeChange = (nextMode: UseCaseSearchMode) => {
     updateParams({
@@ -61,17 +59,6 @@ export function UseCasesBrowser({ useCases }: { useCases: UseCase[] }) {
       task: null,
     });
   };
-
-  const filtered = useCases.filter((u) => {
-    if (!matchesSearchDocument(query, searchDocuments.get(u.slug))) return false;
-    if (!matchesTag(u.industryTags, industry)) return false;
-    if (!matchesTag(u.taskTags, task)) return false;
-    return true;
-  });
-
-  const featured = filtered.slice(0, 2);
-  const rest = filtered.slice(2);
-  const active = industry || task || query;
 
   return (
     <div className="min-h-screen bg-background">

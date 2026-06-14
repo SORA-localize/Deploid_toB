@@ -1,5 +1,20 @@
 import type { Guide, GuideStage } from '@/data/types';
-import { matchesTag } from '@/lib/tags';
+import { guideStageOrder } from '@/lib/display';
+import { matchesTag, normalizeTagKey } from '@/lib/tags';
+import { isOneOf } from '@/lib/typeGuards';
+
+export function normalizeGuideFilters({
+  stage,
+  topic,
+}: {
+  stage: string | null | undefined;
+  topic: string | null | undefined;
+}) {
+  return {
+    stage: isOneOf(stage, guideStageOrder) ? stage : ('all' as const),
+    topic: topic ? normalizeTagKey(topic) : null,
+  };
+}
 
 export function filterGuides({
   guides,

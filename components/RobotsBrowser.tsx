@@ -17,16 +17,17 @@ import {
 } from '@/lib/robotFilters';
 import { normalizeSearchText } from '@/lib/search';
 import { uiText } from '@/lib/uiText';
-import { useUrlFilters } from '@/lib/useUrlFilters';
+import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { useFavorites } from '@/lib/useFavorites';
 
 interface RobotsBrowserProps {
   robots: Robot[];
   manufacturers: Manufacturer[];
+  initialFilters: ReturnType<typeof normalizeRobotFilters>;
 }
 
-export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
-  const { getParam, updateParams } = useUrlFilters();
+export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsBrowserProps) {
+  const { updateParams } = useUrlParamUpdater();
   const { favorites, toggleFavorite } = useFavorites();
 
   const manufacturerById = useMemo(
@@ -34,22 +35,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
     [manufacturers],
   );
   const filterOptions = useMemo(() => getRobotFilterOptions(robots), [robots]);
-  const filters = useMemo(
-    () =>
-      normalizeRobotFilters({
-        industry: getParam('industry'),
-        task: getParam('task'),
-        manufacturer: getParam('manufacturer'),
-        availability: getParam('availability'),
-        release: getParam('release'),
-        query: getParam('q'),
-        manufacturers,
-        industryValues: filterOptions.industries.map((option) => option.value),
-        taskValues: filterOptions.tasks.map((option) => option.value),
-        availabilityValues: filterOptions.availabilityValues,
-      }),
-    [filterOptions, getParam, manufacturers],
-  );
+  const filters = initialFilters;
 
   const industryOptions = useMemo(
     () => [
@@ -153,6 +139,7 @@ export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
         activeCount={activeRobots.length}
         preCount={preReleaseRobots.length}
         activeChips={activeChips}
+        activeRelease={filters.release === 'pre' ? 'pre' : 'active'}
         isCrossReleaseMode={hasActiveFilters}
       />
 

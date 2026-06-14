@@ -2,15 +2,17 @@
 
 import { ContextualPageHeader } from '@/components/ContextualPageHeader';
 import { PageTabBar } from '@/components/PageTabBar';
-import { ARTICLE_SECTION_TABS } from '@/lib/articleSections';
+import { ARTICLE_SECTION_TABS, type ArticleSectionFilter } from '@/lib/articleSections';
 import { uiText } from '@/lib/uiText';
-import { useActiveArticleSection } from '@/lib/useActiveArticleSection';
-import { useUrlFilters } from '@/lib/useUrlFilters';
+import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { ARTICLE_PAGE_PARAM } from '@/lib/articlePagination';
 
-export function ReportsHeader() {
-  const activeSection = useActiveArticleSection();
-  const { updateParams } = useUrlFilters();
+interface ReportsHeaderProps {
+  activeSection: ArticleSectionFilter;
+}
+
+export function ReportsHeader({ activeSection }: ReportsHeaderProps) {
+  const { updateParams } = useUrlParamUpdater();
 
   return (
     <ContextualPageHeader>

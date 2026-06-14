@@ -17,29 +17,20 @@ import {
 } from '@/lib/manufacturerFilters';
 import { manufacturerConsultationRouteLabels } from '@/lib/manufacturerDisplay';
 import { uiText } from '@/lib/uiText';
-import { useUrlFilters } from '@/lib/useUrlFilters';
+import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 
 interface ManufacturersBrowserProps {
   manufacturers: Manufacturer[];
   robots: Robot[];
+  initialFilters: ReturnType<typeof normalizeManufacturerFilters>;
 }
 
-export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBrowserProps) {
-  const { getParam, updateParams } = useUrlFilters();
+export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: ManufacturersBrowserProps) {
+  const { updateParams } = useUrlParamUpdater();
 
   const robotsByManufacturer = useMemo(() => groupRobotsByManufacturer(robots), [robots]);
   const filterOptions = useMemo(() => getManufacturerFilterOptions(manufacturers), [manufacturers]);
-  const filters = useMemo(
-    () =>
-      normalizeManufacturerFilters({
-        country: getParam('country'),
-        consultationRoute: getParam('route'),
-        query: getParam('q'),
-        countries: filterOptions.countries,
-        consultationRoutes: filterOptions.consultationRoutes,
-      }),
-    [filterOptions, getParam],
-  );
+  const filters = initialFilters;
 
   const countryOptions = useMemo(
     () => [
