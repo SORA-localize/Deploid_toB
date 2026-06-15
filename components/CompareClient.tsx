@@ -339,7 +339,8 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
         >
           <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_16rem]">
             {/* Left Sidebar - Manufacturer Menu */}
-            <div className="min-w-0 order-2 md:order-none">
+            {/* モバイルでロボット未選択時はメニューを先（order-1）、選択後はシートを先（order-2）にする */}
+            <div className={`min-w-0 md:order-none ${selectedRobots.length === 0 ? 'order-1' : 'order-2'}`}>
               <CompareDroppableArea
                 id={compareColumnIds.menu}
                 target="menu"
@@ -436,7 +437,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
             </div>
 
             {/* Main Content - Comparison Sheet */}
-            <div className="min-w-0 order-1 md:order-none md:row-span-2 xl:row-span-1">
+            <div className={`min-w-0 md:order-none md:row-span-2 xl:row-span-1 ${selectedRobots.length === 0 ? 'order-2' : 'order-1'}`}>
               <CompareDroppableArea
                 id={compareColumnIds.sheet}
                 target="sheet"
@@ -466,18 +467,15 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                       )}
                     </div>
 
-                    <div className="min-h-[22rem]">
+                    <div className="min-h-[6rem] sm:min-h-[22rem]">
                       {selectedRobots.length === 0 && !sheetPreview ? (
-                        <div className="flex min-h-[22rem] items-center justify-center text-center">
+                        <div className="flex min-h-[6rem] sm:min-h-[22rem] items-center justify-center text-center py-8">
                           <div className="max-w-md">
                             <p className="text-sm font-medium text-foreground">
                               {uiText.comparison.emptyTitle}
                             </p>
                             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                              {uiText.comparison.emptyDescription}
-                            </p>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              {uiText.comparison.emptyHint}
+                              下のメーカーリストからロボットを選んで追加してください。
                             </p>
                           </div>
                         </div>

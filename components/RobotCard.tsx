@@ -126,8 +126,8 @@ export function RobotCard({
         </button>
       )}
 
-      <div className="relative z-20 flex flex-col sm:flex-row md:flex-col h-full pointer-events-none">
-        <div className="sm:w-24 sm:flex-none sm:self-stretch sm:border-r sm:border-border md:w-auto md:aspect-[4/3] md:border-r-0 md:border-b bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden aspect-[4/3] sm:aspect-auto">
+      <div className="relative z-20 flex flex-row md:flex-col h-full pointer-events-none">
+        <div className="w-20 flex-none self-stretch border-r border-border sm:w-24 md:w-auto md:aspect-[4/3] md:border-r-0 md:border-b bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden">
           {(() => {
             const hero = getDisplayableAsset(robot.images?.hero ?? robot.heroImage);
             return hero ? (

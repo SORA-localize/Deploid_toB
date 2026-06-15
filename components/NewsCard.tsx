@@ -25,7 +25,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
       )}
     >
       {/* 画像エリア */}
-      <div className="w-20 flex-none self-stretch border-r border-border overflow-hidden bg-muted sm:w-28 md:w-auto md:aspect-video md:border-r-0">
+      <div className="hidden sm:block sm:w-28 sm:flex-none sm:self-stretch sm:border-r sm:border-border sm:overflow-hidden sm:bg-muted md:w-auto md:aspect-video md:border-r-0">
         {hero ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

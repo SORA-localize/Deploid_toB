@@ -103,44 +103,59 @@ export function Header() {
           </button>
         </div>
       </div>
+      {/* 右スライドインナビ（モバイル） */}
       {isMenuOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-[var(--z-overlay)] lg:hidden"
-            aria-hidden="true"
-            onClick={() => setIsMenuOpen(false)}
-          />
-          <nav
-            id="site-mobile-navigation"
-            className="absolute top-full left-0 right-0 z-[var(--z-dropdown)] border-b border-border bg-background shadow-md lg:hidden"
-          >
-            <div className="site-container grid grid-cols-2 gap-x-4 gap-y-1 py-3">
-              {siteNavItems.map((item) => {
-                const isActive = pathname === item.path ||
-                  (item.path !== '/' && pathname.startsWith(item.path));
-
-                return (
-                  <Link
-                    key={item.path}
-                    href={item.path}
-                    aria-current={isActive ? 'page' : undefined}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`inline-flex min-h-11 items-center py-2 text-sm transition-colors ${
-                      isActive ? 'font-medium text-foreground' : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </div>
-            <div className="site-container flex items-center justify-between border-t border-border py-3">
-              <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">テーマ</span>
-              <ThemeModeToggle />
-            </div>
-          </nav>
-        </>
+        <div
+          className="fixed inset-0 z-[var(--z-overlay)] lg:hidden"
+          aria-hidden="true"
+          onClick={() => setIsMenuOpen(false)}
+        />
       )}
+      <nav
+        id="site-mobile-navigation"
+        aria-hidden={!isMenuOpen}
+        className={`fixed right-0 top-0 z-[var(--z-dropdown)] flex h-full w-72 flex-col border-l border-border bg-background shadow-xl transition-transform duration-300 ease-out lg:hidden ${
+          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex h-16 shrink-0 items-center justify-between border-b border-border px-5">
+          <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            メニュー
+          </span>
+          <button
+            type="button"
+            aria-label="ナビゲーションを閉じる"
+            onClick={() => setIsMenuOpen(false)}
+            className="flex h-10 w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <div className="flex flex-col overflow-y-auto py-2">
+          {siteNavItems.map((item) => {
+            const isActive = pathname === item.path ||
+              (item.path !== '/' && pathname.startsWith(item.path));
+            return (
+              <Link
+                key={item.path}
+                href={item.path}
+                tabIndex={isMenuOpen ? 0 : -1}
+                aria-current={isActive ? 'page' : undefined}
+                onClick={() => setIsMenuOpen(false)}
+                className={`inline-flex min-h-12 items-center px-6 text-sm transition-colors ${
+                  isActive ? 'font-medium text-foreground' : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </div>
+        <div className="mt-auto shrink-0 border-t border-border px-6 py-4 flex items-center justify-between">
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">テーマ</span>
+          <ThemeModeToggle />
+        </div>
+      </nav>
       <HeaderStickyBarSlot />
     </header>
   );

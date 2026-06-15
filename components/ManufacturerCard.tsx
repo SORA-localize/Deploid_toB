@@ -39,7 +39,7 @@ export function ManufacturerCard({ manufacturer, robots, variant = 'default' }: 
         tabIndex={-1}
         className="absolute inset-0"
       />
-      <div className="relative z-10 p-6 pointer-events-none">
+      <div className="relative z-10 p-4 sm:p-6 pointer-events-none">
         <div className="flex items-start justify-between gap-4 mb-5">
           <h2 className="min-w-0 text-xl font-semibold text-foreground">
             <a
