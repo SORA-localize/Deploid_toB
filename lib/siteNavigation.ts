@@ -8,9 +8,9 @@ export const siteNavItems: SiteNavItem[] = [
   { label: 'ロボット', path: '/robots', footerLabel: 'ロボット' },
   { label: 'メーカー', path: '/manufacturers', footerLabel: 'メーカー' },
   { label: '比較', path: '/compare' },
-  { label: 'ガイド', path: '/guides' },
   { label: '用途から探す', path: '/use-cases', footerLabel: '用途' },
   { label: '記事', path: '/reports' },
+  { label: 'ガイド', path: '/guides' },
   { label: '会社概要', path: '/about', footerLabel: 'サイトについて' },
   { label: 'お問い合わせ', path: '/contact' },
 ];

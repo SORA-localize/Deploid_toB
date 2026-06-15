@@ -1,4 +1,5 @@
 import { GuidesBrowser } from '@/components/GuidesBrowser';
+import { ComingSoonGate } from '@/components/ComingSoonGate';
 import { getGuides } from '@/lib/data';
 import { normalizeGuideFilters } from '@/lib/guideFilters';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
@@ -16,12 +17,14 @@ export default async function GuidesPage({
 }) {
   const params = await pickSearchParams(searchParams, ['stage', 'topic'] as const);
   return (
-    <GuidesBrowser
-      guides={getGuides()}
-      initialFilters={normalizeGuideFilters({
-        stage: params.stage,
-        topic: params.topic,
-      })}
-    />
+    <ComingSoonGate storageKey="coming-soon:guides" title="導入ガイドは近日公開予定です">
+      <GuidesBrowser
+        guides={getGuides()}
+        initialFilters={normalizeGuideFilters({
+          stage: params.stage,
+          topic: params.topic,
+        })}
+      />
+    </ComingSoonGate>
   );
 }
