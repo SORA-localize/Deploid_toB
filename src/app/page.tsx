@@ -4,6 +4,7 @@ import { FeaturedRobotsGrid } from '@/components/FeaturedRobotsGrid';
 import { HomeContentNavigator } from '@/components/HomeContentNavigator';
 import { ManufacturerWorldMap } from '@/components/ManufacturerWorldMap';
 import { NewsFeatureCard } from '@/components/NewsFeatureCard';
+import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
 import { TagChip } from '@/components/TagChip';
 import {
   getGuideBySlug,
@@ -60,7 +61,6 @@ export default function HomePage() {
   ];
 
   const { heroReports, featureReports } = getArticleIndexPlacementReports(getArticles());
-  const scrollArticles = [...heroReports, ...featureReports];
 
   const manufacturerById = Object.fromEntries(
     manufacturers.map((m) => [m.id, m])
@@ -88,7 +88,7 @@ export default function HomePage() {
         />
       )}
 
-      {scrollArticles.length > 0 && (
+      {heroReports.length > 0 && (
         <section className="py-8 sm:py-10 border-b border-border">
           <div className="flex items-end justify-between mb-4">
             <h2 className="text-2xl font-semibold text-foreground">注目記事</h2>
@@ -100,12 +100,17 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-proximity pb-3 -mx-4 px-4 sm:-mx-6 sm:px-6">
-            {scrollArticles.map((report) => (
-              <div key={report.id} className="shrink-0 snap-start w-[min(72vw,280px)] sm:w-72 lg:w-80 aspect-[3/4]">
-                <NewsFeatureCard report={report} />
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <NewsHeroCarousel reports={heroReports} className="aspect-[16/9] w-full" />
+            </div>
+            {featureReports.length > 0 && (
+              <div className="hidden lg:flex flex-col gap-4 h-full">
+                {featureReports.map((r) => (
+                  <NewsFeatureCard key={r.id} report={r} className="flex-1 min-h-0" />
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </section>
       )}
