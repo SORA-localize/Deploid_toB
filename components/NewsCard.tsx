@@ -60,13 +60,9 @@ export function NewsCard({ report, className }: NewsCardProps) {
           )}
         </div>
 
-        <h3 className="mb-2 line-clamp-2 text-sm font-semibold leading-snug text-foreground">
+        <h3 className="mb-2 line-clamp-3 text-sm font-semibold leading-snug text-foreground">
           {report.titleJa ?? report.title}
         </h3>
-
-        <p className="mb-3 hidden line-clamp-2 text-xs leading-relaxed text-muted-foreground sm:block">
-          {report.summary}
-        </p>
 
         <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">
           <div className="flex flex-wrap gap-1">
