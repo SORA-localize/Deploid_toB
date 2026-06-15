@@ -14,19 +14,15 @@ import {
 } from '@/lib/manufacturerDisplay';
 import { uiText } from '@/lib/uiText';
 
-type CardVariant = 'compact' | 'default';
-
 interface ManufacturerCardProps {
   manufacturer: Manufacturer;
   robots: Robot[];
-  variant?: CardVariant;
 }
 
-export function ManufacturerCard({ manufacturer, robots, variant = 'default' }: ManufacturerCardProps) {
+export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps) {
   const consultationRoute = getManufacturerConsultationRoute(manufacturer);
   const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
-  // compact: 代表ロボット・国内代理店を非表示。default: モバイルでは非表示、sm以上で表示
-  const optionalRowClass = variant === 'compact' ? 'hidden' : 'hidden sm:flex';
+  const optionalRowClass = 'hidden sm:flex';
 
   return (
     <div className="card-data relative overflow-hidden">

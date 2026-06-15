@@ -90,7 +90,30 @@ export function HomeContentNavigator({
         <h2 className="text-2xl font-semibold text-foreground">主要コンテンツ</h2>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(420px,1.15fr)] lg:items-stretch">
+      {/* モバイル: 3カラム横並び（lg未満。CSS hidden なのでスクリーンリーダーも読まない） */}
+      <div className="flex divide-x divide-border border-y border-border lg:hidden" aria-hidden="true">
+        {items.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.key}
+              href={item.href}
+              tabIndex={-1}
+              className="flex flex-1 flex-col items-center gap-2 px-2 py-5 text-center transition-colors hover:bg-muted/70"
+            >
+              <Icon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              <span className="text-xs font-medium text-foreground">{item.title}</span>
+              <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                {item.action}
+                <ArrowRight className="h-3 w-3" />
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* PC: 縦リスト + 右画像パネル（lg以上。スクリーンリーダーはこちらを読む） */}
+      <div className="hidden lg:grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(420px,1.15fr)] lg:items-stretch">
         <div className="divide-y divide-border border-y border-border">
           {items.map((item) => {
             const Icon = item.icon;

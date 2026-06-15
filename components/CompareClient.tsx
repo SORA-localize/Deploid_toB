@@ -339,8 +339,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
         >
           <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_16rem]">
             {/* Left Sidebar - Manufacturer Menu */}
-            {/* モバイルでロボット未選択時はメニューを先（order-1）、選択後はシートを先（order-2）にする */}
-            <div className={`min-w-0 md:order-none ${selectedRobots.length === 0 ? 'order-1' : 'order-2'}`}>
+            <div className="min-w-0">
               <CompareDroppableArea
                 id={compareColumnIds.menu}
                 target="menu"
@@ -437,7 +436,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
             </div>
 
             {/* Main Content - Comparison Sheet */}
-            <div className={`min-w-0 md:order-none md:row-span-2 xl:row-span-1 ${selectedRobots.length === 0 ? 'order-2' : 'order-1'}`}>
+            <div className="min-w-0 md:row-span-2 xl:row-span-1">
               <CompareDroppableArea
                 id={compareColumnIds.sheet}
                 target="sheet"

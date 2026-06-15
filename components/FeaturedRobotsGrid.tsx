@@ -1,8 +1,6 @@
-'use client';
-
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { RobotCard } from '@/components/RobotCard';
+import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
 import type { Robot, Manufacturer } from '@/data/types';
 
 interface FeaturedRobotsGridProps {
@@ -23,15 +21,14 @@ export function FeaturedRobotsGrid({ robots, manufacturerById }: FeaturedRobotsG
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {robots.map((robot) => {
           const manufacturer = manufacturerById[robot.manufacturerId];
           return (
-            <RobotCard
+            <FeaturedRobotCard
               key={robot.id}
               robot={robot}
               manufacturerName={manufacturer?.name}
-              manufacturerLogo={manufacturer?.logo}
             />
           );
         })}

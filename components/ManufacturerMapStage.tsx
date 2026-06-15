@@ -265,7 +265,7 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
                 />
               ))}
             </h1>
-            <div className="max-w-xl text-sm leading-relaxed text-neutral-300 md:text-base">
+            <div className="hidden sm:block max-w-xl text-sm leading-relaxed text-neutral-300 md:text-base">
               {subcopyLines.map((line, i) => (
                 <EncryptedText
                   key={i}
@@ -304,9 +304,9 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
         </div>
       </div>
 
-      {/* 情報カード（左下）。単独＝1社、クラスタ＝複数社を縦スタック */}
+      {/* 情報カード（左下）。単独＝1社、クラスタ＝複数社を縦スタック。モバイルでは非表示 */}
       {active && ar && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-24 lg:bottom-0">
+        <div className="hidden sm:block pointer-events-none absolute inset-x-0 bottom-24 lg:bottom-0">
           <div className="site-container pb-4 md:pb-10">
             <div
               key={active.id}
