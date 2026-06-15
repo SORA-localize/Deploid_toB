@@ -23,7 +23,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
   return (
     <Link
       href={`/robots/${robot.slug}`}
-      className="group relative block aspect-[5/7] w-full overflow-hidden bg-muted"
+      className="group relative block w-full h-44 sm:h-52 md:h-56 overflow-hidden bg-muted"
       aria-label={robot.nameJa ?? robot.name}
     >
       {cardImage ? (
