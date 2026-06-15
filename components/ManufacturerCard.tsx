@@ -14,14 +14,19 @@ import {
 } from '@/lib/manufacturerDisplay';
 import { uiText } from '@/lib/uiText';
 
+type CardVariant = 'compact' | 'default';
+
 interface ManufacturerCardProps {
   manufacturer: Manufacturer;
   robots: Robot[];
+  variant?: CardVariant;
 }
 
-export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps) {
+export function ManufacturerCard({ manufacturer, robots, variant = 'default' }: ManufacturerCardProps) {
   const consultationRoute = getManufacturerConsultationRoute(manufacturer);
   const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
+  // compact: 代表ロボット・国内代理店を非表示。default: モバイルでは非表示、sm以上で表示
+  const optionalRowClass = variant === 'compact' ? 'hidden' : 'hidden sm:flex';
 
   return (
     <div className="card-data relative overflow-hidden">
@@ -62,19 +67,19 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
               {getManufacturerEstablishedRegionLabel(manufacturer)}
             </span>
           </div>
-          <div className="flex justify-between py-1.5 border-b border-border">
+          <div className={`${optionalRowClass} justify-between py-1.5 border-b border-border`}>
             <span className="text-muted-foreground">代表ロボット</span>
             <span className="ml-2 sm:ml-4 truncate text-right text-foreground">
               {getRepresentativeRobotLabel(robots)}
             </span>
           </div>
-          <div className="flex justify-between py-1.5 border-b border-border">
+          <div className="flex justify-between py-1.5 sm:border-b border-border">
             <span className="text-muted-foreground">相談ルート</span>
             <span className="ml-2 sm:ml-4 text-right text-foreground">
               {manufacturerConsultationRouteLabels[consultationRoute]}
             </span>
           </div>
-          <div className="flex justify-between py-1.5">
+          <div className={`${optionalRowClass} justify-between py-1.5`}>
             <span className="text-muted-foreground">国内代理店</span>
             {domesticDistributor.hasDistributor ? (
               <div className="pointer-events-auto ml-2 sm:ml-4 text-right">
