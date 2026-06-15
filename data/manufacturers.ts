@@ -1062,6 +1062,7 @@ export const manufacturers: Manufacturer[] = [
     companyStatus: 'active',
     country: 'China',
     hqCity: 'Shenzhen',
+    headquarters: { lat: 22.54, lng: 114.06 },
     website: 'https://www.limxdynamics.com/',
     logo: {
       src: '',
@@ -1115,6 +1116,7 @@ export const manufacturers: Manufacturer[] = [
     companyStatus: 'active',
     country: 'China',
     hqCity: 'Guangzhou',
+    headquarters: { lat: 23.13, lng: 113.26 },
     website: 'https://www.xpeng.com/',
     logo: {
       src: '',

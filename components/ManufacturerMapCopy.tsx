@@ -36,6 +36,9 @@ const REGION: Record<string, { name: string; a3: string }> = {
   Norway: { name: 'ノルウェー', a3: 'NOR' },
   Canada: { name: 'カナダ', a3: 'CAN' },
   Spain: { name: 'スペイン', a3: 'ESP' },
+  France: { name: 'フランス', a3: 'FRA' },
+  Israel: { name: 'イスラエル', a3: 'ISR' },
+  Hungary: { name: 'ハンガリー', a3: 'HUN' },
 };
 export const region = (country: string) =>
   REGION[country] ?? { name: country, a3: country.slice(0, 3).toUpperCase() };
