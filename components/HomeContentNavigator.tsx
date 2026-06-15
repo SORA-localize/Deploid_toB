@@ -134,7 +134,7 @@ export function HomeContentNavigator({
 
         {/* 右プレビューはテーマに依らず意図的なダークなメディア面（画像の上に暗い
             オーバーレイを敷く演出）。ロゴグリッドの白バックプレートも意図的に残す。 */}
-        <div className="relative min-h-[220px] overflow-hidden bg-neutral-950 text-white md:min-h-[320px] lg:min-h-[440px]">
+        <div className="relative min-h-[220px] overflow-hidden bg-neutral-950 text-white md:min-h-[320px] lg:min-h-[440px] 2xl:min-h-[520px] 2xl:max-h-[600px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeItem.key}
@@ -161,7 +161,7 @@ export function HomeContentNavigator({
             </motion.div>
           </AnimatePresence>
 
-          <div className="pointer-events-none relative z-10 flex min-h-[360px] flex-col justify-between p-6 lg:min-h-[440px] lg:p-8">
+          <div className="pointer-events-none relative z-10 flex min-h-[360px] flex-col justify-between p-6 lg:min-h-[440px] lg:p-8 2xl:min-h-[520px]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={`${activeItem.key}-copy`}
