@@ -3,7 +3,6 @@ import type { Article, ArticlePlacementSlot } from '@/data/types';
 import { byArticlePublishedDesc } from '@/lib/display';
 
 const reportsIndexSurface = 'reports-index';
-const homeFeaturedArticleLimit = 4;
 
 function sortArticlesByPublishedAt(articles: readonly Article[]) {
   return [...articles].sort(byArticlePublishedDesc);
@@ -98,32 +97,3 @@ export function getArticleIndexPlacementReports(articles: readonly Article[]) {
   };
 }
 
-export function getHomeFeaturedArticles(articles: readonly Article[]) {
-  const sortedArticles = sortArticlesByPublishedAt(articles);
-  const articlesById = getArticlesById(articles);
-  const selectedArticles: Article[] = [];
-  const usedIds = new Set<string>();
-
-  appendPlacedArticles({
-    articlesById,
-    selectedArticles,
-    usedIds,
-    slot: 'hero',
-    limit: homeFeaturedArticleLimit,
-  });
-  appendPlacedArticles({
-    articlesById,
-    selectedArticles,
-    usedIds,
-    slot: 'feature',
-    limit: homeFeaturedArticleLimit,
-  });
-  appendLatestArticles({
-    sortedArticles,
-    selectedArticles,
-    usedIds,
-    limit: homeFeaturedArticleLimit,
-  });
-
-  return selectedArticles;
-}
