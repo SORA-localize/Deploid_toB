@@ -339,7 +339,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
         >
           <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_16rem]">
             {/* Left Sidebar - Manufacturer Menu */}
-            <div className="min-w-0">
+            <div className="min-w-0 order-2 md:order-none">
               <CompareDroppableArea
                 id={compareColumnIds.menu}
                 target="menu"
@@ -436,7 +436,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
             </div>
 
             {/* Main Content - Comparison Sheet */}
-            <div className="min-w-0 md:row-span-2 xl:row-span-1">
+            <div className="min-w-0 order-1 md:order-none md:row-span-2 xl:row-span-1">
               <CompareDroppableArea
                 id={compareColumnIds.sheet}
                 target="sheet"
@@ -483,7 +483,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         </div>
                       ) : (
                         <SortableContext items={sheetItemIds} strategy={rectSortingStrategy}>
-                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
                             {sheetPreviewItems.map((item) => {
                               if (item.type === 'preview') {
                                 const manufacturer = manufacturerFor(item.robot.manufacturerId);
@@ -552,7 +552,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
             </div>
 
             {/* Right Sidebar - Favorites */}
-            <div className="min-w-0">
+            <div className="min-w-0 order-3 md:order-none">
               <CompareDroppableArea
                 id={compareColumnIds.favorite}
                 target="favorite"

@@ -73,7 +73,7 @@ export function DraggableMenuRobotButton({
       onClick={onClick}
       disabled={isDisabled}
       className={cn(
-        'group flex w-full items-center justify-between gap-3 py-1.5 pr-3 text-left text-[11px] transition-colors border-l-2 disabled:cursor-not-allowed disabled:opacity-50',
+        'group flex min-h-10 w-full items-center justify-between gap-3 py-2 pr-3 text-left text-[11px] transition-colors border-l-2 disabled:cursor-not-allowed disabled:opacity-50',
         isSelected
           ? 'border-primary bg-primary/8 pl-[22px] text-primary hover:bg-primary/12'
           : 'border-transparent pl-[22px] text-foreground/70 hover:bg-muted/60 hover:text-foreground',
