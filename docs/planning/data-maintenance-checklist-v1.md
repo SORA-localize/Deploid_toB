@@ -32,8 +32,9 @@
 3. [ ] 必須：name / country / companyType / japanPresence / website / sources
 4. [ ] logo をローカル配置：`public/images/manufacturers/<id>-logo.<ext>`
 5. [ ] 国内代理店があれば `domesticDistributors`（name 必須・URL は形式チェック）
-6. [ ] `headquarters`（lat/lng）はワールドマップ用（任意）
-7. [ ] build 通過 → `published`
+6. [ ] `headquarters`（lat/lng）はワールドマップ用（任意）。設定すると Home ワールドマップにドットが表示される
+7. [ ] **その国が初登場**の場合は `components/ManufacturerMapCopy.tsx` の `REGION` 定数に `'CountryName': { name: '日本語名', a3: 'ISO3文字コード' }` を追加する（手動。漏れてもビルドは通るが、地図カードの国名がフォールバック表示になる）
+8. [ ] build 通過 → `published`
 
 ## C. ニュース記事（articles）追加
 
@@ -124,7 +125,7 @@
 - [ ] 出典（sources）は手動推奨（validate 未強制）
 
 **Deployment**
-- [ ] 型必須：id / manufacturerId / customer / country / location{lat,lng} / status
+- [ ] 型必須：id / slug / manufacturerId / customer / country / location{lat,lng} / status
 - [ ] manufacturerId・robotId（任意）は id 参照（自動）
 - [ ] sources が空でない（自動：常時必須）
 
@@ -220,12 +221,13 @@ AI側の実装手順:
 
 > Home ワールドマップの arc 根拠データ。所在地・主体・段階は一次/信頼できる二次出典で裏取り（AI生成値の混入防止）。
 
-1. [ ] id 発番、`publishStatus: 'draft'`
-2. [ ] 型必須：manufacturerId / customer / country / location{lat,lng} / status
+1. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
+2. [ ] 型必須：manufacturerId / customer / country / location{lat,lng} / status（`announced` / `pilot` / `production` / `ended` / `unknown`）
 3. [ ] `manufacturerId`（arc 始点）・`robotId`（任意・判明時）は **id** 参照（自動：参照切れは build 失敗）
-4. [ ] **`sources` 必須**（自動：空だと build 失敗。2026-06 から validate 強制）
-5. [ ] `location` は拠点のおおよその座標（番地不要）、`startedAt` は YYYY または YYYY-MM
-6. [ ] build 通過 → `published`
+4. [ ] **`sources` 必須**（自動：空だと build 失敗）
+5. [ ] `siteName`（任意）・`startedAt`（YYYY または YYYY-MM）を可能な範囲で記入。`location` は施設のおおよその座標（番地不要・市区町村レベルで可。施設名が非公開の場合は都市中心座標で代替する）
+6. [ ] **導入先の country がメーカーリストに存在しない新しい国**の場合は `components/ManufacturerMapCopy.tsx` の `REGION` 定数に追加する（→ セクション B-7 と同じ対応）
+7. [ ] build 通過 → `published`
 
 ## O. 記事掲載枠（articlePlacements）追加 / 更新
 
