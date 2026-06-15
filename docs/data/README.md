@@ -36,6 +36,7 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / guide
 - 新規レコードは原則 `publishStatus: 'draft'` から作る
 - 記事は `category` と `whyItMatters` を必ず入れる
 - 記事の `type` は `ArticleType`（analysis / deployment-report / interview / event-report / policy-update / case-study / news-brief / tech-update / market-analysis）から選ぶ。`ArticleCategory`（news / company-report 等）と混同しない
+- **記事の日付の使い分け**：`publishedAt` = Deploidがこの記事を公開した日（執筆・掲載日）。元ニュースの発生日ではない。昨日のニュースを今日書いたなら `publishedAt` は今日。元ニュースの日付は `sources[].publishedAt` に書く。`updatedAt` はデータレコードを最後に編集した日
 - 記事本文は速報でも800文字以上、分析・レポートは1,500文字以上を目安にする
 - `published` 記事の `sources[].url` は公開前にアクセス確認する（404・403 のまま published にしない）
 - 記事は原則2件以上の出典を持つ。1件のみで published にする場合はその理由を記録し、追加出典を探す努力をする

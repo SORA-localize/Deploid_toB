@@ -41,7 +41,7 @@
 2. [ ] **`category` を1つ選択**（news / interview / company-report / analysis / policy）
 3. [ ] **`type` を ArticleType の有効値から選択**（analysis / deployment-report / interview / event-report / policy-update / case-study / news-brief / tech-update / market-analysis）。`category` と混同しない
 4. [ ] **`whyItMatters` を必ず書く**（速報でも省略不可＝メディアの付加価値）
-5. [ ] `publishedAt`（鮮度ソート用）を記入
+5. [ ] **`publishedAt` = Deploidがこの記事を公開した日**（元ニュースの発生日ではない）。元ニュースの日付は `sources[].publishedAt` に書く。昨日のニュースを今日書いたなら `publishedAt` は今日の日付になる。`updatedAt` はデータレコードを最後に編集した日
 6. [ ] **`sources` に `checkedAt` と `reliability` を記入**（自動：published かつ非 sample の空 sources は build 失敗）
 7. [ ] **`sources[].url` にHTTPアクセスして 404/403 でないことを確認**（公開前の必須チェック。アクセス不可 URL を published 記事に入れない）
 8. [ ] **出典は原則2件以上**。単一ソースのみの場合はその理由を記録し、可能なら追加出典を探してから published にする
