@@ -126,7 +126,7 @@ export function ManufacturerFactSheet({ manufacturer, robotCount }: Manufacturer
         {rows.map((row) => (
           <div
             key={row.label}
-            className="grid grid-cols-[8rem_minmax(0,1fr)] gap-4 border-b border-border py-3 text-xs"
+            className="grid grid-cols-1 sm:grid-cols-[8rem_minmax(0,1fr)] gap-1 sm:gap-4 border-b border-border py-3 text-xs"
           >
             <dt className="text-muted-foreground">{row.label}:</dt>
             <dd className="min-w-0 font-medium text-foreground">{row.value}</dd>

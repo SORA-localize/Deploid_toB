@@ -13,13 +13,16 @@ interface BreadcrumbsProps {
 
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
-    <nav className="flex items-center gap-1 sm:gap-2 text-xs mb-6">
-      <Link href="/" className="text-muted-foreground hover:text-foreground">
+    <nav className="flex items-center gap-1 sm:gap-2 text-xs mb-6 min-w-0 overflow-hidden">
+      <Link href="/" className="text-muted-foreground hover:text-foreground shrink-0">
         {uiText.common.home}
       </Link>
       {items.map((item, index) => (
-        <div key={index} className="flex items-center gap-1 sm:gap-2">
-          <ChevronRight className="w-3 h-3 text-muted-foreground/70" />
+        <div
+          key={index}
+          className={`flex items-center gap-1 sm:gap-2 ${item.path ? 'shrink-0' : 'min-w-0 overflow-hidden'}`}
+        >
+          <ChevronRight className="w-3 h-3 text-muted-foreground/70 shrink-0" />
           {item.path ? (
             <Link
               href={item.path}
@@ -28,7 +31,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
               {item.label}
             </Link>
           ) : (
-            <span className="text-foreground">{item.label}</span>
+            <span className="text-foreground truncate">{item.label}</span>
           )}
         </div>
       ))}

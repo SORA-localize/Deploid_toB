@@ -109,29 +109,29 @@ export function ManufacturerDetailHero({ manufacturer, robots }: ManufacturerDet
           </div>
 
           <dl className="mt-5 divide-y divide-border text-xs">
-            <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3 py-3">
+            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
               <dt className="text-muted-foreground">{uiText.manufacturers.location}:</dt>
               <dd className="min-w-0 text-foreground">{getManufacturerLocationLabel(manufacturer)}</dd>
             </div>
-            <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3 py-3">
+            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
               <dt className="text-muted-foreground">{uiText.manufacturers.founded}:</dt>
               <dd className="min-w-0 text-foreground">{manufacturer.foundedYear ?? TBD_LABEL}</dd>
             </div>
-            <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3 py-3">
+            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
               <dt className="text-muted-foreground">{uiText.manufacturers.consultationRoute}:</dt>
               <dd className="min-w-0 text-foreground">
                 {manufacturerConsultationRouteLabels[consultationRoute]}
               </dd>
             </div>
-            <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3 py-3">
+            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
               <dt className="text-muted-foreground">{uiText.manufacturers.domesticDistributors}:</dt>
               <dd className="min-w-0 text-foreground">{domesticDistributor.label}</dd>
             </div>
-            <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3 py-3">
+            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
               <dt className="text-muted-foreground">{uiText.manufacturers.handledRobots}:</dt>
               <dd className="min-w-0 text-foreground">{uiText.manufacturers.models(robots.length)}</dd>
             </div>
-            <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3 py-3">
+            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
               <dt className="text-muted-foreground">{uiText.manufacturers.lastUpdated}:</dt>
               <dd className="min-w-0 text-foreground">{manufacturer.updatedAt}</dd>
             </div>

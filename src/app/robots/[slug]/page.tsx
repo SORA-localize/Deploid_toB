@@ -142,35 +142,31 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
             {/* #decision ── バイヤー向け情報を上位に */}
             <div id="decision" className="mt-6 py-8 border-b border-border scroll-mt-site-header">
               <h2 className="text-lg font-semibold text-foreground mb-4">導入判断</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full max-w-3xl min-w-[320px] text-xs">
-                  <tbody className="divide-y divide-border">
-                    {decisionRows.map((row) => {
-                      const LabelIcon =
-                        row.label === '導入段階' ? Activity :
-                        row.label === '日本での入手性' ? MapPin :
-                        row.label === '参考価格' ? CircleDollarSign :
-                        row.label === '安全性' ? ShieldCheck :
-                        null;
-                      return (
-                        <tr key={row.label}>
-                          <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">
-                            {LabelIcon ? (
-                              <span className="inline-flex items-center gap-1.5">
-                                <LabelIcon className="w-3 h-3 shrink-0 opacity-60" />
-                                {row.label}
-                              </span>
-                            ) : row.label}
-                          </td>
-                          <td className="py-3 text-foreground font-medium align-top break-words">
-                            {row.value}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <dl className="divide-y divide-border text-xs max-w-3xl">
+                {decisionRows.map((row) => {
+                  const LabelIcon =
+                    row.label === '導入段階' ? Activity :
+                    row.label === '日本での入手性' ? MapPin :
+                    row.label === '参考価格' ? CircleDollarSign :
+                    row.label === '安全性' ? ShieldCheck :
+                    null;
+                  return (
+                    <div key={row.label} className="grid grid-cols-1 sm:grid-cols-[8rem_1fr] gap-0.5 sm:gap-4 py-3">
+                      <dt className="text-muted-foreground">
+                        {LabelIcon ? (
+                          <span className="inline-flex items-center gap-1.5">
+                            <LabelIcon className="w-3 h-3 shrink-0 opacity-60" />
+                            {row.label}
+                          </span>
+                        ) : row.label}
+                      </dt>
+                      <dd className="text-foreground font-medium break-words">
+                        {row.value}
+                      </dd>
+                    </div>
+                  );
+                })}
+              </dl>
             </div>
 
             {/* #applications */}
@@ -248,22 +244,14 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               <h2 className="text-lg font-semibold text-foreground mb-4">
                 {uiText.robots.technicalSpecifications}
               </h2>
-              <div className="overflow-x-auto">
-                <table className="w-full max-w-3xl min-w-[320px] text-xs">
-                  <tbody className="divide-y divide-border">
-                    {specRows.map((row) => (
-                      <tr key={row.label}>
-                        <td className="py-3 text-muted-foreground w-2/5 sm:w-1/3 align-top">
-                          {row.label}
-                        </td>
-                        <td className="py-3 text-foreground font-medium align-top break-words">
-                          {row.value}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <dl className="divide-y divide-border text-xs max-w-3xl">
+                {specRows.map((row) => (
+                  <div key={row.label} className="grid grid-cols-1 sm:grid-cols-[8rem_1fr] gap-0.5 sm:gap-4 py-3">
+                    <dt className="text-muted-foreground">{row.label}</dt>
+                    <dd className="text-foreground font-medium break-words">{row.value}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
 
             {/* #sources */}
