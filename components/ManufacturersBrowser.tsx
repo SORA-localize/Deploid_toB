@@ -86,7 +86,7 @@ export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: 
         />
 
         <div className="sm:flex sm:items-end gap-4 mb-5">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 max-w-2xl sm:shrink-0">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-2xl sm:shrink-0">
             <SelectControl
               id="manufacturer-country"
               label={uiText.filters.region}

@@ -59,7 +59,7 @@ export function SelectControl({
         <Select value={value} onValueChange={onChange} required={required}>
           <SelectTrigger
             id={`${id}-trigger`}
-            className="h-auto w-full px-3 py-2 text-sm"
+            className="min-h-11 h-auto w-full px-3 py-2 text-sm"
           >
             <SelectValue />
           </SelectTrigger>

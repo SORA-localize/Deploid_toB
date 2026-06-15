@@ -158,7 +158,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
         />
 
         <div className="xl:flex xl:items-end gap-4 mb-5">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 max-w-4xl xl:shrink-0">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4 max-w-4xl xl:shrink-0">
             <SelectControl
               id="robot-industry"
               label={uiText.filters.industry}

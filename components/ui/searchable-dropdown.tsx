@@ -184,7 +184,7 @@ export function SearchableDropdown({
             aria-haspopup="listbox"
             aria-label={`${label}: ${selectedItem?.label ?? placeholder ?? label}`}
             className={cn(
-              "flex min-h-10 w-full items-center justify-between gap-2 rounded-md border border-border bg-input-background px-3 py-2 text-left text-sm text-foreground transition-colors outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+              "flex min-h-11 w-full items-center justify-between gap-2 rounded-md border border-border bg-input-background px-3 py-2 text-left text-sm text-foreground transition-colors outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
               triggerClassName
             )}
           >
