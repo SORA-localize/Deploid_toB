@@ -21,6 +21,7 @@ import {
 import { ChevronDown, ChevronRight, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { SelectControl } from '@/components/SelectControl';
 import {
   CompareDragOverlayCard,
   CompareDroppableArea,
@@ -70,6 +71,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
   const { updateParams } = useUrlParamUpdater();
   const { favorites, toggleFavorite, isMounted } = useFavorites();
   const [expandedManufacturers, setExpandedManufacturers] = useState<string[]>([]);
+  const [mobileManufacturerId, setMobileManufacturerId] = useState('');
   const [activeDrag, setActiveDrag] = useState<CompareRobotDragData | null>(null);
   const [activeDropTarget, setActiveDropTarget] = useState<CompareDropTarget | null>(null);
   const [sheetPreview, setSheetPreview] = useState<SheetPreviewPlacement | null>(null);
@@ -103,6 +105,26 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
   const sortedManufacturers = useMemo(
     () => sortManufacturers([...manufacturers], 'name'),
     [manufacturers],
+  );
+  const mobileManufacturerRobots = useMemo(
+    () =>
+      mobileManufacturerId
+        ? sortRobots(
+            robots.filter((r) => r.manufacturerId === mobileManufacturerId),
+            'name',
+            manufacturers,
+          )
+        : [],
+    [robots, manufacturers, mobileManufacturerId],
+  );
+  const mobileManufacturerOptions = useMemo(
+    () => [
+      { value: '', label: 'メーカーを選択' },
+      ...sortedManufacturers
+        .filter((m) => robots.some((r) => r.manufacturerId === m.id))
+        .map((m) => ({ value: m.id, label: m.nameJa ?? m.name })),
+    ],
+    [sortedManufacturers, robots],
   );
   const selectedRobots = useMemo(
     () =>
@@ -323,8 +345,11 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
           <h1 className="text-2xl md:text-3xl font-semibold leading-tight text-foreground mb-2">
             {uiText.compare.title}
           </h1>
-          <p className="text-sm text-muted-foreground max-w-3xl">
+          <p className="text-sm text-muted-foreground max-w-3xl hidden md:block">
             左のメニューからロボットを選んで比較します。右パネルで気になるロボットをお気に入り登録できます。
+          </p>
+          <p className="text-sm text-muted-foreground max-w-3xl md:hidden">
+            メーカーを選んでロボットを追加してください。
           </p>
         </div>
 
@@ -337,9 +362,49 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
+          {/* Mobile-only: manufacturer selector + robot list */}
+          <div className="md:hidden mb-4 border border-border bg-card">
+            <div className="px-4 pt-4 pb-3">
+              <SelectControl
+                id="mobile-manufacturer"
+                label="メーカー"
+                value={mobileManufacturerId}
+                options={mobileManufacturerOptions}
+                onChange={setMobileManufacturerId}
+                searchable
+              />
+            </div>
+            {mobileManufacturerId && (
+              <div className="border-t border-border-subtle">
+                {mobileManufacturerRobots.length === 0 ? (
+                  <p className="px-4 py-3 text-xs text-muted-foreground">
+                    このメーカーのロボットデータはありません。
+                  </p>
+                ) : (
+                  mobileManufacturerRobots.map((robot) => {
+                    const isSelected = orderedIds.includes(robot.id);
+                    const isDisabled =
+                      !isSelected && orderedIds.length >= MAX_COMPARE_ROBOTS;
+                    return (
+                      <DraggableMenuRobotButton
+                        key={robot.id}
+                        robot={robot}
+                        isSelected={isSelected}
+                        isDisabled={isDisabled}
+                        onClick={() =>
+                          isSelected ? removeRobot(robot.id) : addRobot(robot.id)
+                        }
+                      />
+                    );
+                  })
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_16rem]">
-            {/* Left Sidebar - Manufacturer Menu */}
-            <div className="min-w-0">
+            {/* Left Sidebar - Manufacturer Menu (desktop only) */}
+            <div className="hidden md:block min-w-0">
               <CompareDroppableArea
                 id={compareColumnIds.menu}
                 target="menu"
@@ -436,7 +501,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
             </div>
 
             {/* Main Content - Comparison Sheet */}
-            <div className="min-w-0 md:row-span-2 xl:row-span-1">
+            <div className="min-w-0">
               <CompareDroppableArea
                 id={compareColumnIds.sheet}
                 target="sheet"
@@ -480,7 +545,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         </div>
                       ) : (
                         <SortableContext items={sheetItemIds} strategy={rectSortingStrategy}>
-                          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
+                          <div className="grid grid-cols-3 gap-2 sm:gap-3">
                             {sheetPreviewItems.map((item) => {
                               if (item.type === 'preview') {
                                 const manufacturer = manufacturerFor(item.robot.manufacturerId);
@@ -548,8 +613,8 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
               </CompareDroppableArea>
             </div>
 
-            {/* Right Sidebar - Favorites */}
-            <div className="min-w-0 order-3 md:order-none">
+            {/* Right Sidebar - Favorites (desktop xl+ only) */}
+            <div className="hidden xl:block min-w-0">
               <CompareDroppableArea
                 id={compareColumnIds.favorite}
                 target="favorite"
