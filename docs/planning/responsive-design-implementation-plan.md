@@ -108,7 +108,8 @@
 
 ### Target Files
 
-- `components/HeaderChrome.tsx`（メインナビ。`components/Header.tsx` は存在しない）
+- `components/Header.tsx`（メインナビ＋モバイルメニュー。タップ領域・リンクはここ）
+- `components/HeaderChrome.tsx`（sticky補助バーのprovider/slot。メインナビではない）
 - `components/ContextualPageHeader.tsx`
 - `components/RobotsHeader.tsx`
 - `components/ManufacturersHeader.tsx`
@@ -142,7 +143,7 @@
 - `/robots/unitree-g1`
 - `/manufacturers/unitree`
 - sticky表示状態でスクロール、タブ切り替え、フィルター解除
-- mobile menu: Tab/Enter キー操作、フォーカストラップ確認
+- mobile menu: Tab順、Escape/閉じる挙動、背面リンクへフォーカスが抜けないかを確認。Dialog化する場合のみ focus trap を検討（現状は dropdown nav なので focus trap 不要）
 - PageTabBar: 横スクロール時に選択中タブが見切れないか
 
 ## 7. Phase 3: Card Variants
@@ -167,7 +168,7 @@ PC向けカードを単に縮めるのではなく、画面幅と文脈に応じ
 type CardVariant = 'compact' | 'default' | 'detailed';
 ```
 
-> **型の正本**: `CardVariant` は `lib/cardVariants.ts`（新規）に定義する。`data/types.ts` はデータスキーマ専用のため混入しない。各カードコンポーネントはここから import する。
+> **型の扱い**: `ManufacturerCard` と `RobotCard` の variant 名は同じでも表示項目の意味が異なるため、最初から共通型にまとめない。まず各カード内の local type で開始し、2コンポーネント以上で完全に同じ variant 契約が必要になった時点で `lib/cardVariants.ts` への共通化を検討する。`data/types.ts` はデータスキーマ専用のため混入しない。
 
 `ManufacturerCard`:
 
@@ -224,7 +225,8 @@ type CardVariant = 'compact' | 'default' | 'detailed';
 
 | 状態 | 保護方針 |
 |---|---|
-| dnd-kit によるドラッグ並び替え | スマホ分岐は `useMediaQuery` または CSS で切り替え。dnd ロジック自体には触らない |
+| dnd-kit によるドラッグ並び替え | **CSS-first でスマホ/PC UI を切り替える**。JS 分岐が必要な場合は mounted 後にのみ判定し、ツリーを大きく切り替えない。dnd ロジック自体には触らない |
+| hydration | `useMediaQuery` で SSR/クライアント間の不一致が出やすい。URL state を唯一の復元元にし、クライアントマウント前は最小 UI のみ描画する |
 | URL state（`?compare=id,id,...`） | スマホ UI 追加後も同じ URL から共有・復元できることを確認する |
 | localStorage お気に入り | クライアントマウント前の hydration 不一致を出さない。既存の `useFavorites` フックを再利用する |
 | 上限件数ガード | スマホ追加ボタンでも上限チェックを通す |
