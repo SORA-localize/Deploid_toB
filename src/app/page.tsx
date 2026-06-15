@@ -42,10 +42,10 @@ export default function HomePage() {
     }];
   });
 
-  // 注目ロボット：更新日の新しい順に3件（FeaturedRobotsGrid用）
+  // 注目ロボット：更新日の新しい順に5件（FeaturedRobotsGrid用）
   const featuredRobots = [...getRobots()]
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-    .slice(0, 3);
+    .slice(0, 5);
 
   // HomeContentNavigator用プレビュー画像（各セクション1枚、サムネなし）
   const robotPreviewAssets = [

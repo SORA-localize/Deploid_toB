@@ -21,7 +21,7 @@ export function FeaturedRobotsGrid({ robots, manufacturerById }: FeaturedRobotsG
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
         {robots.map((robot) => {
           const manufacturer = manufacturerById[robot.manufacturerId];
           return (
