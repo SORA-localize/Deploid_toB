@@ -13,6 +13,7 @@ Last cleaned: 2026-06-13
 - `data-architecture-redesign-v1.md` — id/slug分離、参照設計、正本管理、CMS移行を見据えたデータ設計
 - `copyright_and_media_rights_policy_v1.md` — 画像、ロゴ、引用、出典、権利ステータスの運用方針
 - `design_system_v1.md` — 現行UIのデザイン原則、semantic token、カード/レイアウト方針
+- `editorial_style_guide_v1.md` — 記事本文の執筆方針（文体・NG表現・執筆ワークフロー・セクション別テンプレート）
 
 ## 現行の正本
 
@@ -37,6 +38,7 @@ Last cleaned: 2026-06-13
 - `ai_fullstack_development_guardrails_v1.md` — AI実装時の安全策と自己監査
 - `architecture_future_considerations_v1.md` — 将来検討
 - `copyright_and_media_rights_policy_v1.md` — 権利、引用、メディア利用
+- `editorial_style_guide_v1.md` — 記事執筆方針（文体・セクション別テンプレート・NG表現・ワークフロー）
 - `data-architecture-redesign-v1.md` — データ構造設計（データ設計の正本）
 - `data-maintenance-checklist-v1.md` — データ運用チェックリスト（データ運用の正本）
 - `deployment_sites_research_prompt_2026-06-01.md` — 導入事例データ調査用プロンプト
