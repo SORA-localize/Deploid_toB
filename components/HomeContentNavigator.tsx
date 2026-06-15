@@ -144,27 +144,11 @@ export function HomeContentNavigator({
               className="absolute inset-0"
             >
               {primaryAsset ? (
-                activeItem.key === 'manufacturers' ? (
-                  <div className="grid h-full w-full grid-cols-2 place-items-center gap-4 bg-neutral-100 p-8 opacity-95 sm:grid-cols-3">
-                    {activeItem.assets.slice(0, 6).map((asset, index) => (
-                      <motion.div
-                        key={`${asset.src}-${index}`}
-                        initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.94, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        transition={{ ...transition, delay: shouldReduceMotion ? 0 : 0.04 * index }}
-                        className="flex h-20 w-full items-center justify-center bg-white/90 p-4 sm:h-24"
-                      >
-                        <img src={asset.src} alt={asset.alt} className="max-h-full max-w-full object-contain" />
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <img
-                    src={primaryAsset.src}
-                    alt={primaryAsset.alt}
-                    className="h-full w-full object-cover opacity-80"
-                  />
-                )
+                <img
+                  src={primaryAsset.src}
+                  alt={primaryAsset.alt}
+                  className="h-full w-full object-cover opacity-80"
+                />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-neutral-900 text-sm text-neutral-500">
                   {activeItem.fallbackLabel}

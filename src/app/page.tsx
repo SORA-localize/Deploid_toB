@@ -4,13 +4,11 @@ import { FeaturedRobotsGrid } from '@/components/FeaturedRobotsGrid';
 import { HomeContentNavigator } from '@/components/HomeContentNavigator';
 import { ManufacturerWorldMap } from '@/components/ManufacturerWorldMap';
 import { NewsFeatureCard } from '@/components/NewsFeatureCard';
-import { RobotCard } from '@/components/RobotCard';
 import { TagChip } from '@/components/TagChip';
 import {
   getGuideBySlug,
   getGuides,
   getManufacturers,
-  getManufacturerForRobot,
   getArticles,
   getRobots,
   getDeploymentsForManufacturer,
@@ -43,30 +41,38 @@ export default function HomePage() {
     }];
   });
 
-  // 注目ロボット：更新日の新しい順に3件
+  // 注目ロボット：更新日の新しい順に3件（FeaturedRobotsGrid用）
   const featuredRobots = [...getRobots()]
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
     .slice(0, 3);
 
-  const robotPreviewAssets = featuredRobots.flatMap((robot) => {
-    const asset = getDisplayableAsset(robot.images?.hero ?? robot.heroImage);
-    return asset ? [{ src: asset.src, alt: asset.alt, label: robot.name }] : [];
-  });
+  // HomeContentNavigator用プレビュー画像 — 手元にある商用許諾済み press kit 素材を静的指定
+  const robotPreviewAssets = [
+    { src: '/images/robots/agility-digit-hero.jpg', alt: 'Agility Digit 全身', label: 'Digit' },
+    { src: '/images/robots/onex-neo-hero.jpg', alt: '1X NEO 全身', label: 'NEO' },
+    { src: '/images/robots/agility-digit-inOperation.jpg', alt: 'Digit 稼働中', label: 'Digit in operation' },
+    { src: '/images/robots/onex-neo-inOperation.jpg', alt: 'NEO 稼働中', label: 'NEO in operation' },
+    { src: '/images/robots/agility-digit-side.jpg', alt: 'Digit 側面', label: 'Digit side' },
+    { src: '/images/robots/onex-neo-scale.jpg', alt: 'NEO スケール比較', label: 'NEO scale' },
+  ];
 
-  const manufacturerPreviewAssets = manufacturers.flatMap((manufacturer) => {
-    const asset = getDisplayableAsset(manufacturer.logo);
-    return asset ? [{ src: asset.src, alt: asset.alt, label: manufacturer.nameJa ?? manufacturer.name }] : [];
-  }).slice(0, 7);
+  const manufacturerPreviewAssets = [
+    { src: '/images/robots/agility-digit-hero.jpg', alt: 'Agility Digit', label: 'Agility Robotics' },
+    { src: '/images/robots/onex-neo-hero.jpg', alt: '1X NEO', label: '1X Technologies' },
+    { src: '/images/robots/agility-digit-transparent.png', alt: 'Agility Digit 透過', label: 'Digit' },
+    { src: '/images/robots/onex-neo-side.jpg', alt: '1X NEO 側面', label: 'NEO side' },
+    { src: '/images/robots/agility-digit-endEffector.jpg', alt: 'Digit ハンド', label: 'Digit hand' },
+    { src: '/images/robots/onex-neo-inOperation.jpg', alt: 'NEO 稼働中', label: 'NEO in operation' },
+  ];
 
-  const guidePreviewAssets = featuredRobots.flatMap((robot) => {
-    const asset = getDisplayableAsset(
-      robot.images?.inOperation ??
-      robot.images?.scale ??
-      robot.images?.hero ??
-      robot.heroImage,
-    );
-    return asset ? [{ src: asset.src, alt: asset.alt, label: robot.name }] : [];
-  });
+  // ガイドは「実際の導入現場」の記事画像を使い、実用性を伝える
+  const guidePreviewAssets = [
+    { src: '/images/articles/gxo-digit-100k-totes/hero.jpg', alt: 'GXO倉庫でのDigit導入', label: 'GXO' },
+    { src: '/images/articles/jal-haneda-unitree-pilot-2026/hero.jpg', alt: 'JAL羽田でのUnitreeパイロット', label: 'JAL' },
+    { src: '/images/articles/boston-dynamics-atlas-hyundai-rmac-june2026/hero.jpg', alt: 'Boston Dynamics Atlas RMAC', label: 'Atlas' },
+    { src: '/images/robots/agility-digit-inOperation.jpg', alt: 'Digit 稼働中', label: 'Digit' },
+    { src: '/images/robots/onex-neo-inOperation.jpg', alt: 'NEO 稼働中', label: 'NEO' },
+  ];
 
   const homeFeaturedReports = getHomeFeaturedArticles(getArticles());
 
