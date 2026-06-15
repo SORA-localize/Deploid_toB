@@ -21,15 +21,16 @@ export function FeaturedRobotsGrid({ robots, manufacturerById }: FeaturedRobotsG
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+      <div className="flex gap-3 sm:gap-4 overflow-x-auto overscroll-x-contain snap-x pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {robots.map((robot) => {
           const manufacturer = manufacturerById[robot.manufacturerId];
           return (
-            <FeaturedRobotCard
-              key={robot.id}
-              robot={robot}
-              manufacturerName={manufacturer?.name}
-            />
+            <div key={robot.id} className="shrink-0 snap-start w-[44%] sm:w-[30%] md:w-[22%] xl:w-[18%]">
+              <FeaturedRobotCard
+                robot={robot}
+                manufacturerName={manufacturer?.name}
+              />
+            </div>
           );
         })}
       </div>
