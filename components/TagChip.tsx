@@ -30,7 +30,7 @@ export function TagChip<K extends TagKind = TagKind>({
   return (
     <span
       className={cn(
-        'inline-flex items-center border px-2 py-0.5 text-xs',
+        'inline-flex items-center px-2 py-0.5 text-xs',
         getVisualToneClassName(resolvedTone),
         className,
       )}
