@@ -94,10 +94,11 @@
 
 ### Verification
 
-- `npm run build`
+- `npm run validate:data && npm run build`
 - `/robots/unitree-g1`
 - `/manufacturers/unitree`
 - 長い記事タイトル、長いメーカー名、長いURLを含むページ
+- Breadcrumbs の Tab フォーカスと truncate 時のツールチップ有無確認
 
 ## 6. Phase 2: Sticky Header and Navigation
 
@@ -107,9 +108,8 @@
 
 ### Target Files
 
-- `components/Header.tsx`
+- `components/HeaderChrome.tsx`（メインナビ。`components/Header.tsx` は存在しない）
 - `components/ContextualPageHeader.tsx`
-- `components/HeaderChrome.tsx`
 - `components/RobotsHeader.tsx`
 - `components/ManufacturersHeader.tsx`
 - `components/ReportsHeader.tsx`
@@ -135,12 +135,15 @@
 
 ### Verification
 
+- `npm run validate:data && npm run build`
 - `/robots`
 - `/manufacturers`
 - `/reports`
 - `/robots/unitree-g1`
 - `/manufacturers/unitree`
 - sticky表示状態でスクロール、タブ切り替え、フィルター解除
+- mobile menu: Tab/Enter キー操作、フォーカストラップ確認
+- PageTabBar: 横スクロール時に選択中タブが見切れないか
 
 ## 7. Phase 3: Card Variants
 
@@ -163,6 +166,8 @@ PC向けカードを単に縮めるのではなく、画面幅と文脈に応じ
 ```ts
 type CardVariant = 'compact' | 'default' | 'detailed';
 ```
+
+> **型の正本**: `CardVariant` は `lib/cardVariants.ts`（新規）に定義する。`data/types.ts` はデータスキーマ専用のため混入しない。各カードコンポーネントはここから import する。
 
 `ManufacturerCard`:
 
@@ -192,10 +197,12 @@ type CardVariant = 'compact' | 'default' | 'detailed';
 
 ### Verification
 
+- `npm run validate:data && npm run build`
 - `/manufacturers`
 - `/robots`
 - `/manufacturers/unitree`
 - Homeの注目ロボット
+- 既存の default 呼び出し箇所が visual regression していないか（compact/detailed 追加による巻き込みチェック）
 
 ## 8. Phase 4: Tables and Comparison UI
 
@@ -210,6 +217,17 @@ type CardVariant = 'compact' | 'default' | 'detailed';
 - `components/ComparisonRobotPanel.tsx`
 - `components/compare/CompareParts.tsx`
 - 必要なら `components/SpecList.tsx` を新規作成
+
+### 破壊リスク（最高リスクフェーズ）
+
+`CompareClient.tsx` は以下の複合状態を持つ。スマホ UX を追加する際にこれらを壊さないことを最優先にする：
+
+| 状態 | 保護方針 |
+|---|---|
+| dnd-kit によるドラッグ並び替え | スマホ分岐は `useMediaQuery` または CSS で切り替え。dnd ロジック自体には触らない |
+| URL state（`?compare=id,id,...`） | スマホ UI 追加後も同じ URL から共有・復元できることを確認する |
+| localStorage お気に入り | クライアントマウント前の hydration 不一致を出さない。既存の `useFavorites` フックを再利用する |
+| 上限件数ガード | スマホ追加ボタンでも上限チェックを通す |
 
 ### Implementation
 
@@ -230,10 +248,13 @@ type CardVariant = 'compact' | 'default' | 'detailed';
 
 ### Verification
 
+- `npm run validate:data && npm run build`
 - `/compare`
 - 比較ロボット0件、1件、上限件数
 - お気に入り未マウント時、空状態、追加済み、削除
 - キーボード操作、フォーカス、aria-label
+- スマホで追加→URL変化→戻る→URLから復元の一連フロー
+- PCのD&D並び替えが壊れていないこと
 
 ## 9. Phase 5: Filters and Search UI
 
@@ -269,11 +290,13 @@ type CardVariant = 'compact' | 'default' | 'detailed';
 
 ### Verification
 
+- `npm run validate:data && npm run build`
 - `/robots?q=...`
 - `/manufacturers?country=...`
-- `/use-cases`
-- `/guides`
+- `/use-cases`（ComingSoonGate の z-index とフィルター折りたたみの競合がないか確認）
+- `/guides`（同上）
 - URL更新、戻る/進む、検索入力のIME composition
+- フィルター折りたたみ開閉時のフォーカス管理（a11y）
 
 ## 10. Phase 6: Typography and Spacing
 
@@ -305,6 +328,7 @@ type CardVariant = 'compact' | 'default' | 'detailed';
 
 ### Verification
 
+- `npm run validate:data && npm run build`
 - `/reports/[slug]`
 - `/guides/[slug]`
 - `/use-cases/[slug]`
@@ -326,6 +350,10 @@ type CardVariant = 'compact' | 'default' | 'detailed';
 - `components/ManufacturerCard.tsx`
 - `components/HomeContentNavigator.tsx`
 
+### 依存関係
+
+このフェーズは **Phase 3（Card Variants）の完了後** に着手する。`detailed` variant が未実装の場合、大型画面の情報密度改善は `detailed` なしで進めないこと。
+
 ### Implementation
 
 - `2xl:grid-cols-5` は維持するか、カードvariantとセットで判断する
@@ -340,6 +368,7 @@ type CardVariant = 'compact' | 'default' | 'detailed';
 
 ### Verification
 
+- `npm run validate:data && npm run build`
 - `/`
 - `/robots`
 - `/manufacturers`
