@@ -17,7 +17,7 @@ function childrenToText(children: React.ReactNode): string {
 // Editorial rule: h2 text must be plain text and unique within the article.
 export function Markdown({ source, className }: { source: string; className?: string }) {
   return (
-    <div className={cn('text-base leading-[1.75] text-foreground', className)}>
+    <div className={cn('max-w-[72ch] text-base leading-[1.75] text-foreground', className)}>
       <ReactMarkdown
         components={{
           h1: ({ children }) => (
