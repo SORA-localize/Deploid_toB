@@ -25,7 +25,7 @@ export function PageTabBar<T extends string>({
   ariaLabel,
 }: PageTabBarProps<T>) {
   return (
-    <div className="flex flex-wrap gap-0" role="tablist" aria-label={ariaLabel}>
+    <div className="flex flex-nowrap overflow-x-auto gap-0" role="tablist" aria-label={ariaLabel}>
       {tabs.map((tab) => {
         const button = (
           <button
@@ -34,7 +34,7 @@ export function PageTabBar<T extends string>({
             aria-selected={activeValue === tab.value}
             onClick={() => onSelect(tab.value)}
             className={cn(
-              'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+              'inline-flex min-h-10 shrink-0 items-center px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
               activeValue === tab.value
                 ? 'border-foreground text-foreground'
                 : 'border-transparent text-muted-foreground hover:text-foreground',

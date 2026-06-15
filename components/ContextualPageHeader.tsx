@@ -25,8 +25,10 @@ export function ContextualPageHeader({
   return (
     <StickyPageHeader visible={isVisible}>
       <div className={cn('site-container flex items-center', className)}>
-        {children}
-        <div className="ml-auto flex items-center gap-3 pl-4">
+        <div className="min-w-0 flex-1 overflow-x-auto">
+          {children}
+        </div>
+        <div className="ml-2 flex shrink-0 items-center gap-3 pl-2">
           <ActiveFilterChips chips={activeChips} />
           <ScrollToTopIconButton />
         </div>

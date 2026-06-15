@@ -125,7 +125,7 @@ export function Header() {
                     href={item.path}
                     aria-current={isActive ? 'page' : undefined}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`py-2 text-sm transition-colors ${
+                    className={`inline-flex min-h-11 items-center py-2 text-sm transition-colors ${
                       isActive ? 'font-medium text-foreground' : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >

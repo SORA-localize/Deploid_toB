@@ -24,7 +24,7 @@ export function ManufacturerDetailStickyHeader({
 
   return (
     <ContextualPageHeader className="gap-5 py-2">
-      <p className="max-w-[14rem] shrink-0 truncate text-sm font-medium text-foreground">
+      <p className="hidden sm:block max-w-[14rem] shrink-0 truncate text-sm font-medium text-foreground">
         {title}
       </p>
       <ManufacturerDetailSectionNav
