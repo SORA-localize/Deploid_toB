@@ -14,7 +14,7 @@ import {
   getDeploymentsForManufacturer,
 } from '@/lib/data';
 import { getDisplayableAsset } from '@/lib/media';
-import { getHomeFeaturedArticles } from '@/lib/articlePlacements';
+import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
 
 export default function HomePage() {
   const featured = getGuideBySlug('decision-variables') ?? getGuides()[0];
@@ -59,7 +59,8 @@ export default function HomePage() {
     { src: '/images/home/guides-preview.jpg', alt: '1X NEO 3色カラーバリエーション', label: 'NEO Colors', objectPosition: 'top' },
   ];
 
-  const homeFeaturedReports = getHomeFeaturedArticles(getArticles());
+  const { heroReports, featureReports } = getArticleIndexPlacementReports(getArticles());
+  const scrollArticles = [...heroReports, ...featureReports];
 
   const manufacturerById = Object.fromEntries(
     manufacturers.map((m) => [m.id, m])
@@ -87,7 +88,7 @@ export default function HomePage() {
         />
       )}
 
-      {homeFeaturedReports.length > 0 && (
+      {scrollArticles.length > 0 && (
         <section className="py-8 sm:py-10 border-b border-border">
           <div className="flex items-end justify-between mb-4">
             <h2 className="text-2xl font-semibold text-foreground">注目記事</h2>
@@ -99,12 +100,12 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {homeFeaturedReports.map((report) => (
+          <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-proximity pb-3 -mx-4 px-4 sm:-mx-6 sm:px-6">
+            {scrollArticles.map((report) => (
               <NewsFeatureCard
                 key={report.id}
                 report={report}
-                className="min-h-[220px] sm:min-h-[240px] lg:min-h-[260px]"
+                className="shrink-0 snap-start w-[min(72vw,280px)] sm:w-72 lg:w-80 aspect-[3/4]"
               />
             ))}
           </div>

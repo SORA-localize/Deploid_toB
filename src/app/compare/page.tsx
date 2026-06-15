@@ -1,22 +1,24 @@
 import { CompareClient } from '@/components/CompareClient';
 import { getManufacturers, getRobots } from '@/lib/data';
 import { normalizeCompareRobotIds } from '@/lib/compareParams';
-import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 
 export const metadata = {
   title: '比較',
   description: '候補のヒューマノイドロボットを、導入判断変数で横並びに比較できます。',
+  alternates: {
+    canonical: '/compare',
+  },
 };
 
 export default async function ComparePage({
   searchParams,
 }: {
-  searchParams: RouteSearchParams;
+  searchParams: Promise<{ compare?: string }>;
 }) {
   const robots = getRobots();
   const manufacturers = getManufacturers();
-  const params = await pickSearchParams(searchParams, ['compare'] as const);
-  const selectedIds = normalizeCompareRobotIds(params.compare, robots);
+  const { compare } = await searchParams;
+  const selectedIds = normalizeCompareRobotIds(compare, robots);
 
   return (
     <CompareClient
