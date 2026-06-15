@@ -45,8 +45,8 @@
 6. [ ] **`sources` に `checkedAt` と `reliability` を記入**（自動：published かつ非 sample の空 sources は build 失敗）
 7. [ ] **`sources[].url` にHTTPアクセスして 404/403 でないことを確認**（公開前の必須チェック。アクセス不可 URL を published 記事に入れない）
 8. [ ] **出典は原則2件以上**。単一ソースのみの場合はその理由を記録し、可能なら追加出典を探してから published にする
-9. [ ] hero画像がある場合は `public/images/articles/<id>/hero.<ext>` に置く
-10. [ ] hero画像の `ImageAsset.rights` を記入する（自動：空src以外は検証対象）
+9. [ ] hero画像がある場合は `public/images/articles/<id>/hero.<ext>` に置く（外部ホットリンク禁止）。画像が取れない場合は `src: ''` のままでよい（カードにプレースホルダーが出る。`src: ''` は valid）
+10. [ ] hero画像の `ImageAsset.rights` を記入する（`commercial-permitted` または `reference-attributed` のみ公開可。権利が確認できない画像は `src: ''` のまま公開する。詳細は `docs/planning/copyright_and_media_rights_policy_v1.md`）（自動：空src以外は検証対象）
 11. [ ] `related*Ids` は **id で**結ぶ（自動：参照切れは build 失敗）
 12. [ ] tags は tagRegistry 登録値のみ（`lib/tagRegistry.ts` の `kind: 'article'` の value を使う）
 13. [ ] **本文量を確認**：速報（news-brief）でも800文字以上、分析・レポートは1,500文字以上を目安にする
