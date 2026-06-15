@@ -131,7 +131,7 @@ export function sortByDisplayOrder<T extends string>(
 
 // ─── ロボット並び替え ────────────────────────────────────────────
 
-export type RobotSortKey = 'featured' | 'stage' | 'japan' | 'name';
+export type RobotSortKey = 'featured' | 'home-featured' | 'stage' | 'japan' | 'name';
 
 function compareNames(a: string, b: string) {
   return a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
@@ -172,6 +172,19 @@ export function sortRobots(
       if (aRank < bRank) return -1;
       if (aRank > bRank) return 1;
       return compareRobotCatalogNames(a, b, manufacturerById);
+    }
+    if (sort === 'home-featured') {
+      // 1次: featuredRank 昇順（編集ピック。未設定は後ろ）
+      const aRank = a.featuredRank ?? Number.POSITIVE_INFINITY;
+      const bRank = b.featuredRank ?? Number.POSITIVE_INFINITY;
+      if (aRank !== bRank) return aRank - bRank;
+      // 2次: deploymentStage（production が最上位）
+      const stageDiff =
+        (stageIndex.get(a.deploymentStage) ?? Number.MAX_SAFE_INTEGER) -
+        (stageIndex.get(b.deploymentStage) ?? Number.MAX_SAFE_INTEGER);
+      if (stageDiff !== 0) return stageDiff;
+      // 3次: updatedAt 降順（新しいデータを優先）
+      return b.updatedAt.localeCompare(a.updatedAt);
     }
     if (sort === 'stage') {
       const stageDiff =

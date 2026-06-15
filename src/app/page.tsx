@@ -14,6 +14,7 @@ import {
   getRobots,
   getDeploymentsForManufacturer,
 } from '@/lib/data';
+import { sortRobots } from '@/lib/display';
 import { getDisplayableAsset } from '@/lib/media';
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
 
@@ -42,10 +43,8 @@ export default function HomePage() {
     }];
   });
 
-  // 注目ロボット：更新日の新しい順に5件（FeaturedRobotsGrid用）
-  const featuredRobots = [...getRobots()]
-    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-    .slice(0, 5);
+  // 注目ロボット：featuredRank（編集ピック）→ deploymentStage → updatedAt の優先順で5件
+  const featuredRobots = sortRobots(getRobots(), 'home-featured').slice(0, 5);
 
   // HomeContentNavigator用プレビュー画像（各セクション1枚、サムネなし）
   const robotPreviewAssets = [
