@@ -35,6 +35,12 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / guide
 - AIの推測を事実として入れない。不明なスペックや価格は省略または要確認メモにする
 - 新規レコードは原則 `publishStatus: 'draft'` から作る
 - 記事は `category` と `whyItMatters` を必ず入れる
+- 記事の `type` は `ArticleType`（analysis / deployment-report / interview / event-report / policy-update / case-study / news-brief / tech-update / market-analysis）から選ぶ。`ArticleCategory`（news / company-report 等）と混同しない
+- 記事本文は速報でも800文字以上、分析・レポートは1,500文字以上を目安にする
+- `published` 記事の `sources[].url` は公開前にアクセス確認する（404・403 のまま published にしない）
+- 記事は原則2件以上の出典を持つ。1件のみで published にする場合はその理由を記録し、追加出典を探す努力をする
+- 既存記事を全削除して置き換えることは禁止。更新は同じ `id` で行う。url 変更が必要なら `slug` を変更し `previousSlugs` に旧 slug を追記する
+- `requiredCapabilities` には `Capability` 型の値のみ使う。`lib/tagRegistry.ts` のタグ value は `Capability` ではないため混入しない
 - 画像・ロゴは `ImageAsset.rights` を必ず持たせる。外部ホットリンクは避け、可能なら `public/images/` にローカル配置する
 - タグは `lib/tagRegistry.ts` に登録済みの `value` を使う。`label` はUI表示用なので、短い略称や自然な日本語表記でよい
 - スペック項目は `lib/specSchema.ts` にあるキーだけを使う

@@ -39,14 +39,21 @@
 
 1. [ ] id 発番、`slug = id`
 2. [ ] **`category` を1つ選択**（news / interview / company-report / analysis / policy）
-3. [ ] **`whyItMatters` を必ず書く**（速報でも省略不可＝メディアの付加価値）
-4. [ ] `publishedAt`（鮮度ソート用）を記入
-5. [ ] hero画像がある場合は `public/images/articles/<id>/hero.<ext>` に置く
-6. [ ] hero画像の `ImageAsset.rights` を記入する（自動：空src以外は検証対象）
-7. [ ] `related*Ids` は **id で**結ぶ（自動：参照切れは build 失敗）
-8. [ ] tags は tagRegistry 登録値のみ
-9. [ ] `contentKind: 'sample'` の場合は noindex・本番除外を確認（§設計11.9）
-10. [ ] build 通過 → `published`
+3. [ ] **`type` を ArticleType の有効値から選択**（analysis / deployment-report / interview / event-report / policy-update / case-study / news-brief / tech-update / market-analysis）。`category` と混同しない
+4. [ ] **`whyItMatters` を必ず書く**（速報でも省略不可＝メディアの付加価値）
+5. [ ] `publishedAt`（鮮度ソート用）を記入
+6. [ ] **`sources` に `checkedAt` と `reliability` を記入**（自動：published かつ非 sample の空 sources は build 失敗）
+7. [ ] **`sources[].url` にHTTPアクセスして 404/403 でないことを確認**（公開前の必須チェック。アクセス不可 URL を published 記事に入れない）
+8. [ ] **出典は原則2件以上**。単一ソースのみの場合はその理由を記録し、可能なら追加出典を探してから published にする
+9. [ ] hero画像がある場合は `public/images/articles/<id>/hero.<ext>` に置く
+10. [ ] hero画像の `ImageAsset.rights` を記入する（自動：空src以外は検証対象）
+11. [ ] `related*Ids` は **id で**結ぶ（自動：参照切れは build 失敗）
+12. [ ] tags は tagRegistry 登録値のみ（`lib/tagRegistry.ts` の `kind: 'article'` の value を使う）
+13. [ ] **本文量を確認**：速報（news-brief）でも800文字以上、分析・レポートは1,500文字以上を目安にする
+14. [ ] **型の確認**：`requiredCapabilities` は `Capability` 型の値のみ。`lib/tagRegistry.ts` のタグ value を誤って入れない
+15. [ ] **既存記事を全削除して置き換えない**。更新は同じ `id` で行い、url 変更が必要なら `previousSlugs` に旧 slug を追記する
+16. [ ] `contentKind: 'sample'` の場合は noindex・本番除外を確認（§設計11.9）
+17. [ ] build 通過 → `published`
 
 ---
 
