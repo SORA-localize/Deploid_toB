@@ -46,32 +46,17 @@ export default function HomePage() {
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
     .slice(0, 3);
 
-  // HomeContentNavigator用プレビュー画像 — 手元にある商用許諾済み press kit 素材を静的指定
+  // HomeContentNavigator用プレビュー画像（各セクション1枚、サムネなし）
   const robotPreviewAssets = [
-    { src: '/images/robots/agility-digit-hero.jpg', alt: 'Agility Digit 全身', label: 'Digit' },
-    { src: '/images/robots/onex-neo-hero.jpg', alt: '1X NEO 全身', label: 'NEO' },
-    { src: '/images/robots/agility-digit-inOperation.jpg', alt: 'Digit 稼働中', label: 'Digit in operation' },
-    { src: '/images/robots/onex-neo-inOperation.jpg', alt: 'NEO 稼働中', label: 'NEO in operation' },
-    { src: '/images/robots/agility-digit-side.jpg', alt: 'Digit 側面', label: 'Digit side' },
-    { src: '/images/robots/onex-neo-scale.jpg', alt: 'NEO スケール比較', label: 'NEO scale' },
+    { src: '/images/home/robots-preview.jpg', alt: '1X NEO と人間の並び', label: 'NEO', objectPosition: 'top' },
   ];
 
   const manufacturerPreviewAssets = [
-    { src: '/images/robots/agility-digit-hero.jpg', alt: 'Agility Digit', label: 'Agility Robotics' },
-    { src: '/images/robots/onex-neo-hero.jpg', alt: '1X NEO', label: '1X Technologies' },
-    { src: '/images/robots/agility-digit-transparent.png', alt: 'Agility Digit 透過', label: 'Digit' },
-    { src: '/images/robots/onex-neo-side.jpg', alt: '1X NEO 側面', label: 'NEO side' },
-    { src: '/images/robots/agility-digit-endEffector.jpg', alt: 'Digit ハンド', label: 'Digit hand' },
-    { src: '/images/robots/onex-neo-inOperation.jpg', alt: 'NEO 稼働中', label: 'NEO in operation' },
+    { src: '/images/home/manufacturers-preview.png', alt: 'SKL Robotics ロゴ', label: 'Manufacturers', objectPosition: 'center' },
   ];
 
-  // ガイドは「実際の導入現場」の記事画像を使い、実用性を伝える
   const guidePreviewAssets = [
-    { src: '/images/articles/gxo-digit-100k-totes/hero.jpg', alt: 'GXO倉庫でのDigit導入', label: 'GXO' },
-    { src: '/images/articles/jal-haneda-unitree-pilot-2026/hero.jpg', alt: 'JAL羽田でのUnitreeパイロット', label: 'JAL' },
-    { src: '/images/articles/boston-dynamics-atlas-hyundai-rmac-june2026/hero.jpg', alt: 'Boston Dynamics Atlas RMAC', label: 'Atlas' },
-    { src: '/images/robots/agility-digit-inOperation.jpg', alt: 'Digit 稼働中', label: 'Digit' },
-    { src: '/images/robots/onex-neo-inOperation.jpg', alt: 'NEO 稼働中', label: 'NEO' },
+    { src: '/images/home/guides-preview.jpg', alt: '1X NEO 3色カラーバリエーション', label: 'NEO Colors', objectPosition: 'top' },
   ];
 
   const homeFeaturedReports = getHomeFeaturedArticles(getArticles());

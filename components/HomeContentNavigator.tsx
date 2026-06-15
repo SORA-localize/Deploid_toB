@@ -9,6 +9,7 @@ type PreviewAsset = {
   src: string;
   alt: string;
   label: string;
+  objectPosition?: string;
 };
 
 type HomeContentNavigatorProps = {
@@ -148,6 +149,7 @@ export function HomeContentNavigator({
                   src={primaryAsset.src}
                   alt={primaryAsset.alt}
                   className="h-full w-full object-cover opacity-80"
+                  style={{ objectPosition: primaryAsset.objectPosition ?? 'center' }}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-neutral-900 text-sm text-neutral-500">
