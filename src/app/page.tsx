@@ -102,11 +102,9 @@ export default function HomePage() {
           </div>
           <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-proximity pb-3 -mx-4 px-4 sm:-mx-6 sm:px-6">
             {scrollArticles.map((report) => (
-              <NewsFeatureCard
-                key={report.id}
-                report={report}
-                className="shrink-0 snap-start w-[min(72vw,280px)] sm:w-72 lg:w-80 aspect-[3/4]"
-              />
+              <div key={report.id} className="shrink-0 snap-start w-[min(72vw,280px)] sm:w-72 lg:w-80 aspect-[3/4]">
+                <NewsFeatureCard report={report} />
+              </div>
             ))}
           </div>
         </section>
