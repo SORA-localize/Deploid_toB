@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronLeft, ChevronRight, CameraOff } from 'lucide-react';
+import Image from 'next/image';
 import type { ImageAsset, ImageRole } from '@/data/types';
 import { imageRoleLabels, imageRoleOrder } from '@/lib/labels';
 import { getDisplayableAsset } from '@/lib/media';
@@ -91,19 +92,21 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
               {asset ? (
                 <>
                   {/* 背景：拡大ぼかし（画像比率がバラついても余白を埋める） */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={asset.src}
                     alt=""
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 h-full w-full scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
+                    className="pointer-events-none scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
                   />
                   {/* 前景：全身が欠けないよう contain */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={asset.src}
                     alt={asset.alt}
-                    className="relative z-10 h-full w-full object-contain"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
+                    className="z-10 object-contain"
                   />
                 </>
               ) : (

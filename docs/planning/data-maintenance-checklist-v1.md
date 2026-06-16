@@ -20,6 +20,9 @@
 8. [ ] **公開ゲート必須項目**を充足（→ セクション F）
 9. [ ] `specs` を specSchema にある項目で記入。不明値は**省略**（要確認表示に任せる）
 10. [ ] 画像をローカル配置：`public/images/robots/<id>-<role>.<ext>`（外部ホットリンク禁止）
+    - フォーマット：**WebP 推奨**。JPG/PNG 可
+    - ファイルサイズ：**300KB 以下**（超えたら [Squoosh](https://squoosh.app/) で圧縮）
+    - 最大解像度：**1920px 幅**（`sips -Z 1920 <file>` でリサイズ可）
 11. [ ] 画像 `rights`（credit / sourceUrl / rights）を記入（自動：参照表示系は必須）
 12. [ ] industryTags / taskTags は tagRegistry の登録値のみ（自動：未登録は build 失敗）
 13. [ ] `nextReviewBy` を設定（価格含むなら短め）
@@ -47,6 +50,9 @@
 7. [ ] **`sources[].url` にHTTPアクセスして 404/403 でないことを確認**（公開前の必須チェック。アクセス不可 URL を published 記事に入れない）
 8. [ ] **出典は原則2件以上**。単一ソースのみの場合はその理由を記録し、可能なら追加出典を探してから published にする
 9. [ ] hero画像がある場合は `public/images/articles/<id>/hero.<ext>` に置く（外部ホットリンク禁止）。画像が取れない場合は `src: ''` のままでよい（カードにプレースホルダーが出る。`src: ''` は valid）
+    - フォーマット：**WebP 推奨**。JPG/PNG 可
+    - ファイルサイズ：**300KB 以下**（[Squoosh](https://squoosh.app/) で圧縮）
+    - 最大解像度：**1920px 幅**
 10. [ ] hero画像の `ImageAsset.rights` を記入する（`commercial-permitted` または `reference-attributed` のみ公開可。権利が確認できない画像は `src: ''` のまま公開する。詳細は `docs/planning/copyright_and_media_rights_policy_v1.md`）（自動：空src以外は検証対象）
 11. [ ] `related*Ids` は **id で**結ぶ（自動：参照切れは build 失敗）
 12. [ ] tags は tagRegistry 登録値のみ（`lib/tagRegistry.ts` の `kind: 'article'` の value を使う）

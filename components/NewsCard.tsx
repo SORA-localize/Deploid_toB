@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import { TagChip } from '@/components/TagChip';
@@ -25,13 +26,14 @@ export function NewsCard({ report, className }: NewsCardProps) {
       )}
     >
       {/* 画像エリア */}
-      <div className="hidden sm:block sm:w-28 sm:flex-none sm:self-stretch sm:border-r sm:border-border sm:overflow-hidden sm:bg-muted md:w-auto md:aspect-video md:border-r-0">
+      <div className="relative hidden sm:block sm:w-28 sm:flex-none sm:self-stretch sm:border-r sm:border-border sm:overflow-hidden sm:bg-muted md:w-auto md:aspect-video md:border-r-0">
         {hero ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={hero.src}
             alt={hero.alt}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            fill
+            sizes="(max-width: 768px) 112px, 280px"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full items-center justify-center">

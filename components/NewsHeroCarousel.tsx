@@ -4,6 +4,7 @@ import type { Article } from '@/data/types';
 import { articleTypeLabels } from '@/lib/labels';
 import { getDisplayableAsset } from '@/lib/media';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 import Link from 'next/link';
 import { 
   Carousel, 
@@ -75,10 +76,13 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
                 <Link href={`/reports/${report.slug}`} className="group block relative w-full h-full overflow-hidden">
                   {/* Background Image */}
                   {hero ? (
-                    <img
+                    <Image
                       src={hero.src}
                       alt={hero.alt}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                      fill
+                      priority
+                      sizes="100vw"
+                      className="object-cover transition-transform duration-1000 group-hover:scale-105"
                     />
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">

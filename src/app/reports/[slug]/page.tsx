@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Calendar, Clock, User } from 'lucide-react';
@@ -132,11 +133,13 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           </div>
 
           <figure className="relative overflow-hidden bg-muted min-h-[400px] sm:min-h-[500px] md:min-h-[580px]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={heroImage.src}
               alt={heroImage.alt}
-              className="absolute inset-0 h-full w-full object-cover"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
             />
             <div
               aria-hidden="true"

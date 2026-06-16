@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import type { Robot } from '@/data/types';
 import { getDisplayableAsset } from '@/lib/media';
@@ -29,19 +30,21 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
       {cardImage ? (
         <>
           {/* blur 背景 */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={cardImage.src}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-0 h-full w-full scale-110 object-cover blur-2xl brightness-[85] saturate-150"
+            fill
+            sizes="(max-width: 640px) 100vw, 20vw"
+            className="pointer-events-none z-0 scale-110 select-none object-cover blur-2xl brightness-[85] saturate-150"
           />
           {/* 前景 */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={cardImage.src}
             alt={cardImage.alt}
-            className="pointer-events-none absolute inset-0 z-20 h-full w-full object-contain object-center transition-transform duration-300 group-hover:scale-[1.03]"
+            fill
+            sizes="(max-width: 640px) 100vw, 20vw"
+            className="pointer-events-none z-20 object-contain object-center transition-transform duration-300 group-hover:scale-[1.03]"
           />
         </>
       ) : (

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { CameraOff } from 'lucide-react';
 import type { ImageAsset } from '@/data/types';
 import { getDisplayableAsset } from '@/lib/media';
@@ -29,16 +30,15 @@ export function ManufacturerLogoName({
         <span
           // ロゴは白背景前提のものが多いため、フレームは意図的に白の
           // メディアバックプレートとして残す（ページ/カード面には使わない）。
-          className={`inline-flex shrink-0 items-center justify-center border border-border bg-white ${frameClassName}`}
+          className={`relative inline-flex shrink-0 items-center justify-center border border-border bg-white ${frameClassName}`}
           title={displayLogo.credit}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={displayLogo.src}
             alt=""
             aria-hidden="true"
-            loading="lazy"
-            decoding="async"
+            fill
+            sizes="20px"
             className={`object-contain ${imageClassName}`}
           />
         </span>

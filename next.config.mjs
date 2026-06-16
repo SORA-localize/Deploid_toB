@@ -5,6 +5,9 @@ const nextConfig = {
   turbopack: {
     root: path.resolve('.'),
   },
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
 };
 
 export default nextConfig;

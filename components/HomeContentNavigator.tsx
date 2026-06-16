@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { ArrowRight, BookOpen, Bot, Building2, type LucideIcon } from 'lucide-react';
@@ -168,10 +169,13 @@ export function HomeContentNavigator({
               className="absolute inset-0"
             >
               {primaryAsset ? (
-                <img
+                <Image
                   src={primaryAsset.src}
                   alt={primaryAsset.alt}
-                  className="h-full w-full object-cover opacity-80"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 0px, 60vw"
+                  className="object-cover opacity-80"
                   style={{ objectPosition: primaryAsset.objectPosition ?? 'center' }}
                 />
               ) : (
@@ -210,9 +214,9 @@ export function HomeContentNavigator({
                     initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ ...transition, delay: shouldReduceMotion ? 0 : 0.05 * index }}
-                    className="h-16 overflow-hidden bg-white/92 sm:h-20"
+                    className="relative h-16 overflow-hidden bg-white/92 sm:h-20 p-2"
                   >
-                    <img src={asset.src} alt={asset.alt} className="h-full w-full object-contain p-2" />
+                    <Image src={asset.src} alt={asset.alt} fill sizes="10vw" className="object-contain" />
                   </motion.div>
                 ))}
               </div>

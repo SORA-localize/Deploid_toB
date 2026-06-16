@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronRight, Star, CameraOff } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
@@ -133,15 +134,21 @@ export function RobotCard({
             return hero ? (
               <div className="relative h-full w-full">
                 {/* ぼかし背景: 余白をニュートラルに埋める（透過画像入手後は自動で消える） */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={hero.src}
                   alt=""
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 h-full w-full scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
+                  aria-hidden="true"
+                  fill
+                  sizes="(max-width: 768px) 96px, 25vw"
+                  className="pointer-events-none scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
                 />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={hero.src} alt={hero.alt} className="relative z-10 h-full w-full object-contain" />
+                <Image
+                  src={hero.src}
+                  alt={hero.alt}
+                  fill
+                  sizes="(max-width: 768px) 96px, 25vw"
+                  className="z-10 object-contain"
+                />
               </div>
             ) : (
               <>
