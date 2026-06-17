@@ -23,6 +23,8 @@ interface RobotCardProps {
   showFavorite?: boolean;
   isFavorite?: boolean;
   onFavoriteToggle?: (id: string) => void;
+  /** モバイル幅で画像を大きく・テキストを名前のみに絞った縦カードにする（既定は行カード） */
+  mobileVisual?: boolean;
 }
 
 const TILT_MAX = 5;
@@ -36,9 +38,11 @@ export function RobotCard({
   showFavorite = false,
   isFavorite = false,
   onFavoriteToggle,
+  mobileVisual = false,
 }: RobotCardProps) {
   const specRows = getRobotCardSpecRows(robot);
   const deploymentStageTone = getDeploymentStageTone(robot.deploymentStage);
+  const cardImage = getDisplayableAsset(robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage);
 
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -127,82 +131,122 @@ export function RobotCard({
         </button>
       )}
 
-      <div className="relative z-20 flex flex-row md:flex-col h-full pointer-events-none">
-        <div className="w-20 flex-none self-stretch border-r border-border sm:w-24 md:w-auto md:aspect-[7/6] md:border-r-0 md:border-b bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden">
-          {(() => {
-            const cardImage = getDisplayableAsset(
-              robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage,
-            );
-            return cardImage ? (
-              <div className="relative h-full w-full">
-                {/* ぼかし背景: 余白をニュートラルに埋める */}
-                <Image
-                  src={cardImage.src}
-                  alt=""
-                  aria-hidden="true"
-                  fill
-                  sizes="(max-width: 768px) 96px, 25vw"
-                  className="pointer-events-none scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
-                />
-                <Image
-                  src={cardImage.src}
-                  alt={cardImage.alt}
-                  fill
-                  sizes="(max-width: 768px) 96px, 25vw"
-                  className="z-10 object-contain"
+      {(() => {
+        const imageContent = cardImage ? (
+          <div className="relative h-full w-full">
+            {/* ぼかし背景: 余白をニュートラルに埋める */}
+            <Image
+              src={cardImage.src}
+              alt=""
+              aria-hidden="true"
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              className="pointer-events-none scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
+            />
+            <Image
+              src={cardImage.src}
+              alt={cardImage.alt}
+              fill
+              sizes="(max-width: 768px) 50vw, 25vw"
+              className="z-10 object-contain"
+            />
+          </div>
+        ) : (
+          <>
+            <CameraOff className="w-8 h-8 mb-2 opacity-20" />
+            <span className="text-[10px] uppercase tracking-widest font-medium opacity-60">
+              {uiText.robots.imageRequested}
+            </span>
+            <span className="text-[10px] mt-0.5 opacity-40">
+              {uiText.robots.mainImageMissing}
+            </span>
+          </>
+        );
+
+        const imageBox = (
+          <div className="w-20 flex-none self-stretch border-r border-border sm:w-24 md:w-auto md:aspect-[7/6] md:border-r-0 md:border-b bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden">
+            {imageContent}
+          </div>
+        );
+
+        // モバイル専用: 画像を大きく見せるための正方形枠（PC版と同じ矩形・object-contain）
+        const mobileImageBox = (
+          <div className="w-full aspect-square border-b border-border bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden">
+            {imageContent}
+          </div>
+        );
+
+        const detailContent = (
+          <div className="p-3 md:p-3 flex-1 flex flex-col min-w-0">
+            <div className="flex items-start justify-between mb-1.5">
+              <h3 className="font-semibold text-card-foreground">
+                <Link href={`/robots/${robot.slug}`} className="hover:underline">
+                  {robot.nameJa ?? robot.name}
+                </Link>
+              </h3>
+            </div>
+            <div>
+              <div className="inline-block pointer-events-none md:pointer-events-auto">
+                <ManufacturerLogoName
+                  name={manufacturerName ?? robot.manufacturerId}
+                  logo={manufacturerLogo}
+                  className="mb-1 text-xs text-muted-foreground"
+                  frameClassName="h-4 w-4"
+                  imageClassName="h-3 w-3"
                 />
               </div>
-            ) : (
-              <>
-                <CameraOff className="w-8 h-8 mb-2 opacity-20" />
-                <span className="text-[10px] uppercase tracking-widest font-medium opacity-60">
-                  {uiText.robots.imageRequested}
-                </span>
-                <span className="text-[10px] mt-0.5 opacity-40">
-                  {uiText.robots.mainImageMissing}
-                </span>
-              </>
-            );
-          })()}
-        </div>
-        <div className="p-3 md:p-3 flex-1 flex flex-col min-w-0">
-          <div className="flex items-start justify-between mb-1.5">
-            <h3 className="font-semibold text-card-foreground">
-              <Link href={`/robots/${robot.slug}`} className="hover:underline">
-                {robot.nameJa ?? robot.name}
-              </Link>
-            </h3>
-          </div>
-          <div>
-            <div className="inline-block pointer-events-none md:pointer-events-auto">
-              <ManufacturerLogoName
-                name={manufacturerName ?? robot.manufacturerId}
-                logo={manufacturerLogo}
-                className="mb-1 text-xs text-muted-foreground"
-                frameClassName="h-4 w-4"
-                imageClassName="h-3 w-3"
-              />
+              <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+                {specRows.map((row) => (
+                  <div key={row.label} className={row.label === '段階' ? undefined : 'hidden md:block'}>
+                    <dt className="text-muted-foreground">{row.label}</dt>
+                    <dd
+                      className={cn(
+                        'font-medium',
+                        row.label === '段階'
+                          ? getVisualToneTextClassName(deploymentStageTone)
+                          : 'text-card-foreground',
+                      )}
+                    >
+                      {row.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
-            <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
-              {specRows.map((row) => (
-                <div key={row.label} className={row.label === '段階' ? undefined : 'hidden md:block'}>
-                  <dt className="text-muted-foreground">{row.label}</dt>
-                  <dd
-                    className={cn(
-                      'font-medium',
-                      row.label === '段階'
-                        ? getVisualToneTextClassName(deploymentStageTone)
-                        : 'text-card-foreground',
-                    )}
-                  >
-                    {row.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
           </div>
-        </div>
-      </div>
+        );
+
+        if (!mobileVisual) {
+          return (
+            <div className="relative z-20 flex flex-row md:flex-col h-full pointer-events-none">
+              {imageBox}
+              {detailContent}
+            </div>
+          );
+        }
+
+        return (
+          <>
+            {/* モバイル: 画像を大きく、テキストは名前のみ（PC版と同じ矩形画像枠を流用） */}
+            <div className="relative z-20 flex flex-col h-full pointer-events-none md:hidden">
+              {mobileImageBox}
+              <div className="p-3 flex-1 flex flex-col min-w-0">
+                <h3 className="font-semibold text-card-foreground">
+                  <Link href={`/robots/${robot.slug}`} className="hover:underline">
+                    {robot.nameJa ?? robot.name}
+                  </Link>
+                </h3>
+              </div>
+            </div>
+
+            {/* PC: 既存の行カード（画像枠+詳細） */}
+            <div className="relative z-20 hidden md:flex md:flex-col h-full pointer-events-none">
+              {imageBox}
+              {detailContent}
+            </div>
+          </>
+        );
+      })()}
 
       {/* Accent bottom line */}
       <div

@@ -103,7 +103,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
   }, [filters, filterOptions, manufacturers, updateParams]);
 
   const renderRobotGrid = (items: readonly Robot[]) => (
-    <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+    <div className="robot-card-grid grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       {items.map((robot) => {
         const manufacturer = manufacturerById.get(robot.manufacturerId);
         return (
@@ -115,6 +115,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
             showFavorite={true}
             isFavorite={favorites.includes(robot.id)}
             onFavoriteToggle={toggleFavorite}
+            mobileVisual
           />
         );
       })}
