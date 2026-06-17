@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { getManufacturers, getRobots } from '@/lib/data';
 
 export const metadata = {
   title: 'メーカー・代理店の方へ',
@@ -8,6 +9,9 @@ export const metadata = {
 };
 
 export default function ForManufacturersPage() {
+  const robotCount = getRobots().length;
+  const manufacturerCount = getManufacturers().length;
+
   return (
     <div className="site-container py-8">
       <Breadcrumbs items={[{ label: 'メーカー・代理店の方へ' }]} />
@@ -27,7 +31,7 @@ export default function ForManufacturersPage() {
           <h2 className="text-lg font-semibold text-foreground mb-6">サイト概要</h2>
           <dl className="divide-y divide-border">
             {[
-              { label: '掲載数', body: 'ロボット 51件・メーカー 23社（2026年6月現在）' },
+              { label: '掲載数', body: `ロボット ${robotCount}件・メーカー ${manufacturerCount}社（2026年6月現在）` },
               { label: '公開開始', body: '2026年6月' },
               { label: '運営', body: '慶應義塾大学の学生による個人運営。中立的な情報整理を目的とし、特定製品の推奨・販売を目的とするものではありません。' },
               { label: '目的', body: '日本企業がヒューマノイドの導入可否を判断するための情報を整備、導入の支援をすること。国内市場のヒューマノイドの情報ハブとなることを目指しております。' },
@@ -90,6 +94,23 @@ export default function ForManufacturersPage() {
               </li>
             ))}
           </ol>
+        </section>
+
+        <section className="py-8 border-b border-border">
+          <h2 className="text-lg font-semibold text-foreground mb-6">ご提供いただいた素材の利用範囲</h2>
+          <dl className="divide-y divide-border">
+            {[
+              { label: '利用範囲', body: 'Deploid内の製品紹介ページ・関連記事・SNS告知に限って使用します。第三者への再配布・再ホストは行いません。' },
+              { label: '権利表記', body: 'ご指定いただいたクレジット（出典）を画像の近くに表示します。' },
+              { label: '提携表現', body: '「公式」「提携」「推奨」等、関係性を誤認させる表現は使用しません。' },
+              { label: '削除対応', body: '削除・差し替えのご依頼があれば速やかに対応します。' },
+            ].map(({ label, body }) => (
+              <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
+                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">{label}</dt>
+                <dd className="text-sm text-muted-foreground leading-relaxed">{body}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
 
         <section className="py-8 border-b border-border">
