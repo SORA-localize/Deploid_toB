@@ -38,7 +38,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
               href={manufacturer.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="group pointer-events-auto inline-flex min-w-0 items-center gap-1 text-foreground hover:text-muted-foreground"
+              className="group pointer-events-auto flex min-w-0 items-center gap-1 text-foreground hover:text-muted-foreground"
             >
               <ManufacturerLogoName
                 name={manufacturer.nameJa ?? manufacturer.name}
