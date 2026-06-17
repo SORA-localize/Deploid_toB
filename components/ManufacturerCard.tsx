@@ -52,7 +52,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
           </h2>
         </div>
 
-        <div className="space-y-2 text-xs mb-6">
+        <div className="space-y-2 text-xs">
           <div className="hidden sm:flex justify-between py-1.5 border-b border-border">
             <span className="text-muted-foreground">設立</span>
             <span className="ml-2 sm:ml-4 text-right text-foreground">
