@@ -7,6 +7,7 @@
 - **データ**: ローカル TS データ（`data/*.ts`）。将来 CMS 接続前提
 - **設計ドキュメント**: `docs/planning/`（まず `docs/planning/README.md`）
 - **データ追加ガイド**: `docs/data/README.md`
+- **AI実装ワークフロー**: `ai_implementation_workflow_prompt.md`（計画・実装・レビューの共通プロンプト集。データ追加・更新時の事前確認チェックリストは§8）
 
 ## コマンド
 

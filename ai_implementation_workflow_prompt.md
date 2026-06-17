@@ -422,3 +422,164 @@ npm run test:e2e
 まだ実装は開始しないでください。
 ```
 
+---
+
+## 8. データ実装（`data/*.ts`）専用：事前確認プロセス
+
+ここまで（0〜7）は汎用のソフトウェア実装ワークフロー。本章は **Deploid のデータ層（`data/robots.ts` / `manufacturers.ts` / `articles.ts` / `guides.ts` / `useCases.ts` / `deployments.ts` / `articlePlacements.ts`）にレコードを追加・更新するとき専用**の事前確認プロセス。
+
+対象: ロボット・メーカー・記事・ガイド・ユースケース・導入事例・記事掲載枠の追加または更新。
+目的: 経緯を知らないAIでも、このゲートを順に通せば `id/slug` 設計・正本ルール・出典ルール・画像権利ルールを壊さずに実装できるようにする。
+
+**運用ルール**:
+- 下記 G1〜G11 は **MECE（重複なく・抜けなく）**。実装（ファイル編集）は **全ゲートが「進める」と判定されてから**着手する。
+- いずれかのゲートが「止める」と判定されたら、その場でユーザーに確認するか、一次情報を再調査する。憶測で埋めて先に進まない。
+- 各ゲートで読むべき正本ファイルを明記している。読まずに記憶や一般知識で代替しない。
+
+### G1. コレクションと作業種別の確定
+
+- どのコレクションか：`robots` / `manufacturers` / `articles` / `guides` / `useCases` / `deployments` / `articlePlacements` のどれか1つに確定する。
+- 新規追加か既存更新か：`docs/data/README.md` の「更新か新規追加かの判断」を読み、判断する。
+  - 同一個体の名称・スペック・価格・状態・出典の変化 → **既存レコード更新**（新規IDを作らない）。
+  - 公式に別モデル・別世代・別SKU・別法人 → **新規レコード**。
+- 判断に迷う場合（情報が確定しない、公式が別モデル扱いか不明）は、新規作成せず、ユーザーに「既存更新案」と「新規追加案」を両方示して確認する。
+- 参照: `docs/data/README.md`、`docs/planning/data-maintenance-checklist-v1.md` の該当セクション（robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / guides=L / useCases=M / deployments=N / articlePlacements=O）。
+
+### G2. 一次情報の確保（コードを書く前）
+
+- 公式サイト・公式プレスリリース・信頼できる報道のうち、**少なくとも1件のURLを実際に開いて内容を確認**したか。
+- 価格・スペック・代理店・導入状況など事実値は、確認した一次情報の範囲だけを転記する。一次情報に無い値を推測・補完しない。
+- 確認できなかった項目は記入せず省略する（型がOptionalな項目）。省略できない必須項目で確認できない場合はG1に戻ってユーザーに確認する。
+- 参照: CLAUDE.md「ロボットデータの扱い」、`docs/planning/data-maintenance-checklist-v1.md` A-1 / B系 / C-1。
+
+### G3. id / slug の確定（新規追加時のみ）
+
+- `id` は小文字・ハイフン・英数のみで発番し、**発番後は変更しない**前提で決めたか。
+- 初期状態は `id === slug` にしたか。
+- 既存の `id` と衝突しないか（`data/robots.ts` 等を grep で確認）。
+- ロボット・記事等の `name` / `title` にメーカー名を重複させていないか（メーカー名は `manufacturerId` から別表示されるため、`name` はモデル名のみ。例: `Unitree G1` ではなく `G1`）。
+- slug変更（既存レコードの命名修正）の場合は `id` と全ての `*Id` / `*Ids` 参照を**触らず**、旧 `slug` を `previousSlugs` に追記する。
+- 参照: `docs/planning/data-architecture-redesign-v1.md` §3、`docs/planning/data-maintenance-checklist-v1.md` D。
+
+### G4. 型必須フィールドの網羅（公開ゲート要件）
+
+- 対象コレクションの型定義を `data/types.ts` で確認し、必須フィールド（`?` が付いていないフィールド）を一覧化したか。
+- `docs/planning/data-maintenance-checklist-v1.md` F章（公開ゲート）の該当コレクション表で、`published` に必要な項目を満たしているか。
+- 満たせない必須項目がある場合、`publishStatus: 'draft'` のまま進める（G9参照）。
+- 参照: `data/types.ts`、`docs/planning/data-maintenance-checklist-v1.md` F。
+
+### G5. 参照整合性（id参照）
+
+- `manufacturerId` / `relatedRobotIds` / `candidateRobotIds` / `supersededById` など `*Id` / `*Ids` フィールドはすべて **既存の `id`** を指しているか（`slug` を書いていないか）。
+- 参照先のレコードが実在するか（`data/*.ts` 内を grep して確認。存在しなければ `npm run validate:data` がエラーにする）。
+- `guides` ⇄ `useCases` のように双方向参照が必要なコレクションでは、相手側の `related*Ids` にも自分の `id` を追記したか。
+- 参照: `docs/planning/data-architecture-redesign-v1.md` §3-2 / §6、`docs/data/README.md`「参照とタグの追加手順」。
+
+### G6. 出典・信頼度・鮮度
+
+- `sources` は空配列にしていないか（多くのコレクションで必須。空だと `npm run validate:data` がエラーにする）。
+- 各 `sources[]` に `title` / `url` / `checkedAt`（確認日）/ `reliability`（`verified`/`official`/`reported`/`estimated`）を入れたか。
+- レコード直下の `reliability` / `updatedAt` も今回確認した内容に合わせて更新したか。
+- 価格・代理店・在庫など揮発性が高い値を含む場合、`nextReviewBy` を短め（90日程度）に設定したか（任意項目だが推奨）。
+- 参照: `data/types.ts` の `Source`、`docs/planning/data-maintenance-checklist-v1.md` G。
+
+### G7. スペック・タグ・enum は正本のみを使う（直書き禁止）
+
+- スペック値を書く場合、キーは `lib/specSchema.ts` に登録済みのものだけを使ったか（未登録キーを直書きしていないか）。新しい項目が必要な場合は、先に `specSchema.ts` に1行追加してから値を入れる。
+- `industryTags` / `taskTags` 等のタグ値は `lib/tagRegistry.ts` に登録済みの `value` だけを使ったか。新しいタグが必要な場合は、先に `tagRegistry.ts` に追加してから付与する。
+- `requiredCapabilities`（UseCase）には `Capability` 型の値のみを使い、`tagRegistry.ts` のタグ value と混同していないか。
+- 新しい enum 値を追加する場合、型定義 ＋ `lib/labels.ts`（表示ラベル）＋ `lib/display.ts`（表示順）の3箇所をセットで更新したか（1箇所だけの更新で終わっていないか）。
+- 参照: `lib/specSchema.ts`、`lib/tagRegistry.ts`、`lib/labels.ts`、`lib/display.ts`、`docs/planning/data-maintenance-checklist-v1.md` I。
+
+### G8. 画像・権利
+
+- 画像の `rights.status` / `rights.sourceType` / `rights.checkedAt` を入れたか（`ImageAsset.rights` は必須フィールド）。
+- 権利が確認できていない画像は `src: ''`（プレースホルダ）のままにしたか（`commercial-permitted` または `reference-attributed` 以外の状態で実画像を公開していないか）。
+- ローカル画像を配置する場合、外部ホットリンクではなく `public/images/<collection>/<id>-<role>.<ext>` に置いたか（フォーマット: WebP推奨・300KB以下・最大1920px幅）。
+- 参照: `docs/planning/copyright_and_media_rights_policy_v1.md`、`docs/data/README.md`「素材を受け取ったときの置き場所」、`docs/planning/data-maintenance-checklist-v1.md` A-10/A-11。
+
+### G9. publishStatus の初期値とドラフト運用
+
+- 新規レコードは原則 `publishStatus: 'draft'` で作成したか（G4の必須項目が全部埋まっていてもユーザーの最終確認前に `published` にしない）。
+- 既存レコードを更新するだけの場合、現在の `publishStatus` を意図せず変更していないか。
+- 提供終了したレコードは削除せず `publishStatus: 'archived'` にし、後継機がある場合は `supersededById` を設定したか。
+- 参照: `docs/planning/data-maintenance-checklist-v1.md` A-4 / E。
+
+### G10. 検証コマンドの実行
+
+- `npm run validate:data` を実行し、`error` が0件であることを確認したか（warningは把握するが実行は止めない）。
+- 表示に影響する変更（UI側コードも触った場合など）は `npm run build` まで通したか。
+- 検証を実行していない状態で「問題なし」と報告していないか。
+- 参照: README.md「コマンド」、`docs/data/README.md`「検証コマンド」。
+
+### G11. 完了報告のフォーマット
+
+実装後、ユーザーには以下を明示する。
+
+- 変更したファイルと、追加/更新したレコードの `id`
+- `publishStatus` の最終値（`draft` のままなら、`published` にするために何を確認すべきか）
+- 一次情報で確認できた項目と、確認できず省略・要確認にした項目
+- 実行した検証コマンドと結果
+- 公開前にユーザー自身が確認すべき残作業（価格・代理店・画像権利など）
+
+---
+
+### 8.12 コピー用チェックリスト（実装前にAIへ渡す）
+
+```text
+data/*.ts にレコードを追加・更新する前に、以下を順に確認してください。
+全て「進める」と判定できるまで、ファイルの編集を開始しないでください。
+
+G1 コレクションと作業種別:
+- 対象コレクションを1つに確定したか（robots/manufacturers/articles/guides/useCases/deployments/articlePlacements）
+- docs/data/README.md「更新か新規追加かの判断」に従い、新規追加か既存更新かを判定したか
+- 迷う場合は新規作成せず、既存更新案と新規案を両方提示してユーザーに確認したか
+
+G2 一次情報:
+- 公式サイト/プレスリリース/信頼できる報道のURLを実際に開いて確認したか
+- 確認した範囲だけを転記し、確認できない必須項目はユーザーに確認したか
+
+G3 id/slug:
+- id は小文字・ハイフン・英数で発番し、既存と衝突しないか確認したか
+- 初期状態で id === slug にしたか
+- name/title にメーカー名を重複させていないか
+- slug変更の場合、id・参照は触らず previousSlugs に旧slugを追記したか
+
+G4 型必須フィールド:
+- data/types.ts で対象コレクションの必須フィールドを確認したか
+- data-maintenance-checklist-v1.md F章の公開ゲート表を満たしているか
+
+G5 参照整合性:
+- *Id/*Ids フィールドは slug ではなく既存の id を指しているか
+- 参照先レコードが実在するか確認したか
+- 双方向参照が必要なコレクションは相手側にも追記したか
+
+G6 出典・信頼度:
+- sources が空でないか、title/url/checkedAt/reliability を入れたか
+- レコード直下の reliability/updatedAt を今回の確認内容に合わせたか
+
+G7 スペック/タグ/enum:
+- specs のキーは lib/specSchema.ts 登録済みのみ使ったか
+- タグは lib/tagRegistry.ts 登録済みの value のみ使ったか
+- 新しいenum値を追加した場合、型定義+labels.ts+display.tsの3箇所を更新したか
+
+G8 画像・権利:
+- ImageAsset.rights（status/sourceType/checkedAt）を入れたか
+- 権利未確認の画像は src: '' のままにしたか
+- ローカル画像は public/images/<collection>/<id>-<role>.<ext> に置いたか
+
+G9 publishStatus:
+- 新規レコードは publishStatus: 'draft' で作成したか
+- 提供終了レコードは archived + supersededById にしたか
+
+G10 検証:
+- npm run validate:data を実行し error 0件を確認したか
+- UI変更を伴う場合 npm run build まで通したか
+
+G11 完了報告:
+- 変更ファイル、レコードid、publishStatus、確認済み/要確認項目、検証結果、
+  ユーザーが公開前に確認すべき残作業を明示したか
+
+いずれかが未確認・未達成の場合は、その項目を解消するかユーザーに確認してから実装してください。
+```
+

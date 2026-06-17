@@ -17,7 +17,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 設計と意思決定は `docs/planning/` のドキュメント群に集約されている。コードを書く前に必ず参照する：
 
 - `docs/planning/README.md` — ドキュメント地図（迷ったらまずこれ。矛盾時の優先順位もここ）
-- `ai_implementation_workflow_prompt.md` — AI実装・調査・レビューの共通ワークフロー
+- `ai_implementation_workflow_prompt.md` — AI実装・調査・レビューの共通ワークフロー（§8: データ実装の事前確認チェックリスト）
 - `docs/data/README.md` — AIでデータ追加・更新を行うときの入口
 - `docs/planning/data-maintenance-checklist-v1.md` — データ追加、slug変更、公開前確認、鮮度レビュー
 - `docs/planning/data-architecture-redesign-v1.md` — id/slug分離、参照設計、正本管理

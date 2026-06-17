@@ -21,7 +21,7 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / guide
 
 ## 事前に見るもの
 
-- `../../ai_implementation_workflow_prompt.md` — AI作業の共通手順
+- `../../ai_implementation_workflow_prompt.md` — AI作業の共通手順（§8にデータ実装＝`data/*.ts` 追加・更新の事前確認チェックリスト）
 - `../planning/data-maintenance-checklist-v1.md` — 追加・公開・slug変更・鮮度レビューのチェックリスト
 - `../planning/data-architecture-redesign-v1.md` — id/slug分離、参照、正本設計
 - `../planning/copyright_and_media_rights_policy_v1.md` — 画像・ロゴ・引用を扱う場合
