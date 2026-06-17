@@ -344,6 +344,14 @@ tones：
 className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
 ```
 
+カードグリッド（ロボット・記事など `.card-data` 系の一覧）は、画面が広いときさらに列を増やす：
+
+```tsx
+className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
+```
+
+一覧ページ（`/robots`・`/reports`）だけでなく、詳細ページに埋め込む小さな一覧（例: メーカー詳細ページ内の取扱ロボット・関連記事グリッド）も同じ列数に揃える。`lg:grid-cols-3` で止めると、同じ `site-container` 内で一覧ページより列が少なくなり、カードが不自然に大きく見える。
+
 filter grid：
 
 ```tsx
@@ -444,7 +452,7 @@ UI文言：
 
 - データ単位（ロボットカード・メーカーカード）には `.card-data` を使う
 - ナビゲーション要素（RelatedLinkList・サイドバーウィジェット）はボックスを維持する
-- 一覧ページのグリッドに `xl:grid-cols-4` まで使う（既実装）
+- 一覧ページ・詳細ページ内の埋め込みグリッドともに `xl:grid-cols-4 2xl:grid-cols-5` まで使う（既実装。§8参照）
 
 ### 実装参照基準
 
