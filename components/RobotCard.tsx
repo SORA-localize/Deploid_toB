@@ -132,47 +132,48 @@ export function RobotCard({
       )}
 
       {(() => {
-        const imageContent = cardImage ? (
-          <div className="relative h-full w-full">
-            {/* ぼかし背景: 余白をニュートラルに埋める */}
-            <Image
-              src={cardImage.src}
-              alt=""
-              aria-hidden="true"
-              fill
-              sizes="(max-width: 768px) 50vw, 25vw"
-              className="pointer-events-none scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
-            />
-            <Image
-              src={cardImage.src}
-              alt={cardImage.alt}
-              fill
-              sizes="(max-width: 768px) 50vw, 25vw"
-              className="z-10 object-contain"
-            />
-          </div>
-        ) : (
-          <>
-            <CameraOff className="w-8 h-8 mb-2 opacity-20" />
-            <span className="text-[10px] uppercase tracking-widest font-medium opacity-60">
-              {uiText.robots.imageRequested}
-            </span>
-            <span className="text-[10px] mt-0.5 opacity-40">
-              {uiText.robots.mainImageMissing}
-            </span>
-          </>
-        );
+        const renderImageContent = (sizes: string) =>
+          cardImage ? (
+            <div className="relative h-full w-full">
+              {/* ぼかし背景: 余白をニュートラルに埋める */}
+              <Image
+                src={cardImage.src}
+                alt=""
+                aria-hidden="true"
+                fill
+                sizes={sizes}
+                className="pointer-events-none scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
+              />
+              <Image
+                src={cardImage.src}
+                alt={cardImage.alt}
+                fill
+                sizes={sizes}
+                className="z-10 object-contain"
+              />
+            </div>
+          ) : (
+            <>
+              <CameraOff className="w-8 h-8 mb-2 opacity-20" />
+              <span className="text-[10px] uppercase tracking-widest font-medium opacity-60">
+                {uiText.robots.imageRequested}
+              </span>
+              <span className="text-[10px] mt-0.5 opacity-40">
+                {uiText.robots.mainImageMissing}
+              </span>
+            </>
+          );
 
         const imageBox = (
           <div className="w-20 flex-none self-stretch border-r border-border sm:w-24 md:w-auto md:aspect-[7/6] md:border-r-0 md:border-b bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden">
-            {imageContent}
+            {renderImageContent('(max-width: 768px) 96px, 25vw')}
           </div>
         );
 
         // モバイル専用: 画像を大きく見せるための正方形枠（PC版と同じ矩形・object-contain）
         const mobileImageBox = (
           <div className="w-full aspect-square border-b border-border bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden">
-            {imageContent}
+            {renderImageContent('50vw')}
           </div>
         );
 
