@@ -7,7 +7,6 @@ export const uiText = {
     allRegions: 'すべての地域',
     allStatus: 'すべてのステータス',
     clearAll: 'すべて解除',
-    viewDetails: '詳細を見る',
     viewProfile: '詳細を見る',
     website: '公式サイト',
     contact: '問い合わせ',

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronRight, Star, CameraOff } from 'lucide-react';
+import { Star, CameraOff } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { useRef } from 'react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
@@ -128,14 +128,16 @@ export function RobotCard({
       )}
 
       <div className="relative z-20 flex flex-row md:flex-col h-full pointer-events-none">
-        <div className="w-20 flex-none self-stretch border-r border-border sm:w-24 md:w-auto md:aspect-[4/3] md:border-r-0 md:border-b bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden">
+        <div className="w-20 flex-none self-stretch border-r border-border sm:w-24 md:w-auto md:aspect-[7/6] md:border-r-0 md:border-b bg-muted flex flex-col items-center justify-center text-muted-foreground overflow-hidden">
           {(() => {
-            const hero = getDisplayableAsset(robot.images?.hero ?? robot.heroImage);
-            return hero ? (
+            const cardImage = getDisplayableAsset(
+              robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage,
+            );
+            return cardImage ? (
               <div className="relative h-full w-full">
-                {/* ぼかし背景: 余白をニュートラルに埋める（透過画像入手後は自動で消える） */}
+                {/* ぼかし背景: 余白をニュートラルに埋める */}
                 <Image
-                  src={hero.src}
+                  src={cardImage.src}
                   alt=""
                   aria-hidden="true"
                   fill
@@ -143,8 +145,8 @@ export function RobotCard({
                   className="pointer-events-none scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
                 />
                 <Image
-                  src={hero.src}
-                  alt={hero.alt}
+                  src={cardImage.src}
+                  alt={cardImage.alt}
                   fill
                   sizes="(max-width: 768px) 96px, 25vw"
                   className="z-10 object-contain"
@@ -163,8 +165,8 @@ export function RobotCard({
             );
           })()}
         </div>
-        <div className="p-3 md:p-4 flex-1 flex flex-col min-w-0">
-          <div className="flex items-start justify-between mb-2">
+        <div className="p-3 md:p-3 flex-1 flex flex-col min-w-0">
+          <div className="flex items-start justify-between mb-1.5">
             <h3 className="font-semibold text-card-foreground">
               <Link href={`/robots/${robot.slug}`} className="hover:underline">
                 {robot.nameJa ?? robot.name}
@@ -181,7 +183,7 @@ export function RobotCard({
                 imageClassName="h-3 w-3"
               />
             </div>
-            <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 text-xs mb-0 md:mb-4">
+            <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
               {specRows.map((row) => (
                 <div key={row.label} className={row.label === '段階' ? undefined : 'hidden md:block'}>
                   <dt className="text-muted-foreground">{row.label}</dt>
@@ -198,12 +200,6 @@ export function RobotCard({
                 </div>
               ))}
             </dl>
-          </div>
-          <div className="mt-auto hidden md:flex items-center justify-between pt-3 border-t border-border">
-            <span className="text-xs text-muted-foreground">
-              {uiText.common.viewDetails}
-            </span>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </div>
         </div>
       </div>
