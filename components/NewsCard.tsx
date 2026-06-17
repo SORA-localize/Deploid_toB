@@ -1,8 +1,7 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Calendar, Clock } from 'lucide-react';
+import { BudouXText } from '@/components/BudouXText';
 import { TagChip } from '@/components/TagChip';
 import type { Article } from '@/data/types';
 import { articleTypeLabels } from '@/lib/labels';
@@ -63,7 +62,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
         </div>
 
         <h3 className="mb-2 line-clamp-3 text-sm font-semibold leading-snug text-foreground">
-          {report.titleJa ?? report.title}
+          <BudouXText text={report.titleJa ?? report.title} />
         </h3>
 
         <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">
