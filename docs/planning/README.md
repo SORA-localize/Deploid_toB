@@ -7,7 +7,7 @@ Last cleaned: 2026-06-13
 
 ## まず読むもの
 
-- `../../ai_implementation_workflow_prompt.md` — AIに計画、実装、レビューを任せるときの共通手順
+- `../../ai_implementation_workflow_prompt.md` — AIに計画、実装、レビューを任せるときの共通手順（§8: データ実装＝`data/*.ts` 追加・更新の事前確認チェックリスト）
 - `../data/README.md` — AIでデータ追加・更新を行うときの入口
 - `data-maintenance-checklist-v1.md` — データ追加、slug変更、公開前確認、鮮度レビューの実行チェックリスト
 - `data-architecture-redesign-v1.md` — id/slug分離、参照設計、正本管理、CMS移行を見据えたデータ設計
