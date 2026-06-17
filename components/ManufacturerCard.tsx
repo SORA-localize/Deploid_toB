@@ -12,7 +12,6 @@ import {
   getRepresentativeRobotLabel,
   manufacturerConsultationRouteLabels,
 } from '@/lib/manufacturerDisplay';
-import { uiText } from '@/lib/uiText';
 
 interface ManufacturerCardProps {
   manufacturer: Manufacturer;
@@ -22,17 +21,14 @@ interface ManufacturerCardProps {
 export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps) {
   const consultationRoute = getManufacturerConsultationRoute(manufacturer);
   const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
-  const optionalRowClass = 'hidden sm:flex';
 
   return (
     <div className="card-data relative overflow-hidden">
-      {/* カード全体を詳細ページへのリンクに（マウス用の便宜リンク。
-          キーボード/SRは下部の「プロフィールを見る」を正規導線とする）。
+      {/* カード全体を詳細ページへのリンクに（キーボード/SRからもこのリンクで遷移できる正規導線）。
           内側の外部HPリンク・代理店リンク/メニューは pointer-events-auto で温存。 */}
       <Link
         href={`/manufacturers/${manufacturer.slug}`}
-        aria-hidden="true"
-        tabIndex={-1}
+        aria-label={manufacturer.nameJa ?? manufacturer.name}
         className="absolute inset-0"
       />
       <div className="relative z-10 p-4 sm:p-6 pointer-events-none">
@@ -57,40 +53,40 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
         </div>
 
         <div className="space-y-2 text-xs mb-6">
-          <div className="flex justify-between py-1.5 border-b border-border">
+          <div className="hidden sm:flex justify-between py-1.5 border-b border-border">
             <span className="text-muted-foreground">設立</span>
             <span className="ml-2 sm:ml-4 text-right text-foreground">
               {getManufacturerEstablishedRegionLabel(manufacturer)}
             </span>
           </div>
-          <div className={`${optionalRowClass} justify-between py-1.5 border-b border-border`}>
-            <span className="text-muted-foreground">代表ロボット</span>
-            <span className="ml-2 sm:ml-4 truncate text-right text-foreground">
+          <div className="flex justify-between py-1.5 border-b border-border">
+            <span className="shrink-0 text-muted-foreground">代表ロボット</span>
+            <span className="ml-2 sm:ml-4 min-w-0 truncate text-right text-foreground">
               {getRepresentativeRobotLabel(robots)}
             </span>
           </div>
-          <div className="flex justify-between py-1.5 sm:border-b border-border">
+          <div className="hidden sm:flex justify-between py-1.5 border-b border-border">
             <span className="text-muted-foreground">相談ルート</span>
             <span className="ml-2 sm:ml-4 text-right text-foreground">
               {manufacturerConsultationRouteLabels[consultationRoute]}
             </span>
           </div>
-          <div className={`${optionalRowClass} justify-between py-1.5`}>
-            <span className="text-muted-foreground">国内代理店</span>
+          <div className="flex justify-between py-1.5">
+            <span className="shrink-0 text-muted-foreground">国内代理店</span>
             {domesticDistributor.hasDistributor ? (
-              <div className="pointer-events-auto ml-2 sm:ml-4 text-right">
+              <div className="pointer-events-auto ml-2 min-w-0 sm:ml-4 text-right">
                 {domesticDistributor.distributors.length === 1 ? (
                   domesticDistributor.distributors[0].website ? (
                     <a
                       href={domesticDistributor.distributors[0].website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
+                      className="block truncate text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
                     >
                       {domesticDistributor.label}
                     </a>
                   ) : (
-                    <span className="text-xs font-normal leading-normal text-foreground">
+                    <span className="block truncate text-xs font-normal leading-normal text-foreground">
                       {domesticDistributor.label}
                     </span>
                   )
@@ -99,7 +95,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
                     <PopoverPrimitive.Trigger asChild>
                       <button
                         type="button"
-                        className="text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
+                        className="block max-w-full truncate text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
                       >
                         {domesticDistributor.label}
                       </button>
@@ -135,20 +131,13 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
             ) : (
               <Link
                 href="/contact"
-                className="pointer-events-auto ml-2 sm:ml-4 text-right text-xs font-normal text-signal hover:text-signal/80"
+                className="pointer-events-auto ml-2 min-w-0 truncate text-right text-xs font-normal text-signal hover:text-signal/80 sm:ml-4"
               >
                 {domesticDistributor.label}
               </Link>
             )}
           </div>
         </div>
-
-        <Link
-          href={`/manufacturers/${manufacturer.slug}`}
-          className="pointer-events-auto ml-auto flex w-fit border-b border-foreground pb-0.5 text-xs leading-none text-foreground transition-colors hover:border-foreground/40 hover:text-muted-foreground"
-        >
-          <span>{uiText.common.viewProfile}</span>
-        </Link>
       </div>
     </div>
   );
