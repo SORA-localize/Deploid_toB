@@ -11,7 +11,7 @@ export const siteNavItems: SiteNavItem[] = [
   { label: '用途から探す', path: '/use-cases', footerLabel: '用途' },
   { label: '記事', path: '/reports' },
   { label: 'ガイド', path: '/guides' },
-  { label: '会社概要', path: '/about', footerLabel: 'サイトについて' },
+  { label: '会社概要', path: '/about' },
   { label: 'お問い合わせ', path: '/contact' },
 ];
 
@@ -20,6 +20,7 @@ export const footerNavItems = [
     ...item,
     label: item.footerLabel ?? item.label,
   })),
+  { label: 'メーカー・代理店の方へ', path: '/for-manufacturers' },
   { label: 'プライバシーポリシー', path: '/privacy' },
 ];
 

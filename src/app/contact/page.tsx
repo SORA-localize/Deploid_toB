@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ContactForm } from '@/components/ContactForm';
 
@@ -19,6 +20,16 @@ export default function ContactPage() {
         </h1>
         <p className="text-sm text-muted-foreground max-w-3xl leading-relaxed">
           ロボット情報の修正、メーカー・代理店の掲載相談、取材相談、導入検討に関する相談を受け付けています。
+        </p>
+        <p className="text-sm text-muted-foreground mt-3">
+          メーカー・代理店の方は
+          <Link
+            href="/for-manufacturers"
+            className="text-signal hover:text-signal/80 underline underline-offset-2 transition-colors mx-0.5"
+          >
+            掲載情報の確認・提供について
+          </Link>
+          もご覧ください。
         </p>
       </section>
 
