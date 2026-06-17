@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import {
   getRelatedGuides,
@@ -56,7 +57,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
             ]}
           />
           <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-4 leading-tight">
-            {useCase.titleJa ?? useCase.title}
+            <BudouXText text={useCase.titleJa ?? useCase.title} />
           </h1>
           {useCase.sources.length === 0 && (
             <div className="mb-4 flex items-start gap-2 border border-border bg-muted/50 p-3 text-xs text-muted-foreground">

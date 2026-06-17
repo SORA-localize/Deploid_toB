@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
 import { ArticleToc } from '@/components/ArticleToc';
+import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Markdown } from '@/components/Markdown';
 import { RelatedLinkList } from '@/components/RelatedLinkList';
@@ -78,7 +79,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
             {guide.topics[0] ? getTagLabel(guide.topics[0], 'guide-topic') : null}
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-4 leading-tight max-w-4xl">
-            {guide.titleJa ?? guide.title}
+            <BudouXText text={guide.titleJa ?? guide.title} />
           </h1>
           <p className="text-sm text-foreground/80 leading-relaxed max-w-3xl mb-5">{guide.summary}</p>
           <div className="flex items-center gap-5 text-xs text-muted-foreground mb-4 pb-5 border-b border-border flex-wrap">

@@ -4,6 +4,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { Calendar, Clock, User } from 'lucide-react';
 import { ArticleRelatedSidebar } from '@/components/ArticleRelatedSidebar';
 import { ArticleToc } from '@/components/ArticleToc';
+import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
 import { Markdown } from '@/components/Markdown';
@@ -157,7 +158,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   {articleTypeLabels[report.type]}
                 </div>
                 <h1 className="mb-3 text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white">
-                  {reportTitle}
+                  <BudouXText text={reportTitle} />
                 </h1>
                 <p className="mb-4 text-sm sm:text-base leading-relaxed text-white/80">
                   {report.summary}
@@ -195,7 +196,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               {articleTypeLabels[report.type]}
             </div>
             <h1 className="mb-4 max-w-4xl text-2xl md:text-3xl font-semibold leading-tight text-foreground">
-              {reportTitle}
+              <BudouXText text={reportTitle} />
             </h1>
             <p className="mb-5 max-w-3xl text-sm leading-relaxed text-foreground/80">
               {report.summary}
