@@ -24,6 +24,7 @@ import { articleJsonLd, breadcrumbJsonLd } from '@/lib/jsonLd';
 import { articleTypeLabels } from '@/lib/labels';
 import { extractH2Headings } from '@/lib/markdownHeadings';
 import { getDisplayableAsset } from '@/lib/media';
+import { shouldIndexArticle } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
 import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { record: report } = resolveArticleDetailBySlug(slug);
   const seo = report?.seo;
   // sample（UI確認用データ）は検索に載せない（§11.9）
-  const noindex = seo?.noindex || report?.contentKind === 'sample';
+  const noindex = report ? !shouldIndexArticle(report) : seo?.noindex;
   const title = seo?.metaTitle ?? (report ? (report.titleJa ?? report.title) : 'Article');
 
   return createPageMetadata({
@@ -133,8 +134,10 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
       <JsonLd
         data={breadcrumbJsonLd([
           { name: 'ホーム', path: '/' },
-          { name: uiText.reports.breadcrumb, path: '/reports' },
-          { name: reportTitle, path: `/reports/${report.slug}` },
+          ...breadcrumbItems.map((item) => ({
+            name: item.label,
+            path: item.path ?? `/reports/${report.slug}`,
+          })),
         ])}
       />
 

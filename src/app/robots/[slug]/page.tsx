@@ -20,6 +20,7 @@ import {
 } from '@/lib/data';
 import { breadcrumbJsonLd, robotJsonLd } from '@/lib/jsonLd';
 import { getDisplayableAsset } from '@/lib/media';
+import { shouldIndexRobot } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
 import { sortRobots } from '@/lib/display';
 import { getRobotDetailDecisionRows, getRobotDetailSpecRows } from '@/lib/robotDisplay';
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { record: robot } = resolveRobotDetailBySlug(slug);
   const seo = robot?.seo;
   // archived（提供終了）は閲覧可能だが検索には載せない（§11.7）
-  const noindex = seo?.noindex || robot?.publishStatus === 'archived';
+  const noindex = robot ? !shouldIndexRobot(robot) : seo?.noindex;
   const title = seo?.metaTitle ?? (robot ? (robot.nameJa ?? robot.name) : 'Robot');
   const image = getDisplayableAsset(robot?.images?.hero ?? robot?.heroImage)?.src;
 
@@ -74,6 +75,13 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
   const specRows = getRobotDetailSpecRows(robot, manufacturer);
   const decisionRows = getRobotDetailDecisionRows(robot);
+  const breadcrumbItems = [
+    { label: uiText.robots.breadcrumb, path: '/robots' },
+    ...(manufacturer
+      ? [{ label: manufacturer.name, path: `/manufacturers/${manufacturer.slug}` }]
+      : []),
+    { label: robot.nameJa ?? robot.name },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,11 +89,10 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
       <JsonLd
         data={breadcrumbJsonLd([
           { name: 'ホーム', path: '/' },
-          { name: uiText.robots.breadcrumb, path: '/robots' },
-          ...(manufacturer
-            ? [{ name: manufacturer.nameJa ?? manufacturer.name, path: `/manufacturers/${manufacturer.slug}` }]
-            : []),
-          { name: robot.nameJa ?? robot.name, path: `/robots/${robot.slug}` },
+          ...breadcrumbItems.map((item) => ({
+            name: item.label,
+            path: item.path ?? `/robots/${robot.slug}`,
+          })),
         ])}
       />
 
@@ -93,13 +100,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
       <div className="site-container py-8">
         <Breadcrumbs
-          items={[
-            { label: uiText.robots.breadcrumb, path: '/robots' },
-            ...(manufacturer
-              ? [{ label: manufacturer.name, path: `/manufacturers/${manufacturer.slug}` }]
-              : []),
-            { label: robot.nameJa ?? robot.name },
-          ]}
+          items={breadcrumbItems}
         />
 
         {/* 提供終了通知（archived のみ）。旧モデル情報も判断材料として残す（設計 §6.5-2） */}

@@ -16,6 +16,7 @@ import {
   resolveGuideDetailBySlug,
 } from '@/lib/data';
 import { breadcrumbJsonLd, guideJsonLd } from '@/lib/jsonLd';
+import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { guideStageLabels } from '@/lib/labels';
 import { createPageMetadata } from '@/lib/metadata';
 import { getRobotRelatedTitle } from '@/lib/robotDisplay';
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: seo?.metaDescription ?? guide?.summary,
     path: guide ? `/guides/${guide.slug}` : undefined,
     type: 'article',
-    noindex: seo?.noindex,
+    noindex: guide ? !shouldIndexPublishedRecord(guide) : seo?.noindex,
   });
 }
 

@@ -8,8 +8,12 @@ export const defaultSocialDescription =
 
 const defaultOgImage = '/opengraph-image';
 
+function isBrandedTitle(title: string) {
+  return title === 'Deploid' || title === defaultSiteTitle || title.endsWith(' | Deploid');
+}
+
 function socialTitle(title: string) {
-  return title.includes('Deploid') ? title : `${title} | Deploid`;
+  return isBrandedTitle(title) ? title : `${title} | Deploid`;
 }
 
 export function createPageMetadata({
@@ -30,7 +34,7 @@ export function createPageMetadata({
   const resolvedDescription = description ?? defaultSiteDescription;
   const resolvedSocialTitle = socialTitle(title);
   const resolvedImage = image || defaultOgImage;
-  const metadataTitle = title.includes('Deploid') ? { absolute: title } : title;
+  const metadataTitle = isBrandedTitle(title) ? { absolute: title } : title;
 
   return {
     title: metadataTitle,

@@ -17,6 +17,7 @@ import {
   getRobotsByManufacturerId,
 } from '@/lib/data';
 import { sortRobots } from '@/lib/display';
+import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { breadcrumbJsonLd, manufacturerJsonLd } from '@/lib/jsonLd';
 import { createPageMetadata } from '@/lib/metadata';
 import { uiText } from '@/lib/uiText';
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title,
     description: seo?.metaDescription ?? manufacturer?.description,
     path: manufacturer ? `/manufacturers/${manufacturer.slug}` : undefined,
-    noindex: seo?.noindex,
+    noindex: manufacturer ? !shouldIndexPublishedRecord(manufacturer) : seo?.noindex,
   });
 }
 

@@ -28,7 +28,7 @@ export function robotJsonLd(robot: Robot, manufacturer?: Manufacturer) {
     name: robot.name,
     ...(robot.nameJa && robot.nameJa !== robot.name ? { alternateName: robot.nameJa } : {}),
     description: robot.summary,
-    url: `${siteUrl}/robots/${robot.slug}`,
+    url: absoluteUrl(`/robots/${robot.slug}`),
     ...(image ? { image } : {}),
     ...(manufacturer
       ? { brand: { '@type': 'Brand', name: manufacturer.name } }
@@ -47,7 +47,7 @@ export function manufacturerJsonLd(manufacturer: Manufacturer) {
       ? { alternateName: manufacturer.nameJa }
       : {}),
     description: manufacturer.summary,
-    url: `${siteUrl}/manufacturers/${manufacturer.slug}`,
+    url: absoluteUrl(`/manufacturers/${manufacturer.slug}`),
     ...(manufacturer.website ? { sameAs: [manufacturer.website] } : {}),
     ...(logo && logo.trim() ? { logo } : {}),
   };
@@ -64,8 +64,8 @@ export function articleJsonLd(article: Article) {
     description: article.summary,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt,
-    url: `${siteUrl}/reports/${article.slug}`,
-    mainEntityOfPage: `${siteUrl}/reports/${article.slug}`,
+    url: absoluteUrl(`/reports/${article.slug}`),
+    mainEntityOfPage: absoluteUrl(`/reports/${article.slug}`),
     ...(image ? { image } : {}),
     author: article.author
       ? { '@type': 'Organization', name: article.author }
@@ -114,8 +114,8 @@ export function guideJsonLd(guide: Guide) {
     headline: guide.titleJa ?? guide.title,
     description: guide.summary,
     dateModified: guide.updatedAt,
-    url: `${siteUrl}/guides/${guide.slug}`,
-    mainEntityOfPage: `${siteUrl}/guides/${guide.slug}`,
+    url: absoluteUrl(`/guides/${guide.slug}`),
+    mainEntityOfPage: absoluteUrl(`/guides/${guide.slug}`),
     author: PUBLISHER,
     publisher: PUBLISHER,
     inLanguage: 'ja-JP',
@@ -129,8 +129,8 @@ export function useCaseJsonLd(useCase: UseCase) {
     headline: useCase.titleJa ?? useCase.title,
     description: useCase.subtitle ?? useCase.summary,
     dateModified: useCase.updatedAt,
-    url: `${siteUrl}/use-cases/${useCase.slug}`,
-    mainEntityOfPage: `${siteUrl}/use-cases/${useCase.slug}`,
+    url: absoluteUrl(`/use-cases/${useCase.slug}`),
+    mainEntityOfPage: absoluteUrl(`/use-cases/${useCase.slug}`),
     author: PUBLISHER,
     publisher: PUBLISHER,
     inLanguage: 'ja-JP',

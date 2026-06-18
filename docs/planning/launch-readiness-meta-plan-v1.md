@@ -23,16 +23,17 @@
 - 画像データには `rights` / `credit` / `sourceUrl` が多く入っている。
 - `lib/data.ts` の `getRobots()` は `publishStatus === 'published'` のみを返す。コメントにも「一覧・比較・sitemap は published のみ」と明記されているため、archived robot の sitemap 除外は現状維持の確認対象。
 - AnalyticsScripts は `isVercelProduction || (isProd && !process.env.VERCEL_ENV)` でガードされており、開発環境と Vercel Preview では GA/Clarity は発火しない。
-- README の環境変数表では `NEXT_PUBLIC_GA_MEASUREMENT_ID` の未設定時デフォルトが仕様として明記されている。
+- README の環境変数表では `NEXT_PUBLIC_GA_MEASUREMENT_ID` / `NEXT_PUBLIC_CLARITY_PROJECT_ID` の未設定時デフォルトが仕様として明記されている。
+- `/privacy` と `/for-manufacturers` は index 対象として sitemap に含める方針に決定済み。
 
 ### 不足・要修正
 
 - 詳細ページの HTML では `title` / `description` は個別化されるが、`og:title` / `twitter:title` はサイト共通のままになっている。
 - OGP 画像は全ページ共通で、記事・ロボット・メーカーごとの画像が使われていない。
-- `sitemap.xml` に `privacy` / `for-manufacturers` が含まれていない。
+- `sitemap.xml` に `privacy` / `for-manufacturers` を含める対応が必要。
 - noindex と sitemap 掲載対象の整合に確認余地がある。
 - Privacy page は GA4 と Formspree には触れているが、Microsoft Clarity、Vercel Analytics、Cookie、録画について明記していない。
-- `NEXT_PUBLIC_CLARITY_PROJECT_ID` と `NEXT_PUBLIC_GA_MEASUREMENT_ID` のデフォルト値は既存仕様だが、公開前に「env 明示時のみ有効」に変えるべきか再検討する。
+- `NEXT_PUBLIC_CLARITY_PROJECT_ID` と `NEXT_PUBLIC_GA_MEASUREMENT_ID` のデフォルト値は既存仕様として維持する。変更する場合は別途方針決定する。
 - 構造化データは詳細ページ中心で、BreadcrumbList / WebSite / Guide / UseCase は未対応。
 - 画像権利表記は詳細ページの一部では出るが、一覧カードやメーカー画像など全表示面で一貫しているとは言えない。
 - `.env.example` / README にある `NEXT_PUBLIC_MEDIA_USAGE_POLICY` と本番の画像表示ポリシーが、公開時の意図と一致しているか未確認。
@@ -67,7 +68,7 @@
 
 タスク:
 
-- `src/app/sitemap.ts` の static paths に `/privacy` と `/for-manufacturers` を追加するか、noindexにするか決める。
+- `src/app/sitemap.ts` の static paths に `/privacy` と `/for-manufacturers` を追加する。
 - guide/useCase と同じように article/robot/manufacturer も noindex 対象を除外する。
 - archived robot が sitemap から除外され続けることを現状維持として確認する。`getRobots()` が published のみを返すため、現時点では対応済み。
 - sample article は現時点で0件。将来 `contentKind: 'sample'` を持つ記事を追加した時に sitemap へ混ざらないよう、予防的に除外条件を入れるか検討する。P1内では低優先。
@@ -92,14 +93,14 @@
   - Clarity による行動記録・ヒートマップ・セッション録画の可能性
   - Cookie または類似技術の利用
   - Formspree によるフォーム送信処理
-- `lib/env.ts` の GA/Clarity デフォルト値を削除するか、README記載どおりの既存仕様として残すか判断する。
+- `lib/env.ts` の GA/Clarity デフォルト値は、README記載どおりの既存仕様として残す。
 - local/dev/preview/production の発火条件を整理する。現状は dev/preview では発火しないため、この安全性は維持する。
 
 完了条件:
 
 - Privacy page に実際に使っている外部サービスがすべて載る。
 - GA/Clarity のデフォルト値を残すか削除するかの方針が README とコードで一致している。
-- production で env がある場合のみ計測が発火する。
+- production では env 値または既定IDで計測が発火する。dev/preview では発火しない。
 
 ### P3. 構造化データ拡張
 
@@ -208,7 +209,5 @@ npm run dev
 
 ## 未決事項
 
-- `privacy` と `for-manufacturers` を index 対象にするか noindex にするか。
-- GA/Clarity のデフォルトIDをすぐ削除するか、明示的な env override 前提で本番向けに残すか。
 - すべてのカード画像に visible credit が必要か、詳細ページの credit と全体方針の明記で足りるか。
 - コンテンツ別 OGP 画像に元メディア素材を直接使うか、生成したブランドカードを使うか。

@@ -19,6 +19,7 @@ import {
   useCaseCapabilityNoteLabels,
 } from '@/lib/labels';
 import { breadcrumbJsonLd, useCaseJsonLd } from '@/lib/jsonLd';
+import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
 import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: seo?.metaTitle ?? (u ? (u.titleJa ?? u.title) : 'Use Case'),
     description: seo?.metaDescription ?? u?.subtitle ?? u?.summary,
     path: u ? `/use-cases/${u.slug}` : undefined,
-    noindex: seo?.noindex,
+    noindex: u ? !shouldIndexPublishedRecord(u) : seo?.noindex,
   });
 }
 
