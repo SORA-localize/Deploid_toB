@@ -915,7 +915,7 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2023,
     website: 'https://www.gotokepler.com',
     logo: {
-      src: '',
+      src: '/images/manufacturers/kepler-robotics-logo.png',
       alt: 'Kepler Robotics logo',
       credit: 'Kepler Robotics',
       sourceUrl: 'https://www.gotokepler.com/',
@@ -923,19 +923,23 @@ export const manufacturers: Manufacturer[] = [
         status: 'reference-attributed',
         sourceType: 'manufacturer-official',
         rightsHolder: 'Kepler Robotics',
-        checkedAt: '2026-06-02',
+        checkedAt: '2026-06-18',
+        permissionNote:
+          'Kepler media kit received 2026-06-18; no explicit commercial reuse terms found in bundled docs.',
       },
     },
     heroImage: {
-      src: '',
-      alt: 'Kepler Forerunner K2 humanoid robot',
+      src: '/images/manufacturers/kepler-robotics-forerunner-series.jpg',
+      alt: 'Kepler Forerunner series humanoid robots',
       credit: 'Kepler Robotics',
       sourceUrl: 'https://www.gotokepler.com',
       rights: {
         status: 'reference-attributed',
         sourceType: 'manufacturer-official',
         rightsHolder: 'Kepler Robotics',
-        checkedAt: '2026-06-02',
+        checkedAt: '2026-06-18',
+        permissionNote:
+          'Kepler media kit received 2026-06-18; no explicit commercial reuse terms found in bundled docs.',
       },
     },
     summary: '力仕事に強いハイブリッド駆動を提唱する新興勢力。',

@@ -2143,7 +2143,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: 'K2の前世代。25kgペイロード・8時間稼働を実現したハイブリッド駆動の量産機。',
     publishStatus: 'published',
-    updatedAt: '2026-06-07',
+    updatedAt: '2026-06-18',
     reliability: 'reported',
     sources: [
       {
@@ -2156,6 +2156,36 @@ export const robots: Robot[] = [
     ],
     description:
       'Kepler Forerunnerシリーズの第1世代。2023年11月発売。電気＋油圧ハイブリッド駆動で25kgの高ペイロードと8時間稼働を実現。178cm/85kgの産業サイズ。K2（Bumblebee）への移行後も一部用途で選択肢として残る。',
+    images: {
+      hero: {
+        src: '/images/robots/kepler-k1-hero.jpg',
+        alt: 'Kepler Forerunner K1 humanoid robot',
+        credit: 'Kepler Robotics',
+        sourceUrl: 'https://www.gotokepler.com',
+        rights: {
+          status: 'reference-attributed',
+          sourceType: 'manufacturer-official',
+          rightsHolder: 'Kepler Robotics',
+          checkedAt: '2026-06-18',
+          permissionNote:
+            'Kepler media kit received 2026-06-18; no explicit commercial reuse terms found in bundled docs.',
+        },
+      },
+      transparent: {
+        src: '/images/robots/kepler-k1-transparent.png',
+        alt: 'Kepler Forerunner K1 front and rear render',
+        credit: 'Kepler Robotics',
+        sourceUrl: 'https://www.gotokepler.com',
+        rights: {
+          status: 'reference-attributed',
+          sourceType: 'manufacturer-official',
+          rightsHolder: 'Kepler Robotics',
+          checkedAt: '2026-06-18',
+          permissionNote:
+            'Kepler media kit received 2026-06-18; no explicit commercial reuse terms found in bundled docs.',
+        },
+      },
+    },
     deploymentStage: 'limited-production',
     buyerReadiness: 'requires-poc',
     specs: {
