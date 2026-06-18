@@ -47,6 +47,7 @@ Last cleaned: 2026-06-13
 - `humanoid_media_build_notes_v1.md` — UI/コンテンツ品質メモ
 - `humanoid_mvp_scope_decision_v1.md` — MVPスコープ判断
 - `humanoid_platform_tech_stack_v1.md` — 技術スタック
+- `launch-readiness-meta-plan-v1.md` — 公開前のメタ情報、SNS共有、計測、プライバシー、sitemap整備計画
 - `ui_architecture_and_development_policy_v1.md` — UI構造と開発方針
 
 ### (b) 参照・背景（旧／非正本）
