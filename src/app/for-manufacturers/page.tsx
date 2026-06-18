@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { getManufacturers, getRobots } from '@/lib/data';
+import { createPageMetadata } from '@/lib/metadata';
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: 'メーカー・代理店の方へ',
   description:
     'Deploidへの掲載情報の確認・提供・修正依頼について。掲載は無料で、修正・削除依頼にも対応します。公開情報をもとに作成した掲載ページの確認をお願いしています。',
-};
+  path: '/for-manufacturers',
+});
 
 export default function ForManufacturersPage() {
   const robotCount = getRobots().length;

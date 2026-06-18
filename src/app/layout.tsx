@@ -6,6 +6,11 @@ import { Footer } from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AnalyticsScripts } from '@/components/AnalyticsScripts';
 import { env } from '@/lib/env';
+import {
+  defaultSiteDescription,
+  defaultSiteTitle,
+  defaultSocialDescription,
+} from '@/lib/metadata';
 import { siteUrl } from '@/lib/site';
 import './globals.css';
 import { Geist } from "next/font/google";
@@ -16,11 +21,10 @@ const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Deploid | ヒューマノイド導入判断ポータル',
+    default: defaultSiteTitle,
     template: '%s | Deploid',
   },
-  description:
-    '日本のtoB事業者向けに、ヒューマノイドロボット、メーカー、用途、導入ガイド、記事を整理する導入判断ポータル。',
+  description: defaultSiteDescription,
   icons: {
     icon: [
       { url: '/brand/deploid-symbol-square.png', type: 'image/png', sizes: '512x512' },
@@ -34,15 +38,13 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ja_JP',
     siteName: 'Deploid',
-    title: 'Deploid | ヒューマノイド導入判断ポータル',
-    description:
-      '日本のtoB事業者向けに、ヒューマノイドロボットの導入判断に必要な変数を整理する情報基盤。',
+    title: defaultSiteTitle,
+    description: defaultSocialDescription,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Deploid | ヒューマノイド導入判断ポータル',
-    description:
-      '日本のtoB事業者向けに、ヒューマノイドロボットの導入判断に必要な変数を整理する情報基盤。',
+    title: defaultSiteTitle,
+    description: defaultSocialDescription,
   },
 };
 

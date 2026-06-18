@@ -18,7 +18,9 @@ import {
   getUseCasesForRobot,
   resolveRobotDetailBySlug,
 } from '@/lib/data';
-import { robotJsonLd } from '@/lib/jsonLd';
+import { breadcrumbJsonLd, robotJsonLd } from '@/lib/jsonLd';
+import { getDisplayableAsset } from '@/lib/media';
+import { createPageMetadata } from '@/lib/metadata';
 import { sortRobots } from '@/lib/display';
 import { getRobotDetailDecisionRows, getRobotDetailSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
@@ -42,12 +44,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const seo = robot?.seo;
   // archived（提供終了）は閲覧可能だが検索には載せない（§11.7）
   const noindex = seo?.noindex || robot?.publishStatus === 'archived';
-  return {
-    title: seo?.metaTitle ?? (robot ? (robot.nameJa ?? robot.name) : 'Robot'),
+  const title = seo?.metaTitle ?? (robot ? (robot.nameJa ?? robot.name) : 'Robot');
+  const image = getDisplayableAsset(robot?.images?.hero ?? robot?.heroImage)?.src;
+
+  return createPageMetadata({
+    title,
     description: seo?.metaDescription ?? robot?.summary,
-    alternates: robot ? { canonical: `/robots/${robot.slug}` } : undefined,
-    robots: noindex ? { index: false, follow: false } : undefined,
-  };
+    path: robot ? `/robots/${robot.slug}` : undefined,
+    image,
+    noindex,
+  });
 }
 
 export default async function RobotDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -72,6 +78,16 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
   return (
     <div className="min-h-screen bg-background">
       <JsonLd data={robotJsonLd(robot, manufacturer)} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'ホーム', path: '/' },
+          { name: uiText.robots.breadcrumb, path: '/robots' },
+          ...(manufacturer
+            ? [{ name: manufacturer.nameJa ?? manufacturer.name, path: `/manufacturers/${manufacturer.slug}` }]
+            : []),
+          { name: robot.nameJa ?? robot.name, path: `/robots/${robot.slug}` },
+        ])}
+      />
 
       <RobotDetailStickyHeader title={robot.nameJa ?? robot.name} sections={sections} />
 

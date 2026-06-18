@@ -22,6 +22,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/reports',
     '/about',
     '/contact',
+    '/for-manufacturers',
+    '/privacy',
   ];
   const now = new Date();
 
@@ -30,14 +32,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: now,
   }));
 
-  const robotEntries: MetadataRoute.Sitemap = getRobots().map((r) => ({
-    url: `${base}/robots/${r.slug}`,
-    lastModified: new Date(r.updatedAt),
-  }));
-  const manufacturerEntries: MetadataRoute.Sitemap = getManufacturers().map((m) => ({
-    url: `${base}/manufacturers/${m.slug}`,
-    lastModified: new Date(m.updatedAt),
-  }));
+  const robotEntries: MetadataRoute.Sitemap = getRobots()
+    .filter(isIndexable)
+    .map((r) => ({
+      url: `${base}/robots/${r.slug}`,
+      lastModified: new Date(r.updatedAt),
+    }));
+  const manufacturerEntries: MetadataRoute.Sitemap = getManufacturers()
+    .filter(isIndexable)
+    .map((m) => ({
+      url: `${base}/manufacturers/${m.slug}`,
+      lastModified: new Date(m.updatedAt),
+    }));
   const guideEntries: MetadataRoute.Sitemap = getGuides()
     .filter(isIndexable)
     .map((g) => ({
@@ -50,10 +56,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${base}/use-cases/${u.slug}`,
       lastModified: new Date(u.updatedAt),
     }));
-  const reportEntries: MetadataRoute.Sitemap = getArticles().map((r) => ({
-    url: `${base}/reports/${r.slug}`,
-    lastModified: new Date(r.updatedAt),
-  }));
+  const reportEntries: MetadataRoute.Sitemap = getArticles()
+    .filter((r) => isIndexable(r) && r.contentKind !== 'sample')
+    .map((r) => ({
+      url: `${base}/reports/${r.slug}`,
+      lastModified: new Date(r.updatedAt),
+    }));
 
   return [
     ...staticEntries,

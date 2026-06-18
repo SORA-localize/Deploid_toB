@@ -1,19 +1,18 @@
 import { RobotsBrowser } from '@/components/RobotsBrowser';
 import { getManufacturers, getRobots } from '@/lib/data';
+import { createPageMetadata } from '@/lib/metadata';
 import {
   getRobotFilterOptions,
   normalizeRobotFilters,
 } from '@/lib/robotFilters';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: 'ロボット',
   description:
     'ヒューマノイドロボットのカタログ。業種・タスク・メーカー・国内入手性で絞り込み、導入判断に必要な変数で比較できます。',
-  alternates: {
-    canonical: '/robots',
-  },
-};
+  path: '/robots',
+});
 
 export default async function RobotsPage({
   searchParams,

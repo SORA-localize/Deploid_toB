@@ -2,13 +2,15 @@ import { GuidesBrowser } from '@/components/GuidesBrowser';
 import { ComingSoonGate } from '@/components/ComingSoonGate';
 import { getGuides } from '@/lib/data';
 import { normalizeGuideFilters } from '@/lib/guideFilters';
+import { createPageMetadata } from '@/lib/metadata';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: 'ガイド',
   description:
     'ヒューマノイド導入を知る・判断する・動くで理解する常設ガイド。調達・TCO・安全・PoC・ベンダー評価を体系化。',
-};
+  path: '/guides',
+});
 
 export default async function GuidesPage({
   searchParams,

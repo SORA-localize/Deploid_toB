@@ -1,19 +1,18 @@
 import { ManufacturersBrowser } from '@/components/ManufacturersBrowser';
 import { getManufacturers, getRobots } from '@/lib/data';
+import { createPageMetadata } from '@/lib/metadata';
 import {
   getManufacturerFilterOptions,
   normalizeManufacturerFilters,
 } from '@/lib/manufacturerFilters';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: 'メーカー',
   description:
     'ヒューマノイド開発企業のディレクトリ。地域と相談ルートから、日本で検討しやすい企業を確認できます。',
-  alternates: {
-    canonical: '/manufacturers',
-  },
-};
+  path: '/manufacturers',
+});
 
 export default async function ManufacturersPage({
   searchParams,

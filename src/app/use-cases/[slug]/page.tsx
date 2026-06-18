@@ -3,6 +3,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { JsonLd } from '@/components/JsonLd';
 import {
   getRelatedGuides,
   getRelatedRobots,
@@ -17,6 +18,8 @@ import {
   operatingEnvironmentLabels,
   useCaseCapabilityNoteLabels,
 } from '@/lib/labels';
+import { breadcrumbJsonLd, useCaseJsonLd } from '@/lib/jsonLd';
+import { createPageMetadata } from '@/lib/metadata';
 import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
@@ -28,12 +31,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const { record: u } = resolveUseCaseDetailBySlug(slug);
   const seo = u?.seo;
-  return {
+  return createPageMetadata({
     title: seo?.metaTitle ?? (u ? (u.titleJa ?? u.title) : 'Use Case'),
     description: seo?.metaDescription ?? u?.subtitle ?? u?.summary,
-    alternates: u ? { canonical: `/use-cases/${u.slug}` } : undefined,
-    robots: seo?.noindex ? { index: false, follow: false } : undefined,
-  };
+    path: u ? `/use-cases/${u.slug}` : undefined,
+    noindex: seo?.noindex,
+  });
 }
 
 export default async function UseCaseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -48,6 +51,15 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={useCaseJsonLd(useCase)} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'ホーム', path: '/' },
+          { name: uiText.useCases.breadcrumb, path: '/use-cases' },
+          { name: useCase.titleJa ?? useCase.title, path: `/use-cases/${useCase.slug}` },
+        ])}
+      />
+
       <div className="border-b border-border bg-card">
         <div className="site-container py-6">
           <Breadcrumbs

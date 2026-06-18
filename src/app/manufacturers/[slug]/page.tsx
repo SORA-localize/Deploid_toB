@@ -17,7 +17,8 @@ import {
   getRobotsByManufacturerId,
 } from '@/lib/data';
 import { sortRobots } from '@/lib/display';
-import { manufacturerJsonLd } from '@/lib/jsonLd';
+import { breadcrumbJsonLd, manufacturerJsonLd } from '@/lib/jsonLd';
+import { createPageMetadata } from '@/lib/metadata';
 import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
@@ -28,13 +29,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const { record: manufacturer } = resolveManufacturerDetailBySlug(slug);
   const seo = manufacturer?.seo;
-  return {
-    title:
-      seo?.metaTitle ?? (manufacturer ? (manufacturer.nameJa ?? manufacturer.name) : 'Manufacturer'),
+  const title =
+    seo?.metaTitle ?? (manufacturer ? (manufacturer.nameJa ?? manufacturer.name) : 'Manufacturer');
+
+  return createPageMetadata({
+    title,
     description: seo?.metaDescription ?? manufacturer?.description,
-    alternates: manufacturer ? { canonical: `/manufacturers/${manufacturer.slug}` } : undefined,
-    robots: seo?.noindex ? { index: false, follow: false } : undefined,
-  };
+    path: manufacturer ? `/manufacturers/${manufacturer.slug}` : undefined,
+    noindex: seo?.noindex,
+  });
 }
 
 export default async function ManufacturerDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -63,6 +66,13 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
   return (
     <div className="min-h-screen bg-background">
       <JsonLd data={manufacturerJsonLd(manufacturer)} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'ホーム', path: '/' },
+          { name: uiText.manufacturers.breadcrumb, path: '/manufacturers' },
+          { name: manufacturerName, path: `/manufacturers/${manufacturer.slug}` },
+        ])}
+      />
       <ManufacturerDetailStickyHeader
         title={manufacturerName}
         sections={sections}

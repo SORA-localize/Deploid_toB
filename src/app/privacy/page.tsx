@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { createPageMetadata } from '@/lib/metadata';
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: 'プライバシーポリシー',
   description: 'Deploidにおける個人情報の取り扱いについて説明します。',
-};
+  path: '/privacy',
+});
 
 export default function PrivacyPage() {
   return (
@@ -35,7 +37,15 @@ export default function PrivacyPage() {
               },
               {
                 label: '外部サービス',
-                body: 'フォームの送受信にFormspree（formspree.io）を使用しています。送信されたデータはFormspreeのサーバーを経由します。また、アクセス解析のためにGoogle Analytics 4を使用し、閲覧ページや流入元などの利用状況を計測します。各サービスのプライバシーポリシーは各社のウェブサイトをご参照ください。',
+                body: 'フォームの送受信にFormspree（formspree.io）を使用しています。送信されたデータはFormspreeのサーバーを経由します。また、アクセス解析のためにGoogle Analytics 4、Vercel Analytics、Microsoft Clarityを使用する場合があります。各サービスのプライバシーポリシーは各社のウェブサイトをご参照ください。',
+              },
+              {
+                label: 'Cookie等の利用',
+                body: 'アクセス解析やサイト改善のため、Cookieまたはこれに類する技術を利用する場合があります。これらは閲覧ページ、流入元、端末・ブラウザ情報、操作状況などを計測するために使用します。',
+              },
+              {
+                label: '録画・ヒートマップ',
+                body: 'Microsoft Clarityを有効にしている場合、サイト改善のためにクリック、スクロール、ページ遷移などの操作状況がヒートマップやセッション録画として記録される場合があります。フォーム入力欄など個人情報を含み得る箇所の取り扱いには、外部サービス側のマスキング機能と設定を利用します。',
               },
               {
                 label: '第三者提供',

@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ContactForm } from '@/components/ContactForm';
+import { createPageMetadata } from '@/lib/metadata';
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: 'お問い合わせ',
   description:
     'ロボット情報の修正、メーカー・代理店の掲載相談、取材相談、導入検討の相談を受け付けています。',
-};
+  path: '/contact',
+});
 
 export default function ContactPage() {
   return (

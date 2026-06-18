@@ -20,10 +20,11 @@ import {
   getRelatedUseCases,
   resolveArticleDetailBySlug,
 } from '@/lib/data';
-import { articleJsonLd } from '@/lib/jsonLd';
+import { articleJsonLd, breadcrumbJsonLd } from '@/lib/jsonLd';
 import { articleTypeLabels } from '@/lib/labels';
 import { extractH2Headings } from '@/lib/markdownHeadings';
 import { getDisplayableAsset } from '@/lib/media';
+import { createPageMetadata } from '@/lib/metadata';
 import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { getArticleTypeTone } from '@/lib/visualSemantics';
@@ -38,12 +39,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const seo = report?.seo;
   // sample（UI確認用データ）は検索に載せない（§11.9）
   const noindex = seo?.noindex || report?.contentKind === 'sample';
-  return {
-    title: seo?.metaTitle ?? (report ? (report.titleJa ?? report.title) : 'Article'),
+  const title = seo?.metaTitle ?? (report ? (report.titleJa ?? report.title) : 'Article');
+
+  return createPageMetadata({
+    title,
     description: seo?.metaDescription ?? report?.summary,
-    alternates: report ? { canonical: `/reports/${report.slug}` } : undefined,
-    robots: noindex ? { index: false, follow: false } : undefined,
-  };
+    path: report ? `/reports/${report.slug}` : undefined,
+    image: getDisplayableAsset(report?.heroImage)?.src,
+    type: 'article',
+    noindex,
+  });
 }
 
 function ReportSidebarContent() {
@@ -125,6 +130,13 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   return (
     <div className="min-h-screen bg-background">
       <JsonLd data={articleJsonLd(report)} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'ホーム', path: '/' },
+          { name: uiText.reports.breadcrumb, path: '/reports' },
+          { name: reportTitle, path: `/reports/${report.slug}` },
+        ])}
+      />
 
       {/* ── ヒーロー + ヘッダー（統合） ── */}
       {heroImage ? (

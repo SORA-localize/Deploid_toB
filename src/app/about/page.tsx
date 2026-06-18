@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { createPageMetadata } from '@/lib/metadata';
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: '会社概要',
   description:
     'Deploidは、ヒューマノイドロボットの導入を検討する企業のために、分かりやすく、正確な情報を提供いたします。製品の基本情報から、調達・保守・安全性・実務への適用など、導入判断に必要な情報を体系的に提供しております。',
-};
+  path: '/about',
+});
 
 const values = [
   {

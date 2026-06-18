@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { FeaturedRobotsGrid } from '@/components/FeaturedRobotsGrid';
 import { HomeContentNavigator } from '@/components/HomeContentNavigator';
+import { JsonLd } from '@/components/JsonLd';
 import { ManufacturerWorldMap } from '@/components/ManufacturerWorldMap';
 import { NewsFeatureCard } from '@/components/NewsFeatureCard';
 import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
@@ -16,7 +17,19 @@ import {
 } from '@/lib/data';
 import { sortRobots } from '@/lib/display';
 import { getDisplayableAsset } from '@/lib/media';
+import { organizationJsonLd, websiteJsonLd } from '@/lib/jsonLd';
+import {
+  createPageMetadata,
+  defaultSiteDescription,
+  defaultSiteTitle,
+} from '@/lib/metadata';
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
+
+export const metadata = createPageMetadata({
+  title: defaultSiteTitle,
+  description: defaultSiteDescription,
+  path: '/',
+});
 
 export default function HomePage() {
   const featured = getGuideBySlug('decision-variables') ?? getGuides()[0];
@@ -67,6 +80,9 @@ export default function HomePage() {
 
   return (
     <>
+      <JsonLd data={websiteJsonLd()} />
+      <JsonLd data={organizationJsonLd()} />
+
       <ManufacturerWorldMap
         manufacturers={mapPoints}
         heading={"日本の未来を\nヒューマノイドと共に\n切り開く。"}

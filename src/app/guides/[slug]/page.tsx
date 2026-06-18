@@ -4,6 +4,7 @@ import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
 import { ArticleToc } from '@/components/ArticleToc';
 import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { JsonLd } from '@/components/JsonLd';
 import { Markdown } from '@/components/Markdown';
 import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { SourceList } from '@/components/SourceList';
@@ -14,7 +15,9 @@ import {
   getRelatedUseCases,
   resolveGuideDetailBySlug,
 } from '@/lib/data';
+import { breadcrumbJsonLd, guideJsonLd } from '@/lib/jsonLd';
 import { guideStageLabels } from '@/lib/labels';
+import { createPageMetadata } from '@/lib/metadata';
 import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { getTagLabel } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
@@ -28,12 +31,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const { record: guide } = resolveGuideDetailBySlug(slug);
   const seo = guide?.seo;
-  return {
+  return createPageMetadata({
     title: seo?.metaTitle ?? (guide ? (guide.titleJa ?? guide.title) : 'Guide'),
     description: seo?.metaDescription ?? guide?.summary,
-    alternates: guide ? { canonical: `/guides/${guide.slug}` } : undefined,
-    robots: seo?.noindex ? { index: false, follow: false } : undefined,
-  };
+    path: guide ? `/guides/${guide.slug}` : undefined,
+    type: 'article',
+    noindex: seo?.noindex,
+  });
 }
 
 export default async function GuideDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -67,6 +71,15 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={guideJsonLd(guide)} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'ホーム', path: '/' },
+          { name: uiText.guides.breadcrumb, path: '/guides' },
+          { name: guide.titleJa ?? guide.title, path: `/guides/${guide.slug}` },
+        ])}
+      />
+
       <div className="border-b border-border bg-card">
         <div className="site-container py-6">
           <Breadcrumbs
