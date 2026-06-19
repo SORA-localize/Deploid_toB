@@ -2168,31 +2168,31 @@ export const robots: Robot[] = [
       'Kepler Forerunnerシリーズの第1世代。2023年11月発売。電気＋油圧ハイブリッド駆動で25kgの高ペイロードと8時間稼働を実現。178cm/85kgの産業サイズ。K2（Bumblebee）への移行後も一部用途で選択肢として残る。',
     images: {
       hero: {
-        src: '/images/robots/kepler-k1-hero.jpg',
+        src: '',
         alt: 'Kepler Forerunner K1 humanoid robot',
         credit: 'Kepler Robotics',
         sourceUrl: 'https://www.gotokepler.com',
         rights: {
-          status: 'reference-attributed',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: 'Kepler Robotics',
-          checkedAt: '2026-06-18',
+          checkedAt: '2026-06-19',
           permissionNote:
-            'Kepler media kit received 2026-06-18; no explicit commercial reuse terms found in bundled docs.',
+            '2026-06-18にKepler media kit取得、当時は「明示的な商用転載条件は見当たらない」としてreference-attributed登録。2026-06-19にgotokepler.comのUser Agreementを確認したところ「individual, non-commercial license」「書面の同意なしの複製・再公開を禁止」と明記されており、規約違反のおそれがあるため非表示化。',
         },
       },
       transparent: {
-        src: '/images/robots/kepler-k1-transparent.png',
+        src: '',
         alt: 'Kepler Forerunner K1 front and rear render',
         credit: 'Kepler Robotics',
         sourceUrl: 'https://www.gotokepler.com',
         rights: {
-          status: 'reference-attributed',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: 'Kepler Robotics',
-          checkedAt: '2026-06-18',
+          checkedAt: '2026-06-19',
           permissionNote:
-            'Kepler media kit received 2026-06-18; no explicit commercial reuse terms found in bundled docs.',
+            '2026-06-18にKepler media kit取得、当時は「明示的な商用転載条件は見当たらない」としてreference-attributed登録。2026-06-19にgotokepler.comのUser Agreementを確認したところ「individual, non-commercial license」「書面の同意なしの複製・再公開を禁止」と明記されており、規約違反のおそれがあるため非表示化。',
         },
       },
     },
