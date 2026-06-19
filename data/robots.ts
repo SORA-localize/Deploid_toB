@@ -420,52 +420,56 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: '/images/robots/onex-neo-hero.jpg',
+        src: '',
         alt: '1X NEO 全身',
         credit: '1X Technologies',
         sourceUrl: 'https://www.1x.tech/',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: '1X Technologies',
-          checkedAt: '2026-06-08',
-          permissionNote: '1X Technologies 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08に「公式プレスキット」として commercial-permitted 登録されていたが、2026-06-19に1X Press Gallery (1x.tech/press) の実際の利用条件を確認したところ "for media use only" "not for commercial purposes" と明記されており誤分類だったため非表示化。',
         },
       },
       side: {
-        src: '/images/robots/onex-neo-side.jpg',
+        src: '',
         alt: '1X NEO 側面プロフィール',
         credit: '1X Technologies',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: '1X Technologies',
-          checkedAt: '2026-06-08',
-          permissionNote: '1X Technologies 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08に「公式プレスキット」として commercial-permitted 登録されていたが、2026-06-19に1X Press Gallery (1x.tech/press) の実際の利用条件を確認したところ "for media use only" "not for commercial purposes" と明記されており誤分類だったため非表示化。',
         },
       },
       inOperation: {
-        src: '/images/robots/onex-neo-inOperation.jpg',
+        src: '',
         alt: '1X NEO 家庭内稼働',
         credit: '1X Technologies',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: '1X Technologies',
-          checkedAt: '2026-06-08',
-          permissionNote: '1X Technologies 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08に「公式プレスキット」として commercial-permitted 登録されていたが、2026-06-19に1X Press Gallery (1x.tech/press) の実際の利用条件を確認したところ "for media use only" "not for commercial purposes" と明記されており誤分類だったため非表示化。',
         },
       },
       scale: {
-        src: '/images/robots/onex-neo-scale.jpg',
+        src: '',
         alt: '1X NEO と人のスケール比較',
         credit: '1X Technologies',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: '1X Technologies',
-          checkedAt: '2026-06-08',
-          permissionNote: '1X Technologies 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08に「公式プレスキット」として commercial-permitted 登録されていたが、2026-06-19に1X Press Gallery (1x.tech/press) の実際の利用条件を確認したところ "for media use only" "not for commercial purposes" と明記されており誤分類だったため非表示化。',
         },
       },
     },
