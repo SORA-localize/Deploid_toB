@@ -2428,6 +2428,22 @@ export const robots: Robot[] = [
         reliability: 'reported',
       },
     ],
+    images: {
+      hero: {
+        src: '/images/robots/mentee-menteebotv3-hero.jpg',
+        alt: 'MenteeBot humanoid robot',
+        credit: 'Mobileye / Mentee Robotics',
+        sourceUrl: 'https://www.mobileye.com/press-kit/mobileye-agrees-to-acquire-mentee-robotics/',
+        rights: {
+          status: 'reference-attributed',
+          sourceType: 'manufacturer-official',
+          rightsHolder: 'Mobileye / Mentee Robotics',
+          checkedAt: '2026-06-20',
+          permissionNote:
+            '親会社Mobileyeの公式press kitページ（"official press materials, and visual assets"と明記）より取得。利用条件の詳細明記は確認できなかったため reference-attributed として掲載。',
+        },
+      },
+    },
     description:
       'カスタムアクチュエータ（先代比3倍出力）・40+ DoF・25kgペイロード・魚眼カメラによる360°視野を搭載。NVIDIA Jetson Orin AGX×2で強化学習・オンボードLLMを処理。4時間クイックスワップバッテリー。倉庫・物流用途でのHeavy Liftingを主要ユースケースに想定。Jensen Huang（NVIDIA CEO）がCES 2025で紹介。M&A（Mobileye/Intel傘下）進行中のため今後の展開は要注視。',
     deploymentStage: 'pilot',
