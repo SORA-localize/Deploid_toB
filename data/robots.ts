@@ -306,77 +306,83 @@ export const robots: Robot[] = [
     ],
     images: {
       transparent: {
-        src: '/images/robots/agility-digit-transparent.png',
+        src: '',
         alt: 'Agility Digit 全身正面（背景透過）',
         credit: 'Agility Robotics',
         sourceUrl: 'https://www.agilityrobotics.com/',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: 'Agility Robotics',
-          checkedAt: '2026-06-11',
-          permissionNote: 'Agility Robotics 公式プレスキットより取得・rembg で背景除去',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08/06-11に「公式プレスキットより取得」として commercial-permitted/reference-attributed 登録されていたが、2026-06-19にAgility RoboticsのTerms of Use (agilityrobotics.com/legal/terms-of-use) を確認したところ、"personal, non-commercial use only" "must not use images separately from accompanying text" "must not use for any commercial purposes" と明記されており、現行ステータスは規約違反のおそれがあるため非表示化。',
         },
       },
       hero: {
-        src: '/images/robots/agility-digit-hero.jpg',
+        src: '',
         alt: 'Agility Digit 全身正面',
         credit: 'Agility Robotics',
         sourceUrl: 'https://www.agilityrobotics.com/',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: 'Agility Robotics',
-          checkedAt: '2026-06-08',
-          permissionNote: 'Agility Robotics 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08/06-11に「公式プレスキットより取得」として commercial-permitted/reference-attributed 登録されていたが、2026-06-19にAgility RoboticsのTerms of Use (agilityrobotics.com/legal/terms-of-use) を確認したところ、"personal, non-commercial use only" "must not use images separately from accompanying text" "must not use for any commercial purposes" と明記されており、現行ステータスは規約違反のおそれがあるため非表示化。',
         },
       },
       side: {
-        src: '/images/robots/agility-digit-side.jpg',
+        src: '',
         alt: 'Agility Digit 側面',
         credit: 'Agility Robotics',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: 'Agility Robotics',
-          checkedAt: '2026-06-08',
-          permissionNote: 'Agility Robotics 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08/06-11に「公式プレスキットより取得」として commercial-permitted/reference-attributed 登録されていたが、2026-06-19にAgility RoboticsのTerms of Use (agilityrobotics.com/legal/terms-of-use) を確認したところ、"personal, non-commercial use only" "must not use images separately from accompanying text" "must not use for any commercial purposes" と明記されており、現行ステータスは規約違反のおそれがあるため非表示化。',
         },
       },
       inOperation: {
-        src: '/images/robots/agility-digit-inOperation.jpg',
+        src: '',
         alt: 'Agility Digit トート搬送',
         credit: 'Agility Robotics',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: 'Agility Robotics',
-          checkedAt: '2026-06-08',
-          permissionNote: 'Agility Robotics 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08/06-11に「公式プレスキットより取得」として commercial-permitted/reference-attributed 登録されていたが、2026-06-19にAgility RoboticsのTerms of Use (agilityrobotics.com/legal/terms-of-use) を確認したところ、"personal, non-commercial use only" "must not use images separately from accompanying text" "must not use for any commercial purposes" と明記されており、現行ステータスは規約違反のおそれがあるため非表示化。',
         },
       },
       endEffector: {
-        src: '/images/robots/agility-digit-endEffector.jpg',
+        src: '',
         alt: 'Agility Digit グリッパー',
         credit: 'Agility Robotics',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: 'Agility Robotics',
-          checkedAt: '2026-06-08',
-          permissionNote: 'Agility Robotics 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08/06-11に「公式プレスキットより取得」として commercial-permitted/reference-attributed 登録されていたが、2026-06-19にAgility RoboticsのTerms of Use (agilityrobotics.com/legal/terms-of-use) を確認したところ、"personal, non-commercial use only" "must not use images separately from accompanying text" "must not use for any commercial purposes" と明記されており、現行ステータスは規約違反のおそれがあるため非表示化。',
         },
       },
       mobility: {
-        src: '/images/robots/agility-digit-mobility.jpg',
+        src: '',
         alt: 'Agility Digit 脚部メカニズム',
         credit: 'Agility Robotics',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: 'Agility Robotics',
-          checkedAt: '2026-06-08',
-          permissionNote: 'Agility Robotics 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08/06-11に「公式プレスキットより取得」として commercial-permitted/reference-attributed 登録されていたが、2026-06-19にAgility RoboticsのTerms of Use (agilityrobotics.com/legal/terms-of-use) を確認したところ、"personal, non-commercial use only" "must not use images separately from accompanying text" "must not use for any commercial purposes" と明記されており、現行ステータスは規約違反のおそれがあるため非表示化。',
         },
       },
     },
@@ -420,52 +426,56 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: '/images/robots/onex-neo-hero.jpg',
+        src: '',
         alt: '1X NEO 全身',
         credit: '1X Technologies',
         sourceUrl: 'https://www.1x.tech/',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: '1X Technologies',
-          checkedAt: '2026-06-08',
-          permissionNote: '1X Technologies 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08に「公式プレスキット」として commercial-permitted 登録されていたが、2026-06-19に1X Press Gallery (1x.tech/press) の実際の利用条件を確認したところ "for media use only" "not for commercial purposes" と明記されており誤分類だったため非表示化。',
         },
       },
       side: {
-        src: '/images/robots/onex-neo-side.jpg',
+        src: '',
         alt: '1X NEO 側面プロフィール',
         credit: '1X Technologies',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: '1X Technologies',
-          checkedAt: '2026-06-08',
-          permissionNote: '1X Technologies 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08に「公式プレスキット」として commercial-permitted 登録されていたが、2026-06-19に1X Press Gallery (1x.tech/press) の実際の利用条件を確認したところ "for media use only" "not for commercial purposes" と明記されており誤分類だったため非表示化。',
         },
       },
       inOperation: {
-        src: '/images/robots/onex-neo-inOperation.jpg',
+        src: '',
         alt: '1X NEO 家庭内稼働',
         credit: '1X Technologies',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: '1X Technologies',
-          checkedAt: '2026-06-08',
-          permissionNote: '1X Technologies 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08に「公式プレスキット」として commercial-permitted 登録されていたが、2026-06-19に1X Press Gallery (1x.tech/press) の実際の利用条件を確認したところ "for media use only" "not for commercial purposes" と明記されており誤分類だったため非表示化。',
         },
       },
       scale: {
-        src: '/images/robots/onex-neo-scale.jpg',
+        src: '',
         alt: '1X NEO と人のスケール比較',
         credit: '1X Technologies',
         rights: {
-          status: 'commercial-permitted',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: '1X Technologies',
-          checkedAt: '2026-06-08',
-          permissionNote: '1X Technologies 公式プレスキットより取得',
+          checkedAt: '2026-06-19',
+          permissionNote:
+            '2026-06-08に「公式プレスキット」として commercial-permitted 登録されていたが、2026-06-19に1X Press Gallery (1x.tech/press) の実際の利用条件を確認したところ "for media use only" "not for commercial purposes" と明記されており誤分類だったため非表示化。',
         },
       },
     },
@@ -2158,31 +2168,31 @@ export const robots: Robot[] = [
       'Kepler Forerunnerシリーズの第1世代。2023年11月発売。電気＋油圧ハイブリッド駆動で25kgの高ペイロードと8時間稼働を実現。178cm/85kgの産業サイズ。K2（Bumblebee）への移行後も一部用途で選択肢として残る。',
     images: {
       hero: {
-        src: '/images/robots/kepler-k1-hero.jpg',
+        src: '',
         alt: 'Kepler Forerunner K1 humanoid robot',
         credit: 'Kepler Robotics',
         sourceUrl: 'https://www.gotokepler.com',
         rights: {
-          status: 'reference-attributed',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: 'Kepler Robotics',
-          checkedAt: '2026-06-18',
+          checkedAt: '2026-06-19',
           permissionNote:
-            'Kepler media kit received 2026-06-18; no explicit commercial reuse terms found in bundled docs.',
+            '2026-06-18にKepler media kit取得、当時は「明示的な商用転載条件は見当たらない」としてreference-attributed登録。2026-06-19にgotokepler.comのUser Agreementを確認したところ「individual, non-commercial license」「書面の同意なしの複製・再公開を禁止」と明記されており、規約違反のおそれがあるため非表示化。',
         },
       },
       transparent: {
-        src: '/images/robots/kepler-k1-transparent.png',
+        src: '',
         alt: 'Kepler Forerunner K1 front and rear render',
         credit: 'Kepler Robotics',
         sourceUrl: 'https://www.gotokepler.com',
         rights: {
-          status: 'reference-attributed',
+          status: 'blocked',
           sourceType: 'manufacturer-official',
           rightsHolder: 'Kepler Robotics',
-          checkedAt: '2026-06-18',
+          checkedAt: '2026-06-19',
           permissionNote:
-            'Kepler media kit received 2026-06-18; no explicit commercial reuse terms found in bundled docs.',
+            '2026-06-18にKepler media kit取得、当時は「明示的な商用転載条件は見当たらない」としてreference-attributed登録。2026-06-19にgotokepler.comのUser Agreementを確認したところ「individual, non-commercial license」「書面の同意なしの複製・再公開を禁止」と明記されており、規約違反のおそれがあるため非表示化。',
         },
       },
     },
@@ -2418,6 +2428,22 @@ export const robots: Robot[] = [
         reliability: 'reported',
       },
     ],
+    images: {
+      hero: {
+        src: '/images/robots/mentee-menteebotv3-hero.jpg',
+        alt: 'MenteeBot humanoid robot',
+        credit: 'Mobileye / Mentee Robotics',
+        sourceUrl: 'https://www.mobileye.com/press-kit/mobileye-agrees-to-acquire-mentee-robotics/',
+        rights: {
+          status: 'reference-attributed',
+          sourceType: 'manufacturer-official',
+          rightsHolder: 'Mobileye / Mentee Robotics',
+          checkedAt: '2026-06-20',
+          permissionNote:
+            '親会社Mobileyeの公式press kitページ（"official press materials, and visual assets"と明記）より取得。利用条件の詳細明記は確認できなかったため reference-attributed として掲載。',
+        },
+      },
+    },
     description:
       'カスタムアクチュエータ（先代比3倍出力）・40+ DoF・25kgペイロード・魚眼カメラによる360°視野を搭載。NVIDIA Jetson Orin AGX×2で強化学習・オンボードLLMを処理。4時間クイックスワップバッテリー。倉庫・物流用途でのHeavy Liftingを主要ユースケースに想定。Jensen Huang（NVIDIA CEO）がCES 2025で紹介。M&A（Mobileye/Intel傘下）進行中のため今後の展開は要注視。',
     deploymentStage: 'pilot',
