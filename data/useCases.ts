@@ -12,7 +12,6 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-06-02',
     reliability: 'reported',
     sources: [],
-    seo: { noindex: true },
     heroImage: {
       src: '',
       alt: 'Digit robot in a warehouse environment',
@@ -58,7 +57,6 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-06-02',
     reliability: 'reported',
     sources: [],
-    seo: { noindex: true },
     heroImage: {
       src: '',
       alt: 'Humanoid robot in a factory production line',
@@ -102,7 +100,6 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-06-02',
     reliability: 'reported',
     sources: [],
-    seo: { noindex: true },
     heroImage: {
       src: '',
       alt: 'Humanoid robot in a research lab setting',
@@ -145,7 +142,6 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-06-02',
     reliability: 'reported',
     sources: [],
-    seo: { noindex: true },
     heroImage: {
       src: '',
       alt: 'Humanoid robot at a conference or exhibition',
@@ -176,6 +172,156 @@ export const useCases: UseCase[] = [
     whyHardToday: '非定型会話、混雑時の安全確保、安定稼働が課題。',
     japanDeploymentConditions: 'イベント会場の安全ルールと保険条件を確認する。',
     candidateRobotIds: ['unitree-r1', 'booster-k1'],
+    relatedGuideIds: ['decision-variables'],
+  },
+  {
+    id: 'customer-reception',
+    slug: 'customer-reception',
+    title: 'Customer Reception and Guidance',
+    titleJa: '受付・接客対応',
+    subtitle: '受付・案内・接客対応を、定型シナリオの範囲でヒューマノイドに任せられるかを見る用途。',
+    summary: '受付ロビーや商業施設での来場者対応・案内を対象にしたPoC候補。',
+    publishStatus: 'published',
+    updatedAt: '2026-06-20',
+    reliability: 'reported',
+    sources: [],
+    heroImage: {
+      src: '',
+      alt: 'Humanoid robot at a reception or guidance desk',
+      credit: 'AgiBot',
+      rights: {
+        status: 'reference-attributed',
+        sourceType: 'manufacturer-official',
+        checkedAt: '2026-06-20',
+      },
+    },
+    maturityLevel: 'pilot-phase',
+    buyerReadiness: 'requires-poc',
+    environment: 'indoor-controlled',
+    requiredCapabilities: ['mobility', 'communication', 'perception'],
+    industryTags: ['hospitality'],
+    taskTags: ['customer-service'],
+    atAGlance: {
+      whereFits: '受付ロビー、商業施設の案内カウンター、来場者の対応ルートが決まっている屋内空間。',
+      whereDoesNotFit: '非定型な接客交渉、クレーム対応、混雑時の自由な人混み移動。',
+      mustBeTrue: '対話シナリオを事前設計でき、対応範囲を超えたら即座に人にエスカレーションできる体制がある。',
+    },
+    overview:
+      '受付・案内向けロボットは量産が進んでいる領域で、AgiBot A2のように既に商用展開されている機体がある一方、対話の自然さや稼働の安定性は機体ごとに差が大きい。',
+    whyItMatters:
+      '人手不足が深刻な接客・案内業務において、定型的な案内や来場者対応を補助できれば、スタッフを非定型業務に集中させられる可能性がある。',
+    capabilityNotes: {
+      communication: '多言語対応や音声認識の精度は機体・現場の言語環境によって差が大きく、PoCでの実地確認が必要。',
+      mobility: '受付エリア内の限定的な移動が前提で、自由な人混み移動を想定した設計ではない。',
+      perception: '来場者の検知・追従は人数や照明条件で精度が変わる。',
+    },
+    environmentRequirements:
+      '受付カウンターまたは案内エリアの設置スペース、Wi-Fi/通信環境、充電スペース、緊急時にスタッフが即時対応できる配置。',
+    whyHardToday:
+      '非定型な質問への対応、クレーム時のエスカレーション判断、長時間稼働時の応答品質維持が課題。可搬重量や応答速度が公式非公表の機体もあり、現場検証で確認すべき項目が残る。',
+    japanDeploymentConditions:
+      '日本語対話の精度、設置施設の防犯・接客ガイドラインとの整合、機体の代理店・保守体制（要確認）を確認する必要がある。',
+    candidateRobotIds: ['agibot-a2', 'ubtech-walker-x'],
+    relatedGuideIds: ['decision-variables'],
+  },
+  {
+    id: 'retail-shelf-stocking',
+    slug: 'retail-shelf-stocking',
+    title: 'Retail Shelf Stocking',
+    titleJa: '店舗棚補充・売場対応',
+    subtitle: '低価格機を使い、店舗の棚補充や売場での簡易対応をどこまで任せられるかを見る用途。',
+    summary: '軽量商品の棚補充や売場対応を対象にした、低価格機での実証候補。',
+    publishStatus: 'published',
+    updatedAt: '2026-06-20',
+    reliability: 'reported',
+    sources: [],
+    heroImage: {
+      src: '',
+      alt: 'Humanoid robot stocking shelves in a retail store',
+      credit: 'Unitree Robotics',
+      rights: {
+        status: 'reference-attributed',
+        sourceType: 'manufacturer-official',
+        checkedAt: '2026-06-20',
+      },
+    },
+    maturityLevel: 'early-stage',
+    buyerReadiness: 'initial-adoption',
+    environment: 'indoor-controlled',
+    requiredCapabilities: ['mobility', 'manipulation', 'perception'],
+    industryTags: ['retail'],
+    taskTags: ['shelf-stocking', 'customer-service'],
+    atAGlance: {
+      whereFits: '低価格機での実証を前提にした、軽量商品の補充・陳列確認・売場での簡易対応。',
+      whereDoesNotFit: '重量物の棚入れ、繁忙時間帯のレジ・接客の主担当、狭い通路でのすれ違い移動。',
+      mustBeTrue: '対象商品を軽量・標準形状に絞り、低ペイロード機での実証であることを前提に予算とKPIを設定できる。',
+    },
+    overview:
+      'Unitree R1 / R1 AIRのような量産済みの低価格機を使い、店舗棚補充や売場での簡易な接客対応を小規模に試す用途。価格と国内入手性の高さが、他の用途より早く実証段階に入れる要因になっている。',
+    whyItMatters:
+      '小売現場の人手不足は深刻だが、ヒューマノイドの導入予算を確保しづらい業態でもある。低価格機での実証実績が蓄積されれば、投資判断のハードルが下がる可能性がある。',
+    capabilityNotes: {
+      manipulation: 'R1 / R1 AIRは低ペイロード機のため、軽量・小型商品の取り扱いに限定される。',
+      mobility: '店舗の通路幅・床材・段差の有無が稼働可否を左右する。',
+      perception: '商品棚の認識精度や欠品検知の実用性は現場検証が必要。',
+    },
+    environmentRequirements:
+      '充電スペース、通路幅の確保、稼働時間帯の制限（営業時間内か否か）、緊急停止の運用ルール。',
+    whyHardToday:
+      '低ペイロードのため対応できる商品が限られ、レジ・接客対応との役割分担が未整理。長時間稼働時の安定性も検証が必要。',
+    japanDeploymentConditions:
+      '国内代理店経由での調達は可能だが、店舗運用ルール・保険・労働安全衛生上の扱いは個別に確認が必要。',
+    candidateRobotIds: ['unitree-r1', 'unitree-r1-standard'],
+    relatedGuideIds: ['decision-variables'],
+  },
+  {
+    id: 'care-physical-assistance',
+    slug: 'care-physical-assistance',
+    title: 'Care and Physical Assistance',
+    titleJa: '介護・身体介助',
+    subtitle: '介護・リハビリ施設内での移乗補助や見守りを、スタッフ同伴のPoCとして検証する用途。',
+    summary: '身体介助・見守りを対象にした、介護現場でのPoC候補。',
+    publishStatus: 'published',
+    updatedAt: '2026-06-20',
+    reliability: 'reported',
+    sources: [],
+    heroImage: {
+      src: '',
+      alt: 'Humanoid robot assisting in a care facility',
+      credit: 'Fourier Intelligence',
+      rights: {
+        status: 'reference-attributed',
+        sourceType: 'manufacturer-official',
+        checkedAt: '2026-06-20',
+      },
+    },
+    maturityLevel: 'early-stage',
+    buyerReadiness: 'requires-poc',
+    environment: 'indoor-controlled',
+    requiredCapabilities: ['manipulation', 'mobility', 'perception'],
+    industryTags: ['healthcare-care'],
+    taskTags: ['physical-assistance'],
+    atAGlance: {
+      whereFits: '介護施設・リハビリ施設内での移乗補助・見守り・対話を、スタッフ同伴のPoCとして試す環境。',
+      whereDoesNotFit: '単独での身体介助の本番運用、緊急時の即時対応が必須な現場、夜間の無人対応。',
+      mustBeTrue: '介助行為は医療・介護スタッフの監督下で行い、機体の限界（可搬重量・稼働時間）を事前に共有できる。',
+    },
+    overview:
+      'Fourier GR-3はリハビリ外骨格の技術を転用した介護向けコンセプト機として明示的に展開されており、GR-2も同社のリハビリ実績を背景に高い関節自由度を持つ。いずれも介護施設でのPoCを想定した位置づけ。',
+    whyItMatters:
+      '介護人材の不足は構造的な課題であり、身体的負荷の高い業務を補助できる可能性がある分野として注目されている。一方で安全性と信頼性の要求水準は他用途より高い。',
+    capabilityNotes: {
+      manipulation: '移乗補助などの身体接触を伴う動作は、可搬重量・グリップ精度の実証データが限定的。',
+      mobility: '施設内の床材・段差・ベッド周りの狭い動線への対応が必要。',
+      perception: '利用者の状態（姿勢・体調変化）を検知する精度は現場検証の対象。',
+    },
+    environmentRequirements:
+      '医療・介護スタッフの同伴、緊急停止手順、充電・保管スペース、利用者・家族への説明と同意プロセス。',
+    whyHardToday:
+      '身体接触を伴う介助の安全性証明、長時間稼働、設備故障時のフォールバック手順が未整理。国内では問い合わせ制で、価格・保守体制の確認が必要。',
+    japanDeploymentConditions:
+      '介護保険制度上の扱い、医療機器に該当するかの整理、施設の安全管理規程との整合、機体の国内代理店・保守体制（要確認）を確認する必要がある。',
+    candidateRobotIds: ['fourier-gr3', 'fourier-gr2'],
     relatedGuideIds: ['decision-variables'],
   },
 ];
