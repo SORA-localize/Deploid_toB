@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { ArrowRight, Calendar, Clock, User } from 'lucide-react';
+import { Calendar, Clock, User } from 'lucide-react';
 import { ArticleToc } from '@/components/ArticleToc';
 import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { CandidateRobotList } from '@/components/CandidateRobotList';
 import { JsonLd } from '@/components/JsonLd';
 import { Markdown } from '@/components/Markdown';
 import { RelatedLinkList } from '@/components/RelatedLinkList';
@@ -204,55 +205,58 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
             )}
           </div>
 
-          {/* Decision Summary */}
+          {/* サイドバー：robots/[slug]のRobotStickyAside・use-cases/[slug]と同じ「枠なし・区切り線のみ・実データ駆動」に揃える。
+              以前はrelatedRobotIds/relatedUseCaseIdsと無関係な固定リンク3本＋事前選択無しの/compareリンクだった。 */}
           <div className="col-span-12 lg:col-span-3">
-            <div className="lg:sticky top-site-header-gap space-y-6">
-              <section className="border-y border-border py-4">
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {uiText.guides.decisionSummary}
-                </h3>
-                {guide.targetReaders.length > 0 && (
-                  <div className="mb-4 border-y border-border py-4">
-                    <h4 className="text-xs font-semibold text-foreground mb-2">想定読者</h4>
-                    <p className="text-xs text-foreground/80">{guide.targetReaders.join(' / ')}</p>
+            <div className="lg:sticky top-site-header-gap space-y-5">
+              {robots.length > 0 && (
+                <>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
+                      {uiText.guides.relatedRobots}
+                    </p>
+                    <CandidateRobotList robots={robots} />
                   </div>
-                )}
-                <Link
-                  href="/compare"
-                  className="block w-full px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium text-center transition-colors"
-                >
-                  {uiText.guides.compareCandidateRobots}
-                </Link>
-              </section>
+                  <div className="border-t border-border" />
+                </>
+              )}
 
-              <section className="border-y border-border py-4">
-                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {uiText.guides.relatedPaths}
-                </h3>
-                <nav className="divide-y divide-border">
-                  <Link
-                    href="/use-cases"
-                    className="group flex items-center justify-between py-2 text-xs text-foreground/80 transition-colors hover:text-foreground"
-                  >
-                    <span>用途から探す</span>
-                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                  <Link
-                    href="/reports"
-                    className="group flex items-center justify-between py-2 text-xs text-foreground/80 transition-colors hover:text-foreground"
-                  >
-                    <span>関連記事</span>
-                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                  <Link
-                    href="/contact"
-                    className="group flex items-center justify-between py-2 text-xs text-foreground/80 transition-colors hover:text-foreground"
-                  >
-                    <span>相談する</span>
-                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                </nav>
-              </section>
+              {useCases.length > 0 && (
+                <>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
+                      {uiText.guides.relatedUseCases}
+                    </p>
+                    <nav>
+                      {useCases.map((useCase) => (
+                        <Link
+                          key={useCase.id}
+                          href={`/use-cases/${useCase.slug}`}
+                          className="block text-xs text-foreground/80 hover:text-foreground py-2 border-b border-border last:border-b-0"
+                        >
+                          {useCase.titleJa ?? useCase.title}
+                        </Link>
+                      ))}
+                    </nav>
+                  </div>
+                  <div className="border-t border-border" />
+                </>
+              )}
+
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+                  選定の相談
+                </p>
+                <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                  このガイドの内容を踏まえて検討したい場合はご相談ください。
+                </p>
+                <Link
+                  href="/contact"
+                  className="flex items-center justify-center w-full px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium transition-colors"
+                >
+                  相談する
+                </Link>
+              </div>
             </div>
           </div>
         </div>
