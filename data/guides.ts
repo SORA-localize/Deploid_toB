@@ -89,6 +89,7 @@ export const guides: Guide[] = [
       'customer-reception',
       'retail-shelf-stocking',
       'care-physical-assistance',
+      'factory-assembly-support',
     ],
   },
   {

@@ -367,6 +367,9 @@ export function validateData(): ValidationResult {
   for (const d of deployments) {
     check('deployment', d.id, 'manufacturerId', d.manufacturerId, manufacturerIds);
     if (d.robotId) check('deployment', d.id, 'robotId', d.robotId, robotIds);
+    (d.relatedUseCaseIds ?? []).forEach((s) =>
+      check('deployment', d.id, 'relatedUseCaseIds', s, useCaseIds),
+    );
     checkDate('deployment', d.id, 'updatedAt', d.updatedAt);
     checkRequiredSources('deployment', d.id, d.sources);
   }

@@ -218,7 +218,7 @@ export const useCases: UseCase[] = [
     environmentRequirements:
       '受付カウンターまたは案内エリアの設置スペース、Wi-Fi/通信環境、充電スペース、緊急時にスタッフが即時対応できる配置。',
     whyHardToday:
-      '非定型な質問への対応、クレーム時のエスカレーション判断、長時間稼働時の応答品質維持が課題。可搬重量や応答速度が公式非公表の機体もあり、現場検証で確認すべき項目が残る。',
+      '非定型な質問対応、クレーム時のエスカレーション判断、長時間稼働時の応答品質維持が課題（可搬重量・応答速度は機体により非公表）。',
     japanDeploymentConditions:
       '日本語対話の精度、設置施設の防犯・接客ガイドラインとの整合、機体の代理店・保守体制（要確認）を確認する必要がある。',
     candidateRobotIds: ['agibot-a2', 'ubtech-walker-x'],
@@ -268,7 +268,7 @@ export const useCases: UseCase[] = [
     environmentRequirements:
       '充電スペース、通路幅の確保、稼働時間帯の制限（営業時間内か否か）、緊急停止の運用ルール。',
     whyHardToday:
-      '低ペイロードのため対応できる商品が限られ、レジ・接客対応との役割分担が未整理。長時間稼働時の安定性も検証が必要。',
+      '低ペイロードで対応商品が限られ、レジ・接客対応との役割分担や長時間稼働時の安定性は未検証。',
     japanDeploymentConditions:
       '国内代理店経由での調達は可能だが、店舗運用ルール・保険・労働安全衛生上の扱いは個別に確認が必要。',
     candidateRobotIds: ['unitree-r1', 'unitree-r1-standard'],
@@ -318,10 +318,60 @@ export const useCases: UseCase[] = [
     environmentRequirements:
       '医療・介護スタッフの同伴、緊急停止手順、充電・保管スペース、利用者・家族への説明と同意プロセス。',
     whyHardToday:
-      '身体接触を伴う介助の安全性証明、長時間稼働、設備故障時のフォールバック手順が未整理。国内では問い合わせ制で、価格・保守体制の確認が必要。',
+      '身体接触を伴う介助の安全性証明、故障時のフォールバック手順が未整理（国内は価格・保守体制とも問い合わせ制）。',
     japanDeploymentConditions:
       '介護保険制度上の扱い、医療機器に該当するかの整理、施設の安全管理規程との整合、機体の国内代理店・保守体制（要確認）を確認する必要がある。',
     candidateRobotIds: ['fourier-gr3', 'fourier-gr2'],
+    relatedGuideIds: ['decision-variables'],
+  },
+  {
+    id: 'factory-assembly-support',
+    slug: 'factory-assembly-support',
+    title: 'Factory Assembly and Material Handling Support',
+    titleJa: '工場内搬送・組立支援',
+    subtitle: '自動車工場を中心に、部品搬送や組立補助の実証・量産導入が最も集中している用途。',
+    summary: '完成車工場・部品工場での部品搬送、組立キット運搬、外観検査補助を対象にした用途。',
+    publishStatus: 'published',
+    updatedAt: '2026-06-21',
+    reliability: 'reported',
+    sources: [],
+    heroImage: {
+      src: '',
+      alt: 'Humanoid robot assisting on a factory assembly line',
+      credit: 'Wandercraft',
+      rights: {
+        status: 'reference-attributed',
+        sourceType: 'manufacturer-official',
+        checkedAt: '2026-06-21',
+      },
+    },
+    maturityLevel: 'pilot-phase',
+    buyerReadiness: 'requires-poc',
+    environment: 'indoor-semi-controlled',
+    requiredCapabilities: ['mobility', 'manipulation', 'perception'],
+    industryTags: ['manufacturing', 'plant'],
+    taskTags: ['assembly', 'material-handling'],
+    atAGlance: {
+      whereFits: '自動車・電子機器等の組立ラインで、部品搬送・組立キット運搬・簡易な組立補助を行う、動線が決まった工場内環境。',
+      whereDoesNotFit: '高精度・高速なライン作業の本体工程、人手と同等以上の作業速度が必須な工程。',
+      mustBeTrue: '対象工程を部品搬送・補助作業に絞り、既存の生産ラインと並走させながら段階的に検証できる体制がある。',
+    },
+    overview:
+      '工場内搬送・組立支援は、ヒューマノイドの実証・量産導入が他の用途より集中している領域で、BMW・メルセデス・ベンツ・NIO・Renault・Teslaが実証または量産導入を進めている。Renaultドゥエー工場のWandercraft CALVIN-40は350台規模の量産導入に進んでおり、現時点で確認できる中で最も成熟した事例。',
+    whyItMatters:
+      '自動車工場という単一業種に複数メーカーの実証が集中していることは、この用途が現時点で投資対効果を見込みやすい領域であることを示す。日本の製造業が最初に参照しやすいベンチマークになる。',
+    capabilityNotes: {
+      manipulation: '部品・組立キットの把持精度は機種差が大きく、軽量・標準形状の対象物に絞った実証が中心。',
+      mobility: '工場内の決められた動線が前提で、自由な人混み移動は想定しない。',
+      perception: '外観検査補助では対象設備ごとに検知精度の実地確認が必要。',
+    },
+    environmentRequirements:
+      '生産ラインと並走できる動線設計、充電・保管スペース、既存設備との通信・連携環境。',
+    whyHardToday:
+      '人手と同等の作業速度・精度の証明、既存ラインの安全規格との整合、長時間稼働時の安定性が課題。詳しい判断基準は意思決定変数の地図を参照。',
+    japanDeploymentConditions:
+      '国内自動車・電子機器メーカーでの公開実証はまだ確認できておらず、価格・保守体制は機種ごとに要確認。',
+    candidateRobotIds: ['figure-02', 'apptronik-apollo', 'wandercraft-calvin', 'ubtech-walker-s1', 'tesla-optimus'],
     relatedGuideIds: ['decision-variables'],
   },
 ];
