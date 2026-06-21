@@ -7,6 +7,7 @@ import { JsonLd } from '@/components/JsonLd';
 import { ManufacturerDetailStickyHeader } from '@/components/ManufacturerDetailStickyHeader';
 import type { ManufacturerDetailSectionLink } from '@/components/ManufacturerDetailSectionNav';
 import { SourceList } from '@/components/SourceList';
+import { UseCaseCandidateRobots } from '@/components/UseCaseCandidateRobots';
 import {
   getDeploymentsForUseCase,
   getRelatedGuides,
@@ -26,7 +27,6 @@ import {
 import { breadcrumbJsonLd, useCaseJsonLd } from '@/lib/jsonLd';
 import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
-import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
@@ -263,38 +263,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
                   候補ロボット
                 </p>
-                {candidateRobots.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">候補は精査中です。</p>
-                ) : (
-                  <div>
-                    {candidateRobots.length > 1 && (
-                      <Link
-                        href={`/compare?compare=${candidateRobots.map((robot) => robot.id).join(',')}`}
-                        className="mb-4 flex items-center justify-center w-full px-3 py-1.5 border border-foreground/30 hover:border-foreground/60 text-xs font-medium transition-colors text-foreground"
-                      >
-                        {uiText.useCases.compareAllCandidates}
-                      </Link>
-                    )}
-                    {candidateRobots.map((robot) => (
-                      <div key={robot.id} className="border-b border-border py-4 first:pt-0 last:border-b-0 last:pb-0">
-                        <Link href={`/robots/${robot.slug}`} className="block mb-1.5">
-                          <h4 className="text-sm font-semibold text-foreground hover:text-foreground/80">
-                            {getRobotRelatedTitle(robot)}
-                          </h4>
-                        </Link>
-                        <p className="text-xs text-muted-foreground mb-2.5 leading-relaxed line-clamp-2">
-                          {robot.summary}
-                        </p>
-                        <Link
-                          href={`/compare?compare=${robot.id}`}
-                          className="flex items-center justify-center w-full px-3 py-1.5 border border-border hover:border-foreground/40 text-xs transition-colors text-foreground/80 hover:text-foreground"
-                        >
-                          {uiText.compare.compare}
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <UseCaseCandidateRobots robots={candidateRobots} />
               </div>
 
               {(guides.length > 0 || reports.length > 0) && (
