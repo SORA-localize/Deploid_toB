@@ -7,7 +7,7 @@ import { JsonLd } from '@/components/JsonLd';
 import { ManufacturerDetailStickyHeader } from '@/components/ManufacturerDetailStickyHeader';
 import type { ManufacturerDetailSectionLink } from '@/components/ManufacturerDetailSectionNav';
 import { SourceList } from '@/components/SourceList';
-import { UseCaseCandidateRobots } from '@/components/UseCaseCandidateRobots';
+import { CandidateRobotList } from '@/components/CandidateRobotList';
 import {
   getDeploymentsForUseCase,
   getRelatedGuides,
@@ -263,7 +263,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
                   候補ロボット
                 </p>
-                <UseCaseCandidateRobots robots={candidateRobots} />
+                <CandidateRobotList robots={candidateRobots} />
               </div>
 
               {(guides.length > 0 || reports.length > 0) && (

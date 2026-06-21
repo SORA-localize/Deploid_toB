@@ -7,15 +7,16 @@ import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { useFavorites } from '@/lib/useFavorites';
 
-interface UseCaseCandidateRobotsProps {
+interface CandidateRobotListProps {
   robots: Robot[];
+  emptyMessage?: string;
 }
 
-export function UseCaseCandidateRobots({ robots }: UseCaseCandidateRobotsProps) {
+export function CandidateRobotList({ robots, emptyMessage = '候補は精査中です。' }: CandidateRobotListProps) {
   const { favorites, toggleFavorite } = useFavorites();
 
   if (robots.length === 0) {
-    return <p className="text-xs text-muted-foreground">候補は精査中です。</p>;
+    return <p className="text-xs text-muted-foreground">{emptyMessage}</p>;
   }
 
   return (
@@ -25,7 +26,7 @@ export function UseCaseCandidateRobots({ robots }: UseCaseCandidateRobotsProps) 
           href={`/compare?compare=${robots.map((robot) => robot.id).join(',')}`}
           className="mb-4 flex items-center justify-center w-full px-3 py-1.5 border border-foreground/30 hover:border-foreground/60 text-xs font-medium transition-colors text-foreground"
         >
-          {uiText.useCases.compareAllCandidates}
+          {uiText.common.compareAllCandidates}
         </Link>
       )}
       {robots.map((robot) => {

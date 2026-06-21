@@ -1,6 +1,7 @@
 export const uiText = {
   common: {
     home: 'ホーム',
+    compareAllCandidates: '候補ロボットを一括比較',
     all: 'すべて',
     allTypes: 'すべての分類',
     allManufacturers: 'すべてのメーカー',
@@ -110,9 +111,6 @@ export const uiText = {
     relatedRobots: '関連ロボット',
     relatedUseCases: '関連用途',
     relatedRobotsCount: (count: number) => `${count}件の関連ロボット`,
-    decisionSummary: '判断サマリ',
-    compareCandidateRobots: '候補ロボットを比較する',
-    relatedPaths: '関連導線',
     backToAll: 'ガイド一覧へ戻る',
     body: '本文',
     checklist: 'チェックリスト',
@@ -140,7 +138,6 @@ export const uiText = {
     all: 'すべての用途',
     candidateRobots: (count: number) => `${count}件の候補ロボット`,
     atAGlance: '要点',
-    compareAllCandidates: '候補ロボットを一括比較',
   },
   compare: {
     breadcrumb: '比較',
