@@ -1,14 +1,17 @@
 'use client';
 
 import { useMemo } from 'react';
+import type { ActiveFilterChip } from '@/components/ActiveFilterChips';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { SearchInput } from '@/components/SearchInput';
 import { SelectControl } from '@/components/SelectControl';
 import { UseCaseCard } from '@/components/UseCaseCard';
+import { UseCasesHeader } from '@/components/UseCasesHeader';
 import type { UseCase } from '@/data/types';
 import {
+  getTagLabel,
   getUseCaseIndustryTagOptions,
   getUseCaseTaskTagOptions,
 } from '@/lib/tags';
@@ -51,8 +54,29 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
     [useCases, initialFilters],
   );
 
+  const activeChips = useMemo(() => {
+    const chips: ActiveFilterChip[] = [];
+    if (initialFilters.industry) {
+      chips.push({
+        key: 'industry',
+        label: getTagLabel(initialFilters.industry, 'industry'),
+        onRemove: () => updateParams({ industry: null }),
+      });
+    }
+    if (initialFilters.task) {
+      chips.push({
+        key: 'task',
+        label: getTagLabel(initialFilters.task, 'task'),
+        onRemove: () => updateParams({ task: null }),
+      });
+    }
+    return chips;
+  }, [initialFilters, updateParams]);
+
   return (
     <div className="min-h-screen bg-background">
+      <UseCasesHeader activeChips={activeChips} />
+
       <div className="border-b border-border bg-card">
         <div className="site-container py-5">
           <Breadcrumbs items={[{ label: uiText.useCases.breadcrumb }]} />

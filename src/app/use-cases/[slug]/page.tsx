@@ -4,6 +4,8 @@ import { AlertCircle, Building2, CheckCircle2, MapPin } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
+import { ManufacturerDetailStickyHeader } from '@/components/ManufacturerDetailStickyHeader';
+import type { ManufacturerDetailSectionLink } from '@/components/ManufacturerDetailSectionNav';
 import { SourceList } from '@/components/SourceList';
 import {
   getDeploymentsForUseCase,
@@ -62,6 +64,17 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
     ['必要能力', useCase.requiredCapabilities.map((c) => capabilityLabels[c]).join(', ')],
   ];
 
+  const sections: ManufacturerDetailSectionLink[] = [
+    { label: '要点', href: '#at-a-glance' },
+    ...(deployments.length > 0
+      ? [{ label: '導入事例', href: '#deployments', count: deployments.length }]
+      : []),
+    { label: uiText.common.overview, href: '#overview' },
+    { label: 'なぜ重要か', href: '#why-it-matters' },
+    { label: '論点', href: '#considerations' },
+    { label: uiText.common.resources, href: '#sources', count: useCase.sources.length },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <JsonLd data={useCaseJsonLd(useCase)} />
@@ -71,6 +84,11 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
           { name: uiText.useCases.breadcrumb, path: '/use-cases' },
           { name: useCase.titleJa ?? useCase.title, path: `/use-cases/${useCase.slug}` },
         ])}
+      />
+      <ManufacturerDetailStickyHeader
+        title={useCase.titleJa ?? useCase.title}
+        sections={sections}
+        ariaLabel="用途詳細セクション"
       />
 
       <div className="site-container py-8">
@@ -94,7 +112,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8 lg:gap-12 items-start">
           {/* ── LEFT COLUMN ─────────────────────────────── */}
           <div className="min-w-0">
-            <div className="pb-8 border-b border-border">
+            <div id="at-a-glance" className="pb-8 border-b border-border scroll-mt-site-header">
               <h2 className="text-lg font-semibold text-foreground mb-4">
                 {uiText.useCases.atAGlance}
               </h2>
@@ -121,7 +139,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
             </div>
 
             {deployments.length > 0 && (
-              <section className="pt-6 pb-8 border-b border-border">
+              <section id="deployments" className="pt-6 pb-8 border-b border-border scroll-mt-site-header">
                 <h2 className="text-lg font-semibold text-foreground mb-4">実際の導入事例</h2>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {deployments.map((d) => {
@@ -161,20 +179,20 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
               </section>
             )}
 
-            <section className="pt-6 pb-8 border-b border-border">
+            <section id="overview" className="pt-6 pb-8 border-b border-border scroll-mt-site-header">
               <h2 className="text-lg font-semibold text-foreground mb-4">
                 {uiText.common.overview}
               </h2>
               <p className="text-sm text-foreground/80 leading-relaxed">{useCase.overview}</p>
             </section>
 
-            <section className="pt-6 pb-8 border-b border-border">
+            <section id="why-it-matters" className="pt-6 pb-8 border-b border-border scroll-mt-site-header">
               <h2 className="text-lg font-semibold text-foreground mb-4">なぜ重要か</h2>
               <p className="text-sm text-foreground/80 leading-relaxed">{useCase.whyItMatters}</p>
             </section>
 
             {/* 補足セクション：詳しい判断はガイドに渡すため、ここは要点のみに圧縮する */}
-            <section className="pt-6 pb-8">
+            <section id="considerations" className="pt-6 pb-8 scroll-mt-site-header">
               <h2 className="text-sm font-semibold text-muted-foreground mb-5">
                 導入検討の論点（要点）
               </h2>
