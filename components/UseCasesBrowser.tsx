@@ -94,9 +94,9 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
             <h3 className="text-sm font-semibold text-foreground mb-4 px-1">
               {uiText.useCases.featured}
             </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-2 gap-4 max-w-2xl">
               {featured.map((u) => (
-                <UseCaseCard key={u.id} useCase={u} variant="featured" />
+                <UseCaseCard key={u.id} useCase={u} />
               ))}
             </div>
           </div>
@@ -111,9 +111,9 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
           </span>
         </div>
 
-        <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
           {(active ? filtered : rest).map((u) => (
-            <UseCaseCard key={u.id} useCase={u} variant="list" />
+            <UseCaseCard key={u.id} useCase={u} />
           ))}
         </div>
 
