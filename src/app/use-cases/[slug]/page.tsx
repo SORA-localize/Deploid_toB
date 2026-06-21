@@ -4,6 +4,7 @@ import { AlertCircle, Building2, CheckCircle2, MapPin } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
+import { SourceList } from '@/components/SourceList';
 import {
   getDeploymentsForUseCase,
   getRelatedGuides,
@@ -76,12 +77,6 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
           <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-4 leading-tight">
             <BudouXText text={useCase.titleJa ?? useCase.title} />
           </h1>
-          {useCase.sources.length === 0 && (
-            <div className="mb-4 flex items-start gap-2 border border-border bg-muted/50 p-3 text-xs text-muted-foreground">
-              <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              <span>この用途ページは情報確認中です。出典の裏取りが完了次第、更新します。</span>
-            </div>
-          )}
           <p className="text-sm text-foreground/80 leading-relaxed max-w-3xl mb-5">
             {useCase.subtitle ?? useCase.summary}
           </p>
@@ -224,6 +219,13 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                 </Link>
               )}
             </section>
+
+            <SourceList
+              id="sources"
+              sources={useCase.sources}
+              className="py-8 border-t border-border scroll-mt-site-header"
+              titleClassName="text-sm font-semibold text-foreground mb-4"
+            />
           </div>
 
           <div className="col-span-12 lg:col-span-4">
