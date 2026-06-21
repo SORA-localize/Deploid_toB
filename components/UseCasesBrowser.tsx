@@ -1,17 +1,14 @@
 'use client';
 
 import { useMemo } from 'react';
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { SearchInput } from '@/components/SearchInput';
 import { SelectControl } from '@/components/SelectControl';
-import { TagChip } from '@/components/TagChip';
+import { UseCaseCard } from '@/components/UseCaseCard';
 import type { UseCase } from '@/data/types';
-import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
 import {
   getUseCaseIndustryTagOptions,
   getUseCaseTaskTagOptions,
@@ -23,10 +20,6 @@ import {
   type UseCaseSearchMode,
 } from '@/lib/useCaseFilters';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
-import {
-  getBuyerReadinessTone,
-  getUseCaseMaturityTone,
-} from '@/lib/visualSemantics';
 
 const modeOptions: Array<{ value: UseCaseSearchMode; label: string }> = [
   { value: 'task', label: 'タスクで探す' },
@@ -116,28 +109,7 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
             </h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {featured.map((u) => (
-                <Link
-                  key={u.id}
-                  href={`/use-cases/${u.slug}`}
-                  className="card-data block p-6"
-                >
-                  <div className="flex items-center gap-2 mb-3 flex-wrap">
-                    {u.industryTags[0] && (
-                      <TagChip kind="industry" value={u.industryTags[0]} />
-                    )}
-                    <TagChip tone={getUseCaseMaturityTone(u.maturityLevel)}>
-                      {maturityLabels[u.maturityLevel]}
-                    </TagChip>
-                    <TagChip tone={getBuyerReadinessTone(u.buyerReadiness)}>
-                      {buyerReadinessLabels[u.buyerReadiness]}
-                    </TagChip>
-                  </div>
-                  <h4 className="text-lg font-semibold text-foreground mb-2">{u.titleJa ?? u.title}</h4>
-                  <p className="text-sm text-foreground/80 mb-3 leading-relaxed">{u.subtitle ?? u.summary}</p>
-                  <div className="text-xs text-muted-foreground">
-                    {uiText.useCases.candidateRobots(u.candidateRobotIds.length)}
-                  </div>
-                </Link>
+                <UseCaseCard key={u.id} useCase={u} variant="featured" />
               ))}
             </div>
           </div>
@@ -154,40 +126,7 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
 
         <div className="space-y-3">
           {(active ? filtered : rest).map((u) => (
-            <Link
-              key={u.id}
-              href={`/use-cases/${u.slug}`}
-              className="card-data block p-4"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    {u.industryTags[0] && (
-                      <TagChip kind="industry" value={u.industryTags[0]} />
-                    )}
-                    <TagChip tone={getUseCaseMaturityTone(u.maturityLevel)}>
-                      {maturityLabels[u.maturityLevel]}
-                    </TagChip>
-                    <TagChip tone={getBuyerReadinessTone(u.buyerReadiness)}>
-                      {buyerReadinessLabels[u.buyerReadiness]}
-                    </TagChip>
-                  </div>
-                  <h4 className="font-semibold text-foreground mb-2">{u.titleJa ?? u.title}</h4>
-                  <p className="text-xs text-muted-foreground mb-2 leading-relaxed line-clamp-2">
-                    {u.subtitle ?? u.summary}
-                  </p>
-                  <div className="flex gap-2 mb-2 flex-wrap">
-                    {u.taskTags.slice(0, 3).map((t) => (
-                      <TagChip key={t} kind="task" value={t} />
-                    ))}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {uiText.useCases.candidateRobots(u.candidateRobotIds.length)}
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground/70 flex-shrink-0 mt-1" />
-              </div>
-            </Link>
+            <UseCaseCard key={u.id} useCase={u} variant="list" />
           ))}
         </div>
 

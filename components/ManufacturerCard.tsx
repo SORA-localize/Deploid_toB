@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { Manufacturer, Robot } from '@/data/types';
@@ -12,6 +13,7 @@ import {
   getRepresentativeRobotLabel,
   manufacturerConsultationRouteLabels,
 } from '@/lib/manufacturerDisplay';
+import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
 
 interface ManufacturerCardProps {
   manufacturer: Manufacturer;
@@ -21,15 +23,50 @@ interface ManufacturerCardProps {
 export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps) {
   const consultationRoute = getManufacturerConsultationRoute(manufacturer);
   const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
+  const {
+    cardRef,
+    rotateX,
+    rotateY,
+    glowOpacity,
+    handleMouseMove,
+    handleMouseEnter,
+    handleMouseLeave,
+  } = useTiltCardEffect();
 
   return (
-    <div className="card-data relative overflow-hidden">
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{ rotateX, rotateY, transformPerspective: 1000 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="card-data group relative overflow-hidden"
+    >
+      {/* Glow + shimmer はRobotCardと同じ演出（lib/useTiltCardEffect.ts参照） */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-30"
+        style={{
+          opacity: glowOpacity,
+          background: 'radial-gradient(circle at center, var(--card-spotlight) 0%, transparent 70%)',
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 left-0 z-30 w-[100%] -translate-x-full -skew-x-12 bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-[200%]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 left-0 z-40 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full"
+      />
+
       {/* カード全体を詳細ページへのリンクに（キーボード/SRからもこのリンクで遷移できる正規導線）。
           内側の外部HPリンク・代理店リンク/メニューは pointer-events-auto で温存。 */}
       <Link
         href={`/manufacturers/${manufacturer.slug}`}
         aria-label={manufacturer.nameJa ?? manufacturer.name}
-        className="absolute inset-0"
+        className="absolute inset-0 z-20"
       />
       <div className="relative z-10 p-4 sm:p-6 pointer-events-none">
         <div className="flex items-start justify-between gap-4 mb-5">
@@ -139,6 +176,6 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
