@@ -132,7 +132,15 @@ Deploid は、ヒューマノイド導入を検討する事業者向けの buyer
 | floating ボタン | — | `rounded-full` | — |
 
 - 実装: `src/app/globals.css @layer components` の `.card-data` / `.card-editorial` を使う。
-- RobotCard は motion アニメーション専用実装のため例外（`hover:border-ring hover:shadow-lg` + glow を維持）。
+- **更新 2026-06-21**：マウス追従の3Dチルト＋グロー＋シマー＋ホバー下線という演出は、`RobotCard`専用ではなく`lib/useTiltCardEffect.ts`の共通フックとして切り出し、`RobotCard`/`ManufacturerCard`/`UseCaseCard`の一覧カード全種で共有する。新しいカード種別を増やす場合もこのフックを使い、演出ロジックを複製しない。
+
+**画像・ロゴが無いときのプレースホルダー（更新 2026-06-21）**
+
+権利確認が取れず画像を出せないレコードは、`CameraOff`アイコン＋短い1行ラベル（`text-xs text-muted-foreground`程度）だけに留める。英語・日本語の2行ラベルや`uppercase tracking-widest`のような強調装飾は使わない。一覧で同じプレースホルダーが多数並ぶ場合、ラベルが目立つほど「壊れている」ように見えるため、控えめさを優先する（`components/ManufacturerLogoName.tsx`の小アイコン＋テキストの扱いを基準にする）。
+
+**カード内タイポグラフィのコントラスト（更新 2026-06-21）**
+
+一覧カードはタイトルとメタデータ（スペック行・タグ等）の差を意図的につける。タイトルは周囲より一段大きく・太く（`text-base`〜`text-lg font-semibold`程度）、スペック値・補足情報は一段小さく・`text-muted-foreground`寄りにする（`text-[11px]`程度まで落としてよい）。すべてを同じ大きさで並べない。
 
 ---
 
@@ -237,8 +245,9 @@ className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-
 
 - 画像枠は `aspect-[4/3]`。
 - 画像は `object-contain`。
-- 画像が表示不可でも `[ MAIN IMAGE ]` placeholderで成立させる。
+- 画像が表示不可でも成立させる。プレースホルダーは`CameraOff`アイコン＋1行ラベルのみ（§3「画像・ロゴが無いときのプレースホルダー」参照。2行・強調装飾は使わない）。
 - specは捏造しない。未確認は `TBD_LABEL`。
+- ホバー時のチルト/グロー/シマー演出は`lib/useTiltCardEffect.ts`を使う（他カード種別と共通）。
 - favoriteは任意機能としてpropsで渡す。
 
 ### Image Carousel

@@ -3,13 +3,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Star, CameraOff } from 'lucide-react';
-import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { useRef } from 'react';
+import { motion } from 'motion/react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, Robot } from '@/data/types';
 import { getDisplayableAsset } from '@/lib/media';
 import { getRobotCardSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
+import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
 import { cn } from '@/lib/utils';
 import {
   getDeploymentStageTone,
@@ -27,10 +27,6 @@ interface RobotCardProps {
   mobileVisual?: boolean;
 }
 
-const TILT_MAX = 5;
-const TILT_SPRING = { stiffness: 300, damping: 28 } as const;
-const GLOW_SPRING = { stiffness: 180, damping: 22 } as const;
-
 export function RobotCard({
   robot,
   manufacturerName,
@@ -44,35 +40,15 @@ export function RobotCard({
   const deploymentStageTone = getDeploymentStageTone(robot.deploymentStage);
   const cardImage = getDisplayableAsset(robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage);
 
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  const normX = useMotionValue(0.5);
-  const normY = useMotionValue(0.5);
-
-  const rawRotateX = useTransform(normY, [0, 1], [TILT_MAX, -TILT_MAX]);
-  const rawRotateY = useTransform(normX, [0, 1], [-TILT_MAX, TILT_MAX]);
-
-  const rotateX = useSpring(rawRotateX, TILT_SPRING);
-  const rotateY = useSpring(rawRotateY, TILT_SPRING);
-  const glowOpacity = useSpring(0, GLOW_SPRING);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = cardRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    normX.set((e.clientX - rect.left) / rect.width);
-    normY.set((e.clientY - rect.top) / rect.height);
-  };
-
-  const handleMouseEnter = () => {
-    glowOpacity.set(1);
-  };
-
-  const handleMouseLeave = () => {
-    normX.set(0.5);
-    normY.set(0.5);
-    glowOpacity.set(0);
-  };
+  const {
+    cardRef,
+    rotateX,
+    rotateY,
+    glowOpacity,
+    handleMouseMove,
+    handleMouseEnter,
+    handleMouseLeave,
+  } = useTiltCardEffect();
 
   return (
     <motion.div
@@ -154,11 +130,8 @@ export function RobotCard({
             </div>
           ) : (
             <>
-              <CameraOff className="w-8 h-8 mb-2 opacity-20" />
-              <span className="text-[10px] uppercase tracking-widest font-medium opacity-60">
-                {uiText.robots.imageRequested}
-              </span>
-              <span className="text-[10px] mt-0.5 opacity-40">
+              <CameraOff className="w-6 h-6 mb-1.5 opacity-20" />
+              <span className="text-xs text-muted-foreground/70">
                 {uiText.robots.mainImageMissing}
               </span>
             </>
@@ -180,7 +153,7 @@ export function RobotCard({
         const detailContent = (
           <div className="p-3 md:p-3 flex-1 flex flex-col min-w-0">
             <div className="flex items-start justify-between mb-1.5">
-              <h3 className="font-semibold text-card-foreground">
+              <h3 className="text-base font-semibold text-card-foreground">
                 <Link href={`/robots/${robot.slug}`} className="hover:underline">
                   {robot.nameJa ?? robot.name}
                 </Link>
@@ -196,16 +169,16 @@ export function RobotCard({
                   imageClassName="h-3 w-3"
                 />
               </div>
-              <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+              <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
                 {specRows.map((row) => (
                   <div key={row.label} className={row.label === '段階' ? undefined : 'hidden md:block'}>
-                    <dt className="text-muted-foreground">{row.label}</dt>
+                    <dt className="text-muted-foreground/80">{row.label}</dt>
                     <dd
                       className={cn(
                         'font-medium',
                         row.label === '段階'
                           ? getVisualToneTextClassName(deploymentStageTone)
-                          : 'text-card-foreground',
+                          : 'text-card-foreground/90',
                       )}
                     >
                       {row.value}
@@ -232,7 +205,7 @@ export function RobotCard({
             <div className="relative z-20 flex flex-col h-full pointer-events-none md:hidden">
               {mobileImageBox}
               <div className="p-3 flex-1 flex flex-col min-w-0">
-                <h3 className="font-semibold text-card-foreground">
+                <h3 className="text-base font-semibold text-card-foreground">
                   <Link href={`/robots/${robot.slug}`} className="hover:underline">
                     {robot.nameJa ?? robot.name}
                   </Link>
