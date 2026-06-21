@@ -129,7 +129,7 @@ slug ──┬── URL識別子        /robots/unitree-g1
   useCases        用途からの逆引き
 
 派生・補助
-  deployments     導入事例（ワールドマップ用）
+  deployments     導入事例（ワールドマップ用 + useCases の根拠データ）
   placements      記事の掲載枠（旧 reportPlacements）
   tags            タグ正本（lib/tagRegistry.ts）
   specSchema      スペック項目正本（新設）★
@@ -141,12 +141,14 @@ slug ──┬── URL識別子        /robots/unitree-g1
 manufacturers ──< robots                 (manufacturer has many robots)
 robots         ──< deployments           (robot deployed at many sites)
 useCases       >── robots (candidate)    (useCase ← candidate robots)
+useCases       <── deployments           (deployment.relatedUseCaseIds が一方向に useCase を指す。Guide⇄UseCase のような双方向対称は強制しない)
 guides         >── robots, useCases
 articles       >── robots, manufacturers, useCases, guides
 placements     >── articles
 ```
 
 - `<` = 1対多、`>──` = 多対多 or 参照。
+- `deployments.relatedUseCaseIds`（任意項目）は「この導入事例がどの用途の根拠になるか」を示す。`UseCase.candidateRobotIds`と同じ一方向参照パターンで、`lib/data.ts`の`getDeploymentsForUseCase()`が逆引きする。無理な紐付けはしない（該当しない事例は空のままでよい）。
 - **逆向きは導出**（§6）。robots は自分が属する useCases を持たない。`lib/data.ts` が逆引きする。
 
 ---

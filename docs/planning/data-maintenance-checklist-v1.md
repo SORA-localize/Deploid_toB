@@ -234,19 +234,20 @@ AI側の実装手順:
 
 ## M. ユースケース（useCases）追加 / 更新
 
-> 一次情報が薄い間は薄いページを量産しない（CLAUDE.md 方針）。
+> 一次情報が薄い間は薄いページを量産しない（CLAUDE.md 方針）。`UseCase`の役割は「業界紹介ではなく作業・タスク起点の逆引き」（`humanoid_media_IA_v1.md` §7）。深い判断基準（コスト・安全・調達等）はガイド側が担うため、新規追加時もその役割を超えて書きすぎない。
 
 1. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
 2. [ ] 型必須：title / maturityLevel / buyerReadiness / environment / requiredCapabilities / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobotIds / relatedGuideIds
 3. [ ] `industryTags` / `taskTags` は登録タグのみ（自動）
-4. [ ] `candidateRobotIds` は robot の **id** 参照（自動）
+4. [ ] `candidateRobotIds` は robot の **id** 参照（自動）。**先に `data/deployments.ts` を確認し、同じニッチに複数の実在導入事例が集中していないか見る**。集中していれば、それが新規追加の最も強い根拠になる（思いつきで追加しない）
 5. [ ] **双方向対称**：`relatedGuideIds` と相手 guide.`relatedUseCaseIds` を両方そろえる（自動）
-6. [ ] 出典（sources）は手動推奨（validate 未強制）
-7. [ ] build 通過 → `published`
+6. [ ] 出典（sources）は手動推奨（validate 未強制）。個々の事実より、`relatedUseCaseIds` で紐付けた`deployments`側の出典が実質的な根拠になる想定
+7. [ ] `capabilityNotes` / `environmentRequirements` / `whyHardToday` / `japanDeploymentConditions` は各2-3文程度に圧縮し、詳しい判断はガイドへのリンクに渡す（detail page側で視覚的にも補足扱いにする）
+8. [ ] build 通過 → `published`
 
 ## N. 導入事例（deployments）追加 / 更新
 
-> Home ワールドマップの arc 根拠データ。所在地・主体・段階は一次/信頼できる二次出典で裏取り（AI生成値の混入防止）。
+> Home ワールドマップの arc 根拠データ、かつ用途（useCases）の実例的根拠データ。所在地・主体・段階は一次/信頼できる二次出典で裏取り（AI生成値の混入防止）。
 
 1. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
 2. [ ] 型必須：manufacturerId / customer / country / location{lat,lng} / status（`announced` / `pilot` / `production` / `ended` / `unknown`）
@@ -254,7 +255,8 @@ AI側の実装手順:
 4. [ ] **`sources` 必須**（自動：空だと build 失敗）
 5. [ ] `siteName`（任意）・`startedAt`（YYYY または YYYY-MM）を可能な範囲で記入。`location` は施設のおおよその座標（番地不要・市区町村レベルで可。施設名が非公開の場合は都市中心座標で代替する）
 6. [ ] **導入先の country がメーカーリストに存在しない新しい国**の場合は `components/ManufacturerMapCopy.tsx` の `REGION` 定数に追加する（→ セクション B-7 と同じ対応）
-7. [ ] build 通過 → `published`
+7. [ ] **この事例が裏付けになる用途があれば `relatedUseCaseIds`（任意・id参照）に追記する**（自動：参照切れは build 失敗）。該当する用途が無ければ空のままでよい。無理な紐付けはしない。複数の事例が同じニッチに集中している場合は、新しい `UseCase` を起こす根拠として検討する（→ セクション M）。逆引きは `lib/data.ts` の `getDeploymentsForUseCase()` がuseCase詳細ページの「実際の導入事例」セクション用に行う
+8. [ ] build 通過 → `published`
 
 ## O. 記事掲載枠（articlePlacements）追加 / 更新
 

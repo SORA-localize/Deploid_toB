@@ -8,6 +8,7 @@ import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { SearchInput } from '@/components/SearchInput';
+import { SelectControl } from '@/components/SelectControl';
 import { TagChip } from '@/components/TagChip';
 import type { UseCase } from '@/data/types';
 import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
@@ -79,13 +80,13 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
             }
           />
 
-          <FilterChipGroup
-            options={modeOptions}
+          <SelectControl
+            id="use-case-mode"
+            label={uiText.filters.useCaseMode}
             value={mode}
-            onChange={handleModeChange}
-            ariaLabel={uiText.filters.useCaseMode}
-            className="mb-4"
-            buttonClassName="px-4 py-2 text-sm"
+            onChange={(v) => handleModeChange(v as UseCaseSearchMode)}
+            options={modeOptions}
+            className="mb-4 max-w-xs"
           />
 
           <FilterChipGroup
