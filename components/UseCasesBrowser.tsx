@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
-import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { SearchInput } from '@/components/SearchInput';
 import { SelectControl } from '@/components/SelectControl';
 import { UseCaseCard } from '@/components/UseCaseCard';
@@ -17,43 +16,40 @@ import { uiText } from '@/lib/uiText';
 import {
   getUseCaseFilterResult,
   type UseCaseFilters,
-  type UseCaseSearchMode,
 } from '@/lib/useCaseFilters';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
-
-const modeOptions: Array<{ value: UseCaseSearchMode; label: string }> = [
-  { value: 'task', label: 'タスクで探す' },
-  { value: 'industry', label: '業種で探す' },
-];
 
 interface UseCasesBrowserProps {
   useCases: UseCase[];
   initialFilters: UseCaseFilters;
 }
 
+// robots/manufacturers と同じ「業種・タスクを独立した2つのドロップダウンで同時に絞り込む」構造に揃える
+// （lib/robotFilters.ts・components/RobotsBrowser.tsxを参照）。タグの値自体は
+// lib/tagRegistry.ts が唯一の正本で、getUseCaseIndustryTagOptions/getUseCaseTaskTagOptionsがそこから導出する。
 export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserProps) {
   const { updateParams } = useUrlParamUpdater();
-  const { mode, industry, task, query } = initialFilters;
+  const { query } = initialFilters;
 
-  const industries = useMemo(() => getUseCaseIndustryTagOptions(useCases), [useCases]);
-  const tasks = useMemo(() => getUseCaseTaskTagOptions(useCases), [useCases]);
-  const chipOptions = useMemo(
-    () => (mode === 'industry' ? industries : tasks),
-    [mode, industries, tasks],
+  const industryOptions = useMemo(
+    () => [
+      { value: 'all', label: uiText.common.allIndustries },
+      ...getUseCaseIndustryTagOptions(useCases).map((opt) => ({ value: opt.value, label: opt.label })),
+    ],
+    [useCases],
   );
-  const { filtered, featured, rest, active, selectedChip } = useMemo(
+  const taskOptions = useMemo(
+    () => [
+      { value: 'all', label: uiText.common.allTasks },
+      ...getUseCaseTaskTagOptions(useCases).map((opt) => ({ value: opt.value, label: opt.label })),
+    ],
+    [useCases],
+  );
+
+  const { filtered, featured, rest, active } = useMemo(
     () => getUseCaseFilterResult(useCases, initialFilters),
     [useCases, initialFilters],
   );
-
-  const handleModeChange = (nextMode: UseCaseSearchMode) => {
-    // デフォルトは task なので、task への切替は mode を消すだけで足りる。industry は明示指定が必要。
-    updateParams({
-      mode: nextMode === 'industry' ? 'industry' : null,
-      industry: null,
-      task: null,
-    });
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -73,31 +69,22 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
             }
           />
 
-          <SelectControl
-            id="use-case-mode"
-            label={uiText.filters.useCaseMode}
-            value={mode}
-            onChange={(v) => handleModeChange(v as UseCaseSearchMode)}
-            options={modeOptions}
-            className="mb-4 max-w-xs"
-          />
-
-          <FilterChipGroup
-            options={chipOptions}
-            value={selectedChip}
-            onChange={(value) =>
-              mode === 'industry'
-                ? updateParams({ mode: 'industry', industry: value, task: null })
-                : updateParams({ mode: 'task', industry: null, task: value })
-            }
-            allowDeselect
-            onClear={() =>
-              mode === 'industry'
-                ? updateParams({ mode: 'industry', industry: null })
-                : updateParams({ task: null, mode: 'task' })
-            }
-            ariaLabel={mode === 'industry' ? uiText.filters.industryTags : uiText.filters.taskTags}
-          />
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-md">
+            <SelectControl
+              id="use-case-industry"
+              label={uiText.filters.industry}
+              value={initialFilters.industry ?? 'all'}
+              onChange={(v) => updateParams({ industry: v === 'all' ? null : v })}
+              options={industryOptions}
+            />
+            <SelectControl
+              id="use-case-task"
+              label={uiText.filters.task}
+              value={initialFilters.task ?? 'all'}
+              onChange={(v) => updateParams({ task: v === 'all' ? null : v })}
+              options={taskOptions}
+            />
+          </div>
         </div>
       </div>
 

@@ -2,35 +2,33 @@ import type { UseCase } from '@/data/types';
 import { createUseCaseSearchDocument, matchesSearchDocument } from '@/lib/search';
 import { matchesTag, normalizeTagKey } from '@/lib/tags';
 
-export type UseCaseSearchMode = 'industry' | 'task';
-
+// lib/robotFilters.ts と同じ形（業種・タスクは独立した同時絞り込み軸）に揃える。
+// 「モードを選んでから片方だけのタグを出す」設計はrobots/manufacturersと一貫しないため廃止した。
 export interface UseCaseFilters {
-  mode: UseCaseSearchMode;
   industry: string | null;
   task: string | null;
   query: string;
 }
 
 export function normalizeUseCaseFilters({
-  mode,
   industry,
   task,
   query,
+  industryValues,
+  taskValues,
 }: {
-  mode: string | null | undefined;
   industry: string | null | undefined;
   task: string | null | undefined;
   query: string | null | undefined;
+  industryValues: readonly string[];
+  taskValues: readonly string[];
 }): UseCaseFilters {
-  // デフォルトは task（タスク起点）。industry は明示指定（mode=industry または industry param）された場合のみ。
-  // 設計意図: docs/planning/humanoid_media_IA_v1.md §7「業界紹介ではなく、作業・タスク起点」
-  const normalizedMode: UseCaseSearchMode =
-    mode === 'industry' || (industry && mode !== 'task') ? 'industry' : 'task';
+  const normalizedIndustry = industry ? normalizeTagKey(industry) : null;
+  const normalizedTask = task ? normalizeTagKey(task) : null;
 
   return {
-    mode: normalizedMode,
-    industry: normalizedMode === 'industry' && industry ? normalizeTagKey(industry) : null,
-    task: normalizedMode === 'task' && task ? normalizeTagKey(task) : null,
+    industry: normalizedIndustry && industryValues.includes(normalizedIndustry) ? normalizedIndustry : null,
+    task: normalizedTask && taskValues.includes(normalizedTask) ? normalizedTask : null,
     query: query ?? '',
   };
 }
@@ -55,6 +53,5 @@ export function getUseCaseFilterResult(
     featured: filtered.slice(0, 2),
     rest: filtered.slice(2),
     active: Boolean(filters.industry || filters.task || filters.query),
-    selectedChip: filters.mode === 'industry' ? filters.industry : filters.task,
   };
 }

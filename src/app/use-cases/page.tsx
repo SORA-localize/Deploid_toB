@@ -2,34 +2,40 @@ import { UseCasesBrowser } from '@/components/UseCasesBrowser';
 import { getUseCases } from '@/lib/data';
 import { createPageMetadata } from '@/lib/metadata';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
-import { getTagLabel } from '@/lib/tags';
+import { getTagLabel, getUseCaseIndustryTagOptions, getUseCaseTaskTagOptions } from '@/lib/tags';
 import { getUseCaseFilterResult, normalizeUseCaseFilters } from '@/lib/useCaseFilters';
 
 const defaultTitle = '用途から探す';
 const defaultDescription =
   '業種・ワークフロー・タスクから現実的なヒューマノイドの適用機会を探す。ベンダー名ではなく現場の課題から始めます。';
 
-export async function generateMetadata({ searchParams }: { searchParams: RouteSearchParams }) {
-  const params = await pickSearchParams(searchParams, ['mode', 'industry', 'task', 'q'] as const);
-  const filters = normalizeUseCaseFilters({
-    mode: params.mode,
+function resolveFilters(useCases: ReturnType<typeof getUseCases>, params: { industry: string | null; task: string | null; q: string | null }) {
+  return normalizeUseCaseFilters({
     industry: params.industry,
     task: params.task,
     query: params.q,
+    industryValues: getUseCaseIndustryTagOptions(useCases).map((option) => option.value),
+    taskValues: getUseCaseTaskTagOptions(useCases).map((option) => option.value),
   });
-  const { filtered } = getUseCaseFilterResult(getUseCases(), filters);
+}
 
-  const tagLabel = filters.industry
-    ? getTagLabel(filters.industry, 'industry')
-    : filters.task
-      ? getTagLabel(filters.task, 'task')
-      : null;
+export async function generateMetadata({ searchParams }: { searchParams: RouteSearchParams }) {
+  const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
+  const useCases = getUseCases();
+  const filters = resolveFilters(useCases, params);
+  const { filtered } = getUseCaseFilterResult(useCases, filters);
+
+  const tagLabels = [
+    filters.industry ? getTagLabel(filters.industry, 'industry') : null,
+    filters.task ? getTagLabel(filters.task, 'task') : null,
+  ].filter((label): label is string => Boolean(label));
 
   return createPageMetadata({
-    title: tagLabel ? `${tagLabel} × ヒューマノイド活用事例` : defaultTitle,
-    description: tagLabel
-      ? `${tagLabel}領域でヒューマノイドが適用できる業務・候補ロボットを整理する。`
-      : defaultDescription,
+    title: tagLabels.length > 0 ? `${tagLabels.join('×')} × ヒューマノイド活用事例` : defaultTitle,
+    description:
+      tagLabels.length > 0
+        ? `${tagLabels.join('×')}領域でヒューマノイドが適用できる業務・候補ロボットを整理する。`
+        : defaultDescription,
     path: '/use-cases',
     noindex: filtered.length === 0,
   });
@@ -40,16 +46,12 @@ export default async function UseCasesPage({
 }: {
   searchParams: RouteSearchParams;
 }) {
-  const params = await pickSearchParams(searchParams, ['mode', 'industry', 'task', 'q'] as const);
+  const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
+  const useCases = getUseCases();
   return (
     <UseCasesBrowser
-      useCases={getUseCases()}
-      initialFilters={normalizeUseCaseFilters({
-        mode: params.mode,
-        industry: params.industry,
-        task: params.task,
-        query: params.q,
-      })}
+      useCases={useCases}
+      initialFilters={resolveFilters(useCases, params)}
     />
   );
 }
