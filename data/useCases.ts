@@ -422,7 +422,7 @@ export const useCases: UseCase[] = [
       '人手と同等の作業速度・精度の証明、既存ラインの安全規格との整合、長時間稼働時の安定性が課題。詳しい判断基準は意思決定変数の地図を参照。',
     japanDeploymentConditions:
       '国内自動車・電子機器メーカーでの公開実証はまだ確認できておらず、価格・保守体制は機種ごとに要確認。',
-    candidateRobotIds: ['figure-02', 'apptronik-apollo', 'wandercraft-calvin', 'ubtech-walker-s1', 'tesla-optimus'],
+    candidateRobotIds: ['figure-03', 'apptronik-apollo', 'wandercraft-calvin', 'ubtech-walker-s1', 'tesla-optimus'],
     relatedGuideIds: ['decision-variables'],
   },
 ];

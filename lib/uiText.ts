@@ -140,6 +140,7 @@ export const uiText = {
     all: 'すべての用途',
     candidateRobots: (count: number) => `${count}件の候補ロボット`,
     atAGlance: '要点',
+    compareAllCandidates: '候補ロボットを一括比較',
   },
   compare: {
     breadcrumb: '比較',
