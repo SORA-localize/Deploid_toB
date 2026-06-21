@@ -5,6 +5,7 @@ import type {
   CompanyType,
   ContactInquiryType,
   DeploymentStage,
+  DeploymentStatus,
   GuideStage,
   ImageRole,
   JapanAvailability,
@@ -59,6 +60,14 @@ export const deploymentStageLabels: Record<DeploymentStage, string> = {
   production:           '量産・商用化',
   'internal-use':       '自社利用のみ',
   discontinued:         '生産終了',
+};
+
+export const deploymentStatusLabels: Record<DeploymentStatus, string> = {
+  announced: '発表のみ',
+  pilot:     '実証・PoC中',
+  production: '本番運用中',
+  ended:     '終了',
+  unknown:   '不明',
 };
 
 export const robotCategoryLabels: Record<RobotCategory, string> = {

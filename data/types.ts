@@ -420,6 +420,8 @@ export interface DeploymentSite extends BaseRecord {
   status: DeploymentStatus;
   /** 開始/発表時期（YYYY または YYYY-MM） */
   startedAt?: ISODate;
+  /** この導入事例が裏付けとなる用途（data/useCases.ts の id）。無理な紐付けはしない＝任意項目 */
+  relatedUseCaseIds?: Id[];
 }
 
 export type ContactInquiryType =

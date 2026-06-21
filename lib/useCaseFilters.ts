@@ -22,8 +22,10 @@ export function normalizeUseCaseFilters({
   task: string | null | undefined;
   query: string | null | undefined;
 }): UseCaseFilters {
+  // デフォルトは task（タスク起点）。industry は明示指定（mode=industry または industry param）された場合のみ。
+  // 設計意図: docs/planning/humanoid_media_IA_v1.md §7「業界紹介ではなく、作業・タスク起点」
   const normalizedMode: UseCaseSearchMode =
-    mode === 'task' || (task && mode !== 'industry') ? 'task' : 'industry';
+    mode === 'industry' || (industry && mode !== 'task') ? 'industry' : 'task';
 
   return {
     mode: normalizedMode,

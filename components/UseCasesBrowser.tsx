@@ -28,8 +28,8 @@ import {
 } from '@/lib/visualSemantics';
 
 const modeOptions: Array<{ value: UseCaseSearchMode; label: string }> = [
-  { value: 'industry', label: '業種で探す' },
   { value: 'task', label: 'タスクで探す' },
+  { value: 'industry', label: '業種で探す' },
 ];
 
 interface UseCasesBrowserProps {
@@ -53,8 +53,9 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
   );
 
   const handleModeChange = (nextMode: UseCaseSearchMode) => {
+    // デフォルトは task なので、task への切替は mode を消すだけで足りる。industry は明示指定が必要。
     updateParams({
-      mode: nextMode === 'task' ? 'task' : null,
+      mode: nextMode === 'industry' ? 'industry' : null,
       industry: null,
       task: null,
     });
@@ -92,13 +93,13 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
             value={selectedChip}
             onChange={(value) =>
               mode === 'industry'
-                ? updateParams({ mode: null, industry: value, task: null })
+                ? updateParams({ mode: 'industry', industry: value, task: null })
                 : updateParams({ mode: 'task', industry: null, task: value })
             }
             allowDeselect
             onClear={() =>
               mode === 'industry'
-                ? updateParams({ industry: null })
+                ? updateParams({ mode: 'industry', industry: null })
                 : updateParams({ task: null, mode: 'task' })
             }
             ariaLabel={mode === 'industry' ? uiText.filters.industryTags : uiText.filters.taskTags}

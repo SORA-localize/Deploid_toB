@@ -141,6 +141,10 @@ export function getUseCasesForRobot(robotId: string) {
   return getUseCases().filter((useCase) => useCase.candidateRobotIds.includes(robotId));
 }
 
+export function getDeploymentsForUseCase(useCaseId: string) {
+  return getDeployments().filter((deployment) => deployment.relatedUseCaseIds?.includes(useCaseId));
+}
+
 export function getArticlesForRobot(robotId: string) {
   return getArticles().filter((article) => article.relatedRobotIds.includes(robotId));
 }

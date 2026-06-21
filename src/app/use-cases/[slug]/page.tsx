@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Building2, CheckCircle2, MapPin } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
 import {
+  getDeploymentsForUseCase,
   getRelatedGuides,
   getRelatedRobots,
   getArticlesForUseCase,
@@ -14,6 +15,7 @@ import {
 import {
   buyerReadinessLabels,
   capabilityLabels,
+  deploymentStatusLabels,
   maturityLabels,
   operatingEnvironmentLabels,
   useCaseCapabilityNoteLabels,
@@ -49,6 +51,8 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
   const candidateRobots = getRelatedRobots(useCase.candidateRobotIds);
   const guides = getRelatedGuides(useCase.relatedGuideIds);
   const reports = getArticlesForUseCase(useCase.id);
+  const deployments = getDeploymentsForUseCase(useCase.id);
+  const primaryGuide = guides[0];
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,37 +106,75 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
             </div>
           </div>
 
-          <div className="border border-border bg-muted p-5">
-            <h2 className="text-base font-semibold text-foreground mb-4">
-              {uiText.useCases.atAGlance}
-            </h2>
-            <div className="grid grid-cols-1 gap-4 text-xs md:grid-cols-3">
-              <div>
-                <h3 className="font-semibold text-foreground mb-2 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-foreground" />
-                  向く条件
-                </h3>
-                <p className="text-foreground/80 leading-relaxed">{useCase.atAGlance.whereFits}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-2 flex items-center gap-1.5">
-                  <AlertCircle className="w-4 h-4 text-muted-foreground" />
-                  向かない条件
-                </h3>
-                <p className="text-foreground/80 leading-relaxed">{useCase.atAGlance.whereDoesNotFit}</p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-2">成立条件</h3>
-                <p className="text-foreground/80 leading-relaxed">{useCase.atAGlance.mustBeTrue}</p>
-              </div>
+          <h2 className="text-base font-semibold text-foreground mb-1">
+            {uiText.useCases.atAGlance}
+          </h2>
+          <dl className="divide-y divide-border text-xs">
+            <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:gap-4">
+              <dt className="flex items-center gap-1.5 text-muted-foreground">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 opacity-60" />
+                向く条件
+              </dt>
+              <dd className="text-foreground/80 leading-relaxed">{useCase.atAGlance.whereFits}</dd>
             </div>
-          </div>
+            <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:gap-4">
+              <dt className="flex items-center gap-1.5 text-muted-foreground">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0 opacity-60" />
+                向かない条件
+              </dt>
+              <dd className="text-foreground/80 leading-relaxed">{useCase.atAGlance.whereDoesNotFit}</dd>
+            </div>
+            <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:gap-4">
+              <dt className="text-muted-foreground">成立条件</dt>
+              <dd className="text-foreground/80 leading-relaxed">{useCase.atAGlance.mustBeTrue}</dd>
+            </div>
+          </dl>
         </div>
       </div>
 
       <div className="site-container py-8">
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12 lg:col-span-8">
+            {deployments.length > 0 && (
+              <section className="border-b border-border pb-8">
+                <h2 className="text-lg font-semibold text-foreground mb-4">実際の導入事例</h2>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {deployments.map((d) => {
+                    const source = d.sources[0];
+                    return (
+                      <div key={d.id} className="border border-border p-3">
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <span className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                            <Building2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                            {d.customer}
+                          </span>
+                          <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                            {deploymentStatusLabels[d.status]}
+                          </span>
+                        </div>
+                        {d.siteName && (
+                          <p className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <MapPin className="h-3 w-3 shrink-0" />
+                            {d.siteName}（{d.country}）
+                          </p>
+                        )}
+                        <p className="text-xs text-foreground/80 leading-relaxed line-clamp-2">{d.summary}</p>
+                        {source && (
+                          <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-2 inline-block text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                          >
+                            出典：{source.publisher ?? source.title}
+                          </a>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
             <section className="border-b border-border pt-6 pb-8">
               <h2 className="text-lg font-semibold text-foreground mb-4">
                 {uiText.common.overview}
@@ -143,32 +185,44 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
               <h2 className="text-lg font-semibold text-foreground mb-4">なぜ重要か</h2>
               <p className="text-sm text-foreground/80 leading-relaxed">{useCase.whyItMatters}</p>
             </section>
-            <section className="border-b border-border pt-6 pb-8">
-              <h2 className="text-lg font-semibold text-foreground mb-5">必要なロボット能力</h2>
-              <div className="space-y-4">
+
+            {/* 補足セクション：詳しい判断はガイドに渡すため、ここは要点のみに圧縮する */}
+            <section className="pt-6 pb-8">
+              <h2 className="text-sm font-semibold text-muted-foreground mb-5">
+                導入検討の論点（要点）
+              </h2>
+              <div className="space-y-3">
                 {useCaseCapabilityNoteLabels.map(([key, label]) => {
                   const note = useCase.capabilityNotes[key];
                   if (!note) return null;
                   return (
                     <div key={key}>
-                      <h3 className="text-sm font-semibold text-foreground mb-2">{label}</h3>
-                      <p className="text-sm text-foreground/80 leading-relaxed">{note}</p>
+                      <h3 className="text-xs font-semibold text-muted-foreground mb-1">{label}</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{note}</p>
                     </div>
                   );
                 })}
+                <div>
+                  <h3 className="text-xs font-semibold text-muted-foreground mb-1">環境要件</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{useCase.environmentRequirements}</p>
+                </div>
+                <div>
+                  <h3 className="text-xs font-semibold text-muted-foreground mb-1">なぜ今は難しいか</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{useCase.whyHardToday}</p>
+                </div>
+                <div>
+                  <h3 className="text-xs font-semibold text-muted-foreground mb-1">日本での導入条件</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{useCase.japanDeploymentConditions}</p>
+                </div>
               </div>
-            </section>
-            <section className="border-b border-border pt-6 pb-8">
-              <h2 className="text-lg font-semibold text-foreground mb-4">環境要件</h2>
-              <p className="text-sm text-foreground/80 leading-relaxed">{useCase.environmentRequirements}</p>
-            </section>
-            <section className="border-b border-border pt-6 pb-8">
-              <h2 className="text-lg font-semibold text-foreground mb-4">なぜ今は難しいか</h2>
-              <p className="text-sm text-foreground/80 leading-relaxed">{useCase.whyHardToday}</p>
-            </section>
-            <section className="pt-6 pb-8">
-              <h2 className="text-lg font-semibold text-foreground mb-4">日本での導入条件</h2>
-              <p className="text-sm text-foreground/80 leading-relaxed">{useCase.japanDeploymentConditions}</p>
+              {primaryGuide && (
+                <Link
+                  href={`/guides/${primaryGuide.slug}`}
+                  className="mt-5 block border border-border p-3 text-xs text-foreground hover:border-foreground/40 transition-colors"
+                >
+                  詳しい判断基準は「{primaryGuide.titleJa ?? primaryGuide.title}」を参照 →
+                </Link>
+              )}
             </section>
           </div>
 
