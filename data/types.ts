@@ -224,7 +224,7 @@ export interface Robot extends BaseRecord {
   vendorRiskNote?: string;
   /** 役割別の参考画像（詳細ページのカルーセル）。hero が未設定なら BaseRecord.heroImage を hero に昇格して使う。 */
   images?: Partial<Record<ImageRole, ImageAsset>>;
-  // 関連は逆向き(UseCase.candidateRobotIds / Guide.relatedRobotIds /
+  // 関連は逆向き(UseCase.candidateRobots[].robotId / Guide.relatedRobotIds /
   // Article.relatedRobotIds)で導出する。
   /** 業種タグ（lib/tagRegistry.ts の kind:'industry' のvalue）。未設定=調査中扱い。 */
   industryTags?: TagValue<'industry'>[];
@@ -285,14 +285,30 @@ export interface UseCaseCapabilityNotes {
   integration?: string;
 }
 
+export type CandidateFit = 'strong' | 'possible' | 'watch';
+
+export interface UseCaseCandidateRobot {
+  robotId: Id;
+  /** strong=実際の導入事例あり（deployments.tsで裏付け） / possible=スペック・位置付けは合うが実証未確認 / watch=初期段階・参考程度 */
+  fit: CandidateFit;
+  reason: string;
+  caveats?: string[];
+}
+
 export interface UseCase extends BaseRecord {
   title: string;
   titleJa?: string;
   subtitle?: string;
+  /** 「注目の適用領域」での優先順位（編集ピック）。値が小さいほど上位。未設定は非掲載。Robot/Manufacturerのfeaturedrankとは異なり有料枠の意味は持たない。 */
+  featuredRank?: number;
   maturityLevel: UseCaseMaturity;
   buyerReadiness: BuyerReadiness;
   environment: OperatingEnvironment;
   requiredCapabilities: Capability[];
+  /** タスク起点のMECE分類（正本）。lib/tagRegistry.tsの'use-case-domain'から選ぶ。 */
+  primaryDomain: TagValue<'use-case-domain'>;
+  secondaryDomains?: TagValue<'use-case-domain'>[];
+  /** 検索・フィルタ用ファセット（MECEではない。正本はprimaryDomain）。 */
   industryTags: TagValue<'industry'>[];
   taskTags: TagValue<'task'>[];
   atAGlance: UseCaseAtAGlance;
@@ -302,7 +318,7 @@ export interface UseCase extends BaseRecord {
   environmentRequirements: string;
   whyHardToday: string;
   japanDeploymentConditions: string;
-  candidateRobotIds: Id[];
+  candidateRobots: UseCaseCandidateRobot[];
   relatedGuideIds: Id[];
   // 関連articlesは Article.relatedUseCaseIds で逆引きする。
 }

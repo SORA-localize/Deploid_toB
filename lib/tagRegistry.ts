@@ -1,4 +1,4 @@
-export type TagKind = 'article' | 'guide-topic' | 'industry' | 'task';
+export type TagKind = 'article' | 'guide-topic' | 'industry' | 'task' | 'use-case-domain';
 
 export interface TagRegistryEntry {
   kind: TagKind;
@@ -51,6 +51,18 @@ export const tagRegistry = [
   { kind: 'task', value: 'control', label: '制御' },
   { kind: 'task', value: 'demo', label: 'デモ' },
   { kind: 'task', value: 'exhibition', label: '展示' },
+
+  // UseCase.primaryDomain/secondaryDomains の正本。industry/taskと違いMECEを意図した分類
+  // （業界横断で「ロボットに何をさせるか」を9つに分ける）。検索ファセットのindustry/taskとは役割が別。
+  { kind: 'use-case-domain', value: 'move-goods', label: '物を動かす' },
+  { kind: 'use-case-domain', value: 'manipulate-and-assemble', label: '物を加工・組立・操作する' },
+  { kind: 'use-case-domain', value: 'inspect-and-record', label: '状態を見て記録する' },
+  { kind: 'use-case-domain', value: 'clean-and-maintain', label: '場を整える' },
+  { kind: 'use-case-domain', value: 'communicate-with-people', label: '人に応対する' },
+  { kind: 'use-case-domain', value: 'assist-human-body', label: '人の身体行為を支える' },
+  { kind: 'use-case-domain', value: 'hazardous-or-remote-work', label: '危険・遠隔環境で代替する' },
+  { kind: 'use-case-domain', value: 'research-education', label: '技術・人材を育てる' },
+  { kind: 'use-case-domain', value: 'demo-entertainment', label: '体験・認知を作る' },
 
   { kind: 'article', value: 'manufacturing', label: '製造' },
   { kind: 'article', value: 'poc', label: 'PoC' },

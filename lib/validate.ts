@@ -334,8 +334,10 @@ export function validateData(): ValidationResult {
     checkDate('useCase', u.slug, 'updatedAt', u.updatedAt);
     checkTags('useCase', u.slug, 'industryTags', 'industry', u.industryTags);
     checkTags('useCase', u.slug, 'taskTags', 'task', u.taskTags);
-    u.candidateRobotIds.forEach((s) =>
-      check('useCase', u.slug, 'candidateRobotIds', s, robotIds),
+    checkTags('useCase', u.slug, 'primaryDomain', 'use-case-domain', [u.primaryDomain]);
+    checkTags('useCase', u.slug, 'secondaryDomains', 'use-case-domain', u.secondaryDomains ?? []);
+    u.candidateRobots.forEach((c) =>
+      check('useCase', u.slug, 'candidateRobots.robotId', c.robotId, robotIds),
     );
     u.relatedGuideIds.forEach((s) =>
       check('useCase', u.slug, 'relatedGuideIds', s, guideIds),

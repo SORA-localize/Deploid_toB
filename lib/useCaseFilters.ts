@@ -48,10 +48,20 @@ export function getUseCaseFilterResult(
     return true;
   });
 
+  // featuredRank 昇順（未設定は最後）。配列順ではなく明示的な編集ピックで決める（lib/display.tsのfeaturedRank運用と同じ考え方）。
+  const sortedByFeaturedRank = [...filtered].sort((a, b) => {
+    const aRank = a.featuredRank ?? Number.POSITIVE_INFINITY;
+    const bRank = b.featuredRank ?? Number.POSITIVE_INFINITY;
+    return aRank - bRank;
+  });
+  const featured = sortedByFeaturedRank.filter((useCase) => useCase.featuredRank !== undefined).slice(0, 2);
+  const featuredIds = new Set(featured.map((useCase) => useCase.id));
+  const rest = filtered.filter((useCase) => !featuredIds.has(useCase.id));
+
   return {
     filtered,
-    featured: filtered.slice(0, 2),
-    rest: filtered.slice(2),
+    featured,
+    rest,
     active: Boolean(filters.industry || filters.task || filters.query),
   };
 }

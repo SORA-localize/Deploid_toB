@@ -72,7 +72,7 @@ export function UseCaseCard({ useCase: u }: UseCaseCardProps) {
           {u.subtitle ?? u.summary}
         </p>
         <div className="text-[11px] text-muted-foreground/80">
-          {uiText.useCases.candidateRobots(u.candidateRobotIds.length)}
+          {uiText.useCases.candidateRobots(u.candidateRobots.length)}
         </div>
       </Link>
     </motion.div>

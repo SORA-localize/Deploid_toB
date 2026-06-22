@@ -51,7 +51,10 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
   if (redirectTo) permanentRedirect(`/use-cases/${redirectTo}`);
   if (!useCase) notFound();
 
-  const candidateRobots = getRelatedRobots(useCase.candidateRobotIds);
+  const candidateRobots = getRelatedRobots(useCase.candidateRobots.map((c) => c.robotId));
+  const candidateAnnotations = Object.fromEntries(
+    useCase.candidateRobots.map((c) => [c.robotId, { fit: c.fit, reason: c.reason }]),
+  );
   const guides = getRelatedGuides(useCase.relatedGuideIds);
   const reports = getArticlesForUseCase(useCase.id);
   const deployments = getDeploymentsForUseCase(useCase.id);
@@ -263,7 +266,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
                   候補ロボット
                 </p>
-                <CandidateRobotList robots={candidateRobots} />
+                <CandidateRobotList robots={candidateRobots} annotations={candidateAnnotations} />
               </div>
 
               {(guides.length > 0 || reports.length > 0) && (
