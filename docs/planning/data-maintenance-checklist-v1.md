@@ -54,7 +54,7 @@
     - ファイルサイズ：**300KB 以下**（[Squoosh](https://squoosh.app/) で圧縮）
     - 最大解像度：**1920px 幅**
 10. [ ] hero画像の `ImageAsset.rights` を記入する（`commercial-permitted` または `reference-attributed` のみ公開可。権利が確認できない画像は `src: ''` のまま公開する。詳細は `docs/planning/copyright_and_media_rights_policy_v1.md`）（自動：空src以外は検証対象）
-11. [ ] `related*Ids` は **id で**結ぶ（自動：参照切れは build 失敗）
+11. [ ] `related*Ids` は **id で**結ぶ（自動：参照切れ・重複は build 失敗）。配列順は関連欄の表示順として保持されるため、重要度順に並べる
 12. [ ] tags は tagRegistry 登録値のみ（`lib/tagRegistry.ts` の `kind: 'article'` の value を使う）
 13. [ ] **本文量を確認**：速報（news-brief）でも800文字以上、分析・レポートは1,500文字以上を目安にする
 14. [ ] **型の確認**：`requiredCapabilities` は `Capability` 型の値のみ。`lib/tagRegistry.ts` のタグ value を誤って入れない
@@ -127,7 +127,7 @@
 **UseCase**
 - [ ] 型必須：id / slug / title / maturityLevel / buyerReadiness / environment / requiredCapabilities / primaryDomain / atAGlance{3} / overview / whyItMatters / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots / relatedGuideIds
 - [ ] industryTags・taskTags・primaryDomain・secondaryDomains は登録タグ（自動） / candidateRobots[].robotId は id 参照（自動）
-- [ ] candidateRobots[].fit が`'strong'`の場合、data/deployments.tsに同じrobotId・同じuseCaseの実証事例が必要（自動：無いとbuild失敗。詳細は§M）
+- [ ] candidateRobots[].fit が`'strong'`の場合、data/deployments.tsに同じrobotId・同じuseCaseのpublishedな実証事例が必要（自動：無いとbuild失敗。詳細は§M）
 - [ ] relatedGuideIds と相手 guide.relatedUseCaseIds が双方向に揃う（自動）
 - [ ] 出典（sources）は手動推奨（validate 未強制）
 
@@ -241,7 +241,7 @@ AI側の実装手順:
 2. [ ] 型必須：title / maturityLevel / buyerReadiness / environment / requiredCapabilities / **primaryDomain** / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots / relatedGuideIds
 3. [ ] `primaryDomain`（必須・単一）と`secondaryDomains`（任意・配列）は`lib/tagRegistry.ts`の`use-case-domain`から選ぶ（自動：未登録は build 失敗）。これがMECEな分類の正本。`industryTags`/`taskTags`は検索ファセット用で、MECEを意図しない（manufacturing/plantのように粒度が混在してよい）
 4. [ ] 実証事例が複数ドメインに渡る場合（例：搬送＋組立＋検査が同じユースケースに混在）は、最も比重の大きいドメインを`primaryDomain`にし、残りを`secondaryDomains`に入れる。**物理的にユースケースを分割しない**。各ドメインが独立して実証件数を積んだ時点で初めて分割を検討する
-5. [ ] `candidateRobots`は`{robotId, fit, reason}[]`。`robotId`は robot の **id** 参照（自動）。`fit`は3段階：`strong`=`data/deployments.ts`に実在の導入事例（同じrobotId・同じuseCaseへの`relatedUseCaseIds`）がある場合のみ／`possible`=スペック・位置付けは合うが当該ユースケースでの実証未確認（量産・商用展開の事実だけでは`strong`にしない）／`watch`=初期段階・参考程度。**先に `data/deployments.ts` を確認し、同じニッチに複数の実在導入事例が集中していないか見る**（新規追加の最も強い根拠。思いつきで追加しない）。`reason`は既存の`capabilityNotes`等から導出し、新しい主張を作らない
+5. [ ] `candidateRobots`は`{robotId, fit, reason}[]`。`robotId`は robot の **id** 参照（自動）。`fit`は3段階：`strong`=`data/deployments.ts`にpublishedな実在の導入事例（同じrobotId・同じuseCaseへの`relatedUseCaseIds`）がある場合のみ／`possible`=スペック・位置付けは合うが当該ユースケースでの実証未確認（量産・商用展開の事実だけでは`strong`にしない）／`watch`=初期段階・参考程度。**先に `data/deployments.ts` を確認し、同じニッチに複数の実在導入事例が集中していないか見る**（新規追加の最も強い根拠。思いつきで追加しない）。`reason`は既存の`capabilityNotes`等から導出し、新しい主張を作らない
 6. [ ] `industryTags` / `taskTags` は登録タグのみ（自動）
 7. [ ] **双方向対称**：`relatedGuideIds` と相手 guide.`relatedUseCaseIds` を両方そろえる（自動）
 8. [ ] 出典（sources）は手動推奨（validate 未強制）。個々の事実より、`relatedUseCaseIds` で紐付けた`deployments`側の出典が実質的な根拠になる想定

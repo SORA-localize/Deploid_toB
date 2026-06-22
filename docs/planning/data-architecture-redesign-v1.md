@@ -65,7 +65,7 @@ slug ──┬── URL識別子        /robots/unitree-g1
 1. **正本主義（Single Source of Truth）**: あらゆる事実・ラベル・列挙・単位は「1箇所」に置き、他はそれを参照する。「変えたら追従」はこの原則の帰結。
 2. **id と表示の分離**: 機械が使う識別子（id）と、人間が見るもの（slug/name/label）を分ける。
 3. **参照は id、表示は導出**: レコード間リンクは不変 id で持つ。表示名は参照先から都度引く（コピーしない）。
-4. **UI非依存**: データはUIレイアウトの都合を持ち込まない（列数・色・並び順の装飾はデータに入れない。意味的な順序は別途 order レジストリ）。
+4. **UI非依存**: データはUIレイアウトの都合を持ち込まない（列数・色・装飾的な並び順はデータに入れない。一覧・ランキングの意味的な順序は order レジストリや `featuredRank` などの明示フィールドで管理する。ただし `related*Ids` / `candidateRobots` の配列順は、その関連欄内の編集優先度として扱い、`getRelated*()`系は入力順を保持して解決する）。
 5. **出典必須・未確認は明示**: 事実値には `sources`。不明値はハードコードせず省略（UIが「要確認」を表示）。
 6. **検証可能**: 参照整合・id一意・未登録タグ・slug衝突を `validate` で機械検出。
 7. **CMS移行で呼び出し形を変えない**: ページは常に `lib/data.ts` 経由。物理配置（配列TS→個別ファイル）が変わっても上位は不変。
@@ -95,7 +95,7 @@ slug ──┬── URL識別子        /robots/unitree-g1
 | 現フィールド | 新フィールド |
 |---|---|
 | `Robot.manufacturerSlug` | `Robot.manufacturerId` |
-| `UseCase.candidateRobotSlugs` | `UseCase.candidateRobotIds` |
+| `UseCase.candidateRobotSlugs` | `UseCase.candidateRobots[].robotId` |
 | `Report.relatedRobotSlugs` | `Article.relatedRobotIds` |
 | `Report.relatedManufacturerSlugs` | `Article.relatedManufacturerIds` |
 | `Report.relatedUseCaseSlugs` | `Article.relatedUseCaseIds` |
@@ -149,7 +149,7 @@ placements     >── articles
 
 - `<` = 1対多、`>──` = 多対多 or 参照。
 - `deployments.relatedUseCaseIds`（任意項目）は「この導入事例がどの用途の根拠になるか」を示す。`UseCase.candidateRobots[].robotId`と同じ一方向参照パターンで、`lib/data.ts`の`getDeploymentsForUseCase()`が逆引きする。無理な紐付けはしない（該当しない事例は空のままでよい）。
-- `UseCase.candidateRobots`は単なるid配列ではなく`{robotId, fit, reason}[]`（`fit`: strong/possible/watch）。「なぜ候補なのか」をデータ自身が持つ。`fit: 'strong'`は`deployments.ts`の実在事例（同じrobotId・同じuseCase）で裏付けられていることを意味する（量産・商用展開の事実だけでは`strong`にしない）。`lib/data.ts`の`getRelatedRobots()`は呼び出し側が渡した順序を保持する（`candidateRobots`のfit順がそのまま表示順になる）。
+- `UseCase.candidateRobots`は単なるid配列ではなく`{robotId, fit, reason}[]`（`fit`: strong/possible/watch）。「なぜ候補なのか」をデータ自身が持つ。`fit: 'strong'`は`deployments.ts`のpublishedな実在事例（同じrobotId・同じuseCase）で裏付けられていることを意味する（量産・商用展開の事実だけでは`strong`にしない）。`lib/data.ts`の`getRelated*()`は呼び出し側が渡した順序を保持する（関連ID配列の順序は編集上の関連優先度）。
 - **逆向きは導出**（§6）。robots は自分が属する useCases を持たない。`lib/data.ts` が逆引きする。
 
 ---

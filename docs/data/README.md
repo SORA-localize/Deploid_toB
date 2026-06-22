@@ -85,7 +85,7 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / guide
 
 ## 参照とタグの追加手順
 
-- 関連付けは `slug` ではなく `id` で行う。例: `relatedRobotIds`, `relatedManufacturerIds`, `candidateRobotIds`, `manufacturerId`
+- 関連付けは `slug` ではなく `id` で行う。例: `relatedRobotIds`, `relatedManufacturerIds`, `candidateRobots[].robotId`, `manufacturerId`
 - URLを作るときだけ `slug` を使う。例: `/robots/${robot.slug}`
 - 新しいタグが必要な場合は、先に `lib/tagRegistry.ts` へ `value` と `label` を追加する
 - `value` は安定キーなので後から気軽に変えない。表示を変えたいだけなら `label` を変える

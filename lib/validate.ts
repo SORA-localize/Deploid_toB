@@ -51,17 +51,69 @@ export function validateData(): ValidationResult {
   const guideIds = new Set(guides.map((g) => g.id));
   const useCaseIds = new Set(useCases.map((u) => u.id));
   const articleIds = new Set(articles.map((r) => r.id));
+  const visibleRobotIds = new Set(
+    robots
+      .filter((r) => r.publishStatus === 'published' || r.publishStatus === 'archived')
+      .map((r) => r.id),
+  );
+  const publishedRobotIds = new Set(
+    robots.filter((r) => r.publishStatus === 'published').map((r) => r.id),
+  );
+  const publishedManufacturerIds = new Set(
+    manufacturers.filter((m) => m.publishStatus === 'published').map((m) => m.id),
+  );
+  const publishedGuideIds = new Set(
+    guides.filter((g) => g.publishStatus === 'published').map((g) => g.id),
+  );
+  const publishedUseCaseIds = new Set(
+    useCases.filter((u) => u.publishStatus === 'published').map((u) => u.id),
+  );
+  const publishedArticleIds = new Set(
+    articles.filter((article) => article.publishStatus === 'published').map((article) => article.id),
+  );
   // useCase.candidateRobots の fit:'strong' は「このrobotIdがこのuseCaseで実証導入されている」という主張。
-  // deployments.ts の robotId × relatedUseCaseIds の実在ペアでのみ裏付けられる（運用ルールは data-maintenance-checklist-v1.md §M）。
+  // deployments.ts の published な robotId × relatedUseCaseIds の実在ペアでのみ裏付けられる（運用ルールは data-maintenance-checklist-v1.md §M）。
   const strongFitEvidence = new Set(
     deployments
-      .filter((d) => d.robotId)
+      .filter((d) => d.publishStatus === 'published' && d.robotId)
       .flatMap((d) => (d.relatedUseCaseIds ?? []).map((ucId) => `${d.robotId}::${ucId}`)),
   );
 
   const check = (kind: string, owner: string, field: string, id: string, set: Set<string>) => {
     if (!set.has(id)) {
       errors.push(`[missing] ${kind} "${owner}".${field} -> "${id}" は存在しません`);
+    }
+  };
+
+  const checkDisplayableReference = (
+    kind: string,
+    owner: string,
+    field: string,
+    id: string,
+    allIds: Set<string>,
+    displayableIds: Set<string>,
+    displayableStatus: string,
+  ) => {
+    if (allIds.has(id) && !displayableIds.has(id)) {
+      errors.push(
+        `[not-visible] ${kind} "${owner}".${field} -> "${id}" は存在しますが、` +
+          `${displayableStatus} ではないため公開面で表示されません`,
+      );
+    }
+  };
+
+  const checkUniqueValues = (
+    kind: string,
+    owner: string,
+    field: string,
+    values: readonly string[],
+  ) => {
+    const seen = new Set<string>();
+    for (const value of values) {
+      if (seen.has(value)) {
+        errors.push(`[duplicate] ${kind} "${owner}".${field} に重複があります: ${value}`);
+      }
+      seen.add(value);
     }
   };
 
@@ -291,8 +343,30 @@ export function validateData(): ValidationResult {
 
   for (const r of robots) {
     check('robot', r.slug, 'manufacturerId', r.manufacturerId, manufacturerIds);
+    if (visibleRobotIds.has(r.id)) {
+      checkDisplayableReference(
+        'robot',
+        r.slug,
+        'manufacturerId',
+        r.manufacturerId,
+        manufacturerIds,
+        publishedManufacturerIds,
+        'published',
+      );
+    }
     if (r.supersededById) {
       check('robot', r.slug, 'supersededById', r.supersededById, robotIds);
+      if (visibleRobotIds.has(r.id)) {
+        checkDisplayableReference(
+          'robot',
+          r.slug,
+          'supersededById',
+          r.supersededById,
+          robotIds,
+          publishedRobotIds,
+          'published',
+        );
+      }
       if (r.supersededById === r.id) {
         errors.push(`[superseded-self] robot "${r.id}".supersededById が自分自身を指しています`);
       }
@@ -331,10 +405,36 @@ export function validateData(): ValidationResult {
   for (const g of guides) {
     checkDate('guide', g.slug, 'updatedAt', g.updatedAt);
     checkTags('guide', g.slug, 'topics', 'guide-topic', g.topics);
-    g.relatedRobotIds.forEach((s) => check('guide', g.slug, 'relatedRobotIds', s, robotIds));
-    g.relatedUseCaseIds.forEach((s) =>
-      check('guide', g.slug, 'relatedUseCaseIds', s, useCaseIds),
-    );
+    checkUniqueValues('guide', g.slug, 'relatedRobotIds', g.relatedRobotIds);
+    checkUniqueValues('guide', g.slug, 'relatedUseCaseIds', g.relatedUseCaseIds);
+    g.relatedRobotIds.forEach((s) => {
+      check('guide', g.slug, 'relatedRobotIds', s, robotIds);
+      if (g.publishStatus === 'published') {
+        checkDisplayableReference(
+          'guide',
+          g.slug,
+          'relatedRobotIds',
+          s,
+          robotIds,
+          visibleRobotIds,
+          'published/archived',
+        );
+      }
+    });
+    g.relatedUseCaseIds.forEach((s) => {
+      check('guide', g.slug, 'relatedUseCaseIds', s, useCaseIds);
+      if (g.publishStatus === 'published') {
+        checkDisplayableReference(
+          'guide',
+          g.slug,
+          'relatedUseCaseIds',
+          s,
+          useCaseIds,
+          publishedUseCaseIds,
+          'published',
+        );
+      }
+    });
   }
 
   for (const u of useCases) {
@@ -343,8 +443,31 @@ export function validateData(): ValidationResult {
     checkTags('useCase', u.slug, 'taskTags', 'task', u.taskTags);
     checkTags('useCase', u.slug, 'primaryDomain', 'use-case-domain', [u.primaryDomain]);
     checkTags('useCase', u.slug, 'secondaryDomains', 'use-case-domain', u.secondaryDomains ?? []);
+    if (u.secondaryDomains?.includes(u.primaryDomain)) {
+      errors.push(
+        `[domain-duplicate] useCase "${u.slug}".secondaryDomains に primaryDomain と同じ値があります: ${u.primaryDomain}`,
+      );
+    }
+    checkUniqueValues(
+      'useCase',
+      u.slug,
+      'candidateRobots.robotId',
+      u.candidateRobots.map((c) => c.robotId),
+    );
+    checkUniqueValues('useCase', u.slug, 'relatedGuideIds', u.relatedGuideIds);
     u.candidateRobots.forEach((c) => {
       check('useCase', u.slug, 'candidateRobots.robotId', c.robotId, robotIds);
+      if (u.publishStatus === 'published') {
+        checkDisplayableReference(
+          'useCase',
+          u.slug,
+          'candidateRobots.robotId',
+          c.robotId,
+          robotIds,
+          visibleRobotIds,
+          'published/archived',
+        );
+      }
       if (c.fit === 'strong' && !strongFitEvidence.has(`${c.robotId}::${u.id}`)) {
         errors.push(
           `[fit-unverified] useCase "${u.slug}" の candidateRobots「${c.robotId}」は fit:'strong' だが、` +
@@ -352,9 +475,20 @@ export function validateData(): ValidationResult {
         );
       }
     });
-    u.relatedGuideIds.forEach((s) =>
-      check('useCase', u.slug, 'relatedGuideIds', s, guideIds),
-    );
+    u.relatedGuideIds.forEach((s) => {
+      check('useCase', u.slug, 'relatedGuideIds', s, guideIds);
+      if (u.publishStatus === 'published') {
+        checkDisplayableReference(
+          'useCase',
+          u.slug,
+          'relatedGuideIds',
+          s,
+          guideIds,
+          publishedGuideIds,
+          'published',
+        );
+      }
+    });
   }
 
   for (const article of articles) {
@@ -365,26 +499,110 @@ export function validateData(): ValidationResult {
       requireNonEmpty: article.publishStatus === 'published' && article.contentKind !== 'sample',
     });
     checkTags('article', article.slug, 'tags', 'article', article.tags);
-    article.relatedRobotIds.forEach((s) =>
-      check('article', article.slug, 'relatedRobotIds', s, robotIds),
-    );
-    article.relatedManufacturerIds.forEach((s) =>
-      check('article', article.slug, 'relatedManufacturerIds', s, manufacturerIds),
-    );
-    article.relatedUseCaseIds.forEach((s) =>
-      check('article', article.slug, 'relatedUseCaseIds', s, useCaseIds),
-    );
-    (article.relatedGuideIds ?? []).forEach((s) =>
-      check('article', article.slug, 'relatedGuideIds', s, guideIds),
-    );
+    checkUniqueValues('article', article.slug, 'relatedRobotIds', article.relatedRobotIds);
+    checkUniqueValues('article', article.slug, 'relatedManufacturerIds', article.relatedManufacturerIds);
+    checkUniqueValues('article', article.slug, 'relatedUseCaseIds', article.relatedUseCaseIds);
+    checkUniqueValues('article', article.slug, 'relatedGuideIds', article.relatedGuideIds ?? []);
+    article.relatedRobotIds.forEach((s) => {
+      check('article', article.slug, 'relatedRobotIds', s, robotIds);
+      if (article.publishStatus === 'published') {
+        checkDisplayableReference(
+          'article',
+          article.slug,
+          'relatedRobotIds',
+          s,
+          robotIds,
+          visibleRobotIds,
+          'published/archived',
+        );
+      }
+    });
+    article.relatedManufacturerIds.forEach((s) => {
+      check('article', article.slug, 'relatedManufacturerIds', s, manufacturerIds);
+      if (article.publishStatus === 'published') {
+        checkDisplayableReference(
+          'article',
+          article.slug,
+          'relatedManufacturerIds',
+          s,
+          manufacturerIds,
+          publishedManufacturerIds,
+          'published',
+        );
+      }
+    });
+    article.relatedUseCaseIds.forEach((s) => {
+      check('article', article.slug, 'relatedUseCaseIds', s, useCaseIds);
+      if (article.publishStatus === 'published') {
+        checkDisplayableReference(
+          'article',
+          article.slug,
+          'relatedUseCaseIds',
+          s,
+          useCaseIds,
+          publishedUseCaseIds,
+          'published',
+        );
+      }
+    });
+    (article.relatedGuideIds ?? []).forEach((s) => {
+      check('article', article.slug, 'relatedGuideIds', s, guideIds);
+      if (article.publishStatus === 'published') {
+        checkDisplayableReference(
+          'article',
+          article.slug,
+          'relatedGuideIds',
+          s,
+          guideIds,
+          publishedGuideIds,
+          'published',
+        );
+      }
+    });
   }
 
   for (const d of deployments) {
     check('deployment', d.id, 'manufacturerId', d.manufacturerId, manufacturerIds);
-    if (d.robotId) check('deployment', d.id, 'robotId', d.robotId, robotIds);
-    (d.relatedUseCaseIds ?? []).forEach((s) =>
-      check('deployment', d.id, 'relatedUseCaseIds', s, useCaseIds),
-    );
+    if (d.publishStatus === 'published') {
+      checkDisplayableReference(
+        'deployment',
+        d.id,
+        'manufacturerId',
+        d.manufacturerId,
+        manufacturerIds,
+        publishedManufacturerIds,
+        'published',
+      );
+    }
+    if (d.robotId) {
+      check('deployment', d.id, 'robotId', d.robotId, robotIds);
+      if (d.publishStatus === 'published') {
+        checkDisplayableReference(
+          'deployment',
+          d.id,
+          'robotId',
+          d.robotId,
+          robotIds,
+          visibleRobotIds,
+          'published/archived',
+        );
+      }
+    }
+    checkUniqueValues('deployment', d.id, 'relatedUseCaseIds', d.relatedUseCaseIds ?? []);
+    (d.relatedUseCaseIds ?? []).forEach((s) => {
+      check('deployment', d.id, 'relatedUseCaseIds', s, useCaseIds);
+      if (d.publishStatus === 'published') {
+        checkDisplayableReference(
+          'deployment',
+          d.id,
+          'relatedUseCaseIds',
+          s,
+          useCaseIds,
+          publishedUseCaseIds,
+          'published',
+        );
+      }
+    });
     checkDate('deployment', d.id, 'updatedAt', d.updatedAt);
     checkRequiredSources('deployment', d.id, d.sources);
   }
@@ -394,6 +612,15 @@ export function validateData(): ValidationResult {
   for (const placement of articlePlacements) {
     const owner = `${placement.surface}.${placement.slot}.${placement.order}`;
     check('articlePlacement', owner, 'articleId', placement.articleId, articleIds);
+    checkDisplayableReference(
+      'articlePlacement',
+      owner,
+      'articleId',
+      placement.articleId,
+      articleIds,
+      publishedArticleIds,
+      'published',
+    );
 
     const orderKey = `${placement.surface}:${placement.slot}:${placement.order}`;
     if (placementOrders.has(orderKey)) {

@@ -161,26 +161,27 @@ export function getManufacturerForRobot(manufacturerId: string) {
   return getManufacturerById(manufacturerId);
 }
 
+function resolveRecordsByIds<T extends { id: string }>(ids: readonly string[], records: readonly T[]) {
+  const recordById = new Map(records.map((record) => [record.id, record]));
+  // ids の並び順を保持する（呼び出し側が編集判断で並べている関連優先度）。
+  return ids
+    .map((id) => recordById.get(id))
+    .filter((record): record is NonNullable<typeof record> => record !== undefined);
+}
+
 export function getRelatedRobots(ids: string[]) {
   // archived も返す（関連欄から無言脱落させない。表示側が「提供終了」を付ける。設計 §6.5-1）
-  const robotById = new Map(getRobotsForDetail().map((robot) => [robot.id, robot]));
-  // ids の並び順を保持する（呼び出し側が編集判断で並べている。例: UseCase.candidateRobots の fit順）。
-  return ids
-    .map((id) => robotById.get(id))
-    .filter((robot): robot is NonNullable<typeof robot> => robot !== undefined);
+  return resolveRecordsByIds(ids, getRobotsForDetail());
 }
 
 export function getRelatedManufacturers(ids: string[]) {
-  const idSet = new Set(ids);
-  return getManufacturers().filter((manufacturer) => idSet.has(manufacturer.id));
+  return resolveRecordsByIds(ids, getManufacturers());
 }
 
 export function getRelatedUseCases(ids: string[]) {
-  const idSet = new Set(ids);
-  return getUseCases().filter((useCase) => idSet.has(useCase.id));
+  return resolveRecordsByIds(ids, getUseCases());
 }
 
 export function getRelatedGuides(ids: string[]) {
-  const idSet = new Set(ids);
-  return getGuides().filter((guide) => idSet.has(guide.id));
+  return resolveRecordsByIds(ids, getGuides());
 }
