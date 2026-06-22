@@ -12,6 +12,7 @@ import { UseCasesHeader } from '@/components/UseCasesHeader';
 import type { UseCase } from '@/data/types';
 import {
   getTagLabel,
+  getUseCaseDomainOptions,
   getUseCaseIndustryTagOptions,
   getUseCaseTaskTagOptions,
 } from '@/lib/tags';
@@ -48,6 +49,13 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
     ],
     [useCases],
   );
+  const domainOptions = useMemo(
+    () => [
+      { value: 'all', label: uiText.common.allDomains },
+      ...getUseCaseDomainOptions(useCases).map((opt) => ({ value: opt.value, label: opt.label })),
+    ],
+    [useCases],
+  );
 
   const { filtered, featured, rest, active } = useMemo(
     () => getUseCaseFilterResult(useCases, initialFilters),
@@ -56,6 +64,13 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
 
   const activeChips = useMemo(() => {
     const chips: ActiveFilterChip[] = [];
+    if (initialFilters.domain) {
+      chips.push({
+        key: 'domain',
+        label: getTagLabel(initialFilters.domain, 'use-case-domain'),
+        onRemove: () => updateParams({ domain: null }),
+      });
+    }
     if (initialFilters.industry) {
       chips.push({
         key: 'industry',
@@ -93,7 +108,14 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
             }
           />
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-md">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4 max-w-3xl">
+            <SelectControl
+              id="use-case-domain"
+              label={uiText.filters.domain}
+              value={initialFilters.domain ?? 'all'}
+              onChange={(v) => updateParams({ domain: v === 'all' ? null : v })}
+              options={domainOptions}
+            />
             <SelectControl
               id="use-case-industry"
               label={uiText.filters.industry}

@@ -7,28 +7,35 @@ import { matchesTag, normalizeTagKey } from '@/lib/tags';
 export interface UseCaseFilters {
   industry: string | null;
   task: string | null;
+  domain: string | null;
   query: string;
 }
 
 export function normalizeUseCaseFilters({
   industry,
   task,
+  domain,
   query,
   industryValues,
   taskValues,
+  domainValues,
 }: {
   industry: string | null | undefined;
   task: string | null | undefined;
+  domain: string | null | undefined;
   query: string | null | undefined;
   industryValues: readonly string[];
   taskValues: readonly string[];
+  domainValues: readonly string[];
 }): UseCaseFilters {
   const normalizedIndustry = industry ? normalizeTagKey(industry) : null;
   const normalizedTask = task ? normalizeTagKey(task) : null;
+  const normalizedDomain = domain ? normalizeTagKey(domain) : null;
 
   return {
     industry: normalizedIndustry && industryValues.includes(normalizedIndustry) ? normalizedIndustry : null,
     task: normalizedTask && taskValues.includes(normalizedTask) ? normalizedTask : null,
+    domain: normalizedDomain && domainValues.includes(normalizedDomain) ? normalizedDomain : null,
     query: query ?? '',
   };
 }
@@ -45,6 +52,7 @@ export function getUseCaseFilterResult(
     if (!matchesSearchDocument(filters.query, searchDocuments.get(useCase.slug))) return false;
     if (!matchesTag(useCase.industryTags, filters.industry)) return false;
     if (!matchesTag(useCase.taskTags, filters.task)) return false;
+    if (!matchesTag([useCase.primaryDomain, ...(useCase.secondaryDomains ?? [])], filters.domain)) return false;
     return true;
   });
 
@@ -62,6 +70,6 @@ export function getUseCaseFilterResult(
     filtered,
     featured,
     rest,
-    active: Boolean(filters.industry || filters.task || filters.query),
+    active: Boolean(filters.industry || filters.task || filters.domain || filters.query),
   };
 }

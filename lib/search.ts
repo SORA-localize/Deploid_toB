@@ -288,6 +288,10 @@ export function createUseCaseSearchDocument(useCase: UseCase) {
     tags: [
       ...useCase.industryTags.map((value) => ({ value, kind: 'industry' as const })),
       ...useCase.taskTags.map((value) => ({ value, kind: 'task' as const })),
+      ...[useCase.primaryDomain, ...(useCase.secondaryDomains ?? [])].map((value) => ({
+        value,
+        kind: 'use-case-domain' as const,
+      })),
     ],
     fields: [
       useCase.titleJa,
