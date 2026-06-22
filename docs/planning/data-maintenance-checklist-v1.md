@@ -125,8 +125,9 @@
 - [ ] 出典（sources）は手動推奨（validate 未強制）
 
 **UseCase**
-- [ ] 型必須：id / slug / title / maturityLevel / buyerReadiness / environment / requiredCapabilities / atAGlance{3} / overview / whyItMatters / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobotIds / relatedGuideIds
-- [ ] industryTags・taskTags は登録タグ / candidateRobotIds は id 参照（自動）
+- [ ] 型必須：id / slug / title / maturityLevel / buyerReadiness / environment / requiredCapabilities / primaryDomain / atAGlance{3} / overview / whyItMatters / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots / relatedGuideIds
+- [ ] industryTags・taskTags・primaryDomain・secondaryDomains は登録タグ（自動） / candidateRobots[].robotId は id 参照（自動）
+- [ ] candidateRobots[].fit が`'strong'`の場合、data/deployments.tsに同じrobotId・同じuseCaseの実証事例が必要（自動：無いとbuild失敗。詳細は§M）
 - [ ] relatedGuideIds と相手 guide.relatedUseCaseIds が双方向に揃う（自動）
 - [ ] 出典（sources）は手動推奨（validate 未強制）
 

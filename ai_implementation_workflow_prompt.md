@@ -470,7 +470,7 @@ npm run test:e2e
 
 ### G5. 参照整合性（id参照）
 
-- `manufacturerId` / `relatedRobotIds` / `candidateRobotIds` / `supersededById` など `*Id` / `*Ids` フィールドはすべて **既存の `id`** を指しているか（`slug` を書いていないか）。
+- `manufacturerId` / `relatedRobotIds` / `candidateRobots[].robotId` / `supersededById` など `*Id` / `*Ids` フィールドはすべて **既存の `id`** を指しているか（`slug` を書いていないか）。
 - 参照先のレコードが実在するか（`data/*.ts` 内を grep して確認。存在しなければ `npm run validate:data` がエラーにする）。
 - `guides` ⇄ `useCases` のように双方向参照が必要なコレクションでは、相手側の `related*Ids` にも自分の `id` を追記したか。
 - 参照: `docs/planning/data-architecture-redesign-v1.md` §3-2 / §6、`docs/data/README.md`「参照とタグの追加手順」。
