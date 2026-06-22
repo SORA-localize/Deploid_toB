@@ -45,7 +45,7 @@ Last updated: 2026-06-14
 | コレクション | BaseRecord | validate が課す検証 | 型上の主な必須 |
 |---|---|---|---|
 | **Guide** | ○ | `updatedAt` 日付 / `topics`（guide-topic 登録タグ）/ `relatedRobotIds`→robots / `relatedUseCaseIds`→useCases / **guide↔useCase 双方向対称** | title, description, stage, order, topics, targetReaders, relatedRobotIds, relatedUseCaseIds |
-| **UseCase** | ○ | `updatedAt` / `industryTags`・`taskTags`（登録タグ）/ `candidateRobotIds`→robots / `relatedGuideIds`→guides / **双方向対称** | title, maturityLevel, buyerReadiness, environment, requiredCapabilities, atAGlance{3}, overview, **whyItMatters**, capabilityNotes, environmentRequirements, whyHardToday, japanDeploymentConditions, candidateRobotIds, relatedGuideIds |
+| **UseCase** | ○ | `updatedAt` / `industryTags`・`taskTags`・`primaryDomain`・`secondaryDomains`（登録タグ）/ `candidateRobots[].robotId`→robots（`fit:'strong'`はdeployments裏付け必須）/ `relatedGuideIds`→guides / **双方向対称** | title, maturityLevel, buyerReadiness, environment, requiredCapabilities, primaryDomain, atAGlance{3}, overview, **whyItMatters**, capabilityNotes, environmentRequirements, whyHardToday, japanDeploymentConditions, candidateRobots, relatedGuideIds |
 | **DeploymentSite** | ○ | `manufacturerId`→manufacturers / `robotId`→robots（任意）/ `updatedAt`（※本計画で `sources` 必須を追加） | manufacturerId, customer, country, location{lat,lng}, status |
 | **ArticlePlacement** | ✗（独自型） | `articleId`→articles / `order` 一意（surface:slot 内）/ article 一意（surface:slot 内）/ `kind:'sponsored'`→`sponsor.name` 必須 / `sponsor.url` 形式 | surface, slot, articleId, order |
 

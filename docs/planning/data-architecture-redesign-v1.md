@@ -391,7 +391,7 @@ summary, publishStatus, updatedAt, reliability, sources, heroImage?, seo?
 
 **Guide**: title, titleJa?, description, stage, order, topics[], targetReaders[], readingTimeMinutes?, checklistItems?, body?, **relatedRobotIds[], relatedUseCaseIds[]**
 
-**UseCase**: title, titleJa?, subtitle?, maturityLevel, buyerReadiness, environment, requiredCapabilities[], industryTags[], taskTags[], atAGlance, overview, whyItMatters, capabilityNotes, environmentRequirements, whyHardToday, japanDeploymentConditions, **candidateRobotIds[], relatedGuideIds[]**
+**UseCase**: title, titleJa?, subtitle?, featuredRank?, maturityLevel, buyerReadiness, environment, requiredCapabilities[], **primaryDomain, secondaryDomains?**, industryTags[], taskTags[], atAGlance, overview, whyItMatters, capabilityNotes, environmentRequirements, whyHardToday, japanDeploymentConditions, **candidateRobots[]{robotId,fit,reason}, relatedGuideIds[]**
 
 **Deployment**: **manufacturerId, robotId?**, customer, siteName?, country, location, status, startedAt?
 

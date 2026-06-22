@@ -51,6 +51,13 @@ export function validateData(): ValidationResult {
   const guideIds = new Set(guides.map((g) => g.id));
   const useCaseIds = new Set(useCases.map((u) => u.id));
   const articleIds = new Set(articles.map((r) => r.id));
+  // useCase.candidateRobots の fit:'strong' は「このrobotIdがこのuseCaseで実証導入されている」という主張。
+  // deployments.ts の robotId × relatedUseCaseIds の実在ペアでのみ裏付けられる（運用ルールは data-maintenance-checklist-v1.md §M）。
+  const strongFitEvidence = new Set(
+    deployments
+      .filter((d) => d.robotId)
+      .flatMap((d) => (d.relatedUseCaseIds ?? []).map((ucId) => `${d.robotId}::${ucId}`)),
+  );
 
   const check = (kind: string, owner: string, field: string, id: string, set: Set<string>) => {
     if (!set.has(id)) {
@@ -336,9 +343,15 @@ export function validateData(): ValidationResult {
     checkTags('useCase', u.slug, 'taskTags', 'task', u.taskTags);
     checkTags('useCase', u.slug, 'primaryDomain', 'use-case-domain', [u.primaryDomain]);
     checkTags('useCase', u.slug, 'secondaryDomains', 'use-case-domain', u.secondaryDomains ?? []);
-    u.candidateRobots.forEach((c) =>
-      check('useCase', u.slug, 'candidateRobots.robotId', c.robotId, robotIds),
-    );
+    u.candidateRobots.forEach((c) => {
+      check('useCase', u.slug, 'candidateRobots.robotId', c.robotId, robotIds);
+      if (c.fit === 'strong' && !strongFitEvidence.has(`${c.robotId}::${u.id}`)) {
+        errors.push(
+          `[fit-unverified] useCase "${u.slug}" の candidateRobots「${c.robotId}」は fit:'strong' だが、` +
+            `data/deployments.ts に同じrobotId・同じuseCaseの実証事例が見つかりません`,
+        );
+      }
+    });
     u.relatedGuideIds.forEach((s) =>
       check('useCase', u.slug, 'relatedGuideIds', s, guideIds),
     );
