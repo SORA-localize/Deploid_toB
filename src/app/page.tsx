@@ -59,18 +59,22 @@ export default function HomePage() {
   // 注目ロボット：featuredRank（編集ピック）→ deploymentStage → updatedAt の優先順で5件
   const featuredRobots = sortRobots(getRobots(), 'home-featured').slice(0, 5);
 
-  // HomeContentNavigator用プレビュー画像（各セクション1枚、サムネなし）
+  // HomeContentNavigator用プレビュー画像（各セクション1枚、サムネなし）。
+  // 旧画像（1X NEO press kit ×2、SKL Robotics ロゴ）は権利確認の経路（lib/media.ts の
+  // getDisplayableAsset）を通らない直置きファイルだった。1X NEOは data/robots.ts 側で
+  // すでに blocked（press kitが commercial目的不可と明記されているため）、SKL Robotics は
+  // data/manufacturers.ts に存在せず権利確認の記録自体がなかったため、3枚とも削除した。
+  // 現時点でファイルが存在し権利確認済み（reference-attributed・blockedでない）なのは
+  // mentee-menteebotv3 の hero 画像のみなので robots セクションに転用する。
+  // manufacturers/guides は使える画像がないため、HomeContentNavigator のフォールバック
+  // （画像なし・ラベル表示のみ）に委ねる。
   const robotPreviewAssets = [
-    { src: '/images/home/robots-preview.jpg', alt: '1X NEO と人間の並び', label: 'NEO', objectPosition: 'top' },
+    { src: '/images/robots/mentee-menteebotv3-hero.jpg', alt: 'MenteeBot humanoid robot', label: 'MenteeBot', objectPosition: 'center' },
   ];
 
-  const manufacturerPreviewAssets = [
-    { src: '/images/home/manufacturers-preview.png', alt: 'SKL Robotics ロゴ', label: 'Manufacturers', objectPosition: 'center' },
-  ];
+  const manufacturerPreviewAssets: typeof robotPreviewAssets = [];
 
-  const guidePreviewAssets = [
-    { src: '/images/home/guides-preview.jpg', alt: '1X NEO 3色カラーバリエーション', label: 'NEO Colors', objectPosition: 'top' },
-  ];
+  const guidePreviewAssets: typeof robotPreviewAssets = [];
 
   const { heroReports, featureReports } = getArticleIndexPlacementReports(getArticles());
 
