@@ -22,10 +22,12 @@ export const useCases: UseCase[] = [
         checkedAt: '2026-06-02',
       },
     },
+    featuredRank: 2,
     maturityLevel: 'pilot-phase',
     buyerReadiness: 'requires-poc',
     environment: 'indoor-controlled',
     requiredCapabilities: ['mobility', 'manipulation', 'perception', 'integration'],
+    primaryDomain: 'move-goods',
     industryTags: ['logistics', 'e-commerce'],
     taskTags: ['picking', 'material-handling'],
     atAGlance: {
@@ -44,7 +46,18 @@ export const useCases: UseCase[] = [
     environmentRequirements: '平坦な床、通信環境、充電スペース、作業エリア分離、緊急停止手順。',
     whyHardToday: '作業速度、把持精度、例外処理、バッテリー稼働時間が制約になりやすい。',
     japanDeploymentConditions: '労働安全、現場オペレーション、国内保守、夜間対応の確認が必要。',
-    candidateRobotIds: ['agility-digit', 'figure-03'],
+    candidateRobots: [
+      {
+        robotId: 'agility-digit',
+        fit: 'strong',
+        reason: 'Amazon（トートバッグ回収）・GXO（RaaS契約）の2件で実証・商用導入が確認されている、この用途で最も実証が厚い機体。',
+      },
+      {
+        robotId: 'figure-03',
+        fit: 'possible',
+        reason: '移動・操作の汎用性は高いが、倉庫ピッキングそのものの実証事例は確認できていない。',
+      },
+    ],
     relatedGuideIds: ['decision-variables', 'poc-planning'],
   },
   {
@@ -71,6 +84,7 @@ export const useCases: UseCase[] = [
     buyerReadiness: 'limited-today',
     environment: 'indoor-semi-controlled',
     requiredCapabilities: ['mobility', 'perception', 'data-capture'],
+    primaryDomain: 'inspect-and-record',
     industryTags: ['manufacturing', 'plant'],
     taskTags: ['inspection', 'patrol'],
     atAGlance: {
@@ -87,7 +101,18 @@ export const useCases: UseCase[] = [
     environmentRequirements: '通信環境、充電位置、巡回ルート、作業時間帯の分離。',
     whyHardToday: '複雑な現場での自律移動、微細な異常検知、長時間稼働が課題。',
     japanDeploymentConditions: '設備管理ルール、データ管理、保守対応、労働安全の整理が必要。',
-    candidateRobotIds: ['ubtech-walker-s2', 'tesla-optimus'],
+    candidateRobots: [
+      {
+        robotId: 'ubtech-walker-s2',
+        fit: 'possible',
+        reason: 'BYD等の現場に導入済みで24/7稼働に対応するが、巡回・点検タスクそのものでの実証は確認できていない。',
+      },
+      {
+        robotId: 'tesla-optimus',
+        fit: 'watch',
+        reason: '自社工場での稼働実績はあるが、用途は搬送・組立補助が中心で巡回点検への適用はまだ参考段階。',
+      },
+    ],
     relatedGuideIds: ['decision-variables'],
   },
   {
@@ -114,6 +139,7 @@ export const useCases: UseCase[] = [
     buyerReadiness: 'initial-adoption',
     environment: 'indoor-controlled',
     requiredCapabilities: ['mobility', 'manipulation', 'integration'],
+    primaryDomain: 'research-education',
     industryTags: ['research', 'education'],
     taskTags: ['r-and-d', 'hri', 'control'],
     atAGlance: {
@@ -129,7 +155,23 @@ export const useCases: UseCase[] = [
     environmentRequirements: '安全に試験できるスペース、技術者、保守予算。',
     whyHardToday: '研究目的と機体性能のミスマッチ、故障時の復旧、部品供給が課題。',
     japanDeploymentConditions: '輸入、保守、技適、研究室内安全ルールを確認する。',
-    candidateRobotIds: ['unitree-g1', 'pal-talos', 'booster-t1'],
+    candidateRobots: [
+      {
+        robotId: 'pal-talos',
+        fit: 'strong',
+        reason: 'University of Waterloo RoboHubでヒューマノイドマニピュレーション・自律移動研究に実際に活用されている。',
+      },
+      {
+        robotId: 'unitree-g1',
+        fit: 'possible',
+        reason: '研究・教育向けに広く採用されている価格帯・SDK公開状況だが、本データセット内に特定の導入事例は未確認。',
+      },
+      {
+        robotId: 'booster-t1',
+        fit: 'watch',
+        reason: '低価格な研究向け機体として早期段階。実証事例はまだ確認できていない。',
+      },
+    ],
     relatedGuideIds: ['decision-variables'],
   },
   {
@@ -156,6 +198,7 @@ export const useCases: UseCase[] = [
     buyerReadiness: 'initial-adoption',
     environment: 'indoor-controlled',
     requiredCapabilities: ['communication', 'mobility'],
+    primaryDomain: 'demo-entertainment',
     industryTags: ['marketing', 'facility'],
     taskTags: ['demo', 'exhibition'],
     atAGlance: {
@@ -171,7 +214,18 @@ export const useCases: UseCase[] = [
     environmentRequirements: '通信、充電、監視スタッフ、安全動線。',
     whyHardToday: '非定型会話、混雑時の安全確保、安定稼働が課題。',
     japanDeploymentConditions: 'イベント会場の安全ルールと保険条件を確認する。',
-    candidateRobotIds: ['unitree-r1', 'booster-k1'],
+    candidateRobots: [
+      {
+        robotId: 'unitree-r1',
+        fit: 'possible',
+        reason: '低価格・宙返り等の高い運動性能で展示・デモ向けの注目度は高いが、特定の展示導入事例は未確認。',
+      },
+      {
+        robotId: 'booster-k1',
+        fit: 'watch',
+        reason: '小型・低価格機として参考段階。展示・デモでの実証事例は確認できていない。',
+      },
+    ],
     relatedGuideIds: ['decision-variables'],
   },
   {
@@ -208,6 +262,7 @@ export const useCases: UseCase[] = [
     buyerReadiness: 'requires-poc',
     environment: 'indoor-controlled',
     requiredCapabilities: ['mobility', 'communication', 'perception'],
+    primaryDomain: 'communicate-with-people',
     industryTags: ['hospitality'],
     taskTags: ['customer-service'],
     atAGlance: {
@@ -230,7 +285,18 @@ export const useCases: UseCase[] = [
       '非定型な質問対応、クレーム時のエスカレーション判断、長時間稼働時の応答品質維持が課題（可搬重量・応答速度は機体により非公表）。',
     japanDeploymentConditions:
       '日本語対話の精度、設置施設の防犯・接客ガイドラインとの整合、機体の代理店・保守体制（要確認）を確認する必要がある。',
-    candidateRobotIds: ['agibot-a2', 'ubtech-walker-x'],
+    candidateRobots: [
+      {
+        robotId: 'agibot-a2',
+        fit: 'strong',
+        reason: 'マーケティング・受付・案内向けに既に商用展開されている量産機（公式に確認済み）。',
+      },
+      {
+        robotId: 'ubtech-walker-x',
+        fit: 'possible',
+        reason: 'AI研究・スマートサービス向けに設計された対話特化モデルだが、受付・接客の特定導入事例は未確認。',
+      },
+    ],
     relatedGuideIds: ['decision-variables'],
   },
   {
@@ -252,6 +318,15 @@ export const useCases: UseCase[] = [
         reliability: 'official',
         note: 'R1 / R1 AIRの量産・価格帯の裏取り。',
       },
+      {
+        title: 'Sanctuary AI completes first commercial deployment',
+        url: 'https://www.sanctuary.ai/news/sanctuary-ai-successfully-completes-first-commercial-deployment/',
+        publisher: 'Sanctuary AI',
+        publishedAt: '2023-05-16',
+        checkedAt: '2026-06-22',
+        reliability: 'official',
+        note: 'Phoenix のCanadian Tire（Mark\'s）店舗での実証導入の裏取り（data/deployments.tsのsanctuary-canadian-tire-langleyと同一出典）。',
+      },
     ],
     heroImage: {
       src: '',
@@ -267,6 +342,8 @@ export const useCases: UseCase[] = [
     buyerReadiness: 'initial-adoption',
     environment: 'indoor-controlled',
     requiredCapabilities: ['mobility', 'manipulation', 'perception'],
+    primaryDomain: 'move-goods',
+    secondaryDomains: ['communicate-with-people'],
     industryTags: ['retail'],
     taskTags: ['shelf-stocking', 'customer-service'],
     atAGlance: {
@@ -289,7 +366,23 @@ export const useCases: UseCase[] = [
       '低ペイロードで対応商品が限られ、レジ・接客対応との役割分担や長時間稼働時の安定性は未検証。',
     japanDeploymentConditions:
       '国内代理店経由での調達は可能だが、店舗運用ルール・保険・労働安全衛生上の扱いは個別に確認が必要。',
-    candidateRobotIds: ['unitree-r1', 'unitree-r1-standard'],
+    candidateRobots: [
+      {
+        robotId: 'sanctuary-phoenix',
+        fit: 'strong',
+        reason: 'Canadian Tire傘下のMark\'s店舗で、小売店舗での多目的作業の実証導入が確認されている。',
+      },
+      {
+        robotId: 'unitree-r1',
+        fit: 'possible',
+        reason: '量産済みの低価格機で国内入手性も高いが、小売棚補充そのものの実証事例は未確認。',
+      },
+      {
+        robotId: 'unitree-r1-standard',
+        fit: 'possible',
+        reason: 'R1 AIRと同系統の標準構成機。小売棚補充での実証事例は未確認。',
+      },
+    ],
     relatedGuideIds: ['decision-variables'],
   },
   {
@@ -334,6 +427,7 @@ export const useCases: UseCase[] = [
     buyerReadiness: 'requires-poc',
     environment: 'indoor-controlled',
     requiredCapabilities: ['manipulation', 'mobility', 'perception'],
+    primaryDomain: 'assist-human-body',
     industryTags: ['healthcare-care'],
     taskTags: ['physical-assistance'],
     atAGlance: {
@@ -356,7 +450,18 @@ export const useCases: UseCase[] = [
       '身体接触を伴う介助の安全性証明、故障時のフォールバック手順が未整理（国内は価格・保守体制とも問い合わせ制）。',
     japanDeploymentConditions:
       '介護保険制度上の扱い、医療機器に該当するかの整理、施設の安全管理規程との整合、機体の国内代理店・保守体制（要確認）を確認する必要がある。',
-    candidateRobotIds: ['fourier-gr3', 'fourier-gr2'],
+    candidateRobots: [
+      {
+        robotId: 'fourier-gr3',
+        fit: 'possible',
+        reason: '介護向け「Care-bot」として公式に明示展開されているが、実際の介護施設への導入事例は未確認。',
+      },
+      {
+        robotId: 'fourier-gr2',
+        fit: 'watch',
+        reason: 'リハビリ実績を背景にした高自由度機だが、研究向けの位置づけが強く介護施設での実証は未確認。',
+      },
+    ],
     relatedGuideIds: ['decision-variables'],
   },
   {
@@ -406,10 +511,16 @@ export const useCases: UseCase[] = [
         checkedAt: '2026-06-21',
       },
     },
+    featuredRank: 1,
     maturityLevel: 'pilot-phase',
     buyerReadiness: 'requires-poc',
     environment: 'indoor-semi-controlled',
     requiredCapabilities: ['mobility', 'manipulation', 'perception'],
+    // 部品搬送（move-goods）・組立補助（manipulate-and-assemble）・外観検査補助（inspect-and-record）が
+    // 実証事例の中で混在しているため、primaryDomainを最も比重の大きい組立補助とし、残りをsecondaryDomainsで表現する
+    // （実証事例が薄いうちは物理分割しない方針。docs/planning/data-maintenance-checklist-v1.md §M）。
+    primaryDomain: 'manipulate-and-assemble',
+    secondaryDomains: ['move-goods', 'inspect-and-record'],
     industryTags: ['manufacturing', 'plant'],
     taskTags: ['assembly', 'material-handling'],
     atAGlance: {
@@ -432,7 +543,33 @@ export const useCases: UseCase[] = [
       '人手と同等の作業速度・精度の証明、既存ラインの安全規格との整合、長時間稼働時の安定性が課題。詳しい判断基準は意思決定変数の地図を参照。',
     japanDeploymentConditions:
       '国内自動車・電子機器メーカーでの公開実証はまだ確認できておらず、価格・保守体制は機種ごとに要確認。',
-    candidateRobotIds: ['figure-03', 'apptronik-apollo', 'wandercraft-calvin', 'ubtech-walker-s1', 'tesla-optimus'],
+    candidateRobots: [
+      {
+        robotId: 'apptronik-apollo',
+        fit: 'strong',
+        reason: 'Mercedes-Benzのベルリン工場・ケチケメート工場の2拠点で組立キット搬送・製造補助の実証導入が確認されている。',
+      },
+      {
+        robotId: 'wandercraft-calvin',
+        fit: 'strong',
+        reason: 'Renaultドゥエー工場でタイヤ搬送に特化して稼働中。350台規模の量産導入が進む、現時点で最も成熟した事例。',
+      },
+      {
+        robotId: 'ubtech-walker-s1',
+        fit: 'strong',
+        reason: 'NIO合肥工場の最終組立ラインで外観検査等の実証導入が確認されている。',
+      },
+      {
+        robotId: 'tesla-optimus',
+        fit: 'strong',
+        reason: '自社フリーモント工場で部品運搬等の実証導入が確認されている（出典の信頼度は公式発表より一段低い報道ベース）。',
+      },
+      {
+        robotId: 'figure-03',
+        fit: 'possible',
+        reason: '前身機Figure 02がBMWスパルタンバーグ工場で実証を完了したが、Figure 03自体の工場導入事例はまだ確認できていない。',
+      },
+    ],
     relatedGuideIds: ['decision-variables'],
   },
 ];

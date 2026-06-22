@@ -237,13 +237,16 @@ AI側の実装手順:
 > 一次情報が薄い間は薄いページを量産しない（CLAUDE.md 方針）。`UseCase`の役割は「業界紹介ではなく作業・タスク起点の逆引き」（`humanoid_media_IA_v1.md` §7）。深い判断基準（コスト・安全・調達等）はガイド側が担うため、新規追加時もその役割を超えて書きすぎない。
 
 1. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
-2. [ ] 型必須：title / maturityLevel / buyerReadiness / environment / requiredCapabilities / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobotIds / relatedGuideIds
-3. [ ] `industryTags` / `taskTags` は登録タグのみ（自動）
-4. [ ] `candidateRobotIds` は robot の **id** 参照（自動）。**先に `data/deployments.ts` を確認し、同じニッチに複数の実在導入事例が集中していないか見る**。集中していれば、それが新規追加の最も強い根拠になる（思いつきで追加しない）
-5. [ ] **双方向対称**：`relatedGuideIds` と相手 guide.`relatedUseCaseIds` を両方そろえる（自動）
-6. [ ] 出典（sources）は手動推奨（validate 未強制）。個々の事実より、`relatedUseCaseIds` で紐付けた`deployments`側の出典が実質的な根拠になる想定
-7. [ ] `capabilityNotes` / `environmentRequirements` / `whyHardToday` / `japanDeploymentConditions` は各2-3文程度に圧縮し、詳しい判断はガイドへのリンクに渡す（detail page側で視覚的にも補足扱いにする）
-8. [ ] build 通過 → `published`
+2. [ ] 型必須：title / maturityLevel / buyerReadiness / environment / requiredCapabilities / **primaryDomain** / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots / relatedGuideIds
+3. [ ] `primaryDomain`（必須・単一）と`secondaryDomains`（任意・配列）は`lib/tagRegistry.ts`の`use-case-domain`から選ぶ（自動：未登録は build 失敗）。これがMECEな分類の正本。`industryTags`/`taskTags`は検索ファセット用で、MECEを意図しない（manufacturing/plantのように粒度が混在してよい）
+4. [ ] 実証事例が複数ドメインに渡る場合（例：搬送＋組立＋検査が同じユースケースに混在）は、最も比重の大きいドメインを`primaryDomain`にし、残りを`secondaryDomains`に入れる。**物理的にユースケースを分割しない**。各ドメインが独立して実証件数を積んだ時点で初めて分割を検討する
+5. [ ] `candidateRobots`は`{robotId, fit, reason, caveats?}[]`。`robotId`は robot の **id** 参照（自動）。`fit`は3段階：`strong`=`data/deployments.ts`で実在の導入事例に裏付けられている／`possible`=スペック・位置付けは合うが実証未確認／`watch`=初期段階・参考程度。**先に `data/deployments.ts` を確認し、同じニッチに複数の実在導入事例が集中していないか見る**（新規追加の最も強い根拠。思いつきで追加しない）。`reason`は既存の`capabilityNotes`等から導出し、新しい主張を作らない
+6. [ ] `industryTags` / `taskTags` は登録タグのみ（自動）
+7. [ ] **双方向対称**：`relatedGuideIds` と相手 guide.`relatedUseCaseIds` を両方そろえる（自動）
+8. [ ] 出典（sources）は手動推奨（validate 未強制）。個々の事実より、`relatedUseCaseIds` で紐付けた`deployments`側の出典が実質的な根拠になる想定
+9. [ ] `capabilityNotes` / `environmentRequirements` / `whyHardToday` / `japanDeploymentConditions` は各2-3文程度に圧縮し、詳しい判断はガイドへのリンクに渡す（detail page側で視覚的にも補足扱いにする）
+10. [ ] `featuredRank`（任意・数値）は一覧の「注目の適用領域」での優先順位。値が小さいほど上位、未設定は非掲載。実証事例が厚い用途から優先的に設定する（配列順には依存しない。`lib/useCaseFilters.ts`参照）
+11. [ ] build 通過 → `published`
 
 ## N. 導入事例（deployments）追加 / 更新
 

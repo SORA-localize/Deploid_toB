@@ -148,7 +148,8 @@ placements     >── articles
 ```
 
 - `<` = 1対多、`>──` = 多対多 or 参照。
-- `deployments.relatedUseCaseIds`（任意項目）は「この導入事例がどの用途の根拠になるか」を示す。`UseCase.candidateRobotIds`と同じ一方向参照パターンで、`lib/data.ts`の`getDeploymentsForUseCase()`が逆引きする。無理な紐付けはしない（該当しない事例は空のままでよい）。
+- `deployments.relatedUseCaseIds`（任意項目）は「この導入事例がどの用途の根拠になるか」を示す。`UseCase.candidateRobots[].robotId`と同じ一方向参照パターンで、`lib/data.ts`の`getDeploymentsForUseCase()`が逆引きする。無理な紐付けはしない（該当しない事例は空のままでよい）。
+- `UseCase.candidateRobots`は単なるid配列ではなく`{robotId, fit, reason, caveats?}[]`（`fit`: strong/possible/watch）。「なぜ候補なのか」をデータ自身が持つ。`fit: 'strong'`は`deployments.ts`の実在事例で裏付けられていることを意味する。
 - **逆向きは導出**（§6）。robots は自分が属する useCases を持たない。`lib/data.ts` が逆引きする。
 
 ---
@@ -185,7 +186,7 @@ placements     >── articles
 | robot → manufacturer | robot が `manufacturerId` を持つ（単方向） | 多対1。robotが主 |
 | useCase ⇄ guide | **双方向**（互いに id を持つ）＋ validate で整合チェック | 両側UIで使うため |
 | article → robots/mfr/useCase/guide | article が一方的に持つ（単方向） | articleが主、被参照側は知らなくてよい |
-| robot ← useCase（候補） | useCase が `candidateRobotIds`、robot側は持たず導出 | robotページは `lib/data.ts` で逆引き |
+| robot ← useCase（候補） | useCase が `candidateRobots[].robotId`（fit/reason付き）、robot側は持たず導出 | robotページは `lib/data.ts` で逆引き |
 
 **原則**: 双方向は「両側のUIが対称に必要」な時だけ。それ以外は単方向＋導出（コピー二重管理を避ける）。
 

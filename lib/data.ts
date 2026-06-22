@@ -138,7 +138,7 @@ export function getRobotsByManufacturerId(manufacturerId: string) {
 }
 
 export function getUseCasesForRobot(robotId: string) {
-  return getUseCases().filter((useCase) => useCase.candidateRobotIds.includes(robotId));
+  return getUseCases().filter((useCase) => useCase.candidateRobots.some((c) => c.robotId === robotId));
 }
 
 export function getDeploymentsForUseCase(useCaseId: string) {
