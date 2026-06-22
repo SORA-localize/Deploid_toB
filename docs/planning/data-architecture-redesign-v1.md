@@ -149,7 +149,7 @@ placements     >── articles
 
 - `<` = 1対多、`>──` = 多対多 or 参照。
 - `deployments.relatedUseCaseIds`（任意項目）は「この導入事例がどの用途の根拠になるか」を示す。`UseCase.candidateRobots[].robotId`と同じ一方向参照パターンで、`lib/data.ts`の`getDeploymentsForUseCase()`が逆引きする。無理な紐付けはしない（該当しない事例は空のままでよい）。
-- `UseCase.candidateRobots`は単なるid配列ではなく`{robotId, fit, reason, caveats?}[]`（`fit`: strong/possible/watch）。「なぜ候補なのか」をデータ自身が持つ。`fit: 'strong'`は`deployments.ts`の実在事例で裏付けられていることを意味する。
+- `UseCase.candidateRobots`は単なるid配列ではなく`{robotId, fit, reason}[]`（`fit`: strong/possible/watch）。「なぜ候補なのか」をデータ自身が持つ。`fit: 'strong'`は`deployments.ts`の実在事例（同じrobotId・同じuseCase）で裏付けられていることを意味する（量産・商用展開の事実だけでは`strong`にしない）。`lib/data.ts`の`getRelatedRobots()`は呼び出し側が渡した順序を保持する（`candidateRobots`のfit順がそのまま表示順になる）。
 - **逆向きは導出**（§6）。robots は自分が属する useCases を持たない。`lib/data.ts` が逆引きする。
 
 ---

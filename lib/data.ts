@@ -162,9 +162,12 @@ export function getManufacturerForRobot(manufacturerId: string) {
 }
 
 export function getRelatedRobots(ids: string[]) {
-  const idSet = new Set(ids);
   // archived も返す（関連欄から無言脱落させない。表示側が「提供終了」を付ける。設計 §6.5-1）
-  return getRobotsForDetail().filter((robot) => idSet.has(robot.id));
+  const robotById = new Map(getRobotsForDetail().map((robot) => [robot.id, robot]));
+  // ids の並び順を保持する（呼び出し側が編集判断で並べている。例: UseCase.candidateRobots の fit順）。
+  return ids
+    .map((id) => robotById.get(id))
+    .filter((robot): robot is NonNullable<typeof robot> => robot !== undefined);
 }
 
 export function getRelatedManufacturers(ids: string[]) {
