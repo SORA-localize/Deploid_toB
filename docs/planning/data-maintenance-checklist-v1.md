@@ -239,7 +239,7 @@ AI側の実装手順:
 
 1. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
 2. [ ] 型必須：title / maturityLevel / buyerReadiness / environment / requiredCapabilities / **primaryDomain** / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots / relatedGuideIds
-3. [ ] `primaryDomain`（必須・単一）と`secondaryDomains`（任意・配列）は`lib/tagRegistry.ts`の`use-case-domain`から選ぶ（自動：未登録は build 失敗）。これがMECEな分類の正本。`industryTags`/`taskTags`は検索ファセット用で、MECEを意図しない（manufacturing/plantのように粒度が混在してよい）
+3. [ ] `primaryDomain`（必須・単一）と`secondaryDomains`（任意・配列）は`lib/tagRegistry.ts`の`use-case-domain`から選ぶ（自動：未登録は build 失敗）。これが「ロボットが何をするのが得意か」というMECEな動作軸の正本（UI上のラベルは「得意分野」）。`industryTags`/`taskTags`は検索ファセット用で、MECEを意図しない（manufacturing/plantのように粒度が混在してよい）。新しい値を追加する場合は「ロボットの動作」を表す軸に揃え、「導入目的」（集客・人材育成等）を表す値は持ち込まない（過去に`demo-entertainment`/`research-education`が目的軸混入で`demonstrate-capability`/`validate-new-tech`に直された経緯がある）
 4. [ ] 実証事例が複数ドメインに渡る場合（例：搬送＋組立＋検査が同じユースケースに混在）は、最も比重の大きいドメインを`primaryDomain`にし、残りを`secondaryDomains`に入れる。**物理的にユースケースを分割しない**。各ドメインが独立して実証件数を積んだ時点で初めて分割を検討する
 5. [ ] `candidateRobots`は`{robotId, fit, reason}[]`。`robotId`は robot の **id** 参照（自動）。`fit`は3段階：`strong`=`data/deployments.ts`にpublishedな実在の導入事例（同じrobotId・同じuseCaseへの`relatedUseCaseIds`）がある場合のみ／`possible`=スペック・位置付けは合うが当該ユースケースでの実証未確認（量産・商用展開の事実だけでは`strong`にしない）／`watch`=初期段階・参考程度。**先に `data/deployments.ts` を確認し、同じニッチに複数の実在導入事例が集中していないか見る**（新規追加の最も強い根拠。思いつきで追加しない）。`reason`は既存の`capabilityNotes`等から導出し、新しい主張を作らない
 6. [ ] `industryTags` / `taskTags` は登録タグのみ（自動）
