@@ -139,7 +139,7 @@ export const useCases: UseCase[] = [
     buyerReadiness: 'initial-adoption',
     environment: 'indoor-controlled',
     requiredCapabilities: ['mobility', 'manipulation', 'integration'],
-    primaryDomain: 'research-education',
+    primaryDomain: 'validate-new-tech',
     industryTags: ['research', 'education'],
     taskTags: ['r-and-d', 'hri', 'control'],
     atAGlance: {
@@ -198,7 +198,7 @@ export const useCases: UseCase[] = [
     buyerReadiness: 'initial-adoption',
     environment: 'indoor-controlled',
     requiredCapabilities: ['communication', 'mobility'],
-    primaryDomain: 'demo-entertainment',
+    primaryDomain: 'demonstrate-capability',
     industryTags: ['marketing', 'facility'],
     taskTags: ['demo', 'exhibition'],
     atAGlance: {

@@ -27,6 +27,7 @@ import {
 import { breadcrumbJsonLd, useCaseJsonLd } from '@/lib/jsonLd';
 import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
+import { getTagLabel } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
 
 export function generateStaticParams() {
@@ -60,7 +61,16 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
   const deployments = getDeploymentsForUseCase(useCase.id);
   const primaryGuide = guides[0];
 
+  const secondaryDomainLabels = (useCase.secondaryDomains ?? []).map((domain) =>
+    getTagLabel(domain, 'use-case-domain'),
+  );
+  const domainValue =
+    secondaryDomainLabels.length > 0
+      ? `${getTagLabel(useCase.primaryDomain, 'use-case-domain')}（＋${secondaryDomainLabels.join('、')}）`
+      : getTagLabel(useCase.primaryDomain, 'use-case-domain');
+
   const overviewRows: Array<[string, string]> = [
+    ['得意分野', domainValue],
     ['成熟度', maturityLabels[useCase.maturityLevel]],
     ['実務ラベル', buyerReadinessLabels[useCase.buyerReadiness]],
     ['環境', operatingEnvironmentLabels[useCase.environment]],

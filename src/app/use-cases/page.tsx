@@ -2,30 +2,41 @@ import { UseCasesBrowser } from '@/components/UseCasesBrowser';
 import { getUseCases } from '@/lib/data';
 import { createPageMetadata } from '@/lib/metadata';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
-import { getTagLabel, getUseCaseIndustryTagOptions, getUseCaseTaskTagOptions } from '@/lib/tags';
+import {
+  getTagLabel,
+  getUseCaseDomainOptions,
+  getUseCaseIndustryTagOptions,
+  getUseCaseTaskTagOptions,
+} from '@/lib/tags';
 import { getUseCaseFilterResult, normalizeUseCaseFilters } from '@/lib/useCaseFilters';
 
 const defaultTitle = '用途から探す';
 const defaultDescription =
-  '業種・ワークフロー・タスクから現実的なヒューマノイドの適用機会を探す。ベンダー名ではなく現場の課題から始めます。';
+  'やりたい作業の得意分野・業種・タスクから現実的なヒューマノイドの適用機会を探す。ベンダー名ではなく現場の課題から始めます。';
 
-function resolveFilters(useCases: ReturnType<typeof getUseCases>, params: { industry: string | null; task: string | null; q: string | null }) {
+function resolveFilters(
+  useCases: ReturnType<typeof getUseCases>,
+  params: { industry: string | null; task: string | null; domain: string | null; q: string | null },
+) {
   return normalizeUseCaseFilters({
     industry: params.industry,
     task: params.task,
+    domain: params.domain,
     query: params.q,
     industryValues: getUseCaseIndustryTagOptions(useCases).map((option) => option.value),
     taskValues: getUseCaseTaskTagOptions(useCases).map((option) => option.value),
+    domainValues: getUseCaseDomainOptions(useCases).map((option) => option.value),
   });
 }
 
 export async function generateMetadata({ searchParams }: { searchParams: RouteSearchParams }) {
-  const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
+  const params = await pickSearchParams(searchParams, ['industry', 'task', 'domain', 'q'] as const);
   const useCases = getUseCases();
   const filters = resolveFilters(useCases, params);
   const { filtered } = getUseCaseFilterResult(useCases, filters);
 
   const tagLabels = [
+    filters.domain ? getTagLabel(filters.domain, 'use-case-domain') : null,
     filters.industry ? getTagLabel(filters.industry, 'industry') : null,
     filters.task ? getTagLabel(filters.task, 'task') : null,
   ].filter((label): label is string => Boolean(label));
@@ -46,7 +57,7 @@ export default async function UseCasesPage({
 }: {
   searchParams: RouteSearchParams;
 }) {
-  const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
+  const params = await pickSearchParams(searchParams, ['industry', 'task', 'domain', 'q'] as const);
   const useCases = getUseCases();
   return (
     <UseCasesBrowser

@@ -57,7 +57,7 @@ export function UseCaseCard({ useCase: u }: UseCaseCardProps) {
 
       <Link href={`/use-cases/${u.slug}`} className="relative z-10 block h-full p-4">
         <div className="mb-2 flex flex-wrap items-center gap-1.5">
-          {u.industryTags[0] && <TagChip kind="industry" value={u.industryTags[0]} />}
+          <TagChip kind="use-case-domain" value={u.primaryDomain} />
           <TagChip tone={getUseCaseMaturityTone(u.maturityLevel)}>
             {maturityLabels[u.maturityLevel]}
           </TagChip>
