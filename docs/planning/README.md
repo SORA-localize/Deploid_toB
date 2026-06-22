@@ -49,6 +49,7 @@ Last cleaned: 2026-06-13
 - `humanoid_platform_tech_stack_v1.md` — 技術スタック
 - `launch-readiness-meta-plan-v1.md` — 公開前のメタ情報、SNS共有、計測、プライバシー、sitemap整備計画
 - `ui_architecture_and_development_policy_v1.md` — UI構造と開発方針
+- `usecase-domain-ui-rollout-v1.md` — `UseCase.primaryDomain`/`secondaryDomains`をUIに繋ぎ込む実装計画（実装後はarchiveへ移動予定）
 
 ### (b) 参照・背景（旧／非正本）
 

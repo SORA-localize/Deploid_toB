@@ -288,8 +288,8 @@ export const useCases: UseCase[] = [
     candidateRobots: [
       {
         robotId: 'agibot-a2',
-        fit: 'strong',
-        reason: 'マーケティング・受付・案内向けに既に商用展開されている量産機（公式に確認済み）。',
+        fit: 'possible',
+        reason: 'マーケティング・受付・案内向けに量産・商用展開されている機体（公式に確認済み）だが、特定施設での導入事例（deployments.ts）はまだ確認できていない。',
       },
       {
         robotId: 'ubtech-walker-x',

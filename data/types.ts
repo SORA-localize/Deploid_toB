@@ -292,7 +292,6 @@ export interface UseCaseCandidateRobot {
   /** strong=実際の導入事例あり（deployments.tsで裏付け） / possible=スペック・位置付けは合うが実証未確認 / watch=初期段階・参考程度 */
   fit: CandidateFit;
   reason: string;
-  caveats?: string[];
 }
 
 export interface UseCase extends BaseRecord {
