@@ -25,3 +25,7 @@ Last cleaned: 2026-06-23
 - `filter-count-display-plan-v1.md` — robots/manufacturers一覧の件数表示とフィルタ領域レイアウトが現行UIに反映済み。
 - `home-mobile-ui-plan-v1.md` — homeのモバイル主要コンテンツ導線、注目ロボットカード、関連UI調整が現行実装に反映済み。
 - `robots-csv-publish-and-sort-plan-v1.md` — `featuredRank` を使う robot sort と記事配置ソート整理が現行実装に反映済み。
+
+## 2026-06-23 Archived During Hub Page Cache Components Planning
+
+- `seo-hub-prerender-plan-v1.md` — `hub-page-cache-components-plan-v1.md` の調査で、6ハブページすべてが既に `lib/searchParams.ts` 経由でサーバー側 `searchParams` 読み取り＋ `initialFilters` props渡しの構成になっており、`next start` 後の生HTML確認でも実データ（Unitree/Figure等）が出ていることを確認済み。本計画が想定した「初期HTMLが薄い」問題は解消済みのため移動。

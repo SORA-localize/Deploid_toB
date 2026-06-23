@@ -78,4 +78,4 @@ Last cleaned: 2026-06-23
 
 ### (d) archive 移動対象
 
-- `seo-hub-prerender-plan-v1.md` — 調査により実装済みと確認済み。`hub-page-cache-components-plan-v1.md` の実装手順1でarchiveへ移動する（計画段階のため未実施）
+現時点で `docs/planning/` 直下に archive 移動待ちとして残している文書はありません。
