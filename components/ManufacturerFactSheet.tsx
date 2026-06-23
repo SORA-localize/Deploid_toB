@@ -110,9 +110,6 @@ export function ManufacturerFactSheet({ manufacturer, robotCount }: Manufacturer
     <section id="facts" className="scroll-mt-site-header py-8 border-b border-border">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="mb-2 text-xs font-medium text-muted-foreground">
-            {uiText.manufacturers.companySummary}
-          </p>
           <h2 className="text-xl font-semibold text-foreground">
             {uiText.manufacturers.factSheet}
           </h2>

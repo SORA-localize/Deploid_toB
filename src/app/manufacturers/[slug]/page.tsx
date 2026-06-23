@@ -93,7 +93,6 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
         <ManufacturerDetailSection
           id="robots"
-          eyebrow={uiText.manufacturers.robotsSection}
           title={uiText.manufacturers.robotsSection}
           action={
             <span className="text-xs text-muted-foreground whitespace-nowrap">
@@ -110,7 +109,6 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
         {displayedReports.length > 0 && (
           <ManufacturerDetailSection
             id="reports"
-            eyebrow={uiText.manufacturers.relatedReports}
             title={uiText.manufacturers.relatedReports}
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">

@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { ArrowRight, ExternalLink, Globe2, MessageSquare } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { Manufacturer } from '@/data/types';
-import { companyStatusLabels, companyTypeLabels, japanPresenceLabels } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
 
 interface ManufacturerDetailHeroProps {
@@ -14,19 +13,10 @@ export function ManufacturerDetailHero({ manufacturer }: ManufacturerDetailHeroP
   const contactHref = manufacturer.contactUrl ?? '/contact';
   const hasOfficialContact = Boolean(manufacturer.contactUrl);
 
-  const statusItems = [
-    companyTypeLabels[manufacturer.companyType],
-    companyStatusLabels[manufacturer.companyStatus],
-    japanPresenceLabels[manufacturer.japanPresence],
-  ];
-
   return (
     <section id="overview" className="scroll-mt-site-header border-b border-border pb-10">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_24rem] items-start">
         <div className="min-w-0">
-          <p className="mb-3 text-xs font-medium text-muted-foreground">
-            {uiText.manufacturers.profile}
-          </p>
           <h1 className="mb-5 text-2xl font-semibold leading-tight text-foreground md:text-3xl">
             <ManufacturerLogoName
               name={name}
@@ -39,15 +29,6 @@ export function ManufacturerDetailHero({ manufacturer }: ManufacturerDetailHeroP
           <p className="max-w-4xl text-sm leading-relaxed text-foreground/80 sm:text-base">
             {manufacturer.description}
           </p>
-
-          <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            {statusItems.map((item, index) => (
-              <span key={item} className="inline-flex items-center gap-3">
-                <span>{item}</span>
-                {index < statusItems.length - 1 && <span aria-hidden="true">/</span>}
-              </span>
-            ))}
-          </div>
         </div>
 
         <aside className="mt-6 border-t border-border pt-6 self-start lg:mt-0 lg:border-t-0 lg:pt-0 lg:sticky top-site-header-gap lg:border-l lg:border-border lg:pl-6">
