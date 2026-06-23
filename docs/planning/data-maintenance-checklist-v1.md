@@ -27,6 +27,7 @@
 12. [ ] industryTags / taskTags は tagRegistry の登録値のみ（自動：未登録は build 失敗）
 13. [ ] `nextReviewBy` を設定（価格含むなら短め）
 14. [ ] `npm run build` が通る → 問題なければ `publishStatus: 'published'`
+15. [ ] 件数が増減した場合、`/for-manufacturers` の掲載数表示が古くなる。`lib/site.ts` の `siteMeta.dataAsOf` を更新する（手動・即時でなくまとめて更新でも可）
 
 ## B. メーカー追加
 
@@ -38,6 +39,7 @@
 6. [ ] `headquarters`（lat/lng）はワールドマップ用（任意）。設定すると Home ワールドマップにドットが表示される
 7. [ ] **その国が初登場**の場合は `components/ManufacturerMapCopy.tsx` の `REGION` 定数に `'CountryName': { name: '日本語名', a3: 'ISO3文字コード' }` を追加する（手動。漏れてもビルドは通るが、地図カードの国名がフォールバック表示になる）
 8. [ ] build 通過 → `published`
+9. [ ] 件数が増減した場合、`/for-manufacturers` の掲載数表示が古くなる。`lib/site.ts` の `siteMeta.dataAsOf` を更新する（手動・即時でなくまとめて更新でも可）
 
 ## C. ニュース記事（articles）追加
 
