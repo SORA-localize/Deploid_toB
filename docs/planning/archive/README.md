@@ -29,3 +29,10 @@ Last cleaned: 2026-06-23
 ## 2026-06-23 Archived During Hub Page Cache Components Planning
 
 - `seo-hub-prerender-plan-v1.md` — `hub-page-cache-components-plan-v1.md` の調査で、6ハブページすべてが既に `lib/searchParams.ts` 経由でサーバー側 `searchParams` 読み取り＋ `initialFilters` props渡しの構成になっており、`next start` 後の生HTML確認でも実データ（Unitree/Figure等）が出ていることを確認済み。本計画が想定した「初期HTMLが薄い」問題は解消済みのため移動。
+
+## 2026-06-23 Archived After Implementation Sweep
+
+- `hub-page-cache-components-plan-v1.md` — `next.config.mjs` の `cacheComponents: true`、Footerの年表示cache helper、6ハブページのSuspense境界化、トップページ演出の非決定的render除去、sitemapのdeterministic lastModified、`/robots` の `use cache` + `cacheLife('hours')` + `cacheTag('robots-list')` が実装済み。`npm run build` で全137パス生成成功、6ハブページがPartial Prerenderになったことを確認済み。
+- `usecase-domain-ui-rollout-v1.md` — `UseCase.primaryDomain`/`secondaryDomains` のUI接続が現行実装に反映済み。`/use-cases` の `domain` query、`getUseCaseDomainOptions`、カードの `use-case-domain` TagChip、詳細ページの得意分野行、検索documentへの `use-case-domain` 追加、metadata用filter反映まで確認済み。
+- `home-article-scroll-plan-v1.md` — 計画どおりの横スクロールストリップは採用されず、現行homeは `getArticleIndexPlacementReports()` を使う `NewsHeroCarousel` + `NewsFeatureCard` のreports index型レイアウトへ置き換わっている。現行UIを優先し、この横スクロール案は履歴扱いにする。
+- `nav-transition-performance-fix-plan-v1.md` — 主要ハブをclient state化して静的化する旧案。現行はCache Componentsで6ハブページをPartial Prerender化し、`PageSuspenseFallback` もSuspense境界に接続済みのため前提が古い。遷移遅延が再発する場合は現行Cache Components構成を前提に新規計画を作る。

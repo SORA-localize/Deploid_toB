@@ -59,17 +59,13 @@ Last cleaned: 2026-06-23
 
 - `humanoid_data_management_guide_v1.md` — データ運用の背景説明（旧ガイド）
 - `humanoid_data_model_policy_v1.md` — データモデル設計指針（旧。現行は data-architecture-redesign）
+- `responsive-design-implementation-plan.md` — レスポンシブ改善の包括計画（Breadcrumb、詳細ページの1カラム化、sticky/header、比較モバイル操作、横スクロール系UIなどは現行実装へ部分反映済み。今後はこの長大計画をそのまま実行せず、個別の崩れを再調査して小さい計画にする）
 
 ### (c) 未実装・作業計画
 
 実装判断の正本ではなく、これから実行する整理・改善計画。完了後は archive へ移動するか、正本へ反映したうえで役割を更新する。
 
 - `article-tab-layout-data-plan-v1.md` — 記事タブ構造・分類・特集/取材/動画対応の拡張計画
-- `home-article-scroll-plan-v1.md` — home 注目記事の横スクロール化計画
-- `hub-page-cache-components-plan-v1.md` — Cache Components導入計画。実装試行で判明した全体ゲート（Footer、6ハブ、トップページ演出、sitemap）を先に通し、その後 `/robots` のキャッシュ効果を検証する方針
-- `nav-transition-performance-fix-plan-v1.md` — グローバルナビ遷移性能の改善計画（`searchParams`をサーバーから外す案は不採用。残課題は`hub-page-cache-components-plan-v1.md`で検証する）
-- `responsive-design-implementation-plan.md` — レスポンシブ改善の段階実装計画
-- `usecase-domain-ui-rollout-v1.md` — `UseCase.primaryDomain`/`secondaryDomains`をUIに繋ぎ込む実装計画
 
 ## アーカイブ
 
