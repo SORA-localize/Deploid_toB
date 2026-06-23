@@ -1,30 +1,16 @@
 import Link from 'next/link';
 import { ArrowRight, ExternalLink, Globe2, MessageSquare } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
-import type { Manufacturer, Robot } from '@/data/types';
-import {
-  companyStatusLabels,
-  companyTypeLabels,
-  japanPresenceLabels,
-  TBD_LABEL,
-} from '@/lib/labels';
-import {
-  getDomesticDistributorDisplay,
-  getManufacturerConsultationRoute,
-  getManufacturerLocationLabel,
-  manufacturerConsultationRouteLabels,
-} from '@/lib/manufacturerDisplay';
+import type { Manufacturer } from '@/data/types';
+import { companyStatusLabels, companyTypeLabels, japanPresenceLabels } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
 
 interface ManufacturerDetailHeroProps {
   manufacturer: Manufacturer;
-  robots: readonly Robot[];
 }
 
-export function ManufacturerDetailHero({ manufacturer, robots }: ManufacturerDetailHeroProps) {
+export function ManufacturerDetailHero({ manufacturer }: ManufacturerDetailHeroProps) {
   const name = manufacturer.nameJa ?? manufacturer.name;
-  const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
-  const consultationRoute = getManufacturerConsultationRoute(manufacturer);
   const contactHref = manufacturer.contactUrl ?? '/contact';
   const hasOfficialContact = Boolean(manufacturer.contactUrl);
 
@@ -107,35 +93,6 @@ export function ManufacturerDetailHero({ manufacturer, robots }: ManufacturerDet
               <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-60" />
             </a>
           </div>
-
-          <dl className="mt-5 divide-y divide-border text-xs">
-            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
-              <dt className="text-muted-foreground">{uiText.manufacturers.location}:</dt>
-              <dd className="min-w-0 text-foreground">{getManufacturerLocationLabel(manufacturer)}</dd>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
-              <dt className="text-muted-foreground">{uiText.manufacturers.founded}:</dt>
-              <dd className="min-w-0 text-foreground">{manufacturer.foundedYear ?? TBD_LABEL}</dd>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
-              <dt className="text-muted-foreground">{uiText.manufacturers.consultationRoute}:</dt>
-              <dd className="min-w-0 text-foreground">
-                {manufacturerConsultationRouteLabels[consultationRoute]}
-              </dd>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
-              <dt className="text-muted-foreground">{uiText.manufacturers.domesticDistributors}:</dt>
-              <dd className="min-w-0 text-foreground">{domesticDistributor.label}</dd>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
-              <dt className="text-muted-foreground">{uiText.manufacturers.handledRobots}:</dt>
-              <dd className="min-w-0 text-foreground">{uiText.manufacturers.models(robots.length)}</dd>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-[7rem_minmax(0,1fr)] gap-1 sm:gap-3 py-3">
-              <dt className="text-muted-foreground">{uiText.manufacturers.lastUpdated}:</dt>
-              <dd className="min-w-0 text-foreground">{manufacturer.updatedAt}</dd>
-            </div>
-          </dl>
         </aside>
       </div>
     </section>

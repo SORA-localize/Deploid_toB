@@ -87,7 +87,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
           ]}
         />
 
-        <ManufacturerDetailHero manufacturer={manufacturer} robots={robots} />
+        <ManufacturerDetailHero manufacturer={manufacturer} />
 
         <ManufacturerFactSheet manufacturer={manufacturer} robotCount={robots.length} />
 

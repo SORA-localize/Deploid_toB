@@ -13,11 +13,10 @@ Last updated: 2026-06-23
 - `privacy` の定義リスト gutter を `8rem` に統一
 - `about`・`privacy`・`for-manufacturers` の定義リストを共通 `components/DefinitionList.tsx` に統合（`variant` は static-page 相当の1種類のみ）
 
-未着手（スコープ縮小・別途実施）：
-- `robots/[slug]`・`use-cases/[slug]` の `dl`（`sm:grid-cols-[8rem_1fr]`、アイコン付き）の共通化
-- `ManufacturerDetailHero`（`7rem` gutter）・`ManufacturerFactSheet`（`8rem` gutter・border-b方式・2列グリッド内）の共通化
-- これらは static-page 系と gutter・breakpoint・dd装飾（font-weight/colon有無）が異なり、`DefinitionList` に強引に統合すると見た目が変わるリスクが「中〜高」と判定されたため、今回は見送り、視覚確認を伴う別タスクとして残す。
-- `reports/[slug]`・`guides/[slug]` のサイドバー構造そのものの共通化（文言の uiText 化のみ実施、レイアウト構造は未着手）
+未着手（スコープ縮小・別途実施）→ `component-duplication-unification-plan-v1.md` で対応完了：
+- `robots/[slug]`・`use-cases/[slug]` の `dl`（`sm:grid-cols-[8rem_1fr]`、アイコン付き）の共通化 → `DefinitionList` の `detail-decision` variant に統合済み。
+- `ManufacturerDetailHero`（`7rem` gutter）・`ManufacturerFactSheet`（`8rem` gutter・border-b方式・2列グリッド内）の共通化 → 実装時に見た目の差以前にデータの重複（同一事実を2回表示）と判明したため、gutter統一ではなく `ManufacturerDetailHero` 側の重複 `dl` を削除して解消済み。
+- `reports/[slug]`・`guides/[slug]` のサイドバー構造そのものの共通化（文言の uiText 化のみ実施、レイアウト構造は未着手）→ サイドバー外枠（`SidebarSection`/`SidebarBlock`/`SidebarDivider`）は `robots/[slug]`・`use-cases/[slug]`・`guides/[slug]` で統合済み。`reports/[slug]` は見出しシステムが異なるため対象外のまま。
 
 この文書は、Deploid 全体のテキスト表示レイアウトと、ページ上の文字情報が適切なデータ構造から供給されているかを調査するための実行計画です。
 
