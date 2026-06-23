@@ -66,9 +66,9 @@ Last cleaned: 2026-06-23
 
 - `article-tab-layout-data-plan-v1.md` — 記事タブ構造・分類・特集/取材/動画対応の拡張計画
 - `home-article-scroll-plan-v1.md` — home 注目記事の横スクロール化計画
-- `nav-transition-performance-fix-plan-v1.md` — グローバルナビ遷移性能と静的化方針の改善計画
+- `hub-page-cache-components-plan-v1.md` — `/robots`先行でのCache Components導入計画。`seo-hub-prerender-plan-v1.md`は実装済み（(d)参照）、`nav-transition-performance-fix-plan-v1.md`の残課題はこちらで解消する方針
+- `nav-transition-performance-fix-plan-v1.md` — グローバルナビ遷移性能の改善計画（`searchParams`をサーバーから外す案は不採用。残課題は`hub-page-cache-components-plan-v1.md`が解消する想定）
 - `responsive-design-implementation-plan.md` — レスポンシブ改善の段階実装計画
-- `seo-hub-prerender-plan-v1.md` — SEOハブページ初期HTML改善計画
 - `usecase-domain-ui-rollout-v1.md` — `UseCase.primaryDomain`/`secondaryDomains`をUIに繋ぎ込む実装計画
 
 ## アーカイブ
@@ -78,4 +78,4 @@ Last cleaned: 2026-06-23
 
 ### (d) archive 移動対象
 
-現時点で `docs/planning/` 直下に archive 移動待ちとして残している文書はありません。
+- `seo-hub-prerender-plan-v1.md` — 調査により実装済みと確認済み。`hub-page-cache-components-plan-v1.md` の実装手順1でarchiveへ移動する（計画段階のため未実施）
