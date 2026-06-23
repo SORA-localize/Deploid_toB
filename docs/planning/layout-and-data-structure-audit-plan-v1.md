@@ -1,6 +1,6 @@
 # Layout And Data Structure Audit Plan v1
 
-Status: active/unimplemented investigation plan
+Status: active/unimplemented plan — investigation (Phase 1-4) complete, fixes not yet implemented
 Last updated: 2026-06-23
 
 この文書は、Deploid 全体のテキスト表示レイアウトと、ページ上の文字情報が適切なデータ構造から供給されているかを調査するための実行計画です。
@@ -195,27 +195,97 @@ Last updated: 2026-06-23
 
 ## 調査で作る一覧
 
-調査結果では、最低限以下の表を作る。
-
 ### Route Layout Table
 
 | route | main component | container | max width | grid pattern | issue | priority |
 | --- | --- | --- | --- | --- | --- | --- |
+| `/` | page.tsx + `HomeContentNavigator` 等 | `site-container` | `max-w-3xl`（コピー部分のみ） | 固定値なし | 問題なし | - |
+| `/robots`, `/manufacturers`, `/reports`, `/guides`, `/use-cases`, `/compare` | 各 `*Browser`/`CompareClient` | `site-container` | ページ固有なし | フィルタバー等の可変 grid のみ | 問題なし | - |
+| `/robots/[slug]` | page.tsx + `RobotStickyAside` | `site-container` | `max-w-3xl`（`dl`） | `lg:grid-cols-[1fr_280px]`、`sm:grid-cols-[8rem_1fr]` を同一ファイル内に2回直書き | 同一構造の重複。共有化候補 | P2 |
+| `/manufacturers/[slug]` | `ManufacturerDetailHero`/`ManufacturerFactSheet`/`ManufacturerDetailSection` | `site-container` | ページ側指定なし | 各コンポーネントが個別に `sm:grid-cols-[7rem_minmax(0,1fr)]` / `sm:grid-cols-[8rem_minmax(0,1fr)]` を実装 | robots/[slug] と近似だが微妙に値が異なる重複 | P2 |
+| `/reports/[slug]`, `/guides/[slug]` | page.tsx 内 `ReportSidebarContent()` 等 | `site-container` + `site-container-content` | `max-w-4xl`/`max-w-3xl` | `grid-cols-12`（TOC 2 / 本文 7 / サイドバー 3）を両ページで個別に直書き | 同一形状の重複。サイドバー実装も両ページ別物 | P2 |
+| `/use-cases/[slug]` | page.tsx 内の独自 `<aside>` | `site-container` | `max-w-3xl`（`dl`） | `lg:grid-cols-[1fr_280px]`（robots/[slug] と同形状）、`sm:grid-cols-[8rem_1fr]` を同一ファイル内に3回直書き | コメント上は `RobotStickyAside` と同等と書かれているが実際は再実装。重複が最も多い | P1（実装と意図のズレ） |
+| `/about`, `/for-manufacturers` | page.tsx（共有シェルなし） | `site-container` + `content-col` | `content-col`（64rem） | `md:grid-cols-[8rem_1fr]` をそれぞれ5回・4回直書き | 同一ページ内 + ページ間で重複 | P2 |
+| `/privacy` | page.tsx（共有シェルなし） | `site-container` + `content-col` | `content-col`（64rem） | `md:grid-cols-[10rem_1fr]` を2回直書き | `/about`/`/for-manufacturers` と同じ見た目の定義リストだが gutter 幅だけ `10rem` と不揃い | P1（不自然な狭さの直接原因候補） |
+| `/contact` | page.tsx + `ContactForm` | `site-container` + `content-col` | `content-col` | なし | 問題なし | - |
+| `error.tsx`, `not-found.tsx` | page.tsx単体 | `site-container` | `max-w-2xl`/`max-w-3xl` | `not-found.tsx` のみ `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`（ナビ） | 同じシェル形状を別々に実装（軽微） | P3 |
+
+静的ページ（`/about` `/privacy` `/contact` `/for-manufacturers`）はいずれも `content-col`（64rem）を使っており、初期仮説1（個別固定 grid が原因）は部分的に正しいが、`content-col` 自体の幅は統一されている。不自然な狭さの主因は **`content-col` 幅そのものではなく、定義リストの gutter（`8rem` vs `10rem`）の不統一と、本文最大幅をさらに狭める `max-w-*` の重ね指定**である。
 
 ### Text Source Table
 
 | route | text category | current location | expected location | issue | priority |
 | --- | --- | --- | --- | --- | --- |
+| `/`, `/about`, `/privacy`, `/contact`, `/for-manufacturers` | `static_page_content` | page.tsx 内に直書き | 現状で問題なし（固定本文として妥当） | なし | - |
+| `/about`, `/privacy`, `/for-manufacturers` | `derived_value`（"公開開始: 2026年6月" / "最終更新：2026年6月"） | 3ファイルにそれぞれ個別ハードコード | 単一の定数（例: `lib/uiText.ts` か専用 site content 定数） | 3箇所が独立しており、1箇所更新で残り2箇所とズレる | P1 |
+| `/for-manufacturers` | `derived_value`（掲載件数）+ 日付の混在 | `` `ロボット ${robotCount}件・メーカー ${manufacturerCount}社（2026年6月現在）` `` | 件数部分は現状通り動的でよいが、日付部分は上記の単一定数に統一 | 動的値と静的日付が同一文字列に混在し、日付だけ更新漏れしやすい | P1 |
+| `/robots/[slug]`, `/manufacturers/[slug]`, `/reports/[slug]`, `/guides/[slug]`, `/use-cases/[slug]` | `ui_text`（breadcrumb "ホーム"） | 5ファイル全てに `'ホーム'` を個別ハードコード | `uiText.common.home`（既存・未使用） | 既存の共通文言を使わず重複 | P2 |
+| `/robots/[slug]` | `ui_text`（"導入判断" "向く用途" "制約・向かない用途" "不向きな現場" "提供終了：" 等） | page.tsx 内に直書き、隣接見出しは `uiText.robots.*` を使用 | `uiText.robots.*` | 同一ページ内で `uiText` 利用とハードコードが混在 | P2 |
+| `components/RobotStickyAside.tsx` | `ui_text`（"基本スペック" "導入段階" "日本での入手性" "メーカーサイトへ" "比較ページで確認"） | コンポーネント内に直書き | `uiText.robots.*` 等 | ラベルが正本を経由していない | P2 |
+| `/use-cases/[slug]` | `ui_text`（"要点" "導入事例" "なぜ重要か" "論点" "成立条件" "向く条件" "向かない条件" "判断軸" "候補ロボット" "関連" "選定の相談" 等、`overviewRows` ラベル配列含む） | page.tsx 内に大量直書き | `uiText.useCases.*` / `labels.ts` | 詳細ページの中で最も `uiText` 規約からの逸脱が大きい | P1 |
+| `/reports/[slug]` | `ui_text`（`ReportSidebarContent()` 内の "情報提供・取材相談" "関連ツール" "お問い合わせ" "ロボットを探す" 等、"タグ"ラベル） | page.tsx 内に直書き | `uiText.reports.*` | サイドバー全体が共通化されておらず文言も未経由 | P2 |
+| `/guides/[slug]` | `ui_text`（"チェックリスト" "選定の相談" "このガイドの内容を踏まえて検討したい場合はご相談ください。" "相談する" 等） | page.tsx 内に直書き | `uiText.guides.*` | 同上 | P2 |
+| `/use-cases` | `ui_text`（`defaultTitle`/`defaultDescription`） | page.tsx 内の定数 | 現状で問題なし（SEO用メタ文言として妥当） | なし | - |
 
 ### Data Flow Table
 
 | route/component | current source | expected source | direct data import | source/reliability concern |
 | --- | --- | --- | --- | --- |
+| 全15ルート | `lib/data.ts` 経由（`getRobots` 等） | `lib/data.ts` | なし（`data/*.ts` 直import は検出されず） | なし。事実データの供給経路は健全 |
+| `/about`, `/privacy` | ページ固有の静的定数 | 現状で問題なし | なし | "2026年6月" の日付がコード上の固定文字列であり、`sources[].checkedAt` のような確認経路を持たない（lib/data.ts 配下の record とは異質のため許容範囲） |
+| `/for-manufacturers` | `getRobots`/`getManufacturers` の件数 + 固定日付文字列 | 件数は現状通り。日付のみ上記の単一定数化対象 | なし | 上記と同様 |
+
+事実データ（`record_fact`）の供給経路自体に問題は見つからなかった。タグ・カテゴリ・表示ラベルも `tagRegistry`/`labels.ts`/`display.ts` を経由しているページが大半で、検出された逸脱は `ui_text` カテゴリ（文言の置き場所）に集中している。
 
 ### Fix Candidate Table
 
 | target | type | proposed fix | risk | verification |
 | --- | --- | --- | --- | --- |
+| `/privacy` の定義リスト gutter（`10rem`） | layout | `8rem` に統一し `/about`・`/for-manufacturers` と一致させる | 低（class値変更のみ） | 360/768/1280/1440px 表示確認 |
+| `/robots/[slug]`・`/manufacturers/[slug]`・`/use-cases/[slug]` の定義リスト直書き | layout | 共通 `DefinitionList` コンポーネントを新設し3箇所を置き換え | 中（既存マークアップとの差異に注意） | build + 3ページの表示確認 |
+| `/reports/[slug]`・`/guides/[slug]` のサイドバー直書き | layout | 共通 `ArticleSidebar`（仮）に統合するか、現状維持で文言のみ uiText 化するかを Phase 4 で判断 | 中（情報提供導線の文言が記事種別で異なる可能性） | build + 表示確認 |
+| `/use-cases/[slug]` の `<aside>` | layout | `RobotStickyAside` を実際に再利用する形に変更、またはコメントを実装に合わせて修正 | 中（props 形状の差異を要確認） | build + 表示確認 |
+| `/about`・`/privacy`・`/for-manufacturers` の "2026年6月" | data | 単一の site content 定数（例 `lib/uiText.ts` の `siteMeta.launchedAt` 等）を新設し3箇所から参照 | 低 | build。日付変更時に1箇所のみ編集で反映されることを確認 |
+| 5つの詳細ページの `'ホーム'` 直書き | data | `uiText.common.home` を参照するよう置き換え | 低 | build |
+| `/robots/[slug]` 本文中の `uiText` 未経由ラベル | data | `uiText.robots.*` に追加し参照を置き換え | 低〜中（既存キー構造との整合確認） | build |
+| `components/RobotStickyAside.tsx` のラベル | data | `uiText` 経由に変更 | 低 | build + `/robots/[slug]` 表示確認 |
+| `/use-cases/[slug]` のセクション見出し・`overviewRows` ラベル | data | `uiText.useCases.*`／`labels.ts` に追加し参照を置き換え（量が多いため最優先で着手） | 中（既存キー命名との整合、翻訳揺れ確認） | build + `/use-cases/[slug]` 表示確認 |
+| `/reports/[slug]`・`/guides/[slug]` のサイドバー文言 | data | `uiText.reports.*`／`uiText.guides.*` に追加 | 低〜中 | build |
+
+## 修正対象外（現状維持で問題なし）
+
+- 一覧ページ6種（`/robots` `/manufacturers` `/reports` `/guides` `/use-cases` `/compare`）のレイアウト・データ供給経路。
+- `/`、`/contact` のレイアウトと文言。
+- `error.tsx`／`not-found.tsx`（構造重複はP3で軽微、今回のスコープでは対応不要）。
+- 全ルートの `record_fact` 供給経路（`lib/data.ts` 経由で健全）。
+- タグ・カテゴリ・表示ラベルの registry/labels/display 経由の利用（逸脱は見つからず）。
+
+## 要確認（このまま実装に進めない項目）
+
+- `/reports/[slug]`・`/guides/[slug]` のサイドバーは記事種別ごとに文言・導線が異なる可能性があり、共通化するかは Phase 4 で記事の編集方針（`editorial_style_guide_v1.md`）と照合してから決める。
+- `use-cases/[slug]` のラベル群を `uiText.useCases.*` に移す際、既存の `uiText` 命名規則（既存ファイルの構造）と衝突しないか実装前に `lib/uiText.ts` を確認する。
+
+## 修正実行計画（次の実装フェーズで触るファイル）
+
+実装は「データ修正（低リスク・先行可）」と「レイアウト共通化（中リスク・要設計判断）」を別の実装単位に分ける。
+
+1. データ修正（先行して着手可能）
+   - `src/app/about/page.tsx`、`src/app/privacy/page.tsx`、`src/app/for-manufacturers/page.tsx`：日付文字列を単一定数参照に変更
+   - `src/app/robots/[slug]/page.tsx`、`src/app/manufacturers/[slug]/page.tsx`、`src/app/reports/[slug]/page.tsx`、`src/app/guides/[slug]/page.tsx`、`src/app/use-cases/[slug]/page.tsx`：`'ホーム'` を `uiText.common.home` 参照に変更
+   - `components/RobotStickyAside.tsx`：ラベルを `uiText` 参照に変更
+   - `src/app/robots/[slug]/page.tsx`：本文中の未経由ラベルを `uiText.robots.*` 参照に変更
+   - `src/app/use-cases/[slug]/page.tsx`：見出し・`overviewRows` ラベルを `uiText.useCases.*`／`labels.ts` 参照に変更（最優先）
+   - `src/app/reports/[slug]/page.tsx`、`src/app/guides/[slug]/page.tsx`：サイドバー文言を `uiText.reports.*`／`uiText.guides.*` 参照に変更
+   - 付随して `lib/uiText.ts`／`lib/labels.ts` にキー追加
+2. レイアウト共通化（設計判断後に着手）
+   - `src/app/privacy/page.tsx`：定義リスト gutter を `8rem` に統一
+   - 共通 `DefinitionList` コンポーネント新設 → `src/app/robots/[slug]/page.tsx`、`components/ManufacturerDetailHero.tsx`、`components/ManufacturerFactSheet.tsx`、`src/app/use-cases/[slug]/page.tsx`、`src/app/about/page.tsx`、`src/app/for-manufacturers/page.tsx` を置き換え
+   - `src/app/use-cases/[slug]/page.tsx` の `<aside>` を `RobotStickyAside` 再利用に変更（または非再利用の理由をコメントで明記）
+   - `src/app/reports/[slug]/page.tsx`・`src/app/guides/[slug]/page.tsx` のサイドバー共通化は「要確認」の判断後に着手
+
+触らないファイル: 上記「修正対象外」セクションに記載の一覧ページ群、`/`、`/contact`、`error.tsx`/`not-found.tsx`、`lib/data.ts` 経由のデータ供給ロジック本体。
+
+検証チェックリストは既存の「検証方針」セクションをそのまま使う。
 
 ## 検証方針
 
