@@ -37,3 +37,4 @@ Last cleaned: 2026-06-23
 - `home-article-scroll-plan-v1.md` — 計画どおりの横スクロールストリップは採用されず、現行homeは `getArticleIndexPlacementReports()` を使う `NewsHeroCarousel` + `NewsFeatureCard` のreports index型レイアウトへ置き換わっている。現行UIを優先し、この横スクロール案は履歴扱いにする。
 - `nav-transition-performance-fix-plan-v1.md` — 主要ハブをclient state化して静的化する旧案。現行はCache Componentsで6ハブページをPartial Prerender化し、`PageSuspenseFallback` もSuspense境界に接続済みのため前提が古い。遷移遅延が再発する場合は現行Cache Components構成を前提に新規計画を作る。
 - `component-duplication-unification-plan-v1.md` — サイドバー外枠（`SidebarSection`/`SidebarBlock`/`SidebarDivider`）の統一、`RelatedLinkList`/`DefinitionList`のvariant追加、`ConsultationCta`切り出しまで実装済み。`ManufacturerDetailHero`/`ManufacturerFactSheet`は見た目統一ではなく重複データ（同一事実の2重表示）の削除で解決。B（簡易スペックリスト統合）・C（見出しclass重複）はKISSの観点から見送りを決定済み。
+- `article-tab-layout-data-plan-v1.md` — `/reports` と `articlePlacements` の構造整理メモ。現行の正本ではないが、記事タブ拡張やZEALS/Omakase Robotics記事の扱いを検討した経緯として参照価値があるため履歴扱いにする。

@@ -272,7 +272,7 @@ AI側の実装手順:
 2. [ ] `articleId` は article の **id** 参照（自動：参照切れは build 失敗）
 3. [ ] 同一 `surface:slot` 内で `order` 重複なし・同一記事の重複なし（自動）
 4. [ ] `kind: 'sponsored'` なら `sponsor.name` 必須・`sponsor.url` は形式チェック（自動）
-5. [ ] **掲載対象は published 記事にする**（validate は記事の存在のみ確認。draft 記事への枠付けは検出しない＝手動）
+5. [ ] **掲載対象は published 記事にする**（自動：draft / archived 記事への枠付けは build 失敗）
 6. [ ] build 通過
 
 ---
