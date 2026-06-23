@@ -12,9 +12,27 @@ interface RelatedLinkListProps {
   title: string;
   items: readonly RelatedLinkItem[];
   titleLevel?: 'h2' | 'h3';
+  /** 'compact' はサイドバー向け：見出し・説明文・カード装飾を省き、リンク行のみ表示する */
+  variant?: 'card' | 'compact';
 }
 
-export function RelatedLinkList({ id, title, items, titleLevel = 'h2' }: RelatedLinkListProps) {
+export function RelatedLinkList({ id, title, items, titleLevel = 'h2', variant = 'card' }: RelatedLinkListProps) {
+  if (variant === 'compact') {
+    return (
+      <nav aria-label={title}>
+        {items.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="block text-xs text-foreground/80 hover:text-foreground py-2 border-b border-border last:border-b-0"
+          >
+            {item.title}
+          </Link>
+        ))}
+      </nav>
+    );
+  }
+
   const Heading = titleLevel;
   const headingId = `${id}-heading`;
 

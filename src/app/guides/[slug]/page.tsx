@@ -1,13 +1,14 @@
-import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Calendar, Clock, User } from 'lucide-react';
 import { ArticleToc } from '@/components/ArticleToc';
 import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { CandidateRobotList } from '@/components/CandidateRobotList';
+import { ConsultationCta } from '@/components/ConsultationCta';
 import { JsonLd } from '@/components/JsonLd';
 import { Markdown } from '@/components/Markdown';
 import { RelatedLinkList } from '@/components/RelatedLinkList';
+import { SidebarBlock, SidebarDivider, SidebarSection } from '@/components/SidebarSection';
 import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
 import {
@@ -207,56 +208,39 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           {/* サイドバー：robots/[slug]のRobotStickyAside・use-cases/[slug]と同じ「枠なし・区切り線のみ・実データ駆動」に揃える。
               以前はrelatedRobotIds/relatedUseCaseIdsと無関係な固定リンク3本＋事前選択無しの/compareリンクだった。 */}
           <div className="col-span-12 lg:col-span-3">
-            <div className="lg:sticky top-site-header-gap space-y-5">
+            <SidebarSection sticky="lg">
               {robots.length > 0 && (
                 <>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-                      {uiText.guides.relatedRobots}
-                    </p>
+                  <SidebarBlock kicker={uiText.guides.relatedRobots}>
                     <CandidateRobotList robots={robots} />
-                  </div>
-                  <div className="border-t border-border" />
+                  </SidebarBlock>
+                  <SidebarDivider />
                 </>
               )}
 
               {useCases.length > 0 && (
                 <>
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-                      {uiText.guides.relatedUseCases}
-                    </p>
-                    <nav>
-                      {useCases.map((useCase) => (
-                        <Link
-                          key={useCase.id}
-                          href={`/use-cases/${useCase.slug}`}
-                          className="block text-xs text-foreground/80 hover:text-foreground py-2 border-b border-border last:border-b-0"
-                        >
-                          {useCase.titleJa ?? useCase.title}
-                        </Link>
-                      ))}
-                    </nav>
-                  </div>
-                  <div className="border-t border-border" />
+                  <SidebarBlock kicker={uiText.guides.relatedUseCases}>
+                    <RelatedLinkList
+                      id="related-use-cases-sidebar"
+                      title={uiText.guides.relatedUseCases}
+                      variant="compact"
+                      items={useCases.map((useCase) => ({
+                        href: `/use-cases/${useCase.slug}`,
+                        title: useCase.titleJa ?? useCase.title,
+                      }))}
+                    />
+                  </SidebarBlock>
+                  <SidebarDivider />
                 </>
               )}
 
-              <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
-                  {uiText.guides.consultation}
-                </p>
-                <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                  {uiText.guides.consultationDescription}
-                </p>
-                <Link
-                  href="/contact"
-                  className="flex items-center justify-center w-full px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium transition-colors"
-                >
-                  {uiText.guides.consultationCta}
-                </Link>
-              </div>
-            </div>
+              <ConsultationCta
+                kicker={uiText.guides.consultation}
+                description={uiText.guides.consultationDescription}
+                cta={uiText.guides.consultationCta}
+              />
+            </SidebarSection>
           </div>
         </div>
       </div>

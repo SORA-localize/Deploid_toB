@@ -1,24 +1,62 @@
 import type { ReactNode } from 'react';
+import type { LucideIcon } from 'lucide-react';
 
 export interface DefinitionRow {
   label: ReactNode;
   value: ReactNode;
   /** dd のクラスを既定値から上書きする（タイトル+本文など複合コンテンツ用） */
   valueClassName?: string;
+  /** detail-decision バリアントのみ：dt の先頭に小さく表示するアイコン */
+  icon?: LucideIcon;
 }
 
 interface DefinitionListProps {
   rows: DefinitionRow[];
-  /** about/for-manufacturers は foreground、privacy は muted（既存の見た目を保持） */
+  /**
+   * static-page: about/privacy/for-manufacturers の固定本文ページ向け（md breakpoint・8rem gutter）
+   * detail-decision: robots/[slug]・use-cases/[slug] の詳細ページ向け（sm breakpoint・8rem gutter・アイコン対応）
+   */
+  variant?: 'static-page' | 'detail-decision';
+  /** static-page バリアントの dd 文字色（about/for-manufacturers は foreground、privacy は muted） */
   ddTone?: 'foreground' | 'muted';
-  /** 最初のセクション（mission/課題/方針）だけ py-5、他は py-4 */
+  /** static-page バリアントのみ：最初のセクション（mission/課題/方針）だけ py-5、他は py-4 */
   py?: '4' | '5';
   className?: string;
 }
 
-// 情報・テキスト重視ページ（about/contact/privacy/for-manufacturers）共通の
-// ラベル・値の定義リスト。8rem gutter・md breakpoint で統一する。
-export function DefinitionList({ rows, ddTone = 'foreground', py = '4', className }: DefinitionListProps) {
+export function DefinitionList({
+  rows,
+  variant = 'static-page',
+  ddTone = 'foreground',
+  py = '4',
+  className,
+}: DefinitionListProps) {
+  if (variant === 'detail-decision') {
+    return (
+      <dl className={`divide-y divide-border text-xs max-w-3xl ${className ?? ''}`}>
+        {rows.map((row, index) => {
+          const Icon = row.icon;
+          return (
+            <div key={index} className="grid grid-cols-1 sm:grid-cols-[8rem_1fr] gap-1 sm:gap-4 py-3">
+              <dt className="text-muted-foreground">
+                {Icon ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Icon className="w-3 h-3 shrink-0 opacity-60" />
+                    {row.label}
+                  </span>
+                ) : (
+                  row.label
+                )}
+              </dt>
+              <dd className={row.valueClassName ?? 'text-foreground font-medium break-words'}>{row.value}</dd>
+            </div>
+          );
+        })}
+      </dl>
+    );
+  }
+
+  // static-page
   const rowPy = py === '5' ? 'py-5' : 'py-4';
   const defaultDdClassName = `text-sm leading-relaxed ${ddTone === 'foreground' ? 'text-foreground' : 'text-muted-foreground'}`;
   return (

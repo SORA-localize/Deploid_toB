@@ -1,7 +1,24 @@
 # Component Duplication Unification Plan v1
 
-Status: active/unimplemented plan
+Status: active/unimplemented plan — A・Eは実装済み（下記「実装状況」参照）、B/C/ManufacturerDetailHero・FactSheetは見送り/別単位
 Last updated: 2026-06-23
+
+## 実装状況（2026-06-23）
+
+完了：
+- `components/SidebarSection.tsx`（`SidebarSection`/`SidebarBlock`/`SidebarDivider`）を新設し、`RobotStickyAside`・`use-cases/[slug]`・`guides/[slug]` の右サイドバー外枠を統一（sticky breakpointは `sticky: 'always' | 'lg'` propで吸収）。`reports/[slug]` は計画記載どおり対象外。
+- `components/RelatedLinkList.tsx` に `variant="compact"` を追加し、`use-cases/[slug]`（関連ガイド・関連記事の2ループ）と `guides/[slug]`（関連用途の1ループ）の手書き `<nav>` を置き換え。あわせて欠落していた `last:border-b-0` のズレを解消。
+- `components/ConsultationCta.tsx` を新設し、`use-cases/[slug]`・`guides/[slug]` の相談CTAブロックを共通化。
+- `components/DefinitionList.tsx` に `detail-decision` variant（`sm:grid-cols-[8rem_1fr]`、アイコン対応、太字dd）を追加し、`robots/[slug]` の `decisionRows` dl・`specRows` dl（調査時点では未検出だった2つ目の同形 dl）、`use-cases/[slug]` の `atAGlance` dl を統合。mobile gap は `gap-0.5` と `gap-1` が混在していたため `gap-1` に統一（視覚差は360px時のみ・2px程度）。
+
+見送り（この計画内で決定、コード変更なし）：
+- B（`ComparisonRobotPanel`/`RobotCard` の簡易スペックリスト）: レイアウトが本質的に異なる（flex左右配置 vs grid-cols-2）ため、統合がKISSに反する過剰抽象化になると判断し見送りを既定とする。
+- C（`text-xs font-semibold uppercase tracking-wide text-muted-foreground` の見出しclass文字列重複）: 構造的なJSX重複ではなく単一class文字列の重複であり、`reports/[slug]` の見出しシステム（Aとは別系統）にも関わるため、今回は見送る。
+
+別単位とする：
+- `ManufacturerDetailHero`（`7rem` gutter）・`ManufacturerFactSheet`（`8rem` gutter・dd太字・border-b方式）の統合は、A・Eの実装が安定した状態で別途取り組む。
+
+検証: `npx tsc --noEmit`、`npm run build`、`npm run validate:data` 通過。dev server起動後、`/robots/[slug]`・`/use-cases/[slug]`・`/guides/[slug]` をcurlでHTML構造を確認し、見出しラベル・リンクURL・区切り線数・definition listのgrid classが意図通りであることを確認済み。
 
 この文書は、`layout-and-data-structure-audit-plan-v1.md` の調査・一次実装で意図的に保留した「定義リストの構造重複」を解消するための計画である。先行実装では `content-col` 幅の修正、日付・breadcrumb・ラベルの正本化、`about`/`privacy`/`for-manufacturers` の定義リスト共通化までは完了したが、`robots/[slug]`・`use-cases/[slug]`・`ManufacturerDetailHero`・`ManufacturerFactSheet` の4箇所は gutter 幅や breakpoint が異なるため見送っていた。この計画は、その4箇所を含めてプロジェクト全体を再調査し、`ai/rules/10-workflow.md` の Single Source of Truth / DRY / KISS の原則に照らして他にも放置されている構造重複がないかを確認したうえで、優先度をつけて解消する。
 

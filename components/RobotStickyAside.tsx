@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import type { Robot } from '@/data/types';
 import type { Manufacturer } from '@/data/types';
+import { SidebarBlock, SidebarDivider, SidebarSection } from '@/components/SidebarSection';
 import { getSpecRows } from '@/lib/robotDisplay';
 import { deploymentStageLabels, japanAvailabilityLabels } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
@@ -23,13 +24,8 @@ export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps)
 
   return (
     <aside className="hidden lg:block">
-      <div className="sticky top-site-header-gap space-y-5">
-
-        {/* 基本スペック */}
-        <div>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-            {uiText.robots.basicSpecs}
-          </p>
+      <SidebarSection>
+        <SidebarBlock kicker={uiText.robots.basicSpecs}>
           <table className="w-full text-xs">
             <tbody className="divide-y divide-border">
               {quickSpecs.map((row) => (
@@ -40,31 +36,25 @@ export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps)
               ))}
             </tbody>
           </table>
-        </div>
+        </SidebarBlock>
 
-        <div className="border-t border-border" />
+        <SidebarDivider />
 
         {/* 導入段階 + 入手性 */}
         <div className="space-y-4">
-          <div>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-              {uiText.robots.deploymentStage}
-            </p>
+          <SidebarBlock kicker={uiText.robots.deploymentStage} kickerClassName="mb-1">
             <p className="text-sm font-medium text-foreground">
               {deploymentStageLabels[robot.deploymentStage]}
             </p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-              {uiText.robots.japanAvailability}
-            </p>
+          </SidebarBlock>
+          <SidebarBlock kicker={uiText.robots.japanAvailability} kickerClassName="mb-1">
             <p className="text-sm font-medium text-foreground">
               {japanAvailabilityLabels[robot.japanAvailability]}
             </p>
-          </div>
+          </SidebarBlock>
         </div>
 
-        <div className="border-t border-border" />
+        <SidebarDivider />
 
         {/* CTA */}
         <div className="space-y-2">
@@ -86,8 +76,7 @@ export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps)
             {uiText.robots.checkOnComparePage}
           </Link>
         </div>
-
-      </div>
+      </SidebarSection>
     </aside>
   );
 }

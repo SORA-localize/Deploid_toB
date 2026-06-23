@@ -3,11 +3,15 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { AlertCircle, Building2, CheckCircle2, MapPin } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { CandidateRobotList } from '@/components/CandidateRobotList';
+import { ConsultationCta } from '@/components/ConsultationCta';
+import { DefinitionList } from '@/components/DefinitionList';
 import { JsonLd } from '@/components/JsonLd';
 import { ManufacturerDetailStickyHeader } from '@/components/ManufacturerDetailStickyHeader';
 import type { ManufacturerDetailSectionLink } from '@/components/ManufacturerDetailSectionNav';
+import { RelatedLinkList } from '@/components/RelatedLinkList';
+import { SidebarBlock, SidebarDivider, SidebarSection } from '@/components/SidebarSection';
 import { SourceList } from '@/components/SourceList';
-import { CandidateRobotList } from '@/components/CandidateRobotList';
 import {
   getDeploymentsForUseCase,
   getRelatedGuides,
@@ -131,26 +135,25 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
               <h2 className="text-lg font-semibold text-foreground mb-4">
                 {uiText.useCases.atAGlance}
               </h2>
-              <dl className="divide-y divide-border text-xs max-w-3xl">
-                <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:gap-4">
-                  <dt className="flex items-center gap-1.5 text-muted-foreground">
-                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0 opacity-60" />
-                    {uiText.useCases.wherefits}
-                  </dt>
-                  <dd className="text-foreground font-medium break-words">{useCase.atAGlance.whereFits}</dd>
-                </div>
-                <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:gap-4">
-                  <dt className="flex items-center gap-1.5 text-muted-foreground">
-                    <AlertCircle className="h-3.5 w-3.5 shrink-0 opacity-60" />
-                    {uiText.useCases.whereDoesNotFit}
-                  </dt>
-                  <dd className="text-foreground font-medium break-words">{useCase.atAGlance.whereDoesNotFit}</dd>
-                </div>
-                <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:gap-4">
-                  <dt className="text-muted-foreground">{uiText.useCases.mustBeTrue}</dt>
-                  <dd className="text-foreground font-medium break-words">{useCase.atAGlance.mustBeTrue}</dd>
-                </div>
-              </dl>
+              <DefinitionList
+                variant="detail-decision"
+                rows={[
+                  {
+                    label: uiText.useCases.wherefits,
+                    value: useCase.atAGlance.whereFits,
+                    icon: CheckCircle2,
+                  },
+                  {
+                    label: uiText.useCases.whereDoesNotFit,
+                    value: useCase.atAGlance.whereDoesNotFit,
+                    icon: AlertCircle,
+                  },
+                  {
+                    label: uiText.useCases.mustBeTrue,
+                    value: useCase.atAGlance.mustBeTrue,
+                  },
+                ]}
+              />
             </div>
 
             {deployments.length > 0 && (
@@ -255,11 +258,8 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
 
           {/* ── RIGHT COLUMN（robots/[slug] の RobotStickyAside と同じ「枠なし・区切り線のみ」） ── */}
           <aside>
-            <div className="sticky top-site-header-gap space-y-5">
-              <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-                  {uiText.useCases.decisionFactors}
-                </p>
+            <SidebarSection>
+              <SidebarBlock kicker={uiText.useCases.decisionFactors}>
                 <table className="w-full text-xs">
                   <tbody className="divide-y divide-border">
                     {overviewRows.map(([label, value]) => (
@@ -270,65 +270,39 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </SidebarBlock>
 
-              <div className="border-t border-border" />
+              <SidebarDivider />
 
-              <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-                  {uiText.useCases.candidateRobotsLabel}
-                </p>
+              <SidebarBlock kicker={uiText.useCases.candidateRobotsLabel}>
                 <CandidateRobotList robots={candidateRobots} annotations={candidateAnnotations} />
-              </div>
+              </SidebarBlock>
 
               {(guides.length > 0 || reports.length > 0) && (
                 <>
-                  <div className="border-t border-border" />
-                  <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-                      {uiText.useCases.related}
-                    </p>
-                    <nav>
-                      {guides.map((g) => (
-                        <Link
-                          key={g.id}
-                          href={`/guides/${g.slug}`}
-                          className="block text-xs text-foreground/80 hover:text-foreground py-2 border-b border-border"
-                        >
-                          {g.titleJa ?? g.title}
-                        </Link>
-                      ))}
-                      {reports.map((r) => (
-                        <Link
-                          key={r.id}
-                          href={`/reports/${r.slug}`}
-                          className="block text-xs text-foreground/80 hover:text-foreground py-2 border-b border-border last:border-b-0"
-                        >
-                          {r.titleJa ?? r.title}
-                        </Link>
-                      ))}
-                    </nav>
-                  </div>
+                  <SidebarDivider />
+                  <SidebarBlock kicker={uiText.useCases.related}>
+                    <RelatedLinkList
+                      id="related-sidebar"
+                      title={uiText.useCases.related}
+                      variant="compact"
+                      items={[
+                        ...guides.map((g) => ({ href: `/guides/${g.slug}`, title: g.titleJa ?? g.title })),
+                        ...reports.map((r) => ({ href: `/reports/${r.slug}`, title: r.titleJa ?? r.title })),
+                      ]}
+                    />
+                  </SidebarBlock>
                 </>
               )}
 
-              <div className="border-t border-border" />
+              <SidebarDivider />
 
-              <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
-                  {uiText.useCases.consultation}
-                </p>
-                <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                  {uiText.useCases.consultationDescription}
-                </p>
-                <Link
-                  href="/contact"
-                  className="flex items-center justify-center w-full px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium transition-colors"
-                >
-                  {uiText.useCases.consultationCta}
-                </Link>
-              </div>
-            </div>
+              <ConsultationCta
+                kicker={uiText.useCases.consultation}
+                description={uiText.useCases.consultationDescription}
+                cta={uiText.useCases.consultationCta}
+              />
+            </SidebarSection>
           </aside>
         </div>
       </div>
