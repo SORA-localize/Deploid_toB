@@ -66,8 +66,8 @@ Last cleaned: 2026-06-23
 
 - `article-tab-layout-data-plan-v1.md` — 記事タブ構造・分類・特集/取材/動画対応の拡張計画
 - `home-article-scroll-plan-v1.md` — home 注目記事の横スクロール化計画
-- `hub-page-cache-components-plan-v1.md` — `/robots`先行でのCache Components導入計画。`seo-hub-prerender-plan-v1.md`は実装済み（(d)参照）、`nav-transition-performance-fix-plan-v1.md`の残課題はこちらで解消する方針
-- `nav-transition-performance-fix-plan-v1.md` — グローバルナビ遷移性能の改善計画（`searchParams`をサーバーから外す案は不採用。残課題は`hub-page-cache-components-plan-v1.md`が解消する想定）
+- `hub-page-cache-components-plan-v1.md` — Cache Components導入計画。実装試行で判明した全体ゲート（Footer、6ハブ、トップページ演出、sitemap）を先に通し、その後 `/robots` のキャッシュ効果を検証する方針
+- `nav-transition-performance-fix-plan-v1.md` — グローバルナビ遷移性能の改善計画（`searchParams`をサーバーから外す案は不採用。残課題は`hub-page-cache-components-plan-v1.md`で検証する）
 - `responsive-design-implementation-plan.md` — レスポンシブ改善の段階実装計画
 - `usecase-domain-ui-rollout-v1.md` — `UseCase.primaryDomain`/`secondaryDomains`をUIに繋ぎ込む実装計画
 
