@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { DefinitionList } from '@/components/DefinitionList';
 import { createPageMetadata } from '@/lib/metadata';
+import { siteMeta } from '@/lib/site';
 
 export const metadata = createPageMetadata({
   title: '会社概要',
@@ -44,44 +46,41 @@ export default function AboutPage() {
         </section>
 
         <section className="py-8 border-b border-border">
-          <dl className="divide-y divide-border">
-            {values.map((v) => (
-              <div key={v.label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-5 first:pt-0 last:pb-0">
-                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">
-                  {v.label}
-                </dt>
-                <dd>
+          <DefinitionList
+            py="5"
+            rows={values.map((v) => ({
+              label: v.label,
+              value: (
+                <>
                   <p className="font-semibold text-foreground mb-1">{v.title}</p>
                   <p className="text-sm text-muted-foreground leading-relaxed">{v.body}</p>
-                </dd>
-              </div>
-            ))}
-          </dl>
+                </>
+              ),
+              valueClassName: '',
+            }))}
+          />
         </section>
 
         <section className="py-8 border-b border-border">
           <h2 className="text-lg font-semibold text-foreground mb-6">運営者情報</h2>
-          <dl className="divide-y divide-border">
-            <div className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0">
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">運営</dt>
-              <dd className="text-sm text-foreground">Deploid（個人運営）</dd>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4">
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">連絡先</dt>
-              <dd className="text-sm text-foreground">
-                <Link
-                  href="/contact"
-                  className="text-signal hover:text-signal/80 underline underline-offset-2 transition-colors"
-                >
-                  お問い合わせフォーム
-                </Link>
-              </dd>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 last:pb-0">
-              <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">公開開始</dt>
-              <dd className="text-sm text-foreground">2026年6月</dd>
-            </div>
-          </dl>
+          <DefinitionList
+            rows={[
+              { label: '運営', value: 'Deploid（個人運営）', valueClassName: 'text-sm text-foreground' },
+              {
+                label: '連絡先',
+                value: (
+                  <Link
+                    href="/contact"
+                    className="text-signal hover:text-signal/80 underline underline-offset-2 transition-colors"
+                  >
+                    お問い合わせフォーム
+                  </Link>
+                ),
+                valueClassName: 'text-sm text-foreground',
+              },
+              { label: '公開開始', value: siteMeta.launchedAt, valueClassName: 'text-sm text-foreground' },
+            ]}
+          />
         </section>
 
         <section className="py-8 border-b border-border">
@@ -89,47 +88,44 @@ export default function AboutPage() {
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
             各ロボット・メーカーのデータには、情報源の種別と確認日を記録しています。AIによる推測値をそのまま事実として掲載しません。
           </p>
-          <dl className="divide-y divide-border">
-            {[
+          <DefinitionList
+            rows={[
               { label: 'official', title: '公式発表', body: 'メーカー公式サイト・プレスリリース・製品仕様書など一次資料に基づく情報。' },
               { label: 'press', title: '報道・発表', body: '信頼性の高いメディア報道や展示会発表に基づく情報。公式確認は取れていないものを含む。' },
               { label: 'estimated', title: '推計', body: '公開データからの計算・推計値。根拠を明示した上で掲載。' },
               { label: '要確認', title: '未確認', body: '出典が取れておらず、正確性を保証できない項目。確認でき次第更新します。' },
-            ].map(({ label, title, body }) => (
-              <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
-                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">{label}</dt>
-                <dd>
+            ].map(({ label, title, body }) => ({
+              label,
+              value: (
+                <>
                   <p className="text-sm font-semibold text-foreground mb-1">{title}</p>
                   <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
-                </dd>
-              </div>
-            ))}
-          </dl>
+                </>
+              ),
+              valueClassName: '',
+            }))}
+          />
         </section>
 
         <section className="py-8 border-b border-border">
           <h2 className="text-lg font-semibold text-foreground mb-6">掲載・画像方針</h2>
-          <dl className="divide-y divide-border">
-            {[
+          <DefinitionList
+            ddTone="muted"
+            rows={[
               {
                 label: '掲載基準',
-                body: '公開情報をもとに導入判断に有用と判断したロボット・メーカーを掲載しています。',
+                value: '公開情報をもとに導入判断に有用と判断したロボット・メーカーを掲載しています。',
               },
               {
                 label: '中立性',
-                body: '事業者がPoC判断をするのに必要な変数を整理することを目的としています。メーカーからの情報提供や掲載依頼は歓迎しますが、掲載内容は編集基準に基づき客観性を担保します。必要に応じて出典や確認日を明示します。',
+                value: '事業者がPoC判断をするのに必要な変数を整理することを目的としています。メーカーからの情報提供や掲載依頼は歓迎しますが、掲載内容は編集基準に基づき客観性を担保します。必要に応じて出典や確認日を明示します。',
               },
               {
                 label: '画像・ロゴ',
-                body: '掲載している製品画像・ロゴの著作権・商標権は各メーカーに帰属します。情報提供・報道目的の参照用途として使用しており、出典を明記しています。修正・削除依頼はお問い合わせよりご連絡ください。',
+                value: '掲載している製品画像・ロゴの著作権・商標権は各メーカーに帰属します。情報提供・報道目的の参照用途として使用しており、出典を明記しています。修正・削除依頼はお問い合わせよりご連絡ください。',
               },
-            ].map(({ label, body }) => (
-              <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
-                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">{label}</dt>
-                <dd className="text-sm text-muted-foreground leading-relaxed">{body}</dd>
-              </div>
-            ))}
-          </dl>
+            ]}
+          />
         </section>
 
         <section className="py-8">

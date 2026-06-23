@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { DefinitionList } from '@/components/DefinitionList';
 import { getManufacturers, getRobots } from '@/lib/data';
 import { createPageMetadata } from '@/lib/metadata';
+import { siteMeta } from '@/lib/site';
 
 export const metadata = createPageMetadata({
   title: 'メーカー・代理店の方へ',
@@ -31,54 +33,42 @@ export default function ForManufacturersPage() {
 
         <section className="py-8 border-b border-border">
           <h2 className="text-lg font-semibold text-foreground mb-6">サイト概要</h2>
-          <dl className="divide-y divide-border">
-            {[
-              { label: '掲載数', body: `ロボット ${robotCount}件・メーカー ${manufacturerCount}社（2026年6月現在）` },
-              { label: '公開開始', body: '2026年6月' },
-              { label: '運営', body: '慶應義塾大学の学生による個人運営。中立的な情報整理を目的とし、特定製品の推奨・販売を目的とするものではありません。' },
-              { label: '目的', body: '日本企業がヒューマノイドの導入可否を判断するための情報を整備、導入の支援をすること。国内市場のヒューマノイドの情報ハブとなることを目指しております。' },
-              { label: '情報方針', body: '公式発表・報道・取材情報等に基づいた正確な情報を提供いたします。' },
-            ].map(({ label, body }) => (
-              <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
-                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">{label}</dt>
-                <dd className="text-sm text-foreground leading-relaxed">{body}</dd>
-              </div>
-            ))}
-          </dl>
+          <DefinitionList
+            ddTone="foreground"
+            rows={[
+              { label: '掲載数', value: `ロボット ${robotCount}件・メーカー ${manufacturerCount}社（${siteMeta.dataAsOf}現在）` },
+              { label: '公開開始', value: siteMeta.launchedAt },
+              { label: '運営', value: '慶應義塾大学の学生による個人運営。中立的な情報整理を目的とし、特定製品の推奨・販売を目的とするものではありません。' },
+              { label: '目的', value: '日本企業がヒューマノイドの導入可否を判断するための情報を整備、導入の支援をすること。国内市場のヒューマノイドの情報ハブとなることを目指しております。' },
+              { label: '情報方針', value: '公式発表・報道・取材情報等に基づいた正確な情報を提供いたします。' },
+            ]}
+          />
         </section>
 
         <section className="py-8 border-b border-border">
           <h2 className="text-lg font-semibold text-foreground mb-6">掲載できる情報</h2>
-          <dl className="divide-y divide-border">
-            {[
-              { label: '製品画像・ロゴ', body: '許諾条件に従って掲載。公式メディアキット等があればお知らせください。現状は許諾待ちとして表示しているページがあります。' },
-              { label: 'スペック・仕様', body: '公式サイト・プレスリリース・展示会発表などの公開情報。未確認項目は「要確認」として明示。' },
-              { label: '国内販売状況', body: '日本市場での販売状況・代理店・その他スペック等。' },
-              { label: '代理店・問い合わせ先', body: '日本国内での相談・導入問い合わせ先として掲載できます。' },
-              { label: '導入事例', body: '公開済みの事例・PoC実績。守秘義務のない範囲で。' },
-            ].map(({ label, body }) => (
-              <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
-                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">{label}</dt>
-                <dd className="text-sm text-muted-foreground leading-relaxed">{body}</dd>
-              </div>
-            ))}
-          </dl>
+          <DefinitionList
+            ddTone="muted"
+            rows={[
+              { label: '製品画像・ロゴ', value: '許諾条件に従って掲載。公式メディアキット等があればお知らせください。現状は許諾待ちとして表示しているページがあります。' },
+              { label: 'スペック・仕様', value: '公式サイト・プレスリリース・展示会発表などの公開情報。未確認項目は「要確認」として明示。' },
+              { label: '国内販売状況', value: '日本市場での販売状況・代理店・その他スペック等。' },
+              { label: '代理店・問い合わせ先', value: '日本国内での相談・導入問い合わせ先として掲載できます。' },
+              { label: '導入事例', value: '公開済みの事例・PoC実績。守秘義務のない範囲で。' },
+            ]}
+          />
         </section>
 
         <section className="py-8 border-b border-border">
           <h2 className="text-lg font-semibold text-foreground mb-6">掲載できない情報</h2>
-          <dl className="divide-y divide-border">
-            {[
-              { label: '未公開情報', body: 'NDA対象・社外秘・未発表の仕様等' },
-              { label: '誇張表現', body: '「世界最高」「唯一」など客観的根拠のない宣伝表現。' },
-              { label: '未確認スペック', body: '出典の取れない数値、推定値を事実として断定する記載' },
-            ].map(({ label, body }) => (
-              <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
-                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">{label}</dt>
-                <dd className="text-sm text-muted-foreground leading-relaxed">{body}</dd>
-              </div>
-            ))}
-          </dl>
+          <DefinitionList
+            ddTone="muted"
+            rows={[
+              { label: '未公開情報', value: 'NDA対象・社外秘・未発表の仕様等' },
+              { label: '誇張表現', value: '「世界最高」「唯一」など客観的根拠のない宣伝表現。' },
+              { label: '未確認スペック', value: '出典の取れない数値、推定値を事実として断定する記載' },
+            ]}
+          />
         </section>
 
         <section className="py-8 border-b border-border">
@@ -100,19 +90,15 @@ export default function ForManufacturersPage() {
 
         <section className="py-8 border-b border-border">
           <h2 className="text-lg font-semibold text-foreground mb-6">ご提供いただいた素材の利用範囲</h2>
-          <dl className="divide-y divide-border">
-            {[
-              { label: '利用範囲', body: 'Deploid内の製品紹介ページ・関連記事・SNS告知に限って使用します。第三者への再配布・再ホストは行いません。' },
-              { label: '権利表記', body: 'ご指定いただいたクレジット（出典）を画像の近くに表示します。' },
-              { label: '提携表現', body: '「公式」「提携」「推奨」等、関係性を誤認させる表現は使用しません。' },
-              { label: '削除対応', body: '削除・差し替えのご依頼があれば速やかに対応します。' },
-            ].map(({ label, body }) => (
-              <div key={label} className="grid grid-cols-1 md:grid-cols-[8rem_1fr] gap-2 md:gap-8 py-4 first:pt-0 last:pb-0">
-                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground md:pt-0.5">{label}</dt>
-                <dd className="text-sm text-muted-foreground leading-relaxed">{body}</dd>
-              </div>
-            ))}
-          </dl>
+          <DefinitionList
+            ddTone="muted"
+            rows={[
+              { label: '利用範囲', value: 'Deploid内の製品紹介ページ・関連記事・SNS告知に限って使用します。第三者への再配布・再ホストは行いません。' },
+              { label: '権利表記', value: 'ご指定いただいたクレジット（出典）を画像の近くに表示します。' },
+              { label: '提携表現', value: '「公式」「提携」「推奨」等、関係性を誤認させる表現は使用しません。' },
+              { label: '削除対応', value: '削除・差し替えのご依頼があれば速やかに対応します。' },
+            ]}
+          />
         </section>
 
         <section className="py-8 border-b border-border">

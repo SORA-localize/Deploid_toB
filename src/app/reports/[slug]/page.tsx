@@ -57,28 +57,28 @@ function ReportSidebarContent() {
     <div className="space-y-6">
       <section className="border-y border-border py-4">
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          情報提供・取材相談
+          {uiText.reports.sidebarPressContactTitle}
         </h3>
         <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
-          導入事例や一次情報の提供、取材のご相談はこちら。
+          {uiText.reports.sidebarPressContactDescription}
         </p>
         <Link
           href="/contact"
           className="block w-full bg-primary px-4 py-2 text-center text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
         >
-          お問い合わせ
+          {uiText.reports.sidebarContactCta}
         </Link>
       </section>
 
       <section className="border-y border-border py-4">
         <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          関連ツール
+          {uiText.reports.sidebarToolsTitle}
         </h3>
         <nav className="divide-y divide-border">
           {[
-            { href: '/robots', label: 'ロボットを探す' },
-            { href: '/compare', label: '機種を比較する' },
-            { href: '/guides', label: '導入ガイドを読む' },
+            { href: '/robots', label: uiText.reports.sidebarToolFindRobots },
+            { href: '/compare', label: uiText.reports.sidebarToolCompare },
+            { href: '/guides', label: uiText.reports.sidebarToolGuides },
           ].map(({ href, label }) => (
             <Link
               key={href}
@@ -133,7 +133,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
       <JsonLd data={articleJsonLd(report)} />
       <JsonLd
         data={breadcrumbJsonLd([
-          { name: 'ホーム', path: '/' },
           ...breadcrumbItems.map((item) => ({
             name: item.label,
             path: item.path ?? `/reports/${report.slug}`,
@@ -293,7 +292,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 {report.tags.length > 0 && (
                   <div>
                     <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      タグ
+                      {uiText.reports.tags}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {report.tags.map((tag) => (

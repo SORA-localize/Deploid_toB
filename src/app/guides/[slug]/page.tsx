@@ -76,7 +76,6 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
       <JsonLd data={guideJsonLd(guide)} />
       <JsonLd
         data={breadcrumbJsonLd([
-          { name: 'ホーム', path: '/' },
           { name: uiText.guides.breadcrumb, path: '/guides' },
           { name: guide.titleJa ?? guide.title, path: `/guides/${guide.slug}` },
         ])}
@@ -160,7 +159,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
             {hasChecklist && (
               <section id="checklist" className="scroll-mt-site-header pt-6 pb-8">
-                <h3 className="text-sm font-semibold text-foreground mb-4">チェックリスト</h3>
+                <h3 className="text-sm font-semibold text-foreground mb-4">{uiText.guides.checklist}</h3>
                 <ul className="space-y-2 text-sm text-foreground/80">
                   {(guide.checklistItems ?? []).map((item) => (
                     <li key={item} className="flex items-start gap-2">
@@ -245,16 +244,16 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
-                  選定の相談
+                  {uiText.guides.consultation}
                 </p>
                 <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                  このガイドの内容を踏まえて検討したい場合はご相談ください。
+                  {uiText.guides.consultationDescription}
                 </p>
                 <Link
                   href="/contact"
                   className="flex items-center justify-center w-full px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium transition-colors"
                 >
-                  相談する
+                  {uiText.guides.consultationCta}
                 </Link>
               </div>
             </div>

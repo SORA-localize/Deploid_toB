@@ -69,7 +69,6 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
       <JsonLd data={manufacturerJsonLd(manufacturer)} />
       <JsonLd
         data={breadcrumbJsonLd([
-          { name: 'ホーム', path: '/' },
           { name: uiText.manufacturers.breadcrumb, path: '/manufacturers' },
           { name: manufacturerName, path: `/manufacturers/${manufacturer.slug}` },
         ])}

@@ -268,7 +268,7 @@
 
   /* 情報・テキスト重視ページのコンテンツ列幅（about/contact/privacy/for-manufacturers） */
   .content-col {
-    max-width: 64rem;
+    max-width: 72rem;
   }
 
   /* 詳細ページの本文エリア専用コンテナ。大型モニターで左右余白を減らす。 */

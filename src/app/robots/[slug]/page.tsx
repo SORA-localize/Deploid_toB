@@ -88,7 +88,6 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
       <JsonLd data={robotJsonLd(robot, manufacturer)} />
       <JsonLd
         data={breadcrumbJsonLd([
-          { name: 'ホーム', path: '/' },
           ...breadcrumbItems.map((item) => ({
             name: item.label,
             path: item.path ?? `/robots/${robot.slug}`,
@@ -106,11 +105,11 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
         {/* 提供終了通知（archived のみ）。旧モデル情報も判断材料として残す（設計 §6.5-2） */}
         {robot.publishStatus === 'archived' && (
           <div className="mt-6 border border-border bg-muted px-4 py-3 text-xs text-foreground/80">
-            <span className="font-semibold text-foreground">提供終了：</span>
-            この機種は現行ラインアップではありません。
+            <span className="font-semibold text-foreground">{uiText.robots.archivedNotice}</span>
+            {uiText.robots.archivedDescription}
             {successor && (
               <>
-                {' '}後継機:{' '}
+                {' '}{uiText.robots.successor}:{' '}
                 <Link
                   href={`/robots/${successor.slug}`}
                   className="font-medium text-foreground underline underline-offset-2 hover:text-foreground/80"
@@ -158,7 +157,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
             {/* #decision ── バイヤー向け情報を上位に */}
             <div id="decision" className="mt-6 py-8 border-b border-border scroll-mt-site-header">
-              <h2 className="text-lg font-semibold text-foreground mb-4">導入判断</h2>
+              <h2 className="text-lg font-semibold text-foreground mb-4">{uiText.robots.decision}</h2>
               <dl className="divide-y divide-border text-xs max-w-3xl">
                 {decisionRows.map((row) => {
                   const LabelIcon =
@@ -194,7 +193,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               <div className="space-y-4">
                 {robot.comparison.bestFit.length > 0 && (
                   <div>
-                    <h3 className="text-xs font-semibold text-foreground mb-2">向く用途</h3>
+                    <h3 className="text-xs font-semibold text-foreground mb-2">{uiText.robots.bestFit}</h3>
                     <ul className="text-xs text-foreground/80 space-y-1">
                       {robot.comparison.bestFit.map((item) => (
                         <li key={item} className="flex items-start gap-2">
@@ -207,7 +206,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
                 )}
                 {robot.comparison.constraints.length > 0 && (
                   <div>
-                    <h3 className="text-xs font-semibold text-foreground mb-2">制約・向かない用途</h3>
+                    <h3 className="text-xs font-semibold text-foreground mb-2">{uiText.robots.constraints}</h3>
                     <ul className="text-xs text-foreground/80 space-y-1">
                       {robot.comparison.constraints.map((item) => (
                         <li key={item} className="flex items-start gap-2">
@@ -220,7 +219,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
                 )}
                 {robot.comparison.notFit.length > 0 && (
                   <div>
-                    <h3 className="text-xs font-semibold text-foreground mb-2">不向きな現場</h3>
+                    <h3 className="text-xs font-semibold text-foreground mb-2">{uiText.robots.notFit}</h3>
                     <ul className="text-xs text-foreground/80 space-y-1">
                       {robot.comparison.notFit.map((item) => (
                         <li key={item} className="flex items-start gap-2">

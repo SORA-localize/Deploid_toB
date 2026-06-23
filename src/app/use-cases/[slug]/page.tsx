@@ -70,21 +70,24 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
       : getTagLabel(useCase.primaryDomain, 'use-case-domain');
 
   const overviewRows: Array<[string, string]> = [
-    ['得意分野', domainValue],
-    ['成熟度', maturityLabels[useCase.maturityLevel]],
-    ['実務ラベル', buyerReadinessLabels[useCase.buyerReadiness]],
-    ['環境', operatingEnvironmentLabels[useCase.environment]],
-    ['必要能力', useCase.requiredCapabilities.map((c) => capabilityLabels[c]).join(', ')],
+    [uiText.useCases.overviewFields.domain, domainValue],
+    [uiText.useCases.overviewFields.maturity, maturityLabels[useCase.maturityLevel]],
+    [uiText.useCases.overviewFields.buyerReadiness, buyerReadinessLabels[useCase.buyerReadiness]],
+    [uiText.useCases.overviewFields.environment, operatingEnvironmentLabels[useCase.environment]],
+    [
+      uiText.useCases.overviewFields.requiredCapabilities,
+      useCase.requiredCapabilities.map((c) => capabilityLabels[c]).join(', '),
+    ],
   ];
 
   const sections: ManufacturerDetailSectionLink[] = [
-    { label: '要点', href: '#at-a-glance' },
+    { label: uiText.useCases.atAGlance, href: '#at-a-glance' },
     ...(deployments.length > 0
-      ? [{ label: '導入事例', href: '#deployments', count: deployments.length }]
+      ? [{ label: uiText.useCases.deployments, href: '#deployments', count: deployments.length }]
       : []),
     { label: uiText.common.overview, href: '#overview' },
-    { label: 'なぜ重要か', href: '#why-it-matters' },
-    { label: '論点', href: '#considerations' },
+    { label: uiText.useCases.whyItMatters, href: '#why-it-matters' },
+    { label: uiText.useCases.considerations, href: '#considerations' },
     { label: uiText.common.resources, href: '#sources', count: useCase.sources.length },
   ];
 
@@ -93,7 +96,6 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
       <JsonLd data={useCaseJsonLd(useCase)} />
       <JsonLd
         data={breadcrumbJsonLd([
-          { name: 'ホーム', path: '/' },
           { name: uiText.useCases.breadcrumb, path: '/use-cases' },
           { name: useCase.titleJa ?? useCase.title, path: `/use-cases/${useCase.slug}` },
         ])}
@@ -101,7 +103,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
       <ManufacturerDetailStickyHeader
         title={useCase.titleJa ?? useCase.title}
         sections={sections}
-        ariaLabel="用途詳細セクション"
+        ariaLabel={uiText.useCases.detailSectionAria}
       />
 
       <div className="site-container py-8">
@@ -133,19 +135,19 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                 <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:gap-4">
                   <dt className="flex items-center gap-1.5 text-muted-foreground">
                     <CheckCircle2 className="h-3.5 w-3.5 shrink-0 opacity-60" />
-                    向く条件
+                    {uiText.useCases.wherefits}
                   </dt>
                   <dd className="text-foreground font-medium break-words">{useCase.atAGlance.whereFits}</dd>
                 </div>
                 <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:gap-4">
                   <dt className="flex items-center gap-1.5 text-muted-foreground">
                     <AlertCircle className="h-3.5 w-3.5 shrink-0 opacity-60" />
-                    向かない条件
+                    {uiText.useCases.whereDoesNotFit}
                   </dt>
                   <dd className="text-foreground font-medium break-words">{useCase.atAGlance.whereDoesNotFit}</dd>
                 </div>
                 <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[8rem_1fr] sm:gap-4">
-                  <dt className="text-muted-foreground">成立条件</dt>
+                  <dt className="text-muted-foreground">{uiText.useCases.mustBeTrue}</dt>
                   <dd className="text-foreground font-medium break-words">{useCase.atAGlance.mustBeTrue}</dd>
                 </div>
               </dl>
@@ -153,7 +155,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
 
             {deployments.length > 0 && (
               <section id="deployments" className="pt-6 pb-8 border-b border-border scroll-mt-site-header">
-                <h2 className="text-lg font-semibold text-foreground mb-4">実際の導入事例</h2>
+                <h2 className="text-lg font-semibold text-foreground mb-4">{uiText.useCases.deploymentsSectionTitle}</h2>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {deployments.map((d) => {
                     const source = d.sources[0];
@@ -182,7 +184,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                             rel="noopener noreferrer"
                             className="mt-2 inline-block text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
                           >
-                            出典：{source.publisher ?? source.title}
+                            {uiText.useCases.deploymentSource(source.publisher ?? source.title)}
                           </a>
                         )}
                       </div>
@@ -200,14 +202,14 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
             </section>
 
             <section id="why-it-matters" className="pt-6 pb-8 border-b border-border scroll-mt-site-header">
-              <h2 className="text-lg font-semibold text-foreground mb-4">なぜ重要か</h2>
+              <h2 className="text-lg font-semibold text-foreground mb-4">{uiText.useCases.whyItMatters}</h2>
               <p className="text-sm text-foreground/80 leading-relaxed">{useCase.whyItMatters}</p>
             </section>
 
             {/* 補足セクション：詳しい判断はガイドに渡すため、ここは要点のみに圧縮する */}
             <section id="considerations" className="pt-6 pb-8 scroll-mt-site-header">
               <h2 className="text-sm font-semibold text-muted-foreground mb-5">
-                導入検討の論点（要点）
+                {uiText.useCases.considerationsSectionTitle}
               </h2>
               <div className="space-y-3">
                 {useCaseCapabilityNoteLabels.map(([key, label]) => {
@@ -221,15 +223,15 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                   );
                 })}
                 <div>
-                  <h3 className="text-xs font-semibold text-muted-foreground mb-1">環境要件</h3>
+                  <h3 className="text-xs font-semibold text-muted-foreground mb-1">{uiText.useCases.environmentRequirements}</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">{useCase.environmentRequirements}</p>
                 </div>
                 <div>
-                  <h3 className="text-xs font-semibold text-muted-foreground mb-1">なぜ今は難しいか</h3>
+                  <h3 className="text-xs font-semibold text-muted-foreground mb-1">{uiText.useCases.whyHardToday}</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">{useCase.whyHardToday}</p>
                 </div>
                 <div>
-                  <h3 className="text-xs font-semibold text-muted-foreground mb-1">日本での導入条件</h3>
+                  <h3 className="text-xs font-semibold text-muted-foreground mb-1">{uiText.useCases.japanDeploymentConditions}</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">{useCase.japanDeploymentConditions}</p>
                 </div>
               </div>
@@ -238,7 +240,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                   href={`/guides/${primaryGuide.slug}`}
                   className="mt-5 block border border-border p-3 text-xs text-foreground hover:border-foreground/40 transition-colors"
                 >
-                  詳しい判断基準は「{primaryGuide.titleJa ?? primaryGuide.title}」を参照 →
+                  {uiText.useCases.seeGuideForDetail(primaryGuide.titleJa ?? primaryGuide.title)}
                 </Link>
               )}
             </section>
@@ -256,7 +258,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
             <div className="sticky top-site-header-gap space-y-5">
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-                  判断軸
+                  {uiText.useCases.decisionFactors}
                 </p>
                 <table className="w-full text-xs">
                   <tbody className="divide-y divide-border">
@@ -274,7 +276,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
 
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-                  候補ロボット
+                  {uiText.useCases.candidateRobotsLabel}
                 </p>
                 <CandidateRobotList robots={candidateRobots} annotations={candidateAnnotations} />
               </div>
@@ -284,7 +286,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                   <div className="border-t border-border" />
                   <div>
                     <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-                      関連
+                      {uiText.useCases.related}
                     </p>
                     <nav>
                       {guides.map((g) => (
@@ -314,16 +316,16 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
 
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
-                  選定の相談
+                  {uiText.useCases.consultation}
                 </p>
                 <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                  どの用途から検討すべきか整理したい場合はご相談ください。
+                  {uiText.useCases.consultationDescription}
                 </p>
                 <Link
                   href="/contact"
                   className="flex items-center justify-center w-full px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium transition-colors"
                 >
-                  相談する
+                  {uiText.useCases.consultationCta}
                 </Link>
               </div>
             </div>

@@ -4,6 +4,7 @@ import type { Robot } from '@/data/types';
 import type { Manufacturer } from '@/data/types';
 import { getSpecRows } from '@/lib/robotDisplay';
 import { deploymentStageLabels, japanAvailabilityLabels } from '@/lib/labels';
+import { uiText } from '@/lib/uiText';
 
 interface RobotStickyAsideProps {
   robot: Robot;
@@ -27,7 +28,7 @@ export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps)
         {/* 基本スペック */}
         <div>
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
-            基本スペック
+            {uiText.robots.basicSpecs}
           </p>
           <table className="w-full text-xs">
             <tbody className="divide-y divide-border">
@@ -47,7 +48,7 @@ export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps)
         <div className="space-y-4">
           <div>
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-              導入段階
+              {uiText.robots.deploymentStage}
             </p>
             <p className="text-sm font-medium text-foreground">
               {deploymentStageLabels[robot.deploymentStage]}
@@ -55,7 +56,7 @@ export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps)
           </div>
           <div>
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
-              日本での入手性
+              {uiText.robots.japanAvailability}
             </p>
             <p className="text-sm font-medium text-foreground">
               {japanAvailabilityLabels[robot.japanAvailability]}
@@ -74,7 +75,7 @@ export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps)
               rel="noreferrer"
               className="flex items-center justify-center gap-1.5 w-full text-xs py-2.5 border border-border hover:border-foreground/40 transition-colors text-foreground/80 hover:text-foreground"
             >
-              メーカーサイトへ
+              {uiText.robots.toManufacturerSite}
               <ExternalLink className="w-3 h-3" />
             </a>
           )}
@@ -82,7 +83,7 @@ export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps)
             href="/compare"
             className="flex items-center justify-center w-full text-xs py-2.5 border border-border hover:border-foreground/40 transition-colors text-foreground/80 hover:text-foreground"
           >
-            比較ページで確認
+            {uiText.robots.checkOnComparePage}
           </Link>
         </div>
 
