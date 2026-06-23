@@ -66,6 +66,7 @@ Last cleaned: 2026-06-23
 実装判断の正本ではなく、これから実行する整理・改善計画。完了後は archive へ移動するか、正本へ反映したうえで役割を更新する。
 
 - `layout-and-data-structure-audit-plan-v1.md` — 全ページのテキスト表示レイアウトとデータ構造配置の調査実行計画
+- `component-duplication-unification-plan-v1.md` — サイドバー・定義リストの構造重複をプロジェクト全体で再調査し、共通化する計画
 
 ## アーカイブ
 
