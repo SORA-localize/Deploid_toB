@@ -235,7 +235,7 @@ AI側の実装手順:
 
 ## M. ユースケース（useCases）追加 / 更新
 
-> 一次情報が薄い間は薄いページを量産しない（`ai/rules/00-index.md` の Current Work Posture）。`UseCase`の役割は「業界紹介ではなく作業・タスク起点の逆引き」（`humanoid_media_IA_v1.md` §7）。深い判断基準（コスト・安全・調達等）はガイド側が担うため、新規追加時もその役割を超えて書きすぎない。
+> 一次情報が薄い間は薄いページを量産しない（`ai/rules/00-index.md` の Current Work Posture / 現在の作業方針）。`UseCase`の役割は「業界紹介ではなく作業・タスク起点の逆引き」（`humanoid_media_IA_v1.md` §7）。深い判断基準（コスト・安全・調達等）はガイド側が担うため、新規追加時もその役割を超えて書きすぎない。
 
 1. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
 2. [ ] 型必須：title / maturityLevel / buyerReadiness / environment / requiredCapabilities / **primaryDomain** / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots / relatedGuideIds

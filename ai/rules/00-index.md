@@ -27,13 +27,13 @@ For every task:
 
 The current source-of-truth map is `docs/planning/README.md`. Treat its "(a) 正本・現行" group as current, "(b) 参照・背景（旧／非正本）" as background only, "(c) 未実装・作業計画" as plans that must not override current code or source-of-truth docs until implemented, and archived docs as historical context only.
 
-## Current Work Posture
+## Current Work Posture / 現在の作業方針
 
 - The Next.js migration and major UI refactor are complete.
 - Current work should primarily be public-information-based data/article expansion, source and rights maintenance, and small SEO, analytics, or revenue-path improvements.
 - Prefer minimal changes that follow the existing `data/`, `lib/`, and component responsibilities.
-- Treat guides and use cases cautiously while first-party evidence is thin; do not mass-produce thin pages.
-- Confirm with the user before changing scope, product direction, or standing policy.
+- Treat guides and use cases cautiously while first-party evidence is thin; do not mass-produce thin pages. / guides / use-cases は一次情報が薄い間は慎重に扱い、薄いページを量産しない。
+- Confirm with the user before changing scope, product direction, or standing policy. / スコープや方針を変える前に必ずユーザーに確認する。
 
 Code-level truth wins over prose when the two differ:
 
