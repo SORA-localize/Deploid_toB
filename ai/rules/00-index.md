@@ -17,14 +17,15 @@ For every task:
 | Task type | Read next |
 | --- | --- |
 | Any implementation, refactor, review, or validation | `10-workflow.md` |
-| `data/*.ts`, article records, sources, tags, specs, images | `20-data.md` |
+| `data/*.ts`, article records, sources, tags, specs, images | `20-data.md`, then `21-data-maintenance-workflow.md` before editing |
 | UI, layout, components, responsive behavior, design consistency | `30-ui-design.md` |
 | Images, logos, citations, article text, copyright-sensitive content | `40-content-rights.md` |
+| Creating, moving, or reorganizing docs, rules, plans, README/CLAUDE guidance | `80-doc-governance.md` |
 | Old plans, migration notes, historical decisions | `90-archive-policy.md` |
 
 ## Current Source Of Truth
 
-The current source-of-truth map is `docs/planning/README.md`. Treat its "(a) 正本・現行" group as current and its "(b) 参照・背景（旧／非正本）" group as background only.
+The current source-of-truth map is `docs/planning/README.md`. Treat its "(a) 正本・現行" group as current, "(b) 参照・背景（旧／非正本）" as background only, "(c) 未実装・作業計画" as plans that must not override current code or source-of-truth docs until implemented, and archived docs as historical context only.
 
 Code-level truth wins over prose when the two differ:
 

@@ -1,6 +1,6 @@
 # Archive Policy For Agents
 
-Use this file when deciding whether an old planning document should influence current work.
+Use this file when deciding whether an old planning document should influence current work. For creating, classifying, or moving documents, also read `80-doc-governance.md`.
 
 ## Current Versus Historical
 

@@ -8,7 +8,8 @@
 - **AI作業ルール**: `AGENTS.md` → `ai/rules/00-index.md`
 - **設計ドキュメント**: `docs/planning/`（まず `docs/planning/README.md`）
 - **データ追加ガイド**: `docs/data/README.md`
-- **AI実装ワークフロー**: `ai/rules/10-workflow.md`（計画・実装・レビューの共通プロンプト集。データ追加・更新時の事前確認チェックリストは§8）
+- **AI実装ワークフロー**: `ai/rules/10-workflow.md`（計画・実装・レビューの共通プロンプト集）
+- **データ保守ワークフロー**: `ai/rules/20-data.md` → `ai/rules/21-data-maintenance-workflow.md`
 
 ## コマンド
 
@@ -57,10 +58,8 @@ docs/planning/  # 設計・意思決定ドキュメント
 docs/data/      # データ追加・タグ運用メモ
 ```
 
-ページからは `data/*.ts` を直接検索せず、必ず `lib/data.ts` 経由で取得する（CMS 移行時に呼び出し形を変えないため）。
+## 作業規約
 
-## 規約
+実装・データ保守・UI・権利まわりの詳細ルールは `AGENTS.md` と `ai/rules/00-index.md` を入口に参照する。
 
-- 公開 URL 識別子は `slug`。`/reports`（≠`/posts`）、`/use-cases`（≠`/industries`）。
-- ロボットスペック・価格・代理店情報は一次出典で裏取りし `sources`（`Source[]`）に残す。不明値は `要確認`。
-- 画像・ロゴは `ImageAsset.rights` を必ず持たせる。初期運用では `reference-attributed` を許容し、商用許諾が取れたら `commercial-permitted` に更新する。
+データ追加・更新時は `ai/rules/20-data.md` と `ai/rules/21-data-maintenance-workflow.md` を読む。UI変更時は `ai/rules/30-ui-design.md`、画像・引用・記事本文を扱う時は `ai/rules/40-content-rights.md` を読む。

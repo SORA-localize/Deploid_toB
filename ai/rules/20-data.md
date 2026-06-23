@@ -4,6 +4,7 @@ Use this file for data additions, data updates, article records, tags, specs, so
 
 ## Must Read
 
+- `ai/rules/21-data-maintenance-workflow.md` - pre-edit gate for `data/*.ts`
 - `docs/data/README.md` - data work entrypoint
 - `docs/planning/data-maintenance-checklist-v1.md` - collection-specific checklists and publish gates
 - `docs/planning/data-architecture-redesign-v1.md` - id/slug model and source-of-truth design
@@ -36,4 +37,4 @@ For tags and specs, inspect the code source of truth before editing:
 
 ## Data Work Gate
 
-Before editing `data/*.ts`, follow `10-workflow.md` section 8. If any gate cannot be passed, stop and either research the source or ask the user.
+Before editing `data/*.ts`, follow `21-data-maintenance-workflow.md`. If any gate cannot be passed, stop and either research the source or ask the user.

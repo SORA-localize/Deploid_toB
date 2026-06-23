@@ -1,6 +1,6 @@
 # Planning Documents
 
-Last cleaned: 2026-06-13
+Last cleaned: 2026-06-23
 
 このディレクトリは、Deploid の現在有効な設計判断と運用方針を置く場所です。
 実装済みの一時計画や過去の移行計画は `docs/planning/archive/` に退避しています。
@@ -9,7 +9,8 @@ Last cleaned: 2026-06-13
 
 - `../../AGENTS.md` — 汎用AIエージェント入口
 - `../../ai/rules/00-index.md` — 作業種別ごとの参照ルール
-- `../../ai/rules/10-workflow.md` — AIに計画、実装、レビューを任せるときの共通手順（§8: データ実装＝`data/*.ts` 追加・更新の事前確認チェックリスト）
+- `../../ai/rules/10-workflow.md` — AIに計画、実装、レビューを任せるときの共通手順
+- `../../ai/rules/21-data-maintenance-workflow.md` — `data/*.ts` 追加・更新の事前確認ゲート
 - `../data/README.md` — AIでデータ追加・更新を行うときの入口
 - `data-maintenance-checklist-v1.md` — データ追加、slug変更、公開前確認、鮮度レビューの実行チェックリスト
 - `data-architecture-redesign-v1.md` — id/slug分離、参照設計、正本管理、CMS移行を見据えたデータ設計
@@ -51,7 +52,6 @@ Last cleaned: 2026-06-13
 - `humanoid_platform_tech_stack_v1.md` — 技術スタック
 - `launch-readiness-meta-plan-v1.md` — 公開前のメタ情報、SNS共有、計測、プライバシー、sitemap整備計画
 - `ui_architecture_and_development_policy_v1.md` — UI構造と開発方針
-- `usecase-domain-ui-rollout-v1.md` — `UseCase.primaryDomain`/`secondaryDomains`をUIに繋ぎ込む実装計画（実装後はarchiveへ移動予定）
 
 ### (b) 参照・背景（旧／非正本）
 
@@ -60,13 +60,22 @@ Last cleaned: 2026-06-13
 - `humanoid_data_management_guide_v1.md` — データ運用の背景説明（旧ガイド）
 - `humanoid_data_model_policy_v1.md` — データモデル設計指針（旧。現行は data-architecture-redesign）
 
-### (c) 未実装・作業計画（暫定）
+### (c) 未実装・作業計画
 
 実装判断の正本ではなく、これから実行する整理・改善計画。完了後は archive へ移動するか、正本へ反映したうえで役割を更新する。
 
-- `agent-docs-mece-reorganization-plan-v1.md` — AI向け明文化資料を作業種別ごとに MECE 再編する未実装計画
+- `article-tab-layout-data-plan-v1.md` — 記事タブ構造・分類・特集/取材/動画対応の拡張計画
+- `home-article-scroll-plan-v1.md` — home 注目記事の横スクロール化計画
+- `nav-transition-performance-fix-plan-v1.md` — グローバルナビ遷移性能と静的化方針の改善計画
+- `responsive-design-implementation-plan.md` — レスポンシブ改善の段階実装計画
+- `seo-hub-prerender-plan-v1.md` — SEOハブページ初期HTML改善計画
+- `usecase-domain-ui-rollout-v1.md` — `UseCase.primaryDomain`/`secondaryDomains`をUIに繋ぎ込む実装計画
 
 ## アーカイブ
 
 `docs/planning/archive/` は実装済み・履歴参照用の計画書置き場です。
 新しい実装判断では、まず現行コードと上記の正本を確認し、アーカイブ文書は経緯確認に限定して使います。
+
+### (d) archive 移動対象
+
+現時点で `docs/planning/` 直下に archive 移動待ちとして残している文書はありません。
