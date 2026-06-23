@@ -226,7 +226,7 @@ Last updated: 2026-06-23
 | `/`, `/about`, `/privacy`, `/contact`, `/for-manufacturers` | `static_page_content` | page.tsx 内に直書き | 現状で問題なし（固定本文として妥当） | なし | - |
 | `/about`, `/for-manufacturers` | `static_page_content`（"公開開始: 2026年6月" — 創刊月。算出値ではなく固定の site metadata） | `about/page.tsx:81`、`for-manufacturers/page.tsx:37` にそれぞれ個別ハードコード | 単一定数 `siteMeta.launchedAt`（2箇所のみ） | 2箇所が独立しており、1箇所更新で他方とズレる | P1 |
 | `/privacy` | `static_page_content`（"最終更新：2026年6月" — ポリシー改定日。`launchedAt` とは意味が異なり、改定時に独立して動く） | `privacy/page.tsx:84` にハードコード | 別の単一定数 `siteMeta.privacyUpdatedAt`（`launchedAt` と統合しない） | 現状は両者が偶然同じ月だが、`launchedAt` と同一定数にすると将来ポリシー改定時に about の公開開始日が誤って書き換わる逆連動が発生する | P1 |
-| `/for-manufacturers` | `derived_value`（掲載件数）+ `static_page_content`（日付）の混在 | `` `ロボット ${robotCount}件・メーカー ${manufacturerCount}社（2026年6月現在）` `` | 件数部分は現状通り動的でよいが、日付部分は `siteMeta.launchedAt` 参照に統一 | 動的値（算出可能）と固定文字列（日付）が同一テンプレート文字列に混在し、日付だけ更新漏れしやすい | P1 |
+| `/for-manufacturers` | `derived_value`（掲載件数）+ `static_page_content`（日付）の混在 | `` `ロボット ${robotCount}件・メーカー ${manufacturerCount}社（2026年6月現在）` `` | 件数部分は現状通り動的でよい。「現在」は「公開開始」（`launchedAt`）とは別概念＝「この件数が正しい時点」を表すため、`siteMeta.dataAsOf`（またはビルド日由来の値）に統一 | 動的値（算出可能）と固定文字列（日付）が同一テンプレート文字列に混在し、日付だけ更新漏れしやすい。`launchedAt` に固定すると、件数のみ自動更新されて「現在」表示が実際のデータ更新日と矛盾する（データ鮮度の嘘になる） | P1 |
 | `/robots/[slug]`, `/manufacturers/[slug]`, `/reports/[slug]`, `/guides/[slug]`, `/use-cases/[slug]` | 構造化データ（JSON-LD breadcrumb の "ホーム" ノード） | 5ファイルが `breadcrumbJsonLd([{ name: 'ホーム', path: '/' }, ...])` のボイラープレートを個別に直書き | `breadcrumbJsonLd`（`lib/jsonLd.ts:97`）側で home ノードをデフォルト付与 | 可視ブレッドクラム（`components/Breadcrumbs.tsx:18`）は既に `uiText.common.home` を使用済みで重複なし。重複しているのは JSON-LD 側のボイラープレートのみ | P2 |
 | `/robots/[slug]` | `ui_text`（"導入判断" "向く用途" "制約・向かない用途" "不向きな現場" "提供終了：" 等） | page.tsx 内に直書き、隣接見出しは `uiText.robots.*` を使用 | `uiText.robots.*` | 同一ページ内で `uiText` 利用とハードコードが混在 | P2 |
 | `components/RobotStickyAside.tsx` | `ui_text`（"基本スペック" "導入段階" "日本での入手性" "メーカーサイトへ" "比較ページで確認"） | コンポーネント内に直書き | `uiText.robots.*` 等 | ラベルが正本を経由していない | P2 |
@@ -239,9 +239,9 @@ Last updated: 2026-06-23
 
 | route/component | current source | expected source | direct data import | source/reliability concern |
 | --- | --- | --- | --- | --- |
-| 全15ルート | `lib/data.ts` 経由（`getRobots` 等） | `lib/data.ts` | なし（`data/*.ts` 直import は検出されず） | なし。事実データの供給経路は健全 |
+| 全15ルート | `lib/data.ts` 経由（`getRobots` 等） | `lib/data.ts` | データレコードの直 import なし（`import type { Robot } from '@/data/types'` 等の型のみ import は多数存在するが想定どおりの正しいパターンであり対象外） | なし。事実データの供給経路は健全 |
 | `/about`, `/privacy` | ページ固有の静的定数 | 現状で問題なし | なし | "2026年6月" の日付がコード上の固定文字列であり、`sources[].checkedAt` のような確認経路を持たない（`lib/data.ts` 配下の record とは異質のため許容範囲）。`about`/`privacy` で意味の異なる日付（公開開始 vs 最終更新）であることに注意 |
-| `/for-manufacturers` | `getRobots`/`getManufacturers` の件数 + 固定日付文字列 | 件数は現状通り。日付のみ `siteMeta.launchedAt` 参照に統一対象 | なし | 上記と同様 |
+| `/for-manufacturers` | `getRobots`/`getManufacturers` の件数 + 固定日付文字列 | 件数は現状通り。「公開開始」行は `siteMeta.launchedAt`、「現在」表記は `siteMeta.dataAsOf` と別概念で統一対象 | なし | 上記と同様 |
 
 事実データ（`record_fact`）の供給経路自体に問題は見つからなかった。タグ・カテゴリ・表示ラベルも `tagRegistry`/`labels.ts`/`display.ts` を経由しているページが大半で、検出された逸脱は `ui_text` カテゴリ（文言の置き場所）に集中している。
 
@@ -253,8 +253,9 @@ Last updated: 2026-06-23
 | `/robots/[slug]`・`/manufacturers/[slug]`（Hero/FactSheet）・`/use-cases/[slug]`・`/about`・`/for-manufacturers` の定義リスト直書き | layout | 共通 `DefinitionList` コンポーネントを新設し置き換え | 中〜高。差異は gutter 幅だけではない： breakpoint が不統一（静的ページは `md:`、詳細ページは `sm:` で2カラム化のタイミングが異なる）、`gap`（`md:gap-8` / `sm:gap-4` / Hero `gap-3`）、`py`（`py-4`/`py-3`/`py-5`）、`use-cases` の `<dt>` のみアイコン（`CheckCircle2`/`AlertCircle`）付き、フォントサイズ（`text-xs`/`text-sm`）も不統一。これらを props 化しないと見た目が変わってしまう | build + 各ページの表示確認 + 視覚的な差分が出ないことを目視確認 |
 | `/reports/[slug]`・`/guides/[slug]` のサイドバー直書き | layout | 共通 `ArticleSidebar`（仮）に統合するか、現状維持で文言のみ uiText 化するかを Phase 4 で判断 | 中（情報提供導線の文言が記事種別で異なる可能性） | build + 表示確認 |
 | `/use-cases/[slug]` の `<aside>` | layout | `RobotStickyAside` の構造を流用できるか検討（props 形状の差異を要確認）。再利用しない場合は独自実装である理由をコメントで明記 | 中（props 形状の差異を要確認） | build + 表示確認 |
-| `/about`・`/for-manufacturers` の "公開開始: 2026年6月" | data | `siteMeta.launchedAt` 定数を新設し2箇所から参照 | 低 | build。日付変更時に1箇所のみ編集で反映されることを確認 |
+| `/about`・`/for-manufacturers`（「公開開始」行）の "2026年6月" | data | `siteMeta.launchedAt` 定数を新設し2箇所から参照 | 低 | build。日付変更時に1箇所のみ編集で反映されることを確認 |
 | `/privacy` の "最終更新：2026年6月" | data | `siteMeta.launchedAt` とは別の `siteMeta.privacyUpdatedAt` 定数を新設（統合しない） | 低（ただし誤って `launchedAt` と統合しないことが重要） | build。ポリシー改定時に `privacyUpdatedAt` のみ更新され `launchedAt` に影響しないことを確認 |
+| `/for-manufacturers`（「掲載数」行）の "（2026年6月現在）" | data | `launchedAt`/`privacyUpdatedAt` とは別の第3の概念 `siteMeta.dataAsOf`（またはビルド日由来の値）を新設して参照（`launchedAt` には統合しない） | 低（ただし `launchedAt` と混同しないことが重要） | build。ロボット件数が変わった際に「現在」表記が実際のデータ更新時点と一致することを確認 |
 | 5つの詳細ページの `breadcrumbJsonLd([{ name: 'ホーム', path: '/' }, ...])` 直書き | data | `breadcrumbJsonLd`（`lib/jsonLd.ts:97`）側で home ノードをデフォルト付与する形に変更し、各ファイルの呼び出しを簡略化 | 低 | build。JSON-LD の構造化データが変わらないことを確認 |
 | `/robots/[slug]` 本文中の `uiText` 未経由ラベル | data | `uiText.robots.*` に追加し参照を置き換え | 低〜中（既存キー構造との整合確認） | build |
 | `components/RobotStickyAside.tsx` のラベル | data | `uiText` 経由に変更 | 低 | build + `/robots/[slug]` 表示確認 |
@@ -282,8 +283,9 @@ Last updated: 2026-06-23
 0. 判断（実装着手前に確定する）
    - `content-col`（`src/app/globals.css:270`）の 64rem がワイドデスクトップで意図通りの仕様か、広げるべきかを決める。意図通りなら背景の症状は仕様として整理し、Fix Candidate のレイアウト項目から幅変更は除外する。広げるべきなら値変更を本フェーズの最優先項目に追加する。
 1. データ修正（先行して着手可能）
-   - `src/app/about/page.tsx`、`src/app/for-manufacturers/page.tsx`："公開開始" 日付を `siteMeta.launchedAt` 参照に変更
+   - `src/app/about/page.tsx`、`src/app/for-manufacturers/page.tsx`（「公開開始」行）：日付を `siteMeta.launchedAt` 参照に変更
    - `src/app/privacy/page.tsx`："最終更新" 日付を別の `siteMeta.privacyUpdatedAt` 参照に変更（`launchedAt` と統合しない）
+   - `src/app/for-manufacturers/page.tsx`（「掲載数」行の「現在」表記）：`launchedAt`/`privacyUpdatedAt` とは別の `siteMeta.dataAsOf` 参照に変更（統合しない）
    - `lib/jsonLd.ts`：`breadcrumbJsonLd` に home ノードのデフォルト付与を追加し、5つの詳細ページ（`robots/[slug]`、`manufacturers/[slug]`、`reports/[slug]`、`guides/[slug]`、`use-cases/[slug]`）の呼び出しを簡略化
    - `components/RobotStickyAside.tsx`：ラベルを `uiText` 参照に変更
    - `src/app/robots/[slug]/page.tsx`：本文中の未経由ラベルを `uiText.robots.*` 参照に変更
