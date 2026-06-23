@@ -118,7 +118,7 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 例：
 
 - `Robot.manufacturerId`
-- `UseCase.candidateRobotIds`
+- `UseCase.candidateRobots[].robotId`
 - `Article.relatedRobotIds`
 
 ---
@@ -182,7 +182,7 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 - `japanPresence`
 - `deploymentStage`
 - `buyerReadiness`
-- `candidateRobotIds`
+- `candidateRobots[].robotId`
 
 ---
 
@@ -341,7 +341,7 @@ warning（buildは通るが把握する）：
 
 - 推定値に `estimated` が付いている
 - robotは `japanAvailability` が入っている
-- useCaseは `candidateRobotIds` と `relatedGuideIds` が入っている
+- useCaseは `candidateRobots` と `relatedGuideIds` が入っている
 - articleは `category` と `whyItMatters` が入っている
 
 ---

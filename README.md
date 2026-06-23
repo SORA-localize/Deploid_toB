@@ -5,9 +5,10 @@
 - **スタック**: Next.js 16 (App Router) / React 19 / TypeScript / Tailwind CSS v4
 - **デプロイ**: Vercel
 - **データ**: ローカル TS データ（`data/*.ts`）。将来 CMS 接続前提
+- **AI作業ルール**: `AGENTS.md` → `ai/rules/00-index.md`
 - **設計ドキュメント**: `docs/planning/`（まず `docs/planning/README.md`）
 - **データ追加ガイド**: `docs/data/README.md`
-- **AI実装ワークフロー**: `ai_implementation_workflow_prompt.md`（計画・実装・レビューの共通プロンプト集。データ追加・更新時の事前確認チェックリストは§8）
+- **AI実装ワークフロー**: `ai/rules/10-workflow.md`（計画・実装・レビューの共通プロンプト集。データ追加・更新時の事前確認チェックリストは§8）
 
 ## コマンド
 
@@ -48,6 +49,7 @@ Vercelでは Project Settings の Environment Variables に設定する。
 ```text
 src/app/        # App Router ページ（/, /robots, /manufacturers, /compare,
                 #   /guides, /use-cases, /reports, /about, /contact ＋各 [slug]）
+ai/rules/       # AIエージェント向けの入口・作業別ルール
 components/     # UI コンポーネント（Figma Make UI を逐語移植）
 data/           # 配列データ + types.ts（型の真実源）
 lib/            # data.ts（取得/filter/slug lookup）, labels.ts（enum→日本語）

@@ -14,10 +14,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Source of truth: the design docs
 
-設計と意思決定は `docs/planning/` のドキュメント群に集約されている。コードを書く前に必ず参照する：
+共通のAI作業ルールは `AGENTS.md` と `ai/rules/` に集約している。設計と意思決定は `docs/planning/` のドキュメント群に集約されている。コードを書く前に必ず参照する：
 
+- `AGENTS.md` — 汎用AIエージェント入口
+- `ai/rules/00-index.md` — 作業種別ごとの参照ルール
+- `ai/rules/10-workflow.md` — AI実装・調査・レビューの共通ワークフロー（§8: データ実装の事前確認チェックリスト）
 - `docs/planning/README.md` — ドキュメント地図（迷ったらまずこれ。矛盾時の優先順位もここ）
-- `ai_implementation_workflow_prompt.md` — AI実装・調査・レビューの共通ワークフロー（§8: データ実装の事前確認チェックリスト）
 - `docs/data/README.md` — AIでデータ追加・更新を行うときの入口
 - `docs/planning/data-maintenance-checklist-v1.md` — データ追加、slug変更、公開前確認、鮮度レビュー
 - `docs/planning/data-architecture-redesign-v1.md` — id/slug分離、参照設計、正本管理

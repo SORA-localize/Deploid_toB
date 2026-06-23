@@ -1,10 +1,9 @@
 /**
  * Next.js data model v1.
  *
- * Copy this file to `data/types.ts` when the Next.js project is created.
- * The first implementation should keep data in `data/*.ts` and import these
- * types from `data/types.ts`. CMS-specific schemas should be derived from
- * this file later, not the other way around.
+ * Historical reference only. Do not copy this file to `data/types.ts`.
+ * The current source of truth is `data/types.ts`; CMS-specific schemas should
+ * be derived from the current source, not from this planning snapshot.
  */
 import type { RobotSpecsFromSchema } from '@/lib/specSchema';
 import type { TagValue } from '@/lib/tagRegistry';
@@ -224,7 +223,7 @@ export interface Robot extends BaseRecord {
   vendorRiskNote?: string;
   /** 役割別の参考画像（詳細ページのカルーセル）。hero が未設定なら BaseRecord.heroImage を hero に昇格して使う。 */
   images?: Partial<Record<ImageRole, ImageAsset>>;
-  // 関連は逆向き(UseCase.candidateRobotIds / Guide.relatedRobotIds /
+  // 関連は逆向き(UseCase.candidateRobots[].robotId / Guide.relatedRobotIds /
   // Article.relatedRobotIds)で導出する。
   /** 業種タグ（lib/tagRegistry.ts の kind:'industry' のvalue）。未設定=調査中扱い。 */
   industryTags?: TagValue<'industry'>[];
@@ -285,6 +284,14 @@ export interface UseCaseCapabilityNotes {
   integration?: string;
 }
 
+export type CandidateFit = 'strong' | 'possible' | 'watch';
+
+export interface UseCaseCandidateRobot {
+  robotId: Id;
+  fit: CandidateFit;
+  reason: string;
+}
+
 export interface UseCase extends BaseRecord {
   title: string;
   titleJa?: string;
@@ -302,7 +309,7 @@ export interface UseCase extends BaseRecord {
   environmentRequirements: string;
   whyHardToday: string;
   japanDeploymentConditions: string;
-  candidateRobotIds: Id[];
+  candidateRobots: UseCaseCandidateRobot[];
   relatedGuideIds: Id[];
   // 関連articlesは Article.relatedUseCaseIds で逆引きする。
 }

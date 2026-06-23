@@ -8,6 +8,8 @@ Last cleaned: 2026-06-13
 
 - `../README.md`
 - `../../data/README.md`
-- `../../../ai_implementation_workflow_prompt.md`
+- `../../../AGENTS.md`
+- `../../../ai/rules/00-index.md`
+- `../../../ai/rules/10-workflow.md`
 
 このディレクトリの文書は、経緯確認や過去判断の参照に限定して使います。
