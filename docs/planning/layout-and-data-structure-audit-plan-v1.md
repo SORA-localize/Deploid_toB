@@ -214,10 +214,9 @@ Last updated: 2026-06-23
 
 定義リストの gutter 不統一（`8rem` vs `10rem`）は本文（`dd`側）の幅にほぼ影響せず、ラベル列の幅のみを動かす。したがって gutter 統一だけでは背景の症状は解決しない。
 
-`content-col` の 64rem がワイドデスクトップで意図通りの仕様か、広げるべきかを Phase 4 着手前に判断する必要がある。判断項目として以下を追加する。
+**Phase 0 判断結果（確定）**：`content-col` を `64rem` → `72rem` に変更する。
 
-- 64rem が意図通り（読みやすさ優先の固定幅）なら、背景の症状は「設計仕様」として整理し、Fix Candidate からは外す。
-- 意図通りでない（単に既存値を流用しただけ）なら、`content-col` の拡張（例: `globals.css:270` の値変更、または `site-container-content`〔`max-w-[1600px]`〕への切り替え）を Fix Candidate に追加する。
+業界標準（一般的なコンテンツコンテナ幅は1140〜1200px、純粋な連続文章は66〜75文字＝約700px、定義リスト等の2カラム構造は1000〜1200px程度が一般的範囲）と比較すると、64rem(1024px)自体は許容範囲内だが下限に近い。`/about`等は連続文章ではなく定義リスト中心の構造のため、72rem(1152px)へ広げても `dd` 側の可読性は損なわれず、1440px以上のワイドデスクトップでの左右余白過多を緩和できる。これ以上広げる（site-container-content相当の1600px等）と `dd` の行が伸びすぎて可読性が落ちるため避ける。
 
 ### Text Source Table
 
@@ -249,6 +248,7 @@ Last updated: 2026-06-23
 
 | target | type | proposed fix | risk | verification |
 | --- | --- | --- | --- | --- |
+| `content-col` の `max-width`（`src/app/globals.css:270`） | layout | `64rem` → `72rem` に変更（Phase 0 判断確定。背景の症状＝ワイドデスクトップでの本文狭さへの直接対応） | 低（CSS値変更のみ。`/about`/`/privacy`/`/contact`/`/for-manufacturers` 全体に影響するため表示確認は必須） | 360/768/1280/1440/1920px 表示確認。定義リストの `dd` 側の行送りが崩れないことを確認 |
 | `/privacy` の定義リスト gutter（`10rem`） | layout | `8rem` に統一し `/about`・`/for-manufacturers` と一致させる | 低（class値変更のみ） | 360/768/1280/1440px 表示確認 |
 | `/robots/[slug]`・`/manufacturers/[slug]`（Hero/FactSheet）・`/use-cases/[slug]`・`/about`・`/for-manufacturers` の定義リスト直書き | layout | 共通 `DefinitionList` コンポーネントを新設し置き換え | 中〜高。差異は gutter 幅だけではない： breakpoint が不統一（静的ページは `md:`、詳細ページは `sm:` で2カラム化のタイミングが異なる）、`gap`（`md:gap-8` / `sm:gap-4` / Hero `gap-3`）、`py`（`py-4`/`py-3`/`py-5`）、`use-cases` の `<dt>` のみアイコン（`CheckCircle2`/`AlertCircle`）付き、フォントサイズ（`text-xs`/`text-sm`）も不統一。これらを props 化しないと見た目が変わってしまう | build + 各ページの表示確認 + 視覚的な差分が出ないことを目視確認 |
 | `/reports/[slug]`・`/guides/[slug]` のサイドバー直書き | layout | 共通 `ArticleSidebar`（仮）に統合するか、現状維持で文言のみ uiText 化するかを Phase 4 で判断 | 中（情報提供導線の文言が記事種別で異なる可能性） | build + 表示確認 |
@@ -272,7 +272,6 @@ Last updated: 2026-06-23
 
 ## 要確認（このまま実装に進めない項目）
 
-- **最重要**：`content-col`（64rem）がワイドデスクトップでの仕様として意図通りか。これが背景の症状（広い画面で本文が不自然に狭い）の主因であり、判断結果によって Fix Candidate のレイアウト項目の範囲が変わる。
 - `/reports/[slug]`・`/guides/[slug]` のサイドバーは記事種別ごとに文言・導線が異なる可能性があり、共通化するかは Phase 4 で記事の編集方針（`editorial_style_guide_v1.md`）と照合してから決める。
 - `use-cases/[slug]` のラベル群を `uiText.useCases.*` に移す際、既存の `uiText` 命名規則（既存ファイルの構造）と衝突しないか実装前に `lib/uiText.ts` を確認する。
 
@@ -280,8 +279,8 @@ Last updated: 2026-06-23
 
 実装は「データ修正（低リスク・先行可）」と「レイアウト共通化（中リスク・要設計判断）」を別の実装単位に分ける。
 
-0. 判断（実装着手前に確定する）
-   - `content-col`（`src/app/globals.css:270`）の 64rem がワイドデスクトップで意図通りの仕様か、広げるべきかを決める。意図通りなら背景の症状は仕様として整理し、Fix Candidate のレイアウト項目から幅変更は除外する。広げるべきなら値変更を本フェーズの最優先項目に追加する。
+0. レイアウト修正（症状への直接対応・最優先）
+   - `src/app/globals.css:270`：`.content-col` の `max-width` を `64rem` → `72rem` に変更
 1. データ修正（先行して着手可能）
    - `src/app/about/page.tsx`、`src/app/for-manufacturers/page.tsx`（「公開開始」行）：日付を `siteMeta.launchedAt` 参照に変更
    - `src/app/privacy/page.tsx`："最終更新" 日付を別の `siteMeta.privacyUpdatedAt` 参照に変更（`launchedAt` と統合しない）
