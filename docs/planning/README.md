@@ -60,6 +60,12 @@ Last cleaned: 2026-06-13
 - `humanoid_data_management_guide_v1.md` — データ運用の背景説明（旧ガイド）
 - `humanoid_data_model_policy_v1.md` — データモデル設計指針（旧。現行は data-architecture-redesign）
 
+### (c) 未実装・作業計画（暫定）
+
+実装判断の正本ではなく、これから実行する整理・改善計画。完了後は archive へ移動するか、正本へ反映したうえで役割を更新する。
+
+- `agent-docs-mece-reorganization-plan-v1.md` — AI向け明文化資料を作業種別ごとに MECE 再編する未実装計画
+
 ## アーカイブ
 
 `docs/planning/archive/` は実装済み・履歴参照用の計画書置き場です。
