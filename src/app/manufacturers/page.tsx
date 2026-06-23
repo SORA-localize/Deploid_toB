@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { ManufacturersBrowser } from '@/components/ManufacturersBrowser';
 import { getManufacturers, getRobots } from '@/lib/data';
 import { createPageMetadata } from '@/lib/metadata';
@@ -14,11 +16,7 @@ export const metadata = createPageMetadata({
   path: '/manufacturers',
 });
 
-export default async function ManufacturersPage({
-  searchParams,
-}: {
-  searchParams: RouteSearchParams;
-}) {
+async function ManufacturersContent({ searchParams }: { searchParams: RouteSearchParams }) {
   const manufacturers = getManufacturers();
   const robots = getRobots();
   const params = await pickSearchParams(searchParams, ['country', 'route', 'q'] as const);
@@ -37,5 +35,17 @@ export default async function ManufacturersPage({
       robots={robots}
       initialFilters={filters}
     />
+  );
+}
+
+export default function ManufacturersPage({
+  searchParams,
+}: {
+  searchParams: RouteSearchParams;
+}) {
+  return (
+    <Suspense fallback={<PageSuspenseFallback />}>
+      <ManufacturersContent searchParams={searchParams} />
+    </Suspense>
   );
 }

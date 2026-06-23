@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { ReportsBrowser } from '@/components/ReportsBrowser';
 import { getArticles } from '@/lib/data';
 import { ARTICLE_PAGE_PARAM } from '@/lib/articlePagination';
@@ -12,11 +14,7 @@ export const metadata = createPageMetadata({
   path: '/reports',
 });
 
-export default async function ReportsPage({
-  searchParams,
-}: {
-  searchParams: RouteSearchParams;
-}) {
+async function ReportsContent({ searchParams }: { searchParams: RouteSearchParams }) {
   const reports = getArticles();
   const params = await pickSearchParams(searchParams, ['section', ARTICLE_PAGE_PARAM] as const);
   const activeSection = normalizeArticleSectionParam(params.section);
@@ -27,5 +25,17 @@ export default async function ReportsPage({
       activeSection={activeSection}
       initialPageParam={params[ARTICLE_PAGE_PARAM]}
     />
+  );
+}
+
+export default function ReportsPage({
+  searchParams,
+}: {
+  searchParams: RouteSearchParams;
+}) {
+  return (
+    <Suspense fallback={<PageSuspenseFallback />}>
+      <ReportsContent searchParams={searchParams} />
+    </Suspense>
   );
 }

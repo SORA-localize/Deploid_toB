@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { UseCasesBrowser } from '@/components/UseCasesBrowser';
 import { getUseCases } from '@/lib/data';
 import { createPageMetadata } from '@/lib/metadata';
@@ -52,11 +54,7 @@ export async function generateMetadata({ searchParams }: { searchParams: RouteSe
   });
 }
 
-export default async function UseCasesPage({
-  searchParams,
-}: {
-  searchParams: RouteSearchParams;
-}) {
+async function UseCasesContent({ searchParams }: { searchParams: RouteSearchParams }) {
   const params = await pickSearchParams(searchParams, ['industry', 'task', 'domain', 'q'] as const);
   const useCases = getUseCases();
   return (
@@ -64,5 +62,17 @@ export default async function UseCasesPage({
       useCases={useCases}
       initialFilters={resolveFilters(useCases, params)}
     />
+  );
+}
+
+export default function UseCasesPage({
+  searchParams,
+}: {
+  searchParams: RouteSearchParams;
+}) {
+  return (
+    <Suspense fallback={<PageSuspenseFallback />}>
+      <UseCasesContent searchParams={searchParams} />
+    </Suspense>
   );
 }

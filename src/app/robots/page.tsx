@@ -1,3 +1,6 @@
+import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
+import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { RobotsBrowser } from '@/components/RobotsBrowser';
 import { getManufacturers, getRobots } from '@/lib/data';
 import { createPageMetadata } from '@/lib/metadata';
@@ -14,11 +17,38 @@ export const metadata = createPageMetadata({
   path: '/robots',
 });
 
-export default async function RobotsPage({
-  searchParams,
+async function CachedRobotsList({
+  industry,
+  task,
+  manufacturer,
+  availability,
+  release,
+  query,
 }: {
-  searchParams: RouteSearchParams;
+  industry: string | null;
+  task: string | null;
+  manufacturer: string;
+  availability: string;
+  release: string;
+  query: string;
 }) {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('robots-list');
+
+  const robots = getRobots();
+  const manufacturers = getManufacturers();
+
+  return (
+    <RobotsBrowser
+      robots={robots}
+      manufacturers={manufacturers}
+      initialFilters={{ industry, task, manufacturer, availability, release, query }}
+    />
+  );
+}
+
+async function RobotsContent({ searchParams }: { searchParams: RouteSearchParams }) {
   const robots = getRobots();
   const manufacturers = getManufacturers();
   const params = await pickSearchParams(searchParams, [
@@ -44,10 +74,25 @@ export default async function RobotsPage({
   });
 
   return (
-    <RobotsBrowser
-      robots={robots}
-      manufacturers={manufacturers}
-      initialFilters={filters}
+    <CachedRobotsList
+      industry={filters.industry}
+      task={filters.task}
+      manufacturer={filters.manufacturer}
+      availability={filters.availability}
+      release={filters.release}
+      query={filters.query}
     />
+  );
+}
+
+export default function RobotsPage({
+  searchParams,
+}: {
+  searchParams: RouteSearchParams;
+}) {
+  return (
+    <Suspense fallback={<PageSuspenseFallback />}>
+      <RobotsContent searchParams={searchParams} />
+    </Suspense>
   );
 }

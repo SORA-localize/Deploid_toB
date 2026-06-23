@@ -23,13 +23,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/for-manufacturers',
     '/privacy',
   ];
-  const now = new Date();
-
-  const staticEntries: MetadataRoute.Sitemap = staticPaths.map((p) => ({
-    url: `${base}${p}`,
-    lastModified: now,
-  }));
-
   const robotEntries: MetadataRoute.Sitemap = getRobots()
     .filter(shouldIndexRobot)
     .map((r) => ({
@@ -60,6 +53,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${base}/reports/${r.slug}`,
       lastModified: new Date(r.updatedAt),
     }));
+
+  // staticPathsのlastModifiedはビルド時点の現在時刻ではなく、全データの最終更新の
+  // 最大値（データ由来でdeterministic）を使う。cacheComponents配下でnew Date()を
+  // 直接呼ぶとprerenderエラーになるため。
+  const latestUpdatedAt = [
+    ...robotEntries,
+    ...manufacturerEntries,
+    ...guideEntries,
+    ...useCaseEntries,
+    ...reportEntries,
+  ].reduce<Date>((latest, entry) => {
+    const candidate = entry.lastModified;
+    if (candidate instanceof Date && candidate > latest) return candidate;
+    return latest;
+  }, new Date(0));
+
+  const staticEntries: MetadataRoute.Sitemap = staticPaths.map((p) => ({
+    url: `${base}${p}`,
+    lastModified: latestUpdatedAt,
+  }));
 
   return [
     ...staticEntries,

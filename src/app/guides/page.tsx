@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { GuidesBrowser } from '@/components/GuidesBrowser';
 import { ComingSoonGate } from '@/components/ComingSoonGate';
 import { getGuides } from '@/lib/data';
@@ -12,11 +14,7 @@ export const metadata = createPageMetadata({
   path: '/guides',
 });
 
-export default async function GuidesPage({
-  searchParams,
-}: {
-  searchParams: RouteSearchParams;
-}) {
+async function GuidesContent({ searchParams }: { searchParams: RouteSearchParams }) {
   const params = await pickSearchParams(searchParams, ['stage', 'topic'] as const);
   return (
     <ComingSoonGate storageKey="coming-soon:guides" title="導入ガイドは近日公開予定です">
@@ -28,5 +26,17 @@ export default async function GuidesPage({
         })}
       />
     </ComingSoonGate>
+  );
+}
+
+export default function GuidesPage({
+  searchParams,
+}: {
+  searchParams: RouteSearchParams;
+}) {
+  return (
+    <Suspense fallback={<PageSuspenseFallback />}>
+      <GuidesContent searchParams={searchParams} />
+    </Suspense>
   );
 }

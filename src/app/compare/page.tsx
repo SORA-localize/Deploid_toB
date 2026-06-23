@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { CompareClient } from '@/components/CompareClient';
 import { getManufacturers, getRobots } from '@/lib/data';
 import { normalizeCompareRobotIds } from '@/lib/compareParams';
@@ -9,7 +11,7 @@ export const metadata = createPageMetadata({
   path: '/compare',
 });
 
-export default async function ComparePage({
+async function CompareContent({
   searchParams,
 }: {
   searchParams: Promise<{ compare?: string }>;
@@ -25,5 +27,17 @@ export default async function ComparePage({
       manufacturers={manufacturers}
       selectedIds={selectedIds}
     />
+  );
+}
+
+export default function ComparePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ compare?: string }>;
+}) {
+  return (
+    <Suspense fallback={<PageSuspenseFallback />}>
+      <CompareContent searchParams={searchParams} />
+    </Suspense>
   );
 }

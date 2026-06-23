@@ -62,9 +62,10 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
   const animationFrameRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const lastFlipTimeRef = useRef<number>(0);
-  const scrambleCharsRef = useRef<string[]>(
-    text ? generateGibberishPreservingSpaces(text, charset).split("") : [],
-  );
+  // Math.random()ベースのscramble文字列はrender pathで生成しない（Server/Client双方の
+  // 初回レンダリングで非決定的処理に当たるため）。isMounted前はdisplayCharが常に元の
+  // 文字を返すので、空配列で初期化しても表示には影響しない。
+  const scrambleCharsRef = useRef<string[]>([]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -148,7 +149,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
             ? char
             : char === " "
               ? " "
-              : (scrambleCharsRef.current[index] ?? generateRandomCharacter(charset));
+              : (scrambleCharsRef.current[index] ?? char);
 
         return (
           <span

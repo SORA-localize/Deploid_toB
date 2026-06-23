@@ -2,8 +2,13 @@ import Link from 'next/link';
 import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { footerNavItems, footerNotice } from '@/lib/siteNavigation';
 
-export function Footer() {
-  const year = new Date().getFullYear();
+async function getCopyrightYear() {
+  'use cache';
+  return new Date().getFullYear();
+}
+
+export async function Footer() {
+  const year = await getCopyrightYear();
 
   return (
     <footer className="border-t border-border bg-background">
