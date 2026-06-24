@@ -175,7 +175,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
             <SourceList
               sources={guide.sources}
               className="mt-10 border-y border-border py-6 scroll-mt-site-header"
-              titleClassName="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+              titleVariant="meta"
             />
 
             {hasRelated && (

@@ -4,6 +4,11 @@ import { uiText } from '@/lib/uiText';
 import { cn } from '@/lib/utils';
 import { getReliabilityTone, getVisualToneClassName } from '@/lib/visualSemantics';
 
+const titleVariantClassNames = {
+  default: 'text-lg font-semibold text-foreground mb-4',
+  meta: 'mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground',
+} as const;
+
 interface SourceListProps {
   id?: string;
   title?: string;
@@ -11,6 +16,9 @@ interface SourceListProps {
   emptyMessage?: string;
   className?: string;
   titleClassName?: string;
+  /** 見出しのスタイルプリセット。`titleClassName` を指定した場合はそちらが優先される。
+   * 'meta': 記事本文内の出典セクション見出し用（reports/guides の本文メタ見出しと同じ見た目） */
+  titleVariant?: keyof typeof titleVariantClassNames;
 }
 
 export function SourceList({
@@ -19,11 +27,13 @@ export function SourceList({
   sources,
   emptyMessage = uiText.emptyStates.sources,
   className = 'mt-6 border border-border bg-card p-6 scroll-mt-site-header',
-  titleClassName = 'text-lg font-semibold text-foreground mb-4',
+  titleClassName,
+  titleVariant = 'default',
 }: SourceListProps) {
+  const resolvedTitleClassName = titleClassName ?? titleVariantClassNames[titleVariant];
   return (
     <div id={id} className={className}>
-      <h2 className={titleClassName}>{title}</h2>
+      <h2 className={resolvedTitleClassName}>{title}</h2>
       {sources.length === 0 ? (
         <p className="text-xs text-muted-foreground">{emptyMessage}</p>
       ) : (

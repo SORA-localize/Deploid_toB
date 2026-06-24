@@ -305,7 +305,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 <SourceList
                   sources={report.sources}
                   className="scroll-mt-site-header"
-                  titleClassName="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                  titleVariant="meta"
                 />
               </div>
             </section>
