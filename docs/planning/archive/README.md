@@ -38,3 +38,7 @@ Last cleaned: 2026-06-23
 - `nav-transition-performance-fix-plan-v1.md` — 主要ハブをclient state化して静的化する旧案。現行はCache Componentsで6ハブページをPartial Prerender化し、`PageSuspenseFallback` もSuspense境界に接続済みのため前提が古い。遷移遅延が再発する場合は現行Cache Components構成を前提に新規計画を作る。
 - `component-duplication-unification-plan-v1.md` — サイドバー外枠（`SidebarSection`/`SidebarBlock`/`SidebarDivider`）の統一、`RelatedLinkList`/`DefinitionList`のvariant追加、`ConsultationCta`切り出しまで実装済み。`ManufacturerDetailHero`/`ManufacturerFactSheet`は見た目統一ではなく重複データ（同一事実の2重表示）の削除で解決。B（簡易スペックリスト統合）・C（見出しclass重複）はKISSの観点から見送りを決定済み。
 - `article-tab-layout-data-plan-v1.md` — `/reports` と `articlePlacements` の構造整理メモ。現行の正本ではないが、記事タブ拡張やZEALS/Omakase Robotics記事の扱いを検討した経緯として参照価値があるため履歴扱いにする。
+
+## 2026-06-25 Archived After Implementation
+
+- `source-list-meta-heading-dedup-plan-v1.md` — `component-duplication-unification-plan-v1.md` の「C」を自己調査し直して見つかった、`SourceList` の `titleClassName` 重複（reports/guides）のみを対象にした小さな修正計画。`titleVariant`（`titleClassName` 未指定時のみ適用）を追加し、両ファイルを置き換え済み。出典見出しのclass属性が変更前後で一致することを確認済み。

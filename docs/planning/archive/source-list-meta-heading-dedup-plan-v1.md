@@ -1,7 +1,11 @@
 # SourceList Meta Heading Dedup Plan v1
 
-Status: active/unimplemented plan
+Status: completed
 Last updated: 2026-06-25
+
+## 実装結果
+
+`components/SourceList.tsx` に `titleVariant?: 'default' | 'meta'` を追加し、`titleClassName` 未指定時のみ適用する優先順位で実装した。`src/app/reports/[slug]/page.tsx:308`・`src/app/guides/[slug]/page.tsx:178` を `titleVariant="meta"` に置き換え。`npx tsc --noEmit`・`npm run build` 通過。`/reports/bmw-figure-deployment`・`/guides/decision-variables` の出典見出し `<h2>` のclass属性が変更前と一致することを確認済み（commit `3469574`）。完了条件をすべて満たしたため archive へ移動する。
 
 この文書は、`component-duplication-unification-plan-v1.md`（archive済み）で「C: 見出しclass文字列の重複、低優先」として一括で見送った項目を、実装前に自己調査し直した結果見つかった、本物の重複1件だけを対象にする小さな修正計画である。完了後は archive へ移動する。
 
