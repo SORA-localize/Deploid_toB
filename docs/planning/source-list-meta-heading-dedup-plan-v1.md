@@ -1,7 +1,7 @@
 # SourceList Meta Heading Dedup Plan v1
 
 Status: active/unimplemented plan
-Last updated: 2026-06-24
+Last updated: 2026-06-25
 
 この文書は、`component-duplication-unification-plan-v1.md`（archive済み）で「C: 見出しclass文字列の重複、低優先」として一括で見送った項目を、実装前に自己調査し直した結果見つかった、本物の重複1件だけを対象にする小さな修正計画である。完了後は archive へ移動する。
 
@@ -29,14 +29,16 @@ Last updated: 2026-06-24
 
 ## 修正方針
 
-`components/SourceList.tsx` に、3・4が指定している値をそのまま表す選択肢を追加する。具体的には `titleClassName` の代わりに `variant?: 'section' | 'compact'` を新設し、`compact` のときに現在のoverride文字列をデフォルトとして適用する。既存の `variant` 省略時（`'section'`）は現状のデフォルト（`text-lg font-semibold text-foreground mb-4`）を維持し、見た目を変えない。
+`components/SourceList.tsx` に、3・4が指定している値をそのまま表す選択肢を追加する。プロパティ名は `variant` ではなく `titleVariant?: 'default' | 'meta'` にする。`variant` という名前は `RelatedLinkList` で「見出し・説明文・カード装飾・構造ごと全部省いて `<nav>` のみを返す」という、コンテナそのものを切り替える意味で既に使われている（`components/RelatedLinkList.tsx`、`compact` 時は `<section>` も `<Heading>` も生成しない）。`SourceList` 側の今回の変更は見出しのclassだけを切り替えるもので、コンテナ（カード風の `border bg-card p-6` 等）は変えない。同じ `variant` という名前を見出しだけの切り替えに使うと、将来 `<SourceList variant="compact" />` と書いた人が `RelatedLinkList` と同じ「構造が簡略化される」挙動を期待してしまう。`titleVariant` のように見出しのみに作用することが名前から分かる形にする。
 
-`titleClassName` prop自体は残してよい（個別の上書きが今後必要になる可能性があるため、削除はスコープ外）。
+`titleVariant='meta'` のときは、現在のoverride文字列（`mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground`）をデフォルトとして適用する。`titleVariant` 省略時（`'default'`）は現状のデフォルト（`text-lg font-semibold text-foreground mb-4`）を維持し、見た目を変えない。コンテナの `className` prop はこの変更と無関係で、従来通り個別に指定する。
+
+`titleClassName` prop自体は残す（個別の上書きが今後必要になる可能性があるため、削除はスコープ外）。優先順位は次の通り：`titleClassName` が明示的に渡されていれば常にそれを使う。`titleClassName` が省略されているときだけ `titleVariant`（`'default'` か `'meta'`）に応じた既定classを選ぶ。
 
 ## 触るファイル
 
-- `components/SourceList.tsx`：`variant` prop追加
-- `src/app/reports/[slug]/page.tsx:308`：`titleClassName="..."` を `variant="compact"` に置き換え
+- `components/SourceList.tsx`：`titleVariant` prop追加。`titleClassName` 省略時のデフォルト解決ロジックに `titleVariant` を反映
+- `src/app/reports/[slug]/page.tsx:308`：`titleClassName="..."` を `titleVariant="meta"` に置き換え
 - `src/app/guides/[slug]/page.tsx:178`：同上
 
 触らないファイル：`ReportSidebarContent` のサイドバー見出し（上記1）、reports本文の「タグ」ラベル（上記2）、`ArticleToc`/`RelatedLinkList`（上記5）。
@@ -45,11 +47,14 @@ Last updated: 2026-06-24
 
 - `npx tsc --noEmit`
 - `npm run build`
-- `/reports/[任意のslug]` と `/guides/[任意のslug]` の出典セクションを変更前後で見た目が変わらないことを確認（curl でのclass確認、または表示確認）
+- 確認対象は「`SourceList` が出力する出典見出し（`<h2>`）のclassが、変更前の文字列（`mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground`）と一致すること」に絞る。任意のslugではなく、データに実在する以下のページで確認する：
+  - `/reports/bmw-figure-deployment`（`data/articles.ts` に実在、`sources` あり）
+  - `/guides/decision-variables`（`data/guides.ts` に実在、`sources` あり）
+  - `curl -s http://localhost:3000/reports/bmw-figure-deployment | grep -o '<h2[^>]*>出典</h2>'` のように、出典見出しの`<h2>`タグのclass属性を変更前後で取得して文字列比較する
 
 ## 完了条件
 
-- `SourceList` が `variant="compact"` 相当の選択肢を持っている。
-- `reports/[slug]`・`guides/[slug]` の両方が `variant="compact"` を使い、生のclass文字列を直書きしていない。
-- 見た目の変化がないことを確認済み。
+- `SourceList` が `titleVariant="meta"` 相当の選択肢を持ち、`titleClassName` 未指定時のみそれが適用される（`titleClassName` 指定時はそちらが優先される）優先順位がコード上も成立している。
+- `reports/[slug]`・`guides/[slug]` の両方が `titleVariant="meta"` を使い、生のclass文字列を直書きしていない。
+- 上記2ページの出典見出しのclass属性が変更前後で一致することを確認済み。
 - この計画が `docs/planning/README.md` に active/unimplemented plan として登録されている。
