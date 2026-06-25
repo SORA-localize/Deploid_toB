@@ -69,7 +69,6 @@ Last cleaned: 2026-06-23
 
 - `layout-and-data-structure-audit-plan-v1.md` — 全ページのテキスト表示レイアウトとデータ構造配置の調査実行計画
 - `editorial-methodology-review-2026-06-24.md` — 記事題材・切り口・書き方のレビュー用草案（未承認。承認後に editorial_style_guide へ反映）
-- `reports-section-tab-counts-plan-2026-06-25.md` — 記事sectionタブの件数表示・0件disabledをファセットUIと整合させる実装計画
 
 ## アーカイブ
 
