@@ -57,7 +57,7 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
     [useCases],
   );
 
-  const { filtered, featured, rest, active } = useMemo(
+  const { filtered, active } = useMemo(
     () => getUseCaseFilterResult(useCases, initialFilters),
     [useCases, initialFilters],
   );
@@ -135,19 +135,6 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
       </div>
 
       <div className="site-container py-5 min-h-[60vh]">
-        {featured.length > 0 && !active && (
-          <div className="mb-5">
-            <h3 className="text-sm font-semibold text-foreground mb-4 px-1">
-              {uiText.useCases.featured}
-            </h3>
-            <div className="grid auto-rows-fr grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
-              {featured.map((u) => (
-                <UseCaseCard key={u.id} useCase={u} />
-              ))}
-            </div>
-          </div>
-        )}
-
         <div className="flex items-center justify-between mb-4 px-1">
           <h3 className="text-sm font-semibold text-foreground">
             {uiText.useCases.all}
@@ -158,7 +145,7 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
         </div>
 
         <div className="grid auto-rows-fr grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
-          {(active ? filtered : rest).map((u) => (
+          {filtered.map((u) => (
             <UseCaseCard key={u.id} useCase={u} />
           ))}
         </div>
