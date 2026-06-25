@@ -24,6 +24,7 @@ import {
   defaultSiteTitle,
 } from '@/lib/metadata';
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
+import { uiText } from '@/lib/uiText';
 
 export const metadata = createPageMetadata({
   title: defaultSiteTitle,
@@ -89,8 +90,8 @@ export default function HomePage() {
 
       <ManufacturerWorldMap
         manufacturers={mapPoints}
-        heading={"日本の未来を\nヒューマノイドと共に\n切り開く。"}
-        subcopy={"技術の理解から調達の実務まで、実装に必要なプロセスをすべて体系化。\n職種を問わず、社会実装に挑むすべての人が参照できる実践ガイドです。"}
+        heading={uiText.home.worldMap.heading}
+        subcopy={uiText.home.worldMap.subcopy}
       />
 
       <div className="site-container py-6 sm:py-10">

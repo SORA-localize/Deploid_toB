@@ -135,6 +135,29 @@ export function ManufacturerWorldMap({ manufacturers, heading, subcopy }: Manufa
     if (!placed) clusters.push({ x: p.x, y: p.y, items: [p] });
   }
 
+  // 特例統合: Unitree（杭州）は上海クラスタ（agibot/fourier-intelligence/kepler-robotics）と
+  // 地理的に近接しているが CLUSTER_DIST の閾値外で単独点になる。表示上は1点にまとめ、
+  // クラスタ内の表示順は Unitree を先頭にする。
+  const unitreeClusterIdx = clusters.findIndex((c) =>
+    c.items.some((it) => it.input.slug === 'unitree'),
+  );
+  const shanghaiClusterIdx = clusters.findIndex((c) =>
+    c.items.some((it) => it.input.slug === 'agibot'),
+  );
+  if (
+    unitreeClusterIdx !== -1 &&
+    shanghaiClusterIdx !== -1 &&
+    unitreeClusterIdx !== shanghaiClusterIdx
+  ) {
+    const [unitreeCluster] = clusters.splice(unitreeClusterIdx, 1);
+    const adjustedShanghaiIdx =
+      shanghaiClusterIdx > unitreeClusterIdx ? shanghaiClusterIdx - 1 : shanghaiClusterIdx;
+    const shanghai = clusters[adjustedShanghaiIdx];
+    shanghai.items = [...unitreeCluster.items, ...shanghai.items];
+    shanghai.x = shanghai.items.reduce((s, it) => s + it.x, 0) / shanghai.items.length;
+    shanghai.y = shanghai.items.reduce((s, it) => s + it.y, 0) / shanghai.items.length;
+  }
+
   const pointPositions: Pt[] = clusters.map((c) => ({ x: c.x, y: c.y }));
 
   const points: MapPoint[] = clusters
@@ -145,13 +168,27 @@ export function ManufacturerWorldMap({ manufacturers, heading, subcopy }: Manufa
         (it.input.deployments ?? []).flatMap((d) => {
           const pin = map.getPin({ lat: d.lat, lng: d.lng });
           if (!pin) return [];
-          return [{ x: pin.x, y: pin.y, customer: d.customer, status: d.status }];
+          return [
+            {
+              x: pin.x,
+              y: pin.y,
+              customer: d.customer,
+              status: d.status,
+              manufacturerSlug: it.input.slug,
+            },
+          ];
         }),
       );
       pushAway(ends, pointPositions, ARC_END_MIN);
       const arcs = ends.map((e) => {
         const end = toPct(e.x, e.y);
-        return { leftPct: end.leftPct, topPct: end.topPct, customer: e.customer, status: e.status };
+        return {
+          leftPct: end.leftPct,
+          topPct: end.topPct,
+          customer: e.customer,
+          status: e.status,
+          manufacturerSlug: e.manufacturerSlug,
+        };
       });
       const members = c.items.map((it) => ({
         slug: it.input.slug,
