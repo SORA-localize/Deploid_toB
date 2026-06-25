@@ -46,6 +46,7 @@ export const uiText = {
     sources: '出典は本文作成時に追加予定です。',
   },
   filters: {
+    keywordSearch: 'キーワード検索',
     robotType: 'ロボット分類',
     manufacturer: 'メーカー',
     availability: '国内入手性',
