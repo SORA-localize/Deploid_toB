@@ -500,10 +500,10 @@ export function validateData(): ValidationResult {
     });
     checkTags('article', article.slug, 'industryTags', 'industry', article.industryTags ?? []);
     checkTags('article', article.slug, 'regionTags', 'region', article.regionTags ?? []);
-    checkTags('article', article.slug, 'themeTags', 'theme', article.themeTags);
-    if (article.themeTags.length < 1 || article.themeTags.length > 4) {
+    checkTags('article', article.slug, 'themeTags', 'theme', article.themeTags ?? []);
+    if ((article.themeTags?.length ?? 0) > 4) {
       errors.push(
-        `[tag-count] article "${article.slug}".themeTags は1〜4個にしてください（現在 ${article.themeTags.length}個）`,
+        `[tag-count] article "${article.slug}".themeTags は0〜4個にしてください（現在 ${article.themeTags?.length ?? 0}個）`,
       );
     }
     checkUniqueValues('article', article.slug, 'relatedRobotIds', article.relatedRobotIds);

@@ -262,4 +262,20 @@ export const uiText = {
     closeDetail: '詳細を閉じる',
     viewRobotPage: 'ロボット詳細ページへ',
   },
+  home: {
+    worldMap: {
+      kicker: 'JAPAN HUMANOID PORTAL',
+      heading: 'ヒューマノイド\n導入検討するあなたの\n最初の一歩。',
+      subcopy:
+        '主要なロボットのスペック、性能比較から、導入リスクの評価まで。\n導入に必要な「実装プロセス」のすべてをまとめた実践ガイドです。',
+      ctaGuide: '導入ガイドを読む',
+      ctaRobots: 'ロボット一覧',
+      deployments: 'Deployments',
+      memberCount: (count: number) => `${count}社`,
+      overflowCount: (count: number) => `+${count}`,
+      clusterAriaLabel: (regionName: string, count: number) => `${regionName}の${count}社の一覧を見る`,
+      singleAriaLabel: (manufacturerName: string, regionName: string) =>
+        `${manufacturerName}（${regionName}）の詳細を見る`,
+    },
+  },
 } as const;
