@@ -2,12 +2,10 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { TagChip } from '@/components/TagChip';
 import type { UseCase } from '@/data/types';
-import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
 import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
-import { getBuyerReadinessTone, getUseCaseMaturityTone } from '@/lib/visualSemantics';
+import { getUseCaseSummaryFacts } from '@/lib/useCaseDisplay';
 
 interface UseCaseCardProps {
   useCase: UseCase;
@@ -17,6 +15,7 @@ interface UseCaseCardProps {
 // （以前の featured/list 2バリアントは、横幅いっぱいの行カードがグリッドと噛み合わず
 //   カードが肥大化する原因だったため統合した）。
 export function UseCaseCard({ useCase: u }: UseCaseCardProps) {
+  const facts = getUseCaseSummaryFacts(u);
   const {
     cardRef,
     rotateX,
@@ -35,7 +34,7 @@ export function UseCaseCard({ useCase: u }: UseCaseCardProps) {
       onMouseLeave={handleMouseLeave}
       style={{ rotateX, rotateY, transformPerspective: 1000 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="card-data group relative overflow-hidden"
+      className="card-data group relative flex h-full flex-col overflow-hidden"
     >
       {/* Glow + shimmer + accent line はRobotCard/ManufacturerCardと同じ演出（lib/useTiltCardEffect.ts参照） */}
       <motion.div
@@ -55,15 +54,14 @@ export function UseCaseCard({ useCase: u }: UseCaseCardProps) {
         className="pointer-events-none absolute bottom-0 left-0 z-40 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full"
       />
 
-      <Link href={`/use-cases/${u.slug}`} className="relative z-10 block h-full p-4">
-        <div className="mb-2 flex flex-wrap items-center gap-1.5">
-          <TagChip kind="use-case-domain" value={u.primaryDomain} />
-          <TagChip tone={getUseCaseMaturityTone(u.maturityLevel)}>
-            {maturityLabels[u.maturityLevel]}
-          </TagChip>
-          <TagChip tone={getBuyerReadinessTone(u.buyerReadiness)}>
-            {buyerReadinessLabels[u.buyerReadiness]}
-          </TagChip>
+      <Link href={`/use-cases/${u.slug}`} className="relative z-10 flex h-full flex-col p-4">
+        <div className="mb-3 space-y-1">
+          {facts.map((fact) => (
+            <div key={fact.key} className="flex min-w-0 items-center justify-between gap-2 text-[11px] leading-tight">
+              <span className="shrink-0 text-muted-foreground">{fact.label}</span>
+              <span className="truncate font-medium text-foreground">{fact.value}</span>
+            </div>
+          ))}
         </div>
         <h4 className="mb-1.5 line-clamp-2 text-base font-semibold text-foreground">
           {u.titleJa ?? u.title}
@@ -71,7 +69,7 @@ export function UseCaseCard({ useCase: u }: UseCaseCardProps) {
         <p className="mb-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
           {u.subtitle ?? u.summary}
         </p>
-        <div className="text-[11px] text-muted-foreground/80">
+        <div className="mt-auto pt-2 text-[11px] text-muted-foreground/80">
           {uiText.useCases.candidateRobots(u.candidateRobots.length)}
         </div>
       </Link>

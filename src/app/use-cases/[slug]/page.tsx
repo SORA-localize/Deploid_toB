@@ -21,18 +21,14 @@ import {
   resolveUseCaseDetailBySlug,
 } from '@/lib/data';
 import {
-  buyerReadinessLabels,
-  capabilityLabels,
   deploymentStatusLabels,
-  maturityLabels,
-  operatingEnvironmentLabels,
   useCaseCapabilityNoteLabels,
 } from '@/lib/labels';
 import { breadcrumbJsonLd, useCaseJsonLd } from '@/lib/jsonLd';
 import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
-import { getTagLabel } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
+import { getUseCaseOverviewFacts } from '@/lib/useCaseDisplay';
 
 export function generateStaticParams() {
   return getUseCases().map((u) => ({ slug: u.slug }));
@@ -65,24 +61,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
   const deployments = getDeploymentsForUseCase(useCase.id);
   const primaryGuide = guides[0];
 
-  const secondaryDomainLabels = (useCase.secondaryDomains ?? []).map((domain) =>
-    getTagLabel(domain, 'use-case-domain'),
-  );
-  const domainValue =
-    secondaryDomainLabels.length > 0
-      ? `${getTagLabel(useCase.primaryDomain, 'use-case-domain')}（＋${secondaryDomainLabels.join('、')}）`
-      : getTagLabel(useCase.primaryDomain, 'use-case-domain');
-
-  const overviewRows: Array<[string, string]> = [
-    [uiText.useCases.overviewFields.domain, domainValue],
-    [uiText.useCases.overviewFields.maturity, maturityLabels[useCase.maturityLevel]],
-    [uiText.useCases.overviewFields.buyerReadiness, buyerReadinessLabels[useCase.buyerReadiness]],
-    [uiText.useCases.overviewFields.environment, operatingEnvironmentLabels[useCase.environment]],
-    [
-      uiText.useCases.overviewFields.requiredCapabilities,
-      useCase.requiredCapabilities.map((c) => capabilityLabels[c]).join(', '),
-    ],
-  ];
+  const overviewRows = getUseCaseOverviewFacts(useCase);
 
   const sections: ManufacturerDetailSectionLink[] = [
     { label: uiText.useCases.atAGlance, href: '#at-a-glance' },
@@ -262,10 +241,10 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
               <SidebarBlock kicker={uiText.useCases.decisionFactors}>
                 <table className="w-full text-xs">
                   <tbody className="divide-y divide-border">
-                    {overviewRows.map(([label, value]) => (
-                      <tr key={label}>
-                        <td className="py-2 text-muted-foreground">{label}</td>
-                        <td className="py-2 text-foreground font-medium text-right">{value}</td>
+                    {overviewRows.map((row) => (
+                      <tr key={row.key}>
+                        <td className="py-2 text-muted-foreground">{row.label}</td>
+                        <td className="py-2 text-foreground font-medium text-right">{row.value}</td>
                       </tr>
                     ))}
                   </tbody>

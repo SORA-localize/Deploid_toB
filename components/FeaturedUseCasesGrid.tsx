@@ -1,9 +1,8 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { UseCase } from '@/data/types';
-import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
-import { getTagLabel } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
+import { getUseCaseSummaryFacts } from '@/lib/useCaseDisplay';
 
 interface FeaturedUseCasesGridProps {
   useCases: UseCase[];
@@ -12,20 +11,7 @@ interface FeaturedUseCasesGridProps {
 function FeaturedUseCaseCard({ useCase }: { useCase: UseCase }) {
   const title = useCase.titleJa ?? useCase.title;
   const description = useCase.subtitle ?? useCase.summary;
-  const metaItems = [
-    {
-      label: uiText.useCases.featuredCard.domain,
-      value: getTagLabel(useCase.primaryDomain, 'use-case-domain'),
-    },
-    {
-      label: uiText.useCases.featuredCard.maturity,
-      value: maturityLabels[useCase.maturityLevel],
-    },
-    {
-      label: uiText.useCases.featuredCard.buyerReadiness,
-      value: buyerReadinessLabels[useCase.buyerReadiness],
-    },
-  ];
+  const metaItems = getUseCaseSummaryFacts(useCase);
 
   return (
     <Link
@@ -35,7 +21,7 @@ function FeaturedUseCaseCard({ useCase }: { useCase: UseCase }) {
     >
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         {metaItems.map((item) => (
-          <div key={item.label} className="min-w-0 border-l border-border pl-2">
+          <div key={item.key} className="min-w-0 border-l border-border pl-2">
             <div className="text-[10px] font-medium text-muted-foreground">
               {item.label}
             </div>
@@ -58,7 +44,7 @@ function FeaturedUseCaseCard({ useCase }: { useCase: UseCase }) {
       <div className="mt-auto flex items-center justify-between gap-3 pt-5 text-xs text-muted-foreground">
         <span>{uiText.useCases.candidateRobots(useCase.candidateRobots.length)}</span>
         <span className="inline-flex items-center gap-1 font-medium text-foreground">
-          {uiText.useCases.featuredCard.detail}
+          {uiText.useCases.detail}
           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
         </span>
       </div>
