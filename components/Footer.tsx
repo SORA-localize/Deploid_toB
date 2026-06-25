@@ -44,7 +44,7 @@ export async function Footer() {
           </nav>
         </div>
 
-        <div className="mt-4 flex flex-col gap-2 border-t border-border pt-3 text-[11px] leading-relaxed text-muted-foreground md:flex-row md:items-start md:justify-between">
+        <div className="mt-4 flex flex-col gap-2 text-[11px] leading-relaxed text-muted-foreground md:flex-row md:items-start md:justify-between">
           <p className="shrink-0">© {year} Deploid</p>
           <p className="min-w-0 flex-1 md:pl-6 md:text-right">
             {footerNotice}
