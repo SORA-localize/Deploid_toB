@@ -248,7 +248,7 @@ export function createReportSearchDocument(report: Article) {
     tags: [
       ...(report.industryTags ?? []).map((value) => ({ value, kind: 'industry' as const })),
       ...(report.regionTags ?? []).map((value) => ({ value, kind: 'region' as const })),
-      ...report.themeTags.map((value) => ({ value, kind: 'theme' as const })),
+      ...(report.themeTags ?? []).map((value) => ({ value, kind: 'theme' as const })),
     ],
     fields: [
       report.titleJa,

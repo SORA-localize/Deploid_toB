@@ -15,6 +15,10 @@ export interface SelectControlOption {
   label: string;
   description?: string;
   keywords?: readonly string[];
+  /** ファセットの該当件数。指定すると「ラベル (件数)」で表示する。 */
+  count?: number;
+  /** 0件などで選択不可にする。Select/SearchableDropdown 両系統で無効化される。 */
+  disabled?: boolean;
 }
 
 interface SelectControlProps {
@@ -38,6 +42,9 @@ export function SelectControl({
   required = false,
   searchable = false,
 }: SelectControlProps) {
+  const withCount = (option: SelectControlOption) =>
+    option.count != null ? `${option.label} (${option.count})` : option.label;
+
   return (
     <div className={className}>
       <label htmlFor={`${id}-trigger`} className="mb-2 block text-xs text-muted-foreground">
@@ -49,7 +56,7 @@ export function SelectControl({
           label={label}
           value={value}
           onValueChange={onChange}
-          items={options}
+          items={options.map((option) => ({ ...option, label: withCount(option) }))}
           searchPlaceholder={uiText.controls.dropdownSearchPlaceholder(label)}
           searchAriaLabel={uiText.controls.dropdownSearchAria(label)}
           emptyMessage={uiText.controls.dropdownEmpty}
@@ -63,10 +70,13 @@ export function SelectControl({
           >
             <SelectValue />
           </SelectTrigger>
-          <SelectContent position="popper" className="min-w-(--radix-select-trigger-width)">
+          <SelectContent
+            position="popper"
+            className="w-(--radix-select-trigger-width) min-w-0"
+          >
             {options.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
+              <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+                {withCount(option)}
               </SelectItem>
             ))}
           </SelectContent>

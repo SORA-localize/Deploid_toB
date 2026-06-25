@@ -4,10 +4,12 @@
  * 軸の役割:
  * - industry / task: ロボット・用途・記事の検索ファセット。意図的に非MECE（重なりを許容）。
  * - region: 記事の地域ファセット（Article.regionTags。互いに重ならない地域バケット）。
- * - theme: 記事の論点ファセット（Article.themeTags の正本、必須・1〜4個）。
+ * - theme: 記事の論点（angle）ファセット（Article.themeTags、任意・0〜4個）。
  * - use-case-domain: UseCase.primaryDomain の正本。MECEを意図した「ロボットの動作」軸。
  * - guide-topic: ガイドのトピック分類。
  *
+ * 1概念=1軸に保つ。記事の「主題」は Article.section（data/types.ts、必須・タブ）が正本で、
+ * deployment/policy は section に属する。theme はそれと直交する細かい論点（資金調達・価格・安全 等）。
  * 企業名・機種名はタグにしない（relatedManufacturerIds / relatedRobotIds で表す）。
  * 新しい値はまずここに登録してからデータで使う（lib/validate.ts が未登録・件数違反を弾く）。
  */
@@ -95,18 +97,16 @@ export const tagRegistry = [
   { kind: 'region', value: 'southeast-asia', label: '東南アジア' },
   { kind: 'region', value: 'global', label: 'グローバル' },
 
-  // 記事のテーマファセット（Article.themeTags の正本）。industry/regionと直交する「記事の論点」軸。
+  // 記事のテーマファセット（Article.themeTags、任意）。section（主題）と直交する「記事の論点」軸。
   // 旧 article kind のテーマ語を統合した（例: market/analysis/forecast→market-analysis、
-  // policy/regulation→policy、raas/subscription→business-model、viral/demo→pr-demo）。
+  // raas/subscription→business-model、viral/demo→pr-demo）。deployment/policy は section が正本のため持たない。
   { kind: 'theme', value: 'funding', label: '資金調達' },
   { kind: 'theme', value: 'ipo', label: 'IPO' },
   { kind: 'theme', value: 'pricing', label: '価格' },
   { kind: 'theme', value: 'business-model', label: 'ビジネスモデル' },
   { kind: 'theme', value: 'mass-production', label: '量産' },
   { kind: 'theme', value: 'commercialization', label: '商用化' },
-  { kind: 'theme', value: 'deployment', label: '導入' },
   { kind: 'theme', value: 'market-analysis', label: '市場分析' },
-  { kind: 'theme', value: 'policy', label: '政策・規制' },
   { kind: 'theme', value: 'safety', label: '安全' },
   { kind: 'theme', value: 'labor', label: '労使' },
   { kind: 'theme', value: 'consumer', label: '消費者向け' },

@@ -260,7 +260,7 @@ BaseRecord（id, slug, previousSlugs, summary, publishStatus,
 + author?
 + industryTags?     ← tagRegistry kind:'industry'。検索・絞り込み用
 + regionTags?       ← tagRegistry kind:'region'。地域非依存なら省略
-+ themeTags[]       ← tagRegistry kind:'theme'。必須・1〜4個。企業・機種はタグにしない
++ themeTags?[]      ← tagRegistry kind:'theme'。任意・0〜4個（section が主題）。企業・機種はタグにしない
 + whyItMatters      ← 必須（速報でも省略不可）
 + keyTakeaways?[]
 + body?             ← Markdown
@@ -391,7 +391,7 @@ summary, publishStatus, updatedAt, reliability, sources, heroImage?, seo?
 
 **Robot**: name, nameJa?, **manufacturerId**, category, description, featuredRank?, deploymentStage, buyerReadiness, **specs（specSchema駆動）**, procurementModels[], priceNote?, japanAvailability, distributorJapan?, *Note群, images?, industryTags?, taskTags?, comparison
 
-**Article（旧Report）**: title, titleJa?, **category★**, type, section, publishedAt, author?, industryTags?, regionTags?, **themeTags[]**, whyItMatters, keyTakeaways?, body?, readingTimeMin?, featured?, **related*Ids[]**
+**Article（旧Report）**: title, titleJa?, **category★**, type, section, publishedAt, author?, industryTags?, regionTags?, **themeTags?[]**, whyItMatters, keyTakeaways?, body?, readingTimeMin?, featured?, **related*Ids[]**
 
 **Guide**: title, titleJa?, description, stage, order, topics[], targetReaders[], readingTimeMinutes?, checklistItems?, body?, **relatedRobotIds[], relatedUseCaseIds[]**
 
@@ -517,7 +517,7 @@ Git型CMS（Keystatic想定）への到達手順。各段階で `npm run build` 
 1. 新 slug を決める → 2. 旧 slug を `previousSlugs` に追記 → 3. `slug` を更新 → 4. **id・参照は触らない** → 5. validate（衝突チェック）
 
 **ニュース記事追加**
-1. category / type / section を選ぶ → 2. **whyItMatters を必ず書く**（速報でも）→ 3. related*Ids を id で結ぶ → 4. themeTags（必須1〜4個）/ industryTags / regionTags は registry から軸別に選ぶ
+1. category / type / section を選ぶ → 2. **whyItMatters を必ず書く**（速報でも）→ 3. related*Ids を id で結ぶ → 4. themeTags（任意0〜4個）/ industryTags / regionTags は registry から軸別に選ぶ
 
 **スペック項目追加**
 1. `lib/specSchema.ts` に1行追加 → 2. 該当ロボットの `specs` に値を入れる → 3. 型・スペック表・比較表が自動追従

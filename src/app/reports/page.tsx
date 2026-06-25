@@ -3,6 +3,7 @@ import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { ReportsBrowser } from '@/components/ReportsBrowser';
 import { getArticles } from '@/lib/data';
 import { ARTICLE_PAGE_PARAM } from '@/lib/articlePagination';
+import { ARTICLE_FACETS } from '@/lib/facetConfig';
 import { normalizeArticleSectionParam } from '@/lib/articleSections';
 import { createPageMetadata } from '@/lib/metadata';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
@@ -16,22 +17,21 @@ export const metadata = createPageMetadata({
 
 async function ReportsContent({ searchParams }: { searchParams: RouteSearchParams }) {
   const reports = getArticles();
-  const params = await pickSearchParams(
-    searchParams,
-    ['section', 'q', 'theme', 'industry', 'region', ARTICLE_PAGE_PARAM] as const,
-  );
+  const facetKeys = ARTICLE_FACETS.map((facet) => facet.key);
+  const params = await pickSearchParams(searchParams, [
+    'section',
+    'q',
+    ARTICLE_PAGE_PARAM,
+    ...facetKeys,
+  ]);
   const activeSection = normalizeArticleSectionParam(params.section);
+  const facetValues = Object.fromEntries(facetKeys.map((key) => [key, params[key]]));
 
   return (
     <ReportsBrowser
       reports={reports}
       activeSection={activeSection}
-      initialFilters={{
-        query: params.q ?? '',
-        theme: params.theme,
-        industry: params.industry,
-        region: params.region,
-      }}
+      initialFilters={{ query: params.q ?? '', facetValues }}
       initialPageParam={params[ARTICLE_PAGE_PARAM]}
     />
   );

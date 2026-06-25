@@ -67,7 +67,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
 
         <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">
           <div className="flex flex-wrap gap-1">
-            {report.themeTags.slice(0, 2).map((tag) => (
+            {(report.themeTags ?? []).slice(0, 2).map((tag) => (
               <TagChip key={tag} kind="theme" value={tag} className="text-[10px]" />
             ))}
           </div>

@@ -38,7 +38,7 @@ export function getTagSearchValues(values: readonly string[], kind?: TagKind) {
   return Array.from(searchValues);
 }
 
-function toTagOptions(values: readonly string[], kind: TagKind): TagOption[] {
+export function toTagOptions(values: readonly string[], kind: TagKind): TagOption[] {
   const options = new Map<string, TagOption>();
 
   values.forEach((value) => {
@@ -68,7 +68,7 @@ function toTagOptions(values: readonly string[], kind: TagKind): TagOption[] {
 
 export function getArticleThemeOptions(reports: readonly Article[]) {
   return toTagOptions(
-    reports.flatMap((report) => report.themeTags),
+    reports.flatMap((report) => report.themeTags ?? []),
     'theme',
   );
 }

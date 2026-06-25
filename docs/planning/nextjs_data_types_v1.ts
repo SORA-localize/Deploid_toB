@@ -366,8 +366,8 @@ export interface Article extends BaseRecord {
   industryTags?: TagValue<'industry'>[];
   /** 地域ファセット（kind:'region'）。未設定=地域非依存。 */
   regionTags?: TagValue<'region'>[];
-  /** 記事テーマの主ファセット（kind:'theme'、必須・1〜4個）。企業・機種はタグにせず relatedManufacturerIds/relatedRobotIds で表す。 */
-  themeTags: TagValue<'theme'>[];
+  /** 記事の論点ファセット（kind:'theme'、任意・0〜4個）。section（主題）と直交する角度。企業・機種はタグにせず relatedManufacturerIds/relatedRobotIds で表す。 */
+  themeTags?: TagValue<'theme'>[];
   whyItMatters: string;
   keyTakeaways?: string[];
   /** 記事本文（Markdown）。空ならレポート本文セクションは描画されない。 */

@@ -9,6 +9,10 @@ export interface PageTab<T extends string> {
   label: string;
   /** 任意。指定したタブのみツールチップでこの説明を表示する。 */
   description?: string;
+  /** 任意。指定した場合のみラベル横に件数を表示する。0件も表示対象。 */
+  count?: number;
+  /** aria-disabled と click guard で選択不可にする。active tab には指定しない。 */
+  disabled?: boolean;
 }
 
 interface PageTabBarProps<T extends string> {
@@ -27,20 +31,41 @@ export function PageTabBar<T extends string>({
   return (
     <div className="flex flex-nowrap overflow-x-auto gap-0" role="tablist" aria-label={ariaLabel}>
       {tabs.map((tab) => {
+        const isActive = activeValue === tab.value;
+        const isDisabled = Boolean(tab.disabled);
+        const hasCount = tab.count != null;
         const button = (
           <button
             type="button"
             role="tab"
-            aria-selected={activeValue === tab.value}
-            onClick={() => onSelect(tab.value)}
+            aria-selected={isActive}
+            aria-disabled={isDisabled || undefined}
+            aria-label={hasCount ? `${tab.label}、${tab.count}件` : undefined}
+            onClick={(event) => {
+              if (isDisabled) {
+                event.preventDefault();
+                return;
+              }
+              onSelect(tab.value);
+            }}
             className={cn(
               'inline-flex min-h-10 shrink-0 items-center px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
-              activeValue === tab.value
+              isActive
                 ? 'border-foreground text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground',
+                : isDisabled
+                  ? 'cursor-not-allowed border-transparent text-muted-foreground/40'
+                  : 'border-transparent text-muted-foreground hover:text-foreground',
             )}
           >
-            {tab.label}
+            <span>{tab.label}</span>
+            {hasCount && (
+              <span
+                aria-hidden="true"
+                className="ml-1 min-w-4 text-right text-xs tabular-nums opacity-75"
+              >
+                {tab.count}
+              </span>
+            )}
           </button>
         );
 

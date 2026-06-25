@@ -9,7 +9,7 @@ Last reviewed: 2026-06-25
 
 ## タグ軸
 
-- `theme`: 記事の論点ファセット。`Article.themeTags` に必須で1〜4個入れる。
+- `theme`: 記事の論点ファセット。`Article.themeTags` に任意で0〜4個入れる（section が主題、theme は角度。`deployment`/`policy` は section 側）。
 - `region`: 記事の地域ファセット。地域非依存の記事では省略する。
 - `industry`: ロボット・用途・記事で使う業種ファセット。検索・絞り込み用で、MECEは意図しない。
 - `task`: 用途・ロボットのタスクファセット。
@@ -31,4 +31,5 @@ Last reviewed: 2026-06-25
 - URLや検索では `value` の正規化キーを使う。
 - UI表示では `label` を使う。
 - 記事タグは `theme` / `region` / `industry` を混ぜない。`theme` は業種や地域ではなく、記事の主張・論点を表す。
+- 0件sectionを埋めるために `section` や `themeTags` を無理に変えない。UIの空タブは件数/disabledで扱い、データは記事内容に従う。
 - 意味が近いタグを増やす前に、既存タグで表現できないか確認する。

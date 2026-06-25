@@ -17,6 +17,8 @@ Use this file for UI, layout, components, responsive behavior, interaction, visu
 - Avoid "AI-feel" patterns: purple/blue gradient heroes, centered oversized generic copy, glassmorphism, decorative card piles, excessive radius or shadow, and content-free AI art.
 - Use semantic tokens and `lib/visualSemantics.ts`; avoid ad hoc color literals.
 - Keep data access, filtering, URL state, formatting, and business rules out of presentational components when existing boundaries support that.
+- Faceted filters use `FacetFilterBar` + `lib/facetConfig.ts`: show option counts, disable 0-result options (computed from the other active facets), sync state via `useUrlParamUpdater`, and never auto-reset other facets. Lock dropdown panels to trigger width.
+- Primary tab bars (`PageTabBar`) keep their axis fixed. When counts are shown, disable 0-result non-active tabs instead of hiding them; keep the active tab and "all" escape route selectable.
 - Preserve accessibility: semantic HTML, labels, keyboard operation, focus states, and useful empty/error states.
 - Verify responsive behavior for mobile and desktop when layout changes.
 

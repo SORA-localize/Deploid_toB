@@ -56,13 +56,13 @@ UI開発方針とデザインシステムは別文書にする。
 | Shell | `Header`, `Footer`, `Breadcrumbs`, `layout.tsx` | 全ページ共通の外枠 |
 | 一覧ブラウザ | `RobotsBrowser`, `ManufacturersBrowser`, `UseCasesBrowser`, `ReportsBrowser`, `GuidesBrowser` | 検索、filter、tag、一覧表示 |
 | カード | `RobotCard`, `FavoriteCard`, `TagChip`, `EmptyState` | 再利用される表示単位 |
-| 入力 | `SearchInput`, `FilterSelect`, `FilterChipGroup`, `ContactForm` | 絞り込み・問い合わせ |
+| 入力 | `SearchInput`, `SelectControl`, `FacetFilterBar`, `FilterChipGroup`, `ContactForm` | 絞り込み・問い合わせ |
 | 詳細 | `RobotImageCarousel`, `Markdown`, `ManufacturerLogoName` | 詳細ページ固有の補助部品 |
 | データ取得 | `lib/data.ts` | published filter、slug lookup、関連取得 |
 | ラベル | `lib/labels.ts` | enum表示名 |
 | 検索 | `lib/search.ts` | collection別 search document |
 | タグ | `lib/tags.ts` | tag正規化、表示、候補生成 |
-| URL filter | `lib/useUrlFilters.ts` | use-cases 等のURL連動filter |
+| URL filter | `lib/useUrlParamUpdater.ts` | 一覧のURL連動filter（旧 `useUrlFilters` は廃止） |
 | メディア権利 | `lib/media.ts` | 画像・ロゴ表示可否のgate |
 
 ---
@@ -106,7 +106,9 @@ UI開発方針とデザインシステムは別文書にする。
 
 - page側は `lib/data.ts` から取得する。
 - 一覧の検索・filter・chip状態は browser component に閉じる。
-- URL共有したいfilterだけ `useUrlFilters` を使う。
+- URL共有したいfilterだけ `useUrlParamUpdater` を使う（読み取りは Server 側 searchParams / `useSearchParams`）。
+- 主軸タブは `PageTabBar`、補助絞り込みは `FacetFilterBar` / `SelectControl` に分ける。主軸タブの種類は固定し、検索・ファセット条件から導出した件数と0件disabledだけを連動させる。
+- `PageTabBar` は表示部品に留める。件数計算、URL更新、検索状態の解釈は browser/header 側で行う。
 - ページから `data/*.ts` を直接importしない。
 
 ### Detailページ
@@ -145,7 +147,7 @@ Client Component が必要なもの：
 既存の良い例：
 
 - `SearchInput`
-- `FilterSelect`
+- `SelectControl` / `FacetFilterBar`
 - `FilterChipGroup`
 - `TagChip`
 - `EmptyState`
@@ -283,7 +285,7 @@ UIは、存在しないデータを捏造しない。
 
 1. Storybook相当の軽量カタログページを検討する。
 2. Playwrightで主要ページのスクリーンショット回帰を検討する。
-3. `SearchInput`, `FilterSelect`, `FilterChipGroup` の見た目と状態を統一する。
+3. 一覧フィルタは設定駆動の `FacetFilterBar`＋`lib/facetConfig.ts`（件数つき・0件無効化・URLは `useUrlParamUpdater`）へ集約し、`SelectControl` のパネル幅をトリガー幅に統一済み（reports 先行。robots/manufacturers/use-cases は順次寄せる。guides の `FilterChipGroup` も要検討）。
 4. detailページのaside / source list / related list を整理する。
 
 今はやらない：

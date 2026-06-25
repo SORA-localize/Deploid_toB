@@ -289,7 +289,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             {/* 記事メタ（本文の終端） */}
             <section className="border-y border-border py-6">
               <div className="space-y-6">
-                {(report.themeTags.length > 0 ||
+                {((report.themeTags?.length ?? 0) > 0 ||
                   (report.industryTags?.length ?? 0) > 0 ||
                   (report.regionTags?.length ?? 0) > 0) && (
                   <div>
@@ -297,7 +297,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                       {uiText.reports.tags}
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {report.themeTags.map((tag) => (
+                      {(report.themeTags ?? []).map((tag) => (
                         <Link key={`theme-${tag}`} href={`/reports?theme=${tag}`} className="inline-flex">
                           <TagChip kind="theme" value={tag} className="py-1 transition-opacity hover:opacity-80" />
                         </Link>
