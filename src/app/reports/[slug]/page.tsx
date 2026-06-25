@@ -68,8 +68,6 @@ function ReportSidebarContent() {
         </Link>
       </SidebarBlock>
 
-      <SidebarDivider />
-
       <SidebarBlock kicker={uiText.reports.sidebarToolsTitle} kickerClassName="mb-3">
         <nav className="divide-y divide-border">
           {[
@@ -255,9 +253,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             {hasTakeaways && (
               <section
                 id="takeaways"
-                className={`scroll-mt-site-header pt-6 pb-8 ${
-                  hasBody ? 'border-b border-border' : ''
-                }`}
+                className="scroll-mt-site-header pt-6 pb-8 border-b border-border"
               >
                 <h2 className="mb-4 text-lg font-semibold text-foreground">
                   {uiText.reports.keyTakeaways}
@@ -275,7 +271,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
             {/* 本文（Markdown） */}
             {hasBody && (
-              <section id="body" className="scroll-mt-site-header pt-6 pb-8">
+              <section id="body" className="scroll-mt-site-header pt-6 pb-8 border-b border-border">
                 <Markdown source={report.body!} />
               </section>
             )}
@@ -284,7 +280,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           {/* 本文後のメタ・関連情報 */}
           <div className="col-span-12 lg:col-start-3 lg:row-start-2 lg:col-span-7">
             {/* 記事メタ（本文の終端） */}
-            <section className="border-y border-border py-6">
+            <section className={`py-8 ${hasRelated ? 'border-b border-border' : ''}`}>
               <div className="space-y-6">
                 {((report.themeTags?.length ?? 0) > 0 ||
                   (report.industryTags?.length ?? 0) > 0 ||
@@ -322,7 +318,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             </section>
 
             {hasRelated && (
-              <section id="related" className="scroll-mt-site-header mt-12 border-t-2 border-border pt-8 pb-8">
+              <section id="related" className="scroll-mt-site-header py-8">
                 <h2 className="mb-4 text-lg font-semibold text-foreground">
                   {uiText.reports.relatedInfo}
                 </h2>

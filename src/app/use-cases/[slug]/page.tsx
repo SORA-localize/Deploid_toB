@@ -210,7 +210,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
             </section>
 
             {/* 補足セクション：詳しい判断はガイドに渡すため、ここは要点のみに圧縮する */}
-            <section id="considerations" className="pt-6 pb-8 scroll-mt-site-header">
+            <section id="considerations" className="pt-6 pb-8 border-b border-border scroll-mt-site-header">
               <h2 className="text-sm font-semibold text-muted-foreground mb-5">
                 {uiText.useCases.considerationsSectionTitle}
               </h2>
@@ -251,7 +251,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
             <SourceList
               id="sources"
               sources={useCase.sources}
-              className="pt-8 border-t border-border scroll-mt-site-header"
+              className="py-8 scroll-mt-site-header"
               titleClassName="text-sm font-semibold text-foreground mb-4"
             />
           </div>
