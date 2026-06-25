@@ -145,14 +145,6 @@ export function ReportsBrowser({
       <div className="border-b border-border bg-card">
         <div className="site-container space-y-3 py-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
-            <SearchInput
-              value={query}
-              onChange={(nextQuery) =>
-                updateParams({ q: nextQuery, [ARTICLE_PAGE_PARAM]: null }, 'replace')
-              }
-              placeholder={uiText.searchPlaceholders.reports}
-              className="lg:mt-7 lg:max-w-xs"
-            />
             <div className="flex-1">
               <FacetFilterBar
                 articles={sectionScoped}
@@ -164,6 +156,16 @@ export function ReportsBrowser({
                 onChange={onFacetChange}
               />
             </div>
+            <SearchInput
+              id="reports-search"
+              label={uiText.filters.keywordSearch}
+              value={query}
+              onChange={(nextQuery) =>
+                updateParams({ q: nextQuery, [ARTICLE_PAGE_PARAM]: null }, 'replace')
+              }
+              placeholder={uiText.searchPlaceholders.reports}
+              className="w-full sm:w-72 md:w-96 shrink-0"
+            />
           </div>
         </div>
       </div>

@@ -11,6 +11,9 @@ interface SearchInputProps {
   ariaLabel?: string;
   className?: string;
   inputClassName?: string;
+  id?: string;
+  /** SelectControl と同じ見た目のラベル行をコントロール上に表示する（未指定で非表示）。 */
+  label?: string;
 }
 
 export function SearchInput({
@@ -20,6 +23,8 @@ export function SearchInput({
   ariaLabel,
   className = '',
   inputClassName = '',
+  id,
+  label,
 }: SearchInputProps) {
   const [draftValue, setDraftValue] = useState(value);
   const isComposingRef = useRef(false);
@@ -65,7 +70,9 @@ export function SearchInput({
       autoComplete="off"
       className={className}
       clearLabel={uiText.controls.clearSearch}
+      id={id}
       inputClassName={inputClassName}
+      label={label}
       placeholder={placeholder}
       value={draftValue}
       variant="underline"

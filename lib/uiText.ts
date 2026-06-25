@@ -63,6 +63,7 @@ export const uiText = {
     task: 'タスク',
     domain: '得意分野',
     theme: 'テーマ',
+    keywordSearch: 'キーワード検索',
   },
   robots: {
     breadcrumb: 'ロボット',
