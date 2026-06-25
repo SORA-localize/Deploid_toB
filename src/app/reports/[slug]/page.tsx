@@ -11,6 +11,7 @@ import { Markdown } from '@/components/Markdown';
 import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
+import { SidebarBlock, SidebarDivider } from '@/components/SidebarSection';
 import { ActiveSectionProvider } from '@/lib/activeSectionContext';
 import {
   getArticles,
@@ -54,11 +55,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 function ReportSidebarContent() {
   return (
-    <div className="space-y-6">
-      <section className="border-y border-border py-4">
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {uiText.reports.sidebarPressContactTitle}
-        </h3>
+    <div className="space-y-5">
+      <SidebarBlock kicker={uiText.reports.sidebarPressContactTitle} kickerClassName="mb-2">
         <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
           {uiText.reports.sidebarPressContactDescription}
         </p>
@@ -68,12 +66,11 @@ function ReportSidebarContent() {
         >
           {uiText.reports.sidebarContactCta}
         </Link>
-      </section>
+      </SidebarBlock>
 
-      <section className="border-y border-border py-4">
-        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {uiText.reports.sidebarToolsTitle}
-        </h3>
+      <SidebarDivider />
+
+      <SidebarBlock kicker={uiText.reports.sidebarToolsTitle} kickerClassName="mb-3">
         <nav className="divide-y divide-border">
           {[
             { href: '/robots', label: uiText.reports.sidebarToolFindRobots },
@@ -89,7 +86,7 @@ function ReportSidebarContent() {
             </Link>
           ))}
         </nav>
-      </section>
+      </SidebarBlock>
     </div>
   );
 }
