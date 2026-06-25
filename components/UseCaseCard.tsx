@@ -5,7 +5,6 @@ import { motion } from 'motion/react';
 import type { UseCase } from '@/data/types';
 import { uiText } from '@/lib/uiText';
 import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
-import { getUseCaseSummaryFacts } from '@/lib/useCaseDisplay';
 
 interface UseCaseCardProps {
   useCase: UseCase;
@@ -15,7 +14,6 @@ interface UseCaseCardProps {
 // （以前の featured/list 2バリアントは、横幅いっぱいの行カードがグリッドと噛み合わず
 //   カードが肥大化する原因だったため統合した）。
 export function UseCaseCard({ useCase: u }: UseCaseCardProps) {
-  const facts = getUseCaseSummaryFacts(u);
   const {
     cardRef,
     rotateX,
@@ -34,7 +32,7 @@ export function UseCaseCard({ useCase: u }: UseCaseCardProps) {
       onMouseLeave={handleMouseLeave}
       style={{ rotateX, rotateY, transformPerspective: 1000 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="card-data group relative flex h-full flex-col overflow-hidden"
+      className="card-data group relative flex h-full min-h-[148px] flex-col overflow-hidden"
     >
       {/* Glow + shimmer + accent line はRobotCard/ManufacturerCardと同じ演出（lib/useTiltCardEffect.ts参照） */}
       <motion.div
@@ -55,14 +53,6 @@ export function UseCaseCard({ useCase: u }: UseCaseCardProps) {
       />
 
       <Link href={`/use-cases/${u.slug}`} className="relative z-10 flex h-full flex-col p-4">
-        <div className="mb-3 space-y-1">
-          {facts.map((fact) => (
-            <div key={fact.key} className="flex min-w-0 items-center justify-between gap-2 text-[11px] leading-tight">
-              <span className="shrink-0 text-muted-foreground">{fact.label}</span>
-              <span className="truncate font-medium text-foreground">{fact.value}</span>
-            </div>
-          ))}
-        </div>
         <h4 className="mb-1.5 line-clamp-2 text-base font-semibold text-foreground">
           {u.titleJa ?? u.title}
         </h4>

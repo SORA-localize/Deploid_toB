@@ -29,26 +29,6 @@ export function getUseCaseDomainLabel(
   return `${primaryLabel}（＋${secondaryLabels.join('、')}）`;
 }
 
-export function getUseCaseSummaryFacts(useCase: UseCase): UseCaseFactRow[] {
-  return [
-    {
-      key: 'domain',
-      label: uiText.useCases.overviewFields.domain,
-      value: getUseCaseDomainLabel(useCase),
-    },
-    {
-      key: 'maturity',
-      label: uiText.useCases.overviewFields.maturity,
-      value: maturityLabels[useCase.maturityLevel],
-    },
-    {
-      key: 'buyer-readiness',
-      label: uiText.useCases.overviewFields.buyerReadiness,
-      value: buyerReadinessLabels[useCase.buyerReadiness],
-    },
-  ];
-}
-
 export function getUseCaseOverviewFacts(useCase: UseCase): UseCaseFactRow[] {
   return [
     {

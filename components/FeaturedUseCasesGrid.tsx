@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { UseCase } from '@/data/types';
 import { uiText } from '@/lib/uiText';
-import { getUseCaseSummaryFacts } from '@/lib/useCaseDisplay';
 
 interface FeaturedUseCasesGridProps {
   useCases: UseCase[];
@@ -11,28 +10,14 @@ interface FeaturedUseCasesGridProps {
 function FeaturedUseCaseCard({ useCase }: { useCase: UseCase }) {
   const title = useCase.titleJa ?? useCase.title;
   const description = useCase.subtitle ?? useCase.summary;
-  const metaItems = getUseCaseSummaryFacts(useCase);
 
   return (
     <Link
       href={`/use-cases/${useCase.slug}`}
-      className="group flex h-full min-h-[224px] flex-col border border-border bg-card p-4 transition-colors hover:border-ring focus-visible:border-ring focus-visible:outline-none sm:min-h-[236px]"
+      className="group flex h-full min-h-[172px] flex-col border border-border bg-card p-4 transition-colors hover:border-ring focus-visible:border-ring focus-visible:outline-none sm:min-h-[184px]"
       aria-label={`${title}の詳細を見る`}
     >
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-        {metaItems.map((item) => (
-          <div key={item.key} className="min-w-0 border-l border-border pl-2">
-            <div className="text-[10px] font-medium text-muted-foreground">
-              {item.label}
-            </div>
-            <div className="mt-1 line-clamp-2 text-xs font-medium leading-snug text-foreground">
-              {item.value}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5">
+      <div>
         <h3 className="line-clamp-2 text-lg font-semibold leading-snug text-foreground">
           {title}
         </h3>

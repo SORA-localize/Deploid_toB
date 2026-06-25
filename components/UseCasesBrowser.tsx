@@ -140,7 +140,7 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
             <h3 className="text-sm font-semibold text-foreground mb-4 px-1">
               {uiText.useCases.featured}
             </h3>
-            <div className="grid grid-cols-2 gap-4 max-w-2xl">
+            <div className="grid auto-rows-fr grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
               {featured.map((u) => (
                 <UseCaseCard key={u.id} useCase={u} />
               ))}
@@ -157,7 +157,7 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid auto-rows-fr grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
           {(active ? filtered : rest).map((u) => (
             <UseCaseCard key={u.id} useCase={u} />
           ))}
