@@ -285,14 +285,17 @@ tones：
 
 使い分け：
 
-- 選択肢が多い/enum: `FilterSelect`
-- 状態切替/少数カテゴリ: `FilterChipGroup`
+- 詳細ファセット（選択肢が多い/enum）: `SelectControl`（内部は Radix Select。多選択肢は `searchable` で SearchableDropdown）
+- 主題・粗い軸（タブ）: `PageTabBar`（記事の section、ロボットの release 等）
+- 少数カテゴリのトグル: `FilterChipGroup`
 - 自由検索: `SearchInput`
 
 ルール：
 
-- searchはページ内filterとして扱う。
-- URL共有したいfilterだけ `useUrlFilters`。
+- searchはページ内filterとして扱う（記事は MiniSearch=`lib/searchIndex.ts`、他は `lib/search.ts` の部分一致）。
+- URL共有するfilterは `useUrlParamUpdater` でURLに同期する（旧 `useUrlFilters` は廃止）。
+- **ファセット（SelectControl）は設定駆動の `FacetFilterBar`＋`lib/facetConfig.ts` で組む**。選択肢は他の選択で絞った部分集合から件数つきで導出し（`ラベル (件数)`）、0件は `disabled` で無効化して行き止まりを防ぐ。**他ファセットは自動リセットしない**（選択は保持）。
+- ドロップダウンのパネル幅はトリガー幅に固定する（内容で伸ばさない）。Select と SearchableDropdown の閉じた見た目を揃える。
 - chip buttonは `aria-pressed`。
 - **選択中インジケーター（ActiveFilterChips）はプレーンテキスト**。border/background/shadow を付けない。`text-muted-foreground hover:text-foreground` のみ。TagChip とは別物。
 

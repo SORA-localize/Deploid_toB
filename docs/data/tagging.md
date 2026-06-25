@@ -9,7 +9,7 @@ Last reviewed: 2026-06-25
 
 ## タグ軸
 
-- `theme`: 記事の論点ファセット。`Article.themeTags` に必須で1〜4個入れる。
+- `theme`: 記事の論点ファセット。`Article.themeTags` に任意で0〜4個入れる（section が主題、theme は角度。`deployment`/`policy` は section 側）。
 - `region`: 記事の地域ファセット。地域非依存の記事では省略する。
 - `industry`: ロボット・用途・記事で使う業種ファセット。検索・絞り込み用で、MECEは意図しない。
 - `task`: 用途・ロボットのタスクファセット。
