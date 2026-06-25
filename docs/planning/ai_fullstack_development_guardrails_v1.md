@@ -118,7 +118,7 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 対策:
 
 - 型変更前に `data/types.ts` と `docs/planning/nextjs_data_types_v1.ts` を確認する
-- 関連は原則 `slug` で持つ
+- 関連は原則 `id` で持つ。`slug` は公開URL専用として扱う
 - 逆引きできる関係は重複保持しない
 
 フェイルセーフ:
