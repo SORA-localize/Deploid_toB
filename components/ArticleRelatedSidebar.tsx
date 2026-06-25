@@ -1,45 +1,40 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { useSharedActiveSection } from '@/lib/activeSectionContext';
 import { cn } from '@/lib/utils';
 
 interface ArticleRelatedSidebarProps {
   children: ReactNode;
   className?: string;
-  enabled?: boolean;
-  revealId: string;
-  sectionIds: readonly string[];
-}
-
-const DESKTOP_MEDIA_QUERY = '(min-width: 1024px)';
-
-function useDesktopLayout() {
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
-    const update = () => setIsDesktop(mediaQuery.matches);
-
-    update();
-    mediaQuery.addEventListener('change', update);
-    return () => mediaQuery.removeEventListener('change', update);
-  }, []);
-
-  return isDesktop;
+  /**
+   * この要素がビューポートから外れたときにサイドバーを表示する。
+   * 記事ヘッダー要素の id を渡す。
+   */
+  triggerId: string;
 }
 
 export function ArticleRelatedSidebar({
   children,
   className,
-  enabled = true,
-  revealId,
-  sectionIds,
+  triggerId,
 }: ArticleRelatedSidebarProps) {
-  const isDesktop = useDesktopLayout();
-  const shouldTrackActiveSection = enabled && isDesktop && sectionIds.includes(revealId);
-  const activeId = useSharedActiveSection(sectionIds, { enabled: shouldTrackActiveSection });
-  const visible = !enabled || (isDesktop && activeId === revealId);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = document.getElementById(triggerId);
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // ヘッダーがビューポートから出たら表示
+        setVisible(!entry.isIntersecting);
+      },
+      { threshold: 0 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [triggerId]);
 
   return (
     <div

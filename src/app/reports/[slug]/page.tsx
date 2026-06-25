@@ -142,7 +142,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
       {/* ── ヒーロー + ヘッダー（統合） ── */}
       {heroImage ? (
-        <header className="border-b border-border bg-background">
+        <header id="report-article-header" className="border-b border-border bg-background">
           <div className="site-container pt-4 sm:pt-5">
             <Breadcrumbs items={breadcrumbItems} />
           </div>
@@ -203,7 +203,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           </figure>
         </header>
       ) : (
-        <header className="border-b border-border bg-card">
+        <header id="report-article-header" className="border-b border-border bg-card">
           <div className="site-container py-6">
             <Breadcrumbs items={breadcrumbItems} />
             <div className="mb-3 text-xs font-medium text-muted-foreground">
@@ -388,9 +388,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               <ReportSidebarContent />
             </div>
             <ArticleRelatedSidebar
-              enabled={hasRelated}
-              revealId="related"
-              sectionIds={tocIds}
+              triggerId="report-article-header"
               className="top-site-header-gap hidden lg:sticky lg:block"
             >
               <ReportSidebarContent />
