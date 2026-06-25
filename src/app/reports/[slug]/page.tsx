@@ -54,8 +54,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 function ReportSidebarContent() {
   return (
-    <div className="space-y-6">
-      <section className="border-y border-border py-4">
+    <div className="flex flex-col gap-6">
+      <section>
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {uiText.reports.sidebarPressContactTitle}
         </h3>
@@ -70,7 +70,9 @@ function ReportSidebarContent() {
         </Link>
       </section>
 
-      <section className="border-y border-border py-4">
+      <div className="border-t border-border" />
+
+      <section>
         <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {uiText.reports.sidebarToolsTitle}
         </h3>
