@@ -17,6 +17,7 @@ Use this file for UI, layout, components, responsive behavior, interaction, visu
 - Avoid "AI-feel" patterns: purple/blue gradient heroes, centered oversized generic copy, glassmorphism, decorative card piles, excessive radius or shadow, and content-free AI art.
 - Use semantic tokens and `lib/visualSemantics.ts`; avoid ad hoc color literals.
 - Keep data access, filtering, URL state, formatting, and business rules out of presentational components when existing boundaries support that.
+- For repeated cards, keep card components reusable and placement-agnostic. The card owns content density, `h-full`, min-height, and line clamps; the parent grid owns width, column count, row sizing, and responsive behavior. Do not create home/list/detail-specific card clones or put `w-[...]` placement widths inside cards unless the data shape or interaction is genuinely different.
 - Faceted filters use `FacetFilterBar` + `lib/facetConfig.ts`: show option counts, disable 0-result options (computed from the other active facets), sync state via `useUrlParamUpdater`, and never auto-reset other facets. Lock dropdown panels to trigger width.
 - Primary tab bars (`PageTabBar`) keep their axis fixed. When counts are shown, disable 0-result non-active tabs instead of hiding them; keep the active tab and "all" escape route selectable.
 - Preserve accessibility: semantic HTML, labels, keyboard operation, focus states, and useful empty/error states.
