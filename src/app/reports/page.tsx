@@ -16,13 +16,22 @@ export const metadata = createPageMetadata({
 
 async function ReportsContent({ searchParams }: { searchParams: RouteSearchParams }) {
   const reports = getArticles();
-  const params = await pickSearchParams(searchParams, ['section', ARTICLE_PAGE_PARAM] as const);
+  const params = await pickSearchParams(
+    searchParams,
+    ['section', 'q', 'theme', 'industry', 'region', ARTICLE_PAGE_PARAM] as const,
+  );
   const activeSection = normalizeArticleSectionParam(params.section);
 
   return (
     <ReportsBrowser
       reports={reports}
       activeSection={activeSection}
+      initialFilters={{
+        query: params.q ?? '',
+        theme: params.theme,
+        industry: params.industry,
+        region: params.region,
+      }}
       initialPageParam={params[ARTICLE_PAGE_PARAM]}
     />
   );

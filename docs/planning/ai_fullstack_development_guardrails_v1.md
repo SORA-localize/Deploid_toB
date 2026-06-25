@@ -205,7 +205,7 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 起きること:
 
-- `tags`、`topics`、`industryTags`、`taskTags` が別々のUIで表示される
+- `themeTags`、`regionTags`、`industryTags`、`topics`、`taskTags` が軸の違いを無視して同じUIや同じURLパラメータで扱われる
 - 表示名と検索キーが混在する
 - タグクリック後のURLが共有できない
 - 日本語検索や部分一致の仕様がページごとに違う
@@ -214,8 +214,8 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 - タグ表示は `TagChip` に寄せる
 - タグ集約と正規化は `lib/tags.ts` に寄せる
-- URLに `?tag=` や `?topic=` を反映するか早めに決める
-- 検索は `lib/search.ts` に閉じ込め、将来 Fuse.js / Pagefind に差し替え可能にする
+- URLに `?theme=` / `?region=` / `?industry=` など軸別パラメータを使うか早めに決める
+- 検索は `lib/search.ts` / 必要な検索インデックス helper に閉じ込め、MiniSearch / Fuse.js / Pagefind などを差し替え可能にする
 
 フェイルセーフ:
 
@@ -473,8 +473,8 @@ git commit -m "<scope>: <summary>"
 
 4. タグ機能フェーズ
    - `lib/tags.ts` を作る
-   - `reports.tags`、`guides.topics`、`useCases.industryTags/taskTags` を集約する
-   - タグクリックとURL stateを設計する
+   - `articles.themeTags/regionTags/industryTags`、`guides.topics`、`useCases.industryTags/taskTags` を軸別に集約する
+   - タグクリックとURL stateを軸別に設計する
 
 5. 検索改善フェーズ
    - 現状の `matchesQuery` を保ったまま検索対象を整理する
@@ -491,4 +491,3 @@ git commit -m "<scope>: <summary>"
    - 未解決リスクの記録
 
 各フェーズは「調査、計画、実装、自己監査、検証、コミット」の順で進める。前フェーズの不備が残っている場合、次フェーズへ進まない。
-

@@ -238,7 +238,7 @@ placements     >── articles
 | `analysis` | 分析・市場考察 | 低 |
 | `policy` | 政策・規制アップデート | 中 |
 
-> 既存の `type`（フォーマット）と `section`（サブジェクト）は維持可能だが、第一軸を `category` に一本化し役割重複を整理する（実装フェーズで `type`/`section` を `category` ＋ `tags` に吸収できるか精査）。
+> 現行実装では `category`（編集上の記事種別）、`type`（フォーマット）、`section`（記事タブのサブジェクト）を別軸として保持する。`section` は `/reports?section=` のタブ分類、タグは下記の軸別ファセットに分ける。
 
 ### 7-2. 編集ポリシーの矛盾解消
 
@@ -254,9 +254,13 @@ BaseRecord（id, slug, previousSlugs, summary, publishStatus,
             updatedAt, reliability, sources, heroImage, seo）
 + title, titleJa
 + category          ← 必須・第一軸（news/interview/company-report/analysis/policy）
++ type              ← フォーマット（analysis/deployment-report/news-brief 等）
++ section           ← 記事タブのサブジェクト（deployment/business/tech/policy/entertainment）
 + publishedAt       ← 一覧の鮮度ソート
 + author?
-+ tags[]            ← tagRegistry 'report'（→ 'article' に改称検討）
++ industryTags?     ← tagRegistry kind:'industry'。検索・絞り込み用
++ regionTags?       ← tagRegistry kind:'region'。地域非依存なら省略
++ themeTags[]       ← tagRegistry kind:'theme'。必須・1〜4個。企業・機種はタグにしない
 + whyItMatters      ← 必須（速報でも省略不可）
 + keyTakeaways?[]
 + body?             ← Markdown
@@ -387,7 +391,7 @@ summary, publishStatus, updatedAt, reliability, sources, heroImage?, seo?
 
 **Robot**: name, nameJa?, **manufacturerId**, category, description, featuredRank?, deploymentStage, buyerReadiness, **specs（specSchema駆動）**, procurementModels[], priceNote?, japanAvailability, distributorJapan?, *Note群, images?, industryTags?, taskTags?, comparison
 
-**Article（旧Report）**: title, titleJa?, **category★**, publishedAt, author?, tags[], whyItMatters, keyTakeaways?, body?, readingTimeMin?, featured?, **related*Ids[]**
+**Article（旧Report）**: title, titleJa?, **category★**, type, section, publishedAt, author?, industryTags?, regionTags?, **themeTags[]**, whyItMatters, keyTakeaways?, body?, readingTimeMin?, featured?, **related*Ids[]**
 
 **Guide**: title, titleJa?, description, stage, order, topics[], targetReaders[], readingTimeMinutes?, checklistItems?, body?, **relatedRobotIds[], relatedUseCaseIds[]**
 
@@ -513,7 +517,7 @@ Git型CMS（Keystatic想定）への到達手順。各段階で `npm run build` 
 1. 新 slug を決める → 2. 旧 slug を `previousSlugs` に追記 → 3. `slug` を更新 → 4. **id・参照は触らない** → 5. validate（衝突チェック）
 
 **ニュース記事追加**
-1. category を選ぶ（news/interview/company-report/analysis/policy）→ 2. **whyItMatters を必ず書く**（速報でも）→ 3. related*Ids を id で結ぶ → 4. tags は registry から
+1. category / type / section を選ぶ → 2. **whyItMatters を必ず書く**（速報でも）→ 3. related*Ids を id で結ぶ → 4. themeTags（必須1〜4個）/ industryTags / regionTags は registry から軸別に選ぶ
 
 **スペック項目追加**
 1. `lib/specSchema.ts` に1行追加 → 2. 該当ロボットの `specs` に値を入れる → 3. 型・スペック表・比較表が自動追従

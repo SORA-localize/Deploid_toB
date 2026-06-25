@@ -370,7 +370,12 @@ export interface Article extends BaseRecord {
   contentKind?: ArticleContentKind;
   publishedAt: ISODate;
   author?: string;
-  tags: TagValue<'article'>[];
+  /** 業種ファセット（lib/tagRegistry.ts の kind:'industry'）。検索・絞り込み用。未設定=該当なし。 */
+  industryTags?: TagValue<'industry'>[];
+  /** 地域ファセット（kind:'region'）。未設定=地域非依存。 */
+  regionTags?: TagValue<'region'>[];
+  /** 記事テーマの主ファセット（kind:'theme'、必須・1〜4個）。企業・機種はタグにせず relatedManufacturerIds/relatedRobotIds で表す。 */
+  themeTags: TagValue<'theme'>[];
   whyItMatters: string;
   keyTakeaways?: string[];
   /** 記事本文（Markdown）。空ならレポート本文セクションは描画されない。 */

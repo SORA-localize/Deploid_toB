@@ -289,14 +289,28 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             {/* 記事メタ（本文の終端） */}
             <section className="border-y border-border py-6">
               <div className="space-y-6">
-                {report.tags.length > 0 && (
+                {(report.themeTags.length > 0 ||
+                  (report.industryTags?.length ?? 0) > 0 ||
+                  (report.regionTags?.length ?? 0) > 0) && (
                   <div>
                     <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       {uiText.reports.tags}
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {report.tags.map((tag) => (
-                        <TagChip key={tag} kind="article" value={tag} className="py-1" />
+                      {report.themeTags.map((tag) => (
+                        <Link key={`theme-${tag}`} href={`/reports?theme=${tag}`} className="inline-flex">
+                          <TagChip kind="theme" value={tag} className="py-1 transition-opacity hover:opacity-80" />
+                        </Link>
+                      ))}
+                      {(report.industryTags ?? []).map((tag) => (
+                        <Link key={`industry-${tag}`} href={`/reports?industry=${tag}`} className="inline-flex">
+                          <TagChip kind="industry" value={tag} className="py-1 transition-opacity hover:opacity-80" />
+                        </Link>
+                      ))}
+                      {(report.regionTags ?? []).map((tag) => (
+                        <Link key={`region-${tag}`} href={`/reports?region=${tag}`} className="inline-flex">
+                          <TagChip kind="region" value={tag} className="py-1 transition-opacity hover:opacity-80" />
+                        </Link>
                       ))}
                     </div>
                   </div>

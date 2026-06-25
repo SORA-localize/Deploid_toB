@@ -245,7 +245,11 @@ export function createReportSearchDocument(report: Article) {
     collection: 'reports',
     title: report.titleJa ?? report.title,
     url: `/reports/${report.slug}`,
-    tags: report.tags.map((value) => ({ value, kind: 'article' as const })),
+    tags: [
+      ...(report.industryTags ?? []).map((value) => ({ value, kind: 'industry' as const })),
+      ...(report.regionTags ?? []).map((value) => ({ value, kind: 'region' as const })),
+      ...report.themeTags.map((value) => ({ value, kind: 'theme' as const })),
+    ],
     fields: [
       report.titleJa,
       report.title,
@@ -255,6 +259,10 @@ export function createReportSearchDocument(report: Article) {
       report.publishedAt,
       articleTypeLabels[report.type],
       report.keyTakeaways,
+      report.relatedRobotIds,
+      report.relatedManufacturerIds,
+      report.relatedUseCaseIds,
+      report.relatedGuideIds,
     ],
   });
 }

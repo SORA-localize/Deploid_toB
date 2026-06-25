@@ -66,10 +66,24 @@ function toTagOptions(values: readonly string[], kind: TagKind): TagOption[] {
   });
 }
 
-export function getArticleTagOptions(reports: readonly Article[]) {
+export function getArticleThemeOptions(reports: readonly Article[]) {
   return toTagOptions(
-    reports.flatMap((report) => report.tags),
-    'article',
+    reports.flatMap((report) => report.themeTags),
+    'theme',
+  );
+}
+
+export function getArticleRegionOptions(reports: readonly Article[]) {
+  return toTagOptions(
+    reports.flatMap((report) => report.regionTags ?? []),
+    'region',
+  );
+}
+
+export function getArticleIndustryTagOptions(reports: readonly Article[]) {
+  return toTagOptions(
+    reports.flatMap((report) => report.industryTags ?? []),
+    'industry',
   );
 }
 
@@ -125,7 +139,9 @@ export function getAllTagOptions({
   useCases?: readonly UseCase[];
 }) {
   return [
-    ...(reports ? getArticleTagOptions(reports) : []),
+    ...(reports ? getArticleThemeOptions(reports) : []),
+    ...(reports ? getArticleIndustryTagOptions(reports) : []),
+    ...(reports ? getArticleRegionOptions(reports) : []),
     ...(guides ? getGuideTopicOptions(guides) : []),
     ...(useCases ? getUseCaseIndustryTagOptions(useCases) : []),
     ...(useCases ? getUseCaseTaskTagOptions(useCases) : []),

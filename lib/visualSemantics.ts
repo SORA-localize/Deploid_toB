@@ -173,11 +173,12 @@ export const deploymentStatusTones = {
 } as const satisfies Record<DeploymentStatus, VisualTone>;
 
 export const tagKindTones = {
-  article: 'neutral',
   'guide-topic': 'brand',
   industry: 'info',
   task: 'neutral',
   'use-case-domain': 'brand',
+  region: 'info',
+  theme: 'neutral',
 } as const satisfies Record<TagKind, VisualTone>;
 
 export const getPublishStatusTone = (status: PublishStatus) => publishStatusTones[status];

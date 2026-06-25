@@ -21,6 +21,7 @@ export const uiText = {
     allIndustries: 'すべての業種',
     allTasks: 'すべてのタスク',
     allDomains: 'すべての得意分野',
+    allThemes: 'すべてのテーマ',
     results: (count: number, filtered: boolean) =>
       filtered ? `${count}件（絞り込み中）` : `${count}件`,
   },
@@ -61,6 +62,7 @@ export const uiText = {
     industry: '業種',
     task: 'タスク',
     domain: '得意分野',
+    theme: 'テーマ',
   },
   robots: {
     breadcrumb: 'ロボット',

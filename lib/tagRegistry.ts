@@ -1,4 +1,23 @@
-export type TagKind = 'article' | 'guide-topic' | 'industry' | 'task' | 'use-case-domain';
+/**
+ * タグの統制語彙（唯一の正本）。kind ごとに別々の軸で、値は kind 名前空間で一意。
+ *
+ * 軸の役割:
+ * - industry / task: ロボット・用途・記事の検索ファセット。意図的に非MECE（重なりを許容）。
+ * - region: 記事の地域ファセット（Article.regionTags。互いに重ならない地域バケット）。
+ * - theme: 記事の論点ファセット（Article.themeTags の正本、必須・1〜4個）。
+ * - use-case-domain: UseCase.primaryDomain の正本。MECEを意図した「ロボットの動作」軸。
+ * - guide-topic: ガイドのトピック分類。
+ *
+ * 企業名・機種名はタグにしない（relatedManufacturerIds / relatedRobotIds で表す）。
+ * 新しい値はまずここに登録してからデータで使う（lib/validate.ts が未登録・件数違反を弾く）。
+ */
+export type TagKind =
+  | 'guide-topic'
+  | 'industry'
+  | 'task'
+  | 'use-case-domain'
+  | 'region'
+  | 'theme';
 
 export interface TagRegistryEntry {
   kind: TagKind;
@@ -66,54 +85,34 @@ export const tagRegistry = [
   { kind: 'use-case-domain', value: 'demonstrate-capability', label: '実演・デモ動作' },
   { kind: 'use-case-domain', value: 'validate-new-tech', label: '新技術・新動作の検証' },
 
-  { kind: 'article', value: 'manufacturing', label: '製造' },
-  { kind: 'article', value: 'poc', label: 'PoC' },
-  { kind: 'article', value: 'figure', label: 'Figure AI' },
-  { kind: 'article', value: 'bmw', label: 'BMW' },
-  { kind: 'article', value: 'logistics', label: '物流' },
-  { kind: 'article', value: 'raas', label: 'RaaS' },
-  { kind: 'article', value: 'agility', label: 'Agility Robotics' },
-  { kind: 'article', value: 'gxo', label: 'GXO' },
-  { kind: 'article', value: '1x', label: '1X' },
-  { kind: 'article', value: 'consumer', label: '消費者向け' },
-  { kind: 'article', value: 'subscription', label: 'サブスク' },
-  { kind: 'article', value: 'apptronik', label: 'Apptronik' },
-  { kind: 'article', value: 'mercedes-benz', label: 'Mercedes-Benz' },
-  { kind: 'article', value: 'commercial', label: '商用化' },
-  { kind: 'article', value: 'unitree', label: 'Unitree' },
-  { kind: 'article', value: 'pricing', label: '価格' },
-  { kind: 'article', value: 'research', label: '研究' },
-  { kind: 'article', value: 'boston-dynamics', label: 'Boston Dynamics' },
-  { kind: 'article', value: 'autonomous', label: '自律制御' },
-  { kind: 'article', value: 'tesla', label: 'Tesla' },
-  { kind: 'article', value: 'optimus', label: 'Optimus' },
-  { kind: 'article', value: 'production', label: '量産' },
-  { kind: 'article', value: 'policy', label: '政策・規制' },
-  { kind: 'article', value: 'japan', label: '日本' },
-  { kind: 'article', value: 'regulation', label: '規制' },
-  { kind: 'article', value: 'safety', label: '安全' },
-  { kind: 'article', value: 'viral', label: 'バイラル' },
-  { kind: 'article', value: 'demo', label: 'デモ' },
-  { kind: 'article', value: 'series-b', label: 'シリーズB' },
-  { kind: 'article', value: 'funding', label: '資金調達' },
-  { kind: 'article', value: 'amazon', label: 'Amazon' },
-  { kind: 'article', value: 'deployment', label: '導入' },
-  { kind: 'article', value: 'market', label: '市場' },
-  { kind: 'article', value: 'analysis', label: '分析' },
-  { kind: 'article', value: 'forecast', label: '予測' },
-  { kind: 'article', value: 'nvidia', label: 'NVIDIA' },
-  { kind: 'article', value: 'agibot', label: 'AGIBOT' },
-  { kind: 'article', value: 'china', label: '中国' },
-  { kind: 'article', value: 'ipo', label: 'IPO' },
-  { kind: 'article', value: 'robotera', label: 'RobotEra' },
-  { kind: 'article', value: 'dobot', label: 'DOBOT' },
-  { kind: 'article', value: 'vietnam', label: 'ベトナム' },
-  { kind: 'article', value: 'genesis-ai', label: 'Genesis AI' },
-  { kind: 'article', value: 'j-hrti', label: 'J-HRTI' },
-  { kind: 'article', value: 'physical-ai', label: 'フィジカルAI' },
-  { kind: 'article', value: 'hyundai', label: 'Hyundai' },
-  { kind: 'article', value: 'pudu', label: 'Pudu Robotics' },
-  { kind: 'article', value: 'labor', label: '労使関係' },
+  // 記事の地域ファセット（Article.regionTags）。検索・絞り込み用で互いに重ならない地域バケット。
+  // 企業・機種は relatedManufacturerIds/relatedRobotIds で表すのでここには入れない。
+  { kind: 'region', value: 'japan', label: '日本' },
+  { kind: 'region', value: 'china', label: '中国' },
+  { kind: 'region', value: 'korea', label: '韓国' },
+  { kind: 'region', value: 'us', label: '米国' },
+  { kind: 'region', value: 'europe', label: '欧州' },
+  { kind: 'region', value: 'southeast-asia', label: '東南アジア' },
+  { kind: 'region', value: 'global', label: 'グローバル' },
+
+  // 記事のテーマファセット（Article.themeTags の正本）。industry/regionと直交する「記事の論点」軸。
+  // 旧 article kind のテーマ語を統合した（例: market/analysis/forecast→market-analysis、
+  // policy/regulation→policy、raas/subscription→business-model、viral/demo→pr-demo）。
+  { kind: 'theme', value: 'funding', label: '資金調達' },
+  { kind: 'theme', value: 'ipo', label: 'IPO' },
+  { kind: 'theme', value: 'pricing', label: '価格' },
+  { kind: 'theme', value: 'business-model', label: 'ビジネスモデル' },
+  { kind: 'theme', value: 'mass-production', label: '量産' },
+  { kind: 'theme', value: 'commercialization', label: '商用化' },
+  { kind: 'theme', value: 'deployment', label: '導入' },
+  { kind: 'theme', value: 'market-analysis', label: '市場分析' },
+  { kind: 'theme', value: 'policy', label: '政策・規制' },
+  { kind: 'theme', value: 'safety', label: '安全' },
+  { kind: 'theme', value: 'labor', label: '労使' },
+  { kind: 'theme', value: 'consumer', label: '消費者向け' },
+  { kind: 'theme', value: 'poc', label: 'PoC' },
+  { kind: 'theme', value: 'physical-ai', label: 'フィジカルAI' },
+  { kind: 'theme', value: 'pr-demo', label: 'デモ・話題' },
 ] as const satisfies readonly TagRegistryEntry[];
 
 export type RegisteredTag = (typeof tagRegistry)[number];
