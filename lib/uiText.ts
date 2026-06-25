@@ -161,6 +161,12 @@ export const uiText = {
     featured: '注目の適用領域',
     all: 'すべての用途',
     candidateRobots: (count: number) => `${count}件の候補ロボット`,
+    featuredCard: {
+      domain: '用途分類',
+      maturity: '成熟度',
+      buyerReadiness: '導入判断',
+      detail: '詳細',
+    },
     atAGlance: '要点',
     deployments: '導入事例',
     deploymentsSectionTitle: '実際の導入事例',

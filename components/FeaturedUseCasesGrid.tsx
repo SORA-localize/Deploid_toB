@@ -1,10 +1,69 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { UseCaseCard } from '@/components/UseCaseCard';
 import type { UseCase } from '@/data/types';
+import { buyerReadinessLabels, maturityLabels } from '@/lib/labels';
+import { getTagLabel } from '@/lib/tags';
+import { uiText } from '@/lib/uiText';
 
 interface FeaturedUseCasesGridProps {
   useCases: UseCase[];
+}
+
+function FeaturedUseCaseCard({ useCase }: { useCase: UseCase }) {
+  const title = useCase.titleJa ?? useCase.title;
+  const description = useCase.subtitle ?? useCase.summary;
+  const metaItems = [
+    {
+      label: uiText.useCases.featuredCard.domain,
+      value: getTagLabel(useCase.primaryDomain, 'use-case-domain'),
+    },
+    {
+      label: uiText.useCases.featuredCard.maturity,
+      value: maturityLabels[useCase.maturityLevel],
+    },
+    {
+      label: uiText.useCases.featuredCard.buyerReadiness,
+      value: buyerReadinessLabels[useCase.buyerReadiness],
+    },
+  ];
+
+  return (
+    <Link
+      href={`/use-cases/${useCase.slug}`}
+      className="group flex h-full min-h-[224px] flex-col border border-border bg-card p-4 transition-colors hover:border-ring focus-visible:border-ring focus-visible:outline-none sm:min-h-[236px]"
+      aria-label={`${title}の詳細を見る`}
+    >
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        {metaItems.map((item) => (
+          <div key={item.label} className="min-w-0 border-l border-border pl-2">
+            <div className="text-[10px] font-medium text-muted-foreground">
+              {item.label}
+            </div>
+            <div className="mt-1 line-clamp-2 text-xs font-medium leading-snug text-foreground">
+              {item.value}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-5">
+        <h3 className="line-clamp-2 text-lg font-semibold leading-snug text-foreground">
+          {title}
+        </h3>
+        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+      </div>
+
+      <div className="mt-auto flex items-center justify-between gap-3 pt-5 text-xs text-muted-foreground">
+        <span>{uiText.useCases.candidateRobots(useCase.candidateRobots.length)}</span>
+        <span className="inline-flex items-center gap-1 font-medium text-foreground">
+          {uiText.useCases.featuredCard.detail}
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+        </span>
+      </div>
+    </Link>
+  );
 }
 
 export function FeaturedUseCasesGrid({ useCases }: FeaturedUseCasesGridProps) {
@@ -20,14 +79,9 @@ export function FeaturedUseCasesGrid({ useCases }: FeaturedUseCasesGridProps) {
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="flex gap-3 sm:gap-4 overflow-x-auto overscroll-x-contain snap-x pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
         {useCases.map((useCase) => (
-          <div
-            key={useCase.id}
-            className="shrink-0 snap-start w-[78%] sm:w-[42%] md:w-[32%] xl:w-[26%]"
-          >
-            <UseCaseCard useCase={useCase} />
-          </div>
+          <FeaturedUseCaseCard key={useCase.id} useCase={useCase} />
         ))}
       </div>
     </section>

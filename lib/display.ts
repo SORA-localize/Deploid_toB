@@ -262,3 +262,10 @@ export function sortUseCases(useCases: UseCase[], sort: UseCaseSortKey): UseCase
     return 0;
   });
 }
+
+export function getHomeFeaturedUseCases(useCases: UseCase[], limit = 5): UseCase[] {
+  return sortUseCases(
+    useCases.filter((useCase) => useCase.featuredRank !== undefined),
+    'home-featured',
+  ).slice(0, limit);
+}
