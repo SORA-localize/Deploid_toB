@@ -298,8 +298,6 @@ export interface UseCase extends BaseRecord {
   title: string;
   titleJa?: string;
   subtitle?: string;
-  /** Homeの「用途から探す」での優先順位（編集ピック）。値が小さいほど上位。未設定はHome非掲載。Robot/Manufacturerのfeaturedrankとは異なり有料枠の意味は持たない。 */
-  featuredRank?: number;
   maturityLevel: UseCaseMaturity;
   buyerReadiness: BuyerReadiness;
   environment: OperatingEnvironment;

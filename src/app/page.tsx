@@ -14,7 +14,7 @@ import {
   getUseCases,
   getDeploymentsForManufacturer,
 } from '@/lib/data';
-import { getHomeFeaturedUseCases, sortRobots } from '@/lib/display';
+import { sortRobots } from '@/lib/display';
 import { getDisplayableAsset } from '@/lib/media';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/jsonLd';
 import {
@@ -58,8 +58,8 @@ export default function HomePage() {
   // 注目ロボット：featuredRank（編集ピック）→ deploymentStage → updatedAt の優先順で5件
   const featuredRobots = sortRobots(getRobots(), 'home-featured').slice(0, 5);
 
-  // 用途から探す：UseCase.featuredRank を持つHome掲載用の編集ピックだけを表示する。
-  const featuredUseCases = getHomeFeaturedUseCases(getUseCases());
+  // 用途から探す：用途一覧と同じカードを、Homeではプレビューとして全件表示する。
+  const homeUseCases = getUseCases();
 
   // HomeContentNavigator用プレビュー画像（各セクション1枚、サムネなし）。
   // 旧画像（1X NEO press kit ×2、SKL Robotics ロゴ）は権利確認の経路（lib/media.ts の
@@ -109,8 +109,8 @@ export default function HomePage() {
         />
       )}
 
-      {featuredUseCases.length > 0 && (
-        <FeaturedUseCasesGrid useCases={featuredUseCases} />
+      {homeUseCases.length > 0 && (
+        <FeaturedUseCasesGrid useCases={homeUseCases} />
       )}
 
       {heroReports.length > 0 && (
