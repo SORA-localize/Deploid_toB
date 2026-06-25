@@ -31,4 +31,5 @@ Last reviewed: 2026-06-25
 - URLや検索では `value` の正規化キーを使う。
 - UI表示では `label` を使う。
 - 記事タグは `theme` / `region` / `industry` を混ぜない。`theme` は業種や地域ではなく、記事の主張・論点を表す。
+- 0件sectionを埋めるために `section` や `themeTags` を無理に変えない。UIの空タブは件数/disabledで扱い、データは記事内容に従う。
 - 意味が近いタグを増やす前に、既存タグで表現できないか確認する。

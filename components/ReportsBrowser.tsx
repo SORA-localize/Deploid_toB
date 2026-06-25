@@ -10,7 +10,7 @@ import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
 import { ReportsHeader } from '@/components/ReportsHeader';
 import { SearchInput } from '@/components/SearchInput';
 import { CardHoverEffect } from '@/components/ui/card-hover-effect';
-import type { Article } from '@/data/types';
+import type { Article, ArticleSection } from '@/data/types';
 import { filterArticles } from '@/lib/articleFilters';
 import { byArticlePublishedDesc } from '@/lib/display';
 import {
@@ -25,7 +25,7 @@ import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
 import { ARTICLE_FACETS } from '@/lib/facetConfig';
 import { createArticleSearchIndex, searchArticleSlugs } from '@/lib/searchIndex';
 import { uiText } from '@/lib/uiText';
-import type { ArticleSectionFilter } from '@/lib/articleSections';
+import { ARTICLE_SECTION_TABS, type ArticleSectionFilter } from '@/lib/articleSections';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { cn } from '@/lib/utils';
 
@@ -85,6 +85,33 @@ export function ReportsBrowser({
     [sectionScoped, facetValues, matchedSlugs],
   );
 
+  const sectionTabs = useMemo(() => {
+    const sectionCountBase = filterArticles({
+      reports: sorted,
+      facets: ARTICLE_FACETS,
+      facetValues,
+      matchedSlugs,
+    });
+    const countBySection = new Map<ArticleSection, number>();
+
+    for (const article of sectionCountBase) {
+      countBySection.set(article.section, (countBySection.get(article.section) ?? 0) + 1);
+    }
+
+    return ARTICLE_SECTION_TABS.map((tab) => {
+      const count = tab.value === 'all'
+        ? sectionCountBase.length
+        : countBySection.get(tab.value) ?? 0;
+
+      return {
+        ...tab,
+        count,
+        // Keep the current section enabled even when it has 0 results so URL-entered states stay legible.
+        disabled: tab.value !== 'all' && tab.value !== activeSection && count === 0,
+      };
+    });
+  }, [sorted, facetValues, matchedSlugs, activeSection]);
+
   const pageCount = getArticlePageCount(gridReports.length, perPage);
   const activePage = useMemo(
     () => normalizeReportPageParam(initialPageParam, pageCount),
@@ -112,7 +139,7 @@ export function ReportsBrowser({
 
   return (
     <div className="bg-background">
-      <ReportsHeader activeSection={activeSection} />
+      <ReportsHeader activeSection={activeSection} tabs={sectionTabs} />
 
       {/* ── 検索 + ファセット絞り込み（設定駆動・件数つき・0件無効化） ── */}
       <div className="border-b border-border bg-card">

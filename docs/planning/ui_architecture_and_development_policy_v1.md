@@ -107,6 +107,8 @@ UI開発方針とデザインシステムは別文書にする。
 - page側は `lib/data.ts` から取得する。
 - 一覧の検索・filter・chip状態は browser component に閉じる。
 - URL共有したいfilterだけ `useUrlParamUpdater` を使う（読み取りは Server 側 searchParams / `useSearchParams`）。
+- 主軸タブは `PageTabBar`、補助絞り込みは `FacetFilterBar` / `SelectControl` に分ける。主軸タブの種類は固定し、検索・ファセット条件から導出した件数と0件disabledだけを連動させる。
+- `PageTabBar` は表示部品に留める。件数計算、URL更新、検索状態の解釈は browser/header 側で行う。
 - ページから `data/*.ts` を直接importしない。
 
 ### Detailページ

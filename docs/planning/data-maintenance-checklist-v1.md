@@ -57,7 +57,7 @@
     - 最大解像度：**1920px 幅**
 10. [ ] hero画像の `ImageAsset.rights` を記入する（`commercial-permitted` または `reference-attributed` のみ公開可。権利が確認できない画像は `src: ''` のまま公開する。詳細は `docs/planning/copyright_and_media_rights_policy_v1.md`）（自動：空src以外は検証対象）
 11. [ ] `related*Ids` は **id で**結ぶ（自動：参照切れ・重複は build 失敗）。配列順は関連欄の表示順として保持されるため、重要度順に並べる
-12. [ ] 記事タグは軸別に入れる。`section` が主題（必須・タブ）、`themeTags` は `kind:'theme'` から任意0〜4個（論点）、`industryTags` は `kind:'industry'`、`regionTags` は `kind:'region'` を使う。`deployment`/`policy` は section が正本で theme に入れない。企業名・機種名はタグにせず `relatedManufacturerIds` / `relatedRobotIds` で結ぶ
+12. [ ] 記事タグは軸別に入れる。`section` が主題（必須・タブ）、`themeTags` は `kind:'theme'` から任意0〜4個（論点）、`industryTags` は `kind:'industry'`、`regionTags` は `kind:'region'` を使う。`deployment`/`policy` は section が正本で theme に入れない。UIの空タブや件数都合で `section` / `themeTags` を選ばない。企業名・機種名はタグにせず `relatedManufacturerIds` / `relatedRobotIds` で結ぶ
 13. [ ] **本文量を確認**：速報（news-brief）でも800文字以上、分析・レポートは1,500文字以上を目安にする
 14. [ ] **型の確認**：`requiredCapabilities` は `Capability` 型の値のみ。`lib/tagRegistry.ts` のタグ value を誤って入れない
 15. [ ] **既存記事を全削除して置き換えない**。更新は同じ `id` で行い、url 変更が必要なら `previousSlugs` に旧 slug を追記する
