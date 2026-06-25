@@ -41,7 +41,7 @@ export function RelatedLinkList({ id, title, items, titleLevel = 'h2', variant =
       <Heading id={headingId} className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {title}
       </Heading>
-      <div className="divide-y divide-border border-y border-border">
+      <div className="divide-y divide-border">
         {items.map((item) => (
           <Link
             key={item.href}

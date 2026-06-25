@@ -22,7 +22,7 @@ export function ArticleToc({ items, backHref, backLabel }: ArticleTocProps) {
 
   return (
     <div className="sticky top-site-header-gap">
-      <div className="border-y border-border py-3">
+      <div className="py-3">
         <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {uiText.common.contents}
         </h3>
@@ -45,7 +45,7 @@ export function ArticleToc({ items, backHref, backLabel }: ArticleTocProps) {
             );
           })}
         </nav>
-        <div className="mt-4 border-t border-border pt-3">
+        <div className="mt-5">
           <Link href={backHref} className="text-xs text-muted-foreground hover:text-foreground">
             ← {backLabel}
           </Link>

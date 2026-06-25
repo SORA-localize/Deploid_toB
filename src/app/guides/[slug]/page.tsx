@@ -137,9 +137,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
           <div className="col-span-12 lg:col-span-7">
             <section
               id="overview"
-              className={`scroll-mt-site-header pt-6 pb-8 ${
-                hasBody || hasChecklist ? 'border-b border-border' : ''
-              }`}
+              className="scroll-mt-site-header pt-6 pb-8 border-b border-border"
             >
               <h2 className="text-lg font-semibold text-foreground mb-4">
                 {uiText.common.overview}
@@ -150,16 +148,14 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
             {hasBody && (
               <section
                 id="body"
-                className={`scroll-mt-site-header pt-6 pb-8 ${
-                  hasChecklist ? 'border-b border-border' : ''
-                }`}
+                className="scroll-mt-site-header pt-6 pb-8 border-b border-border"
               >
                 <Markdown source={guide.body!} />
               </section>
             )}
 
             {hasChecklist && (
-              <section id="checklist" className="scroll-mt-site-header pt-6 pb-8">
+              <section id="checklist" className="scroll-mt-site-header pt-6 pb-8 border-b border-border">
                 <h3 className="text-sm font-semibold text-foreground mb-4">{uiText.guides.checklist}</h3>
                 <ul className="space-y-2 text-sm text-foreground/80">
                   {(guide.checklistItems ?? []).map((item) => (
@@ -174,12 +170,12 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
 
             <SourceList
               sources={guide.sources}
-              className="mt-10 border-y border-border py-6 scroll-mt-site-header"
+              className={`py-8 scroll-mt-site-header ${hasRelated ? 'border-b border-border' : ''}`}
               titleVariant="meta"
             />
 
             {hasRelated && (
-              <section id="related" className="scroll-mt-site-header mt-12 border-t-2 border-border pt-8 pb-8">
+              <section id="related" className="scroll-mt-site-header py-8">
                 <h2 className="mb-4 text-lg font-semibold text-foreground">
                   {uiText.guides.relatedInfo}
                 </h2>
