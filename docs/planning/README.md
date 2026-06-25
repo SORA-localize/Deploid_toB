@@ -17,6 +17,7 @@ Last cleaned: 2026-06-23
 - `copyright_and_media_rights_policy_v1.md` — 画像、ロゴ、引用、出典、権利ステータスの運用方針
 - `design_system_v1.md` — 現行UIのデザイン原則、semantic token、カード/レイアウト方針
 - `editorial_style_guide_v1.md` — 記事本文の執筆方針（文体・NG表現・執筆ワークフロー・セクション別テンプレート）
+- `article-sourcing-reference-v1.md` — 記事候補を探す段階の方針（許可/除外ソース、検索クエリ例）
 
 ## 現行の正本
 
@@ -42,6 +43,7 @@ Last cleaned: 2026-06-23
 - `architecture_future_considerations_v1.md` — 将来検討
 - `copyright_and_media_rights_policy_v1.md` — 権利、引用、メディア利用
 - `editorial_style_guide_v1.md` — 記事執筆方針（文体・セクション別テンプレート・NG表現・ワークフロー）
+- `article-sourcing-reference-v1.md` — 記事候補ソーシング方針（許可/除外ソース、検索クエリ）
 - `data-architecture-redesign-v1.md` — データ構造設計（データ設計の正本）
 - `data-maintenance-checklist-v1.md` — データ運用チェックリスト（データ運用の正本）
 - `deployment_sites_research_prompt_2026-06-01.md` — 導入事例データ調査用プロンプト
@@ -66,6 +68,8 @@ Last cleaned: 2026-06-23
 実装判断の正本ではなく、これから実行する整理・改善計画。完了後は archive へ移動するか、正本へ反映したうえで役割を更新する。
 
 - `layout-and-data-structure-audit-plan-v1.md` — 全ページのテキスト表示レイアウトとデータ構造配置の調査実行計画
+- `editorial-methodology-review-2026-06-24.md` — 記事題材・切り口・書き方のレビュー用草案（未承認。承認後に editorial_style_guide へ反映）
+- `source-list-meta-heading-dedup-plan-v1.md` — `SourceList` の `titleClassName` 重複（reports/guides）を `titleVariant` で解消する小さな修正計画
 
 ## アーカイブ
 

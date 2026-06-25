@@ -111,6 +111,9 @@ export const tagRegistry = [
   { kind: 'article', value: 'genesis-ai', label: 'Genesis AI' },
   { kind: 'article', value: 'j-hrti', label: 'J-HRTI' },
   { kind: 'article', value: 'physical-ai', label: 'フィジカルAI' },
+  { kind: 'article', value: 'hyundai', label: 'Hyundai' },
+  { kind: 'article', value: 'pudu', label: 'Pudu Robotics' },
+  { kind: 'article', value: 'labor', label: '労使関係' },
 ] as const satisfies readonly TagRegistryEntry[];
 
 export type RegisteredTag = (typeof tagRegistry)[number];

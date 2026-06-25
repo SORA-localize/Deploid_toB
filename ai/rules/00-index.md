@@ -18,6 +18,7 @@ For every task:
 | --- | --- |
 | Any implementation, refactor, review, or validation | `10-workflow.md` |
 | `data/*.ts`, article records, sources, tags, specs, images | `20-data.md`, then `21-data-maintenance-workflow.md` before editing |
+| Searching for article candidates (news/press to add) | `22-article-sourcing.md` before searching, then `21-data-maintenance-workflow.md` |
 | UI, layout, components, responsive behavior, design consistency | `30-ui-design.md` |
 | Images, logos, citations, article text, copyright-sensitive content | `40-content-rights.md` |
 | Creating, moving, or reorganizing docs, rules, plans, README/CLAUDE guidance | `80-doc-governance.md` |
