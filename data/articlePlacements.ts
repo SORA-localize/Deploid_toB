@@ -7,55 +7,57 @@ export const articleIndexPlacementLimits: Record<ArticlePlacementSlot, number> =
 
 // Reports page curation slots. Sponsored placements should be represented here,
 // not embedded in presentation components.
+// hero/feature は publishedAt の新しい順（同日付はファイル内の登場順）で並べる。
+// 並び替えは記事追加のたびに見直す。
 export const articlePlacements: ArticlePlacement[] = [
   // ── hero スロット（左カルーセル） ──
   {
     surface: 'reports-index',
     slot: 'hero',
-    articleId: 'nvidia-halos-robotics-safety-2026',
+    articleId: 'pudu-d7-industrial-semi-humanoid-2026',
     order: 1,
     kind: 'editorial',
   },
   {
     surface: 'reports-index',
     slot: 'hero',
-    articleId: 'robot-com-rnoid-workplace-humanoid-2026',
+    articleId: 'nvidia-halos-robotics-safety-2026',
     order: 2,
     kind: 'editorial',
   },
   {
     surface: 'reports-index',
     slot: 'hero',
-    articleId: 'jal-haneda-unitree-pilot-2026',
+    articleId: 'robot-com-rnoid-workplace-humanoid-2026',
+    order: 3,
+    kind: 'editorial',
+  },
+  {
+    surface: 'reports-index',
+    slot: 'hero',
+    articleId: 'io-ai-teleoperation-training-shenzhen-2026',
+    order: 4,
+    kind: 'editorial',
+  },
+  {
+    surface: 'reports-index',
+    slot: 'hero',
+    articleId: 'unitree-r1-global-lineup-2026',
     order: 5,
-    kind: 'editorial',
-  },
-  {
-    surface: 'reports-index',
-    slot: 'hero',
-    articleId: 'figure-botq-production-milestone-2026',
-    order: 10,
-    kind: 'editorial',
-  },
-  {
-    surface: 'reports-index',
-    slot: 'hero',
-    articleId: 'bmw-figure-deployment',
-    order: 20,
     kind: 'editorial',
   },
   // ── feature スロット（右カード列） ──
   {
     surface: 'reports-index',
     slot: 'feature',
-    articleId: 'unitree-ipo-star-market-june2026',
+    articleId: 'dobot-atom-max-rtj-japan-2026',
     order: 10,
     kind: 'editorial',
   },
   {
     surface: 'reports-index',
     slot: 'feature',
-    articleId: 'onex-neo-preorder',
+    articleId: 'vindynamics-vinrobotics-debut-2026',
     order: 20,
     kind: 'editorial',
   },
