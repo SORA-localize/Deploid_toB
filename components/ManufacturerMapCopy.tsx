@@ -2,12 +2,15 @@
 
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import Link from 'next/link';
+import { uiText } from '@/lib/uiText';
 
 export interface ManufacturerArc {
   leftPct: number;
   topPct: number;
   customer: string;
   status: string;
+  /** どの社の導入事例か（クラスタ内で会社名の行に突合表示するため）。 */
+  manufacturerSlug: string;
 }
 
 export interface ManufacturerInfo {
@@ -142,8 +145,8 @@ export function ManufacturerMapCopy({
         const r = region(p.members[0].country);
         const href = isCluster ? '/manufacturers' : `/manufacturers/${p.members[0].slug}`;
         const label = isCluster
-          ? `${r.name}の${p.members.length}社の一覧を見る`
-          : `${p.members[0].name}（${r.name}）の詳細を見る`;
+          ? uiText.home.worldMap.clusterAriaLabel(r.name, p.members.length)
+          : uiText.home.worldMap.singleAriaLabel(p.members[0].name, r.name);
         return (
           <Link
             key={p.id}

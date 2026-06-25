@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowRight, Building2 } from 'lucide-react';
 import { EncryptedText } from '@/components/ui/encrypted-text';
 import { ManufacturerMapCopy, region, type MapPoint } from '@/components/ManufacturerMapCopy';
+import { uiText } from '@/lib/uiText';
 import React from 'react';
 
 interface ManufacturerMapStageProps {
@@ -18,6 +19,7 @@ interface ManufacturerMapStageProps {
 const AUTO_SPEED = 0.18; // px/frame ≈ 10px/s
 const RESUME_DELAY_MS = 2500;
 const DWELL_MS = 1500; // 自動ハイライトの最小保持時間（密集地でも切替が速すぎないように）
+const MAX_VISIBLE_CLUSTER_MEMBERS = 3; // クラスタ内表示の上限（超過分は「+n社」で畳む。左上の見出しに被るのを防ぐ）
 
 function Wordmark({ src, compact }: { src?: string; compact?: boolean }) {
   const [failed, setFailed] = useState(false);
@@ -252,9 +254,9 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
         <div className="site-container h-full pt-10 md:pt-16">
           <div className="max-w-2xl">
             <p className="mb-3 font-mono text-xs uppercase tracking-wider text-neutral-400">
-              GLOBAL HUMANOID. PORTAL
+              {uiText.home.worldMap.kicker}
             </p>
-            <h1 className="mb-4 text-3xl font-semibold leading-tight text-white md:text-5xl">
+            <h1 className="mb-4 text-[1.6875rem] font-semibold leading-tight text-white md:text-[2.625rem]">
               {headingLines.map((line, i) => (
                 <EncryptedText
                   key={i}
@@ -291,14 +293,14 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
               href="/guides"
               className="inline-flex items-center gap-2 bg-white px-4 py-3 text-xs font-medium text-neutral-900 transition-colors hover:bg-neutral-200 sm:px-6 sm:py-4 sm:text-sm"
             >
-              導入ガイドを読む
+              {uiText.home.worldMap.ctaGuide}
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/robots"
               className="inline-flex items-center gap-2 border border-white/30 px-4 py-3 text-xs text-white transition-colors hover:bg-white/10 sm:px-6 sm:py-4 sm:text-sm"
             >
-              ロボット一覧
+              {uiText.home.worldMap.ctaRobots}
             </Link>
           </div>
         </div>
@@ -310,29 +312,51 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
           <div className="site-container pb-4 md:pb-10">
             <div
               key={active.id}
-              className="manufacturer-card-enter max-w-[92%] lg:max-w-[62%]"
+              className="manufacturer-card-enter inline-block max-w-[92%] lg:max-w-[62%]"
             >
               {isCluster ? (
                 <>
                   <p className="mb-1 text-xs">
                     <span className="font-mono text-[11px] text-neutral-400">{ar.a3}</span>
-                    <span className="ml-2 text-neutral-400">{active.members.length}社</span>
+                    <span className="ml-2 text-neutral-400">
+                      {uiText.home.worldMap.memberCount(active.members.length)}
+                    </span>
                   </p>
                   <ul className="text-xs">
-                    {active.members.map((m) => (
-                      <li
-                        key={m.slug}
-                        className="flex items-center gap-2 border-t border-neutral-700 py-1.5 first:border-t-0"
-                      >
-                        <span className="inline-flex h-6 w-12 items-center justify-center bg-white">
-                          <Wordmark src={m.logoSrc} compact />
-                        </span>
-                        <span className="font-medium text-white">{m.name}</span>
-                        <span className="font-mono text-[10px] text-neutral-400">
-                          {m.foundedYear ?? '—'}
-                        </span>
-                      </li>
-                    ))}
+                    {active.members.slice(0, MAX_VISIBLE_CLUSTER_MEMBERS).map((m, i) => {
+                      const isLastVisible = i === MAX_VISIBLE_CLUSTER_MEMBERS - 1;
+                      const overflowCount = active.members.length - MAX_VISIBLE_CLUSTER_MEMBERS;
+                      const memberCustomers = active.arcs
+                        .filter((a) => a.manufacturerSlug === m.slug)
+                        .map((a) => a.customer);
+                      return (
+                        <li key={m.slug} className="relative flex items-center gap-2 py-1.5">
+                          {i !== 0 && (
+                            <span
+                              aria-hidden="true"
+                              className="absolute left-0 top-0 h-px w-1/2 bg-neutral-700"
+                            />
+                          )}
+                          <span className="inline-flex h-6 w-12 items-center justify-center bg-white">
+                            <Wordmark src={m.logoSrc} compact />
+                          </span>
+                          <span className="font-medium text-white">{m.name}</span>
+                          <span className="font-mono text-[10px] text-neutral-400">
+                            {m.foundedYear ?? '—'}
+                          </span>
+                          {memberCustomers.length > 0 && (
+                            <span className="min-w-0 flex-1 truncate text-[10px] text-neutral-300">
+                              : {memberCustomers.join('・')}
+                            </span>
+                          )}
+                          {isLastVisible && overflowCount > 0 && (
+                            <span className="ml-auto shrink-0 font-mono text-[10px] text-neutral-400">
+                              {uiText.home.worldMap.overflowCount(overflowCount)}
+                            </span>
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </>
               ) : (
@@ -352,10 +376,12 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
                 </>
               )}
 
-              {active.arcs.length > 0 && (
+              {/* クラスタ（3社以上想定）では各社の行に導入先を突合表示するので、
+                  ここでの一括表示は単独社の場合のみ。 */}
+              {!isCluster && active.arcs.length > 0 && (
                 <p className="mt-2 max-w-xs text-[11px] leading-snug">
                   <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">
-                    Deployments
+                    {uiText.home.worldMap.deployments}
                   </span>{' '}
                   <span className="text-neutral-200">
                     {active.arcs.map((a) => a.customer).join(' · ')}
