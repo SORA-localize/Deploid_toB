@@ -12,6 +12,7 @@ import type {
   ArticleType,
   Robot,
   RobotCategory,
+  UseCase,
 } from '@/data/types';
 
 export const robotCategoryOrder: RobotCategory[] = [
@@ -241,5 +242,23 @@ export function sortManufacturers(
     }
     // 'name'
     return compareNames(a.name, b.name);
+  });
+}
+
+// ─── 用途並び替え ────────────────────────────────────────────────
+
+export type UseCaseSortKey = 'home-featured';
+
+export function sortUseCases(useCases: UseCase[], sort: UseCaseSortKey): UseCase[] {
+  return [...useCases].sort((a, b) => {
+    if (sort === 'home-featured') {
+      // 1次: featuredRank 昇順（編集ピック。未設定は後ろ）
+      const aRank = a.featuredRank ?? Number.POSITIVE_INFINITY;
+      const bRank = b.featuredRank ?? Number.POSITIVE_INFINITY;
+      if (aRank !== bRank) return aRank - bRank;
+      // 2次: updatedAt 降順（新しいデータを優先）
+      return b.updatedAt.localeCompare(a.updatedAt);
+    }
+    return 0;
   });
 }
