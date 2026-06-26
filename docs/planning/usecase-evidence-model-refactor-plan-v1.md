@@ -219,8 +219,10 @@ UseCase loop 内で candidate ごとに検証する。
 共通:
 
 - `basis` が未設定なら error
+- published UseCase の candidate は、fit によらず `reason.trim().length > 0` でなければ error
 - `evidenceSourceUrls[]` がある場合、各 URL が http(s) URL であること
 - `evidenceDeploymentIds[]` がある場合、各 id が `deployments` に存在すること
+- published UseCase の candidate が `evidenceDeploymentIds[]` を持つ場合、各 deployment が `publishStatus === 'published'` でなければ error
 
 `fit: 'strong'`:
 
@@ -234,14 +236,14 @@ UseCase loop 内で candidate ごとに検証する。
 `fit: 'possible'`:
 
 - `basis !== 'editorial-watch'`
-- `basis !== 'deployment'` を原則にする
+- `basis === 'deployment'` は error。matching deployment があるなら `fit: 'strong'` にする
 - `basis === 'adjacent-deployment'` の場合は `evidenceDeploymentIds.length > 0`
+- `basis === 'adjacent-deployment'` の deployment は published 必須。ただし隣接根拠なので `robotId === candidate.robotId` や `relatedUseCaseIds` の一致までは要求しない
 - `basis === 'official-use-case' | 'product-capability' | 'market-signal'` の場合は `evidenceSourceUrls.length > 0`
 
 `fit: 'watch'`:
 
 - `basis === 'market-signal' | 'editorial-watch' | 'product-capability'`
-- `reason` は空でないこと
 - `basis === 'product-capability'` の場合は、fit によらず `evidenceSourceUrls.length > 0`
 - `basis === 'market-signal'` の場合は `evidenceSourceUrls.length > 0`
 - `basis === 'editorial-watch'` の場合のみ、`evidenceSourceUrls` 空を warning に留められる
@@ -253,8 +255,11 @@ UseCase loop 内で candidate ごとに検証する。
 - published UseCase の sources 空
 - published UseCase の `candidateRobots` 空
 - candidate `basis` 未設定
+- candidate `reason` 空
 - `strong` の deployment 不整合
+- `possible` かつ `basis === 'deployment'`
 - `possible` の根拠参照なし
+- published UseCase の candidate が未公開 deployment を根拠参照している
 - `product-capability` / `market-signal` の source URL なし
 
 以下は warning で開始する。
@@ -395,9 +400,12 @@ Files:
 2. published UseCase の `candidateRobots.length === 0` を error にする。
 3. candidate `basis` 未設定を error にする。
 4. 既存の `strongFitEvidence` / `[fit-unverified]` 暗黙チェックを削除し、`strong` の `evidenceDeploymentIds` 明示チェックへ置き換える。
-5. `possible` の根拠参照なしを error にする。
-6. `product-capability` / `market-signal` の source URL なしを error にする。
-7. `watch` かつ `basis === 'editorial-watch'` の source URL なしは warning に留める。
+5. candidate `reason.trim().length === 0` を error にする。
+6. `possible` かつ `basis === 'deployment'` を error にする。
+7. `possible` の根拠参照なしを error にする。
+8. published UseCase の candidate が `evidenceDeploymentIds` で未公開 deployment を参照した場合は error にする。
+9. `product-capability` / `market-signal` の source URL なしを error にする。
+10. `watch` かつ `basis === 'editorial-watch'` の source URL なしは warning に留める。
 
 完了条件:
 
@@ -405,6 +413,9 @@ Files:
 - 一時的に published UseCase の sources を空にすると validate が失敗することを確認できる。
 - 一時的に published UseCase の candidateRobots を空にすると validate が失敗することを確認できる。
 - 一時的に `strong` の `evidenceDeploymentIds` を消すと validate が失敗することを確認できる。
+- 一時的に candidate の `reason` を空にすると validate が失敗することを確認できる。
+- 一時的に `possible` の `basis` を `deployment` にすると validate が失敗することを確認できる。
+- 一時的に `adjacent-deployment` の `evidenceDeploymentIds` を draft deployment にすると validate が失敗することを確認できる。
 - `lib/validate.ts` 内に、`strongFitEvidence` 由来の暗黙チェックと `evidenceDeploymentIds` 明示チェックが併存していない。
 
 ### UEM-006: 型を最終形に締める
