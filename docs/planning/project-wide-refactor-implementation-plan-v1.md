@@ -152,6 +152,12 @@ Files:
 
 ## 7. Phase C: 出典・検証方針の統一
 
+2026-06-26 update:
+
+- UseCase は `/use-cases` として公開済みで、単なる sources 空の問題ではなく「用途本文・候補ロボット・導入事例の根拠をどう結ぶか」のデータモデル問題として扱う。
+- UseCase については `usecase-evidence-model-refactor-plan-v1.md` を優先し、この節の C-003A / C-004A をそのまま実行しない。
+- Guide は ComingSoonGate / noindex / 公開判断が絡むため、UseCase と同列に sources 強制しない。Guide sources は E-001 の公開方針決定後に別途扱う。
+
 ### C-001: Guide/UseCase の sources 方針を決める
 
 Files:
@@ -165,18 +171,20 @@ Files:
 - `data-architecture-redesign-v1.md` は「出典必須」。
 - `data-maintenance-checklist-v1.md` は Guide/UseCase sources を「手動推奨（validate 未強制）」。
 - 実データは Guide 2件、UseCase 4件で sources 空。
+- UseCase については sources 追加だけでは不十分。`candidateRobots[].reason` が自由文で、`fit: 'possible'` / `fit: 'watch'` の根拠を機械的に追跡できない。
 
 決定肢:
 - Option A: Guide/UseCase も published なら sources 必須にする。
 - Option B: Guide/UseCase は編集方針・概念整理コンテンツとして、sources 未強制を明文化する。
+- Option C: UseCase は `usecase-evidence-model-refactor-plan-v1.md` で evidence model を導入し、Guide は公開方針決定後に別判断する。
 
 推奨:
-- Option A。B2B判断支援サイトとして、用途・ガイドも出典のある公開情報に寄せる。
+- Option C。UseCase は公開済みの候補提示ページなので evidence model まで締める。Guide は未公開扱いが混在するため、UseCase と切り離す。
 
 完了条件:
-- Option A/B のどちらを採用するか、実装前にユーザーまたはオーナーが明示する。
+- Option A/B/C のどれを採用するか、実装前にユーザーまたはオーナーが明示する。
 - 決定結果をこの文書または後続の変更PR説明に残す。
-- 採用 Option に対応する実装 task ID を明記する。Option A は C-002A/C-003A/C-004A、Option B は C-002B。
+- 採用 Option に対応する実装 task ID を明記する。Option A は C-002A/C-003A/C-004A、Option B は C-002B、Option C は `usecase-evidence-model-refactor-plan-v1.md` の UEM task 群。
 
 ### C-002A: Option A 採用時、Guide sources を追加する
 

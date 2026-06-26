@@ -69,6 +69,7 @@ Last cleaned: 2026-06-23
 
 - `layout-and-data-structure-audit-plan-v1.md` — 全ページのテキスト表示レイアウトとデータ構造配置の調査実行計画
 - `project-wide-refactor-implementation-plan-v1.md` — 全体リファクタリングの実装順、最小task、完了条件を定義した実行計画
+- `usecase-evidence-model-refactor-plan-v1.md` — `/use-cases` の出典、導入事例、候補ロボット根拠をデータモデルと validator で保証する実行計画
 - `editorial-methodology-review-2026-06-24.md` — 記事題材・切り口・書き方のレビュー用草案（未承認。承認後に editorial_style_guide へ反映）
 
 ## アーカイブ
