@@ -116,6 +116,68 @@ AIは局所最適な修正を作りやすいため、以下を禁止または強
 
 ---
 
+## 1.1. 大規模リファクタ計画で先に作る文脈セット
+
+プロジェクト全体、複数ページ、共通部品、データ設計、依存関係にまたがる計画では、通常の計画作成に入る前に以下を棚卸ししてください。
+この棚卸しを省くと、AIは局所的な改善を大きな方針のように扱いやすくなります。
+
+参照する文書:
+
+- `AGENTS.md`
+- `ai/rules/00-index.md`
+- `ai/rules/10-workflow.md`
+- 該当する work-type rule
+- `docs/planning/README.md`
+- `docs/planning/data-architecture-redesign-v1.md`
+- `docs/planning/data-maintenance-checklist-v1.md`
+- `docs/planning/design_system_v1.md`
+- `docs/planning/ui_architecture_and_development_policy_v1.md`
+- `docs/planning/copyright_and_media_rights_policy_v1.md`
+- 必要に応じて `docs/planning/ai_fullstack_development_guardrails_v1.md`
+
+実コードの正本として確認するファイル:
+
+- Data: `data/types.ts`, `data/*.ts`, `lib/data.ts`, `lib/validate.ts`
+- Labels/display/tags/specs: `lib/labels.ts`, `lib/display.ts`, `lib/tagRegistry.ts`, `lib/specSchema.ts`
+- UI text/theme: `lib/uiText.ts`, `src/app/globals.css`, `lib/visualSemantics.ts`
+- Search/filter/state: `lib/search*.ts`, `lib/*Filters.ts`, `lib/useUrlParamUpdater.ts`
+- Routes/layout: `src/app/**/page.tsx`, `src/app/layout.tsx`, `src/app/sitemap.ts`, `src/app/robots.ts`
+- Shared components: `components/`, especially cards, filters, detail sidebars, form controls, layout shells
+- Runtime/config/deps: `package.json`, `next.config.*`, `.env.example`, README environment section
+
+必ず取るインベントリ:
+
+- route 一覧と、各 route の責務、データ取得元、metadata/JSON-LD/sitemap/noindex の扱い
+- collection ごとの件数、publishStatus、sources 空、rights status、関連参照の状態
+- 共通化候補: 同じ layout、card、filter、sidebar、definition list、empty state、URL param 処理
+- 状態管理: URL state、localStorage、client state、cache、DnD、search debounce
+- アクセシビリティ/レスポンシブ: label、aria、keyboard、focus、scrollbar、overlay、z-index、mobile/wide
+- 外部サービス/運用: analytics、forms、env default、media policy、privacy、secrets、build warning
+- 未使用/負債: unused component、unused dependency、古いコメント、命名不一致、stale docs
+- git状態: branch、未コミット差分、既存差分がユーザー由来か、触るファイルとの衝突可能性
+- 検証: 既存 scripts、validate/build/test の通過状況、手動確認が必要なページ
+
+良い計画に落とす条件:
+
+- task ID を付け、各 task に `Files`、問題、変更内容、完了条件、検証方法を書く
+- 1 task は 1 commit にできる大きさにする
+- 方針決定が必要な箇所は Option A/B と推奨を分け、採用後に実行する task ID を明記する
+- task 間の順序制約を書く。特に同じファイルを触る task、docs と validate の整合、package/lockfile 変更は明示する
+- 技術的に壊れやすい前提を書く。例: z-index と pointer-events、accessible name、cache、URL同期、hydration
+- 挙動変更、構造改善、見た目変更、依存整理を同じ task に混ぜない
+- 「実装しないこと」を書き、計画外の膨張を止める
+- 最後に全体完了条件と、再検索コマンドや validate/build を置く
+
+今回のような計画がうまくいく理由:
+
+- 正本 docs と実コードの両方を見て、文書だけの理想論にしない
+- ページ、データ、UI、状態、運用、依存、検証を同じ粒度で棚卸しする
+- 発見事項を P1/P2/P3 のまま終わらせず、実装 task と完了条件へ変換する
+- Option が残る箇所を曖昧にせず、決定 task と実装 task を分ける
+- build 可能な順序に並べ、途中で止まっても壊れた状態を残しにくくする
+
+---
+
 ## 1.5. 計画の監査フェーズ
 
 計画が出たあと、すぐ実装せず、計画自体を疑わせるためのプロンプトです。
@@ -423,4 +485,3 @@ npm run test:e2e
 ```
 
 ---
-
