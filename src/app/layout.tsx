@@ -48,7 +48,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Figma Layout.tsx を逐語移植（Outlet → children）。
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja" suppressHydrationWarning className={cn("font-sans", geist.variable)}>

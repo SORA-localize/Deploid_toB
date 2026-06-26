@@ -10,9 +10,8 @@ import { FilterChipGroup } from '@/components/FilterChipGroup';
 import { TagChip } from '@/components/TagChip';
 import type { Guide, GuideStage } from '@/data/types';
 import { guideStageOrder } from '@/lib/display';
-import { filterGuides, normalizeGuideFilters } from '@/lib/guideFilters';
+import { filterGuides, getGuideFilterOptions, normalizeGuideFilters } from '@/lib/guideFilters';
 import { guideStageLabels } from '@/lib/labels';
-import { getGuideTopicOptions } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { getGuideStageTone } from '@/lib/visualSemantics';
@@ -31,7 +30,7 @@ export function GuidesBrowser({ guides, initialFilters }: GuidesBrowserProps) {
   const { updateParams } = useUrlParamUpdater();
   const filters = initialFilters;
 
-  const topicOptions = useMemo(() => getGuideTopicOptions(guides), [guides]);
+  const topicOptions = useMemo(() => getGuideFilterOptions(guides).topics, [guides]);
   const featured = guides.find((g) => g.order === 1) ?? guides[0];
 
   const filtered = useMemo(

@@ -146,7 +146,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
                       <a
                         href={asset.sourceUrl}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="underline"
                       >
                         {uiText.common.source}

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ExternalLink, GripVertical, Star, X } from 'lucide-react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import type { CompareCardDragHandleProps } from '@/components/SortableCompareCard';
-import type { ImageAsset, Robot } from '@/data/types';
+import type { Robot } from '@/data/types';
 import { getDisplayableAsset } from '@/lib/media';
 import { TBD_LABEL } from '@/lib/labels';
 import { getComparisonCoreRows, getComparisonDetailRows } from '@/lib/robotDisplay';
@@ -15,7 +15,6 @@ import { uiText } from '@/lib/uiText';
 interface ComparisonRobotPanelProps {
   robot: Robot;
   manufacturerName?: string;
-  manufacturerLogo?: ImageAsset; // 現在未使用（呼び出し元変更を避けるため維持）
   isFavorite: boolean;
   onFavoriteToggle: (id: string) => void;
   onRemove: (id: string) => void;

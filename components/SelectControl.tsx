@@ -57,6 +57,7 @@ export function SelectControl({
           value={value}
           onValueChange={onChange}
           items={options.map((option) => ({ ...option, label: withCount(option) }))}
+          triggerId={`${id}-trigger`}
           searchPlaceholder={uiText.controls.dropdownSearchPlaceholder(label)}
           searchAriaLabel={uiText.controls.dropdownSearchAria(label)}
           emptyMessage={uiText.controls.dropdownEmpty}

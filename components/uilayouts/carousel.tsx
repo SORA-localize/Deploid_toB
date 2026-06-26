@@ -6,7 +6,7 @@ import {
   EmblaPluginType 
 } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import {
   createContext,
   forwardRef,

@@ -89,11 +89,11 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
   // 並べ替え順の真実源はこの local state。URL は commitOrder で副作用同期する。
   // こうしないと onDragEnd 時に URL 遷移(非同期)を待つ間、dnd-kit が一旦
   // 元の順序へ戻してから整列し直すため、ドロップ時に「元位置へ戻る」違和感が出る。
-  const [orderedIds, setOrderedSlugs] = useState<string[]>(urlSelectedIds);
+  const [orderedIds, setOrderedIds] = useState<string[]>(urlSelectedIds);
   useEffect(() => {
     // 共有リンク/戻る・進む等で URL が外部から変わった時だけ local を追従させる。
     // 自分の操作で書き換えた場合は値が一致するので no-op。
-    setOrderedSlugs((prev) =>
+    setOrderedIds((prev) =>
       prev.join(',') === urlSelectedIds.join(',') ? prev : urlSelectedIds,
     );
   }, [urlSelectedIds]);
@@ -119,7 +119,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
   );
   const mobileManufacturerOptions = useMemo(
     () => [
-      { value: '', label: 'メーカーを選択' },
+      { value: '', label: uiText.compare.selectManufacturer },
       ...sortedManufacturers
         .filter((m) => robots.some((r) => r.manufacturerId === m.id))
         .map((m) => ({ value: m.id, label: m.nameJa ?? m.name })),
@@ -168,7 +168,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
 
   // 並び順を local state へ即時反映し、URL も同じ値へ同期する(共有・履歴用)。
   const commitOrder = (nextIds: string[], mode: 'push' | 'replace' = 'push') => {
-    setOrderedSlugs(nextIds);
+    setOrderedIds(nextIds);
     updateParams({ compare: nextIds.length > 0 ? nextIds.join(',') : null }, mode);
   };
 
@@ -346,10 +346,10 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
             {uiText.compare.title}
           </h1>
           <p className="text-sm text-muted-foreground max-w-3xl hidden md:block">
-            左のメニューからロボットを選んで比較します。右パネルで気になるロボットをお気に入り登録できます。
+            {uiText.compare.desktopDescription}
           </p>
           <p className="text-sm text-muted-foreground max-w-3xl md:hidden">
-            メーカーを選んでロボットを追加してください。
+            {uiText.compare.mobileDescription}
           </p>
         </div>
 
@@ -365,10 +365,10 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
           {/* Mobile-only: manufacturer selector + robot list */}
           <div className="md:hidden mb-4 border border-border bg-card">
             <div className="px-4 pt-4 pb-3">
-              <SelectControl
-                id="mobile-manufacturer"
-                label="メーカー"
-                value={mobileManufacturerId}
+                <SelectControl
+                  id="mobile-manufacturer"
+                  label={uiText.compare.manufacturers}
+                  value={mobileManufacturerId}
                 options={mobileManufacturerOptions}
                 onChange={setMobileManufacturerId}
                 searchable
@@ -378,7 +378,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
               <div className="border-t border-border-subtle">
                 {mobileManufacturerRobots.length === 0 ? (
                   <p className="px-4 py-3 text-xs text-muted-foreground">
-                    このメーカーのロボットデータはありません。
+                    {uiText.compare.manufacturerEmpty}
                   </p>
                 ) : (
                   mobileManufacturerRobots.map((robot) => {
@@ -591,7 +591,6 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                                       <ComparisonRobotPanel
                                         robot={robot}
                                         manufacturerName={manufacturer?.name ?? robot.manufacturerId}
-                                        manufacturerLogo={manufacturer?.logo}
                                         isFavorite={
                                           isMounted ? favorites.includes(robot.id) : false
                                         }
@@ -685,7 +684,6 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                   <ComparisonRobotPanel
                     robot={activeDragRobot}
                     manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerId}
-                    manufacturerLogo={activeDragManufacturer?.logo}
                     isFavorite={isMounted ? favorites.includes(activeDragRobot.id) : false}
                     onFavoriteToggle={() => {}}
                     onRemove={() => {}}

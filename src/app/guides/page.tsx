@@ -3,7 +3,7 @@ import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { GuidesBrowser } from '@/components/GuidesBrowser';
 import { ComingSoonGate } from '@/components/ComingSoonGate';
 import { getGuides } from '@/lib/data';
-import { normalizeGuideFilters } from '@/lib/guideFilters';
+import { getGuideFilterOptions, normalizeGuideFilters } from '@/lib/guideFilters';
 import { createPageMetadata } from '@/lib/metadata';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 
@@ -15,14 +15,18 @@ export const metadata = createPageMetadata({
 });
 
 async function GuidesContent({ searchParams }: { searchParams: RouteSearchParams }) {
+  const guides = getGuides();
   const params = await pickSearchParams(searchParams, ['stage', 'topic'] as const);
+  const filterOptions = getGuideFilterOptions(guides);
+
   return (
     <ComingSoonGate storageKey="coming-soon:guides" title="導入ガイドは近日公開予定です">
       <GuidesBrowser
-        guides={getGuides()}
+        guides={guides}
         initialFilters={normalizeGuideFilters({
           stage: params.stage,
           topic: params.topic,
+          topicValues: filterOptions.topics.map((option) => option.value),
         })}
       />
     </ComingSoonGate>

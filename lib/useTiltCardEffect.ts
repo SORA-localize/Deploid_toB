@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { useMotionValue, useSpring, useTransform } from 'motion/react';
+import { useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
 
 // カード一覧（robots/manufacturers/use-cases）共通のホバー演出：
 // マウス座標に追従する3Dチルト＋グロー。元実装は RobotCard 専用だったが、
@@ -12,6 +12,7 @@ const GLOW_SPRING = { stiffness: 180, damping: 22 } as const;
 
 export function useTiltCardEffect() {
   const cardRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   const normX = useMotionValue(0.5);
   const normY = useMotionValue(0.5);
@@ -24,6 +25,7 @@ export function useTiltCardEffect() {
   const glowOpacity = useSpring(0, GLOW_SPRING);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (shouldReduceMotion) return;
     const el = cardRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -32,6 +34,7 @@ export function useTiltCardEffect() {
   };
 
   const handleMouseEnter = () => {
+    if (shouldReduceMotion) return;
     glowOpacity.set(1);
   };
 

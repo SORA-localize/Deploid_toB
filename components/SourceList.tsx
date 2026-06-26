@@ -43,7 +43,7 @@ export function SourceList({
               <a
                 href={source.url}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="text-foreground hover:text-muted-foreground underline"
               >
                 {source.title}

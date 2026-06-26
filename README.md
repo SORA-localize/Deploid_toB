@@ -51,7 +51,7 @@ Vercelでは Project Settings の Environment Variables に設定する。
 src/app/        # App Router ページ（/, /robots, /manufacturers, /compare,
                 #   /guides, /use-cases, /reports, /about, /contact ＋各 [slug]）
 ai/rules/       # AIエージェント向けの入口・作業別ルール
-components/     # UI コンポーネント（Figma Make UI を逐語移植）
+components/     # UI コンポーネント、カード、フィルター、共通レイアウト
 data/           # 配列データ + types.ts（型の真実源）
 lib/            # data.ts（取得/filter/slug lookup）, labels.ts（enum→日本語）
 docs/planning/  # 設計・意思決定ドキュメント

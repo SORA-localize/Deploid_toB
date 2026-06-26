@@ -195,7 +195,11 @@ export const uiText = {
   compare: {
     breadcrumb: '比較',
     title: '比較',
+    desktopDescription: '左のメニューからロボットを選んで比較します。右パネルで気になるロボットをお気に入り登録できます。',
+    mobileDescription: 'メーカーを選んでロボットを追加してください。',
     manufacturers: 'メーカー',
+    selectManufacturer: 'メーカーを選択',
+    manufacturerEmpty: 'このメーカーのロボットデータはありません。',
     comparisonSheet: (count: number, max: number) => `比較シート（${count}/${max}）`,
     favorites: 'お気に入り',
     compare: '比較する',

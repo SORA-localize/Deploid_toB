@@ -62,7 +62,7 @@ export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps)
             <a
               href={manufacturer.website}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="flex items-center justify-center gap-1.5 w-full text-xs py-2.5 border border-border hover:border-foreground/40 transition-colors text-foreground/80 hover:text-foreground"
             >
               {uiText.robots.toManufacturerSite}

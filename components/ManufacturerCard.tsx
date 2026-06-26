@@ -61,12 +61,14 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
         className="pointer-events-none absolute bottom-0 left-0 z-40 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full"
       />
 
-      {/* カード全体を詳細ページへのリンクに（キーボード/SRからもこのリンクで遷移できる正規導線）。
-          内側の外部HPリンク・代理店リンク/メニューは pointer-events-auto で温存。 */}
+      {/* カード全体を詳細ページへのリンクにする正規導線。
+          z-10 の内容ラッパーは pointer-events-none なので、空白クリックは z-0 の全面リンクへ貫通し、
+          内側の外部HPリンク・代理店リンク/メニューだけ pointer-events-auto で捕捉する。
+          z-30/z-40 の glow/shimmer/下線装飾は pointer-events-none なのでクリックを妨げない。 */}
       <Link
         href={`/manufacturers/${manufacturer.slug}`}
         aria-label={manufacturer.nameJa ?? manufacturer.name}
-        className="absolute inset-0 z-20"
+        className="absolute inset-0 z-0"
       />
       <div className="relative z-10 p-4 sm:p-6 pointer-events-none">
         <div className="flex items-start justify-between gap-4 mb-5">

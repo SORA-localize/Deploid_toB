@@ -28,6 +28,7 @@ interface SearchableDropdownProps {
   searchAriaLabel: string
   searchPlaceholder: string
   triggerClassName?: string
+  triggerId?: string
   value: string
 }
 
@@ -45,11 +46,12 @@ export function SearchableDropdown({
   searchAriaLabel,
   searchPlaceholder,
   triggerClassName,
+  triggerId: externalTriggerId,
   value,
 }: SearchableDropdownProps) {
   const reactId = React.useId()
   const baseId = `${id}-${reactId}`
-  const triggerId = `${baseId}-trigger`
+  const triggerId = externalTriggerId ?? `${baseId}-trigger`
   const inputId = `${baseId}-input`
   const listboxId = `${baseId}-listbox`
   const triggerRef = React.useRef<HTMLButtonElement>(null)

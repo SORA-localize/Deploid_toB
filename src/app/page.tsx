@@ -61,15 +61,8 @@ export default function HomePage() {
   // 用途から探す：用途一覧と同じカードを、Homeではプレビューとして全件表示する。
   const homeUseCases = getUseCases();
 
-  // HomeContentNavigator用プレビュー画像（各セクション1枚、サムネなし）。
-  // 旧画像（1X NEO press kit ×2、SKL Robotics ロゴ）は権利確認の経路（lib/media.ts の
-  // getDisplayableAsset）を通らない直置きファイルだった。1X NEOは data/robots.ts 側で
-  // すでに blocked（press kitが commercial目的不可と明記されているため）、SKL Robotics は
-  // data/manufacturers.ts に存在せず権利確認の記録自体がなかったため、3枚とも削除した。
-  // 現時点でファイルが存在し権利確認済み（reference-attributed・blockedでない）なのは
-  // mentee-menteebotv3 の hero 画像のみなので robots セクションに転用する。
-  // manufacturers/guides は使える画像がないため、HomeContentNavigator のフォールバック
-  // （画像なし・ラベル表示のみ）に委ねる。
+  // HomeContentNavigator 用プレビュー画像。表示可否は data 側の rights と lib/media.ts で管理し、
+  // ここではローカルに存在する表示可能アセットだけを参照する。
   const robotPreviewAssets = [
     { src: '/images/robots/mentee-menteebotv3-hero.jpg', alt: 'MenteeBot humanoid robot', label: 'MenteeBot', objectPosition: 'center' },
   ];

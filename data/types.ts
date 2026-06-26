@@ -1,10 +1,6 @@
 /**
- * Next.js data model v1.
- *
- * Copy this file to `data/types.ts` when the Next.js project is created.
- * The first implementation should keep data in `data/*.ts` and import these
- * types from `data/types.ts`. CMS-specific schemas should be derived from
- * this file later, not the other way around.
+ * Deploid data model.
+ * `data/*.ts`, validation, and future CMS schemas derive from these types.
  */
 import type { RobotSpecsFromSchema } from '@/lib/specSchema';
 import type { TagValue } from '@/lib/tagRegistry';
