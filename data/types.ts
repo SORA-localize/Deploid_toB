@@ -283,10 +283,24 @@ export interface UseCaseCapabilityNotes {
 
 export type CandidateFit = 'strong' | 'possible' | 'watch';
 
+export type CandidateEvidenceBasis =
+  | 'deployment'
+  | 'adjacent-deployment'
+  | 'official-use-case'
+  | 'product-capability'
+  | 'market-signal'
+  | 'editorial-watch';
+
 export interface UseCaseCandidateRobot {
   robotId: Id;
   /** strong=実際の導入事例あり（deployments.tsで裏付け） / possible=スペック・位置付けは合うが実証未確認 / watch=初期段階・参考程度 */
   fit: CandidateFit;
+  /** fit判断の根拠種別。強い主張ほど deployments.ts の明示idで裏付ける。 */
+  basis: CandidateEvidenceBasis;
+  /** deployments.ts の id。strong は同じ robotId・useCaseId の published deployment が必須。 */
+  evidenceDeploymentIds?: Id[];
+  /** 製品能力・市場シグナル等の根拠URL。原則 useCase.sources にも同じURLを載せる。 */
+  evidenceSourceUrls?: string[];
   reason: string;
 }
 

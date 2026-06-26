@@ -206,7 +206,7 @@ Files:
 - Guide 2件の `sources.length > 0`。
 - `npm run validate:data` が通る。
 
-### C-003A: Option A 採用時、UseCase sources を追加する
+### C-003A: Superseded - UseCase sources を追加する
 
 Files:
 - `data/useCases.ts`
@@ -218,6 +218,7 @@ Files:
 - `demo-exhibition`
 
 変更:
+0. この task は `usecase-evidence-model-refactor-plan-v1.md` の UEM-004/UEM-005/UEM-006/UEM-008 で置き換え済み。今後この task 単独では実行しない。
 1. 各 useCase の `sources: []` を、最低1件以上の `Source[]` に置き換える。
 2. useCase の主張に紐づく sources を入れる。
 3. 強い導入実績がある useCase は、対応する `data/deployments.ts` と矛盾しない sources を選ぶ。
@@ -225,25 +226,26 @@ Files:
 
 完了条件:
 - UseCase 8件すべての `sources.length > 0`。
+- UseCase candidate evidence の `basis` / `evidenceDeploymentIds` / `evidenceSourceUrls` が実装済み。
 - `npm run validate:data` が通る。
 
-### C-004A: Option A 採用時、validate で Guide/UseCase sources を強制する
+### C-004A: Option A 採用時、validate で Guide sources を強制する
 
 Files:
 - `lib/validate.ts`
 - `docs/planning/data-maintenance-checklist-v1.md`
 
 実施前提:
-- C-002A と C-003A が完了し、published Guide/UseCase の `sources` が空でない状態になってから実施する。
+- C-002A が完了し、published Guide の `sources` が空でない状態になってから実施する。
+- UseCase sources 強制は `usecase-evidence-model-refactor-plan-v1.md` の UEM-005 で置き換え済み。この task では UseCase を触らない。
 - この順序を守らないと、validate 強制を入れた時点で `npm run validate:data` が失敗する。
 
 変更:
 1. `lib/validate.ts` の guide loop 内で `checkRequiredSources('guide', g.slug, g.sources, { requireNonEmpty: g.publishStatus === 'published' })` を呼ぶ。
-2. useCase loop 内で `checkRequiredSources('useCase', u.slug, u.sources, { requireNonEmpty: u.publishStatus === 'published' })` を呼ぶ。
-3. `data-maintenance-checklist-v1.md` の Guide/UseCase sources 記述を「自動: published は必須」に更新する。
+2. `data-maintenance-checklist-v1.md` の Guide sources 記述を「自動: published は必須」に更新する。
 
 完了条件:
-- sources を空にした published Guide/UseCase で validate が失敗する。
+- sources を空にした published Guide で validate が失敗する。
 - 現データでは `npm run validate:data` が通る。
 
 ### C-002B: Option B 採用時、未強制方針を正本側へ明文化する
@@ -908,7 +910,7 @@ Commands:
 8. E-004
 9. E-005
 10. C-001
-11. C-002A/C-003A/C-004A または C-002B
+11. Option C 採用済み: UseCase は UEM task 群で対応済み。Guide sources は E-001 の公開方針後に C-002A/C-004A または C-002B を実施
 12. F-001, F-002
 13. F-003
 14. F-004, F-005

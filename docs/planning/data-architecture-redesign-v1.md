@@ -148,8 +148,8 @@ placements     >── articles
 ```
 
 - `<` = 1対多、`>──` = 多対多 or 参照。
-- `deployments.relatedUseCaseIds`（任意項目）は「この導入事例がどの用途の根拠になるか」を示す。`UseCase.candidateRobots[].robotId`と同じ一方向参照パターンで、`lib/data.ts`の`getDeploymentsForUseCase()`が逆引きする。無理な紐付けはしない（該当しない事例は空のままでよい）。
-- `UseCase.candidateRobots`は単なるid配列ではなく`{robotId, fit, reason}[]`（`fit`: strong/possible/watch）。「なぜ候補なのか」をデータ自身が持つ。`fit: 'strong'`は`deployments.ts`のpublishedな実在事例（同じrobotId・同じuseCase）で裏付けられていることを意味する（量産・商用展開の事実だけでは`strong`にしない）。`lib/data.ts`の`getRelated*()`は呼び出し側が渡した順序を保持する（関連ID配列の順序は編集上の関連優先度）。
+- `deployments.relatedUseCaseIds`（任意項目）は「この導入事例がどの用途の根拠になるか」を示す。`UseCase.candidateRobots[].evidenceDeploymentIds` と組み合わせて、候補ロボットの `strong` / `adjacent-deployment` 根拠にも使う。無理な紐付けはしない（該当しない事例は空のままでよい）。
+- `UseCase.candidateRobots`は単なるid配列ではなく`{robotId, fit, basis, evidenceDeploymentIds?, evidenceSourceUrls?, reason}[]`（`fit`: strong/possible/watch）。「なぜ候補なのか」と「どの根拠でそう言えるのか」をデータ自身が持つ。`fit: 'strong'`は`evidenceDeploymentIds`で同じrobotId・同じuseCaseのpublished deploymentを明示できる場合だけ使う（量産・商用展開の事実だけでは`strong`にしない）。`lib/data.ts`の`getRelated*()`は呼び出し側が渡した順序を保持する（関連ID配列の順序は編集上の関連優先度）。
 - **逆向きは導出**（§6）。robots は自分が属する useCases を持たない。`lib/data.ts` が逆引きする。
 
 ---
@@ -395,7 +395,7 @@ summary, publishStatus, updatedAt, reliability, sources, heroImage?, seo?
 
 **Guide**: title, titleJa?, description, stage, order, topics[], targetReaders[], readingTimeMinutes?, checklistItems?, body?, **relatedRobotIds[], relatedUseCaseIds[]**
 
-**UseCase**: title, titleJa?, subtitle?, featuredRank?, maturityLevel, buyerReadiness, environment, requiredCapabilities[], **primaryDomain, secondaryDomains?**, industryTags[], taskTags[], atAGlance, overview, whyItMatters, capabilityNotes, environmentRequirements, whyHardToday, japanDeploymentConditions, **candidateRobots[]{robotId,fit,reason}, relatedGuideIds[]**
+**UseCase**: title, titleJa?, subtitle?, featuredRank?, maturityLevel, buyerReadiness, environment, requiredCapabilities[], **primaryDomain, secondaryDomains?**, industryTags[], taskTags[], atAGlance, overview, whyItMatters, capabilityNotes, environmentRequirements, whyHardToday, japanDeploymentConditions, **candidateRobots[]{robotId,fit,basis,evidenceDeploymentIds?,evidenceSourceUrls?,reason}, relatedGuideIds[]**
 
 **Deployment**: **manufacturerId, robotId?**, customer, siteName?, country, location, status, startedAt?
 

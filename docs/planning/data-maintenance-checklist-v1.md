@@ -129,9 +129,12 @@
 **UseCase**
 - [ ] 型必須：id / slug / title / maturityLevel / buyerReadiness / environment / requiredCapabilities / primaryDomain / atAGlance{3} / overview / whyItMatters / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots / relatedGuideIds
 - [ ] industryTags・taskTags・primaryDomain・secondaryDomains は登録タグ（自動） / candidateRobots[].robotId は id 参照（自動）
-- [ ] candidateRobots[].fit が`'strong'`の場合、data/deployments.tsに同じrobotId・同じuseCaseのpublishedな実証事例が必要（自動：無いとbuild失敗。詳細は§M）
+- [ ] published の sources は空不可（自動）
+- [ ] published の candidateRobots は空不可（自動）
+- [ ] candidateRobots[].fit が`'strong'`の場合、`basis:'deployment'` と `evidenceDeploymentIds` が必須。同じrobotId・同じuseCaseのpublishedな実証事例でなければ build 失敗（自動。詳細は§M）
+- [ ] `possible` / `watch` も `basis` と evidence を持つ。`product-capability` / `market-signal` / `official-use-case` は `evidenceSourceUrls` 必須、`adjacent-deployment` は `evidenceDeploymentIds` 必須（自動）
 - [ ] relatedGuideIds と相手 guide.relatedUseCaseIds が双方向に揃う（自動）
-- [ ] 出典（sources）は手動推奨（validate 未強制）
+- [ ] `evidenceSourceUrls` は原則 useCase.sources にも同じURLを載せる（自動 warning）
 
 **Deployment**
 - [ ] 型必須：id / slug / manufacturerId / customer / country / location{lat,lng} / status
@@ -243,13 +246,17 @@ AI側の実装手順:
 2. [ ] 型必須：title / maturityLevel / buyerReadiness / environment / requiredCapabilities / **primaryDomain** / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots / relatedGuideIds
 3. [ ] `primaryDomain`（必須・単一）と`secondaryDomains`（任意・配列）は`lib/tagRegistry.ts`の`use-case-domain`から選ぶ（自動：未登録は build 失敗）。これが「ロボットが何をするのが得意か」というMECEな動作軸の正本（UI上のラベルは「得意分野」）。`industryTags`/`taskTags`は検索ファセット用で、MECEを意図しない（manufacturing/plantのように粒度が混在してよい）。新しい値を追加する場合は「ロボットの動作」を表す軸に揃え、「導入目的」（集客・人材育成等）を表す値は持ち込まない（過去に`demo-entertainment`/`research-education`が目的軸混入で`demonstrate-capability`/`validate-new-tech`に直された経緯がある）
 4. [ ] 実証事例が複数ドメインに渡る場合（例：搬送＋組立＋検査が同じユースケースに混在）は、最も比重の大きいドメインを`primaryDomain`にし、残りを`secondaryDomains`に入れる。**物理的にユースケースを分割しない**。各ドメインが独立して実証件数を積んだ時点で初めて分割を検討する
-5. [ ] `candidateRobots`は`{robotId, fit, reason}[]`。`robotId`は robot の **id** 参照（自動）。`fit`は3段階：`strong`=`data/deployments.ts`にpublishedな実在の導入事例（同じrobotId・同じuseCaseへの`relatedUseCaseIds`）がある場合のみ／`possible`=スペック・位置付けは合うが当該ユースケースでの実証未確認（量産・商用展開の事実だけでは`strong`にしない）／`watch`=初期段階・参考程度。**先に `data/deployments.ts` を確認し、同じニッチに複数の実在導入事例が集中していないか見る**（新規追加の最も強い根拠。思いつきで追加しない）。`reason`は既存の`capabilityNotes`等から導出し、新しい主張を作らない
-6. [ ] `industryTags` / `taskTags` は登録タグのみ（自動）
-7. [ ] **双方向対称**：`relatedGuideIds` と相手 guide.`relatedUseCaseIds` を両方そろえる（自動）
-8. [ ] 出典（sources）は手動推奨（validate 未強制）。個々の事実より、`relatedUseCaseIds` で紐付けた`deployments`側の出典が実質的な根拠になる想定
-9. [ ] `capabilityNotes` / `environmentRequirements` / `whyHardToday` / `japanDeploymentConditions` は各2-3文程度に圧縮し、詳しい判断はガイドへのリンクに渡す（detail page側で視覚的にも補足扱いにする）
-10. [ ] `featuredRank`（任意・数値）は一覧の「注目の適用領域」での優先順位。値が小さいほど上位、未設定は非掲載。実証事例が厚い用途から優先的に設定する（配列順には依存しない。`lib/useCaseFilters.ts`参照）
-11. [ ] build 通過 → `published`
+5. [ ] `candidateRobots`は`{robotId, fit, basis, evidenceDeploymentIds?, evidenceSourceUrls?, reason}[]`。`robotId`は robot の **id** 参照（自動）。`reason`は空不可（自動）
+6. [ ] `fit`は3段階：`strong`=`data/deployments.ts`にpublishedな実在の導入事例（同じrobotId・同じuseCaseへの`relatedUseCaseIds`）がある場合のみ／`possible`=スペック・位置付けは合うが当該ユースケースでの実証未確認／`watch`=初期段階・参考程度。量産・商用展開の事実だけでは`strong`にしない。**先に `data/deployments.ts` を確認し、同じニッチに複数の実在導入事例が集中していないか見る**（新規追加の最も強い根拠。思いつきで追加しない）
+7. [ ] `basis`は根拠種別：`deployment` / `adjacent-deployment` / `official-use-case` / `product-capability` / `market-signal` / `editorial-watch`。`strong`は必ず`basis:'deployment'`かつ`evidenceDeploymentIds`必須（自動）。`possible + basis:'deployment'` は過小申告として build 失敗。前世代機・近接用途の導入事例を根拠にする場合は `basis:'adjacent-deployment'` にする
+8. [ ] `product-capability` / `market-signal` / `official-use-case` は `evidenceSourceUrls` 必須（自動）。`adjacent-deployment` は `evidenceDeploymentIds` 必須（自動）。公開UseCaseで未公開deploymentを evidence に使うと build 失敗
+9. [ ] `evidenceSourceUrls` は原則 `useCase.sources` にも同じURLを載せる（自動 warning）。ページ本文・候補理由・出典欄が同じ根拠を指すようにする
+10. [ ] `industryTags` / `taskTags` は登録タグのみ（自動）
+11. [ ] **双方向対称**：`relatedGuideIds` と相手 guide.`relatedUseCaseIds` を両方そろえる（自動）
+12. [ ] published の `sources` は空不可（自動）。用途本文と candidate evidence の根拠になる公式/一次情報・信頼できる報道を載せる
+13. [ ] `capabilityNotes` / `environmentRequirements` / `whyHardToday` / `japanDeploymentConditions` は各2-3文程度に圧縮し、詳しい判断はガイドへのリンクに渡す（detail page側で視覚的にも補足扱いにする）
+14. [ ] `featuredRank`（任意・数値）は一覧の「注目の適用領域」での優先順位。値が小さいほど上位、未設定は非掲載。実証事例が厚い用途から優先的に設定する（配列順には依存しない。`lib/useCaseFilters.ts`参照）
+15. [ ] build 通過 → `published`
 
 ## N. 導入事例（deployments）追加 / 更新
 

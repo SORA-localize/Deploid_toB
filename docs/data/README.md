@@ -1,6 +1,6 @@
 # Deploid Data Work Guide
 
-Last reviewed: 2026-06-14
+Last reviewed: 2026-06-26
 
 この文書は、AIでデータ追加・更新を行うときの入口です。
 実装上の正本は `data/types.ts` と `lib/*` にあります。
@@ -12,7 +12,7 @@ Last reviewed: 2026-06-14
 - `data/articles.ts` — 記事。公開URLは `/reports`。速報でも `whyItMatters` を必須にする
 - `data/deployments.ts` — 実在の導入事例。Homeのワールドマップ根拠データ
 - `data/guides.ts` — 導入判断ガイド。常設コンテンツ
-- `data/useCases.ts` — 用途から探す逆引き。一次情報が薄い間は慎重に扱う
+- `data/useCases.ts` — 用途から探す逆引き。公開データは sources と candidate evidence を必須にし、一次情報が薄い間は慎重に扱う
 - `data/articlePlacements.ts` — 記事タブ/home注目記事の掲載枠
 - `data/types.ts` — 型の正本
 
@@ -36,6 +36,8 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / guide
 - 参照は `id` で結ぶ。`slug` は公開URL専用。slugを変えるときは `previousSlugs` に旧slugを追記する
 - `id` は発番後に変えない。命名修正では `slug` / `name` / `nameJa` だけを変える。例: A2 Ultra は `id: 'agibot-a2-max'`、公開slugは `agibot-a2-ultra`
 - 公式ページ、press release、信頼できる報道を確認し、`sources` に `url` / `checkedAt` / `reliability` を残す
+- 公開 UseCase は `sources` を空にしない。`candidateRobots` は `fit` だけでなく `basis` と `evidenceDeploymentIds` または `evidenceSourceUrls` で根拠を明示する
+- UseCase の `fit:'strong'` は、同じ `robotId` と `useCase.id` を持つ published deployment を `evidenceDeploymentIds` で明示できる場合だけ使う
 - AIの推測を事実として入れない。不明なスペックや価格は省略または要確認メモにする
 - 新規レコードは原則 `publishStatus: 'draft'` から作る
 - 記事は `category` と `whyItMatters` を必ず入れる

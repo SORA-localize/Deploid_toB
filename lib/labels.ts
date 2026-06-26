@@ -54,9 +54,9 @@ export const buyerReadinessLabels: Record<BuyerReadiness, string> = {
 };
 
 export const candidateFitLabels: Record<CandidateFit, string> = {
-  strong: '実証済み',
-  possible: '適合検討中',
-  watch: '要観察',
+  strong: '導入事例あり',
+  possible: '根拠あり',
+  watch: '要確認',
 };
 
 export const deploymentStageLabels: Record<DeploymentStage, string> = {

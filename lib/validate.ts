@@ -7,7 +7,7 @@ import { manufacturers } from '../data/manufacturers.ts';
 import { articlePlacements } from '../data/articlePlacements.ts';
 import { articles } from '../data/articles.ts';
 import { robots } from '../data/robots.ts';
-import type { ImageAsset, RightsStatus } from '../data/types.ts';
+import type { CandidateEvidenceBasis, ImageAsset, RightsStatus } from '../data/types.ts';
 import { useCases } from '../data/useCases.ts';
 import {
   articleCategoryOrder,
@@ -26,6 +26,14 @@ const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
 const referenceDisplayStatuses = new Set<RightsStatus>([
   'reference-attributed',
   'permission-requested',
+]);
+const candidateEvidenceBases = new Set<CandidateEvidenceBasis>([
+  'deployment',
+  'adjacent-deployment',
+  'official-use-case',
+  'product-capability',
+  'market-signal',
+  'editorial-watch',
 ]);
 
 /** 鮮度warningの既定: sources の最新確認日がこの日数を超えたら再確認を促す（設計 §11.6） */
@@ -71,13 +79,7 @@ export function validateData(): ValidationResult {
   const publishedArticleIds = new Set(
     articles.filter((article) => article.publishStatus === 'published').map((article) => article.id),
   );
-  // useCase.candidateRobots の fit:'strong' は「このrobotIdがこのuseCaseで実証導入されている」という主張。
-  // deployments.ts の published な robotId × relatedUseCaseIds の実在ペアでのみ裏付けられる（運用ルールは data-maintenance-checklist-v1.md §M）。
-  const strongFitEvidence = new Set(
-    deployments
-      .filter((d) => d.publishStatus === 'published' && d.robotId)
-      .flatMap((d) => (d.relatedUseCaseIds ?? []).map((ucId) => `${d.robotId}::${ucId}`)),
-  );
+  const deploymentById = new Map(deployments.map((deployment) => [deployment.id, deployment]));
 
   const check = (kind: string, owner: string, field: string, id: string, set: Set<string>) => {
     if (!set.has(id)) {
@@ -138,7 +140,7 @@ export function validateData(): ValidationResult {
   const checkRequiredSources = (
     kind: string,
     owner: string,
-    sources: readonly { checkedAt: string }[],
+    sources: readonly { checkedAt: string; url?: string }[],
     options: { requireNonEmpty?: boolean } = {},
   ) => {
     const requireNonEmpty = options.requireNonEmpty ?? true;
@@ -146,8 +148,140 @@ export function validateData(): ValidationResult {
       errors.push(`[source-empty] ${kind} "${owner}".sources が空です`);
     }
     sources.forEach((source, index) => {
+      checkUrl(kind, owner, `sources[${index}].url`, source.url);
       checkDate(kind, owner, `sources[${index}].checkedAt`, source.checkedAt);
     });
+  };
+
+  const checkUseCaseCandidateEvidence = (
+    useCase: (typeof useCases)[number],
+    candidate: (typeof useCases)[number]['candidateRobots'][number],
+    index: number,
+  ) => {
+    const owner = `${useCase.slug}.candidateRobots[${index}]`;
+    const deploymentIds = candidate.evidenceDeploymentIds ?? [];
+    const sourceUrls = candidate.evidenceSourceUrls ?? [];
+
+    if (!candidate.reason.trim()) {
+      errors.push(`[candidate-reason] useCase "${owner}.reason" が空です`);
+    }
+    if (!candidateEvidenceBases.has(candidate.basis)) {
+      errors.push(`[candidate-basis] useCase "${owner}.basis" が未定義または未登録です: ${candidate.basis}`);
+    }
+
+    checkUniqueValues('useCase', useCase.slug, `candidateRobots[${index}].evidenceDeploymentIds`, deploymentIds);
+    checkUniqueValues('useCase', useCase.slug, `candidateRobots[${index}].evidenceSourceUrls`, sourceUrls);
+
+    const useCaseSourceUrls = new Set(useCase.sources.map((source) => source.url));
+    sourceUrls.forEach((url, sourceIndex) => {
+      checkUrl('useCase', useCase.slug, `candidateRobots[${index}].evidenceSourceUrls[${sourceIndex}]`, url);
+      if (!useCaseSourceUrls.has(url)) {
+        warnings.push(
+          `[candidate-source-unlisted] useCase "${useCase.slug}" の candidateRobots[${index}].evidenceSourceUrls ` +
+            `"${url}" が useCase.sources にありません`,
+        );
+      }
+    });
+
+    const evidenceDeployments = deploymentIds.flatMap((deploymentId, deploymentIndex) => {
+      const deployment = deploymentById.get(deploymentId);
+      if (!deployment) {
+        errors.push(
+          `[candidate-deployment-missing] useCase "${useCase.slug}".candidateRobots[${index}].` +
+            `evidenceDeploymentIds[${deploymentIndex}] -> "${deploymentId}" は存在しません`,
+        );
+        return [];
+      }
+      if (useCase.publishStatus === 'published' && deployment.publishStatus !== 'published') {
+        errors.push(
+          `[candidate-deployment-draft] useCase "${useCase.slug}".candidateRobots[${index}] は公開ページの根拠として ` +
+            `未公開deployment "${deploymentId}" を参照しています`,
+        );
+      }
+      return [deployment];
+    });
+
+    if (candidate.fit === 'strong') {
+      if (candidate.basis !== 'deployment') {
+        errors.push(
+          `[candidate-fit-basis] useCase "${owner}" は fit:'strong' なので basis:'deployment' にしてください`,
+        );
+      }
+      if (deploymentIds.length === 0) {
+        errors.push(
+          `[candidate-evidence-empty] useCase "${owner}" は fit:'strong' なので evidenceDeploymentIds が必須です`,
+        );
+      }
+      evidenceDeployments.forEach((deployment) => {
+        if (deployment.robotId !== candidate.robotId) {
+          errors.push(
+            `[candidate-deployment-robot] useCase "${useCase.slug}".candidateRobots[${index}] の根拠deployment ` +
+              `"${deployment.id}" は robotId が一致しません: ${deployment.robotId ?? '(none)'}`,
+          );
+        }
+        if (!(deployment.relatedUseCaseIds ?? []).includes(useCase.id)) {
+          errors.push(
+            `[candidate-deployment-usecase] useCase "${useCase.slug}".candidateRobots[${index}] の根拠deployment ` +
+              `"${deployment.id}" は relatedUseCaseIds に "${useCase.id}" を含みません`,
+          );
+        }
+      });
+      return;
+    }
+
+    if (candidate.fit === 'possible') {
+      if (candidate.basis === 'deployment') {
+        errors.push(
+          `[candidate-fit-understated] useCase "${owner}" は basis:'deployment' なので fit:'strong' にするか、` +
+            `根拠種別を adjacent-deployment 等に落としてください`,
+        );
+      }
+      if (candidate.basis === 'editorial-watch') {
+        errors.push(
+          `[candidate-fit-basis] useCase "${owner}" は fit:'possible' なので basis:'editorial-watch' は使えません`,
+        );
+      }
+      if (candidate.basis === 'adjacent-deployment' && deploymentIds.length === 0) {
+        errors.push(
+          `[candidate-evidence-empty] useCase "${owner}" は basis:'adjacent-deployment' なので evidenceDeploymentIds が必須です`,
+        );
+      }
+      if (
+        (candidate.basis === 'official-use-case' ||
+          candidate.basis === 'product-capability' ||
+          candidate.basis === 'market-signal') &&
+        sourceUrls.length === 0
+      ) {
+        errors.push(
+          `[candidate-evidence-empty] useCase "${owner}" は basis:'${candidate.basis}' なので evidenceSourceUrls が必須です`,
+        );
+      }
+      return;
+    }
+
+    if (candidate.fit === 'watch') {
+      if (
+        candidate.basis !== 'market-signal' &&
+        candidate.basis !== 'editorial-watch' &&
+        candidate.basis !== 'product-capability'
+      ) {
+        errors.push(
+          `[candidate-fit-basis] useCase "${owner}" は fit:'watch' なので ` +
+            `basis は market-signal / product-capability / editorial-watch のいずれかにしてください`,
+        );
+      }
+      if (
+        (candidate.basis === 'market-signal' || candidate.basis === 'product-capability') &&
+        sourceUrls.length === 0
+      ) {
+        errors.push(
+          `[candidate-evidence-empty] useCase "${owner}" は basis:'${candidate.basis}' なので evidenceSourceUrls が必須です`,
+        );
+      }
+      return;
+    }
+
+    errors.push(`[candidate-fit] useCase "${owner}.fit" が未登録です: ${candidate.fit}`);
   };
 
   const checkImageAsset = (
@@ -439,6 +573,9 @@ export function validateData(): ValidationResult {
 
   for (const u of useCases) {
     checkDate('useCase', u.slug, 'updatedAt', u.updatedAt);
+    checkRequiredSources('useCase', u.slug, u.sources, {
+      requireNonEmpty: u.publishStatus === 'published',
+    });
     checkTags('useCase', u.slug, 'industryTags', 'industry', u.industryTags);
     checkTags('useCase', u.slug, 'taskTags', 'task', u.taskTags);
     checkTags('useCase', u.slug, 'primaryDomain', 'use-case-domain', [u.primaryDomain]);
@@ -454,8 +591,11 @@ export function validateData(): ValidationResult {
       'candidateRobots.robotId',
       u.candidateRobots.map((c) => c.robotId),
     );
+    if (u.publishStatus === 'published' && u.candidateRobots.length === 0) {
+      errors.push(`[candidate-empty] useCase "${u.slug}".candidateRobots が空です`);
+    }
     checkUniqueValues('useCase', u.slug, 'relatedGuideIds', u.relatedGuideIds);
-    u.candidateRobots.forEach((c) => {
+    u.candidateRobots.forEach((c, index) => {
       check('useCase', u.slug, 'candidateRobots.robotId', c.robotId, robotIds);
       if (u.publishStatus === 'published') {
         checkDisplayableReference(
@@ -468,12 +608,7 @@ export function validateData(): ValidationResult {
           'published/archived',
         );
       }
-      if (c.fit === 'strong' && !strongFitEvidence.has(`${c.robotId}::${u.id}`)) {
-        errors.push(
-          `[fit-unverified] useCase "${u.slug}" の candidateRobots「${c.robotId}」は fit:'strong' だが、` +
-            `data/deployments.ts に同じrobotId・同じuseCaseの実証事例が見つかりません`,
-        );
-      }
+      checkUseCaseCandidateEvidence(u, c, index);
     });
     u.relatedGuideIds.forEach((s) => {
       check('useCase', u.slug, 'relatedGuideIds', s, guideIds);
