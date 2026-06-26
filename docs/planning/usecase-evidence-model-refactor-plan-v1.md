@@ -185,6 +185,21 @@ export interface UseCaseCandidateRobot {
 
 `lib/validate.ts` に以下を追加する。
 
+### 5.0 既存 strong 検証との関係
+
+現行 `lib/validate.ts` には、`strongFitEvidence` で deployments の `robotId::useCaseId` ペアを暗黙に導出し、`fit: 'strong'` を error 検証する `[fit-unverified]` チェックが既にある。
+
+evidence model 導入時は、この暗黙チェックを残して新しい `evidenceDeploymentIds` チェックを足さない。
+二重管理を避けるため、既存 `[fit-unverified]` チェックは `evidenceDeploymentIds` ベースの明示チェックへ置き換える。
+
+置き換え後の正本:
+
+- `strong` の根拠正本は `UseCase.candidateRobots[].evidenceDeploymentIds`
+- `Deployment.relatedUseCaseIds` は deployment がどの UseCase に属するかの正本
+- validator は両者が一致していることを検証する
+
+この方針により、「deployment 側の暗黙ペアでは通るが candidate 側の evidence は空」のようなズレを error にできる。
+
 ### 5.1 published UseCase sources 必須
 
 UseCase loop 内で以下を呼ぶ。
@@ -194,6 +209,8 @@ checkRequiredSources('useCase', u.slug, u.sources, {
   requireNonEmpty: u.publishStatus === 'published',
 });
 ```
+
+さらに、published UseCase は候補提示ページとして公開されるため、`candidateRobots.length > 0` も error にする。
 
 ### 5.2 candidate evidence 検証
 
@@ -212,6 +229,7 @@ UseCase loop 内で candidate ごとに検証する。
 - 各 deployment が `publishStatus === 'published'`
 - deployment の `robotId === candidate.robotId`
 - deployment の `relatedUseCaseIds` に当該 `useCase.id` が含まれる
+- 現行の `strongFitEvidence` 暗黙チェックは、この明示チェックに置き換える
 
 `fit: 'possible'`:
 
@@ -224,20 +242,24 @@ UseCase loop 内で candidate ごとに検証する。
 
 - `basis === 'market-signal' | 'editorial-watch' | 'product-capability'`
 - `reason` は空でないこと
-- `evidenceSourceUrls` は推奨。最終的に必須化するかはデータ移行後に判断する
+- `basis === 'product-capability'` の場合は、fit によらず `evidenceSourceUrls.length > 0`
+- `basis === 'market-signal'` の場合は `evidenceSourceUrls.length > 0`
+- `basis === 'editorial-watch'` の場合のみ、`evidenceSourceUrls` 空を warning に留められる
 
 ### 5.3 error / warning の境界
 
 初回導入では published UseCase の公開面に影響するため、以下は error にする。
 
 - published UseCase の sources 空
+- published UseCase の `candidateRobots` 空
 - candidate `basis` 未設定
 - `strong` の deployment 不整合
 - `possible` の根拠参照なし
+- `product-capability` / `market-signal` の source URL なし
 
 以下は warning で開始する。
 
-- `watch` の `evidenceSourceUrls` 空
+- `watch` かつ `basis === 'editorial-watch'` の `evidenceSourceUrls` 空
 - UseCase の `sources.checkedAt` が古い
 - candidate の `evidenceSourceUrls` が UseCase.sources に含まれていない
 
@@ -319,13 +341,16 @@ Files:
 
 1. deployment id から deployment を引く Map を作る。
 2. candidate evidence 検証 helper を追加する。
-3. ただし初回は `basis` 未設定を warning に留める。
-4. published UseCase の sources 空も、移行前は warning に留める。
+3. 既存の `strongFitEvidence` / `[fit-unverified]` チェックは、この段階では残す。
+4. 新 helper では、`evidenceDeploymentIds` がある candidate だけ deployment id の存在・robotId・relatedUseCaseIds を warning 検証する。
+5. ただし初回は `basis` 未設定を warning に留める。
+6. published UseCase の sources 空、published UseCase の candidate 空も、移行前は warning に留める。
 
 完了条件:
 
 - `npm run validate:data` が warning を出して通る。
-- warning に空 sources と basis 未設定 candidate が出る。
+- warning に空 sources、candidate 空、basis 未設定 candidate が出る。
+- 既存 `[fit-unverified]` error の挙動はまだ壊していない。
 
 ### UEM-004: UseCase データを移行する
 
@@ -367,16 +392,20 @@ Files:
 変更:
 
 1. published UseCase sources 空を error にする。
-2. candidate `basis` 未設定を error にする。
-3. `strong` の deployment 不整合を error にする。
-4. `possible` の根拠参照なしを error にする。
-5. `watch` の根拠不足は warning に留めるか、移行結果を見て error にする。
+2. published UseCase の `candidateRobots.length === 0` を error にする。
+3. candidate `basis` 未設定を error にする。
+4. 既存の `strongFitEvidence` / `[fit-unverified]` 暗黙チェックを削除し、`strong` の `evidenceDeploymentIds` 明示チェックへ置き換える。
+5. `possible` の根拠参照なしを error にする。
+6. `product-capability` / `market-signal` の source URL なしを error にする。
+7. `watch` かつ `basis === 'editorial-watch'` の source URL なしは warning に留める。
 
 完了条件:
 
 - `npm run validate:data` が通る。
 - 一時的に published UseCase の sources を空にすると validate が失敗することを確認できる。
+- 一時的に published UseCase の candidateRobots を空にすると validate が失敗することを確認できる。
 - 一時的に `strong` の `evidenceDeploymentIds` を消すと validate が失敗することを確認できる。
+- `lib/validate.ts` 内に、`strongFitEvidence` 由来の暗黙チェックと `evidenceDeploymentIds` 明示チェックが併存していない。
 
 ### UEM-006: 型を最終形に締める
 
