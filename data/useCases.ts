@@ -64,7 +64,6 @@ export const useCases: UseCase[] = [
         reason: '公式ページで倉庫自動化への接続、物流・流通、トート搬送用途が明示されている。ただし個別導入URLは現行確認できないためdeployment扱いにはしない。',
       },
     ],
-    relatedGuideIds: ['decision-variables', 'poc-planning'],
   },
   {
     id: 'factory-inspection',
@@ -125,7 +124,6 @@ export const useCases: UseCase[] = [
         reason: '24/7稼働対応など工場運用向けの位置付けは確認できるが、巡回・点検タスクそのものでの実証は確認できていない。',
       },
     ],
-    relatedGuideIds: [],
   },
   {
     id: 'research-development',
@@ -215,7 +213,6 @@ export const useCases: UseCase[] = [
         reason: '公式ページで開発者・研究者・競技向けの機体として明示されている。ただし実証事例はまだ確認できていない。',
       },
     ],
-    relatedGuideIds: ['decision-variables'],
   },
   {
     id: 'demo-exhibition',
@@ -290,7 +287,6 @@ export const useCases: UseCase[] = [
         reason: '小型・低価格機として参考段階。展示・デモでの実証事例は確認できていない。',
       },
     ],
-    relatedGuideIds: [],
   },
   {
     id: 'customer-reception',
@@ -358,7 +354,6 @@ export const useCases: UseCase[] = [
         reason: 'マーケティング・受付・案内向けに量産・商用展開されている機体（公式に確認済み）だが、特定施設での導入事例（deployments.ts）はまだ確認できていない。',
       },
     ],
-    relatedGuideIds: ['decision-variables'],
   },
   {
     id: 'retail-shelf-stocking',
@@ -449,7 +444,6 @@ export const useCases: UseCase[] = [
         reason: 'R1 AIRと同系統の標準構成機。小売棚補充での実証事例は未確認。',
       },
     ],
-    relatedGuideIds: [],
   },
   {
     id: 'care-physical-assistance',
@@ -519,7 +513,6 @@ export const useCases: UseCase[] = [
         reason: '介護向け「Care-bot」として公式に明示展開されているが、実際の介護施設への導入事例は未確認。',
       },
     ],
-    relatedGuideIds: [],
   },
   {
     id: 'factory-assembly-support',
@@ -646,6 +639,5 @@ export const useCases: UseCase[] = [
         reason: '前身機Figure 02がBMWスパルタンバーグ工場で実証を完了したが、Figure 03自体の工場導入事例はまだ確認できていない。',
       },
     ],
-    relatedGuideIds: ['decision-variables'],
   },
 ];

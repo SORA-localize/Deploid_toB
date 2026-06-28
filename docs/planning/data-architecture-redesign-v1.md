@@ -1,5 +1,7 @@
 # データアーキテクチャ再設計 v1（CMS見据え・保守性主眼）
 
+> **2026-06-28 撤去注記（Guide）**: `Guide` エンティティと `/guides` は撤去済み。本書の現行データ設計から Guide / `relatedGuideIds` / 「useCase ⇄ guide 双方向」「guide sources」の記述は削除済み。判断層は構造化データ（use-cases の `candidateRobots` evidence / compare / robots）側で担う。撤去理由と復活手順は `archive/guides-retirement-v1.md`、計画は `guides-retirement-plan-v1.md` を参照。
+
 ## 0. このドキュメントの位置づけ
 
 - **目的**: Deploid のデータ構造を「正本がどこにあり、何を変えれば何が追従するか」が一目で分かる形に再設計する。Git型CMS移行と長期保守に耐える骨格を定義する。
@@ -99,8 +101,6 @@ slug ──┬── URL識別子        /robots/unitree-g1
 | `Report.relatedRobotSlugs` | `Article.relatedRobotIds` |
 | `Report.relatedManufacturerSlugs` | `Article.relatedManufacturerIds` |
 | `Report.relatedUseCaseSlugs` | `Article.relatedUseCaseIds` |
-| `Report.relatedGuideSlugs` | `Article.relatedGuideIds` |
-| `Guide.relatedRobotSlugs` / `relatedUseCaseSlugs` | `relatedRobotIds` / `relatedUseCaseIds` |
 | `Deployment.manufacturerSlug` / `robotSlug` | `manufacturerId` / `robotId` |
 
 > 命名は `~Id` / `~Ids` に統一。「何を参照しているか」がフィールド名で自明になる。
@@ -124,8 +124,7 @@ slug ──┬── URL識別子        /robots/unitree-g1
 編集コンテンツ（鮮度・読み物）
   articles        ニュースメディア（旧 reports を改称・拡張）★
 
-意思決定支援（フレーム・逆引き）
-  guides          意思決定フレーム
+意思決定支援（逆引き）
   useCases        用途からの逆引き
 
 派生・補助
@@ -141,9 +140,8 @@ slug ──┬── URL識別子        /robots/unitree-g1
 manufacturers ──< robots                 (manufacturer has many robots)
 robots         ──< deployments           (robot deployed at many sites)
 useCases       >── robots (candidate)    (useCase ← candidate robots)
-useCases       <── deployments           (deployment.relatedUseCaseIds が一方向に useCase を指す。Guide⇄UseCase のような双方向対称は強制しない)
-guides         >── robots, useCases
-articles       >── robots, manufacturers, useCases, guides
+useCases       <── deployments           (deployment.relatedUseCaseIds が一方向に useCase を指す。双方向対称は強制しない)
+articles       >── robots, manufacturers, useCases
 placements     >── articles
 ```
 
@@ -184,8 +182,7 @@ placements     >── articles
 | 関連 | 持ち方 | 理由 |
 |---|---|---|
 | robot → manufacturer | robot が `manufacturerId` を持つ（単方向） | 多対1。robotが主 |
-| useCase ⇄ guide | **双方向**（互いに id を持つ）＋ validate で整合チェック | 両側UIで使うため |
-| article → robots/mfr/useCase/guide | article が一方的に持つ（単方向） | articleが主、被参照側は知らなくてよい |
+| article → robots/mfr/useCase | article が一方的に持つ（単方向） | articleが主、被参照側は知らなくてよい |
 | robot ← useCase（候補） | useCase が `candidateRobots[].robotId`（fit/reason付き）、robot側は持たず導出 | robotページは `lib/data.ts` で逆引き |
 
 **原則**: 双方向は「両側のUIが対称に必要」な時だけ。それ以外は単方向＋導出（コピー二重管理を避ける）。
@@ -267,7 +264,7 @@ BaseRecord（id, slug, previousSlugs, summary, publishStatus,
 + readingTimeMin?
 + featured?
 + relatedRobotIds[] / relatedManufacturerIds[] /
-  relatedUseCaseIds[] / relatedGuideIds?[]
+  relatedUseCaseIds[]
 ```
 
 ---
@@ -350,7 +347,6 @@ export const specSchema = [
 |---|---|
 | slug 重複検出 | **id 重複検出**＋ slug 重複検出（別々に） |
 | 参照先 slug 存在チェック | **参照先 id 存在チェック** |
-| 双方向ズレ（useCase⇄guide） | 維持（id ベースに） |
 | 未登録タグ検出 | 維持 |
 | 日付・URL・画像権利 | 維持 |
 | （新規）| **`previousSlugs` が現存slugと衝突しない** |
@@ -393,9 +389,7 @@ summary, publishStatus, updatedAt, reliability, sources, heroImage?, seo?
 
 **Article（旧Report）**: title, titleJa?, **category★**, type, section, publishedAt, author?, industryTags?, regionTags?, **themeTags?[]**, whyItMatters, keyTakeaways?, body?, readingTimeMin?, featured?, **related*Ids[]**
 
-**Guide**: title, titleJa?, description, stage, order, topics[], targetReaders[], readingTimeMinutes?, checklistItems?, body?, **relatedRobotIds[], relatedUseCaseIds[]**
-
-**UseCase**: title, titleJa?, subtitle?, featuredRank?, maturityLevel, buyerReadiness, environment, requiredCapabilities[], **primaryDomain, secondaryDomains?**, industryTags[], taskTags[], atAGlance, overview, whyItMatters, capabilityNotes, environmentRequirements, whyHardToday, japanDeploymentConditions, **candidateRobots[]{robotId,fit,basis,evidenceDeploymentIds?,evidenceSourceUrls?,reason}, relatedGuideIds[]**
+**UseCase**: title, titleJa?, subtitle?, featuredRank?, maturityLevel, buyerReadiness, environment, requiredCapabilities[], **primaryDomain, secondaryDomains?**, industryTags[], taskTags[], atAGlance, overview, whyItMatters, capabilityNotes, environmentRequirements, whyHardToday, japanDeploymentConditions, **candidateRobots[]{robotId,fit,basis,evidenceDeploymentIds?,evidenceSourceUrls?,reason}**
 
 **Deployment**: **manufacturerId, robotId?**, customer, siteName?, country, location, status, startedAt?
 

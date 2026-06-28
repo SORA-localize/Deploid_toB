@@ -23,7 +23,7 @@ interface CandidateRobotAnnotation {
 interface CandidateRobotListProps {
   robots: Robot[];
   emptyMessage?: string;
-  /** use-cases/[slug] のみ渡す。「なぜ候補なのか」を根拠種別とreasonで表示する（guides/[slug]では渡さず素のロボット一覧のまま）。 */
+  /** use-cases/[slug] のみ渡す。「なぜ候補なのか」を根拠種別とreasonで表示する。 */
   annotations?: Record<string, CandidateRobotAnnotation>;
 }
 

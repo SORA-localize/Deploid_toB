@@ -32,7 +32,7 @@ For tags and specs, inspect the code source of truth before editing:
 - Record sources with URL, checked date, and reliability.
 - Unknown optional facts should be omitted or marked as confirmation-needed according to the existing data model.
 - Use only registered tag values and spec keys. Add new registry entries first when needed.
-- Tags are split by axis (`industry` / `region` / `theme` / `task` / `use-case-domain` / `guide-topic`); keep each field to its own axis. Companies and robots are relations, not tags. See the header of `lib/tagRegistry.ts`.
+- Tags are split by axis (`industry` / `region` / `theme` / `task` / `use-case-domain`); keep each field to its own axis. Companies and robots are relations, not tags. See the header of `lib/tagRegistry.ts`.
 - Pages should use `lib/data.ts`, not direct searches through `data/*.ts`.
 - Run `npm run validate:data` after data changes. Run `npm run build` when UI/rendering can be affected.
 

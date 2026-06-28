@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { ArrowRight, BookOpen, Bot, Building2, type LucideIcon } from 'lucide-react';
+import { ArrowRight, Bot, Building2, type LucideIcon } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 
 type PreviewAsset = {
@@ -16,10 +16,9 @@ type PreviewAsset = {
 type HomeContentNavigatorProps = {
   robotAssets: PreviewAsset[];
   manufacturerAssets: PreviewAsset[];
-  guideAssets: PreviewAsset[];
 };
 
-type ContentKey = 'robots' | 'manufacturers' | 'guides';
+type ContentKey = 'robots' | 'manufacturers';
 
 type ContentItem = {
   key: ContentKey;
@@ -36,7 +35,6 @@ type ContentItem = {
 export function HomeContentNavigator({
   robotAssets,
   manufacturerAssets,
-  guideAssets,
 }: HomeContentNavigatorProps) {
   const shouldReduceMotion = useReducedMotion();
   const [activeKey, setActiveKey] = useState<ContentKey>('robots');
@@ -65,19 +63,8 @@ export function HomeContentNavigator({
         assets: manufacturerAssets,
         fallbackLabel: 'Manufacturer network',
       },
-      {
-        key: 'guides',
-        title: '導入ガイド',
-        href: '/guides',
-        description: '調達、評価、PoC設計まで導入判断の流れを整理する。',
-        stat: '調達 / 評価 / PoC',
-        action: 'ガイドを見る',
-        icon: BookOpen,
-        assets: guideAssets,
-        fallbackLabel: 'Implementation guide',
-      },
     ],
-    [guideAssets, manufacturerAssets, robotAssets],
+    [manufacturerAssets, robotAssets],
   );
 
   const activeItem = items.find((item) => item.key === activeKey) ?? items[0];

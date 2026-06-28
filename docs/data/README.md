@@ -11,13 +11,13 @@ Last reviewed: 2026-06-28
 - `data/manufacturers.ts` — メーカー/供給体制。企業種別、日本窓口、サポート、調達メモ
 - `data/articles.ts` — 記事。公開URLは `/reports`。速報でも `whyItMatters` を必須にする
 - `data/deployments.ts` — 実在の導入事例。Homeのワールドマップ根拠データ
-- `data/guides.ts` — 導入判断ガイド。常設コンテンツ
 - `data/useCases.ts` — 用途から探す逆引き。公開データは sources と candidate evidence を必須にし、一次情報が薄い間は慎重に扱う
 - `data/articlePlacements.ts` — 記事タブ/home注目記事の掲載枠
 - `data/types.ts` — 型の正本
 
 各コレクションの追加・更新手順は `../planning/data-maintenance-checklist-v1.md` の対応セクション：
-robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / guides=L / useCases=M / deployments=N / articlePlacements=O。
+robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCases=M / deployments=N / articlePlacements=O。
+（guides=L は撤去済み。経緯は `../planning/archive/guides-retirement-v1.md`。）
 
 ## 事前に見るもの
 

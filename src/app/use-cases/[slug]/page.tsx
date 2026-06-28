@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { AlertCircle, Building2, CheckCircle2, MapPin } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
@@ -15,7 +14,6 @@ import { SourceList } from '@/components/SourceList';
 import {
   getDeploymentById,
   getDeploymentsForUseCase,
-  getRelatedGuides,
   getRelatedRobots,
   getArticlesForUseCase,
   getUseCases,
@@ -88,10 +86,8 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
       ];
     }),
   );
-  const guides = getRelatedGuides(useCase.relatedGuideIds);
   const reports = getArticlesForUseCase(useCase.id);
   const deployments = getDeploymentsForUseCase(useCase.id);
-  const primaryGuide = guides[0];
 
   const overviewRows = getUseCaseOverviewFacts(useCase);
 
@@ -249,14 +245,6 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                   <p className="text-xs text-muted-foreground leading-relaxed">{useCase.japanDeploymentConditions}</p>
                 </div>
               </div>
-              {primaryGuide && (
-                <Link
-                  href={`/guides/${primaryGuide.slug}`}
-                  className="mt-5 block border border-border p-3 text-xs text-foreground hover:border-foreground/40 transition-colors"
-                >
-                  {uiText.useCases.seeGuideForDetail(primaryGuide.titleJa ?? primaryGuide.title)}
-                </Link>
-              )}
             </section>
 
             <SourceList
@@ -289,7 +277,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                 <CandidateRobotList robots={candidateRobots} annotations={candidateAnnotations} />
               </SidebarBlock>
 
-              {(guides.length > 0 || reports.length > 0) && (
+              {reports.length > 0 && (
                 <>
                   <SidebarDivider />
                   <SidebarBlock kicker={uiText.useCases.related}>
@@ -297,10 +285,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
                       id="related-sidebar"
                       title={uiText.useCases.related}
                       variant="compact"
-                      items={[
-                        ...guides.map((g) => ({ href: `/guides/${g.slug}`, title: g.titleJa ?? g.title })),
-                        ...reports.map((r) => ({ href: `/reports/${r.slug}`, title: r.titleJa ?? r.title })),
-                      ]}
+                      items={reports.map((r) => ({ href: `/reports/${r.slug}`, title: r.titleJa ?? r.title }))}
                     />
                   </SidebarBlock>
                 </>

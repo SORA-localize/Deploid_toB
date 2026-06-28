@@ -1,10 +1,9 @@
-import type { Guide, Manufacturer, Article, Robot, UseCase } from '@/data/types';
+import type { Manufacturer, Article, Robot, UseCase } from '@/data/types';
 import {
   buyerReadinessLabels,
   companyStatusLabels,
   companyTypeLabels,
   deploymentStageLabels,
-  guideStageLabels,
   japanAvailabilityLabels,
   japanPresenceLabels,
   mobilityLabels,
@@ -17,7 +16,7 @@ import {
 } from '@/lib/labels';
 import { getTagLabel, getTagSearchValues, normalizeTagKey, type TagKind } from '@/lib/tags';
 
-export type SearchCollection = 'robots' | 'manufacturers' | 'reports' | 'guides' | 'useCases';
+export type SearchCollection = 'robots' | 'manufacturers' | 'reports' | 'useCases';
 export type SearchPrimitive = string | number | null | undefined;
 export type SearchValueInput = SearchPrimitive | readonly SearchValueInput[];
 
@@ -262,27 +261,6 @@ export function createReportSearchDocument(report: Article) {
       report.relatedRobotIds,
       report.relatedManufacturerIds,
       report.relatedUseCaseIds,
-      report.relatedGuideIds,
-    ],
-  });
-}
-
-export function createGuideSearchDocument(guide: Guide) {
-  return createSearchDocument({
-    id: guide.slug,
-    collection: 'guides',
-    title: guide.titleJa ?? guide.title,
-    url: `/guides/${guide.slug}`,
-    tags: guide.topics.map((value) => ({ value, kind: 'guide-topic' as const })),
-    fields: [
-      guide.titleJa,
-      guide.title,
-      guide.summary,
-      guide.description,
-      guide.targetReaders,
-      guide.checklistItems,
-      guide.updatedAt,
-      guideStageLabels[guide.stage],
     ],
   });
 }

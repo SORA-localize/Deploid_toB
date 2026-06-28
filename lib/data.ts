@@ -1,5 +1,4 @@
 import { deployments } from '@/data/deployments';
-import { guides } from '@/data/guides';
 import { manufacturers } from '@/data/manufacturers';
 import { articles } from '@/data/articles';
 import { robots } from '@/data/robots';
@@ -57,10 +56,6 @@ export function resolveManufacturerDetailBySlug(slug: string) {
   return resolveBySlug(getManufacturers(), slug);
 }
 
-export function resolveGuideDetailBySlug(slug: string) {
-  return resolveBySlug(getGuides(), slug);
-}
-
 export function resolveUseCaseDetailBySlug(slug: string) {
   return resolveBySlug(getUseCases(), slug);
 }
@@ -99,18 +94,6 @@ export function getManufacturerBySlug(slug: string) {
 
 export function getManufacturerById(id: string) {
   return getManufacturers().find((manufacturer) => manufacturer.id === id);
-}
-
-export function getGuides() {
-  return published(guides).sort((a, b) => a.order - b.order);
-}
-
-export function getGuideBySlug(slug: string) {
-  return getGuides().find((guide) => guide.slug === slug);
-}
-
-export function getGuideById(id: string) {
-  return getGuides().find((guide) => guide.id === id);
 }
 
 export function getUseCases() {
@@ -184,8 +167,4 @@ export function getRelatedManufacturers(ids: string[]) {
 
 export function getRelatedUseCases(ids: string[]) {
   return resolveRecordsByIds(ids, getUseCases());
-}
-
-export function getRelatedGuides(ids: string[]) {
-  return resolveRecordsByIds(ids, getGuides());
 }

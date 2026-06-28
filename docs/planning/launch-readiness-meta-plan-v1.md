@@ -1,5 +1,7 @@
 # 公開前メタ情報・共有表示・計測ポリシー整備計画 v1
 
+> **2026-06-28 撤去注記**: `/guides`・`src/app/guides/[slug]/page.tsx` は撤去済み。本書のガイド向け noindex/JSON-LD/metadata 項目は対象外。経緯は `archive/guides-retirement-v1.md`。
+
 作成日: 2026-06-18
 ブランチ: `fix/launch-readiness-meta`
 

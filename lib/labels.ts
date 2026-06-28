@@ -7,7 +7,6 @@ import type {
   ContactInquiryType,
   DeploymentStage,
   DeploymentStatus,
-  GuideStage,
   ImageRole,
   JapanAvailability,
   JapanPresence,
@@ -133,12 +132,6 @@ export const japanPresenceLabels: Record<JapanPresence, string> = {
   remote: '海外から対応',
   none: '国内体制なし',
   unknown: '要確認',
-};
-
-export const guideStageLabels: Record<GuideStage, string> = {
-  learn: '知る',
-  evaluate: '判断する',
-  act: '動く',
 };
 
 export const articleCategoryLabels: Record<ArticleCategory, string> = {

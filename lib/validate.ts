@@ -2,7 +2,6 @@
 // 「存在しないidを参照している」「双方向リンクが片側だけ」「id/slug重複」を
 // console に出す。`npm run validate:data`（scripts/validate-data.mjs）からも実行される。
 import { deployments } from '../data/deployments.ts';
-import { guides } from '../data/guides.ts';
 import { manufacturers } from '../data/manufacturers.ts';
 import { articlePlacements } from '../data/articlePlacements.ts';
 import { articles } from '../data/articles.ts';
@@ -57,7 +56,6 @@ export function validateData(): ValidationResult {
   // 参照整合は不変 id で取る（slug は可変URLであり外部キーではない）
   const robotIds = new Set(robots.map((r) => r.id));
   const manufacturerIds = new Set(manufacturers.map((m) => m.id));
-  const guideIds = new Set(guides.map((g) => g.id));
   const useCaseIds = new Set(useCases.map((u) => u.id));
   const articleIds = new Set(articles.map((r) => r.id));
   const visibleRobotIds = new Set(
@@ -70,9 +68,6 @@ export function validateData(): ValidationResult {
   );
   const publishedManufacturerIds = new Set(
     manufacturers.filter((m) => m.publishStatus === 'published').map((m) => m.id),
-  );
-  const publishedGuideIds = new Set(
-    guides.filter((g) => g.publishStatus === 'published').map((g) => g.id),
   );
   const publishedUseCaseIds = new Set(
     useCases.filter((u) => u.publishStatus === 'published').map((u) => u.id),
@@ -416,7 +411,6 @@ export function validateData(): ValidationResult {
   };
   dup('robots', robots);
   dup('manufacturers', manufacturers);
-  dup('guides', guides);
   dup('useCases', useCases);
   dup('articles', articles);
   dup('deployments', deployments);
@@ -547,41 +541,6 @@ export function validateData(): ValidationResult {
     });
   }
 
-  for (const g of guides) {
-    checkDate('guide', g.slug, 'updatedAt', g.updatedAt);
-    checkTags('guide', g.slug, 'topics', 'guide-topic', g.topics);
-    checkUniqueValues('guide', g.slug, 'relatedRobotIds', g.relatedRobotIds);
-    checkUniqueValues('guide', g.slug, 'relatedUseCaseIds', g.relatedUseCaseIds);
-    g.relatedRobotIds.forEach((s) => {
-      check('guide', g.slug, 'relatedRobotIds', s, robotIds);
-      if (g.publishStatus === 'published') {
-        checkDisplayableReference(
-          'guide',
-          g.slug,
-          'relatedRobotIds',
-          s,
-          robotIds,
-          visibleRobotIds,
-          'published/archived',
-        );
-      }
-    });
-    g.relatedUseCaseIds.forEach((s) => {
-      check('guide', g.slug, 'relatedUseCaseIds', s, useCaseIds);
-      if (g.publishStatus === 'published') {
-        checkDisplayableReference(
-          'guide',
-          g.slug,
-          'relatedUseCaseIds',
-          s,
-          useCaseIds,
-          publishedUseCaseIds,
-          'published',
-        );
-      }
-    });
-  }
-
   for (const u of useCases) {
     checkDate('useCase', u.slug, 'updatedAt', u.updatedAt);
     checkRequiredSources('useCase', u.slug, u.sources, {
@@ -611,7 +570,6 @@ export function validateData(): ValidationResult {
     ) {
       errors.push(`[candidate-public-empty] useCase "${u.slug}" に公開候補として使える candidateRobots がありません`);
     }
-    checkUniqueValues('useCase', u.slug, 'relatedGuideIds', u.relatedGuideIds);
     u.candidateRobots.forEach((c, index) => {
       check('useCase', u.slug, 'candidateRobots.robotId', c.robotId, robotIds);
       if (u.publishStatus === 'published') {
@@ -626,20 +584,6 @@ export function validateData(): ValidationResult {
         );
       }
       checkUseCaseCandidateEvidence(u, c, index);
-    });
-    u.relatedGuideIds.forEach((s) => {
-      check('useCase', u.slug, 'relatedGuideIds', s, guideIds);
-      if (u.publishStatus === 'published') {
-        checkDisplayableReference(
-          'useCase',
-          u.slug,
-          'relatedGuideIds',
-          s,
-          guideIds,
-          publishedGuideIds,
-          'published',
-        );
-      }
     });
   }
 
@@ -661,7 +605,6 @@ export function validateData(): ValidationResult {
     checkUniqueValues('article', article.slug, 'relatedRobotIds', article.relatedRobotIds);
     checkUniqueValues('article', article.slug, 'relatedManufacturerIds', article.relatedManufacturerIds);
     checkUniqueValues('article', article.slug, 'relatedUseCaseIds', article.relatedUseCaseIds);
-    checkUniqueValues('article', article.slug, 'relatedGuideIds', article.relatedGuideIds ?? []);
     article.relatedRobotIds.forEach((s) => {
       check('article', article.slug, 'relatedRobotIds', s, robotIds);
       if (article.publishStatus === 'published') {
@@ -700,20 +643,6 @@ export function validateData(): ValidationResult {
           s,
           useCaseIds,
           publishedUseCaseIds,
-          'published',
-        );
-      }
-    });
-    (article.relatedGuideIds ?? []).forEach((s) => {
-      check('article', article.slug, 'relatedGuideIds', s, guideIds);
-      if (article.publishStatus === 'published') {
-        checkDisplayableReference(
-          'article',
-          article.slug,
-          'relatedGuideIds',
-          s,
-          guideIds,
-          publishedGuideIds,
           'published',
         );
       }
@@ -804,31 +733,6 @@ export function validateData(): ValidationResult {
     }
   }
 
-  // Bidirectional consistency: Guide <-> UseCase（両側ともUIで使うため整合が必要・id参照）
-  for (const g of guides) {
-    for (const ucId of g.relatedUseCaseIds) {
-      const uc = useCases.find((u) => u.id === ucId);
-      if (uc && !uc.relatedGuideIds.includes(g.id)) {
-        errors.push(
-          `[asymmetric] guide "${g.id}" は useCase "${ucId}" を参照しているが、逆向き(useCase.relatedGuideIds)に含まれていません`,
-        );
-      }
-    }
-  }
-  for (const u of useCases) {
-    for (const gId of u.relatedGuideIds) {
-      const g = guides.find((x) => x.id === gId);
-      if (g && !g.relatedUseCaseIds.includes(u.id)) {
-        errors.push(
-          `[asymmetric] useCase "${u.id}" は guide "${gId}" を参照しているが、逆向き(guide.relatedUseCaseIds)に含まれていません`,
-        );
-      }
-    }
-  }
-
-  // 余談: report.relatedGuideIds があるならガイドが知らなくても警告しない
-  // (片方向リレーション。reportが主、guideは知らなくていい設計)
-
   return { errors, warnings };
 }
 
@@ -838,7 +742,7 @@ export function runValidationInDev(): void {
   didRun = true;
   if (process.env.NODE_ENV === 'production') return;
   const { errors, warnings } = validateData();
-  const total = robots.length + manufacturers.length + guides.length + useCases.length + articles.length;
+  const total = robots.length + manufacturers.length + useCases.length + articles.length;
   if (errors.length === 0 && warnings.length === 0) {
     // eslint-disable-next-line no-console
     console.log(`[data] referential integrity: OK (${total} records)`);

@@ -1,7 +1,7 @@
 // 構造化データ（JSON-LD）のビルダー（設計: data-architecture-redesign-v1 §11.7）。
 // Robot=Product / Manufacturer=Organization / Article=NewsArticle。
 // 値はすべてレコードから導出する（直書きしない）。
-import type { Article, Guide, Manufacturer, Robot, UseCase } from '@/data/types';
+import type { Article, Manufacturer, Robot, UseCase } from '@/data/types';
 import { getDisplayableAsset } from './media';
 import { siteUrl } from './site';
 import { uiText } from './uiText';
@@ -109,20 +109,6 @@ export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
   };
 }
 
-export function guideJsonLd(guide: Guide) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: guide.titleJa ?? guide.title,
-    description: guide.summary,
-    dateModified: guide.updatedAt,
-    url: absoluteUrl(`/guides/${guide.slug}`),
-    mainEntityOfPage: absoluteUrl(`/guides/${guide.slug}`),
-    author: PUBLISHER,
-    publisher: PUBLISHER,
-    inLanguage: 'ja-JP',
-  };
-}
 
 export function useCaseJsonLd(useCase: UseCase) {
   return {

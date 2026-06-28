@@ -290,15 +290,8 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
             onPointerDown={(e) => e.stopPropagation()}
           >
             <Link
-              href="/guides"
-              className="inline-flex items-center gap-2 bg-white px-4 py-3 text-xs font-medium text-neutral-900 transition-colors hover:bg-neutral-200 sm:px-6 sm:py-4 sm:text-sm"
-            >
-              {uiText.home.worldMap.ctaGuide}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
               href="/robots"
-              className="inline-flex items-center gap-2 border border-white/30 px-4 py-3 text-xs text-white transition-colors hover:bg-white/10 sm:px-6 sm:py-4 sm:text-sm"
+              className="inline-flex items-center gap-2 bg-white px-4 py-3 text-xs font-medium text-neutral-900 transition-colors hover:bg-neutral-200 sm:px-6 sm:py-4 sm:text-sm"
             >
               {uiText.home.worldMap.ctaRobots}
             </Link>

@@ -7,7 +7,7 @@ interface ConsultationCtaProps {
   cta: string;
 }
 
-// use-cases/[slug] と guides/[slug] のサイドバー末尾で使う相談CTA。
+// use-cases/[slug] のサイドバー末尾で使う相談CTA。
 // 文言（uiText）以外は完全一致していたため共通化する。
 export function ConsultationCta({ kicker, description, cta }: ConsultationCtaProps) {
   return (

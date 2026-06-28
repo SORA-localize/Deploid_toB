@@ -4,7 +4,6 @@ import type {
   CompanyStatus,
   DeploymentStage,
   DeploymentStatus,
-  GuideStage,
   JapanAvailability,
   JapanPresence,
   PublishStatus,
@@ -140,12 +139,6 @@ export const japanPresenceTones = {
   unknown: 'unknown',
 } as const satisfies Record<JapanPresence, VisualTone>;
 
-export const guideStageTones = {
-  learn: 'info',
-  evaluate: 'warning',
-  act: 'brand',
-} as const satisfies Record<GuideStage, VisualTone>;
-
 export const articleTypeTones = {
   analysis: 'brand',
   'deployment-report': 'success',
@@ -173,7 +166,6 @@ export const deploymentStatusTones = {
 } as const satisfies Record<DeploymentStatus, VisualTone>;
 
 export const tagKindTones = {
-  'guide-topic': 'brand',
   industry: 'info',
   task: 'neutral',
   'use-case-domain': 'brand',
@@ -190,7 +182,6 @@ export const getJapanAvailabilityTone = (availability: JapanAvailability) =>
   japanAvailabilityTones[availability];
 export const getCompanyStatusTone = (status: CompanyStatus) => companyStatusTones[status];
 export const getJapanPresenceTone = (presence: JapanPresence) => japanPresenceTones[presence];
-export const getGuideStageTone = (stage: GuideStage) => guideStageTones[stage];
 export const getArticleTypeTone = (type: ArticleType) => articleTypeTones[type];
 export const getUseCaseMaturityTone = (maturity: UseCaseMaturity) =>
   useCaseMaturityTones[maturity];

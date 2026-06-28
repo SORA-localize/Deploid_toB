@@ -1,6 +1,5 @@
 import type { MetadataRoute } from 'next';
 import {
-  getGuides,
   getManufacturers,
   getArticles,
   getRobots,
@@ -15,7 +14,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/robots',
     '/manufacturers',
     '/compare',
-    '/guides',
     '/use-cases',
     '/reports',
     '/about',
@@ -34,12 +32,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .map((m) => ({
       url: `${base}/manufacturers/${m.slug}`,
       lastModified: new Date(m.updatedAt),
-    }));
-  const guideEntries: MetadataRoute.Sitemap = getGuides()
-    .filter(shouldIndexPublishedRecord)
-    .map((g) => ({
-      url: `${base}/guides/${g.slug}`,
-      lastModified: new Date(g.updatedAt),
     }));
   const useCaseEntries: MetadataRoute.Sitemap = getUseCases()
     .filter(shouldIndexPublishedRecord)
@@ -60,7 +52,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const latestUpdatedAt = [
     ...robotEntries,
     ...manufacturerEntries,
-    ...guideEntries,
     ...useCaseEntries,
     ...reportEntries,
   ].reduce<Date>((latest, entry) => {
@@ -78,7 +69,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...staticEntries,
     ...robotEntries,
     ...manufacturerEntries,
-    ...guideEntries,
     ...useCaseEntries,
     ...reportEntries,
   ];

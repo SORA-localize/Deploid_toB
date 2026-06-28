@@ -72,6 +72,8 @@ Last cleaned: 2026-06-23
 - `usecase-evidence-model-refactor-plan-v1.md` — `/use-cases` の出典、導入事例、候補ロボット根拠をデータモデルと validator で保証する実行計画
 - `editorial-methodology-review-2026-06-24.md` — 記事題材・切り口・書き方のレビュー用草案（未承認。承認後に editorial_style_guide へ反映）
 
+実装完了で archive へ移動した計画: `archive/guides-retirement-plan-v1.md`（`/guides` 撤去、2026-06-28 実装）＋ 復活資産 `archive/guides-retirement-v1.md`。
+
 ## アーカイブ
 
 `docs/planning/archive/` は実装済み・履歴参照用の計画書置き場です。

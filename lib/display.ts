@@ -2,7 +2,6 @@ import type {
   CompanyStatus,
   CompanyType,
   DeploymentStage,
-  GuideStage,
   JapanAvailability,
   JapanPresence,
   Article,
@@ -76,8 +75,6 @@ export const manufacturerCountryOrder = [
   'Spain',
   'Norway',
 ] as const;
-
-export const guideStageOrder: GuideStage[] = ['learn', 'evaluate', 'act'];
 
 export const articleTypeOrder: ArticleType[] = [
   'analysis',

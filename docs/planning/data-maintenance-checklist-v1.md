@@ -1,5 +1,7 @@
 # データ保守運用チェックリスト v1
 
+> **2026-06-28 撤去注記（Guide）**: `Guide` / `/guides` は撤去済み。本書からは Guide 追加手順（旧 §L）・publish gate の Guide 項・useCase⇄guide 双方向チェック・`relatedGuideIds` を**削除済み**。経緯と復活は `archive/guides-retirement-v1.md` / `archive/guides-retirement-plan-v1.md`。
+
 `data-architecture-redesign-v1.md`（設計）の **運用面の実行チェックリスト**。
 日々のデータ追加・更新・slug変更・公開・定期レビューで「何を確認すれば破綻しないか」を手順化する。
 
@@ -120,14 +122,8 @@
 - [ ] id / slug / title / category / publishedAt / whyItMatters
 - [ ] sources が空でない（自動：published かつ `contentKind:'sample'` 以外で必須）
 
-**Guide**
-- [ ] 型必須：id / slug / title / description / stage / order / topics / targetReaders / relatedRobotIds / relatedUseCaseIds
-- [ ] topics は `guide-topic` 登録タグ / relatedRobotIds は id 参照（自動）
-- [ ] relatedUseCaseIds と相手 useCase.relatedGuideIds が双方向に揃う（自動：非対称は build 失敗）
-- [ ] 出典（sources）は手動推奨（validate 未強制）
-
 **UseCase**
-- [ ] 型必須：id / slug / title / maturityLevel / buyerReadiness / environment / requiredCapabilities / primaryDomain / atAGlance{3} / overview / whyItMatters / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots / relatedGuideIds
+- [ ] 型必須：id / slug / title / maturityLevel / buyerReadiness / environment / requiredCapabilities / primaryDomain / atAGlance{3} / overview / whyItMatters / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots
 - [ ] industryTags・taskTags・primaryDomain・secondaryDomains は登録タグ（自動） / candidateRobots[].robotId は id 参照（自動）
 - [ ] published の sources は空不可（自動）
 - [ ] published の candidateRobots は空不可（自動）
@@ -135,7 +131,6 @@
 - [ ] `possible` / `watch` も `basis` と evidence を持つ。`product-capability` / `market-signal` / `official-use-case` は `evidenceSourceUrls` 必須、`adjacent-deployment` は `evidenceDeploymentIds` 必須（自動）
 - [ ] published の candidateRobots は public-grade basis（`deployment` / `official-use-case` / `adjacent-deployment`）のみ。`product-capability` / `market-signal` / `editorial-watch` が残ると build 失敗（自動）
 - [ ] published の candidateRobots は、候補カードから根拠の deployment/source へ到達できる evidence を持つ。実例がある候補は `evidenceDeploymentIds`、公式用途根拠の候補は `evidenceSourceUrls` で候補単位に明示する
-- [ ] relatedGuideIds と相手 guide.relatedUseCaseIds が双方向に揃う（自動）
 - [ ] `evidenceSourceUrls` は原則 useCase.sources にも同じURLを載せる（自動 warning）。published の `official-use-case` では未掲載URLは build 失敗（自動）
 
 **Deployment**
@@ -228,24 +223,12 @@ AI側の実装手順:
 
 ---
 
-## L. ガイド（guides）追加 / 更新
-
-> robots/manufacturers（A/B）に準拠。id 発番 → `draft` → build ゲート → `published`。固有の罠は **guide↔useCase 双方向対称**。
-
-1. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
-2. [ ] 型必須：title / description / stage / order / topics / targetReaders / relatedRobotIds / relatedUseCaseIds
-3. [ ] `topics` は tagRegistry の `guide-topic` 登録値のみ（自動：未登録は build 失敗）
-4. [ ] `relatedRobotIds` は robot の **id** 参照（自動：参照切れは build 失敗）
-5. [ ] **双方向対称**：`relatedUseCaseIds` に入れた useCase 側の `relatedGuideIds` にも本ガイドの id を入れる（自動：片方向だけだと build 失敗）
-6. [ ] 出典（sources）は手動推奨（validate 未強制。一次情報があれば記入）
-7. [ ] `npm run build` 通過 → `published`
-
 ## M. ユースケース（useCases）追加 / 更新
 
-> 一次情報が薄い間は薄いページを量産しない（`ai/rules/00-index.md` の Current Work Posture / 現在の作業方針）。`UseCase`の役割は「業界紹介ではなく作業・タスク起点の逆引き」（`humanoid_media_IA_v1.md` §7）。深い判断基準（コスト・安全・調達等）はガイド側が担うため、新規追加時もその役割を超えて書きすぎない。
+> 一次情報が薄い間は薄いページを量産しない（`ai/rules/00-index.md` の Current Work Posture / 現在の作業方針）。`UseCase`の役割は「業界紹介ではなく作業・タスク起点の逆引き」（`humanoid_media_IA_v1.md` §7）。深い判断基準（コスト・安全・調達等）も含め、その役割を超えて書きすぎない。
 
 1. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
-2. [ ] 型必須：title / maturityLevel / buyerReadiness / environment / requiredCapabilities / **primaryDomain** / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots / relatedGuideIds
+2. [ ] 型必須：title / maturityLevel / buyerReadiness / environment / requiredCapabilities / **primaryDomain** / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots
 3. [ ] `primaryDomain`（必須・単一）と`secondaryDomains`（任意・配列）は`lib/tagRegistry.ts`の`use-case-domain`から選ぶ（自動：未登録は build 失敗）。これが「ロボットが何をするのが得意か」というMECEな動作軸の正本（UI上のラベルは「得意分野」）。`industryTags`/`taskTags`は検索ファセット用で、MECEを意図しない（manufacturing/plantのように粒度が混在してよい）。新しい値を追加する場合は「ロボットの動作」を表す軸に揃え、「導入目的」（集客・人材育成等）を表す値は持ち込まない（過去に`demo-entertainment`/`research-education`が目的軸混入で`demonstrate-capability`/`validate-new-tech`に直された経緯がある）
 4. [ ] 実証事例が複数ドメインに渡る場合（例：搬送＋組立＋検査が同じユースケースに混在）は、最も比重の大きいドメインを`primaryDomain`にし、残りを`secondaryDomains`に入れる。**物理的にユースケースを分割しない**。各ドメインが独立して実証件数を積んだ時点で初めて分割を検討する
 5. [ ] `candidateRobots`は`{robotId, fit, basis, evidenceDeploymentIds?, evidenceSourceUrls?, reason}[]`。`robotId`は robot の **id** 参照（自動）。`reason`は空不可（自動）
@@ -257,11 +240,10 @@ AI側の実装手順:
 11. [ ] 候補ごとの `reason` は「どの実例があるか」または「実例未確認だが、公式source上どの用途・業務領域へコミットできる根拠があるか」を書く。実例未確認なら未確認であることも書く。読者が候補カードの根拠リンクから deployment/source へ到達できない candidate は公開に残さない
 12. [ ] `evidenceSourceUrls` は原則 `useCase.sources` にも同じURLを載せる（自動 warning）。published の `official-use-case` では未掲載URLは build 失敗（自動）。ページ本文・候補理由・出典欄が同じ根拠を指すようにする
 13. [ ] `industryTags` / `taskTags` は登録タグのみ（自動）
-14. [ ] **双方向対称**：`relatedGuideIds` と相手 guide.`relatedUseCaseIds` を両方そろえる（自動）
-15. [ ] published の `sources` は空不可（自動）。用途本文と candidate evidence の根拠になる公式/一次情報・信頼できる報道を載せる
-16. [ ] `capabilityNotes` / `environmentRequirements` / `whyHardToday` / `japanDeploymentConditions` は各2-3文程度に圧縮し、詳しい判断はガイドへのリンクに渡す（detail page側で視覚的にも補足扱いにする）
-17. [ ] `featuredRank`（任意・数値）は一覧の「注目の適用領域」での優先順位。値が小さいほど上位、未設定は非掲載。実証事例が厚い用途から優先的に設定する（配列順には依存しない。`lib/useCaseFilters.ts`参照）
-18. [ ] build 通過 → `published`
+14. [ ] published の `sources` は空不可（自動）。用途本文と candidate evidence の根拠になる公式/一次情報・信頼できる報道を載せる
+15. [ ] `capabilityNotes` / `environmentRequirements` / `whyHardToday` / `japanDeploymentConditions` は各2-3文程度に圧縮する（detail page側で視覚的にも補足扱いにする）
+16. [ ] `featuredRank`（任意・数値）は一覧の「注目の適用領域」での優先順位。値が小さいほど上位、未設定は非掲載。実証事例が厚い用途から優先的に設定する（配列順には依存しない。`lib/useCaseFilters.ts`参照）
+17. [ ] build 通過 → `published`
 
 ## N. 導入事例（deployments）追加 / 更新
 
