@@ -1,5 +1,7 @@
 # ヒューマノイド導入メディア — 情報設計・要件定義 v1
 
+> **2026-06-28 撤去注記（導入ガイド）**: 本書は「ガイド（知る／判断する／動く）」を中核に据えるが、`Guide` タイプと `/guides` タブは撤去済み。当初ガイドが担う想定だった「判断する」層は構造化データ（use-cases の candidateRobots evidence・compare・robots）側で担う方針に移行した。本文のガイド記述は構想の記録として残置。撤去理由・将来の復活手順は `archive/guides-retirement-v1.md`、計画は `guides-retirement-plan-v1.md`。
+>
 > 注記：情報設計とページ役割の大枠は有効。  
 > §9〜§12 は Next.js / TypeScript 前提に更新済み（旧 Astro 版は削除）。技術判断は `humanoid_platform_tech_stack_v1.md` を優先する。
 > データフィールド名は再設計後の `data/types.ts` / `docs/planning/data-architecture-redesign-v1.md` を正とする。本文中の `manufacturerSlug` などは旧仕様の記述。

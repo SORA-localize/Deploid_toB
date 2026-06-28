@@ -1,5 +1,7 @@
 # データアーキテクチャ再設計 v1（CMS見据え・保守性主眼）
 
+> **2026-06-28 撤去注記（Guide）**: `Guide` エンティティと `/guides` は撤去済み。本書に残る Guide / `relatedGuideIds` / 「useCase ⇄ guide 双方向」「guide sources」の記述は**もう有効でない**（歴史的経緯として残置）。判断層は構造化データ（use-cases の `candidateRobots` evidence / compare / robots）側で担う。撤去理由と復活手順は `archive/guides-retirement-v1.md`、計画は `guides-retirement-plan-v1.md` を参照。
+
 ## 0. このドキュメントの位置づけ
 
 - **目的**: Deploid のデータ構造を「正本がどこにあり、何を変えれば何が追従するか」が一目で分かる形に再設計する。Git型CMS移行と長期保守に耐える骨格を定義する。

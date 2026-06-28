@@ -1,5 +1,7 @@
 # データ保守運用チェックリスト v1
 
+> **2026-06-28 撤去注記（Guide）**: `Guide` / `/guides` は撤去済み。本書の guide sources・guide 追加・useCase⇄guide 双方向に関する手順（§M 含む）は**もう適用しない**。詳細は `archive/guides-retirement-v1.md` / `guides-retirement-plan-v1.md`。
+
 `data-architecture-redesign-v1.md`（設計）の **運用面の実行チェックリスト**。
 日々のデータ追加・更新・slug変更・公開・定期レビューで「何を確認すれば破綻しないか」を手順化する。
 

@@ -7,7 +7,6 @@ This gate is specific to Deploid's data layer:
 - `data/robots.ts`
 - `data/manufacturers.ts`
 - `data/articles.ts`
-- `data/guides.ts`
 - `data/useCases.ts`
 - `data/deployments.ts`
 - `data/articlePlacements.ts`
@@ -22,7 +21,7 @@ Purpose: let an AI agent add or update records without breaking the `id` / `slug
 
 ## G1. Collection And Work Type
 
-- Decide exactly one target collection: `robots` / `manufacturers` / `articles` / `guides` / `useCases` / `deployments` / `articlePlacements`.
+- Decide exactly one target collection: `robots` / `manufacturers` / `articles` / `useCases` / `deployments` / `articlePlacements`.
 - Decide whether this is a new record or an existing-record update using `docs/data/README.md` "更新か新規追加かの判断".
   - Same real-world entity with changed name, specs, price, status, or sources: update the existing record.
   - Officially separate model, generation, SKU, or legal entity: create a new record.
@@ -56,7 +55,7 @@ Purpose: let an AI agent add or update records without breaking the `id` / `slug
 
 - All `manufacturerId`, `relatedRobotIds`, `candidateRobots[].robotId`, `supersededById`, and similar `*Id` / `*Ids` fields must point to existing immutable `id` values, not slugs.
 - Confirm referenced records exist. `npm run validate:data` should catch misses, but do not rely on it as the first check.
-- For symmetric relationships such as guides and use cases, update both sides when required by the current data model.
+- If the current data model has any symmetric (two-way) relationship, update both sides. Most relationships are one-way and derived; do not invent two-way links.
 - References: `docs/planning/data-architecture-redesign-v1.md`, `docs/data/README.md`.
 
 ## G6. Sources, Reliability, And Freshness

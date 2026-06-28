@@ -4,6 +4,8 @@ Status: active/unimplemented plan
 Created: 2026-06-26
 Branch: `refactor/project-wide-refactor`
 
+> **2026-06-28 整合注記**: Guide / `/guides` は `guides-retirement-plan-v1.md` により撤去済み。本計画の guide 関連 task は**実行しない（無効）**: C-001 / C-002A / C-002B（guide sources）、E-001 / E-002A / E-002B（ComingSoonGate）、H-001（guide topic filter）、I-004 / I-005B / I-006B（guide article grid 共通化）。UseCase 側の出典・候補根拠は evidence model で別途実装済み。
+
 この文書は、Deploid 全体リファクタリングを AI が迷わず実装できる粒度まで分解した実行計画です。
 実装判断の正本ではありません。実装時は常に現行コード、型、`docs/planning/README.md` の正本群を優先します。
 
