@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
 
 interface SidebarSectionProps {
-  /** robots/use-cases は常時sticky、guides（12colグリッド）は lg からのみ */
+  /** robots/use-cases は常時sticky。'lg' は12colグリッド用（現在未使用） */
   sticky?: 'always' | 'lg';
   children: ReactNode;
 }
 
-// RobotStickyAside / use-cases[slug] / guides[slug] の右サイドバーで共通の
+// RobotStickyAside / use-cases[slug] の右サイドバーで共通の
 // 「sticky + 区切り線で並ぶブロック群」の外枠。<aside>か<div>か、hidden有無は
 // 各ページのグリッド構造に依存するため、ここでは内側のラッパーのみを担う。
 export function SidebarSection({ sticky = 'always', children }: SidebarSectionProps) {

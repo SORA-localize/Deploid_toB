@@ -17,7 +17,7 @@ interface SourceListProps {
   className?: string;
   titleClassName?: string;
   /** 見出しのスタイルプリセット。`titleClassName` を指定した場合はそちらが優先される。
-   * 'meta': 記事本文内の出典セクション見出し用（reports/guides の本文メタ見出しと同じ見た目） */
+   * 'meta': 記事本文内の出典セクション見出し用（reports の本文メタ見出しと同じ見た目） */
   titleVariant?: keyof typeof titleVariantClassNames;
 }
 
