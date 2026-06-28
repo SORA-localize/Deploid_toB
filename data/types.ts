@@ -220,32 +220,13 @@ export interface Robot extends BaseRecord {
   vendorRiskNote?: string;
   /** 役割別の参考画像（詳細ページのカルーセル）。hero が未設定なら BaseRecord.heroImage を hero に昇格して使う。 */
   images?: Partial<Record<ImageRole, ImageAsset>>;
-  // 関連は逆向き(UseCase.candidateRobots[].robotId / Guide.relatedRobotIds /
+  // 関連は逆向き(UseCase.candidateRobots[].robotId /
   // Article.relatedRobotIds)で導出する。
   /** 業種タグ（lib/tagRegistry.ts の kind:'industry' のvalue）。未設定=調査中扱い。 */
   industryTags?: TagValue<'industry'>[];
   /** タスクタグ（lib/tagRegistry.ts の kind:'task' のvalue）。未設定=調査中扱い。 */
   taskTags?: TagValue<'task'>[];
   comparison: ComparisonProfile;
-}
-
-export type GuideStage = 'learn' | 'evaluate' | 'act';
-
-export interface Guide extends BaseRecord {
-  title: string;
-  titleJa?: string;
-  description: string;
-  stage: GuideStage;
-  order: number;
-  topics: TagValue<'guide-topic'>[];
-  targetReaders: string[];
-  readingTimeMinutes?: number;
-  checklistItems?: string[];
-  /** 記事本文（Markdown）。空ならガイド本文セクションは描画されない。 */
-  body?: string;
-  relatedRobotIds: Id[];
-  relatedUseCaseIds: Id[];
-  // 関連articlesは Article.relatedGuideIds で逆引きする。
 }
 
 export type UseCaseMaturity = 'early-stage' | 'pilot-phase' | 'production-ready';
@@ -460,7 +441,6 @@ export type ContactInquiryType =
 export interface SiteData {
   robots: Robot[];
   manufacturers: Manufacturer[];
-  guides: Guide[];
   useCases: UseCase[];
   articles: Article[];
 }

@@ -1,4 +1,4 @@
-import type { Guide, Article, Robot, UseCase } from '@/data/types';
+import type { Article, Robot, UseCase } from '@/data/types';
 import {
   getAnyRegisteredTag,
   getRegisteredTag,
@@ -87,13 +87,6 @@ export function getArticleIndustryTagOptions(reports: readonly Article[]) {
   );
 }
 
-export function getGuideTopicOptions(guides: readonly Guide[]) {
-  return toTagOptions(
-    guides.flatMap((guide) => guide.topics),
-    'guide-topic',
-  );
-}
-
 export function getUseCaseIndustryTagOptions(useCases: readonly UseCase[]) {
   return toTagOptions(
     useCases.flatMap((useCase) => useCase.industryTags),
@@ -131,18 +124,15 @@ export function getRobotTaskTagOptions(robots: readonly Robot[]) {
 
 export function getAllTagOptions({
   reports,
-  guides,
   useCases,
 }: {
   reports?: readonly Article[];
-  guides?: readonly Guide[];
   useCases?: readonly UseCase[];
 }) {
   return [
     ...(reports ? getArticleThemeOptions(reports) : []),
     ...(reports ? getArticleIndustryTagOptions(reports) : []),
     ...(reports ? getArticleRegionOptions(reports) : []),
-    ...(guides ? getGuideTopicOptions(guides) : []),
     ...(useCases ? getUseCaseIndustryTagOptions(useCases) : []),
     ...(useCases ? getUseCaseTaskTagOptions(useCases) : []),
   ];

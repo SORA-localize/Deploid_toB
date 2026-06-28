@@ -2,7 +2,6 @@
 // 「存在しないidを参照している」「双方向リンクが片側だけ」「id/slug重複」を
 // console に出す。`npm run validate:data`（scripts/validate-data.mjs）からも実行される。
 import { deployments } from '../data/deployments.ts';
-import { guides } from '../data/guides.ts';
 import { manufacturers } from '../data/manufacturers.ts';
 import { articlePlacements } from '../data/articlePlacements.ts';
 import { articles } from '../data/articles.ts';
@@ -401,7 +400,6 @@ export function validateData(): ValidationResult {
   };
   dup('robots', robots);
   dup('manufacturers', manufacturers);
-  dup('guides', guides);
   dup('useCases', useCases);
   dup('articles', articles);
   dup('deployments', deployments);
@@ -529,41 +527,6 @@ export function validateData(): ValidationResult {
       checkUrl('manufacturer', m.slug, `${field}.website`, distributor.website);
       checkUrl('manufacturer', m.slug, `${field}.sourceUrl`, distributor.sourceUrl);
       checkDate('manufacturer', m.slug, `${field}.checkedAt`, distributor.checkedAt);
-    });
-  }
-
-  for (const g of guides) {
-    checkDate('guide', g.slug, 'updatedAt', g.updatedAt);
-    checkTags('guide', g.slug, 'topics', 'guide-topic', g.topics);
-    checkUniqueValues('guide', g.slug, 'relatedRobotIds', g.relatedRobotIds);
-    checkUniqueValues('guide', g.slug, 'relatedUseCaseIds', g.relatedUseCaseIds);
-    g.relatedRobotIds.forEach((s) => {
-      check('guide', g.slug, 'relatedRobotIds', s, robotIds);
-      if (g.publishStatus === 'published') {
-        checkDisplayableReference(
-          'guide',
-          g.slug,
-          'relatedRobotIds',
-          s,
-          robotIds,
-          visibleRobotIds,
-          'published/archived',
-        );
-      }
-    });
-    g.relatedUseCaseIds.forEach((s) => {
-      check('guide', g.slug, 'relatedUseCaseIds', s, useCaseIds);
-      if (g.publishStatus === 'published') {
-        checkDisplayableReference(
-          'guide',
-          g.slug,
-          'relatedUseCaseIds',
-          s,
-          useCaseIds,
-          publishedUseCaseIds,
-          'published',
-        );
-      }
     });
   }
 
@@ -762,7 +725,7 @@ export function runValidationInDev(): void {
   didRun = true;
   if (process.env.NODE_ENV === 'production') return;
   const { errors, warnings } = validateData();
-  const total = robots.length + manufacturers.length + guides.length + useCases.length + articles.length;
+  const total = robots.length + manufacturers.length + useCases.length + articles.length;
   if (errors.length === 0 && warnings.length === 0) {
     // eslint-disable-next-line no-console
     console.log(`[data] referential integrity: OK (${total} records)`);

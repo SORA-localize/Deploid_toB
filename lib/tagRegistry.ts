@@ -6,7 +6,6 @@
  * - region: 記事の地域ファセット（Article.regionTags。互いに重ならない地域バケット）。
  * - theme: 記事の論点（angle）ファセット（Article.themeTags、任意・0〜4個）。
  * - use-case-domain: UseCase.primaryDomain の正本。MECEを意図した「ロボットの動作」軸。
- * - guide-topic: ガイドのトピック分類。
  *
  * 1概念=1軸に保つ。記事の「主題」は Article.section（data/types.ts、必須・タブ）が正本で、
  * deployment/policy は section に属する。theme はそれと直交する細かい論点（資金調達・価格・安全 等）。
@@ -14,7 +13,6 @@
  * 新しい値はまずここに登録してからデータで使う（lib/validate.ts が未登録・件数違反を弾く）。
  */
 export type TagKind =
-  | 'guide-topic'
   | 'industry'
   | 'task'
   | 'use-case-domain'
@@ -32,14 +30,6 @@ export function normalizeTagKey(value: string) {
 }
 
 export const tagRegistry = [
-  { kind: 'guide-topic', value: 'decision-variables', label: '判断軸' },
-  { kind: 'guide-topic', value: 'tco', label: 'TCO' },
-  { kind: 'guide-topic', value: 'safety', label: '安全' },
-  { kind: 'guide-topic', value: 'procurement', label: '調達' },
-  { kind: 'guide-topic', value: 'poc', label: 'PoC' },
-  { kind: 'guide-topic', value: 'kpi', label: 'KPI' },
-  { kind: 'guide-topic', value: 'operations', label: '運用' },
-
   { kind: 'industry', value: 'manufacturing', label: '製造' },
   { kind: 'industry', value: 'logistics', label: '物流' },
   { kind: 'industry', value: 'healthcare-care', label: '医療・介護' },
