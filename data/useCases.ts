@@ -79,7 +79,6 @@ export const useCases: UseCase[] = [
         reason: '移動・操作の汎用性は高いが、倉庫内トート・軽量搬送そのものの実証事例は確認できていない。',
       },
     ],
-    relatedGuideIds: ['decision-variables', 'poc-planning'],
   },
   {
     id: 'factory-inspection',
@@ -140,7 +139,6 @@ export const useCases: UseCase[] = [
         reason: '24/7稼働対応など工場運用向けの位置付けは確認できるが、巡回・点検タスクそのものでの実証は確認できていない。',
       },
     ],
-    relatedGuideIds: ['decision-variables'],
   },
   {
     id: 'research-development',
@@ -230,7 +228,6 @@ export const useCases: UseCase[] = [
         reason: '低価格な研究向け機体として早期段階。実証事例はまだ確認できていない。',
       },
     ],
-    relatedGuideIds: ['decision-variables'],
   },
   {
     id: 'demo-exhibition',
@@ -305,7 +302,6 @@ export const useCases: UseCase[] = [
         reason: '小型・低価格機として参考段階。展示・デモでの実証事例は確認できていない。',
       },
     ],
-    relatedGuideIds: ['decision-variables'],
   },
   {
     id: 'customer-reception',
@@ -388,7 +384,6 @@ export const useCases: UseCase[] = [
         reason: 'AI研究・スマートサービス向けに設計された対話特化モデルだが、受付・接客の特定導入事例は未確認。',
       },
     ],
-    relatedGuideIds: ['decision-variables'],
   },
   {
     id: 'retail-shelf-stocking',
@@ -479,7 +474,6 @@ export const useCases: UseCase[] = [
         reason: 'R1 AIRと同系統の標準構成機。小売棚補充での実証事例は未確認。',
       },
     ],
-    relatedGuideIds: [],
   },
   {
     id: 'care-physical-assistance',
@@ -564,7 +558,6 @@ export const useCases: UseCase[] = [
         reason: 'リハビリ実績を背景にした高自由度機だが、研究向けの位置づけが強く介護施設での実証は未確認。',
       },
     ],
-    relatedGuideIds: ['decision-variables'],
   },
   {
     id: 'factory-assembly-support',
@@ -691,6 +684,5 @@ export const useCases: UseCase[] = [
         reason: '前身機Figure 02がBMWスパルタンバーグ工場で実証を完了したが、Figure 03自体の工場導入事例はまだ確認できていない。',
       },
     ],
-    relatedGuideIds: ['decision-variables'],
   },
 ];

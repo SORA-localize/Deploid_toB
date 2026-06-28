@@ -326,7 +326,6 @@ export interface UseCase extends BaseRecord {
   whyHardToday: string;
   japanDeploymentConditions: string;
   candidateRobots: UseCaseCandidateRobot[];
-  relatedGuideIds: Id[];
   // 関連articlesは Article.relatedUseCaseIds で逆引きする。
 }
 
@@ -396,7 +395,6 @@ export interface Article extends BaseRecord {
   relatedRobotIds: Id[];
   relatedManufacturerIds: Id[];
   relatedUseCaseIds: Id[];
-  relatedGuideIds?: Id[];
 }
 
 export type ArticlePlacementSurface = 'reports-index';

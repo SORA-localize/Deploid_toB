@@ -262,7 +262,6 @@ export function createReportSearchDocument(report: Article) {
       report.relatedRobotIds,
       report.relatedManufacturerIds,
       report.relatedUseCaseIds,
-      report.relatedGuideIds,
     ],
   });
 }

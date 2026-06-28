@@ -56,7 +56,6 @@ export function validateData(): ValidationResult {
   // 参照整合は不変 id で取る（slug は可変URLであり外部キーではない）
   const robotIds = new Set(robots.map((r) => r.id));
   const manufacturerIds = new Set(manufacturers.map((m) => m.id));
-  const guideIds = new Set(guides.map((g) => g.id));
   const useCaseIds = new Set(useCases.map((u) => u.id));
   const articleIds = new Set(articles.map((r) => r.id));
   const visibleRobotIds = new Set(
@@ -69,9 +68,6 @@ export function validateData(): ValidationResult {
   );
   const publishedManufacturerIds = new Set(
     manufacturers.filter((m) => m.publishStatus === 'published').map((m) => m.id),
-  );
-  const publishedGuideIds = new Set(
-    guides.filter((g) => g.publishStatus === 'published').map((g) => g.id),
   );
   const publishedUseCaseIds = new Set(
     useCases.filter((u) => u.publishStatus === 'published').map((u) => u.id),
@@ -594,7 +590,6 @@ export function validateData(): ValidationResult {
     if (u.publishStatus === 'published' && u.candidateRobots.length === 0) {
       errors.push(`[candidate-empty] useCase "${u.slug}".candidateRobots が空です`);
     }
-    checkUniqueValues('useCase', u.slug, 'relatedGuideIds', u.relatedGuideIds);
     u.candidateRobots.forEach((c, index) => {
       check('useCase', u.slug, 'candidateRobots.robotId', c.robotId, robotIds);
       if (u.publishStatus === 'published') {
@@ -609,20 +604,6 @@ export function validateData(): ValidationResult {
         );
       }
       checkUseCaseCandidateEvidence(u, c, index);
-    });
-    u.relatedGuideIds.forEach((s) => {
-      check('useCase', u.slug, 'relatedGuideIds', s, guideIds);
-      if (u.publishStatus === 'published') {
-        checkDisplayableReference(
-          'useCase',
-          u.slug,
-          'relatedGuideIds',
-          s,
-          guideIds,
-          publishedGuideIds,
-          'published',
-        );
-      }
     });
   }
 
@@ -644,7 +625,6 @@ export function validateData(): ValidationResult {
     checkUniqueValues('article', article.slug, 'relatedRobotIds', article.relatedRobotIds);
     checkUniqueValues('article', article.slug, 'relatedManufacturerIds', article.relatedManufacturerIds);
     checkUniqueValues('article', article.slug, 'relatedUseCaseIds', article.relatedUseCaseIds);
-    checkUniqueValues('article', article.slug, 'relatedGuideIds', article.relatedGuideIds ?? []);
     article.relatedRobotIds.forEach((s) => {
       check('article', article.slug, 'relatedRobotIds', s, robotIds);
       if (article.publishStatus === 'published') {
@@ -683,20 +663,6 @@ export function validateData(): ValidationResult {
           s,
           useCaseIds,
           publishedUseCaseIds,
-          'published',
-        );
-      }
-    });
-    (article.relatedGuideIds ?? []).forEach((s) => {
-      check('article', article.slug, 'relatedGuideIds', s, guideIds);
-      if (article.publishStatus === 'published') {
-        checkDisplayableReference(
-          'article',
-          article.slug,
-          'relatedGuideIds',
-          s,
-          guideIds,
-          publishedGuideIds,
           'published',
         );
       }
@@ -786,31 +752,6 @@ export function validateData(): ValidationResult {
       checkUrl('articlePlacement', owner, 'sponsor.url', placement.sponsor.url);
     }
   }
-
-  // Bidirectional consistency: Guide <-> UseCase（両側ともUIで使うため整合が必要・id参照）
-  for (const g of guides) {
-    for (const ucId of g.relatedUseCaseIds) {
-      const uc = useCases.find((u) => u.id === ucId);
-      if (uc && !uc.relatedGuideIds.includes(g.id)) {
-        errors.push(
-          `[asymmetric] guide "${g.id}" は useCase "${ucId}" を参照しているが、逆向き(useCase.relatedGuideIds)に含まれていません`,
-        );
-      }
-    }
-  }
-  for (const u of useCases) {
-    for (const gId of u.relatedGuideIds) {
-      const g = guides.find((x) => x.id === gId);
-      if (g && !g.relatedUseCaseIds.includes(u.id)) {
-        errors.push(
-          `[asymmetric] useCase "${u.id}" は guide "${gId}" を参照しているが、逆向き(guide.relatedUseCaseIds)に含まれていません`,
-        );
-      }
-    }
-  }
-
-  // 余談: report.relatedGuideIds があるならガイドが知らなくても警告しない
-  // (片方向リレーション。reportが主、guideは知らなくていい設計)
 
   return { errors, warnings };
 }
