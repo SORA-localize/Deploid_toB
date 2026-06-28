@@ -42,3 +42,7 @@ Last cleaned: 2026-06-23
 ## 2026-06-25 Archived After Implementation
 
 - `source-list-meta-heading-dedup-plan-v1.md` — `component-duplication-unification-plan-v1.md` の「C」を自己調査し直して見つかった、`SourceList` の `titleClassName` 重複（reports/guides）のみを対象にした小さな修正計画。`titleVariant`（`titleClassName` 未指定時のみ適用）を追加し、両ファイルを置き換え済み。出典見出しのclass属性が変更前後で一致することを確認済み。
+
+## 2026-06-28 Archived After Implementation
+
+- `usecase-publication-quality-gate-plan-v1.md` — published UseCase の候補を public-grade basis（`deployment` / `official-use-case` / `adjacent-deployment`）に限定し、既存UseCaseデータ、validator、候補ラベル表示、standing docsへ反映済み。

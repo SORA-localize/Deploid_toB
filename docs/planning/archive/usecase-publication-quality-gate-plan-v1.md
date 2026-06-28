@@ -1,7 +1,8 @@
 # UseCase Publication Quality Gate Plan v1
 
-Status: active/unimplemented plan
+Status: completed/archived plan
 Created: 2026-06-28
+Completed: 2026-06-28
 Scope: `/use-cases` の公開候補、根拠表示、既存 UseCase データ再判定
 
 この文書は、`/use-cases` を「用途から探す逆引き」として成立させるための実装計画です。
