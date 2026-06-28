@@ -54,7 +54,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
 
   const candidateRobots = getRelatedRobots(useCase.candidateRobots.map((c) => c.robotId));
   const candidateAnnotations = Object.fromEntries(
-    useCase.candidateRobots.map((c) => [c.robotId, { fit: c.fit, reason: c.reason }]),
+    useCase.candidateRobots.map((c) => [c.robotId, { fit: c.fit, basis: c.basis, reason: c.reason }]),
   );
   const guides = getRelatedGuides(useCase.relatedGuideIds);
   const reports = getArticlesForUseCase(useCase.id);

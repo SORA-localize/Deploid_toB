@@ -21,6 +21,7 @@ import {
 import { articleCategoryLabels, articleSectionLabels } from './labels.ts';
 import { isSpecKey } from './specSchema.ts';
 import { isRegisteredTag, normalizeTagKey, type TagKind } from './tagRegistry.ts';
+import { isPublicUseCaseCandidateBasis } from './useCaseEvidence.ts';
 
 const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
 const referenceDisplayStatuses = new Set<RightsStatus>([
@@ -168,6 +169,12 @@ export function validateData(): ValidationResult {
     if (!candidateEvidenceBases.has(candidate.basis)) {
       errors.push(`[candidate-basis] useCase "${owner}.basis" が未定義または未登録です: ${candidate.basis}`);
     }
+    if (useCase.publishStatus === 'published' && !isPublicUseCaseCandidateBasis(candidate.basis)) {
+      errors.push(
+        `[candidate-public-basis] useCase "${owner}" は公開UseCaseの候補なので ` +
+          `basis:'${candidate.basis}' は使えません`,
+      );
+    }
 
     checkUniqueValues('useCase', useCase.slug, `candidateRobots[${index}].evidenceDeploymentIds`, deploymentIds);
     checkUniqueValues('useCase', useCase.slug, `candidateRobots[${index}].evidenceSourceUrls`, sourceUrls);
@@ -176,10 +183,14 @@ export function validateData(): ValidationResult {
     sourceUrls.forEach((url, sourceIndex) => {
       checkUrl('useCase', useCase.slug, `candidateRobots[${index}].evidenceSourceUrls[${sourceIndex}]`, url);
       if (!useCaseSourceUrls.has(url)) {
-        warnings.push(
+        const message =
           `[candidate-source-unlisted] useCase "${useCase.slug}" の candidateRobots[${index}].evidenceSourceUrls ` +
-            `"${url}" が useCase.sources にありません`,
-        );
+          `"${url}" が useCase.sources にありません`;
+        if (useCase.publishStatus === 'published' && candidate.basis === 'official-use-case') {
+          errors.push(message);
+        } else {
+          warnings.push(message);
+        }
       }
     });
 
@@ -593,6 +604,12 @@ export function validateData(): ValidationResult {
     );
     if (u.publishStatus === 'published' && u.candidateRobots.length === 0) {
       errors.push(`[candidate-empty] useCase "${u.slug}".candidateRobots が空です`);
+    }
+    if (
+      u.publishStatus === 'published' &&
+      !u.candidateRobots.some((candidate) => isPublicUseCaseCandidateBasis(candidate.basis))
+    ) {
+      errors.push(`[candidate-public-empty] useCase "${u.slug}" に公開候補として使える candidateRobots がありません`);
     }
     checkUniqueValues('useCase', u.slug, 'relatedGuideIds', u.relatedGuideIds);
     u.candidateRobots.forEach((c, index) => {
