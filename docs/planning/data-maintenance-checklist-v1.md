@@ -133,8 +133,9 @@
 - [ ] published の candidateRobots は空不可（自動）
 - [ ] candidateRobots[].fit が`'strong'`の場合、`basis:'deployment'` と `evidenceDeploymentIds` が必須。同じrobotId・同じuseCaseのpublishedな実証事例でなければ build 失敗（自動。詳細は§M）
 - [ ] `possible` / `watch` も `basis` と evidence を持つ。`product-capability` / `market-signal` / `official-use-case` は `evidenceSourceUrls` 必須、`adjacent-deployment` は `evidenceDeploymentIds` 必須（自動）
+- [ ] published の candidateRobots は public-grade basis（`deployment` / `official-use-case` / `adjacent-deployment`）のみ。`product-capability` / `market-signal` / `editorial-watch` が残ると build 失敗（自動）
 - [ ] relatedGuideIds と相手 guide.relatedUseCaseIds が双方向に揃う（自動）
-- [ ] `evidenceSourceUrls` は原則 useCase.sources にも同じURLを載せる（自動 warning）
+- [ ] `evidenceSourceUrls` は原則 useCase.sources にも同じURLを載せる（自動 warning）。published の `official-use-case` では未掲載URLは build 失敗（自動）
 
 **Deployment**
 - [ ] 型必須：id / slug / manufacturerId / customer / country / location{lat,lng} / status
@@ -250,13 +251,15 @@ AI側の実装手順:
 6. [ ] `fit`は3段階：`strong`=`data/deployments.ts`にpublishedな実在の導入事例（同じrobotId・同じuseCaseへの`relatedUseCaseIds`）がある場合のみ／`possible`=スペック・位置付けは合うが当該ユースケースでの実証未確認／`watch`=初期段階・参考程度。量産・商用展開の事実だけでは`strong`にしない。**先に `data/deployments.ts` を確認し、同じニッチに複数の実在導入事例が集中していないか見る**（新規追加の最も強い根拠。思いつきで追加しない）
 7. [ ] `basis`は根拠種別：`deployment` / `adjacent-deployment` / `official-use-case` / `product-capability` / `market-signal` / `editorial-watch`。`strong`は必ず`basis:'deployment'`かつ`evidenceDeploymentIds`必須（自動）。`possible + basis:'deployment'` は過小申告として build 失敗。前世代機・近接用途の導入事例を根拠にする場合は `basis:'adjacent-deployment'` にする
 8. [ ] `product-capability` / `market-signal` / `official-use-case` は `evidenceSourceUrls` 必須（自動）。`adjacent-deployment` は `evidenceDeploymentIds` 必須（自動）。公開UseCaseで未公開deploymentを evidence に使うと build 失敗
-9. [ ] `evidenceSourceUrls` は原則 `useCase.sources` にも同じURLを載せる（自動 warning）。ページ本文・候補理由・出典欄が同じ根拠を指すようにする
-10. [ ] `industryTags` / `taskTags` は登録タグのみ（自動）
-11. [ ] **双方向対称**：`relatedGuideIds` と相手 guide.`relatedUseCaseIds` を両方そろえる（自動）
-12. [ ] published の `sources` は空不可（自動）。用途本文と candidate evidence の根拠になる公式/一次情報・信頼できる報道を載せる
-13. [ ] `capabilityNotes` / `environmentRequirements` / `whyHardToday` / `japanDeploymentConditions` は各2-3文程度に圧縮し、詳しい判断はガイドへのリンクに渡す（detail page側で視覚的にも補足扱いにする）
-14. [ ] `featuredRank`（任意・数値）は一覧の「注目の適用領域」での優先順位。値が小さいほど上位、未設定は非掲載。実証事例が厚い用途から優先的に設定する（配列順には依存しない。`lib/useCaseFilters.ts`参照）
-15. [ ] build 通過 → `published`
+9. [ ] published UseCase の候補に残せる public-grade basis は `deployment` / `official-use-case` / `adjacent-deployment` のみ（自動）。`product-capability` / `market-signal` / `editorial-watch` は draft の調査メモに留めるか、候補から削除する。public-grade candidate が0件なら UseCase は `draft` のままにする
+10. [ ] `official-use-case` は、メーカー・導入先・研究機関などの公式 source が当該用途または業務領域を明示している場合だけ使う。信頼できる報道だけでは昇格しない。`adjacent-deployment` は `reason` に前世代機・同系統機・同じ顧客工程・近接タスクなど、何が隣接なのかを書く
+11. [ ] `evidenceSourceUrls` は原則 `useCase.sources` にも同じURLを載せる（自動 warning）。published の `official-use-case` では未掲載URLは build 失敗（自動）。ページ本文・候補理由・出典欄が同じ根拠を指すようにする
+12. [ ] `industryTags` / `taskTags` は登録タグのみ（自動）
+13. [ ] **双方向対称**：`relatedGuideIds` と相手 guide.`relatedUseCaseIds` を両方そろえる（自動）
+14. [ ] published の `sources` は空不可（自動）。用途本文と candidate evidence の根拠になる公式/一次情報・信頼できる報道を載せる
+15. [ ] `capabilityNotes` / `environmentRequirements` / `whyHardToday` / `japanDeploymentConditions` は各2-3文程度に圧縮し、詳しい判断はガイドへのリンクに渡す（detail page側で視覚的にも補足扱いにする）
+16. [ ] `featuredRank`（任意・数値）は一覧の「注目の適用領域」での優先順位。値が小さいほど上位、未設定は非掲載。実証事例が厚い用途から優先的に設定する（配列順には依存しない。`lib/useCaseFilters.ts`参照）
+17. [ ] build 通過 → `published`
 
 ## N. 導入事例（deployments）追加 / 更新
 

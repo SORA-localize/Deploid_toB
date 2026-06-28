@@ -1,6 +1,6 @@
 # Deploid Data Work Guide
 
-Last reviewed: 2026-06-26
+Last reviewed: 2026-06-28
 
 この文書は、AIでデータ追加・更新を行うときの入口です。
 実装上の正本は `data/types.ts` と `lib/*` にあります。
@@ -37,6 +37,8 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / guide
 - `id` は発番後に変えない。命名修正では `slug` / `name` / `nameJa` だけを変える。例: A2 Ultra は `id: 'agibot-a2-max'`、公開slugは `agibot-a2-ultra`
 - 公式ページ、press release、信頼できる報道を確認し、`sources` に `url` / `checkedAt` / `reliability` を残す
 - 公開 UseCase は `sources` を空にしない。`candidateRobots` は `fit` だけでなく `basis` と `evidenceDeploymentIds` または `evidenceSourceUrls` で根拠を明示する
+- 公開 UseCase の候補に残せる `basis` は `deployment` / `official-use-case` / `adjacent-deployment` のみ。`product-capability` / `market-signal` / `editorial-watch` は draft の調査メモに留めるか削除する
+- `official-use-case` は公式 source が当該用途または業務領域を明示している場合だけ使い、その URL を `useCase.sources` にも載せる。`adjacent-deployment` は `reason` に前世代機・同系統機・近接タスクなど隣接根拠の種類を書く
 - UseCase の `fit:'strong'` は、同じ `robotId` と `useCase.id` を持つ published deployment を `evidenceDeploymentIds` で明示できる場合だけ使う
 - AIの推測を事実として入れない。不明なスペックや価格は省略または要確認メモにする
 - 新規レコードは原則 `publishStatus: 'draft'` から作る
