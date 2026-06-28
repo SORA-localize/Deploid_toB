@@ -1,8 +1,9 @@
 # Guides Retirement Plan v1
 
-Status: active/unimplemented plan
+Status: completed / archived（2026-06-28 に `refactor/retire-guides` で実装。GR-001〜GR-012 完了）
 Created: 2026-06-28
-Branch: 未作成（実装時に `refactor/retire-guides` を切る。現在の作業ブランチは `main`）
+Branch: `refactor/retire-guides`
+復活資産: `archive/guides-retirement-v1.md`（型・タグ・本文・撤去 commit 列・revert 手順）
 
 この文書は、`/guides`（導入ガイド）コンテンツタイプをサイトとコードから全面撤去し、同時に将来の復活を容易にするための実行計画です。
 実装判断の正本ではありません。実装時は現行コード、`data/types.ts`、`lib/validate.ts`、`docs/planning/data-architecture-redesign-v1.md`、`docs/planning/data-maintenance-checklist-v1.md`、`docs/planning/humanoid_media_IA_v1.md` を優先します。

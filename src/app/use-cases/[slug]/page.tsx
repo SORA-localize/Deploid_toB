@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { AlertCircle, Building2, CheckCircle2, MapPin } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';

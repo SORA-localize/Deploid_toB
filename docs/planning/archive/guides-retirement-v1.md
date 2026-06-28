@@ -32,14 +32,22 @@ Related plan: `docs/planning/guides-retirement-plan-v1.md`
 
 復活の最短経路:
 
+`fe0ce68`（GR-007）は `Guide` 削除と同じ commit で `tsconfig.json` の exclude に `docs` を追加している。
+この docs 除外は撤去と独立した正しい設定なので**戻さない**。そのため GR-007 だけ分けて扱う。
+
 ```sh
-# 1) コード撤去 commit を逆順で revert
-git revert --no-edit 166e53c fe0ce68 70ad050 41d194d bd4b36f 7823056
-# 2) もしくは個別ファイルを撤去前から取り出す
-git checkout 62836442 -- data/guides.ts
+# 1) GR-007 以外を逆順で revert
+git revert --no-edit 166e53c 70ad050 41d194d bd4b36f 7823056   # GR-008, 006, 005, 004, 003
+
+# 2) GR-007 を revert しつつ tsconfig の docs 除外は維持する
+git revert --no-commit fe0ce68
+git checkout HEAD -- tsconfig.json        # docs 除外を巻き戻さない
+git commit -m "Revert GR-007 (restore Guide; keep docs excluded from tsconfig)"
+
+# （別法）個別ファイルを撤去前から取り出す: git checkout 62836442 -- data/guides.ts data/types.ts ...
 ```
 
-注意: `fe0ce68`（GR-007）で `tsconfig.json` の exclude に `docs` を追加している。これは復活と独立した正しい設定なので revert しない（revert 時に競合したら docs 除外は残す）。
+復活後は現行の `UseCase` 型・validator（evidence model 導入後）に合わせて `relatedGuideIds` 等を再設計すること。`PRE_REMOVAL_SHA` の `data/useCases.ts` をそのまま上書きしない。
 
 ## 型スナップショット（`data/types.ts`）
 

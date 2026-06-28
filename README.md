@@ -49,7 +49,7 @@ Vercelでは Project Settings の Environment Variables に設定する。
 
 ```text
 src/app/        # App Router ページ（/, /robots, /manufacturers, /compare,
-                #   /guides, /use-cases, /reports, /about, /contact ＋各 [slug]）
+                #   /use-cases, /reports, /about, /contact ＋各 [slug]）
 ai/rules/       # AIエージェント向けの入口・作業別ルール
 components/     # UI コンポーネント、カード、フィルター、共通レイアウト
 data/           # 配列データ + types.ts（型の真実源）
