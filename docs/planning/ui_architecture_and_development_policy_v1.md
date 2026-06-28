@@ -1,5 +1,7 @@
 # UIアーキテクチャ・開発方針 v1
 
+> **2026-06-28 撤去注記**: `/guides`・`GuidesBrowser`・ガイド詳細は撤去済み。本書のガイド関連記述（`GuidesBrowser`、`/guides → GuidesBrowser`、ガイド専用ブロック等）は**もう有効でない**。経緯は `archive/guides-retirement-v1.md`。
+
 Last reviewed: 2026-05-29
 
 > この文書は、Deploid のUIを作り込む前に、既存実装の構造、責務分担、今後の開発ルールを明文化する。具体的な色・余白・部品の見た目は `design_system_v1.md` に分ける。

@@ -125,7 +125,7 @@ Deploid は、ヒューマノイド導入を検討する事業者向けの buyer
 
 | 種別 | クラス | rounded | hover border |
 |---|---|---|---|
-| カタログ・業務系（ロボット・メーカー・ガイド・ユースケース） | `.card-data` | なし（矩形） | `border-ring`（jade） |
+| カタログ・業務系（ロボット・メーカー・ユースケース） | `.card-data` | なし（矩形） | `border-ring`（jade） |
 | 記事・メディア系 | `.card-editorial` | `rounded-lg` | `border-foreground/30` |
 | hero/featured カルーセル（NewsFeatureCard, NewsHeroCarousel） | — | `rounded-xl` | `border-foreground/30` |
 | 小 UI パーツ（タグ・ラベル） | — | `rounded-sm` | — |
@@ -470,8 +470,8 @@ UI文言：
 
 | ゾーン | ジャンル | 代表 | 対象ページ |
 |---|---|---|---|
-| 読む場所 | Editorial Broadsheet | FT.com / Bloomberg | 詳細ページ本文（reports/guides/use-cases/[slug]） |
-| 操作する場所 | Product Dashboard | Linear / Vercel | 一覧・比較（robots/reports/guides/use-cases/compare） |
+| 読む場所 | Editorial Broadsheet | FT.com / Bloomberg | 詳細ページ本文（reports/use-cases/[slug]） |
+| 操作する場所 | Product Dashboard | Linear / Vercel | 一覧・比較（robots/reports/use-cases/compare） |
 
 ### Editorial ゾーンのルール
 

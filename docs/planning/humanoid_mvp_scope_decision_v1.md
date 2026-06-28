@@ -1,5 +1,7 @@
 # 6/10 MVP スコープ決定書 v1
 
+> **2026-06-28 撤去注記**: 本書が「旗艦ガイド `/guides/decision-variables`」「データモデル `guides`」を必須としていた件は撤去済み。判断層は use-cases / compare 側へ移行。経緯は `archive/guides-retirement-v1.md`。
+
 > 本書はMVPスコープの**唯一の確定版**。他のドキュメントと矛盾があれば本書を優先する。
 
 ---

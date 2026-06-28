@@ -1,5 +1,7 @@
 # ヒューマノイド導入メディア — 構築メモ＆公開TODO（議事録 v1）
 
+> **2026-06-28 撤去注記**: `/guides`・`data/guides.ts`・Guides 一覧/詳細は撤去済み。本書のガイド関連 TODO・ページ構成・サンプル記述は**もう有効でない**。経緯は `archive/guides-retirement-v1.md`。
+
 > 姉妹文書：情報設計は `humanoid_media_IA_v1.md`、技術判断は `humanoid_platform_tech_stack_v1.md`、データ型は `nextjs_data_types_v1.ts`、スコープ確定は `humanoid_mvp_scope_decision_v1.md` を参照。  
 > 本書は「Next.js 前提で、何をどう作って公開するか」の作業メモ。
 

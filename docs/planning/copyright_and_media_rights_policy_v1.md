@@ -137,7 +137,7 @@ Last reviewed: 2026-05-29
 |---|---|---|
 | ロボット写真 | `BaseRecord.heroImage`, `Robot.images` | 写真の著作権、CDN直リンク、商用再掲載不可 |
 | メーカーロゴ | `Manufacturer.logo` | 商標、ロゴ図案の著作権、提携誤認 |
-| 本文Markdown | `Guide.body`, `Report.body` | 外部記事・プレスリリースの表現コピー、長い引用 |
+| 本文Markdown | `Report.body` | 外部記事・プレスリリースの表現コピー、長い引用 |
 | 短文コンテンツ | `summary`, `description`, `overview`, `whyItMatters`, `keyTakeaways`, `comparison` | 事実の無出典化、外部表現の要約コピー |
 | SEO文言 | `seo.metaTitle`, `seo.metaDescription`, `metadata.description` | 外部コピー・商標誤認・広告的表現 |
 | 出典情報 | `Source.title`, `Source.url`, `Source.publisher` | 引用元タイトルの扱い、リンク先の信頼性 |
@@ -304,7 +304,7 @@ export interface ImageAsset {
 }
 ```
 
-将来、Markdown本文にも引用や埋め込みを入れるなら、`Guide` / `Report` に次のような管理項目を足す。
+将来、Markdown本文にも引用や埋め込みを入れるなら、`Report` に次のような管理項目を足す。
 
 ```ts
 export interface ContentRightsReview {
@@ -376,11 +376,6 @@ export function canDisplayAsset(asset?: ImageAsset) {
   - カンファレンス資料では、メーカー名テキストだけで足りるならロゴを使わない。
 
 ### 中リスク
-
-- `data/guides.ts` の `Guide.body`
-  - 現在 `sources: []` のまま、Figure/BMW/Apptronik/Agility/AMR等の具体例に触れている。
-  - 文章自体は独自分析寄りだが、事実主張の出典を残すべき。
-  - 関連する `reports` や公式発表を `sources` に追加する。
 
 - `data/useCases.ts`
   - `sources: []` のまま業界・用途の一般論を書いている。
