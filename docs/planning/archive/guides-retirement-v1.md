@@ -13,11 +13,33 @@ Related plan: `docs/planning/guides-retirement-plan-v1.md`
 - この commit ではガイドが完全に存在し、`npm run validate:data` / `npm run build` が通る。
 - 最短復活はこの SHA から guide 関連ファイルを取り出すこと（§ 復活手順）。
 
-## 撤去 commit 列（GR-011 で記入）
+## 撤去 commit 列
 
-撤去を構成する原子的 commit を順に記録する。`git revert` で戻す際はこの逆順で行う。
+撤去を構成する原子的 commit（ブランチ `refactor/retire-guides`、`PRE_REMOVAL_SHA` の直後から）。
+`git revert` で戻す際はこの**逆順**で行う（GR-008 → GR-003）。
 
-- （実装後に GR-011 で SHA を追記）
+- `7823056` GR-003 他ページからガイド導線を外す
+- `bd4b36f` GR-004 nav / sitemap からガイドを外す
+- `41d194d` GR-005 `/guides` ルートと GuidesBrowser / guideFilters を削除
+- `70ad050` GR-006 `relatedGuideIds` 参照を全撤去（atomic）
+- `fe0ce68` GR-007 `Guide` 型・data・lib を削除（tsconfig で docs を除外）（atomic）
+- `166e53c` GR-008 guide uiText と孤児 ComingSoonGate を削除
+
+補助 commit（コード撤去ではないが復活時に有用）:
+
+- `48acf1c` GR-002 本計画 archive（型・タグ・本文の退避）
+- `7c57255` GR-009/010 docs と先行計画の整合
+
+復活の最短経路:
+
+```sh
+# 1) コード撤去 commit を逆順で revert
+git revert --no-edit 166e53c fe0ce68 70ad050 41d194d bd4b36f 7823056
+# 2) もしくは個別ファイルを撤去前から取り出す
+git checkout 62836442 -- data/guides.ts
+```
+
+注意: `fe0ce68`（GR-007）で `tsconfig.json` の exclude に `docs` を追加している。これは復活と独立した正しい設定なので revert しない（revert 時に競合したら docs 除外は残す）。
 
 ## 型スナップショット（`data/types.ts`）
 
