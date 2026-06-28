@@ -85,6 +85,10 @@ export function getDeployments() {
   return published(deployments);
 }
 
+export function getDeploymentById(id: string) {
+  return getDeployments().find((deployment) => deployment.id === id);
+}
+
 export function getDeploymentsForManufacturer(manufacturerId: string) {
   return getDeployments().filter((deployment) => deployment.manufacturerId === manufacturerId);
 }

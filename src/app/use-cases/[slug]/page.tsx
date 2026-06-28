@@ -13,6 +13,7 @@ import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { SidebarBlock, SidebarDivider, SidebarSection } from '@/components/SidebarSection';
 import { SourceList } from '@/components/SourceList';
 import {
+  getDeploymentById,
   getDeploymentsForUseCase,
   getRelatedGuides,
   getRelatedRobots,
@@ -53,8 +54,39 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
   if (!useCase) notFound();
 
   const candidateRobots = getRelatedRobots(useCase.candidateRobots.map((c) => c.robotId));
+  const sourceByUrl = new Map(useCase.sources.map((source) => [source.url, source]));
   const candidateAnnotations = Object.fromEntries(
-    useCase.candidateRobots.map((c) => [c.robotId, { fit: c.fit, basis: c.basis, reason: c.reason }]),
+    useCase.candidateRobots.map((c) => {
+      const deploymentEvidenceLinks = (c.evidenceDeploymentIds ?? []).flatMap((deploymentId) => {
+        const deployment = getDeploymentById(deploymentId);
+        const source = deployment?.sources[0];
+        if (!deployment || !source) return [];
+        return [
+          {
+            href: source.url,
+            label: deployment.siteName
+              ? `事例: ${deployment.customer} ${deployment.siteName}`
+              : `事例: ${deployment.customer}`,
+          },
+        ];
+      });
+      const sourceEvidenceLinks = (c.evidenceSourceUrls ?? []).map((url) => {
+        const source = sourceByUrl.get(url);
+        return {
+          href: url,
+          label: `公式: ${source?.publisher ?? source?.title ?? new URL(url).hostname}`,
+        };
+      });
+      return [
+        c.robotId,
+        {
+          fit: c.fit,
+          basis: c.basis,
+          reason: c.reason,
+          evidenceLinks: [...deploymentEvidenceLinks, ...sourceEvidenceLinks],
+        },
+      ];
+    }),
   );
   const guides = getRelatedGuides(useCase.relatedGuideIds);
   const reports = getArticlesForUseCase(useCase.id);

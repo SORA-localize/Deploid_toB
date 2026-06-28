@@ -14,6 +14,10 @@ interface CandidateRobotAnnotation {
   fit: CandidateFit;
   basis: CandidateEvidenceBasis;
   reason: string;
+  evidenceLinks?: Array<{
+    href: string;
+    label: string;
+  }>;
 }
 
 interface CandidateRobotListProps {
@@ -69,6 +73,22 @@ export function CandidateRobotList({ robots, emptyMessage = '候補は精査中�
             <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
               {annotation ? annotation.reason : robot.summary}
             </p>
+            {annotation?.evidenceLinks && annotation.evidenceLinks.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
+                <span className="text-muted-foreground">根拠</span>
+                {annotation.evidenceLinks.map((link) => (
+                  <a
+                    key={`${robot.id}-${link.href}-${link.label}`}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="border border-border px-1.5 py-0.5 text-foreground underline-offset-2 hover:border-foreground/40 hover:underline"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         );
       })}
