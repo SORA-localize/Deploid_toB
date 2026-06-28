@@ -83,11 +83,8 @@ export const guides: Guide[] = [
     relatedRobotIds: ['unitree-g1', 'figure-03'],
     relatedUseCaseIds: [
       'warehouse-picking',
-      'factory-inspection',
       'research-development',
-      'demo-exhibition',
       'customer-reception',
-      'care-physical-assistance',
       'factory-assembly-support',
     ],
   },
