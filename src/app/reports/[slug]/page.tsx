@@ -15,7 +15,6 @@ import { SidebarBlock, SidebarDivider } from '@/components/SidebarSection';
 import { ActiveSectionProvider } from '@/lib/activeSectionContext';
 import {
   getArticles,
-  getRelatedGuides,
   getRelatedManufacturers,
   getRelatedRobots,
   getRelatedUseCases,
@@ -73,7 +72,6 @@ function ReportSidebarContent() {
           {[
             { href: '/robots', label: uiText.reports.sidebarToolFindRobots },
             { href: '/compare', label: uiText.reports.sidebarToolCompare },
-            { href: '/guides', label: uiText.reports.sidebarToolGuides },
           ].map(({ href, label }) => (
             <Link
               key={href}
@@ -98,13 +96,12 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const robots = getRelatedRobots(report.relatedRobotIds);
   const manufacturers = getRelatedManufacturers(report.relatedManufacturerIds);
   const useCases = getRelatedUseCases(report.relatedUseCaseIds);
-  const guides = getRelatedGuides(report.relatedGuideIds ?? []);
 
   const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
   const hasBody = (report.body ?? '').trim().length > 0;
   const bodyHeadings = hasBody ? extractH2Headings(report.body!) : [];
   const heroImage = getDisplayableAsset(report.heroImage);
-  const hasRelated = robots.length > 0 || manufacturers.length > 0 || useCases.length > 0 || guides.length > 0;
+  const hasRelated = robots.length > 0 || manufacturers.length > 0 || useCases.length > 0;
   const reportTitle = report.titleJa ?? report.title;
   const breadcrumbItems = [
     { label: uiText.reports.breadcrumb, path: '/reports' },
@@ -355,18 +352,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                       items={useCases.map((u) => ({
                         href: `/use-cases/${u.slug}`,
                         title: u.titleJa ?? u.title,
-                      }))}
-                    />
-                  )}
-                  {guides.length > 0 && (
-                    <RelatedLinkList
-                      id="related-guides"
-                      title={uiText.reports.relatedGuides}
-                      titleLevel="h3"
-                      items={guides.map((g) => ({
-                        href: `/guides/${g.slug}`,
-                        title: g.titleJa ?? g.title,
-                        description: g.summary,
                       }))}
                     />
                   )}

@@ -69,8 +69,6 @@ export default function HomePage() {
 
   const manufacturerPreviewAssets: typeof robotPreviewAssets = [];
 
-  const guidePreviewAssets: typeof robotPreviewAssets = [];
-
   const { heroReports, featureReports } = getArticleIndexPlacementReports(getArticles());
 
   const manufacturerById = Object.fromEntries(
@@ -92,7 +90,6 @@ export default function HomePage() {
       <HomeContentNavigator
         robotAssets={robotPreviewAssets}
         manufacturerAssets={manufacturerPreviewAssets}
-        guideAssets={guidePreviewAssets}
       />
 
       {featuredRobots.length > 0 && (
