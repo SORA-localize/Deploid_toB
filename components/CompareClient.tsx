@@ -402,7 +402,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
             )}
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_16rem]">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_minmax(0,1fr)] lg:grid-cols-[16rem_minmax(0,1fr)_16rem]">
             {/* Left Sidebar - Manufacturer Menu (desktop only) */}
             <div className="hidden md:block min-w-0">
               <CompareDroppableArea
@@ -414,7 +414,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                   <div
                     ref={setNodeRef}
                     className={cn(
-                      'border border-border bg-card transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
+                      'border border-border bg-card transition-[box-shadow,outline-color] duration-200 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]',
                       isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                     )}
                   >
@@ -423,7 +423,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         {uiText.compare.manufacturers}
                       </h2>
                     </div>
-                    <div className="max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden xl:max-h-[calc(100vh-200px)]">
+                    <div className="max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:max-h-[calc(100vh-200px)]">
                       {sortedManufacturers.map((manufacturer) => {
                         const manufacturerRobots = sortRobots(
                           robots.filter((r) => r.manufacturerId === manufacturer.id),
@@ -613,7 +613,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
             </div>
 
             {/* Right Sidebar - Favorites (desktop xl+ only) */}
-            <div className="hidden xl:block min-w-0">
+            <div className="hidden lg:block min-w-0">
               <CompareDroppableArea
                 id={compareColumnIds.favorite}
                 target="favorite"
@@ -623,7 +623,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                   <div
                     ref={setNodeRef}
                     className={cn(
-                      'border border-border bg-card transition-[box-shadow,outline-color] duration-200 xl:sticky xl:top-[calc(var(--header-h)+1.5rem)]',
+                      'border border-border bg-card transition-[box-shadow,outline-color] duration-200 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]',
                       isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
                     )}
                   >
@@ -633,7 +633,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         {uiText.compare.favorites}
                       </h2>
                     </div>
-                    <div className="p-3 max-h-80 overflow-y-auto overscroll-contain xl:max-h-[calc(100vh-200px)]">
+                    <div className="p-3 max-h-80 overflow-y-auto overscroll-contain lg:max-h-[calc(100vh-200px)]">
                       {!isMounted ? (
                         <div className="text-center py-8" aria-hidden="true" />
                       ) : favoriteRobots.length === 0 ? (
