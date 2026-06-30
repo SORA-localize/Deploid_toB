@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { UseCasesBrowser } from '@/components/UseCasesBrowser';
-import { getUseCases } from '@/lib/data';
+import { getDeploymentsForUseCase, getUseCases } from '@/lib/data';
 import { createPageMetadata } from '@/lib/metadata';
+import { createUseCaseSearchIndex, searchUseCaseSlugs } from '@/lib/searchIndex';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 import {
   getTagLabel,
@@ -11,6 +12,7 @@ import {
   getUseCaseTaskTagOptions,
 } from '@/lib/tags';
 import { getUseCaseFilterResult, normalizeUseCaseFilters } from '@/lib/useCaseFilters';
+import { getUseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
 
 const defaultTitle = '用途から探す';
 const defaultDescription =
@@ -35,7 +37,8 @@ export async function generateMetadata({ searchParams }: { searchParams: RouteSe
   const params = await pickSearchParams(searchParams, ['industry', 'task', 'domain', 'q'] as const);
   const useCases = getUseCases();
   const filters = resolveFilters(useCases, params);
-  const { filtered } = getUseCaseFilterResult(useCases, filters);
+  const matchedSlugs = searchUseCaseSlugs(createUseCaseSearchIndex(useCases), filters.query);
+  const { filtered } = getUseCaseFilterResult(useCases, filters, matchedSlugs);
 
   const tagLabels = [
     filters.domain ? getTagLabel(filters.domain, 'use-case-domain') : null,
@@ -57,10 +60,19 @@ export async function generateMetadata({ searchParams }: { searchParams: RouteSe
 async function UseCasesContent({ searchParams }: { searchParams: RouteSearchParams }) {
   const params = await pickSearchParams(searchParams, ['industry', 'task', 'domain', 'q'] as const);
   const useCases = getUseCases();
+  const cardEvidenceByUseCaseId = Object.fromEntries(
+    useCases.map((useCase) => [
+      useCase.id,
+      getUseCaseCardEvidenceSummary({
+        hasDeployments: getDeploymentsForUseCase(useCase.id).length > 0,
+      }),
+    ]),
+  );
   return (
     <UseCasesBrowser
       useCases={useCases}
       initialFilters={resolveFilters(useCases, params)}
+      cardEvidenceByUseCaseId={cardEvidenceByUseCaseId}
     />
   );
 }

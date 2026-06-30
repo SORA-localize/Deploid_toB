@@ -2,18 +2,21 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
+import { TagChip } from '@/components/TagChip';
 import type { UseCase } from '@/data/types';
+import type { UseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
 import { uiText } from '@/lib/uiText';
 import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
 
 interface UseCaseCardProps {
   useCase: UseCase;
+  evidenceSummary?: UseCaseCardEvidenceSummary;
 }
 
 // robots/manufacturers と同じグリッド密度で並ぶことを前提にしたコンパクトな縦カード
 // （以前の featured/list 2バリアントは、横幅いっぱいの行カードがグリッドと噛み合わず
 //   カードが肥大化する原因だったため統合した）。
-export function UseCaseCard({ useCase: u }: UseCaseCardProps) {
+export function UseCaseCard({ useCase: u, evidenceSummary }: UseCaseCardProps) {
   const {
     cardRef,
     rotateX,
@@ -59,8 +62,13 @@ export function UseCaseCard({ useCase: u }: UseCaseCardProps) {
         <p className="mb-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
           {u.subtitle ?? u.summary}
         </p>
-        <div className="mt-auto pt-2 text-[11px] text-muted-foreground/80">
-          {uiText.useCases.candidateRobots(u.candidateRobots.length)}
+        <div className="mt-auto flex min-w-0 items-center gap-1.5 pt-2 text-[11px] text-muted-foreground/80">
+          <span className="shrink-0">{uiText.useCases.candidateRobots(u.candidateRobots.length)}</span>
+          {evidenceSummary && (
+            <TagChip tone={evidenceSummary.tone} className="min-w-0 max-w-full truncate px-1.5 py-0 text-[10px]">
+              {evidenceSummary.label}
+            </TagChip>
+          )}
         </div>
       </Link>
     </motion.div>

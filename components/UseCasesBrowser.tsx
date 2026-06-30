@@ -5,18 +5,16 @@ import type { ActiveFilterChip } from '@/components/ActiveFilterChips';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
+import { FacetFilterBar } from '@/components/FacetFilterBar';
 import { SearchInput } from '@/components/SearchInput';
-import { SelectControl } from '@/components/SelectControl';
 import { UseCaseCard } from '@/components/UseCaseCard';
 import { UseCasesHeader } from '@/components/UseCasesHeader';
 import type { UseCase } from '@/data/types';
-import {
-  getTagLabel,
-  getUseCaseDomainOptions,
-  getUseCaseIndustryTagOptions,
-  getUseCaseTaskTagOptions,
-} from '@/lib/tags';
+import { USE_CASE_FACETS } from '@/lib/facetConfig';
+import { createUseCaseSearchIndex, searchUseCaseSlugs } from '@/lib/searchIndex';
+import { getTagLabel } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
+import type { UseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
 import {
   getUseCaseFilterResult,
   type UseCaseFilters,
@@ -26,40 +24,31 @@ import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 interface UseCasesBrowserProps {
   useCases: UseCase[];
   initialFilters: UseCaseFilters;
+  cardEvidenceByUseCaseId: Record<string, UseCaseCardEvidenceSummary | undefined>;
 }
 
-// robots/manufacturers と同じ「業種・タスクを独立した2つのドロップダウンで同時に絞り込む」構造に揃える
-// （lib/robotFilters.ts・components/RobotsBrowser.tsxを参照）。タグの値自体は
-// lib/tagRegistry.ts が唯一の正本で、getUseCaseIndustryTagOptions/getUseCaseTaskTagOptionsがそこから導出する。
-export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserProps) {
+export function UseCasesBrowser({
+  useCases,
+  initialFilters,
+  cardEvidenceByUseCaseId,
+}: UseCasesBrowserProps) {
   const { updateParams } = useUrlParamUpdater();
   const { query } = initialFilters;
 
-  const industryOptions = useMemo(
-    () => [
-      { value: 'all', label: uiText.common.allIndustries },
-      ...getUseCaseIndustryTagOptions(useCases).map((opt) => ({ value: opt.value, label: opt.label })),
-    ],
-    [useCases],
+  const facetValues = useMemo(
+    () => ({
+      domain: initialFilters.domain,
+      industry: initialFilters.industry,
+      task: initialFilters.task,
+    }),
+    [initialFilters.domain, initialFilters.industry, initialFilters.task],
   );
-  const taskOptions = useMemo(
-    () => [
-      { value: 'all', label: uiText.common.allTasks },
-      ...getUseCaseTaskTagOptions(useCases).map((opt) => ({ value: opt.value, label: opt.label })),
-    ],
-    [useCases],
-  );
-  const domainOptions = useMemo(
-    () => [
-      { value: 'all', label: uiText.common.allDomains },
-      ...getUseCaseDomainOptions(useCases).map((opt) => ({ value: opt.value, label: opt.label })),
-    ],
-    [useCases],
-  );
+  const searchIndex = useMemo(() => createUseCaseSearchIndex(useCases), [useCases]);
+  const matchedSlugs = useMemo(() => searchUseCaseSlugs(searchIndex, query), [searchIndex, query]);
 
   const { filtered, active } = useMemo(
-    () => getUseCaseFilterResult(useCases, initialFilters),
-    [useCases, initialFilters],
+    () => getUseCaseFilterResult(useCases, initialFilters, matchedSlugs),
+    [useCases, initialFilters, matchedSlugs],
   );
 
   const activeChips = useMemo(() => {
@@ -88,6 +77,8 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
     return chips;
   }, [initialFilters, updateParams]);
 
+  const onFacetChange = (key: string, value: string | null) => updateParams({ [key]: value });
+
   return (
     <div className="min-h-screen bg-background">
       <UseCasesHeader activeChips={activeChips} />
@@ -108,45 +99,30 @@ export function UseCasesBrowser({ useCases, initialFilters }: UseCasesBrowserPro
             }
           />
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4 max-w-3xl">
-            <SelectControl
-              id="use-case-domain"
-              label={uiText.filters.domain}
-              value={initialFilters.domain ?? 'all'}
-              onChange={(v) => updateParams({ domain: v === 'all' ? null : v })}
-              options={domainOptions}
-            />
-            <SelectControl
-              id="use-case-industry"
-              label={uiText.filters.industry}
-              value={initialFilters.industry ?? 'all'}
-              onChange={(v) => updateParams({ industry: v === 'all' ? null : v })}
-              options={industryOptions}
-            />
-            <SelectControl
-              id="use-case-task"
-              label={uiText.filters.task}
-              value={initialFilters.task ?? 'all'}
-              onChange={(v) => updateParams({ task: v === 'all' ? null : v })}
-              options={taskOptions}
-            />
-          </div>
+          <FacetFilterBar
+            items={useCases}
+            facets={USE_CASE_FACETS}
+            values={facetValues}
+            matchedSlugs={matchedSlugs}
+            resultCount={filtered.length}
+            active={active}
+            idPrefix="use-case"
+            showChips={false}
+            onChange={onFacetChange}
+          />
         </div>
       </div>
 
       <div className="site-container py-5 min-h-[60vh]">
-        <div className="flex items-center justify-between mb-4 px-1">
+        <div className="mb-4 px-1">
           <h3 className="text-sm font-semibold text-foreground">
             {uiText.useCases.all}
           </h3>
-          <span className="text-xs text-muted-foreground">
-            {uiText.common.results(filtered.length, Boolean(active))}
-          </span>
         </div>
 
         <div className="grid auto-rows-fr grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((u) => (
-            <UseCaseCard key={u.id} useCase={u} />
+            <UseCaseCard key={u.id} useCase={u} evidenceSummary={cardEvidenceByUseCaseId[u.id]} />
           ))}
         </div>
 

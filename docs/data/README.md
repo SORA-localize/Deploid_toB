@@ -41,6 +41,7 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCa
 - 公開 UseCase の候補に残せる `basis` は `deployment` / `official-use-case` / `adjacent-deployment` のみ。`product-capability` / `market-signal` / `editorial-watch` は draft の調査メモに留めるか削除する
 - `official-use-case` は公式 source が当該用途または業務領域を明示している場合だけ使い、その URL を `useCase.sources` にも載せる。`adjacent-deployment` は `reason` に前世代機・同系統機・近接タスクなど隣接根拠の種類を書く
 - UseCase の `fit:'strong'` は、同じ `robotId` と `useCase.id` を持つ published deployment を `evidenceDeploymentIds` で明示できる場合だけ使う
+- 用途詳細の関連記事は `Article.relatedUseCaseIds` が正本。`industryTags` / `taskTags` の一致だけで関連記事や候補ロボットを自動生成しない
 - AIの推測を事実として入れない。不明なスペックや価格は省略または要確認メモにする
 - 新規レコードは原則 `publishStatus: 'draft'` から作る
 - 記事は `category` と `whyItMatters` を必ず入れる
@@ -94,7 +95,7 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCa
 
 ## 参照とタグの追加手順
 
-- 関連付けは `slug` ではなく `id` で行う。例: `relatedRobotIds`, `relatedManufacturerIds`, `candidateRobots[].robotId`, `manufacturerId`
+- 関連付けは `slug` ではなく `id` で行う。例: `relatedRobotIds`, `relatedManufacturerIds`, `relatedUseCaseIds`, `candidateRobots[].robotId`, `manufacturerId`
 - URLを作るときだけ `slug` を使う。例: `/robots/${robot.slug}`
 - 新しいタグが必要な場合は、先に `lib/tagRegistry.ts` へ `value` と `label` を追加する
 - `value` は安定キーなので後から気軽に変えない。表示を変えたいだけなら `label` を変える

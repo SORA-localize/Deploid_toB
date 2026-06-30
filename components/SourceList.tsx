@@ -1,8 +1,5 @@
 import type { Source } from '@/data/types';
-import { reliabilityLabels } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
-import { cn } from '@/lib/utils';
-import { getReliabilityTone, getVisualToneClassName } from '@/lib/visualSemantics';
 
 const titleVariantClassNames = {
   default: 'text-lg font-semibold text-foreground mb-4',
@@ -49,15 +46,7 @@ export function SourceList({
                 {source.title}
               </a>
               <span className="text-muted-foreground">
-                {source.publisher ? ` / ${source.publisher}` : ''} / 確認 {source.checkedAt}{' '}
-              </span>
-              <span
-                className={cn(
-                  'ml-1 inline-flex border px-1.5 py-0.5 text-[10px] font-medium',
-                  getVisualToneClassName(getReliabilityTone(source.reliability)),
-                )}
-              >
-                {reliabilityLabels[source.reliability]}
+                {source.publisher ? ` / ${source.publisher}` : ''} / 確認 {source.checkedAt}
               </span>
             </li>
           ))}
