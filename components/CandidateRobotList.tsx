@@ -57,7 +57,7 @@ export function CandidateRobotList({ robots, emptyMessage = '候補は精査中�
             </div>
             {annotation && (
               <TagChip tone={getCandidateFitTone(annotation.fit)} className="mb-1.5 py-0.5">
-                {annotation.fitLabel} / {annotation.basisLabel}
+                {annotation.fitLabel}
               </TagChip>
             )}
             <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">

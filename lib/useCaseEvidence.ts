@@ -39,7 +39,6 @@ export interface UseCaseCandidateEvidenceViewModel {
   fit: CandidateFit;
   fitLabel: string;
   basis: CandidateEvidenceBasis;
-  basisLabel: string;
   reason: string;
   evidenceLinks: CandidateEvidenceLink[];
 }
@@ -84,7 +83,6 @@ export function getUseCaseCandidateEvidenceViewModel(
     fit: candidate.fit,
     fitLabel: candidateFitLabels[candidate.fit],
     basis: candidate.basis,
-    basisLabel: candidateEvidenceBasisLabels[candidate.basis],
     reason: candidate.reason,
     evidenceLinks: [...deploymentEvidenceLinks, ...sourceEvidenceLinks],
   };
@@ -103,19 +101,11 @@ export function getUseCaseCandidateEvidenceByRobotId(
   );
 }
 
-export function getUseCaseCardEvidenceSummary(
-  useCase: UseCase,
-  { hasDeployments }: { hasDeployments: boolean },
-): UseCaseCardEvidenceSummary {
+export function getUseCaseCardEvidenceSummary({
+  hasDeployments,
+}: {
+  hasDeployments: boolean;
+}): UseCaseCardEvidenceSummary | undefined {
   if (hasDeployments) return { label: uiText.useCases.evidenceSummary.deployment, tone: 'success' };
-  if (useCase.candidateRobots.some((candidate) => candidate.basis === 'official-use-case')) {
-    return { label: uiText.useCases.evidenceSummary.official, tone: 'info' };
-  }
-  if (useCase.candidateRobots.some((candidate) => candidate.basis === 'adjacent-deployment')) {
-    return { label: uiText.useCases.evidenceSummary.adjacent, tone: 'info' };
-  }
-  if (useCase.candidateRobots.some((candidate) => candidate.fit === 'watch')) {
-    return { label: uiText.useCases.evidenceSummary.watch, tone: 'neutral' };
-  }
-  return { label: uiText.useCases.evidenceSummary.capability, tone: 'neutral' };
+  return undefined;
 }

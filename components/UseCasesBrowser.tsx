@@ -24,7 +24,7 @@ import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 interface UseCasesBrowserProps {
   useCases: UseCase[];
   initialFilters: UseCaseFilters;
-  cardEvidenceByUseCaseId: Record<string, UseCaseCardEvidenceSummary>;
+  cardEvidenceByUseCaseId: Record<string, UseCaseCardEvidenceSummary | undefined>;
 }
 
 export function UseCasesBrowser({

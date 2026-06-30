@@ -63,7 +63,7 @@ async function UseCasesContent({ searchParams }: { searchParams: RouteSearchPara
   const cardEvidenceByUseCaseId = Object.fromEntries(
     useCases.map((useCase) => [
       useCase.id,
-      getUseCaseCardEvidenceSummary(useCase, {
+      getUseCaseCardEvidenceSummary({
         hasDeployments: getDeploymentsForUseCase(useCase.id).length > 0,
       }),
     ]),

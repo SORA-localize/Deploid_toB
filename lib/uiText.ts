@@ -163,10 +163,6 @@ export const uiText = {
     deploymentSource: (publisher: string) => `出典：${publisher}`,
     evidenceSummary: {
       deployment: '実導入事例あり',
-      official: '公式根拠あり',
-      adjacent: '隣接実証あり',
-      watch: '監視対象中心',
-      capability: '製品能力ベース',
     },
     overviewFields: {
       domain: '用途分類',
