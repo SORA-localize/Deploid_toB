@@ -1,6 +1,5 @@
 import type {
   BuyerReadiness,
-  CandidateFit,
   CompanyStatus,
   DeploymentStage,
   DeploymentStatus,
@@ -108,12 +107,6 @@ export const buyerReadinessTones = {
   'limited-today': 'unknown',
 } as const satisfies Record<BuyerReadiness, VisualTone>;
 
-export const candidateFitTones = {
-  strong: 'success',
-  possible: 'info',
-  watch: 'unknown',
-} as const satisfies Record<CandidateFit, VisualTone>;
-
 export const japanAvailabilityTones = {
   'official-japan': 'success',
   'distributor-japan': 'success',
@@ -185,6 +178,5 @@ export const getJapanPresenceTone = (presence: JapanPresence) => japanPresenceTo
 export const getArticleTypeTone = (type: ArticleType) => articleTypeTones[type];
 export const getUseCaseMaturityTone = (maturity: UseCaseMaturity) =>
   useCaseMaturityTones[maturity];
-export const getCandidateFitTone = (fit: CandidateFit) => candidateFitTones[fit];
 export const getDeploymentStatusTone = (status: DeploymentStatus) => deploymentStatusTones[status];
 export const getTagKindTone = (kind: TagKind) => tagKindTones[kind];

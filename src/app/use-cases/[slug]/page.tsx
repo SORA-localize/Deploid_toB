@@ -14,6 +14,7 @@ import { SourceList } from '@/components/SourceList';
 import {
   getDeploymentById,
   getDeploymentsForUseCase,
+  getManufacturerById,
   getRelatedRobots,
   getArticlesForUseCase,
   getUseCases,
@@ -27,7 +28,6 @@ import { breadcrumbJsonLd, useCaseJsonLd } from '@/lib/jsonLd';
 import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
 import { uiText } from '@/lib/uiText';
-import { getUseCaseOverviewFacts } from '@/lib/useCaseDisplay';
 import { getUseCaseCandidateEvidenceByRobotId } from '@/lib/useCaseEvidence';
 
 export function generateStaticParams() {
@@ -53,11 +53,19 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
   if (!useCase) notFound();
 
   const candidateRobots = getRelatedRobots(useCase.candidateRobots.map((c) => c.robotId));
-  const candidateAnnotations = getUseCaseCandidateEvidenceByRobotId(useCase, getDeploymentById);
+  const candidateRobotById = new Map(candidateRobots.map((robot) => [robot.id, robot]));
+  const candidateAnnotations = getUseCaseCandidateEvidenceByRobotId(
+    useCase,
+    getDeploymentById,
+    (robotId) => {
+      const robot = candidateRobotById.get(robotId);
+      if (!robot) return undefined;
+      const manufacturer = getManufacturerById(robot.manufacturerId);
+      return manufacturer?.nameJa ?? manufacturer?.name ?? robot.manufacturerId;
+    },
+  );
   const reports = getArticlesForUseCase(useCase.id);
   const deployments = getDeploymentsForUseCase(useCase.id);
-
-  const overviewRows = getUseCaseOverviewFacts(useCase);
 
   const sections: ManufacturerDetailSectionLink[] = [
     { label: uiText.useCases.atAGlance, href: '#at-a-glance' },
@@ -226,21 +234,6 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
           {/* ── RIGHT COLUMN（robots/[slug] の RobotStickyAside と同じ「枠なし・区切り線のみ」） ── */}
           <aside>
             <SidebarSection>
-              <SidebarBlock kicker={uiText.useCases.decisionFactors}>
-                <table className="w-full text-xs">
-                  <tbody className="divide-y divide-border">
-                    {overviewRows.map((row) => (
-                      <tr key={row.key}>
-                        <td className="py-2 text-muted-foreground">{row.label}</td>
-                        <td className="py-2 text-foreground font-medium text-right">{row.value}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </SidebarBlock>
-
-              <SidebarDivider />
-
               <SidebarBlock kicker={uiText.useCases.candidateRobotsLabel}>
                 <CandidateRobotList robots={candidateRobots} annotations={candidateAnnotations} />
               </SidebarBlock>

@@ -151,7 +151,6 @@ export const uiText = {
     wherefits: '向く条件',
     whereDoesNotFit: '向かない条件',
     mustBeTrue: '成立条件',
-    decisionFactors: '用途の条件',
     candidateRobotsLabel: '候補ロボット',
     related: '関連記事',
     consultation: '導入相談',
@@ -163,13 +162,6 @@ export const uiText = {
     deploymentSource: (publisher: string) => `出典：${publisher}`,
     evidenceSummary: {
       deployment: '実導入事例あり',
-    },
-    overviewFields: {
-      domain: '用途分類',
-      maturity: '成熟度',
-      buyerReadiness: '導入判断',
-      environment: '環境',
-      requiredCapabilities: '必要能力',
     },
   },
   compare: {

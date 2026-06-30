@@ -1,6 +1,5 @@
 import type {
   BuyerReadiness,
-  CandidateFit,
   Capability,
   CompanyStatus,
   CompanyType,
@@ -50,12 +49,6 @@ export const buyerReadinessLabels: Record<BuyerReadiness, string> = {
   'initial-adoption': '初期導入向き',
   'requires-poc': '要PoC',
   'limited-today': '現時点では限定的',
-};
-
-export const candidateFitLabels: Record<CandidateFit, string> = {
-  strong: '導入事例あり',
-  possible: '根拠あり',
-  watch: '要確認',
 };
 
 export const deploymentStageLabels: Record<DeploymentStage, string> = {

@@ -1,12 +1,9 @@
 import type {
   CandidateEvidenceBasis,
-  CandidateFit,
   DeploymentSite,
-  Source,
   UseCase,
   UseCaseCandidateRobot,
 } from '../data/types.ts';
-import { candidateFitLabels } from './labels.ts';
 import { uiText } from './uiText.ts';
 
 export const publicUseCaseCandidateBases = [
@@ -21,24 +18,12 @@ export function isPublicUseCaseCandidateBasis(basis: CandidateEvidenceBasis): bo
   return publicUseCaseCandidateBasisSet.has(basis);
 }
 
-export const candidateEvidenceBasisLabels = {
-  deployment: '導入事例あり',
-  'official-use-case': '公式用途あり',
-  'adjacent-deployment': '隣接実証あり',
-  'product-capability': '製品能力のみ',
-  'market-signal': '市場シグナル',
-  'editorial-watch': '調査待ち',
-} as const satisfies Record<CandidateEvidenceBasis, string>;
-
 export interface CandidateEvidenceLink {
   href: string;
   label: string;
 }
 
 export interface UseCaseCandidateEvidenceViewModel {
-  fit: CandidateFit;
-  fitLabel: string;
-  basis: CandidateEvidenceBasis;
   reason: string;
   evidenceLinks: CandidateEvidenceLink[];
 }
@@ -49,19 +34,20 @@ export interface UseCaseCardEvidenceSummary {
 }
 
 export type DeploymentResolver = (id: string) => DeploymentSite | undefined;
+export type RobotManufacturerNameResolver = (robotId: string) => string | undefined;
 
-function formatDeploymentEvidenceLabel(customer: string, siteName?: string) {
-  return siteName ? `事例: ${customer} ${siteName}` : `事例: ${customer}`;
+function formatDeploymentEvidenceLabel() {
+  return '導入事例';
 }
 
-function formatSourceEvidenceLabel(source: Source | undefined, url: string) {
-  return `公式: ${source?.publisher ?? source?.title ?? new URL(url).hostname}`;
+function formatSourceEvidenceLabel(manufacturerName?: string) {
+  return manufacturerName ? `メーカーHP：${manufacturerName}` : 'メーカーHP';
 }
 
 export function getUseCaseCandidateEvidenceViewModel(
   candidate: UseCaseCandidateRobot,
-  sourceByUrl: ReadonlyMap<string, Source>,
   resolveDeployment: DeploymentResolver,
+  resolveRobotManufacturerName?: RobotManufacturerNameResolver,
 ): UseCaseCandidateEvidenceViewModel {
   const deploymentEvidenceLinks = (candidate.evidenceDeploymentIds ?? []).flatMap((deploymentId) => {
     const deployment = resolveDeployment(deploymentId);
@@ -70,19 +56,16 @@ export function getUseCaseCandidateEvidenceViewModel(
     return [
       {
         href: source.url,
-        label: formatDeploymentEvidenceLabel(deployment.customer, deployment.siteName),
+        label: formatDeploymentEvidenceLabel(),
       },
     ];
   });
   const sourceEvidenceLinks = (candidate.evidenceSourceUrls ?? []).map((url) => ({
     href: url,
-    label: formatSourceEvidenceLabel(sourceByUrl.get(url), url),
+    label: formatSourceEvidenceLabel(resolveRobotManufacturerName?.(candidate.robotId)),
   }));
 
   return {
-    fit: candidate.fit,
-    fitLabel: candidateFitLabels[candidate.fit],
-    basis: candidate.basis,
     reason: candidate.reason,
     evidenceLinks: [...deploymentEvidenceLinks, ...sourceEvidenceLinks],
   };
@@ -91,12 +74,16 @@ export function getUseCaseCandidateEvidenceViewModel(
 export function getUseCaseCandidateEvidenceByRobotId(
   useCase: UseCase,
   resolveDeployment: DeploymentResolver,
+  resolveRobotManufacturerName?: RobotManufacturerNameResolver,
 ) {
-  const sourceByUrl = new Map(useCase.sources.map((source) => [source.url, source]));
   return Object.fromEntries(
     useCase.candidateRobots.map((candidate) => [
       candidate.robotId,
-      getUseCaseCandidateEvidenceViewModel(candidate, sourceByUrl, resolveDeployment),
+      getUseCaseCandidateEvidenceViewModel(
+        candidate,
+        resolveDeployment,
+        resolveRobotManufacturerName,
+      ),
     ]),
   );
 }
