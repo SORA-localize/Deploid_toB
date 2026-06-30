@@ -1,5 +1,5 @@
 import type { Article } from '@/data/types';
-import { articleSectionLabels } from '@/lib/labels';
+import { articleSectionLabels, articleTypeLabels } from '@/lib/labels';
 
 export type ArticleShelf = 'all' | 'news' | 'manufacturer-guide' | 'robot-guide' | 'basics-guide';
 
@@ -30,9 +30,8 @@ export function getArticleShelf(article: Article): Exclude<ArticleShelf, 'all'> 
  * 解説・基礎知識は棚名をそのまま出す。ニュースは section ラベルで話題を示す。
  */
 export function getArticleCardLabel(article: Article): string {
-  if (article.type === 'manufacturer-guide') return 'メーカー解説';
-  if (article.type === 'robot-guide') return 'ロボット解説';
-  if (article.type === 'basics-guide') return '基礎知識';
+  const shelf = getArticleShelf(article);
+  if (shelf !== 'news') return articleTypeLabels[article.type];
   return articleSectionLabels[article.section];
 }
 

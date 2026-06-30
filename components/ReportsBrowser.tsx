@@ -75,11 +75,17 @@ export function ReportsBrowser({
       const shelf = getArticleShelf(article);
       countByShelf.set(shelf, (countByShelf.get(shelf) ?? 0) + 1);
     }
-    return ARTICLE_SHELF_TABS.map((tab) => ({
-      ...tab,
-      count: tab.value === 'all' ? countBase.length : (countByShelf.get(tab.value) ?? 0),
-    }));
-  }, [sorted, matchedSlugs]);
+    return ARTICLE_SHELF_TABS.map((tab) => {
+      const count = tab.value === 'all' ? countBase.length : (countByShelf.get(tab.value) ?? 0);
+      return {
+        ...tab,
+        count,
+        // 0件かつ現在選択中でないタブは disabled（active tab には指定しない）。
+        // basics-guide は ARTICLE_SHELF_TABS 側で固定 disabled なのでそちらが優先される。
+        disabled: tab.disabled || (tab.value !== 'all' && tab.value !== activeShelf && count === 0),
+      };
+    });
+  }, [sorted, matchedSlugs, activeShelf]);
 
   const pageCount = getArticlePageCount(gridReports.length, perPage);
   const activePage = useMemo(
