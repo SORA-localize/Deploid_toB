@@ -152,6 +152,9 @@ export const articleTypeLabels: Record<ArticleType, string> = {
   'news-brief': 'ニュースメモ',
   'tech-update': 'テックアップデート',
   'market-analysis': '市場分析',
+  'manufacturer-guide': 'メーカー解説',
+  'robot-guide': 'ロボット解説',
+  'basics-guide': '基礎知識',
 };
 
 export const articleSectionLabels: Record<ArticleSection, string> = {

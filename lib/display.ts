@@ -86,6 +86,9 @@ export const articleTypeOrder: ArticleType[] = [
   'news-brief',
   'tech-update',
   'market-analysis',
+  'manufacturer-guide',
+  'robot-guide',
+  'basics-guide',
 ];
 
 /** 記事種別（category・第一軸）の表示順。完全性は articleCategoryLabels(Record) と validate の diff で担保。 */

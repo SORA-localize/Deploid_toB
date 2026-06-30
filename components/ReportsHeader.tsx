@@ -2,29 +2,27 @@
 
 import { ContextualPageHeader } from '@/components/ContextualPageHeader';
 import { PageTabBar, type PageTab } from '@/components/PageTabBar';
-import { ARTICLE_SECTION_TABS, type ArticleSectionFilter } from '@/lib/articleSections';
+import { ARTICLE_SHELF_TABS, type ArticleShelf } from '@/lib/articleShelves';
 import { uiText } from '@/lib/uiText';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { ARTICLE_PAGE_PARAM } from '@/lib/articlePagination';
 
 interface ReportsHeaderProps {
-  activeSection: ArticleSectionFilter;
-  tabs?: readonly PageTab<ArticleSectionFilter>[];
+  activeShelf: ArticleShelf;
+  tabs?: readonly PageTab<ArticleShelf>[];
 }
 
-export function ReportsHeader({ activeSection, tabs = ARTICLE_SECTION_TABS }: ReportsHeaderProps) {
+export function ReportsHeader({ activeShelf, tabs = ARTICLE_SHELF_TABS }: ReportsHeaderProps) {
   const { updateParams } = useUrlParamUpdater();
 
   return (
     <ContextualPageHeader>
       <PageTabBar
         tabs={tabs}
-        activeValue={activeSection}
+        activeValue={activeShelf}
         onSelect={(value) =>
           updateParams({
-            section: value === 'all' ? null : value,
-            // 旧 ?category= が残らないよう同時に除去する
-            category: null,
+            kind: value === 'all' ? null : value,
             [ARTICLE_PAGE_PARAM]: null,
           })
         }
