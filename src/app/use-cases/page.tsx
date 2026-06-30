@@ -1,47 +1,39 @@
 import { Suspense } from 'react';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { UseCasesBrowser } from '@/components/UseCasesBrowser';
-import { getDeploymentsForUseCase, getUseCases } from '@/lib/data';
+import { getDeploymentsForUseCase, getRobots, getUseCases } from '@/lib/data';
 import { createPageMetadata } from '@/lib/metadata';
 import { createUseCaseSearchIndex, searchUseCaseSlugs } from '@/lib/searchIndex';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
-import {
-  getTagLabel,
-  getUseCaseDomainOptions,
-  getUseCaseIndustryTagOptions,
-  getUseCaseTaskTagOptions,
-} from '@/lib/tags';
+import { getTagLabel, getUseCaseIndustryTagOptions, getUseCaseTaskTagOptions } from '@/lib/tags';
 import { getUseCaseFilterResult, normalizeUseCaseFilters } from '@/lib/useCaseFilters';
 import { getUseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
 
 const defaultTitle = '用途から探す';
 const defaultDescription =
-  'やりたい作業の得意分野・業種・タスクから現実的なヒューマノイドの適用機会を探す。ベンダー名ではなく現場の課題から始めます。';
+  '産業・現場タスクからヒューマノイドの実適用シーンを探す。実導入事例の有無を明示しています。';
 
 function resolveFilters(
   useCases: ReturnType<typeof getUseCases>,
-  params: { industry: string | null; task: string | null; domain: string | null; q: string | null },
+  params: { industry: string | null; task: string | null; q: string | null },
 ) {
   return normalizeUseCaseFilters({
     industry: params.industry,
     task: params.task,
-    domain: params.domain,
     query: params.q,
     industryValues: getUseCaseIndustryTagOptions(useCases).map((option) => option.value),
     taskValues: getUseCaseTaskTagOptions(useCases).map((option) => option.value),
-    domainValues: getUseCaseDomainOptions(useCases).map((option) => option.value),
   });
 }
 
 export async function generateMetadata({ searchParams }: { searchParams: RouteSearchParams }) {
-  const params = await pickSearchParams(searchParams, ['industry', 'task', 'domain', 'q'] as const);
+  const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
   const useCases = getUseCases();
   const filters = resolveFilters(useCases, params);
   const matchedSlugs = searchUseCaseSlugs(createUseCaseSearchIndex(useCases), filters.query);
   const { filtered } = getUseCaseFilterResult(useCases, filters, matchedSlugs);
 
   const tagLabels = [
-    filters.domain ? getTagLabel(filters.domain, 'use-case-domain') : null,
     filters.industry ? getTagLabel(filters.industry, 'industry') : null,
     filters.task ? getTagLabel(filters.task, 'task') : null,
   ].filter((label): label is string => Boolean(label));
@@ -58,8 +50,11 @@ export async function generateMetadata({ searchParams }: { searchParams: RouteSe
 }
 
 async function UseCasesContent({ searchParams }: { searchParams: RouteSearchParams }) {
-  const params = await pickSearchParams(searchParams, ['industry', 'task', 'domain', 'q'] as const);
+  const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
   const useCases = getUseCases();
+  const robotNameById = Object.fromEntries(
+    getRobots().map((r) => [r.id, r.nameJa ?? r.name]),
+  );
   const cardEvidenceByUseCaseId = Object.fromEntries(
     useCases.map((useCase) => [
       useCase.id,
@@ -73,6 +68,7 @@ async function UseCasesContent({ searchParams }: { searchParams: RouteSearchPara
       useCases={useCases}
       initialFilters={resolveFilters(useCases, params)}
       cardEvidenceByUseCaseId={cardEvidenceByUseCaseId}
+      robotNameById={robotNameById}
     />
   );
 }
