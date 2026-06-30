@@ -69,6 +69,11 @@ export default function HomePage() {
 
   const manufacturerPreviewAssets: typeof robotPreviewAssets = [];
 
+  // Unsplash: Adrian Sulyok / https://unsplash.com/photos/c_4eaGRDSVU / Unsplash License
+  const useCasePreviewAssets: typeof robotPreviewAssets = [
+    { src: '/images/home/use-cases/warehouse-workers-aisle.jpg', alt: 'Workers walking through a warehouse aisle', label: 'Warehouse', objectPosition: 'center' },
+  ];
+
   const { heroReports, featureReports } = getArticleIndexPlacementReports(getArticles());
 
   const manufacturerById = Object.fromEntries(
@@ -90,6 +95,7 @@ export default function HomePage() {
       <HomeContentNavigator
         robotAssets={robotPreviewAssets}
         manufacturerAssets={manufacturerPreviewAssets}
+        useCaseAssets={useCasePreviewAssets}
       />
 
       {featuredRobots.length > 0 && (

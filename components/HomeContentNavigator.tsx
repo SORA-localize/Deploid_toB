@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { ArrowRight, Bot, Building2, type LucideIcon } from 'lucide-react';
+import { ArrowRight, Bot, Building2, ClipboardList, type LucideIcon } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 
 type PreviewAsset = {
@@ -16,9 +16,10 @@ type PreviewAsset = {
 type HomeContentNavigatorProps = {
   robotAssets: PreviewAsset[];
   manufacturerAssets: PreviewAsset[];
+  useCaseAssets: PreviewAsset[];
 };
 
-type ContentKey = 'robots' | 'manufacturers';
+type ContentKey = 'robots' | 'manufacturers' | 'use-cases';
 
 type ContentItem = {
   key: ContentKey;
@@ -35,6 +36,7 @@ type ContentItem = {
 export function HomeContentNavigator({
   robotAssets,
   manufacturerAssets,
+  useCaseAssets,
 }: HomeContentNavigatorProps) {
   const shouldReduceMotion = useReducedMotion();
   const [activeKey, setActiveKey] = useState<ContentKey>('robots');
@@ -63,8 +65,19 @@ export function HomeContentNavigator({
         assets: manufacturerAssets,
         fallbackLabel: 'Manufacturer network',
       },
+      {
+        key: 'use-cases',
+        title: '用途から探す',
+        href: '/use-cases',
+        description: 'やりたい作業・業種からヒューマノイドの適用機会と候補ロボットを探す。',
+        stat: '業種 / タスク / 成熟度',
+        action: '用途を見る',
+        icon: ClipboardList,
+        assets: useCaseAssets,
+        fallbackLabel: 'Use case catalog',
+      },
     ],
-    [manufacturerAssets, robotAssets],
+    [manufacturerAssets, robotAssets, useCaseAssets],
   );
 
   const activeItem = items.find((item) => item.key === activeKey) ?? items[0];
