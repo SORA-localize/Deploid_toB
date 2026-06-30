@@ -71,6 +71,7 @@ Last cleaned: 2026-06-23
 - `project-wide-refactor-implementation-plan-v1.md` — 全体リファクタリングの実装順、最小task、完了条件を定義した実行計画
 - `reports-news-explainer-ia-plan-v1.md` — `/reports` をニュース・メーカー解説・ロボット解説・基礎知識の4棚へ整理する実行計画
 - `usecase-evidence-model-refactor-plan-v1.md` — `/use-cases` の出典、導入事例、候補ロボット根拠をデータモデルと validator で保証する実行計画
+- `usecase-page-redesign-plan-v1.md` — `/use-cases` を産業入口→タスク→成熟度別グリッドへ全面再設計する実行計画（タグ再設計・42シーン追加・UI刷新）
 - `editorial-methodology-review-2026-06-24.md` — 記事題材・切り口・書き方のレビュー用草案（未承認。承認後に editorial_style_guide へ反映）
 
 実装完了で archive へ移動した計画: `archive/guides-retirement-plan-v1.md`（`/guides` 撤去、2026-06-28 実装）＋ 復活資産 `archive/guides-retirement-v1.md`。
