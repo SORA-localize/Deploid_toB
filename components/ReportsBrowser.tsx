@@ -3,14 +3,13 @@
 import { useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState';
-import { FacetFilterBar } from '@/components/FacetFilterBar';
 import { NewsFeatureCard } from '@/components/NewsFeatureCard';
 import { NewsCard } from '@/components/NewsCard';
 import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
 import { ReportsHeader } from '@/components/ReportsHeader';
 import { SearchInput } from '@/components/SearchInput';
 import { CardHoverEffect } from '@/components/ui/card-hover-effect';
-import type { Article, ArticleSection } from '@/data/types';
+import type { Article } from '@/data/types';
 import { filterArticles } from '@/lib/articleFilters';
 import { byArticlePublishedDesc } from '@/lib/display';
 import {
@@ -22,36 +21,32 @@ import {
 } from '@/lib/articlePagination';
 import { useArticlesPerPage } from '@/lib/useArticlesPerPage';
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
-import { ARTICLE_FACETS } from '@/lib/facetConfig';
 import { createArticleSearchIndex, searchArticleSlugs } from '@/lib/searchIndex';
 import { uiText } from '@/lib/uiText';
-import { ARTICLE_SECTION_TABS, type ArticleSectionFilter } from '@/lib/articleSections';
+import {
+  ARTICLE_SHELF_TABS,
+  getArticleShelf,
+  type ArticleShelf,
+} from '@/lib/articleShelves';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { cn } from '@/lib/utils';
 
-export interface ReportsFilters {
-  /** ファセット選択（URLパラメータ key → 値）。lib/facetConfig.ts の ARTICLE_FACETS が正本。 */
-  facetValues: Record<string, string | null>;
-  query: string;
-}
-
 interface ReportsBrowserProps {
   reports: Article[];
-  activeSection: ArticleSectionFilter;
-  initialFilters: ReportsFilters;
+  activeShelf: ArticleShelf;
+  initialQuery: string;
   initialPageParam: string | null;
 }
 
 export function ReportsBrowser({
   reports,
-  activeSection,
-  initialFilters,
+  activeShelf,
+  initialQuery,
   initialPageParam,
 }: ReportsBrowserProps) {
   const { updateParams } = useUrlParamUpdater();
   const perPage = useArticlesPerPage();
   const gridRef = useRef<HTMLDivElement>(null);
-  const { facetValues, query } = initialFilters;
 
   const sorted = useMemo(() => [...reports].sort(byArticlePublishedDesc), [reports]);
 
@@ -60,57 +55,37 @@ export function ReportsBrowser({
     [sorted],
   );
 
-  // 記事のフリーテキスト検索は MiniSearch（日本語トークナイズ）。クエリ空なら null＝全件通過。
   const searchIndex = useMemo(() => createArticleSearchIndex(reports), [reports]);
-  const matchedSlugs = useMemo(() => searchArticleSlugs(searchIndex, query), [searchIndex, query]);
-
-  // section タブで先に母集団を絞る（ファセットの選択肢・件数はこのタブ内で計算する）。
-  const sectionScoped = useMemo(
-    () => filterArticles({ reports: sorted, section: activeSection }),
-    [sorted, activeSection],
+  const matchedSlugs = useMemo(
+    () => searchArticleSlugs(searchIndex, initialQuery),
+    [searchIndex, initialQuery],
   );
 
-  const hasActiveFilters = Boolean(
-    query.trim() || ARTICLE_FACETS.some((facet) => facetValues[facet.key]),
-  );
+  const hasActiveFilters = Boolean(initialQuery.trim());
 
   const gridReports = useMemo(
-    () =>
-      filterArticles({
-        reports: sectionScoped,
-        facets: ARTICLE_FACETS,
-        facetValues,
-        matchedSlugs,
-      }),
-    [sectionScoped, facetValues, matchedSlugs],
+    () => filterArticles({ reports: sorted, shelf: activeShelf, matchedSlugs }),
+    [sorted, activeShelf, matchedSlugs],
   );
 
-  const sectionTabs = useMemo(() => {
-    const sectionCountBase = filterArticles({
-      reports: sorted,
-      facets: ARTICLE_FACETS,
-      facetValues,
-      matchedSlugs,
-    });
-    const countBySection = new Map<ArticleSection, number>();
-
-    for (const article of sectionCountBase) {
-      countBySection.set(article.section, (countBySection.get(article.section) ?? 0) + 1);
+  const shelfTabs = useMemo(() => {
+    const countBase = filterArticles({ reports: sorted, matchedSlugs });
+    const countByShelf = new Map<ArticleShelf, number>();
+    for (const article of countBase) {
+      const shelf = getArticleShelf(article);
+      countByShelf.set(shelf, (countByShelf.get(shelf) ?? 0) + 1);
     }
-
-    return ARTICLE_SECTION_TABS.map((tab) => {
-      const count = tab.value === 'all'
-        ? sectionCountBase.length
-        : countBySection.get(tab.value) ?? 0;
-
+    return ARTICLE_SHELF_TABS.map((tab) => {
+      const count = tab.value === 'all' ? countBase.length : (countByShelf.get(tab.value) ?? 0);
       return {
         ...tab,
         count,
-        // Keep the current section enabled even when it has 0 results so URL-entered states stay legible.
-        disabled: tab.value !== 'all' && tab.value !== activeSection && count === 0,
+        // 0件かつ現在選択中でないタブは disabled（active tab には指定しない）。
+        // basics-guide は ARTICLE_SHELF_TABS 側で固定 disabled なのでそちらが優先される。
+        disabled: tab.disabled || (tab.value !== 'all' && tab.value !== activeShelf && count === 0),
       };
     });
-  }, [sorted, facetValues, matchedSlugs, activeSection]);
+  }, [sorted, matchedSlugs, activeShelf]);
 
   const pageCount = getArticlePageCount(gridReports.length, perPage);
   const activePage = useMemo(
@@ -126,47 +101,30 @@ export function ReportsBrowser({
     [activePage, pageCount],
   );
 
-  // ファセット変更時はページを1に戻す（件数が変わるため）。他ファセットは保持（自動リセットしない）。
-  const onFacetChange = (key: string, value: string | null) =>
-    updateParams({ [key]: value, [ARTICLE_PAGE_PARAM]: null });
-
   const updatePage = (page: number) => {
     updateParams({ [ARTICLE_PAGE_PARAM]: page <= 1 ? null : String(page) });
     gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const showHero = activeSection === 'all' && !hasActiveFilters && heroReports.length > 0;
+  const showHero = activeShelf === 'all' && !hasActiveFilters && heroReports.length > 0;
 
   return (
     <div className="bg-background">
-      <ReportsHeader activeSection={activeSection} tabs={sectionTabs} />
+      <ReportsHeader activeShelf={activeShelf} tabs={shelfTabs} />
 
-      {/* ── 検索 + ファセット絞り込み（設定駆動・件数つき・0件無効化） ── */}
+      {/* ── 検索 ── */}
       <div className="border-b border-border bg-card">
-        <div className="site-container space-y-3 py-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
-            <div className="flex-1">
-              <FacetFilterBar
-                articles={sectionScoped}
-                facets={ARTICLE_FACETS}
-                values={facetValues}
-                matchedSlugs={matchedSlugs}
-                resultCount={gridReports.length}
-                active={hasActiveFilters}
-                onChange={onFacetChange}
-              />
-            </div>
-            <SearchInput
-              id="reports-search"
-              label={uiText.filters.keywordSearch}
-              value={query}
-              onChange={(nextQuery) =>
-                updateParams({ q: nextQuery, [ARTICLE_PAGE_PARAM]: null }, 'replace')
-              }
-              placeholder={uiText.searchPlaceholders.reports}
-              className="w-full sm:w-72 md:w-96 shrink-0"
-            />
-          </div>
+        <div className="site-container py-4">
+          <SearchInput
+            id="reports-search"
+            label={uiText.filters.keywordSearch}
+            value={initialQuery}
+            onChange={(nextQuery) =>
+              updateParams({ q: nextQuery, [ARTICLE_PAGE_PARAM]: null }, 'replace')
+            }
+            placeholder={uiText.searchPlaceholders.reports}
+            className="w-full sm:w-72 md:w-96"
+          />
         </div>
       </div>
 

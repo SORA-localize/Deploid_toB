@@ -21,7 +21,7 @@ import {
   resolveArticleDetailBySlug,
 } from '@/lib/data';
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/jsonLd';
-import { articleTypeLabels } from '@/lib/labels';
+import { getArticleCardLabel } from '@/lib/articleShelves';
 import { extractH2Headings } from '@/lib/markdownHeadings';
 import { getDisplayableAsset } from '@/lib/media';
 import { shouldIndexArticle } from '@/lib/indexing';
@@ -161,7 +161,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             <div className="relative z-10 flex min-h-[400px] items-end sm:min-h-[500px] md:min-h-[580px]">
               <div className="site-container pb-8 sm:pb-10">
                 <div className="mb-2 text-xs font-medium text-white/70">
-                  {articleTypeLabels[report.type]}
+                  {getArticleCardLabel(report)}
                 </div>
                 <h1 className="mb-3 text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white">
                   <BudouXText text={reportTitle} />
@@ -181,7 +181,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                     </span>
                   )}
                   <TagChip tone={getArticleTypeTone(report.type)} className="py-1 font-medium">
-                    {articleTypeLabels[report.type]}
+                    {getArticleCardLabel(report)}
                   </TagChip>
                   {report.author && (
                     <span className="flex items-center gap-1.5">
@@ -199,7 +199,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           <div className="site-container py-6">
             <Breadcrumbs items={breadcrumbItems} />
             <div className="mb-3 text-xs font-medium text-muted-foreground">
-              {articleTypeLabels[report.type]}
+              {getArticleCardLabel(report)}
             </div>
             <h1 className="mb-4 max-w-4xl text-2xl md:text-3xl font-semibold leading-tight text-foreground">
               <BudouXText text={reportTitle} />
@@ -219,7 +219,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 </span>
               )}
               <TagChip tone={getArticleTypeTone(report.type)} className="py-1 font-medium">
-                {articleTypeLabels[report.type]}
+                {getArticleCardLabel(report)}
               </TagChip>
               {report.author && (
                 <span className="flex items-center gap-1.5">
@@ -288,19 +288,13 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {(report.themeTags ?? []).map((tag) => (
-                        <Link key={`theme-${tag}`} href={`/reports?theme=${tag}`} className="inline-flex">
-                          <TagChip kind="theme" value={tag} className="py-1 transition-opacity hover:opacity-80" />
-                        </Link>
+                        <TagChip key={`theme-${tag}`} kind="theme" value={tag} className="py-1" />
                       ))}
                       {(report.industryTags ?? []).map((tag) => (
-                        <Link key={`industry-${tag}`} href={`/reports?industry=${tag}`} className="inline-flex">
-                          <TagChip kind="industry" value={tag} className="py-1 transition-opacity hover:opacity-80" />
-                        </Link>
+                        <TagChip key={`industry-${tag}`} kind="industry" value={tag} className="py-1" />
                       ))}
                       {(report.regionTags ?? []).map((tag) => (
-                        <Link key={`region-${tag}`} href={`/reports?region=${tag}`} className="inline-flex">
-                          <TagChip kind="region" value={tag} className="py-1 transition-opacity hover:opacity-80" />
-                        </Link>
+                        <TagChip key={`region-${tag}`} kind="region" value={tag} className="py-1" />
                       ))}
                     </div>
                   </div>

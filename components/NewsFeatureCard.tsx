@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Article } from '@/data/types';
-import { articleTypeLabels } from '@/lib/labels';
+import { getArticleCardLabel } from '@/lib/articleShelves';
 import { getDisplayableAsset } from '@/lib/media';
 import { cn } from '@/lib/utils';
 
@@ -41,7 +41,7 @@ export function NewsFeatureCard({ report, className }: NewsFeatureCardProps) {
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <span className="rounded-sm bg-signal px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-signal-foreground">
-              {articleTypeLabels[report.type]}
+              {getArticleCardLabel(report)}
             </span>
             <time className="font-mono text-xs text-white/60">{report.publishedAt}</time>
           </div>

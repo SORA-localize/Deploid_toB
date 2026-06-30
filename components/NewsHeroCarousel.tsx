@@ -1,7 +1,7 @@
 'use client';
 
 import type { Article } from '@/data/types';
-import { articleTypeLabels } from '@/lib/labels';
+import { getArticleCardLabel } from '@/lib/articleShelves';
 import { getDisplayableAsset } from '@/lib/media';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -98,7 +98,7 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
                     <div className="max-w-4xl space-y-3">
                       <div className="flex items-center gap-3">
                         <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-signal text-signal-foreground rounded-sm">
-                          {articleTypeLabels[report.type]}
+                          {getArticleCardLabel(report)}
                         </span>
                         <time className="text-xs text-white/60 font-mono">
                           {report.publishedAt}

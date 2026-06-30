@@ -332,7 +332,10 @@ export type ArticleType =
   | 'case-study'
   | 'news-brief'
   | 'tech-update'
-  | 'market-analysis';
+  | 'market-analysis'
+  | 'manufacturer-guide'
+  | 'robot-guide'
+  | 'basics-guide';
 
 /**
  * 記事のサブジェクト（何の話か）＝記事タブの分類。

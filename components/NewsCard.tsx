@@ -4,7 +4,7 @@ import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
 import { TagChip } from '@/components/TagChip';
 import type { Article } from '@/data/types';
-import { articleTypeLabels } from '@/lib/labels';
+import { getArticleCardLabel } from '@/lib/articleShelves';
 import { getDisplayableAsset } from '@/lib/media';
 import { getArticleTypeTone } from '@/lib/visualSemantics';
 import { cn } from '@/lib/utils';
@@ -37,7 +37,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
         ) : (
           <div className="flex h-full items-center justify-center">
             <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/50">
-              {articleTypeLabels[report.type]}
+              {getArticleCardLabel(report)}
             </span>
           </div>
         )}
@@ -47,7 +47,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
       <div className="flex flex-1 flex-col p-3 sm:p-4 min-w-0">
         <div className="mb-2 flex items-center gap-2">
           <TagChip tone={getArticleTypeTone(report.type)} className="text-[10px]">
-            {articleTypeLabels[report.type]}
+            {getArticleCardLabel(report)}
           </TagChip>
           <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
             <Calendar className="h-3 w-3" />

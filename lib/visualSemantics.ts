@@ -149,6 +149,9 @@ export const articleTypeTones = {
   'news-brief': 'neutral',
   'tech-update': 'info',
   'market-analysis': 'brand',
+  'manufacturer-guide': 'brand',
+  'robot-guide': 'brand',
+  'basics-guide': 'info',
 } as const satisfies Record<ArticleType, VisualTone>;
 
 export const useCaseMaturityTones = {

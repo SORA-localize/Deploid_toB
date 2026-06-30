@@ -9,7 +9,7 @@ export const siteNavItems: SiteNavItem[] = [
   { label: 'メーカー', path: '/manufacturers', footerLabel: 'メーカー' },
   { label: '比較', path: '/compare' },
   { label: '用途から探す', path: '/use-cases', footerLabel: '用途' },
-  { label: '記事', path: '/reports' },
+  { label: 'ニュース・解説', path: '/reports' },
   { label: '会社概要', path: '/about' },
   { label: 'お問い合わせ', path: '/contact' },
 ];
