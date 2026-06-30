@@ -64,7 +64,7 @@ export default function HomePage() {
   // HomeContentNavigator 用プレビュー画像。表示可否は data 側の rights と lib/media.ts で管理し、
   // ここではローカルに存在する表示可能アセットだけを参照する。
   const robotPreviewAssets = [
-    { src: '/images/robots/mentee-menteebotv3-hero.jpg', alt: 'MenteeBot humanoid robot', label: 'MenteeBot', objectPosition: 'center' },
+    { src: '/images/robots/mentee-menteebotv3-hero.jpg', alt: 'MenteeBot humanoid robot', label: 'MenteeBot', objectPosition: 'top' },
   ];
 
   // Unsplash: Jonathan Phillips / https://unsplash.com/photos/fTxWB2uCBz8 / Unsplash License
