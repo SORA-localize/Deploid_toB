@@ -16,6 +16,43 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 ---
 
+## 1.5 このプロジェクトにおける「フロント/バックエンド」の定義
+
+このプロジェクトはNext.js App Router + 静的データファイルで動いており、APIサーバーもDBもない。「フルスタック確認」とは以下の層を指す。
+
+```
+┌─────────────────────────────────────────────────────┐
+│ データ層（バックエンド相当）                            │
+│  data/types.ts         — 型定義の唯一の正本            │
+│  data/*.ts             — 実データ（配列）              │
+│  lib/data.ts           — 取得・slug解決・関連解決      │
+│  lib/validate.ts       — 参照整合・型カバレッジ検査    │
+│  scripts/validate-data.mjs — CI相当の検証実行         │
+│  lib/labels.ts         — enum→表示名の正本            │
+│  lib/display.ts        — 表示順・並び替え関数         │
+│  lib/tagRegistry.ts    — タグ値の正本                  │
+│  lib/visualSemantics.ts — 色トーンの正本              │
+│  lib/uiText.ts         — UI文言の正本                  │
+├─────────────────────────────────────────────────────┤
+│ ブリッジ層（Server Component / ルーティング）           │
+│  src/app/**/page.tsx   — URLパラメータ読取・データ取得 │
+│  lib/searchParams.ts   — URLパラメータ正規化           │
+│  lib/metadata.ts       — OGP・seo生成                  │
+│  src/app/sitemap.ts    — サイトマップ生成              │
+├─────────────────────────────────────────────────────┤
+│ フロントエンド層（Client Component / 状態管理）         │
+│  components/*.tsx      — UIコンポーネント              │
+│  lib/article*.ts       — 記事フィルタ・棚・ページング  │
+│  lib/useUrlParamUpdater.ts — URL state更新             │
+│  lib/*Filters.ts       — フィルタロジック              │
+│  lib/searchIndex.ts    — MiniSearch インデックス       │
+└─────────────────────────────────────────────────────┘
+```
+
+実装がおかしいとき、問題は必ずこの3層のどこかにある。
+
+---
+
 ## 2. AIがやりがちな失敗と対策
 
 ### 2.1 既存構造を読まずに実装する
@@ -97,13 +134,23 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 - enumラベルは `lib/labels.ts` に集約する
 - データ取得、slug lookup、関連取得は `lib/data.ts` に寄せる
 - 外部サービスIDや秘密情報は環境変数に寄せる
-- UI文言も複数箇所で使うなら定数化する
+- UI文言も複数箇所で使うなら `lib/uiText.ts` に寄せる
 
-フェイルセーフ:
+フェイルセーフ（このプロジェクト用 grep）:
 
-- `rg "要確認|All Status|Featured|VIEW FULL PROFILE|formspree"` のように直書きを定期検索する
-- `data/*.ts` 以外に業務データが入っていないか確認する
-- 本番URL、APIキー、フォームIDをコミット前に確認する
+```bash
+# コンポーネント内の日本語文字列直書き（ラベル・文言）
+rg --no-ignore "['\"][　-鿿][^'\"]*['\"]" components src --include="*.tsx" -l
+
+# ArticleType/ArticleSection/ArticleShelf の値をコンポーネント内で直比較
+rg "article\.type\s*===|article\.section\s*===" components src
+
+# 旧URLパラメータ名の残留
+rg "section=|theme=|industry=|region=" src components lib --include="*.ts" --include="*.tsx"
+
+# labels.ts を通さず enum 値を日本語化
+rg "'(analysis|market-analysis|tech-update|deployment-report|news-brief)'" components src
+```
 
 ---
 
@@ -113,19 +160,20 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 - UI都合で型を追加し、データ運用ルールとズレる
 - 関連slugが片方向だけ更新され、詳細ページの関連表示が壊れる
-- CMS移行時にデータ構造が再設計になる
+- validate が通らない値がデータに入る
 
 対策:
 
-- 型変更前に `data/types.ts` と `docs/planning/nextjs_data_types_v1.ts` を確認する
+- 型変更前に `data/types.ts` を確認する
 - 関連は原則 `id` で持つ。`slug` は公開URL専用として扱う
 - 逆引きできる関係は重複保持しない
 
 フェイルセーフ:
 
-- `npm run build` で型エラーを確認する
-- dev起動時の `lib/validate.ts` の参照整合警告を見る
-- 型変更は単独コミットにする
+```bash
+npm run validate:data   # 型・ラベル・参照整合の全チェック
+npm run build           # TypeScript型エラーの最終確認
+```
 
 ---
 
@@ -135,7 +183,7 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 - TypeScriptは通るがUIが崩れている
 - 一覧は動くが空状態やフィルタ組み合わせで壊れる
-- Vercelでは環境変数やビルド条件が違い失敗する
+- URLを直打ちすると崩れる
 
 対策:
 
@@ -146,9 +194,8 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 フェイルセーフ:
 
-- 検証できなかった項目は final で明記する
+- 検証できなかった項目は明記する
 - ビルドできない場合は原因を切り分けてから次へ進む
-- UI変更はスクリーンショット確認を推奨する
 
 ---
 
@@ -158,22 +205,19 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 - ユーザーの未コミット変更を混ぜる
 - unrelatedな変更を同じコミットに入れる
-- Vercel反映に必要なpushを忘れる
-- GitHubが進んでいるのに古いローカルから作業する
 
 対策:
 
-- 作業前に `git status --short --branch`
-- 作業前に `git fetch origin main`
-- `git rev-list --left-right --count origin/main...HEAD` で差分数を見る
-- コミット前に `git diff --cached --name-only`
+```bash
+git status --short --branch
+git diff --cached --name-only     # stageした差分を確認
+```
 
 フェイルセーフ:
 
 - 未コミット差分がある場合は、今回の作業対象か確認してから stage する
 - unrelatedな差分は触らない
 - `git reset --hard` や `git checkout --` はユーザー明示なしに使わない
-- push前にコミット一覧を確認する
 
 ---
 
@@ -184,14 +228,12 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 - 固定3カラムがモバイルで崩れる
 - テキストがボタンやカードからはみ出る
 - button/link/input の意味が曖昧になる
-- 見た目が似ているが細部が揃わない
 
 対策:
 
 - 固定 `grid-cols-3` は `sm:` / `md:` / `lg:` を明示する
 - フォームには label と `aria-label` を付ける
 - icon button には `aria-label` を付ける
-- 共通UI部品で余白、border、hover状態を統一する
 
 フェイルセーフ:
 
@@ -201,51 +243,56 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 ---
 
-### 2.9 検索・タグを場当たり的に作る
+### 2.9 URL state を正しく扱わない
 
 起きること:
 
-- `themeTags`、`regionTags`、`industryTags`、`topics`、`taskTags` が軸の違いを無視して同じUIや同じURLパラメータで扱われる
-- 表示名と検索キーが混在する
-- タグクリック後のURLが共有できない
-- 日本語検索や部分一致の仕様がページごとに違う
+- URLパラメータの正規化が抜けて、無効値でUIが壊れる
+- 旧URLパラメータが来たときにエラーになる
+- タブ選択がリロードで消える
+- フィルタ変更時にページが1に戻らない
 
 対策:
 
-- タグ表示は `TagChip` に寄せる
-- タグ集約と正規化は `lib/tags.ts` に寄せる
-- URLに `?theme=` / `?region=` / `?industry=` など軸別パラメータを使うか早めに決める
-- 検索は `lib/search.ts` / 必要な検索インデックス helper に閉じ込め、MiniSearch / Fuse.js / Pagefind などを差し替え可能にする
+- URL読取は page.tsx（Server Component）で行い、正規化関数を通す
+- 旧パラメータは「無視して正常表示」に倒す（404や空一覧にしない）
+- ページ変更パラメータはフィルタ変更時に同時にリセットする
 
-フェイルセーフ:
+フェイルセーフ（手動確認）:
 
-- タグ文字列の大文字小文字、空白、ハイフンを正規化する
-- タグ一覧を自動生成し、存在しないタグへのリンクを作らない
-- 検索ライブラリ導入前に、対象件数と必要機能を決める
+```
+/path?unknown=value            → 壊れないこと
+/path?oldparam=oldvalue        → 壊れないこと
+/path?kind=news → リロード     → ニュースタブが選ばれていること
+/path?page=99 (存在しないページ) → 崩れないこと
+```
 
 ---
 
-### 2.10 フルスタック境界を曖昧にする
+### 2.10 Server / Client 境界を崩す
 
 起きること:
 
-- client component に不要なサーバーデータ処理を入れる
-- APIの入力検証をUIだけに任せる
-- DB schema、API response、UI type が別々にズレる
-- エラー、loading、empty state が抜ける
+- 'use client' が不要なファイルについている（SSG効率低下）
+- Server Component でイベントハンドラを書いてビルドエラー
+- Client Component で `getArticles()` を直接呼び出してデータが取れない
+- URL state の読取を Client Component でやっていて hydration がずれる
 
 対策:
 
-- Server Component、Client Component、API route の責務を分ける
-- 外部入力はサーバー側で必ず検証する
-- API contract は型または schema で管理する
-- 成功、失敗、空、読み込み中を必ず設計する
+- データ取得・URLパラメータ読取は page.tsx（Server Component）で完結させる
+- インタラクション（クリック・検索・ページング）だけ Client Component に渡す
+- Client Component に渡す props は最小限にする
 
 フェイルセーフ:
 
-- UIだけで成立しているバリデーションを信用しない
-- API追加時は request/response/error の例を残す
-- 破壊的DB変更は migration と rollback 方針をセットで扱う
+```bash
+# 'use client' のついたファイルを確認し、不要なものがないか見る
+rg "'use client'" components lib src --include="*.tsx" --include="*.ts" -l
+
+# Client Component 内で lib/data.ts を直接呼んでいないか確認
+rg "getArticles\|getManufacturers\|getRobots\|getUseCases" components --include="*.tsx"
+```
 
 ---
 
@@ -253,47 +300,27 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 各フェーズは以下の順序で進める。これは毎回必須。
 
-### Phase 0: GitHub最新確認
-
-目的:
-
-- 古いローカルから作業しない
-- ユーザーの未コミット差分を巻き込まない
-
-実行:
+### Phase 0: git状態確認
 
 ```bash
 git status --short --branch
-git fetch origin main
-git rev-list --left-right --count origin/main...HEAD
-git log --oneline origin/main..HEAD
+git log --oneline -5
 ```
 
 合格条件:
 
-- `origin/main...HEAD` の左側が `0`
-- 未コミット差分のうち、今回触るファイルが明確
-- unrelatedな差分は stage しない
-
-不合格時:
-
-- GitHubが進んでいる場合は先に取り込み方針を決める
-- 未コミット差分が作業対象か不明なら、実装前に確認する
+- 今回の作業対象外の差分を stage しない
+- `git reset --hard` や `git checkout --` はユーザー明示なしに使わない
 
 ---
 
 ### Phase 1: 調査
-
-目的:
-
-- 既存実装、既存データ、既存コンポーネントを把握する
 
 確認:
 
 - 同じUIや同じ処理が既にあるか
 - データ取得ルールに従っているか
 - 設計ドキュメントと矛盾していないか
-- 変更対象の周辺に未解決の不具合がないか
 
 合格条件:
 
@@ -304,16 +331,11 @@ git log --oneline origin/main..HEAD
 
 ### Phase 2: 最小計画
 
-目的:
-
-- 変更を小さく保つ
-
 計画に含める:
 
 - 変更するファイル
 - 変更しないファイル
-- 共通化するもの
-- あえて共通化しないもの
+- 正本になる定数・型・関数の置き場所
 - 検証方法
 
 合格条件:
@@ -325,169 +347,165 @@ git log --oneline origin/main..HEAD
 
 ### Phase 3: 実装
 
-目的:
-
-- 計画に沿って最小変更を入れる
-
 ルール:
 
-- 手動編集は `apply_patch` を使う
-- データ層、UI層、設定変更をむやみに同時変更しない
+- データ層、ブリッジ層、フロントエンド層を別々に変更する
 - 新しい依存は必要性を説明できる時だけ追加する
-
-合格条件:
-
-- 変更差分が計画と一致している
-- 既存の未コミット差分を壊していない
 
 ---
 
 ### Phase 4: 自己回帰的な不備探し
 
-目的:
-
-- 「実装は間違っているかもしれない」という前提で確認する
-
 問い:
 
 - 同じUIがまだ他にも残っていないか
-- 逆に抽象化しすぎていないか
 - 既存のデータ取得ルールを破っていないか
 - ラベルや定数が散らばっていないか
 - モバイルで崩れないか
 - 空状態、0件、長文で壊れないか
-- アクセシビリティ上の抜けがないか
-
-合格条件:
-
-- 発見した不備を修正済み
-- 残す不備がある場合は理由と後続タスクを明記
+- URLを直打ちしたとき壊れないか
 
 ---
 
 ### Phase 5: 検証
 
-目的:
+```bash
+npm run validate:data
+npm run build
+```
 
-- 実装が最低限壊れていないことを確認する
+手動:
 
-実行:
+- 変更したページの基本操作
+- モバイル幅
+- URLパラメータの直打ち・リロード
+
+---
+
+### Phase 6: コミット
+
+```bash
+git diff --cached --name-only   # stageした内容を最終確認
+git commit -m "<scope>: <summary>"
+```
+
+---
+
+## 4. 実装後フルスタック確認チェックリスト
+
+実装後に「これが通れば壊れていない」と言える最小確認セット。
+
+### 4.1 データ層（バックエンド相当）
+
+```bash
+npm run validate:data
+```
+
+これ1本で以下を全チェックする:
+
+- `data/types.ts` の ArticleType / ArticleSection 等の enum と `lib/labels.ts` / `lib/display.ts` の順序配列がカバレッジ一致
+- `data/*.ts` の各レコードの必須フィールド・参照整合（relatedRobotIds が実在するか等）
+- タグ値が `lib/tagRegistry.ts` に登録済みか
+
+追加で目視:
+
+- `data/types.ts` に追加した型が `lib/labels.ts`, `lib/display.ts`, `lib/visualSemantics.ts` のすべてに反映されているか
+
+---
+
+### 4.2 ブリッジ層（Server Component / URLルーティング）
 
 ```bash
 npm run build
 ```
 
-必要に応じて:
+これで静的生成（133ページ）が全部通ることを確認する。
 
-- `npm run dev`
-- 対象ページの手動確認
-- モバイル幅の確認
-- 代表的な検索、タグ、フィルタ条件の確認
+追加で目視:
 
-合格条件:
-
-- build成功
-- 変更したページの基本操作が動く
-- 検証できなかった項目が明記されている
+| 確認 | コマンド |
+|---|---|
+| page.tsx がデータを lib/data.ts 経由で取っているか | `rg "from '@/data/" src/app --include="*.tsx"` |
+| URLパラメータ正規化関数が通っているか | 変更した page.tsx のパラメータ読取箇所を目視 |
+| metadata が更新されているか | ブラウザのタブタイトル・description を確認 |
 
 ---
 
-### Phase 6: コミットと次フェーズ判定
+### 4.3 フロントエンド層（Client Component / URL state）
 
-目的:
+手動確認（ブラウザ）:
 
-- 変更履歴を追いやすくする
+```
+正常系:
+  /reports                     → デフォルト表示
+  /reports?kind=news           → ニュースだけ表示
+  /reports?q=Unitree           → 検索結果
+  /reports?q=xxx&kind=news     → 組み合わせ
 
-実行:
+異常系・境界値:
+  /reports?kind=basics-guide   → all にフォールバック（壊れない）
+  /reports?unknown=xxx         → 壊れない
+  /reports?page=999            → 壊れない（最終ページか1ページ目に倒れる）
+  /reports?kind=news → リロード → ニュースタブが選ばれていること
 
-```bash
-git diff --cached --name-only
-git commit -m "<scope>: <summary>"
+空状態:
+  0件になるフィルタ条件        → EmptyState が出る
+  disabled タブのクリック       → 無反応（クリックできない）
+
+レスポンシブ:
+  モバイル幅（375px）でタブが横スクロールできる
+  カードテキストがはみ出ない
 ```
 
-合格条件:
+---
 
-- 1コミット1目的
-- unrelatedな差分なし
-- 次フェーズに進む理由が明確
+### 4.4 共通のAIミス確認（grep）
 
-不合格時:
+実装後に以下を流してゼロヒットを確認する:
 
-- コミットせず差分を見直す
-- フェーズを分割する
+```bash
+# 旧URLパラメータ名の残留（?section= / ?theme= / ?industry= / ?region=）
+rg "section=|theme=|industry=|region=" src components lib --include="*.ts" --include="*.tsx" \
+  | grep -v "facetConfig\|ARTICLE_FACETS\|tagRegistry\|// "
+
+# ArticleType / ArticleSection 値のコンポーネント内直比較
+rg "article\.(type|section)\s*===\s*['\"]" components src
+
+# data/*.ts をコンポーネントから直接 import
+rg "from '@/data/(?!types)" components --include="*.tsx"
+
+# lib/data.ts を Client Component から直接呼び出し
+rg "getArticles\|getManufacturers\|getRobots\|getUseCases\|getUseCases" components --include="*.tsx"
+
+# 旧型名・旧パラメータ名の残留
+rg "ArticleSectionFilter|activeSection|ARTICLE_SECTION_TABS|normalizeArticleSectionParam" \
+  components src lib --include="*.ts" --include="*.tsx"
+```
 
 ---
 
-## 4. このプロジェクトで特に見るべきチェックリスト
+### 4.5 デプロイ層（Vercel）
 
-### データ層
+```bash
+git log --oneline -3     # 最新コミットを確認
+git push                 # pushされているか確認
+```
 
-- `data/*.ts` は配列データだけか
-- 取得、filter、slug lookup は `lib/data.ts` にあるか
-- enumの表示名は `lib/labels.ts` にあるか
-- 参照slugは存在するか
-- 不明値を仮値で埋めず `要確認` にしているか
-- 出典は `sources` にあるか
+Vercel ダッシュボードで:
 
-### UI層
-
-- 同じカード、タグ、空状態、select、サイドバーを焼き増ししていないか
-- fixedな3カラムがモバイルで崩れないか
-- icon button に `aria-label` があるか
-- input/select/textarea に label があるか
-- 空配列や長文でレイアウトが崩れないか
-
-### 検索・タグ
-
-- 検索ロジックは `lib/search.ts` に閉じているか
-- タグUIは共通化できているか
-- タグ文字列の正規化方針があるか
-- URLに反映すべきフィルタかどうかを決めているか
-
-### デプロイ
-
-- `npm run build` が通るか
-- Vercelに必要な環境変数が揃っているか
-- GitHubにpush済みか
-- Vercelの対象コミットが最新か
+- 最新コミットのビルドが成功しているか
+- Production / Preview URL が想定の環境か
 
 ---
 
 ## 5. 修正計画を作る時の推奨フェーズ
 
-今回のリファクタと機能改善は、以下の順で進めるのが安全。
+今後のリファクタや機能改善は以下の順で進めるのが安全。
 
-1. 監査フェーズ
-   - 重複UI、ハードコード、データ取得ルール違反、レスポンシブ問題を一覧化する
-
-2. 小型共通コンポーネント化フェーズ
-   - `TagChip`
-   - `FilterChipGroup`
-   - `FilterSelect`
-   - `EmptyState`
-
-3. データ/helper整理フェーズ
-   - `categoryLabels` などを `lib/labels.ts` へ移す
-   - ページ側の直接 filter を `lib/data.ts` へ戻す
-   - `TBD` などの表示定数を整理する
-
-4. タグ機能フェーズ
-   - `lib/tags.ts` を作る
-   - `articles.themeTags/regionTags/industryTags`、`guides.topics`、`useCases.industryTags/taskTags` を軸別に集約する
-   - タグクリックとURL stateを軸別に設計する
-
-5. 検索改善フェーズ
-   - 現状の `matchesQuery` を保ったまま検索対象を整理する
-   - 必要なら Fuse.js または Pagefind に差し替える
-
-6. レスポンシブ・アクセシビリティフェーズ
-   - 固定3カラムを responsive grid に直す
-   - icon button、form、modal相当UIを確認する
-
-7. 最終監査フェーズ
-   - build
-   - 手動確認
-   - git diff
-   - 未解決リスクの記録
+1. 監査フェーズ — 重複UI、ハードコード、データ取得ルール違反、レスポンシブ問題を一覧化
+2. データ/helper整理フェーズ — labels.ts, display.ts, uiText.ts に正本を集約
+3. UI共通化フェーズ — TagChip, EmptyState, PageTabBar など既存部品を最大限利用
+4. URL state整理フェーズ — パラメータ名・正規化関数の一本化
+5. 最終監査フェーズ — validate:data + build + 手動確認 + git diff
 
 各フェーズは「調査、計画、実装、自己監査、検証、コミット」の順で進める。前フェーズの不備が残っている場合、次フェーズへ進まない。
