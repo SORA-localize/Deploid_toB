@@ -146,11 +146,11 @@ Branch: TBD - create a dedicated branch from updated `main` before implementatio
 
 | UI表示 | 正本 | 派生方法 | タグ利用 |
 | --- | --- | --- | --- |
-| 候補ロボット | `UseCase.candidateRobots[]` | `robotId` を `getRelatedRobots()` で解決し、candidate の順序を保持 | 使わない |
-| 実際の導入事例 | `DeploymentSite.relatedUseCaseIds` | `getDeploymentsForUseCase(useCase.id)` | 使わない |
+| 候補ロボット | `UseCase.candidateRobots[]` | `lib/data.ts`: `getRelatedRobots()` で `robotId` を解決し、candidate の順序を保持 | 使わない |
+| 実際の導入事例 | `DeploymentSite.relatedUseCaseIds` | `lib/data.ts`: `getDeploymentsForUseCase(useCase.id)` | 使わない |
 | 候補根拠 | `candidateRobots[].basis` + `evidenceDeploymentIds` / `evidenceSourceUrls` | helper で表示用 view model にする | 使わない |
-| 関連記事 | `Article.relatedUseCaseIds` | `getArticlesForUseCase(useCase.id)` | 使わない |
-| 用途分類 | `primaryDomain` / `secondaryDomains` | `getUseCaseDomainLabel()` | `use-case-domain` の登録語彙 |
+| 関連記事 | `Article.relatedUseCaseIds` | `lib/data.ts`: `getArticlesForUseCase(useCase.id)` | 使わない |
+| 用途分類 | `primaryDomain` / `secondaryDomains` | `lib/useCaseDisplay.ts`: `getUseCaseDomainLabel()` | `use-case-domain` の登録語彙 |
 | 絞り込み | `industryTags` / `taskTags` / domain | `lib/useCaseFilters.ts` | 使う |
 
 この定義により、「関連性が曖昧」という問題を UI ラベルとデータ構造の両方で解消する。
@@ -341,6 +341,7 @@ Files:
 完了条件:
 
 - candidate evidence 表示のための label / URL / deployment 解決が一箇所に集まる。
+- `CandidateRobotList` の `annotations` 型は UCD-003 では旧 `evidenceLinks` 形式のままでもよい。型変更と描画反映は UCD-004 で行う。
 - 既存の `CandidateRobotList.tsx` と `lib/validate.ts` の import が壊れていない。
 
 検証:
@@ -366,7 +367,7 @@ Files:
 5. deployment evidence がある candidate では、対応する導入事例名または件数を表示する。
 6. source URL evidence しかない candidate では、公式情報/製品能力などの根拠種別が伝わる文言にする。
 7. stale な guide コメントを削除する。
-8. `RelatedLinkList` の `title` / `SidebarBlock kicker` が重複して読みにくい場合は、既存コンポーネントの責務を壊さない範囲で片方に寄せる。
+8. `RelatedLinkList` の `title` / `SidebarBlock kicker` が重複する場合は、`RelatedLinkList` の `title` prop を削除または未指定にし、見出し表示は `SidebarBlock` の `kicker` 側へ寄せる。
 9. UCD-003 の helper を使い、page component に evidence の細かい条件分岐を直書きしない。
 10. `CandidateRobotList` の `annotations` props 型を UCD-003 の view model に合わせて更新する。現行 `evidenceLinks` 形式を使い続ける場合は、helper 側で最終形まで整形し、page component で再変換しない。
 
@@ -395,6 +396,7 @@ Files:
 - `src/app/use-cases/page.tsx`
 - `lib/uiText.ts`
 - `lib/useCaseEvidence.ts`
+- `lib/useCaseDisplay.ts`（必要な場合のみ）
 - `lib/visualSemantics.ts`（必要な場合のみ）
 
 変更:
@@ -454,10 +456,11 @@ Files:
 9. `UseCasesBrowser` は `createUseCaseSearchIndex(useCases)` と `searchUseCaseSlugs(searchIndex, query)` で use-cases 用 `matchedSlugs` を生成し、`FacetFilterBar` へ渡す。
 10. `FacetFilterBar` の option count は、reports と同じく `matchedSlugs` でテキスト検索結果に連動させる。テキスト検索と facet 適用後の最終結果 set を混同しない。
 11. `UseCasesBrowser` の3つの `SelectControl` 直書きを `FacetFilterBar` に置き換える。
-12. URL state は引き続き `useUrlParamUpdater` を使う。
-13. `normalizeUseCaseFilters()` の挙動は維持する。
-14. `lib/tags.ts` の `getUseCaseDomainOptions()` / `getUseCaseIndustryTagOptions()` / `getUseCaseTaskTagOptions()` は、`src/app/use-cases/page.tsx` の URL param 正規化で使うため削除しない。UCD-006 では `UseCasesBrowser` からの直接利用だけを減らす。
-15. reports の挙動を変えない。
+12. 件数表示は `FacetFilterBar` 側に統一する。`UseCasesBrowser` の独自 `uiText.common.results(filtered.length, Boolean(active))` 表示は削除し、同じ件数を2箇所に出さない。
+13. URL state は引き続き `useUrlParamUpdater` を使う。
+14. `normalizeUseCaseFilters()` の挙動は維持する。
+15. `lib/tags.ts` の `getUseCaseDomainOptions()` / `getUseCaseIndustryTagOptions()` / `getUseCaseTaskTagOptions()` は、`src/app/use-cases/page.tsx` の URL param 正規化で使うため削除しない。UCD-006 では `UseCasesBrowser` からの直接利用だけを減らす。
+16. reports の挙動を変えない。
 
 完了条件:
 
@@ -466,6 +469,7 @@ Files:
 - active chip と件数表示が domain / industry / task のすべてで正しい。
 - `/use-cases` の active chip は `UseCasesHeader` 側だけに出る。`/reports` は従来通り `FacetFilterBar` 内に出る。
 - chips が header と filter bar で二重表示されない。
+- `/use-cases` の件数表示は `FacetFilterBar` 側だけに出る。
 - `SelectControl` の `id` / `label htmlFor` が reports/use-cases の両方で一意かつ対応している。
 - 検索クエリと facet の組み合わせで option count が正しく変わる。
 
