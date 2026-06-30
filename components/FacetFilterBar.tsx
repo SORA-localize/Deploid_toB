@@ -3,15 +3,14 @@
 import { useMemo } from 'react';
 import { ActiveFilterChips, type ActiveFilterChip } from '@/components/ActiveFilterChips';
 import { SelectControl, type SelectControlOption } from '@/components/SelectControl';
-import type { Article } from '@/data/types';
 import type { FacetConfig } from '@/lib/facetConfig';
 import { getTagLabel, matchesTag, toTagOptions } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
 
-interface FacetFilterBarProps {
-  /** 選択肢・件数の母集団（セクションタブで事前に絞った記事）。 */
-  articles: readonly Article[];
-  facets: readonly FacetConfig[];
+interface FacetFilterBarProps<T extends { slug: string }> {
+  /** 選択肢・件数の母集団（タブ等で事前に絞ったレコード）。 */
+  items: readonly T[];
+  facets: readonly FacetConfig<T>[];
   /** 現在のファセット選択（key→値、null/未指定で未選択）。 */
   values: Record<string, string | null>;
   /** フリーテキスト検索のマッチ slug 集合（件数計算に反映）。null=検索なし。 */
@@ -20,6 +19,10 @@ interface FacetFilterBarProps {
   resultCount: number;
   /** いずれかのファセットor検索が有効か（件数・チップ行の表示制御）。 */
   active: boolean;
+  /** SelectControl id の接頭辞。reports/use-cases で label 対応を一意に保つ。 */
+  idPrefix: string;
+  /** chips だけを非表示にする。件数表示は active 時に残す。 */
+  showChips?: boolean;
   onChange: (key: string, value: string | null) => void;
 }
 
@@ -28,35 +31,37 @@ interface FacetFilterBarProps {
  * 部分集合」から件数つきで導出し、0件は無効化して行き止まりを防ぐ（動的ファセット）。
  * 他ファセットは自動リセットしない（選択は保持）。
  */
-export function FacetFilterBar({
-  articles,
+export function FacetFilterBar<T extends { slug: string }>({
+  items,
   facets,
   values,
   matchedSlugs,
   resultCount,
   active,
+  idPrefix,
+  showChips = true,
   onChange,
-}: FacetFilterBarProps) {
+}: FacetFilterBarProps<T>) {
   const optionsByKey = useMemo(() => {
     const result: Record<string, SelectControlOption[]> = {};
     for (const facet of facets) {
       // 当該ファセット以外の選択＋検索で母集団を絞る（＝このファセットを切り替えたら何件になるか）
-      const subset = articles.filter(
-        (article) =>
-          (!matchedSlugs || matchedSlugs.has(article.slug)) &&
+      const subset = items.filter(
+        (item) =>
+          (!matchedSlugs || matchedSlugs.has(item.slug)) &&
           facets.every(
-            (other) => other.key === facet.key || matchesTag(other.getValues(article), values[other.key]),
+            (other) => other.key === facet.key || matchesTag(other.getValues(item), values[other.key]),
           ),
       );
       const countByValue = new Map<string, number>();
       toTagOptions(
-        subset.flatMap((article) => facet.getValues(article)),
+        subset.flatMap((item) => facet.getValues(item)),
         facet.kind,
       ).forEach((option) => countByValue.set(option.value, option.count));
 
       // セクション内に存在する全選択肢を安定表示し、現在の絞り込みでの件数を添えて0件は無効化
       const poolOptions = toTagOptions(
-        articles.flatMap((article) => facet.getValues(article)),
+        items.flatMap((item) => facet.getValues(item)),
         facet.kind,
       );
       const built: SelectControlOption[] = [
@@ -74,7 +79,7 @@ export function FacetFilterBar({
       result[facet.key] = built;
     }
     return result;
-  }, [articles, facets, values, matchedSlugs]);
+  }, [items, facets, values, matchedSlugs]);
 
   const chips = useMemo<ActiveFilterChip[]>(() => {
     const list: ActiveFilterChip[] = [];
@@ -97,7 +102,7 @@ export function FacetFilterBar({
         {facets.map((facet) => (
           <SelectControl
             key={facet.key}
-            id={`report-${facet.key}`}
+            id={`${idPrefix}-${facet.key}`}
             label={facet.label}
             value={values[facet.key] ?? 'all'}
             onChange={(next) => onChange(facet.key, next === 'all' ? null : next)}
@@ -108,7 +113,7 @@ export function FacetFilterBar({
 
       {active && (
         <div className="flex items-center justify-between gap-3">
-          <ActiveFilterChips chips={chips} />
+          {showChips ? <ActiveFilterChips chips={chips} /> : <div />}
           <span className="shrink-0 text-xs text-muted-foreground">
             {uiText.common.results(resultCount, true)}
           </span>

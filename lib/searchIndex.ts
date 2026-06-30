@@ -1,6 +1,6 @@
 import MiniSearch from 'minisearch';
-import type { Article } from '@/data/types';
-import { createReportSearchDocument } from '@/lib/search';
+import type { Article, UseCase } from '@/data/types';
+import { createReportSearchDocument, createUseCaseSearchDocument } from '@/lib/search';
 
 // 日本語は空白で区切られないため、MiniSearch 既定のトークナイザでは語に分割できない。
 // Intl.Segmenter('ja') の単語境界分割をインデックス時・検索時の両方で使う（同一トークナイザが必須）。
@@ -22,17 +22,18 @@ export function tokenizeJa(text: string): string[] {
   return tokens;
 }
 
-interface ArticleIndexDocument {
+interface SearchIndexDocument {
   id: string;
   text: string;
 }
 
-export type ArticleSearchIndex = MiniSearch<ArticleIndexDocument>;
+export type ArticleSearchIndex = MiniSearch<SearchIndexDocument>;
+export type UseCaseSearchIndex = MiniSearch<SearchIndexDocument>;
 
 const SEARCH_OPTIONS = { prefix: true, fuzzy: 0.2, combineWith: 'AND' as const };
 
 export function createArticleSearchIndex(reports: readonly Article[]): ArticleSearchIndex {
-  const index = new MiniSearch<ArticleIndexDocument>({
+  const index = new MiniSearch<SearchIndexDocument>({
     fields: ['text'],
     tokenize: tokenizeJa,
     searchOptions: SEARCH_OPTIONS,
@@ -49,6 +50,27 @@ export function createArticleSearchIndex(reports: readonly Article[]): ArticleSe
 
 /** クエリにマッチする記事 slug の集合を返す。空クエリは null（＝テキスト絞り込みなし＝全件通過）。 */
 export function searchArticleSlugs(index: ArticleSearchIndex, query: string): Set<string> | null {
+  if (!query.trim()) return null;
+  return new Set(index.search(query).map((result) => String(result.id)));
+}
+
+export function createUseCaseSearchIndex(useCases: readonly UseCase[]): UseCaseSearchIndex {
+  const index = new MiniSearch<SearchIndexDocument>({
+    fields: ['text'],
+    tokenize: tokenizeJa,
+    searchOptions: SEARCH_OPTIONS,
+  });
+  index.addAll(
+    useCases.map((useCase) => ({
+      id: useCase.slug,
+      text: createUseCaseSearchDocument(useCase).fields.join(' '),
+    })),
+  );
+  return index;
+}
+
+/** クエリにマッチする用途 slug の集合を返す。空クエリは null（＝テキスト絞り込みなし＝全件通過）。 */
+export function searchUseCaseSlugs(index: UseCaseSearchIndex, query: string): Set<string> | null {
   if (!query.trim()) return null;
   return new Set(index.search(query).map((result) => String(result.id)));
 }

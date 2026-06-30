@@ -9,17 +9,25 @@ export interface RelatedLinkItem {
 
 interface RelatedLinkListProps {
   id: string;
-  title: string;
+  title?: string;
+  ariaLabel?: string;
   items: readonly RelatedLinkItem[];
   titleLevel?: 'h2' | 'h3';
   /** 'compact' はサイドバー向け：見出し・説明文・カード装飾を省き、リンク行のみ表示する */
   variant?: 'card' | 'compact';
 }
 
-export function RelatedLinkList({ id, title, items, titleLevel = 'h2', variant = 'card' }: RelatedLinkListProps) {
+export function RelatedLinkList({
+  id,
+  title,
+  ariaLabel,
+  items,
+  titleLevel = 'h2',
+  variant = 'card',
+}: RelatedLinkListProps) {
   if (variant === 'compact') {
     return (
-      <nav aria-label={title}>
+      <nav aria-label={ariaLabel ?? title ?? id}>
         {items.map((item) => (
           <Link
             key={item.href}
@@ -39,7 +47,7 @@ export function RelatedLinkList({ id, title, items, titleLevel = 'h2', variant =
   return (
     <section id={id} aria-labelledby={headingId} className="scroll-mt-site-header">
       <Heading id={headingId} className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        {title}
+        {title ?? ariaLabel ?? id}
       </Heading>
       <div className="divide-y divide-border">
         {items.map((item) => (

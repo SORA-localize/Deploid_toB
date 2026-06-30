@@ -16,7 +16,7 @@ export function filterArticles({
 }: {
   reports: readonly Article[];
   section?: ArticleSection | 'all';
-  facets?: readonly FacetConfig[];
+  facets?: readonly FacetConfig<Article>[];
   facetValues?: Record<string, string | null>;
   matchedSlugs?: ReadonlySet<string> | null;
 }) {

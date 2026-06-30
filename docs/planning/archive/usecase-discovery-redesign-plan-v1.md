@@ -1,8 +1,9 @@
 # UseCase Discovery Redesign Plan v1
 
-Status: active/unimplemented plan
+Status: completed / archived
 Created: 2026-06-28
-Branch: TBD - create a dedicated branch from updated `main` before implementation
+Completed: 2026-06-30
+Branch: plan/usecase-discovery-redesign
 
 この文書は、`/use-cases`（用途から探す）を「現場の用途から、根拠付きで候補ロボット・実例・関連記事へ進めるページ」に再設計するための実装計画です。
 実装判断の正本ではありません。実装時は現行コード、`data/types.ts`、`lib/data.ts`、`lib/validate.ts`、`docs/planning/data-architecture-redesign-v1.md`、`docs/planning/data-maintenance-checklist-v1.md` を優先します。

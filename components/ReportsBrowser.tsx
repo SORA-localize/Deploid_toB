@@ -147,12 +147,13 @@ export function ReportsBrowser({
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
             <div className="flex-1">
               <FacetFilterBar
-                articles={sectionScoped}
+                items={sectionScoped}
                 facets={ARTICLE_FACETS}
                 values={facetValues}
                 matchedSlugs={matchedSlugs}
                 resultCount={gridReports.length}
                 active={hasActiveFilters}
+                idPrefix="report"
                 onChange={onFacetChange}
               />
             </div>

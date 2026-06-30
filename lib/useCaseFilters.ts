@@ -1,6 +1,7 @@
 import type { UseCase } from '@/data/types';
 import { createUseCaseSearchDocument, matchesSearchDocument } from '@/lib/search';
 import { matchesTag, normalizeTagKey } from '@/lib/tags';
+import { USE_CASE_FACETS } from '@/lib/facetConfig';
 
 // lib/robotFilters.ts と同じ形（業種・タスクは独立した同時絞り込み軸）に揃える。
 // 「モードを選んでから片方だけのタグを出す」設計はrobots/manufacturersと一貫しないため廃止した。
@@ -43,16 +44,28 @@ export function normalizeUseCaseFilters({
 export function getUseCaseFilterResult(
   useCases: readonly UseCase[],
   filters: UseCaseFilters,
+  matchedSlugs?: ReadonlySet<string> | null,
 ) {
-  const searchDocuments = new Map(
-    useCases.map((useCase) => [useCase.slug, createUseCaseSearchDocument(useCase)]),
-  );
+  const searchDocuments = matchedSlugs === undefined
+    ? new Map(useCases.map((useCase) => [useCase.slug, createUseCaseSearchDocument(useCase)]))
+    : null;
 
   const filtered = useCases.filter((useCase) => {
-    if (!matchesSearchDocument(filters.query, searchDocuments.get(useCase.slug))) return false;
-    if (!matchesTag(useCase.industryTags, filters.industry)) return false;
-    if (!matchesTag(useCase.taskTags, filters.task)) return false;
-    if (!matchesTag([useCase.primaryDomain, ...(useCase.secondaryDomains ?? [])], filters.domain)) return false;
+    if (matchedSlugs !== undefined) {
+      if (matchedSlugs && !matchedSlugs.has(useCase.slug)) return false;
+    } else if (!matchesSearchDocument(filters.query, searchDocuments?.get(useCase.slug))) {
+      return false;
+    }
+    const facetValues = {
+      domain: filters.domain,
+      industry: filters.industry,
+      task: filters.task,
+    };
+    for (const facet of USE_CASE_FACETS) {
+      if (!matchesTag(facet.getValues(useCase), facetValues[facet.key as keyof typeof facetValues])) {
+        return false;
+      }
+    }
     return true;
   });
 

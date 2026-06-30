@@ -2,29 +2,19 @@
 
 import Link from 'next/link';
 import { Star } from 'lucide-react';
-import type { CandidateEvidenceBasis, CandidateFit, Robot } from '@/data/types';
+import type { Robot } from '@/data/types';
 import { TagChip } from '@/components/TagChip';
 import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
-import { candidateEvidenceBasisLabels } from '@/lib/useCaseEvidence';
+import type { UseCaseCandidateEvidenceViewModel } from '@/lib/useCaseEvidence';
 import { useFavorites } from '@/lib/useFavorites';
 import { getCandidateFitTone } from '@/lib/visualSemantics';
-
-interface CandidateRobotAnnotation {
-  fit: CandidateFit;
-  basis: CandidateEvidenceBasis;
-  reason: string;
-  evidenceLinks?: Array<{
-    href: string;
-    label: string;
-  }>;
-}
 
 interface CandidateRobotListProps {
   robots: Robot[];
   emptyMessage?: string;
   /** use-cases/[slug] のみ渡す。「なぜ候補なのか」を根拠種別とreasonで表示する。 */
-  annotations?: Record<string, CandidateRobotAnnotation>;
+  annotations?: Record<string, UseCaseCandidateEvidenceViewModel>;
 }
 
 export function CandidateRobotList({ robots, emptyMessage = '候補は精査中です。', annotations }: CandidateRobotListProps) {
@@ -67,7 +57,7 @@ export function CandidateRobotList({ robots, emptyMessage = '候補は精査中�
             </div>
             {annotation && (
               <TagChip tone={getCandidateFitTone(annotation.fit)} className="mb-1.5 py-0.5">
-                {candidateEvidenceBasisLabels[annotation.basis]}
+                {annotation.fitLabel} / {annotation.basisLabel}
               </TagChip>
             )}
             <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
