@@ -293,10 +293,9 @@ export interface UseCase extends BaseRecord {
   buyerReadiness: BuyerReadiness;
   environment: OperatingEnvironment;
   requiredCapabilities: Capability[];
-  /** タスク起点のMECE分類（正本）。lib/tagRegistry.tsの'use-case-domain'から選ぶ。 */
-  primaryDomain: TagValue<'use-case-domain'>;
-  secondaryDomains?: TagValue<'use-case-domain'>[];
-  /** 検索・フィルタ用ファセット（MECEではない。正本はprimaryDomain）。 */
+  /** 産業タブのグルーピング基準となる単一産業（正本）。lib/tagRegistry.tsの'industry'から選ぶ。 */
+  primaryIndustry: TagValue<'industry'>;
+  /** 検索・フィルタ用ファセット（複数産業にまたがる場合の補助）。 */
   industryTags: TagValue<'industry'>[];
   taskTags: TagValue<'task'>[];
   atAGlance: UseCaseAtAGlance;

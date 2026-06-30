@@ -14,7 +14,6 @@
 export type TagKind =
   | 'industry'
   | 'task'
-  | 'use-case-domain'
   | 'region'
   | 'theme';
 
@@ -38,16 +37,6 @@ export const tagRegistry = [
   { kind: 'industry', value: 'retail', label: '小売・店舗' },
   { kind: 'industry', value: 'facility-management', label: '施設管理' },
   { kind: 'industry', value: 'research', label: '研究・開発' },
-  // 移行中の旧産業タグ（B-09/B-09b 完了後に削除）
-  { kind: 'industry', value: 'healthcare-care', label: '医療・介護（旧）' },
-  { kind: 'industry', value: 'hospitality', label: 'ホテル・接客（旧）' },
-  { kind: 'industry', value: 'construction-infrastructure', label: '建設・インフラ（旧）' },
-  { kind: 'industry', value: 'public-sector', label: '公共・行政（旧）' },
-  { kind: 'industry', value: 'education', label: '教育（旧）' },
-  { kind: 'industry', value: 'e-commerce', label: 'EC（旧）' },
-  { kind: 'industry', value: 'plant', label: '工場（旧）' },
-  { kind: 'industry', value: 'facility', label: '施設（旧）' },
-  { kind: 'industry', value: 'marketing', label: 'マーケティング（旧）' },
 
   // 正規タスクタグ（11種）
   { kind: 'task', value: 'material-handling', label: '搬送・マテハン' },
@@ -61,24 +50,6 @@ export const tagRegistry = [
   { kind: 'task', value: 'agricultural-work', label: '農作業・収穫' },
   { kind: 'task', value: 'hazardous-work', label: '危険作業・インフラ保守' },
   { kind: 'task', value: 'research-task', label: '研究・実験・検証' },
-  // 移行中の旧タスクタグ（B-09/B-09c 完了後に削除）
-  { kind: 'task', value: 'quality-inspection', label: '品質検査（旧）' },
-  { kind: 'task', value: 'shelf-stocking', label: '棚補充（旧）' },
-  { kind: 'task', value: 'disaster-response', label: '災害対応（旧）' },
-  { kind: 'task', value: 'r-and-d', label: '研究開発（旧）' },
-  { kind: 'task', value: 'hri', label: 'HRI（旧）' },
-  { kind: 'task', value: 'control', label: '制御（旧）' },
-  { kind: 'task', value: 'demo', label: 'デモ（旧）' },
-  { kind: 'task', value: 'exhibition', label: '展示（旧）' },
-
-  // use-case-domain: UseCase.primaryDomain/secondaryDomains の正本（廃止予定。B-01〜B-09 完了後に A-03 で削除）
-  { kind: 'use-case-domain', value: 'move-goods', label: '物の運搬' },
-  { kind: 'use-case-domain', value: 'manipulate-and-assemble', label: '組立・加工作業' },
-  { kind: 'use-case-domain', value: 'inspect-and-record', label: '巡回・点検・記録' },
-  { kind: 'use-case-domain', value: 'communicate-with-people', label: '人対応・案内' },
-  { kind: 'use-case-domain', value: 'assist-human-body', label: '身体介助の代行' },
-  { kind: 'use-case-domain', value: 'demonstrate-capability', label: '実演・デモ動作' },
-  { kind: 'use-case-domain', value: 'validate-new-tech', label: '新技術・新動作の検証' },
 
   // 記事の地域ファセット（Article.regionTags）。検索・絞り込み用で互いに重ならない地域バケット。
   // 企業・機種は relatedManufacturerIds/relatedRobotIds で表すのでここには入れない。

@@ -46,15 +46,8 @@ export const ARTICLE_FACETS: readonly FacetConfig<Article>[] = [
   },
 ];
 
-/** 用途一覧（/use-cases）のファセット。domain は primary/secondary を横断して探す。 */
+/** 用途一覧（/use-cases）のファセット。産業は産業タブで操作するため industry のみ残す。 */
 export const USE_CASE_FACETS: readonly FacetConfig<UseCase>[] = [
-  {
-    key: 'domain',
-    kind: 'use-case-domain',
-    label: uiText.filters.domain,
-    allLabel: uiText.common.allDomains,
-    getValues: (useCase) => [useCase.primaryDomain, ...(useCase.secondaryDomains ?? [])],
-  },
   {
     key: 'industry',
     kind: 'industry',

@@ -101,12 +101,6 @@ export function getUseCaseTaskTagOptions(useCases: readonly UseCase[]) {
   );
 }
 
-export function getUseCaseDomainOptions(useCases: readonly UseCase[]) {
-  return toTagOptions(
-    useCases.flatMap((useCase) => [useCase.primaryDomain, ...(useCase.secondaryDomains ?? [])]),
-    'use-case-domain',
-  );
-}
 
 export function getRobotIndustryTagOptions(robots: readonly Robot[]) {
   return toTagOptions(

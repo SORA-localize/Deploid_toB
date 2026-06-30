@@ -546,15 +546,9 @@ export function validateData(): ValidationResult {
     checkRequiredSources('useCase', u.slug, u.sources, {
       requireNonEmpty: u.publishStatus === 'published',
     });
+    checkTags('useCase', u.slug, 'primaryIndustry', 'industry', [u.primaryIndustry]);
     checkTags('useCase', u.slug, 'industryTags', 'industry', u.industryTags);
     checkTags('useCase', u.slug, 'taskTags', 'task', u.taskTags);
-    checkTags('useCase', u.slug, 'primaryDomain', 'use-case-domain', [u.primaryDomain]);
-    checkTags('useCase', u.slug, 'secondaryDomains', 'use-case-domain', u.secondaryDomains ?? []);
-    if (u.secondaryDomains?.includes(u.primaryDomain)) {
-      errors.push(
-        `[domain-duplicate] useCase "${u.slug}".secondaryDomains に primaryDomain と同じ値があります: ${u.primaryDomain}`,
-      );
-    }
     checkUniqueValues(
       'useCase',
       u.slug,

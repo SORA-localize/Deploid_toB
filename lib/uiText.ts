@@ -20,7 +20,6 @@ export const uiText = {
     readingMinutes: (minutes: number) => `${minutes}分`,
     allIndustries: 'すべての業種',
     allTasks: 'すべてのタスク',
-    allDomains: 'すべての得意分野',
     allThemes: 'すべてのテーマ',
     results: (count: number, filtered: boolean) =>
       filtered ? `${count}件（絞り込み中）` : `${count}件`,
@@ -58,7 +57,6 @@ export const uiText = {
     reportTopics: '記事トピック',
     industry: '業種',
     task: 'タスク',
-    domain: '得意分野',
     theme: 'テーマ',
     keywordSearch: 'キーワード検索',
   },
@@ -136,7 +134,7 @@ export const uiText = {
   useCases: {
     breadcrumb: '用途から探す',
     title: '用途から探す',
-    description: 'やりたい作業の得意分野・業種・タスクから、現実的なヒューマノイドの適用機会を探せます。',
+    description: '産業・現場タスクからヒューマノイドの実適用シーンを探す。実導入事例の有無を明示しています。',
     featured: '注目の適用領域',
     all: 'すべての用途',
     candidateRobots: (count: number) => `${count}件の候補ロボット`,

@@ -164,7 +164,6 @@ export const deploymentStatusTones = {
 export const tagKindTones = {
   industry: 'info',
   task: 'neutral',
-  'use-case-domain': 'brand',
   region: 'info',
   theme: 'neutral',
 } as const satisfies Record<TagKind, VisualTone>;
