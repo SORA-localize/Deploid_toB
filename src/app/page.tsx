@@ -67,7 +67,10 @@ export default function HomePage() {
     { src: '/images/robots/mentee-menteebotv3-hero.jpg', alt: 'MenteeBot humanoid robot', label: 'MenteeBot', objectPosition: 'center' },
   ];
 
-  const manufacturerPreviewAssets: typeof robotPreviewAssets = [];
+  // Unsplash: Jonathan Phillips / https://unsplash.com/photos/fTxWB2uCBz8 / Unsplash License
+  const manufacturerPreviewAssets: typeof robotPreviewAssets = [
+    { src: '/images/home/manufacturers/office-building-dusk.jpg', alt: 'Modern office building exterior at dusk', label: 'Headquarters', objectPosition: 'center' },
+  ];
 
   // Unsplash: Adrian Sulyok / https://unsplash.com/photos/c_4eaGRDSVU / Unsplash License
   const useCasePreviewAssets: typeof robotPreviewAssets = [
