@@ -2631,7 +2631,7 @@ export const robots: Robot[] = [
     manufacturerId: 'ubtech',
     category: 'humanoid',
     summary: 'Walker E シリーズの改名後製品。172cm・フルサイズ研究・実証向けヒューマノイド。GA Robotics が日本代理店として評価貸出し中。',
-    publishStatus: 'draft',
+    publishStatus: 'published',
     updatedAt: '2026-07-01',
     reliability: 'official',
     sources: [
@@ -2848,8 +2848,8 @@ export const robots: Robot[] = [
     nameJa: 'NEXTAGE',
     manufacturerId: 'kawasaki-heavy-industries',
     category: 'humanoid',
-    summary: '川田ロボティクスの双腕ロボット NEXTAGE。既存ID・メーカーIDの誤同定を確認したため、正規レコード化まで draft とする。',
-    publishStatus: 'draft',
+    summary: '川田ロボティクスの双腕ロボット NEXTAGE。id・manufacturerId が Kawasaki として誤登録されていたため archived。正規レコードは kawada-robotics / kawada-nextage として別途作成が必要。',
+    publishStatus: 'archived',
     updatedAt: '2026-07-01',
     reliability: 'reported',
     sources: [
