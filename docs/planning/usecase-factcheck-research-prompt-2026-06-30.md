@@ -1,5 +1,12 @@
 # /use-cases ファクトチェック Deep Research 用プロンプト
 
+> **警告（2026-07-01）：このファイルは調査プロンプトの生の抽出物です。**
+> usecase-data-scope-cleanup-plan-2026-06-30.md の UCD-002〜008 が実装済みのため、
+> このプロンプトが前提にした use case セット・候補ロボット・根拠 URL の一部はすでに除去またはdraft化されています。
+> このファイルを実装の根拠や正本として使用しないでください。
+> 調査済み・整理済みの正本は `usecase-data-scope-cleanup-plan-2026-06-30.md` の
+> editorial decisions（セクション 4）を参照してください。
+
 作成日: 2026-06-30
 対象実装: `/use-cases` 一覧・詳細ページ、`data/useCases.ts` の公開用途データ
 対象件数: 44件（`publishStatus: published` のみが `lib/data.ts#getUseCases()` から表示される）
