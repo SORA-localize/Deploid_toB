@@ -2660,7 +2660,7 @@ export const robots: Robot[] = [
         sourceUrl: 'https://ga-robotics.co.jp/products/walker-tienkung/',
         rights: {
           status: 'reference-attributed',
-          sourceType: 'distributor-official',
+          sourceType: 'partner-official',
           rightsHolder: 'UBTECH Robotics',
           checkedAt: '2026-07-01',
         },
@@ -3143,7 +3143,7 @@ export const robots: Robot[] = [
       },
     },
     description: 'Pudu Robotics が2026年6月に発表した産業用半人型ロボット。車輪移動を採用し、14kg ペイロード、両腕の力制御、360度環境認識、自動バッテリー交換機能を備える。倉庫・工場向けの搬送・棚ピッキング・補充・構内物流を想定。二足歩行を前提としないため既存の工場床面への適合が容易と訴求。発表段階であり、価格・出荷時期・日本展開は未公表。',
-    deploymentStage: 'announced',
+    deploymentStage: 'concept',
     buyerReadiness: 'requires-poc',
     specs: {
       payloadKg: 14,

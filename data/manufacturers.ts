@@ -1606,11 +1606,12 @@ export const manufacturers: Manufacturer[] = [
   },
   {
     id: 'pudu-robotics',
+    slug: 'pudu-robotics',
     name: 'Pudu Robotics',
+    website: 'https://www.pudurobotics.com/',
     country: 'China',
     companyType: 'manufacturer',
     companyStatus: 'active',
-    founded: 2016,
     logo: {
       src: '',
       alt: 'Pudu Robotics logo',
