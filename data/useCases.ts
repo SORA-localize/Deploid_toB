@@ -530,16 +530,7 @@ export const useCases: UseCase[] = [
         publisher: 'Wandercraft',
         checkedAt: '2026-06-22',
         reliability: 'official',
-        note: 'パートナーシップの一次情報。「350台」の具体的な数字はこの記事には記載が無く、下のRobotics and Automation News記事のみが裏付ける。',
-      },
-      {
-        title: 'Renault reportedly planning to deploy 350 humanoid robots in manufacturing push',
-        url: 'https://roboticsandautomationnews.com/2026/03/23/renault-reportedly-planning-to-deploy-350-humanoid-robots-in-manufacturing-push/100050/',
-        publisher: 'Robotics and Automation News',
-        publishedAt: '2026-03-23',
-        checkedAt: '2026-06-22',
-        reliability: 'reported',
-        note: 'Renaultドゥエー工場でのCALVIN-40量産導入規模（350台）の裏取り（最も成熟した事例として overview で引用）。',
+        note: 'パートナーシップの一次情報。',
       },
       {
         title: 'Successful test of humanoid robots at BMW Group Plant Spartanburg',
@@ -590,7 +581,7 @@ export const useCases: UseCase[] = [
       mustBeTrue: '対象工程を部品搬送・補助作業に絞り、既存の生産ラインと並走させながら段階的に検証できる体制がある。',
     },
     overview:
-      '工場内搬送・組立支援は、ヒューマノイドの実証・量産導入が他の用途より集中している領域で、BMW・Mercedes-Benz・Renault などの公開事例が確認できる。Renaultドゥエー工場のWandercraft CALVIN-40は350台規模の量産導入報道があり、現時点で確認できる中で最も成熟した事例。',
+      '工場内搬送・組立支援は、ヒューマノイドの実証・量産導入が他の用途より集中している領域で、BMW・Mercedes-Benz・Renault などの公開事例が確認できる。Renaultドゥエー工場のWandercraft CALVIN-40は製造現場向けパートナーシップの代表例。',
     whyItMatters:
       '自動車工場という単一業種に複数メーカーの実証が集中していることは、この用途が現時点で投資対効果を見込みやすい領域であることを示す。日本の製造業が最初に参照しやすいベンチマークになる。',
     capabilityNotes: {
@@ -617,7 +608,7 @@ export const useCases: UseCase[] = [
         fit: 'strong',
         basis: 'deployment',
         evidenceDeploymentIds: ['wandercraft-renault-douai'],
-        reason: 'Renaultドゥエー工場でタイヤ搬送に特化して稼働中。350台規模の量産導入が進む、現時点で最も成熟した事例。',
+        reason: 'Renaultドゥエー工場でタイヤ搬送・重量物物流向けに展開される製造現場事例。',
       },
       {
         robotId: 'ubtech-walker-s1',
@@ -718,12 +709,10 @@ export const useCases: UseCase[] = [
     titleJa: '精密粉体秤量',
     subtitle: '医薬品・食品・化学製造での粉体計量・秤量作業をヒューマノイドで自動化する用途。',
     summary: '医薬品・食品・化学製造での粉体計量・秤量作業をヒューマノイドで自動化する用途。',
-    publishStatus: 'published',
+    publishStatus: 'draft',
     updatedAt: '2026-06-30',
-    reliability: 'reported',
-    sources: [
-      { title: 'NEXTAGE product page', url: 'https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/', publisher: '川崎ロボティクス', checkedAt: '2026-06-30', reliability: 'official' },
-    ],
+    reliability: 'estimated',
+    sources: [],
     maturityLevel: 'production-ready',
     buyerReadiness: 'initial-adoption',
     environment: 'indoor-controlled',
@@ -742,9 +731,7 @@ export const useCases: UseCase[] = [
     environmentRequirements: '整備された作業台、標準化された容器・秤のレイアウト、充電スペース。',
     whyHardToday: '環境の微妙な変化（容器サイズ・粉体特性）への汎化が課題。',
     japanDeploymentConditions: '食品衛生法・薬機法に基づく衛生管理要件への適合確認が必要。',
-    candidateRobots: [
-      { robotId: 'kawasaki-nextage', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/'], reason: '川崎ロボティクス公式ページで精密計量・配合作業への適用実績が示されている。' },
-    ],
+    candidateRobots: [],
   },
   {
     id: 'factory-visual-inspection',
@@ -758,7 +745,6 @@ export const useCases: UseCase[] = [
     reliability: 'reported',
     sources: [
       { title: 'UBTECH Walker S official page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s', publisher: 'UBTECH Robotics', checkedAt: '2026-06-30', reliability: 'official' },
-      { title: 'NEXTAGE product page', url: 'https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/', publisher: '川崎ロボティクス', checkedAt: '2026-06-30', reliability: 'official' },
     ],
     maturityLevel: 'production-ready',
     buyerReadiness: 'requires-poc',
@@ -772,7 +758,7 @@ export const useCases: UseCase[] = [
       whereDoesNotFit: '微細なキズ・寸法精度が厳しい高精度検査（専用の機械視覚装置が適切）。',
       mustBeTrue: '検査対象物の位置・照明条件を制御でき、AIによる良否判定を受け入れる体制がある。',
     },
-    overview: 'UBTECHやKawasakiが製造ライン向け検査支援を訴求。AIビジョンとの組み合わせで、熟練検査員の不足を補う用途として注目が高い。',
+    overview: 'UBTECHが製造ライン向け検査支援を訴求。AIビジョンとの組み合わせで、熟練検査員の不足を補う用途として注目が高い。',
     whyItMatters: '検査工程の標準化と品質記録の自動化で、不良流出リスクと人件費を同時に削減できる。',
     capabilityNotes: { perception: '照明条件・表面反射によって検出精度が大きく変わる。専用カメラ搭載の検討が必要。' },
     environmentRequirements: '安定した照明、検査対象物の定位置配置、画像ログ保管インフラ。',
@@ -780,7 +766,6 @@ export const useCases: UseCase[] = [
     japanDeploymentConditions: '品質管理基準（ISO 9001等）への適合、判定ログの保管義務の確認が必要。',
     candidateRobots: [
       { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s'], reason: '製造ライン品質管理向け公式ユースケースに掲載。' },
-      { robotId: 'kawasaki-nextage', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/'], reason: '検査・計測補助での適用実績が公式に示されている。' },
     ],
   },
   {
@@ -790,12 +775,10 @@ export const useCases: UseCase[] = [
     titleJa: 'マシンテンディング',
     subtitle: 'CNC・射出成形機など工作機械へのワーク供給・取り出し・操作パネル操作をヒューマノイドで補助する用途。',
     summary: 'CNC・射出成形機など工作機械へのワーク供給・取り出し・操作パネル操作をヒューマノイドで補助する用途。',
-    publishStatus: 'published',
+    publishStatus: 'draft',
     updatedAt: '2026-06-30',
-    reliability: 'reported',
-    sources: [
-      { title: 'NEXTAGE product page', url: 'https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/', publisher: '川崎ロボティクス', checkedAt: '2026-06-30', reliability: 'official' },
-    ],
+    reliability: 'estimated',
+    sources: [],
     maturityLevel: 'production-ready',
     buyerReadiness: 'initial-adoption',
     environment: 'indoor-controlled',
@@ -814,9 +797,7 @@ export const useCases: UseCase[] = [
     environmentRequirements: '機械インターロック対応、安全柵または協働運用設計、充電スペース。',
     whyHardToday: '多品種対応時のプログラム変更コスト、例外処理（詰まり等）の自動対応が課題。',
     japanDeploymentConditions: '労働安全衛生規則・安全規格（ISO 10218）への適合確認が必要。',
-    candidateRobots: [
-      { robotId: 'kawasaki-nextage', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/'], reason: 'マシンテンディングは川崎ロボティクス NEXTAGE の主要適用領域として公式に示されている。' },
-    ],
+    candidateRobots: [],
   },
 
   // --- E-02: 物流（logistics）4件 ---
@@ -831,7 +812,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-06-30',
     reliability: 'reported',
     sources: [
-      { title: 'Boston Dynamics Atlas use cases', url: 'https://bostondynamics.com/atlas/', publisher: 'Boston Dynamics', checkedAt: '2026-06-30', reliability: 'official' },
+      { title: 'Boston Dynamics Atlas product page', url: 'https://bostondynamics.com/products/atlas/', publisher: 'Boston Dynamics', checkedAt: '2026-07-01', reliability: 'official' },
     ],
     maturityLevel: 'pilot-phase',
     buyerReadiness: 'requires-poc',
@@ -852,7 +833,7 @@ export const useCases: UseCase[] = [
     whyHardToday: 'ランダムな荷物位置・形状への汎化、狭いコンテナ内での動作計画が技術的難関。',
     japanDeploymentConditions: '港湾・物流センターの安全基準適合、シフト型運用計画の策定が必要。',
     candidateRobots: [
-      { robotId: 'boston-dynamics-atlas', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://bostondynamics.com/atlas/'], reason: 'Boston Dynamics が Atlas の物流荷下ろし用途を公式に訴求。DHL等との実証実績あり。' },
+      { robotId: 'boston-dynamics-atlas', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://bostondynamics.com/products/atlas/'], reason: 'Boston Dynamics が Atlas の物流荷下ろし用途を公式に訴求。DHL等との実証実績あり。' },
     ],
   },
   {
@@ -1002,12 +983,10 @@ export const useCases: UseCase[] = [
     titleJa: '建設現場巡視',
     subtitle: '建設現場の進捗確認・安全チェック・異常報告をヒューマノイドが巡回して実施する用途。',
     summary: '建設現場の進捗確認・安全チェック・異常報告をヒューマノイドが巡回して実施する用途。',
-    publishStatus: 'published',
+    publishStatus: 'draft',
     updatedAt: '2026-06-30',
-    reliability: 'reported',
-    sources: [
-      { title: 'ZIZAI official website', url: 'https://zizai.co.jp/', publisher: 'ZIZAI', checkedAt: '2026-06-30', reliability: 'official' },
-    ],
+    reliability: 'estimated',
+    sources: [],
     maturityLevel: 'pilot-phase',
     buyerReadiness: 'limited-today',
     environment: 'outdoor',
@@ -1026,9 +1005,7 @@ export const useCases: UseCase[] = [
     environmentRequirements: '屋外・不整地対応、防水設計、通信インフラ。',
     whyHardToday: '屋外での自律ナビゲーション精度、長時間バッテリー稼働が技術的課題。',
     japanDeploymentConditions: '建設業法・労働安全衛生法への適合、現場責任者との連携体制が必要。',
-    candidateRobots: [
-      { robotId: 'zizai-zeroshiki', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://zizai.co.jp/'], reason: 'ZIZAIが建設・インフラ現場での巡視を主要ユースケースとして開発を進めている。' },
-    ],
+    candidateRobots: [],
   },
   {
     id: 'construction-material-transport',
@@ -1040,9 +1017,7 @@ export const useCases: UseCase[] = [
     publishStatus: 'draft',
     updatedAt: '2026-06-30',
     reliability: 'estimated',
-    sources: [
-      { title: 'NEXTAGE product page', url: 'https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/', publisher: '川崎ロボティクス', checkedAt: '2026-06-30', reliability: 'official' },
-    ],
+    sources: [],
     maturityLevel: 'early-stage',
     buyerReadiness: 'limited-today',
     environment: 'indoor-semi-controlled',
@@ -1061,9 +1036,7 @@ export const useCases: UseCase[] = [
     environmentRequirements: '整備された搬送ルート、充電スペース、重機との動線分離。',
     whyHardToday: '建設現場環境の多様性と予測困難性が、自律移動の実用化を妨げている。',
     japanDeploymentConditions: '建設現場安全管理計画への組み込み、機器認証が必要。',
-    candidateRobots: [
-      { robotId: 'kawasaki-nextage', fit: 'watch', basis: 'product-capability', evidenceSourceUrls: ['https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/'], reason: '屋内制御環境での搬送実績あり。建設現場への適用は今後の検討段階。' },
-    ],
+    candidateRobots: [],
   },
   {
     id: 'infrastructure-ultrasonic-inspection',
@@ -1072,12 +1045,10 @@ export const useCases: UseCase[] = [
     titleJa: '超音波橋梁点検',
     subtitle: '橋梁・高架等のインフラ構造物に対して、ヒューマノイドが超音波センサを用いた非破壊点検を実施する用途。',
     summary: '橋梁・高架等のインフラ構造物に対して、ヒューマノイドが超音波センサを用いた非破壊点検を実施する用途。',
-    publishStatus: 'published',
+    publishStatus: 'draft',
     updatedAt: '2026-06-30',
-    reliability: 'reported',
-    sources: [
-      { title: 'ZIZAI official website', url: 'https://zizai.co.jp/', publisher: 'ZIZAI', checkedAt: '2026-06-30', reliability: 'official' },
-    ],
+    reliability: 'estimated',
+    sources: [],
     maturityLevel: 'production-ready',
     buyerReadiness: 'requires-poc',
     environment: 'outdoor',
@@ -1096,9 +1067,7 @@ export const useCases: UseCase[] = [
     environmentRequirements: '橋梁へのアクセス足場、センサキャリブレーション環境、データ記録システム。',
     whyHardToday: '不整形な構造物面でのセンサ接触精度、悪天候時の作業継続が課題。',
     japanDeploymentConditions: '国道橋・県道橋の点検基準（国土交通省）への適合、近接目視の代替承認が必要。',
-    candidateRobots: [
-      { robotId: 'zizai-zeroshiki', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://zizai.co.jp/'], reason: 'ZIZAIが橋梁超音波点検を公式の主要ユースケースとして展開している。' },
-    ],
+    candidateRobots: [],
   },
   {
     id: 'infrastructure-overhead-wire-maintenance',
@@ -1107,12 +1076,10 @@ export const useCases: UseCase[] = [
     titleJa: '架線保守',
     subtitle: '鉄道・電力系統の架線点検・保守作業をヒューマノイドで実施する用途。',
     summary: '鉄道・電力系統の架線点検・保守作業をヒューマノイドで実施する用途。',
-    publishStatus: 'published',
+    publishStatus: 'draft',
     updatedAt: '2026-06-30',
-    reliability: 'reported',
-    sources: [
-      { title: 'ZIZAI official website', url: 'https://zizai.co.jp/', publisher: 'ZIZAI', checkedAt: '2026-06-30', reliability: 'official' },
-    ],
+    reliability: 'estimated',
+    sources: [],
     maturityLevel: 'production-ready',
     buyerReadiness: 'requires-poc',
     environment: 'outdoor',
@@ -1131,9 +1098,7 @@ export const useCases: UseCase[] = [
     environmentRequirements: '絶縁対応設計、高所作業車との連携、通信インフラ。',
     whyHardToday: '架線電圧・天候変化への耐久性、精密な位置決めが現行技術の限界に近い。',
     japanDeploymentConditions: '電気事業法・鉄道事業法への適合、停電手順との連動、規制当局の承認が必要。',
-    candidateRobots: [
-      { robotId: 'zizai-zeroshiki', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://zizai.co.jp/'], reason: 'ZIZAIが架線保守を主要ユースケースとして開発・訴求している。' },
-    ],
+    candidateRobots: [],
   },
 
   // --- E-04: 農業・食品生産（agriculture）5件 ---
@@ -1144,12 +1109,10 @@ export const useCases: UseCase[] = [
     titleJa: '苗移植',
     subtitle: '農業ハウス・育苗施設での苗の移植・定植作業をヒューマノイドで自動化する用途。',
     summary: '農業ハウス・育苗施設での苗の移植・定植作業をヒューマノイドで自動化する用途。',
-    publishStatus: 'published',
+    publishStatus: 'draft',
     updatedAt: '2026-06-30',
-    reliability: 'reported',
-    sources: [
-      { title: 'NEXTAGE product page', url: 'https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/', publisher: '川崎ロボティクス', checkedAt: '2026-06-30', reliability: 'official' },
-    ],
+    reliability: 'estimated',
+    sources: [],
     maturityLevel: 'pilot-phase',
     buyerReadiness: 'requires-poc',
     environment: 'indoor-semi-controlled',
@@ -1168,9 +1131,7 @@ export const useCases: UseCase[] = [
     environmentRequirements: '均一な育苗トレイ・作業台レイアウト、充電スペース、防湿対応。',
     whyHardToday: '苗の個体差への対応、土・水の存在による把持難易度が高い。',
     japanDeploymentConditions: '農業施設安全基準、食品衛生管理規定への適合確認が必要。',
-    candidateRobots: [
-      { robotId: 'kawasaki-nextage', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/'], reason: '川崎ロボティクスNEXTAGEが農業・食品業界への応用事例を公式に掲載している。' },
-    ],
+    candidateRobots: [],
   },
   {
     id: 'agriculture-fruit-harvest',
@@ -1214,12 +1175,10 @@ export const useCases: UseCase[] = [
     titleJa: '食材仕分け箱詰め',
     subtitle: '収穫後の野菜・果物の選別・等級分け・箱詰め作業をヒューマノイドで自動化する用途。',
     summary: '収穫後の野菜・果物の選別・等級分け・箱詰め作業をヒューマノイドで自動化する用途。',
-    publishStatus: 'published',
+    publishStatus: 'draft',
     updatedAt: '2026-06-30',
-    reliability: 'reported',
-    sources: [
-      { title: 'NEXTAGE product page', url: 'https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/', publisher: '川崎ロボティクス', checkedAt: '2026-06-30', reliability: 'official' },
-    ],
+    reliability: 'estimated',
+    sources: [],
     maturityLevel: 'production-ready',
     buyerReadiness: 'initial-adoption',
     environment: 'indoor-controlled',
@@ -1238,9 +1197,7 @@ export const useCases: UseCase[] = [
     environmentRequirements: 'コンベア連携設備、食品衛生対応（防水・清掃性）、充電スペース。',
     whyHardToday: '多品種対応時の段取り替えコスト、食品衛生基準への適合設計が課題。',
     japanDeploymentConditions: '食品衛生法（HACCP対応）、農産物の等級基準への適合が必要。',
-    candidateRobots: [
-      { robotId: 'kawasaki-nextage', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/'], reason: 'NEXTAGEが食品業界の選別・箱詰め作業での実用化実績を公式に掲載している。' },
-    ],
+    candidateRobots: [],
   },
   {
     id: 'agriculture-fruit-transport',
@@ -1777,12 +1734,10 @@ export const useCases: UseCase[] = [
     titleJa: '創薬・実験自動化',
     subtitle: '製薬・バイオテクノロジー研究における試薬分注・プレート操作・実験器具操作をヒューマノイドで自動化する用途。',
     summary: '製薬・バイオテクノロジー研究における試薬分注・プレート操作・実験器具操作をヒューマノイドで自動化する用途。',
-    publishStatus: 'published',
+    publishStatus: 'draft',
     updatedAt: '2026-06-30',
-    reliability: 'reported',
-    sources: [
-      { title: 'NEXTAGE product page', url: 'https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/', publisher: '川崎ロボティクス', checkedAt: '2026-06-30', reliability: 'official' },
-    ],
+    reliability: 'estimated',
+    sources: [],
     maturityLevel: 'production-ready',
     buyerReadiness: 'initial-adoption',
     environment: 'indoor-controlled',
@@ -1801,9 +1756,7 @@ export const useCases: UseCase[] = [
     environmentRequirements: '実験台の標準化レイアウト、LIMS連携、清掃可能な設計（試薬こぼれ対応）。',
     whyHardToday: '試薬の多様性（粘度・揮発性等）への対応、高精度分注の再現性確保が課題。',
     japanDeploymentConditions: '薬機法・化学物質管理法への適合、安全データシートに基づく取り扱いルールの整備が必要。',
-    candidateRobots: [
-      { robotId: 'kawasaki-nextage', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.kawasakirobotics.com/jp/products/assembly-applications/nextage/'], reason: 'NEXTAGEが製薬・研究所での実験自動化ユースケースで複数の導入実績を持つ。' },
-    ],
+    candidateRobots: [],
   },
   {
     id: 'research-ai-simulation',

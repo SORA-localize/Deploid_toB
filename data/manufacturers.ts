@@ -1586,9 +1586,9 @@ export const manufacturers: Manufacturer[] = [
         checkedAt: '2026-06-30',
       },
     },
-    summary: '建設・インフラ現場向けに特化した国産ヒューマノイド「零式人機」を開発する日本のスタートアップ。',
-    publishStatus: 'published',
-    updatedAt: '2026-06-30',
+    summary: '建設・インフラ現場向けに特化した国産ヒューマノイド「零式人機」を開発する日本のスタートアップ。現行用途DBスコープでは公開対象外。',
+    publishStatus: 'draft',
+    updatedAt: '2026-07-01',
     reliability: 'official',
     sources: [
       {
@@ -1602,6 +1602,6 @@ export const manufacturers: Manufacturer[] = [
     description: '2023年東京創業。建設現場・インフラ保守（架線保守・橋梁点検等）に特化した国産ヒューマノイド「零式人機（ZEROSHIKI）」を開発。危険作業の無人化・省人化を目指す。',
     japanPresence: 'office',
     procurementNote: '日本法人（東京）にて直接問い合わせ対応。',
-    supportNote: '東京本社にてサポート。',
+    supportNote: '東京本社にてサポート。Deploid の現行用途DBスコープでは公開候補から外し、将来 in-scope な公式導入根拠が出た段階で再公開を検討する。',
   },
 ];

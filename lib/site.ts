@@ -14,5 +14,5 @@ export const siteMeta = {
   // プライバシーポリシーの最終改定月。改定時のみ更新する。
   privacyUpdatedAt: '2026年6月',
   // 掲載件数（ロボット・メーカー数）が正しい時点。件数を確認・更新したら合わせて更新する。
-  dataAsOf: '2026年6月',
+  dataAsOf: '2026年7月',
 } as const;

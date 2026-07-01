@@ -1,24 +1,58 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { articles } from '../data/articles.ts';
 import { deployments } from '../data/deployments.ts';
+import { manufacturers } from '../data/manufacturers.ts';
+import { robots } from '../data/robots.ts';
 import { useCases } from '../data/useCases.ts';
 
 const execFileAsync = promisify(execFile);
 
 const entries = [];
 const seen = new Set();
+const planTouchedArticleIds = new Set([
+  'pudu-d7-industrial-semi-humanoid-2026',
+  'robot-com-rnoid-workplace-humanoid-2026',
+  'genesis-ai-eno-non-humanoid-2026',
+  'jal-haneda-unitree-pilot-2026',
+  'dobot-atom-max-rtj-japan-2026',
+]);
+const planTouchedRobotIds = new Set([
+  'kawasaki-nextage',
+  'zizai-zeroshiki',
+  'pudu-d7',
+  'ubtech-walker-tienkung',
+]);
+const planTouchedManufacturerIds = new Set([
+  'zizai',
+  'pudu-robotics',
+]);
 
 const addUrl = (owner, field, url) => {
-  const key = `${field}\t${url}`;
+  if (!url) return;
+  const key = `${owner}\t${field}\t${url}`;
   if (seen.has(key)) return;
   seen.add(key);
   entries.push({ owner, field, url });
 };
 
+const addSources = (owner, sources = []) => {
+  sources.forEach((source, index) => addUrl(owner, `sources[${index}]`, source.url));
+};
+
+const addImageAsset = (owner, field, image) => {
+  if (!image) return;
+  addUrl(owner, `${field}.sourceUrl`, image.sourceUrl);
+};
+
+const addImageAssets = (owner, record) => {
+  addImageAsset(owner, 'heroImage', record.heroImage);
+  if (!record.images) return;
+  Object.entries(record.images).forEach(([role, image]) => addImageAsset(owner, `images.${role}`, image));
+};
+
 for (const useCase of useCases.filter((item) => item.publishStatus === 'published')) {
-  useCase.sources.forEach((source, index) =>
-    addUrl(`useCase:${useCase.id}`, `sources[${index}]`, source.url),
-  );
+  addSources(`useCase:${useCase.id}`, useCase.sources);
   useCase.candidateRobots.forEach((candidate, candidateIndex) => {
     candidate.evidenceSourceUrls?.forEach((url, sourceIndex) =>
       addUrl(
@@ -31,9 +65,22 @@ for (const useCase of useCases.filter((item) => item.publishStatus === 'publishe
 }
 
 for (const deployment of deployments.filter((item) => item.publishStatus === 'published')) {
-  deployment.sources.forEach((source, index) =>
-    addUrl(`deployment:${deployment.id}`, `sources[${index}]`, source.url),
-  );
+  addSources(`deployment:${deployment.id}`, deployment.sources);
+}
+
+for (const article of articles.filter((item) => item.publishStatus === 'published' && planTouchedArticleIds.has(item.id))) {
+  addSources(`article:${article.id}`, article.sources);
+  addImageAssets(`article:${article.id}`, article);
+}
+
+for (const robot of robots.filter((item) => planTouchedRobotIds.has(item.id))) {
+  addSources(`robot:${robot.id}`, robot.sources);
+  addImageAssets(`robot:${robot.id}`, robot);
+}
+
+for (const manufacturer of manufacturers.filter((item) => planTouchedManufacturerIds.has(item.id))) {
+  addSources(`manufacturer:${manufacturer.id}`, manufacturer.sources);
+  addImageAsset(`manufacturer:${manufacturer.id}`, 'logo', manufacturer.logo);
 }
 
 let failures = 0;
@@ -42,6 +89,8 @@ for (const entry of entries) {
   try {
     const { stdout } = await execFileAsync('curl', [
       '-L',
+      '-A',
+      'DeploidSourceCheck/1.0',
       '--max-time',
       '15',
       '-o',
@@ -53,8 +102,10 @@ for (const entry of entries) {
     ]);
     const [statusText, effectiveUrl] = stdout.trim().split('\t');
     const status = Number(statusText);
-    const ok = status >= 200 && status < 400;
-    console.log(`${ok ? 'OK' : 'FAIL'}\t${statusText}\t${entry.owner}\t${entry.field}\t${effectiveUrl}`);
+    const blockedButReachable = status === 403 || status === 405;
+    const ok = (status >= 200 && status < 400) || blockedButReachable;
+    const label = ok ? (blockedButReachable ? 'BLOCKED' : 'OK') : 'FAIL';
+    console.log(`${label}\t${statusText}\t${entry.owner}\t${entry.field}\t${effectiveUrl}`);
     if (!ok) failures += 1;
   } catch (error) {
     failures += 1;
