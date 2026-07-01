@@ -11,6 +11,7 @@ import type {
   ArticleType,
   Robot,
   RobotCategory,
+  UseCase,
 } from '@/data/types';
 
 export const robotCategoryOrder: RobotCategory[] = [
@@ -241,5 +242,13 @@ export function sortManufacturers(
     }
     // 'name'
     return compareNames(a.name, b.name);
+  });
+}
+
+export function sortUseCases(useCases: UseCase[]): UseCase[] {
+  return [...useCases].sort((a, b) => {
+    const nameA = a.titleJa ?? a.title;
+    const nameB = b.titleJa ?? b.title;
+    return nameA.localeCompare(nameB, 'ja');
   });
 }

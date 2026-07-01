@@ -70,7 +70,9 @@ Last cleaned: 2026-06-23
 - `layout-and-data-structure-audit-plan-v1.md` — 全ページのテキスト表示レイアウトとデータ構造配置の調査実行計画
 - `project-wide-refactor-implementation-plan-v1.md` — 全体リファクタリングの実装順、最小task、完了条件を定義した実行計画
 - `reports-news-explainer-ia-plan-v1.md` — `/reports` をニュース・メーカー解説・ロボット解説・基礎知識の4棚へ整理する実行計画
+- `usecase-data-scope-cleanup-plan-2026-06-30.md` — `/use-cases` のスコープ外ロボット、404出典、未登録ロボット候補を整理する実行計画
 - `usecase-evidence-model-refactor-plan-v1.md` — `/use-cases` の出典、導入事例、候補ロボット根拠をデータモデルと validator で保証する実行計画
+- `usecase-factcheck-research-prompt-2026-06-30.md` — `/use-cases` 現行実装のファクトチェック用Deep Researchプロンプト（調査用。実装判断の正本ではない）
 - `usecase-page-redesign-plan-v1.md` — `/use-cases` を産業入口→タスク→成熟度別グリッドへ全面再設計する実行計画（タグ再設計・42シーン追加・UI刷新）
 - `editorial-methodology-review-2026-06-24.md` — 記事題材・切り口・書き方のレビュー用草案（未承認。承認後に editorial_style_guide へ反映）
 

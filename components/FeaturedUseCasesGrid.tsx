@@ -20,9 +20,11 @@ export function FeaturedUseCasesGrid({ useCases }: FeaturedUseCasesGridProps) {
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="grid auto-rows-fr grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {useCases.map((useCase) => (
-          <UseCaseCard key={useCase.id} useCase={useCase} />
+          <div key={useCase.id} className="w-[220px] shrink-0">
+            <UseCaseCard useCase={useCase} />
+          </div>
         ))}
       </div>
     </section>

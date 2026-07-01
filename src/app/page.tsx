@@ -14,7 +14,7 @@ import {
   getUseCases,
   getDeploymentsForManufacturer,
 } from '@/lib/data';
-import { sortRobots } from '@/lib/display';
+import { sortRobots, sortUseCases } from '@/lib/display';
 import { getDisplayableAsset } from '@/lib/media';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/jsonLd';
 import {
@@ -59,7 +59,7 @@ export default function HomePage() {
   const featuredRobots = sortRobots(getRobots(), 'home-featured').slice(0, 5);
 
   // 用途から探す：用途一覧と同じカードを、Homeではプレビューとして全件表示する。
-  const homeUseCases = getUseCases();
+  const homeUseCases = sortUseCases(getUseCases());
 
   // HomeContentNavigator 用プレビュー画像。表示可否は data 側の rights と lib/media.ts で管理し、
   // ここではローカルに存在する表示可能アセットだけを参照する。
