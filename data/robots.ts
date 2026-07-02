@@ -557,7 +557,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: 'Figure 02 の後継機。BMW 向け実証から汎用製造タスクへの展開を目指す Figure AI の現行ロボット。',
     publishStatus: 'published',
-    updatedAt: '2026-05-30',
+    updatedAt: '2026-07-03',
     reliability: 'official',
     sources: [
       {
@@ -582,7 +582,7 @@ export const robots: Robot[] = [
         },
       },
     },
-    description: 'Figure 02 の実績を継承し、軽量化と稼働時間延長が図られた Figure 03。',
+    description: 'Figure 02 の実績を継承し、軽量化と稼働時間延長が図られた Figure 03。ワイヤレス充電・軽量化・触覚検知は公式発表済みだが、身長・重量・可搬・自由度などの数値は報道ベースの参考値。',
     deploymentStage: 'pilot',
     buyerReadiness: 'limited-today',
     specs: {
@@ -800,7 +800,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: '動的バランス制御のパイオニアが刷新した電動ヒューマノイド。瞬間最大 50kg を扱える腕リーチが特徴。',
     publishStatus: 'published',
-    updatedAt: '2026-05-30',
+    updatedAt: '2026-07-03',
     reliability: 'official',
     sources: [
       {
@@ -825,8 +825,8 @@ export const robots: Robot[] = [
         },
       },
     },
-    description: '油圧から電動へ刷新された Atlas。業界最高水準の制御と高出力を両立。',
-    deploymentStage: 'limited-production',
+    description: '油圧から電動へ刷新された Atlas。業界最高水準の制御と高出力を両立。公式発表はエンタープライズ向けパイロットの文脈で、量産販売は未開始。',
+    deploymentStage: 'pilot',
     buyerReadiness: 'limited-today',
     specs: {
       heightCm: 190,
@@ -856,7 +856,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: 'Tesla が自社工場での実用を目標に開発する汎用ヒューマノイド。外部販売は未開始。',
     publishStatus: 'published',
-    updatedAt: '2026-05-30',
+    updatedAt: '2026-07-03',
     reliability: 'official',
     sources: [
       {
@@ -881,7 +881,7 @@ export const robots: Robot[] = [
         },
       },
     },
-    description: 'Tesla 自社工場での実証を続ける Optimus。将来的な量産と低コスト化を目指す。',
+    description: 'Tesla 自社工場での実証を続ける Optimus。現在は社内利用中で、量産時期は未公表。',
     deploymentStage: 'internal-use',
     buyerReadiness: 'limited-today',
     specs: {
@@ -910,7 +910,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: '汎用ロボットAI「Carbon」を搭載し、多様なタスク適応を目指すカナダのヒューマノイド。',
     publishStatus: 'published',
-    updatedAt: '2026-05-30',
+    updatedAt: '2026-07-03',
     reliability: 'official',
     sources: [
       {
@@ -935,7 +935,7 @@ export const robots: Robot[] = [
         },
       },
     },
-    description: '汎用AI「Carbon」を統合した Phoenix。製造現場でのタスク適応を検証中。',
+    description: '汎用AI「Carbon」を統合した Phoenix。製造現場でのタスク適応を検証中。第8世代（Gen 8）以降は車輪ベースの移動機構を採用する。',
     deploymentStage: 'pilot',
     buyerReadiness: 'limited-today',
     specs: {
@@ -943,7 +943,7 @@ export const robots: Robot[] = [
       weightKg: 70,
       payloadKg: 25,
       speedMps: 1.3,
-      mobility: 'biped',
+      mobility: 'wheeled',
     },
     procurementModels: ['partner-program', 'inquiry'],
     japanAvailability: 'unknown',
@@ -1240,7 +1240,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: '川崎重工業が開発を続ける国産 RHP Kaleido。堅牢な構造が特徴。',
     publishStatus: 'published',
-    updatedAt: '2026-05-30',
+    updatedAt: '2026-07-03',
     reliability: 'official',
     sources: [
       {
@@ -1265,7 +1265,7 @@ export const robots: Robot[] = [
         },
       },
     },
-    description: '「転んでも壊れない」をコンセプトにする国産ヒューマノイド Kaleido。',
+    description: '「転んでも壊れない」をコンセプトにする国産ヒューマノイド Kaleido。研究・実証段階にあり、世代（Kaleido 9 等）によりスペックが異なる。',
     deploymentStage: 'prototype',
     buyerReadiness: 'limited-today',
     specs: { payloadKg: 18, mobility: 'biped' },
@@ -1993,9 +1993,9 @@ export const robots: Robot[] = [
     name: 'IRON',
     manufacturerId: 'xpeng-robotics',
     category: 'humanoid',
-    summary: '自社開発 Turing AI チップを搭載。EV製造技術を応用した量産設計。',
+    summary: '自社開発 Turing AI チップを搭載。EV製造技術を応用し、量産は2026年末開始目標と発表。',
     publishStatus: 'published',
-    updatedAt: '2026-06-02',
+    updatedAt: '2026-07-03',
     reliability: 'official',
     sources: [
       {
@@ -2020,8 +2020,8 @@ export const robots: Robot[] = [
         },
       },
     },
-    description: 'EV製造の知見を活かした XPENG IRON。自律バッテリー（全固体）や独自チップを搭載。',
-    deploymentStage: 'internal-use',
+    description: 'EV製造の知見を活かした XPENG IRON。自律バッテリー（全固体）や独自チップを搭載。量産開始は2026年末目標と公表されており、現段階は実証・試験運用にあたる。',
+    deploymentStage: 'pilot',
     buyerReadiness: 'limited-today',
     specs: { heightCm: 173, weightKg: 70, mobility: 'biped' },
     procurementModels: ['not-for-sale'],
@@ -2364,7 +2364,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: 'Renault工場に350台導入予定のヘッドレス産業ヒューマノイド。40kgを1日数百回搬送。',
     publishStatus: 'published',
-    updatedAt: '2026-06-07',
+    updatedAt: '2026-07-03',
     reliability: 'official',
     sources: [
       {
@@ -2383,8 +2383,8 @@ export const robots: Robot[] = [
       },
     ],
     description:
-      '「40日で開発」したヘッドレス（頭部なし）産業ヒューマノイド。頭部センサーをより低い位置に配置することで作業台下やシェルフ間の視認性を向上。ハンドは吸着カップ・グリッパーとモジュール交換可能。タイヤ搬送ラインで1日数百回・90ポンド（40kg）の重量物を搬送しながら自律走行。外骨格Atalante由来のリアルタイムバランスアルゴリズムとNVIDIA Isaac Simで訓練。',
-    deploymentStage: 'production',
+      '「40日で開発」したヘッドレス（頭部なし）産業ヒューマノイド。頭部センサーをより低い位置に配置することで作業台下やシェルフ間の視認性を向上。ハンドは吸着カップ・グリッパーとモジュール交換可能。タイヤ搬送ラインで1日数百回・90ポンド（40kg）の重量物を搬送しながら自律走行（数値は報道ベース）。外骨格Atalante由来のリアルタイムバランスアルゴリズムとNVIDIA Isaac Simで訓練。導入先は現時点でRenault1社。',
+    deploymentStage: 'limited-production',
     buyerReadiness: 'requires-poc',
     specs: {
       payloadKg: 40,
@@ -2477,14 +2477,14 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: '1X が産業・物流向けに開発するホイールベース人型ロボット。上半身特化タスク設計。',
     publishStatus: 'published',
-    updatedAt: '2026-06-10',
+    updatedAt: '2026-07-03',
     reliability: 'official',
     sources: [{ title: '1X Technologies official website', url: 'https://www.1x.tech/', publisher: '1X Technologies', checkedAt: '2026-06-10', reliability: 'official' }],
     images: { hero: { src: '', alt: '1X Eve', credit: '1X Technologies', sourceUrl: 'https://www.1x.tech/', rights: { status: 'reference-attributed', sourceType: 'manufacturer-official', rightsHolder: '1X Technologies', checkedAt: '2026-06-10' } } },
-    description: '1X Technologies の産業向けモデル。詳細スペックは要確認。',
+    description: '1X Technologies の産業向けモデル。車輪ベースの下部構造に人型上半身を組み合わせる。詳細スペックは要確認。',
     deploymentStage: 'prototype',
     buyerReadiness: 'limited-today',
-    specs: { mobility: 'biped' },
+    specs: { mobility: 'wheeled' },
     procurementModels: ['inquiry'],
     japanAvailability: 'unknown',
     industryTags: ['manufacturing', 'logistics'],
@@ -2781,16 +2781,16 @@ export const robots: Robot[] = [
     name: 'Q5',
     manufacturerId: 'robotera',
     category: 'humanoid',
-    summary: 'RobotEra の量産向けモデル Q5。詳細スペックは要確認。',
+    summary: 'RobotEra の量産向け車輪型モデル Q5。双腕構成の詳細スペックは公式確認待ち。',
     publishStatus: 'published',
-    updatedAt: '2026-06-10',
+    updatedAt: '2026-07-03',
     reliability: 'official',
     sources: [{ title: 'RobotEra official website', url: 'https://www.robotera.com/', publisher: 'RobotEra', checkedAt: '2026-06-10', reliability: 'official' }],
     images: { hero: { src: '', alt: 'RobotEra Q5', credit: 'RobotEra', sourceUrl: 'https://www.robotera.com/', rights: { status: 'reference-attributed', sourceType: 'manufacturer-official', rightsHolder: 'RobotEra', checkedAt: '2026-06-10' } } },
-    description: 'RobotEra の量産向け Q5。詳細スペックは要確認。',
+    description: 'RobotEra の量産向け Q5。車輪ベースの台車部に双腕の人型上半身を組み合わせる構成。可搬重量など詳細スペックは公式確認待ち。',
     deploymentStage: 'pilot',
     buyerReadiness: 'requires-poc',
-    specs: { mobility: 'biped' },
+    specs: { mobility: 'wheeled' },
     procurementModels: ['purchase', 'inquiry'],
     japanAvailability: 'unknown',
     industryTags: ['manufacturing', 'logistics'],
@@ -2824,10 +2824,11 @@ export const robots: Robot[] = [
     slug: 'galbot-g1',
     name: 'Galbot G1',
     manufacturerId: 'galbot',
-    category: 'humanoid',
+    // 全方位車輪ベース＋人型上半身のため pudu-d7 と同じ mobile-manipulator に分類（FC-A-004）
+    category: 'mobile-manipulator',
     summary: 'Galbot が開発した小売・飲食向けサービスヒューマノイド。バリスタ・配膳用途での量産商品化を目指す。',
     publishStatus: 'published',
-    updatedAt: '2026-06-30',
+    updatedAt: '2026-07-03',
     reliability: 'reported',
     sources: [
       {
@@ -2852,11 +2853,11 @@ export const robots: Robot[] = [
         },
       },
     },
-    description: 'Galbot が2023年から開発を進めるサービスヒューマノイド。小売・飲食の現場タスク（バリスタ・配膳・棚補充）に特化した動作モデルを持つ。量産商品化フェーズにあり、中国国内での実証が進んでいる。',
+    description: 'Galbot が2023年から開発を進めるサービスロボット。全方位車輪ベースに人型上半身・双腕を組み合わせた形態で、小売・飲食の現場タスク（バリスタ・配膳・棚補充）に特化した動作モデルを持つ。量産商品化フェーズにあり、中国国内での実証が進んでいる。',
     deploymentStage: 'pilot',
     buyerReadiness: 'limited-today',
     specs: {
-      mobility: 'biped',
+      mobility: 'wheeled',
     },
     procurementModels: ['inquiry'],
     japanAvailability: 'unknown',
