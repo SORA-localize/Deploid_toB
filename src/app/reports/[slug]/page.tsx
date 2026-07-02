@@ -15,9 +15,11 @@ import { SidebarBlock, SidebarDivider } from '@/components/SidebarSection';
 import { ActiveSectionProvider } from '@/lib/activeSectionContext';
 import {
   getArticles,
+  getManufacturerGuideContent,
   getRelatedManufacturers,
   getRelatedRobots,
   getRelatedUseCases,
+  getStandardArticleBody,
   resolveArticleDetailBySlug,
 } from '@/lib/data';
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/jsonLd';
@@ -106,8 +108,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
   // manufacturer-guide は固定テンプレート型で、見出し・目次は MANUFACTURER_GUIDE_SECTIONS を
   // 正本にする（本文markdownの見出しをパースしない）。要点(TL;DR)セクションも持たない設計。
-  const guideContent = report.type === 'manufacturer-guide' ? report.manufacturerGuideContent : null;
-  const standardBody = report.type === 'manufacturer-guide' ? undefined : report.body;
+  const guideContent = getManufacturerGuideContent(report);
+  const standardBody = getStandardArticleBody(report);
   const isManufacturerGuide = guideContent !== null;
   const hasTakeaways = !isManufacturerGuide && (report.keyTakeaways ?? []).length > 0;
   const hasBody = (standardBody ?? '').trim().length > 0;

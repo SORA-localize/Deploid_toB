@@ -3,6 +3,7 @@ import { manufacturers } from '@/data/manufacturers';
 import { articles } from '@/data/articles';
 import { robots } from '@/data/robots';
 import { useCases } from '@/data/useCases';
+import type { Article } from '@/data/types';
 import { runValidationInDev } from './validate';
 import { byArticlePublishedDesc } from '@/lib/display';
 
@@ -118,6 +119,18 @@ export function getArticleBySlug(slug: string) {
 
 export function getArticleById(id: string) {
   return getArticles().find((article) => article.id === id);
+}
+
+/**
+ * 記事本文の判別（StandardArticle | ManufacturerGuideArticle）をUI層に持ち込まないためのヘルパー。
+ * ページは raw な type 比較をせず、この2つで本文モデルを取り出す。
+ */
+export function getManufacturerGuideContent(article: Article) {
+  return article.type === 'manufacturer-guide' ? article.manufacturerGuideContent : null;
+}
+
+export function getStandardArticleBody(article: Article) {
+  return article.type === 'manufacturer-guide' ? undefined : article.body;
 }
 
 export function getRobotsByManufacturerId(manufacturerId: string) {

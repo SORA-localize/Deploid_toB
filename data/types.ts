@@ -339,7 +339,7 @@ export type ArticleType =
 /**
  * 記事のサブジェクト（何の話か）＝記事タブの分類。
  * type（フォーマット：どう書かれたか）とは独立した軸で、記事ごとに編集者が明示指定する。
- * UI専用の 'all' は含めない（lib/articleSections.ts の ArticleSectionFilter 側で付与）。
+ * UI専用の 'all' は含めない（棚タブ側 lib/articleShelves.ts の ArticleShelf で付与）。
  */
 export type ArticleSection =
   | 'deployment'
