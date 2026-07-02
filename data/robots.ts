@@ -245,7 +245,7 @@ export const robots: Robot[] = [
     sources: [
       {
         title: 'Apptronik Apollo product page',
-        url: 'https://apptronik.com/apollo',
+        url: 'https://apptronik.com/apollo/apollo-2',
         publisher: 'Apptronik',
         checkedAt: '2026-05-28',
         reliability: 'official',
@@ -256,7 +256,7 @@ export const robots: Robot[] = [
         src: '',
         alt: 'Apptronik Apollo',
         credit: 'Apptronik',
-        sourceUrl: 'https://apptronik.com/apollo',
+        sourceUrl: 'https://apptronik.com/apollo/apollo-2',
         rights: {
           status: 'reference-attributed',
           sourceType: 'manufacturer-official',
@@ -2985,13 +2985,13 @@ export const robots: Robot[] = [
     manufacturerId: 'apptronik',
     category: 'humanoid',
     summary: 'Apptronik が2026年6月に公開した Apollo 後継機。二足と車輪ベースを換装できるモジュラー構成が特徴。',
-    publishStatus: 'draft',
+    publishStatus: 'published',
     updatedAt: '2026-07-03',
     reliability: 'reported',
     sources: [
       {
         title: 'Apollo official page',
-        url: 'https://apptronik.com/apollo',
+        url: 'https://apptronik.com/apollo/apollo-2',
         publisher: 'Apptronik',
         checkedAt: '2026-07-03',
         reliability: 'official',
@@ -3010,7 +3010,7 @@ export const robots: Robot[] = [
         src: '',
         alt: 'Apptronik Apollo 2 humanoid robot',
         credit: 'Apptronik',
-        sourceUrl: 'https://apptronik.com/apollo',
+        sourceUrl: 'https://apptronik.com/apollo/apollo-2',
         rights: {
           status: 'reference-attributed',
           sourceType: 'manufacturer-official',
@@ -3045,7 +3045,7 @@ export const robots: Robot[] = [
     manufacturerId: 'agibot',
     category: 'mobile-manipulator',
     summary: 'AgiBot が2025年10月に投入した産業用車輪型ヒューマノイド。全方位ホイールベースにフルサイズ上半身・力制御双腕を搭載。',
-    publishStatus: 'draft',
+    publishStatus: 'published',
     updatedAt: '2026-07-03',
     reliability: 'reported',
     sources: [
@@ -3106,7 +3106,7 @@ export const robots: Robot[] = [
     manufacturerId: 'unitree',
     category: 'mobile-manipulator',
     summary: 'Unitree の車輪ベース型開発プラットフォーム。昇降カラムに7自由度×2の双腕を搭載し、G1 とは別製品。',
-    publishStatus: 'draft',
+    publishStatus: 'published',
     updatedAt: '2026-07-03',
     reliability: 'official',
     sources: [
