@@ -6,6 +6,7 @@ import type {
   JapanAvailability,
   JapanPresence,
   ManufacturerGuideDeploymentEvidence,
+  MarketAvailability,
   ManufacturerGuideEvaluationLevel,
   PublishStatus,
   Reliability,
@@ -148,6 +149,18 @@ export const articleTypeTones = {
   'robot-guide': 'brand',
   'basics-guide': 'info',
 } as const satisfies Record<ArticleType, VisualTone>;
+
+export const marketAvailabilityTones = {
+  'enterprise-deployment': 'success',
+  'enterprise-pilot': 'warning',
+  'developer-platform': 'info',
+  'research-platform': 'info',
+  reservation: 'info',
+  'internal-use': 'unknown',
+  'planned-production': 'unknown',
+  'company-claimed-delivery': 'warning',
+  unknown: 'unknown',
+} as const satisfies Record<MarketAvailability, VisualTone>;
 
 export const manufacturerGuideEvaluationLevelTones = {
   strength: 'success',

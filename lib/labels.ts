@@ -9,6 +9,7 @@ import type {
   ImageRole,
   JapanAvailability,
   JapanPresence,
+  MarketAvailability,
   MobilityType,
   OperatingEnvironment,
   ProcurementModel,
@@ -103,8 +104,23 @@ export const procurementLabels: Record<ProcurementModel, string> = {
 export const mobilityLabels: Record<MobilityType, string> = {
   biped: '二足',
   wheeled: '車輪',
+  'wheel-legged': '車輪脚',
   hybrid: 'ハイブリッド',
   stationary: '据置',
+  unknown: TBD_LABEL,
+};
+
+/** 調達可能性の実態（Robot.marketAvailability）のラベル。deploymentStage（成熟段階）とは別軸。 */
+export const marketAvailabilityLabels: Record<MarketAvailability, string> = {
+  'enterprise-deployment': '企業導入あり（商用稼働）',
+  'enterprise-pilot': '企業パイロット中',
+  'developer-platform': '開発者向け販売中',
+  'research-platform': '研究機関向け提供',
+  reservation: '予約受付中',
+  'internal-use': '自社利用のみ',
+  'planned-production': '量産予定（未発売）',
+  'company-claimed-delivery': '出荷開始（自社発表のみ）',
+  unknown: TBD_LABEL,
 };
 
 export const companyTypeLabels: Record<CompanyType, string> = {

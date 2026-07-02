@@ -151,7 +151,23 @@ export type RobotCategory =
   | 'mobile-manipulator'
   | 'other';
 
-export type MobilityType = 'biped' | 'wheeled' | 'hybrid' | 'stationary';
+export type MobilityType = 'biped' | 'wheeled' | 'wheel-legged' | 'hybrid' | 'stationary' | 'unknown';
+
+/**
+ * 調達可能性の実態。deploymentStage が「製品の成熟段階」を表すのに対し、
+ * こちらは「いま買えるのか・誰に売っているのか」を表す（factcheck計画 FC-C-003）。
+ * 裏取りできるロボットにのみ設定し、不明な場合は未設定のまま（UIは非表示）にする。
+ */
+export type MarketAvailability =
+  | 'enterprise-deployment'
+  | 'enterprise-pilot'
+  | 'developer-platform'
+  | 'research-platform'
+  | 'reservation'
+  | 'internal-use'
+  | 'planned-production'
+  | 'company-claimed-delivery'
+  | 'unknown';
 
 export type DeploymentStage =
   | 'concept'
@@ -207,6 +223,8 @@ export interface Robot extends BaseRecord {
   /** 将来の掲載提携・有料スポンサード枠のための優先順位。値が小さいほど上位。未設定は非スポンサード扱い。 */
   featuredRank?: number;
   deploymentStage: DeploymentStage;
+  /** 調達可能性の実態（出典で裏取りできる場合のみ設定）。未設定はUI非表示。 */
+  marketAvailability?: MarketAvailability;
   buyerReadiness: BuyerReadiness;
   /** 提供終了（archived）時の後継機。詳細・関連欄で「後継機: X」導線を出す。 */
   supersededById?: Id;
