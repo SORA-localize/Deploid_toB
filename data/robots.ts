@@ -39,6 +39,7 @@ export const robots: Robot[] = [
     description:
       'Unitree G1は、研究・教育・実証実験で比較対象になりやすい価格帯のヒューマノイド。導入検討では、公開スペックよりも国内サポート、保守部品、現場安全設計を先に確認する。通常G1は二次開発非対応で、二次開発が必要な場合は構成・自由度が異なるG1 EDU（要問い合わせ）を検討する。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'developer-platform',
     buyerReadiness: 'requires-poc',
     specs: {
       heightCm: 132,
@@ -98,6 +99,7 @@ export const robots: Robot[] = [
     description:
       'Unitree G1 EDUは、通常G1と同じ筐体をベースに二次開発（カスタムソフトウェア・ハードウェア拡張）に対応する研究・教育向け構成。自由度は構成により23〜43DoF、アーム荷重は約3kgとされる（通常G1は二次開発非対応・自由度23DoF・アーム荷重約2kg）。価格は問い合わせ対応のみで公式には非掲載。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'developer-platform',
     buyerReadiness: 'requires-poc',
     specs: {
       heightCm: 132,
@@ -156,6 +158,7 @@ export const robots: Robot[] = [
     description:
       'H1 は同社のフルサイズ二足ヒューマノイド。移動速度3.3m/s、潜在移動能力は5m/s超とされ、研究・教育用途で先行販売されている。各脚5DoF・各腕4DoFで構成され、用途に応じて拡張可能。同じ製品ページに掲載される H1-2 は身長・重量・自由度が異なる別構成のため、別レコード（H1-2）として扱う。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'developer-platform',
     buyerReadiness: 'requires-poc',
     specs: {
       heightCm: 180,
@@ -212,6 +215,7 @@ export const robots: Robot[] = [
     description:
       'Unitree H1-2は、H1と同じ製品ページに掲載されるがスペックが異なる別構成。身長約178cm、重量約70kg、合計27DoF（各脚6DoF・各腕7DoF）、アーム荷重はPeak約21kg・Rated約7kg、移動速度は2m/s未満とされる。価格・稼働時間は公式に確認できず要問い合わせ。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'developer-platform',
     buyerReadiness: 'requires-poc',
     specs: {
       heightCm: 178,
@@ -388,6 +392,7 @@ export const robots: Robot[] = [
     },
     description: '物流・倉庫タスクに最適化された二足ロボット Digit。累計10万トート以上の搬送実績を報告。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'enterprise-deployment',
     buyerReadiness: 'requires-poc',
     specs: {
       heightCm: 175,
@@ -584,6 +589,7 @@ export const robots: Robot[] = [
     },
     description: 'Figure 02 の実績を継承し、軽量化と稼働時間延長が図られた Figure 03。ワイヤレス充電・軽量化・触覚検知は公式発表済みだが、身長・重量・可搬・自由度などの数値は報道ベースの参考値。',
     deploymentStage: 'pilot',
+    marketAvailability: 'enterprise-pilot',
     buyerReadiness: 'limited-today',
     specs: {
       heightCm: 173,
@@ -640,6 +646,7 @@ export const robots: Robot[] = [
     description:
       'H1 を発展させた Unitree H2。アーム最大荷重はPeak約15kg・Rated約7kgで、高い関節自由度とペイロード増を実現。二次開発が必要な場合は同構成のH2 EDU（要問い合わせ）を検討する。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'developer-platform',
     buyerReadiness: 'requires-poc',
     specs: {
       heightCm: 182,
@@ -698,6 +705,7 @@ export const robots: Robot[] = [
     description:
       'Unitree H2 EDUは、H2と同じ製品ページに掲載される二次開発対応の研究・教育向け構成。本体スペック（身長・重量・自由度・ペイロード）はH2と同一の値が確認できたが、本体仕様自体に独自の差分があるかは公式ページ上で明確に確認できていない。価格はContact Salesのみで公式非掲載。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'developer-platform',
     buyerReadiness: 'requires-poc',
     specs: {
       heightCm: 182,
@@ -771,6 +779,7 @@ export const robots: Robot[] = [
     description:
       'Unitree H2 を発展させた研究開発向け新型機 H2 Plus。NVIDIA Isaac GR00T Reference Humanoid Robotと関連付けられ、Jetson Thor（FP4で2,070 TFLOPS）、SharpaWave五指デクスタラスハンド（オプション）、Isaac開発スタックを含む構成。本体は31DoFだが、ハンドを含む総自由度は75DoF。二次開発対応（Secondary Development: YES）、保証12ヶ月。アーム最大トルク120 N/m、脚最大トルク360 N/m。国内入手性は公式に確認できず要確認。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'developer-platform',
     buyerReadiness: 'requires-poc',
     specs: {
       heightCm: 182,
@@ -827,6 +836,7 @@ export const robots: Robot[] = [
     },
     description: '油圧から電動へ刷新された Atlas。業界最高水準の制御と高出力を両立。公式発表はエンタープライズ向けパイロットの文脈で、量産販売は未開始。',
     deploymentStage: 'pilot',
+    marketAvailability: 'enterprise-pilot',
     buyerReadiness: 'limited-today',
     specs: {
       heightCm: 190,
@@ -883,6 +893,7 @@ export const robots: Robot[] = [
     },
     description: 'Tesla 自社工場での実証を続ける Optimus。現在は社内利用中で、量産時期は未公表。',
     deploymentStage: 'internal-use',
+    marketAvailability: 'internal-use',
     buyerReadiness: 'limited-today',
     specs: {
       heightCm: 173,
@@ -937,6 +948,7 @@ export const robots: Robot[] = [
     },
     description: '汎用AI「Carbon」を統合した Phoenix。製造現場でのタスク適応を検証中。第8世代（Gen 8）以降は車輪ベースの移動機構を採用する。',
     deploymentStage: 'pilot',
+    marketAvailability: 'enterprise-pilot',
     buyerReadiness: 'limited-today',
     specs: {
       heightCm: 170,
@@ -1267,6 +1279,7 @@ export const robots: Robot[] = [
     },
     description: '「転んでも壊れない」をコンセプトにする国産ヒューマノイド Kaleido。研究・実証段階にあり、世代（Kaleido 9 等）によりスペックが異なる。',
     deploymentStage: 'prototype',
+    marketAvailability: 'research-platform',
     buyerReadiness: 'limited-today',
     specs: { payloadKg: 18, mobility: 'biped' },
     procurementModels: ['inquiry'],
@@ -1538,6 +1551,7 @@ export const robots: Robot[] = [
     description:
       '量産型二足ロボットとして極めて低価格な R1 AIR。運動制御研究やデモに最適。公式にはR1 AIRに加えて、自由度・重量が高い「R1」（標準構成）、二次開発向けの「R1 EDU」（要問い合わせ）がある。',
     deploymentStage: 'production',
+    marketAvailability: 'developer-platform',
     buyerReadiness: 'initial-adoption',
     specs: {
       heightCm: 123,
@@ -1594,6 +1608,7 @@ export const robots: Robot[] = [
     description:
       'Unitree R1は、R1 AIRと同じ筐体をベースに自由度を高めた標準構成。身長約123cm、重量約29kg、26DoF。R1 AIR（20DoF・$4,900）より高機能・高価格で、さらに上位のR1 EDU（26〜40DoF・要問い合わせ）もある。',
     deploymentStage: 'production',
+    marketAvailability: 'developer-platform',
     buyerReadiness: 'initial-adoption',
     specs: {
       heightCm: 123,
@@ -2022,6 +2037,7 @@ export const robots: Robot[] = [
     },
     description: 'EV製造の知見を活かした XPENG IRON。自律バッテリー（全固体）や独自チップを搭載。量産開始は2026年末目標と公表されており、現段階は実証・試験運用にあたる。',
     deploymentStage: 'pilot',
+    marketAvailability: 'planned-production',
     buyerReadiness: 'limited-today',
     specs: { heightCm: 173, weightKg: 70, mobility: 'biped' },
     procurementModels: ['not-for-sale'],
@@ -2385,6 +2401,7 @@ export const robots: Robot[] = [
     description:
       '「40日で開発」したヘッドレス（頭部なし）産業ヒューマノイド。頭部センサーをより低い位置に配置することで作業台下やシェルフ間の視認性を向上。ハンドは吸着カップ・グリッパーとモジュール交換可能。タイヤ搬送ラインで1日数百回・90ポンド（40kg）の重量物を搬送しながら自律走行（数値は報道ベース）。外骨格Atalante由来のリアルタイムバランスアルゴリズムとNVIDIA Isaac Simで訓練。導入先は現時点でRenault1社。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'enterprise-deployment',
     buyerReadiness: 'requires-poc',
     specs: {
       payloadKg: 40,
@@ -2668,6 +2685,7 @@ export const robots: Robot[] = [
     },
     description: 'Walker E シリーズの後継として改名されたフルサイズヒューマノイド。GA Robotics（GMO グループ）が日本正規代理店として評価貸出しサービスを提供中。産業向け Walker S 系列とは別ライン。標準版（Voice & Vision）：172cm・約61kg・21 DOF・7km/h。拡張版（DEX）：172cm・約73kg・42 DOF。用途として物流仕分け・高リスク作業・ホームサービス・スーパーマーケット対応を GA Robotics が訴求。GMO AI&ロボティクス商事は2026年2月よりロボット人材派遣型サービスに Walker E（現 Tienkung）を追加している。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'enterprise-pilot',
     buyerReadiness: 'requires-poc',
     specs: {
       heightCm: 172,
@@ -3022,6 +3040,7 @@ export const robots: Robot[] = [
     description:
       'Apptronik が2026年6月30日に公開した Apollo の第2世代。二足歩行と車輪ベースをワークロードに応じて換装できるモジュラー移動方式を採用し、車輪構成では昇降軸により高所リーチを拡張する。交換式バッテリー、高効率アクチュエータを備え、Google DeepMind との提携でデータ収集・基盤モデル学習にも使われる。想定用途は G2P ピッキング、梱包、自動車部品キッティング、マシンテンディング等。価格・出荷時期は未公表。初代 Apollo とは別レコードで管理し、スペックを流用しない。',
     deploymentStage: 'pilot',
+    marketAvailability: 'enterprise-pilot',
     buyerReadiness: 'requires-poc',
     specs: {
       mobility: 'hybrid',
@@ -3082,6 +3101,7 @@ export const robots: Robot[] = [
     description:
       'AgiBot が2025年10月に正式発表した産業用の車輪型ヒューマノイド。四輪操舵の全方位ホイールベースに26自由度の上半身（5自由度の腰脚構造、7自由度の力制御双腕）を組み合わせ、サブミリ精度の組立作業を訴求する。車載グレード部品・IP42、ホットスワップ式デュアルバッテリーによる連続稼働、NVIDIA Jetson Thor 搭載。自動車部品（シートベルトロック組立等）での協働実績が報じられている。日本展開・価格は未確認。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'enterprise-pilot',
     buyerReadiness: 'requires-poc',
     specs: {
       dof: 26,
@@ -3144,6 +3164,7 @@ export const robots: Robot[] = [
     description:
       'Unitree の車輪ベース型プラットフォーム。差動駆動でその場360度旋回に対応し、0〜2mの昇降カラムに7自由度×2の双腕（腕可搬約3kg）を搭載する。全高1260〜1680mm、稼働約6時間、LiDAR・頭部両眼カメラ・両手首カメラを備え、遠隔操作レイテンシ100ms未満を訴求。データ収集・二次開発向けの位置づけで、二足歩行の G1 とは別製品としてスペックを流用しない。日本では TechShare が予約販売を開始している。',
     deploymentStage: 'limited-production',
+    marketAvailability: 'developer-platform',
     buyerReadiness: 'requires-poc',
     specs: {
       heightCm: 168,
