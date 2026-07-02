@@ -15,9 +15,16 @@ import {
   companyTypeOrder,
   japanAvailabilityOrder,
   manufacturerCountryOrder,
+  manufacturerGuideDeploymentCategoryOrder,
+  manufacturerGuideEvaluationAxisOrder,
   robotCategoryOrder,
 } from './display.ts';
-import { articleCategoryLabels, articleSectionLabels } from './labels.ts';
+import {
+  articleCategoryLabels,
+  articleSectionLabels,
+  manufacturerGuideDeploymentCategoryLabels,
+  manufacturerGuideEvaluationAxisLabels,
+} from './labels.ts';
 import { isSpecKey } from './specSchema.ts';
 import { isRegisteredTag, normalizeTagKey, type TagKind } from './tagRegistry.ts';
 import { isPublicUseCaseCandidateBasis } from './useCaseEvidence.ts';
@@ -479,6 +486,49 @@ export function validateData(): ValidationResult {
   };
   checkLabelOrderSync('section', articleSectionLabels, articleSectionOrder);
   checkLabelOrderSync('category', articleCategoryLabels, articleCategoryOrder);
+  checkLabelOrderSync(
+    'manufacturerGuideEvaluationAxis',
+    manufacturerGuideEvaluationAxisLabels,
+    manufacturerGuideEvaluationAxisOrder,
+  );
+  checkLabelOrderSync(
+    'manufacturerGuideDeploymentCategory',
+    manufacturerGuideDeploymentCategoryLabels,
+    manufacturerGuideDeploymentCategoryOrder,
+  );
+
+  // manufacturer-guide は本文を manufacturerGuideContent に持つ固定テンプレート型。
+  // 型では表現しきれない「非空文字であること」「prose に見出しを持ち込まないこと」をここで確認する。
+  for (const article of articles) {
+    if (article.type !== 'manufacturer-guide') continue;
+    const content = article.manufacturerGuideContent;
+    // prose フィールドは string 型のトップレベル値をすべて対象にする（新フィールド追加時の列挙漏れ防止）。
+    Object.entries(content).forEach(([field, value]) => {
+      if (typeof value !== 'string') return;
+      if (!value.trim()) {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: ${field} が空です`);
+      }
+      // 見出しはテンプレート（MANUFACTURER_GUIDE_SECTIONS）の専有。prose に Markdown 見出しが
+      // 混入すると TOC・スクロール連動の外に h2 が生まれるため build で弾く。
+      if (/^#{1,6}\s/m.test(value)) {
+        errors.push(
+          `[manufacturerGuideContent] ${article.slug}: ${field} に Markdown 見出しが含まれています（見出しはテンプレート固定）`,
+        );
+      }
+    });
+    manufacturerGuideEvaluationAxisOrder.forEach((axis) => {
+      const item = content.evaluationAxes[axis];
+      if (!item || !item.body.trim() || item.labelOverride?.trim() === '') {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: evaluationAxes.${axis} が不完全です`);
+      }
+    });
+    manufacturerGuideDeploymentCategoryOrder.forEach((category) => {
+      const item = content.deploymentStatus[category];
+      if (!item || !item.body.trim() || item.labelOverride?.trim() === '') {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: deploymentStatus.${category} が不完全です`);
+      }
+    });
+  }
 
   for (const r of robots) {
     check('robot', r.slug, 'manufacturerId', r.manufacturerId, manufacturerIds);

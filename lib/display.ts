@@ -9,6 +9,8 @@ import type {
   ArticleSection,
   ArticleCategory,
   ArticleType,
+  ManufacturerGuideEvaluationAxis,
+  ManufacturerGuideDeploymentCategory,
   Robot,
   RobotCategory,
   UseCase,
@@ -108,6 +110,24 @@ export const articleSectionOrder: ArticleSection[] = [
   'tech',
   'policy',
   'entertainment',
+];
+
+/** メーカー解説「強みと注意点」5軸の表示順。完全性は manufacturerGuideEvaluationAxisLabels(Record) と validate の diff で担保。 */
+export const manufacturerGuideEvaluationAxisOrder: ManufacturerGuideEvaluationAxis[] = [
+  'pricing',
+  'productionCapacity',
+  'ecosystem',
+  'trackRecord',
+  'geopoliticalRisk',
+];
+
+/** メーカー解説「導入実績」5分類の表示順。完全性は manufacturerGuideDeploymentCategoryLabels(Record) と validate の diff で担保。 */
+export const manufacturerGuideDeploymentCategoryOrder: ManufacturerGuideDeploymentCategory[] = [
+  'commercial',
+  'poc',
+  'researchEducation',
+  'exhibitionDemo',
+  'internalTrial',
 ];
 
 const preReleaseDeploymentStages: DeploymentStage[] = ['concept', 'prototype'];

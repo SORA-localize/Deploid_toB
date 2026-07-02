@@ -5,6 +5,8 @@ import type {
   DeploymentStatus,
   JapanAvailability,
   JapanPresence,
+  ManufacturerGuideDeploymentEvidence,
+  ManufacturerGuideEvaluationLevel,
   PublishStatus,
   Reliability,
   ArticleType,
@@ -146,6 +148,18 @@ export const articleTypeTones = {
   'robot-guide': 'brand',
   'basics-guide': 'info',
 } as const satisfies Record<ArticleType, VisualTone>;
+
+export const manufacturerGuideEvaluationLevelTones = {
+  strength: 'success',
+  caution: 'warning',
+  risk: 'danger',
+} as const satisfies Record<ManufacturerGuideEvaluationLevel, VisualTone>;
+
+export const manufacturerGuideDeploymentEvidenceTones = {
+  confirmed: 'success',
+  limited: 'warning',
+  none: 'unknown',
+} as const satisfies Record<ManufacturerGuideDeploymentEvidence, VisualTone>;
 
 export const useCaseMaturityTones = {
   'early-stage': 'unknown',

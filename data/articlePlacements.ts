@@ -28,7 +28,7 @@ export const articlePlacements: ArticlePlacement[] = [
   {
     surface: 'reports-index',
     slot: 'hero',
-    articleId: 'robot-com-rnoid-workplace-humanoid-2026',
+    articleId: 'j-hrti-chiba-data-center-2026',
     order: 3,
     kind: 'editorial',
   },

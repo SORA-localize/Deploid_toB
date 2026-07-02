@@ -1,8 +1,11 @@
 # Reports News/Explainer IA Plan v1
 
-Status: draft plan
+Status: archived implemented plan
 Created: 2026-06-30
 Updated: 2026-06-30 (4棚目追加・計画レビュー×2 反映)
+Archived: 2026-07-01
+
+> 2026-07-01時点で `/reports` の4棚化は実装済み。現行の棚定義は `lib/articleShelves.ts`、記事執筆方針は `docs/planning/editorial_style_guide_v1.md`、記事追加手順は `docs/planning/data-maintenance-checklist-v1.md` を正本とする。この文書は実装判断の履歴としてのみ参照する。
 
 ## 1. 目的
 

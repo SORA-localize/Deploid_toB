@@ -43,11 +43,11 @@
 8. [ ] build 通過 → `published`
 9. [ ] 件数が増減した場合、`/for-manufacturers` の掲載数表示が古くなる。`lib/site.ts` の `siteMeta.dataAsOf` を更新する（手動・即時でなくまとめて更新でも可）
 
-## C. ニュース記事（articles）追加
+## C. ニュース・解説記事（articles）追加
 
 1. [ ] id 発番、`slug = id`
 2. [ ] **`category` を1つ選択**（news / interview / company-report / analysis / policy）
-3. [ ] **`type` を ArticleType の有効値から選択**（analysis / deployment-report / interview / event-report / policy-update / case-study / news-brief / tech-update / market-analysis）。`category` と混同しない
+3. [ ] **`type` を ArticleType の有効値から選択**（analysis / deployment-report / interview / event-report / policy-update / case-study / news-brief / tech-update / market-analysis / manufacturer-guide / robot-guide / basics-guide）。`category` と混同しない。公開棚は `lib/articleShelves.ts` が `type` から判定する
 4. [ ] **`whyItMatters` を必ず書く**（速報でも省略不可＝メディアの付加価値）
 5. [ ] **`publishedAt` = Deploidがこの記事を公開した日**（元ニュースの発生日ではない）。元ニュースの日付は `sources[].publishedAt` に書く。昨日のニュースを今日書いたなら `publishedAt` は今日の日付になる。`updatedAt` はデータレコードを最後に編集した日
 6. [ ] **`sources` に `checkedAt` と `reliability` を記入**（自動：published かつ非 sample の空 sources は build 失敗）
