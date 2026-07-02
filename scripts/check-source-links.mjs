@@ -10,23 +10,6 @@ const execFileAsync = promisify(execFile);
 
 const entries = [];
 const seen = new Set();
-const planTouchedArticleIds = new Set([
-  'pudu-d7-industrial-semi-humanoid-2026',
-  'robot-com-rnoid-workplace-humanoid-2026',
-  'genesis-ai-eno-non-humanoid-2026',
-  'jal-haneda-unitree-pilot-2026',
-  'dobot-atom-max-rtj-japan-2026',
-]);
-const planTouchedRobotIds = new Set([
-  'kawasaki-nextage',
-  'zizai-zeroshiki',
-  'pudu-d7',
-  'ubtech-walker-tienkung',
-]);
-const planTouchedManufacturerIds = new Set([
-  'zizai',
-  'pudu-robotics',
-]);
 
 const addUrl = (owner, field, url) => {
   if (!url) return;
@@ -68,17 +51,17 @@ for (const deployment of deployments.filter((item) => item.publishStatus === 'pu
   addSources(`deployment:${deployment.id}`, deployment.sources);
 }
 
-for (const article of articles.filter((item) => item.publishStatus === 'published' && planTouchedArticleIds.has(item.id))) {
+for (const article of articles.filter((item) => item.publishStatus === 'published')) {
   addSources(`article:${article.id}`, article.sources);
   addImageAssets(`article:${article.id}`, article);
 }
 
-for (const robot of robots.filter((item) => planTouchedRobotIds.has(item.id))) {
+for (const robot of robots.filter((item) => item.publishStatus === 'published')) {
   addSources(`robot:${robot.id}`, robot.sources);
   addImageAssets(`robot:${robot.id}`, robot);
 }
 
-for (const manufacturer of manufacturers.filter((item) => planTouchedManufacturerIds.has(item.id))) {
+for (const manufacturer of manufacturers.filter((item) => item.publishStatus === 'published')) {
   addSources(`manufacturer:${manufacturer.id}`, manufacturer.sources);
   addImageAsset(`manufacturer:${manufacturer.id}`, 'logo', manufacturer.logo);
 }
