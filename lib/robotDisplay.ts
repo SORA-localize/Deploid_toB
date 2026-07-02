@@ -3,6 +3,7 @@ import {
   buyerReadinessLabels,
   deploymentStageLabels,
   japanAvailabilityLabels,
+  marketAvailabilityLabels,
   mobilityLabels,
   procurementLabels,
   robotCategoryLabels,
@@ -125,6 +126,10 @@ export function getRobotDetailSpecRows(robot: Robot, manufacturer?: Manufacturer
 export function getRobotDetailDecisionRows(robot: Robot): DisplayRow[] {
   return [
     { label: '導入段階', value: deploymentStageLabels[robot.deploymentStage] },
+    // 調達可能性の実態は裏取りできたロボットのみ設定される（未設定は行ごと非表示）
+    ...(robot.marketAvailability
+      ? [{ label: '調達可能性', value: marketAvailabilityLabels[robot.marketAvailability] }]
+      : []),
     { label: '実務ラベル', value: buyerReadinessLabels[robot.buyerReadiness] },
     { label: '日本での入手性', value: japanAvailabilityLabels[robot.japanAvailability] },
     {
