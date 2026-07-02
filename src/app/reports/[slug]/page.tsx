@@ -21,14 +21,21 @@ import {
   resolveArticleDetailBySlug,
 } from '@/lib/data';
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/jsonLd';
-import { getArticleCardLabel } from '@/lib/articleShelves';
+import {
+  ARTICLE_SHELF_TABS,
+  getArticleCardLabel,
+  getArticleShelf,
+  getArticleShelfHref,
+} from '@/lib/articleShelves';
 import { extractH2Headings } from '@/lib/markdownHeadings';
+import { MANUFACTURER_GUIDE_SECTIONS } from '@/lib/manufacturerGuideTemplate';
 import { getDisplayableAsset } from '@/lib/media';
 import { shouldIndexArticle } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
 import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { getArticleTypeTone } from '@/lib/visualSemantics';
+import { ManufacturerGuideArticleBody } from '@/components/ManufacturerGuideArticleBody';
 
 export function generateStaticParams() {
   return getArticles().map((report) => ({ slug: report.slug }));
@@ -97,19 +104,35 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const manufacturers = getRelatedManufacturers(report.relatedManufacturerIds);
   const useCases = getRelatedUseCases(report.relatedUseCaseIds);
 
-  const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
-  const hasBody = (report.body ?? '').trim().length > 0;
-  const bodyHeadings = hasBody ? extractH2Headings(report.body!) : [];
+  // manufacturer-guide は固定テンプレート型で、見出し・目次は MANUFACTURER_GUIDE_SECTIONS を
+  // 正本にする（本文markdownの見出しをパースしない）。要点(TL;DR)セクションも持たない設計。
+  const guideContent = report.type === 'manufacturer-guide' ? report.manufacturerGuideContent : null;
+  const standardBody = report.type === 'manufacturer-guide' ? undefined : report.body;
+  const isManufacturerGuide = guideContent !== null;
+  const hasTakeaways = !isManufacturerGuide && (report.keyTakeaways ?? []).length > 0;
+  const hasBody = (standardBody ?? '').trim().length > 0;
+  const bodyHeadings = hasBody ? extractH2Headings(standardBody!) : [];
   const heroImage = getDisplayableAsset(report.heroImage);
   const hasRelated = robots.length > 0 || manufacturers.length > 0 || useCases.length > 0;
   const reportTitle = report.titleJa ?? report.title;
+  const shelf = getArticleShelf(report);
+  const shelfTab = ARTICLE_SHELF_TABS.find((tab) => tab.value === shelf);
+  // 階層はロボット詳細（ホーム > ロボット > メーカー > 機体）と揃えた4階層:
+  // ホーム > 記事 > 棚（ニュース/メーカー解説…） > 記事タイトル
   const breadcrumbItems = [
     { label: uiText.reports.breadcrumb, path: '/reports' },
+    ...(shelfTab ? [{ label: shelfTab.label, path: getArticleShelfHref(shelf) }] : []),
     { label: reportTitle },
   ];
 
   const toc = [
     ...(hasTakeaways ? [{ label: uiText.reports.keyTakeaways, href: '#takeaways' }] : []),
+    ...(isManufacturerGuide
+      ? MANUFACTURER_GUIDE_SECTIONS.map((section) => ({
+          label: section.label,
+          href: `#${section.id}`,
+        }))
+      : []),
     ...(hasBody
       ? [
           { label: uiText.reports.body, href: '#body' },
@@ -266,10 +289,18 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               </section>
             )}
 
-            {/* 本文（Markdown） */}
+            {/* 本文（メーカー解説は固定テンプレート、それ以外はMarkdown） */}
+            {guideContent && (
+              <section
+                id="manufacturer-guide-body"
+                className="scroll-mt-site-header pt-6 pb-8 border-b border-border"
+              >
+                <ManufacturerGuideArticleBody content={guideContent} />
+              </section>
+            )}
             {hasBody && (
               <section id="body" className="scroll-mt-site-header pt-6 pb-8 border-b border-border">
-                <Markdown source={report.body!} />
+                <Markdown source={standardBody!} />
               </section>
             )}
           </div>
@@ -355,7 +386,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           </div>
 
           {/* サイドバー（右） */}
-          <div className="col-span-12 lg:col-start-10 lg:row-start-2 lg:col-span-3">
+          <div className="col-span-12 lg:col-start-10 lg:row-start-1 lg:row-span-2 lg:col-span-3">
             <div className="lg:hidden">
               <ReportSidebarContent />
             </div>

@@ -16,6 +16,10 @@ import type {
   ArticleSection,
   ArticleCategory,
   ArticleType,
+  ManufacturerGuideEvaluationAxis,
+  ManufacturerGuideEvaluationLevel,
+  ManufacturerGuideDeploymentCategory,
+  ManufacturerGuideDeploymentEvidence,
   RobotCategory,
   UseCaseMaturity,
   UseCaseCapabilityNotes,
@@ -156,6 +160,38 @@ export const articleSectionLabels: Record<ArticleSection, string> = {
   tech: '技術・製品',
   policy: '政策・規制',
   entertainment: '話題・その他',
+};
+
+/** メーカー解説「強みと注意点」の固定5軸のラベル。docs/planning/editorial_style_guide_v1.md §6-1 参照。 */
+export const manufacturerGuideEvaluationAxisLabels: Record<ManufacturerGuideEvaluationAxis, string> = {
+  pricing: '価格・調達しやすさ',
+  productionCapacity: '量産・ハードウェア供給力',
+  ecosystem: '技術・エコシステム',
+  trackRecord: '導入実績・検証状況',
+  geopoliticalRisk: '調達・規制・地政学リスク',
+};
+
+/** メーカー解説「導入実績」の固定5分類のラベル。docs/planning/editorial_style_guide_v1.md §6-1 参照。 */
+export const manufacturerGuideDeploymentCategoryLabels: Record<ManufacturerGuideDeploymentCategory, string> = {
+  commercial: '商用導入',
+  poc: 'PoC',
+  researchEducation: '研究・教育',
+  exhibitionDemo: '展示・デモ',
+  internalTrial: '社内実証',
+};
+
+/** 評価レベルの既定ステータスラベル。記事側は labelOverride で個別表現（例:「あり（自社発表のみ）」）だけ上書きする。 */
+export const manufacturerGuideEvaluationLevelLabels: Record<ManufacturerGuideEvaluationLevel, string> = {
+  strength: '強み',
+  caution: '未確認・留意点',
+  risk: 'リスク（要確認）',
+};
+
+/** 導入実績の根拠有無の既定ステータスラベル。 */
+export const manufacturerGuideDeploymentEvidenceLabels: Record<ManufacturerGuideDeploymentEvidence, string> = {
+  confirmed: 'あり',
+  limited: '限定的',
+  none: 'なし',
 };
 
 export const maturityLabels: Record<UseCaseMaturity, string> = {

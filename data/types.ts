@@ -350,12 +350,11 @@ export type ArticleSection =
 
 export type ArticleContentKind = 'editorial' | 'sample' | 'sponsored';
 
-export interface Article extends BaseRecord {
+interface ArticleCommon extends BaseRecord {
   title: string;
   titleJa?: string;
   /** 第一軸の記事種別（必須）。一覧の絞り込み・編集方針の基準になる。 */
   category: ArticleCategory;
-  type: ArticleType;
   /** editorial が通常記事。sample はUI確認用公開データとして sources 空を許容する。 */
   contentKind?: ArticleContentKind;
   publishedAt: ISODate;
@@ -368,8 +367,6 @@ export interface Article extends BaseRecord {
   themeTags?: TagValue<'theme'>[];
   whyItMatters: string;
   keyTakeaways?: string[];
-  /** 記事本文（Markdown）。空ならレポート本文セクションは描画されない。 */
-  body?: string;
   featured?: boolean;
   /** 記事タブの分類（サブジェクト）。type とは独立した必須フィールド。 */
   section: ArticleSection;
@@ -379,6 +376,85 @@ export interface Article extends BaseRecord {
   relatedManufacturerIds: Id[];
   relatedUseCaseIds: Id[];
 }
+
+/**
+ * 固定テンプレート本文を持つ記事種別の一覧。新しいテンプレート型（robot-guide 等）を実装したら
+ * 必ずここに追加する。追加しないと新種別が StandardArticle（自由記述 body）として通ってしまう。
+ */
+export type TemplatedArticleType = 'manufacturer-guide';
+
+/** テンプレート種別以外の記事。本文は自由記述の Markdown（`body`）。 */
+export interface StandardArticle extends ArticleCommon {
+  type: Exclude<ArticleType, TemplatedArticleType>;
+  /** 記事本文（Markdown）。空ならレポート本文セクションは描画されない。 */
+  body?: string;
+}
+
+/**
+ * メーカー解説（manufacturer-guide）専用の固定テンプレート型。
+ * 見出し・セクション順は lib/manufacturerGuideTemplate.ts の MANUFACTURER_GUIDE_SECTIONS が正本で、
+ * 著者はセクションごとの中身（prose と評価/分類データ）だけを埋める。
+ * テンプレートの意味づけは docs/planning/editorial_style_guide_v1.md §6-1 を参照。
+ */
+export type ManufacturerGuideEvaluationAxis =
+  | 'pricing'
+  | 'productionCapacity'
+  | 'ecosystem'
+  | 'trackRecord'
+  | 'geopoliticalRisk';
+
+export type ManufacturerGuideEvaluationLevel = 'strength' | 'caution' | 'risk';
+
+export interface ManufacturerGuideEvaluationItem {
+  level: ManufacturerGuideEvaluationLevel;
+  /** ステータス表示は level から lib/labels.ts の既定ラベルを導出。個別表現が要る行だけ上書きする。 */
+  labelOverride?: string;
+  body: string;
+}
+
+export type ManufacturerGuideDeploymentCategory =
+  | 'commercial'
+  | 'poc'
+  | 'researchEducation'
+  | 'exhibitionDemo'
+  | 'internalTrial';
+
+export type ManufacturerGuideDeploymentEvidence = 'confirmed' | 'limited' | 'none';
+
+export interface ManufacturerGuideDeploymentItem {
+  evidence: ManufacturerGuideDeploymentEvidence;
+  /** ステータス表示は evidence から lib/labels.ts の既定ラベルを導出。個別表現（例:「あり（自社発表のみ）」）だけ上書きする。 */
+  labelOverride?: string;
+  body: string;
+}
+
+export interface ManufacturerGuideContent {
+  companyOverview: string;
+  history: string;
+  productLineup: string;
+  /** 強みと注意点セクションの評価テーブル前のリード文 */
+  evaluationIntro: string;
+  /** 固定5軸。Record なので1軸でも欠けるとコンパイルが通らない。 */
+  evaluationAxes: Record<ManufacturerGuideEvaluationAxis, ManufacturerGuideEvaluationItem>;
+  /** 導入実績セクションの分類テーブル前のリード文 */
+  deploymentIntro: string;
+  /** 固定5分類。Record なので1分類でも欠けるとコンパイルが通らない。 */
+  deploymentStatus: Record<ManufacturerGuideDeploymentCategory, ManufacturerGuideDeploymentItem>;
+  /** 分類テーブル後の結論文 */
+  deploymentOutro: string;
+  japanProcurement: string;
+  /** どんな検討者に向くか */
+  fitSummary: string;
+}
+
+export interface ManufacturerGuideArticle extends ArticleCommon {
+  type: 'manufacturer-guide';
+  manufacturerGuideContent: ManufacturerGuideContent;
+  /** レンダラーが要点(TL;DR)ブロックを持たない設計のため、設定してもレンダリングされない。型で禁止する。 */
+  keyTakeaways?: never;
+}
+
+export type Article = StandardArticle | ManufacturerGuideArticle;
 
 export type ArticlePlacementSurface = 'reports-index';
 export type ArticlePlacementSlot = 'hero' | 'feature';
