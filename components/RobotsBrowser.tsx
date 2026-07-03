@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import { CardGridSkeleton } from '@/components/CardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { SelectControl } from '@/components/SelectControl';
@@ -195,36 +196,33 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
           </p>
         </div>
 
-        <div
-          className={['transition-opacity duration-150', isPending ? 'opacity-60' : 'opacity-100'].join(' ')}
-          aria-busy={isPending}
-        >
-          {hasActiveFilters ? (
-            crossReleaseTotal === 0 ? (
-              <EmptyState
-                message={uiText.emptyStates.robots}
-                variant="muted"
-                size="large"
-              />
-            ) : (
-              <div className="space-y-8">
-                {renderRobotSection(uiText.robots.activeSection(activeRobots.length), activeRobots)}
-                {renderRobotSection(
-                  uiText.robots.preReleaseSection(preReleaseRobots.length),
-                  preReleaseRobots,
-                )}
-              </div>
-            )
-          ) : filtered.length === 0 ? (
+        {isPending ? (
+          <CardGridSkeleton gridClassName="robot-card-grid grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" />
+        ) : hasActiveFilters ? (
+          crossReleaseTotal === 0 ? (
             <EmptyState
               message={uiText.emptyStates.robots}
               variant="muted"
               size="large"
             />
           ) : (
-            renderRobotGrid(filtered)
-          )}
-        </div>
+            <div className="space-y-8">
+              {renderRobotSection(uiText.robots.activeSection(activeRobots.length), activeRobots)}
+              {renderRobotSection(
+                uiText.robots.preReleaseSection(preReleaseRobots.length),
+                preReleaseRobots,
+              )}
+            </div>
+          )
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            message={uiText.emptyStates.robots}
+            variant="muted"
+            size="large"
+          />
+        ) : (
+          renderRobotGrid(filtered)
+        )}
       </div>
     </div>
   );
