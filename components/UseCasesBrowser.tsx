@@ -46,7 +46,7 @@ export function UseCasesBrowser({
   cardEvidenceByUseCaseId,
   robotNameById,
 }: UseCasesBrowserProps) {
-  const { updateParams } = useUrlParamUpdater();
+  const { updateParams, isPending } = useUrlParamUpdater();
   const { query, industry: selectedIndustry, task: selectedTask } = initialFilters;
   const tabListRef = useRef<HTMLDivElement>(null);
 
@@ -284,7 +284,13 @@ export function UseCasesBrowser({
         </div>
       </div>
 
-      <div className="site-container min-h-[60vh] py-5">
+      <div
+        className={[
+          'site-container min-h-[60vh] py-5 transition-opacity duration-150',
+          isPending ? 'opacity-60' : 'opacity-100',
+        ].join(' ')}
+        aria-busy={isPending}
+      >
         {filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.useCases} />
         ) : (
