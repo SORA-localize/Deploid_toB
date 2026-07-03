@@ -464,12 +464,26 @@ export interface ManufacturerGuideFaqItem {
   answer: string;
 }
 
+/**
+ * 埋め込み動画。ファイルは複製せずYouTube側から配信させる（facadeで遅延読み込み）。
+ * 埋め込みが許可されている公式チャンネルの動画のみを対象にする（40-content-rights.md 準拠）。
+ */
+export interface ManufacturerGuideVideo {
+  platform: 'youtube';
+  videoId: string;
+  title: string;
+  channelName: string;
+  channelUrl: string;
+}
+
 export interface ManufacturerGuideContent {
   companyOverview: string;
   history: string;
   productLineup: string;
   /** 製品ラインナップ表（DB連携）。製品ラインナップセクション内に描画される。 */
   lineup: ManufacturerGuideLineupRow[];
+  /** 製品ラインナップセクションに表示する公式動画（任意・0〜数本）。 */
+  videos?: ManufacturerGuideVideo[];
   /** 強みと注意点セクションの評価テーブル前のリード文 */
   evaluationIntro: string;
   /** 固定5軸。Record なので1軸でも欠けるとコンパイルが通らない。 */

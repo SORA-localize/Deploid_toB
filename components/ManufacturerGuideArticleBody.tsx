@@ -19,6 +19,7 @@ import {
 import { MANUFACTURER_GUIDE_SECTIONS, type ManufacturerGuideSectionId } from '@/lib/manufacturerGuideTemplate';
 import { Markdown, sectionHeadingClassName } from '@/components/Markdown';
 import { JudgmentTable, type JudgmentRow } from '@/components/JudgmentTable';
+import { YouTubeEmbed } from '@/components/YouTubeEmbed';
 import { uiText } from '@/lib/uiText';
 
 function toEvaluationRows(content: ManufacturerGuideContent): JudgmentRow[] {
@@ -109,6 +110,9 @@ export function ManufacturerGuideArticleBody({
       <>
         <Markdown source={content.productLineup} />
         <LineupTable rows={lineupRows} />
+        {content.videos?.map((video) => (
+          <YouTubeEmbed key={video.videoId} video={video} />
+        ))}
       </>
     ),
     'strengths-and-cautions': (
