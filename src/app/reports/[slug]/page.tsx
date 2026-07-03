@@ -21,8 +21,9 @@ import {
   getRelatedUseCases,
   getStandardArticleBody,
   resolveArticleDetailBySlug,
+  resolveManufacturerGuideLineup,
 } from '@/lib/data';
-import { articleJsonLd, breadcrumbJsonLd } from '@/lib/jsonLd';
+import { articleJsonLd, breadcrumbJsonLd, faqPageJsonLd } from '@/lib/jsonLd';
 import {
   ARTICLE_SHELF_TABS,
   getArticleCardLabel,
@@ -148,6 +149,9 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   return (
     <div className="min-h-screen bg-background">
       <JsonLd data={articleJsonLd(report)} />
+      {guideContent && guideContent.faq.length > 0 && (
+        <JsonLd data={faqPageJsonLd(guideContent.faq)} />
+      )}
       <JsonLd
         data={breadcrumbJsonLd([
           ...breadcrumbItems.map((item) => ({
@@ -297,7 +301,10 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 id="manufacturer-guide-body"
                 className="scroll-mt-site-header pt-6 pb-8 border-b border-border"
               >
-                <ManufacturerGuideArticleBody content={guideContent} />
+                <ManufacturerGuideArticleBody
+                  content={guideContent}
+                  lineupRows={resolveManufacturerGuideLineup(guideContent)}
+                />
               </section>
             )}
             {hasBody && (

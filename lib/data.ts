@@ -3,7 +3,7 @@ import { manufacturers } from '@/data/manufacturers';
 import { articles } from '@/data/articles';
 import { robots } from '@/data/robots';
 import { useCases } from '@/data/useCases';
-import type { Article } from '@/data/types';
+import type { Article, ManufacturerGuideContent } from '@/data/types';
 import { runValidationInDev } from './validate';
 import { byArticlePublishedDesc } from '@/lib/display';
 
@@ -131,6 +131,31 @@ export function getManufacturerGuideContent(article: Article) {
 
 export function getStandardArticleBody(article: Article) {
   return article.type === 'manufacturer-guide' ? undefined : article.body;
+}
+
+export interface ManufacturerGuideLineupDisplayRow {
+  name: string;
+  href: string;
+  roleLabel: string;
+  priceLabel: string;
+}
+
+/** メーカー解説のラインナップ表を表示用に解決する。機体名・リンクはDBが正本、位置づけ・価格目安は記事編集。 */
+export function resolveManufacturerGuideLineup(
+  content: ManufacturerGuideContent,
+): ManufacturerGuideLineupDisplayRow[] {
+  return content.lineup.flatMap((row) => {
+    const robot = getRobotById(row.robotId);
+    if (!robot) return []; // 存在チェックは validate 側で担保。非公開化された場合は行ごと落とす
+    return [
+      {
+        name: robot.nameJa ?? robot.name,
+        href: `/robots/${robot.slug}`,
+        roleLabel: row.roleLabel,
+        priceLabel: row.priceLabel,
+      },
+    ];
+  });
 }
 
 export function getRobotsByManufacturerId(manufacturerId: string) {

@@ -1,7 +1,7 @@
 // 構造化データ（JSON-LD）のビルダー（設計: data-architecture-redesign-v1 §11.7）。
 // Robot=Product / Manufacturer=Organization / Article=NewsArticle。
 // 値はすべてレコードから導出する（直書きしない）。
-import type { Article, Manufacturer, Robot, UseCase } from '@/data/types';
+import type { Article, ManufacturerGuideFaqItem, Manufacturer, Robot, UseCase } from '@/data/types';
 import { getDisplayableAsset } from './media';
 import { siteUrl } from './site';
 import { uiText } from './uiText';
@@ -72,6 +72,19 @@ export function articleJsonLd(article: Article) {
       ? { '@type': 'Organization', name: article.author }
       : PUBLISHER,
     publisher: PUBLISHER,
+  };
+}
+
+/** メーカー解説のFAQセクション用（FAQPage）。 */
+export function faqPageJsonLd(items: ManufacturerGuideFaqItem[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
   };
 }
 
