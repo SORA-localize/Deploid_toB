@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { UseCasesBrowser } from '@/components/UseCasesBrowser';
 import { getDeploymentsForUseCase, getRobots, getUseCases } from '@/lib/data';
@@ -49,8 +50,19 @@ export async function generateMetadata({ searchParams }: { searchParams: RouteSe
   });
 }
 
-async function UseCasesContent({ searchParams }: { searchParams: RouteSearchParams }) {
-  const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
+async function CachedUseCasesList({
+  industry,
+  task,
+  query,
+}: {
+  industry: string | null;
+  task: string | null;
+  query: string | null;
+}) {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('use-cases-list');
+
   const useCases = getUseCases();
   const robotNameById = Object.fromEntries(
     getRobots().map((r) => [r.id, r.nameJa ?? r.name]),
@@ -66,10 +78,17 @@ async function UseCasesContent({ searchParams }: { searchParams: RouteSearchPara
   return (
     <UseCasesBrowser
       useCases={useCases}
-      initialFilters={resolveFilters(useCases, params)}
+      initialFilters={resolveFilters(useCases, { industry, task, q: query })}
       cardEvidenceByUseCaseId={cardEvidenceByUseCaseId}
       robotNameById={robotNameById}
     />
+  );
+}
+
+async function UseCasesContent({ searchParams }: { searchParams: RouteSearchParams }) {
+  const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
+  return (
+    <CachedUseCasesList industry={params.industry} task={params.task} query={params.q} />
   );
 }
 

@@ -138,9 +138,28 @@ export function UseCasesBrowser({
     ? taskDataByIndustry[selectedIndustry]?.options.find((t) => t.value === selectedTask)?.label
     : null;
 
+  const activeChips = useMemo(() => {
+    const chips: import('@/components/ActiveFilterChips').ActiveFilterChip[] = [];
+    if (activeIndustryLabel) {
+      chips.push({
+        key: 'industry',
+        label: activeIndustryLabel,
+        onRemove: () => updateParams({ industry: null, task: null }),
+      });
+    }
+    if (activeTaskLabel) {
+      chips.push({
+        key: 'task',
+        label: activeTaskLabel,
+        onRemove: () => updateParams({ task: null }),
+      });
+    }
+    return chips;
+  }, [activeIndustryLabel, activeTaskLabel, updateParams]);
+
   return (
     <div className="min-h-screen bg-background">
-      <UseCasesHeader activeChips={[]} />
+      <UseCasesHeader activeChips={activeChips} />
 
       <div className="border-b border-border bg-card">
         <div className="site-container py-5">
@@ -202,7 +221,7 @@ export function UseCasesBrowser({
                       side="bottom"
                       align="start"
                       sideOffset={6}
-                      className="z-50 min-w-[200px] rounded-lg border border-border bg-card p-1 shadow-md"
+                      className="z-50 min-w-[200px] rounded-lg border border-border bg-card p-1 shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out fade-in-0 data-[state=closed]:fade-out-0 zoom-in-95 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 motion-reduce:animate-none"
                     >
                       <p className="px-2 pb-1 pt-0.5 text-[11px] font-semibold text-muted-foreground">
                         {uiText.useCases.industryTasksHeading(tab.label)}
