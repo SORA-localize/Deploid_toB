@@ -19,6 +19,7 @@ import {
 import { MANUFACTURER_GUIDE_SECTIONS, type ManufacturerGuideSectionId } from '@/lib/manufacturerGuideTemplate';
 import { Markdown, sectionHeadingClassName } from '@/components/Markdown';
 import { JudgmentTable, type JudgmentRow } from '@/components/JudgmentTable';
+import { uiText } from '@/lib/uiText';
 
 function toEvaluationRows(content: ManufacturerGuideContent): JudgmentRow[] {
   return manufacturerGuideEvaluationAxisOrder.map((axis) => {
@@ -53,9 +54,9 @@ function LineupTable({ rows }: { rows: ManufacturerGuideLineupDisplayRow[] }) {
       <table className="w-full border border-border text-sm">
         <thead>
           <tr className="bg-muted/60 text-left text-xs text-muted-foreground">
-            <th scope="col" className="px-3 py-2 font-medium">機体</th>
-            <th scope="col" className="px-3 py-2 font-medium">位置づけ</th>
-            <th scope="col" className="px-3 py-2 font-medium whitespace-nowrap">価格目安</th>
+            <th scope="col" className="px-3 py-2 font-medium">{uiText.reports.guideLineupRobot}</th>
+            <th scope="col" className="px-3 py-2 font-medium">{uiText.reports.guideLineupRole}</th>
+            <th scope="col" className="px-3 py-2 font-medium whitespace-nowrap">{uiText.reports.guideLineupPrice}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -81,7 +82,7 @@ function FaqList({ content }: { content: ManufacturerGuideContent }) {
     <div className="space-y-5">
       {content.faq.map((item) => (
         <div key={item.question}>
-          <h3 className="mb-1.5 font-semibold text-foreground">Q. {item.question}</h3>
+          <h3 className="mb-1.5 font-semibold text-foreground">{uiText.reports.guideFaqPrefix}{item.question}</h3>
           <Markdown source={item.answer} />
         </div>
       ))}
