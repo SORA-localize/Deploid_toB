@@ -446,10 +446,30 @@ export interface ManufacturerGuideDeploymentItem {
   body: string;
 }
 
+/**
+ * 製品ラインナップ表の1行。機体名・リンク・詳細はDB（robotId）から解決し、
+ * 「どの検討者に関係するか」の一言と価格目安だけ記事側で編集する。
+ */
+export interface ManufacturerGuideLineupRow {
+  robotId: Id;
+  /** 読者向けの位置づけ一言（例: 研究・教育・PoCの標準候補） */
+  roleLabel: string;
+  /** 価格目安（例: '$13,500〜'）。ロボット詳細の priceNote と矛盾させない。未確認は '要確認' */
+  priceLabel: string;
+}
+
+export interface ManufacturerGuideFaqItem {
+  question: string;
+  /** 回答（Markdown可・見出し不可）。既出セクションの要約＋出典済み事実のみで書く。 */
+  answer: string;
+}
+
 export interface ManufacturerGuideContent {
   companyOverview: string;
   history: string;
   productLineup: string;
+  /** 製品ラインナップ表（DB連携）。製品ラインナップセクション内に描画される。 */
+  lineup: ManufacturerGuideLineupRow[];
   /** 強みと注意点セクションの評価テーブル前のリード文 */
   evaluationIntro: string;
   /** 固定5軸。Record なので1軸でも欠けるとコンパイルが通らない。 */
@@ -461,6 +481,8 @@ export interface ManufacturerGuideContent {
   /** 分類テーブル後の結論文 */
   deploymentOutro: string;
   japanProcurement: string;
+  /** よくある質問。FAQPage 構造化データにも使われる。 */
+  faq: ManufacturerGuideFaqItem[];
   /** どんな検討者に向くか */
   fitSummary: string;
 }

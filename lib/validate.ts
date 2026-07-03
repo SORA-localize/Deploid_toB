@@ -528,6 +528,29 @@ export function validateData(): ValidationResult {
         errors.push(`[manufacturerGuideContent] ${article.slug}: deploymentStatus.${category} が不完全です`);
       }
     });
+    if (content.lineup.length === 0) {
+      errors.push(`[manufacturerGuideContent] ${article.slug}: lineup が空です`);
+    }
+    const robotIdSet = new Set(robots.map((r) => r.id));
+    content.lineup.forEach((row) => {
+      if (!robotIdSet.has(row.robotId)) {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: lineup の robotId "${row.robotId}" が存在しません`);
+      }
+      if (!row.roleLabel.trim() || !row.priceLabel.trim()) {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: lineup.${row.robotId} の roleLabel/priceLabel が空です`);
+      }
+    });
+    if (content.faq.length === 0) {
+      errors.push(`[manufacturerGuideContent] ${article.slug}: faq が空です`);
+    }
+    content.faq.forEach((item, i) => {
+      if (!item.question.trim() || !item.answer.trim()) {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: faq[${i}] が不完全です`);
+      }
+      if (/^#{1,6}\s/m.test(item.answer)) {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: faq[${i}] の回答に Markdown 見出しが含まれています`);
+      }
+    });
   }
 
   for (const r of robots) {
