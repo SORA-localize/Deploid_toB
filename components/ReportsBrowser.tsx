@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState';
 import { NewsFeatureCard } from '@/components/NewsFeatureCard';
@@ -21,11 +22,13 @@ import {
 } from '@/lib/articlePagination';
 import { useArticlesPerPage } from '@/lib/useArticlesPerPage';
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
+import { readClientSearchParam } from '@/lib/searchParams';
 import { createArticleSearchIndex, searchArticleSlugs } from '@/lib/searchIndex';
 import { uiText } from '@/lib/uiText';
 import {
   ARTICLE_SHELF_TABS,
   getArticleShelf,
+  normalizeArticleShelfParam,
   type ArticleShelf,
 } from '@/lib/articleShelves';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
@@ -33,20 +36,23 @@ import { cn } from '@/lib/utils';
 
 interface ReportsBrowserProps {
   reports: Article[];
-  activeShelf: ArticleShelf;
-  initialQuery: string;
-  initialPageParam: string | null;
 }
 
-export function ReportsBrowser({
-  reports,
-  activeShelf,
-  initialQuery,
-  initialPageParam,
-}: ReportsBrowserProps) {
+/**
+ * 棚・検索語・ページ番号は useSearchParams() からクライアントで直接読む。
+ * reports は全件が既にクライアントにあり、絞り込み・検索もクライアント側完結のため、
+ * フィルタ変更のたびにサーバーへ新しいRSCペイロードを取りに行く必要がない。
+ */
+export function ReportsBrowser({ reports }: ReportsBrowserProps) {
   const { updateParams, isPending } = useUrlParamUpdater();
   const perPage = useArticlesPerPage();
   const gridRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const activeShelf: ArticleShelf = normalizeArticleShelfParam(
+    readClientSearchParam(searchParams, 'kind'),
+  );
+  const initialQuery = readClientSearchParam(searchParams, 'q') ?? '';
+  const initialPageParam = readClientSearchParam(searchParams, ARTICLE_PAGE_PARAM);
 
   const sorted = useMemo(() => [...reports].sort(byArticlePublishedDesc), [reports]);
 

@@ -2,10 +2,7 @@ import { Suspense } from 'react';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { ReportsBrowser } from '@/components/ReportsBrowser';
 import { getArticles } from '@/lib/data';
-import { ARTICLE_PAGE_PARAM } from '@/lib/articlePagination';
-import { normalizeArticleShelfParam } from '@/lib/articleShelves';
 import { createPageMetadata } from '@/lib/metadata';
-import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 
 export const metadata = createPageMetadata({
   title: 'ニュース・解説',
@@ -14,29 +11,13 @@ export const metadata = createPageMetadata({
   path: '/reports',
 });
 
-async function ReportsContent({ searchParams }: { searchParams: RouteSearchParams }) {
+// 棚・検索語・ページ番号は ReportsBrowser 内で useSearchParams() を使いクライアントで読む。
+export default function ReportsPage() {
   const reports = getArticles();
-  const params = await pickSearchParams(searchParams, ['kind', 'q', ARTICLE_PAGE_PARAM]);
-  const activeShelf = normalizeArticleShelfParam(params.kind);
 
-  return (
-    <ReportsBrowser
-      reports={reports}
-      activeShelf={activeShelf}
-      initialQuery={params.q ?? ''}
-      initialPageParam={params[ARTICLE_PAGE_PARAM]}
-    />
-  );
-}
-
-export default function ReportsPage({
-  searchParams,
-}: {
-  searchParams: RouteSearchParams;
-}) {
   return (
     <Suspense fallback={<PageSuspenseFallback />}>
-      <ReportsContent searchParams={searchParams} />
+      <ReportsBrowser reports={reports} />
     </Suspense>
   );
 }
