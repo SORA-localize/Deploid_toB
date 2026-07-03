@@ -27,7 +27,7 @@ interface RobotsBrowserProps {
 }
 
 export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsBrowserProps) {
-  const { updateParams } = useUrlParamUpdater();
+  const { updateParams, isPending } = useUrlParamUpdater();
   const { favorites, toggleFavorite } = useFavorites();
 
   const manufacturerById = useMemo(
@@ -195,31 +195,36 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
           </p>
         </div>
 
-        {hasActiveFilters ? (
-          crossReleaseTotal === 0 ? (
+        <div
+          className={['transition-opacity duration-150', isPending ? 'opacity-60' : 'opacity-100'].join(' ')}
+          aria-busy={isPending}
+        >
+          {hasActiveFilters ? (
+            crossReleaseTotal === 0 ? (
+              <EmptyState
+                message={uiText.emptyStates.robots}
+                variant="muted"
+                size="large"
+              />
+            ) : (
+              <div className="space-y-8">
+                {renderRobotSection(uiText.robots.activeSection(activeRobots.length), activeRobots)}
+                {renderRobotSection(
+                  uiText.robots.preReleaseSection(preReleaseRobots.length),
+                  preReleaseRobots,
+                )}
+              </div>
+            )
+          ) : filtered.length === 0 ? (
             <EmptyState
               message={uiText.emptyStates.robots}
               variant="muted"
               size="large"
             />
           ) : (
-            <div className="space-y-8">
-              {renderRobotSection(uiText.robots.activeSection(activeRobots.length), activeRobots)}
-              {renderRobotSection(
-                uiText.robots.preReleaseSection(preReleaseRobots.length),
-                preReleaseRobots,
-              )}
-            </div>
-          )
-        ) : filtered.length === 0 ? (
-          <EmptyState
-            message={uiText.emptyStates.robots}
-            variant="muted"
-            size="large"
-          />
-        ) : (
-          renderRobotGrid(filtered)
-        )}
+            renderRobotGrid(filtered)
+          )}
+        </div>
       </div>
     </div>
   );
