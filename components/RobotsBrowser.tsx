@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
@@ -16,6 +17,7 @@ import {
   normalizeRobotFilters,
 } from '@/lib/robotFilters';
 import { normalizeSearchText } from '@/lib/search';
+import { pickClientSearchParams } from '@/lib/searchParams';
 import { uiText } from '@/lib/uiText';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { useFavorites } from '@/lib/useFavorites';
@@ -23,19 +25,46 @@ import { useFavorites } from '@/lib/useFavorites';
 interface RobotsBrowserProps {
   robots: Robot[];
   manufacturers: Manufacturer[];
-  initialFilters: ReturnType<typeof normalizeRobotFilters>;
 }
 
-export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsBrowserProps) {
+/**
+ * フィルタ状態は useSearchParams() からクライアントで直接読む（サーバーからのprops経由にしない）。
+ * robots/manufacturers は全件が既にクライアントにあり、絞り込みも filterRobots() で
+ * クライアント側完結のため、フィルタ変更のたびにサーバーへ新しいRSCペイロードを
+ * 取りに行く必要がない。updateParams は URL 同期（共有・戻るボタン用）のためだけに呼ぶ。
+ */
+export function RobotsBrowser({ robots, manufacturers }: RobotsBrowserProps) {
   const { updateParams, isPending } = useUrlParamUpdater();
   const { favorites, toggleFavorite } = useFavorites();
+  const searchParams = useSearchParams();
 
   const manufacturerById = useMemo(
     () => new Map(manufacturers.map((manufacturer) => [manufacturer.id, manufacturer])),
     [manufacturers],
   );
   const filterOptions = useMemo(() => getRobotFilterOptions(robots), [robots]);
-  const filters = initialFilters;
+  const filters = useMemo(() => {
+    const params = pickClientSearchParams(searchParams, [
+      'industry',
+      'task',
+      'manufacturer',
+      'availability',
+      'release',
+      'q',
+    ] as const);
+    return normalizeRobotFilters({
+      industry: params.industry,
+      task: params.task,
+      manufacturer: params.manufacturer,
+      availability: params.availability,
+      release: params.release,
+      query: params.q,
+      manufacturers,
+      industryValues: filterOptions.industries.map((option) => option.value),
+      taskValues: filterOptions.tasks.map((option) => option.value),
+      availabilityValues: filterOptions.availabilityValues,
+    });
+  }, [searchParams, manufacturers, filterOptions]);
 
   const industryOptions = useMemo(
     () => [

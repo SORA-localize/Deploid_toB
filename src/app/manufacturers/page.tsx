@@ -3,11 +3,6 @@ import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { ManufacturersBrowser } from '@/components/ManufacturersBrowser';
 import { getManufacturers, getRobots } from '@/lib/data';
 import { createPageMetadata } from '@/lib/metadata';
-import {
-  getManufacturerFilterOptions,
-  normalizeManufacturerFilters,
-} from '@/lib/manufacturerFilters';
-import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 
 export const metadata = createPageMetadata({
   title: 'メーカー',
@@ -16,36 +11,14 @@ export const metadata = createPageMetadata({
   path: '/manufacturers',
 });
 
-async function ManufacturersContent({ searchParams }: { searchParams: RouteSearchParams }) {
+// フィルタ状態は ManufacturersBrowser 内で useSearchParams() を使いクライアントで読む。
+export default function ManufacturersPage() {
   const manufacturers = getManufacturers();
   const robots = getRobots();
-  const params = await pickSearchParams(searchParams, ['country', 'route', 'q'] as const);
-  const filterOptions = getManufacturerFilterOptions(manufacturers);
-  const filters = normalizeManufacturerFilters({
-    country: params.country,
-    consultationRoute: params.route,
-    query: params.q,
-    countries: filterOptions.countries,
-    consultationRoutes: filterOptions.consultationRoutes,
-  });
 
-  return (
-    <ManufacturersBrowser
-      manufacturers={manufacturers}
-      robots={robots}
-      initialFilters={filters}
-    />
-  );
-}
-
-export default function ManufacturersPage({
-  searchParams,
-}: {
-  searchParams: RouteSearchParams;
-}) {
   return (
     <Suspense fallback={<PageSuspenseFallback />}>
-      <ManufacturersContent searchParams={searchParams} />
+      <ManufacturersBrowser manufacturers={manufacturers} robots={robots} />
     </Suspense>
   );
 }

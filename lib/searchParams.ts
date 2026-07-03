@@ -28,3 +28,24 @@ export async function pickSearchParams<const Key extends string>(
     keys.map((key) => [key, readFirstSearchParam(resolved, key)]),
   ) as Record<Key, string | null>;
 }
+
+/**
+ * readFirstSearchParam のクライアント版。next/navigation の useSearchParams() が返す
+ * URLSearchParams から、空文字を null に正規化して読む（サーバー側 pickSearchParams と同じ規約）。
+ */
+export function readClientSearchParam(
+  searchParams: URLSearchParams,
+  key: string,
+): string | null {
+  const normalized = searchParams.get(key)?.trim();
+  return normalized ? normalized : null;
+}
+
+export function pickClientSearchParams<const Key extends string>(
+  searchParams: URLSearchParams,
+  keys: readonly Key[],
+): Record<Key, string | null> {
+  return Object.fromEntries(
+    keys.map((key) => [key, readClientSearchParam(searchParams, key)]),
+  ) as Record<Key, string | null>;
+}

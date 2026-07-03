@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useRef } from 'react';
 import type { KeyboardEvent } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { HoverCard as HoverCardPrimitive } from 'radix-ui';
 import { X } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -13,16 +14,16 @@ import type { UseCase } from '@/data/types';
 import { createUseCaseSearchIndex, searchUseCaseSlugs } from '@/lib/searchIndex';
 import { maturityLabels } from '@/lib/labels';
 import { SearchInput } from '@/components/SearchInput';
-import { toTagOptions } from '@/lib/tags';
+import { pickClientSearchParams } from '@/lib/searchParams';
+import { getUseCaseIndustryTagOptions, getUseCaseTaskTagOptions, toTagOptions } from '@/lib/tags';
 import { sortUseCases } from '@/lib/display';
 import { uiText } from '@/lib/uiText';
 import type { UseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
-import type { UseCaseFilters } from '@/lib/useCaseFilters';
+import { normalizeUseCaseFilters } from '@/lib/useCaseFilters';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 
 interface UseCasesBrowserProps {
   useCases: UseCase[];
-  initialFilters: UseCaseFilters;
   cardEvidenceByUseCaseId: Record<string, UseCaseCardEvidenceSummary | undefined>;
   robotNameById: Record<string, string>;
 }
@@ -40,15 +41,31 @@ function chipClassName(selected: boolean) {
   ].join(' ');
 }
 
+/**
+ * フィルタ状態は useSearchParams() からクライアントで直接読む。
+ * useCases は全件が既にクライアントにあり、絞り込みもクライアント側完結のため、
+ * フィルタ変更のたびにサーバーへ新しいRSCペイロードを取りに行く必要がない。
+ */
 export function UseCasesBrowser({
   useCases,
-  initialFilters,
   cardEvidenceByUseCaseId,
   robotNameById,
 }: UseCasesBrowserProps) {
   const { updateParams, isPending } = useUrlParamUpdater();
-  const { query, industry: selectedIndustry, task: selectedTask } = initialFilters;
+  const searchParams = useSearchParams();
   const tabListRef = useRef<HTMLDivElement>(null);
+
+  const filters = useMemo(() => {
+    const params = pickClientSearchParams(searchParams, ['industry', 'task', 'q'] as const);
+    return normalizeUseCaseFilters({
+      industry: params.industry,
+      task: params.task,
+      query: params.q,
+      industryValues: getUseCaseIndustryTagOptions(useCases).map((option) => option.value),
+      taskValues: getUseCaseTaskTagOptions(useCases).map((option) => option.value),
+    });
+  }, [searchParams, useCases]);
+  const { query, industry: selectedIndustry, task: selectedTask } = filters;
 
   const industryTabOptions = useMemo(
     () => toTagOptions(useCases.map((u) => u.primaryIndustry), 'industry'),
