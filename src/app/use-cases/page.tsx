@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { cacheLife, cacheTag } from 'next/cache';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { UseCasesBrowser } from '@/components/UseCasesBrowser';
 import { getDeploymentsForUseCase, getRobots, getUseCases } from '@/lib/data';
@@ -13,18 +14,23 @@ const defaultTitle = '用途から探す';
 const defaultDescription =
   '産業・現場タスクからヒューマノイドの実適用シーンを探す。実導入事例の有無を明示しています。';
 
-// generateMetadata は絞り込み条件ごとにSEOタイトル/descriptionを変えるため、
-// searchParams を引き続きサーバー側で読む（本文レンダリングとは別関心）。
-export async function generateMetadata({ searchParams }: { searchParams: RouteSearchParams }) {
-  const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
-  const useCases = getUseCases();
-  const filters = normalizeUseCaseFilters({
+function resolveFilters(
+  useCases: ReturnType<typeof getUseCases>,
+  params: { industry: string | null; task: string | null; q: string | null },
+) {
+  return normalizeUseCaseFilters({
     industry: params.industry,
     task: params.task,
     query: params.q,
     industryValues: getUseCaseIndustryTagOptions(useCases).map((option) => option.value),
     taskValues: getUseCaseTaskTagOptions(useCases).map((option) => option.value),
   });
+}
+
+export async function generateMetadata({ searchParams }: { searchParams: RouteSearchParams }) {
+  const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
+  const useCases = getUseCases();
+  const filters = resolveFilters(useCases, params);
   const matchedSlugs = searchUseCaseSlugs(createUseCaseSearchIndex(useCases), filters.query);
   const { filtered } = getUseCaseFilterResult(useCases, filters, matchedSlugs);
 
@@ -44,10 +50,19 @@ export async function generateMetadata({ searchParams }: { searchParams: RouteSe
   });
 }
 
-// フィルタ状態は UseCasesBrowser 内で useSearchParams() を使いクライアントで読む。
-// cardEvidenceByUseCaseId/robotNameById はフィルタに依存しない全件計算のため、
-// フィルタの組み合わせ別にキャッシュする意味がなかった（以前の 'use cache' を撤去）。
-export default function UseCasesPage() {
+async function CachedUseCasesList({
+  industry,
+  task,
+  query,
+}: {
+  industry: string | null;
+  task: string | null;
+  query: string | null;
+}) {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('use-cases-list');
+
   const useCases = getUseCases();
   const robotNameById = Object.fromEntries(
     getRobots().map((r) => [r.id, r.nameJa ?? r.name]),
@@ -60,14 +75,31 @@ export default function UseCasesPage() {
       }),
     ]),
   );
+  return (
+    <UseCasesBrowser
+      useCases={useCases}
+      initialFilters={resolveFilters(useCases, { industry, task, q: query })}
+      cardEvidenceByUseCaseId={cardEvidenceByUseCaseId}
+      robotNameById={robotNameById}
+    />
+  );
+}
 
+async function UseCasesContent({ searchParams }: { searchParams: RouteSearchParams }) {
+  const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
+  return (
+    <CachedUseCasesList industry={params.industry} task={params.task} query={params.q} />
+  );
+}
+
+export default function UseCasesPage({
+  searchParams,
+}: {
+  searchParams: RouteSearchParams;
+}) {
   return (
     <Suspense fallback={<PageSuspenseFallback />}>
-      <UseCasesBrowser
-        useCases={useCases}
-        cardEvidenceByUseCaseId={cardEvidenceByUseCaseId}
-        robotNameById={robotNameById}
-      />
+      <UseCasesContent searchParams={searchParams} />
     </Suspense>
   );
 }

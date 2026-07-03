@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
@@ -17,36 +16,21 @@ import {
   normalizeManufacturerFilters,
 } from '@/lib/manufacturerFilters';
 import { manufacturerConsultationRouteLabels } from '@/lib/manufacturerDisplay';
-import { pickClientSearchParams } from '@/lib/searchParams';
 import { uiText } from '@/lib/uiText';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 
 interface ManufacturersBrowserProps {
   manufacturers: Manufacturer[];
   robots: Robot[];
+  initialFilters: ReturnType<typeof normalizeManufacturerFilters>;
 }
 
-/**
- * フィルタ状態は useSearchParams() からクライアントで直接読む。
- * manufacturers/robots は全件が既にクライアントにあり、絞り込みもクライアント側完結のため、
- * フィルタ変更のたびにサーバーへ新しいRSCペイロードを取りに行く必要がない。
- */
-export function ManufacturersBrowser({ manufacturers, robots }: ManufacturersBrowserProps) {
+export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: ManufacturersBrowserProps) {
   const { updateParams, isPending } = useUrlParamUpdater();
-  const searchParams = useSearchParams();
 
   const robotsByManufacturer = useMemo(() => groupRobotsByManufacturer(robots), [robots]);
   const filterOptions = useMemo(() => getManufacturerFilterOptions(manufacturers), [manufacturers]);
-  const filters = useMemo(() => {
-    const params = pickClientSearchParams(searchParams, ['country', 'route', 'q'] as const);
-    return normalizeManufacturerFilters({
-      country: params.country,
-      consultationRoute: params.route,
-      query: params.q,
-      countries: filterOptions.countries,
-      consultationRoutes: filterOptions.consultationRoutes,
-    });
-  }, [searchParams, filterOptions]);
+  const filters = initialFilters;
 
   const countryOptions = useMemo(
     () => [
