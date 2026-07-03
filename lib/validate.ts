@@ -551,6 +551,14 @@ export function validateData(): ValidationResult {
         errors.push(`[manufacturerGuideContent] ${article.slug}: faq[${i}] の回答に Markdown 見出しが含まれています`);
       }
     });
+    (content.videos ?? []).forEach((video, i) => {
+      if (!/^[A-Za-z0-9_-]{11}$/.test(video.videoId)) {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: videos[${i}].videoId の形式が不正です`);
+      }
+      if (!video.title.trim() || !video.channelName.trim() || !video.channelUrl.trim()) {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: videos[${i}] が不完全です`);
+      }
+    });
   }
 
   for (const r of robots) {
