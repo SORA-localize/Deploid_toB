@@ -26,7 +26,7 @@ interface ManufacturersBrowserProps {
 }
 
 export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: ManufacturersBrowserProps) {
-  const { updateParams } = useUrlParamUpdater();
+  const { updateParams, isPending } = useUrlParamUpdater();
 
   const robotsByManufacturer = useMemo(() => groupRobotsByManufacturer(robots), [robots]);
   const filterOptions = useMemo(() => getManufacturerFilterOptions(manufacturers), [manufacturers]);
@@ -116,19 +116,24 @@ export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: 
           </p>
         </div>
 
-        {filtered.length === 0 ? (
-          <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
-        ) : (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-            {filtered.map((manufacturer) => (
-              <ManufacturerCard
-                key={manufacturer.id}
-                manufacturer={manufacturer}
-                robots={robotsByManufacturer.get(manufacturer.id) ?? []}
-              />
-            ))}
-          </div>
-        )}
+        <div
+          className={['transition-opacity duration-150', isPending ? 'opacity-60' : 'opacity-100'].join(' ')}
+          aria-busy={isPending}
+        >
+          {filtered.length === 0 ? (
+            <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
+          ) : (
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+              {filtered.map((manufacturer) => (
+                <ManufacturerCard
+                  key={manufacturer.id}
+                  manufacturer={manufacturer}
+                  robots={robotsByManufacturer.get(manufacturer.id) ?? []}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
