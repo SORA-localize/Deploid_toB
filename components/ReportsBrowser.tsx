@@ -44,7 +44,7 @@ export function ReportsBrowser({
   initialQuery,
   initialPageParam,
 }: ReportsBrowserProps) {
-  const { updateParams } = useUrlParamUpdater();
+  const { updateParams, isPending } = useUrlParamUpdater();
   const perPage = useArticlesPerPage();
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -148,7 +148,14 @@ export function ReportsBrowser({
         )}
 
         {/* ── 記事グリッド ── */}
-        <div ref={gridRef} className="site-container py-4 scroll-mt-site-header">
+        <div
+          ref={gridRef}
+          className={[
+            'site-container py-4 scroll-mt-site-header transition-opacity duration-150',
+            isPending ? 'opacity-60' : 'opacity-100',
+          ].join(' ')}
+          aria-busy={isPending}
+        >
           {gridReports.length === 0 ? (
             <EmptyState message={uiText.emptyStates.reports} />
           ) : (
