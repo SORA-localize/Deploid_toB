@@ -29,6 +29,7 @@ import {
   getArticleShelf,
   type ArticleShelf,
 } from '@/lib/articleShelves';
+import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { cn } from '@/lib/utils';
 
@@ -161,12 +162,12 @@ export function ReportsBrowser({
         {/* ── 記事グリッド ── */}
         <div ref={gridRef} className="site-container py-4 scroll-mt-site-header">
           {isPending ? (
-            <NewsCardGridSkeleton gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" />
+            <NewsCardGridSkeleton gridClassName={browserGridClassNames.reports} />
           ) : gridReports.length === 0 ? (
             <EmptyState message={uiText.emptyStates.reports} />
           ) : (
             <div className="space-y-3">
-              <CardHoverEffect className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 items-stretch">
+              <CardHoverEffect className={browserGridClassNames.reports}>
                 {paginatedReports.map((r) => (
                   <NewsCard key={r.id} report={r} />
                 ))}

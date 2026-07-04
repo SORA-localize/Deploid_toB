@@ -3,6 +3,7 @@
 import { EmptyState } from '@/components/EmptyState';
 import { RobotCard } from '@/components/RobotCard';
 import type { Robot, Manufacturer } from '@/data/types';
+import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 
 interface ManufacturerRobotsGridProps {
   robots: Robot[];
@@ -15,7 +16,7 @@ export function ManufacturerRobotsGrid({ robots, manufacturer }: ManufacturerRob
   }
 
   return (
-    <div className="robot-card-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+    <div className={browserGridClassNames.robots}>
       {robots.map((robot) => (
         <RobotCard
           key={robot.id}

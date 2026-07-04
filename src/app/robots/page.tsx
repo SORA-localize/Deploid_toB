@@ -1,8 +1,10 @@
 import { Suspense } from 'react';
 import { cacheLife, cacheTag } from 'next/cache';
-import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
+import { CardGridSkeleton } from '@/components/CardGridSkeleton';
+import { ListPageSkeletonShell } from '@/components/ListPageSkeletonShell';
 import { RobotsBrowser } from '@/components/RobotsBrowser';
 import { getManufacturers, getRobots } from '@/lib/data';
+import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { createPageMetadata } from '@/lib/metadata';
 import {
   getRobotFilterOptions,
@@ -16,6 +18,14 @@ export const metadata = createPageMetadata({
     'ヒューマノイドロボットのカタログ。業種・タスク・メーカー・国内入手性で絞り込み、導入判断に必要な変数で比較できます。',
   path: '/robots',
 });
+
+function RobotsPageSkeleton() {
+  return (
+    <ListPageSkeletonShell>
+      <CardGridSkeleton gridClassName={`mt-8 ${browserGridClassNames.robots}`} />
+    </ListPageSkeletonShell>
+  );
+}
 
 async function CachedRobotsList({
   industry,
@@ -91,7 +101,7 @@ export default function RobotsPage({
   searchParams: RouteSearchParams;
 }) {
   return (
-    <Suspense fallback={<PageSuspenseFallback />}>
+    <Suspense fallback={<RobotsPageSkeleton />}>
       <RobotsContent searchParams={searchParams} />
     </Suspense>
   );

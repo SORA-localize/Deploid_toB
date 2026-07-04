@@ -17,6 +17,7 @@ import { SearchInput } from '@/components/SearchInput';
 import { toTagOptions } from '@/lib/tags';
 import { sortUseCases } from '@/lib/display';
 import { uiText } from '@/lib/uiText';
+import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import type { UseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
 import type { UseCaseFilters } from '@/lib/useCaseFilters';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
@@ -287,7 +288,7 @@ export function UseCasesBrowser({
 
       <div className="site-container min-h-[60vh] py-5">
         {isPending ? (
-          <UseCaseCardGridSkeleton gridClassName="grid auto-rows-fr grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4" />
+          <UseCaseCardGridSkeleton gridClassName={browserGridClassNames.useCases} />
         ) : filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.useCases} />
         ) : (
@@ -296,7 +297,7 @@ export function UseCasesBrowser({
               <h3 className="mb-3 px-1 text-sm font-semibold text-foreground">
                 {maturityLabels[level as keyof typeof maturityLabels]}
               </h3>
-              <div className="grid auto-rows-fr grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
+              <div className={browserGridClassNames.useCases}>
                 {cases.map((u) => (
                   <UseCaseCard
                     key={u.id}

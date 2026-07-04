@@ -17,6 +17,7 @@ import {
   normalizeManufacturerFilters,
 } from '@/lib/manufacturerFilters';
 import { manufacturerConsultationRouteLabels } from '@/lib/manufacturerDisplay';
+import { browserFilterGridClassNames, browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { uiText } from '@/lib/uiText';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 
@@ -87,7 +88,7 @@ export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: 
         />
 
         <div className="sm:flex sm:items-end gap-4 mb-5">
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-2xl sm:shrink-0">
+          <div className={browserFilterGridClassNames.manufacturers}>
             <SelectControl
               id="manufacturer-country"
               label={uiText.filters.region}
@@ -118,11 +119,11 @@ export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: 
         </div>
 
         {isPending ? (
-          <ManufacturerCardGridSkeleton gridClassName="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" />
+          <ManufacturerCardGridSkeleton gridClassName={browserGridClassNames.manufacturers} />
         ) : filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
         ) : (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+          <div className={browserGridClassNames.manufacturers}>
             {filtered.map((manufacturer) => (
               <ManufacturerCard
                 key={manufacturer.id}
