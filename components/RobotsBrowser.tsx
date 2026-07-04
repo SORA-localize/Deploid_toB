@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { CardGridSkeleton } from '@/components/CardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
@@ -135,6 +135,13 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
     );
   };
 
+  const updateRelease = useCallback(
+    (value: 'active' | 'pre') => {
+      updateParams({ release: value === 'active' ? null : value });
+    },
+    [updateParams],
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <RobotsHeader
@@ -142,6 +149,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
         preCount={preReleaseRobots.length}
         activeChips={activeChips}
         activeRelease={filters.release === 'pre' ? 'pre' : 'active'}
+        onReleaseSelect={updateRelease}
         isCrossReleaseMode={hasActiveFilters}
       />
 

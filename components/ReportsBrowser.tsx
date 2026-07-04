@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { NewsCardGridSkeleton } from '@/components/NewsCardGridSkeleton';
 import { EmptyState } from '@/components/EmptyState';
@@ -102,6 +102,16 @@ export function ReportsBrowser({
     [activePage, pageCount],
   );
 
+  const updateShelf = useCallback(
+    (value: ArticleShelf) => {
+      updateParams({
+        kind: value === 'all' ? null : value,
+        [ARTICLE_PAGE_PARAM]: null,
+      });
+    },
+    [updateParams],
+  );
+
   const updatePage = (page: number) => {
     updateParams({ [ARTICLE_PAGE_PARAM]: page <= 1 ? null : String(page) });
     gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -111,7 +121,7 @@ export function ReportsBrowser({
 
   return (
     <div className="bg-background">
-      <ReportsHeader activeShelf={activeShelf} tabs={shelfTabs} />
+      <ReportsHeader activeShelf={activeShelf} tabs={shelfTabs} onShelfSelect={updateShelf} />
 
       {/* ── 検索 ── */}
       <div className="border-b border-border bg-card">
