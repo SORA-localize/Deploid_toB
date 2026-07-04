@@ -1,5 +1,5 @@
-import { DetailPageSuspenseFallback } from '@/components/DetailPageSuspenseFallback';
+import { ManufacturerDetailSkeleton } from '@/components/ManufacturerDetailSkeleton';
 
 export default function Loading() {
-  return <DetailPageSuspenseFallback />;
+  return <ManufacturerDetailSkeleton />;
 }

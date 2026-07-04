@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { CardGridSkeleton } from '@/components/CardGridSkeleton';
+import { ManufacturerCardGridSkeleton } from '@/components/ManufacturerCardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { ManufacturerCard } from '@/components/ManufacturerCard';
@@ -118,7 +118,7 @@ export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: 
         </div>
 
         {isPending ? (
-          <CardGridSkeleton gridClassName="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" />
+          <ManufacturerCardGridSkeleton gridClassName="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" />
         ) : filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
         ) : (

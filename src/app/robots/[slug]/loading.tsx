@@ -1,5 +1,5 @@
-import { DetailPageSuspenseFallback } from '@/components/DetailPageSuspenseFallback';
+import { RobotDetailSkeleton } from '@/components/RobotDetailSkeleton';
 
 export default function Loading() {
-  return <DetailPageSuspenseFallback />;
+  return <RobotDetailSkeleton />;
 }

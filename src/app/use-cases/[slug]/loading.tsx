@@ -1,5 +1,5 @@
-import { DetailPageSuspenseFallback } from '@/components/DetailPageSuspenseFallback';
+import { UseCaseDetailSkeleton } from '@/components/UseCaseDetailSkeleton';
 
 export default function Loading() {
-  return <DetailPageSuspenseFallback />;
+  return <UseCaseDetailSkeleton />;
 }

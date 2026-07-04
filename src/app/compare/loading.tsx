@@ -1,5 +1,5 @@
-import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
+import { CompareSkeleton } from '@/components/CompareSkeleton';
 
 export default function Loading() {
-  return <PageSuspenseFallback />;
+  return <CompareSkeleton />;
 }

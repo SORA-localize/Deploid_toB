@@ -5,7 +5,7 @@ import type { KeyboardEvent } from 'react';
 import { HoverCard as HoverCardPrimitive } from 'radix-ui';
 import { X } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { CardGridSkeleton } from '@/components/CardGridSkeleton';
+import { UseCaseCardGridSkeleton } from '@/components/UseCaseCardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { UseCaseCard } from '@/components/UseCaseCard';
@@ -287,7 +287,7 @@ export function UseCasesBrowser({
 
       <div className="site-container min-h-[60vh] py-5">
         {isPending ? (
-          <CardGridSkeleton gridClassName="grid auto-rows-fr grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4" />
+          <UseCaseCardGridSkeleton gridClassName="grid auto-rows-fr grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4" />
         ) : filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.useCases} />
         ) : (

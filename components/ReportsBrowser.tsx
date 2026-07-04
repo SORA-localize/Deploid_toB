@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { CardGridSkeleton } from '@/components/CardGridSkeleton';
+import { NewsCardGridSkeleton } from '@/components/NewsCardGridSkeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { NewsFeatureCard } from '@/components/NewsFeatureCard';
 import { NewsCard } from '@/components/NewsCard';
@@ -151,7 +151,7 @@ export function ReportsBrowser({
         {/* ── 記事グリッド ── */}
         <div ref={gridRef} className="site-container py-4 scroll-mt-site-header">
           {isPending ? (
-            <CardGridSkeleton gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" />
+            <NewsCardGridSkeleton gridClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" />
           ) : gridReports.length === 0 ? (
             <EmptyState message={uiText.emptyStates.reports} />
           ) : (

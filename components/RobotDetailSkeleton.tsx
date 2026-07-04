@@ -1,9 +1,10 @@
 /**
- * 詳細ページ（ロボット/メーカー/用途/記事）用の route-level loading.tsx フォールバック。
- * PageSuspenseFallback（一覧のカードグリッド用）とは形が違うため専用に用意する。
- * パンくず・タイトル・本文2カラムの大まかな形に合わせたスケルトン。
+ * ロボット詳細ページ専用のroute-level loading.tsxフォールバック。
+ * パンくず→タイトル→（大きな画像2/3＋スペック表1/3）という実際のレイアウトに合わせている。
+ * メーカー/用途/記事の詳細ページはそれぞれ形が違うため、専用スケルトンを別途用意している
+ * （ManufacturerDetailSkeleton / UseCaseDetailSkeleton / ArticleDetailSkeleton）。
  */
-export function DetailPageSuspenseFallback() {
+export function RobotDetailSkeleton() {
   return (
     <div
       className="min-h-[calc(100svh-4rem)] bg-background"
