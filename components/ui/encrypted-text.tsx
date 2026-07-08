@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "motion/react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 type EncryptedTextProps = {
@@ -57,6 +57,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
   const [isMounted, setIsMounted] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true });
+  const shouldReduceMotion = useReducedMotion();
 
   const [revealCount, setRevealCount] = useState<number>(0);
   const animationFrameRef = useRef<number | null>(null);
@@ -73,6 +74,11 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
 
   useEffect(() => {
     if (!isInView || !isMounted) return;
+
+    if (shouldReduceMotion) {
+      setRevealCount(text.length);
+      return;
+    }
 
     // Reset state for a fresh animation whenever dependencies change
     const initial = text
@@ -128,7 +134,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isInView, isMounted, text, revealDelayMs, charset, flipDelayMs]);
+  }, [isInView, isMounted, shouldReduceMotion, text, revealDelayMs, charset, flipDelayMs]);
 
   if (!text) return null;
 

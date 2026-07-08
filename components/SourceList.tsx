@@ -36,16 +36,16 @@ export function SourceList({
       ) : (
         <ul className="space-y-2 text-xs">
           {sources.map((source) => (
-            <li key={source.url}>
+            <li key={source.url} className="break-words [overflow-wrap:anywhere]">
               <a
                 href={source.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground hover:text-muted-foreground underline"
+                className="text-foreground underline hover:text-muted-foreground"
               >
                 {source.title}
               </a>
-              <span className="text-muted-foreground">
+              <span className="text-muted-foreground break-words [overflow-wrap:anywhere]">
                 {source.publisher ? ` / ${source.publisher}` : ''} / 確認 {source.checkedAt}
               </span>
             </li>

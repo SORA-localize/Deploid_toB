@@ -168,7 +168,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             <Breadcrumbs items={breadcrumbItems} />
           </div>
 
-          <figure className="relative overflow-hidden bg-muted min-h-[400px] sm:min-h-[500px] md:min-h-[580px]">
+          <figure className="relative overflow-hidden bg-muted min-h-[min(400px,68vh)] sm:min-h-[min(500px,70vh)] md:min-h-[min(580px,72vh)]">
             <Image
               src={heroImage.src}
               alt={heroImage.alt}
@@ -187,7 +187,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               </p>
             )}
 
-            <div className="relative z-10 flex min-h-[400px] items-end sm:min-h-[500px] md:min-h-[580px]">
+            <div className="relative z-10 flex min-h-[min(400px,68vh)] items-end sm:min-h-[min(500px,70vh)] md:min-h-[min(580px,72vh)]">
               <div className="site-container pb-8 sm:pb-10">
                 <div className="mb-2 text-xs font-medium text-white/70">
                   {getArticleCardLabel(report)}

@@ -33,7 +33,7 @@ export function YouTubeEmbed({ video }: { video: ManufacturerGuideVideo }) {
         type="button"
         onClick={() => setActivated(true)}
         aria-label={`動画を再生: ${video.title}`}
-        className="group relative block aspect-video w-full overflow-hidden rounded border border-border bg-muted"
+        className="group relative block aspect-video w-full overflow-hidden rounded border border-border bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- YouTubeサムネイルCDN直参照。next/imageのドメイン許可を増やさないための例外 */}
         <img
@@ -41,13 +41,13 @@ export function YouTubeEmbed({ video }: { video: ManufacturerGuideVideo }) {
           alt=""
           className="h-full w-full object-cover"
         />
-        <span className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/40">
+        <span className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors motion-reduce:transition-none group-hover:bg-black/40">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-black">
             <Play className="ml-1 h-6 w-6" fill="currentColor" />
           </span>
         </span>
       </button>
-      <p className="mt-2 text-xs text-muted-foreground">
+      <p className="mt-2 break-words text-xs text-muted-foreground [overflow-wrap:anywhere]">
         {video.title} —{' '}
         <a
           href={video.channelUrl}

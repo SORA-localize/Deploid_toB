@@ -51,8 +51,8 @@ function toDeploymentRows(content: ManufacturerGuideContent): JudgmentRow[] {
 /** ラインナップ表。機体名・リンクはDB解決済みの行を受け取る（データ取得はページ側）。 */
 function LineupTable({ rows }: { rows: ManufacturerGuideLineupDisplayRow[] }) {
   return (
-    <div className="my-6 overflow-x-auto">
-      <table className="w-full border border-border text-sm">
+    <div className="-mx-4 my-6 overflow-x-auto overscroll-x-contain px-4 sm:mx-0 sm:px-0">
+      <table className="min-w-[34rem] w-full border border-border text-sm">
         <thead>
           <tr className="bg-muted/60 text-left text-xs text-muted-foreground">
             <th scope="col" className="px-3 py-2 font-medium">{uiText.reports.guideLineupRobot}</th>
@@ -68,7 +68,7 @@ function LineupTable({ rows }: { rows: ManufacturerGuideLineupDisplayRow[] }) {
                   {row.name}
                 </Link>
               </td>
-              <td className="px-3 py-2.5 leading-relaxed text-foreground/80">{row.roleLabel}</td>
+              <td className="px-3 py-2.5 leading-relaxed text-foreground/80 break-words [overflow-wrap:anywhere]">{row.roleLabel}</td>
               <td className="px-3 py-2.5 whitespace-nowrap text-foreground/80">{row.priceLabel}</td>
             </tr>
           ))}

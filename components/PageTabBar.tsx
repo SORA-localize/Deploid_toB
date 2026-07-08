@@ -26,10 +26,10 @@ export function PageTabBar<T extends string>({
   tabs,
   activeValue,
   onSelect,
-  ariaLabel,
+  ariaLabel: _ariaLabel,
 }: PageTabBarProps<T>) {
   return (
-    <div className="flex flex-nowrap overflow-x-auto gap-0" role="tablist" aria-label={ariaLabel}>
+    <div className="flex flex-nowrap overflow-x-auto gap-0">
       {tabs.map((tab) => {
         const isActive = activeValue === tab.value;
         const isDisabled = Boolean(tab.disabled);
@@ -37,8 +37,7 @@ export function PageTabBar<T extends string>({
         const button = (
           <button
             type="button"
-            role="tab"
-            aria-selected={isActive}
+            aria-current={isActive ? 'page' : undefined}
             aria-disabled={isDisabled || undefined}
             aria-label={hasCount ? `${tab.label}、${tab.count}件` : undefined}
             onClick={(event) => {

@@ -70,6 +70,7 @@ Last cleaned: 2026-07-01
 - `layout-and-data-structure-audit-plan-v1.md` — 全ページのテキスト表示レイアウトとデータ構造配置の調査実行計画
 - `project-wide-refactor-implementation-plan-v1.md` — 全体リファクタリングの実装順、最小task、完了条件を定義した実行計画
 - `responsive-phase-1-static-audit-v1.md` — Phase 0のレスポンシブ監査台帳をもとにした、実装修正前の優先度付き静的監査
+- `responsive-capture-protocol-v1.md` — Phase 1 R-06で使うレスポンシブ手動スクリーンショット取得プロトコル
 - `responsive-surface-audit-targets-v1.md` — プロジェクト全体のレスポンシブ監査対象をMECEに棚卸しするPhase 0計画
 - `usecase-data-scope-cleanup-plan-2026-06-30.md` — `/use-cases` のスコープ外ロボット、404出典、未登録ロボット候補を整理する実行計画
 - `usecase-evidence-model-refactor-plan-v1.md` — `/use-cases` の出典、導入事例、候補ロボット根拠をデータモデルと validator で保証する実行計画

@@ -1,8 +1,8 @@
 # Responsive Phase 1 Static Audit v1
 
 Created: 2026-07-04
-Revised: 2026-07-08 (review pass: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification)
-Status: active / R-01 implemented, R-02 next
+Revised: 2026-07-08 (review passes: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification; matrix cross-reference corrections, P1-02 implementation decisions, R-06 axis alignment; R-02 implementation notes; R-06 capture protocol; R-03/R-04/R-05 code implementation)
+Status: active / Phase 1 code implemented; R-06 visual capture pass still pending for final acceptance
 Scope: Phase 0 の responsive surface inventory をもとにした、静的監査と実装バッチの進行トラッカー
 
 ## 0. Purpose
@@ -440,7 +440,7 @@ Implemented notes:
 
 ### R-02 Interaction primitives: carousel, tabs/filters, header
 
-Status: next implementation batch.
+Status: implemented in `010bddf`, `8709068`, and `c2a5267`.
 
 Owners:
 
@@ -476,6 +476,13 @@ Definition of done:
 - Header drawer has focus containment, Escape close, focus restore, and no focusable descendants while closed (`inert` acceptable).
 - Header desktop dropdown no longer declares unimplemented menu semantics.
 
+Implemented notes:
+
+- Carousel primitive and callers were updated in `010bddf` (`fix(carousel): improve responsive accessibility`).
+- PageTabBar and use-case filter controls were updated in `8709068` (`fix(filters): use button semantics for category controls`).
+- Header mobile drawer focus containment and closed-state focus exclusion were updated in `c2a5267` (`fix(header): trap focus in mobile navigation`).
+- Verification: `npm run build` passed after the carousel/filter changes and again after the Header changes.
+
 Start gate:
 
 - Working tree must not contain unrelated data/article/navigation changes.
@@ -483,6 +490,8 @@ Start gate:
 - R-02 should be split into primitive-level commits; the natural split is (1) carousel primitive + callers, (2) tabs/filters + task picker, (3) header drawer + desktop dropdown.
 
 ### R-06 Browser screenshot automation setup
+
+Status: implemented by `responsive-capture-protocol-v1.md`.
 
 Owners:
 
@@ -504,7 +513,14 @@ Definition of done:
 - Phase 0 §6 required axes have repeatable captures: W-01, W-02, W-03, W-05, W-06, W-07, W-08; H-01/H-02/H-03 where specified; and P-01, P-03, P-04, P-05.
 - The confirmation queue below documents any intentionally narrower route-specific captures; omissions from the full Phase 0 axis set require an explicit reason in the runner or capture protocol.
 
+Implemented notes:
+
+- `responsive-capture-protocol-v1.md` defines the manual capture route, output folder, filename format, Phase 0 M-01 through M-18 coverage, state setup notes, and Q-01 through Q-08 priority queue.
+- Actual screenshot images remain outside git under `/private/tmp/deploid-responsive-captures/<YYYYMMDD>-<short-sha>/` unless a later review asks to preserve a failing-state sample.
+
 ### R-03 Compare mobile model
+
+Status: code implemented in `5078ba7`; R-06 capture protocol should still be run for W-01/W-02 visual acceptance.
 
 Owners:
 
@@ -534,7 +550,15 @@ Definition of done:
 - DnD is enhancement, not the only ergonomic workflow.
 - Insertion-preview layout animation is disabled under `prefers-reduced-motion: reduce`.
 
+Implemented notes:
+
+- Mobile selected robots now render as a horizontally scrollable rail at base width and return to the existing 3-column grid from `sm`.
+- Compare detail dialog uses dynamic viewport height and reduced-motion-safe Radix animation classes.
+- Insertion-preview layout animation and preview scale animation are disabled under reduced motion.
+
 ### R-04 Detail text/media overflow hardening
+
+Status: code implemented in `a6e7417`; R-06 capture protocol should still be run for G-01 through G-09 W-01/W-02 visual acceptance.
 
 Owners:
 
@@ -545,9 +569,10 @@ Targets:
 - SourceList
 - RelatedLinkList
 - manufacturer guide tables and YouTube
-- article hero height (P2-01; height values chosen from R-06 captures)
-- robot prev/next links
-- route-page local surfaces not owned by Phase 0 §7 component owners: article hero blocks in `src/app/reports/[slug]/page.tsx` and robot prev/next links in `src/app/robots/[slug]/page.tsx`
+- article hero height (P2-01; height values chosen from R-06 captures; page-file surface)
+- robot prev/next links (page-file surface)
+
+Note: the page-file surfaces above are not owned by Phase 0 §7 component owners. They live in `src/app/reports/[slug]/page.tsx` and `src/app/robots/[slug]/page.tsx`, so R-04 tracks them explicitly here.
 
 Why after R-03:
 
@@ -559,7 +584,15 @@ Definition of done:
 - G-01 through G-09 have no horizontal overflow at W-01/W-02.
 - Source, table, YouTube, and tag sections wrap or scroll only where intentional.
 
+Implemented notes:
+
+- SourceList, RelatedLinkList, Markdown, and DefinitionList now use explicit long-token wrapping for detail text surfaces.
+- Manufacturer guide lineup tables intentionally scroll horizontally at small widths; YouTube captions wrap and the facade has visible focus.
+- Article hero height is capped by viewport height; robot prev/next links stack and wrap on mobile.
+
 ### R-05 Home accessible mobile discovery
+
+Status: code implemented in `02fe437`; R-06 capture protocol should still be run for `/` W-01/W-02/P-01/P-05 and reduced-motion acceptance.
 
 Owners:
 
@@ -582,6 +615,12 @@ Definition of done:
 - Mobile users can reach the same primary links exposed visually.
 - Keyboard users have a usable path through map-related manufacturer discovery.
 - No decorative shimmer/scale/tilt motion plays under `prefers-reduced-motion: reduce` on home, browsers, or detail cards.
+
+Implemented notes:
+
+- HomeContentNavigator mobile links are no longer hidden from assistive technology or removed from tab order.
+- Manufacturer map point links are keyboard-focusable on the primary map copy; duplicate map copies remain out of tab order.
+- EncryptedText stops its scramble animation under reduced motion, and card shimmer/scale/accent-line motion is disabled or made instant under reduced motion across home, browser, and detail card surfaces.
 
 ## 4. Screenshot Confirmation Queue
 

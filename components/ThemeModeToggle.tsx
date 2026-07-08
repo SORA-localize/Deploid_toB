@@ -9,7 +9,13 @@ type ViewTransitionDocument = Document & {
   startViewTransition?: (callback: () => void) => { ready: Promise<void> };
 };
 
-export function ThemeModeToggle({ className = '' }: { className?: string }) {
+export function ThemeModeToggle({
+  className = '',
+  tabIndex,
+}: {
+  className?: string;
+  tabIndex?: number;
+}) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -81,6 +87,7 @@ export function ThemeModeToggle({ className = '' }: { className?: string }) {
       onClick={toggle}
       aria-label={label}
       title={label}
+      tabIndex={tabIndex}
       className={`inline-flex h-9 w-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground ${className}`}
     >
       {/* アイコンは固有の view-transition-name を持ち、同じ位置で回転しながら

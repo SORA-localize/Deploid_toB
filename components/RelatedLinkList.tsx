@@ -32,7 +32,7 @@ export function RelatedLinkList({
           <Link
             key={item.href}
             href={item.href}
-            className="block text-xs text-foreground/80 hover:text-foreground py-2 border-b border-border last:border-b-0"
+            className="block break-words border-b border-border py-2 text-xs text-foreground/80 hover:text-foreground [overflow-wrap:anywhere] last:border-b-0"
           >
             {item.title}
           </Link>
@@ -57,9 +57,11 @@ export function RelatedLinkList({
             className="group flex items-start justify-between gap-4 py-4 transition-colors hover:bg-muted/50 focus-visible:bg-muted/50"
           >
             <div className="min-w-0 flex-1">
-              <div className="mb-1 text-sm font-semibold text-foreground">{item.title}</div>
+              <div className="mb-1 break-words text-sm font-semibold text-foreground [overflow-wrap:anywhere]">
+                {item.title}
+              </div>
               {item.description && (
-                <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                <p className="line-clamp-2 break-words text-sm leading-relaxed text-muted-foreground [overflow-wrap:anywhere]">
                   {item.description}
                 </p>
               )}

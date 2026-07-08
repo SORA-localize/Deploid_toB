@@ -91,16 +91,15 @@ export function HomeContentNavigator({
         <h2 className="text-2xl font-semibold text-foreground">主要コンテンツ</h2>
       </div>
 
-      {/* モバイル: 3カラム横並び（lg未満。CSS hidden なのでスクリーンリーダーも読まない） */}
-      <div className="flex divide-x divide-border border-y border-border lg:hidden" aria-hidden="true">
+      {/* モバイル: 3カラム横並び。見えている主要導線なのでキーボード/支援技術にも公開する。 */}
+      <div className="flex divide-x divide-border border-y border-border lg:hidden">
         {items.map((item) => {
           const Icon = item.icon;
           return (
             <Link
               key={item.key}
               href={item.href}
-              tabIndex={-1}
-              className="flex flex-1 flex-col items-center gap-2 px-2 py-5 text-center transition-colors hover:bg-muted/70"
+              className="flex flex-1 flex-col items-center gap-2 px-2 py-5 text-center transition-colors hover:bg-muted/70 focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             >
               <Icon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
               <span className="text-xs font-medium text-foreground">{item.title}</span>
@@ -147,7 +146,7 @@ export function HomeContentNavigator({
                       <span className="border-b border-foreground pb-0.5 leading-none transition-colors group-hover:border-foreground/40 group-hover:text-muted-foreground">
                         {item.action}
                       </span>
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 motion-reduce:transform-none motion-reduce:transition-none" />
                     </span>
                   </div>
                 </div>

@@ -32,7 +32,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
             alt={hero.alt}
             fill
             sizes="(max-width: 768px) 112px, 280px"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
           />
         ) : (
           <div className="flex h-full items-center justify-center">
@@ -71,14 +71,14 @@ export function NewsCard({ report, className }: NewsCardProps) {
               <TagChip key={tag} kind="theme" value={tag} className="text-[10px]" />
             ))}
           </div>
-          <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+          <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none motion-reduce:transition-none" />
         </div>
       </div>
 
       {/* Accent bottom line */}
       <div
         aria-hidden="true"
-        className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary transition-all duration-300 group-hover:w-full"
+        className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary transition-all duration-300 group-hover:w-full motion-reduce:transition-none"
       />
 
       <Link href={`/reports/${report.slug}`} className="absolute inset-0 z-20" aria-hidden="true" tabIndex={-1} />

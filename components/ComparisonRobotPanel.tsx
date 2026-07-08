@@ -80,7 +80,7 @@ export function ComparisonRobotPanel({
             alt={cardImage.alt}
             fill
             sizes="(max-width: 640px) 100vw, 50vw"
-            className="pointer-events-none z-20 object-contain object-center transition-transform duration-300 group-hover:scale-[1.03]"
+            className="pointer-events-none z-20 object-contain object-center transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
           />
         </>
       ) : (
@@ -90,7 +90,7 @@ export function ComparisonRobotPanel({
       )}
 
       {/* ── ホバー暗転オーバーレイ（pointer-events-none）── */}
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-black/0 transition-colors duration-300 group-hover:bg-black/20" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-black/0 transition-colors duration-300 group-hover:bg-black/20 motion-reduce:transition-none" aria-hidden="true" />
 
       {/* ── 背景グラデーション: ロボット前景より下、テキストより下 ── */}
       <div
@@ -120,17 +120,17 @@ export function ComparisonRobotPanel({
             className="fixed inset-0 z-[var(--z-modal)] bg-black/30
                        data-[state=open]:animate-in data-[state=open]:fade-in-0
                        data-[state=closed]:animate-out data-[state=closed]:fade-out-0
-                       duration-300"
+                       duration-300 motion-reduce:animate-none"
           />
           {/* 右パネル本体 */}
           <DialogPrimitive.Content
-            className="fixed right-0 top-0 z-[var(--z-modal)] h-full w-[min(420px,90vw)]
+            className="fixed right-0 top-0 z-[var(--z-modal)] h-dvh max-h-dvh w-[min(420px,90vw)]
                        bg-card border-l border-border shadow-xl overflow-y-auto
                        flex flex-col
                        focus:outline-none
                        data-[state=open]:animate-in data-[state=open]:slide-in-from-right
                        data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right
-                       duration-300 ease-out"
+                       duration-300 ease-out motion-reduce:animate-none"
           >
             {/* a11y 用 visually-hidden タイトル */}
             <DialogPrimitive.Title className="sr-only">
@@ -294,7 +294,7 @@ export function ComparisonRobotPanel({
 
       {/* ── bottom overlay: メーカー名（ホバーで表示 / z-30）── */}
       <div className="pointer-events-none absolute bottom-0 inset-x-0 z-30 px-2.5 pb-2
-                      opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                      opacity-100 transition-opacity duration-300 motion-reduce:transition-none sm:opacity-0 sm:group-hover:opacity-100">
         <p className="truncate text-right text-[11px] font-medium text-white/90">
           {manufacturerName ?? robot.manufacturerId}
         </p>
