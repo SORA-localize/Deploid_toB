@@ -1,8 +1,8 @@
 # Responsive Phase 1 Static Audit v1
 
 Created: 2026-07-04
-Revised: 2026-07-08 (review passes: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification; matrix cross-reference corrections, P1-02 implementation decisions, R-06 axis alignment)
-Status: active / R-01 implemented, R-02 next
+Revised: 2026-07-08 (review passes: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification; matrix cross-reference corrections, P1-02 implementation decisions, R-06 axis alignment; R-02 implementation notes)
+Status: active / R-01 and R-02 implemented, R-06 next
 Scope: Phase 0 の responsive surface inventory をもとにした、静的監査と実装バッチの進行トラッカー
 
 ## 0. Purpose
@@ -440,7 +440,7 @@ Implemented notes:
 
 ### R-02 Interaction primitives: carousel, tabs/filters, header
 
-Status: next implementation batch.
+Status: implemented in `010bddf`, `8709068`, and `c2a5267`.
 
 Owners:
 
@@ -475,6 +475,13 @@ Definition of done:
 - The use-case task picker is operable on coarse pointer and keyboard without relying on HoverCard hover.
 - Header drawer has focus containment, Escape close, focus restore, and no focusable descendants while closed (`inert` acceptable).
 - Header desktop dropdown no longer declares unimplemented menu semantics.
+
+Implemented notes:
+
+- Carousel primitive and callers were updated in `010bddf` (`fix(carousel): improve responsive accessibility`).
+- PageTabBar and use-case filter controls were updated in `8709068` (`fix(filters): use button semantics for category controls`).
+- Header mobile drawer focus containment and closed-state focus exclusion were updated in `c2a5267` (`fix(header): trap focus in mobile navigation`).
+- Verification: `npm run build` passed after the carousel/filter changes and again after the Header changes.
 
 Start gate:
 
