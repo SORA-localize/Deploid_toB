@@ -80,7 +80,7 @@ export function ComparisonRobotPanel({
             alt={cardImage.alt}
             fill
             sizes="(max-width: 640px) 100vw, 50vw"
-            className="pointer-events-none z-20 object-contain object-center transition-transform duration-300 group-hover:scale-[1.03]"
+            className="pointer-events-none z-20 object-contain object-center transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
           />
         </>
       ) : (
@@ -90,7 +90,7 @@ export function ComparisonRobotPanel({
       )}
 
       {/* ── ホバー暗転オーバーレイ（pointer-events-none）── */}
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-black/0 transition-colors duration-300 group-hover:bg-black/20" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-black/0 transition-colors duration-300 group-hover:bg-black/20 motion-reduce:transition-none" aria-hidden="true" />
 
       {/* ── 背景グラデーション: ロボット前景より下、テキストより下 ── */}
       <div

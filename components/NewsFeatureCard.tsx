@@ -27,7 +27,7 @@ export function NewsFeatureCard({ report, className }: NewsFeatureCardProps) {
           alt={hero.alt}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-1000 group-hover:scale-105"
+          className="object-cover transition-transform duration-1000 group-hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
         />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
@@ -46,11 +46,11 @@ export function NewsFeatureCard({ report, className }: NewsFeatureCardProps) {
             <time className="font-mono text-xs text-white/60">{report.publishedAt}</time>
           </div>
 
-          <h2 className="line-clamp-2 text-base font-bold leading-tight text-white transition-colors group-hover:text-signal">
+          <h2 className="line-clamp-2 text-base font-bold leading-tight text-white transition-colors group-hover:text-signal motion-reduce:transition-none">
             {report.titleJa ?? report.title}
           </h2>
 
-          <p className="hidden line-clamp-2 text-xs leading-relaxed text-white/75 transition-colors group-hover:text-white 2xl:block">
+          <p className="hidden line-clamp-2 text-xs leading-relaxed text-white/75 transition-colors group-hover:text-white motion-reduce:transition-none 2xl:block">
             {report.summary}
           </p>
         </div>

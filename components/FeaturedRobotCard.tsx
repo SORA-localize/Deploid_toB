@@ -64,7 +64,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
             alt={cardImage.alt}
             fill
             sizes="(max-width: 640px) 100vw, 20vw"
-            className="pointer-events-none z-10 object-contain object-center transition-transform duration-300 group-hover:scale-[1.03]"
+            className="pointer-events-none z-10 object-contain object-center transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
           />
         </>
       ) : (
@@ -75,7 +75,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
 
       {/* ホバー暗転 */}
       <div
-        className="pointer-events-none absolute inset-0 z-20 bg-black/0 transition-colors duration-300 group-hover:bg-black/20"
+        className="pointer-events-none absolute inset-0 z-20 bg-black/0 transition-colors duration-300 group-hover:bg-black/20 motion-reduce:transition-none"
         aria-hidden="true"
       />
 
@@ -98,7 +98,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
       {/* Shimmer sweep */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-0 z-50 w-[100%] -translate-x-full -skew-x-12 bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-[200%]"
+        className="pointer-events-none absolute inset-y-0 left-0 z-50 w-[100%] -translate-x-full -skew-x-12 bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-[200%] motion-reduce:hidden"
       />
 
       {/* 上部: ロボット名 + メーカー名 */}
@@ -112,7 +112,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
       {/* Accent bottom line */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 z-[60] h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full"
+        className="pointer-events-none absolute bottom-0 left-0 z-[60] h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full motion-reduce:transition-none"
       />
 
       <Link

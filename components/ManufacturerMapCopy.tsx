@@ -151,10 +151,10 @@ export function ManufacturerMapCopy({
           <Link
             key={p.id}
             href={href}
-            tabIndex={-1}
+            tabIndex={ariaHidden ? -1 : 0}
             aria-label={label}
             draggable={false}
-            className="group absolute z-[6] -translate-x-1/2 -translate-y-1/2"
+            className="group absolute z-[6] -translate-x-1/2 -translate-y-1/2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
             style={{ left: `${p.leftPct}%`, top: `${p.topPct}%` }}
             onPointerEnter={() => onActivate(p.id)}
             onPointerLeave={onClear}
@@ -165,7 +165,7 @@ export function ManufacturerMapCopy({
             <span className="relative flex h-8 w-8 items-center justify-center">
               <span
                 aria-hidden="true"
-                className={`absolute rounded-full border border-signal transition-all duration-300 ease-out ${
+                className={`absolute rounded-full border border-signal transition-all duration-300 ease-out motion-reduce:transition-none ${
                   isActive
                     ? `${isCluster ? 'h-8 w-8' : 'h-6 w-6'} opacity-70`
                     : 'h-3 w-3 opacity-0'
@@ -174,7 +174,7 @@ export function ManufacturerMapCopy({
               {isCluster ? (
                 <span
                   aria-hidden="true"
-                  className={`flex items-center justify-center rounded-full text-[9px] font-medium leading-none transition-all duration-200 ease-out ${
+                  className={`flex items-center justify-center rounded-full text-[9px] font-medium leading-none transition-all duration-200 ease-out motion-reduce:transition-none ${
                     isActive ? 'h-5 w-5 bg-signal text-signal-foreground' : 'h-4 w-4 bg-neutral-200 text-neutral-900'
                   }`}
                 >
@@ -183,7 +183,7 @@ export function ManufacturerMapCopy({
               ) : (
                 <span
                   aria-hidden="true"
-                  className={`h-2 w-2 rounded-full transition-all duration-200 ease-out ${
+                  className={`h-2 w-2 rounded-full transition-all duration-200 ease-out motion-reduce:transition-none ${
                     isActive ? 'scale-150 bg-signal' : 'bg-neutral-300'
                   }`}
                 />
