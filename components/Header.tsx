@@ -75,7 +75,6 @@ export function Header() {
                       <Link
                         href={item.path}
                         aria-current={isActive ? 'page' : undefined}
-                        aria-haspopup="menu"
                         onClick={() => setIsMenuOpen(false)}
                         className={`relative inline-flex items-center gap-1 px-3 py-2 text-sm transition-all duration-200 ${
                           isActive
@@ -95,7 +94,6 @@ export function Header() {
 
                       <div className="pointer-events-none absolute left-1/2 top-full z-[var(--z-dropdown)] w-48 -translate-x-1/2 pt-2 opacity-0 transition duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
                         <div
-                          role="menu"
                           aria-label={`${item.label}の項目`}
                           className="border border-border bg-background p-1 shadow-xl"
                         >
@@ -103,7 +101,6 @@ export function Header() {
                             <Link
                               key={child.path}
                               href={child.path}
-                              role="menuitem"
                               onClick={() => setIsMenuOpen(false)}
                               className="block px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted focus-visible:text-foreground"
                             >
