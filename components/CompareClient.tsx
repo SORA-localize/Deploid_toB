@@ -366,46 +366,6 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
-          {/* Mobile-only: manufacturer selector + robot list */}
-          <div className="md:hidden mb-4 border border-border bg-card">
-            <div className="px-4 pt-4 pb-3">
-                <SelectControl
-                  id="mobile-manufacturer"
-                  label={uiText.compare.manufacturers}
-                  value={mobileManufacturerId}
-                options={mobileManufacturerOptions}
-                onChange={setMobileManufacturerId}
-                searchable
-              />
-            </div>
-            {mobileManufacturerId && (
-              <div className="border-t border-border-subtle">
-                {mobileManufacturerRobots.length === 0 ? (
-                  <p className="px-4 py-3 text-xs text-muted-foreground">
-                    {uiText.compare.manufacturerEmpty}
-                  </p>
-                ) : (
-                  mobileManufacturerRobots.map((robot) => {
-                    const isSelected = orderedIds.includes(robot.id);
-                    const isDisabled =
-                      !isSelected && orderedIds.length >= MAX_COMPARE_ROBOTS;
-                    return (
-                      <DraggableMenuRobotButton
-                        key={robot.id}
-                        robot={robot}
-                        isSelected={isSelected}
-                        isDisabled={isDisabled}
-                        onClick={() =>
-                          isSelected ? removeRobot(robot.id) : addRobot(robot.id)
-                        }
-                      />
-                    );
-                  })
-                )}
-              </div>
-            )}
-          </div>
-
           <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_minmax(0,1fr)] lg:grid-cols-[16rem_minmax(0,1fr)_16rem]">
             {/* Left Sidebar - Manufacturer Menu (desktop only) */}
             <div className="hidden md:block min-w-0">
@@ -614,6 +574,46 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                   </section>
                 )}
               </CompareDroppableArea>
+
+              {/* Mobile-only: add robots after the comparison sheet so the selected set stays primary. */}
+              <div className="mt-4 border border-border bg-card md:hidden">
+                <div className="px-4 pb-3 pt-4">
+                  <SelectControl
+                    id="mobile-manufacturer"
+                    label={uiText.compare.manufacturers}
+                    value={mobileManufacturerId}
+                    options={mobileManufacturerOptions}
+                    onChange={setMobileManufacturerId}
+                    searchable
+                  />
+                </div>
+                {mobileManufacturerId && (
+                  <div className="max-h-[45vh] overflow-y-auto border-t border-border-subtle">
+                    {mobileManufacturerRobots.length === 0 ? (
+                      <p className="px-4 py-3 text-xs text-muted-foreground">
+                        {uiText.compare.manufacturerEmpty}
+                      </p>
+                    ) : (
+                      mobileManufacturerRobots.map((robot) => {
+                        const isSelected = orderedIds.includes(robot.id);
+                        const isDisabled =
+                          !isSelected && orderedIds.length >= MAX_COMPARE_ROBOTS;
+                        return (
+                          <DraggableMenuRobotButton
+                            key={robot.id}
+                            robot={robot}
+                            isSelected={isSelected}
+                            isDisabled={isDisabled}
+                            onClick={() =>
+                              isSelected ? removeRobot(robot.id) : addRobot(robot.id)
+                            }
+                          />
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Right Sidebar - Favorites (desktop xl+ only) */}

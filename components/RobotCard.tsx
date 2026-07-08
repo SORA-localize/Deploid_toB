@@ -204,8 +204,8 @@ export function RobotCard({
             {/* モバイル: 画像を大きく、テキストは名前のみ（PC版と同じ矩形画像枠を流用） */}
             <div className="relative z-20 flex flex-col h-full pointer-events-none md:hidden">
               {mobileImageBox}
-              <div className="p-3 flex-1 flex flex-col min-w-0">
-                <h3 className="text-base font-semibold text-card-foreground">
+              <div className="flex min-w-0 flex-1 flex-col p-2.5">
+                <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-card-foreground">
                   <Link href={`/robots/${robot.slug}`} className="hover:underline">
                     {robot.nameJa ?? robot.name}
                   </Link>

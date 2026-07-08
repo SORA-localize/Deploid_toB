@@ -169,36 +169,42 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
         />
 
         <div className="xl:flex xl:items-end gap-4 mb-5">
-          <div className={browserFilterGridClassNames.robots}>
-            <SelectControl
-              id="robot-industry"
-              label={uiText.filters.industry}
-              value={filters.industry ?? 'all'}
-              onChange={(v) => updateParams({ industry: v === 'all' ? null : v })}
-              options={industryOptions}
-            />
-            <SelectControl
-              id="robot-task"
-              label={uiText.filters.task}
-              value={filters.task ?? 'all'}
-              onChange={(v) => updateParams({ task: v === 'all' ? null : v })}
-              options={taskOptions}
-            />
-            <SelectControl
-              id="robot-manufacturer"
-              label={uiText.filters.manufacturer}
-              value={filters.manufacturer}
-              onChange={(v) => updateParams({ manufacturer: v === 'all' ? null : v })}
-              options={manufacturerOptions}
-              searchable
-            />
-            <SelectControl
-              id="robot-availability"
-              label={uiText.filters.availability}
-              value={filters.availability}
-              onChange={(v) => updateParams({ availability: v === 'all' ? null : v })}
-              options={availabilityOptions}
-            />
+          <div className="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0">
+            <div className={browserFilterGridClassNames.robots}>
+              <SelectControl
+                id="robot-industry"
+                label={uiText.filters.industry}
+                value={filters.industry ?? 'all'}
+                onChange={(v) => updateParams({ industry: v === 'all' ? null : v })}
+                options={industryOptions}
+                className="min-w-40 sm:min-w-0"
+              />
+              <SelectControl
+                id="robot-task"
+                label={uiText.filters.task}
+                value={filters.task ?? 'all'}
+                onChange={(v) => updateParams({ task: v === 'all' ? null : v })}
+                options={taskOptions}
+                className="min-w-40 sm:min-w-0"
+              />
+              <SelectControl
+                id="robot-manufacturer"
+                label={uiText.filters.manufacturer}
+                value={filters.manufacturer}
+                onChange={(v) => updateParams({ manufacturer: v === 'all' ? null : v })}
+                options={manufacturerOptions}
+                searchable
+                className="min-w-48 sm:min-w-0"
+              />
+              <SelectControl
+                id="robot-availability"
+                label={uiText.filters.availability}
+                value={filters.availability}
+                onChange={(v) => updateParams({ availability: v === 'all' ? null : v })}
+                options={availabilityOptions}
+                className="min-w-40 sm:min-w-0"
+              />
+            </div>
           </div>
           <p className="mt-3 xl:mt-0 xl:ml-auto shrink-0 whitespace-nowrap px-1 text-xs text-muted-foreground text-right xl:text-left">
             {uiText.common.results(resultCount, hasActiveFilters)}

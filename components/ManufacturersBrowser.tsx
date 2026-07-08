@@ -88,27 +88,31 @@ export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: 
         />
 
         <div className="sm:flex sm:items-end gap-4 mb-5">
-          <div className={browserFilterGridClassNames.manufacturers}>
-            <SelectControl
-              id="manufacturer-country"
-              label={uiText.filters.region}
-              value={filters.country}
-              onChange={(nextCountry) =>
-                updateParams({ country: nextCountry === 'all' ? null : nextCountry })
-              }
-              options={countryOptions}
-              searchable
-            />
-            <SelectControl
-              id="manufacturer-consultation-route"
-              label={uiText.filters.consultationRoute}
-              value={filters.consultationRoute}
-              onChange={(nextRoute) =>
-                updateParams({ route: nextRoute === 'all' ? null : nextRoute })
-              }
-              options={consultationRouteOptions}
-              searchable
-            />
+          <div className="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0">
+            <div className={browserFilterGridClassNames.manufacturers}>
+              <SelectControl
+                id="manufacturer-country"
+                label={uiText.filters.region}
+                value={filters.country}
+                onChange={(nextCountry) =>
+                  updateParams({ country: nextCountry === 'all' ? null : nextCountry })
+                }
+                options={countryOptions}
+                searchable
+                className="min-w-44 sm:min-w-0"
+              />
+              <SelectControl
+                id="manufacturer-consultation-route"
+                label={uiText.filters.consultationRoute}
+                value={filters.consultationRoute}
+                onChange={(nextRoute) =>
+                  updateParams({ route: nextRoute === 'all' ? null : nextRoute })
+                }
+                options={consultationRouteOptions}
+                searchable
+                className="min-w-52 sm:min-w-0"
+              />
+            </div>
           </div>
           <p className="mt-3 sm:mt-0 sm:ml-auto shrink-0 whitespace-nowrap text-xs text-muted-foreground text-right sm:text-left">
             {uiText.common.results(
