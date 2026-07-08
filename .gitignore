@@ -31,3 +31,6 @@ tsconfig.tsbuildinfo
 # jetbrains setting folder
 .idea/
 .vercel
+
+# local-only prototype media（無許諾・ローカル確認専用。絶対にcommitしない）
+public/images/_local-prototype/
