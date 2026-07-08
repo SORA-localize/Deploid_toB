@@ -261,28 +261,32 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
             />
 
             {/* prev / next */}
-            <div className="flex items-center justify-between mt-6 pt-0">
+            <div className="mt-6 grid grid-cols-1 gap-3 pt-0 sm:grid-cols-2">
               {prev ? (
                 <Link
                   href={`/robots/${prev.slug}`}
-                  className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
+                  className="inline-flex min-w-0 items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                  {prev.nameJa ?? prev.name}
+                  <ChevronLeft className="h-4 w-4 shrink-0" />
+                  <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                    {prev.nameJa ?? prev.name}
+                  </span>
                 </Link>
               ) : (
-                <span />
+                <span className="hidden sm:block" />
               )}
               {next ? (
                 <Link
                   href={`/robots/${next.slug}`}
-                  className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
+                  className="inline-flex min-w-0 items-center justify-start gap-2 text-xs text-muted-foreground hover:text-foreground sm:justify-end sm:text-right"
                 >
-                  {next.nameJa ?? next.name}
-                  <ChevronRight className="w-4 h-4" />
+                  <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                    {next.nameJa ?? next.name}
+                  </span>
+                  <ChevronRight className="h-4 w-4 shrink-0" />
                 </Link>
               ) : (
-                <span />
+                <span className="hidden sm:block" />
               )}
             </div>
           </div>

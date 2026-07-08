@@ -41,7 +41,9 @@ export function DefinitionList({
             className="grid grid-cols-1 gap-1.5 p-4 sm:grid-cols-[11rem_1fr] sm:gap-4"
           >
             <dt className="text-foreground">{row.label}</dt>
-            <dd className={row.valueClassName ?? 'leading-relaxed text-foreground/80'}>{row.value}</dd>
+            <dd className={row.valueClassName ?? 'break-words leading-relaxed text-foreground/80 [overflow-wrap:anywhere]'}>
+              {row.value}
+            </dd>
           </div>
         ))}
       </dl>
@@ -65,7 +67,9 @@ export function DefinitionList({
                   row.label
                 )}
               </dt>
-              <dd className={row.valueClassName ?? 'text-foreground font-medium break-words'}>{row.value}</dd>
+              <dd className={row.valueClassName ?? 'break-words font-medium text-foreground [overflow-wrap:anywhere]'}>
+                {row.value}
+              </dd>
             </div>
           );
         })}
@@ -75,7 +79,7 @@ export function DefinitionList({
 
   // static-page
   const rowPy = py === '5' ? 'py-5' : 'py-4';
-  const defaultDdClassName = `text-sm leading-relaxed ${ddTone === 'foreground' ? 'text-foreground' : 'text-muted-foreground'}`;
+  const defaultDdClassName = `break-words text-sm leading-relaxed [overflow-wrap:anywhere] ${ddTone === 'foreground' ? 'text-foreground' : 'text-muted-foreground'}`;
   return (
     <dl className={`divide-y divide-border ${className ?? ''}`}>
       {rows.map((row, index) => (
