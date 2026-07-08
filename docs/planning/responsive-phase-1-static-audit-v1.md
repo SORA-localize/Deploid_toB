@@ -1,8 +1,8 @@
 # Responsive Phase 1 Static Audit v1
 
 Created: 2026-07-04
-Revised: 2026-07-08 (review passes: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification; matrix cross-reference corrections, P1-02 implementation decisions, R-06 axis alignment; R-02 implementation notes; R-06 capture protocol; R-03/R-04 code implementation)
-Status: active / R-01, R-02, R-06, R-03 code, and R-04 code implemented; R-05 next
+Revised: 2026-07-08 (review passes: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification; matrix cross-reference corrections, P1-02 implementation decisions, R-06 axis alignment; R-02 implementation notes; R-06 capture protocol; R-03/R-04/R-05 code implementation)
+Status: active / Phase 1 code implemented; R-06 visual capture pass still pending for final acceptance
 Scope: Phase 0 の responsive surface inventory をもとにした、静的監査と実装バッチの進行トラッカー
 
 ## 0. Purpose
@@ -592,6 +592,8 @@ Implemented notes:
 
 ### R-05 Home accessible mobile discovery
 
+Status: code implemented in `02fe437`; R-06 capture protocol should still be run for `/` W-01/W-02/P-01/P-05 and reduced-motion acceptance.
+
 Owners:
 
 - O-06, O-07
@@ -613,6 +615,12 @@ Definition of done:
 - Mobile users can reach the same primary links exposed visually.
 - Keyboard users have a usable path through map-related manufacturer discovery.
 - No decorative shimmer/scale/tilt motion plays under `prefers-reduced-motion: reduce` on home, browsers, or detail cards.
+
+Implemented notes:
+
+- HomeContentNavigator mobile links are no longer hidden from assistive technology or removed from tab order.
+- Manufacturer map point links are keyboard-focusable on the primary map copy; duplicate map copies remain out of tab order.
+- EncryptedText stops its scramble animation under reduced motion, and card shimmer/scale/accent-line motion is disabled or made instant under reduced motion across home, browser, and detail card surfaces.
 
 ## 4. Screenshot Confirmation Queue
 
