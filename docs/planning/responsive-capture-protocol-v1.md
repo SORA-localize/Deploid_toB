@@ -10,7 +10,7 @@ This protocol is the repeatable capture path for Phase 0 matrix rows M-01 throug
 - Branch: run on the responsive implementation branch being reviewed.
 - Build sanity: `npm run build` must pass before capture.
 - Media policy: run with `NEXT_PUBLIC_MEDIA_USAGE_POLICY=reference-attributed`.
-- Local server: `npm run dev -- --host 127.0.0.1`, then capture from `http://127.0.0.1:3000`.
+- Local server: `npm run dev -- -H 127.0.0.1`, then capture from `http://127.0.0.1:3000`.
 - Output root: `/private/tmp/deploid-responsive-captures/<YYYYMMDD>-<short-sha>/`.
 - Filename format: `<matrix-id>__<state-or-route>__<axis-ids>.png`.
 - Capture log: write `/private/tmp/deploid-responsive-captures/<YYYYMMDD>-<short-sha>/capture-log.md` with commit SHA, server command, browser, and any not-covered rows.
