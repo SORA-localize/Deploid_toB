@@ -38,6 +38,7 @@ function SlotIndicators({ count }: { count: number }) {
           onClick={() => onDotButtonClick(index)}
           className="h-0.5 flex-1 overflow-hidden rounded-full bg-white/25 backdrop-blur-sm"
           aria-label={`画像 ${index + 1} へ`}
+          aria-current={index === selectedIndex ? 'true' : undefined}
         >
           <span
             className={cn(
@@ -80,7 +81,11 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
 
   return (
     <div className="group/carousel relative w-full overflow-hidden rounded-xl border border-border bg-muted/30">
-      <Carousel options={{ loop: hasMultiple }} className="h-[280px] sm:h-[360px] md:h-[420px] w-full">
+      <Carousel
+        options={{ loop: hasMultiple }}
+        className="h-[280px] sm:h-[360px] md:h-[420px] w-full"
+        aria-label="ロボット画像カルーセル"
+      >
         {hasMultiple && <SlotIndicators count={slides.length} />}
 
         <SliderContainer
@@ -161,7 +166,7 @@ export function RobotImageCarousel({ images, fallbackHero }: RobotImageCarouselP
 
         {/* prev/next（ホバー時のみ表示） */}
         {hasMultiple && (
-          <div className="absolute bottom-4 right-4 z-30 flex items-center gap-2 opacity-0 transition-opacity duration-300 group-hover/carousel:opacity-100">
+          <div className="absolute bottom-4 right-4 z-30 flex items-center gap-2 opacity-100 transition-opacity duration-300 motion-reduce:transition-none md:opacity-0 md:group-hover/carousel:opacity-100 md:focus-within:opacity-100">
             <SliderPrevButton className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60 disabled:opacity-30">
               <ChevronLeft className="h-5 w-5" />
             </SliderPrevButton>

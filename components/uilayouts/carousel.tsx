@@ -79,6 +79,9 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
       className,
       isScale = false,
       dir,
+      role = "region",
+      "aria-label": ariaLabel,
+      "aria-roledescription": ariaRoleDescription,
       ...props
     },
     ref,
@@ -311,6 +314,9 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
         <div
           ref={ref}
           tabIndex={0}
+          role={role}
+          aria-label={ariaLabel ?? "カルーセル"}
+          aria-roledescription={ariaRoleDescription ?? (role === "region" ? "carousel" : undefined)}
           onKeyDownCapture={handleKeyDown}
           className={cn("relative w-full focus:outline-none", className)}
           dir={direction}
@@ -381,12 +387,13 @@ Slider.displayName = "Slider";
 
 // ============= NAVIGATION BUTTONS =============
 export const SliderPrevButton = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>>(
-  ({ children, className, ...props }, ref) => {
+  ({ children, className, "aria-label": ariaLabel, ...props }, ref) => {
     const { onPrevButtonClick, prevBtnDisabled } = useCarousel();
     return (
       <button
         ref={ref}
         type="button"
+        aria-label={ariaLabel ?? "前のスライド"}
         onClick={onPrevButtonClick}
         disabled={prevBtnDisabled}
         className={cn("", className)}
@@ -399,12 +406,13 @@ export const SliderPrevButton = forwardRef<HTMLButtonElement, ButtonHTMLAttribut
 SliderPrevButton.displayName = "SliderPrevButton";
 
 export const SliderNextButton = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement>>(
-  ({ children, className, ...props }, ref) => {
+  ({ children, className, "aria-label": ariaLabel, ...props }, ref) => {
     const { onNextButtonClick, nextBtnDisabled } = useCarousel();
     return (
       <button
         ref={ref}
         type="button"
+        aria-label={ariaLabel ?? "次のスライド"}
         onClick={onNextButtonClick}
         disabled={nextBtnDisabled}
         className={cn("", className)}
@@ -494,6 +502,8 @@ export const SliderDotButton = forwardRef<HTMLDivElement, SliderDotButtonProps>(
             key={`${carouselId}-dot-${index}`}
             type="button"
             onClick={() => onDotButtonClick(index)}
+            aria-label={`スライド ${index + 1} へ`}
+            aria-current={index === selectedIndex ? "true" : undefined}
             className={cn(
               "relative inline-flex p-0 m-0",
               orientation === "vertical" ? "h-6 w-1" : "w-6 h-1",
@@ -550,6 +560,7 @@ export const CarouselIndicator = forwardRef<HTMLButtonElement, CarouselIndicator
           className,
         )}
         aria-label={`Go to slide ${index + 1}`}
+        aria-current={isActive ? "true" : undefined}
         {...props}>
         <span className="sr-only">Slide {index + 1}</span>
       </button>

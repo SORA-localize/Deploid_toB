@@ -17,7 +17,8 @@ import {
 } from './uilayouts/carousel';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Autoplay from 'embla-carousel-autoplay';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useReducedMotion } from 'motion/react';
 
 interface NewsHeroCarouselProps {
   reports: Article[];
@@ -25,7 +26,13 @@ interface NewsHeroCarouselProps {
 }
 
 // 内部コンポーネント: スムーズなタイマー連動型インジケーター
-function ProgressIndicators({ count }: { count: number }) {
+function ProgressIndicators({
+  count,
+  reducedMotion,
+}: {
+  count: number;
+  reducedMotion: boolean;
+}) {
   const { selectedIndex } = useCarousel();
   const [active, setActive] = useState(selectedIndex);
 
@@ -40,12 +47,15 @@ function ProgressIndicators({ count }: { count: number }) {
         <div key={index} className="h-0.5 flex-1 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
           <div 
             className={cn(
-              "h-full bg-signal transition-all ease-linear",
+              "h-full bg-signal",
+              reducedMotion ? "transition-none" : "transition-all ease-linear",
             )}
             style={{
-              // 現在のスライドなら 5秒かけて 100% へ、それ以外は 0% または 100% 固定
-              width: active === index ? '100%' : (active > index ? '100%' : '0%'),
-              transitionDuration: active === index ? '5000ms' : '0ms'
+              // reduced motion時は位置表示だけにし、自動進行に見えるprogress animationを止める。
+              width: reducedMotion
+                ? (selectedIndex === index ? '100%' : '0%')
+                : (active === index ? '100%' : (active > index ? '100%' : '0%')),
+              transitionDuration: !reducedMotion && active === index ? '5000ms' : '0ms'
             }}
           />
         </div>
@@ -55,17 +65,24 @@ function ProgressIndicators({ count }: { count: number }) {
 }
 
 export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const autoplayPlugins = useMemo(
+    () => (prefersReducedMotion ? [] : [Autoplay({ delay: 5000, stopOnInteraction: true })]),
+    [prefersReducedMotion],
+  );
+
   if (!reports || reports.length === 0) return null;
 
   return (
     <div className={cn("relative w-full overflow-hidden rounded-xl border border-border bg-muted/30 group/carousel", className)}>
       <Carousel
         options={{ loop: true }}
-        plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}
+        plugins={autoplayPlugins}
         className="w-full h-full"
+        aria-label="注目記事カルーセル"
       >
         {/* リッチなインジケーター */}
-        <ProgressIndicators count={reports.length} />
+        <ProgressIndicators count={reports.length} reducedMotion={Boolean(prefersReducedMotion)} />
 
         {/* outer overflow-hidden div に height:100% を渡し、inner flex div に h-full を渡すことで高さチェーンを繋ぐ */}
         <SliderContainer className="cursor-grab active:cursor-grabbing h-full" style={{ height: '100%' }}>
@@ -82,7 +99,7 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
                       fill
                       priority
                       sizes="100vw"
-                      className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                      className="object-cover transition-transform duration-1000 group-hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none"
                     />
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
@@ -121,7 +138,7 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
         </SliderContainer>
 
         {/* Navigation Controls: ホバー時のみ表示してスッキリさせる */}
-        <div className="absolute bottom-6 right-6 flex items-center gap-4 z-10 opacity-0 group-hover/carousel:opacity-100 transition-opacity duration-300">
+        <div className="absolute bottom-6 right-6 flex items-center gap-4 z-10 opacity-100 transition-opacity duration-300 motion-reduce:transition-none md:opacity-0 md:group-hover/carousel:opacity-100 md:focus-within:opacity-100">
           <div className="flex items-center gap-2">
             <SliderPrevButton className="h-10 w-10 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 backdrop-blur-md transition-colors border border-white/10">
               <ChevronLeft className="h-5 w-5" />
