@@ -77,6 +77,7 @@ Last cleaned: 2026-07-01
 - `usecase-factcheck-research-prompt-2026-06-30.md` — `/use-cases` 現行実装のファクトチェック用Deep Researchプロンプト（調査用。実装判断の正本ではない）
 - `usecase-page-redesign-plan-v1.md` — `/use-cases` を産業入口→タスク→成熟度別グリッドへ全面再設計する実行計画（タグ再設計・42シーン追加・UI刷新）
 - `editorial-methodology-review-2026-06-24.md` — 記事題材・切り口・書き方のレビュー用草案（未承認。承認後に editorial_style_guide へ反映）
+- `robot-image-sourcing-plan-v1.md` — ロボット画像調達・カードUI対応の実行計画（メーカー分類、調達手順、通知メール文面）
 
 実装完了で archive へ移動した計画:
 - `archive/reports-news-explainer-ia-plan-v1.md`（`/reports` 4棚化、2026-07-01 正本 docs へ方針反映）
