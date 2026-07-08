@@ -1,15 +1,30 @@
+import { ARTICLE_SHELF_TABS, getArticleShelfHref } from '@/lib/articleShelves';
+
+export interface SiteNavSubItem {
+  label: string;
+  path: string;
+}
+
 export interface SiteNavItem {
   label: string;
   path: string;
   footerLabel?: string;
+  children?: SiteNavSubItem[];
 }
+
+const reportNavItems: SiteNavSubItem[] = ARTICLE_SHELF_TABS
+  .filter((tab) => tab.value !== 'all' && !tab.disabled)
+  .map((tab) => ({
+    label: tab.label,
+    path: getArticleShelfHref(tab.value),
+  }));
 
 export const siteNavItems: SiteNavItem[] = [
   { label: 'ロボット', path: '/robots', footerLabel: 'ロボット' },
   { label: 'メーカー', path: '/manufacturers', footerLabel: 'メーカー' },
   { label: '比較', path: '/compare' },
   { label: '用途から探す', path: '/use-cases', footerLabel: '用途' },
-  { label: 'ニュース・解説', path: '/reports' },
+  { label: 'ニュース・解説', path: '/reports', children: reportNavItems },
   { label: '会社概要', path: '/about' },
   { label: 'お問い合わせ', path: '/contact' },
 ];
