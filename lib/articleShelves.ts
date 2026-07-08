@@ -43,11 +43,11 @@ export function normalizeArticleShelfParam(value: string | null): ArticleShelf {
   return 'all';
 }
 
-/**
- * 棚→一覧URLの正本。パンくず等のリンク生成はここを経由する。
+ /**
+  * 棚→一覧URLの正本。パンくず等のリンク生成はここを経由する。
  * normalizeArticleShelfParam が受け付けない棚（all / disabled中の basics-guide）は
  * クエリ無しの一覧へ落とし、無効な kind 付きURLを配らない。
- */
+  */
 export function getArticleShelfHref(shelf: ArticleShelf): string {
   if (normalizeArticleShelfParam(shelf) !== shelf) return '/reports';
   return shelf === 'all' ? '/reports' : `/reports?kind=${shelf}`;
