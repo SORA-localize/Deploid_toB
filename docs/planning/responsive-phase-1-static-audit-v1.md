@@ -1,7 +1,7 @@
 # Responsive Phase 1 Static Audit v1
 
 Created: 2026-07-04
-Status: active / static audit findings
+Status: active / R-01 implemented, R-02 pending
 Scope: Phase 0 の responsive surface inventory をもとにした、実装修正前の優先度付き静的監査
 
 ## 0. Purpose
@@ -331,6 +331,8 @@ First implementation task:
 
 ### R-01 Shared browser density and skeleton parity
 
+Status: implemented in `ff76f7b` (`feat(responsive): unify browser grid density`).
+
 Owners:
 
 - O-03, O-05, O-11
@@ -338,6 +340,8 @@ Owners:
 Targets:
 
 - Robots, manufacturers, use-cases browser grids
+- Reports browser grids
+- Manufacturer detail related robot grid
 - Filter control grids
 - CardGridSkeleton and route-specific skeleton grids
 
@@ -352,7 +356,16 @@ Definition of done:
 - Skeleton and loaded grids share the same breakpoint model.
 - Active filter stress URLs still fit without horizontal page overflow.
 
+Implemented notes:
+
+- `lib/catalogLayoutClasses.ts` is the breakpoint source for catalog browser grids and filter grids.
+- Robots, manufacturers, use-cases, reports, route loading, Suspense fallback, pending skeletons, and manufacturer detail robot grids use the shared grid source where applicable.
+- Verified after implementation with `npm run validate:data`, `git diff --check`, and `npm run build`.
+- Manual browser checks remain useful before release, especially W-01/W-02 card density and tab-click pending transitions, but they are no longer blockers for starting R-02.
+
 ### R-02 Interaction primitives: carousel, tabs, drawer
+
+Status: next implementation batch.
 
 Owners:
 
@@ -375,6 +388,12 @@ Definition of done:
 - Touch and keyboard users can discover carousel controls.
 - `PageTabBar` semantics match keyboard behavior.
 - Header drawer has focus containment and close/focus-restore behavior.
+
+Start gate:
+
+- Working tree must not contain unrelated data/article/navigation changes.
+- R-02 should not modify catalog grid density unless a new visual regression is found.
+- R-02 should be split into primitive-level commits if carousel, tabs, and drawer changes cannot be reviewed as one coherent interaction batch.
 
 ### R-03 Compare mobile model
 
