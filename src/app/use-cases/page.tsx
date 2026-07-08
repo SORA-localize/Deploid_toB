@@ -1,8 +1,10 @@
 import { Suspense } from 'react';
 import { cacheLife, cacheTag } from 'next/cache';
-import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
+import { ListPageSkeletonShell } from '@/components/ListPageSkeletonShell';
+import { UseCaseCardGridSkeleton } from '@/components/UseCaseCardGridSkeleton';
 import { UseCasesBrowser } from '@/components/UseCasesBrowser';
 import { getDeploymentsForUseCase, getRobots, getUseCases } from '@/lib/data';
+import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { createPageMetadata } from '@/lib/metadata';
 import { createUseCaseSearchIndex, searchUseCaseSlugs } from '@/lib/searchIndex';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
@@ -25,6 +27,16 @@ function resolveFilters(
     industryValues: getUseCaseIndustryTagOptions(useCases).map((option) => option.value),
     taskValues: getUseCaseTaskTagOptions(useCases).map((option) => option.value),
   });
+}
+
+function UseCasesPageSkeleton() {
+  return (
+    <ListPageSkeletonShell>
+      <div className="mt-8">
+        <UseCaseCardGridSkeleton gridClassName={browserGridClassNames.useCases} />
+      </div>
+    </ListPageSkeletonShell>
+  );
 }
 
 export async function generateMetadata({ searchParams }: { searchParams: RouteSearchParams }) {
@@ -98,7 +110,7 @@ export default function UseCasesPage({
   searchParams: RouteSearchParams;
 }) {
   return (
-    <Suspense fallback={<PageSuspenseFallback />}>
+    <Suspense fallback={<UseCasesPageSkeleton />}>
       <UseCasesContent searchParams={searchParams} />
     </Suspense>
   );

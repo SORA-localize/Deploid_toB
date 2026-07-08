@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { CardGridSkeleton } from '@/components/CardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
@@ -17,6 +17,7 @@ import {
   normalizeRobotFilters,
 } from '@/lib/robotFilters';
 import { normalizeSearchText } from '@/lib/search';
+import { browserFilterGridClassNames, browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { uiText } from '@/lib/uiText';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { useFavorites } from '@/lib/useFavorites';
@@ -104,7 +105,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
   }, [filters, filterOptions, manufacturers, updateParams]);
 
   const renderRobotGrid = (items: readonly Robot[]) => (
-    <div className="robot-card-grid grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+    <div className={browserGridClassNames.robots}>
       {items.map((robot) => {
         const manufacturer = manufacturerById.get(robot.manufacturerId);
         return (
@@ -135,6 +136,13 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
     );
   };
 
+  const updateRelease = useCallback(
+    (value: 'active' | 'pre') => {
+      updateParams({ release: value === 'active' ? null : value });
+    },
+    [updateParams],
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <RobotsHeader
@@ -142,6 +150,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
         preCount={preReleaseRobots.length}
         activeChips={activeChips}
         activeRelease={filters.release === 'pre' ? 'pre' : 'active'}
+        onReleaseSelect={updateRelease}
         isCrossReleaseMode={hasActiveFilters}
       />
 
@@ -160,7 +169,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
         />
 
         <div className="xl:flex xl:items-end gap-4 mb-5">
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4 max-w-4xl xl:shrink-0">
+          <div className={browserFilterGridClassNames.robots}>
             <SelectControl
               id="robot-industry"
               label={uiText.filters.industry}
@@ -197,7 +206,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
         </div>
 
         {isPending ? (
-          <CardGridSkeleton gridClassName="robot-card-grid grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" />
+          <CardGridSkeleton gridClassName={browserGridClassNames.robots} />
         ) : hasActiveFilters ? (
           crossReleaseTotal === 0 ? (
             <EmptyState

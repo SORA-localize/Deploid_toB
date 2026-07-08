@@ -1,7 +1,9 @@
 import { Suspense } from 'react';
-import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
+import { ListPageSkeletonShell } from '@/components/ListPageSkeletonShell';
+import { ManufacturerCardGridSkeleton } from '@/components/ManufacturerCardGridSkeleton';
 import { ManufacturersBrowser } from '@/components/ManufacturersBrowser';
 import { getManufacturers, getRobots } from '@/lib/data';
+import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { createPageMetadata } from '@/lib/metadata';
 import {
   getManufacturerFilterOptions,
@@ -15,6 +17,14 @@ export const metadata = createPageMetadata({
     'ヒューマノイド開発企業のディレクトリ。地域と相談ルートから、日本で検討しやすい企業を確認できます。',
   path: '/manufacturers',
 });
+
+function ManufacturersPageSkeleton() {
+  return (
+    <ListPageSkeletonShell>
+      <ManufacturerCardGridSkeleton gridClassName={`mt-8 ${browserGridClassNames.manufacturers}`} />
+    </ListPageSkeletonShell>
+  );
+}
 
 async function ManufacturersContent({ searchParams }: { searchParams: RouteSearchParams }) {
   const manufacturers = getManufacturers();
@@ -44,7 +54,7 @@ export default function ManufacturersPage({
   searchParams: RouteSearchParams;
 }) {
   return (
-    <Suspense fallback={<PageSuspenseFallback />}>
+    <Suspense fallback={<ManufacturersPageSkeleton />}>
       <ManufacturersContent searchParams={searchParams} />
     </Suspense>
   );

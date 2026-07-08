@@ -5,13 +5,13 @@ import type { ActiveFilterChip } from '@/components/ActiveFilterChips';
 import { ContextualPageHeader } from '@/components/ContextualPageHeader';
 import { PageTabBar, type PageTab } from '@/components/PageTabBar';
 import { uiText } from '@/lib/uiText';
-import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 
 interface RobotsHeaderProps {
   activeCount: number;
   preCount: number;
   activeChips: ActiveFilterChip[];
   activeRelease: 'active' | 'pre';
+  onReleaseSelect: (value: 'active' | 'pre') => void;
   isCrossReleaseMode?: boolean;
 }
 
@@ -20,10 +20,9 @@ export function RobotsHeader({
   preCount,
   activeChips,
   activeRelease,
+  onReleaseSelect,
   isCrossReleaseMode = false,
 }: RobotsHeaderProps) {
-  const { updateParams } = useUrlParamUpdater();
-
   const tabs = useMemo<readonly PageTab<'active' | 'pre'>[]>(
     () => [
       { value: 'active', label: uiText.robots.activeModels(activeCount) },
@@ -49,9 +48,7 @@ export function RobotsHeader({
         <PageTabBar
           tabs={tabs}
           activeValue={activeRelease}
-          onSelect={(value) =>
-            updateParams({ release: value === 'active' ? null : value })
-          }
+          onSelect={onReleaseSelect}
           ariaLabel="リリースステータスで絞り込む"
         />
       )}

@@ -1,3 +1,6 @@
+import { CardGridSkeleton } from '@/components/CardGridSkeleton';
+import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
+
 /**
  * メーカー詳細ページ専用のroute-level loading.tsxフォールバック。
  * ロボット詳細（大きな画像＋右スペック表）とは違い、メーカー詳細は画像を持たず、
@@ -32,11 +35,7 @@ export function ManufacturerDetailSkeleton() {
         </div>
 
         <div className="mb-4 h-5 w-28 animate-pulse bg-muted" />
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="aspect-[4/3] animate-pulse bg-muted" />
-          ))}
-        </div>
+        <CardGridSkeleton gridClassName={browserGridClassNames.robots} count={4} />
       </div>
     </div>
   );

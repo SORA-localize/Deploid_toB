@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 const ROWS_PER_PAGE = 3;
 
-// Tailwind breakpoints と grid-cols の対応（ReportsBrowser.tsx のグリッド定義と同期すること）
+// Tailwind breakpoints と grid-cols の対応（catalogLayoutClasses.reports と同期すること）
 function getColsForViewport(width: number): number {
   if (width >= 1536) return 5; // 2xl: grid-cols-5
   if (width >= 1280) return 4; // xl:  grid-cols-4
