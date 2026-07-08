@@ -2978,7 +2978,7 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: '',
+        src: '/images/robots/aeolus-aeo-hero.jpg',
         alt: 'Aeolus aeo robot',
         credit: 'Aeolus Robotics',
         sourceUrl: 'https://aeolusbot.com/',
@@ -2986,7 +2986,8 @@ export const robots: Robot[] = [
           status: 'reference-attributed',
           sourceType: 'manufacturer-official',
           rightsHolder: 'Aeolus Robotics',
-          checkedAt: '2026-06-30',
+          checkedAt: '2026-07-08',
+          permissionNote: '出典明記による参照表示。商用再掲載の明示許可は未確認。公開後に通知メール送付予定。',
         },
       },
     },
@@ -3033,15 +3034,16 @@ export const robots: Robot[] = [
     ],
     images: {
       hero: {
-        src: '',
+        src: '/images/robots/pudu-d7-hero.jpg',
         alt: 'PUDU D7 industrial semi-humanoid robot',
         credit: 'Pudu Robotics',
-        sourceUrl: 'https://www.prnewswire.com/news-releases/pudu-embodied-unveils-the-next-generation-pudu-d7-opening-a-new-chapter-for-industrial-semi-humanoid-robotics-302786976.html',
+        sourceUrl: 'https://www.pudurobotics.com/en/news/pudu-d7-industrial-humanoid-robot-launch',
         rights: {
           status: 'reference-attributed',
           sourceType: 'press-release',
           rightsHolder: 'Pudu Robotics',
-          checkedAt: '2026-07-01',
+          checkedAt: '2026-07-08',
+          permissionNote: '出典明記による参照表示。プレスリリース画像から広告文言部分をトリミング。商用再掲載の明示許可は未確認。公開後に通知メール送付予定。',
         },
       },
     },
