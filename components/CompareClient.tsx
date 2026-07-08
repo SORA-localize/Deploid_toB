@@ -19,7 +19,7 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import { ChevronDown, ChevronRight, Star } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { SelectControl } from '@/components/SelectControl';
 import {
@@ -70,6 +70,7 @@ type SheetPreviewItem =
 export function CompareClient({ robots, manufacturers, selectedIds }: CompareClientProps) {
   const { updateParams } = useUrlParamUpdater();
   const { favorites, toggleFavorite, isMounted } = useFavorites();
+  const prefersReducedMotion = Boolean(useReducedMotion());
   const [expandedManufacturers, setExpandedManufacturers] = useState<string[]>([]);
   const [mobileManufacturerId, setMobileManufacturerId] = useState('');
   const [activeDrag, setActiveDrag] = useState<CompareRobotDragData | null>(null);
@@ -158,7 +159,10 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
   // 挿入プレビュー中だけ Framer Motion の layout を有効化する。
   // シート内の並べ替えは dnd-kit が transform で整列アニメを担うため、
   // ここで layout を併用すると同じカードを二重にアニメートしてガクつく。
-  const isInsertionPreviewing = sheetPreview !== null;
+  const isInsertionPreviewing = sheetPreview !== null && !prefersReducedMotion;
+  const sheetMotionTransition = prefersReducedMotion
+    ? { duration: 0 }
+    : SHEET_LAYOUT_TRANSITION;
 
   const manufacturerFor = (id: string) => manufacturers.find((m) => m.id === id);
   const activeDragRobot = activeDrag ? robotById.get(activeDrag.id) : undefined;
@@ -545,18 +549,18 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         </div>
                       ) : (
                         <SortableContext items={sheetItemIds} strategy={rectSortingStrategy}>
-                          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                          <div className="flex snap-x gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 sm:gap-3 sm:overflow-visible sm:pb-0">
                             {sheetPreviewItems.map((item) => {
                               if (item.type === 'preview') {
                                 const manufacturer = manufacturerFor(item.robot.manufacturerId);
                                 return (
                                   <motion.div
                                     key={`sheet-preview-${item.robot.id}`}
-                                    layout
-                                    initial={{ opacity: 0, scale: 0.96 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={SHEET_LAYOUT_TRANSITION}
-                                    className="h-full"
+                                    layout={!prefersReducedMotion}
+                                    initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.96 }}
+                                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                                    transition={sheetMotionTransition}
+                                    className="h-full w-[min(74vw,18rem)] shrink-0 snap-start sm:w-auto"
                                   >
                                     <CompareInsertionPreviewCard
                                       robot={item.robot}
@@ -573,8 +577,8 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                                 <motion.div
                                   key={robot.id}
                                   layout={isInsertionPreviewing}
-                                  transition={SHEET_LAYOUT_TRANSITION}
-                                  className="h-full"
+                                  transition={sheetMotionTransition}
+                                  className="h-full w-[min(74vw,18rem)] shrink-0 snap-start sm:w-auto"
                                 >
                                   <SortableCompareCard
                                     robotId={robot.id}
