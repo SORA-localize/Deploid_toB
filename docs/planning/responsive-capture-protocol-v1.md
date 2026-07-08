@@ -62,7 +62,84 @@ W-04 and P-02 are optional targeted checks. Add them only when the implementatio
 6. Name the file with all applied axis IDs, for example `M-02R__robots-active-chips__W-01-P01.png`.
 7. If a setup cannot be reproduced, do not fake coverage. Write `manual/not-covered` and the reason in `capture-log.md`.
 
-## 4. Matrix Capture Plan
+## 4. Mac And iPhone Check Methods
+
+Use at least one desktop browser emulator and one real iOS/WebKit path before final acceptance.
+
+Recommended sequence:
+
+1. Chrome DevTools device toolbar for fast layout sweeps.
+   - Open `http://127.0.0.1:3000`.
+   - Toggle device toolbar.
+   - Use fixed dimensions from section 2, especially 320, 360, 390, 768, 1024, 1280, and 1536 widths.
+   - Enable touch emulation for P-01 and reduced motion/dark mode from Rendering tools when needed.
+2. Safari Responsive Design Mode for WebKit-specific behavior.
+   - Safari > Settings > Advanced > enable "Show features for web developers".
+   - Develop > Enter Responsive Design Mode.
+   - Check iPhone presets plus custom widths for W-01/W-02/W-03.
+3. Real iPhone over the local network for final mobile confidence.
+   - Start dev server with a LAN host, for example `npm run dev -- -H 0.0.0.0`.
+   - Find the Mac LAN IP with `ipconfig getifaddr en0`.
+   - On the iPhone, open `http://<mac-lan-ip>:3000`.
+   - Keep Mac and iPhone on the same Wi-Fi. Disable VPN/private relay if the site cannot connect.
+4. iPhone Simulator if Xcode is installed and a physical device is unavailable.
+   - Open Simulator, then open Safari inside the simulated device.
+   - Use the same LAN-hosted URL or `http://127.0.0.1:3000` if the simulator resolves it in the local environment.
+
+Browser resizing alone is not enough for final sign-off because it does not reliably reproduce coarse pointer, touch scrolling, iOS Safari viewport units, address-bar behavior, or WebKit focus quirks.
+
+## 5. GUI Acceptance Checklist
+
+Use this quick checklist before taking the full matrix screenshots.
+
+Global shell:
+
+- Header drawer at 320/360px opens without horizontal overflow.
+- Closed drawer controls are not reachable by Tab.
+- Open drawer traps Tab/Shift+Tab, closes with Escape, restores focus to the menu button, and locks body scroll.
+- Theme toggle is reachable inside the drawer.
+- Desktop nav dropdown opens by keyboard focus at 1024/1280px and has no stale menu semantics.
+
+Collection browsers:
+
+- `/robots`, `/manufacturers`, `/use-cases`, and `/reports` are one column at 320/360px where intended.
+- Loaded, pending skeleton, and loading states use matching card density.
+- Filter chips, dropdown triggers, search fields, and result counts wrap without clipping.
+- `/use-cases?industry=manufacturing&task=material-handling` exposes task selection without hover.
+- `/reports?page=3` and `/reports?page=10` do not break pagination after hydration.
+
+Cards and media:
+
+- Robot cards, manufacturer cards, use-case cards, and news cards have no horizontal overflow at 320/360px.
+- No-image robot cards and no-image detail pages remain readable.
+- Carousel prev/next/dot controls have visible focus and accessible names.
+- Reduced motion stops carousel autoplay/progress and decorative hover scale/shimmer/tilt.
+
+Detail pages:
+
+- `/robots/mentee-menteebotv3`, `/robots/agility-digit`, `/manufacturers/unitree`, `/use-cases/research-development`, and article fixtures G-07/G-08/G-09 have no page-level horizontal scroll at 320/360px.
+- Source lists and long titles wrap; manufacturer guide lineup table scrolls only inside its table container.
+- YouTube facade and activated iframe keep aspect ratio and visible focus.
+- Article hero does not consume the whole short mobile viewport.
+- Robot prev/next links stack and wrap on mobile.
+
+Compare:
+
+- `/compare` empty, one selected, three selected, invalid/dedupe, and max-count states remain inspectable at 320/360px.
+- Selected robots use the mobile horizontal rail at base width and the desktop grid at larger widths.
+- Add/remove/inspect works without DnD.
+- Detail dialog fits H-01 short height, scrolls internally, closes, and returns focus.
+- Reduced motion disables insertion-preview layout animation.
+
+Home:
+
+- Mobile "主要コンテンツ" links are reachable by keyboard and screen-reader path.
+- Manufacturer map points are keyboard-focusable on the primary map copy.
+- Map drag/tap still works on touch.
+- Featured rails scroll horizontally without trapping the page.
+- Encrypted heading and decorative card motion stop under reduced motion.
+
+## 6. Matrix Capture Plan
 
 | Matrix | URL / State | Width Captures | Height Captures | Preference / Input Captures | Required Setup |
 | --- | --- | --- | --- | --- | --- |
@@ -88,7 +165,7 @@ W-04 and P-02 are optional targeted checks. Add them only when the implementatio
 | M-17 | `/robots/mentee-menteebotv3`; `/reports/bmw-figure-deployment`; `/compare?compare=unitree-g1,agility-digit,apptronik-apollo` | W-06, W-07 | H-02, H-03 | none | sticky sidebars, article TOC, compare dialog height, SS-08 |
 | M-18 | `/robots/unitree-r1`; `/use-cases/warehouse-picking`; `/reports/jal-haneda-unitree-pilot-2026` | W-01, W-07 | none | none | redirect target layout sanity and no fallback flash |
 
-## 5. State Setup Notes
+## 7. State Setup Notes
 
 - SS-02 requires either a stable Formspree test endpoint or a network mock. If neither exists, mark success/error as `manual/not-covered`.
 - SS-05 has no stable runtime error trigger. Keep it `manual/not-covered` until a test-only trigger exists.
@@ -96,7 +173,7 @@ W-04 and P-02 are optional targeted checks. Add them only when the implementatio
 - SS-12 requires two captures for `/reports/unitree-manufacturer-guide`: YouTube facade before activation and iframe after activation.
 - SS-16 requires interacting with filters/search/tabs until `CardGridSkeleton` is visible.
 
-## 6. Priority Queue
+## 8. Priority Queue
 
 Run these first before R-03 and R-04 implementation review:
 
@@ -111,6 +188,6 @@ Run these first before R-03 and R-04 implementation review:
 | Q-07 | M-15 at W-01, W-02, H-01, P-05 with mobile drawer open |
 | Q-08 | M-15 at W-06, W-07, P-05 with desktop nav dropdown open by keyboard focus |
 
-## 7. Completion Rule
+## 9. Completion Rule
 
 R-06 is complete when this protocol is committed and the Phase 1 tracker links it as the active capture method. Actual screenshot image files remain outside git unless a later review explicitly asks to preserve a small failing-state sample.
