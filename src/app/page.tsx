@@ -61,11 +61,22 @@ export default function HomePage() {
   // 用途から探す：用途一覧と同じカードを、Homeではプレビューとして全件表示する。
   const homeUseCases = sortUseCases(getUseCases());
 
-  // HomeContentNavigator 用プレビュー画像。表示可否は data 側の rights と lib/media.ts で管理し、
-  // ここではローカルに存在する表示可能アセットだけを参照する。
-  const robotPreviewAssets = [
-    { src: '/images/robots/mentee-menteebotv3-hero.jpg', alt: 'MenteeBot humanoid robot', label: 'MenteeBot', objectPosition: 'top' },
-  ];
+  // HomeContentNavigator 用プレビュー画像の型（component側の PreviewAsset と同形）。
+  type PreviewAsset = { src: string; alt: string; label: string; objectPosition?: string };
+
+  // data/robots.ts の rights を getDisplayableAsset で判定し、表示可能なアセットを持つ
+  // ロボットだけを対象にする（画像パスを直書きしない。直書きすると該当ロボットの
+  // rights.status が blocked に変わっても、ここだけ表示され続けてしまうため）。
+  const robotPreviewAssets: PreviewAsset[] = getRobots()
+    .flatMap((robot) => {
+      const asset = getDisplayableAsset(
+        robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage,
+      );
+      return asset
+        ? [{ src: asset.src, alt: asset.alt, label: robot.nameJa ?? robot.name }]
+        : [];
+    })
+    .slice(0, 6);
 
   // Unsplash: Jonathan Phillips / https://unsplash.com/photos/fTxWB2uCBz8 / Unsplash License
   const manufacturerPreviewAssets: typeof robotPreviewAssets = [
