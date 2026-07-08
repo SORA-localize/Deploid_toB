@@ -133,6 +133,33 @@ NEURA Robotics、Leju Robotics、PAL Robotics、EngineAI、RobotEra、Galbot の
 figure-02、グループC 6社（NEURA, Leju, PAL, EngineAI, RobotEra, Galbot）の目視確認、
 カードUIの非透過・画像なし対応。
 
+### 追加進捗（同日続行分）
+
+優先5社の後、グループBの残りメーカーにも着手し、以下7機体を追加した。
+
+- **Sanctuary AI**：sanctuary-phoenix（Gen 8, hero + endEffector）
+- **AgiBot**：agibot-a2（他バリアント a2-ultra/a2-max/a2-lite 等は仕様差が大きく別写真が必要なため保留）
+- **Fourier Intelligence**：fourier-gr3（"Care-bot"の柔らかい意匠と一致確認）。fourier-gr2は
+  候補画像が複数機種の合成バナーで誤認リスクがあり見送り
+- **Booster Robotics**：booster-t1, booster-k1（いずれもワイドバナーを機体中心にクロップ。
+  K1のeducationシーンは未成年の顔が写り込むため使わず、人物なしのprofessionalシーンを採用）
+- **Kawasaki Heavy Industries**：kawasaki-kaleido（旧世代機の展示会実演写真。最新Kaleido 9の
+  クリーンな単体写真は見つからず）
+- **LimX Dynamics**：limx-oli（2体並んだ画像から手前の個体をクロップして単体化）
+- **Aeolus Robotics**：aeolus-aeo
+- **Pudu Robotics**：pudu-d7（プレスリリースのバナー画像から広告文言部分をクロップ）
+
+これで合計20機体に画像が入った。`npm run validate:data`・`tsc --noEmit`とも通過。
+
+**運用上のインシデントと対処（重要）**：この作業中、同一リポジトリで並行稼働していた別セッション
+（レスポンシブ対応作業）がブランチ切り替えを行い、一時的にコミット前の変更が見えなくなる事象が
+発生した。実際にはデータは失われていなかったが、リスクを断つため以降は以下の運用に切り替えた。
+
+1. 作業は`content/data-maintenance`ブランチ上で行う（READMEのブランチ運用どおり）。
+2. メーカー数機体単位でこまめに`git commit`する（大きな作業をコミット前の状態で長時間放置しない）。
+3. 複数セッションが同一チェックアウトを共有する場合は、`EnterWorktree`等で作業ツリーを分離することを
+   推奨する。
+
 ## 完了条件とアーカイブ
 
 主要メーカー分の画像調達とカードUI対応が完了した時点で、この計画は
