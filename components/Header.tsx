@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import { HeaderStickyBarSlot } from '@/components/HeaderChrome';
 import { ThemeModeToggle } from '@/components/ThemeModeToggle';
@@ -11,6 +11,41 @@ import { siteNavItems } from '@/lib/siteNavigation';
 export function Header() {
   const pathname = usePathname() ?? '';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const shouldRestoreFocusRef = useRef(false);
+
+  const closeMenu = useCallback((options: { restoreFocus?: boolean } = {}) => {
+    const shouldRestoreFocus = options.restoreFocus ?? true;
+    setIsMenuOpen((current) => {
+      if (current && shouldRestoreFocus) {
+        shouldRestoreFocusRef.current = true;
+      }
+      return false;
+    });
+  }, []);
+
+  const openMenu = useCallback(() => {
+    restoreFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : menuButtonRef.current;
+    setIsMenuOpen(true);
+  }, []);
+
+  const handleNavigationClick = useCallback(() => {
+    closeMenu({ restoreFocus: false });
+  }, [closeMenu]);
+
+  const handleMenuButtonClick = useCallback(() => {
+    if (isMenuOpen) {
+      closeMenu();
+      return;
+    }
+    openMenu();
+  }, [closeMenu, isMenuOpen, openMenu]);
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -21,13 +56,13 @@ export function Header() {
 
     const mediaQuery = window.matchMedia('(min-width: 1024px)');
     const closeMenuOnDesktop = () => {
-      if (mediaQuery.matches) setIsMenuOpen(false);
+      if (mediaQuery.matches) closeMenu({ restoreFocus: false });
     };
 
     closeMenuOnDesktop();
     mediaQuery.addEventListener('change', closeMenuOnDesktop);
     return () => mediaQuery.removeEventListener('change', closeMenuOnDesktop);
-  }, [isMenuOpen]);
+  }, [closeMenu, isMenuOpen]);
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -40,6 +75,73 @@ export function Header() {
     };
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const frame = window.requestAnimationFrame(() => {
+      closeButtonRef.current?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (isMenuOpen || !shouldRestoreFocusRef.current) return;
+    shouldRestoreFocusRef.current = false;
+    const target = restoreFocusRef.current;
+    const frame = window.requestAnimationFrame(() => {
+      if (target?.isConnected) {
+        target.focus({ preventScroll: true });
+        return;
+      }
+      menuButtonRef.current?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [isMenuOpen]);
+
+  const handleMobileNavKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLElement>) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeMenu();
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+
+      const drawer = drawerRef.current;
+      if (!drawer) return;
+
+      const focusable = Array.from(
+        drawer.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter(
+        (element) =>
+          !element.hasAttribute('disabled') && element.getAttribute('aria-hidden') !== 'true',
+      );
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+        drawer.focus({ preventScroll: true });
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus({ preventScroll: true });
+        return;
+      }
+
+      if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus({ preventScroll: true });
+      }
+    },
+    [closeMenu],
+  );
+
   return (
     <header className="sticky top-0 z-[var(--z-header)] border-b border-border bg-background relative">
       <div className="site-container">
@@ -47,7 +149,7 @@ export function Header() {
           <Link
             href="/"
             className="flex min-w-0 items-center gap-3 text-foreground transition-opacity hover:opacity-75"
-            onClick={() => setIsMenuOpen(false)}
+            onClick={handleNavigationClick}
             aria-label="Deploid ホームへ"
           >
             <img
@@ -75,7 +177,7 @@ export function Header() {
                       <Link
                         href={item.path}
                         aria-current={isActive ? 'page' : undefined}
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={handleNavigationClick}
                         className={`relative inline-flex items-center gap-1 px-3 py-2 text-sm transition-all duration-200 ${
                           isActive
                             ? 'text-foreground font-medium'
@@ -98,7 +200,7 @@ export function Header() {
                             <Link
                               key={child.path}
                               href={child.path}
-                              onClick={() => setIsMenuOpen(false)}
+                              onClick={handleNavigationClick}
                               className="block px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted focus-visible:text-foreground"
                             >
                               {child.label}
@@ -115,7 +217,7 @@ export function Header() {
                     key={item.path}
                     href={item.path}
                     aria-current={isActive ? 'page' : undefined}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={handleNavigationClick}
                     className={`relative px-3 py-2 text-sm transition-all duration-200 ${
                       isActive
                         ? 'text-foreground font-medium'
@@ -134,12 +236,13 @@ export function Header() {
           </div>
 
           <button
+            ref={menuButtonRef}
             type="button"
             className="inline-flex h-12 w-12 items-center justify-center text-muted-foreground transition-colors hover:text-foreground lg:hidden"
             aria-label={isMenuOpen ? 'ナビゲーションを閉じる' : 'ナビゲーションを開く'}
             aria-expanded={isMenuOpen}
             aria-controls="site-mobile-navigation"
-            onClick={() => setIsMenuOpen((current) => !current)}
+            onClick={handleMenuButtonClick}
           >
             {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -150,12 +253,17 @@ export function Header() {
         <div
           className="fixed inset-0 z-[var(--z-overlay)] lg:hidden"
           aria-hidden="true"
-          onClick={() => setIsMenuOpen(false)}
+          onClick={() => closeMenu()}
         />
       )}
       <nav
+        ref={drawerRef}
         id="site-mobile-navigation"
         aria-hidden={!isMenuOpen}
+        aria-label="サイトナビゲーション"
+        inert={!isMenuOpen}
+        tabIndex={-1}
+        onKeyDown={handleMobileNavKeyDown}
         className={`fixed right-0 top-0 z-[var(--z-dropdown)] flex h-full w-72 flex-col border-l border-border bg-background shadow-xl transition-transform duration-300 ease-out lg:hidden ${
           isMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
@@ -165,9 +273,11 @@ export function Header() {
             メニュー
           </span>
           <button
+            ref={closeButtonRef}
             type="button"
             aria-label="ナビゲーションを閉じる"
-            onClick={() => setIsMenuOpen(false)}
+            tabIndex={isMenuOpen ? 0 : -1}
+            onClick={() => closeMenu()}
             className="flex h-10 w-10 items-center justify-center text-muted-foreground hover:text-foreground"
           >
             <X className="h-5 w-5" />
@@ -183,7 +293,7 @@ export function Header() {
                   href={item.path}
                   tabIndex={isMenuOpen ? 0 : -1}
                   aria-current={isActive ? 'page' : undefined}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={handleNavigationClick}
                   className={`inline-flex min-h-12 items-center px-6 text-sm transition-colors ${
                     isActive ? 'font-medium text-foreground' : 'text-muted-foreground hover:text-foreground'
                   }`}
@@ -197,7 +307,7 @@ export function Header() {
                         key={child.path}
                         href={child.path}
                         tabIndex={isMenuOpen ? 0 : -1}
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={handleNavigationClick}
                         className="inline-flex min-h-10 items-center px-9 text-sm text-muted-foreground transition-colors hover:text-foreground"
                       >
                         {child.label}
@@ -211,7 +321,7 @@ export function Header() {
         </div>
         <div className="mt-auto shrink-0 border-t border-border px-6 py-4 flex items-center justify-between">
           <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">テーマ</span>
-          <ThemeModeToggle />
+          <ThemeModeToggle tabIndex={isMenuOpen ? 0 : -1} />
         </div>
       </nav>
       <HeaderStickyBarSlot />
