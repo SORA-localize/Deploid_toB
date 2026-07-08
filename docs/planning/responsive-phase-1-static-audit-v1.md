@@ -1,8 +1,8 @@
 # Responsive Phase 1 Static Audit v1
 
 Created: 2026-07-04
-Revised: 2026-07-08 (review passes: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification; matrix cross-reference corrections, P1-02 implementation decisions, R-06 axis alignment; R-02 implementation notes; R-06 capture protocol; R-03 code implementation)
-Status: active / R-01, R-02, R-06, and R-03 code implemented; R-04 next
+Revised: 2026-07-08 (review passes: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification; matrix cross-reference corrections, P1-02 implementation decisions, R-06 axis alignment; R-02 implementation notes; R-06 capture protocol; R-03/R-04 code implementation)
+Status: active / R-01, R-02, R-06, R-03 code, and R-04 code implemented; R-05 next
 Scope: Phase 0 の responsive surface inventory をもとにした、静的監査と実装バッチの進行トラッカー
 
 ## 0. Purpose
@@ -558,6 +558,8 @@ Implemented notes:
 
 ### R-04 Detail text/media overflow hardening
 
+Status: code implemented in `a6e7417`; R-06 capture protocol should still be run for G-01 through G-09 W-01/W-02 visual acceptance.
+
 Owners:
 
 - O-08, O-13
@@ -581,6 +583,12 @@ Definition of done:
 
 - G-01 through G-09 have no horizontal overflow at W-01/W-02.
 - Source, table, YouTube, and tag sections wrap or scroll only where intentional.
+
+Implemented notes:
+
+- SourceList, RelatedLinkList, Markdown, and DefinitionList now use explicit long-token wrapping for detail text surfaces.
+- Manufacturer guide lineup tables intentionally scroll horizontally at small widths; YouTube captions wrap and the facade has visible focus.
+- Article hero height is capped by viewport height; robot prev/next links stack and wrap on mobile.
 
 ### R-05 Home accessible mobile discovery
 
