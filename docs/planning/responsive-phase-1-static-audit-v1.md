@@ -1,8 +1,8 @@
 # Responsive Phase 1 Static Audit v1
 
 Created: 2026-07-04
-Revised: 2026-07-08 (review passes: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification; matrix cross-reference corrections, P1-02 implementation decisions, R-06 axis alignment; R-02 implementation notes)
-Status: active / R-01 and R-02 implemented, R-06 next
+Revised: 2026-07-08 (review passes: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification; matrix cross-reference corrections, P1-02 implementation decisions, R-06 axis alignment; R-02 implementation notes; R-06 capture protocol)
+Status: active / R-01, R-02, and R-06 implemented; R-03 next
 Scope: Phase 0 の responsive surface inventory をもとにした、静的監査と実装バッチの進行トラッカー
 
 ## 0. Purpose
@@ -491,6 +491,8 @@ Start gate:
 
 ### R-06 Browser screenshot automation setup
 
+Status: implemented by `responsive-capture-protocol-v1.md`.
+
 Owners:
 
 - all surfaces
@@ -510,6 +512,11 @@ Definition of done:
 
 - Phase 0 §6 required axes have repeatable captures: W-01, W-02, W-03, W-05, W-06, W-07, W-08; H-01/H-02/H-03 where specified; and P-01, P-03, P-04, P-05.
 - The confirmation queue below documents any intentionally narrower route-specific captures; omissions from the full Phase 0 axis set require an explicit reason in the runner or capture protocol.
+
+Implemented notes:
+
+- `responsive-capture-protocol-v1.md` defines the manual capture route, output folder, filename format, Phase 0 M-01 through M-18 coverage, state setup notes, and Q-01 through Q-08 priority queue.
+- Actual screenshot images remain outside git under `/private/tmp/deploid-responsive-captures/<YYYYMMDD>-<short-sha>/` unless a later review asks to preserve a failing-state sample.
 
 ### R-03 Compare mobile model
 
