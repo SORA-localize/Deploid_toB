@@ -42,6 +42,24 @@ function chipClassName(selected: boolean) {
   ].join(' ');
 }
 
+function taskOptionClassName(selected: boolean, surface: 'popover' | 'inline') {
+  const base =
+    surface === 'popover'
+      ? 'flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors'
+      : 'inline-flex min-h-9 items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors';
+
+  return [
+    base,
+    selected
+      ? surface === 'popover'
+        ? 'bg-primary/10 font-medium text-primary'
+        : 'bg-primary text-primary-foreground'
+      : surface === 'popover'
+        ? 'text-foreground hover:bg-muted'
+        : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+  ].join(' ');
+}
+
 export function UseCasesBrowser({
   useCases,
   initialFilters,
@@ -121,8 +139,10 @@ export function UseCasesBrowser({
 
   const handleTabKeyDown = useCallback(
     (e: KeyboardEvent<HTMLButtonElement>, currentIndex: number) => {
-      const tabs = tabListRef.current?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
-      if (!tabs) return;
+      const tabs = tabListRef.current?.querySelectorAll<HTMLButtonElement>(
+        '[data-use-case-filter-tab="true"]',
+      );
+      if (!tabs || tabs.length === 0) return;
       const count = tabs.length;
       if (e.key === 'ArrowRight') {
         e.preventDefault();
@@ -130,12 +150,19 @@ export function UseCasesBrowser({
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
         tabs[(currentIndex - 1 + count) % count]?.focus();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        tabs[0]?.focus();
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        tabs[count - 1]?.focus();
       }
     },
     [],
   );
 
   const activeIndustryLabel = industryTabOptions.find((t) => t.value === selectedIndustry)?.label;
+  const activeIndustryTaskData = selectedIndustry ? taskDataByIndustry[selectedIndustry] : undefined;
   const activeTaskLabel = selectedIndustry
     ? taskDataByIndustry[selectedIndustry]?.options.find((t) => t.value === selectedTask)?.label
     : null;
@@ -179,16 +206,12 @@ export function UseCasesBrowser({
             }
           />
 
-          <div
-            role="tablist"
-            aria-label={uiText.useCases.industryTabsAriaLabel}
-            ref={tabListRef}
-            className="flex flex-wrap gap-2"
-          >
+          <div ref={tabListRef} className="flex flex-wrap gap-2">
             {/* すべて chip — no popover */}
             <button
-              role="tab"
-              aria-selected={!selectedIndustry}
+              type="button"
+              data-use-case-filter-tab="true"
+              aria-current={!selectedIndustry ? 'page' : undefined}
               onClick={() => handleChipClick(null)}
               onKeyDown={(e) => handleTabKeyDown(e, 0)}
               className={chipClassName(!selectedIndustry)}
@@ -208,8 +231,9 @@ export function UseCasesBrowser({
                 >
                   <HoverCardPrimitive.Trigger asChild>
                     <button
-                      role="tab"
-                      aria-selected={isSelected}
+                      type="button"
+                      data-use-case-filter-tab="true"
+                      aria-current={isSelected ? 'page' : undefined}
                       onClick={() => handleChipClick(tab.value)}
                       onKeyDown={(e) => handleTabKeyDown(e, index + 1)}
                       className={chipClassName(isSelected)}
@@ -230,16 +254,16 @@ export function UseCasesBrowser({
                       </p>
 
                       <button
+                        type="button"
                         onClick={() => handleTaskSelect(tab.value, null)}
-                        className={[
-                          'flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors',
-                          isSelected && !selectedTask
-                            ? 'bg-primary/10 font-medium text-primary'
-                            : 'text-foreground hover:bg-muted',
-                        ].join(' ')}
+                        aria-current={isSelected && !selectedTask ? 'page' : undefined}
+                        aria-label={`${uiText.common.all}、${data?.total ?? 0}件`}
+                        className={taskOptionClassName(isSelected && !selectedTask, 'popover')}
                       >
                         <span>{uiText.common.all}</span>
-                        <span className="ml-3 text-xs text-muted-foreground">{data?.total ?? 0}</span>
+                        <span className="ml-3 text-xs text-muted-foreground" aria-hidden="true">
+                          {data?.total ?? 0}
+                        </span>
                       </button>
 
                       {data?.options.map((task) => {
@@ -248,16 +272,16 @@ export function UseCasesBrowser({
                         return (
                           <button
                             key={task.value}
+                            type="button"
                             onClick={() => handleTaskSelect(tab.value, task.value)}
-                            className={[
-                              'flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors',
-                              isActiveTask
-                                ? 'bg-primary/10 font-medium text-primary'
-                                : 'text-foreground hover:bg-muted',
-                            ].join(' ')}
+                            aria-current={isActiveTask ? 'page' : undefined}
+                            aria-label={`${task.label}、${count}件`}
+                            className={taskOptionClassName(isActiveTask, 'popover')}
                           >
                             <span>{task.label}</span>
-                            <span className="ml-3 text-xs text-muted-foreground">{count}</span>
+                            <span className="ml-3 text-xs text-muted-foreground" aria-hidden="true">
+                              {count}
+                            </span>
                           </button>
                         );
                       })}
@@ -267,6 +291,48 @@ export function UseCasesBrowser({
               );
             })}
           </div>
+
+          {activeIndustryLabel && selectedIndustry && activeIndustryTaskData && (
+            <div className="mt-4 rounded-lg border border-border bg-background/60 p-3">
+              <p className="mb-2 text-xs font-semibold text-muted-foreground">
+                {uiText.useCases.industryTasksHeading(activeIndustryLabel)}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleTaskSelect(selectedIndustry, null)}
+                  aria-current={!selectedTask ? 'page' : undefined}
+                  aria-label={`${uiText.common.all}、${activeIndustryTaskData.total}件`}
+                  className={taskOptionClassName(!selectedTask, 'inline')}
+                >
+                  <span>{uiText.common.all}</span>
+                  <span className="text-xs opacity-75" aria-hidden="true">
+                    {activeIndustryTaskData.total}
+                  </span>
+                </button>
+
+                {activeIndustryTaskData.options.map((task) => {
+                  const isActiveTask = selectedTask === task.value;
+                  const count = activeIndustryTaskData.counts[task.value] ?? 0;
+                  return (
+                    <button
+                      key={task.value}
+                      type="button"
+                      onClick={() => handleTaskSelect(selectedIndustry, task.value)}
+                      aria-current={isActiveTask ? 'page' : undefined}
+                      aria-label={`${task.label}、${count}件`}
+                      className={taskOptionClassName(isActiveTask, 'inline')}
+                    >
+                      <span>{task.label}</span>
+                      <span className="text-xs opacity-75" aria-hidden="true">
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {activeIndustryLabel && (
             <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
