@@ -1,8 +1,8 @@
 # Responsive Phase 1 Static Audit v1
 
 Created: 2026-07-04
-Revised: 2026-07-08 (review passes: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification; matrix cross-reference corrections, P1-02 implementation decisions, R-06 axis alignment; R-02 implementation notes; R-06 capture protocol)
-Status: active / R-01, R-02, and R-06 implemented; R-03 next
+Revised: 2026-07-08 (review passes: batch execution order, R-02 scope, P1-07 addition, evidence line re-verification; matrix cross-reference corrections, P1-02 implementation decisions, R-06 axis alignment; R-02 implementation notes; R-06 capture protocol; R-03 code implementation)
+Status: active / R-01, R-02, R-06, and R-03 code implemented; R-04 next
 Scope: Phase 0 の responsive surface inventory をもとにした、静的監査と実装バッチの進行トラッカー
 
 ## 0. Purpose
@@ -520,6 +520,8 @@ Implemented notes:
 
 ### R-03 Compare mobile model
 
+Status: code implemented in `5078ba7`; R-06 capture protocol should still be run for W-01/W-02 visual acceptance.
+
 Owners:
 
 - O-09
@@ -547,6 +549,12 @@ Definition of done:
 - Selected robots remain inspectable at W-01/W-02 for 1, 2, 3, invalid, deduped, and max-count fixtures.
 - DnD is enhancement, not the only ergonomic workflow.
 - Insertion-preview layout animation is disabled under `prefers-reduced-motion: reduce`.
+
+Implemented notes:
+
+- Mobile selected robots now render as a horizontally scrollable rail at base width and return to the existing 3-column grid from `sm`.
+- Compare detail dialog uses dynamic viewport height and reduced-motion-safe Radix animation classes.
+- Insertion-preview layout animation and preview scale animation are disabled under reduced motion.
 
 ### R-04 Detail text/media overflow hardening
 
