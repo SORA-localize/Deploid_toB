@@ -59,7 +59,7 @@ export interface ImageAsset {
   rights: RightsMeta;
 }
 
-/** ロボットの画像スロット。詳細ページのカルーセルで6スロット固定で使う。
+/** ロボットの画像スロット。詳細ページのカルーセルで7スロット固定で使う。
  *  写真が無いスロットは empty state（役割名のラベル）になる。 */
 export type ImageRole =
   | 'hero'         // 全身正面

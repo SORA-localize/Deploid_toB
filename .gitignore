@@ -34,3 +34,4 @@ tsconfig.tsbuildinfo
 
 # local-only prototype media（無許諾・ローカル確認専用。絶対にcommitしない）
 public/images/_local-prototype/
+docs/planning/local-prototype-image-fill-plan-v1.md

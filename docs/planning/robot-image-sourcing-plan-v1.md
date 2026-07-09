@@ -10,8 +10,9 @@ Last created: 2026-07-08
 
 ## 背景
 
-`data/robots.ts` は68機体中67の `images.hero.src` が空文字のままで、詳細ページ・一覧カードの大半が
-placeholder表示になっている。権利メタ (`rights.status`, `sourceType`, `checkedAt` 等) は型・表示ゲート
+2026-07-09時点の `data/robots.ts` は全63機体（published 61 / archived 1 / draft 1）。`images.hero.src`
+が入っているのは全体23件、publishedでは22/61件で、公開詳細ページ・一覧カードにはまだ
+placeholder表示が多い。権利メタ (`rights.status`, `sourceType`, `checkedAt` 等) は型・表示ゲート
 (`lib/media.ts`) まで実装済みで、`reference-attributed` ステータスも「初期MVPでは公開可」と明記されて
 いるにもかかわらず、実データではほぼ使われてこなかった。つまり技術的な障害ではなく運用が止まっていた
 だけであり、今回の計画はその運用を再開させることが目的になる。
@@ -68,10 +69,12 @@ NEURA Robotics、Leju Robotics、PAL Robotics、EngineAI、RobotEra、Galbot の
 
 1. `data/robots.ts` から対象ロボットの `manufacturerId` を確認し、当該メーカーの公式サイトで
    製品ページ・ニュースリリース・プレスページを探す。
-2. 実機を正面から捉えた、加工されていない写真を1枚選ぶ。背景透過やトリミングなど、配布時点から
-   姿を変える加工はしない（同一性保持権の観点で無加工利用より扱いが不利になるため）。
+2. 実機を正面から捉えた、加工されていない写真を1枚選ぶ。公開用の `reference-attributed` 画像では
+   背景透過やトリミングなど、配布時点から姿を変える加工はしない（同一性保持権の観点で無加工利用より
+   扱いが不利になるため）。`transparent` は、改変許諾を確認できた `licensed` / `commercial-permitted`
+   素材、またはローカル確認専用の `prototype-only` だけで扱う。
 3. 画像をダウンロードし、`public/images/robots/README.md` の命名規則・圧縮ルール
-   （`<slug>-hero.jpg` 等、300KB以下、幅1920px以下）に従ってローカル保存する。
+   （`<robot-id>-hero.jpg` 等、300KB以下、幅1920px以下）に従ってローカル保存する。
 4. `data/robots.ts` の該当レコードに `images.hero`（または他ロール）を追加し、
    `rights.status: 'reference-attributed'`、`sourceType: 'press-release'` または
    `'manufacturer-official'`、`checkedAt` に確認日、`rightsHolder` にメーカー名、`sourceUrl` に
@@ -149,7 +152,8 @@ figure-02、グループC 6社（NEURA, Leju, PAL, EngineAI, RobotEra, Galbot）
 - **Aeolus Robotics**：aeolus-aeo
 - **Pudu Robotics**：pudu-d7（プレスリリースのバナー画像から広告文言部分をクロップ）
 
-これで合計20機体に画像が入った。`npm run validate:data`・`tsc --noEmit`とも通過。
+この追加進捗を反映した現行データでは、2026-07-09時点で `images.hero.src` 入りは全体23件、
+publishedでは22件。`npm run validate:data`・`tsc --noEmit`とも通過。
 
 **運用上のインシデントと対処（重要）**：この作業中、同一リポジトリで並行稼働していた別セッション
 （レスポンシブ対応作業）がブランチ切り替えを行い、一時的にコミット前の変更が見えなくなる事象が
