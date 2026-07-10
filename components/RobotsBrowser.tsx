@@ -49,7 +49,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
   );
   const facetOption = useCallback(
     (
-      axis: 'task' | 'manufacturer' | 'availability',
+      axis: 'manufacturer' | 'availability',
       value: string,
       label: string,
       selected: string | null,
@@ -62,6 +62,11 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
 
   // 業種は最頻の絞り込み軸なのでドロップダウンに隠さず、タブとして常時露出する
   // （用途一覧の産業タブと同じ操作感。部品は汎用 PageTabBar を再利用）。
+  // 同じタブをスクロール後の sticky bar（RobotsHeader）にもミラー表示する。
+  const handleIndustrySelect = useCallback(
+    (value: string) => updateParams({ industry: value === 'all' ? null : value }),
+    [updateParams],
+  );
   const industryTabs = useMemo<readonly PageTab<string>[]>(
     () => [
       { value: 'all', label: uiText.common.all },
@@ -76,15 +81,6 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
       }),
     ],
     [filterOptions.industries, facetCounts.industry, filters.industry],
-  );
-  const taskOptions = useMemo(
-    () => [
-      { value: 'all', label: uiText.common.allTasks },
-      ...filterOptions.tasks.map((opt) =>
-        facetOption('task', opt.value, opt.label, filters.task),
-      ),
-    ],
-    [filterOptions.tasks, facetOption, filters.task],
   );
   const manufacturerOptions = useMemo(
     () => [
@@ -105,29 +101,20 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
     [filterOptions.availabilityValues, facetOption, filters.availability],
   );
 
-  const { activeRobots, preReleaseRobots, filtered } = useMemo(
+  const { activeRobots, preReleaseRobots } = useMemo(
     () => filterRobots({ robots, manufacturers, filters }),
     [robots, manufacturers, filters],
   );
   const hasActiveFilters =
     normalizeSearchText(filters.query) !== '' ||
     filters.industry !== null ||
-    filters.task !== null ||
     filters.manufacturer !== 'all' ||
     filters.availability !== 'all';
-  const crossReleaseTotal = activeRobots.length + preReleaseRobots.length;
-  const resultCount = hasActiveFilters ? crossReleaseTotal : filtered.length;
+  const resultCount = activeRobots.length + preReleaseRobots.length;
 
+  // 業種は sticky bar 側でタブとしてアクティブ表示されるため、チップからは外す（二重表示防止）。
   const activeChips = useMemo(() => {
     const chips: import('@/components/ActiveFilterChips').ActiveFilterChip[] = [];
-    if (filters.industry) {
-      const label = filterOptions.industries.find((o) => o.value === filters.industry)?.label ?? filters.industry;
-      chips.push({ key: 'industry', label, onRemove: () => updateParams({ industry: null }) });
-    }
-    if (filters.task) {
-      const label = filterOptions.tasks.find((o) => o.value === filters.task)?.label ?? filters.task;
-      chips.push({ key: 'task', label, onRemove: () => updateParams({ task: null }) });
-    }
     if (filters.manufacturer !== 'all') {
       const label = manufacturers.find((m) => m.id === filters.manufacturer)?.name ?? filters.manufacturer;
       chips.push({ key: 'manufacturer', label, onRemove: () => updateParams({ manufacturer: null }) });
@@ -137,7 +124,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
       chips.push({ key: 'availability', label, onRemove: () => updateParams({ availability: null }) });
     }
     return chips;
-  }, [filters, filterOptions, manufacturers, updateParams]);
+  }, [filters, manufacturers, updateParams]);
 
   const renderRobotGrid = (items: readonly Robot[]) => (
     <div className={browserGridClassNames.robots}>
@@ -171,22 +158,13 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
     );
   };
 
-  const updateRelease = useCallback(
-    (value: 'active' | 'pre') => {
-      updateParams({ release: value === 'active' ? null : value });
-    },
-    [updateParams],
-  );
-
   return (
     <div className="min-h-screen bg-background">
       <RobotsHeader
-        activeCount={activeRobots.length}
-        preCount={preReleaseRobots.length}
+        industryTabs={industryTabs}
+        activeIndustry={filters.industry ?? 'all'}
+        onIndustrySelect={handleIndustrySelect}
         activeChips={activeChips}
-        activeRelease={filters.release === 'pre' ? 'pre' : 'active'}
-        onReleaseSelect={updateRelease}
-        isCrossReleaseMode={hasActiveFilters}
       />
 
       <div className="site-container py-5 min-h-[60vh]">
@@ -207,7 +185,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
           <PageTabBar
             tabs={industryTabs}
             activeValue={filters.industry ?? 'all'}
-            onSelect={(v) => updateParams({ industry: v === 'all' ? null : v })}
+            onSelect={handleIndustrySelect}
             ariaLabel={uiText.useCases.industryTabsAriaLabel}
           />
         </div>
@@ -215,14 +193,6 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
         <div className="xl:flex xl:items-end gap-4 mb-5">
           <div className="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0">
             <div className={browserFilterGridClassNames.robots}>
-              <SelectControl
-                id="robot-task"
-                label={uiText.filters.task}
-                value={filters.task ?? 'all'}
-                onChange={(v) => updateParams({ task: v === 'all' ? null : v })}
-                options={taskOptions}
-                className="min-w-40 sm:min-w-0"
-              />
               <SelectControl
                 id="robot-manufacturer"
                 label={uiText.filters.manufacturer}
@@ -249,30 +219,20 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
 
         {isPending ? (
           <CardGridSkeleton gridClassName={browserGridClassNames.robots} />
-        ) : hasActiveFilters ? (
-          crossReleaseTotal === 0 ? (
-            <EmptyState
-              message={uiText.emptyStates.robots}
-              variant="muted"
-              size="large"
-            />
-          ) : (
-            <div className="space-y-8">
-              {renderRobotSection(uiText.robots.activeSection(activeRobots.length), activeRobots)}
-              {renderRobotSection(
-                uiText.robots.preReleaseSection(preReleaseRobots.length),
-                preReleaseRobots,
-              )}
-            </div>
-          )
-        ) : filtered.length === 0 ? (
+        ) : resultCount === 0 ? (
           <EmptyState
             message={uiText.emptyStates.robots}
             variant="muted"
             size="large"
           />
         ) : (
-          renderRobotGrid(filtered)
+          <div className="space-y-8">
+            {renderRobotSection(uiText.robots.activeSection(activeRobots.length), activeRobots)}
+            {renderRobotSection(
+              uiText.robots.preReleaseSection(preReleaseRobots.length),
+              preReleaseRobots,
+            )}
+          </div>
         )}
       </div>
     </div>

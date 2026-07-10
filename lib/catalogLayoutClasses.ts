@@ -11,7 +11,7 @@ export const browserGridClassNames = {
 
 export const browserFilterGridClassNames = {
   robots:
-    'flex w-max min-w-full gap-3 sm:grid sm:w-auto sm:grid-cols-2 sm:gap-4 xl:grid-cols-3 xl:max-w-3xl xl:shrink-0',
+    'flex w-max min-w-full gap-3 sm:grid sm:w-auto sm:grid-cols-2 sm:gap-4 sm:max-w-2xl sm:shrink-0',
   manufacturers:
     'flex w-max min-w-full gap-3 sm:grid sm:w-auto sm:grid-cols-2 sm:gap-4 sm:max-w-2xl sm:shrink-0',
 } as const;
