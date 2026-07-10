@@ -45,7 +45,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
       onMouseLeave={handleMouseLeave}
       style={{ rotateX, rotateY, transformPerspective: 1000 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="group relative block aspect-[5/7] w-full overflow-hidden bg-muted"
+      className="group relative isolate block aspect-[5/7] w-full overflow-hidden bg-muted"
     >
       {cardImage ? (
         <>

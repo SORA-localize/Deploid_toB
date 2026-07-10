@@ -40,7 +40,7 @@ export function UseCaseCard({ useCase: u, evidenceSummary, robotNames }: UseCase
       onMouseLeave={handleMouseLeave}
       style={{ rotateX, rotateY, transformPerspective: 1000 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="card-data group relative flex h-full min-h-[148px] flex-col overflow-hidden"
+      className="card-data group relative isolate flex h-full min-h-[148px] flex-col overflow-hidden"
     >
       {/* Glow + shimmer + accent line はRobotCard/ManufacturerCardと同じ演出（lib/useTiltCardEffect.ts参照） */}
       <motion.div
