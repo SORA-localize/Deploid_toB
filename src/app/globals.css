@@ -95,6 +95,7 @@
   --font-sans: var(--font-sans);
   --radius-2xl: calc(var(--radius) * 1.8);
   /* z-index 階層（Tailwind v4 は --z-* を utility 自動生成しないため、z-[var(--z-header)] 形式で参照） */
+  --z-page-sticky: 30; /* ページ内 sticky 要素（タブ行など）。ヘッダー(40)より下、コンテンツより上 */
   --z-overlay:  38;
   --z-header:   40;
   --z-dropdown: 50;
@@ -367,5 +368,17 @@
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
+  }
+}
+
+/* ページ内 sticky タブ行。position:sticky で上端に固定されている間だけ下影を出す。
+   scroll-state コンテナクエリは Chrome/Edge 133+ のみ対応（Baseline外）。
+   非対応ブラウザでは固定は効いたまま影だけが出ない安全な劣化になる。 */
+.page-sticky-tabs {
+  container-type: scroll-state;
+}
+@container scroll-state(stuck: top) {
+  .page-sticky-tabs-inner {
+    box-shadow: 0 10px 14px -14px rgb(0 0 0 / 0.35);
   }
 }

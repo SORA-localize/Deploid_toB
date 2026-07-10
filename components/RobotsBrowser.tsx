@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
+import { ActiveFilterChips } from '@/components/ActiveFilterChips';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { CardGridSkeleton } from '@/components/CardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
@@ -8,7 +9,6 @@ import { EmptyState } from '@/components/EmptyState';
 import { PageTabBar, type PageTab } from '@/components/PageTabBar';
 import { SelectControl } from '@/components/SelectControl';
 import { RobotCard } from '@/components/RobotCard';
-import { RobotsHeader } from '@/components/RobotsHeader';
 import { SearchInput } from '@/components/SearchInput';
 import type { Manufacturer, Robot } from '@/data/types';
 import { japanAvailabilityLabels } from '@/lib/labels';
@@ -62,7 +62,6 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
 
   // 業種は最頻の絞り込み軸なのでドロップダウンに隠さず、タブとして常時露出する
   // （用途一覧の産業タブと同じ操作感。部品は汎用 PageTabBar を再利用）。
-  // 同じタブをスクロール後の sticky bar（RobotsHeader）にもミラー表示する。
   const handleIndustrySelect = useCallback(
     (value: string) => updateParams({ industry: value === 'all' ? null : value }),
     [updateParams],
@@ -112,7 +111,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
     filters.availability !== 'all';
   const resultCount = activeRobots.length + preReleaseRobots.length;
 
-  // 業種は sticky bar 側でタブとしてアクティブ表示されるため、チップからは外す（二重表示防止）。
+  // 業種はタブでアクティブ表示されるため、チップからは外す（二重表示防止）。
   const activeChips = useMemo(() => {
     const chips: import('@/components/ActiveFilterChips').ActiveFilterChip[] = [];
     if (filters.manufacturer !== 'all') {
@@ -160,13 +159,6 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
 
   return (
     <div className="min-h-screen bg-background">
-      <RobotsHeader
-        industryTabs={industryTabs}
-        activeIndustry={filters.industry ?? 'all'}
-        onIndustrySelect={handleIndustrySelect}
-        activeChips={activeChips}
-      />
-
       <div className="site-container py-5 min-h-[60vh]">
         <Breadcrumbs items={[{ label: uiText.robots.breadcrumb }]} />
         <PageListHeader
@@ -181,13 +173,20 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
           }
         />
 
-        <div className="-mx-4 mb-4 overflow-x-auto border-b border-border px-4 sm:mx-0 sm:px-0">
-          <PageTabBar
-            tabs={industryTabs}
-            activeValue={filters.industry ?? 'all'}
-            onSelect={handleIndustrySelect}
-            ariaLabel={uiText.useCases.industryTabsAriaLabel}
-          />
+        {/* タブ行はミラーを作らず、この要素自体をヘッダー下端で position:sticky 固定する。
+            固定中の下影は .page-sticky-tabs の scroll-state クエリ（globals.css）が担う。 */}
+        <div className="page-sticky-tabs sticky top-[var(--header-h)] z-[var(--z-page-sticky)] -mx-4 mb-4 bg-background px-4 sm:mx-0 sm:px-0">
+          <div className="page-sticky-tabs-inner flex items-center gap-3 border-b border-border">
+            <div className="min-w-0 flex-1 overflow-x-auto">
+              <PageTabBar
+                tabs={industryTabs}
+                activeValue={filters.industry ?? 'all'}
+                onSelect={handleIndustrySelect}
+                ariaLabel={uiText.useCases.industryTabsAriaLabel}
+              />
+            </div>
+            <ActiveFilterChips chips={activeChips} />
+          </div>
         </div>
 
         <div className="xl:flex xl:items-end gap-4 mb-5">
