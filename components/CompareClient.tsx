@@ -18,7 +18,7 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { ChevronDown, ChevronRight, Link2, Star } from 'lucide-react';
+import { Link2, Star } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { SelectControl } from '@/components/SelectControl';
 import {
@@ -105,7 +105,6 @@ function CompareCardSpecList({ robot }: { robot: Robot }) {
 export function CompareClient({ robots, manufacturers, selectedIds }: CompareClientProps) {
   const { updateParams } = useUrlParamUpdater();
   const { favorites, toggleFavorite, isMounted } = useFavorites();
-  const [expandedManufacturers, setExpandedManufacturers] = useState<string[]>([]);
   const [mobileManufacturerId, setMobileManufacturerId] = useState('');
   const [activeDrag, setActiveDrag] = useState<CompareRobotDragData | null>(null);
   const [activeDropTarget, setActiveDropTarget] = useState<CompareDropTarget | null>(null);
@@ -388,14 +387,6 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
     setSheetPreview(null);
   };
 
-  const toggleManufacturer = (id: string) => {
-    if (expandedManufacturers.includes(id)) {
-      setExpandedManufacturers(expandedManufacturers.filter((s) => s !== id));
-    } else {
-      setExpandedManufacturers([...expandedManufacturers, id]);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <div className="site-container py-8">
@@ -444,34 +435,20 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                       </h2>
                     </div>
                     <div className="max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:max-h-[calc(100vh-200px)]">
+                      {/* 常時展開ツリー: 開閉操作を持たない。メーカー名はスクロール内 sticky 見出しで、
+                          どのメーカーの機体を見ているかを保ちながら全機体へスクロールだけで届く。
+                          （ホバー展開のフライアウトは、ここがD&Dのドラッグ元のため不採用。§8.6） */}
                       {sortedManufacturers.map((manufacturer) => {
                         const manufacturerRobots = sortRobots(
                           robots.filter((r) => r.manufacturerId === manufacturer.id),
                           'name',
                           manufacturers,
                         );
-                        const isEmpty = manufacturerRobots.length === 0;
-                        const isExpanded =
-                          !isEmpty && expandedManufacturers.includes(manufacturer.id);
+                        if (manufacturerRobots.length === 0) return null;
 
                         return (
-                          <div key={manufacturer.id} className="border-b border-border-subtle last:border-0">
-                            <button
-                              type="button"
-                              disabled={isEmpty}
-                              aria-label={uiText.comparison.toggleAria(
-                                manufacturer.nameJa ?? manufacturer.name,
-                                isExpanded,
-                              )}
-                              aria-expanded={isEmpty ? undefined : isExpanded}
-                              onClick={() => toggleManufacturer(manufacturer.id)}
-                              className={cn(
-                                'w-full px-4 py-3 flex items-center justify-between transition-colors text-left',
-                                isEmpty
-                                  ? 'bg-card cursor-not-allowed opacity-50'
-                                  : 'bg-card hover:bg-muted',
-                              )}
-                            >
+                          <div key={manufacturer.id} className="border-b border-border-subtle last:border-0 pb-2">
+                            <div className="sticky top-0 z-[1] flex items-center justify-between bg-card px-4 py-2.5">
                               <ManufacturerLogoName
                                 name={manufacturer.nameJa ?? manufacturer.name}
                                 logo={manufacturer.logo}
@@ -479,37 +456,25 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                                 frameClassName="h-5 w-5"
                                 imageClassName="h-4 w-4"
                               />
-                              {isEmpty ? (
-                                <span className="text-[10px] font-medium text-muted-foreground tabular-nums">
-                                  0
-                                </span>
-                              ) : isExpanded ? (
-                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                              )}
-                            </button>
-                            {isExpanded && (
-                              <div className="pb-2">
-                                <div>
-                                  {manufacturerRobots.map((robot) => {
-                                    const isSelected = orderedIds.includes(robot.id);
-                                    const isDisabled =
-                                      !isSelected && orderedIds.length >= MAX_COMPARE_ROBOTS;
-                                    return (
-                                      <DraggableMenuRobotButton
-                                        key={robot.id}
-                                        robot={robot}
-                                        isSelected={isSelected}
-                                        isDisabled={isDisabled}
-                                        isFavorite={isMounted ? favorites.includes(robot.id) : false}
-                                        onClick={() => handleMenuRobotClick(robot.id)}
-                                      />
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            )}
+                              <span className="text-[10px] font-medium text-muted-foreground tabular-nums">
+                                {manufacturerRobots.length}
+                              </span>
+                            </div>
+                            {manufacturerRobots.map((robot) => {
+                              const isSelected = orderedIds.includes(robot.id);
+                              const isDisabled =
+                                !isSelected && orderedIds.length >= MAX_COMPARE_ROBOTS;
+                              return (
+                                <DraggableMenuRobotButton
+                                  key={robot.id}
+                                  robot={robot}
+                                  isSelected={isSelected}
+                                  isDisabled={isDisabled}
+                                  isFavorite={isMounted ? favorites.includes(robot.id) : false}
+                                  onClick={() => handleMenuRobotClick(robot.id)}
+                                />
+                              );
+                            })}
                           </div>
                         );
                       })}

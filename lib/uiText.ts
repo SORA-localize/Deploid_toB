@@ -221,7 +221,6 @@ export const uiText = {
     emptyDescription: '左メニューから追加できます。',
     emptyHint: 'ドラッグ&ドロップ・お気に入り機能に対応しています。',
     clearAria: '比較シートを空にする',
-    toggleAria: (name: string, expanded: boolean) => `${name}のロボット一覧を${expanded ? '閉じる' : '開く'}`,
     addAria: (name: string) => `${name}を比較に追加する`,
     addToSheet: 'ここに追加',
     removeAria: (name: string) => `${name}を比較から外す`,
