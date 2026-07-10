@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { CardGridSkeleton } from '@/components/CardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
+import { PageTabBar, type PageTab } from '@/components/PageTabBar';
 import { SelectControl } from '@/components/SelectControl';
 import { RobotCard } from '@/components/RobotCard';
 import { RobotsHeader } from '@/components/RobotsHeader';
@@ -39,9 +40,11 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
   const filterOptions = useMemo(() => getRobotFilterOptions(robots), [robots]);
   const filters = initialFilters;
 
-  const industryOptions = useMemo(
+  // 業種は最頻の絞り込み軸なのでドロップダウンに隠さず、タブとして常時露出する
+  // （用途一覧の産業タブと同じ操作感。部品は汎用 PageTabBar を再利用）。
+  const industryTabs = useMemo<readonly PageTab<string>[]>(
     () => [
-      { value: 'all', label: uiText.common.allIndustries },
+      { value: 'all', label: uiText.common.all },
       ...filterOptions.industries.map((opt) => ({ value: opt.value, label: opt.label })),
     ],
     [filterOptions.industries],
@@ -168,17 +171,18 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
           }
         />
 
+        <div className="-mx-4 mb-4 overflow-x-auto border-b border-border px-4 sm:mx-0 sm:px-0">
+          <PageTabBar
+            tabs={industryTabs}
+            activeValue={filters.industry ?? 'all'}
+            onSelect={(v) => updateParams({ industry: v === 'all' ? null : v })}
+            ariaLabel={uiText.useCases.industryTabsAriaLabel}
+          />
+        </div>
+
         <div className="xl:flex xl:items-end gap-4 mb-5">
           <div className="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0">
             <div className={browserFilterGridClassNames.robots}>
-              <SelectControl
-                id="robot-industry"
-                label={uiText.filters.industry}
-                value={filters.industry ?? 'all'}
-                onChange={(v) => updateParams({ industry: v === 'all' ? null : v })}
-                options={industryOptions}
-                className="min-w-40 sm:min-w-0"
-              />
               <SelectControl
                 id="robot-task"
                 label={uiText.filters.task}
