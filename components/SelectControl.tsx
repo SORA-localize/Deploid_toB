@@ -21,6 +21,14 @@ export interface SelectControlOption {
   disabled?: boolean;
 }
 
+/**
+ * searchable 指定時でも、選択肢がこの数未満なら検索窓なしの通常 Select にする。
+ * 一覧して選べる規模（例: 地域10件）に検索UIは過剰なため。
+ * 閾値の根拠は docs/planning/compare-and-catalog-ui-improvement-plan-v1.md §2
+ * （地域10 / メーカー27 の間に境界を置く）。
+ */
+const SEARCHABLE_MIN_OPTIONS = 12;
+
 interface SelectControlProps {
   id: string;
   label: string;
@@ -45,12 +53,14 @@ export function SelectControl({
   const withCount = (option: SelectControlOption) =>
     option.count != null ? `${option.label} (${option.count})` : option.label;
 
+  const showSearch = searchable && options.length >= SEARCHABLE_MIN_OPTIONS;
+
   return (
     <div className={className}>
       <label htmlFor={`${id}-trigger`} className="mb-2 block text-xs text-muted-foreground">
         {label}
       </label>
-      {searchable ? (
+      {showSearch ? (
         <SearchableDropdown
           id={id}
           label={label}
