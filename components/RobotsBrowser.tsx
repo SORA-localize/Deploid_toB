@@ -14,6 +14,7 @@ import type { Manufacturer, Robot } from '@/data/types';
 import { japanAvailabilityLabels } from '@/lib/labels';
 import {
   filterRobots,
+  getRobotFacetCounts,
   getRobotFilterOptions,
   normalizeRobotFilters,
 } from '@/lib/robotFilters';
@@ -40,37 +41,68 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
   const filterOptions = useMemo(() => getRobotFilterOptions(robots), [robots]);
   const filters = initialFilters;
 
+  // ファセット件数: 選ぶ前に該当数を見せて0件デッドエンドを防ぐ。
+  // 0件選択肢は選択不可にするが、選択中の値は解除操作を塞がないよう無効化しない。
+  const facetCounts = useMemo(
+    () => getRobotFacetCounts({ robots, manufacturers, filters }),
+    [robots, manufacturers, filters],
+  );
+  const facetOption = useCallback(
+    (
+      axis: 'task' | 'manufacturer' | 'availability',
+      value: string,
+      label: string,
+      selected: string | null,
+    ) => {
+      const count = facetCounts[axis].counts.get(value) ?? 0;
+      return { value, label, count, disabled: count === 0 && selected !== value };
+    },
+    [facetCounts],
+  );
+
   // 業種は最頻の絞り込み軸なのでドロップダウンに隠さず、タブとして常時露出する
   // （用途一覧の産業タブと同じ操作感。部品は汎用 PageTabBar を再利用）。
   const industryTabs = useMemo<readonly PageTab<string>[]>(
     () => [
       { value: 'all', label: uiText.common.all },
-      ...filterOptions.industries.map((opt) => ({ value: opt.value, label: opt.label })),
+      ...filterOptions.industries.map((opt) => {
+        const count = facetCounts.industry.counts.get(opt.value) ?? 0;
+        return {
+          value: opt.value,
+          label: opt.label,
+          count,
+          disabled: count === 0 && filters.industry !== opt.value,
+        };
+      }),
     ],
-    [filterOptions.industries],
+    [filterOptions.industries, facetCounts.industry, filters.industry],
   );
   const taskOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allTasks },
-      ...filterOptions.tasks.map((opt) => ({ value: opt.value, label: opt.label })),
+      ...filterOptions.tasks.map((opt) =>
+        facetOption('task', opt.value, opt.label, filters.task),
+      ),
     ],
-    [filterOptions.tasks],
+    [filterOptions.tasks, facetOption, filters.task],
   );
   const manufacturerOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allManufacturers },
       ...[...manufacturers]
         .sort((a, b) => a.name.localeCompare(b.name, 'en'))
-        .map((m) => ({ value: m.id, label: m.name })),
+        .map((m) => facetOption('manufacturer', m.id, m.name, filters.manufacturer)),
     ],
-    [manufacturers],
+    [manufacturers, facetOption, filters.manufacturer],
   );
   const availabilityOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allStatus },
-      ...filterOptions.availabilityValues.map((value) => ({ value, label: japanAvailabilityLabels[value] })),
+      ...filterOptions.availabilityValues.map((value) =>
+        facetOption('availability', value, japanAvailabilityLabels[value], filters.availability),
+      ),
     ],
-    [filterOptions.availabilityValues],
+    [filterOptions.availabilityValues, facetOption, filters.availability],
   );
 
   const { activeRobots, preReleaseRobots, filtered } = useMemo(
