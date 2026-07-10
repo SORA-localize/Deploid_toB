@@ -6,7 +6,7 @@ import {
   companyStatusLabels,
   companyTypeLabels,
   japanPresenceLabels,
-  TBD_LABEL,
+  EMPTY_VALUE_LABEL,
 } from '@/lib/labels';
 import {
   getDomesticDistributorDisplay,
@@ -37,7 +37,7 @@ export function ManufacturerFactSheet({ manufacturer, robotCount }: Manufacturer
     },
     {
       label: uiText.manufacturers.founded,
-      value: manufacturer.foundedYear ?? TBD_LABEL,
+      value: manufacturer.foundedYear ?? EMPTY_VALUE_LABEL,
     },
     {
       label: uiText.manufacturers.companyType,

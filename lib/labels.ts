@@ -28,6 +28,14 @@ import type {
 
 export const TBD_LABEL = '要確認';
 
+/**
+ * 閲覧者向けの値欠損表示。データが未取得・非公表のスペック値や年などに使う。
+ * TBD_LABEL（要確認）は「不明なので確認が要る」という意味を持つ enum ステータス
+ * （mobility / marketAvailability の unknown）専用に残す。値の欠損に「要確認」を
+ * 使うと編集側のTODOに見えるため、無味の em-dash で「非公表・情報なし」を示す。
+ */
+export const EMPTY_VALUE_LABEL = '—';
+
 /** 詳細ページのカルーセルで固定表示する画像スロットの順序。 */
 export const imageRoleOrder: ImageRole[] = [
   'hero',

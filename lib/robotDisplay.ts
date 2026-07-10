@@ -7,7 +7,7 @@ import {
   mobilityLabels,
   procurementLabels,
   robotCategoryLabels,
-  TBD_LABEL,
+  EMPTY_VALUE_LABEL,
 } from '@/lib/labels';
 import { getSpecEntry, specSchema, type SpecKey } from '@/lib/specSchema';
 import { getTagLabel } from '@/lib/tags';
@@ -19,11 +19,11 @@ export interface DisplayRow {
 }
 
 export function formatNumber(value: number | undefined, unit = '') {
-  return value != null ? `${value}${unit}` : TBD_LABEL;
+  return value != null ? `${value}${unit}` : EMPTY_VALUE_LABEL;
 }
 
 export function formatRuntime(value: number | undefined) {
-  return value != null ? `約${value}分` : TBD_LABEL;
+  return value != null ? `約${value}分` : EMPTY_VALUE_LABEL;
 }
 
 /** 関連欄での表示名。archived は「提供終了」を付けて状態を明示する（無言脱落させない。設計 §6.5-1） */
@@ -32,11 +32,11 @@ export function getRobotRelatedTitle(robot: Robot): string {
   return robot.publishStatus === 'archived' ? `${base}（提供終了）` : base;
 }
 
-/** specSchema の kind/unit に従ってスペック値を整形する（未設定は「要確認」） */
+/** specSchema の kind/unit に従ってスペック値を整形する（未設定は「—」） */
 export function formatSpecValue(specs: RobotSpecs, key: SpecKey): string {
   const entry = getSpecEntry(key);
   const raw = specs[key];
-  if (raw == null || raw === '') return TBD_LABEL;
+  if (raw == null || raw === '') return EMPTY_VALUE_LABEL;
   switch (entry.kind) {
     case 'mobility':
       return mobilityLabels[raw as NonNullable<RobotSpecs['mobility']>];
@@ -63,7 +63,7 @@ function formatComparisonPriceStatus(robot: Robot) {
   const normalizedNote = note?.toLowerCase() ?? '';
 
   if (robot.procurementModels.includes('not-for-sale')) return '一般販売なし';
-  if (!note) return TBD_LABEL;
+  if (!note) return EMPTY_VALUE_LABEL;
   if (/価格は?非公開|価格未公開|未公表|未発表|問い合わせ制|公開価格なし/.test(note)) {
     return '問い合わせ';
   }
@@ -72,11 +72,11 @@ function formatComparisonPriceStatus(robot: Robot) {
   }
   if (/問い合わせ|要確認/.test(note)) return '問い合わせ';
 
-  return TBD_LABEL;
+  return EMPTY_VALUE_LABEL;
 }
 
 function formatComparisonPayloadStatus(value: number | undefined) {
-  if (value == null) return TBD_LABEL;
+  if (value == null) return EMPTY_VALUE_LABEL;
   if (value < 5) return '小型（5kg未満）';
   if (value < 15) return '標準（5〜15kg）';
   if (value < 30) return '高可搬（15〜30kg）';
@@ -84,7 +84,7 @@ function formatComparisonPayloadStatus(value: number | undefined) {
 }
 
 function formatComparisonRuntimeStatus(value: number | undefined) {
-  if (value == null) return TBD_LABEL;
+  if (value == null) return EMPTY_VALUE_LABEL;
   if (value < 90) return '短時間（90分未満）';
   if (value < 180) return '標準（90〜180分）';
   if (value < 360) return '長時間（3〜6時間）';
@@ -92,17 +92,17 @@ function formatComparisonRuntimeStatus(value: number | undefined) {
 }
 
 export function joinOrFallback(values: readonly string[]) {
-  return values.length > 0 ? values.join(' / ') : TBD_LABEL;
+  return values.length > 0 ? values.join(' / ') : EMPTY_VALUE_LABEL;
 }
 
 export function getRobotCardSpecRows(robot: Robot): DisplayRow[] {
   const { specs } = robot;
   const size = specs.heightCm != null || specs.weightKg != null
     ? `${formatNumber(specs.heightCm, 'cm')} / ${formatNumber(specs.weightKg, 'kg')}`
-    : TBD_LABEL;
+    : EMPTY_VALUE_LABEL;
   const primaryIndustry = robot.industryTags?.[0]
     ? getTagLabel(robot.industryTags[0], 'industry')
-    : TBD_LABEL;
+    : EMPTY_VALUE_LABEL;
 
   return [
     { label: '国内', value: japanAvailabilityLabels[robot.japanAvailability] },
@@ -136,9 +136,9 @@ export function getRobotDetailDecisionRows(robot: Robot): DisplayRow[] {
       label: '調達形態',
       value: joinOrFallback(robot.procurementModels.map((model) => procurementLabels[model])),
     },
-    { label: '参考価格', value: robot.priceNote ?? TBD_LABEL },
-    { label: '安全性', value: robot.safetyNote ?? TBD_LABEL },
-    { label: '継続性リスク', value: robot.vendorRiskNote ?? TBD_LABEL },
+    { label: '参考価格', value: robot.priceNote ?? EMPTY_VALUE_LABEL },
+    { label: '安全性', value: robot.safetyNote ?? EMPTY_VALUE_LABEL },
+    { label: '継続性リスク', value: robot.vendorRiskNote ?? EMPTY_VALUE_LABEL },
   ];
 }
 
@@ -159,7 +159,7 @@ export function getComparisonDetailRows(robot: Robot): DisplayRow[] {
 
   const height = formatNumber(specs.heightCm, 'cm');
   const weight = formatNumber(specs.weightKg, 'kg');
-  const dimensions = (specs.heightCm != null || specs.weightKg != null) ? `${height} / ${weight}` : TBD_LABEL;
+  const dimensions = (specs.heightCm != null || specs.weightKg != null) ? `${height} / ${weight}` : EMPTY_VALUE_LABEL;
 
   return [
     { label: uiText.comparison.dimensions, value: dimensions },

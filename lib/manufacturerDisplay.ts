@@ -1,5 +1,5 @@
 import type { Manufacturer, Robot } from '@/data/types';
-import { TBD_LABEL } from '@/lib/labels';
+import { EMPTY_VALUE_LABEL } from '@/lib/labels';
 
 export type ManufacturerConsultationRoute =
   | 'domestic-distributor'
@@ -26,13 +26,13 @@ export function getManufacturerLocationLabel(manufacturer: Manufacturer) {
 }
 
 export function getManufacturerEstablishedRegionLabel(manufacturer: Manufacturer) {
-  const year = manufacturer.foundedYear ? String(manufacturer.foundedYear) : TBD_LABEL;
+  const year = manufacturer.foundedYear ? String(manufacturer.foundedYear) : EMPTY_VALUE_LABEL;
   return `${getManufacturerLocationLabel(manufacturer)},${year}`;
 }
 
 export function getRepresentativeRobotLabel(robots: readonly Robot[], limit = 2) {
   if (robots.length === 0) {
-    return TBD_LABEL;
+    return EMPTY_VALUE_LABEL;
   }
 
   const names = robots.slice(0, limit).map((robot) => robot.nameJa ?? robot.name);

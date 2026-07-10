@@ -8,7 +8,7 @@ import { Dialog as DialogPrimitive } from 'radix-ui';
 import type { CompareCardDragHandleProps } from '@/components/SortableCompareCard';
 import type { Robot } from '@/data/types';
 import { getDisplayableAsset } from '@/lib/media';
-import { TBD_LABEL } from '@/lib/labels';
+import { EMPTY_VALUE_LABEL } from '@/lib/labels';
 import { getComparisonCoreRows, getComparisonDetailRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
@@ -22,7 +22,7 @@ interface ComparisonRobotPanelProps {
 }
 
 function CompactList({ items }: { items: string[] }) {
-  if (items.length === 0) return <p className="text-xs text-muted-foreground">{TBD_LABEL}</p>;
+  if (items.length === 0) return <p className="text-xs text-muted-foreground">{EMPTY_VALUE_LABEL}</p>;
   return (
     <ul className="space-y-1 text-xs text-foreground">
       {items.map((item) => (
