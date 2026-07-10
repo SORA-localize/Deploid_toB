@@ -171,6 +171,7 @@ export const articleTypeLabels: Record<ArticleType, string> = {
 };
 
 export const articleSectionLabels: Record<ArticleSection, string> = {
+  digest: 'ニュースダイジェスト',
   deployment: '導入・事例',
   business: '市場・動向',
   tech: '技術・製品',

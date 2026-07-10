@@ -5,6 +5,7 @@ Last reviewed: 2026-06-24
 > このドキュメントは、Deploid の記事候補（`data/articles.ts` に書く前のネタ）を探す段階の運用方針を定める。
 > 書き方・文体・分量は `editorial_style_guide_v1.md`、題材選定の判断軸は `editorial-methodology-review-2026-06-24.md`（承認後は統合）を参照。
 > このドキュメントは「どこを探すか・どう検索するか・何を除外するか」専用。
+> ChatGPT Scheduled Tasks で日次ニュース記事データを出力し CLI 側AIへ渡す場合、および CLI 側AIが公開済み記事から週次ニュースレターを作る場合の変換ルールは `news-automation-prompt-contract-v1.md` を正本とする。
 
 ---
 

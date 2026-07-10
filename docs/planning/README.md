@@ -18,6 +18,7 @@ Last cleaned: 2026-07-01
 - `design_system_v1.md` — 現行UIのデザイン原則、semantic token、カード/レイアウト方針
 - `editorial_style_guide_v1.md` — 記事本文の執筆方針（文体・NG表現・執筆ワークフロー・セクション別テンプレート）
 - `article-sourcing-reference-v1.md` — 記事候補を探す段階の方針（許可/除外ソース、検索クエリ例）
+- `news-automation-prompt-contract-v1.md` — ChatGPT Scheduled Tasks で日次記事データを出力し、週次ニュースレターは CLI 側AIが公開済み記事から作るための出力スキーマ・変換ルール
 
 ## 現行の正本
 
@@ -53,6 +54,7 @@ Last cleaned: 2026-07-01
 - `humanoid_mvp_scope_decision_v1.md` — MVPスコープ判断
 - `humanoid_platform_tech_stack_v1.md` — 技術スタック
 - `launch-readiness-meta-plan-v1.md` — 公開前のメタ情報、SNS共有、計測、プライバシー、sitemap整備計画
+- `news-automation-prompt-contract-v1.md` — ChatGPT Scheduled Tasks で日次記事データを出力し、週次ニュースレターは CLI 側AIが公開済み記事から作るための出力スキーマ・変換ルール
 - `ui_architecture_and_development_policy_v1.md` — UI構造と開発方針
 
 ### (b) 参照・背景（旧／非正本）

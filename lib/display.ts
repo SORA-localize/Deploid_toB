@@ -105,6 +105,7 @@ export const articleCategoryOrder: ArticleCategory[] = [
 
 /** 記事タブ（section）の表示順。完全性は articleSectionLabels(Record) と validate の diff で担保。 */
 export const articleSectionOrder: ArticleSection[] = [
+  'digest',
   'deployment',
   'business',
   'tech',

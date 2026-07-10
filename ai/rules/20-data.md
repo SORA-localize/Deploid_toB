@@ -15,6 +15,7 @@ Use this file for data additions, data updates, article records, tags, specs, so
 For articles, also read:
 
 - `docs/planning/editorial_style_guide_v1.md`
+- `docs/planning/news-automation-prompt-contract-v1.md` when the user pastes daily news output from ChatGPT Scheduled Tasks or asks for a weekly newsletter from local published articles
 
 For tags and specs, inspect the code source of truth before editing:
 

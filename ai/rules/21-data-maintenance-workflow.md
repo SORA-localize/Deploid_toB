@@ -70,7 +70,7 @@ Purpose: let an AI agent add or update records without breaking the `id` / `slug
 
 - Use only spec keys registered in `lib/specSchema.ts`.
 - Use only tag values registered in `lib/tagRegistry.ts`.
-- Tag by axis, do not mix axes in one field. For articles: `section` is the subject (required, drives tabs), `themeTags` (kind `theme`, optional, 0-4) is the angle, `industryTags` (kind `industry`) and `regionTags` (kind `region`) are facets. Keep one concept in one axis — `deployment`/`policy` live in `section`, not `theme`.
+- Tag by axis, do not mix axes in one field. For articles: `section` is the subject (required, drives tabs), `themeTags` (kind `theme`, optional, 0-4) is the angle, `industryTags` (kind `industry`) and `regionTags` (kind `region`) are facets. Automated daily article generation should create separate articles with the appropriate subject section, not a digest. Keep one concept in one axis — `deployment`/`policy` live in `section`, not `theme`.
 - Do not tag company or robot names. Use `relatedManufacturerIds` / `relatedRobotIds`; non-entity companies are found via full-text search.
 - `requiredCapabilities` must use `Capability` values, not tag registry values.
 - When adding enum values, update the type definition plus `lib/labels.ts` and `lib/display.ts`.

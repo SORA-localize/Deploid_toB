@@ -360,6 +360,7 @@ export type ArticleType =
  * UI専用の 'all' は含めない（棚タブ側 lib/articleShelves.ts の ArticleShelf で付与）。
  */
 export type ArticleSection =
+  | 'digest'
   | 'deployment'
   | 'business'
   | 'tech'

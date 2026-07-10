@@ -253,7 +253,7 @@ BaseRecord（id, slug, previousSlugs, summary, publishStatus,
 + title, titleJa
 + category          ← 必須・第一軸（news/interview/company-report/analysis/policy）
 + type              ← フォーマット（analysis/deployment-report/news-brief 等）
-+ section           ← 記事タブのサブジェクト（deployment/business/tech/policy/entertainment）
++ section           ← 記事タブのサブジェクト（digest/deployment/business/tech/policy/entertainment）
 + publishedAt       ← 一覧の鮮度ソート
 + author?
 + industryTags?     ← tagRegistry kind:'industry'。検索・絞り込み用
