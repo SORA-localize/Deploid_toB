@@ -18,7 +18,7 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { ChevronDown, ChevronRight, Star } from 'lucide-react';
+import { ChevronDown, ChevronRight, Link2, Star } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { SelectControl } from '@/components/SelectControl';
 import {
@@ -241,6 +241,24 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
 
   const clearAll = () => {
     commitOrder([]);
+  };
+
+  // 共有: 選択・並び順はURLが正本（commitOrder が同期済み）なので、現在のURLを
+  // コピーするだけで比較状態を再現できるリンクになる。
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
+  useEffect(() => {
+    if (shareStatus === 'idle') return;
+    const timer = setTimeout(() => setShareStatus('idle'), 2500);
+    return () => clearTimeout(timer);
+  }, [shareStatus]);
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setShareStatus('copied');
+    } catch {
+      setShareStatus('failed');
+    }
   };
 
   // over しているカードの「前/後ろ」どちらに差し込むかをポインタ(ドラッグ中の
@@ -504,16 +522,32 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                       <span className="text-xs font-medium text-muted-foreground">
                         {uiText.compare.comparisonSheet(orderedIds.length, MAX_COMPARE_ROBOTS)}
                       </span>
-                      {orderedIds.length > 0 && (
-                        <button
-                          type="button"
-                          aria-label={uiText.comparison.clearAria}
-                          onClick={clearAll}
-                          className="text-xs text-muted-foreground hover:text-foreground"
-                        >
-                          {uiText.common.clearAll}
-                        </button>
-                      )}
+                      <div className="flex items-center gap-4">
+                        <span role="status" className="text-xs text-muted-foreground">
+                          {shareStatus === 'copied' && uiText.comparison.shareCopied}
+                          {shareStatus === 'failed' && uiText.comparison.shareFailed}
+                        </span>
+                        {orderedIds.length > 0 && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={handleShare}
+                              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                            >
+                              <Link2 className="h-3.5 w-3.5" aria-hidden="true" />
+                              {uiText.comparison.shareLink}
+                            </button>
+                            <button
+                              type="button"
+                              aria-label={uiText.comparison.clearAria}
+                              onClick={clearAll}
+                              className="text-xs text-muted-foreground hover:text-foreground"
+                            >
+                              {uiText.common.clearAll}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
 
                     <div className="min-h-[6rem]">
