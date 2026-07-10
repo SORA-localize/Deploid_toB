@@ -2,7 +2,7 @@
 
 import { type ReactNode } from 'react';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
-import { X } from 'lucide-react';
+import { Star, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { FavoriteCard } from '@/components/FavoriteCard';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
@@ -42,6 +42,8 @@ interface DraggableMenuRobotButtonProps {
   robot: Robot;
   isSelected: boolean;
   isDisabled: boolean;
+  /** お気に入り登録済み表示（表示のみ。誤タップ防止のため、この行から★の操作はさせない） */
+  isFavorite?: boolean;
   onClick: () => void;
 }
 
@@ -49,6 +51,7 @@ export function DraggableMenuRobotButton({
   robot,
   isSelected,
   isDisabled,
+  isFavorite = false,
   onClick,
 }: DraggableMenuRobotButtonProps) {
   const data: CompareRobotDragData = { type: 'robot', source: 'menu', id: robot.id };
@@ -91,6 +94,12 @@ export function DraggableMenuRobotButton({
       >
         {robot.nameJa ?? robot.name}
       </span>
+      {isFavorite && (
+        <Star
+          className="h-3 w-3 shrink-0 fill-favorite text-favorite"
+          aria-hidden="true"
+        />
+      )}
       <span className="flex h-4 w-4 shrink-0 items-center justify-center" aria-hidden="true">
         {isSelected && (
           <X className="h-3.5 w-3.5 text-primary/70 group-hover:text-primary" />

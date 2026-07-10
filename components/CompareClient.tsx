@@ -239,6 +239,18 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
     commitOrder(orderedIds.filter((s) => s !== id));
   };
 
+  // メニューからの追加は5列目以降で画面外に着地することがあるため、
+  // お気に入りクリック時と同じ自動スクロール+ハイライトで追加位置を知らせる。
+  const handleMenuRobotClick = (id: string) => {
+    if (orderedIds.includes(id)) {
+      removeRobot(id);
+      return;
+    }
+    if (addRobot(id)) {
+      setTimeout(() => highlightRobot(id), 100);
+    }
+  };
+
   const clearAll = () => {
     commitOrder([]);
   };
@@ -485,9 +497,8 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                                         robot={robot}
                                         isSelected={isSelected}
                                         isDisabled={isDisabled}
-                                        onClick={() =>
-                                          isSelected ? removeRobot(robot.id) : addRobot(robot.id)
-                                        }
+                                        isFavorite={isMounted ? favorites.includes(robot.id) : false}
+                                        onClick={() => handleMenuRobotClick(robot.id)}
                                       />
                                     );
                                   })}
@@ -563,86 +574,90 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                           </div>
                         </div>
                       ) : (
-                        // カード＝列ヘッダーの比較表。行ラベル列は横スクロール時も左に固定する。
-                        // 列間の区切りは grid gap ではなくセルの padding + 縦罫線で作る
-                        // （gap だと sticky なラベル列の背景が隙間を覆えず、下を流れる列が透ける）。
+                        // カード＝列ヘッダーの比較表。
+                        // 各行を flex コンテナ + 固定幅セルで組む。grid にしないのは、
+                        // grid アイテムの包含ブロックは自分のグリッド領域になり
+                        // sticky left が機能しない（動ける余地がない）ため。
+                        // flex 行なら包含ブロック＝行全体なのでラベル列が正しく左に固定される。
+                        // 固定幅はカードの過大化防止と行間の列揃えを兼ねる。
                         <div className="overflow-x-auto pb-2">
-                          <div
-                            className="grid"
-                            style={{
-                              gridTemplateColumns: `minmax(5.5rem, 8rem) repeat(${sheetPreviewItems.length}, minmax(10.5rem, 1fr))`,
-                            }}
-                          >
+                          <div className="w-max min-w-full">
                             {/* 列ヘッダー行: 左上の角セル + ロボットカード */}
-                            <div
-                              className="sticky left-0 z-[2] bg-surface-inset"
-                              aria-hidden="true"
-                            />
-                            <SortableContext items={sheetItemIds} strategy={horizontalListSortingStrategy}>
-                              {sheetPreviewItems.map((item) => {
-                                if (item.type === 'preview') {
-                                  const manufacturer = manufacturerFor(item.robot.manufacturerId);
-                                  return (
-                                    <div key={`sheet-preview-${item.robot.id}`} className="px-1.5">
-                                      <CompareInsertionPreviewCard
-                                        robot={item.robot}
-                                        manufacturerName={manufacturer?.name ?? item.robot.manufacturerId}
-                                        manufacturerLogo={manufacturer?.logo}
-                                      />
-                                    </div>
-                                  );
-                                }
+                            <div className="flex">
+                              <div
+                                className="sticky left-0 z-[2] w-28 shrink-0 bg-surface-inset sm:w-32"
+                                aria-hidden="true"
+                              />
+                              <SortableContext items={sheetItemIds} strategy={horizontalListSortingStrategy}>
+                                {sheetPreviewItems.map((item) => {
+                                  if (item.type === 'preview') {
+                                    const manufacturer = manufacturerFor(item.robot.manufacturerId);
+                                    return (
+                                      <div
+                                        key={`sheet-preview-${item.robot.id}`}
+                                        className="w-40 shrink-0 px-1.5 sm:w-44"
+                                      >
+                                        <CompareInsertionPreviewCard
+                                          robot={item.robot}
+                                          manufacturerName={manufacturer?.name ?? item.robot.manufacturerId}
+                                          manufacturerLogo={manufacturer?.logo}
+                                        />
+                                      </div>
+                                    );
+                                  }
 
-                                const { robot } = item;
-                                const manufacturer = manufacturerFor(robot.manufacturerId);
-                                return (
-                                  <SortableCompareCard
-                                    key={robot.id}
-                                    robotId={robot.id}
-                                    sortableId={getDndItemId('sheet', robot.id)}
-                                    className="px-1.5"
-                                    data={{
-                                      type: 'robot',
-                                      source: 'sheet',
-                                      target: 'sheet',
-                                      dropType: 'sheet-card',
-                                      id: robot.id,
-                                    }}
-                                  >
-                                    {(dragHandleProps) => (
-                                      <ComparisonRobotPanel
-                                        robot={robot}
-                                        manufacturerName={manufacturer?.name ?? robot.manufacturerId}
-                                        isFavorite={
-                                          isMounted ? favorites.includes(robot.id) : false
-                                        }
-                                        onFavoriteToggle={toggleFavorite}
-                                        onRemove={removeRobot}
-                                        dragHandleProps={dragHandleProps}
-                                      />
-                                    )}
-                                  </SortableCompareCard>
-                                );
-                              })}
-                            </SortableContext>
+
+                                  const { robot } = item;
+                                  const manufacturer = manufacturerFor(robot.manufacturerId);
+                                  return (
+                                    <SortableCompareCard
+                                      key={robot.id}
+                                      robotId={robot.id}
+                                      sortableId={getDndItemId('sheet', robot.id)}
+                                      className="w-40 shrink-0 px-1.5 sm:w-44"
+                                      data={{
+                                        type: 'robot',
+                                        source: 'sheet',
+                                        target: 'sheet',
+                                        dropType: 'sheet-card',
+                                        id: robot.id,
+                                      }}
+                                    >
+                                      {(dragHandleProps) => (
+                                        <ComparisonRobotPanel
+                                          robot={robot}
+                                          manufacturerName={manufacturer?.name ?? robot.manufacturerId}
+                                          isFavorite={
+                                            isMounted ? favorites.includes(robot.id) : false
+                                          }
+                                          onFavoriteToggle={toggleFavorite}
+                                          onRemove={removeRobot}
+                                          dragHandleProps={dragHandleProps}
+                                        />
+                                      )}
+                                    </SortableCompareCard>
+                                  );
+                                })}
+                              </SortableContext>
+                            </div>
 
                             {/* スペック行（基本スペック / 詳細データ） */}
                             {specRowGroups.map((group) => (
                               <Fragment key={group.key}>
-                                <div className="col-span-full mt-4 border-b border-border-subtle pb-1.5">
+                                <div className="mt-4 border-b border-border-subtle pb-1.5">
                                   <span className="sticky left-0 inline-block text-xs font-semibold text-foreground">
                                     {group.heading}
                                   </span>
                                 </div>
                                 {group.labels.map((label, rowIndex) => (
-                                  <Fragment key={label}>
-                                    <div className="sticky left-0 z-[1] border-b border-border-subtle bg-surface-inset py-2 pr-3 text-xs text-muted-foreground">
+                                  <div key={label} className="flex border-b border-border-subtle">
+                                    <div className="sticky left-0 z-[1] w-28 shrink-0 bg-surface-inset py-2 pr-3 text-xs text-muted-foreground sm:w-32">
                                       {label}
                                     </div>
                                     {sheetPreviewItems.map((item) => (
                                       <div
                                         key={item.type === 'preview' ? `preview-${item.robot.id}` : item.robot.id}
-                                        className="border-b border-border-subtle px-1.5 py-2 text-xs font-medium text-foreground [overflow-wrap:anywhere]"
+                                        className="w-40 shrink-0 px-1.5 py-2 text-xs font-medium text-foreground [overflow-wrap:anywhere] sm:w-44"
                                       >
                                         {item.type === 'preview' ? (
                                           <span className="text-muted-foreground/60">{EMPTY_VALUE_LABEL}</span>
@@ -652,7 +667,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                                         )}
                                       </div>
                                     ))}
-                                  </Fragment>
+                                  </div>
                                 ))}
                               </Fragment>
                             ))}
@@ -693,9 +708,8 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                             robot={robot}
                             isSelected={isSelected}
                             isDisabled={isDisabled}
-                            onClick={() =>
-                              isSelected ? removeRobot(robot.id) : addRobot(robot.id)
-                            }
+                            isFavorite={isMounted ? favorites.includes(robot.id) : false}
+                            onClick={() => handleMenuRobotClick(robot.id)}
                           />
                         );
                       })
