@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -14,12 +14,11 @@ import {
 } from '@dnd-kit/core';
 import {
   arrayMove,
-  rectSortingStrategy,
+  horizontalListSortingStrategy,
   SortableContext,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import { ChevronDown, ChevronRight, Star } from 'lucide-react';
-import { motion, useReducedMotion } from 'motion/react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { SelectControl } from '@/components/SelectControl';
 import {
@@ -43,14 +42,14 @@ import {
   type CompareDropTarget,
   type CompareRobotDragData,
 } from '@/lib/compare/dnd';
+import { EMPTY_VALUE_LABEL } from '@/lib/labels';
+import { getComparisonCoreRows, getComparisonDetailRows, type DisplayRow } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { MAX_COMPARE_ROBOTS } from '@/lib/compareParams';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { useFavorites } from '@/lib/useFavorites';
 import { cn } from '@/lib/utils';
 import { sortManufacturers, sortRobots } from '@/lib/display';
-
-const SHEET_LAYOUT_TRANSITION = { type: 'spring', stiffness: 360, damping: 34 } as const;
 
 interface CompareClientProps {
   robots: Robot[];
@@ -70,7 +69,6 @@ type SheetPreviewItem =
 export function CompareClient({ robots, manufacturers, selectedIds }: CompareClientProps) {
   const { updateParams } = useUrlParamUpdater();
   const { favorites, toggleFavorite, isMounted } = useFavorites();
-  const prefersReducedMotion = Boolean(useReducedMotion());
   const [expandedManufacturers, setExpandedManufacturers] = useState<string[]>([]);
   const [mobileManufacturerId, setMobileManufacturerId] = useState('');
   const [activeDrag, setActiveDrag] = useState<CompareRobotDragData | null>(null);
@@ -156,13 +154,36 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
     return nextItems;
   }, [robotById, selectedRobots, sheetPreview]);
 
-  // 挿入プレビュー中だけ Framer Motion の layout を有効化する。
-  // シート内の並べ替えは dnd-kit が transform で整列アニメを担うため、
-  // ここで layout を併用すると同じカードを二重にアニメートしてガクつく。
-  const isInsertionPreviewing = sheetPreview !== null && !prefersReducedMotion;
-  const sheetMotionTransition = prefersReducedMotion
-    ? { duration: 0 }
-    : SHEET_LAYOUT_TRANSITION;
+  // 比較表の行データ。ラベル・順序・整形は lib/robotDisplay の関数が正本で、
+  // 全ロボットで同じ行構成を返す前提（行ラベルは先頭ロボットから取る）。
+  const columnRowsById = useMemo(() => {
+    const map = new Map<string, { core: DisplayRow[]; detail: DisplayRow[] }>();
+    for (const robot of selectedRobots) {
+      map.set(robot.id, {
+        core: getComparisonCoreRows(robot),
+        detail: getComparisonDetailRows(robot),
+      });
+    }
+    return map;
+  }, [selectedRobots]);
+
+  const specRowGroups = useMemo(() => {
+    const firstRobot = selectedRobots[0];
+    const firstRows = firstRobot ? columnRowsById.get(firstRobot.id) : undefined;
+    if (!firstRows) return [];
+    return [
+      {
+        key: 'core' as const,
+        heading: uiText.comparison.coreVariables,
+        labels: firstRows.core.map((row) => row.label),
+      },
+      {
+        key: 'detail' as const,
+        heading: uiText.comparison.detailedData,
+        labels: firstRows.detail.map((row) => row.label),
+      },
+    ];
+  }, [selectedRobots, columnRowsById]);
 
   const manufacturerFor = (id: string) => manufacturers.find((m) => m.id === id);
   const activeDragRobot = activeDrag ? robotById.get(activeDrag.id) : undefined;
@@ -495,7 +516,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                       )}
                     </div>
 
-                    <div className="min-h-[6rem] sm:min-h-[22rem]">
+                    <div className="min-h-[6rem]">
                       {selectedRobots.length === 0 && !sheetPreview ? (
                         <div className="flex min-h-[6rem] sm:min-h-[22rem] items-center justify-center text-center py-8">
                           <div className="max-w-md">
@@ -508,41 +529,44 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                           </div>
                         </div>
                       ) : (
-                        <SortableContext items={sheetItemIds} strategy={rectSortingStrategy}>
-                          <div className="flex snap-x gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 sm:gap-3 sm:overflow-visible sm:pb-0">
-                            {sheetPreviewItems.map((item) => {
-                              if (item.type === 'preview') {
-                                const manufacturer = manufacturerFor(item.robot.manufacturerId);
-                                return (
-                                  <motion.div
-                                    key={`sheet-preview-${item.robot.id}`}
-                                    layout={!prefersReducedMotion}
-                                    initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.96 }}
-                                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-                                    transition={sheetMotionTransition}
-                                    className="h-full w-[min(74vw,18rem)] shrink-0 snap-start sm:w-auto"
-                                  >
-                                    <CompareInsertionPreviewCard
-                                      robot={item.robot}
-                                      manufacturerName={manufacturer?.name ?? item.robot.manufacturerId}
-                                      manufacturerLogo={manufacturer?.logo}
-                                    />
-                                  </motion.div>
-                                );
-                              }
+                        // カード＝列ヘッダーの比較表。行ラベル列は横スクロール時も左に固定する。
+                        // 列間の区切りは grid gap ではなくセルの padding + 縦罫線で作る
+                        // （gap だと sticky なラベル列の背景が隙間を覆えず、下を流れる列が透ける）。
+                        <div className="overflow-x-auto pb-2">
+                          <div
+                            className="grid"
+                            style={{
+                              gridTemplateColumns: `minmax(5.5rem, 8rem) repeat(${sheetPreviewItems.length}, minmax(10.5rem, 1fr))`,
+                            }}
+                          >
+                            {/* 列ヘッダー行: 左上の角セル + ロボットカード */}
+                            <div
+                              className="sticky left-0 z-[2] bg-surface-inset"
+                              aria-hidden="true"
+                            />
+                            <SortableContext items={sheetItemIds} strategy={horizontalListSortingStrategy}>
+                              {sheetPreviewItems.map((item) => {
+                                if (item.type === 'preview') {
+                                  const manufacturer = manufacturerFor(item.robot.manufacturerId);
+                                  return (
+                                    <div key={`sheet-preview-${item.robot.id}`} className="px-1.5">
+                                      <CompareInsertionPreviewCard
+                                        robot={item.robot}
+                                        manufacturerName={manufacturer?.name ?? item.robot.manufacturerId}
+                                        manufacturerLogo={manufacturer?.logo}
+                                      />
+                                    </div>
+                                  );
+                                }
 
-                              const { robot } = item;
-                              const manufacturer = manufacturerFor(robot.manufacturerId);
-                              return (
-                                <motion.div
-                                  key={robot.id}
-                                  layout={isInsertionPreviewing}
-                                  transition={sheetMotionTransition}
-                                  className="h-full w-[min(74vw,18rem)] shrink-0 snap-start sm:w-auto"
-                                >
+                                const { robot } = item;
+                                const manufacturer = manufacturerFor(robot.manufacturerId);
+                                return (
                                   <SortableCompareCard
+                                    key={robot.id}
                                     robotId={robot.id}
                                     sortableId={getDndItemId('sheet', robot.id)}
+                                    className="px-1.5"
                                     data={{
                                       type: 'robot',
                                       source: 'sheet',
@@ -564,11 +588,42 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                                       />
                                     )}
                                   </SortableCompareCard>
-                                </motion.div>
-                              );
-                            })}
+                                );
+                              })}
+                            </SortableContext>
+
+                            {/* スペック行（基本スペック / 詳細データ） */}
+                            {specRowGroups.map((group) => (
+                              <Fragment key={group.key}>
+                                <div className="col-span-full mt-4 border-b border-border-subtle pb-1.5">
+                                  <span className="sticky left-0 inline-block text-xs font-semibold text-foreground">
+                                    {group.heading}
+                                  </span>
+                                </div>
+                                {group.labels.map((label, rowIndex) => (
+                                  <Fragment key={label}>
+                                    <div className="sticky left-0 z-[1] border-b border-border-subtle bg-surface-inset py-2 pr-3 text-xs text-muted-foreground">
+                                      {label}
+                                    </div>
+                                    {sheetPreviewItems.map((item) => (
+                                      <div
+                                        key={item.type === 'preview' ? `preview-${item.robot.id}` : item.robot.id}
+                                        className="border-b border-border-subtle px-1.5 py-2 text-xs font-medium text-foreground [overflow-wrap:anywhere]"
+                                      >
+                                        {item.type === 'preview' ? (
+                                          <span className="text-muted-foreground/60">{EMPTY_VALUE_LABEL}</span>
+                                        ) : (
+                                          columnRowsById.get(item.robot.id)?.[group.key][rowIndex]?.value ??
+                                          EMPTY_VALUE_LABEL
+                                        )}
+                                      </div>
+                                    ))}
+                                  </Fragment>
+                                ))}
+                              </Fragment>
+                            ))}
                           </div>
-                        </SortableContext>
+                        </div>
                       )}
                     </div>
                   </section>

@@ -177,7 +177,7 @@ export function CompareInsertionPreviewCard({
 }: CompareDragOverlayCardProps) {
   return (
     <article
-      className="pointer-events-none relative aspect-[5/7] w-full overflow-hidden
+      className="pointer-events-none relative aspect-[4/3] w-full overflow-hidden
                  rounded-lg border border-dashed border-ring bg-card/70 opacity-60"
       aria-hidden="true"
     >

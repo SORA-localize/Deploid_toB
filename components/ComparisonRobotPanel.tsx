@@ -60,7 +60,9 @@ export function ComparisonRobotPanel({
   const cardImage = getDisplayableAsset(robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage);
 
   return (
-    <article className="group relative aspect-[5/7] w-full overflow-hidden rounded-lg bg-muted text-card-foreground">
+    // 比較表の列ヘッダーとして使うコンパクトカード。スペック本体は下の表が担うため、
+    // ここは「どのロボットか」の識別（画像+名前+★✕+ドラッグ）と詳細ドロワーの入口に徹する。
+    <article className="group relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-muted text-card-foreground">
 
       {/* ── 画像レイヤー: blur 背景 < グラデーション < ロボット前景 < 操作UI ── */}
       {cardImage ? (

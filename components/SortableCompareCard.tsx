@@ -21,10 +21,12 @@ interface SortableCompareCardProps {
   /** dnd-kit 用の識別子。未指定なら robotId を使う */
   sortableId?: UniqueIdentifier;
   data?: Record<string, unknown>;
+  /** ルート要素に追加するクラス（比較表のセル内余白など） */
+  className?: string;
   children: (dragHandleProps: CompareCardDragHandleProps) => ReactNode;
 }
 
-export function SortableCompareCard({ robotId, sortableId, data, children }: SortableCompareCardProps) {
+export function SortableCompareCard({ robotId, sortableId, data, className, children }: SortableCompareCardProps) {
   const {
     attributes,
     listeners,
@@ -43,7 +45,11 @@ export function SortableCompareCard({ robotId, sortableId, data, children }: Sor
   return (
     // ドラッグ中は元の位置に薄いプレースホルダとして残り、着地点を示す。
     // 実際に持ち上がって動くカードは DragOverlay 側が描画する。
-    <div ref={setNodeRef} style={style} className={isDragging ? 'relative opacity-40' : 'relative'}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={[isDragging ? 'relative opacity-40' : 'relative', className].filter(Boolean).join(' ')}
+    >
       <div
         id={`compare-card-${robotId}`}
         className="rounded-lg transition-shadow duration-500"
