@@ -219,10 +219,9 @@ export const uiText = {
   comparison: {
     emptyTitle: '比較シートにロボットがありません。',
     emptyDescription: '左メニューから追加できます。',
-    emptyHint: 'ドラッグ&ドロップ・お気に入り機能に対応しています。',
     clearAria: '比較シートを空にする',
     addAria: (name: string) => `${name}を比較に追加する`,
-    addToSheet: 'ここに追加',
+    addToSheet: '追加',
     removeAria: (name: string) => `${name}を比較から外す`,
     reorderAria: (name: string) => `${name}の比較順を並び替える`,
     reorderHint: 'ドラッグまたはキーボードで並び替え',

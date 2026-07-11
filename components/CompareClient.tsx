@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
+  closestCenter,
   DndContext,
   DragOverlay,
   KeyboardSensor,
@@ -9,7 +10,6 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-  type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
 import {
@@ -21,27 +21,12 @@ import {
 import { Link2, Star } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { SelectControl } from '@/components/SelectControl';
-import {
-  CompareDragOverlayCard,
-  CompareDroppableArea,
-  CompareInsertionPreviewCard,
-  DraggableFavoriteCard,
-  DraggableMenuRobotButton,
-} from '@/components/compare/CompareParts';
+import { MenuRobotButton } from '@/components/compare/CompareParts';
 import { ComparisonRobotPanel } from '@/components/ComparisonRobotPanel';
+import { FavoriteCard } from '@/components/FavoriteCard';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SortableCompareCard } from '@/components/SortableCompareCard';
 import type { Manufacturer, Robot } from '@/data/types';
-import {
-  compareCollisionDetection,
-  compareColumnIds,
-  getDndItemId,
-  getDropData,
-  getRobotDragData,
-  type CompareDropData,
-  type CompareDropTarget,
-  type CompareRobotDragData,
-} from '@/lib/compare/dnd';
 import { getComparisonCoreRows, getComparisonDetailRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { MAX_COMPARE_ROBOTS } from '@/lib/compareParams';
@@ -55,15 +40,6 @@ interface CompareClientProps {
   manufacturers: Manufacturer[];
   selectedIds: string[];
 }
-
-interface SheetPreviewPlacement {
-  id: string;
-  index: number;
-}
-
-type SheetPreviewItem =
-  | { type: 'robot'; robot: Robot }
-  | { type: 'preview'; robot: Robot };
 
 /**
  * カード内蔵のスペック一覧。共有ラベル列を持たず、各カードが自分のラベル+値を持つ。
@@ -106,9 +82,8 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
   const { updateParams } = useUrlParamUpdater();
   const { favorites, toggleFavorite, isMounted } = useFavorites();
   const [mobileManufacturerId, setMobileManufacturerId] = useState('');
-  const [activeDrag, setActiveDrag] = useState<CompareRobotDragData | null>(null);
-  const [activeDropTarget, setActiveDropTarget] = useState<CompareDropTarget | null>(null);
-  const [sheetPreview, setSheetPreview] = useState<SheetPreviewPlacement | null>(null);
+  // D&D はシート内の並べ替え専用（カラム間の移動はクリック操作。§8.7）
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
@@ -172,25 +147,8 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
     () => sortRobots(robots.filter((r) => favorites.includes(r.id)), 'name', manufacturers),
     [robots, favorites, manufacturers],
   );
-  const sheetItemIds = useMemo(
-    () => orderedIds.map((id) => getDndItemId('sheet', id)),
-    [orderedIds],
-  );
-  const sheetPreviewItems = useMemo<SheetPreviewItem[]>(() => {
-    const baseItems: SheetPreviewItem[] = selectedRobots.map((robot) => ({ type: 'robot', robot }));
-    if (!sheetPreview) return baseItems;
-
-    const previewRobot = robotById.get(sheetPreview.id);
-    if (!previewRobot) return baseItems;
-
-    const nextItems = [...baseItems];
-    const previewIndex = Math.max(0, Math.min(sheetPreview.index, nextItems.length));
-    nextItems.splice(previewIndex, 0, { type: 'preview', robot: previewRobot });
-    return nextItems;
-  }, [robotById, selectedRobots, sheetPreview]);
-
   const manufacturerFor = (id: string) => manufacturers.find((m) => m.id === id);
-  const activeDragRobot = activeDrag ? robotById.get(activeDrag.id) : undefined;
+  const activeDragRobot = activeDragId ? robotById.get(activeDragId) : undefined;
   const activeDragManufacturer = activeDragRobot
     ? manufacturerFor(activeDragRobot.manufacturerId)
     : undefined;
@@ -205,19 +163,6 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
     if (orderedIds.length >= MAX_COMPARE_ROBOTS || orderedIds.includes(id)) return false;
 
     commitOrder([...orderedIds, id]);
-    return true;
-  };
-
-  const insertRobot = (id: string, index?: number) => {
-    if (orderedIds.length >= MAX_COMPARE_ROBOTS || orderedIds.includes(id)) return false;
-
-    const insertIndex =
-      typeof index === 'number'
-        ? Math.max(0, Math.min(index, orderedIds.length))
-        : orderedIds.length;
-    const nextIds = [...orderedIds];
-    nextIds.splice(insertIndex, 0, id);
-    commitOrder(nextIds);
     return true;
   };
 
@@ -277,115 +222,25 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
     }
   };
 
-  // over しているカードの「前/後ろ」どちらに差し込むかをポインタ(ドラッグ中の
-  // 矩形中心)とカード中心の位置関係で判定する。これで任意位置に挿入できる。
-  const isInsertedAfterOver = (
-    active: DragOverEvent['active'],
-    over: NonNullable<DragOverEvent['over']>,
-  ): boolean => {
-    const activeRect = active.rect.current.translated;
-    const overRect = over.rect;
-    if (!activeRect) return false;
-
-    const overMidX = overRect.left + overRect.width / 2;
-    const overMidY = overRect.top + overRect.height / 2;
-    const activeMidX = activeRect.left + activeRect.width / 2;
-    const activeMidY = activeRect.top + activeRect.height / 2;
-
-    if (activeMidY > overMidY + overRect.height / 2) return true; // 明確に下の行
-    if (activeMidY < overMidY - overRect.height / 2) return false; // 明確に上の行
-    return activeMidX > overMidX; // 同じ行付近なら左右で判定
-  };
-
-  const getSheetInsertionPreview = (
-    activeData: CompareRobotDragData | null,
-    dropData: CompareDropData | null,
-    active: DragOverEvent['active'],
-    over: DragOverEvent['over'],
-  ): SheetPreviewPlacement | null => {
-    if (!activeData || !dropData || dropData.target !== 'sheet') return null;
-    if (activeData.source === 'sheet') return null;
-    if (orderedIds.includes(activeData.id)) return null;
-    if (orderedIds.length >= MAX_COMPARE_ROBOTS) return null;
-
-    // 既定は末尾(空シート/列の上)。カードの上ならポインタ位置で前後を決める。
-    let index = orderedIds.length;
-    if (dropData.dropType === 'sheet-card') {
-      const cardIndex = orderedIds.indexOf(dropData.id);
-      if (cardIndex >= 0) {
-        index = over ? cardIndex + (isInsertedAfterOver(active, over) ? 1 : 0) : cardIndex;
-      }
-    }
-    return { id: activeData.id, index };
-  };
-
   const handleDragStart = ({ active }: DragStartEvent) => {
-    setActiveDrag(getRobotDragData(active.data.current));
-    setActiveDropTarget(null);
-    setSheetPreview(null);
-  };
-
-  const handleDragOver = ({ active, over }: DragOverEvent) => {
-    const activeData = getRobotDragData(active.data.current);
-    const dropData = getDropData(over?.data.current);
-    setActiveDropTarget(dropData?.target ?? null);
-    setSheetPreview(getSheetInsertionPreview(activeData, dropData, active, over));
+    setActiveDragId(String(active.id));
   };
 
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
-    const activeData = getRobotDragData(active.data.current);
-    const dropData = getDropData(over?.data.current);
-    setActiveDrag(null);
-    setActiveDropTarget(null);
-    setSheetPreview(null);
+    setActiveDragId(null);
+    if (!over || active.id === over.id) return;
 
-    if (!activeData || !dropData) return;
+    const oldIndex = orderedIds.indexOf(String(active.id));
+    const newIndex = orderedIds.indexOf(String(over.id));
+    if (oldIndex < 0 || newIndex < 0) return;
 
-    if (
-      activeData.source === 'sheet' &&
-      dropData.dropType === 'sheet-card' &&
-      activeData.id !== dropData.id
-    ) {
-      const oldIndex = orderedIds.indexOf(activeData.id);
-      const newIndex = orderedIds.indexOf(dropData.id);
-      if (oldIndex < 0 || newIndex < 0) return;
-
-      commitOrder(arrayMove(orderedIds, oldIndex, newIndex), 'replace');
-      return;
-    }
-
-    if (dropData.target === 'sheet') {
-      if (activeData.source === 'sheet') return;
-      if (orderedIds.includes(activeData.id)) {
-        highlightRobot(activeData.id);
-        return;
-      }
-
-      // プレビューと同じ計算で着地indexを決め、見た目と一致させる。
-      const placement = getSheetInsertionPreview(activeData, dropData, active, over);
-      if (placement && insertRobot(activeData.id, placement.index)) {
-        setTimeout(() => highlightRobot(activeData.id), 100);
-      }
-      return;
-    }
-
-    if (dropData.target === 'menu' && activeData.source === 'sheet') {
-      removeRobot(activeData.id);
-      return;
-    }
-
-    if (dropData.target === 'favorite' && activeData.source === 'sheet') {
-      if (!favorites.includes(activeData.id)) {
-        toggleFavorite(activeData.id);
-      }
-    }
+    commitOrder(arrayMove(orderedIds, oldIndex, newIndex), 'replace');
   };
 
   const handleDragCancel = () => {
-    setActiveDrag(null);
-    setActiveDropTarget(null);
-    setSheetPreview(null);
+    setActiveDragId(null);
   };
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -405,30 +260,17 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
         </div>
 
         <DndContext
-          id="compare-three-column"
+          id="compare-sheet-sort"
           sensors={sensors}
-          collisionDetection={compareCollisionDetection}
+          collisionDetection={closestCenter}
           onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
           <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_minmax(0,1fr)] lg:grid-cols-[16rem_minmax(0,1fr)_16rem]">
             {/* Left Sidebar - Manufacturer Menu (desktop only) */}
             <div className="hidden md:block min-w-0">
-              <CompareDroppableArea
-                id={compareColumnIds.menu}
-                target="menu"
-                isHighlighted={activeDropTarget === 'menu'}
-              >
-                {({ setNodeRef, isActive }) => (
-                  <div
-                    ref={setNodeRef}
-                    className={cn(
-                      'border border-border bg-card transition-[box-shadow,outline-color] duration-200 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]',
-                      isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
-                    )}
-                  >
+              <div className="border border-border bg-card lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
                     <div className="px-4 py-3 border-b border-border-subtle">
                       <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {uiText.compare.manufacturers}
@@ -465,7 +307,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                               const isDisabled =
                                 !isSelected && orderedIds.length >= MAX_COMPARE_ROBOTS;
                               return (
-                                <DraggableMenuRobotButton
+                                <MenuRobotButton
                                   key={robot.id}
                                   robot={robot}
                                   isSelected={isSelected}
@@ -479,26 +321,12 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         );
                       })}
                     </div>
-                  </div>
-                )}
-              </CompareDroppableArea>
+              </div>
             </div>
 
             {/* Main Content - Comparison Sheet */}
             <div className="min-w-0">
-              <CompareDroppableArea
-                id={compareColumnIds.sheet}
-                target="sheet"
-                isHighlighted={activeDropTarget === 'sheet'}
-              >
-                {({ setNodeRef, isActive }) => (
-                  <section
-                    ref={setNodeRef}
-                    className={cn(
-                      'border border-border-subtle bg-surface-inset p-3 transition-[box-shadow,outline-color] duration-200',
-                      isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
-                    )}
-                  >
+              <section className="border border-border-subtle bg-surface-inset p-3">
                     <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <span className="text-xs font-medium text-muted-foreground">
                         {uiText.compare.comparisonSheet(orderedIds.length, MAX_COMPARE_ROBOTS)}
@@ -532,7 +360,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                     </div>
 
                     <div className="min-h-[6rem]">
-                      {selectedRobots.length === 0 && !sheetPreview ? (
+                      {selectedRobots.length === 0 ? (
                         <div className="flex min-h-[6rem] sm:min-h-[22rem] items-center justify-center text-center py-8">
                           <div className="max-w-md">
                             <p className="text-sm font-medium text-foreground">
@@ -547,37 +375,15 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         // ラベル内蔵カードの折り返しグリッド。共有ラベル列を持たないので
                         // 横スクロールも sticky 列も不要になり、縦方向に画面を使い切る。
                         // 並べ替えは元実装と同じ rectSortingStrategy（グリッド内 D&D）。
-                        <SortableContext items={sheetItemIds} strategy={rectSortingStrategy}>
+                        <SortableContext items={orderedIds} strategy={rectSortingStrategy}>
                           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                            {sheetPreviewItems.map((item) => {
-                              if (item.type === 'preview') {
-                                const manufacturer = manufacturerFor(item.robot.manufacturerId);
-                                return (
-                                  <div key={`sheet-preview-${item.robot.id}`} className="h-full">
-                                    <CompareInsertionPreviewCard
-                                      robot={item.robot}
-                                      manufacturerName={manufacturer?.name ?? item.robot.manufacturerId}
-                                      manufacturerLogo={manufacturer?.logo}
-                                    />
-                                  </div>
-                                );
-                              }
-
-                              const { robot } = item;
+                            {selectedRobots.map((robot) => {
                               const manufacturer = manufacturerFor(robot.manufacturerId);
                               return (
                                 <SortableCompareCard
                                   key={robot.id}
                                   robotId={robot.id}
-                                  sortableId={getDndItemId('sheet', robot.id)}
                                   className="h-full"
-                                  data={{
-                                    type: 'robot',
-                                    source: 'sheet',
-                                    target: 'sheet',
-                                    dropType: 'sheet-card',
-                                    id: robot.id,
-                                  }}
                                 >
                                   {(dragHandleProps) => (
                                     <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card">
@@ -601,9 +407,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         </SortableContext>
                       )}
                     </div>
-                  </section>
-                )}
-              </CompareDroppableArea>
+              </section>
 
               {/* Mobile-only: add robots after the comparison sheet so the selected set stays primary. */}
               <div className="mt-4 border border-border bg-card md:hidden">
@@ -629,7 +433,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         const isDisabled =
                           !isSelected && orderedIds.length >= MAX_COMPARE_ROBOTS;
                         return (
-                          <DraggableMenuRobotButton
+                          <MenuRobotButton
                             key={robot.id}
                             robot={robot}
                             isSelected={isSelected}
@@ -647,19 +451,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
 
             {/* Right Sidebar - Favorites (desktop xl+ only) */}
             <div className="hidden lg:block min-w-0">
-              <CompareDroppableArea
-                id={compareColumnIds.favorite}
-                target="favorite"
-                isHighlighted={activeDropTarget === 'favorite'}
-              >
-                {({ setNodeRef, isActive }) => (
-                  <div
-                    ref={setNodeRef}
-                    className={cn(
-                      'border border-border bg-card transition-[box-shadow,outline-color] duration-200 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]',
-                      isActive && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
-                    )}
-                  >
+              <div className="border border-border bg-card lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
                     <div className="px-4 py-3 border-b border-border-subtle flex items-center gap-2">
                       <Star className="w-4 h-4 fill-favorite text-favorite" />
                       <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -683,7 +475,7 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                           {favoriteRobots.map((robot) => {
                             const manufacturer = manufacturerFor(robot.manufacturerId);
                             return (
-                              <DraggableFavoriteCard
+                              <FavoriteCard
                                 key={robot.id}
                                 robot={robot}
                                 manufacturerName={manufacturer?.name ?? robot.manufacturerId}
@@ -696,40 +488,24 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         </div>
                       )}
                     </div>
-                  </div>
-                )}
-              </CompareDroppableArea>
+              </div>
             </div>
           </div>
 
-          {/*
-            持ち上げ中のカードを描画する層。元カードは SortableCompareCard 側で
-            薄いプレースホルダとして残り、着地点を示す。
-            - シート内並べ替え(source='sheet'): 実物大の忠実なカードを持ち上げる
-              (ミニカードが別々に飛ぶ違和感を避けるため)。DragOverlay は元ノードと
-              同じ寸法で描画されるので h-full のパネルがそのまま収まる。
-            - メニュー/お気に入りからの挿入: リスト行を掴む場面なので小カード。
-          */}
+          {/* 持ち上げ中のカードを描画する層。元カードは SortableCompareCard 側で
+              薄いプレースホルダとして残り、着地点を示す。D&D はシート内並べ替え専用。 */}
           <DragOverlay>
-            {activeDrag && activeDragRobot ? (
-              activeDrag.source === 'sheet' ? (
-                <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-2xl">
-                  <ComparisonRobotPanel
-                    robot={activeDragRobot}
-                    manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerId}
-                    isFavorite={isMounted ? favorites.includes(activeDragRobot.id) : false}
-                    onFavoriteToggle={() => {}}
-                    onRemove={() => {}}
-                  />
-                  <CompareCardSpecList robot={activeDragRobot} />
-                </div>
-              ) : (
-                <CompareDragOverlayCard
+            {activeDragRobot ? (
+              <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-2xl">
+                <ComparisonRobotPanel
                   robot={activeDragRobot}
                   manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerId}
-                  manufacturerLogo={activeDragManufacturer?.logo}
+                  isFavorite={isMounted ? favorites.includes(activeDragRobot.id) : false}
+                  onFavoriteToggle={() => {}}
+                  onRemove={() => {}}
                 />
-              )
+                <CompareCardSpecList robot={activeDragRobot} />
+              </div>
             ) : null}
           </DragOverlay>
         </DndContext>
