@@ -64,19 +64,28 @@ export default function HomePage() {
   // HomeContentNavigator 用プレビュー画像の型（component側の PreviewAsset と同形）。
   type PreviewAsset = { src: string; alt: string; label: string; objectPosition?: string };
 
-  // data/robots.ts の rights を getDisplayableAsset で判定し、表示可能なアセットを持つ
-  // ロボットだけを対象にする（画像パスを直書きしない。直書きすると該当ロボットの
-  // rights.status が blocked に変わっても、ここだけ表示され続けてしまうため）。
-  const robotPreviewAssets: PreviewAsset[] = getRobots()
-    .flatMap((robot) => {
-      const asset = getDisplayableAsset(
-        robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage,
-      );
-      return asset
-        ? [{ src: asset.src, alt: asset.alt, label: robot.nameJa ?? robot.name }]
-        : [];
-    })
-    .slice(0, 6);
+  // ロボットタブの背景は1枚だけ見せる（サムネ帯は出さない）。機体は編集判断で指名し、
+  // 画像パスは直書きせず rights（getDisplayableAsset）を通して解決する。直書きすると
+  // rights.status が blocked に変わってもここだけ表示され続けてしまうため。
+  // 指名機体が表示不可になった場合は、表示可能な機体の先頭へ自動フォールバックする。
+  const HOME_ROBOT_PREVIEW_ID = 'figure-03';
+  const resolveRobotPreview = (robot: ReturnType<typeof getRobots>[number]) => {
+    const asset = getDisplayableAsset(
+      robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage,
+    );
+    return asset
+      ? { src: asset.src, alt: asset.alt, label: robot.nameJa ?? robot.name }
+      : undefined;
+  };
+  const robotPreviewAssets: PreviewAsset[] = (() => {
+    const pool = getRobots();
+    const pinned = pool.find((robot) => robot.id === HOME_ROBOT_PREVIEW_ID);
+    for (const robot of [pinned, ...pool]) {
+      const preview = robot && resolveRobotPreview(robot);
+      if (preview) return [preview];
+    }
+    return [];
+  })();
 
   // Unsplash: Jonathan Phillips / https://unsplash.com/photos/fTxWB2uCBz8 / Unsplash License
   const manufacturerPreviewAssets: typeof robotPreviewAssets = [
