@@ -25,6 +25,7 @@ import { MenuRobotButton } from '@/components/compare/CompareParts';
 import { ComparisonRobotPanel } from '@/components/ComparisonRobotPanel';
 import { FavoriteCard } from '@/components/FavoriteCard';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
+import { SearchInput } from '@/components/SearchInput';
 import { SortableCompareCard } from '@/components/SortableCompareCard';
 import type { Manufacturer, Robot } from '@/data/types';
 import { getComparisonCoreRows, getComparisonDetailRows } from '@/lib/robotDisplay';
@@ -34,6 +35,7 @@ import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
 import { useFavorites } from '@/lib/useFavorites';
 import { cn } from '@/lib/utils';
 import { sortManufacturers, sortRobots } from '@/lib/display';
+import { normalizeSearchText } from '@/lib/search';
 
 type CompareView = 'visual' | 'specs';
 
@@ -98,6 +100,16 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
     if (next === view) return;
     setView(next);
     updateParams({ view: next === 'specs' ? 'specs' : null }, 'replace');
+  };
+
+  // メニュー内検索: 90行前後のツリーをスクロールせず目的の機体へ最短で届くための
+  // ローカル絞り込み（URLには載せない。共有すべき状態は選択と表示モードのみ）。
+  const [menuQuery, setMenuQuery] = useState('');
+  const normalizedMenuQuery = normalizeSearchText(menuQuery);
+  const menuRobotMatches = (robot: Robot, manufacturer: Manufacturer) => {
+    if (!normalizedMenuQuery) return true;
+    return [robot.name, robot.nameJa, manufacturer.name, manufacturer.nameJa]
+      .some((text) => text && normalizeSearchText(text).includes(normalizedMenuQuery));
   };
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -286,10 +298,17 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
             {/* Left Sidebar - Manufacturer Menu (desktop only) */}
             <div className="hidden md:block min-w-0">
               <div className="border border-border bg-card lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
-                    <div className="px-4 py-3 border-b border-border-subtle">
+                    <div className="space-y-2 px-4 py-3 border-b border-border-subtle">
                       <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {uiText.compare.manufacturers}
                       </h2>
+                      <SearchInput
+                        id="compare-menu-search"
+                        value={menuQuery}
+                        onChange={setMenuQuery}
+                        placeholder={uiText.compare.menuSearchPlaceholder}
+                        inputClassName="min-h-9 text-xs"
+                      />
                     </div>
                     <div className="max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:max-h-[calc(100vh-200px)]">
                       {/* 常時展開ツリー: 開閉操作を持たない。メーカー名はスクロール内 sticky 見出しで、
@@ -297,7 +316,11 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                           （ホバー展開のフライアウトは、ここがD&Dのドラッグ元のため不採用。§8.6） */}
                       {sortedManufacturers.map((manufacturer) => {
                         const manufacturerRobots = sortRobots(
-                          robots.filter((r) => r.manufacturerId === manufacturer.id),
+                          robots.filter(
+                            (r) =>
+                              r.manufacturerId === manufacturer.id &&
+                              menuRobotMatches(r, manufacturer),
+                          ),
                           'name',
                           manufacturers,
                         );

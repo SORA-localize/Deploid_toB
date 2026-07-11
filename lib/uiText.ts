@@ -174,6 +174,7 @@ export const uiText = {
     manufacturers: 'メーカー',
     selectManufacturer: 'メーカーを選択',
     manufacturerEmpty: 'このメーカーのロボットデータはありません。',
+    menuSearchPlaceholder: '機体名・メーカー名で検索',
     comparisonSheet: (count: number, max: number) => `比較シート（${count}/${max}）`,
     favorites: 'お気に入り',
     compare: '比較する',
