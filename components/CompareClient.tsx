@@ -222,6 +222,18 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
     cancelFlyoutClose();
     setMenuFlyout(null);
   };
+  // ウィンドウのスクロール/リサイズはアンカー行を動かすが fixed のパネルは動かない。
+  // 座標が古くなったら追従せず閉じる（メニュー内スクロールの onScroll と同じ方針）。
+  useEffect(() => {
+    if (!menuFlyout) return;
+    const close = () => setMenuFlyout(null);
+    window.addEventListener('scroll', close, { passive: true });
+    window.addEventListener('resize', close);
+    return () => {
+      window.removeEventListener('scroll', close);
+      window.removeEventListener('resize', close);
+    };
+  }, [menuFlyout]);
   const menuFlyoutManufacturer = menuFlyout ? manufacturerFor(menuFlyout.manufacturerId) : undefined;
   const menuFlyoutRobots =
     menuFlyout && menuFlyoutManufacturer
@@ -235,6 +247,10 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
           manufacturers,
         )
       : [];
+  // 検索でアンカーの機体が全滅したら（行ごと消えるので）幽霊パネルを残さない
+  useEffect(() => {
+    if (menuFlyout && menuFlyoutRobots.length === 0) setMenuFlyout(null);
+  }, [menuFlyout, menuFlyoutRobots.length]);
 
   // 並び順を local state へ即時反映し、URL も同じ値へ同期する(共有・履歴用)。
   const commitOrder = (nextIds: string[], mode: 'push' | 'replace' = 'push') => {
@@ -377,7 +393,11 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                         );
                         if (manufacturerRobots.length === 0) return null;
                         const isOpen = menuFlyout?.manufacturerId === manufacturer.id;
-                        const hasSelection = manufacturerRobots.some((r) => orderedIds.includes(r.id));
+                        // 選択インジケータは検索フィルタと無関係の全体状態から出す
+                        // （検索で選択中の機体が隠れても選択は生きているため）
+                        const hasSelection = orderedIds.some(
+                          (id) => robotById.get(id)?.manufacturerId === manufacturer.id,
+                        );
 
                         return (
                           <button
@@ -509,8 +529,11 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                             <p className="text-sm font-medium text-foreground">
                               {uiText.comparison.emptyTitle}
                             </p>
-                            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                              下のメーカーリストからロボットを選んで追加してください。
+                            <p className="mt-2 text-xs leading-relaxed text-muted-foreground md:hidden">
+                              {uiText.comparison.emptyDescriptionMobile}
+                            </p>
+                            <p className="mt-2 hidden text-xs leading-relaxed text-muted-foreground md:block">
+                              {uiText.comparison.emptyDescription}
                             </p>
                           </div>
                         </div>

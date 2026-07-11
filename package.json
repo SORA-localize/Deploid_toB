@@ -7,7 +7,6 @@
   },
   "scripts": {
     "dev": "next dev",
-    "dev:sandbox": "cd /private/tmp/deploid-local-media-preview && npm run dev",
     "build": "node scripts/validate-data.mjs && next build",
     "start": "next start",
     "validate:data": "node scripts/validate-data.mjs",
