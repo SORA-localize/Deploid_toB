@@ -14,11 +14,11 @@ export const metadata = createPageMetadata({
 async function CompareContent({
   searchParams,
 }: {
-  searchParams: Promise<{ compare?: string }>;
+  searchParams: Promise<{ compare?: string; view?: string }>;
 }) {
   const robots = getRobots();
   const manufacturers = getManufacturers();
-  const { compare } = await searchParams;
+  const { compare, view } = await searchParams;
   const selectedIds = normalizeCompareRobotIds(compare, robots);
 
   return (
@@ -26,6 +26,7 @@ async function CompareContent({
       robots={robots}
       manufacturers={manufacturers}
       selectedIds={selectedIds}
+      initialView={view === 'specs' ? 'specs' : 'visual'}
     />
   );
 }
@@ -33,7 +34,7 @@ async function CompareContent({
 export default function ComparePage({
   searchParams,
 }: {
-  searchParams: Promise<{ compare?: string }>;
+  searchParams: Promise<{ compare?: string; view?: string }>;
 }) {
   return (
     <Suspense fallback={<PageSuspenseFallback />}>

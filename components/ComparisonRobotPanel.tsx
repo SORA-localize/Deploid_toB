@@ -19,6 +19,11 @@ interface ComparisonRobotPanelProps {
   onFavoriteToggle: (id: string) => void;
   onRemove: (id: string) => void;
   dragHandleProps?: CompareCardDragHandleProps;
+  /**
+   * visual: 単独で置く大きめの画像カード（眺める・並べ替えるモード）
+   * compact: スペック一覧カードの画像ヘッダー（親がborder/roundingを持つ）
+   */
+  variant?: 'visual' | 'compact';
 }
 
 function CompactList({ items }: { items: string[] }) {
@@ -42,6 +47,7 @@ export function ComparisonRobotPanel({
   onFavoriteToggle,
   onRemove,
   dragHandleProps,
+  variant = 'compact',
 }: ComparisonRobotPanelProps) {
   const coreRows = getComparisonCoreRows(robot);
   const detailRows = getComparisonDetailRows(robot);
@@ -60,9 +66,15 @@ export function ComparisonRobotPanel({
   const cardImage = getDisplayableAsset(robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage);
 
   return (
-    // 比較表の列ヘッダーとして使うコンパクトカード。スペック本体は下の表が担うため、
-    // ここは「どのロボットか」の識別（画像+名前+★✕+ドラッグ）と詳細ドロワーの入口に徹する。
-    <article className="group relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-muted text-card-foreground">
+    // 「どのロボットか」の識別（画像+名前+★✕+ドラッグ）と詳細ドロワーの入口。
+    // スペックは compact では下の一覧、visual ではドロワーが担う。
+    <article
+      className={
+        variant === 'visual'
+          ? 'group relative isolate aspect-[4/5] w-full overflow-hidden rounded-lg bg-muted text-card-foreground'
+          : 'group relative isolate aspect-[4/3] w-full shrink-0 overflow-hidden bg-muted text-card-foreground'
+      }
+    >
 
       {/* ── 画像レイヤー: blur 背景 < グラデーション < ロボット前景 < 操作UI ── */}
       {cardImage ? (

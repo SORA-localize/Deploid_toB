@@ -35,10 +35,13 @@ import { useFavorites } from '@/lib/useFavorites';
 import { cn } from '@/lib/utils';
 import { sortManufacturers, sortRobots } from '@/lib/display';
 
+type CompareView = 'visual' | 'specs';
+
 interface CompareClientProps {
   robots: Robot[];
   manufacturers: Manufacturer[];
   selectedIds: string[];
+  initialView: CompareView;
 }
 
 /**
@@ -78,12 +81,24 @@ function CompareCardSpecList({ robot }: { robot: Robot }) {
   );
 }
 
-export function CompareClient({ robots, manufacturers, selectedIds }: CompareClientProps) {
+export function CompareClient({ robots, manufacturers, selectedIds, initialView }: CompareClientProps) {
   const { updateParams } = useUrlParamUpdater();
   const { favorites, toggleFavorite, isMounted } = useFavorites();
   const [mobileManufacturerId, setMobileManufacturerId] = useState('');
   // D&D はシート内の並べ替え専用（カラム間の移動はクリック操作。§8.7）
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
+
+  // 表示モードはシート全体で一括切替（カード個別のフリップ/開閉は行ズレするため不採用。§8.7）。
+  // URLに載せて共有リンクでも表示モードを再現する。
+  const [view, setView] = useState<CompareView>(initialView);
+  useEffect(() => {
+    setView(initialView);
+  }, [initialView]);
+  const handleViewSelect = (next: CompareView) => {
+    if (next === view) return;
+    setView(next);
+    updateParams({ view: next === 'specs' ? 'specs' : null }, 'replace');
+  };
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
@@ -332,6 +347,33 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         {uiText.compare.comparisonSheet(orderedIds.length, MAX_COMPARE_ROBOTS)}
                       </span>
                       <div className="flex items-center gap-4">
+                        <div
+                          role="group"
+                          aria-label={uiText.comparison.viewToggleAria}
+                          className="flex items-center border border-border bg-background p-0.5 text-xs"
+                        >
+                          {(
+                            [
+                              { value: 'visual', label: uiText.comparison.viewVisual },
+                              { value: 'specs', label: uiText.comparison.viewSpecs },
+                            ] as const
+                          ).map((option) => (
+                            <button
+                              key={option.value}
+                              type="button"
+                              aria-pressed={view === option.value}
+                              onClick={() => handleViewSelect(option.value)}
+                              className={cn(
+                                'px-2 py-1 transition-colors',
+                                view === option.value
+                                  ? 'bg-primary text-primary-foreground'
+                                  : 'text-muted-foreground hover:text-foreground',
+                              )}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
                         <span role="status" className="text-xs text-muted-foreground">
                           {shareStatus === 'copied' && uiText.comparison.shareCopied}
                           {shareStatus === 'failed' && uiText.comparison.shareFailed}
@@ -376,7 +418,13 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                         // 横スクロールも sticky 列も不要になり、縦方向に画面を使い切る。
                         // 並べ替えは元実装と同じ rectSortingStrategy（グリッド内 D&D）。
                         <SortableContext items={orderedIds} strategy={rectSortingStrategy}>
-                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                          <div
+                            className={
+                              view === 'visual'
+                                ? 'grid grid-cols-2 gap-3 sm:grid-cols-3 2xl:grid-cols-4'
+                                : 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
+                            }
+                          >
                             {selectedRobots.map((robot) => {
                               const manufacturer = manufacturerFor(robot.manufacturerId);
                               return (
@@ -385,9 +433,10 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                                   robotId={robot.id}
                                   className="h-full"
                                 >
-                                  {(dragHandleProps) => (
-                                    <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card">
+                                  {(dragHandleProps) =>
+                                    view === 'visual' ? (
                                       <ComparisonRobotPanel
+                                        variant="visual"
                                         robot={robot}
                                         manufacturerName={manufacturer?.name ?? robot.manufacturerId}
                                         isFavorite={
@@ -397,9 +446,23 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
                                         onRemove={removeRobot}
                                         dragHandleProps={dragHandleProps}
                                       />
-                                      <CompareCardSpecList robot={robot} />
-                                    </div>
-                                  )}
+                                    ) : (
+                                      <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card">
+                                        <ComparisonRobotPanel
+                                          variant="compact"
+                                          robot={robot}
+                                          manufacturerName={manufacturer?.name ?? robot.manufacturerId}
+                                          isFavorite={
+                                            isMounted ? favorites.includes(robot.id) : false
+                                          }
+                                          onFavoriteToggle={toggleFavorite}
+                                          onRemove={removeRobot}
+                                          dragHandleProps={dragHandleProps}
+                                        />
+                                        <CompareCardSpecList robot={robot} />
+                                      </div>
+                                    )
+                                  }
                                 </SortableCompareCard>
                               );
                             })}
@@ -496,16 +559,30 @@ export function CompareClient({ robots, manufacturers, selectedIds }: CompareCli
               薄いプレースホルダとして残り、着地点を示す。D&D はシート内並べ替え専用。 */}
           <DragOverlay>
             {activeDragRobot ? (
-              <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-2xl">
-                <ComparisonRobotPanel
-                  robot={activeDragRobot}
-                  manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerId}
-                  isFavorite={isMounted ? favorites.includes(activeDragRobot.id) : false}
-                  onFavoriteToggle={() => {}}
-                  onRemove={() => {}}
-                />
-                <CompareCardSpecList robot={activeDragRobot} />
-              </div>
+              view === 'visual' ? (
+                <div className="h-full shadow-2xl">
+                  <ComparisonRobotPanel
+                    variant="visual"
+                    robot={activeDragRobot}
+                    manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerId}
+                    isFavorite={isMounted ? favorites.includes(activeDragRobot.id) : false}
+                    onFavoriteToggle={() => {}}
+                    onRemove={() => {}}
+                  />
+                </div>
+              ) : (
+                <div className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-2xl">
+                  <ComparisonRobotPanel
+                    variant="compact"
+                    robot={activeDragRobot}
+                    manufacturerName={activeDragManufacturer?.name ?? activeDragRobot.manufacturerId}
+                    isFavorite={isMounted ? favorites.includes(activeDragRobot.id) : false}
+                    onFavoriteToggle={() => {}}
+                    onRemove={() => {}}
+                  />
+                  <CompareCardSpecList robot={activeDragRobot} />
+                </div>
+              )
             ) : null}
           </DragOverlay>
         </DndContext>
