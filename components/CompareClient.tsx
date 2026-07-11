@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { toast } from 'sonner';
 import {
   closestCenter,
   DndContext,
@@ -96,10 +98,11 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
   useEffect(() => {
     setView(initialView);
   }, [initialView]);
-  const handleViewSelect = (next: CompareView) => {
-    if (next === view) return;
+  const handleSpecToggle = () => {
+    const next: CompareView = view === 'specs' ? 'visual' : 'specs';
     setView(next);
     updateParams({ view: next === 'specs' ? 'specs' : null }, 'replace');
+    toast(next === 'specs' ? uiText.comparison.toastSpecsOn : uiText.comparison.toastSpecsOff);
   };
 
   // メニュー内検索: 90行前後のツリーをスクロールせず目的の機体へ最短で届くための
@@ -190,7 +193,24 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
     top: number;
     left: number;
   } | null>(null);
+  // パネルは portal で body 直下に描画する。メニュー列は lg:sticky で
+  // スタッキングコンテキストを作るため、DOM子のままだと fixed でも
+  // 後続のシート列（比較カード）に重なり負けする。
+  // portal で DOM が離れるぶん、行→パネル間の hover 維持は猶予タイマーで行う。
+  const flyoutCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelFlyoutClose = () => {
+    if (flyoutCloseTimer.current) {
+      clearTimeout(flyoutCloseTimer.current);
+      flyoutCloseTimer.current = null;
+    }
+  };
+  const scheduleFlyoutClose = () => {
+    cancelFlyoutClose();
+    flyoutCloseTimer.current = setTimeout(() => setMenuFlyout(null), 120);
+  };
+  useEffect(() => cancelFlyoutClose, []);
   const openMenuFlyout = (manufacturerId: string, element: HTMLElement) => {
+    cancelFlyoutClose();
     const rect = element.getBoundingClientRect();
     const top = Math.max(
       12,
@@ -198,7 +218,10 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
     );
     setMenuFlyout({ manufacturerId, top, left: rect.right });
   };
-  const closeMenuFlyout = () => setMenuFlyout(null);
+  const closeMenuFlyout = () => {
+    cancelFlyoutClose();
+    setMenuFlyout(null);
+  };
   const menuFlyoutManufacturer = menuFlyout ? manufacturerFor(menuFlyout.manufacturerId) : undefined;
   const menuFlyoutRobots =
     menuFlyout && menuFlyoutManufacturer
@@ -265,20 +288,13 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
   };
 
   // 共有: 選択・並び順はURLが正本（commitOrder が同期済み）なので、現在のURLを
-  // コピーするだけで比較状態を再現できるリンクになる。
-  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
-  useEffect(() => {
-    if (shareStatus === 'idle') return;
-    const timer = setTimeout(() => setShareStatus('idle'), 2500);
-    return () => clearTimeout(timer);
-  }, [shareStatus]);
-
+  // コピーするだけで比較状態を再現できるリンクになる。通知はオーバーレイ（sonner）。
   const handleShare = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      setShareStatus('copied');
+      toast(uiText.comparison.shareCopied);
     } catch {
-      setShareStatus('failed');
+      toast.error(uiText.comparison.shareFailed);
     }
   };
 
@@ -332,7 +348,7 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
             <div className="hidden md:block min-w-0">
               {/* パネルはこの div の DOM 子なので、行→パネルへポインタを移しても mouseleave しない */}
               <div
-                onMouseLeave={closeMenuFlyout}
+                onMouseLeave={scheduleFlyoutClose}
                 onKeyDown={(e) => {
                   if (e.key === 'Escape') closeMenuFlyout();
                 }}
@@ -396,9 +412,14 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                       })}
                     </div>
 
-                    {/* 機体リストのフライアウトパネル（行の右に出る） */}
-                    {menuFlyout && menuFlyoutManufacturer && (
+                    {/* 機体リストのフライアウトパネル（行の右に portal で出す） */}
+                    {menuFlyout && menuFlyoutManufacturer && createPortal(
                       <div
+                        onMouseEnter={cancelFlyoutClose}
+                        onMouseLeave={scheduleFlyoutClose}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') closeMenuFlyout();
+                        }}
                         style={{ top: menuFlyout.top, left: menuFlyout.left, maxHeight: MENU_FLYOUT_MAX_HEIGHT }}
                         className="fixed z-[var(--z-dropdown)] w-64 overflow-y-auto border border-border bg-card shadow-xl"
                       >
@@ -420,7 +441,8 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                             />
                           );
                         })}
-                      </div>
+                      </div>,
+                      document.body,
                     )}
               </div>
             </div>
@@ -433,37 +455,30 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                         {uiText.compare.comparisonSheet(orderedIds.length, MAX_COMPARE_ROBOTS)}
                       </span>
                       <div className="flex items-center gap-4">
-                        <div
-                          role="group"
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={view === 'specs'}
                           aria-label={uiText.comparison.viewToggleAria}
-                          className="flex items-center gap-1 text-xs"
+                          onClick={handleSpecToggle}
+                          className="group flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
                         >
-                          {(
-                            [
-                              { value: 'visual', label: uiText.comparison.viewVisual },
-                              { value: 'specs', label: uiText.comparison.viewSpecs },
-                            ] as const
-                          ).map((option) => (
-                            <button
-                              key={option.value}
-                              type="button"
-                              aria-pressed={view === option.value}
-                              onClick={() => handleViewSelect(option.value)}
+                          <span>{uiText.comparison.specToggleLabel}</span>
+                          <span
+                            aria-hidden="true"
+                            className={cn(
+                              'relative h-5 w-9 rounded-full transition-colors',
+                              view === 'specs' ? 'bg-primary' : 'bg-border',
+                            )}
+                          >
+                            <span
                               className={cn(
-                                '-mb-px border-b-2 px-2 py-1 transition-colors',
-                                view === option.value
-                                  ? 'border-foreground font-medium text-foreground'
-                                  : 'border-transparent text-muted-foreground hover:text-foreground',
+                                'absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-background shadow transition-transform',
+                                view === 'specs' && 'translate-x-4',
                               )}
-                            >
-                              {option.label}
-                            </button>
-                          ))}
-                        </div>
-                        <span role="status" className="text-xs text-muted-foreground">
-                          {shareStatus === 'copied' && uiText.comparison.shareCopied}
-                          {shareStatus === 'failed' && uiText.comparison.shareFailed}
-                        </span>
+                            />
+                          </span>
+                        </button>
                         {orderedIds.length > 0 && (
                           <>
                             <button

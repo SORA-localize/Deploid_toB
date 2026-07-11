@@ -4,6 +4,7 @@ import { Header } from '@/components/Header';
 import { HeaderChromeProvider } from '@/components/HeaderChrome';
 import { Footer } from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { Toaster } from '@/components/ui/sonner';
 import { AnalyticsScripts } from '@/components/AnalyticsScripts';
 import { env } from '@/lib/env';
 import {
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <main id="main-content" tabIndex={-1} className="flex-1 outline-none">{children}</main>
               <Footer />
             </div>
+            <Toaster />
           </HeaderChromeProvider>
         </ThemeProvider>
         <AnalyticsScripts
