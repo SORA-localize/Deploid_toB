@@ -8,7 +8,7 @@ type ToasterProps = ComponentProps<typeof Sonner>;
 
 /**
  * サイト共通のトースト表示層。呼び出し側は `import { toast } from 'sonner'` を使う。
- * デザイントークン（角丸なし・border・card配色）に合わせて既定スタイルを上書きする。
+ * 背景の箱は出さない方針（unstyled）: 短い状態通知だけなのでテキストのみを浮かせる。
  */
 export function Toaster(props: ToasterProps) {
   const { resolvedTheme } = useTheme();
@@ -18,9 +18,9 @@ export function Toaster(props: ToasterProps) {
       theme={(resolvedTheme as 'light' | 'dark' | undefined) ?? 'system'}
       position="bottom-center"
       toastOptions={{
+        unstyled: true,
         classNames: {
-          toast:
-            '!rounded-none !border !border-border !bg-card !text-card-foreground !text-xs !shadow-xl',
+          toast: 'flex w-full items-center justify-center gap-2 text-xs font-medium text-foreground',
         },
       }}
       {...props}
