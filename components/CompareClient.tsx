@@ -18,7 +18,7 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { Link2, Star } from 'lucide-react';
+import { ChevronRight, Link2, Star } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { SelectControl } from '@/components/SelectControl';
 import { MenuRobotButton } from '@/components/compare/CompareParts';
@@ -111,6 +111,7 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
     return [robot.name, robot.nameJa, manufacturer.name, manufacturer.nameJa]
       .some((text) => text && normalizeSearchText(text).includes(normalizedMenuQuery));
   };
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
@@ -179,6 +180,38 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
   const activeDragManufacturer = activeDragRobot
     ? manufacturerFor(activeDragRobot.manufacturerId)
     : undefined;
+
+  // カスケードメニュー: メーカー行の hover/クリック/フォーカスで、行の右に機体リストを出す。
+  // パネルは position:fixed（メニューの overflow-y に切り取られないため）。
+  // メニューのスクロールで座標が古くなるので、スクロール時は閉じる。
+  const MENU_FLYOUT_MAX_HEIGHT = 336;
+  const [menuFlyout, setMenuFlyout] = useState<{
+    manufacturerId: string;
+    top: number;
+    left: number;
+  } | null>(null);
+  const openMenuFlyout = (manufacturerId: string, element: HTMLElement) => {
+    const rect = element.getBoundingClientRect();
+    const top = Math.max(
+      12,
+      Math.min(rect.top, window.innerHeight - MENU_FLYOUT_MAX_HEIGHT - 12),
+    );
+    setMenuFlyout({ manufacturerId, top, left: rect.right });
+  };
+  const closeMenuFlyout = () => setMenuFlyout(null);
+  const menuFlyoutManufacturer = menuFlyout ? manufacturerFor(menuFlyout.manufacturerId) : undefined;
+  const menuFlyoutRobots =
+    menuFlyout && menuFlyoutManufacturer
+      ? sortRobots(
+          robots.filter(
+            (r) =>
+              r.manufacturerId === menuFlyout.manufacturerId &&
+              menuRobotMatches(r, menuFlyoutManufacturer),
+          ),
+          'name',
+          manufacturers,
+        )
+      : [];
 
   // 並び順を local state へ即時反映し、URL も同じ値へ同期する(共有・履歴用)。
   const commitOrder = (nextIds: string[], mode: 'push' | 'replace' = 'push') => {
@@ -297,7 +330,13 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_minmax(0,1fr)] lg:grid-cols-[16rem_minmax(0,1fr)_16rem]">
             {/* Left Sidebar - Manufacturer Menu (desktop only) */}
             <div className="hidden md:block min-w-0">
-              <div className="border border-border bg-card lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
+              {/* パネルはこの div の DOM 子なので、行→パネルへポインタを移しても mouseleave しない */}
+              <div
+                onMouseLeave={closeMenuFlyout}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') closeMenuFlyout();
+                }}
+                className="border border-border bg-card lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
                     <div className="space-y-2 px-4 py-3 border-b border-border-subtle">
                       <h2 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {uiText.compare.manufacturers}
@@ -310,55 +349,79 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                         inputClassName="min-h-9 text-xs"
                       />
                     </div>
-                    <div className="max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:max-h-[calc(100vh-200px)]">
-                      {/* 常時展開ツリー: 開閉操作を持たない。メーカー名はスクロール内 sticky 見出しで、
-                          どのメーカーの機体を見ているかを保ちながら全機体へスクロールだけで届く。
-                          （ホバー展開のフライアウトは、ここがD&Dのドラッグ元のため不採用。§8.6） */}
+                    <div
+                      onScroll={closeMenuFlyout}
+                      className="max-h-80 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:max-h-[calc(100vh-200px)]"
+                    >
                       {sortedManufacturers.map((manufacturer) => {
-                        const manufacturerRobots = sortRobots(
-                          robots.filter(
-                            (r) =>
-                              r.manufacturerId === manufacturer.id &&
-                              menuRobotMatches(r, manufacturer),
-                          ),
-                          'name',
-                          manufacturers,
+                        const manufacturerRobots = robots.filter(
+                          (r) =>
+                            r.manufacturerId === manufacturer.id &&
+                            menuRobotMatches(r, manufacturer),
                         );
                         if (manufacturerRobots.length === 0) return null;
+                        const isOpen = menuFlyout?.manufacturerId === manufacturer.id;
+                        const hasSelection = manufacturerRobots.some((r) => orderedIds.includes(r.id));
 
                         return (
-                          <div key={manufacturer.id} className="border-b border-border-subtle last:border-0 pb-2">
-                            <div className="sticky top-0 z-[1] flex items-center justify-between bg-card px-4 py-2.5">
-                              <ManufacturerLogoName
-                                name={manufacturer.nameJa ?? manufacturer.name}
-                                logo={manufacturer.logo}
-                                className="text-sm font-semibold text-foreground"
-                                frameClassName="h-5 w-5"
-                                imageClassName="h-4 w-4"
-                              />
-                              <span className="text-[10px] font-medium text-muted-foreground tabular-nums">
-                                {manufacturerRobots.length}
-                              </span>
-                            </div>
-                            {manufacturerRobots.map((robot) => {
-                              const isSelected = orderedIds.includes(robot.id);
-                              const isDisabled =
-                                !isSelected && orderedIds.length >= MAX_COMPARE_ROBOTS;
-                              return (
-                                <MenuRobotButton
-                                  key={robot.id}
-                                  robot={robot}
-                                  isSelected={isSelected}
-                                  isDisabled={isDisabled}
-                                  isFavorite={isMounted ? favorites.includes(robot.id) : false}
-                                  onClick={() => handleMenuRobotClick(robot.id)}
-                                />
-                              );
-                            })}
-                          </div>
+                          <button
+                            key={manufacturer.id}
+                            type="button"
+                            aria-haspopup="true"
+                            aria-expanded={isOpen}
+                            onMouseEnter={(e) => openMenuFlyout(manufacturer.id, e.currentTarget)}
+                            onFocus={(e) => openMenuFlyout(manufacturer.id, e.currentTarget)}
+                            onClick={(e) =>
+                              isOpen ? closeMenuFlyout() : openMenuFlyout(manufacturer.id, e.currentTarget)
+                            }
+                            className={cn(
+                              'flex w-full items-center justify-between gap-2 border-b border-border-subtle border-l-2 px-4 py-2.5 text-left transition-colors last:border-b-0',
+                              hasSelection ? 'border-l-primary' : 'border-l-transparent',
+                              isOpen ? 'bg-muted' : 'hover:bg-muted/60',
+                            )}
+                          >
+                            <ManufacturerLogoName
+                              name={manufacturer.nameJa ?? manufacturer.name}
+                              logo={manufacturer.logo}
+                              className="text-sm font-semibold text-foreground"
+                              frameClassName="h-5 w-5"
+                              imageClassName="h-4 w-4"
+                            />
+                            <span className="flex shrink-0 items-center gap-1 text-[10px] font-medium text-muted-foreground tabular-nums">
+                              {manufacturerRobots.length}
+                              <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
+                            </span>
+                          </button>
                         );
                       })}
                     </div>
+
+                    {/* 機体リストのフライアウトパネル（行の右に出る） */}
+                    {menuFlyout && menuFlyoutManufacturer && (
+                      <div
+                        style={{ top: menuFlyout.top, left: menuFlyout.left, maxHeight: MENU_FLYOUT_MAX_HEIGHT }}
+                        className="fixed z-[var(--z-dropdown)] w-64 overflow-y-auto border border-border bg-card shadow-xl"
+                      >
+                        <div className="border-b border-border-subtle px-4 py-2 text-xs font-semibold text-foreground">
+                          {menuFlyoutManufacturer.nameJa ?? menuFlyoutManufacturer.name}
+                        </div>
+                        {menuFlyoutRobots.map((robot) => {
+                          const isSelected = orderedIds.includes(robot.id);
+                          const isDisabled =
+                            !isSelected && orderedIds.length >= MAX_COMPARE_ROBOTS;
+                          return (
+                            <MenuRobotButton
+                              key={robot.id}
+                              robot={robot}
+                              isSelected={isSelected}
+                              isDisabled={isDisabled}
+                              isFavorite={isMounted ? favorites.includes(robot.id) : false}
+                              onClick={() => handleMenuRobotClick(robot.id)}
+                            />
+                          );
+                        })}
+                      </div>
+                    )}
               </div>
             </div>
 
@@ -373,7 +436,7 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                         <div
                           role="group"
                           aria-label={uiText.comparison.viewToggleAria}
-                          className="flex items-center border border-border bg-background p-0.5 text-xs"
+                          className="flex items-center gap-1 text-xs"
                         >
                           {(
                             [
@@ -387,10 +450,10 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                               aria-pressed={view === option.value}
                               onClick={() => handleViewSelect(option.value)}
                               className={cn(
-                                'px-2 py-1 transition-colors',
+                                '-mb-px border-b-2 px-2 py-1 transition-colors',
                                 view === option.value
-                                  ? 'bg-primary text-primary-foreground'
-                                  : 'text-muted-foreground hover:text-foreground',
+                                  ? 'border-foreground font-medium text-foreground'
+                                  : 'border-transparent text-muted-foreground hover:text-foreground',
                               )}
                             >
                               {option.label}
