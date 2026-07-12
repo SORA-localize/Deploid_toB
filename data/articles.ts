@@ -2,6 +2,94 @@ import type { Article } from './types';
 
 export const articles: Article[] = [
   {
+    id: 'surgie-unitree-g1-preclinical-surgery',
+    slug: 'surgie-unitree-g1-preclinical-surgery',
+    title: 'Unitree G1-based "Surgie" completes teleoperated preclinical surgery — what it means for general-purpose humanoids in hospitals',
+    titleJa: 'Unitree G1を改造した「Surgie」が生体手術を完了、汎用ヒューマノイドは手術室へ入れるか',
+    type: 'tech-update',
+    category: 'news',
+    section: 'tech',
+    summary: 'カリフォルニア大学サンディエゴ校の研究チームは、Unitree G1を基盤とする遠隔操作型ヒューマノイド「Surgie」を用い、ブタを対象とした腹腔鏡下胆嚢摘出術を2件実施した。人への臨床使用や自律手術ではないが、専用の大型手術ロボットではなく人間用の手術室設備へ汎用機を適応させる設計が、生体試験の一連の工程まで進んだ点が導入判断上の差分である。',
+    publishStatus: 'published',
+    updatedAt: '2026-07-12',
+    reliability: 'official',
+    publishedAt: '2026-07-12',
+    author: 'Deploid Research',
+    industryTags: ['healthcare', 'research'],
+    regionTags: ['us'],
+    themeTags: ['safety'],
+    heroImage: {
+      src: '/images/article-generic/teleoperation-vr/vr-headset-hands-outstretched.jpg',
+      alt: 'Person wearing a VR headset with hands raised, mimicking remote-control gestures',
+      credit: 'Vitaly Gariev / Unsplash',
+      sourceUrl: 'https://unsplash.com/photos/man-wearing-vr-headset-with-hands-outstretched-sESr6zSRxk8',
+      rights: {
+        status: 'licensed',
+        sourceType: 'third-party',
+        rightsHolder: 'Vitaly Gariev',
+        licenseUrl: 'https://unsplash.com/license',
+        checkedAt: '2026-07-12',
+        permissionNote: 'Unsplash Licenseの汎用イメージ。Surgie実機ではなく、遠隔操作というテーマを示す代替画像として使用。UC San Diego公式画像は転載条件が未確認のため使用していない。',
+      },
+    },
+    whyItMatters: '今回動いた変数は運動性能そのものではなく、既存施設への設置性、遠隔操作による責任分界、専用設備とのコスト構造、複数作業への転用可能性である。医療に限らず、人間用設備を大規模改修せずにロボットを導入する構想を評価する材料になる。',
+    keyTakeaways: [
+      '試験はブタを対象とする前臨床研究であり、人への手術や商用医療サービスではない。',
+      'ロボットは自律手術を行ったのではなく、訓練を受けた外科医が遠隔操作した。',
+      '1件は人間の外科医とヒューマノイド、もう1件は2台のヒューマノイドによる構成で実施された。',
+      'Unitree G1には医療器具を扱うための専用エンドエフェクター、姿勢追跡、力制御などが追加されている。',
+      '導入判断では機体価格だけでなく、器具の滅菌、通信遅延、再較正、故障時の退避、医療機器認証を含むシステム全体を評価する必要がある。',
+    ],
+    body: `## Unitree G1を基盤に2件の胆嚢摘出術を実施
+
+カリフォルニア大学サンディエゴ校の工学・外科研究チームは、遠隔操作型ヒューマノイドを使い、ブタを対象とする腹腔鏡下胆嚢摘出術を2件実施した。研究成果は2026年7月8日付でNatureに掲載された。
+
+使用された「Surgie」は、Unitree Roboticsの小型二足ヒューマノイドG1を基盤とする研究システムである。市販状態のG1がそのまま手術を行ったわけではない。研究チームは、医療器具を把持するための構成、両腕の遠隔操作系、姿勢追跡、インピーダンス制御などを組み込み、外科医の動作をロボットへ反映させた。
+
+2件のうち1件は、人間の外科医と1台のヒューマノイドが協働する形で行われた。もう1件では2台のヒューマノイドを使用し、それぞれを外科医が遠隔操作した。工程には、胆嚢の牽引、肝胆嚢三角の剥離、胆嚢管などの構造確認、肝床からの胆嚢切離が含まれる。
+
+これは人間の患者を対象とした臨床試験ではなく、生体動物を対象とする前臨床の実現可能性研究である。また、ロボットが状況を判断して手術を完遂した自律手術でもない。「ヒューマノイドが単独で外科医を代替した」と解釈すべき結果ではない。
+
+## 専用手術ロボットとは異なる導入仮説
+
+現在普及している手術支援ロボットは、特定の手術工程や操作方法に合わせて設計された専用システムである。これに対しSurgieの研究は、人間が使う器具や空間へヒューマノイドを適応させる構成を採る。
+
+研究チームが提示する利点は、機体の小ささ、設置面積、基盤機の価格、用途転換の余地である。UC San Diegoは、従来型の大型手術ロボットと比べて、システムをより小さな空間へ配置できる可能性を挙げている。
+
+ただし、市販G1の価格と、実際に手術へ使用できるシステムの導入費用は分けて考える必要がある。専用器具、制御装置、映像系、通信設備、ソフトウェア、検証、滅菌対応、保守、教育を加えた総費用は公表されていない。安価な市販ヒューマノイドを基盤にしたことだけでは、医療機関の総保有コストが低くなるとは判断できない。
+
+## 実験で残った運用上の制約
+
+論文と公式発表は、試験中に再較正が必要だったことや、操作時間に影響する遅延があったことを示している。手術では、単に器具を動かせるだけでなく、力の再現性、映像と操作の同期、長時間の安定稼働、緊急停止後の安全な復帰が必要になる。
+
+二足歩行機構も、手術中の中心的な価値が確立したわけではない。今回の作業は基本的に手術台付近で行われており、歩行能力が手術成績や作業時間をどこまで改善したかは示されていない。移動が不要な工程では、固定台や車輪型の双腕ロボットの方が、安定性、電力、保守、安全設計で有利となる可能性がある。
+
+一方、同一の機体が器具の準備、患者周辺の補助、物品搬送、遠隔診察など複数の役割を担えるなら、人型構成の価値は手術工程だけでなく病院全体の稼働率で評価できる。この仮説を検証するには、作業間の切り替え時間、洗浄と滅菌の範囲、スタッフ教育、利用可能時間を含む運用データが必要である。
+
+## 医療機関が調達前に分けるべき責任範囲
+
+遠隔操作型ロボットでは、機体メーカー、システム統合事業者、医療機関、通信事業者、操作する医師の責任範囲を契約上明確にする必要がある。通信が途切れた場合に誰が現場で介入するのか、ロボットが器具を保持した状態で停止した場合にどう退避させるのか、操作ログを誰が保管するのかといった条件が導入可否を左右する。
+
+日本で医療用途として使用する場合、医療機器としての承認・認証の要否、適用範囲、臨床評価、サイバーセキュリティ、遠隔医療に関する運用設計を確認しなければならない。今回の研究結果は、日本国内でG1やSurgieを手術へ使用できることを意味しない。
+
+医療以外の現場にも共通する確認項目は多い。市販機を基盤としたヒューマノイドを導入する企業は、本体仕様だけでなく、用途別改造の供給者、改造後の保証、ソフトウェア更新の影響、通信障害時の挙動、作業者が介入する手順まで一体で評価すべきである。
+
+## 次の判断材料となるデータ
+
+次に必要なのは、成功映像の追加ではなく、再現性と運用負荷を示す数字である。複数症例での完遂率、手術時間、再較正回数、通信遅延、機体停止、器具交換時間、外科医の学習時間、既存手術ロボットとの比較が求められる。
+
+Surgieは商用製品ではなく、今回の発表も医療機関への導入契約ではない。それでも、人間向けに設計された高度な作業環境へ、汎用ヒューマノイドを後付けで適応させる方法が生体試験まで進んだ。導入企業にとっての論点は、ヒューマノイドが人間の形を再現できるかではなく、専用機より低い設備変更費と十分な稼働率を両立できるかである。`,
+    relatedRobotIds: ['unitree-g1'],
+    relatedManufacturerIds: ['unitree'],
+    relatedUseCaseIds: [],
+    sources: [
+      { title: 'In vivo feasibility study of humanoid robots in surgery', url: 'https://www.nature.com/articles/s41586-026-10796-x', publisher: 'Nature', publishedAt: '2026-07-08', checkedAt: '2026-07-12', reliability: 'official' },
+      { title: 'Surgeons Use Teleoperated Humanoid Robots to Perform Live Surgery, a World First', url: 'https://today.ucsd.edu/story/surgeons-use-teleoperated-humanoid-robots-to-perform-live-surgery-a-world-first', publisher: 'University of California San Diego', publishedAt: '2026-07-08', checkedAt: '2026-07-12', reliability: 'official' },
+      { title: 'Humanoids in Hospitals: A Technical Study of Humanoid Robots in Healthcare', url: 'https://surgie-humanoid.github.io/', publisher: 'UC San Diego Advanced Robotics and Controls Laboratory', checkedAt: '2026-07-12', reliability: 'official' },
+      { title: 'Beyond da Vinci: Why versatile humanoid robots are the next frontier in surgery', url: 'https://www.therobotreport.com/beyond-da-vinci-why-versatile-humanoid-robots-are-next-frontier-surgery/', publisher: 'The Robot Report', publishedAt: '2026-07-09', checkedAt: '2026-07-12', reliability: 'reported' },
+    ],
+  },
+  {
     id: 'mitsubishi-highlanders-humanoid-mou-kyoto-2026',
     slug: 'mitsubishi-highlanders-humanoid-mou-kyoto-2026',
     title: 'Mitsubishi Motors and Highlanders Plan Humanoid Development and Production at Kyoto Plant',
