@@ -137,7 +137,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const toc = [
     ...(hasTakeaways ? [{ label: uiText.reports.keyTakeaways, href: '#takeaways' }] : []),
     ...(isManufacturerGuide
-      ? MANUFACTURER_GUIDE_SECTIONS.map((section) => ({
+      ? MANUFACTURER_GUIDE_SECTIONS.filter((section) => section.id !== 'faq' || guideContent!.faq.length > 0).map((section) => ({
           label: section.label,
           href: `#${section.id}`,
         }))

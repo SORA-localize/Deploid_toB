@@ -25,7 +25,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
       )}
     >
       {/* 画像エリア */}
-      <div className="relative hidden sm:block sm:w-28 sm:flex-none sm:self-stretch sm:border-r sm:border-border sm:overflow-hidden sm:bg-muted md:w-auto md:aspect-video md:border-r-0">
+      <div className="relative hidden sm:block sm:w-28 sm:flex-none sm:self-stretch sm:border-r sm:border-border sm:overflow-hidden sm:bg-muted md:w-auto md:aspect-[16/8] md:border-r-0">
         {hero ? (
           <Image
             src={hero.src}

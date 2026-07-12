@@ -540,9 +540,6 @@ export function validateData(): ValidationResult {
         errors.push(`[manufacturerGuideContent] ${article.slug}: lineup.${row.robotId} の roleLabel/priceLabel が空です`);
       }
     });
-    if (content.faq.length === 0) {
-      errors.push(`[manufacturerGuideContent] ${article.slug}: faq が空です`);
-    }
     content.faq.forEach((item, i) => {
       if (!item.question.trim() || !item.answer.trim()) {
         errors.push(`[manufacturerGuideContent] ${article.slug}: faq[${i}] が不完全です`);

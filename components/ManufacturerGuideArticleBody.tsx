@@ -102,7 +102,6 @@ export function ManufacturerGuideArticleBody({
       <>
         <Markdown source={content.deploymentIntro} />
         <JudgmentTable rows={toDeploymentRows(content)} />
-        <Markdown source={content.deploymentOutro} />
       </>
     ),
     'japan-procurement': <Markdown source={content.japanProcurement} />,
@@ -112,7 +111,7 @@ export function ManufacturerGuideArticleBody({
 
   return (
     <>
-      {MANUFACTURER_GUIDE_SECTIONS.map((section) => (
+      {MANUFACTURER_GUIDE_SECTIONS.filter((section) => section.id !== 'faq' || content.faq.length > 0).map((section) => (
         <section key={section.id} aria-labelledby={section.id}>
           <h2 id={section.id} className={sectionHeadingClassName}>
             {section.label}
