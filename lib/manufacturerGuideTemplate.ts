@@ -6,13 +6,12 @@
  */
 export const MANUFACTURER_GUIDE_SECTIONS = [
   { id: 'company-overview', label: '会社概要' },
-  { id: 'history', label: '沿革' },
+  { id: 'history', label: '事業の変遷' },
   { id: 'product-lineup', label: '製品ラインナップ' },
-  { id: 'strengths-and-cautions', label: '強みと注意点' },
   { id: 'deployment-track-record', label: '導入実績' },
   { id: 'japan-procurement', label: '日本からの購入・相談窓口' },
   { id: 'faq', label: 'よくある質問' },
-  { id: 'fit-summary', label: 'どんな検討者に向くか' },
+  { id: 'fit-summary', label: '向く組織' },
 ] as const;
 
 export type ManufacturerGuideSectionId = (typeof MANUFACTURER_GUIDE_SECTIONS)[number]['id'];

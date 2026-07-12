@@ -389,8 +389,6 @@ interface ArticleCommon extends BaseRecord {
   featured?: boolean;
   /** 記事タブの分類（サブジェクト）。type とは独立した必須フィールド。 */
   section: ArticleSection;
-  /** 目安読了時間（分）。未設定時は非表示。 */
-  readingTimeMin?: number;
   relatedRobotIds: Id[];
   relatedManufacturerIds: Id[];
   relatedUseCaseIds: Id[];

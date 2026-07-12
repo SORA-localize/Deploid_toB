@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { Calendar, Clock, User } from 'lucide-react';
+import { Calendar, User } from 'lucide-react';
 import { ArticleRelatedSidebar } from '@/components/ArticleRelatedSidebar';
 import { ArticleToc } from '@/components/ArticleToc';
 import { BudouXText } from '@/components/BudouXText';
@@ -9,6 +9,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
 import { Markdown } from '@/components/Markdown';
 import { RelatedLinkList } from '@/components/RelatedLinkList';
+import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
 import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
 import { SidebarBlock, SidebarDivider } from '@/components/SidebarSection';
@@ -16,6 +17,7 @@ import { ActiveSectionProvider } from '@/lib/activeSectionContext';
 import {
   getArticles,
   getManufacturerGuideContent,
+  getManufacturerForRobot,
   getRelatedManufacturers,
   getRelatedRobots,
   getRelatedUseCases,
@@ -35,7 +37,6 @@ import { MANUFACTURER_GUIDE_SECTIONS } from '@/lib/manufacturerGuideTemplate';
 import { getDisplayableAsset } from '@/lib/media';
 import { shouldIndexArticle } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
-import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { getArticleTypeTone } from '@/lib/visualSemantics';
 import { ManufacturerGuideArticleBody } from '@/components/ManufacturerGuideArticleBody';
@@ -118,6 +119,11 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const heroImage = getDisplayableAsset(report.heroImage);
   const hasRelated = robots.length > 0 || manufacturers.length > 0 || useCases.length > 0;
   const reportTitle = report.titleJa ?? report.title;
+  // メーカー解説のH1は、シリーズ名と記事固有のタイトルを視覚的に分ける。
+  // reportTitle自体は改変しないため、メタデータ・パンくず・一覧カードは1行表記を維持する。
+  const reportHeadingTitle = isManufacturerGuide
+    ? reportTitle.replace('｜', '｜\n')
+    : reportTitle;
   const shelf = getArticleShelf(report);
   const shelfTab = ARTICLE_SHELF_TABS.find((tab) => tab.value === shelf);
   // 階層はロボット詳細（ホーム > ロボット > メーカー > 機体）と揃えた4階層:
@@ -193,7 +199,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   {getArticleCardLabel(report)}
                 </div>
                 <h1 className="mb-3 text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white">
-                  <BudouXText text={reportTitle} />
+                  <BudouXText text={reportHeadingTitle} />
                 </h1>
                 <p className="mb-4 text-sm sm:text-base leading-relaxed text-white/80">
                   {report.summary}
@@ -203,12 +209,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                     <Calendar className="h-3.5 w-3.5" />
                     {report.publishedAt}
                   </span>
-                  {report.readingTimeMin && (
-                    <span className="flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5" />
-                      {uiText.common.readingMinutes(report.readingTimeMin)}
-                    </span>
-                  )}
                   <TagChip tone={getArticleTypeTone(report.type)} className="py-1 font-medium">
                     {getArticleCardLabel(report)}
                   </TagChip>
@@ -231,7 +231,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               {getArticleCardLabel(report)}
             </div>
             <h1 className="mb-4 max-w-4xl text-2xl md:text-3xl font-semibold leading-tight text-foreground">
-              <BudouXText text={reportTitle} />
+              <BudouXText text={reportHeadingTitle} />
             </h1>
             <p className="mb-5 max-w-3xl text-sm leading-relaxed text-foreground/80">
               {report.summary}
@@ -241,12 +241,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 <Calendar className="h-3.5 w-3.5" />
                 {report.publishedAt}
               </span>
-              {report.readingTimeMin && (
-                <span className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" />
-                  {uiText.common.readingMinutes(report.readingTimeMin)}
-                </span>
-              )}
               <TagChip tone={getArticleTypeTone(report.type)} className="py-1 font-medium">
                 {getArticleCardLabel(report)}
               </TagChip>
@@ -355,16 +349,21 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 </h2>
                 <div className="space-y-4">
                   {robots.length > 0 && (
-                    <RelatedLinkList
-                      id="related-robots"
-                      title={uiText.reports.relatedRobots}
-                      titleLevel="h3"
-                      items={robots.map((r) => ({
-                        href: `/robots/${r.slug}`,
-                        title: getRobotRelatedTitle(r),
-                        description: r.summary,
-                      }))}
-                    />
+                    <section id="related-robots" aria-labelledby="related-robots-heading">
+                      <h3 id="related-robots-heading" className="mb-3 text-base font-semibold text-foreground">
+                        {uiText.reports.relatedRobots}
+                      </h3>
+                      <div className="flex gap-3 overflow-x-auto overscroll-x-contain snap-x pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                        {robots.map((robot) => {
+                          const manufacturer = getManufacturerForRobot(robot.manufacturerId);
+                          return (
+                            <div key={robot.id} className="w-[44%] shrink-0 snap-start sm:w-[30%] md:w-[22%] xl:w-[18%]">
+                              <FeaturedRobotCard robot={robot} manufacturerName={manufacturer?.name} />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </section>
                   )}
                   {manufacturers.length > 0 && (
                     <RelatedLinkList

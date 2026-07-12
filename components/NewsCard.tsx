@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Calendar, Clock } from 'lucide-react';
+import { ArrowRight, Calendar } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
 import { TagChip } from '@/components/TagChip';
 import type { Article } from '@/data/types';
@@ -53,12 +53,6 @@ export function NewsCard({ report, className }: NewsCardProps) {
             <Calendar className="h-3 w-3" />
             {report.publishedAt}
           </span>
-          {report.readingTimeMin && (
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-              <Clock className="h-3 w-3" />
-              {report.readingTimeMin}分
-            </span>
-          )}
         </div>
 
         <h3 className="mb-2 line-clamp-3 text-sm font-semibold leading-snug text-foreground">

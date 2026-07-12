@@ -17,7 +17,6 @@ export const uiText = {
     overview: '概要',
     contents: '目次',
     updated: '更新',
-    readingMinutes: (minutes: number) => `${minutes}分`,
     allIndustries: 'すべての業種',
     allTasks: 'すべてのタスク',
     allThemes: 'すべてのテーマ',

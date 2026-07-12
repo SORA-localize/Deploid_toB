@@ -5,35 +5,18 @@ import type { ManufacturerGuideLineupDisplayRow } from '@/lib/data';
 import {
   manufacturerGuideDeploymentCategoryLabels,
   manufacturerGuideDeploymentEvidenceLabels,
-  manufacturerGuideEvaluationAxisLabels,
-  manufacturerGuideEvaluationLevelLabels,
 } from '@/lib/labels';
 import {
   manufacturerGuideDeploymentCategoryOrder,
-  manufacturerGuideEvaluationAxisOrder,
 } from '@/lib/display';
 import {
   manufacturerGuideDeploymentEvidenceTones,
-  manufacturerGuideEvaluationLevelTones,
 } from '@/lib/visualSemantics';
 import { MANUFACTURER_GUIDE_SECTIONS, type ManufacturerGuideSectionId } from '@/lib/manufacturerGuideTemplate';
 import { Markdown, sectionHeadingClassName } from '@/components/Markdown';
 import { JudgmentTable, type JudgmentRow } from '@/components/JudgmentTable';
 import { YouTubeEmbed } from '@/components/YouTubeEmbed';
 import { uiText } from '@/lib/uiText';
-
-function toEvaluationRows(content: ManufacturerGuideContent): JudgmentRow[] {
-  return manufacturerGuideEvaluationAxisOrder.map((axis) => {
-    const item = content.evaluationAxes[axis];
-    return {
-      key: axis,
-      label: manufacturerGuideEvaluationAxisLabels[axis],
-      statusLabel: item.labelOverride ?? manufacturerGuideEvaluationLevelLabels[item.level],
-      tone: manufacturerGuideEvaluationLevelTones[item.level],
-      body: item.body,
-    };
-  });
-}
 
 function toDeploymentRows(content: ManufacturerGuideContent): JudgmentRow[] {
   return manufacturerGuideDeploymentCategoryOrder.map((category) => {
@@ -113,12 +96,6 @@ export function ManufacturerGuideArticleBody({
         {content.videos?.map((video) => (
           <YouTubeEmbed key={video.videoId} video={video} />
         ))}
-      </>
-    ),
-    'strengths-and-cautions': (
-      <>
-        <Markdown source={content.evaluationIntro} />
-        <JudgmentTable rows={toEvaluationRows(content)} />
       </>
     ),
     'deployment-track-record': (
