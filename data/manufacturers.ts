@@ -13,6 +13,22 @@ export const manufacturers: Manufacturer[] = [
     foundedYear: 2016,
     website: 'https://www.unitree.com/',
     contactUrl: 'https://techshare.co.jp/product/unitree/g1/',
+    logos: {
+      wordmark: {
+        src: '/images/manufacturers/logos/unitree-wordmark.svg',
+        alt: 'Unitree Robotics logo',
+        credit: 'Unitree Robotics',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Unitree.svg',
+        rights: {
+          status: 'commercial-permitted',
+          sourceType: 'third-party',
+          rightsHolder: 'Unitree Robotics',
+          licenseUrl: 'https://commons.wikimedia.org/wiki/File:Unitree.svg',
+          checkedAt: '2026-07-13',
+          permissionNote: 'Wikimedia Commons PD-textlogo（著作権の閾値未満のためパブリックドメイン）。商標権は権利者に帰属。無改変で、提携・公認を示唆しない記述的表示に限り使用する。',
+        },
+      },
+    },
     logo: {
       src: '',
       alt: 'Unitree Robotics logo',
@@ -232,6 +248,22 @@ export const manufacturers: Manufacturer[] = [
     headquarters: { lat: 44.94, lng: -123.04 },
     foundedYear: 2015,
     website: 'https://agilityrobotics.com/',
+    logos: {
+      combined: {
+        src: '/images/manufacturers/logos/agility-robotics-combined.svg',
+        alt: 'Agility Robotics logo',
+        credit: 'Agility Robotics',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Agility_Robotics_logo.svg',
+        rights: {
+          status: 'commercial-permitted',
+          sourceType: 'third-party',
+          rightsHolder: 'Agility Robotics',
+          licenseUrl: 'https://commons.wikimedia.org/wiki/File:Agility_Robotics_logo.svg',
+          checkedAt: '2026-07-13',
+          permissionNote: 'Wikimedia Commons PD-textlogo（著作権の閾値未満のためパブリックドメイン）。商標権は権利者に帰属。無改変で、提携・公認を示唆しない記述的表示に限り使用する。',
+        },
+      },
+    },
     logo: {
       src: '',
       alt: 'Agility Robotics シンボルマーク',
@@ -425,6 +457,22 @@ export const manufacturers: Manufacturer[] = [
     headquarters: { lat: 30.30, lng: -97.70 },
     foundedYear: 2003,
     website: 'https://www.tesla.com/',
+    logos: {
+      symbol: {
+        src: '/images/manufacturers/logos/tesla-symbol.svg',
+        alt: 'Tesla, Inc. logo',
+        credit: 'Tesla, Inc.',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Tesla_Motors.svg',
+        rights: {
+          status: 'commercial-permitted',
+          sourceType: 'third-party',
+          rightsHolder: 'Tesla, Inc.',
+          licenseUrl: 'https://commons.wikimedia.org/wiki/File:Tesla_Motors.svg',
+          checkedAt: '2026-07-13',
+          permissionNote: 'Wikimedia Commons PD-textlogo（著作権の閾値未満のためパブリックドメイン）。商標権は権利者に帰属。無改変で、提携・公認を示唆しない記述的表示に限り使用する。',
+        },
+      },
+    },
     logo: {
       src: '',
       alt: 'Tesla logo',
@@ -537,6 +585,22 @@ export const manufacturers: Manufacturer[] = [
     headquarters: { lat: 31.23, lng: 121.47 },
     foundedYear: 2023,
     website: 'https://www.agibot.com/',
+    logos: {
+      combined: {
+        src: '/images/manufacturers/logos/agibot-combined.png',
+        alt: 'AgiBot logo',
+        credit: 'AgiBot',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:AgiBot.png',
+        rights: {
+          status: 'commercial-permitted',
+          sourceType: 'third-party',
+          rightsHolder: 'AgiBot',
+          licenseUrl: 'https://commons.wikimedia.org/wiki/File:AgiBot.png',
+          checkedAt: '2026-07-13',
+          permissionNote: 'Wikimedia Commons PD-textlogo（著作権の閾値未満のためパブリックドメイン）。商標権は権利者に帰属。無改変で、提携・公認を示唆しない記述的表示に限り使用する。',
+        },
+      },
+    },
     logo: {
       src: '',
       alt: 'AgiBot logo',
@@ -663,6 +727,22 @@ export const manufacturers: Manufacturer[] = [
     headquarters: { lat: 31.20, lng: 121.50 },
     foundedYear: 2015,
     website: 'https://fftai.com/',
+    logos: {
+      combined: {
+        src: '/images/manufacturers/logos/fourier-intelligence-combined.png',
+        alt: 'Fourier Intelligence logo',
+        credit: 'Fourier Intelligence',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Fourier_Logo.png',
+        rights: {
+          status: 'commercial-permitted',
+          sourceType: 'third-party',
+          rightsHolder: 'Fourier Intelligence',
+          licenseUrl: 'https://commons.wikimedia.org/wiki/File:Fourier_Logo.png',
+          checkedAt: '2026-07-13',
+          permissionNote: 'Wikimedia Commons PD-textlogo（著作権の閾値未満のためパブリックドメイン）。商標権は権利者に帰属。無改変で、提携・公認を示唆しない記述的表示に限り使用する。',
+        },
+      },
+    },
     logo: {
       src: '',
       alt: 'Fourier logo',
@@ -789,6 +869,22 @@ export const manufacturers: Manufacturer[] = [
     headquarters: { lat: 34.69, lng: 135.20 },
     foundedYear: 1896,
     website: 'https://www.khi.co.jp/',
+    logos: {
+      combined: {
+        src: '/images/manufacturers/logos/kawasaki-heavy-industries-combined.svg',
+        alt: 'Kawasaki Heavy Industries logo',
+        credit: 'Kawasaki Heavy Industries',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Kawasaki_Heavy_Industries_Logo.svg',
+        rights: {
+          status: 'commercial-permitted',
+          sourceType: 'third-party',
+          rightsHolder: 'Kawasaki Heavy Industries',
+          licenseUrl: 'https://commons.wikimedia.org/wiki/File:Kawasaki_Heavy_Industries_Logo.svg',
+          checkedAt: '2026-07-13',
+          permissionNote: 'Wikimedia Commons PD-textlogo（著作権の閾値未満のためパブリックドメイン）。商標権は権利者に帰属。無改変で、提携・公認を示唆しない記述的表示に限り使用する。',
+        },
+      },
+    },
     logo: {
       src: '',
       alt: 'Kawasaki logo',
@@ -845,6 +941,22 @@ export const manufacturers: Manufacturer[] = [
     headquarters: { lat: 48.54, lng: 9.28 },
     foundedYear: 2019,
     website: 'https://neura-robotics.com',
+    logos: {
+      wordmark: {
+        src: '/images/manufacturers/logos/neura-robotics-wordmark.svg',
+        alt: 'Neura Robotics GmbH logo',
+        credit: 'Neura Robotics GmbH',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Neura_robotics_logo.svg',
+        rights: {
+          status: 'commercial-permitted',
+          sourceType: 'third-party',
+          rightsHolder: 'Neura Robotics GmbH',
+          licenseUrl: 'https://commons.wikimedia.org/wiki/File:Neura_robotics_logo.svg',
+          checkedAt: '2026-07-13',
+          permissionNote: 'Wikimedia Commons PD-textlogo（著作権の閾値未満のためパブリックドメイン）。商標権は権利者に帰属。無改変で、提携・公認を示唆しない記述的表示に限り使用する。',
+        },
+      },
+    },
     logo: {
       src: '',
       alt: 'NEURA Robotics logo',
@@ -1141,6 +1253,22 @@ export const manufacturers: Manufacturer[] = [
     hqCity: 'Guangzhou',
     headquarters: { lat: 23.13, lng: 113.26 },
     website: 'https://www.xpeng.com/',
+    logos: {
+      combined: {
+        src: '/images/manufacturers/logos/xpeng-robotics-combined.svg',
+        alt: 'XPeng Inc. logo',
+        credit: 'XPeng Inc.',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:XPeng_logo.svg',
+        rights: {
+          status: 'commercial-permitted',
+          sourceType: 'third-party',
+          rightsHolder: 'XPeng Inc.',
+          licenseUrl: 'https://commons.wikimedia.org/wiki/File:XPeng_logo.svg',
+          checkedAt: '2026-07-13',
+          permissionNote: 'Wikimedia Commons PD-textlogo（著作権の閾値未満のためパブリックドメイン）。商標権は権利者に帰属。無改変で、提携・公認を示唆しない記述的表示に限り使用する。',
+        },
+      },
+    },
     logo: {
       src: '',
       alt: 'XPENG logo',
@@ -1247,6 +1375,22 @@ export const manufacturers: Manufacturer[] = [
     headquarters: { lat: 48.85, lng: 2.35 },
     foundedYear: 2012,
     website: 'https://www.wandercraft.eu/',
+    logos: {
+      wordmark: {
+        src: '/images/manufacturers/logos/wandercraft-wordmark.svg',
+        alt: 'Wandercraft logo',
+        credit: 'Wandercraft',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Wandercraft_logo.svg',
+        rights: {
+          status: 'commercial-permitted',
+          sourceType: 'third-party',
+          rightsHolder: 'Wandercraft',
+          licenseUrl: 'https://commons.wikimedia.org/wiki/File:Wandercraft_logo.svg',
+          checkedAt: '2026-07-13',
+          permissionNote: 'Wikimedia Commons PD-textlogo（著作権の閾値未満のためパブリックドメイン）。商標権は権利者に帰属。無改変で、提携・公認を示唆しない記述的表示に限り使用する。',
+        },
+      },
+    },
     logo: {
       src: '',
       alt: 'Wandercraft logo',

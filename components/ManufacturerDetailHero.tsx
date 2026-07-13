@@ -20,9 +20,11 @@ export function ManufacturerDetailHero({ manufacturer }: ManufacturerDetailHeroP
           <h1 className="mb-5 text-2xl font-semibold leading-tight text-foreground md:text-3xl">
             <ManufacturerLogoName
               name={name}
-              logo={manufacturer.logo}
-              frameClassName="h-12 w-12"
-              imageClassName="h-9 w-9"
+              logos={manufacturer.logos}
+              variant="combined"
+              targetAreaPx={40 * 160}
+              maxHeightPx={40}
+              maxWidthPx={160}
               textClassName="overflow-visible whitespace-normal text-clip"
             />
           </h1>

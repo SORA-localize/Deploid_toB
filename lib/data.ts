@@ -6,6 +6,7 @@ import { useCases } from '@/data/useCases';
 import type { Article, ManufacturerGuideContent } from '@/data/types';
 import { runValidationInDev } from './validate';
 import { byArticlePublishedDesc } from '@/lib/display';
+import { withMeasuredLogoAspect } from '@/lib/manufacturerLogoEnrich';
 
 // dev時のみ：参照整合（存在しないid参照・双方向のズレ・id/slug重複）をconsoleで通知
 runValidationInDev();
@@ -74,7 +75,9 @@ export function getRobotById(id: string) {
 }
 
 export function getManufacturers() {
-  return published(manufacturers);
+  // ロゴのアスペクト比はデータに手打ちせず、サーバー側でファイル実測して付与する
+  // （docs/planning/manufacturer-logo-usage-spec-v1.md）。
+  return published(manufacturers).map(withMeasuredLogoAspect);
 }
 
 export function getDeployments() {

@@ -1,6 +1,8 @@
 // 参照整合チェック。dev起動時に lib/data.ts から1度だけ呼ばれ、
 // 「存在しないidを参照している」「双方向リンクが片側だけ」「id/slug重複」を
 // console に出す。`npm run validate:data`（scripts/validate-data.mjs）からも実行される。
+import fs from 'node:fs';
+import path from 'node:path';
 import { deployments } from '../data/deployments.ts';
 import { manufacturers } from '../data/manufacturers.ts';
 import { articlePlacements } from '../data/articlePlacements.ts';
@@ -625,6 +627,20 @@ export function validateData(): ValidationResult {
     checkDate('manufacturer', m.slug, 'updatedAt', m.updatedAt);
     checkRequiredSources('manufacturer', m.slug, m.sources);
     checkImageAsset('manufacturer', m.slug, 'logo', m.logo);
+    (['symbol', 'wordmark', 'combined'] as const).forEach((variant) => {
+      const asset = m.logos?.[variant];
+      if (!asset) return;
+      checkImageAsset('manufacturer', m.slug, `logos.${variant}`, asset);
+      // logos.* は空srcプレースホルダーを認めない（置くなら実ファイルと権利を揃えてから）
+      if (!asset.src.trim()) {
+        errors.push(`[image-missing] manufacturer "${m.slug}".logos.${variant}.src が空です`);
+      } else if (
+        asset.src.startsWith('/') &&
+        !fs.existsSync(path.join(process.cwd(), 'public', asset.src.replace(/^\//, '')))
+      ) {
+        errors.push(`[image-missing] manufacturer "${m.slug}".logos.${variant}.src のファイルが存在しません: ${asset.src}`);
+      }
+    });
     m.domesticDistributors?.forEach((distributor, index) => {
       const field = `domesticDistributors[${index}]`;
       if (!distributor.name.trim()) {

@@ -2,6 +2,7 @@
 // Robot=Product / Manufacturer=Organization / Article=NewsArticle。
 // 値はすべてレコードから導出する（直書きしない）。
 import type { Article, ManufacturerGuideFaqItem, Manufacturer, Robot, UseCase } from '@/data/types';
+import { resolveManufacturerLogo } from './manufacturerLogo';
 import { getDisplayableAsset } from './media';
 import { siteUrl } from './site';
 import { uiText } from './uiText';
@@ -38,7 +39,7 @@ export function robotJsonLd(robot: Robot, manufacturer?: Manufacturer) {
 }
 
 export function manufacturerJsonLd(manufacturer: Manufacturer) {
-  const logoSrc = getDisplayableAsset(manufacturer.logo)?.src;
+  const logoSrc = resolveManufacturerLogo(manufacturer, 'combined').asset?.src;
   const logo = logoSrc ? absoluteUrl(logoSrc) : undefined;
   return {
     '@context': 'https://schema.org',

@@ -131,9 +131,12 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
             >
               <ManufacturerLogoName
                 name={manufacturer.name}
-                logo={manufacturer.logo}
-                frameClassName="h-5 w-5"
-                imageClassName="h-4 w-4"
+                logos={manufacturer.logos}
+                variant="combined"
+                targetAreaPx={20 * 96}
+                maxHeightPx={20}
+                maxWidthPx={96}
+                hideName
               />
             </Link>
           )}

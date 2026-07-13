@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { X } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
-import type { ImageAsset, Robot } from '@/data/types';
+import type { ManufacturerLogos, Robot } from '@/data/types';
 import { uiText } from '@/lib/uiText';
 
 interface FavoriteCardProps {
   robot: Robot;
   manufacturerName?: string;
-  manufacturerLogo?: ImageAsset;
+  manufacturerLogos?: ManufacturerLogos;
   onRemove: (id: string) => void;
   onSelect?: (id: string) => void;
 }
@@ -17,7 +17,7 @@ interface FavoriteCardProps {
 export function FavoriteCard({
   robot,
   manufacturerName,
-  manufacturerLogo,
+  manufacturerLogos,
   onRemove,
   onSelect,
 }: FavoriteCardProps) {
@@ -48,10 +48,13 @@ export function FavoriteCard({
         </div>
         <ManufacturerLogoName
           name={manufacturerName ?? robot.manufacturerId}
-          logo={manufacturerLogo}
+          logos={manufacturerLogos}
+          variant="combined"
           className="text-xs text-muted-foreground"
-          frameClassName="h-4 w-4"
-          imageClassName="h-3 w-3"
+          targetAreaPx={16 * 56}
+          maxHeightPx={16}
+          maxWidthPx={56}
+          hideName
         />
       </div>
 

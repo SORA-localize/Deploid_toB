@@ -418,10 +418,13 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                           >
                             <ManufacturerLogoName
                               name={manufacturer.nameJa ?? manufacturer.name}
-                              logo={manufacturer.logo}
+                              logos={manufacturer.logos}
+                              variant="combined"
                               className="text-sm font-semibold text-foreground"
-                              frameClassName="h-5 w-5"
-                              imageClassName="h-4 w-4"
+                              targetAreaPx={20 * 84}
+                              maxHeightPx={20}
+                              maxWidthPx={84}
+                              hideName
                             />
                             <span className="flex shrink-0 items-center gap-1 text-[10px] font-medium text-muted-foreground tabular-nums">
                               {manufacturerRobots.length}
@@ -666,7 +669,7 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                                 key={robot.id}
                                 robot={robot}
                                 manufacturerName={manufacturer?.name ?? robot.manufacturerId}
-                                manufacturerLogo={manufacturer?.logo}
+                                manufacturerLogos={manufacturer?.logos}
                                 onRemove={toggleFavorite}
                                 onSelect={handleFavoriteSelect}
                               />

@@ -1,6 +1,27 @@
 # メーカーロゴ利用仕様 v1
 
-Last created: 2026-07-09
+Last created: 2026-07-09 / Last updated: 2026-07-13（本番反映開始）
+
+## 本番反映状況（2026-07-13）
+
+`feature/manufacturer-logos-20260713` で、権利確認済みの9社分を本番データに登録した。
+
+**素材規格（確定）**
+
+- 置き場所: `public/images/manufacturers/logos/<manufacturer-id>-<variant>.svg|png`
+- 原本無改変。**PNG→SVGのトレース変換はしない**（再作画＝改変にあたり、権利ポリシー§7の改変禁止に触れる）。低解像度PNGは小〜中枠用途には十分で、大枠で粗い場合のみ高解像度素材を別途調達する
+- 寸法はデータに書かず実測（`lib/imageDimensions.ts`）
+- rights: `status: 'commercial-permitted'` + `sourceType: 'third-party'` + `licenseUrl`にWikimedia Commonsファイルページ + `permissionNote`にPD-textlogo根拠と商標留意を記録
+
+**権利判定の方法（今後の追加時も同じ手順）**
+
+- Commons APIで`LicenseShortName`を確認し、`Public domain`＋ファイルページに`PD-textlogo`テンプレートがある場合のみ使用可
+- `Copyrighted: True`＋個人の自己ライセンス（CC BY等）は不可。**Boston Dynamics（Own work自称の模写）とFigure AI（seeklogo.com転載）はこれに該当し使用不可と判定済み**。公式press/brandページからの再調達待ち
+- seeklogo等のロゴ集積サイトを出所とするファイルは、ライセンス表示があっても使わない
+
+**登録済み9社**: Unitree(wordmark) / Agility Robotics(combined) / Tesla(symbol・名前併記対象) / 川崎重工業(combined) / Wandercraft(wordmark) / NEURA Robotics(wordmark) / XPENG(combined) / Fourier(combined・PNG) / AgiBot(combined・PNG)
+
+**監査A〜Jの反映状況**: A（symbol単独時の名前併記）はManufacturerLogoNameの`resolvedVariant`検知で実装済み。B・C・D・E・Fは実験ブランチ側で修正済みのコードをそのまま移植。G・HはL3/L5の現状（名前併記あり）を正とする。
 
 ## 位置づけ
 
