@@ -113,6 +113,13 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const guideContent = getManufacturerGuideContent(report);
   const standardBody = getStandardArticleBody(report);
   const isManufacturerGuide = guideContent !== null;
+  // 製品ラインナップのカード横スクロール用。lineup の robotId をDB解決し、メーカー名は機体側から引く。
+  const lineupRobots = guideContent
+    ? getRelatedRobots(guideContent.lineup.map((row) => row.robotId))
+    : [];
+  const lineupManufacturer = lineupRobots[0]
+    ? getManufacturerForRobot(lineupRobots[0].manufacturerId)
+    : undefined;
   const hasTakeaways = !isManufacturerGuide && (report.keyTakeaways ?? []).length > 0;
   const hasBody = (standardBody ?? '').trim().length > 0;
   const bodyHeadings = hasBody ? extractH2Headings(standardBody!) : [];
@@ -297,7 +304,10 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               >
                 <ManufacturerGuideArticleBody
                   content={guideContent}
+                  sources={report.sources}
                   lineupRows={resolveManufacturerGuideLineup(guideContent)}
+                  lineupRobots={lineupRobots}
+                  manufacturerName={lineupManufacturer?.name}
                 />
               </section>
             )}
@@ -313,7 +323,9 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
             {/* 記事メタ（本文の終端） */}
             <section className={`py-8 ${hasRelated ? 'border-b border-border' : ''}`}>
               <div className="space-y-6">
-                {((report.themeTags?.length ?? 0) > 0 ||
+                {/* メーカー解説はタグを表示しない（常設シリーズであり、ニュース的なファセット導線が不要なため） */}
+                {!isManufacturerGuide &&
+                  ((report.themeTags?.length ?? 0) > 0 ||
                   (report.industryTags?.length ?? 0) > 0 ||
                   (report.regionTags?.length ?? 0) > 0) && (
                   <div>
@@ -370,10 +382,10 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                       id="related-manufacturers"
                       title={uiText.reports.relatedManufacturers}
                       titleLevel="h3"
+                      // 紹介文（summary）は出さない。名前リンクのみ（将来はワードロゴ化の方針）
                       items={manufacturers.map((m) => ({
                         href: `/manufacturers/${m.slug}`,
                         title: m.nameJa ?? m.name,
-                        description: m.summary,
                       }))}
                     />
                   )}

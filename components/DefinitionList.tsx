@@ -15,9 +15,10 @@ interface DefinitionListProps {
   /**
    * static-page: about/privacy/for-manufacturers の固定本文ページ向け（md breakpoint・8rem gutter）
    * detail-decision: robots/[slug]・use-cases/[slug] の詳細ページ向け（sm breakpoint・8rem gutter・アイコン対応）
-   * judgment: 記事本文内の定性判断テーブル向け（外枠 border + bg-card・11rem gutter・dt は呼び出し側が合成）
+   * 注: 旧 'judgment'（外枠 border + bg-card の箱）は design_system_v1.md「本文ブロックに矩形背景を貼らない」
+   * に違反していたため削除した。本文内リストは罫線（divide-y）のみで区切る。
    */
-  variant?: 'static-page' | 'detail-decision' | 'judgment';
+  variant?: 'static-page' | 'detail-decision';
   /** static-page バリアントの dd 文字色（about/for-manufacturers は foreground、privacy は muted） */
   ddTone?: 'foreground' | 'muted';
   /** static-page バリアントのみ：最初のセクション（mission/課題/方針）だけ py-5、他は py-4 */
@@ -32,24 +33,6 @@ export function DefinitionList({
   py = '4',
   className,
 }: DefinitionListProps) {
-  if (variant === 'judgment') {
-    return (
-      <dl className={`my-6 divide-y divide-border border border-border bg-card text-sm ${className ?? ''}`}>
-        {rows.map((row, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-1 gap-1.5 p-4 sm:grid-cols-[11rem_1fr] sm:gap-4"
-          >
-            <dt className="text-foreground">{row.label}</dt>
-            <dd className={row.valueClassName ?? 'break-words leading-relaxed text-foreground/80 [overflow-wrap:anywhere]'}>
-              {row.value}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    );
-  }
-
   if (variant === 'detail-decision') {
     return (
       <dl className={`divide-y divide-border text-xs max-w-3xl ${className ?? ''}`}>

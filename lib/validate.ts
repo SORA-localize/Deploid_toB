@@ -16,14 +16,12 @@ import {
   japanAvailabilityOrder,
   manufacturerCountryOrder,
   manufacturerGuideDeploymentCategoryOrder,
-  manufacturerGuideEvaluationAxisOrder,
   robotCategoryOrder,
 } from './display.ts';
 import {
   articleCategoryLabels,
   articleSectionLabels,
   manufacturerGuideDeploymentCategoryLabels,
-  manufacturerGuideEvaluationAxisLabels,
 } from './labels.ts';
 import { isSpecKey } from './specSchema.ts';
 import { isRegisteredTag, normalizeTagKey, type TagKind } from './tagRegistry.ts';
@@ -487,11 +485,6 @@ export function validateData(): ValidationResult {
   checkLabelOrderSync('section', articleSectionLabels, articleSectionOrder);
   checkLabelOrderSync('category', articleCategoryLabels, articleCategoryOrder);
   checkLabelOrderSync(
-    'manufacturerGuideEvaluationAxis',
-    manufacturerGuideEvaluationAxisLabels,
-    manufacturerGuideEvaluationAxisOrder,
-  );
-  checkLabelOrderSync(
     'manufacturerGuideDeploymentCategory',
     manufacturerGuideDeploymentCategoryLabels,
     manufacturerGuideDeploymentCategoryOrder,
@@ -516,16 +509,40 @@ export function validateData(): ValidationResult {
         );
       }
     });
-    manufacturerGuideEvaluationAxisOrder.forEach((axis) => {
-      const item = content.evaluationAxes[axis];
-      if (!item || !item.body.trim() || item.labelOverride?.trim() === '') {
-        errors.push(`[manufacturerGuideContent] ${article.slug}: evaluationAxes.${axis} が不完全です`);
-      }
-    });
+    const articleSourceUrls = new Set(article.sources.map((s) => s.url));
     manufacturerGuideDeploymentCategoryOrder.forEach((category) => {
       const item = content.deploymentStatus[category];
-      if (!item || !item.body.trim() || item.labelOverride?.trim() === '') {
+      if (!item || !item.body.trim()) {
         errors.push(`[manufacturerGuideContent] ${article.slug}: deploymentStatus.${category} が不完全です`);
+        return;
+      }
+      // evidence が none 以外の行は根拠URL必須。URLは記事 sources[] と一致させる。
+      if (item.evidence !== 'none') {
+        if (!item.sourceUrls || item.sourceUrls.length === 0) {
+          errors.push(
+            `[manufacturerGuideContent] ${article.slug}: deploymentStatus.${category} に sourceUrls がありません（evidence が none 以外は必須）`,
+          );
+        }
+      }
+      (item.sourceUrls ?? []).forEach((url) => {
+        if (!articleSourceUrls.has(url)) {
+          errors.push(
+            `[manufacturerGuideContent] ${article.slug}: deploymentStatus.${category}.sourceUrls の "${url}" が記事 sources[] に登録されていません`,
+          );
+        }
+      });
+    });
+    if (content.procurementChannels.length === 0) {
+      errors.push(
+        `[manufacturerGuideContent] ${article.slug}: procurementChannels が空です（国内窓口が無い場合も公式問い合わせ窓口を載せる）`,
+      );
+    }
+    content.procurementChannels.forEach((channel, i) => {
+      if (!channel.name.trim() || !channel.role.trim()) {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: procurementChannels[${i}] の name/role が空です`);
+      }
+      if (!/^https?:\/\//.test(channel.url)) {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: procurementChannels[${i}].url の形式が不正です`);
       }
     });
     if (content.lineup.length === 0) {

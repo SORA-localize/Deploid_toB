@@ -23,7 +23,8 @@ export function SourceList({
   title = uiText.common.resources,
   sources,
   emptyMessage = uiText.emptyStates.sources,
-  className = 'mt-6 border border-border bg-card p-6 scroll-mt-site-header',
+  // 出典欄はカード面にしない（design_system_v1.md「本文ブロックに矩形背景を貼らない」）。
+  className = 'mt-6 scroll-mt-site-header',
   titleClassName,
   titleVariant = 'default',
 }: SourceListProps) {

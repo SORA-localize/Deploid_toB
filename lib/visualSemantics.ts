@@ -5,9 +5,7 @@ import type {
   DeploymentStatus,
   JapanAvailability,
   JapanPresence,
-  ManufacturerGuideDeploymentEvidence,
   MarketAvailability,
-  ManufacturerGuideEvaluationLevel,
   PublishStatus,
   Reliability,
   ArticleType,
@@ -161,18 +159,6 @@ export const marketAvailabilityTones = {
   'company-claimed-delivery': 'warning',
   unknown: 'unknown',
 } as const satisfies Record<MarketAvailability, VisualTone>;
-
-export const manufacturerGuideEvaluationLevelTones = {
-  strength: 'success',
-  caution: 'warning',
-  risk: 'danger',
-} as const satisfies Record<ManufacturerGuideEvaluationLevel, VisualTone>;
-
-export const manufacturerGuideDeploymentEvidenceTones = {
-  confirmed: 'success',
-  limited: 'warning',
-  none: 'unknown',
-} as const satisfies Record<ManufacturerGuideDeploymentEvidence, VisualTone>;
 
 export const useCaseMaturityTones = {
   'early-stage': 'unknown',

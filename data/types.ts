@@ -413,36 +413,39 @@ export interface StandardArticle extends ArticleCommon {
  * 著者はセクションごとの中身（prose と評価/分類データ）だけを埋める。
  * テンプレートの意味づけは docs/planning/editorial_style_guide_v1.md §6-1 を参照。
  */
-export type ManufacturerGuideEvaluationAxis =
-  | 'pricing'
-  | 'productionCapacity'
-  | 'ecosystem'
-  | 'trackRecord'
-  | 'geopoliticalRisk';
-
-export type ManufacturerGuideEvaluationLevel = 'strength' | 'caution' | 'risk';
-
-export interface ManufacturerGuideEvaluationItem {
-  level: ManufacturerGuideEvaluationLevel;
-  /** ステータス表示は level から lib/labels.ts の既定ラベルを導出。個別表現が要る行だけ上書きする。 */
-  labelOverride?: string;
-  body: string;
-}
-
 export type ManufacturerGuideDeploymentCategory =
-  | 'commercial'
-  | 'poc'
   | 'researchEducation'
   | 'exhibitionDemo'
-  | 'internalTrial';
+  | 'poc'
+  | 'internalTrial'
+  | 'commercial';
 
 export type ManufacturerGuideDeploymentEvidence = 'confirmed' | 'limited' | 'none';
 
 export interface ManufacturerGuideDeploymentItem {
+  /** 視覚表示の正本（confirmed=チェックマーク付き強調 / limited=通常 / none=グレーアウト）。ステータス文言は持たず、何が確認できたかは body に直接書く。 */
   evidence: ManufacturerGuideDeploymentEvidence;
-  /** ステータス表示は evidence から lib/labels.ts の既定ラベルを導出。個別表現（例:「あり（自社発表のみ）」）だけ上書きする。 */
-  labelOverride?: string;
   body: string;
+  /** 根拠URL。evidence が 'none' 以外は必須（validate で強制）。記事 sources[] に登録済みのURLと一致させる。 */
+  sourceUrls?: string[];
+}
+
+export type ManufacturerGuideProcurementChannelKind =
+  | 'official-direct'
+  | 'domestic-distributor'
+  | 'consultation';
+
+/**
+ * 購入・導入・相談セクションのチャネル1件。文章だけの窓口説明は禁止で、
+ * 窓口は必ずこの構造化リストに載せる。Deploidの問い合わせ窓口はデータに含めず、
+ * コンポーネント側で末尾に自動追加する。
+ */
+export interface ManufacturerGuideProcurementChannel {
+  kind: ManufacturerGuideProcurementChannelKind;
+  name: string;
+  url: string;
+  /** 役割の一言（販売のみか、導入支援・保守まで含むか）。読者がどこに相談すべきか判断できる粒度で書く。 */
+  role: string;
 }
 
 /**
@@ -477,27 +480,22 @@ export interface ManufacturerGuideVideo {
 
 export interface ManufacturerGuideContent {
   companyOverview: string;
-  history: string;
   productLineup: string;
-  /** 製品ラインナップ表（DB連携）。製品ラインナップセクション内に描画される。 */
+  /** 製品ラインナップ表（DB連携）。製品ラインナップセクション内にカード横スクロール＋表として描画される。 */
   lineup: ManufacturerGuideLineupRow[];
   /** 製品ラインナップセクションに表示する公式動画（任意・0〜数本）。 */
   videos?: ManufacturerGuideVideo[];
-  /** 強みと注意点セクションの評価テーブル前のリード文 */
-  evaluationIntro: string;
-  /** 固定5軸。Record なので1軸でも欠けるとコンパイルが通らない。 */
-  evaluationAxes: Record<ManufacturerGuideEvaluationAxis, ManufacturerGuideEvaluationItem>;
-  /** 導入実績セクションの分類テーブル前のリード文 */
+  history: string;
+  /** 導入実績のリード文（1〜2文）。このメーカーの実績の業界内での位置だけを書く。表の後の要約文は持たない設計。 */
   deploymentIntro: string;
-  /** 固定5分類。Record なので1分類でも欠けるとコンパイルが通らない。 */
+  /** 固定5分類・時系列順。Record なので1分類でも欠けるとコンパイルが通らない。 */
   deploymentStatus: Record<ManufacturerGuideDeploymentCategory, ManufacturerGuideDeploymentItem>;
-  /** 分類テーブル後の結論文 */
-  deploymentOutro: string;
+  /** 購入・導入・相談のチャネルリスト。国内窓口が確認できない場合も公式問い合わせ窓口を必ず載せる。 */
+  procurementChannels: ManufacturerGuideProcurementChannel[];
+  /** 購入・導入・相談の文章部（確認事項とリスク）。輸出規制・制裁リスト等の調達リスクはここに書く。 */
   japanProcurement: string;
   /** よくある質問。FAQPage 構造化データにも使われる。 */
   faq: ManufacturerGuideFaqItem[];
-  /** どんな検討者に向くか */
-  fitSummary: string;
 }
 
 export interface ManufacturerGuideArticle extends ArticleCommon {

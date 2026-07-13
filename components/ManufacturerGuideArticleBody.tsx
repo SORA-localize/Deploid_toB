@@ -1,34 +1,106 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import type { ManufacturerGuideContent } from '@/data/types';
+import {
+  Check,
+  FlaskConical,
+  Factory,
+  GraduationCap,
+  Briefcase,
+  Presentation,
+  type LucideIcon,
+} from 'lucide-react';
+import type {
+  ManufacturerGuideContent,
+  ManufacturerGuideDeploymentCategory,
+  ManufacturerGuideProcurementChannel,
+  Robot,
+  Source,
+} from '@/data/types';
 import type { ManufacturerGuideLineupDisplayRow } from '@/lib/data';
 import {
   manufacturerGuideDeploymentCategoryLabels,
-  manufacturerGuideDeploymentEvidenceLabels,
+  manufacturerGuideProcurementChannelKindLabels,
 } from '@/lib/labels';
 import {
   manufacturerGuideDeploymentCategoryOrder,
+  manufacturerGuideProcurementChannelKindOrder,
 } from '@/lib/display';
-import {
-  manufacturerGuideDeploymentEvidenceTones,
-} from '@/lib/visualSemantics';
 import { MANUFACTURER_GUIDE_SECTIONS, type ManufacturerGuideSectionId } from '@/lib/manufacturerGuideTemplate';
 import { Markdown, sectionHeadingClassName } from '@/components/Markdown';
-import { JudgmentTable, type JudgmentRow } from '@/components/JudgmentTable';
+import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
 import { YouTubeEmbed } from '@/components/YouTubeEmbed';
 import { uiText } from '@/lib/uiText';
 
-function toDeploymentRows(content: ManufacturerGuideContent): JudgmentRow[] {
-  return manufacturerGuideDeploymentCategoryOrder.map((category) => {
-    const item = content.deploymentStatus[category];
-    return {
-      key: category,
-      label: manufacturerGuideDeploymentCategoryLabels[category],
-      statusLabel: item.labelOverride ?? manufacturerGuideDeploymentEvidenceLabels[item.evidence],
-      tone: manufacturerGuideDeploymentEvidenceTones[item.evidence],
-      body: item.body,
-    };
-  });
+/** 導入実績の分類アイコン。段階の内容を直感的に示す（色は付けず、状態は evidence 側で表す）。 */
+const DEPLOYMENT_CATEGORY_ICON: Record<ManufacturerGuideDeploymentCategory, LucideIcon> = {
+  researchEducation: GraduationCap,
+  exhibitionDemo: Presentation,
+  poc: FlaskConical,
+  internalTrial: Factory,
+  commercial: Briefcase,
+};
+
+/**
+ * 導入実績の簡素なリスト。囲い枠・ステータス文言は持たず
+ * （design_system_v1.md「本文ブロックに矩形背景を貼らない」/ 商用実績が薄い段階で主役化させない）、
+ * 確認状態は evidence からモノクロの濃淡で表す:
+ * confirmed=チェックマーク付き強調 / limited=通常 / none=グレーアウト（新しい色は持ち込まない）。
+ * 行の根拠は「参照:」として媒体名リンクで示す。sourceUrls と記事 sources[] の対応は validate が強制する。
+ */
+function DeploymentList({ content, sources }: { content: ManufacturerGuideContent; sources: readonly Source[] }) {
+  const sourceByUrl = new Map(sources.map((s) => [s.url, s]));
+  return (
+    <dl className="my-6 divide-y divide-border text-sm">
+      {manufacturerGuideDeploymentCategoryOrder.map((category) => {
+        const item = content.deploymentStatus[category];
+        const Icon = DEPLOYMENT_CATEGORY_ICON[category];
+        const isNone = item.evidence === 'none';
+        const refs = (item.sourceUrls ?? []).map((url) => {
+          const source = sourceByUrl.get(url);
+          return { href: url, name: source?.publisher ?? source?.title ?? url };
+        });
+        return (
+          <div key={category} className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
+            <dt className="flex items-start gap-2">
+              <Icon
+                aria-hidden="true"
+                className={`mt-0.5 h-4 w-4 shrink-0 ${isNone ? 'text-muted-foreground/40' : 'text-muted-foreground'}`}
+              />
+              <span className={`font-medium ${isNone ? 'text-muted-foreground' : 'text-foreground'}`}>
+                {manufacturerGuideDeploymentCategoryLabels[category]}
+              </span>
+              {item.evidence === 'confirmed' && (
+                <Check aria-label="確認済み" className="mt-0.5 h-4 w-4 shrink-0 text-foreground" />
+              )}
+            </dt>
+            <dd
+              className={`break-words leading-relaxed [overflow-wrap:anywhere] ${isNone ? 'text-muted-foreground' : 'text-foreground/80'}`}
+            >
+              {item.body}
+              {refs.length > 0 && (
+                <span className="mt-1 block text-xs text-muted-foreground">
+                  {uiText.reports.guideDeploymentSourcePrefix}
+                  {refs.map((ref, i) => (
+                    <span key={ref.href}>
+                      {i > 0 && ' / '}
+                      <a
+                        href={ref.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline underline-offset-2 hover:text-foreground"
+                      >
+                        {ref.name}
+                      </a>
+                    </span>
+                  ))}
+                </span>
+              )}
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
+  );
 }
 
 /** ラインナップ表。機体名・リンクはDB解決済みの行を受け取る（データ取得はページ側）。 */
@@ -61,6 +133,72 @@ function LineupTable({ rows }: { rows: ManufacturerGuideLineupDisplayRow[] }) {
   );
 }
 
+/** ラインナップ機体のカード横スクロール（関連ロボットと同じ FeaturedRobotCard パターン）。 */
+function LineupRobotCards({ robots, manufacturerName }: { robots: Robot[]; manufacturerName?: string }) {
+  if (robots.length === 0) return null;
+  return (
+    <div className="mt-6 flex gap-3 overflow-x-auto overscroll-x-contain snap-x pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      {robots.map((robot) => (
+        <div key={robot.id} className="w-[44%] shrink-0 snap-start sm:w-[30%] md:w-[26%]">
+          <FeaturedRobotCard robot={robot} manufacturerName={manufacturerName} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * 日本からの調達のチャネルリスト。窓口は文章でなく必ずこのリストで示す（§6-1）。
+ * 囲い枠・背景は付けない（design_system_v1.md）。Deploid の問い合わせ窓口は記事データに
+ * 持たせず、ここで導入支援・相談グループの末尾に固定追加する。
+ */
+function ProcurementChannelList({ channels }: { channels: ManufacturerGuideProcurementChannel[] }) {
+  return (
+    <div className="my-6 space-y-5">
+      {manufacturerGuideProcurementChannelKindOrder.map((kind) => {
+        const group = channels.filter((channel) => channel.kind === kind);
+        const isConsultation = kind === 'consultation';
+        if (group.length === 0 && !isConsultation) return null;
+        return (
+          <div key={kind}>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              {manufacturerGuideProcurementChannelKindLabels[kind]}
+            </p>
+            <ul className="divide-y divide-border text-sm">
+              {group.map((channel) => (
+                <li key={channel.url} className="grid grid-cols-1 gap-1 py-2.5 sm:grid-cols-[14rem_1fr] sm:gap-4">
+                  <a
+                    href={channel.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-foreground underline underline-offset-4 hover:text-muted-foreground break-words [overflow-wrap:anywhere]"
+                  >
+                    {channel.name}
+                  </a>
+                  <span className="leading-relaxed text-foreground/80">{channel.role}</span>
+                </li>
+              ))}
+              {isConsultation && (
+                <li className="grid grid-cols-1 gap-1 py-2.5 sm:grid-cols-[14rem_1fr] sm:gap-4">
+                  <Link
+                    href="/contact"
+                    className="font-medium text-foreground underline underline-offset-4 hover:text-muted-foreground"
+                  >
+                    {uiText.reports.guideProcurementDeploidName}
+                  </Link>
+                  <span className="leading-relaxed text-foreground/80">
+                    {uiText.reports.guideProcurementDeploidRole}
+                  </span>
+                </li>
+              )}
+            </ul>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function FaqList({ content }: { content: ManufacturerGuideContent }) {
   return (
     <div className="space-y-5">
@@ -81,32 +219,44 @@ function FaqList({ content }: { content: ManufacturerGuideContent }) {
  */
 export function ManufacturerGuideArticleBody({
   content,
+  sources,
   lineupRows,
+  lineupRobots,
+  manufacturerName,
 }: {
   content: ManufacturerGuideContent;
+  sources: readonly Source[];
   lineupRows: ManufacturerGuideLineupDisplayRow[];
+  /** lineup の robotId をDB解決した機体（カード横スクロール用）。取得はページ側。 */
+  lineupRobots: Robot[];
+  manufacturerName?: string;
 }) {
   const sectionContent = {
     'company-overview': <Markdown source={content.companyOverview} />,
-    history: <Markdown source={content.history} />,
     'product-lineup': (
       <>
         <Markdown source={content.productLineup} />
+        <LineupRobotCards robots={lineupRobots} manufacturerName={manufacturerName} />
         <LineupTable rows={lineupRows} />
         {content.videos?.map((video) => (
           <YouTubeEmbed key={video.videoId} video={video} />
         ))}
       </>
     ),
+    history: <Markdown source={content.history} />,
     'deployment-track-record': (
       <>
         <Markdown source={content.deploymentIntro} />
-        <JudgmentTable rows={toDeploymentRows(content)} />
+        <DeploymentList content={content} sources={sources} />
       </>
     ),
-    'japan-procurement': <Markdown source={content.japanProcurement} />,
+    'japan-procurement': (
+      <>
+        <ProcurementChannelList channels={content.procurementChannels} />
+        <Markdown source={content.japanProcurement} />
+      </>
+    ),
     faq: <FaqList content={content} />,
-    'fit-summary': <Markdown source={content.fitSummary} />,
   } satisfies Record<ManufacturerGuideSectionId, ReactNode>;
 
   return (

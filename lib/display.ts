@@ -9,8 +9,8 @@ import type {
   ArticleSection,
   ArticleCategory,
   ArticleType,
-  ManufacturerGuideEvaluationAxis,
   ManufacturerGuideDeploymentCategory,
+  ManufacturerGuideProcurementChannelKind,
   Robot,
   RobotCategory,
   UseCase,
@@ -113,22 +113,20 @@ export const articleSectionOrder: ArticleSection[] = [
   'entertainment',
 ];
 
-/** メーカー解説「強みと注意点」5軸の表示順。完全性は manufacturerGuideEvaluationAxisLabels(Record) と validate の diff で担保。 */
-export const manufacturerGuideEvaluationAxisOrder: ManufacturerGuideEvaluationAxis[] = [
-  'pricing',
-  'productionCapacity',
-  'ecosystem',
-  'trackRecord',
-  'geopoliticalRisk',
+/** メーカー解説「購入・導入・相談」チャネル種別の表示順。 */
+export const manufacturerGuideProcurementChannelKindOrder: ManufacturerGuideProcurementChannelKind[] = [
+  'official-direct',
+  'domestic-distributor',
+  'consultation',
 ];
 
-/** メーカー解説「導入実績」5分類の表示順。完全性は manufacturerGuideDeploymentCategoryLabels(Record) と validate の diff で担保。 */
+/** メーカー解説「導入実績」5分類の表示順。実装段階の時系列順（研究→デモ→PoC→社内実証→商用）に固定する。完全性は manufacturerGuideDeploymentCategoryLabels(Record) と validate の diff で担保。 */
 export const manufacturerGuideDeploymentCategoryOrder: ManufacturerGuideDeploymentCategory[] = [
-  'commercial',
-  'poc',
   'researchEducation',
   'exhibitionDemo',
+  'poc',
   'internalTrial',
+  'commercial',
 ];
 
 const preReleaseDeploymentStages: DeploymentStage[] = ['concept', 'prototype'];

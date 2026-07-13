@@ -114,6 +114,7 @@ Deploid は、ヒューマノイド導入を検討する事業者向けの buyer
 - ページセクションは全幅bandまたは余白で区切る。
 - カードの中にカードを入れない。
 - 詳細ページの本文セクション、Fact Sheet、調達メモ、出典欄はカード面にしない。`border border-border bg-card` / `bg-muted` の矩形背景を本文ブロックへ貼らず、見出し・余白・罫線行で構造を出す。
+- 既存コンポーネントのスタイルを流用する前に、このルールとの整合を確認する。過去にコンポーネントのデフォルト（旧SourceList・旧DefinitionList judgmentバリアント）が矩形背景を焼き込んでいて、新実装がそれをコピーして違反が再生産された。呼び出し側が全てclassNameを上書きしているデフォルトは違反の温床なので、見つけたらデフォルト自体を直す。
 - コンパクトな管理UIではhero級の余白を使わない。
 
 ### Radius / Shadow
@@ -299,6 +300,30 @@ tones：
 - ドロップダウンのパネル幅はトリガー幅に固定する（内容で伸ばさない）。Select と SearchableDropdown の閉じた見た目を揃える。
 - chip buttonは `aria-pressed`。
 - **選択中インジケーター（ActiveFilterChips）はプレーンテキスト**。border/background/shadow を付けない。`text-muted-foreground hover:text-foreground` のみ。TagChip とは別物。
+
+### 記事本文内リスト（メーカー解説）
+
+メーカー解説（`ManufacturerGuideArticleBody`）の本文内リストは、上記「本文ブロックに矩形背景を貼らない」に従い、罫線（`divide-y divide-border`）のみで区切る。
+
+**導入実績リスト（DeploymentList）**
+
+- ステータス文言（「導入確認」「あり/限定的」等）は表示しない。何が確認できたかは本文が直接語る
+- 各分類に内容を示すlucideアイコンを付ける：研究・教育=`GraduationCap`／展示・デモ=`Presentation`／PoC=`FlaskConical`／社内実証=`Factory`／商用導入=`Briefcase`
+- 確認状態は `evidence` からモノクロの濃淡で表す。新しい色（緑等）は持ち込まない：
+  - `confirmed`：分類名の横に `Check`（`text-foreground`）
+  - `limited`：通常表示（マークなし）
+  - `none`：アイコン `text-muted-foreground/40`、分類名・本文 `text-muted-foreground` でグレーアウト
+- 行の根拠は本文下に `参照: 媒体名リンク`（`text-xs text-muted-foreground`、複数は ` / ` 区切り）
+
+**調達チャネルリスト（ProcurementChannelList）**
+
+- kind別（公式販売／国内代理店／導入支援・相談）にkicker見出し＋罫線リスト。囲い枠なし
+- 各行は名前リンク＋役割一言の2カラム（`sm:grid-cols-[14rem_1fr]`）
+- Deploidの問い合わせ窓口は導入支援・相談グループの末尾にコード側で固定追加する（記事データに持たせない）
+
+**関連メーカー（記事ページ）**
+
+- 名前リンクのみ。紹介文（`manufacturer.summary`）は表示しない。将来はワードロゴ・シンボルロゴの列挙に置き換える方針
 
 ### Forms
 
