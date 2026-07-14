@@ -5,7 +5,6 @@ import type { Robot } from '@/data/types';
 import type { Manufacturer } from '@/data/types';
 import { SidebarBlock, SidebarDivider, SidebarSection } from '@/components/SidebarSection';
 import { getRobotBasicFacts } from '@/lib/robotCatalog';
-import { deploymentStageLabels, japanAvailabilityLabels } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
 
 interface RobotStickyAsideProps {
@@ -25,22 +24,6 @@ export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps)
             rows={quickSpecs.map((row) => ({ key: row.key, label: row.label, value: row.value }))}
           />
         </SidebarBlock>
-
-        <SidebarDivider />
-
-        {/* 導入段階 + 入手性 */}
-        <div className="space-y-4">
-          <SidebarBlock kicker={uiText.robots.deploymentStage} kickerClassName="mb-1">
-            <p className="text-sm font-medium text-foreground">
-              {deploymentStageLabels[robot.deploymentStage]}
-            </p>
-          </SidebarBlock>
-          <SidebarBlock kicker={uiText.robots.japanAvailability} kickerClassName="mb-1">
-            <p className="text-sm font-medium text-foreground">
-              {japanAvailabilityLabels[robot.japanAvailability]}
-            </p>
-          </SidebarBlock>
-        </div>
 
         <SidebarDivider />
 

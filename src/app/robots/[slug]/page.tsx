@@ -1,39 +1,36 @@
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { Activity, ChevronLeft, ChevronRight, CircleDollarSign, MapPin, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { DefinitionList } from '@/components/DefinitionList';
+import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
 import { JsonLd } from '@/components/JsonLd';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
-import { RobotImageCarousel } from '@/components/RobotImageCarousel';
+import { RobotCardRail } from '@/components/RobotCardRail';
 import { RobotDetailStickyHeader } from '@/components/RobotDetailStickyHeader';
+import { RobotImageCarousel } from '@/components/RobotImageCarousel';
+import { RobotSpecExplorer } from '@/components/RobotSpecExplorer';
 import { RobotStickyAside } from '@/components/RobotStickyAside';
 import { SourceList } from '@/components/SourceList';
 import {
   getManufacturerForRobot,
   getManufacturers,
-  getArticlesForRobot,
+  getOfficialUseCasesForRobot,
+  getRelatedRobotsForRobot,
   getRobotById,
   getRobots,
   getRobotsForDetail,
-  getUseCasesForRobot,
   resolveRobotDetailBySlug,
 } from '@/lib/data';
-import { breadcrumbJsonLd, robotJsonLd } from '@/lib/jsonLd';
-import { getRobotPrimaryImage } from '@/lib/robotMedia';
-import { shouldIndexRobot } from '@/lib/indexing';
-import { createPageMetadata } from '@/lib/metadata';
 import { sortRobots } from '@/lib/display';
-import { getRobotDetailDecisionRows, getRobotDetailSpecRows } from '@/lib/robotDisplay';
+import { shouldIndexRobot } from '@/lib/indexing';
+import { breadcrumbJsonLd, robotJsonLd } from '@/lib/jsonLd';
+import { createPageMetadata } from '@/lib/metadata';
+import {
+  getRobotSpecGroups,
+  resolveRobotUsageExamples,
+} from '@/lib/robotCatalog';
+import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import { uiText } from '@/lib/uiText';
-
-const sections = [
-  { label: uiText.common.overview,     href: '#overview'      },
-  { label: '導入判断',                  href: '#decision'      },
-  { label: uiText.robots.applications, href: '#applications'  },
-  { label: uiText.robots.specifications, href: '#specs'       },
-  { label: uiText.common.resources,    href: '#sources'       },
-];
 
 export function generateStaticParams() {
   // archived も詳細ページは残す（「提供終了」表示。一覧・比較には出ない）
@@ -66,16 +63,31 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
   const successor = robot.supersededById ? getRobotById(robot.supersededById) : undefined;
   const manufacturer = getManufacturerForRobot(robot.manufacturerId);
-  const useCases = getUseCasesForRobot(robot.id);
-  const reports = getArticlesForRobot(robot.id);
+  const manufacturers = getManufacturers();
+  const intendedUses = getOfficialUseCasesForRobot(robot.id);
+  const usageExamples = resolveRobotUsageExamples(robot);
+  const specGroups = getRobotSpecGroups(robot);
+  const relatedRobots = getRelatedRobotsForRobot(robot);
 
-  const all = sortRobots(getRobots(), 'featured', getManufacturers());
-  const idx = all.findIndex((r) => r.id === robot.id);
-  const prev = idx > 0 ? all[idx - 1] : null;
-  const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
+  const all = sortRobots(getRobots(), 'featured', manufacturers);
+  const index = all.findIndex((candidate) => candidate.id === robot.id);
+  const previousRobot = index > 0 ? all[index - 1] : null;
+  const nextRobot = index >= 0 && index < all.length - 1 ? all[index + 1] : null;
 
-  const specRows = getRobotDetailSpecRows(robot, manufacturer);
-  const decisionRows = getRobotDetailDecisionRows(robot);
+  const sections = [
+    { label: uiText.common.overview, href: '#overview' },
+    { label: uiText.robots.detailedSpecifications, href: '#specs' },
+    ...(intendedUses.length > 0
+      ? [{ label: uiText.robots.intendedUses, href: '#intended-uses' }]
+      : []),
+    ...(usageExamples.length > 0
+      ? [{ label: uiText.robots.usageExamples, href: '#usage-examples' }]
+      : []),
+    ...(relatedRobots.length > 0
+      ? [{ label: uiText.robots.relatedRobots, href: '#related-robots' }]
+      : []),
+    { label: uiText.common.resources, href: '#sources' },
+  ];
   const breadcrumbItems = [
     { label: uiText.robots.breadcrumb, path: '/robots' },
     ...(manufacturer
@@ -88,29 +100,27 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
     <div className="min-h-screen bg-background">
       <JsonLd data={robotJsonLd(robot, manufacturer)} />
       <JsonLd
-        data={breadcrumbJsonLd([
-          ...breadcrumbItems.map((item) => ({
+        data={breadcrumbJsonLd(
+          breadcrumbItems.map((item) => ({
             name: item.label,
             path: item.path ?? `/robots/${robot.slug}`,
           })),
-        ])}
+        )}
       />
 
       <RobotDetailStickyHeader title={robot.nameJa ?? robot.name} sections={sections} />
 
       <div className="site-container py-8">
-        <Breadcrumbs
-          items={breadcrumbItems}
-        />
+        <Breadcrumbs items={breadcrumbItems} />
 
-        {/* 提供終了通知（archived のみ）。旧モデル情報も判断材料として残す（設計 §6.5-2） */}
         {robot.publishStatus === 'archived' && (
           <div className="mt-6 border border-border bg-muted px-4 py-3 text-xs text-foreground/80">
             <span className="font-semibold text-foreground">{uiText.robots.archivedNotice}</span>
             {uiText.robots.archivedDescription}
             {successor && (
               <>
-                {' '}{uiText.robots.successor}:{' '}
+                {' '}
+                {uiText.robots.successor}:{' '}
                 <Link
                   href={`/robots/${successor.slug}`}
                   className="font-medium text-foreground underline underline-offset-2 hover:text-foreground/80"
@@ -122,8 +132,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
           </div>
         )}
 
-        {/* #overview — グリッド外・全幅 */}
-        <div id="overview" className="mt-6 mb-6 scroll-mt-site-header">
+        <div id="overview" className="mb-6 mt-6 scroll-mt-site-header">
           {manufacturer && (
             <Link
               href={`/manufacturers/${manufacturer.slug}`}
@@ -141,163 +150,138 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               />
             </Link>
           )}
-          <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-3">
+          <h1 className="mb-3 text-2xl font-semibold text-foreground md:text-3xl">
             {robot.nameJa ?? robot.name}
           </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {robot.description}
-          </p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{robot.description}</p>
         </div>
 
-        {/* 2カラムグリッド — カルーセルと右カラムが同じ高さからスタート */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-12">
+          <main className="min-w-0">
+            <RobotImageCarousel robot={robot} />
 
-          {/* ── LEFT COLUMN ─────────────────────────────── */}
-          <div className="min-w-0">
-
-            {/* Image carousel */}
-            <div className="mb-0">
-              <RobotImageCarousel robot={robot} />
-            </div>
-
-            {/* #decision ── バイヤー向け情報を上位に */}
-            <div id="decision" className="mt-6 py-8 border-b border-border scroll-mt-site-header">
-              <h2 className="text-lg font-semibold text-foreground mb-4">{uiText.robots.decision}</h2>
-              <DefinitionList
-                variant="detail-decision"
-                rows={decisionRows.map((row) => ({
-                  label: row.label,
-                  value: row.value,
-                  icon:
-                    row.label === '導入段階' ? Activity :
-                    row.label === '日本での入手性' ? MapPin :
-                    row.label === '参考価格' ? CircleDollarSign :
-                    row.label === '安全性' ? ShieldCheck :
-                    undefined,
-                }))}
-              />
-            </div>
-
-            {/* #applications */}
-            <div id="applications" className="py-8 border-b border-border scroll-mt-site-header">
-              <h2 className="text-lg font-semibold text-foreground mb-4">
-                {uiText.robots.applications}
+            <section id="specs" className="scroll-mt-site-header border-b border-border py-10">
+              <h2 className="mb-5 text-lg font-semibold text-foreground">
+                {uiText.robots.detailedSpecifications}
               </h2>
-              <div className="space-y-4">
-                {robot.comparison.bestFit.length > 0 && (
-                  <div>
-                    <h3 className="text-xs font-semibold text-foreground mb-2">{uiText.robots.bestFit}</h3>
-                    <ul className="text-xs text-foreground/80 space-y-1">
-                      {robot.comparison.bestFit.map((item) => (
-                        <li key={item} className="flex items-start gap-2">
-                          <span className="mt-0.5 text-foreground">+</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {robot.comparison.constraints.length > 0 && (
-                  <div>
-                    <h3 className="text-xs font-semibold text-foreground mb-2">{uiText.robots.constraints}</h3>
-                    <ul className="text-xs text-foreground/80 space-y-1">
-                      {robot.comparison.constraints.map((item) => (
-                        <li key={item} className="flex items-start gap-2">
-                          <span className="text-muted-foreground mt-0.5">−</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {robot.comparison.notFit.length > 0 && (
-                  <div>
-                    <h3 className="text-xs font-semibold text-foreground mb-2">{uiText.robots.notFit}</h3>
-                    <ul className="text-xs text-foreground/80 space-y-1">
-                      {robot.comparison.notFit.map((item) => (
-                        <li key={item} className="flex items-start gap-2">
-                          <span className="text-muted-foreground mt-0.5">×</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {(useCases.length > 0 || reports.length > 0) && (
-                  <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
-                    {useCases.map((useCase) => (
-                      <Link
-                        key={useCase.id}
-                        href={`/use-cases/${useCase.slug}`}
-                        className="text-xs px-3 py-1 border border-border hover:border-foreground/40 transition-colors text-foreground/80"
-                      >
-                        {useCase.titleJa ?? useCase.title}
-                      </Link>
-                    ))}
-                    {reports.map((report) => (
-                      <Link
-                        key={report.id}
-                        href={`/reports/${report.slug}`}
-                        className="text-xs px-3 py-1 border border-border hover:border-foreground/40 transition-colors text-foreground/80"
-                      >
-                        {report.titleJa ?? report.title}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+              <RobotSpecExplorer groups={specGroups} />
+            </section>
 
-            {/* #specs */}
-            <div id="specs" className="py-8 border-b border-border scroll-mt-site-header">
-              <h2 className="text-lg font-semibold text-foreground mb-4">
-                {uiText.robots.technicalSpecifications}
-              </h2>
-              <DefinitionList variant="detail-decision" rows={specRows} />
-            </div>
+            {intendedUses.length > 0 && (
+              <section
+                id="intended-uses"
+                className="scroll-mt-site-header border-b border-border py-8"
+              >
+                <p className="text-sm leading-relaxed text-foreground">
+                  <span className="font-semibold">{uiText.robots.intendedUses}：</span>
+                  {intendedUses.map((useCase, useCaseIndex) => (
+                    <span key={useCase.id}>
+                      {useCaseIndex > 0 && <span className="text-muted-foreground"> / </span>}
+                      <Link
+                        href={useCase.href}
+                        className="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                      >
+                        {useCase.label}
+                      </Link>
+                    </span>
+                  ))}
+                </p>
+              </section>
+            )}
 
-            {/* #sources */}
+            {usageExamples.length > 0 && (
+              <section
+                id="usage-examples"
+                className="scroll-mt-site-header border-b border-border py-8"
+              >
+                <h2 className="mb-4 text-lg font-semibold text-foreground">
+                  {uiText.robots.usageExamples}
+                </h2>
+                <ul className="divide-y divide-border border-y border-border">
+                  {usageExamples.map((example) => (
+                    <li key={example.url} className="py-4">
+                      <a
+                        href={example.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium leading-relaxed text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+                      >
+                        {example.title}
+                      </a>
+                      {(example.publisher || example.publishedAt) && (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {[example.publisher, example.publishedAt].filter(Boolean).join(' · ')}
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {(previousRobot || nextRobot) && (
+              <nav
+                aria-label="前後のロボット"
+                className="grid grid-cols-1 gap-3 border-b border-border py-8 sm:grid-cols-2"
+              >
+                {previousRobot ? (
+                  <Link
+                    href={`/robots/${previousRobot.slug}`}
+                    className="inline-flex min-w-0 items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    <ChevronLeft className="h-4 w-4 shrink-0" />
+                    <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                      {previousRobot.nameJa ?? previousRobot.name}
+                    </span>
+                  </Link>
+                ) : (
+                  <span className="hidden sm:block" />
+                )}
+                {nextRobot ? (
+                  <Link
+                    href={`/robots/${nextRobot.slug}`}
+                    className="inline-flex min-w-0 items-center justify-start gap-2 text-xs text-muted-foreground hover:text-foreground sm:justify-end sm:text-right"
+                  >
+                    <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                      {nextRobot.nameJa ?? nextRobot.name}
+                    </span>
+                    <ChevronRight className="h-4 w-4 shrink-0" />
+                  </Link>
+                ) : (
+                  <span className="hidden sm:block" />
+                )}
+              </nav>
+            )}
+
+            {relatedRobots.length > 0 && (
+              <section
+                id="related-robots"
+                className="scroll-mt-site-header border-b border-border py-8"
+              >
+                <h2 className="mb-4 text-lg font-semibold text-foreground">
+                  {uiText.robots.relatedRobots}
+                </h2>
+                <RobotCardRail ariaLabel={uiText.robots.relatedRobots}>
+                  {relatedRobots.map((relatedRobot) => (
+                    <FeaturedRobotCard
+                      key={relatedRobot.id}
+                      robot={relatedRobot}
+                      manufacturerName={manufacturer?.name}
+                    />
+                  ))}
+                </RobotCardRail>
+              </section>
+            )}
+
             <SourceList
               id="sources"
               sources={robot.sources}
-              className="py-8 border-b border-border scroll-mt-site-header"
-              titleClassName="text-sm font-semibold text-foreground mb-4"
+              className="scroll-mt-site-header py-8"
+              titleClassName="mb-4 text-lg font-semibold text-foreground"
             />
+          </main>
 
-            {/* prev / next */}
-            <div className="mt-6 grid grid-cols-1 gap-3 pt-0 sm:grid-cols-2">
-              {prev ? (
-                <Link
-                  href={`/robots/${prev.slug}`}
-                  className="inline-flex min-w-0 items-center gap-2 text-xs text-muted-foreground hover:text-foreground"
-                >
-                  <ChevronLeft className="h-4 w-4 shrink-0" />
-                  <span className="min-w-0 break-words [overflow-wrap:anywhere]">
-                    {prev.nameJa ?? prev.name}
-                  </span>
-                </Link>
-              ) : (
-                <span className="hidden sm:block" />
-              )}
-              {next ? (
-                <Link
-                  href={`/robots/${next.slug}`}
-                  className="inline-flex min-w-0 items-center justify-start gap-2 text-xs text-muted-foreground hover:text-foreground sm:justify-end sm:text-right"
-                >
-                  <span className="min-w-0 break-words [overflow-wrap:anywhere]">
-                    {next.nameJa ?? next.name}
-                  </span>
-                  <ChevronRight className="h-4 w-4 shrink-0" />
-                </Link>
-              ) : (
-                <span className="hidden sm:block" />
-              )}
-            </div>
-          </div>
-
-          {/* ── RIGHT COLUMN — sticky sidebar ──────────── */}
           <RobotStickyAside robot={robot} manufacturer={manufacturer ?? undefined} />
-
         </div>
       </div>
     </div>

@@ -14,8 +14,6 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
   const baseId = useId();
   const [activeIndex, setActiveIndex] = useState(0);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const activeGroup = groups[activeIndex] ?? groups[0];
-
   const selectAndFocus = (index: number) => {
     setActiveIndex(index);
     tabRefs.current[index]?.focus();
@@ -97,24 +95,28 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
           })}
         </div>
 
-        {activeGroup && (
-          <div
-            id={`${baseId}-panel-${activeIndex}`}
-            role="tabpanel"
-            aria-labelledby={`${baseId}-tab-${activeIndex}`}
-            tabIndex={0}
-            className="h-full min-h-0 min-w-0 overflow-y-auto px-7 py-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset"
-          >
-            <h3 className="mb-4 text-base font-semibold text-foreground">{activeGroup.label}</h3>
-            {activeGroup.rows.length > 0 ? (
-              <FactList rows={activeGroup.rows} />
-            ) : (
-              <p className="border-b border-border py-3 text-xs text-muted-foreground">
-                {uiText.robots.publicInfoMissing}
-              </p>
-            )}
-          </div>
-        )}
+        <div className="h-full min-h-0 min-w-0">
+          {groups.map((group, index) => (
+            <div
+              key={group.key}
+              id={`${baseId}-panel-${index}`}
+              role="tabpanel"
+              aria-labelledby={`${baseId}-tab-${index}`}
+              tabIndex={0}
+              hidden={index !== activeIndex}
+              className="h-full min-h-0 min-w-0 overflow-y-auto px-7 py-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset"
+            >
+              <h3 className="mb-4 text-base font-semibold text-foreground">{group.label}</h3>
+              {group.rows.length > 0 ? (
+                <FactList rows={group.rows} />
+              ) : (
+                <p className="border-b border-border py-3 text-xs text-muted-foreground">
+                  {uiText.robots.publicInfoMissing}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );
