@@ -109,6 +109,8 @@ export const uiText = {
     externalWebsite: '公式サイトを見る',
     location: '所在地',
     founded: '設立',
+    establishedRegion: '設立・所在地',
+    representativeRobot: '代表ロボット',
     companyType: '企業区分',
     companyStatus: '会社ステータス',
     japanPresence: '日本体制',

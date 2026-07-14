@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Popover as PopoverPrimitive } from 'radix-ui';
+import { CardFactGrid, type CardFactItems } from '@/components/CardFactGrid';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { Manufacturer, Robot } from '@/data/types';
 import {
@@ -14,6 +15,7 @@ import {
   manufacturerConsultationRouteLabels,
 } from '@/lib/manufacturerDisplay';
 import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
+import { uiText } from '@/lib/uiText';
 
 interface ManufacturerCardProps {
   manufacturer: Manufacturer;
@@ -23,6 +25,90 @@ interface ManufacturerCardProps {
 export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps) {
   const consultationRoute = getManufacturerConsultationRoute(manufacturer);
   const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
+  const distributorValue = domesticDistributor.hasDistributor ? (
+    <div className="pointer-events-auto min-w-0">
+      {domesticDistributor.distributors.length === 1 ? (
+        domesticDistributor.distributors[0].website ? (
+          <a
+            href={domesticDistributor.distributors[0].website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block truncate font-normal hover:text-muted-foreground"
+          >
+            {domesticDistributor.label}
+          </a>
+        ) : (
+          <span className="block truncate font-normal">{domesticDistributor.label}</span>
+        )
+      ) : (
+        <PopoverPrimitive.Root>
+          <PopoverPrimitive.Trigger asChild>
+            <button
+              type="button"
+              className="block max-w-full truncate text-left font-normal hover:text-muted-foreground"
+            >
+              {domesticDistributor.label}
+            </button>
+          </PopoverPrimitive.Trigger>
+          <PopoverPrimitive.Portal>
+            <PopoverPrimitive.Content
+              align="end"
+              sideOffset={4}
+              className="z-[var(--z-dropdown)] min-w-44 border border-border bg-popover p-2 text-popover-foreground shadow-sm"
+            >
+              {domesticDistributor.distributors.map((distributor) =>
+                distributor.website ? (
+                  <a
+                    key={distributor.name}
+                    href={distributor.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block py-1 text-xs font-normal text-foreground hover:text-muted-foreground"
+                  >
+                    {distributor.name}
+                  </a>
+                ) : (
+                  <div key={distributor.name} className="py-1 text-xs font-normal text-foreground">
+                    {distributor.name}
+                  </div>
+                ),
+              )}
+            </PopoverPrimitive.Content>
+          </PopoverPrimitive.Portal>
+        </PopoverPrimitive.Root>
+      )}
+    </div>
+  ) : (
+    <Link
+      href="/contact"
+      className="pointer-events-auto block min-w-0 truncate text-left font-normal text-signal hover:text-signal/80"
+    >
+      {domesticDistributor.label}
+    </Link>
+  );
+  const facts: CardFactItems = [
+    {
+      key: 'established-region',
+      label: uiText.manufacturers.establishedRegion,
+      value: getManufacturerEstablishedRegionLabel(manufacturer),
+    },
+    {
+      key: 'representative-robot',
+      label: uiText.manufacturers.representativeRobot,
+      value: getRepresentativeRobotLabel(robots),
+    },
+    {
+      key: 'consultation-route',
+      label: uiText.manufacturers.consultationRoute,
+      value: manufacturerConsultationRouteLabels[consultationRoute],
+    },
+    {
+      key: 'domestic-distributors',
+      label: uiText.manufacturers.domesticDistributors,
+      value: distributorValue,
+      valueClassName: 'overflow-visible',
+    },
+  ];
   const {
     cardRef,
     rotateX,
@@ -94,92 +180,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
           </h2>
         </div>
 
-        <div className="space-y-2 text-xs">
-          <div className="hidden sm:flex justify-between py-1.5 border-b border-border">
-            <span className="text-muted-foreground">設立</span>
-            <span className="ml-2 sm:ml-4 text-right text-foreground">
-              {getManufacturerEstablishedRegionLabel(manufacturer)}
-            </span>
-          </div>
-          <div className="flex justify-between py-1.5 border-b border-border">
-            <span className="shrink-0 text-muted-foreground">代表ロボット</span>
-            <span className="ml-2 sm:ml-4 min-w-0 truncate text-right text-foreground">
-              {getRepresentativeRobotLabel(robots)}
-            </span>
-          </div>
-          <div className="hidden sm:flex justify-between py-1.5 border-b border-border">
-            <span className="text-muted-foreground">相談ルート</span>
-            <span className="ml-2 sm:ml-4 text-right text-foreground">
-              {manufacturerConsultationRouteLabels[consultationRoute]}
-            </span>
-          </div>
-          <div className="flex justify-between py-1.5">
-            <span className="shrink-0 text-muted-foreground">国内代理店</span>
-            {domesticDistributor.hasDistributor ? (
-              <div className="pointer-events-auto ml-2 min-w-0 sm:ml-4 text-right">
-                {domesticDistributor.distributors.length === 1 ? (
-                  domesticDistributor.distributors[0].website ? (
-                    <a
-                      href={domesticDistributor.distributors[0].website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block truncate text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
-                    >
-                      {domesticDistributor.label}
-                    </a>
-                  ) : (
-                    <span className="block truncate text-xs font-normal leading-normal text-foreground">
-                      {domesticDistributor.label}
-                    </span>
-                  )
-                ) : (
-                  <PopoverPrimitive.Root>
-                    <PopoverPrimitive.Trigger asChild>
-                      <button
-                        type="button"
-                        className="block max-w-full truncate text-xs font-normal leading-normal text-foreground hover:text-muted-foreground"
-                      >
-                        {domesticDistributor.label}
-                      </button>
-                    </PopoverPrimitive.Trigger>
-                    <PopoverPrimitive.Portal>
-                      <PopoverPrimitive.Content
-                        align="end"
-                        sideOffset={4}
-                        className="z-[var(--z-dropdown)] min-w-44 border border-border bg-popover text-popover-foreground p-2 shadow-sm"
-                      >
-                        {domesticDistributor.distributors.map((distributor) =>
-                          distributor.website ? (
-                            <a
-                              key={distributor.name}
-                              href={distributor.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block py-1 text-xs font-normal text-foreground hover:text-muted-foreground"
-                            >
-                              {distributor.name}
-                            </a>
-                          ) : (
-                            <div key={distributor.name} className="py-1 text-xs font-normal text-foreground">
-                              {distributor.name}
-                            </div>
-                          ),
-                        )}
-                      </PopoverPrimitive.Content>
-                    </PopoverPrimitive.Portal>
-                  </PopoverPrimitive.Root>
-                )}
-              </div>
-            ) : (
-              <Link
-                href="/contact"
-                className="pointer-events-auto ml-2 min-w-0 truncate text-right text-xs font-normal text-signal hover:text-signal/80 sm:ml-4"
-              >
-                {domesticDistributor.label}
-              </Link>
-            )}
-          </div>
-        </div>
+        <CardFactGrid items={facts} />
       </div>
     </motion.div>
   );

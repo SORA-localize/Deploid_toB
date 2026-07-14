@@ -12,13 +12,13 @@ export function ManufacturerCardGridSkeleton({ gridClassName }: { gridClassName:
             <div className="h-10 w-10 shrink-0 animate-pulse bg-muted" />
             <div className="h-5 w-2/3 animate-pulse bg-muted" />
           </div>
-          <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-x-4">
             {Array.from({ length: 4 }).map((__, rowIndex) => (
               <div
                 key={rowIndex}
-                className="flex items-center justify-between border-b border-border py-1.5 last:border-b-0"
+                className="border-b border-border py-2"
               >
-                <div className="h-3 w-16 animate-pulse bg-muted" />
+                <div className="mb-1 h-2.5 w-14 animate-pulse bg-muted" />
                 <div className="h-3 w-20 animate-pulse bg-muted" />
               </div>
             ))}
