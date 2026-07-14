@@ -19,10 +19,14 @@ import type {
   ArticleType,
   ManufacturerGuideDeploymentCategory,
   ManufacturerGuideProcurementChannelKind,
+  RobotLoadRatingKind,
+  RobotLoadScope,
+  RobotPriceChannel,
   RobotCategory,
   UseCaseMaturity,
   UseCaseCapabilityNotes,
 } from '@/data/types';
+import type { SpecGroup } from '@/lib/specSchema';
 
 export const TBD_LABEL = '要確認';
 
@@ -34,7 +38,7 @@ export const TBD_LABEL = '要確認';
  */
 export const EMPTY_VALUE_LABEL = '—';
 
-/** 詳細ページのカルーセルで固定表示する画像スロットの順序。 */
+/** Robot.imagesに登録された画像を並べる優先順。欠損roleは表示しない。 */
 export const imageRoleOrder: ImageRole[] = [
   'hero',
   'transparent',
@@ -54,6 +58,32 @@ export const imageRoleLabels: Record<ImageRole, string> = {
   scale: 'サイズ比較',
   endEffector: 'ハンド・把持部',
   mobility: '移動機構',
+};
+
+export const specGroupLabels: Record<SpecGroup, string> = {
+  'body-motion': '本体・可動',
+  'power-runtime': '電源・稼働',
+  'operation-development': '操作・開発',
+  'environment-safety': '環境・安全',
+};
+
+export const robotPriceChannelLabels: Record<RobotPriceChannel, string> = {
+  'manufacturer-public': 'メーカー公開価格',
+  'authorized-distributor-public': '正規代理店公開価格',
+};
+
+export const robotLoadScopeLabels: Record<RobotLoadScope, string> = {
+  'single-arm': '片腕',
+  'dual-arm': '両腕',
+  'whole-body': '全身',
+  carrier: '搬送部',
+  'manufacturer-wording': 'メーカー表記',
+};
+
+export const robotLoadRatingLabels: Record<RobotLoadRatingKind, string> = {
+  rated: '定格',
+  maximum: '最大',
+  unspecified: '区分非公表',
 };
 
 export const buyerReadinessLabels: Record<BuyerReadiness, string> = {

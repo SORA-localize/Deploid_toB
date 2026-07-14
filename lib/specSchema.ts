@@ -8,13 +8,10 @@ import type { MobilityType } from '../data/types.ts';
 
 /** 詳細ページのスペック表のセクション分類（設計 §8-2） */
 export type SpecGroup =
-  | 'physical'
-  | 'power'
-  | 'mobility'
-  | 'manipulation'
-  | 'environment'
-  | 'compliance'
-  | 'integration';
+  | 'body-motion'
+  | 'power-runtime'
+  | 'operation-development'
+  | 'environment-safety';
 
 /** 値の表示方法。number は `値+unit`、runtime は `約N分`、mobility は labels 経由、text はそのまま */
 export type SpecValueKind = 'number' | 'runtime' | 'mobility' | 'text';
@@ -29,16 +26,24 @@ export interface SpecSchemaEntry {
 }
 
 // 並び順 = 詳細ページのスペック表の表示順。
-// 項目追加はここに1行（値の裏取りは別途。未設定のロボットは「要確認」表示になる）。
+// 項目追加はここに1行（値の裏取りは別途。未設定項目は詳細仕様から省略できる）。
 export const specSchema = [
-  { key: 'mobility',   group: 'mobility',    label: '移動方式', unit: '',      kind: 'mobility' },
-  { key: 'heightCm',   group: 'physical',    label: '身長',     unit: ' cm',   kind: 'number' },
-  { key: 'weightKg',   group: 'physical',    label: '重量',     unit: ' kg',   kind: 'number' },
-  { key: 'payloadKg',  group: 'manipulation', label: 'ペイロード', unit: ' kg', kind: 'number' },
-  { key: 'runtimeMin', group: 'power',       label: '稼働時間', unit: '',      kind: 'runtime' },
-  { key: 'speedMps',   group: 'mobility',    label: '速度',     unit: ' m/s',  kind: 'number' },
-  { key: 'dof',        group: 'mobility',    label: '自由度',   unit: ' DoF',  kind: 'number' },
-  { key: 'ipRating',   group: 'environment', label: '防塵防水', unit: '',      kind: 'text' },
+  { key: 'mobility',             group: 'body-motion',           label: '移動方式',       unit: '',      kind: 'mobility' },
+  { key: 'heightCm',             group: 'body-motion',           label: '身長',           unit: ' cm',   kind: 'number' },
+  { key: 'weightKg',             group: 'body-motion',           label: '重量',           unit: ' kg',   kind: 'number' },
+  { key: 'speedMps',             group: 'body-motion',           label: '速度',           unit: ' m/s',  kind: 'number' },
+  { key: 'dof',                  group: 'body-motion',           label: '自由度',         unit: ' DoF',  kind: 'number' },
+  { key: 'payloadKg',            group: 'body-motion',           label: 'ペイロード',     unit: ' kg',   kind: 'number' },
+  { key: 'runtimeMin',           group: 'power-runtime',         label: '稼働時間',       unit: '',      kind: 'runtime' },
+  { key: 'batteryCapacityWh',    group: 'power-runtime',         label: 'バッテリー容量', unit: ' Wh',   kind: 'number' },
+  { key: 'chargeTimeMin',        group: 'power-runtime',         label: '充電時間',       unit: ' 分',   kind: 'number' },
+  { key: 'batterySystem',        group: 'power-runtime',         label: '電源方式',       unit: '',      kind: 'text' },
+  { key: 'controlMethod',        group: 'operation-development', label: '操作方式',       unit: '',      kind: 'text' },
+  { key: 'sdk',                  group: 'operation-development', label: 'SDK',            unit: '',      kind: 'text' },
+  { key: 'computePlatform',      group: 'operation-development', label: '計算基盤',       unit: '',      kind: 'text' },
+  { key: 'ipRating',             group: 'environment-safety',    label: '防塵防水',       unit: '',      kind: 'text' },
+  { key: 'operatingTemperature', group: 'environment-safety',    label: '動作温度',       unit: '',      kind: 'text' },
+  { key: 'safetyStandard',       group: 'environment-safety',    label: '安全規格',       unit: '',      kind: 'text' },
 ] as const satisfies readonly SpecSchemaEntry[];
 
 export type SpecKey = (typeof specSchema)[number]['key'];

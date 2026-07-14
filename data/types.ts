@@ -2,7 +2,7 @@
  * Deploid data model.
  * `data/*.ts`, validation, and future CMS schemas derive from these types.
  */
-import type { RobotSpecsFromSchema } from '@/lib/specSchema';
+import type { RobotSpecsFromSchema, SpecKey } from '@/lib/specSchema';
 import type { TagValue } from '@/lib/tagRegistry';
 
 /** 不変の安定ID。外部キー・一意性・将来のCMSレコードキーに使う。発番後は二度と変えない。 */
@@ -74,8 +74,7 @@ export interface ManufacturerLogos {
   combined?: ImageAsset;
 }
 
-/** ロボットの画像スロット。詳細ページのカルーセルで7スロット固定で使う。
- *  写真が無いスロットは empty state（役割名のラベル）になる。 */
+/** ロボット画像の用途。登録・表示可能なroleだけをカルーセルへ並べる。 */
 export type ImageRole =
   | 'hero'         // 全身正面
   | 'transparent'  // 背景透過・全身正面（カード用）
@@ -231,6 +230,46 @@ export interface ComparisonProfile {
   notFit: string[];
 }
 
+export type RobotPriceChannel = 'manufacturer-public' | 'authorized-distributor-public';
+
+/** メーカーまたは国内正規代理店が公開している価格表記。推測価格は登録しない。 */
+export interface RobotPriceOffer {
+  channel: RobotPriceChannel;
+  /** 公式ページ上の価格を、意味を変えず短く整えた表示。 */
+  display: string;
+  amount?: number;
+  currency?: string;
+  taxStatus?: 'included' | 'excluded' | 'unknown';
+  variant?: string;
+  /** authorized-distributor-public では必須。 */
+  sellerName?: string;
+  /** 同じRobotのsourcesに存在するURL。 */
+  sourceUrl: string;
+}
+
+export type RobotLoadScope =
+  | 'single-arm'
+  | 'dual-arm'
+  | 'whole-body'
+  | 'carrier'
+  | 'manufacturer-wording';
+
+export type RobotLoadRatingKind = 'rated' | 'maximum' | 'unspecified';
+
+/** 対象範囲とrated/maximumを分離した荷重情報。旧payloadKgを自動変換しない。 */
+export interface RobotLoadRating {
+  scope: RobotLoadScope;
+  rating: RobotLoadRatingKind;
+  kg: number;
+  condition?: string;
+  variant?: string;
+  /** 同じRobotのsourcesに存在するURL。 */
+  sourceUrl: string;
+}
+
+export type RobotEvidenceField = SpecKey | 'priceOffers' | 'loadRatings';
+export type RobotFieldEvidence = Partial<Record<RobotEvidenceField, string[]>>;
+
 export interface Robot extends BaseRecord {
   name: string;
   nameJa?: string;
@@ -242,18 +281,26 @@ export interface Robot extends BaseRecord {
   deploymentStage: DeploymentStage;
   /** 調達可能性の実態（出典で裏取りできる場合のみ設定）。未設定はUI非表示。 */
   marketAvailability?: MarketAvailability;
+  /** @deprecated 新しい詳細ページでは表示しない。既存データ移行完了まで保持する。 */
   buyerReadiness: BuyerReadiness;
   /** 提供終了（archived）時の後継機。詳細・関連欄で「後継機: X」導線を出す。 */
   supersededById?: Id;
   specs: RobotSpecs;
   procurementModels: ProcurementModel[];
+  priceOffers?: RobotPriceOffer[];
+  /** @deprecated 新UIはpriceOffersのresolverを使う。全件移行完了まで保持する。 */
   priceNote?: string;
+  loadRatings?: RobotLoadRating[];
+  /** 仕様・価格・荷重を同じRobotのsources URLへ接続する。 */
+  fieldEvidence?: RobotFieldEvidence;
+  /** 詳細ページに表示する活用事例。値は同じRobotのsources URL、最大3件。 */
+  usageExampleSourceUrls?: string[];
   japanAvailability: JapanAvailability;
   distributorJapan?: string;
   supportNote?: string;
   safetyNote?: string;
   vendorRiskNote?: string;
-  /** 役割別の参考画像（詳細ページのカルーセル）。hero が未設定なら BaseRecord.heroImage を hero に昇格して使う。 */
+  /** 役割別の参考画像。表示可能な実画像だけをカード・詳細・比較で使う。 */
   images?: Partial<Record<ImageRole, ImageAsset>>;
   // 関連は逆向き(UseCase.candidateRobots[].robotId /
   // Article.relatedRobotIds)で導出する。
@@ -261,6 +308,7 @@ export interface Robot extends BaseRecord {
   industryTags?: TagValue<'industry'>[];
   /** タスクタグ（lib/tagRegistry.ts の kind:'task' のvalue）。未設定=調査中扱い。 */
   taskTags?: TagValue<'task'>[];
+  /** @deprecated 新しい詳細ページでは表示しない。比較画面の移行完了まで保持する。 */
   comparison: ComparisonProfile;
 }
 
