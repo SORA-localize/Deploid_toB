@@ -25,6 +25,8 @@ export interface SpecSchemaEntry {
   kind: SpecValueKind;
 }
 
+export const MAX_SPEC_ROWS_PER_GROUP = 6;
+
 // 並び順 = 詳細ページのスペック表の表示順。
 // 項目追加はここに1行（値の裏取りは別途。未設定項目は詳細仕様から省略できる）。
 export const specSchema = [

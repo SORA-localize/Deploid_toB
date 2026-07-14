@@ -3,10 +3,15 @@ import { manufacturers } from '@/data/manufacturers';
 import { articles } from '@/data/articles';
 import { robots } from '@/data/robots';
 import { useCases } from '@/data/useCases';
-import type { Article, ManufacturerGuideContent } from '@/data/types';
+import type { Article, ManufacturerGuideContent, Robot } from '@/data/types';
 import { runValidationInDev } from './validate';
 import { byArticlePublishedDesc } from '@/lib/display';
 import { withMeasuredLogoAspect } from '@/lib/manufacturerLogoEnrich';
+import {
+  createRobotCardViewModels,
+  resolveOfficialUseCasesForRobot,
+  resolveSameManufacturerRobots,
+} from '@/lib/robotCatalog';
 
 // dev時のみ：参照整合（存在しないid参照・双方向のズレ・id/slug重複）をconsoleで通知
 runValidationInDev();
@@ -167,6 +172,18 @@ export function getRobotsByManufacturerId(manufacturerId: string) {
 
 export function getUseCasesForRobot(robotId: string) {
   return getUseCases().filter((useCase) => useCase.candidateRobots.some((c) => c.robotId === robotId));
+}
+
+export function getOfficialUseCasesForRobot(robotId: string) {
+  return resolveOfficialUseCasesForRobot(robotId, getUseCases());
+}
+
+export function getRobotCardViewModels(visibleRobots: readonly Robot[] = getRobots()) {
+  return createRobotCardViewModels(visibleRobots, getUseCases());
+}
+
+export function getRelatedRobotsForRobot(robot: Robot) {
+  return resolveSameManufacturerRobots(robot, getRobots(), getManufacturers());
 }
 
 export function getDeploymentsForUseCase(useCaseId: string) {

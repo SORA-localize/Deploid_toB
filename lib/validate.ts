@@ -25,7 +25,7 @@ import {
   articleSectionLabels,
   manufacturerGuideDeploymentCategoryLabels,
 } from './labels.ts';
-import { isSpecKey } from './specSchema.ts';
+import { isSpecKey, MAX_SPEC_ROWS_PER_GROUP, specSchema } from './specSchema.ts';
 import { isRegisteredTag, normalizeTagKey, type TagKind } from './tagRegistry.ts';
 import { isPublicUseCaseCandidateBasis } from './useCaseEvidence.ts';
 
@@ -42,6 +42,20 @@ const candidateEvidenceBases = new Set<CandidateEvidenceBasis>([
   'market-signal',
   'editorial-watch',
 ]);
+const robotPriceChannels = new Set([
+  'manufacturer-public',
+  'authorized-distributor-public',
+]);
+const robotLoadScopes = new Set([
+  'single-arm',
+  'dual-arm',
+  'whole-body',
+  'carrier',
+  'manufacturer-wording',
+]);
+const robotLoadRatingKinds = new Set(['rated', 'maximum', 'unspecified']);
+const robotPriceTaxStatuses = new Set(['included', 'excluded', 'unknown']);
+const robotEvidenceFields = new Set(['priceOffers', 'loadRatings']);
 
 /** 鮮度warningの既定: sources の最新確認日がこの日数を超えたら再確認を促す（設計 §11.6） */
 const FRESHNESS_DAYS = 180;
@@ -634,6 +648,111 @@ export function validateData(): ValidationResult {
       if (!isSpecKey(key)) {
         errors.push(`[spec-unknown] robot "${r.id}".specs に未登録キーがあります: ${key}（lib/specSchema.ts に追加してください）`);
       }
+    });
+    const potentialSpecRowsByGroup = new Map<string, number>();
+    specSchema.forEach((entry) => {
+      if (entry.key === 'payloadKg') return;
+      potentialSpecRowsByGroup.set(
+        entry.group,
+        (potentialSpecRowsByGroup.get(entry.group) ?? 0) + 1,
+      );
+    });
+    if ((r.loadRatings?.length ?? 0) > 0) {
+      potentialSpecRowsByGroup.set(
+        'body-motion',
+        (potentialSpecRowsByGroup.get('body-motion') ?? 0) + 1,
+      );
+    }
+    potentialSpecRowsByGroup.forEach((count, group) => {
+      if (count > MAX_SPEC_ROWS_PER_GROUP) {
+        errors.push(
+          `[spec-group-limit] robot "${r.id}" の ${group} は最大${MAX_SPEC_ROWS_PER_GROUP}行を超える可能性があります: ${count}`,
+        );
+      }
+    });
+    const robotSourceUrls = new Set(r.sources.map((source) => source.url));
+    checkUniqueValues(
+      'robot',
+      r.slug,
+      'usageExampleSourceUrls',
+      r.usageExampleSourceUrls ?? [],
+    );
+    if ((r.usageExampleSourceUrls?.length ?? 0) > 3) {
+      errors.push(`[usage-example-limit] robot "${r.id}".usageExampleSourceUrls は最大3件です`);
+    }
+    (r.usageExampleSourceUrls ?? []).forEach((url, index) => {
+      checkUrl('robot', r.slug, `usageExampleSourceUrls[${index}]`, url);
+      if (!robotSourceUrls.has(url)) {
+        errors.push(
+          `[usage-example-source] robot "${r.id}".usageExampleSourceUrls[${index}] が sources にありません: ${url}`,
+        );
+      }
+    });
+    (r.priceOffers ?? []).forEach((offer, index) => {
+      const field = `priceOffers[${index}]`;
+      if (!robotPriceChannels.has(offer.channel)) {
+        errors.push(`[price-channel] robot "${r.id}".${field}.channel が未登録です: ${offer.channel}`);
+      }
+      if (!offer.display.trim()) {
+        errors.push(`[price-display] robot "${r.id}".${field}.display が空です`);
+      }
+      if (offer.amount != null && (!Number.isFinite(offer.amount) || offer.amount < 0)) {
+        errors.push(`[price-amount] robot "${r.id}".${field}.amount は0以上の有限値にしてください`);
+      }
+      if ((offer.amount == null) !== (offer.currency == null)) {
+        errors.push(`[price-currency] robot "${r.id}".${field}.amount と currency は同時に設定してください`);
+      }
+      if (offer.currency != null && !offer.currency.trim()) {
+        errors.push(`[price-currency] robot "${r.id}".${field}.currency が空です`);
+      }
+      if (offer.taxStatus != null && !robotPriceTaxStatuses.has(offer.taxStatus)) {
+        errors.push(`[price-tax] robot "${r.id}".${field}.taxStatus が未登録です: ${offer.taxStatus}`);
+      }
+      if (offer.channel === 'authorized-distributor-public' && !offer.sellerName?.trim()) {
+        errors.push(`[price-seller] robot "${r.id}".${field}.sellerName は正規代理店価格で必須です`);
+      }
+      checkUrl('robot', r.slug, `${field}.sourceUrl`, offer.sourceUrl);
+      if (!robotSourceUrls.has(offer.sourceUrl)) {
+        errors.push(`[price-source] robot "${r.id}".${field}.sourceUrl が sources にありません: ${offer.sourceUrl}`);
+      }
+    });
+    const loadRatingKeys = new Set<string>();
+    (r.loadRatings ?? []).forEach((load, index) => {
+      const field = `loadRatings[${index}]`;
+      if (!robotLoadScopes.has(load.scope)) {
+        errors.push(`[load-scope] robot "${r.id}".${field}.scope が未登録です: ${load.scope}`);
+      }
+      if (!robotLoadRatingKinds.has(load.rating)) {
+        errors.push(`[load-rating] robot "${r.id}".${field}.rating が未登録です: ${load.rating}`);
+      }
+      if (!Number.isFinite(load.kg) || load.kg <= 0) {
+        errors.push(`[load-kg] robot "${r.id}".${field}.kg は0より大きい有限値にしてください`);
+      }
+      const uniqueKey = `${load.variant?.trim() ?? ''}\u0000${load.scope}\u0000${load.rating}`;
+      if (loadRatingKeys.has(uniqueKey)) {
+        errors.push(`[load-duplicate] robot "${r.id}".${field} に同一variant/scope/ratingがあります`);
+      }
+      loadRatingKeys.add(uniqueKey);
+      checkUrl('robot', r.slug, `${field}.sourceUrl`, load.sourceUrl);
+      if (!robotSourceUrls.has(load.sourceUrl)) {
+        errors.push(`[load-source] robot "${r.id}".${field}.sourceUrl が sources にありません: ${load.sourceUrl}`);
+      }
+    });
+    Object.entries(r.fieldEvidence ?? {}).forEach(([key, urls]) => {
+      if (!isSpecKey(key) && !robotEvidenceFields.has(key)) {
+        errors.push(`[evidence-field] robot "${r.id}".fieldEvidence に未登録キーがあります: ${key}`);
+      }
+      if (!urls || urls.length === 0) {
+        errors.push(`[evidence-empty] robot "${r.id}".fieldEvidence.${key} が空です`);
+        return;
+      }
+      checkUniqueValues('robot', r.slug, `fieldEvidence.${key}`, urls);
+      urls.forEach((url, index) => {
+        checkUrl('robot', r.slug, `fieldEvidence.${key}[${index}]`, url);
+        if (!robotSourceUrls.has(url)) {
+          errors.push(`[evidence-source] robot "${r.id}".fieldEvidence.${key} が sources にありません: ${url}`);
+        }
+      });
     });
     checkDate('robot', r.slug, 'updatedAt', r.updatedAt);
     checkRequiredSources('robot', r.slug, r.sources);
