@@ -279,7 +279,7 @@ className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-
 
 ルール：
 
-- 画像枠は `aspect-[16/9]`。
+- 画像枠は幅100%、高さ280px、`sm` 360px、`md` 以上420pxで固定する。画像ごとに外寸を変えない。
 - 表示可能画像が0枚なら、単一placeholderを表示する。
 - 1枚なら静止表示とし、dot、prev/next、drag cursorを表示しない。
 - 2枚以上なら表示可能な実画像だけをカルーセルへ入れる。未投入roleをslide化しない。

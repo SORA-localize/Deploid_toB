@@ -51,9 +51,11 @@ function SlotIndicators({ count }: { count: number }) {
 function RobotImageFrame({
   image,
   withIndicators = false,
+  preload = false,
 }: {
   image: DisplayableRobotImage;
   withIndicators?: boolean;
+  preload?: boolean;
 }) {
   const { role, asset } = image;
   return (
@@ -70,6 +72,7 @@ function RobotImageFrame({
         src={asset.src}
         alt={asset.alt}
         fill
+        preload={preload}
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 60vw"
         className="z-10 object-contain"
       />
@@ -80,12 +83,12 @@ function RobotImageFrame({
         </span>
       </div>
 
-      {asset.credit && (
+      {(asset.credit || asset.sourceUrl) && (
         <div className="absolute bottom-3 right-4 z-20 rounded-sm bg-black/30 px-1.5 py-0.5 text-[10px] text-white/80 backdrop-blur-sm">
-          {uiText.common.credit}: {asset.credit}
+          {asset.credit ? `${uiText.common.credit}: ${asset.credit}` : ''}
           {asset.sourceUrl && (
             <>
-              {' '}
+              {asset.credit ? ' ' : ''}
               <a
                 href={asset.sourceUrl}
                 target="_blank"
@@ -121,7 +124,7 @@ export function RobotImageCarousel({ robot }: RobotImageCarouselProps) {
   if (images.length === 1) {
     return (
       <div className="relative h-[280px] w-full overflow-hidden rounded-xl border border-border bg-muted/30 sm:h-[360px] md:h-[420px]">
-        <RobotImageFrame image={images[0]} />
+        <RobotImageFrame image={images[0]} preload />
       </div>
     );
   }
@@ -139,9 +142,9 @@ export function RobotImageCarousel({ robot }: RobotImageCarouselProps) {
           className="h-full cursor-grab active:cursor-grabbing"
           style={{ height: '100%' }}
         >
-          {images.map((image) => (
+          {images.map((image, index) => (
             <Slider key={image.role} className="relative h-full w-full">
-              <RobotImageFrame image={image} withIndicators />
+              <RobotImageFrame image={image} withIndicators preload={index === 0} />
             </Slider>
           ))}
         </SliderContainer>

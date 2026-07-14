@@ -38,7 +38,7 @@ export const TBD_LABEL = '要確認';
  */
 export const EMPTY_VALUE_LABEL = '—';
 
-/** カルーセルのempty state（写真未投入時のラベル）と、タブ表記。 */
+/** カルーセル上に表示する画像roleラベル。 */
 export const imageRoleLabels: Record<ImageRole, string> = {
   hero: 'メイン画像',
   transparent: '背景透過',

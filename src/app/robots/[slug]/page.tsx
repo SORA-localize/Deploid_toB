@@ -157,7 +157,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
         </div>
 
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-12">
-          <main className="min-w-0">
+          <div className="min-w-0">
             <RobotImageCarousel robot={robot} />
 
             <section id="specs" className="scroll-mt-site-header border-b border-border py-10">
@@ -204,7 +204,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
                         href={example.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm font-medium leading-relaxed text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+                        className="line-clamp-2 text-sm font-medium leading-relaxed text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
                       >
                         {example.title}
                       </a>
@@ -279,7 +279,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               className="scroll-mt-site-header py-8"
               titleClassName="mb-4 text-lg font-semibold text-foreground"
             />
-          </main>
+          </div>
 
           <RobotStickyAside robot={robot} manufacturer={manufacturer ?? undefined} />
         </div>

@@ -108,7 +108,12 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
             >
               <h3 className="mb-4 text-base font-semibold text-foreground">{group.label}</h3>
               {group.rows.length > 0 ? (
-                <FactList rows={group.rows} />
+                <FactList
+                  rows={group.rows.map((row) => ({
+                    ...row,
+                    valueClassName: 'line-clamp-2',
+                  }))}
+                />
               ) : (
                 <p className="border-b border-border py-3 text-xs text-muted-foreground">
                   {uiText.robots.publicInfoMissing}

@@ -122,7 +122,10 @@ export function resolveOfficialUseCasesForRobot(
     ),
   ).map((useCase) => {
     const relation = useCase.candidateRobots.find(
-      (candidate) => candidate.robotId === robotId && candidate.basis === 'official-use-case',
+      (candidate) =>
+        candidate.robotId === robotId &&
+        candidate.basis === 'official-use-case' &&
+        (candidate.evidenceSourceUrls?.length ?? 0) > 0,
     )!;
     return {
       id: useCase.id,
