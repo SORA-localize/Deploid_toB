@@ -6,10 +6,11 @@ import Link from 'next/link';
 import { ExternalLink, GripVertical, Star, X } from 'lucide-react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import type { CompareCardDragHandleProps } from '@/components/SortableCompareCard';
+import { ComparisonSpecList } from '@/components/ComparisonSpecList';
 import type { Robot } from '@/data/types';
 import { getDisplayableAsset } from '@/lib/media';
 import { EMPTY_VALUE_LABEL } from '@/lib/labels';
-import { getComparisonCoreRows, getComparisonDetailRows } from '@/lib/robotDisplay';
+import { getComparisonSpecGroups } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
 interface ComparisonRobotPanelProps {
@@ -49,8 +50,7 @@ export function ComparisonRobotPanel({
   dragHandleProps,
   variant = 'compact',
 }: ComparisonRobotPanelProps) {
-  const coreRows = getComparisonCoreRows(robot);
-  const detailRows = getComparisonDetailRows(robot);
+  const specGroups = getComparisonSpecGroups(robot);
 
   const [popoverOpen, setPopoverOpen] = useState(false);
 
@@ -168,33 +168,7 @@ export function ComparisonRobotPanel({
 
             {/* パネル本文 */}
             <div className="flex-1 px-4 py-4 space-y-6">
-              <section>
-                <h5 className="mb-2 text-xs font-semibold text-foreground pb-1.5 border-b border-border-subtle">
-                  {uiText.comparison.coreVariables}
-                </h5>
-                <dl className="space-y-2 text-xs">
-                  {coreRows.map((row) => (
-                    <div key={row.label} className="flex justify-between gap-3 border-b border-border-subtle pb-2 last:border-0 last:pb-0">
-                      <dt className="shrink-0 text-muted-foreground">{row.label}</dt>
-                      <dd className="text-right font-medium text-foreground break-words max-w-[65%]">{row.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </section>
-
-              <section>
-                <h5 className="mb-2 text-xs font-semibold text-foreground pb-1.5 border-b border-border-subtle">
-                  {uiText.comparison.detailedData}
-                </h5>
-                <dl className="space-y-2 text-xs">
-                  {detailRows.map((row) => (
-                    <div key={row.label} className="flex justify-between gap-3 border-b border-border-subtle pb-2 last:border-0 last:pb-0">
-                      <dt className="shrink-0 text-muted-foreground">{row.label}</dt>
-                      <dd className="text-right font-medium text-foreground break-words max-w-[65%]">{row.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </section>
+              <ComparisonSpecList groups={specGroups} variant="panel" />
 
               {(robot.comparison.bestFit.length > 0 ||
                 robot.comparison.notFit.length > 0 ||

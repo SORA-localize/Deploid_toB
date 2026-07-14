@@ -18,6 +18,17 @@ export interface DisplayRow {
   value: string;
 }
 
+export type ComparisonValueKind = 'number' | 'text' | 'empty';
+
+export interface ComparisonDisplayRow extends DisplayRow {
+  valueKind: ComparisonValueKind;
+}
+
+export interface ComparisonSpecGroup {
+  heading: string;
+  rows: ComparisonDisplayRow[];
+}
+
 export function formatNumber(value: number | undefined, unit = '') {
   return value != null ? `${value}${unit}` : EMPTY_VALUE_LABEL;
 }
@@ -142,19 +153,19 @@ export function getRobotDetailDecisionRows(robot: Robot): DisplayRow[] {
   ];
 }
 
-export function getComparisonCoreRows(robot: Robot): DisplayRow[] {
+export function getComparisonCoreRows(robot: Robot): ComparisonDisplayRow[] {
   const { specs } = robot;
 
   return [
-    { label: uiText.compare.price, value: formatComparisonPriceStatus(robot) },
-    { label: uiText.comparison.japanSupport, value: japanAvailabilityLabels[robot.japanAvailability] },
-    { label: uiText.compare.deploymentStage, value: deploymentStageLabels[robot.deploymentStage] },
-    { label: '可搬重量', value: formatComparisonPayloadStatus(specs.payloadKg) },
-    { label: '稼働時間', value: formatComparisonRuntimeStatus(specs.runtimeMin) },
+    { label: uiText.compare.price, value: formatComparisonPriceStatus(robot), valueKind: 'text' },
+    { label: uiText.comparison.japanSupport, value: japanAvailabilityLabels[robot.japanAvailability], valueKind: 'text' },
+    { label: uiText.compare.deploymentStage, value: deploymentStageLabels[robot.deploymentStage], valueKind: 'text' },
+    { label: '可搬重量', value: formatComparisonPayloadStatus(specs.payloadKg), valueKind: 'text' },
+    { label: '稼働時間', value: formatComparisonRuntimeStatus(specs.runtimeMin), valueKind: 'text' },
   ];
 }
 
-export function getComparisonDetailRows(robot: Robot): DisplayRow[] {
+export function getComparisonDetailRows(robot: Robot): ComparisonDisplayRow[] {
   const { specs } = robot;
 
   const height = formatNumber(specs.heightCm, 'cm');
@@ -162,8 +173,26 @@ export function getComparisonDetailRows(robot: Robot): DisplayRow[] {
   const dimensions = (specs.heightCm != null || specs.weightKg != null) ? `${height} / ${weight}` : EMPTY_VALUE_LABEL;
 
   return [
-    { label: uiText.comparison.dimensions, value: dimensions },
+    {
+      label: uiText.comparison.dimensions,
+      value: dimensions,
+      valueKind: dimensions === EMPTY_VALUE_LABEL ? 'empty' : 'number',
+    },
     // 項目の選抜は比較UIの編集判断、ラベル・整形は specSchema 準拠
-    ...getSpecRows(specs, ['dof', 'mobility', 'ipRating']),
+    ...getSpecRows(specs, ['dof', 'mobility', 'ipRating']).map((row, index) => ({
+      ...row,
+      valueKind: row.value === EMPTY_VALUE_LABEL
+        ? 'empty' as const
+        : index === 0
+          ? 'number' as const
+          : 'text' as const,
+    })),
+  ];
+}
+
+export function getComparisonSpecGroups(robot: Robot): ComparisonSpecGroup[] {
+  return [
+    { heading: uiText.comparison.coreVariables, rows: getComparisonCoreRows(robot) },
+    { heading: uiText.comparison.detailedData, rows: getComparisonDetailRows(robot) },
   ];
 }

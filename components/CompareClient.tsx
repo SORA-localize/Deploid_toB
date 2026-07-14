@@ -25,12 +25,13 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { SelectControl } from '@/components/SelectControl';
 import { MenuRobotButton } from '@/components/compare/CompareParts';
 import { ComparisonRobotPanel } from '@/components/ComparisonRobotPanel';
+import { ComparisonSpecList } from '@/components/ComparisonSpecList';
 import { FavoriteCard } from '@/components/FavoriteCard';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
 import { SortableCompareCard } from '@/components/SortableCompareCard';
 import type { Manufacturer, Robot } from '@/data/types';
-import { getComparisonCoreRows, getComparisonDetailRows } from '@/lib/robotDisplay';
+import { getComparisonSpecGroups } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { MAX_COMPARE_ROBOTS } from '@/lib/compareParams';
 import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
@@ -46,43 +47,6 @@ interface CompareClientProps {
   manufacturers: Manufacturer[];
   selectedIds: string[];
   initialView: CompareView;
-}
-
-/**
- * カード内蔵のスペック一覧。共有ラベル列を持たず、各カードが自分のラベル+値を持つ。
- * 行の構成・順序は robotDisplay の関数が全ロボットで同一なので、min-h を揃えれば
- * 隣のカードと行が揃い、横方向のスキャン比較が成立する。
- */
-function CompareCardSpecList({ robot }: { robot: Robot }) {
-  const groups = [
-    { heading: uiText.comparison.coreVariables, rows: getComparisonCoreRows(robot) },
-    { heading: uiText.comparison.detailedData, rows: getComparisonDetailRows(robot) },
-  ];
-
-  return (
-    <div className="flex-1 px-3 pb-3">
-      {groups.map((group) => (
-        <div key={group.heading}>
-          <p className="mt-3 mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            {group.heading}
-          </p>
-          <dl>
-            {group.rows.map((row) => (
-              <div
-                key={row.label}
-                className="flex min-h-9 items-center justify-between gap-3 border-b border-border-subtle py-1 text-xs last:border-0"
-              >
-                <dt className="shrink-0 text-muted-foreground">{row.label}</dt>
-                <dd className="text-right font-medium text-foreground [overflow-wrap:anywhere]">
-                  {row.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      ))}
-    </div>
-  );
 }
 
 export function CompareClient({ robots, manufacturers, selectedIds, initialView }: CompareClientProps) {
@@ -587,7 +551,7 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                                           onRemove={removeRobot}
                                           dragHandleProps={dragHandleProps}
                                         />
-                                        <CompareCardSpecList robot={robot} />
+                                        <ComparisonSpecList groups={getComparisonSpecGroups(robot)} />
                                       </div>
                                     )
                                   }
@@ -709,7 +673,7 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                     onFavoriteToggle={() => {}}
                     onRemove={() => {}}
                   />
-                  <CompareCardSpecList robot={activeDragRobot} />
+                  <ComparisonSpecList groups={getComparisonSpecGroups(activeDragRobot)} />
                 </div>
               )
             ) : null}
