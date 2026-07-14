@@ -11,6 +11,7 @@ import { SelectControl } from '@/components/SelectControl';
 import { RobotCard } from '@/components/RobotCard';
 import { SearchInput } from '@/components/SearchInput';
 import type { Manufacturer, Robot } from '@/data/types';
+import type { RobotCardViewModel } from '@/lib/robotCatalog';
 import { japanAvailabilityLabels } from '@/lib/labels';
 import {
   filterRobots,
@@ -27,10 +28,11 @@ import { useFavorites } from '@/lib/useFavorites';
 interface RobotsBrowserProps {
   robots: Robot[];
   manufacturers: Manufacturer[];
+  cardViewModels: Record<string, RobotCardViewModel>;
   initialFilters: ReturnType<typeof normalizeRobotFilters>;
 }
 
-export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsBrowserProps) {
+export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialFilters }: RobotsBrowserProps) {
   const { updateParams, isPending } = useUrlParamUpdater();
   const { favorites, toggleFavorite } = useFavorites();
 
@@ -133,6 +135,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
           <RobotCard
             key={robot.id}
             robot={robot}
+            viewModel={cardViewModels[robot.id]}
             manufacturerName={manufacturer?.name ?? robot.manufacturerId}
             manufacturerLogo={manufacturer?.logo}
             manufacturerLogos={manufacturer?.logos}

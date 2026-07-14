@@ -14,6 +14,7 @@ import {
   getManufacturers,
   getArticlesForManufacturer,
   getArticles,
+  getRobotCardViewModels,
   getRobotsByManufacturerId,
 } from '@/lib/data';
 import { sortRobots } from '@/lib/display';
@@ -49,6 +50,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
   const robots = sortRobots(getRobotsByManufacturerId(manufacturer.id), 'name', [manufacturer]);
   const reports = getArticlesForManufacturer(manufacturer.id);
+  const cardViewModels = getRobotCardViewModels(robots);
   const sampleReports = getArticles()
     .filter((report) => report.contentKind === 'sample')
     .slice(0, 3);
@@ -103,6 +105,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
           <ManufacturerRobotsGrid
             robots={robots}
             manufacturer={manufacturer}
+            cardViewModels={cardViewModels}
           />
         </ManufacturerDetailSection>
 

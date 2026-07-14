@@ -33,7 +33,7 @@ export interface RobotCardFact extends RobotFactRow {
 
 export interface RobotCardViewModel {
   robotId: string;
-  facts: RobotCardFact[];
+  facts: [RobotCardFact, RobotCardFact, RobotCardFact, RobotCardFact];
 }
 
 export interface RobotPriceView {

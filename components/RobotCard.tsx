@@ -4,10 +4,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Star, CameraOff } from 'lucide-react';
 import { motion } from 'motion/react';
+import { CardFactGrid, type CardFactItem, type CardFactItems } from '@/components/CardFactGrid';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, ManufacturerLogos, Robot } from '@/data/types';
+import type { RobotCardFact, RobotCardViewModel } from '@/lib/robotCatalog';
 import { getRobotPrimaryImage } from '@/lib/robotMedia';
-import { getRobotCardSpecRows } from '@/lib/robotDisplay';
+import { deploymentStageLabels } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
 import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
 import { cn } from '@/lib/utils';
@@ -18,6 +20,7 @@ import {
 
 interface RobotCardProps {
   robot: Robot;
+  viewModel: RobotCardViewModel;
   manufacturerName?: string;
   manufacturerLogo?: ImageAsset;
   manufacturerLogos?: ManufacturerLogos;
@@ -33,6 +36,7 @@ interface RobotCardProps {
 
 export function RobotCard({
   robot,
+  viewModel,
   manufacturerName,
   manufacturerLogo,
   manufacturerLogos,
@@ -42,9 +46,28 @@ export function RobotCard({
   onFavoriteToggle,
   mobileVisual = false,
 }: RobotCardProps) {
-  const specRows = getRobotCardSpecRows(robot);
   const deploymentStageTone = getDeploymentStageTone(robot.deploymentStage);
   const cardImage = getRobotPrimaryImage(robot);
+  const toCardFactItem = (fact: RobotCardFact): CardFactItem => ({
+    key: fact.key,
+    label: fact.label,
+    value: fact.href ? (
+      <Link
+        href={fact.href}
+        className="pointer-events-auto underline underline-offset-2 hover:text-muted-foreground"
+        aria-label={`${robot.nameJa ?? robot.name}の価格を問い合わせる`}
+      >
+        {fact.value}
+      </Link>
+    ) : fact.value,
+    valueClassName: fact.href ? 'overflow-visible' : undefined,
+  });
+  const cardFacts: CardFactItems = [
+    toCardFactItem(viewModel.facts[0]),
+    toCardFactItem(viewModel.facts[1]),
+    toCardFactItem(viewModel.facts[2]),
+    toCardFactItem(viewModel.facts[3]),
+  ];
 
   const {
     cardRef,
@@ -156,17 +179,16 @@ export function RobotCard({
           </div>
         );
 
-        const detailContent = (
-          <div className="p-3 md:p-3 flex-1 flex flex-col min-w-0">
+        const desktopDetailContent = (
+          <div className="flex min-w-0 flex-1 flex-col p-3">
             <div className="flex items-start justify-between mb-1.5">
-              <h3 className="text-base font-semibold text-card-foreground">
+              <h3 className="line-clamp-2 text-base font-semibold text-card-foreground">
                 <Link href={`/robots/${robot.slug}`} className="hover:underline">
                   {robot.nameJa ?? robot.name}
                 </Link>
               </h3>
             </div>
-            <div>
-              {hideManufacturer ? null : (
+            {hideManufacturer ? null : (
               <div className="inline-block pointer-events-none md:pointer-events-auto">
                 <ManufacturerLogoName
                   name={manufacturerName ?? robot.manufacturerId}
@@ -179,34 +201,41 @@ export function RobotCard({
                   maxWidthPx={64}
                 />
               </div>
-              )}
-              <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
-                {specRows.map((row) => (
-                  <div key={row.label} className={row.label === '段階' ? undefined : 'hidden md:block'}>
-                    <dt className="text-muted-foreground/80">{row.label}</dt>
-                    <dd
-                      className={cn(
-                        'font-medium',
-                        row.label === '段階'
-                          ? getVisualToneTextClassName(deploymentStageTone)
-                          : 'text-card-foreground/90',
-                      )}
-                    >
-                      {row.value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
+            )}
+            <CardFactGrid items={cardFacts} className="mt-auto" />
+          </div>
+        );
+
+        const mobileRowContent = (
+          <div className="flex min-w-0 flex-1 flex-col p-3">
+            <h3 className="line-clamp-2 text-base font-semibold text-card-foreground">
+              <Link href={`/robots/${robot.slug}`} className="hover:underline">
+                {robot.nameJa ?? robot.name}
+              </Link>
+            </h3>
+            <dl className="mt-1.5 text-[11px]">
+              <div>
+                <dt className="text-muted-foreground/80">{uiText.robots.deploymentStage}</dt>
+                <dd className={cn('font-medium', getVisualToneTextClassName(deploymentStageTone))}>
+                  {deploymentStageLabels[robot.deploymentStage]}
+                </dd>
+              </div>
+            </dl>
           </div>
         );
 
         if (!mobileVisual) {
           return (
-            <div className="relative z-20 flex flex-row md:flex-col h-full pointer-events-none">
-              {imageBox}
-              {detailContent}
-            </div>
+            <>
+              <div className="relative z-20 flex h-full flex-row pointer-events-none md:hidden">
+                {imageBox}
+                {mobileRowContent}
+              </div>
+              <div className="relative z-20 hidden h-full flex-col pointer-events-none md:flex">
+                {imageBox}
+                {desktopDetailContent}
+              </div>
+            </>
           );
         }
 
@@ -224,10 +253,10 @@ export function RobotCard({
               </div>
             </div>
 
-            {/* PC: 既存の行カード（画像枠+詳細） */}
+            {/* PC: 4項目の共通カード */}
             <div className="relative z-20 hidden md:flex md:flex-col h-full pointer-events-none">
               {imageBox}
-              {detailContent}
+              {desktopDetailContent}
             </div>
           </>
         );

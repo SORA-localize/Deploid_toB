@@ -10,7 +10,6 @@ import {
   EMPTY_VALUE_LABEL,
 } from '@/lib/labels';
 import { getSpecEntry, specSchema, type SpecKey } from '@/lib/specSchema';
-import { getTagLabel } from '@/lib/tags';
 import { uiText } from '@/lib/uiText';
 
 export interface DisplayRow {
@@ -104,25 +103,6 @@ function formatComparisonRuntimeStatus(value: number | undefined) {
 
 export function joinOrFallback(values: readonly string[]) {
   return values.length > 0 ? values.join(' / ') : EMPTY_VALUE_LABEL;
-}
-
-export function getRobotCardSpecRows(robot: Robot): DisplayRow[] {
-  const { specs } = robot;
-  const size = specs.heightCm != null || specs.weightKg != null
-    ? `${formatNumber(specs.heightCm, 'cm')} / ${formatNumber(specs.weightKg, 'kg')}`
-    : EMPTY_VALUE_LABEL;
-  const primaryIndustry = robot.industryTags?.[0]
-    ? getTagLabel(robot.industryTags[0], 'industry')
-    : EMPTY_VALUE_LABEL;
-
-  return [
-    { label: '国内', value: japanAvailabilityLabels[robot.japanAvailability] },
-    { label: '段階', value: deploymentStageLabels[robot.deploymentStage] },
-    { label: '用途', value: primaryIndustry },
-    { label: 'サイズ', value: size },
-    { label: '稼働', value: formatRuntime(specs.runtimeMin) },
-    { label: '可搬', value: formatNumber(specs.payloadKg, 'kg') },
-  ];
 }
 
 export function getRobotDetailSpecRows(robot: Robot, manufacturer?: Manufacturer): DisplayRow[] {

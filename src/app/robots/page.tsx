@@ -3,7 +3,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { CardGridSkeleton } from '@/components/CardGridSkeleton';
 import { ListPageSkeletonShell } from '@/components/ListPageSkeletonShell';
 import { RobotsBrowser } from '@/components/RobotsBrowser';
-import { getManufacturers, getRobots } from '@/lib/data';
+import { getManufacturers, getRobotCardViewModels, getRobots } from '@/lib/data';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { createPageMetadata } from '@/lib/metadata';
 import {
@@ -49,6 +49,7 @@ async function CachedRobotsList({
     <RobotsBrowser
       robots={robots}
       manufacturers={manufacturers}
+      cardViewModels={getRobotCardViewModels(robots)}
       initialFilters={{ industry, manufacturer, availability, query }}
     />
   );
