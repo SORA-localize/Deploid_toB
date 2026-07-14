@@ -402,6 +402,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                             >
                               <ManufacturerLogoName
                                 name={name}
+                                logo={manufacturer.logo}
                                 logos={manufacturer.logos}
                                 variant="wordmark"
                                 targetAreaPx={24 * 120}

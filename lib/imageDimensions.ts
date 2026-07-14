@@ -25,10 +25,14 @@ function readPngDimensions(buf: Buffer): ImageDimensions | null {
 
 function readSvgDimensions(buf: Buffer): ImageDimensions | null {
   const text = buf.toString('utf8', 0, Math.min(buf.length, 4096));
-  const viewBoxMatch = text.match(/viewBox=["']\s*([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)/i);
+  const viewBoxMatch = text.match(/viewBox=["']([^"']+)["']/i);
   if (viewBoxMatch) {
-    const width = parseFloat(viewBoxMatch[3]);
-    const height = parseFloat(viewBoxMatch[4]);
+    const values = viewBoxMatch[1]
+      .trim()
+      .split(/[\s,]+/)
+      .map(Number);
+    const width = values[2];
+    const height = values[3];
     if (Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0) {
       return { width, height };
     }
@@ -78,7 +82,16 @@ export function measureImageDimensions(publicSrc: string): ImageDimensions | nul
   if (dimensionCache.has(publicSrc)) {
     return dimensionCache.get(publicSrc) ?? null;
   }
-  const absolutePath = path.join(process.cwd(), 'public', publicSrc.replace(/^\//, ''));
+  if (!publicSrc.startsWith('/')) {
+    dimensionCache.set(publicSrc, null);
+    return null;
+  }
+  const publicRoot = path.resolve(process.cwd(), 'public');
+  const absolutePath = path.resolve(publicRoot, publicSrc.replace(/^\/+/, ''));
+  if (!absolutePath.startsWith(`${publicRoot}${path.sep}`)) {
+    dimensionCache.set(publicSrc, null);
+    return null;
+  }
   let result: ImageDimensions | null = null;
   try {
     const buf = fs.readFileSync(absolutePath);

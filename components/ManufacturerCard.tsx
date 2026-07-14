@@ -81,6 +81,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
             >
               <ManufacturerLogoName
                 name={manufacturer.nameJa ?? manufacturer.name}
+                logo={manufacturer.logo}
                 logos={manufacturer.logos}
                 variant="combined"
                 targetAreaPx={32 * 120}

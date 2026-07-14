@@ -131,6 +131,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
             >
               <ManufacturerLogoName
                 name={manufacturer.name}
+                logo={manufacturer.logo}
                 logos={manufacturer.logos}
                 variant="combined"
                 targetAreaPx={20 * 96}

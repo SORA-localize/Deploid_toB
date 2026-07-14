@@ -134,6 +134,7 @@ export function RobotsBrowser({ robots, manufacturers, initialFilters }: RobotsB
             key={robot.id}
             robot={robot}
             manufacturerName={manufacturer?.name ?? robot.manufacturerId}
+            manufacturerLogo={manufacturer?.logo}
             manufacturerLogos={manufacturer?.logos}
             showFavorite={true}
             isFavorite={favorites.includes(robot.id)}

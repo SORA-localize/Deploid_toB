@@ -57,8 +57,9 @@ export function ManufacturerLogoName({
     <span className={`flex min-w-0 items-center gap-1.5 ${className}`}>
       {displayLogo ? (
         <span
-          // 枠・背景なし。ロゴ自体の透過をそのまま活かす。
-          className="relative inline-block shrink-0"
+          // 配布ロゴは白背景前提の黒版が多い。dark modeでもブランド色を
+          // 改変せず読めるよう、ロゴだけに白いメディアバックプレートを置く。
+          className="relative inline-block shrink-0 overflow-hidden bg-white"
           style={{ height: heightPx, width: widthPx }}
           title={displayLogo.credit}
         >
@@ -67,7 +68,7 @@ export function ManufacturerLogoName({
             alt=""
             aria-hidden="true"
             fill
-            sizes="120px"
+            sizes={`${widthPx}px`}
             className="object-contain object-left"
           />
         </span>

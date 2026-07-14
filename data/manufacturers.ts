@@ -457,22 +457,6 @@ export const manufacturers: Manufacturer[] = [
     headquarters: { lat: 30.30, lng: -97.70 },
     foundedYear: 2003,
     website: 'https://www.tesla.com/',
-    logos: {
-      symbol: {
-        src: '/images/manufacturers/logos/tesla-symbol.svg',
-        alt: 'Tesla, Inc. logo',
-        credit: 'Tesla, Inc.',
-        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Tesla_Motors.svg',
-        rights: {
-          status: 'commercial-permitted',
-          sourceType: 'third-party',
-          rightsHolder: 'Tesla, Inc.',
-          licenseUrl: 'https://commons.wikimedia.org/wiki/File:Tesla_Motors.svg',
-          checkedAt: '2026-07-13',
-          permissionNote: 'Wikimedia Commons PD-textlogo（著作権の閾値未満のためパブリックドメイン）。商標権は権利者に帰属。無改変で、提携・公認を示唆しない記述的表示に限り使用する。',
-        },
-      },
-    },
     logo: {
       src: '',
       alt: 'Tesla logo',

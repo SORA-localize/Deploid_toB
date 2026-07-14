@@ -418,6 +418,7 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                           >
                             <ManufacturerLogoName
                               name={manufacturer.nameJa ?? manufacturer.name}
+                              logo={manufacturer.logo}
                               logos={manufacturer.logos}
                               variant="combined"
                               className="text-sm font-semibold text-foreground"
@@ -669,6 +670,7 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
                                 key={robot.id}
                                 robot={robot}
                                 manufacturerName={manufacturer?.name ?? robot.manufacturerId}
+                                manufacturerLogo={manufacturer?.logo}
                                 manufacturerLogos={manufacturer?.logos}
                                 onRemove={toggleFavorite}
                                 onSelect={handleFavoriteSelect}

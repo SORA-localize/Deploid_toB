@@ -43,6 +43,7 @@ Last cleaned: 2026-07-01
 - `ai_fullstack_development_guardrails_v1.md` — AI実装時の安全策と自己監査
 - `architecture_future_considerations_v1.md` — 将来検討
 - `copyright_and_media_rights_policy_v1.md` — 権利、引用、メディア利用
+- `manufacturer-logo-usage-spec-v1.md` — メーカーロゴのvariant、表示解決、素材受入の現行仕様
 - `editorial_style_guide_v1.md` — 記事執筆方針（文体・セクション別テンプレート・NG表現・ワークフロー）
 - `article-sourcing-reference-v1.md` — 記事候補ソーシング方針（許可/除外ソース、検索クエリ）
 - `data-architecture-redesign-v1.md` — データ構造設計（データ設計の正本）
@@ -80,7 +81,6 @@ Last cleaned: 2026-07-01
 - `usecase-page-redesign-plan-v1.md` — `/use-cases` を産業入口→タスク→成熟度別グリッドへ全面再設計する実行計画（タグ再設計・42シーン追加・UI刷新）
 - `editorial-methodology-review-2026-06-24.md` — 記事題材・切り口・書き方のレビュー用草案（未承認。承認後に editorial_style_guide へ反映）
 - `robot-image-sourcing-plan-v1.md` — ロボット画像調達・カードUI対応の実行計画（メーカー分類、調達手順、通知メール文面）
-- `manufacturer-logo-usage-spec-v1.md` — メーカーロゴのシンボル/ワードマーク/複合ロゴの使い分けと将来データ構造案
 
 実装完了で archive へ移動した計画:
 - `archive/reports-news-explainer-ia-plan-v1.md`（`/reports` 4棚化、2026-07-01 正本 docs へ方針反映）

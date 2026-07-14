@@ -20,6 +20,7 @@ export function ManufacturerDetailHero({ manufacturer }: ManufacturerDetailHeroP
           <h1 className="mb-5 text-2xl font-semibold leading-tight text-foreground md:text-3xl">
             <ManufacturerLogoName
               name={name}
+              logo={manufacturer.logo}
               logos={manufacturer.logos}
               variant="combined"
               targetAreaPx={40 * 160}

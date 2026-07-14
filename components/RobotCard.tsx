@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Star, CameraOff } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
-import type { ManufacturerLogos, Robot } from '@/data/types';
+import type { ImageAsset, ManufacturerLogos, Robot } from '@/data/types';
 import { getDisplayableAsset } from '@/lib/media';
 import { getRobotCardSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
@@ -19,6 +19,7 @@ import {
 interface RobotCardProps {
   robot: Robot;
   manufacturerName?: string;
+  manufacturerLogo?: ImageAsset;
   manufacturerLogos?: ManufacturerLogos;
   /** メーカー詳細ページ内の取り扱いロボット一覧など、同一メーカー文脈で
    *  メーカー表示が冗長になる面ではメーカー行ごと隠す（仕様L7） */
@@ -33,6 +34,7 @@ interface RobotCardProps {
 export function RobotCard({
   robot,
   manufacturerName,
+  manufacturerLogo,
   manufacturerLogos,
   hideManufacturer = false,
   showFavorite = false,
@@ -168,6 +170,7 @@ export function RobotCard({
               <div className="inline-block pointer-events-none md:pointer-events-auto">
                 <ManufacturerLogoName
                   name={manufacturerName ?? robot.manufacturerId}
+                  logo={manufacturerLogo}
                   logos={manufacturerLogos}
                   variant="combined"
                   className="mb-1 text-xs text-muted-foreground"
