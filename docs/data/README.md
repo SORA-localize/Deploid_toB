@@ -86,12 +86,12 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCa
 | 種類 | 配置先 | データに書く場所 |
 | --- | --- | --- |
 | ロボット画像 | `public/images/robots/<robot-id>-<role>.<ext>` | `data/robots.ts` の `images.<role>` または `heroImage` |
-| メーカーロゴ | `public/images/manufacturers/<manufacturer-id>-logo.<ext>` | `data/manufacturers.ts` の `logo` |
+| メーカーロゴ | `public/images/manufacturers/logos/<manufacturer-id>-<variant>.<ext>` | `data/manufacturers.ts` の `logos.symbol` / `logos.wordmark` / `logos.combined`（`logo` は移行中の後方互換のみ） |
 | メーカー補助画像 | `public/images/manufacturers/<manufacturer-id>-<purpose>.<ext>` | 必要な表示枠がある場合のみ追加 |
 | 記事hero画像 | `public/images/articles/<article-id>/hero.<ext>` | `data/articles.ts` の `heroImage` |
 | 記事本文補助画像 | `public/images/articles/<article-id>/<name>.<ext>` | 本文や将来の画像フィールドで明示参照 |
 
-画像を登録するときは `src` / `alt` / `credit` / `sourceUrl` / `rights.status` / `rights.sourceType` / `rights.rightsHolder` / `rights.checkedAt` を確認する。権利が不明な画像は公開用データに入れず、必要なら `publishStatus: 'draft'` のままにする。
+画像を登録するときは `src` / `alt` / `credit` / `sourceUrl` / `rights.status` / `rights.sourceType` / `rights.rightsHolder` / `rights.checkedAt` を確認する。許諾・商用利用可として登録する場合は `licenseUrl` または `permissionNote` に根拠を残す。メーカーから直接提供された素材は、利用媒体・商用利用・改変可否・期限・クレジット条件を `permissionNote` に記録し、原本メールや契約書の管理先を `licenseUrl` または社内管理番号で追跡できる状態にする。権利が不明な画像は公開用データに入れず、必要なら `publishStatus: 'draft'` のままにする。
 
 ## 参照とタグの追加手順
 

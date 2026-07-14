@@ -36,12 +36,13 @@
 1. [ ] 既存メーカーの名称変更・ロゴ差し替え・代理店更新ではなく、実体として別会社を追加すべきか確認
 2. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
 3. [ ] 必須：name / country / companyType / japanPresence / website / sources
-4. [ ] logo をローカル配置：`public/images/manufacturers/<id>-logo.<ext>`
-5. [ ] 国内代理店があれば `domesticDistributors`（name 必須・URL は形式チェック）
-6. [ ] `headquarters`（lat/lng）はワールドマップ用（任意）。設定すると Home ワールドマップにドットが表示される
-7. [ ] **その国が初登場**の場合は `components/ManufacturerMapCopy.tsx` の `REGION` 定数に `'CountryName': { name: '日本語名', a3: 'ISO3文字コード' }` を追加する（手動。漏れてもビルドは通るが、地図カードの国名がフォールバック表示になる）
-8. [ ] build 通過 → `published`
-9. [ ] 件数が増減した場合、`/for-manufacturers` の掲載数表示が古くなる。`lib/site.ts` の `siteMeta.dataAsOf` を更新する（手動・即時でなくまとめて更新でも可）
+4. [ ] ロゴを種別判定し、`public/images/manufacturers/logos/<id>-<variant>.<ext>` にローカル配置して `logos.symbol` / `logos.wordmark` / `logos.combined` の該当欄へ登録する（legacy `logo` への新規登録は禁止）
+5. [ ] ロゴの表示用途・商用利用・改変可否・期限・クレジット条件を確認し、`rights` と `licenseUrl` / `permissionNote` に根拠を記録する
+6. [ ] 国内代理店があれば `domesticDistributors`（name 必須・URL は形式チェック）
+7. [ ] `headquarters`（lat/lng）はワールドマップ用（任意）。設定すると Home ワールドマップにドットが表示される
+8. [ ] **その国が初登場**の場合は `components/ManufacturerMapCopy.tsx` の `REGION` 定数に `'CountryName': { name: '日本語名', a3: 'ISO3文字コード' }` を追加する（手動。漏れてもビルドは通るが、地図カードの国名がフォールバック表示になる）
+9. [ ] build 通過 → `published`
+10. [ ] 件数が増減した場合、`/for-manufacturers` の掲載数表示が古くなる。`lib/site.ts` の `siteMeta.dataAsOf` を更新する（手動・即時でなくまとめて更新でも可）
 
 ## C. ニュース・解説記事（articles）追加
 
@@ -213,14 +214,16 @@ featuredRank: 1,  // 他のピックと被らない数値を割り当て
 - 素材の用途: hero / logo / transparent / side / inOperation / scale / article hero など
 - 権利情報: 自社素材、公式提供、CC0、CC BY 4.0、許諾済み、確認中など
 - credit / sourceUrl / rightsHolder / checkedAt
+- 公式提供・個別許諾の場合: 利用媒体、商用利用、改変可否、期限、クレジット条件、許諾記録の管理先
 
 AI側の実装手順:
 
 1. [ ] 対象レコードの `id` を確認する。見つからなければ新規追加か既存更新かを確認する
 2. [ ] 素材を `public/images/...` の `id` ベースパスに置く
 3. [ ] 該当レコードの `ImageAsset` を更新する
-4. [ ] `getDisplayableAsset()` の表示ポリシーに通る rights か確認する
-5. [ ] `npm run validate:data` と、表示に関わる場合は `npm run build` を実行する
+4. [ ] メーカーロゴは variant を人が判定して `Manufacturer.logos` に登録し、legacy `logo` は増やさない
+5. [ ] `getDisplayableAsset()` の表示ポリシーに通る rights か確認する
+6. [ ] `npm run validate:data` と、表示に関わる場合は `npm run build` を実行する
 
 ---
 

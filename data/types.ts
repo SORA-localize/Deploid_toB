@@ -57,6 +57,21 @@ export interface ImageAsset {
   credit?: string;
   sourceUrl?: string;
   rights: RightsMeta;
+  /** 実行時にサーバー側で実測して付与される（data/*.ts に手打ちしない）。
+   *  lib/data.ts の enrichment 経由でのみ設定される。詳細は lib/imageDimensions.ts 参照。 */
+  aspectRatio?: number;
+}
+
+/** メーカーロゴの種別。詳細は docs/planning/manufacturer-logo-usage-spec-v1.md 参照。
+ *  symbol: アイコン/シンボルマーク（文字を含まない、または文字が主役ではない）
+ *  wordmark: 会社名を読ませる横長ワードロゴ
+ *  combined: シンボル + ワードロゴの複合ロゴ（公式が1枚のアセットとして提供している場合のみ設定する。
+ *    symbolとwordmarkを実装側で合成して combined 相当にすることはしない — 公式が意図しない間隔・比率の
+ *    組み合わせを作ってしまうため。symbol/wordmarkしか無いメーカーは、そのままそれぞれのvariantとして扱う） */
+export interface ManufacturerLogos {
+  symbol?: ImageAsset;
+  wordmark?: ImageAsset;
+  combined?: ImageAsset;
 }
 
 /** ロボットの画像スロット。詳細ページのカルーセルで7スロット固定で使う。
@@ -129,7 +144,9 @@ export interface Manufacturer extends BaseRecord {
   headquarters?: { lat: number; lng: number };
   foundedYear?: number;
   website: string;
+  /** @deprecated 種別未分類の1枚ロゴ（後方互換）。logos が存在するメーカーでは表示解決から除外される（lib/manufacturerLogo.ts）。新規データは logos を使う。 */
   logo?: ImageAsset;
+  logos?: ManufacturerLogos;
   contactUrl?: string;
   description: string;
   japanPresence: JapanPresence;

@@ -21,8 +21,11 @@ export function ManufacturerDetailHero({ manufacturer }: ManufacturerDetailHeroP
             <ManufacturerLogoName
               name={name}
               logo={manufacturer.logo}
-              frameClassName="h-12 w-12"
-              imageClassName="h-9 w-9"
+              logos={manufacturer.logos}
+              variant="combined"
+              targetAreaPx={40 * 160}
+              maxHeightPx={40}
+              maxWidthPx={160}
               textClassName="overflow-visible whitespace-normal text-clip"
             />
           </h1>

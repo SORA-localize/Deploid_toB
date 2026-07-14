@@ -16,6 +16,7 @@ import {
 } from '@/lib/data';
 import { sortRobots, sortUseCases } from '@/lib/display';
 import { getDisplayableAsset } from '@/lib/media';
+import { resolveManufacturerLogo } from '@/lib/manufacturerLogo';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/jsonLd';
 import {
   createPageMetadata,
@@ -45,7 +46,7 @@ export default function HomePage() {
       lat: manufacturer.headquarters.lat,
       lng: manufacturer.headquarters.lng,
       foundedYear: manufacturer.foundedYear,
-      logoSrc: getDisplayableAsset(manufacturer.logo)?.src,
+      logoSrc: resolveManufacturerLogo(manufacturer, 'wordmark').asset?.src,
       deployments: getDeploymentsForManufacturer(manufacturer.id).map((d) => ({
         lat: d.location.lat,
         lng: d.location.lng,

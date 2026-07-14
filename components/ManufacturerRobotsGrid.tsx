@@ -22,7 +22,7 @@ export function ManufacturerRobotsGrid({ robots, manufacturer }: ManufacturerRob
           key={robot.id}
           robot={robot}
           manufacturerName={manufacturer.name}
-          manufacturerLogo={manufacturer.logo}
+          hideManufacturer
         />
       ))}
     </div>

@@ -82,9 +82,12 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
               <ManufacturerLogoName
                 name={manufacturer.nameJa ?? manufacturer.name}
                 logo={manufacturer.logo}
-                frameClassName="h-10 w-10"
-                imageClassName="h-7 w-7"
-                textClassName="leading-tight"
+                logos={manufacturer.logos}
+                variant="combined"
+                targetAreaPx={32 * 120}
+                maxHeightPx={32}
+                maxWidthPx={120}
+                hideName
               />
               <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-45 transition-opacity group-hover:opacity-80" />
             </a>

@@ -1,6 +1,8 @@
 // 参照整合チェック。dev起動時に lib/data.ts から1度だけ呼ばれ、
 // 「存在しないidを参照している」「双方向リンクが片側だけ」「id/slug重複」を
 // console に出す。`npm run validate:data`（scripts/validate-data.mjs）からも実行される。
+import fs from 'node:fs';
+import path from 'node:path';
 import { deployments } from '../data/deployments.ts';
 import { manufacturers } from '../data/manufacturers.ts';
 import { articlePlacements } from '../data/articlePlacements.ts';
@@ -305,6 +307,14 @@ export function validateData(): ValidationResult {
     if (!asset.src.trim()) return; // 空src = 未取得。警告・検証不要
     if (!asset.src.startsWith('/')) {
       warnings.push(`[image-remote] ${kind} "${owner}".${field}.src が外部URLです（public/ へのローカル化推奨）: ${asset.src}`);
+    } else {
+      const publicRoot = path.resolve(process.cwd(), 'public');
+      const absolutePath = path.resolve(publicRoot, asset.src.replace(/^\/+/, ''));
+      if (!absolutePath.startsWith(`${publicRoot}${path.sep}`)) {
+        errors.push(`[image-path] ${kind} "${owner}".${field}.src が public/ の外を指しています: ${asset.src}`);
+      } else if (!fs.existsSync(absolutePath)) {
+        errors.push(`[image-missing] ${kind} "${owner}".${field}.src のファイルが存在しません: ${asset.src}`);
+      }
     }
     if (!asset.alt.trim()) errors.push(`[image-alt] ${kind} "${owner}".${field}.alt が空です`);
     if (!asset.rights) {
@@ -313,15 +323,29 @@ export function validateData(): ValidationResult {
     }
 
     checkDate(kind, owner, `${field}.rights.checkedAt`, asset.rights.checkedAt);
+    if (asset.rights.sourceType !== 'own' && !asset.rights.rightsHolder) {
+      errors.push(`[image-rights-holder] ${kind} "${owner}".${field}.rights.rightsHolder が未設定です`);
+    }
+    if (
+      (asset.rights.status === 'licensed' || asset.rights.status === 'commercial-permitted') &&
+      !asset.rights.licenseUrl &&
+      !asset.rights.permissionNote
+    ) {
+      errors.push(
+        `[image-permission-evidence] ${kind} "${owner}".${field} は ${asset.rights.status} ですが、licenseUrl / permissionNote のどちらもありません`,
+      );
+    }
 
     if (referenceDisplayStatuses.has(asset.rights.status)) {
       if (!asset.credit) errors.push(`[image-credit] ${kind} "${owner}".${field}.credit が未設定です`);
       if (!asset.sourceUrl) {
         errors.push(`[image-source] ${kind} "${owner}".${field}.sourceUrl が未設定です`);
       }
-      if (!asset.rights.rightsHolder) {
-        errors.push(`[image-rights-holder] ${kind} "${owner}".${field}.rights.rightsHolder が未設定です`);
-      }
+    }
+    if (asset.aspectRatio != null) {
+      errors.push(
+        `[image-derived-metadata] ${kind} "${owner}".${field}.aspectRatio は data/*.ts に保存せず、実行時に計測してください`,
+      );
     }
   };
 
@@ -625,6 +649,15 @@ export function validateData(): ValidationResult {
     checkDate('manufacturer', m.slug, 'updatedAt', m.updatedAt);
     checkRequiredSources('manufacturer', m.slug, m.sources);
     checkImageAsset('manufacturer', m.slug, 'logo', m.logo);
+    (['symbol', 'wordmark', 'combined'] as const).forEach((variant) => {
+      const asset = m.logos?.[variant];
+      if (!asset) return;
+      checkImageAsset('manufacturer', m.slug, `logos.${variant}`, asset);
+      // logos.* は空srcプレースホルダーを認めない（置くなら実ファイルと権利を揃えてから）
+      if (!asset.src.trim()) {
+        errors.push(`[image-missing] manufacturer "${m.slug}".logos.${variant}.src が空です`);
+      }
+    });
     m.domesticDistributors?.forEach((distributor, index) => {
       const field = `domesticDistributors[${index}]`;
       if (!distributor.name.trim()) {

@@ -1,12 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
-import { Calendar, User } from 'lucide-react';
+import { ArrowRight, Calendar, User } from 'lucide-react';
 import { ArticleRelatedSidebar } from '@/components/ArticleRelatedSidebar';
 import { ArticleToc } from '@/components/ArticleToc';
 import { BudouXText } from '@/components/BudouXText';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
+import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { Markdown } from '@/components/Markdown';
 import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
@@ -378,16 +379,46 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                     </section>
                   )}
                   {manufacturers.length > 0 && (
-                    <RelatedLinkList
+                    <section
                       id="related-manufacturers"
-                      title={uiText.reports.relatedManufacturers}
-                      titleLevel="h3"
-                      // 紹介文（summary）は出さない。名前リンクのみ（将来はワードロゴ化の方針）
-                      items={manufacturers.map((m) => ({
-                        href: `/manufacturers/${m.slug}`,
-                        title: m.nameJa ?? m.name,
-                      }))}
-                    />
+                      aria-labelledby="related-manufacturers-heading"
+                      className="scroll-mt-site-header"
+                    >
+                      <h3
+                        id="related-manufacturers-heading"
+                        className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                      >
+                        {uiText.reports.relatedManufacturers}
+                      </h3>
+                      <div className="divide-y divide-border">
+                        {manufacturers.map((manufacturer) => {
+                          const name = manufacturer.nameJa ?? manufacturer.name;
+                          return (
+                            <Link
+                              key={manufacturer.id}
+                              href={`/manufacturers/${manufacturer.slug}`}
+                              aria-label={name}
+                              className="group flex min-h-14 items-center justify-between gap-4 py-4 transition-colors hover:bg-muted/50 focus-visible:bg-muted/50"
+                            >
+                              <ManufacturerLogoName
+                                name={name}
+                                logo={manufacturer.logo}
+                                logos={manufacturer.logos}
+                                variant="wordmark"
+                                targetAreaPx={24 * 120}
+                                minHeightPx={16}
+                                maxHeightPx={28}
+                                maxWidthPx={140}
+                                textClassName="text-sm font-semibold text-foreground"
+                                showPlaceholder={false}
+                                hideName
+                              />
+                              <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </section>
                   )}
                   {useCases.length > 0 && (
                     <RelatedLinkList

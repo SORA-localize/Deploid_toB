@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Star, CameraOff } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
-import type { ImageAsset, Robot } from '@/data/types';
+import type { ImageAsset, ManufacturerLogos, Robot } from '@/data/types';
 import { getDisplayableAsset } from '@/lib/media';
 import { getRobotCardSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
@@ -20,6 +20,10 @@ interface RobotCardProps {
   robot: Robot;
   manufacturerName?: string;
   manufacturerLogo?: ImageAsset;
+  manufacturerLogos?: ManufacturerLogos;
+  /** メーカー詳細ページ内の取り扱いロボット一覧など、同一メーカー文脈で
+   *  メーカー表示が冗長になる面ではメーカー行ごと隠す（仕様L7） */
+  hideManufacturer?: boolean;
   showFavorite?: boolean;
   isFavorite?: boolean;
   onFavoriteToggle?: (id: string) => void;
@@ -31,6 +35,8 @@ export function RobotCard({
   robot,
   manufacturerName,
   manufacturerLogo,
+  manufacturerLogos,
+  hideManufacturer = false,
   showFavorite = false,
   isFavorite = false,
   onFavoriteToggle,
@@ -160,15 +166,20 @@ export function RobotCard({
               </h3>
             </div>
             <div>
+              {hideManufacturer ? null : (
               <div className="inline-block pointer-events-none md:pointer-events-auto">
                 <ManufacturerLogoName
                   name={manufacturerName ?? robot.manufacturerId}
                   logo={manufacturerLogo}
+                  logos={manufacturerLogos}
+                  variant="combined"
                   className="mb-1 text-xs text-muted-foreground"
-                  frameClassName="h-4 w-4"
-                  imageClassName="h-3 w-3"
+                  targetAreaPx={16 * 64}
+                  maxHeightPx={16}
+                  maxWidthPx={64}
                 />
               </div>
+              )}
               <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
                 {specRows.map((row) => (
                   <div key={row.label} className={row.label === '段階' ? undefined : 'hidden md:block'}>
