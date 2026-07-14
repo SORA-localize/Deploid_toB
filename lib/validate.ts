@@ -591,8 +591,8 @@ export function validateData(): ValidationResult {
       if (!robotIdSet.has(row.robotId)) {
         errors.push(`[manufacturerGuideContent] ${article.slug}: lineup の robotId "${row.robotId}" が存在しません`);
       }
-      if (!row.roleLabel.trim() || !row.priceLabel.trim()) {
-        errors.push(`[manufacturerGuideContent] ${article.slug}: lineup.${row.robotId} の roleLabel/priceLabel が空です`);
+      if (!row.roleLabel.trim()) {
+        errors.push(`[manufacturerGuideContent] ${article.slug}: lineup.${row.robotId} の roleLabel が空です`);
       }
     });
     content.faq.forEach((item, i) => {

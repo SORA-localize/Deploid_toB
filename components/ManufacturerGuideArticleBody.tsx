@@ -124,7 +124,24 @@ function LineupTable({ rows }: { rows: ManufacturerGuideLineupDisplayRow[] }) {
                 </Link>
               </td>
               <td className="px-3 py-2.5 leading-relaxed text-foreground/80 break-words [overflow-wrap:anywhere]">{row.roleLabel}</td>
-              <td className="px-3 py-2.5 whitespace-nowrap text-foreground/80">{row.priceLabel}</td>
+              <td className="px-3 py-2.5 whitespace-nowrap text-foreground/80">
+                {row.price.kind === 'contact' && row.price.href ? (
+                  <Link href={row.price.href} className="underline underline-offset-4 hover:text-foreground">
+                    {row.price.label}
+                  </Link>
+                ) : row.price.sourceUrl ? (
+                  <a
+                    href={row.price.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-4 hover:text-foreground"
+                  >
+                    {row.price.label}
+                  </a>
+                ) : (
+                  row.price.label
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

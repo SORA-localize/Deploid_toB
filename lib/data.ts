@@ -10,8 +10,10 @@ import { withMeasuredLogoAspect } from '@/lib/manufacturerLogoEnrich';
 import {
   createRobotCardViewModels,
   resolveOfficialUseCasesForRobot,
+  resolveRobotPrice,
   resolveSameManufacturerRobots,
 } from '@/lib/robotCatalog';
+import type { RobotPriceView } from '@/lib/robotCatalog';
 
 // dev時のみ：参照整合（存在しないid参照・双方向のズレ・id/slug重複）をconsoleで通知
 runValidationInDev();
@@ -145,10 +147,10 @@ export interface ManufacturerGuideLineupDisplayRow {
   name: string;
   href: string;
   roleLabel: string;
-  priceLabel: string;
+  price: RobotPriceView;
 }
 
-/** メーカー解説のラインナップ表を表示用に解決する。機体名・リンクはDBが正本、位置づけ・価格目安は記事編集。 */
+/** メーカー解説のラインナップ表を表示用に解決する。機体名・リンク・価格はRobotが正本、位置づけだけ記事編集。 */
 export function resolveManufacturerGuideLineup(
   content: ManufacturerGuideContent,
 ): ManufacturerGuideLineupDisplayRow[] {
@@ -160,7 +162,7 @@ export function resolveManufacturerGuideLineup(
         name: robot.nameJa ?? robot.name,
         href: `/robots/${robot.slug}`,
         roleLabel: row.roleLabel,
-        priceLabel: row.priceLabel,
+        price: resolveRobotPrice(robot),
       },
     ];
   });

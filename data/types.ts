@@ -515,14 +515,12 @@ export interface ManufacturerGuideProcurementChannel {
 
 /**
  * 製品ラインナップ表の1行。機体名・リンク・詳細はDB（robotId）から解決し、
- * 「どの検討者に関係するか」の一言と価格目安だけ記事側で編集する。
+ * 「どの検討者に関係するか」の一言だけ記事側で編集する。価格はRobotから解決する。
  */
 export interface ManufacturerGuideLineupRow {
   robotId: Id;
   /** 読者向けの位置づけ一言（例: 研究・教育・PoCの標準候補） */
   roleLabel: string;
-  /** 価格目安（例: '$13,500〜'）。ロボット詳細の priceNote と矛盾させない。未確認は '要確認' */
-  priceLabel: string;
 }
 
 export interface ManufacturerGuideFaqItem {
