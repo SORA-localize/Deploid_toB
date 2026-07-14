@@ -1,6 +1,6 @@
 # Robot Catalog Full-stack Implementation Plan v2
 
-Status: plan reviewed / implementation not started / logo baseline PR待ち
+Status: implementation complete / final review in progress
 Created: 2026-07-14
 Last reviewed: 2026-07-14
 Branch: `feature/robot-catalog-fullstack-20260714`
@@ -21,18 +21,17 @@ Implementation review rule: `docs/planning/ai_fullstack_development_guardrails_v
 
 | ref | commit | 状態 |
 |---|---|---|
-| `origin/main` | `59d3bcd` | remoteの現行main |
-| local `main` | `6d3c48b` | origin/mainより3commit先。レビュー済みロゴbaseline |
-| `agent/manufacturer-media-review-20260714` | `6d3c48b` | origin/main向けDraft PR作成元 |
-| `feature/robot-catalog-fullstack-20260714` | branch HEAD | 本計画。ロゴ修正のcherry-pickを含む |
+| `origin/main` | `d25108e` | ロゴbaseline PR #1をmerge済み |
+| local `main` | `d25108e` | origin/mainと同期済み |
+| `feature/robot-catalog-fullstack-20260714` | branch HEAD | merge後mainへrebase済み。本計画の実装branch |
 
-実装開始条件:
+実装開始条件（2026-07-14完了）:
 
-1. `gh auth login -h github.com` でGitHub CLI認証を復旧する。
-2. `agent/manufacturer-media-review-20260714` をpushし、origin/main向けDraft PRを作る。
-3. ロゴPRのレビュー・merge後、local mainをorigin/mainへ同期する。
-4. 本branchを更新後mainへrebaseし、ロゴ修正が重複していないことを確認する。
-5. `git status --short` がcleanであることを確認してから本計画を実装する。
+1. GitHub CLI認証を復旧した。
+2. ロゴbaselineをPR #1でレビューし、`origin/main`へmergeした。
+3. local mainをorigin/mainへ同期した。
+4. 本branchをmerge後mainへrebaseし、重複cherry-pickを除外した。
+5. cleanなworktreeから本計画の実装を開始した。
 
 `archive/robot-detail-prototype-20260714` と `archive/local-media-preview-20260714` は履歴参照のみとし、mergeしない。著作権無視プロトタイプの素材・権利判断・データを採用しない。
 

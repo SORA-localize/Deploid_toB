@@ -1,12 +1,8 @@
-import type { Manufacturer, Robot, RobotSpecs } from '@/data/types';
+import type { Robot, RobotSpecs } from '@/data/types';
 import {
-  buyerReadinessLabels,
   deploymentStageLabels,
   japanAvailabilityLabels,
-  marketAvailabilityLabels,
   mobilityLabels,
-  procurementLabels,
-  robotCategoryLabels,
   EMPTY_VALUE_LABEL,
 } from '@/lib/labels';
 import { getSpecEntry, specSchema, type SpecKey } from '@/lib/specSchema';
@@ -99,38 +95,6 @@ function formatComparisonRuntimeStatus(value: number | undefined) {
   if (value < 180) return '標準（90〜180分）';
   if (value < 360) return '長時間（3〜6時間）';
   return '超長時間（6時間以上）';
-}
-
-export function joinOrFallback(values: readonly string[]) {
-  return values.length > 0 ? values.join(' / ') : EMPTY_VALUE_LABEL;
-}
-
-export function getRobotDetailSpecRows(robot: Robot, manufacturer?: Manufacturer): DisplayRow[] {
-  // メーカー/カテゴリは関連参照、スペック行は specSchema が正本（並び順も schema 準拠）
-  return [
-    { label: 'メーカー', value: manufacturer?.name ?? robot.manufacturerId },
-    { label: 'カテゴリ', value: robotCategoryLabels[robot.category] },
-    ...getSpecRows(robot.specs),
-  ];
-}
-
-export function getRobotDetailDecisionRows(robot: Robot): DisplayRow[] {
-  return [
-    { label: '導入段階', value: deploymentStageLabels[robot.deploymentStage] },
-    // 調達可能性の実態は裏取りできたロボットのみ設定される（未設定は行ごと非表示）
-    ...(robot.marketAvailability
-      ? [{ label: '調達可能性', value: marketAvailabilityLabels[robot.marketAvailability] }]
-      : []),
-    { label: '実務ラベル', value: buyerReadinessLabels[robot.buyerReadiness] },
-    { label: '日本での入手性', value: japanAvailabilityLabels[robot.japanAvailability] },
-    {
-      label: '調達形態',
-      value: joinOrFallback(robot.procurementModels.map((model) => procurementLabels[model])),
-    },
-    { label: '参考価格', value: robot.priceNote ?? EMPTY_VALUE_LABEL },
-    { label: '安全性', value: robot.safetyNote ?? EMPTY_VALUE_LABEL },
-    { label: '継続性リスク', value: robot.vendorRiskNote ?? EMPTY_VALUE_LABEL },
-  ];
 }
 
 export function getComparisonCoreRows(robot: Robot): ComparisonDisplayRow[] {
