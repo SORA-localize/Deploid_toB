@@ -71,6 +71,7 @@ Last created: 2026-07-09 / Last updated: 2026-07-13（本番反映開始）
 | L9 | 比較タブのお気に入りカード | `FavoriteCard` -> `ManufacturerLogoName` | `combined` | シンボル・ロゴのみ。メーカー名テキストは削除する |
 | L10 | 比較タブの挿入/ドラッグ用小型カード | `CompareParts.CompareDragOverlayCard` 等 | `combined` | シンボル・ロゴのみ。メーカー名テキストは削除する。小さすぎる場合のみ `symbol` fallbackを検討 |
 | L11 | Organization JSON-LD | `manufacturerJsonLd` | `combined` または `wordmark` | 画面には出ない。Google等に組織ロゴURLを伝える構造化データ。公式ロゴとして読める画像を使い、権利上不安なら出さない |
+| L12 | 記事詳細の関連メーカー | `reports/[slug]` -> `ManufacturerLogoName` | `wordmark` | 会社名を読ませる一覧なのでwordmark優先。wordmarkがなくsymbolへfallbackした場合、または表示可能ロゴがない場合はメーカー名テキストを残す |
 
 現行の通常比較パネル `ComparisonRobotPanel` は、ロゴではなくメーカー名テキストだけを表示する。ここはロゴ消費地点ではない。
 
@@ -138,7 +139,7 @@ fallback方針:
 2. `lib/media.ts` または新規 `lib/manufacturerLogo.ts` に `getManufacturerLogoAsset(manufacturer, variant)` を作る。
 3. 既存 `Manufacturer.logo` を `combined` fallbackとして維持する。
 4. `ManufacturerLogoName` に `variant` と `showName` propを追加する。
-5. L1-L11の表示面にvariantとメーカー名テキスト表示有無を割り当てる。
+5. L1-L12の表示面にvariantとメーカー名テキスト表示有無を割り当てる。
 6. validatorで `logos.*` の `ImageAsset` を検証する。
 7. ローカルプロトタイプで Agility / Apptronik / Unitree / Figure AI を最低限の比較対象にして、サイズ差を確認する。
 
@@ -191,7 +192,7 @@ fallback方針:
 
 6. `scripts/validate-data.mjs`に、`logos.*`が参照する`src`のファイルが実在するかのチェックを追加する（`ImageAsset`の必須項目`rights`等の既存チェックと同様の粒度）。
 
-7. L1〜L11の表示面に`variant`と`showName`を実際に割り当てる（本文の表のとおり）。
+7. L1〜L12の表示面に`variant`と`showName`を実際に割り当てる（本文の表のとおり）。
 
 8. サンドボックスで実際に本番同様のデータ（下記チェックリストで集めた素材）を入れて`npm run validate:data` / `tsc --noEmit` / 目視確認する。
 
@@ -199,7 +200,7 @@ fallback方針:
 
 ### 素材調達チェックリスト（2026-07-09時点、追加調査反映済み）
 
-サンドボックスの`public/images/_local-prototype/manufacturers/`にある26社分を目視で再分類した。**L1〜L11のほぼ全箇所が`combined`を第一希望としているため、`combined`を持たない社は本番相当の見た目にならない。**
+サンドボックスの`public/images/_local-prototype/manufacturers/`にある26社分を目視で再分類した。**L1〜L11のほぼ全箇所が`combined`を第一希望としているため、`combined`を持たない社は本番相当の見た目にならない。L12は会社名を読む面なので`wordmark`を第一希望とする。**
 
 **重要な発見（追加調査で判明）**：「combined」は必ずしも1枚の完成ファイルとして配布されているとは限らない。多くのブランドは symbol と wordmark を別々のファイルとして持っていて、実装側（このサイト）がCSSで横に並べて合成する前提になっている（Figure AI、Tesla、EngineAIで実例確認）。逆に、**そもそも独立したsymbolを持たず、ロゴ自体がwordmark単体として設計されているブランドも存在する**（PAL Robotics、Wandercraftは公式ブランドガイド/公式サイトを直接確認した上で、独立アイコンが無いことを確認済み）。この場合「combinedを探す」のではなく「wordmarkがブランドの正式な姿である」と理解すべきで、無理にアイコンを作る/探す必要はない。
 
@@ -244,7 +245,7 @@ fallback方針:
 
 ### 完了の目安
 
-- 26社中、`combined`（またはL1-L11が要求するvariant）を持つ社数。
+- 26社中、`combined`（またはL1-L12が要求するvariant）を持つ社数。
 - 各社の素材が本物のSVGまたは高解像度PNG＋実測寸法で扱えている。
 - `data/*.ts`に寸法・アスペクト比の手打ち数値が一切ないこと。
 
