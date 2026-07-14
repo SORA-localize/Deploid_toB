@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { FactList } from '@/components/FactList';
 import type { Manufacturer } from '@/data/types';
 import {
   companyStatusLabels,
@@ -119,17 +120,10 @@ export function ManufacturerFactSheet({ manufacturer, robotCount }: Manufacturer
         </span>
       </div>
 
-      <dl className="grid grid-cols-1 gap-x-10 md:grid-cols-2">
-        {rows.map((row) => (
-          <div
-            key={row.label}
-            className="grid grid-cols-1 sm:grid-cols-[8rem_minmax(0,1fr)] gap-1 sm:gap-4 border-b border-border py-3 text-xs"
-          >
-            <dt className="text-muted-foreground">{row.label}:</dt>
-            <dd className="min-w-0 font-medium text-foreground">{row.value}</dd>
-          </div>
-        ))}
-      </dl>
+      <FactList
+        rows={rows.map((row) => ({ key: row.label, label: row.label, value: row.value }))}
+        className="grid grid-cols-1 gap-x-10 md:grid-cols-2"
+      />
     </section>
   );
 }

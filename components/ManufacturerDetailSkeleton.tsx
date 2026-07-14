@@ -25,9 +25,9 @@ export function ManufacturerDetailSkeleton() {
           <div className="h-4 w-2/3 max-w-xl animate-pulse bg-muted" />
         </div>
 
-        <div className="mb-10 grid grid-cols-1 gap-x-8 gap-y-3 border border-border bg-card p-6 sm:grid-cols-2">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="flex items-center justify-between border-b border-border py-2 last:border-b-0">
+        <div className="mb-10 grid grid-cols-1 gap-x-10 md:grid-cols-2">
+          {Array.from({ length: 10 }).map((_, index) => (
+            <div key={index} className="grid grid-cols-[8rem_minmax(0,1fr)] gap-4 border-b border-border py-3">
               <div className="h-3 w-16 animate-pulse bg-muted" />
               <div className="h-3 w-24 animate-pulse bg-muted" />
             </div>

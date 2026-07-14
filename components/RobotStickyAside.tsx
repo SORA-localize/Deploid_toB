@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
+import { FactList } from '@/components/FactList';
 import type { Robot } from '@/data/types';
 import type { Manufacturer } from '@/data/types';
 import { SidebarBlock, SidebarDivider, SidebarSection } from '@/components/SidebarSection';
-import { getSpecRows } from '@/lib/robotDisplay';
+import { getRobotBasicFacts } from '@/lib/robotCatalog';
 import { deploymentStageLabels, japanAvailabilityLabels } from '@/lib/labels';
 import { uiText } from '@/lib/uiText';
 
@@ -13,29 +14,16 @@ interface RobotStickyAsideProps {
 }
 
 export function RobotStickyAside({ robot, manufacturer }: RobotStickyAsideProps) {
-  // 項目の選抜はサイドバーの編集判断、ラベル・整形は specSchema 準拠
-  const quickSpecs = getSpecRows(robot.specs, [
-    'heightCm',
-    'weightKg',
-    'payloadKg',
-    'runtimeMin',
-    'mobility',
-  ]);
+  const quickSpecs = getRobotBasicFacts(robot);
 
   return (
     <aside className="hidden lg:block">
       <SidebarSection>
         <SidebarBlock kicker={uiText.robots.basicSpecs}>
-          <table className="w-full text-xs">
-            <tbody className="divide-y divide-border">
-              {quickSpecs.map((row) => (
-                <tr key={row.label}>
-                  <td className="py-2 text-muted-foreground">{row.label}</td>
-                  <td className="py-2 text-foreground font-medium text-right">{row.value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <FactList
+            variant="compact"
+            rows={quickSpecs.map((row) => ({ key: row.key, label: row.label, value: row.value }))}
+          />
         </SidebarBlock>
 
         <SidebarDivider />
