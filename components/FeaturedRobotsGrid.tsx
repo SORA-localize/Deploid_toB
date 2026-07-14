@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
+import { RobotCardRail } from '@/components/RobotCardRail';
 import type { Robot, Manufacturer } from '@/data/types';
 
 interface FeaturedRobotsGridProps {
@@ -21,19 +22,18 @@ export function FeaturedRobotsGrid({ robots, manufacturerById }: FeaturedRobotsG
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="flex gap-3 sm:gap-4 overflow-x-auto overscroll-x-contain snap-x pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <RobotCardRail ariaLabel="注目ロボット">
         {robots.map((robot) => {
           const manufacturer = manufacturerById[robot.manufacturerId];
           return (
-            <div key={robot.id} className="shrink-0 snap-start w-[44%] sm:w-[30%] md:w-[22%] xl:w-[18%]">
-              <FeaturedRobotCard
-                robot={robot}
-                manufacturerName={manufacturer?.name}
-              />
-            </div>
+            <FeaturedRobotCard
+              key={robot.id}
+              robot={robot}
+              manufacturerName={manufacturer?.name}
+            />
           );
         })}
-      </div>
+      </RobotCardRail>
     </section>
   );
 }

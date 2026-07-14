@@ -11,6 +11,7 @@ import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { Markdown } from '@/components/Markdown';
 import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
+import { RobotCardRail } from '@/components/RobotCardRail';
 import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
 import { SidebarBlock, SidebarDivider } from '@/components/SidebarSection';
@@ -366,16 +367,18 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                       <h3 id="related-robots-heading" className="mb-3 text-base font-semibold text-foreground">
                         {uiText.reports.relatedRobots}
                       </h3>
-                      <div className="flex gap-3 overflow-x-auto overscroll-x-contain snap-x pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                      <RobotCardRail ariaLabel={uiText.reports.relatedRobots}>
                         {robots.map((robot) => {
                           const manufacturer = getManufacturerForRobot(robot.manufacturerId);
                           return (
-                            <div key={robot.id} className="w-[44%] shrink-0 snap-start sm:w-[30%] md:w-[22%] xl:w-[18%]">
-                              <FeaturedRobotCard robot={robot} manufacturerName={manufacturer?.name} />
-                            </div>
+                            <FeaturedRobotCard
+                              key={robot.id}
+                              robot={robot}
+                              manufacturerName={manufacturer?.name}
+                            />
                           );
                         })}
-                      </div>
+                      </RobotCardRail>
                     </section>
                   )}
                   {manufacturers.length > 0 && (

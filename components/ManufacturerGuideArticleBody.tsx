@@ -28,6 +28,7 @@ import {
 import { MANUFACTURER_GUIDE_SECTIONS, type ManufacturerGuideSectionId } from '@/lib/manufacturerGuideTemplate';
 import { Markdown, sectionHeadingClassName } from '@/components/Markdown';
 import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
+import { RobotCardRail } from '@/components/RobotCardRail';
 import { YouTubeEmbed } from '@/components/YouTubeEmbed';
 import { uiText } from '@/lib/uiText';
 
@@ -154,13 +155,11 @@ function LineupTable({ rows }: { rows: ManufacturerGuideLineupDisplayRow[] }) {
 function LineupRobotCards({ robots, manufacturerName }: { robots: Robot[]; manufacturerName?: string }) {
   if (robots.length === 0) return null;
   return (
-    <div className="mt-6 flex gap-3 overflow-x-auto overscroll-x-contain snap-x pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+    <RobotCardRail className="mt-6">
       {robots.map((robot) => (
-        <div key={robot.id} className="w-[44%] shrink-0 snap-start sm:w-[30%] md:w-[26%]">
-          <FeaturedRobotCard robot={robot} manufacturerName={manufacturerName} />
-        </div>
+        <FeaturedRobotCard key={robot.id} robot={robot} manufacturerName={manufacturerName} />
       ))}
-    </div>
+    </RobotCardRail>
   );
 }
 
