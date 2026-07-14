@@ -20,7 +20,7 @@ import {
   resolveRobotDetailBySlug,
 } from '@/lib/data';
 import { breadcrumbJsonLd, robotJsonLd } from '@/lib/jsonLd';
-import { getDisplayableAsset } from '@/lib/media';
+import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import { shouldIndexRobot } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
 import { sortRobots } from '@/lib/display';
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // archived（提供終了）は閲覧可能だが検索には載せない（§11.7）
   const noindex = robot ? !shouldIndexRobot(robot) : seo?.noindex;
   const title = seo?.metaTitle ?? (robot ? (robot.nameJa ?? robot.name) : 'Robot');
-  const image = getDisplayableAsset(robot?.images?.hero ?? robot?.heroImage)?.src;
+  const image = robot ? getRobotPrimaryImage(robot)?.src : undefined;
 
   return createPageMetadata({
     title,
@@ -157,7 +157,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
             {/* Image carousel */}
             <div className="mb-0">
-              <RobotImageCarousel images={robot.images} fallbackHero={robot.heroImage} />
+              <RobotImageCarousel robot={robot} />
             </div>
 
             {/* #decision ── バイヤー向け情報を上位に */}

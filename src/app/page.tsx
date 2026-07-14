@@ -15,7 +15,7 @@ import {
   getDeploymentsForManufacturer,
 } from '@/lib/data';
 import { sortRobots, sortUseCases } from '@/lib/display';
-import { getDisplayableAsset } from '@/lib/media';
+import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import { resolveManufacturerLogo } from '@/lib/manufacturerLogo';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/jsonLd';
 import {
@@ -66,14 +66,12 @@ export default function HomePage() {
   type PreviewAsset = { src: string; alt: string; label: string; objectPosition?: string };
 
   // ロボットタブの背景は1枚だけ見せる（サムネ帯は出さない）。機体は編集判断で指名し、
-  // 画像パスは直書きせず rights（getDisplayableAsset）を通して解決する。直書きすると
+  // 画像パスは直書きせず共通resolverのrights gateを通す。直書きすると
   // rights.status が blocked に変わってもここだけ表示され続けてしまうため。
   // 指名機体が表示不可になった場合は、表示可能な機体の先頭へ自動フォールバックする。
   const HOME_ROBOT_PREVIEW_ID = 'figure-03';
   const resolveRobotPreview = (robot: ReturnType<typeof getRobots>[number]) => {
-    const asset = getDisplayableAsset(
-      robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage,
-    );
+    const asset = getRobotPrimaryImage(robot);
     return asset
       ? { src: asset.src, alt: asset.alt, label: robot.nameJa ?? robot.name }
       : undefined;

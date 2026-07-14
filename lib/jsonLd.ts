@@ -4,6 +4,7 @@
 import type { Article, ManufacturerGuideFaqItem, Manufacturer, Robot, UseCase } from '@/data/types';
 import { resolveManufacturerLogo } from './manufacturerLogo';
 import { getDisplayableAsset } from './media';
+import { getRobotPrimaryImage } from './robotMedia';
 import { siteUrl } from './site';
 import { uiText } from './uiText';
 
@@ -18,7 +19,7 @@ function absoluteUrl(path: string) {
 }
 
 function imageSrc(robot: Robot): string | undefined {
-  const src = getDisplayableAsset(robot.images?.hero ?? robot.heroImage)?.src;
+  const src = getRobotPrimaryImage(robot)?.src;
   return src ? absoluteUrl(src) : undefined;
 }
 

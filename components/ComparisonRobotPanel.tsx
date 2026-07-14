@@ -8,7 +8,7 @@ import { Dialog as DialogPrimitive } from 'radix-ui';
 import type { CompareCardDragHandleProps } from '@/components/SortableCompareCard';
 import { ComparisonSpecList } from '@/components/ComparisonSpecList';
 import type { Robot } from '@/data/types';
-import { getDisplayableAsset } from '@/lib/media';
+import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import { EMPTY_VALUE_LABEL } from '@/lib/labels';
 import { getComparisonSpecGroups } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
@@ -62,8 +62,7 @@ export function ComparisonRobotPanel({
 
   const canDrag = isPointerDevice && !!dragHandleProps;
 
-  // 透過 PNG → hero ロール → heroImage の順でフォールバック
-  const cardImage = getDisplayableAsset(robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage);
+  const cardImage = getRobotPrimaryImage(robot);
 
   return (
     // 「どのロボットか」の識別（画像+名前+★✕+ドラッグ）と詳細ドロワーの入口。

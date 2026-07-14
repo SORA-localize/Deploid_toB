@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import type { Robot } from '@/data/types';
-import { getDisplayableAsset } from '@/lib/media';
+import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import { uiText } from '@/lib/uiText';
 import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
 
@@ -22,10 +22,7 @@ interface FeaturedRobotCardProps {
  * useTiltCardEffect 経由で共通化する。
  */
 export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCardProps) {
-  // transparent → hero → heroImage の順でフォールバック（ComparisonRobotPanel と同じ）
-  const cardImage = getDisplayableAsset(
-    robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage,
-  );
+  const cardImage = getRobotPrimaryImage(robot);
 
   const {
     cardRef,

@@ -6,7 +6,7 @@ import { Star, CameraOff } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import type { ImageAsset, ManufacturerLogos, Robot } from '@/data/types';
-import { getDisplayableAsset } from '@/lib/media';
+import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import { getRobotCardSpecRows } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
@@ -44,7 +44,7 @@ export function RobotCard({
 }: RobotCardProps) {
   const specRows = getRobotCardSpecRows(robot);
   const deploymentStageTone = getDeploymentStageTone(robot.deploymentStage);
-  const cardImage = getDisplayableAsset(robot.images?.transparent ?? robot.images?.hero ?? robot.heroImage);
+  const cardImage = getRobotPrimaryImage(robot);
 
   const {
     cardRef,

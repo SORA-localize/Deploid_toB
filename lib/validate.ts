@@ -758,6 +758,9 @@ export function validateData(): ValidationResult {
     checkRequiredSources('robot', r.slug, r.sources);
     checkTags('robot', r.slug, 'industryTags', 'industry', r.industryTags ?? []);
     checkTags('robot', r.slug, 'taskTags', 'task', r.taskTags ?? []);
+    if (r.heroImage?.src.trim()) {
+      errors.push(`[robot-hero-image] robot "${r.id}" は heroImage ではなく images のroleへ登録してください`);
+    }
     checkImageAsset('robot', r.slug, 'heroImage', r.heroImage);
     Object.entries(r.images ?? {}).forEach(([role, image]) =>
       checkImageAsset('robot', r.slug, `images.${role}`, image),

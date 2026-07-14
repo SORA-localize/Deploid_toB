@@ -38,17 +38,6 @@ export const TBD_LABEL = '要確認';
  */
 export const EMPTY_VALUE_LABEL = '—';
 
-/** Robot.imagesに登録された画像を並べる優先順。欠損roleは表示しない。 */
-export const imageRoleOrder: ImageRole[] = [
-  'hero',
-  'transparent',
-  'side',
-  'inOperation',
-  'scale',
-  'endEffector',
-  'mobility',
-];
-
 /** カルーセルのempty state（写真未投入時のラベル）と、タブ表記。 */
 export const imageRoleLabels: Record<ImageRole, string> = {
   hero: 'メイン画像',
