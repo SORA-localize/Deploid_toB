@@ -240,30 +240,61 @@ className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-
 役割：
 
 - ロボット比較・一覧の中核部品。
-- 画像、機種名、メーカー、summary、主要spec、詳細導線を持つ。
+- 画像、機種名、メーカー、4つの主要fact、詳細導線を持つ。
 
 ルール：
 
-- 画像枠は `aspect-[4/3]`。
+- desktopの画像枠は `aspect-[7/6]`。
 - 画像は `object-contain`。
 - 画像が表示不可でも成立させる。プレースホルダーは`CameraOff`アイコン＋1行ラベルのみ（§3「画像・ロゴが無いときのプレースホルダー」参照。2行・強調装飾は使わない）。
+- desktopのfactは `用途 / サイズ / 価格 / 稼働時間` の2列×2行で固定し、ラベル・値とも左揃えにする。
+- 用途は公式根拠付きで既存UseCaseへ接続できるものだけを使い、複数時は代表1件 + `ほかN件` とする。
+- 価格はメーカー公開価格、国内正規代理店公開価格、問い合わせの順で解決し、推測価格を表示しない。
+- 「国内」「段階」「可搬」、概要文、固定 `min-height` はdesktopカードへ追加しない。
 - specは捏造しない。未確認は `TBD_LABEL`。
 - ホバー時のチルト/グロー/シマー演出は`lib/useTiltCardEffect.ts`を使う（他カード種別と共通）。
 - favoriteは任意機能としてpropsで渡す。
+
+### FactList / CardFactGrid / ComparisonSpecList
+
+- `FactList` は詳細・sidebarの短いラベル–値情報に使う。`dl/dt/dd`、行罫線、折返しを共通化し、ラベル・値とも左揃えにする。
+- `FactList` の `compact` はラベル7rem、`standard` は8rem。mobileでは1列へ積む。
+- `CardFactGrid` はカード内専用の2列×2行。ラベル上・値下、値は最大2行とし、項目数をカードごとに増やさない。
+- `ComparisonSpecList` は比較面専用。数値だけを右揃え + `tabular-nums` にし、状態名・文章・欠損値は左揃えにする。文字列の見た目から数値判定せず、view modelの `valueKind` を使う。
+- 長文説明、記事本文、FAQ、真の多列表をこれらへ押し込まない。
+
+### RobotCardRail
+
+- 子カードは `FeaturedRobotCard` に固定し、見出し・データ取得・表示件数は親が持つ。
+- card widthはmobile 44%、`sm` 30%、`md` 以上12rem。
+- gapは0.75rem、`sm` 以上1rem。
+- `overflow-x-auto`、`overscroll-x-contain`、`snap-x snap-mandatory` を使い、子は `shrink-0 snap-start` とする。
+- Home、記事、メーカー解説、ロボット詳細の関連ロボットで同じレールを使う。
 
 ### Image Carousel
 
 役割：
 
-- robot detailの画像スロット表示。
+- robot detailの表示可能な実画像を順に表示する。
 
 ルール：
 
 - 画像枠は `aspect-[16/9]`。
-- `ImageRole` の固定スロットを使う。
-- 表示不可画像はrole label placeholderにする。
+- 表示可能画像が0枚なら、単一placeholderを表示する。
+- 1枚なら静止表示とし、dot、prev/next、drag cursorを表示しない。
+- 2枚以上なら表示可能な実画像だけをカルーセルへ入れる。未投入roleをslide化しない。
+- role labelを表示する。
 - credit/sourceを表示する。
-- 今後 `aria-current` の補強を検討する。
+- dotには現在位置が分かるaccessible nameと `aria-current` を付ける。
+
+### Robot detail spec explorer
+
+- desktopは高さ480px、左ナビ11rem、右表示領域は選択項目によらず同じ外寸を維持する。
+- 左ナビは `本体・可動 / 電源・稼働 / 操作・開発 / 環境・安全` の4項目を等分する。
+- 1グループ最大6行、値は原則2行以内。公開値がない行は省き、空グループでは `公開情報なし` を1回だけ表示する。
+- overflowは長い公式値への安全弁として右パネルだけに許可する。
+- hover、focus、clickで選択し、Arrow/Home/Endを使えるtab semanticsを持つ。
+- mobileは同じview modelを縦積みFactListで表示し、hover専用UIを作らない。
 
 ### Tags
 

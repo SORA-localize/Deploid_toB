@@ -21,15 +21,19 @@
 7. [ ] `sources` に `checkedAt` と `reliability` を記入（手動）
 8. [ ] **公開ゲート必須項目**を充足（→ セクション F）
 9. [ ] `specs` を specSchema にある項目で記入。不明値は**省略**（要確認表示に任せる）
-10. [ ] 画像をローカル配置：`public/images/robots/<id>-<role>.<ext>`（外部ホットリンク禁止）
+10. [ ] 価格を登録する場合は、メーカー公式公開価格 → 国内正規代理店公開価格の順に確認して `priceOffers` へ入れる。`sourceUrl` は同じRobotの `sources` にも登録する。どちらもなければ価格フィールドを捏造せず、UIの問い合わせフォールバックに任せる
+11. [ ] 荷重を登録する場合は、対象範囲（片腕/両腕/全身/搬送部）、rated/maximum、条件、variantを公式情報で確認して `loadRatings` へ入れる。旧 `specs.payloadKg` を片腕荷重へ自動移行しない
+12. [ ] 活用事例を表示する場合は、最大3件のURLを `usageExampleSourceUrls` に選び、同じURLをRobotの `sources` に登録する。UI用タイトル等は複製しない
+13. [ ] 想定用途はRobotへ複製せず、既存UseCaseの `candidateRobots` に `basis:'official-use-case'` と `evidenceSourceUrls` を付ける。公式用途に対応するUseCaseがなければ自動追加せず `USE_CASE_GAP <robotId> <公式表現> <sourceUrl>` を報告する
+14. [ ] 画像をローカル配置：`public/images/robots/<id>-<role>.<ext>`（外部ホットリンク禁止）。Robotでは `images` を使い、`heroImage` へ新規登録しない
     - フォーマット：**WebP 推奨**。JPG/PNG 可
     - ファイルサイズ：**300KB 以下**（超えたら [Squoosh](https://squoosh.app/) で圧縮）
     - 最大解像度：**1920px 幅**（`sips -Z 1920 <file>` でリサイズ可）
-11. [ ] 画像 `rights`（credit / sourceUrl / rights）を記入（自動：参照表示系は必須）
-12. [ ] industryTags / taskTags は tagRegistry の登録値のみ（自動：未登録は build 失敗）
-13. [ ] `nextReviewBy` を設定（価格含むなら短め）
-14. [ ] `npm run build` が通る → 問題なければ `publishStatus: 'published'`
-15. [ ] 件数が増減した場合、`/for-manufacturers` の掲載数表示が古くなる。`lib/site.ts` の `siteMeta.dataAsOf` を更新する（手動・即時でなくまとめて更新でも可）
+15. [ ] 画像 `rights`（credit / sourceUrl / rights）を記入（自動：参照表示系は必須）
+16. [ ] industryTags / taskTags は tagRegistry の登録値のみ（自動：未登録は build 失敗）
+17. [ ] `nextReviewBy` を設定（価格含むなら短め）
+18. [ ] `npm run build` が通る → 問題なければ `publishStatus: 'published'`
+19. [ ] 件数が増減した場合、`/for-manufacturers` の掲載数表示が古くなる。`lib/site.ts` の `siteMeta.dataAsOf` を更新する（手動・即時でなくまとめて更新でも可）
 
 ## B. メーカー追加
 
@@ -211,7 +215,7 @@ featuredRank: 1,  // 他のピックと被らない数値を割り当て
 
 - 対象種別: robot / manufacturer / article
 - 対象名または既存 `id`
-- 素材の用途: hero / logo / transparent / side / inOperation / scale / article hero など
+- 素材の用途: hero / logo / transparent / side / inOperation / scale / article hero など（Robot画像は投入できたroleだけでよい）
 - 権利情報: 自社素材、公式提供、CC0、CC BY 4.0、許諾済み、確認中など
 - credit / sourceUrl / rightsHolder / checkedAt
 - 公式提供・個別許諾の場合: 利用媒体、商用利用、改変可否、期限、クレジット条件、許諾記録の管理先

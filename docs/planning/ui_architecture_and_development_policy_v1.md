@@ -2,7 +2,7 @@
 
 > **2026-06-28 撤去注記**: `/guides`・`GuidesBrowser`・ガイド詳細は撤去済み。本書のガイド関連記述（`GuidesBrowser`、`/guides → GuidesBrowser`、ガイド専用ブロック等）は**もう有効でない**。経緯は `archive/guides-retirement-v1.md`。
 
-Last reviewed: 2026-05-29
+Last reviewed: 2026-07-14
 
 > この文書は、Deploid のUIを作り込む前に、既存実装の構造、責務分担、今後の開発ルールを明文化する。具体的な色・余白・部品の見た目は `design_system_v1.md` に分ける。
 
@@ -57,7 +57,9 @@ UI開発方針とデザインシステムは別文書にする。
 |---|---|---|
 | Shell | `Header`, `Footer`, `Breadcrumbs`, `layout.tsx` | 全ページ共通の外枠 |
 | 一覧ブラウザ | `RobotsBrowser`, `ManufacturersBrowser`, `UseCasesBrowser`, `ReportsBrowser`, `GuidesBrowser` | 検索、filter、tag、一覧表示 |
-| カード | `RobotCard`, `FavoriteCard`, `TagChip`, `EmptyState` | 再利用される表示単位 |
+| カード | `RobotCard`, `FeaturedRobotCard`, `FavoriteCard`, `TagChip`, `EmptyState` | 再利用される表示単位 |
+| fact表示 | `FactList`, `CardFactGrid`, `ComparisonSpecList` | 短いラベル–値、カード、比較の役割別表示 |
+| ロボットレール | `RobotCardRail` | `FeaturedRobotCard` の幅・gap・snap・横スクロール |
 | 入力 | `SearchInput`, `SelectControl`, `FacetFilterBar`, `FilterChipGroup`, `ContactForm` | 絞り込み・問い合わせ |
 | 詳細 | `RobotImageCarousel`, `Markdown`, `ManufacturerLogoName` | 詳細ページ固有の補助部品 |
 | データ取得 | `lib/data.ts` | published filter、slug lookup、関連取得 |
@@ -130,6 +132,7 @@ Client Component が必要なもの：
 - carousel
 - accordion
 - tabs
+- hover/focus/clickで切り替える詳細仕様パネル
 - favorite
 - filter/search
 - form
@@ -154,6 +157,9 @@ Client Component が必要なもの：
 - `TagChip`
 - `EmptyState`
 - `ManufacturerLogoName`
+- `FactList`
+- `CardFactGrid`
+- `RobotCardRail`
 
 ### 作りすぎないもの
 
@@ -204,6 +210,8 @@ UIは、存在しないデータを捏造しない。
 - 検索対象は `lib/search.ts` に追加する。
 - タグ表示・正規化は `lib/tags.ts` に追加する。
 - 画像・ロゴは `lib/media.ts` のgateを通す。
+- ロボットのカード・詳細・比較・JSON-LD用画像は `Robot.images` を正本にし、共通resolverで解決する。
+- カード用の用途・価格・サイズ・稼働時間と、詳細の仕様・活用事例・関連ロボットはpure view model resolverで組み立てる。
 
 禁止：
 
@@ -228,9 +236,16 @@ UIは、存在しないデータを捏造しない。
 
 デザイン上の考え方：
 
-- 実機画像は補助情報。
-- 主役は「導入判断変数」「比較」「出典」「国内可否」。
+- 実機画像はロボットを知る入口として十分な面積を確保する。
+- 主役は公式に追跡できる「用途」「仕様」「価格」「活用事例」「出典」。根拠の曖昧な導入判断ラベルや国内可否をカードの主要変数にしない。
 - 画像の有無でカードの高さやレイアウトが極端に崩れないようにする。
+
+### ロボット詳細のServer / Client境界
+
+- page側は `lib/data.ts` からRobot・UseCase・Source・関連Robotを取得する。
+- `lib/robotCatalog.ts` がserializableなcard/detail view modelを組み立てる。
+- `RobotSpecExplorer` と `RobotImageCarousel` は操作状態だけを持ち、raw data検索や用途・価格の業務ルールを持たない。
+- 活用事例はRobotが保持するsource URLから既存Sourceを解決し、タイトル・publisher・日付をRobotへ複製しない。
 
 ---
 

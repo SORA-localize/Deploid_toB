@@ -1,13 +1,13 @@
 # Deploid Data Work Guide
 
-Last reviewed: 2026-06-28
+Last reviewed: 2026-07-14
 
 この文書は、AIでデータ追加・更新を行うときの入口です。
 実装上の正本は `data/types.ts` と `lib/*` にあります。
 
 ## データの種類
 
-- `data/robots.ts` — ロボット個票。導入判断、スペック、価格メモ、日本入手性、比較材料
+- `data/robots.ts` — ロボット個票。公式スペック、価格offer、画像、活用事例source参照、比較材料。用途はUseCaseから逆引きする
 - `data/manufacturers.ts` — メーカー/供給体制。企業種別、日本窓口、サポート、調達メモ
 - `data/articles.ts` — 記事。公開URLは `/reports`。速報でも `whyItMatters` を必須にする
 - `data/deployments.ts` — 実在の導入事例。Homeのワールドマップ根拠データ
@@ -43,6 +43,10 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCa
 - UseCase の `fit:'strong'` は、同じ `robotId` と `useCase.id` を持つ published deployment を `evidenceDeploymentIds` で明示できる場合だけ使う
 - 用途詳細の関連記事は `Article.relatedUseCaseIds` が正本。`industryTags` / `taskTags` の一致だけで関連記事や候補ロボットを自動生成しない
 - AIの推測を事実として入れない。不明なスペックや価格は省略または要確認メモにする
+- ロボット価格はメーカー公式公開価格、国内正規代理店公開価格だけを `priceOffers` に入れ、該当がなければUIでDeploid問い合わせへフォールバックする。推測価格や非正規販売店価格を入れない
+- `specs.payloadKg` を片腕荷重へ読み替えない。荷重はscope・rated/maximum・sourceを確認して `loadRatings` に記録する
+- 活用事例は `usageExampleSourceUrls` から同じRobotの `sources` を参照し、タイトル・媒体・日付・画像を重複保持しない
+- ロボット側へ用途タグや用途名を複製しない。公式用途は `UseCase.candidateRobots` の `basis:'official-use-case'` と根拠URLから逆引きする
 - 新規レコードは原則 `publishStatus: 'draft'` から作る
 - 記事は `category` と `whyItMatters` を必ず入れる
 - 記事の `type` は `ArticleType`（analysis / deployment-report / interview / event-report / policy-update / case-study / news-brief / tech-update / market-analysis）から選ぶ。`ArticleCategory`（news / company-report 等）と混同しない
@@ -66,7 +70,7 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCa
 同じレコードを更新する例:
 
 - ロボット名や日本語表記を直す
-- 公式スペック、価格メモ、安全性メモ、日本入手性を更新する
+- 公式スペック、価格offer、安全性メモ、日本入手性を更新する
 - メーカーの国内代理店、所在地、企業ステータス、ロゴを更新する
 - 既存ロボットやメーカーに関連する導入事例、記事、用途を追加する
 - URLを変えるために `slug` を変更する
@@ -85,7 +89,7 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCa
 
 | 種類 | 配置先 | データに書く場所 |
 | --- | --- | --- |
-| ロボット画像 | `public/images/robots/<robot-id>-<role>.<ext>` | `data/robots.ts` の `images.<role>` または `heroImage` |
+| ロボット画像 | `public/images/robots/<robot-id>-<role>.<ext>` | `data/robots.ts` の `images.<role>`（Robotで `heroImage` は新規登録しない） |
 | メーカーロゴ | `public/images/manufacturers/logos/<manufacturer-id>-<variant>.<ext>` | `data/manufacturers.ts` の `logos.symbol` / `logos.wordmark` / `logos.combined`（`logo` は移行中の後方互換のみ） |
 | メーカー補助画像 | `public/images/manufacturers/<manufacturer-id>-<purpose>.<ext>` | 必要な表示枠がある場合のみ追加 |
 | 記事hero画像 | `public/images/articles/<article-id>/hero.<ext>` | `data/articles.ts` の `heroImage` |
