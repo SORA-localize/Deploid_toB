@@ -62,6 +62,7 @@ Last cleaned: 2026-07-01
 
 経緯・背景の参照用。運用やデータ設計の**正本ではない**。データ運用の正本は `../data/README.md` と `data-maintenance-checklist-v1.md`、データ設計の正本は `data-architecture-redesign-v1.md`。
 
+- `robot-image-sourcing-research-B1.md`〜`robot-image-sourcing-research-B6.md` — 公開Robot 61機の読み取り専用素材候補調査。候補URL・機種一致状態・公式規約の観測記録であり、権利許諾・公開可否・最終roleの正本ではない
 - `humanoid_data_management_guide_v1.md` — データ運用の背景説明（旧ガイド）
 - `humanoid_data_model_policy_v1.md` — データモデル設計指針（旧。現行は data-architecture-redesign）
 - `responsive-design-implementation-plan.md` — レスポンシブ改善の包括計画（Breadcrumb、詳細ページの1カラム化、sticky/header、比較モバイル操作、横スクロール系UIなどは現行実装へ部分反映済み。今後はこの長大計画をそのまま実行せず、個別の崩れを再調査して小さい計画にする）
