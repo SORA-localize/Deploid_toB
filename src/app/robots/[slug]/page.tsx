@@ -219,10 +219,37 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
               </section>
             )}
 
+            {relatedRobots.length > 0 && (
+              <section
+                id="related-robots"
+                className="scroll-mt-site-header border-b border-border py-8"
+              >
+                <h2 className="mb-4 text-lg font-semibold text-foreground">
+                  {uiText.robots.relatedRobots}
+                </h2>
+                <RobotCardRail ariaLabel={uiText.robots.relatedRobots}>
+                  {relatedRobots.map((relatedRobot) => (
+                    <FeaturedRobotCard
+                      key={relatedRobot.id}
+                      robot={relatedRobot}
+                      manufacturerName={manufacturer?.name}
+                    />
+                  ))}
+                </RobotCardRail>
+              </section>
+            )}
+
+            <SourceList
+              id="sources"
+              sources={robot.sources}
+              className="scroll-mt-site-header border-b border-border py-8"
+              titleClassName="mb-4 text-lg font-semibold text-foreground"
+            />
+
             {(previousRobot || nextRobot) && (
               <nav
                 aria-label="前後のロボット"
-                className="grid grid-cols-1 gap-3 border-b border-border py-8 sm:grid-cols-2"
+                className="grid grid-cols-1 gap-3 py-6 sm:grid-cols-2"
               >
                 {previousRobot ? (
                   <Link
@@ -252,33 +279,6 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
                 )}
               </nav>
             )}
-
-            {relatedRobots.length > 0 && (
-              <section
-                id="related-robots"
-                className="scroll-mt-site-header border-b border-border py-8"
-              >
-                <h2 className="mb-4 text-lg font-semibold text-foreground">
-                  {uiText.robots.relatedRobots}
-                </h2>
-                <RobotCardRail ariaLabel={uiText.robots.relatedRobots}>
-                  {relatedRobots.map((relatedRobot) => (
-                    <FeaturedRobotCard
-                      key={relatedRobot.id}
-                      robot={relatedRobot}
-                      manufacturerName={manufacturer?.name}
-                    />
-                  ))}
-                </RobotCardRail>
-              </section>
-            )}
-
-            <SourceList
-              id="sources"
-              sources={robot.sources}
-              className="scroll-mt-site-header py-8"
-              titleClassName="mb-4 text-lg font-semibold text-foreground"
-            />
           </div>
 
           <RobotStickyAside robot={robot} manufacturer={manufacturer ?? undefined} />
