@@ -172,6 +172,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'AGIBOT X2 Ultra official store', url: 'https://store.agibot.com/products/x2-ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       {
         title: 'TALOS – PAL Robotics',
         url: 'https://pal-robotics.com/robot/talos/',
@@ -300,6 +301,7 @@ export const useCases: UseCase[] = [
     whyHardToday: '研究目的と機体性能のミスマッチ、故障時の復旧、部品供給が課題。',
     japanDeploymentConditions: '輸入、保守、技適、研究室内安全ルールを確認する。',
     candidateRobots: [
+      { robotId: 'agibot-x2-ultra', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://store.agibot.com/products/x2-ultra'], reason: '公式ストアが研究・教育向けの利用を対象用途として示している。' },
       {
         robotId: 'pal-talos',
         fit: 'possible',
@@ -485,6 +487,20 @@ export const useCases: UseCase[] = [
         note: 'A2 がマーケティング、カスタマーサービス、商業施設案内、フロント受付に適することの公式根拠。',
       },
       {
+        title: 'AGIBOT A2 official product page',
+        url: 'https://agibot.com/products/A2',
+        publisher: 'AgiBot',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
+      {
+        title: 'AGIBOT X2 Ultra official store',
+        url: 'https://store.agibot.com/products/x2-ultra',
+        publisher: 'AgiBot',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
+      {
         title: '商業空間向けの対話・観客エンゲージメント機能を発表',
         url: 'https://www.limxdynamics.com/en/news/BK000062',
         publisher: 'LimX Dynamics',
@@ -545,8 +561,15 @@ export const useCases: UseCase[] = [
         robotId: 'agibot-a2',
         fit: 'possible',
         basis: 'official-use-case',
-        evidenceSourceUrls: ['https://agibot.com/jp/products/A2'],
+        evidenceSourceUrls: ['https://agibot.com/jp/products/A2', 'https://agibot.com/products/A2'],
         reason: 'マーケティング・受付・案内向けに量産・商用展開されている機体（公式に確認済み）だが、特定施設での導入事例（deployments.ts）はまだ確認できていない。',
+      },
+      {
+        robotId: 'agibot-x2-ultra',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://store.agibot.com/products/x2-ultra'],
+        reason: '公式ストアが店舗での受付対応を対象用途として示している。',
       },
       {
         robotId: 'limx-luna',
@@ -689,6 +712,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'AGIBOT G2 official product page', url: 'https://www.agibot.com/products/G2', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       {
         title: 'Renault Group finalises a strategic partnership with Wandercraft',
         url: 'https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft',
@@ -862,6 +886,7 @@ export const useCases: UseCase[] = [
     japanDeploymentConditions:
       '国内自動車・電子機器メーカーでの公開実証はまだ確認できておらず、価格・保守体制は機種ごとに要確認。',
     candidateRobots: [
+      { robotId: 'agibot-g2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.agibot.com/products/G2'], reason: '公式製品ページが高精度の力制御とサブミリ精度組立を対象用途として示している。' },
       {
         robotId: 'apptronik-apollo',
         fit: 'strong',
@@ -2174,6 +2199,9 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'AGIBOT A2 official product page', url: 'https://agibot.com/products/A2', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
+      { title: 'AGIBOT A2 Ultra official product page', url: 'https://agibot.com/products/A2_Ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
+      { title: 'AGIBOT X2 Ultra official store', url: 'https://store.agibot.com/products/x2-ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       {
         title: 'RobotEra application scenarios',
         url: 'https://www.robotera.com/application.html',
@@ -2208,6 +2236,9 @@ export const useCases: UseCase[] = [
     whyHardToday: '複雑な質問への対応限界、人との密な混在環境でのナビゲーション安全性が課題。',
     japanDeploymentConditions: '個人情報の取り扱い（案内時の音声・映像記録）、バリアフリー基準への適合が必要。',
     candidateRobots: [
+      { robotId: 'agibot-a2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://agibot.com/products/A2'], reason: '公式ページが展示ホールでの説明とスーパーマーケットでの案内を対象用途として示している。' },
+      { robotId: 'agibot-a2-ultra', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://agibot.com/products/A2_Ultra'], reason: '公式ページが自律受付、経路案内、説明を対象用途として示している。' },
+      { robotId: 'agibot-x2-ultra', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://store.agibot.com/products/x2-ultra'], reason: '公式ストアが展示案内と文化・観光施設での案内を対象用途として示している。' },
       {
         robotId: 'robotera-l7',
         fit: 'possible',
