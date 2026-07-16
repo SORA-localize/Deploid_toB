@@ -155,6 +155,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'SA01 EDU research and delivery announcement', url: 'https://www.engineai.com.cn/about-news-media/34.html', publisher: 'EngineAI', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'GR-1 official product page', url: 'https://www.fftai.com/products-gr1', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'GR-3C official product page', url: 'https://www.fftai.com/products-gr3c', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT X2 Ultra official store', url: 'https://store.agibot.com/products/x2-ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
@@ -286,6 +287,7 @@ export const useCases: UseCase[] = [
     whyHardToday: '研究目的と機体性能のミスマッチ、故障時の復旧、部品供給が課題。',
     japanDeploymentConditions: '輸入、保守、技適、研究室内安全ルールを確認する。',
     candidateRobots: [
+      { robotId: 'engineai-sa01', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.engineai.com.cn/about-news-media/34.html'], reason: '公式情報が研究・教育、個人開発者・研究者向けのプラットフォームとして示している。' },
       { robotId: 'fourier-gr1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/products-gr1'], reason: '公式製品ページが研究開発を対象用途として示している。' },
       { robotId: 'fourier-gr3c', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/products-gr3c'], reason: '公式製品ページが具身AIと実環境向けカスタマイズの研究を対象用途として示している。' },
       { robotId: 'agibot-x2-ultra', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://store.agibot.com/products/x2-ultra'], reason: '公式ストアが研究・教育向けの利用を対象用途として示している。' },
@@ -2491,6 +2493,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'ENGINEAI SA01 official product page', url: 'https://www.engineai.com.cn/product-sa01.html', publisher: 'EngineAI', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'GR-2 SDK overview', url: 'https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR2/SDK/Overview/', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'GR-1 Aurora SDK introduction', url: 'https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR1/SDK/Aurora-SDK/introduction_CN/', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       {
@@ -2562,6 +2565,7 @@ export const useCases: UseCase[] = [
     whyHardToday: '試作改造の自由度とロボット本体の安全性・保証のバランスが課題。',
     japanDeploymentConditions: '機器安全基準（CE/PSE）への適合確認、研究機関の設備安全管理規程への適合が必要。',
     candidateRobots: [
+      { robotId: 'engineai-sa01', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.engineai.com.cn/product-sa01.html'], reason: '公式製品ページが全開放プラットフォーム、ユーザー定義カスタマイズ、技術情報の共有を示している。' },
       { robotId: 'fourier-gr2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR2/SDK/Overview/'], reason: '公式SDK資料が二次開発と高度機能研究を対象として示している。' },
       { robotId: 'fourier-gr1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR1/SDK/Aurora-SDK/introduction_CN/'], reason: '公式Aurora SDK資料がdeveloper modeでの二次開発を示している。' },
       {
