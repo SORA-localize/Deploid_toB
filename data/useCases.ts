@@ -196,6 +196,13 @@ export const useCases: UseCase[] = [
         note: 'G1 の研究・教育向け製品能力の裏取り。',
       },
       {
+        title: 'Unitree H2 Plus official product page',
+        url: 'https://www.unitree.com/mobile/H2plus/',
+        publisher: 'Unitree Robotics',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
+      {
         title: 'Booster Robotics T1 product page',
         url: 'https://www.booster.tech/booster-t1/',
         publisher: 'Booster Robotics',
@@ -315,6 +322,20 @@ export const useCases: UseCase[] = [
         reason: '公式ページで教育向け位置付け、AI/学習、開発リソースが示されている。ただし特定研究機関への導入事例は未確認。',
       },
       {
+        robotId: 'unitree-g1-edu',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://www.unitree.com/g1/'],
+        reason: '公式ページがG1 EDUを二次開発とAI学習に対応する研究・教育向け構成として示している。',
+      },
+      {
+        robotId: 'unitree-h2-plus',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://www.unitree.com/mobile/H2plus/'],
+        reason: '公式ページがH2 Plusを研究開発・製造とポリシー開発向けに位置付けている。',
+      },
+      {
         robotId: 'booster-t1',
         fit: 'possible',
         basis: 'official-use-case',
@@ -402,17 +423,9 @@ export const useCases: UseCase[] = [
     titleJa: '展示・デモ',
     summary: '展示会、施設案内、社内デモでヒューマノイドの認知と検証を行う用途。',
     publishStatus: 'draft',
-    updatedAt: '2026-06-28',
+    updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
-      {
-        title: 'Unitree R1',
-        url: 'https://www.unitree.com/R1/',
-        publisher: 'Unitree Robotics',
-        checkedAt: '2026-06-28',
-        reliability: 'official',
-        note: 'R1 / R1 AIR の価格帯・運動性能・量産構成の裏取り。展示・デモ用途そのものの直接根拠ではないため公開用途からは外す。',
-      },
       {
         title: 'Booster K1',
         url: 'https://www.booster.tech/booster-k1/',
@@ -443,13 +456,6 @@ export const useCases: UseCase[] = [
     whyHardToday: '非定型会話、混雑時の安全確保、安定稼働が課題。',
     japanDeploymentConditions: 'イベント会場の安全ルールと保険条件を確認する。',
     candidateRobots: [
-      {
-        robotId: 'unitree-r1',
-        fit: 'possible',
-        basis: 'product-capability',
-        evidenceSourceUrls: ['https://www.unitree.com/R1/'],
-        reason: '低価格・宙返り等の高い運動性能で展示・デモ向けの注目度は高いが、特定の展示導入事例は未確認。',
-      },
       {
         robotId: 'booster-k1',
         fit: 'possible',
@@ -582,27 +588,9 @@ export const useCases: UseCase[] = [
     subtitle: '低価格機を使い、店舗の棚補充や売場での簡易対応をどこまで任せられるかを見る用途。',
     summary: '軽量商品の棚補充や売場対応を対象にした、低価格機での実証候補。',
     publishStatus: 'draft',
-    updatedAt: '2026-06-26',
-    reliability: 'reported',
-    sources: [
-      {
-        title: 'Unitree R1',
-        url: 'https://www.unitree.com/R1/',
-        publisher: 'Unitree Robotics',
-        checkedAt: '2026-06-21',
-        reliability: 'official',
-        note: 'R1 / R1 AIRの量産・価格帯の裏取り。',
-      },
-      {
-        title: 'Sanctuary AI completes first commercial deployment',
-        url: 'https://www.sanctuary.ai/news/sanctuary-ai-successfully-completes-first-commercial-deployment/',
-        publisher: 'Sanctuary AI',
-        publishedAt: '2023-05-16',
-        checkedAt: '2026-06-22',
-        reliability: 'official',
-        note: '2026-06-26時点で現行URLは404。置換できる一次/信頼報道を確認するまで公開面から外す。',
-      },
-    ],
+    updatedAt: '2026-07-16',
+    reliability: 'estimated',
+    sources: [],
     maturityLevel: 'early-stage',
     buyerReadiness: 'initial-adoption',
     environment: 'indoor-controlled',
@@ -615,12 +603,11 @@ export const useCases: UseCase[] = [
       whereDoesNotFit: '重量物の棚入れ、繁忙時間帯のレジ・接客の主担当、狭い通路でのすれ違い移動。',
       mustBeTrue: '対象商品を軽量・標準形状に絞り、低ペイロード機での実証であることを前提に予算とKPIを設定できる。',
     },
-    overview:
-      'Unitree R1 / R1 AIRのような量産済みの低価格機を使い、店舗棚補充や売場での簡易な接客対応を小規模に試す用途。価格と国内入手性の高さが、他の用途より早く実証段階に入れる要因になっている。',
+    overview: '店舗棚補充は自動化候補だが、現時点で公式根拠を伴う対象ヒューマノイドは登録できていない。',
     whyItMatters:
       '小売現場の人手不足は深刻だが、ヒューマノイドの導入予算を確保しづらい業態でもある。低価格機での実証実績が蓄積されれば、投資判断のハードルが下がる可能性がある。',
     capabilityNotes: {
-      manipulation: 'R1 / R1 AIRは低ペイロード機のため、軽量・小型商品の取り扱いに限定される。',
+      manipulation: '軽量・小型商品に対象を限定し、把持条件を標準化する必要がある。',
       mobility: '店舗の通路幅・床材・段差の有無が稼働可否を左右する。',
       perception: '商品棚の認識精度や欠品検知の実用性は現場検証が必要。',
     },
@@ -630,28 +617,7 @@ export const useCases: UseCase[] = [
       '低ペイロードで対応商品が限られ、レジ・接客対応との役割分担や長時間稼働時の安定性は未検証。',
     japanDeploymentConditions:
       '国内代理店経由での調達は可能だが、店舗運用ルール・保険・労働安全衛生上の扱いは個別に確認が必要。',
-    candidateRobots: [
-      {
-        robotId: 'sanctuary-phoenix',
-        fit: 'watch',
-        basis: 'editorial-watch',
-        reason: '小売店舗での導入事例として扱っていた出典URLが現行確認できないため、置換出典が見つかるまで調査待ち。',
-      },
-      {
-        robotId: 'unitree-r1',
-        fit: 'possible',
-        basis: 'product-capability',
-        evidenceSourceUrls: ['https://www.unitree.com/R1/'],
-        reason: '量産済みの低価格機で国内入手性も高いが、小売棚補充そのものの実証事例は未確認。',
-      },
-      {
-        robotId: 'unitree-r1-standard',
-        fit: 'possible',
-        basis: 'product-capability',
-        evidenceSourceUrls: ['https://www.unitree.com/R1/'],
-        reason: 'R1 AIRと同系統の標準構成機。小売棚補充での実証事例は未確認。',
-      },
-    ],
+    candidateRobots: [],
   },
   {
     id: 'care-physical-assistance',
@@ -2370,6 +2336,20 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      {
+        title: 'Unitree H2 Plus official product page',
+        url: 'https://www.unitree.com/mobile/H2plus/',
+        publisher: 'Unitree Robotics',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
+      {
+        title: 'Unitree R1 official product page',
+        url: 'https://www.unitree.com/mobile/R1/',
+        publisher: 'Unitree Robotics',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
       { title: 'Figure AI use cases', url: 'https://www.figure.ai/', publisher: 'Figure AI', checkedAt: '2026-06-30', reliability: 'official' },
       {
         title: 'KANGAROO official product page',
@@ -2419,6 +2399,27 @@ export const useCases: UseCase[] = [
         basis: 'official-use-case',
         evidenceSourceUrls: ['https://www.limxdynamics.com/en/products/oli'],
         reason: '公式ページでURDFとIsaac Sim、MuJoCo、Gazeboを用いた開発環境を示している。',
+      },
+      {
+        robotId: 'unitree-h2-plus',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://www.unitree.com/mobile/H2plus/'],
+        reason: '公式ページがIsaac SimとIsaac Labによるシミュレーション、学習、試験、評価を示している。',
+      },
+      {
+        robotId: 'unitree-r1',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://www.unitree.com/mobile/R1/'],
+        reason: '公式ページが主要シミュレーションプラットフォームへの対応を示している。',
+      },
+      {
+        robotId: 'unitree-r1-standard',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://www.unitree.com/mobile/R1/'],
+        reason: '公式ページが主要シミュレーションプラットフォームへの対応を示している。',
       },
     ],
   },
@@ -2497,6 +2498,13 @@ export const useCases: UseCase[] = [
         reliability: 'official',
       },
       {
+        title: 'Unitree H2 Plus official product page',
+        url: 'https://www.unitree.com/mobile/H2plus/',
+        publisher: 'Unitree Robotics',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
+      {
         title: 'KANGAROO official product page',
         url: 'https://pal-robotics.com/robot/kangaroo/',
         publisher: 'PAL Robotics',
@@ -2563,6 +2571,13 @@ export const useCases: UseCase[] = [
           'https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/',
         ],
         reason: '公式LeToolsとROS SDKが、KUAVO向けの学習・制御・実機デプロイ環境を提供している。',
+      },
+      {
+        robotId: 'unitree-h2-plus',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://www.unitree.com/mobile/H2plus/'],
+        reason: '公式ページがIsaac TeleOpによるデモデータ収集とポリシー開発を示している。',
       },
       {
         robotId: 'pal-kangaroo',
