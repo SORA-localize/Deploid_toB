@@ -22,12 +22,17 @@ Last reviewed: 2026-07-16
 - `DATA-R01-B01-*.md`〜`DATA-R01-B14-*.md` — バッチ別の人間向け要約
 - `DATA-R01-verification-report.md` — raw調査を公式原典と現行schemaに照合した全件検証報告
 - `DATA-R01-VERIFY-B01.json`〜`DATA-R01-VERIFY-B14.json` — raw値、検証結果、実装候補値、未解決理由を1対1で保持する検証データ
+- `DATA-R01-implementation-manifest-report.md` — VERIFYから実装可能値、削除候補、source join、未解決値を分離した実装準備報告
+- `DATA-R01-IMPLEMENT-B01.json`〜`DATA-R01-IMPLEMENT-B14.json` — 現行Robot/UseCaseとの差分を含むメーカー・機体バッチ別の実装manifest
 
 これらは調査対象をMECEに収録した非正本であり、`data/*.ts`へ直接コピーしない。
 実装候補にはVERIFYデータの `verificationStatus` が `verified` または `corrected` で、
 かつ `proposedValue` がnullでないレコードだけを使用する。
 `unresolved` / `rejected`、variant未確定、取得エラーの値は推測で補完せず、UIでは省略または既定のフォールバックを使う。
 実装時は候補値を現行型へ正規化し、validatorを通過させてから `data/*.ts` へ反映する。
+IMPLEMENT manifestは `npm run build:data-r01-manifest` でVERIFYと現行 `data/*.ts` から再生成する。
+manifest内の `robotPatch` は候補差分であり、`status: add-after-review` のsource metadataを先に確定する。
+`manualReview` の値を自動適用せず、UseCase relationは既存candidateへ上書きせずmergeする。
 
 各コレクションの追加・更新手順は `../planning/data-maintenance-checklist-v1.md` の対応セクション：
 robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCases=M / deployments=N / articlePlacements=O。
@@ -133,6 +138,7 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCa
 ## 検証コマンド
 
 ```bash
+npm run build:data-r01-manifest
 npm run validate:data
 npm run build
 ```
