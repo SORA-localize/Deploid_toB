@@ -155,6 +155,8 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'GR-1 official product page', url: 'https://www.fftai.com/products-gr1', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
+      { title: 'GR-3C official product page', url: 'https://www.fftai.com/products-gr3c', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT X2 Ultra official store', url: 'https://store.agibot.com/products/x2-ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       {
         title: 'TALOS – PAL Robotics',
@@ -284,6 +286,8 @@ export const useCases: UseCase[] = [
     whyHardToday: '研究目的と機体性能のミスマッチ、故障時の復旧、部品供給が課題。',
     japanDeploymentConditions: '輸入、保守、技適、研究室内安全ルールを確認する。',
     candidateRobots: [
+      { robotId: 'fourier-gr1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/products-gr1'], reason: '公式製品ページが研究開発を対象用途として示している。' },
+      { robotId: 'fourier-gr3c', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/products-gr3c'], reason: '公式製品ページが具身AIと実環境向けカスタマイズの研究を対象用途として示している。' },
       { robotId: 'agibot-x2-ultra', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://store.agibot.com/products/x2-ultra'], reason: '公式ストアが研究・教育向けの利用を対象用途として示している。' },
       {
         robotId: 'pal-talos',
@@ -461,6 +465,8 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'GR-3 developer specifications', url: 'https://support.fftai.com/en/getting-started/general-information', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
+      { title: 'GR-1 exhibition consultation case', url: 'https://www.fftai.com/solutions/9', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'Walker X official product page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-x', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'Walker C official product page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-c', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       {
@@ -542,6 +548,8 @@ export const useCases: UseCase[] = [
     japanDeploymentConditions:
       '日本語対話の精度、設置施設の防犯・接客ガイドラインとの整合、機体の代理店・保守体制（要確認）を確認する必要がある。',
     candidateRobots: [
+      { robotId: 'fourier-gr3', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://support.fftai.com/en/getting-started/general-information'], reason: '公式資料が公共サービス空間での自然な対話とインタラクティブなコンパニオン用途を示している。' },
+      { robotId: 'fourier-gr1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/solutions/9'], reason: '公式事例が銀行ロビーでの受付・顧客相談を示している。' },
       { robotId: 'ubtech-walker-x', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-x'], reason: '公式ページが対話を通じたサービス提供を対象用途として示している。' },
       { robotId: 'ubtech-walker-c', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-c'], reason: '公式ページがオフィスビルでの挨拶・受付を対象用途として示している。' },
       {
@@ -639,16 +647,7 @@ export const useCases: UseCase[] = [
     publishStatus: 'draft',
     updatedAt: '2026-06-28',
     reliability: 'reported',
-    sources: [
-      {
-        title: 'Fourier Makes CES Debut With GR-3, a Next-Generation Care-Focused Humanoid Robot',
-        url: 'https://www.prnewswire.com/news-releases/fourier-makes-ces-debut-with-gr-3-a-next-generation-care-focused-humanoid-robot-302654565.html',
-        publisher: 'Fourier Intelligence',
-        checkedAt: '2026-06-28',
-        reliability: 'official',
-        note: 'GR-3がcare-focused / companion向けとして明示されている根拠。移乗補助・身体介助を公開用途として支える直接根拠ではないため公開用途からは外す。',
-      },
-    ],
+    sources: [],
     maturityLevel: 'early-stage',
     buyerReadiness: 'requires-poc',
     environment: 'indoor-controlled',
@@ -662,7 +661,7 @@ export const useCases: UseCase[] = [
       mustBeTrue: '介助行為は医療・介護スタッフの監督下で行い、機体の限界（可搬重量・稼働時間）を事前に共有できる。',
     },
     overview:
-      'Fourier GR-3はリハビリ外骨格の技術を転用した介護向けコンセプト機として明示的に展開されており、GR-2も同社のリハビリ実績を背景に高い関節自由度を持つ。いずれも介護施設でのPoCを想定した位置づけ。',
+      '身体接触を伴う介助は安全要件が高く、現時点で掲載機体へ直接接続できる公式根拠は未登録。対話・見守り・リハビリ支援とは分けて評価する。',
     whyItMatters:
       '介護人材の不足は構造的な課題であり、身体的負荷の高い業務を補助できる可能性がある分野として注目されている。一方で安全性と信頼性の要求水準は他用途より高い。',
     capabilityNotes: {
@@ -676,17 +675,7 @@ export const useCases: UseCase[] = [
       '身体接触を伴う介助の安全性証明、故障時のフォールバック手順が未整理（国内は価格・保守体制とも問い合わせ制）。',
     japanDeploymentConditions:
       '介護保険制度上の扱い、医療機器に該当するかの整理、施設の安全管理規程との整合、機体の国内代理店・保守体制（要確認）を確認する必要がある。',
-    candidateRobots: [
-      {
-        robotId: 'fourier-gr3',
-        fit: 'possible',
-        basis: 'official-use-case',
-        evidenceSourceUrls: [
-          'https://www.prnewswire.com/news-releases/fourier-makes-ces-debut-with-gr-3-a-next-generation-care-focused-humanoid-robot-302654565.html',
-        ],
-        reason: '介護向け「Care-bot」として公式に明示展開されているが、実際の介護施設への導入事例は未確認。',
-      },
-    ],
+    candidateRobots: [],
   },
   {
     id: 'factory-assembly-support',
@@ -699,6 +688,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'GR-3C official product page', url: 'https://www.fftai.com/products-gr3c', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'UBTECH industrial humanoid solutions', url: 'https://www.ubtrobot.com/en/humanoid/solutions/industry', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT G2 official product page', url: 'https://www.agibot.com/products/G2', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       {
@@ -874,6 +864,7 @@ export const useCases: UseCase[] = [
     japanDeploymentConditions:
       '国内自動車・電子機器メーカーでの公開実証はまだ確認できておらず、価格・保守体制は機種ごとに要確認。',
     candidateRobots: [
+      { robotId: 'fourier-gr3c', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/products-gr3c'], reason: '公式製品ページが産業組立を対象用途として示している。' },
       { robotId: 'ubtech-walker-s2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式産業ソリューションが精密ハンドリング、組立、製造ライン作業を対象用途として示している。' },
       { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式産業ソリューションが組立、ねじ・ボルト締めを対象用途として示している。' },
       { robotId: 'agibot-g2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.agibot.com/products/G2'], reason: '公式製品ページが高精度の力制御とサブミリ精度組立を対象用途として示している。' },
@@ -1219,6 +1210,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'GR-3C official product page', url: 'https://www.fftai.com/products-gr3c', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'UBTECH industrial humanoid solutions', url: 'https://www.ubtrobot.com/en/humanoid/solutions/industry', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'UBTECH Walker S official page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s', publisher: 'UBTECH Robotics', checkedAt: '2026-06-30', reliability: 'official' },
       {
@@ -1270,6 +1262,7 @@ export const useCases: UseCase[] = [
     whyHardToday: '合否判定モデルの構築・維持コスト、多品種対応時の再学習コストが課題。',
     japanDeploymentConditions: '品質管理基準（ISO 9001等）への適合、判定ログの保管義務の確認が必要。',
     candidateRobots: [
+      { robotId: 'fourier-gr3c', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/products-gr3c'], reason: '公式製品ページが遠隔点検を対象用途として示している。' },
       { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s', 'https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式情報が自動車製造ラインの外観品質検査を対象用途として示している。' },
       { robotId: 'ubtech-walker-s1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式産業ソリューションが自動車製造ラインの外観品質検査を対象用途として示している。' },
       {
@@ -1885,10 +1878,11 @@ export const useCases: UseCase[] = [
     subtitle: '脳卒中・骨折回復患者のリハビリ動作補助をヒューマノイドが担当する用途。',
     summary: '脳卒中・骨折回復患者のリハビリ動作補助をヒューマノイドが担当する用途。',
     publishStatus: 'published',
-    updatedAt: '2026-06-30',
+    updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
-      { title: 'Fourier GR-2 product page', url: 'https://fourierintelligence.com/gr2/', publisher: 'Fourier Intelligence', checkedAt: '2026-06-30', reliability: 'official' },
+      { title: 'GR-3 care applications', url: 'https://www.fftai.com/newsroom-humanoid/26', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
+      { title: 'GR-1 Series brochure', url: 'https://www.fftai.com/uploads/upload/files/20250515/3f8dfafee28ab3d5c6688016d8e36eaf.pdf', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     maturityLevel: 'pilot-phase',
     buyerReadiness: 'limited-today',
@@ -1902,15 +1896,15 @@ export const useCases: UseCase[] = [
       whereDoesNotFit: '急性期・集中治療室。認知症ケアなど高度なコミュニケーションが必要な場面。',
       mustBeTrue: '理学療法士が監督できる環境で、緊急停止手順が整備されている。',
     },
-    overview: 'Fourier GR-2/GR-3は医療リハビリ向けのヒューマノイドとして臨床実証を進めており、欧州の医療機関での実証報告がある。',
+    overview: 'Fourierの公式情報では、GR-3の支援移動・健康モニタリング・リハビリ可能性と、GR-1シリーズの医療・リハビリ用途が示されている。実際の臨床導入実績とは分けて扱う。',
     whyItMatters: 'リハビリ療法士の不足と高齢者増加が重なり、反復リハビリ補助の需要が急拡大している。',
     capabilityNotes: { manipulation: '患者の身体に適切な力で接触するフォース制御が安全上重要。', communication: '患者への声かけ・ガイドのシンプルなインタラクションが求められる。' },
     environmentRequirements: 'リハビリ室の安全スペース、緊急停止設備、医療スタッフ常駐。',
     whyHardToday: '患者の個人差（体格・可動域）への適応、フォース制御の安全性確保が技術課題。',
     japanDeploymentConditions: '医療機器認証（薬機法）、療法士との協働運用プロトコル、倫理委員会承認が必要。',
     candidateRobots: [
-      { robotId: 'fourier-gr2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://fourierintelligence.com/gr2/'], reason: 'Fourier GR-2 が医療リハビリ向け用途を公式に訴求。欧州医療機関での実証報告あり。' },
-      { robotId: 'fourier-gr3', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://fourierintelligence.com/gr2/'], reason: 'Fourier GR-3 は GR-2 の後継として医療・リハビリ向け能力を継承している。' },
+      { robotId: 'fourier-gr3', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/newsroom-humanoid/26'], reason: '公式情報が支援移動、健康モニタリング、リハビリへの活用可能性を示している。' },
+      { robotId: 'fourier-gr1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/uploads/upload/files/20250515/3f8dfafee28ab3d5c6688016d8e36eaf.pdf'], reason: '公式brochureが医療・リハビリを対象用途として示している。' },
     ],
   },
   {
@@ -2186,6 +2180,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'GR-1 exhibition consultation case', url: 'https://www.fftai.com/solutions/9', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'Walker X official product page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-x', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'Walker C official product page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-c', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT A2 official product page', url: 'https://agibot.com/products/A2', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
@@ -2225,6 +2220,7 @@ export const useCases: UseCase[] = [
     whyHardToday: '複雑な質問への対応限界、人との密な混在環境でのナビゲーション安全性が課題。',
     japanDeploymentConditions: '個人情報の取り扱い（案内時の音声・映像記録）、バリアフリー基準への適合が必要。',
     candidateRobots: [
+      { robotId: 'fourier-gr1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/solutions/9'], reason: '公式事例が来訪者の待機列、顧客動線、ATM案内、展示案内を示している。' },
       { robotId: 'ubtech-walker-x', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-x'], reason: '公式ページがU-SLAMナビゲーションと自律経路計画を案内サービス向けに示している。' },
       { robotId: 'ubtech-walker-c', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-c'], reason: '公式ページが展示ホールと交通施設でのスマートガイドを対象用途として示している。' },
       { robotId: 'agibot-a2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://agibot.com/products/A2'], reason: '公式ページが展示ホールでの説明とスーパーマーケットでの案内を対象用途として示している。' },
@@ -2259,6 +2255,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'GR-1 Series brochure', url: 'https://www.fftai.com/uploads/upload/files/20250515/3f8dfafee28ab3d5c6688016d8e36eaf.pdf', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'Meet aeo', url: 'https://www.aeolusbot.com/meet-aeo', publisher: 'Aeolus Robotics', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     maturityLevel: 'pilot-phase',
@@ -2280,6 +2277,7 @@ export const useCases: UseCase[] = [
     whyHardToday: '夜間環境での認識精度、誤報（false positive）管理、実力行使禁止の法的制約が課題。',
     japanDeploymentConditions: '警備業法への適合（機械警備の届け出等）、個人情報保護法上の映像管理規制への準拠が必要。',
     candidateRobots: [
+      { robotId: 'fourier-gr1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/uploads/upload/files/20250515/3f8dfafee28ab3d5c6688016d8e36eaf.pdf'], reason: '公式brochureがsecurity inspectionを対象用途として示している。' },
       { robotId: 'aeolus-aeo', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.aeolusbot.com/meet-aeo'], reason: '現行公式ページが公共・私有空間の自律警備巡回を対象用途として示している。' },
     ],
   },
@@ -2453,9 +2451,10 @@ export const useCases: UseCase[] = [
     subtitle: 'ヒューマノイドと人間の相互作用（HRI）・社会的受容性を研究するための実験環境としての用途。',
     summary: 'ヒューマノイドと人間の相互作用（HRI）・社会的受容性を研究するための実験環境としての用途。',
     publishStatus: 'published',
-    updatedAt: '2026-06-30',
+    updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'GR-3 Series official page', url: 'https://fftai.com/products-gr3series', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'Figure AI use cases', url: 'https://www.figure.ai/', publisher: 'Figure AI', checkedAt: '2026-06-30', reliability: 'official' },
     ],
     maturityLevel: 'pilot-phase',
@@ -2477,6 +2476,7 @@ export const useCases: UseCase[] = [
     whyHardToday: '長時間・多様なシナリオでの安定動作、研究用データ収集インフラの整備が課題。',
     japanDeploymentConditions: '機関内倫理委員会の承認、個人情報保護法への適合（実験映像の管理）が必要。',
     candidateRobots: [
+      { robotId: 'fourier-gr3', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://fftai.com/products-gr3series'], reason: '公式シリーズページが学術研究と感情的インタラクションを対象用途として示している。' },
       { robotId: 'figure-02', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.figure.ai/'], reason: 'Figure 02がHRI・AI研究向けプラットフォームとして研究機関に提供されている。' },
     ],
   },
@@ -2491,6 +2491,8 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'GR-2 SDK overview', url: 'https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR2/SDK/Overview/', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
+      { title: 'GR-1 Aurora SDK introduction', url: 'https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR1/SDK/Aurora-SDK/introduction_CN/', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       {
         title: 'Booster Robotics T1 product page',
         url: 'https://www.booster.tech/booster-t1/',
@@ -2560,6 +2562,8 @@ export const useCases: UseCase[] = [
     whyHardToday: '試作改造の自由度とロボット本体の安全性・保証のバランスが課題。',
     japanDeploymentConditions: '機器安全基準（CE/PSE）への適合確認、研究機関の設備安全管理規程への適合が必要。',
     candidateRobots: [
+      { robotId: 'fourier-gr2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR2/SDK/Overview/'], reason: '公式SDK資料が二次開発と高度機能研究を対象として示している。' },
+      { robotId: 'fourier-gr1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR1/SDK/Aurora-SDK/introduction_CN/'], reason: '公式Aurora SDK資料がdeveloper modeでの二次開発を示している。' },
       {
         robotId: 'booster-t1',
         fit: 'possible',
