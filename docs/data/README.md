@@ -1,6 +1,6 @@
 # Deploid Data Work Guide
 
-Last reviewed: 2026-07-14
+Last reviewed: 2026-07-16
 
 この文書は、AIでデータ追加・更新を行うときの入口です。
 実装上の正本は `data/types.ts` と `lib/*` にあります。
@@ -20,10 +20,14 @@ Last reviewed: 2026-07-14
 - `DATA-R01-master-report.md` — published Robot全61機の公式情報一次調査の統合報告
 - `DATA-R01-B01-*.json`〜`DATA-R01-B14-*.json` — 項目別raw調査データ
 - `DATA-R01-B01-*.md`〜`DATA-R01-B14-*.md` — バッチ別の人間向け要約
+- `DATA-R01-verification-report.md` — raw調査を公式原典と現行schemaに照合した全件検証報告
+- `DATA-R01-VERIFY-B01.json`〜`DATA-R01-VERIFY-B14.json` — raw値、検証結果、実装候補値、未解決理由を1対1で保持する検証データ
 
 これらは調査対象をMECEに収録した非正本であり、`data/*.ts`へ直接コピーしない。
-master reportの事後構造監査、`needs-review`、`conflict`、`humanReviewRequired`を解決し、
-現行型・validatorを通過した値だけを実装へ反映する。
+実装候補にはVERIFYデータの `verificationStatus` が `verified` または `corrected` で、
+かつ `proposedValue` がnullでないレコードだけを使用する。
+`unresolved` / `rejected`、variant未確定、取得エラーの値は推測で補完せず、UIでは省略または既定のフォールバックを使う。
+実装時は候補値を現行型へ正規化し、validatorを通過させてから `data/*.ts` へ反映する。
 
 各コレクションの追加・更新手順は `../planning/data-maintenance-checklist-v1.md` の対応セクション：
 robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCases=M / deployments=N / articlePlacements=O。
