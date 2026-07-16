@@ -288,8 +288,6 @@ export interface Robot extends BaseRecord {
   specs: RobotSpecs;
   procurementModels: ProcurementModel[];
   priceOffers?: RobotPriceOffer[];
-  /** @deprecated 新UIはpriceOffersのresolverを使う。全件移行完了まで保持する。 */
-  priceNote?: string;
   loadRatings?: RobotLoadRating[];
   /** 仕様・価格・荷重を同じRobotのsources URLへ接続する。 */
   fieldEvidence?: RobotFieldEvidence;

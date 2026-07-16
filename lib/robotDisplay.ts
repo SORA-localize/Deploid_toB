@@ -65,20 +65,8 @@ export function getSpecRows(specs: RobotSpecs, keys?: readonly SpecKey[]): Displ
 }
 
 function formatComparisonPriceStatus(robot: Robot) {
-  const note = robot.priceNote?.trim();
-  const normalizedNote = note?.toLowerCase() ?? '';
-
   if (robot.procurementModels.includes('not-for-sale')) return '一般販売なし';
-  if (!note) return EMPTY_VALUE_LABEL;
-  if (/価格は?非公開|価格未公開|未公表|未発表|問い合わせ制|公開価格なし/.test(note)) {
-    return '問い合わせ';
-  }
-  if (/[$＄€￥¥]|usd|eur|円|公開価格|参考価格|約\s*[0-9]/i.test(normalizedNote)) {
-    return '公開価格あり';
-  }
-  if (/問い合わせ|要確認/.test(note)) return '問い合わせ';
-
-  return EMPTY_VALUE_LABEL;
+  return (robot.priceOffers?.length ?? 0) > 0 ? '公開価格あり' : '問い合わせ';
 }
 
 function formatComparisonPayloadStatus(value: number | undefined) {

@@ -734,6 +734,13 @@ export const useCases: UseCase[] = [
         note: 'キッティング、部材搬送、ラインサイド支援、設備支援を含む製造用途の公式根拠。',
       },
       {
+        title: 'Apollo 2',
+        url: 'https://apptronik.com/apollo/apollo-2',
+        publisher: 'Apptronik',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
+      {
         title: 'Welcome to Robot Park: Where Apptronik’s Apollo Goes to Work Training the Next Generation of Humanoid Robot Intelligence',
         url: 'https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work',
         publisher: 'Apptronik',
@@ -882,6 +889,7 @@ export const useCases: UseCase[] = [
         fit: 'possible',
         basis: 'official-use-case',
         evidenceSourceUrls: [
+          'https://apptronik.com/apollo/apollo-2',
           'https://apptronik.com/industries/manufacturing',
           'https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work',
         ],
@@ -1429,6 +1437,13 @@ export const useCases: UseCase[] = [
     whyHardToday: '多品種の把持への汎化、ピッキング速度（AGV比）がまだ低い。',
     japanDeploymentConditions: '倉庫の安全管理規程対応、WMS連携の標準化、保守体制の整備が必要。',
     candidateRobots: [
+      {
+        robotId: 'apptronik-apollo',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://apptronik.com/solutions/person-to-goods'],
+        reason: '公式ソリューションがケース・トート処理とgoods-to-person／person-to-goods倉庫フローを対象用途として示している。',
+      },
       {
         robotId: 'apptronik-apollo-2',
         fit: 'possible',
@@ -2494,8 +2509,7 @@ export const useCases: UseCase[] = [
     reliability: 'reported',
     sources: [
       { title: 'ENGINEAI SA01 official product page', url: 'https://www.engineai.com.cn/product-sa01.html', publisher: 'EngineAI', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'GR-2 SDK overview', url: 'https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR2/SDK/Overview/', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'GR-1 Aurora SDK introduction', url: 'https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR1/SDK/Aurora-SDK/introduction_CN/', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
+      { title: 'Fourier Aurora SDK', url: 'https://github.com/FFTAI/fourier_aurora_sdk', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       {
         title: 'Booster Robotics T1 product page',
         url: 'https://www.booster.tech/booster-t1/',
@@ -2566,8 +2580,7 @@ export const useCases: UseCase[] = [
     japanDeploymentConditions: '機器安全基準（CE/PSE）への適合確認、研究機関の設備安全管理規程への適合が必要。',
     candidateRobots: [
       { robotId: 'engineai-sa01', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.engineai.com.cn/product-sa01.html'], reason: '公式製品ページが全開放プラットフォーム、ユーザー定義カスタマイズ、技術情報の共有を示している。' },
-      { robotId: 'fourier-gr2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR2/SDK/Overview/'], reason: '公式SDK資料が二次開発と高度機能研究を対象として示している。' },
-      { robotId: 'fourier-gr1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR1/SDK/Aurora-SDK/introduction_CN/'], reason: '公式Aurora SDK資料がdeveloper modeでの二次開発を示している。' },
+      { robotId: 'fourier-gr2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://github.com/FFTAI/fourier_aurora_sdk'], reason: '公式SDKリポジトリがGR-2を対応機種として明記し、二次開発用のPython SDKと機種別サンプルを公開している。' },
       {
         robotId: 'booster-t1',
         fit: 'possible',

@@ -728,9 +728,17 @@ export function validateData(): ValidationResult {
       if (!Number.isFinite(load.kg) || load.kg <= 0) {
         errors.push(`[load-kg] robot "${r.id}".${field}.kg は0より大きい有限値にしてください`);
       }
-      const uniqueKey = `${load.variant?.trim() ?? ''}\u0000${load.scope}\u0000${load.rating}`;
+      // 同一variantでも、瞬間/持続や特定姿勢/全作業域など条件別の荷重を持てる。
+      // kg と condition まで一致する完全重複だけをエラーにする。
+      const uniqueKey = [
+        load.variant?.trim() ?? '',
+        load.scope,
+        load.rating,
+        String(load.kg),
+        load.condition?.trim() ?? '',
+      ].join('\u0000');
       if (loadRatingKeys.has(uniqueKey)) {
-        errors.push(`[load-duplicate] robot "${r.id}".${field} に同一variant/scope/ratingがあります`);
+        errors.push(`[load-duplicate] robot "${r.id}".${field} に同一条件の荷重レコードがあります`);
       }
       loadRatingKeys.add(uniqueKey);
       checkUrl('robot', r.slug, `${field}.sourceUrl`, load.sourceUrl);

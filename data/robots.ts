@@ -68,7 +68,6 @@ export const robots: Robot[] = [
       mobility: ['https://www.unitree.com/g1/'], heightCm: ['https://www.unitree.com/g1/'], weightKg: ['https://www.unitree.com/g1/'], dof: ['https://www.unitree.com/g1/'], runtimeMin: ['https://www.unitree.com/g1/'], batterySystem: ['https://www.unitree.com/g1/'], controlMethod: ['https://shop.unitree.com/products/unitree-g1'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/g1/'], priceOffers: ['https://shop.unitree.com/products/unitree-g1'], loadRatings: ['https://www.unitree.com/g1/'],
     },
     usageExampleSourceUrls: ['https://icontrol.ri.cmu.edu/news/icra2025-wbcd.html', 'https://www.unitree.com/news1/'],
-    priceNote: 'Unitree公式はG1をUS $13.5K（税・送料別）から、G1 EDUは問い合わせ。国内価格・保証・納期はTechShare等の代理店見積で確認。',
     japanAvailability: 'distributor-japan',
     distributorJapan: 'TechShare',
     supportNote: 'TechShareのUnitreeチームが問い合わせ窓口。',
@@ -141,7 +140,6 @@ export const robots: Robot[] = [
       mobility: ['https://www.unitree.com/g1/'], heightCm: ['https://www.unitree.com/g1/'], runtimeMin: ['https://www.unitree.com/g1/'], batterySystem: ['https://www.unitree.com/g1/'], controlMethod: ['https://www.unitree.com/g1/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/g1/'], loadRatings: ['https://www.unitree.com/g1/'],
     },
     usageExampleSourceUrls: ['https://www.wpunj.edu/articles/news/2025-10-27/humanoid-AI-robot-computer-science-department-william-paterson-university'],
-    priceNote: 'Unitree公式は価格非掲載でContact Sales対応のみ。最小構成（23DoF）を基準値として記載、最大43DoFまで拡張可能（要見積）。',
     japanAvailability: 'unknown',
     industryTags: ['research'],
     taskTags: ['research-task'],
@@ -214,7 +212,6 @@ export const robots: Robot[] = [
       mobility: ['https://www.unitree.com/mobile/h1/'], heightCm: ['https://www.unitree.com/mobile/h1/'], weightKg: ['https://www.unitree.com/mobile/h1/'], speedMps: ['https://www.unitree.com/mobile/h1/'], batteryCapacityWh: ['https://www.unitree.com/mobile/h1/'], batterySystem: ['https://www.unitree.com/mobile/h1/'], controlMethod: ['https://www.unitree.com/app/h1/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/mobile/h1/'],
     },
     usageExampleSourceUrls: ['https://www.unitree.com/news1/'],
-    priceNote: 'Unitree公式ショップ上の表示価格は$90,000だが「Contact us for the real price」と記載されており、実価格は要問い合わせ。',
     japanAvailability: 'distributor-japan',
     industryTags: ['research'],
     taskTags: ['research-task'],
@@ -284,7 +281,6 @@ export const robots: Robot[] = [
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/h1/'], heightCm: ['https://www.unitree.com/mobile/h1/'], weightKg: ['https://www.unitree.com/mobile/h1/'], dof: ['https://www.unitree.com/mobile/h1/'], batteryCapacityWh: ['https://www.unitree.com/mobile/h1/'], batterySystem: ['https://www.unitree.com/mobile/h1/'], controlMethod: ['https://www.unitree.com/app/h1/'], computePlatform: ['https://www.unitree.com/mobile/h1/'], loadRatings: ['https://www.unitree.com/mobile/h1/'],
     },
-    priceNote: '価格は公式で確認できず、要問い合わせ。',
     japanAvailability: 'unknown',
     industryTags: ['research'],
     taskTags: ['research-task'],
@@ -354,6 +350,7 @@ export const robots: Robot[] = [
       weightKg: 73,
       runtimeMin: 240,
       batterySystem: '交換式バッテリー（1本あたり約4時間）',
+      controlMethod: '力制御による自律・汎用作業プラットフォーム',
     },
     procurementModels: ['partner-program', 'inquiry'],
     loadRatings: [
@@ -371,6 +368,7 @@ export const robots: Robot[] = [
       weightKg: ['https://apptronik.com/news-collection/apptronik-unveils-apollo'],
       runtimeMin: ['https://apptronik.com/news-collection/apptronik-unveils-apollo'],
       batterySystem: ['https://apptronik.com/news-collection/apptronik-unveils-apollo'],
+      controlMethod: ['https://apptronik.com/news-collection/apptronik-unveils-apollo'],
       loadRatings: ['https://apptronik.com/news-collection/apptronik-unveils-apollo'],
     },
     usageExampleSourceUrls: [
@@ -609,6 +607,13 @@ export const robots: Robot[] = [
         checkedAt: '2026-07-16',
         reliability: 'official',
       },
+      {
+        title: 'About 1X',
+        url: 'https://www.1x.tech/about',
+        publisher: '1X Technologies',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
     ],
     images: {
       hero: {
@@ -697,7 +702,7 @@ export const robots: Robot[] = [
         channel: 'manufacturer-public',
         display: '$499/月（Standardサブスクリプション）',
         amount: 499,
-        currency: 'USD',
+        currency: 'USD/month',
         taxStatus: 'unknown',
         variant: 'NEO Standard Subscription',
         sellerName: '1X Technologies',
@@ -708,15 +713,15 @@ export const robots: Robot[] = [
       {
         scope: 'single-arm',
         rating: 'unspecified',
-        kg: 8.2,
+        kg: 8.1647,
         condition: '公式表記はArm Payload 18lb。定格/最大の区別は未公表',
         variant: 'NEO',
         sourceUrl: 'https://www.1x.tech/neo',
       },
       {
-        scope: 'manufacturer-wording',
+        scope: 'whole-body',
         rating: 'unspecified',
-        kg: 70,
+        kg: 69.8532,
         condition: '公式表記はLift 154lb。荷重範囲と定格/最大の区別は未公表',
         variant: 'NEO',
         sourceUrl: 'https://www.1x.tech/neo',
@@ -724,7 +729,7 @@ export const robots: Robot[] = [
       {
         scope: 'carrier',
         rating: 'unspecified',
-        kg: 25,
+        kg: 24.9476,
         condition: '公式表記はCarry 55lb。定格/最大の区別は未公表',
         variant: 'NEO',
         sourceUrl: 'https://www.1x.tech/neo',
@@ -744,6 +749,7 @@ export const robots: Robot[] = [
       priceOffers: ['https://www.1x.tech/order'],
       loadRatings: ['https://www.1x.tech/neo'],
     },
+    usageExampleSourceUrls: ['https://www.1x.tech/about'],
     japanAvailability: 'unknown',
     supportNote: '2026年は主に米国向けに配送し、他市場は2027年以降へ拡大予定。日本への配送・保守体制は未確認。',
     comparison: {
@@ -792,7 +798,6 @@ export const robots: Robot[] = [
     buyerReadiness: 'limited-today',
     specs: { mobility: 'biped' },
     procurementModels: ['partner-program', 'not-for-sale'],
-    priceNote: '一般販売条件は確認できない。',
     japanAvailability: 'unknown',
     industryTags: ['manufacturing'],
     taskTags: ['assembly', 'material-handling'],
@@ -939,7 +944,7 @@ export const robots: Robot[] = [
         publisher: 'Unitree Robotics',
         checkedAt: '2026-07-16',
         reliability: 'official',
-        note: 'アーム荷重をPeak/Ratedで明記、priceNoteを追加（2026-06-17確認）。',
+        note: 'アーム荷重をPeak/Ratedで明記（2026-06-17確認）。',
       },
       { title: 'Unitree H2 official shop', url: 'https://shop.unitree.com/products/unitree-h2', publisher: 'Unitree Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'Unitree Robotics GitHub', url: 'https://github.com/unitreerobotics', publisher: 'Unitree Robotics', checkedAt: '2026-07-16', reliability: 'official' },
@@ -987,7 +992,6 @@ export const robots: Robot[] = [
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/H2/'], heightCm: ['https://www.unitree.com/mobile/H2/'], weightKg: ['https://www.unitree.com/mobile/H2/'], dof: ['https://www.unitree.com/mobile/H2/'], runtimeMin: ['https://www.unitree.com/mobile/H2/'], batteryCapacityWh: ['https://www.unitree.com/mobile/H2/'], batterySystem: ['https://www.unitree.com/mobile/H2/'], controlMethod: ['https://www.unitree.com/mobile/H2/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/mobile/H2/'], priceOffers: ['https://shop.unitree.com/products/unitree-h2'], loadRatings: ['https://www.unitree.com/mobile/H2/'],
     },
-    priceNote: 'Unitree公式はH2をUS $29,900（税・送料別）から、H2 EDUは問い合わせ。国内価格・保証・納期は代理店見積で確認。',
     japanAvailability: 'inquiry-required',
     industryTags: ['research'],
     taskTags: ['research-task', 'material-handling'],
@@ -1061,7 +1065,6 @@ export const robots: Robot[] = [
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/H2/'], heightCm: ['https://www.unitree.com/mobile/H2/'], weightKg: ['https://www.unitree.com/mobile/H2/'], dof: ['https://www.unitree.com/mobile/H2/'], runtimeMin: ['https://www.unitree.com/mobile/H2/'], batteryCapacityWh: ['https://www.unitree.com/mobile/H2/'], batterySystem: ['https://www.unitree.com/mobile/H2/'], controlMethod: ['https://www.unitree.com/mobile/H2/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/mobile/H2/'], loadRatings: ['https://www.unitree.com/mobile/H2/'],
     },
-    priceNote: 'Unitree公式は価格非掲載でContact Sales対応のみ。',
     japanAvailability: 'inquiry-required',
     industryTags: ['research'],
     taskTags: ['research-task', 'material-handling'],
@@ -1145,7 +1148,6 @@ export const robots: Robot[] = [
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/H2plus/'], heightCm: ['https://www.unitree.com/mobile/H2plus/'], weightKg: ['https://www.unitree.com/mobile/H2plus/'], dof: ['https://www.unitree.com/mobile/H2plus/'], runtimeMin: ['https://www.unitree.com/mobile/H2plus/'], batteryCapacityWh: ['https://www.unitree.com/mobile/H2plus/'], batterySystem: ['https://www.unitree.com/mobile/H2plus/'], controlMethod: ['https://www.unitree.com/mobile/H2plus/'], loadRatings: ['https://www.unitree.com/mobile/H2plus/'],
     },
-    priceNote: '公式ストア一覧の100,000米ドル表示と商品詳細のContact Salesが競合するため、価格は問い合わせ扱い。',
     japanAvailability: 'inquiry-required',
     industryTags: ['research'],
     taskTags: ['research-task', 'material-handling'],
@@ -1222,6 +1224,14 @@ export const robots: Robot[] = [
     },
     procurementModels: ['inquiry', 'partner-program'],
     loadRatings: [
+      {
+        scope: 'manufacturer-wording',
+        rating: 'unspecified',
+        kg: 50,
+        condition: '公式仕様のInstant weight capacity。定格・最大の別は未公表。',
+        variant: '現行電動Atlas',
+        sourceUrl: 'https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf',
+      },
       {
         scope: 'manufacturer-wording',
         rating: 'unspecified',
@@ -1449,7 +1459,6 @@ export const robots: Robot[] = [
       { title: 'AGIBOT A2 official product page', url: 'https://agibot.com/products/A2', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT A2 at Fortune event', url: 'https://www.agibot.com/article/231/detail/32.html', publisher: 'AGIBOT', publishedAt: '2025-12-02', checkedAt: '2026-07-16', reliability: 'reported' },
       { title: 'AGIBOT A2 Guinness walking record', url: 'https://www.agibot.com/article/231/detail/35.html', publisher: 'AGIBOT', checkedAt: '2026-07-16', reliability: 'reported' },
-      { title: 'AGIBOT contact', url: 'https://agibot.com/contact/', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     images: {
       hero: {
@@ -1590,7 +1599,7 @@ export const robots: Robot[] = [
         reliability: 'official',
       },
       { title: 'GR-2 product announcement', url: 'https://www.fftai.com/newsroom-newintech/14', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'GR-2 SDK overview', url: 'https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR2/SDK/Overview/', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
+      { title: 'Fourier Aurora SDK', url: 'https://github.com/FFTAI/fourier_aurora_sdk', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     images: {
       hero: {
@@ -1621,7 +1630,7 @@ export const robots: Robot[] = [
     fieldEvidence: {
       batterySystem: ['https://www.fftai.com/newsroom-newintech/14'],
       controlMethod: ['https://www.fftai.com/newsroom-newintech/14'],
-      sdk: ['https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR2/SDK/Overview/'],
+      sdk: ['https://github.com/FFTAI/fourier_aurora_sdk'],
       loadRatings: ['https://www.fftai.com/newsroom-newintech/14'],
     },
     japanAvailability: 'inquiry-required',
@@ -1648,7 +1657,7 @@ export const robots: Robot[] = [
     sources: [
       { title: 'GR-3 official product page', url: 'https://fftai.com/products-gr3', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'GR-3 developer specifications', url: 'https://support.fftai.com/en/getting-started/general-information', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'GR-X SDK overview', url: 'https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR2/SDK/Overview/', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
+      { title: 'Fourier Aurora SDK', url: 'https://github.com/FFTAI/fourier_aurora_sdk', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'GR-3 care applications', url: 'https://www.fftai.com/newsroom-humanoid/26', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'GR-3 Series official page', url: 'https://fftai.com/products-gr3series', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
     ],
@@ -1690,7 +1699,7 @@ export const robots: Robot[] = [
       { scope: 'single-arm', rating: 'unspecified', kg: 3, condition: '公式表記は片腕約3kg。定格・最大の別は未公表。', variant: 'GR-3', sourceUrl: 'https://support.fftai.com/en/getting-started/general-information' },
     ],
     fieldEvidence: {
-      mobility: ['https://support.fftai.com/en/getting-started/general-information'], heightCm: ['https://support.fftai.com/en/getting-started/general-information'], weightKg: ['https://support.fftai.com/en/getting-started/general-information'], speedMps: ['https://support.fftai.com/en/getting-started/general-information'], dof: ['https://support.fftai.com/en/getting-started/general-information'], runtimeMin: ['https://support.fftai.com/en/getting-started/general-information'], batteryCapacityWh: ['https://support.fftai.com/en/getting-started/general-information'], chargeTimeMin: ['https://support.fftai.com/en/getting-started/general-information'], batterySystem: ['https://support.fftai.com/en/getting-started/general-information'], controlMethod: ['https://support.fftai.com/en/getting-started/general-information'], sdk: ['https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR2/SDK/Overview/'], computePlatform: ['https://support.fftai.com/en/getting-started/general-information'], operatingTemperature: ['https://support.fftai.com/en/getting-started/general-information'], loadRatings: ['https://support.fftai.com/en/getting-started/general-information'],
+      mobility: ['https://support.fftai.com/en/getting-started/general-information'], heightCm: ['https://support.fftai.com/en/getting-started/general-information'], weightKg: ['https://support.fftai.com/en/getting-started/general-information'], speedMps: ['https://support.fftai.com/en/getting-started/general-information'], dof: ['https://support.fftai.com/en/getting-started/general-information'], runtimeMin: ['https://support.fftai.com/en/getting-started/general-information'], batteryCapacityWh: ['https://support.fftai.com/en/getting-started/general-information'], chargeTimeMin: ['https://support.fftai.com/en/getting-started/general-information'], batterySystem: ['https://support.fftai.com/en/getting-started/general-information'], controlMethod: ['https://support.fftai.com/en/getting-started/general-information'], sdk: ['https://github.com/FFTAI/fourier_aurora_sdk'], computePlatform: ['https://support.fftai.com/en/getting-started/general-information'], operatingTemperature: ['https://support.fftai.com/en/getting-started/general-information'], loadRatings: ['https://support.fftai.com/en/getting-started/general-information'],
     },
     japanAvailability: 'unknown',
     industryTags: ['healthcare', 'research', 'retail'],
@@ -1769,7 +1778,7 @@ export const robots: Robot[] = [
     },
     description: 'Booster T1は、研究・ロボット競技・二次開発向けの二足歩行プラットフォーム。Basic / Standard / Customizedで自由度と演算構成が異なるため、構成を指定せず単一の自由度や演算性能として比較しない。',
     deploymentStage: 'production',
-    marketAvailability: 'developer-platform',
+    marketAvailability: 'unknown',
     buyerReadiness: 'requires-poc',
     specs: {
       heightCm: 118,
@@ -2033,26 +2042,22 @@ export const robots: Robot[] = [
       sdk: 'Kepler OS / Kepler Developer Platform',
     },
     procurementModels: ['purchase', 'inquiry'],
-    priceOffers: [
-      {
-        channel: 'manufacturer-public',
-        display: 'RMB 248,000',
-        amount: 248000,
-        currency: 'CNY',
-        taxStatus: 'unknown',
-        variant: 'K2 Bumblebee',
-        sellerName: 'Kepler Robotics',
-        sourceUrl: 'https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html',
-      },
-    ],
     loadRatings: [
       {
         scope: 'dual-arm',
-        rating: 'maximum',
+        rating: 'unspecified',
+        kg: 25,
+        condition: '公式の双腕協調ハンドリング範囲25～30kgの下限。定格・最大の別は未公表。',
+        variant: 'K2 industrial configuration',
+        sourceUrl: 'https://www.gotokepler.com/productDetailK2?id=2',
+      },
+      {
+        scope: 'dual-arm',
+        rating: 'unspecified',
         kg: 30,
-        condition: 'メーカー発表はdual-arm payload capacity up to 30kg',
-        variant: 'K2 Bumblebee',
-        sourceUrl: 'https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html',
+        condition: '公式の双腕協調ハンドリング範囲25～30kgの上限。定格・最大の別は未公表。',
+        variant: 'K2 industrial configuration',
+        sourceUrl: 'https://www.gotokepler.com/productDetailK2?id=2',
       },
     ],
     fieldEvidence: {
@@ -2065,12 +2070,7 @@ export const robots: Robot[] = [
       batterySystem: ['https://www.gotokepler.com/productDetailK2?id=2'],
       controlMethod: ['https://www.gotokepler.com/productDetailK2?id=2'],
       sdk: ['https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index'],
-      priceOffers: [
-        'https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html',
-      ],
-      loadRatings: [
-        'https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html',
-      ],
+      loadRatings: ['https://www.gotokepler.com/productDetailK2?id=2'],
     },
     usageExampleSourceUrls: [
       'https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-humanoid-robot-lands-at-saic-gm-activity-7321418311701815298-9Hyn',
@@ -2367,7 +2367,6 @@ export const robots: Robot[] = [
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/R1/'], heightCm: ['https://www.unitree.com/mobile/R1/'], weightKg: ['https://www.unitree.com/mobile/R1/'], dof: ['https://www.unitree.com/mobile/R1/'], runtimeMin: ['https://www.unitree.com/mobile/R1/'], batterySystem: ['https://www.unitree.com/mobile/R1/'], controlMethod: ['https://www.unitree.com/mobile/R1/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/mobile/R1/'], priceOffers: ['https://www.unitree.com/mobile/R1/'],
     },
-    priceNote: 'Unitree公式はR1 AIRをUS $4,900から提供（2026-06-17確認）。税・送料等は購入時にショップ条件を確認。',
     japanAvailability: 'inquiry-required',
     industryTags: ['research'],
     taskTags: ['research-task'],
@@ -2437,7 +2436,6 @@ export const robots: Robot[] = [
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/R1/'], heightCm: ['https://www.unitree.com/mobile/R1/'], weightKg: ['https://www.unitree.com/mobile/R1/'], dof: ['https://www.unitree.com/mobile/R1/'], runtimeMin: ['https://www.unitree.com/mobile/R1/'], batterySystem: ['https://www.unitree.com/mobile/R1/'], controlMethod: ['https://www.unitree.com/mobile/R1/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/mobile/R1/'], priceOffers: ['https://www.unitree.com/mobile/R1/'],
     },
-    priceNote: 'Unitree公式はR1をUS $5,900から提供（2026-06-17確認）。税・送料等は購入時にショップ条件を確認。',
     japanAvailability: 'inquiry-required',
     industryTags: ['research'],
     taskTags: ['research-task'],
@@ -2470,7 +2468,6 @@ export const robots: Robot[] = [
       { title: 'AGIBOT A2 Ultra official product page', url: 'https://agibot.com/products/A2_Ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT A2 Ultra official store', url: 'https://store.agibot.com/products/a2-ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AimDK A2 development guide', url: 'https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'AGIBOT contact', url: 'https://agibot.com/contact/', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     images: {
       hero: {
@@ -2521,7 +2518,6 @@ export const robots: Robot[] = [
         checkedAt: '2026-07-16',
         reliability: 'official',
       },
-      { title: 'AGIBOT contact', url: 'https://agibot.com/contact/', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     images: {
       hero: {
@@ -2587,7 +2583,6 @@ export const robots: Robot[] = [
       },
       { title: 'UBTECH industrial humanoid solutions', url: 'https://www.ubtrobot.com/en/humanoid/solutions/industry', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'UBTECH commercial contract announcement', url: 'https://owebsite-cdn.ubtrobot.com/resources/file/2025/04/28/670407684730949.pdf', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'UBTECH contact', url: 'https://www.ubtrobot.com/en/contact-us', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     images: {
       hero: {
@@ -3227,10 +3222,8 @@ export const robots: Robot[] = [
     reliability: 'official',
     sources: [
       { title: 'GR-1 official product page', url: 'https://www.fftai.com/products-gr1', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'GR-1 operation guide', url: 'https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR1/Operation-Guide/app/', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'GR-1 Series brochure', url: 'https://www.fftai.com/uploads/upload/files/20250515/3f8dfafee28ab3d5c6688016d8e36eaf.pdf', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official', note: 'GR-1 / Pro / Liteの複数行を含むため、variant共通と確認できる情報だけを採用。' },
       { title: 'GR-1 exhibition consultation case', url: 'https://www.fftai.com/solutions/9', publisher: 'Fourier Intelligence', publishedAt: '2025-03-14', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'GR-1 Aurora SDK introduction', url: 'https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR1/SDK/Aurora-SDK/introduction_CN/', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     images: {
       hero: {
@@ -3255,7 +3248,6 @@ export const robots: Robot[] = [
       weightKg: 55,
       dof: 44,
       mobility: 'biped',
-      controlMethod: '遠隔操作 / developer mode',
     },
     procurementModels: ['purchase', 'inquiry'],
     marketAvailability: 'company-claimed-delivery',
@@ -3263,14 +3255,14 @@ export const robots: Robot[] = [
       { scope: 'single-arm', rating: 'unspecified', kg: 3, condition: '公式brochureのsingle-handed payload。GR-1 / Pro / Liteのどの構成か、定格・最大の別は特定できない。', variant: 'GR-1 generic entry', sourceUrl: 'https://www.fftai.com/uploads/upload/files/20250515/3f8dfafee28ab3d5c6688016d8e36eaf.pdf' },
     ],
     fieldEvidence: {
-      mobility: ['https://www.fftai.com/products-gr1'], heightCm: ['https://www.fftai.com/products-gr1'], weightKg: ['https://www.fftai.com/products-gr1'], dof: ['https://www.fftai.com/products-gr1'], controlMethod: ['https://support.fftai.com/en/docs/GR-X-Humanoid-Robot/GR1/Operation-Guide/app/'], loadRatings: ['https://www.fftai.com/uploads/upload/files/20250515/3f8dfafee28ab3d5c6688016d8e36eaf.pdf'],
+      mobility: ['https://www.fftai.com/products-gr1'], heightCm: ['https://www.fftai.com/products-gr1'], weightKg: ['https://www.fftai.com/products-gr1'], dof: ['https://www.fftai.com/products-gr1'], loadRatings: ['https://www.fftai.com/uploads/upload/files/20250515/3f8dfafee28ab3d5c6688016d8e36eaf.pdf'],
     },
     usageExampleSourceUrls: ['https://www.fftai.com/solutions/9'],
     japanAvailability: 'unknown',
     industryTags: ['research', 'healthcare', 'retail', 'facility-management'],
     taskTags: ['research-task', 'customer-service', 'patrol', 'physical-assistance'],
     comparison: {
-      strengths: ['44自由度', '公式操作・開発ドキュメント', '受付・案内の公式事例'],
+      strengths: ['44自由度', '受付・案内の公式事例'],
       constraints: ['variantごとの速度・稼働時間・計算機構成は未確定', '日本での正規取扱は未確認'],
       bestFit: ['研究開発・サービス実証'],
       notFit: ['variant未指定の性能比較'],
@@ -3836,7 +3828,6 @@ export const robots: Robot[] = [
     sources: [
       { title: 'AGIBOT A2 Lite official product page', url: 'https://agibot.com/products/A2_Pro', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT A2 Lite official store', url: 'https://store.agibot.com/products/a2-lite', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'AGIBOT contact', url: 'https://agibot.com/contact/', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     images: { hero: { src: '', alt: 'AgiBot A2 Lite', credit: 'AgiBot', sourceUrl: 'https://agibot.com/jp/products/A2_Pro', rights: { status: 'reference-attributed', sourceType: 'manufacturer-official', rightsHolder: 'AgiBot', checkedAt: '2026-06-09' } } },
     description: 'A2 Liteは身長169cm、重量63kg、最大0.8m/s、23自由度の二足機。無線リモコン、AimMaster、オプションのVR遠隔操作に対応する。稼働時間は立位／歩行条件と公式ページ間で値が異なるため単一値では登録しない。',
@@ -3844,6 +3835,7 @@ export const robots: Robot[] = [
     buyerReadiness: 'limited-today',
     specs: { heightCm: 169, weightKg: 63, speedMps: 0.8, dof: 23, mobility: 'biped', chargeTimeMin: 120, batterySystem: '13直列リチウム電池 / クイックリリース式スマートバッテリー', controlMethod: '無線リモコン / AimMaster / VR遠隔操作（オプション）', computePlatform: '14コア高性能CPU（高演算ボードなし）', ipRating: 'IP5X', operatingTemperature: '0～40℃ / RH 10～90%（結露なし）' },
     procurementModels: ['purchase', 'inquiry'],
+    marketAvailability: 'unknown',
     priceOffers: [
       { channel: 'manufacturer-public', display: '$44,560.00 USD', amount: 44560, currency: 'USD', taxStatus: 'unknown', variant: 'A2 Lite', sellerName: 'AGIBOT Store', sourceUrl: 'https://store.agibot.com/products/a2-lite' },
     ],
@@ -3895,7 +3887,6 @@ export const robots: Robot[] = [
     sources: [
       { title: 'AGIBOT X2 official product page', url: 'https://agibot.com/products/X2', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT X2 official store', url: 'https://store.agibot.com/products/x2', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'AGIBOT contact', url: 'https://agibot.com/contact/', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     images: { hero: { src: '', alt: 'AgiBot X2', credit: 'AgiBot', sourceUrl: 'https://agibot.com/jp/products/X2', rights: { status: 'reference-attributed', sourceType: 'manufacturer-official', rightsHolder: 'AgiBot', checkedAt: '2026-06-09' } } },
     description: 'AgiBot X2は身長131cm、重量35kg、約2時間稼働の二足機。500Whの交換式バッテリー、ハンドヘルドコントローラーとモバイルアプリに対応する。荷重は特定姿勢で最大3kg、全作業域で最大1kgと条件を分けて公表している。',
@@ -3908,7 +3899,8 @@ export const robots: Robot[] = [
       { channel: 'manufacturer-public', display: '$24,240.00 USD', amount: 24240, currency: 'USD', taxStatus: 'unknown', variant: 'X2', sellerName: 'AGIBOT Store', sourceUrl: 'https://store.agibot.com/products/x2' },
     ],
     loadRatings: [
-      { scope: 'manufacturer-wording', rating: 'maximum', kg: 3, condition: '特定姿勢で最大3kg、全作業域では1kg以下。エンドエフェクタを除き、腕／全身scopeは未定義。', variant: 'X2', sourceUrl: 'https://store.agibot.com/products/x2' },
+      { scope: 'manufacturer-wording', rating: 'maximum', kg: 3, condition: '特定姿勢で最大3kg。エンドエフェクタを除き、腕／全身scopeは未定義。', variant: 'X2', sourceUrl: 'https://store.agibot.com/products/x2' },
+      { scope: 'manufacturer-wording', rating: 'maximum', kg: 1, condition: '全作業域では1kg以下。エンドエフェクタを除き、腕／全身scopeは未定義。', variant: 'X2', sourceUrl: 'https://store.agibot.com/products/x2' },
     ],
     fieldEvidence: {
       mobility: ['https://agibot.com/products/X2'], heightCm: ['https://store.agibot.com/products/x2'], weightKg: ['https://store.agibot.com/products/x2'], runtimeMin: ['https://store.agibot.com/products/x2'], batteryCapacityWh: ['https://store.agibot.com/products/x2'], chargeTimeMin: ['https://store.agibot.com/products/x2'], batterySystem: ['https://store.agibot.com/products/x2'], controlMethod: ['https://store.agibot.com/products/x2'], computePlatform: ['https://store.agibot.com/products/x2'], operatingTemperature: ['https://store.agibot.com/products/x2'], priceOffers: ['https://store.agibot.com/products/x2'], loadRatings: ['https://store.agibot.com/products/x2'],
@@ -3933,7 +3925,6 @@ export const robots: Robot[] = [
       { title: 'AGIBOT X2 Ultra official store', url: 'https://store.agibot.com/products/x2-ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT X2 official product page', url: 'https://agibot.com/products/X2', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AimDK_X2 SDK', url: 'https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'AGIBOT contact', url: 'https://agibot.com/contact/', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     images: { hero: { src: '', alt: 'AgiBot X2 Ultra', credit: 'AgiBot', sourceUrl: 'https://agibot.com/jp/products/X2', rights: { status: 'reference-attributed', sourceType: 'manufacturer-official', rightsHolder: 'AgiBot', checkedAt: '2026-06-09' } } },
     description: 'X2 Ultraは身長131cm、重量39kg、30自由度、約2時間稼働の二足機。500Wh交換式バッテリー、Orin NX、AimDK_X2を搭載する。速度は英語・日本語の公式ページで最大値が異なるため登録しない。',
@@ -3942,7 +3933,8 @@ export const robots: Robot[] = [
     specs: { heightCm: 131, weightKg: 39, runtimeMin: 120, dof: 30, mobility: 'biped', batteryCapacityWh: 500, chargeTimeMin: 90, batterySystem: '直接充電 / 交換式バッテリー / 自動充電ドック（オプション）', controlMethod: 'ハンドヘルドコントローラー / モバイルアプリ / 二次開発', sdk: 'AimDK_X2 SDK', computePlatform: 'RK3588デュアルボード + NVIDIA Orin NX 157TOPS', operatingTemperature: '-10～40℃' },
     procurementModels: ['purchase', 'inquiry'],
     loadRatings: [
-      { scope: 'manufacturer-wording', rating: 'maximum', kg: 3, condition: '特定姿勢で最大3kg、全作業域では1kg以下。エンドエフェクタを除き、腕／全身scopeは未定義。', variant: 'X2 Ultra', sourceUrl: 'https://store.agibot.com/products/x2-ultra' },
+      { scope: 'manufacturer-wording', rating: 'maximum', kg: 3, condition: '特定姿勢で最大3kg。エンドエフェクタを除き、腕／全身scopeは未定義。', variant: 'X2 Ultra', sourceUrl: 'https://store.agibot.com/products/x2-ultra' },
+      { scope: 'manufacturer-wording', rating: 'maximum', kg: 1, condition: '全作業域では1kg以下。エンドエフェクタを除き、腕／全身scopeは未定義。', variant: 'X2 Ultra', sourceUrl: 'https://store.agibot.com/products/x2-ultra' },
     ],
     fieldEvidence: {
       mobility: ['https://store.agibot.com/products/x2-ultra'], heightCm: ['https://store.agibot.com/products/x2-ultra'], weightKg: ['https://store.agibot.com/products/x2-ultra'], dof: ['https://store.agibot.com/products/x2-ultra'], runtimeMin: ['https://store.agibot.com/products/x2-ultra'], batteryCapacityWh: ['https://store.agibot.com/products/x2-ultra'], chargeTimeMin: ['https://store.agibot.com/products/x2-ultra'], batterySystem: ['https://store.agibot.com/products/x2-ultra'], controlMethod: ['https://store.agibot.com/products/x2-ultra'], sdk: ['https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html'], computePlatform: ['https://store.agibot.com/products/x2-ultra'], operatingTemperature: ['https://store.agibot.com/products/x2-ultra'], loadRatings: ['https://store.agibot.com/products/x2-ultra'],
@@ -3966,7 +3958,6 @@ export const robots: Robot[] = [
     sources: [
       { title: 'Walker S official product page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'UBTECH industrial humanoid solutions', url: 'https://www.ubtrobot.com/en/humanoid/solutions/industry', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
-      { title: 'UBTECH contact', url: 'https://www.ubtrobot.com/en/contact-us', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
     ],
     images: { hero: { src: '', alt: 'UBTECH Walker S', credit: 'UBTECH Robotics', sourceUrl: 'https://www.ubtrobot.com/', rights: { status: 'reference-attributed', sourceType: 'manufacturer-official', rightsHolder: 'UBTECH Robotics', checkedAt: '2026-06-10' } } },
     description: 'Walker Sは工場の精密な同期作業向けに設計された二足ヒューマノイド。公式ページで身長170cm、41自由度、ROSA 2.0、GUI、遠隔操作、AIOTへの対応を確認できる。Walker S Liteとは別モデルとして扱う。',
