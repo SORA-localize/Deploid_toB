@@ -112,7 +112,7 @@ export const useCases: UseCase[] = [
     titleJa: '研究開発',
     summary: '大学・研究機関・企業R&Dで、制御、操作、HRI、AI統合を検証する用途。',
     publishStatus: 'published',
-    updatedAt: '2026-06-28',
+    updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
       {
@@ -138,6 +138,15 @@ export const useCases: UseCase[] = [
         checkedAt: '2026-06-28',
         reliability: 'official',
         note: 'T1 の研究・競技向け製品能力の裏取り。',
+      },
+      {
+        title: 'Welcome to Robot Park: Where Apptronik’s Apollo Goes to Work Training the Next Generation of Humanoid Robot Intelligence',
+        url: 'https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work',
+        publisher: 'Apptronik',
+        publishedAt: '2026-06-30',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+        note: 'Apollo 2を使った実環境データ収集とGoogle DeepMindとのAIモデル学習の公式根拠。',
       },
     ],
     maturityLevel: 'pilot-phase',
@@ -181,6 +190,15 @@ export const useCases: UseCase[] = [
         basis: 'official-use-case',
         evidenceSourceUrls: ['https://www.booster.tech/booster-t1/'],
         reason: '公式ページで開発者・研究者・競技向けの機体として明示されている。ただし実証事例はまだ確認できていない。',
+      },
+      {
+        robotId: 'apptronik-apollo-2',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: [
+          'https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work',
+        ],
+        reason: 'Robot Parkと顧客・提携先でApollo 2を使った実環境データ収集とAIモデル学習が公式に示されている。',
       },
     ],
   },
@@ -451,7 +469,7 @@ export const useCases: UseCase[] = [
     subtitle: '自動車工場を中心に、部品搬送や組立補助の実証・量産導入が最も集中している用途。',
     summary: '完成車工場・部品工場での部品搬送、組立キット運搬、外観検査補助を対象にした用途。',
     publishStatus: 'published',
-    updatedAt: '2026-06-28',
+    updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
       {
@@ -478,6 +496,23 @@ export const useCases: UseCase[] = [
         checkedAt: '2026-06-26',
         reliability: 'official',
         note: 'Mercedes-Benz manufacturing facilities での Apollo 実証と、assembly kits / component inspection の裏取り。',
+      },
+      {
+        title: 'Manufacturing',
+        url: 'https://apptronik.com/industries/manufacturing',
+        publisher: 'Apptronik',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+        note: 'キッティング、部材搬送、ラインサイド支援、設備支援を含む製造用途の公式根拠。',
+      },
+      {
+        title: 'Welcome to Robot Park: Where Apptronik’s Apollo Goes to Work Training the Next Generation of Humanoid Robot Intelligence',
+        url: 'https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work',
+        publisher: 'Apptronik',
+        publishedAt: '2026-06-30',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+        note: 'Apollo 2が製造・物流等の実環境タスクで稼働していることの公式根拠。',
       },
       {
         title: 'UBTECH Walker S1 official page',
@@ -522,6 +557,16 @@ export const useCases: UseCase[] = [
         basis: 'deployment',
         evidenceDeploymentIds: ['apptronik-mercedes-berlin'],
         reason: 'Mercedes-Benz manufacturing facilities で、組立キット搬送や部品検査を含む製造補助用途の実証が公式に確認できる。',
+      },
+      {
+        robotId: 'apptronik-apollo-2',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: [
+          'https://apptronik.com/industries/manufacturing',
+          'https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work',
+        ],
+        reason: '公式サイトがApolloの製造用途をキッティング、部材搬送、ラインサイド支援等として示し、Apollo 2の実環境稼働も公表している。特定工程への導入実績は未確認。',
       },
       {
         robotId: 'wandercraft-calvin',
@@ -593,11 +638,19 @@ export const useCases: UseCase[] = [
     subtitle: '製造ラインへの部品キット・ワゴン搬送をヒューマノイドで代替する用途。',
     summary: '製造ラインへの部品キット・ワゴン搬送をヒューマノイドで代替する用途。',
     publishStatus: 'published',
-    updatedAt: '2026-06-30',
+    updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
       { title: 'UBTECH Walker S official page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s', publisher: 'UBTECH Robotics', checkedAt: '2026-06-30', reliability: 'official' },
       { title: 'UBTECH Walker S1 official page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s1', publisher: 'UBTECH Robotics', checkedAt: '2026-06-30', reliability: 'official' },
+      {
+        title: 'Apptronik and Mercedes-Benz Enter Commercial Agreement',
+        url: 'https://apptronik.com/news-collection/apptronik-and-mercedes-benz-enter-commercial-agreement',
+        publisher: 'Apptronik',
+        publishedAt: '2024-03-15',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
     ],
     maturityLevel: 'production-ready',
     buyerReadiness: 'requires-poc',
@@ -620,6 +673,15 @@ export const useCases: UseCase[] = [
     candidateRobots: [
       { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s'], reason: '製造ライン向け搬送タスクを公式ユースケースに掲載。' },
       { robotId: 'ubtech-walker-s1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s1'], reason: 'NIO工場等の自動車製造ラインへの投入が公式に示されている。' },
+      {
+        robotId: 'apptronik-apollo',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: [
+          'https://apptronik.com/news-collection/apptronik-and-mercedes-benz-enter-commercial-agreement',
+        ],
+        reason: 'Mercedes-Benzの製造施設で、組立キットとキット済み部品トートの搬送を検証すると公式発表されている。',
+      },
     ],
   },
   {
@@ -661,10 +723,18 @@ export const useCases: UseCase[] = [
     subtitle: '製造ライン上の完成品・部品を、ヒューマノイドが外観撮影・異常検出する用途。',
     summary: '製造ライン上の完成品・部品を、ヒューマノイドが外観撮影・異常検出する用途。',
     publishStatus: 'published',
-    updatedAt: '2026-06-30',
+    updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
       { title: 'UBTECH Walker S official page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s', publisher: 'UBTECH Robotics', checkedAt: '2026-06-30', reliability: 'official' },
+      {
+        title: 'Apptronik and Mercedes-Benz Enter Commercial Agreement',
+        url: 'https://apptronik.com/news-collection/apptronik-and-mercedes-benz-enter-commercial-agreement',
+        publisher: 'Apptronik',
+        publishedAt: '2024-03-15',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
     ],
     maturityLevel: 'production-ready',
     buyerReadiness: 'requires-poc',
@@ -686,6 +756,15 @@ export const useCases: UseCase[] = [
     japanDeploymentConditions: '品質管理基準（ISO 9001等）への適合、判定ログの保管義務の確認が必要。',
     candidateRobots: [
       { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s'], reason: '製造ライン品質管理向け公式ユースケースに掲載。' },
+      {
+        robotId: 'apptronik-apollo',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: [
+          'https://apptronik.com/news-collection/apptronik-and-mercedes-benz-enter-commercial-agreement',
+        ],
+        reason: 'Mercedes-Benzの製造施設で、Apolloが部品を搬送しながら検査する用途を検証すると公式発表されている。',
+      },
     ],
   },
   {
@@ -764,10 +843,27 @@ export const useCases: UseCase[] = [
     subtitle: 'FC（フルフィルメントセンター）内の棚からの商品ピッキングをヒューマノイドで実施する用途。',
     summary: 'FC（フルフィルメントセンター）内の棚からの商品ピッキングをヒューマノイドで実施する用途。',
     publishStatus: 'published',
-    updatedAt: '2026-06-30',
+    updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
       { title: '1X NEO use cases', url: 'https://www.1x.tech/androids/neo', publisher: '1X Technologies', checkedAt: '2026-06-30', reliability: 'official' },
+      {
+        title: 'Person-to-goods',
+        url: 'https://apptronik.com/solutions/person-to-goods',
+        publisher: 'Apptronik',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+        note: 'Apolloによる棚・ラックからの商品ピッキングとトート投入の公式根拠。',
+      },
+      {
+        title: 'Welcome to Robot Park: Where Apptronik’s Apollo Goes to Work Training the Next Generation of Humanoid Robot Intelligence',
+        url: 'https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work',
+        publisher: 'Apptronik',
+        publishedAt: '2026-06-30',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+        note: 'Apollo 2が物流を含む実環境タスクで稼働していることの公式根拠。',
+      },
     ],
     maturityLevel: 'pilot-phase',
     buyerReadiness: 'requires-poc',
@@ -789,6 +885,16 @@ export const useCases: UseCase[] = [
     japanDeploymentConditions: '倉庫の安全管理規程対応、WMS連携の標準化、保守体制の整備が必要。',
     candidateRobots: [
       { robotId: 'onex-eve', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.1x.tech/androids/neo'], reason: '1X Technologiesがホームサービス・ピッキングタスクを主力ユースケースとして位置付けている。' },
+      {
+        robotId: 'apptronik-apollo-2',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: [
+          'https://apptronik.com/solutions/person-to-goods',
+          'https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work',
+        ],
+        reason: '現行公式サイトがApolloの棚・ラックからの商品ピッキングを示し、Apollo 2が物流を含む実環境タスクで稼働していると公表している。特定倉庫への商用導入は未確認。',
+      },
     ],
   },
   {
