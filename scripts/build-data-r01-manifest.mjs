@@ -617,8 +617,8 @@ function createReport(manifests, totals) {
 
   return `# DATA-R01 implementation manifest report
 
-Generated from: \`DATA-R01-VERIFY-B01.json\`〜\`DATA-R01-VERIFY-B14.json\`  
-Schema: \`${manifestSchemaVersion}\`  
+Generated from: \`DATA-R01-VERIFY-B01.json\`〜\`DATA-R01-VERIFY-B14.json\`
+Schema: \`${manifestSchemaVersion}\`
 Checked at: 2026-07-16
 
 ## 結論

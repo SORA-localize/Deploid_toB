@@ -1,7 +1,7 @@
 # DATA-R01 published Robot 全件公式情報調査
 
-調査日: 2026-07-16（Asia/Tokyo）  
-対象: `data/robots.ts` の実行時 `publishStatus: 'published'`  61機  
+調査日: 2026-07-16（Asia/Tokyo）
+対象: `data/robots.ts` の実行時 `publishStatus: 'published'` 61機
 調査単位: 1 Robot ID を1回だけ調査し、14バッチへ分割
 
 Status: **一次調査完了 / 正規化・独立ファクトチェック未完了**
