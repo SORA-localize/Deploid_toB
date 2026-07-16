@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
 import { RobotCardRail } from '@/components/RobotCardRail';
 import type { Robot, Manufacturer } from '@/data/types';
+import { getRobotPrimaryImage } from '@/lib/robotMedia';
 
 interface FeaturedRobotsGridProps {
   robots: Robot[];
@@ -10,6 +11,8 @@ interface FeaturedRobotsGridProps {
 }
 
 export function FeaturedRobotsGrid({ robots, manufacturerById }: FeaturedRobotsGridProps) {
+  const leadingImageRobotId = robots.find((robot) => getRobotPrimaryImage(robot))?.id;
+
   return (
     <section className="py-8 sm:py-12 border-b border-border">
       <div className="flex items-end justify-between mb-5">
@@ -30,6 +33,7 @@ export function FeaturedRobotsGrid({ robots, manufacturerById }: FeaturedRobotsG
               key={robot.id}
               robot={robot}
               manufacturerName={manufacturer?.name}
+              eagerImage={robot.id === leadingImageRobotId}
             />
           );
         })}

@@ -13,6 +13,7 @@ import { SearchInput } from '@/components/SearchInput';
 import type { Manufacturer, Robot } from '@/data/types';
 import type { RobotCardViewModel } from '@/lib/robotCatalog';
 import { japanAvailabilityLabels } from '@/lib/labels';
+import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import {
   filterRobots,
   getRobotFacetCounts,
@@ -112,6 +113,8 @@ export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialFi
     filters.manufacturer !== 'all' ||
     filters.availability !== 'all';
   const resultCount = activeRobots.length + preReleaseRobots.length;
+  const leadingImageRobotId = [...activeRobots, ...preReleaseRobots]
+    .find((robot) => getRobotPrimaryImage(robot))?.id;
 
   // 業種はタブでアクティブ表示されるため、チップからは外す（二重表示防止）。
   const activeChips = useMemo(() => {
@@ -143,6 +146,7 @@ export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialFi
             isFavorite={favorites.includes(robot.id)}
             onFavoriteToggle={toggleFavorite}
             mobileVisual
+            eagerImage={robot.id === leadingImageRobotId}
           />
         );
       })}

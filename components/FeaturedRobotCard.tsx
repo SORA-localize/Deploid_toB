@@ -11,6 +11,8 @@ import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
 interface FeaturedRobotCardProps {
   robot: Robot;
   manufacturerName?: string;
+  /** 初期viewport内でLCP候補になる先頭カードだけに指定する。 */
+  eagerImage?: boolean;
 }
 
 /**
@@ -21,7 +23,11 @@ interface FeaturedRobotCardProps {
  * ホバー演出（チルト・グロー・シマー・アクセントライン）は RobotCard/UseCaseCard と同じ
  * useTiltCardEffect 経由で共通化する。
  */
-export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCardProps) {
+export function FeaturedRobotCard({
+  robot,
+  manufacturerName,
+  eagerImage = false,
+}: FeaturedRobotCardProps) {
   const cardImage = getRobotPrimaryImage(robot);
 
   const {
@@ -52,6 +58,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
             alt=""
             aria-hidden="true"
             fill
+            loading={eagerImage ? 'eager' : 'lazy'}
             sizes="(max-width: 640px) 100vw, 20vw"
             className="pointer-events-none z-0 scale-110 select-none object-cover blur-2xl brightness-[85] saturate-150"
           />
@@ -60,6 +67,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
             src={cardImage.src}
             alt={cardImage.alt}
             fill
+            loading={eagerImage ? 'eager' : 'lazy'}
             sizes="(max-width: 640px) 100vw, 20vw"
             className="pointer-events-none z-10 object-contain object-center transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
           />
