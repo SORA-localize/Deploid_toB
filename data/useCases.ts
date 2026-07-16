@@ -121,16 +121,7 @@ export const useCases: UseCase[] = [
     publishStatus: 'draft',
     updatedAt: '2026-06-28',
     reliability: 'reported',
-    sources: [
-      {
-        title: 'UBTECH Walker S2 official page',
-        url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s2',
-        publisher: 'UBTECH Robotics',
-        checkedAt: '2026-06-28',
-        reliability: 'official',
-        note: 'Walker S2 の産業向け機能と24/7稼働対応の裏取り。巡回・点検タスクそのものの直接根拠ではないため公開用途からは外す。',
-      },
-    ],
+    sources: [],
     maturityLevel: 'early-stage',
     buyerReadiness: 'limited-today',
     environment: 'indoor-semi-controlled',
@@ -152,15 +143,7 @@ export const useCases: UseCase[] = [
     environmentRequirements: '通信環境、充電位置、巡回ルート、作業時間帯の分離。',
     whyHardToday: '複雑な現場での自律移動、微細な異常検知、長時間稼働が課題。',
     japanDeploymentConditions: '設備管理ルール、データ管理、保守対応、労働安全の整理が必要。',
-    candidateRobots: [
-      {
-        robotId: 'ubtech-walker-s2',
-        fit: 'possible',
-        basis: 'product-capability',
-        evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s2'],
-        reason: '24/7稼働対応など工場運用向けの位置付けは確認できるが、巡回・点検タスクそのものでの実証は確認できていない。',
-      },
-    ],
+    candidateRobots: [],
   },
   {
     id: 'research-development',
@@ -478,6 +461,8 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'Walker X official product page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-x', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
+      { title: 'Walker C official product page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-c', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       {
         title: 'AgiBot A2 公式ページ',
         url: 'https://agibot.com/jp/products/A2',
@@ -557,6 +542,8 @@ export const useCases: UseCase[] = [
     japanDeploymentConditions:
       '日本語対話の精度、設置施設の防犯・接客ガイドラインとの整合、機体の代理店・保守体制（要確認）を確認する必要がある。',
     candidateRobots: [
+      { robotId: 'ubtech-walker-x', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-x'], reason: '公式ページが対話を通じたサービス提供を対象用途として示している。' },
+      { robotId: 'ubtech-walker-c', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-c'], reason: '公式ページがオフィスビルでの挨拶・受付を対象用途として示している。' },
       {
         robotId: 'agibot-a2',
         fit: 'possible',
@@ -712,6 +699,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'UBTECH industrial humanoid solutions', url: 'https://www.ubtrobot.com/en/humanoid/solutions/industry', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT G2 official product page', url: 'https://www.agibot.com/products/G2', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       {
         title: 'Renault Group finalises a strategic partnership with Wandercraft',
@@ -886,6 +874,8 @@ export const useCases: UseCase[] = [
     japanDeploymentConditions:
       '国内自動車・電子機器メーカーでの公開実証はまだ確認できておらず、価格・保守体制は機種ごとに要確認。',
     candidateRobots: [
+      { robotId: 'ubtech-walker-s2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式産業ソリューションが精密ハンドリング、組立、製造ライン作業を対象用途として示している。' },
+      { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式産業ソリューションが組立、ねじ・ボルト締めを対象用途として示している。' },
       { robotId: 'agibot-g2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.agibot.com/products/G2'], reason: '公式製品ページが高精度の力制御とサブミリ精度組立を対象用途として示している。' },
       {
         robotId: 'apptronik-apollo',
@@ -945,7 +935,7 @@ export const useCases: UseCase[] = [
         robotId: 'ubtech-walker-s1',
         fit: 'possible',
         basis: 'official-use-case',
-        evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s1'],
+        evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s1', 'https://www.ubtrobot.com/en/humanoid/solutions/industry'],
         reason: '公式ページで車両製造ラインへの投入とスマート製造向けの位置付けが示されている。ただしNIO導入URLは現行確認できないためdeployment扱いにはしない。',
       },
       {
@@ -1044,7 +1034,6 @@ export const useCases: UseCase[] = [
     japanDeploymentConditions: '労働安全衛生規則対応、設備側の安全連動、国内保守体制の確認が必要。',
     candidateRobots: [
       { robotId: 'figure-02', fit: 'possible', basis: 'adjacent-deployment', evidenceDeploymentIds: ['figure-bmw-spartanburg'], reason: 'BMWスパルタンバーグ工場での製造ライン補助実証実績。板金供給は近接タスク。' },
-      { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s'], reason: 'UBTECHが製造ライン補助向け公式ソリューションとして訴求している。' },
     ],
   },
   {
@@ -1058,8 +1047,8 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'UBTECH industrial humanoid solutions', url: 'https://www.ubtrobot.com/en/humanoid/solutions/industry', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'UBTECH Walker S official page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s', publisher: 'UBTECH Robotics', checkedAt: '2026-06-30', reliability: 'official' },
-      { title: 'UBTECH Walker S1 official page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s1', publisher: 'UBTECH Robotics', checkedAt: '2026-06-30', reliability: 'official' },
       {
         title: 'Calvin-40 official product page',
         url: 'https://en.wandercraft.eu/calvin-40',
@@ -1124,15 +1113,15 @@ export const useCases: UseCase[] = [
       whereDoesNotFit: '高速・多品種・不定形部品のピッキングが必要な工程。',
       mustBeTrue: '搬送ルートを人との動線から分離でき、キット置き場を標準化できる。',
     },
-    overview: 'UBTECH Walker S1はNIO等の自動車工場での組立ライン搬送補助を公式ユースケースとして打ち出している。量産体制にあり、アセンブリキット搬送は最も成熟した製造ユースケースの一つ。',
+    overview: 'UBTECHの産業向け公式ソリューションでは、SPS部品供給、満載トレー搬送、空トレー回収などが対象作業として示されている。',
     whyItMatters: '部品搬送工程の人手依存度を下げることで、ライン設計の柔軟性が高まる。',
     capabilityNotes: { mobility: '床面の平坦性と通路幅の確保が前提。', integration: 'MES/ERPとの連動で搬送タイミングの最適化が必要。' },
     environmentRequirements: '整備された床面、WMS/MES連携環境、充電ステーション。',
     whyHardToday: '動的な人との混在動線での安全確保、例外対応（キット不足等）の自動化が課題。',
     japanDeploymentConditions: '国内自動車工場でのPoC実績確認、安全基準（ISO 10218等）適合が前提。',
     candidateRobots: [
-      { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s'], reason: '製造ライン向け搬送タスクを公式ユースケースに掲載。' },
-      { robotId: 'ubtech-walker-s1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s1'], reason: 'NIO工場等の自動車製造ラインへの投入が公式に示されている。' },
+      { robotId: 'ubtech-walker-s2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式産業ソリューションがSPS部品供給、満載トレー搬送、空トレー回収を対象用途として示している。' },
+      { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s', 'https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式情報が製造ラインの部材搬送とSPS仕分けを対象用途として示している。' },
       {
         robotId: 'wandercraft-calvin',
         fit: 'possible',
@@ -1230,6 +1219,7 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'UBTECH industrial humanoid solutions', url: 'https://www.ubtrobot.com/en/humanoid/solutions/industry', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'UBTECH Walker S official page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s', publisher: 'UBTECH Robotics', checkedAt: '2026-06-30', reliability: 'official' },
       {
         title: 'Apptronik and Mercedes-Benz Enter Commercial Agreement',
@@ -1280,7 +1270,8 @@ export const useCases: UseCase[] = [
     whyHardToday: '合否判定モデルの構築・維持コスト、多品種対応時の再学習コストが課題。',
     japanDeploymentConditions: '品質管理基準（ISO 9001等）への適合、判定ログの保管義務の確認が必要。',
     candidateRobots: [
-      { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s'], reason: '製造ライン品質管理向け公式ユースケースに掲載。' },
+      { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s', 'https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式情報が自動車製造ラインの外観品質検査を対象用途として示している。' },
+      { robotId: 'ubtech-walker-s1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式産業ソリューションが自動車製造ラインの外観品質検査を対象用途として示している。' },
       {
         robotId: 'apptronik-apollo',
         fit: 'possible',
@@ -1462,12 +1453,10 @@ export const useCases: UseCase[] = [
     titleJa: 'カゴ車積載',
     subtitle: 'ソーターラインから送られてきた荷物のカゴ台車への積み込みをヒューマノイドで実施する用途。',
     summary: 'ソーターラインから送られてきた荷物のカゴ台車への積み込みをヒューマノイドで実施する用途。',
-    publishStatus: 'published',
-    updatedAt: '2026-06-30',
+    publishStatus: 'draft',
+    updatedAt: '2026-07-16',
     reliability: 'reported',
-    sources: [
-      { title: 'UBTECH Walker S1 official page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s1', publisher: 'UBTECH Robotics', checkedAt: '2026-06-30', reliability: 'official' },
-    ],
+    sources: [],
     maturityLevel: 'production-ready',
     buyerReadiness: 'requires-poc',
     environment: 'indoor-controlled',
@@ -1480,15 +1469,13 @@ export const useCases: UseCase[] = [
       whereDoesNotFit: '超大型荷物・液体・壊れ物を含む混載作業。',
       mustBeTrue: '作業エリアをソーターラインと安全に分離でき、カゴ台車の配置を標準化できる。',
     },
-    overview: 'UBTECHが物流センターでのカゴ積載タスクを公式に訴求しており、量産体制で実績を積みつつある。定型動作の繰り返しが多いため自動化の優先度が高い。',
+    overview: 'カゴ車積載は定型動作の繰り返しが多い一方、荷姿のばらつきと積み付け安定性の検証が必要な用途。現時点で掲載機体に直接接続できる公式根拠は未登録。',
     whyItMatters: 'カゴ積み作業は腰への負担が大きく、深夜・早朝シフトで人材確保が特に困難。',
     capabilityNotes: { manipulation: '荷物サイズ・重量のばらつきに対応できるグリッパ選定が重要。' },
     environmentRequirements: '安全柵または人機分離設計、標準化されたカゴ配置、充電スペース。',
     whyHardToday: '多品種混載時の積み付けパターン最適化と荷崩れ防止が技術課題。',
     japanDeploymentConditions: '物流センターの安全基準、機器認証、保守体制の整備が必要。',
-    candidateRobots: [
-      { robotId: 'ubtech-walker-s1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s1'], reason: '物流センター内の仕分け・積み込みタスクを公式ユースケースに掲載。' },
-    ],
+    candidateRobots: [],
   },
   {
     id: 'logistics-returns-sorting',
@@ -2199,6 +2186,8 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
+      { title: 'Walker X official product page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-x', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
+      { title: 'Walker C official product page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-c', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT A2 official product page', url: 'https://agibot.com/products/A2', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT A2 Ultra official product page', url: 'https://agibot.com/products/A2_Ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT X2 Ultra official store', url: 'https://store.agibot.com/products/x2-ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
@@ -2236,6 +2225,8 @@ export const useCases: UseCase[] = [
     whyHardToday: '複雑な質問への対応限界、人との密な混在環境でのナビゲーション安全性が課題。',
     japanDeploymentConditions: '個人情報の取り扱い（案内時の音声・映像記録）、バリアフリー基準への適合が必要。',
     candidateRobots: [
+      { robotId: 'ubtech-walker-x', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-x'], reason: '公式ページがU-SLAMナビゲーションと自律経路計画を案内サービス向けに示している。' },
+      { robotId: 'ubtech-walker-c', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-c'], reason: '公式ページが展示ホールと交通施設でのスマートガイドを対象用途として示している。' },
       { robotId: 'agibot-a2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://agibot.com/products/A2'], reason: '公式ページが展示ホールでの説明とスーパーマーケットでの案内を対象用途として示している。' },
       { robotId: 'agibot-a2-ultra', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://agibot.com/products/A2_Ultra'], reason: '公式ページが自律受付、経路案内、説明を対象用途として示している。' },
       { robotId: 'agibot-x2-ultra', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://store.agibot.com/products/x2-ultra'], reason: '公式ストアが展示案内と文化・観光施設での案内を対象用途として示している。' },
