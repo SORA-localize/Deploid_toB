@@ -15,6 +15,16 @@ Last reviewed: 2026-07-14
 - `data/articlePlacements.ts` — 記事タブ/home注目記事の掲載枠
 - `data/types.ts` — 型の正本
 
+## 全件調査成果物
+
+- `DATA-R01-master-report.md` — published Robot全61機の公式情報一次調査の統合報告
+- `DATA-R01-B01-*.json`〜`DATA-R01-B14-*.json` — 項目別raw調査データ
+- `DATA-R01-B01-*.md`〜`DATA-R01-B14-*.md` — バッチ別の人間向け要約
+
+これらは調査対象をMECEに収録した非正本であり、`data/*.ts`へ直接コピーしない。
+master reportの事後構造監査、`needs-review`、`conflict`、`humanReviewRequired`を解決し、
+現行型・validatorを通過した値だけを実装へ反映する。
+
 各コレクションの追加・更新手順は `../planning/data-maintenance-checklist-v1.md` の対応セクション：
 robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCases=M / deployments=N / articlePlacements=O。
 （guides=L は撤去済み。経緯は `../planning/archive/guides-retirement-v1.md`。）

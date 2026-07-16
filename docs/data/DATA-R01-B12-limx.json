@@ -1,0 +1,140 @@
+{
+  "batchId": "DATA-R01-B12",
+  "checkedAt": "2026-07-16",
+  "targetRobotIds": ["limx-oli", "limx-luna"],
+  "schemaKeysChecked": ["mobility", "heightCm", "weightKg", "speedMps", "dof", "payloadKg", "runtimeMin", "batteryCapacityWh", "chargeTimeMin", "batterySystem", "controlMethod", "sdk", "computePlatform", "ipRating", "operatingTemperature", "safetyStandard"],
+  "robots": [
+    {
+      "robotId": "limx-oli",
+      "manufacturerId": "limx-dynamics",
+      "identity": {
+        "status": "needs-review",
+        "officialName": "LimX Oli",
+        "variant": "Oli Lite / Oli EDU / Oli Super and additional official spec column; generic record is not assigned one package",
+        "officialProductUrl": "https://www.limxdynamics.com/en/products/oli",
+        "notes": "LimX公式ページはOliシリーズの複数variantを明記し、仕様表も高さ・重量・DoF・稼働時間・荷重・算力を構成別に掲載。単一variantの値へ統合していない。"
+      },
+      "positioningFacts": [
+        {"statement": "LimX positions Oli as a full-size general-purpose humanoid robot with independent motion-control and perception compute", "sourceUrl": "https://www.limxdynamics.com/en/products/oli"},
+        {"statement": "Oli official overview lists scientific research and development, entertainment and performance, exhibition and event guidance, equipment inspection, industrial operations and property management", "sourceUrl": "https://www.limxdynamics.com/en/products/oli"},
+        {"statement": "Oli supports full Python development, modular SDK, upper/lower-level APIs, URDF, code examples and major simulators", "sourceUrl": "https://www.limxdynamics.com/en/products/oli"}
+      ],
+      "fields": {
+        "mobility": {"status": "needs-review", "rawValue": "Full-size humanoid robot; official high-level control supports humanoid walking, mobile operation, stationary operation and remote operation", "normalizedValue": null, "unit": "", "variant": "Oli series", "condition": "official page supports walking but generic mobility enum is not fixed for all variants", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "歩行・人形機体は確認できるが、シリーズ代表variantを選んでいない。"},
+        "heightCm": {"status": "needs-review", "rawValue": "165cm for multiple Oli columns; 175cm in another official spec column", "normalizedValue": null, "unit": "cm", "variant": "Oli series specification columns", "condition": "height differs by official configuration", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "公式仕様表に165cmと175cmがあり、単一値を選択していない。"},
+        "weightKg": {"status": "needs-review", "rawValue": "≤55kg for multiple Oli columns; ≤60kg in another official spec column, battery included", "normalizedValue": null, "unit": "kg", "variant": "Oli series specification columns", "condition": "configuration-dependent upper bounds", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "電池込み重量が≤55kg／≤60kgでvariant依存。"},
+        "speedMps": {"status": "found", "rawValue": "Maximum moving speed 5km/h", "normalizedValue": 1.3889, "unit": "m/s", "variant": "Oli series specification table", "condition": "official maximum speed converted from 5km/h; 1.3889m/s", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "最大移動速度5km/hをm/sへ換算。"},
+        "dof": {"status": "needs-review", "rawValue": "Active DoF total 31 for Lite/EDU columns, 33 for Super column and 43 in another official spec column; single arm 7, single leg 6, waist 3, neck 2", "normalizedValue": null, "unit": "DoF", "variant": "Oli series specification columns", "condition": "official configuration-dependent total; end-effector DoF may differ", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "公式表の31／33／43 DoFとscope別内訳。"},
+        "payloadKg": {"status": "not-published", "rawValue": "Official maximum single-arm load values are retained in loadRatings and not copied to scalar payloadKg", "normalizedValue": null, "unit": "kg", "variant": "Oli series", "condition": "arm scope is separated", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "片腕荷重をscalarへ流用していない。"},
+        "runtimeMin": {"status": "needs-review", "rawValue": "Battery life about 2h in multiple Oli columns; about 1.5h in Super/additional column", "normalizedValue": null, "unit": "min", "variant": "Oli series specification columns", "condition": "runtime differs by configuration and official condition is approximate", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "構成別の約2時間／約1.5時間を分離。"},
+        "batteryCapacityWh": {"status": "needs-review", "rawValue": "9,500mAh battery capacity; no battery voltage is published for Wh conversion", "normalizedValue": null, "unit": "Wh", "variant": "Oli series", "condition": "official capacity is Ah-based, so Wh cannot be derived without voltage", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "9500mAhは確認したがWh換算していない。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "Charger output 58.8V 10A is published, but charging duration is not", "normalizedValue": null, "unit": "min", "variant": "Oli series", "condition": "charger output is not charge time", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "充電器出力のみで充電時間は非公開。"},
+        "batterySystem": {"status": "found", "rawValue": "Slide-out/quick-swap battery module; 9,500mAh; charger 58.8V 10A", "normalizedValue": "slide-out quick-swap battery module", "unit": "", "variant": "Oli series", "condition": "battery chemistry and voltage of the battery itself are not stated", "sourceUrl": "https://www.limxdynamics.com/en/products/oli", "evidenceSummary": "交換式モジュールと公式容量・充電器表記。"},
+        "controlMethod": {"status": "found", "rawValue": "Remote controller, handheld emergency stop, voice-based control and high/low-level motion APIs", "normalizedValue": "remote control / voice control / motion APIs", "unit": "", "variant": "Oli series", "condition": "official overview and specification", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "リモコン、音声、API操作を確認。"},
+        "sdk": {"status": "found", "rawValue": "Full Python development, modular SDK, upper/lower-level APIs, URDF, code examples, Isaac Sim, MuJoCo and Gazebo support", "normalizedValue": "LimX modular SDK / Python / upper-lower APIs", "unit": "", "variant": "Oli series", "condition": "official developer-support description", "sourceUrl": "https://www.limxdynamics.com/en/products/oli", "evidenceSummary": "公式ページのSDK、Python、API、Sim2Real資料を確認。"},
+        "computePlatform": {"status": "needs-review", "rawValue": "Motion control RK3588/8G/64G or RK3588/16G/256G; perception absent or Orin NX 157TOPS/16G/1T or 2T; optional computing backpack AGX Orin 64GB/275TOPS", "normalizedValue": null, "unit": "TOPS", "variant": "Oli series configuration-dependent", "condition": "official compute stack differs by package", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "RK3588・Orin NX・AGX Orinの構成差を確認。"},
+        "ipRating": {"status": "not-published", "rawValue": "No Oli IP ingress-protection rating found on reviewed official product, spec, news and support pages", "normalizedValue": null, "unit": "", "variant": "Oli series", "condition": "quick-swap or general-purpose wording is not an IP rating", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "防塵防水等級は確認できない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "No whole-robot operating-temperature range found on reviewed Oli official product, spec, news and support pages", "normalizedValue": null, "unit": "°C", "variant": "Oli series", "condition": "remote-controller temperature is not robot operating temperature", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "機体動作温度は確認できない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "Handheld emergency stop is published, but no named Oli safety standard or certification number found", "normalizedValue": null, "unit": "", "variant": "Oli series", "condition": "emergency stop function is not a compliance standard", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec", "evidenceSummary": "E-stopは確認したが規格名・認証番号はない。"}
+      },
+      "loadRatings": [
+        {"scope": "single-arm", "rating": "maximum", "kg": 3, "condition": "Official maximum single-arm load for multiple Oli columns; exact package mapping is not fully exposed in extracted table", "variant": "Oli series specification columns", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec"},
+        {"scope": "single-arm", "rating": "maximum", "kg": 5, "condition": "Official maximum single-arm load for another Oli specification column; exact variant name is not fully exposed in extracted table", "variant": "Oli series specification column", "sourceUrl": "https://limxdynamics.com/en/products/oli/spec"}
+      ],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [
+        {"existingUseCaseId": "research-development", "officialExpression": "Scientific Research & Development", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "reason": "公式Oliページが科学研究・開発を明示。"},
+        {"existingUseCaseId": "customer-reception", "officialExpression": "Exhibition & Event Guidance", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "reason": "展示・イベント案内を既存受付・案内UseCaseへ接続。"},
+        {"existingUseCaseId": "factory-visual-inspection", "officialExpression": "Equipment Inspection", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "reason": "設備検査を既存の視覚検査UseCaseへ接続。"},
+        {"existingUseCaseId": "factory-assembly-support", "officialExpression": "Industrial Operations", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "reason": "公式の産業オペレーション表現を工場作業支援へ接続。"}
+      ],
+      "useCaseGaps": [
+        "USE_CASE_GAP limx-oli \"Entertainment & Performance\" https://www.limxdynamics.com/en/products/oli",
+        "USE_CASE_GAP limx-oli \"Property Management\" https://www.limxdynamics.com/en/products/oli"
+      ],
+      "usageExamples": [
+        {"title": "Full-Size Humanoid Oli | Fully Autonomous Tennis Ball Picks Up & Tosses", "url": "https://www.limxdynamics.com/en/news/BK000046", "publisher": "LimX Dynamics", "publishedAt": "2025-09-30", "summary": "LimX公式ニュースがOliの自律的なテニスボール拾い上げ・投げ動作を紹介する製品デモ。導入・量産配備ではなくdemonstrationとして記録した。", "type": "demonstration"}
+      ],
+      "usageExampleSourceUrls": ["https://www.limxdynamics.com/en/news/BK000046"],
+      "procurement": {
+        "procurementModels": ["purchase", "inquiry", "research-partnership"],
+        "marketAvailability": {"status": "needs-review", "rawValue": "Oli has an official Buy Now/order-consultation route and a current multi-variant specification page; public stock, shipment terms and production package status are not published", "sourceUrl": "https://limxdynamics.com/en/order", "evidenceSummary": "公式購入・問い合わせ導線はあるが、在庫と出荷条件は非公開。"},
+        "japanAvailability": {"status": "not-published", "rawValue": "Order form includes Japan as a country/phone option, but no Japan sales, shipping or local fulfillment statement is published", "sourceUrl": "https://limxdynamics.com/en/order", "evidenceSummary": "日本選択肢は確認したが日本入手可能とは断定していない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "No domestic authorized distributor identified on reviewed LimX official pages", "sourceUrl": "https://limxdynamics.com/en/about", "evidenceSummary": "国内正規代理店は確認できない。"},
+        "supportNote": {"status": "needs-review", "rawValue": "Official order consultation, service/support pages, manuals and developer documentation are public; Japan repair SLA and field-service terms are not published", "sourceUrl": "https://limxdynamics.com/en/order", "evidenceSummary": "公式サポート導線はあるが国内支援条件は非公開。"}
+      },
+      "pagesReviewed": ["https://www.limxdynamics.com/en/products/oli", "https://limxdynamics.com/en/products/oli/spec", "https://limxdynamics.com/en/order", "https://www.limxdynamics.com/en/news", "https://www.limxdynamics.com/en/news/BK000043", "https://www.limxdynamics.com/en/news/BK000046", "https://www.limxdynamics.com/en/about", "https://www.limxdynamics.com/en/videos"],
+      "sourceCandidates": [
+        {"url": "https://limxdynamics.com/en/order", "status": "price-checked", "reason": "公式Buy Now/Contact Salesを確認したがOli公開価格はない。"},
+        {"url": "https://limxdynamics.com/en/products/oli/spec", "status": "variant-checked", "reason": "Oli Lite/EDU/Super等の構成別仕様表を確認した。"}
+      ],
+      "fieldEvidence": {"mobility":["https://limxdynamics.com/en/products/oli/spec"],"heightCm":["https://limxdynamics.com/en/products/oli/spec"],"weightKg":["https://limxdynamics.com/en/products/oli/spec"],"speedMps":["https://limxdynamics.com/en/products/oli/spec"],"dof":["https://limxdynamics.com/en/products/oli/spec"],"payloadKg":["https://limxdynamics.com/en/products/oli/spec"],"runtimeMin":["https://limxdynamics.com/en/products/oli/spec"],"batteryCapacityWh":["https://limxdynamics.com/en/products/oli/spec"],"chargeTimeMin":["https://limxdynamics.com/en/products/oli/spec"],"batterySystem":["https://www.limxdynamics.com/en/products/oli"],"controlMethod":["https://limxdynamics.com/en/products/oli/spec"],"sdk":["https://www.limxdynamics.com/en/products/oli"],"computePlatform":["https://limxdynamics.com/en/products/oli/spec"],"ipRating":["https://limxdynamics.com/en/products/oli/spec"],"operatingTemperature":["https://limxdynamics.com/en/products/oli/spec"],"safetyStandard":["https://limxdynamics.com/en/products/oli/spec"],"loadRatings":["https://limxdynamics.com/en/products/oli/spec"],"officialUseCases":["https://www.limxdynamics.com/en/products/oli"],"usageExample":["https://www.limxdynamics.com/en/news/BK000046"],"procurement":["https://limxdynamics.com/en/order","https://limxdynamics.com/en/about"]},
+      "conflicts": ["Oli公式仕様表は高さ165/175cm、重量≤55/≤60kg、DoF31/33/43、稼働約2/約1.5時間、片腕最大荷重3/5kg、計算基盤が構成依存。", "公式ページは製品構成が継続的に更新されると注意しているため、generic recordを代表variantへ固定していない。"],
+      "humanReviewRequired": ["Oli Lite、EDU、Super等のどのvariantを公開Robotレコードの代表とするか決定する。", "公開仕様表の4列目variant名と片腕5kg・175cm・43DoF・60kgの対応をLimX公式へ確認する。", "日本向け販売・保守条件とOliの実導入事例を公式窓口で確認する。"]
+    },
+    {
+      "robotId": "limx-luna",
+      "manufacturerId": "limx-dynamics",
+      "identity": {
+        "status": "confirmed",
+        "officialName": "LimX Luna",
+        "variant": "Luna full-size interactive humanoid robot",
+        "officialProductUrl": "https://www.limxdynamics.com/en/products/luna",
+        "notes": "Luna公式製品ページ、公式仕様表、公式製品発表を確認。Oli/TRONの値を流用していない。"
+      },
+      "positioningFacts": [
+        {"statement": "LimX positions Luna as a full-size interactive humanoid robot for commercial spaces and consumer engagement", "sourceUrl": "https://www.limxdynamics.com/en/news/BK000062"},
+        {"statement": "Official Luna use environments include shopping malls, museums, theme parks and live stages", "sourceUrl": "https://www.limxdynamics.com/en/products/luna"},
+        {"statement": "Luna provides multimodal interaction, video-to-motion, AI task editor and synchronized control for 200+ units", "sourceUrl": "https://www.limxdynamics.com/en/products/luna"}
+      ],
+      "fields": {
+        "mobility": {"status": "needs-review", "rawValue": "Full-size interactive humanoid with leg DoF and maximum walking speed", "normalizedValue": null, "unit": "", "variant": "Luna", "condition": "walking and leg structure are explicit; official page does not use a single mobility enum", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "脚部・walkingは確認できるが、二足enumの公式明示は確認できない。"},
+        "heightCm": {"status": "found", "rawValue": "160cm", "normalizedValue": 160, "unit": "cm", "variant": "Luna", "condition": "official product and spec pages", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "Luna公式仕様の160cm。"},
+        "weightKg": {"status": "found", "rawValue": "56kg with battery", "normalizedValue": 56, "unit": "kg", "variant": "Luna", "condition": "official weight includes battery", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "電池込み56kg。"},
+        "speedMps": {"status": "found", "rawValue": "Maximum walking speed 5km/h", "normalizedValue": 1.3889, "unit": "m/s", "variant": "Luna", "condition": "official maximum walking speed converted from 5km/h", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "最大歩行速度5km/hを換算。"},
+        "dof": {"status": "found", "rawValue": "27 active DoF; leg 6, arm 5, waist 3, neck 2", "normalizedValue": 27, "unit": "DoF", "variant": "Luna", "condition": "active whole-body total; end-effector option is separate", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "全身27 active DoFと内訳。"},
+        "payloadKg": {"status": "not-published", "rawValue": "3kg max arm payload is retained in loadRatings and not copied to scalar payloadKg", "normalizedValue": null, "unit": "kg", "variant": "Luna", "condition": "arm scope separated", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "片腕最大荷重をscalarへ流用していない。"},
+        "runtimeMin": {"status": "found", "rawValue": "Battery life approximately 4h", "normalizedValue": 240, "unit": "min", "variant": "Luna", "condition": "official laboratory specification; actual performance may vary", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "Luna公式仕様の約4時間。"},
+        "batteryCapacityWh": {"status": "needs-review", "rawValue": "10,000mAh battery capacity; battery voltage is not provided for Wh conversion", "normalizedValue": null, "unit": "Wh", "variant": "Luna", "condition": "official capacity is mAh, not Wh", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "10000mAhは確認したがWh換算不可。"},
+        "chargeTimeMin": {"status": "found", "rawValue": "Charging time approximately 1h", "normalizedValue": 60, "unit": "min", "variant": "Luna", "condition": "official charging-time value", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "充電時間約1時間。"},
+        "batterySystem": {"status": "found", "rawValue": "Two slide-out battery modules; direct charging or battery swapping; charger output 58.8V 10A", "normalizedValue": "slide-out dual battery / direct charging or swapping", "unit": "", "variant": "Luna", "condition": "battery chemistry not stated", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "二つの引出式電池、直接充電・交換、充電器出力を確認。"},
+        "controlMethod": {"status": "found", "rawValue": "Remote controller and tablet; LimX Studio supports video imitation, manual teaching, choreography, intelligent tasks and group control", "normalizedValue": "remote controller / tablet / LimX Studio", "unit": "", "variant": "Luna", "condition": "official Luna specification and software description", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "リモコン・タブレット・Studio機能。"},
+        "sdk": {"status": "not-published", "rawValue": "LimX Studio and LimX UP are documented as control/content platforms, but no Luna SDK/API package is named in reviewed official pages", "normalizedValue": null, "unit": "", "variant": "Luna", "condition": "do not relabel a content platform as SDK", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "Luna固有のSDK/API名は確認できない。"},
+        "computePlatform": {"status": "found", "rawValue": "Motion control RK3588/16G/256G; perception RK3588/8G/32G", "normalizedValue": "RK3588 motion-control and perception computers", "unit": "", "variant": "Luna", "condition": "official compute table", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "動作制御・知覚のRK3588構成。"},
+        "ipRating": {"status": "not-published", "rawValue": "No Luna IP ingress-protection rating found on reviewed official product, spec and news pages", "normalizedValue": null, "unit": "", "variant": "Luna", "condition": "multi-layer safety wording is not IP rating", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "防塵防水等級は確認できない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "No whole-robot operating-temperature range found on reviewed Luna official product, spec and news pages", "normalizedValue": null, "unit": "°C", "variant": "Luna", "condition": "no environmental range published", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "evidenceSummary": "動作温度は確認できない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "Active fall mitigation, external force sensing, hardware E-stop and safe action override are published; no named safety standard/certification found", "normalizedValue": null, "unit": "", "variant": "Luna", "condition": "functional safety architecture is not a named compliance standard", "sourceUrl": "https://www.limxdynamics.com/en/products/luna", "evidenceSummary": "安全機能は確認したが規格名・認証番号はない。"}
+      },
+      "loadRatings": [
+        {"scope": "single-arm", "rating": "maximum", "kg": 3, "condition": "Official Max Arm Payload; exact load condition beyond arm scope is not stated", "variant": "Luna", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec"}
+      ],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [
+        {"existingUseCaseId": "customer-reception", "officialExpression": "commercial spaces, multimodal interaction, audience engagement", "evidenceSourceUrl": "https://www.limxdynamics.com/en/news/BK000062", "reason": "公式発表が商業空間での顧客体験・インタラクションを明示。"}
+      ],
+      "useCaseGaps": [
+        "USE_CASE_GAP limx-luna \"shopping malls / museums / theme parks / live stages\" https://www.limxdynamics.com/en/products/luna",
+        "USE_CASE_GAP limx-luna \"Entertainment & Performance / brand activations\" https://www.limxdynamics.com/en/news/BK000062"
+      ],
+      "usageExamples": [],
+      "usageExampleSourceUrls": [],
+      "procurement": {
+        "procurementModels": ["purchase", "inquiry"],
+        "marketAvailability": {"status": "needs-review", "rawValue": "Luna has an official Buy Now/order-consultation route and current product/spec pages; public stock, shipment terms and production package status are not published", "sourceUrl": "https://limxdynamics.com/en/order", "evidenceSummary": "購入相談導線はあるが在庫・出荷条件は非公開。"},
+        "japanAvailability": {"status": "not-published", "rawValue": "Order form includes Japan as a country/phone option, but no Japan sales, shipping or local fulfillment statement is published", "sourceUrl": "https://limxdynamics.com/en/order", "evidenceSummary": "日本選択肢は確認したが国内入手可能とは断定していない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "No domestic authorized distributor identified on reviewed LimX official pages", "sourceUrl": "https://limxdynamics.com/en/about", "evidenceSummary": "国内正規代理店は確認できない。"},
+        "supportNote": {"status": "needs-review", "rawValue": "Official order consultation and product/support documentation are public; Japan repair SLA and field-service terms are not published", "sourceUrl": "https://limxdynamics.com/en/order", "evidenceSummary": "公式問い合わせはあるが国内サポート条件は非公開。"}
+      },
+      "pagesReviewed": ["https://www.limxdynamics.com/en/products/luna", "https://www.limxdynamics.com/en/products/luna/spec", "https://limxdynamics.com/en/order", "https://www.limxdynamics.com/en/news/BK000062", "https://www.limxdynamics.com/en/about", "https://www.limxdynamics.com/en/videos"],
+      "sourceCandidates": [
+        {"url": "https://limxdynamics.com/en/order", "status": "price-checked", "reason": "公式Buy Now/Contact Salesを確認したがLuna公開価格はない。"},
+        {"url": "https://www.limxdynamics.com/en/news/BK000062", "status": "usage-checked", "reason": "公式Luna発表は製品発表であり導入事例には数えていない。"}
+      ],
+      "fieldEvidence": {"mobility":["https://www.limxdynamics.com/en/products/luna/spec"],"heightCm":["https://www.limxdynamics.com/en/products/luna/spec"],"weightKg":["https://www.limxdynamics.com/en/products/luna/spec"],"speedMps":["https://www.limxdynamics.com/en/products/luna/spec"],"dof":["https://www.limxdynamics.com/en/products/luna/spec"],"payloadKg":["https://www.limxdynamics.com/en/products/luna/spec"],"runtimeMin":["https://www.limxdynamics.com/en/products/luna/spec"],"batteryCapacityWh":["https://www.limxdynamics.com/en/products/luna/spec"],"chargeTimeMin":["https://www.limxdynamics.com/en/products/luna/spec"],"batterySystem":["https://www.limxdynamics.com/en/products/luna/spec"],"controlMethod":["https://www.limxdynamics.com/en/products/luna/spec"],"sdk":["https://www.limxdynamics.com/en/products/luna/spec"],"computePlatform":["https://www.limxdynamics.com/en/products/luna/spec"],"ipRating":["https://www.limxdynamics.com/en/products/luna/spec"],"operatingTemperature":["https://www.limxdynamics.com/en/products/luna/spec"],"safetyStandard":["https://www.limxdynamics.com/en/products/luna"],"loadRatings":["https://www.limxdynamics.com/en/products/luna/spec"],"officialUseCases":["https://www.limxdynamics.com/en/news/BK000062"],"procurement":["https://limxdynamics.com/en/order","https://limxdynamics.com/en/about"]},
+      "conflicts": ["Luna公式発表は27 DoF、仕様表も27 active DoFで一致する。", "公式製品発表・仕様表は性能値を掲載するが、実際の商用導入事例は確認できなかった。"],
+      "humanReviewRequired": ["Lunaの日本向け販売・保守条件と実際の商業空間導入事例を公式窓口で確認する。"]
+    }
+  ]
+}

@@ -1,0 +1,409 @@
+{
+  "batchId": "DATA-R01-B02",
+  "checkedAt": "2026-07-16",
+  "targetRobotIds": ["agibot-a2", "agibot-a2-ultra", "agibot-a2-max", "agibot-a2-lite", "agibot-x1", "agibot-x2", "agibot-x2-ultra", "agibot-g2"],
+  "schemaKeysChecked": ["mobility", "heightCm", "weightKg", "speedMps", "dof", "payloadKg", "runtimeMin", "batteryCapacityWh", "chargeTimeMin", "batterySystem", "controlMethod", "sdk", "computePlatform", "ipRating", "operatingTemperature", "safetyStandard"],
+  "robots": [
+    {
+      "robotId": "agibot-a2",
+      "manufacturerId": "agibot",
+      "identity": {"status": "confirmed", "officialName": "AGIBOT A2", "variant": "A2", "officialProductUrl": "https://agibot.com/products/A2", "notes": "A2の公式製品ページを対象にした。A2 Ultra／A2 Liteのストア仕様はA2へ流用しない。"},
+      "positioningFacts": [
+        {"statement": "Interactive Service Robot", "sourceUrl": "https://agibot.com/products/A2"},
+        {"statement": "marketing, customer service, exhibition hall presentations, supermarket guidance, front desk reception, business inquiries", "sourceUrl": "https://agibot.com/products/A2"},
+        {"statement": "L4-level autonomous mobility and multimodal interaction", "sourceUrl": "https://agibot.com/products/A2"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "humanoid robot; autonomous walking", "normalizedValue": "biped", "unit": "", "variant": "A2", "condition": "公式カテゴリと自律歩行説明", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "A2公式製品ページはヒューマノイド構成と自律歩行を説明している。"},
+        "heightCm": {"status": "found", "rawValue": "169 cm", "normalizedValue": 169, "unit": "cm", "variant": "A2", "condition": "公式仕様", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "公式仕様のHeight。"},
+        "weightKg": {"status": "found", "rawValue": "69 kg", "normalizedValue": 69, "unit": "kg", "variant": "A2", "condition": "公式仕様", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "公式仕様のWeight。"},
+        "speedMps": {"status": "not-published", "rawValue": "歩行説明はあるがA2の速度値なし", "normalizedValue": null, "unit": "m/s", "variant": "A2", "condition": "A2 Ultra／A2 Liteの速度を流用しない", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "A2製品ページを確認したが、対象A2の最大／通常速度は公開されていない。"},
+        "dof": {"status": "needs-review", "rawValue": "40+ active DoF", "normalizedValue": null, "unit": "DoF", "variant": "A2", "condition": "+表記で単一値・scopeが確定しない", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "公式仕様は40+ active degrees of freedomであり、正確な総数ではない。"},
+        "payloadKg": {"status": "not-published", "rawValue": "payload値なし", "normalizedValue": null, "unit": "kg", "variant": "A2", "condition": "A2 Ultra／Liteの荷重を流用しない", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "A2公式ページに対象variantのpayload値はない。"},
+        "runtimeMin": {"status": "found", "rawValue": "2 h; supports battery swapping", "normalizedValue": 120, "unit": "min", "variant": "A2", "condition": "公式runtime; 条件記載なし", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "公式仕様のRuntime。"},
+        "batteryCapacityWh": {"status": "found", "rawValue": "700 Wh", "normalizedValue": 700, "unit": "Wh", "variant": "A2", "condition": "公式仕様", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "公式仕様のBattery。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "充電時間の記載なし", "normalizedValue": null, "unit": "min", "variant": "A2", "condition": "A2 Ultra／Liteの2hを流用しない", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "A2製品ページに充電時間はない。"},
+        "batterySystem": {"status": "found", "rawValue": "Battery swapping possible", "normalizedValue": "swappable battery; chemistry not published", "unit": "", "variant": "A2", "condition": "交換可能性のみ公式明示", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "公式ページはバッテリー交換可能と記載するが、電池化学系・電圧は記載しない。"},
+        "controlMethod": {"status": "found", "rawValue": "Remote, smartphone, computer", "normalizedValue": "remote / smartphone / computer control", "unit": "", "variant": "A2", "condition": "公式操作説明", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "複数プラットフォーム操作を公式に記載。"},
+        "sdk": {"status": "not-published", "rawValue": "A2固有SDKの記載なし", "normalizedValue": null, "unit": "", "variant": "A2", "condition": "A2 Ultra AimDKをA2へ流用しない", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "対象A2ページ・公式ドキュメント導線でA2固有SDK名を確認できない。"},
+        "computePlatform": {"status": "not-published", "rawValue": "計算基盤の記載なし", "normalizedValue": null, "unit": "", "variant": "A2", "condition": "A2 Ultraの16-core/Orinを流用しない", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "A2公式製品ページに計算基盤の型番はない。"},
+        "ipRating": {"status": "not-published", "rawValue": "IP等級の記載なし", "normalizedValue": null, "unit": "", "variant": "A2", "condition": "A2 UltraのJoint Module IP5Xを流用しない", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "対象A2の防塵防水等級は公開されていない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "動作温度の記載なし", "normalizedValue": null, "unit": "℃", "variant": "A2", "condition": "公式A2ページ確認", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "A2の動作温度範囲は公開されていない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "安全規格番号の記載なし", "normalizedValue": null, "unit": "", "variant": "A2", "condition": "安全機能説明を規格認証としない", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "安全監視の説明はあるが、対象A2のIEC/ISO/CE等の規格番号はない。"}
+      },
+      "loadRatings": [],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [
+        {"existingUseCaseId": "customer-reception", "officialExpression": "customer service / front desk reception / business inquiries", "evidenceSourceUrl": "https://agibot.com/products/A2", "reason": "公式の接客・受付・業務相談表現が既存のcustomer-receptionに直接対応する。"},
+        {"existingUseCaseId": "facility-wayfinding", "officialExpression": "exhibition hall presentations / supermarket guidance", "evidenceSourceUrl": "https://agibot.com/products/A2", "reason": "公式の展示解説・商業施設案内表現が既存のfacility-wayfindingに対応する。"}
+      ],
+      "useCaseGaps": ["USE_CASE_GAP agibot-a2 \"marketing / business consultation\" https://agibot.com/products/A2"],
+      "usageExamples": [
+        {"title": "AGIBOT Makes Debut at Fortune Event with Full-Size Humanoid Robot AGIBOT A2 as Special Guest", "url": "https://www.agibot.com/article/231/detail/32.html", "publisher": "AGIBOT", "publishedAt": "2025-12-02", "summary": "FortuneのイベントでA2が来場者を迎え、展示・対話・太極拳を実演した。導入ではなくイベント実演として分類。", "type": "demonstration"},
+        {"title": "AGIBOT A2 Compeleted Guinness World Records of Longest Journey Walked by a Humanoid Robot", "url": "https://www.agibot.com/article/231/detail/35.html", "publisher": "AGIBOT", "publishedAt": null, "summary": "A2が106.286kmの長距離歩行記録に挑戦し、タイル路・坂・人混みで自律歩行を示した。本文は12月20日と記載するが年は明記しない。", "type": "demonstration"}
+      ],
+      "usageExampleSourceUrls": ["https://www.agibot.com/article/231/detail/32.html", "https://www.agibot.com/article/231/detail/35.html"],
+      "procurement": {
+        "procurementModels": ["inquiry"],
+        "marketAvailability": {"status": "inquiry-required", "rawValue": "公式製品ページに購入意向フォーム。公開価格・在庫なし", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "問い合わせ導線はあるが、購入可能・商用提供中とは断定しない。"},
+        "japanAvailability": {"status": "unknown", "rawValue": "A2固有の日本販売・出荷情報を確認できず", "sourceUrl": "https://agibot.com/products/A2", "evidenceSummary": "公式グローバルストアのA2 Ultra掲載をA2へ流用しない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "国内正規代理店のA2固有表記なし", "sourceUrl": "https://agibot.com/contact/", "evidenceSummary": "AgiBot公式問い合わせ窓口を確認したが、国内代理店名はない。"},
+        "supportNote": {"status": "found", "rawValue": "AgiBot公式問い合わせ窓口 sales@agibot.com", "sourceUrl": "https://agibot.com/contact/", "evidenceSummary": "対象A2のサポート導線として公式窓口を確認。"}
+      },
+      "pagesReviewed": ["https://agibot.com/products/A2", "https://agibot.com/jp/products/A2", "https://agibot.com/contact/", "https://www.agibot.com/article/231/detail/32.html", "https://www.agibot.com/article/231/detail/35.html", "https://store.agibot.com/"],
+      "sourceCandidates": [{"url": "https://store.agibot.com/products/a2-ultra", "status": "excluded", "reason": "A2 Ultraのストアページであり、generic A2へ価格・IP・速度を流用しない。"}],
+      "fieldEvidence": {"mobility": ["https://agibot.com/products/A2"], "heightCm": ["https://agibot.com/products/A2"], "weightKg": ["https://agibot.com/products/A2"], "dof": ["https://agibot.com/products/A2"], "runtimeMin": ["https://agibot.com/products/A2"], "batteryCapacityWh": ["https://agibot.com/products/A2"], "batterySystem": ["https://agibot.com/products/A2"], "controlMethod": ["https://agibot.com/products/A2"], "usageExample": ["https://www.agibot.com/article/231/detail/32.html", "https://www.agibot.com/article/231/detail/35.html"]},
+      "conflicts": ["A2ページのgeneric A2と公式ストアA2 Ultraはvariantが異なるため、ストア値をA2へ流用していない。"],
+      "humanReviewRequired": ["A2の公開価格・国内販売窓口・正確なDoF scopeを公式営業資料で確認する。"]
+    },
+    {
+      "robotId": "agibot-a2-ultra",
+      "manufacturerId": "agibot",
+      "identity": {"status": "confirmed", "officialName": "AGIBOT A2 Ultra", "variant": "A2 Ultra", "officialProductUrl": "https://agibot.com/products/A2_Ultra", "notes": "A2 Ultra公式製品ページと公式ストア仕様を対象にした。A2 generic／A2 Lite列は混在させない。"},
+      "positioningFacts": [
+        {"statement": "Full-Size Humanoid Robot; commercially deployed at scale", "sourceUrl": "https://store.agibot.com/products/a2-ultra"},
+        {"statement": "showroom explanations, customer service interactions, cultural and commercial performances, brand endorsements", "sourceUrl": "https://store.agibot.com/products/a2-ultra"},
+        {"statement": "China CR, EU CE-MD, EU CE-RED, US FCC certifications", "sourceUrl": "https://store.agibot.com/products/a2-ultra"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "full-size humanoid robot; autonomous navigation and obstacle avoidance", "normalizedValue": "biped", "unit": "", "variant": "A2 Ultra", "condition": "公式製品・ストア記載", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "A2 Ultra公式ストアはフルサイズ・自律ナビゲーションを記載。"},
+        "heightCm": {"status": "found", "rawValue": "169cm", "normalizedValue": 169, "unit": "cm", "variant": "A2 Ultra", "condition": "standing; dimensions 169(H)*75(W)*30(L)cm", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式ストア仕様比較のA2 Ultra列。"},
+        "weightKg": {"status": "found", "rawValue": "≈69kg", "normalizedValue": 69, "unit": "kg", "variant": "A2 Ultra", "condition": "net weight approximate", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式ストア仕様比較のNet Weight。"},
+        "speedMps": {"status": "conflict", "rawValue": "Maximum speed 0.8m/s, daily use ≤0.6m/s (store); product page search text says up to 1.2m/s", "normalizedValue": null, "unit": "m/s", "variant": "A2 Ultra", "condition": "同一公式サイト内で速度値が一致しない。最大／通常の意味も分離", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式ストアの詳細仕様は0.8/≤0.6、公式製品ページの現行検索表示は最大1.2m/sで、単一値にしない。"},
+        "dof": {"status": "found", "rawValue": "40 active DoF: arms 7×2, legs 6×2, head 2, dexterous hands 6×2", "normalizedValue": 40, "unit": "DoF", "variant": "A2 Ultra", "condition": "active DoF; end-effector dexterous hands included in breakdown", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式ストアのDoF breakdownをscope付きで記録。"},
+        "payloadKg": {"status": "not-published", "rawValue": "単独payloadではなくsingle-arm rated loadとhand grip表記", "normalizedValue": null, "unit": "kg", "variant": "A2 Ultra", "condition": "loadRatingsへ分離", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "腕荷重はscope/ratingを分けてloadRatingsへ記録。"},
+        "runtimeMin": {"status": "needs-review", "rawValue": "standing + voice broadcast 3h; walking 1.5h", "normalizedValue": null, "unit": "min", "variant": "A2 Ultra", "condition": "立位・音声放送と歩行の条件が異なるため単一カード値にしない", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式仕様は3h/1.5hの条件別値。"},
+        "batteryCapacityWh": {"status": "needs-review", "rawValue": "14.4Ah", "normalizedValue": null, "unit": "Ah", "variant": "A2 Ultra", "condition": "48V DCはcharging voltageであり、電池公称電圧としてWh換算しない", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式値はAhのみで、電池電圧・Whの直接値がない。"},
+        "chargeTimeMin": {"status": "found", "rawValue": "2h", "normalizedValue": 120, "unit": "min", "variant": "A2 Ultra", "condition": "fast charging; charging voltage 48V DC", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式ストア仕様のCharging Time。"},
+        "batterySystem": {"status": "found", "rawValue": "hot-swappable battery replacement and fast charging; 14.4Ah", "normalizedValue": "hot-swappable battery; fast charging; chemistry not published", "unit": "", "variant": "A2 Ultra", "condition": "battery capacity remains Ah", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式製品・ストアが交換と急速充電を明記。"},
+        "controlMethod": {"status": "found", "rawValue": "Wireless remote control; AimMaster client; smartphone/computer control described on product page", "normalizedValue": "wireless remote / AimMaster / remote software control", "unit": "", "variant": "A2 Ultra", "condition": "公式操作導線", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式ストアのwireless remoteとA2 Ultra製品機能を確認。"},
+        "sdk": {"status": "found", "rawValue": "AimDK-A2-Ultra v2.1 development guide; Python/C++/ROS2 secondary-development documentation", "normalizedValue": "AimDK for A2 Ultra", "unit": "", "variant": "A2 Ultra", "condition": "software version v2.1.x documentation", "sourceUrl": "https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide", "evidenceSummary": "A2 Ultra専用の公式AimDK開発ガイドを確認。"},
+        "computePlatform": {"status": "found", "rawValue": "16-core high-performance CPU; Jetson AGX Orin 64G", "normalizedValue": "16-core CPU + NVIDIA Jetson AGX Orin 64GB", "unit": "", "variant": "A2 Ultra", "condition": "basic and high-compute boards", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式ストア仕様のBasic/High computing power board。"},
+        "ipRating": {"status": "found", "rawValue": "Joint Module: IP5X", "normalizedValue": "IP5X", "unit": "", "variant": "A2 Ultra", "condition": "joint module only; not whole-machine IP rating", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式仕様は関節モジュールのIP5Xであり、本体全体へ拡張しない。"},
+        "operatingTemperature": {"status": "found", "rawValue": "0~40℃; relative humidity 10%~90%, no condensation", "normalizedValue": {"minC": 0, "maxC": 40}, "unit": "℃", "variant": "A2 Ultra", "condition": "operating temperature and humidity", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式ストア仕様のWorking Temperature and Humidity。"},
+        "safetyStandard": {"status": "found", "rawValue": "China CR; EU CE-MD; EU CE-RED; US FCC", "normalizedValue": ["China CR", "EU CE-MD", "EU CE-RED", "US FCC"], "unit": "", "variant": "A2 Ultra", "condition": "certifications stated by manufacturer; not interpreted beyond listed marks", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式ストアFAQの認証記載。"}
+      },
+      "loadRatings": [
+        {"scope": "single-arm", "rating": "rated", "kg": 2, "condition": "single-arm rated load; excluding end effector", "variant": "A2 Ultra", "sourceUrl": "https://store.agibot.com/products/a2-ultra"},
+        {"scope": "manufacturer-wording", "rating": "maximum", "kg": 3, "condition": "dexterous hand grip weight, palm down; not an arm payload rating", "variant": "A2 Ultra", "sourceUrl": "https://store.agibot.com/products/a2-ultra"},
+        {"scope": "manufacturer-wording", "rating": "maximum", "kg": 8, "condition": "dexterous hand hook grip weight, palm up; not an arm payload rating", "variant": "A2 Ultra", "sourceUrl": "https://store.agibot.com/products/a2-ultra"}
+      ],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [
+        {"existingUseCaseId": "customer-reception", "officialExpression": "customer service interactions / showroom explanations", "evidenceSourceUrl": "https://store.agibot.com/products/a2-ultra", "reason": "公式ストアが接客・ショールーム説明を明示し、既存customer-receptionに対応する。"},
+        {"existingUseCaseId": "facility-wayfinding", "officialExpression": "autonomous reception / route guidance & explanation", "evidenceSourceUrl": "https://agibot.com/products/A2_Ultra", "reason": "公式製品ページの受付・経路案内表現が既存facility-wayfindingに対応する。"}
+      ],
+      "useCaseGaps": ["USE_CASE_GAP agibot-a2-ultra \"cultural and commercial performances / brand endorsements\" https://store.agibot.com/products/a2-ultra"],
+      "usageExamples": [],
+      "usageExampleSourceUrls": [],
+      "procurement": {
+        "procurementModels": ["purchase", "inquiry"],
+        "marketAvailability": {"status": "global-store-listed", "rawValue": "公式グローバルストアに掲載、Add to cart導線あり。配送・納期はcustomer serviceへ問い合わせ", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "購入導線はあるが、価格・納期の公開値は確認できない。"},
+        "japanAvailability": {"status": "unknown", "rawValue": "グローバルストアは海外発送を案内するが、日本の正規代理店・国内価格は未確認", "sourceUrl": "https://store.agibot.com/pages/about-us", "evidenceSummary": "海外発送FAQを日本国内の調達可能性・代理店と混同しない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "A2 Ultraの国内正規代理店名なし", "sourceUrl": "https://agibot.com/contact/", "evidenceSummary": "公式問い合わせページに国内代理店表記なし。"},
+        "supportNote": {"status": "found", "rawValue": "1-year warranty; factory or authorized service center repair described; sales@agibot.com", "sourceUrl": "https://store.agibot.com/products/a2-ultra", "evidenceSummary": "公式ストアFAQと公式サポート窓口を確認。"}
+      },
+      "pagesReviewed": ["https://agibot.com/products/A2_Ultra", "https://store.agibot.com/products/a2-ultra", "https://store.agibot.com/collections/humanoid-robot", "https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide", "https://agibot.com/contact/", "https://www.agibot.com/Defined%20Support%20Period%20V4.pdf"],
+      "sourceCandidates": [{"url": "https://store.agibot.com/products/a2-ultra", "status": "reviewed-no-price", "reason": "公式ストアにAdd to cartとContact Usはあるが、価格金額は確認できない。"}],
+      "fieldEvidence": {"mobility": ["https://store.agibot.com/products/a2-ultra"], "heightCm": ["https://store.agibot.com/products/a2-ultra"], "weightKg": ["https://store.agibot.com/products/a2-ultra"], "speedMps": ["https://store.agibot.com/products/a2-ultra", "https://agibot.com/products/A2_Ultra"], "dof": ["https://store.agibot.com/products/a2-ultra"], "runtimeMin": ["https://store.agibot.com/products/a2-ultra"], "chargeTimeMin": ["https://store.agibot.com/products/a2-ultra"], "batterySystem": ["https://store.agibot.com/products/a2-ultra"], "controlMethod": ["https://store.agibot.com/products/a2-ultra"], "sdk": ["https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide"], "computePlatform": ["https://store.agibot.com/products/a2-ultra"], "ipRating": ["https://store.agibot.com/products/a2-ultra"], "operatingTemperature": ["https://store.agibot.com/products/a2-ultra"], "safetyStandard": ["https://store.agibot.com/products/a2-ultra"], "loadRatings": ["https://store.agibot.com/products/a2-ultra"]},
+      "conflicts": ["A2 Ultra公式製品ページの現行表示は最大1.2m/s、公式ストア詳細仕様は最大0.8m/s・通常≤0.6m/s。速度を単一値にしない。", "公式ストアはA2 Ultraを商品一覧・問い合わせ導線に載せるが、金額を公開していない。"],
+      "humanReviewRequired": ["速度の現行出荷variant値を公式データシートで確認する。", "公式ストアの価格が問い合わせ扱いか、非表示価格があるかを確認する。", "14.4AhをWhへ換算するための電池公称電圧を確認する。"]
+    },
+    {
+      "robotId": "agibot-a2-max",
+      "manufacturerId": "agibot",
+      "identity": {"status": "confirmed", "officialName": "AGIBOT A2-Max", "variant": "A2 Max", "officialProductUrl": "https://www.agibot.com/products/A2_Max", "notes": "公式ページはComing soon表記。A2／A2 Ultraの値を流用していない。"},
+      "positioningFacts": [
+        {"statement": "Heavy-Duty Special-Purpose Robot", "sourceUrl": "https://www.agibot.com/products/A2_Max"},
+        {"statement": "designed for material handling and palletizing", "sourceUrl": "https://www.agibot.com/products/A2_Max"},
+        {"statement": "Coming soon", "sourceUrl": "https://www.agibot.com/products/A2_Max"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "full-sized humanoid robot; walking", "normalizedValue": "biped", "unit": "", "variant": "A2 Max", "condition": "公式製品カテゴリ", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "公式ページはfull-sized humanoid robotとして掲載。"},
+        "heightCm": {"status": "found", "rawValue": "175 cm", "normalizedValue": 175, "unit": "cm", "variant": "A2 Max", "condition": "公式仕様", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "公式仕様のHeight。"},
+        "weightKg": {"status": "found", "rawValue": "85 kg", "normalizedValue": 85, "unit": "kg", "variant": "A2 Max", "condition": "公式仕様", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "公式仕様のWeight。"},
+        "speedMps": {"status": "found", "rawValue": "1 m/s walking speed", "normalizedValue": 1, "unit": "m/s", "variant": "A2 Max", "condition": "walking speed", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "公式仕様のWalking Speed。"},
+        "dof": {"status": "needs-review", "rawValue": "67 total / 53 active DoF", "normalizedValue": null, "unit": "DoF", "variant": "A2 Max", "condition": "公式ページのActive DoF表示が67と53DoFの二段表記でscopeが曖昧", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "67 totalと53 activeの関係を単一値に正規化しない。"},
+        "payloadKg": {"status": "not-published", "rawValue": "manufacturer says handle objects up to 40kg; load scope is separated below", "normalizedValue": null, "unit": "kg", "variant": "A2 Max", "condition": "loadRatingsへ分離", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "payload欄へ単独値を置かず、メーカー表現のscopeを保つ。"},
+        "runtimeMin": {"status": "found", "rawValue": "2 h; support battery swapping", "normalizedValue": 120, "unit": "min", "variant": "A2 Max", "condition": "公式runtime", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "公式仕様のRuntime。"},
+        "batteryCapacityWh": {"status": "not-published", "rawValue": "バッテリー容量の数値なし", "normalizedValue": null, "unit": "Wh", "variant": "A2 Max", "condition": "runtimeとbattery swappingのみ掲載", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "容量値は公開されていない。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "充電時間の記載なし", "normalizedValue": null, "unit": "min", "variant": "A2 Max", "condition": "公式ページ確認", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "充電時間は公開されていない。"},
+        "batterySystem": {"status": "found", "rawValue": "Support battery swapping", "normalizedValue": "swappable battery; chemistry and voltage not published", "unit": "", "variant": "A2 Max", "condition": "交換対応のみ", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "公式ページのbattery swapping記載。"},
+        "controlMethod": {"status": "not-published", "rawValue": "操作方式・リモートコントローラの記載なし", "normalizedValue": null, "unit": "", "variant": "A2 Max", "condition": "A2/A2 Ultraの操作方式を流用しない", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "対象A2 Maxの操作方式は公開されていない。"},
+        "sdk": {"status": "not-published", "rawValue": "SDKの記載なし", "normalizedValue": null, "unit": "", "variant": "A2 Max", "condition": "A2 Ultra AimDKを流用しない", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "A2 Max固有SDKは確認できない。"},
+        "computePlatform": {"status": "not-published", "rawValue": "計算基盤の型番なし", "normalizedValue": null, "unit": "", "variant": "A2 Max", "condition": "公式ページ確認", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "計算基盤は公開されていない。"},
+        "ipRating": {"status": "not-published", "rawValue": "IP等級の記載なし", "normalizedValue": null, "unit": "", "variant": "A2 Max", "condition": "公式ページ確認", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "防塵防水等級は公開されていない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "動作温度の記載なし", "normalizedValue": null, "unit": "℃", "variant": "A2 Max", "condition": "公式ページ確認", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "動作温度は公開されていない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "安全規格番号の記載なし", "normalizedValue": null, "unit": "", "variant": "A2 Max", "condition": "トルク・推力表記を安全規格としない", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "IEC/ISO/CE等の規格番号は公開されていない。"}
+      },
+      "loadRatings": [{"scope": "manufacturer-wording", "rating": "maximum", "kg": 40, "condition": "manufacturer says the dual-arm system can handle objects up to 40kg within its entire working range; not labeled as single-arm or dual-arm payload", "variant": "A2 Max", "sourceUrl": "https://www.agibot.com/products/A2_Max"}],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [],
+      "useCaseGaps": ["USE_CASE_GAP agibot-a2-max \"material handling / palletizing / heavy-duty object handling\" https://www.agibot.com/products/A2_Max"],
+      "usageExamples": [],
+      "usageExampleSourceUrls": [],
+      "procurement": {
+        "procurementModels": ["inquiry"],
+        "marketAvailability": {"status": "coming-soon", "rawValue": "Coming soon", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "公式ページの提供状況表記。"},
+        "japanAvailability": {"status": "unknown", "rawValue": "日本向け提供情報なし", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "公式ページ・問い合わせ導線で国内提供は確認できない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "国内正規代理店名なし", "sourceUrl": "https://agibot.com/contact/", "evidenceSummary": "公式問い合わせページを確認。"},
+        "supportNote": {"status": "not-published", "rawValue": "A2 Max固有の保証・保守情報なし", "sourceUrl": "https://www.agibot.com/products/A2_Max", "evidenceSummary": "Coming soon製品ページに対象機体のサポート条件はない。"}
+      },
+      "pagesReviewed": ["https://www.agibot.com/products/A2_Max", "https://jp.agibot.com/products/A2_Max", "https://agibot.com/contact/", "https://store.agibot.com/"],
+      "sourceCandidates": [{"url": "https://store.agibot.com/products/a2-ultra", "status": "excluded", "reason": "A2 Ultraは別variantであり、A2 Maxへ値・価格を流用しない。"}],
+      "fieldEvidence": {"mobility": ["https://www.agibot.com/products/A2_Max"], "heightCm": ["https://www.agibot.com/products/A2_Max"], "weightKg": ["https://www.agibot.com/products/A2_Max"], "speedMps": ["https://www.agibot.com/products/A2_Max"], "dof": ["https://www.agibot.com/products/A2_Max"], "runtimeMin": ["https://www.agibot.com/products/A2_Max"], "batterySystem": ["https://www.agibot.com/products/A2_Max"], "loadRatings": ["https://www.agibot.com/products/A2_Max"]},
+      "conflicts": ["公式ページのDoF表示は67 total/53 activeで、scopeと項目ラベルの関係が曖昧。", "A2 MaxはComing soonで価格・納期・日本販売を公開していない。"],
+      "humanReviewRequired": ["40kg荷重の正式scope（dual-arm／whole-body／manufacturer wording）をデータシートで確認する。", "67と53のDoF定義を確認する。"]
+    },
+    {
+      "robotId": "agibot-a2-lite",
+      "manufacturerId": "agibot",
+      "identity": {"status": "confirmed", "officialName": "AGIBOT A2 Lite", "variant": "A2 Lite", "officialProductUrl": "https://agibot.com/products/A2_Pro", "notes": "A2 Lite公式製品ページと公式ストアを対象にした。A2 Ultraの値を混在させない。"},
+      "positioningFacts": [
+        {"statement": "Master of Performance; full-size AI star", "sourceUrl": "https://agibot.com/products/A2_Pro"},
+        {"statement": "entertainment, cultural and commercial performances; exhibitions, commercial events, theme parks", "sourceUrl": "https://agibot.com/products/A2_Pro"},
+        {"statement": "VR teleoperation for secondary creation and group control", "sourceUrl": "https://agibot.com/products/A2_Pro"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "full-size humanoid robot; walking", "normalizedValue": "biped", "unit": "", "variant": "A2 Lite", "condition": "公式製品ページ", "sourceUrl": "https://agibot.com/products/A2_Pro", "evidenceSummary": "A2 Lite公式ページの製品カテゴリ。"},
+        "heightCm": {"status": "found", "rawValue": "169cm (H)", "normalizedValue": 169, "unit": "cm", "variant": "A2 Lite", "condition": "standing; 169*75*30cm", "sourceUrl": "https://agibot.com/products/A2_Pro", "evidenceSummary": "公式製品パラメータ。"},
+        "weightKg": {"status": "found", "rawValue": "approximately 63kg including battery pack", "normalizedValue": 63, "unit": "kg", "variant": "A2 Lite", "condition": "battery pack included; approximate", "sourceUrl": "https://agibot.com/products/A2_Pro", "evidenceSummary": "公式製品パラメータ。"},
+        "speedMps": {"status": "found", "rawValue": "maximum 0.8m/s; daily use ≤0.6m/s", "normalizedValue": 0.8, "unit": "m/s", "variant": "A2 Lite", "condition": "maximum and daily-use bound kept separately in rawValue", "sourceUrl": "https://store.agibot.com/products/a2-lite", "evidenceSummary": "公式ストア仕様のMaximum Movement Speed。"},
+        "dof": {"status": "found", "rawValue": "23 total joint motors; both arms 5×2, both legs 6×2, head 1", "normalizedValue": 23, "unit": "DoF", "variant": "A2 Lite", "condition": "active joint motors; end effector not added", "sourceUrl": "https://agibot.com/products/A2_Pro", "evidenceSummary": "公式製品パラメータの総自由度・scope別内訳。"},
+        "payloadKg": {"status": "not-published", "rawValue": "single-arm rated load is recorded in loadRatings", "normalizedValue": null, "unit": "kg", "variant": "A2 Lite", "condition": "payload field separated from load rating", "sourceUrl": "https://store.agibot.com/products/a2-lite", "evidenceSummary": "単独payload値としては登録しない。"},
+        "runtimeMin": {"status": "conflict", "rawValue": "product page: standing approx 4.5h / walking approx 2h; store comparison: standing 4h35min / walking 1.5h", "normalizedValue": null, "unit": "min", "variant": "A2 Lite", "condition": "same official site but differing table values; standing/walking conditions preserved", "sourceUrl": "https://store.agibot.com/products/a2-lite", "evidenceSummary": "A2 Lite公式製品ページとストア仕様に条件別の不一致がある。"},
+        "batteryCapacityWh": {"status": "needs-review", "rawValue": "Smart battery (quick release) 14.4Ah", "normalizedValue": null, "unit": "Ah", "variant": "A2 Lite", "condition": "公称電圧が電池電圧として確認できないためWh換算しない", "sourceUrl": "https://agibot.com/products/A2_Pro", "evidenceSummary": "公式値は14.4Ah。"},
+        "chargeTimeMin": {"status": "found", "rawValue": "2h", "normalizedValue": 120, "unit": "min", "variant": "A2 Lite", "condition": "公式仕様", "sourceUrl": "https://agibot.com/products/A2_Pro", "evidenceSummary": "公式製品パラメータのCharging Time。"},
+        "batterySystem": {"status": "found", "rawValue": "13-series lithium battery; smart battery quick release; 14.4Ah", "normalizedValue": "13-series lithium; quick-release smart battery", "unit": "", "variant": "A2 Lite", "condition": "公式製品パラメータ", "sourceUrl": "https://agibot.com/products/A2_Pro", "evidenceSummary": "電池方式・交換方式を確認。"},
+        "controlMethod": {"status": "found", "rawValue": "wireless remote control; AimMaster; VR teleoperation optional; group control software", "normalizedValue": "wireless remote / AimMaster / optional VR teleoperation", "unit": "", "variant": "A2 Lite", "condition": "VR is optional tool", "sourceUrl": "https://store.agibot.com/products/a2-lite", "evidenceSummary": "公式ストアと製品ページの操作・創作機能。"},
+        "sdk": {"status": "not-published", "rawValue": "A2 Lite固有SDKの記載なし", "normalizedValue": null, "unit": "", "variant": "A2 Lite", "condition": "A2 Ultra AimDKを流用しない", "sourceUrl": "https://agibot.com/products/A2_Pro", "evidenceSummary": "対象A2 LiteのSDK名は公開されていない。"},
+        "computePlatform": {"status": "found", "rawValue": "14-core high-performance CPU; high-compute board /", "normalizedValue": "14-core high-performance CPU; no high-compute board listed", "unit": "", "variant": "A2 Lite", "condition": "official product/store comparison", "sourceUrl": "https://store.agibot.com/products/a2-lite", "evidenceSummary": "公式ストア仕様のprocessor/basic board。"},
+        "ipRating": {"status": "found", "rawValue": "Joint Module: IP5X", "normalizedValue": "IP5X", "unit": "", "variant": "A2 Lite", "condition": "joint module only", "sourceUrl": "https://store.agibot.com/products/a2-lite", "evidenceSummary": "本体全体ではなく関節モジュールの等級。"},
+        "operatingTemperature": {"status": "found", "rawValue": "0~40℃; relative humidity 10%~90%, no condensation", "normalizedValue": {"minC": 0, "maxC": 40}, "unit": "℃", "variant": "A2 Lite", "condition": "operating temperature and humidity", "sourceUrl": "https://store.agibot.com/products/a2-lite", "evidenceSummary": "公式ストア仕様。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "low-power alarm, self-balancing, collision avoidance; no standard number", "normalizedValue": null, "unit": "", "variant": "A2 Lite", "condition": "safety functions are not certification numbers", "sourceUrl": "https://store.agibot.com/products/a2-lite", "evidenceSummary": "安全機能は確認できるが、規格番号はない。"}
+      },
+      "loadRatings": [{"scope": "single-arm", "rating": "rated", "kg": 1.5, "condition": "single-arm rated load; excluding end effector", "variant": "A2 Lite", "sourceUrl": "https://store.agibot.com/products/a2-lite"}],
+      "priceOffers": [{"channel": "manufacturer-public", "display": "$44,560.00 USD", "amount": 44560, "currency": "USD", "taxStatus": "unknown", "variant": "A2 Lite", "sellerName": "AGIBOT Store", "sourceUrl": "https://store.agibot.com/products/a2-lite"}],
+      "priceResearchStatus": "found",
+      "officialUseCases": [],
+      "useCaseGaps": ["USE_CASE_GAP agibot-a2-lite \"entertainment / cultural and commercial performances / theme-park promotion\" https://agibot.com/products/A2_Pro"],
+      "usageExamples": [],
+      "usageExampleSourceUrls": [],
+      "procurement": {
+        "procurementModels": ["purchase", "inquiry"],
+        "marketAvailability": {"status": "global-store-listed", "rawValue": "Official store Add to cart; sale price displayed; overseas shipping FAQ", "sourceUrl": "https://store.agibot.com/products/a2-lite", "evidenceSummary": "公式ストアに直接購入導線と価格がある。"},
+        "japanAvailability": {"status": "unknown", "rawValue": "海外発送は公式FAQにあるが、日本の正規代理店・国内在庫は未確認", "sourceUrl": "https://store.agibot.com/pages/about-us", "evidenceSummary": "海外発送を国内商用提供・代理店と混同しない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "国内正規代理店名なし", "sourceUrl": "https://agibot.com/contact/", "evidenceSummary": "公式窓口に国内代理店情報はない。"},
+        "supportNote": {"status": "found", "rawValue": "one-year warranty or over 3000 hours cumulative use; authorized service center/factory repair described", "sourceUrl": "https://store.agibot.com/products/a2-lite", "evidenceSummary": "公式ストアFAQの保証・修理条件。"}
+      },
+      "pagesReviewed": ["https://agibot.com/products/A2_Pro", "https://agibot.com/jp/products/A2_Pro", "https://store.agibot.com/products/a2-lite", "https://store.agibot.com/pages/about-us", "https://agibot.com/contact/"],
+      "sourceCandidates": [{"url": "https://store.agibot.com/products/a2-lite", "status": "reviewed-runtime-conflict", "reason": "A2 Lite公式ストアの比較表と製品ページ本文で立位・歩行runtimeが異なる。"}],
+      "fieldEvidence": {"mobility": ["https://agibot.com/products/A2_Pro"], "heightCm": ["https://agibot.com/products/A2_Pro"], "weightKg": ["https://agibot.com/products/A2_Pro"], "speedMps": ["https://store.agibot.com/products/a2-lite"], "dof": ["https://agibot.com/products/A2_Pro"], "runtimeMin": ["https://agibot.com/products/A2_Pro", "https://store.agibot.com/products/a2-lite"], "chargeTimeMin": ["https://agibot.com/products/A2_Pro"], "batterySystem": ["https://agibot.com/products/A2_Pro"], "controlMethod": ["https://store.agibot.com/products/a2-lite"], "computePlatform": ["https://store.agibot.com/products/a2-lite"], "ipRating": ["https://store.agibot.com/products/a2-lite"], "operatingTemperature": ["https://store.agibot.com/products/a2-lite"], "loadRatings": ["https://store.agibot.com/products/a2-lite"], "priceOffers": ["https://store.agibot.com/products/a2-lite"]},
+      "conflicts": ["公式A2 Liteページは立位約4.5h・歩行約2h、公式ストア比較表は立位4h35min・歩行1.5h。", "14.4Ahは公称電圧不明のためWhへ換算しない。"],
+      "humanReviewRequired": ["A2 Liteの現行出荷版runtimeを公式マニュアルで確認する。", "国内正規代理店・日本向け価格・税区分を確認する。"]
+    },
+    {
+      "robotId": "agibot-x1",
+      "manufacturerId": "agibot",
+      "identity": {"status": "conflict", "officialName": "AGIBOT X1", "variant": "X1; official English/JP pages and open-source guide show different specification revisions", "officialProductUrl": "https://agibot.com/products/X1", "notes": "同一X1ページの英語・日本語表示、公式開発ガイドを別revisionとして記録。値を単一仕様へ丸めない。"},
+      "positioningFacts": [
+        {"statement": "Full-Stack Open-Source Robot", "sourceUrl": "https://agibot.com/products/X1"},
+        {"statement": "modular design, high degree of freedom, safe and lightweight, highly scalable", "sourceUrl": "https://agibot.com/products/X1"},
+        {"statement": "official inference code, training code and hardware materials", "sourceUrl": "https://www.agibot.com/filepage/254.html"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "open-source humanoid robot; maximum walking speed listed", "normalizedValue": "biped", "unit": "", "variant": "X1", "condition": "公式製品カテゴリ", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "公式X1製品ページはhumanoid robotとして掲載。"},
+        "heightCm": {"status": "found", "rawValue": "130 cm", "normalizedValue": 130, "unit": "cm", "variant": "X1", "condition": "English and Japanese official pages agree", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "公式英語・日本語ページのHeight。"},
+        "weightKg": {"status": "conflict", "rawValue": "English: 33kg; Japanese: ≤33kg", "normalizedValue": null, "unit": "kg", "variant": "X1", "condition": "exact vs upper-bound wording differs", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "同一製品ページの言語版で重量表記の意味が異なる。"},
+        "speedMps": {"status": "conflict", "rawValue": "English: maximum walking speed 1m/s; Japanese: maximum walking speed ≥1m/s", "normalizedValue": null, "unit": "m/s", "variant": "X1", "condition": "maximum vs lower-bound semantics conflict", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "同一X1製品ページの英語・日本語表記を単一速度へ変換しない。"},
+        "dof": {"status": "conflict", "rawValue": "English: 34DoF; Japanese: 31/41DoF configurable; open-source guide: 29 body joints plus 2 grippers and optional 3-DoF head", "normalizedValue": null, "unit": "DoF", "variant": "X1", "condition": "revision/configuration/scope differ", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "複数の公式X1資料でDoF定義が一致しない。"},
+        "payloadKg": {"status": "not-published", "rawValue": "single-arm load capacity is recorded in loadRatings", "normalizedValue": null, "unit": "kg", "variant": "X1", "condition": "payload field separated", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "単独payload値は登録しない。"},
+        "runtimeMin": {"status": "conflict", "rawValue": "English: 2h; Japanese: ≥4h", "normalizedValue": null, "unit": "min", "variant": "X1", "condition": "official language/revision values differ", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "同一X1公式ページでruntimeが2hと4h以上に分かれる。"},
+        "batteryCapacityWh": {"status": "not-published", "rawValue": "電池容量Wh/Ahの記載なし", "normalizedValue": null, "unit": "Wh", "variant": "X1", "condition": "runtime値を容量へ換算しない", "sourceUrl": "https://www.agibot.com/filepage/254.html", "evidenceSummary": "公式開発ガイド・製品ページを確認したが容量値はない。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "充電時間の記載なし", "normalizedValue": null, "unit": "min", "variant": "X1", "condition": "公式資料確認", "sourceUrl": "https://www.agibot.com/filepage/254.html", "evidenceSummary": "充電時間は公開されていない。"},
+        "batterySystem": {"status": "not-published", "rawValue": "電池方式・交換方式の対象X1仕様なし", "normalizedValue": null, "unit": "", "variant": "X1", "condition": "公式製品・開発ガイド確認", "sourceUrl": "https://www.agibot.com/filepage/254.html", "evidenceSummary": "X1の電池化学系・交換方式は確認できない。"},
+        "controlMethod": {"status": "found", "rawValue": "open-source inference/training code; Linux secondary-development SDK for domain controller", "normalizedValue": "open-source software development / Linux secondary development", "unit": "", "variant": "X1", "condition": "development/control interface, not a teleoperation claim", "sourceUrl": "https://www.agibot.com/filepage/254.html", "evidenceSummary": "公式X1開発ガイドと製品ページが開発コード・SDKを案内。"},
+        "sdk": {"status": "found", "rawValue": "AGIBOT X1 inference code; training code; Linux secondary development SDK", "normalizedValue": "X1 open-source code and Linux SDK", "unit": "", "variant": "X1", "condition": "official open-source documentation", "sourceUrl": "https://www.agibot.com/filepage/254.html", "evidenceSummary": "公式Document CenterがX1 inference/training GitHubとSDK導線を明記。"},
+        "computePlatform": {"status": "not-published", "rawValue": "計算基盤の型番なし", "normalizedValue": null, "unit": "", "variant": "X1", "condition": "PowerFlow component data is not robot compute platform", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "公式ページのコア部品情報は関節・制御部品であり、ロボット計算基盤の型番ではない。"},
+        "ipRating": {"status": "not-published", "rawValue": "IP等級の記載なし", "normalizedValue": null, "unit": "", "variant": "X1", "condition": "公式製品・開発ガイド確認", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "防塵防水等級は公開されていない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "動作温度の記載なし", "normalizedValue": null, "unit": "℃", "variant": "X1", "condition": "公式製品・開発ガイド確認", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "動作温度は公開されていない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "安全規格番号の記載なし", "normalizedValue": null, "unit": "", "variant": "X1", "condition": "safe/lightweight product claim is not a certification", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "安全規格番号は確認できない。"}
+      },
+      "loadRatings": [{"scope": "single-arm", "rating": "unspecified", "kg": 0.5, "condition": "English says single-arm load capacity 0.5kg; Japanese page says ≥0.5kg; exact rated/maximum semantics conflict", "variant": "X1", "sourceUrl": "https://agibot.com/products/X1"}],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [{"existingUseCaseId": "research-prototype-dev", "officialExpression": "full-stack open-source robot / inference code / training code / hardware development materials", "evidenceSourceUrl": "https://www.agibot.com/filepage/254.html", "reason": "公式のオープンソース開発導線が既存research-prototype-devに直接対応する。"}],
+      "useCaseGaps": [],
+      "usageExamples": [],
+      "usageExampleSourceUrls": [],
+      "procurement": {
+        "procurementModels": ["inquiry", "partner-program"],
+        "marketAvailability": {"status": "inquiry-required", "rawValue": "公式製品ページはContact Us、公式ドキュメントはopen-source materialsを案内。ストア販売価格なし", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "開発資料の公開と完成品の購入可能性を分けて記録。"},
+        "japanAvailability": {"status": "unknown", "rawValue": "日本の完成品販売・代理店情報なし", "sourceUrl": "https://agibot.com/products/X1", "evidenceSummary": "公式海外窓口以外の日本調達情報は確認できない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "国内正規代理店名なし", "sourceUrl": "https://agibot.com/contact/", "evidenceSummary": "公式問い合わせページ確認。"},
+        "supportNote": {"status": "found", "rawValue": "X1 Development Guide; inference/training repositories; sales@agibot.com", "sourceUrl": "https://www.agibot.com/filepage/254.html", "evidenceSummary": "公式開発資料・コードのサポート導線を確認。"}
+      },
+      "pagesReviewed": ["https://agibot.com/products/X1", "https://agibot.com/jp/products/X1", "https://www.agibot.com/filepage/254.html", "https://agibot.com/DOCS/OS", "https://agibot.com/contact/", "https://store.agibot.com/"],
+      "sourceCandidates": [{"url": "https://agibot.com/products/X1", "status": "spec-revision-conflict", "reason": "English/JP official pages show 34DoF/2h vs 31/41DoF configurable/≥4h; both are retained as conflict."}],
+      "fieldEvidence": {"mobility": ["https://agibot.com/products/X1"], "heightCm": ["https://agibot.com/products/X1"], "weightKg": ["https://agibot.com/products/X1"], "speedMps": ["https://agibot.com/products/X1"], "dof": ["https://agibot.com/products/X1", "https://www.agibot.com/filepage/254.html"], "runtimeMin": ["https://agibot.com/products/X1"], "controlMethod": ["https://www.agibot.com/filepage/254.html"], "sdk": ["https://www.agibot.com/filepage/254.html"], "loadRatings": ["https://agibot.com/products/X1"]},
+      "conflicts": ["公式英語ページは34DoF・33kg・2h・最大1m/s、公式日本語ページは31/41DoF・≤33kg・≥4h・≥1m/s。", "公式開発ガイドは29 body joints + grippersを説明し、製品ページのactive DoFとも一致しない。"],
+      "humanReviewRequired": ["出荷時X1 hardware revisionを特定してDoF、runtime、速度、荷重を確定する。", "完成品の現行調達価格・日本入手性を公式窓口で確認する。"]
+    },
+    {
+      "robotId": "agibot-x2",
+      "manufacturerId": "agibot",
+      "identity": {"status": "confirmed", "officialName": "AGIBOT X2", "variant": "X2 standard", "officialProductUrl": "https://agibot.com/products/X2", "notes": "X2/X2 Ultra比較表のX2列と公式ストアX2商品を対象。X2 Ultra列は流用しない。"},
+      "positioningFacts": [
+        {"statement": "AGIBOT X2 series Fully Intelligent & Agile Robot", "sourceUrl": "https://agibot.com/products/X2"},
+        {"statement": "multimodal interaction, humanoid gait, autonomous navigation and obstacle avoidance", "sourceUrl": "https://agibot.com/products/X2"},
+        {"statement": "entertainment and commercial performance sector", "sourceUrl": "https://store.agibot.com/products/x2"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "compact humanoid robot; humanoid gait", "normalizedValue": "biped", "unit": "", "variant": "X2", "condition": "公式製品・ストア", "sourceUrl": "https://agibot.com/products/X2", "evidenceSummary": "X2公式ページのhumanoid gaitと製品カテゴリ。"},
+        "heightCm": {"status": "found", "rawValue": "Approx. 1.31m; 1310mm(H)×460mm(W)×210mm(L)", "normalizedValue": 131, "unit": "cm", "variant": "X2", "condition": "approximate height", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "公式ストアX2仕様。"},
+        "weightKg": {"status": "found", "rawValue": "Approx. 35kg", "normalizedValue": 35, "unit": "kg", "variant": "X2", "condition": "approximate", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "公式ストアX2仕様。"},
+        "speedMps": {"status": "conflict", "rawValue": "English/current store: up to 1.8m/s, typical ≤0.8m/s; Japanese official page: maximum 1.5m/s, typical ≤0.8m/s", "normalizedValue": null, "unit": "m/s", "variant": "X2", "condition": "maximum vs typical separated; official language versions disagree on maximum", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "現行ストア・英語ページの1.8m/sと日本語ページの1.5m/sを統合しない。"},
+        "dof": {"status": "conflict", "rawValue": "English/store: 25 total; Japanese official page: X2 27 total", "normalizedValue": null, "unit": "DoF", "variant": "X2", "condition": "official table revision/language discrepancy", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "X2 standardのDoFが25と27に分かれる。"},
+        "payloadKg": {"status": "not-published", "rawValue": "Payload Capacity is recorded as manufacturer-wording loadRatings", "normalizedValue": null, "unit": "kg", "variant": "X2", "condition": "page does not state single/dual/whole-body scope", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "payloadフィールドへ読み替えず、メーカー表現scopeを保つ。"},
+        "runtimeMin": {"status": "found", "rawValue": "At 0.5m/s walking, approx. 2 hours", "normalizedValue": 120, "unit": "min", "variant": "X2", "condition": "walking at 0.5m/s", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "公式ストアのOperating Time条件。"},
+        "batteryCapacityWh": {"status": "found", "rawValue": "Approx. 500Wh", "normalizedValue": 500, "unit": "Wh", "variant": "X2", "condition": "公式仕様", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "公式ストア仕様。"},
+        "chargeTimeMin": {"status": "found", "rawValue": "≤1.5 hours", "normalizedValue": 90, "unit": "min", "variant": "X2", "condition": "upper-bound charging time", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "公式ストアのCharging Time。"},
+        "batterySystem": {"status": "found", "rawValue": "Direct charging, swappable battery; 54.6V 10A charger", "normalizedValue": "direct charging + swappable battery", "unit": "", "variant": "X2", "condition": "charger output kept separate", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "公式ストア仕様のPower Supply Method。"},
+        "controlMethod": {"status": "found", "rawValue": "handheld controller included; mobile app; OTA updates", "normalizedValue": "handheld controller / mobile app", "unit": "", "variant": "X2", "condition": "secondary development listed as not supported", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "公式ストアのOthers欄。"},
+        "sdk": {"status": "conflict", "rawValue": "AimDK_X2 documentation and open SDK marketing; store X2 specification says secondary development not supported", "normalizedValue": null, "unit": "", "variant": "X2", "condition": "SDK documentation exists but product-level access/support differs by model", "sourceUrl": "https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html", "evidenceSummary": "公式SDK docsはafter-sales経由取得を案内し、ストアX2列はsecondary development not supported。"},
+        "computePlatform": {"status": "found", "rawValue": "RK3588 ×2; high-performance board not equipped", "normalizedValue": "RK3588 dual-board; no high-performance board", "unit": "", "variant": "X2", "condition": "X2 standard column", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "公式ストア仕様のMain Compute Board/High-performance Board。"},
+        "ipRating": {"status": "not-published", "rawValue": "IP等級の記載なし", "normalizedValue": null, "unit": "", "variant": "X2", "condition": "official product/store/spec reviewed", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "X2のIP等級は公開されていない。"},
+        "operatingTemperature": {"status": "found", "rawValue": "-10℃ to 40℃", "normalizedValue": {"minC": -10, "maxC": 40}, "unit": "℃", "variant": "X2", "condition": "official specification", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "公式ストアX2仕様。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "Certificate of Conformity is included; standard number not stated", "normalizedValue": null, "unit": "", "variant": "X2", "condition": "certificate package item is not a named safety standard", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "同梱品にCertificate of Conformityはあるが規格番号は公開されていない。"}
+      },
+      "loadRatings": [
+        {"scope": "manufacturer-wording", "rating": "maximum", "kg": 3, "condition": "maximum in specific postures; excluding end effector; page does not define arm/body scope", "variant": "X2", "sourceUrl": "https://store.agibot.com/products/x2"},
+        {"scope": "manufacturer-wording", "rating": "maximum", "kg": 1, "condition": "across full range ≤1kg; excluding end effector; page does not define arm/body scope", "variant": "X2", "sourceUrl": "https://store.agibot.com/products/x2"}
+      ],
+      "priceOffers": [{"channel": "manufacturer-public", "display": "$24,240.00 USD", "amount": 24240, "currency": "USD", "taxStatus": "unknown", "variant": "X2", "sellerName": "AGIBOT Store", "sourceUrl": "https://store.agibot.com/products/x2"}],
+      "priceResearchStatus": "found",
+      "officialUseCases": [],
+      "useCaseGaps": ["USE_CASE_GAP agibot-x2 \"entertainment and commercial performance\" https://store.agibot.com/products/x2"],
+      "usageExamples": [],
+      "usageExampleSourceUrls": [],
+      "procurement": {
+        "procurementModels": ["purchase", "inquiry"],
+        "marketAvailability": {"status": "global-store-listed", "rawValue": "Official store sale price, Add to cart and overseas shipping FAQ", "sourceUrl": "https://store.agibot.com/products/x2", "evidenceSummary": "公式ストアで価格・購入導線を確認。"},
+        "japanAvailability": {"status": "unknown", "rawValue": "海外発送は案内されるが、日本の正規代理店・国内在庫なし", "sourceUrl": "https://store.agibot.com/pages/about-us", "evidenceSummary": "海外配送を日本での購入可能性と同一視しない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "国内正規代理店名なし", "sourceUrl": "https://agibot.com/contact/", "evidenceSummary": "公式窓口確認。"},
+        "supportNote": {"status": "found", "rawValue": "AimDK_X2 after-sales technical support; official X2 user guide and after-sales service guide", "sourceUrl": "https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html", "evidenceSummary": "公式SDK・マニュアルのサポート導線を確認。"}
+      },
+      "pagesReviewed": ["https://agibot.com/products/X2", "https://agibot.com/jp/products/X2", "https://store.agibot.com/products/x2", "https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html", "https://x2-aimdk.agibot.com/en/latest/operation_guide/index.html", "https://store.agibot.com/pages/about-us", "https://agibot.com/contact/"],
+      "sourceCandidates": [{"url": "https://agibot.com/jp/products/X2", "status": "spec-conflict", "reason": "Japanese official table says 27DoF and 1.5m/s maximum; current English/store says 25DoF and 1.8m/s maximum."}],
+      "fieldEvidence": {"mobility": ["https://agibot.com/products/X2"], "heightCm": ["https://store.agibot.com/products/x2"], "weightKg": ["https://store.agibot.com/products/x2"], "speedMps": ["https://store.agibot.com/products/x2", "https://agibot.com/jp/products/X2"], "dof": ["https://store.agibot.com/products/x2", "https://agibot.com/jp/products/X2"], "runtimeMin": ["https://store.agibot.com/products/x2"], "batteryCapacityWh": ["https://store.agibot.com/products/x2"], "chargeTimeMin": ["https://store.agibot.com/products/x2"], "batterySystem": ["https://store.agibot.com/products/x2"], "controlMethod": ["https://store.agibot.com/products/x2"], "sdk": ["https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html"], "computePlatform": ["https://store.agibot.com/products/x2"], "operatingTemperature": ["https://store.agibot.com/products/x2"], "loadRatings": ["https://store.agibot.com/products/x2"], "priceOffers": ["https://store.agibot.com/products/x2"]},
+      "conflicts": ["X2公式英語・ストアは25DoF、最大1.8m/s、日本語公式は27DoF、最大1.5m/s。", "AimDK_X2公式ドキュメントとストアのsecondary development可否が一致しない。"],
+      "humanReviewRequired": ["X2 standardの出荷revisionとSDKアクセス権を公式データシートで確認する。", "Payload Capacityの正式scopeを確認する。"]
+    },
+    {
+      "robotId": "agibot-x2-ultra",
+      "manufacturerId": "agibot",
+      "identity": {"status": "confirmed", "officialName": "AGIBOT X2 Ultra", "variant": "X2 Ultra", "officialProductUrl": "https://agibot.com/products/X2", "notes": "X2比較表のX2 Ultra列と公式ストアX2 UItra商品を対象。ストアの商品タイトルのUItra typoは原文として記録し、officialNameはUltraに正規化。"},
+      "positioningFacts": [
+        {"statement": "high-performance intelligent and agile robot", "sourceUrl": "https://store.agibot.com/products/x2-ultra"},
+        {"statement": "exhibition guide, in-store receptionist, cultural and entertainment tourism ambassador, research and education advocate", "sourceUrl": "https://store.agibot.com/products/x2-ultra"},
+        {"statement": "autonomous navigation, obstacle avoidance and automatic energy replenishment", "sourceUrl": "https://agibot.com/products/X2"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "compact humanoid robot; autonomous navigation walking", "normalizedValue": "biped", "unit": "", "variant": "X2 Ultra", "condition": "official product/store", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "X2 Ultra公式ストアの製品説明。"},
+        "heightCm": {"status": "found", "rawValue": "Approx. 1.31m; 1310mm(H)×460mm(W)×210mm(L)", "normalizedValue": 131, "unit": "cm", "variant": "X2 Ultra", "condition": "approximate", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "公式ストアX2 Ultra仕様。"},
+        "weightKg": {"status": "found", "rawValue": "Approx. 39kg", "normalizedValue": 39, "unit": "kg", "variant": "X2 Ultra", "condition": "approximate", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "公式ストアX2 Ultra仕様。"},
+        "speedMps": {"status": "conflict", "rawValue": "English/current store: up to 1.8m/s, typical ≤0.8m/s; Japanese official page: maximum 1.5m/s, typical ≤0.8m/s", "normalizedValue": null, "unit": "m/s", "variant": "X2 Ultra", "condition": "official language versions disagree on maximum; typical value preserved", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "公式ストア・英語ページと日本語ページの速度差。"},
+        "dof": {"status": "found", "rawValue": "30 total; neck 1, arms 7 per arm, waist 3, legs 6 per leg", "normalizedValue": 30, "unit": "DoF", "variant": "X2 Ultra", "condition": "total active DoF; end effectors not included", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "公式ストアX2 Ultra列のscope別DoF。"},
+        "payloadKg": {"status": "not-published", "rawValue": "Payload Capacity is recorded as manufacturer-wording loadRatings", "normalizedValue": null, "unit": "kg", "variant": "X2 Ultra", "condition": "page does not state single/dual/whole-body scope", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "payloadフィールドへ読み替えない。"},
+        "runtimeMin": {"status": "found", "rawValue": "At 0.5m/s walking, approx. 2 hours", "normalizedValue": 120, "unit": "min", "variant": "X2 Ultra", "condition": "walking at 0.5m/s", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "公式ストアのOperating Time。"},
+        "batteryCapacityWh": {"status": "found", "rawValue": "Approx. 500Wh", "normalizedValue": 500, "unit": "Wh", "variant": "X2 Ultra", "condition": "official specification", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "公式ストアのBattery Capacity。"},
+        "chargeTimeMin": {"status": "found", "rawValue": "≤1.5 hours", "normalizedValue": 90, "unit": "min", "variant": "X2 Ultra", "condition": "upper-bound charging time", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "公式ストア仕様。"},
+        "batterySystem": {"status": "found", "rawValue": "Direct charging, swappable battery, optional auto-charging dock; 54.6V 10A charger", "normalizedValue": "direct charging + swappable battery + optional auto-charge dock", "unit": "", "variant": "X2 Ultra", "condition": "charger output kept separate", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "公式ストアのPower Supply Method。"},
+        "controlMethod": {"status": "found", "rawValue": "handheld controller included; mobile app; OTA updates; secondary development supported", "normalizedValue": "handheld controller / mobile app / secondary development", "unit": "", "variant": "X2 Ultra", "condition": "official X2 Ultra column", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "公式ストアのOthers欄。"},
+        "sdk": {"status": "found", "rawValue": "AimDK_X2 documentation; SDK package and URDF currently obtained via after-sales technical support", "normalizedValue": "AimDK_X2 SDK", "unit": "", "variant": "X2 Ultra", "condition": "official SDK docs/user-guide; package access is support-mediated", "sourceUrl": "https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html", "evidenceSummary": "公式SDKドキュメントがX2 SDK・URDF取得方法を明記。"},
+        "computePlatform": {"status": "found", "rawValue": "RK3588 ×2; Orin NX (157 TOPS)", "normalizedValue": "RK3588 dual-board + NVIDIA Orin NX 157 TOPS", "unit": "", "variant": "X2 Ultra", "condition": "main and high-performance boards", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "公式ストアX2 Ultra仕様。"},
+        "ipRating": {"status": "not-published", "rawValue": "IP等級の記載なし", "normalizedValue": null, "unit": "", "variant": "X2 Ultra", "condition": "official product/store/spec reviewed", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "X2 UltraのIP等級は公開されていない。"},
+        "operatingTemperature": {"status": "found", "rawValue": "-10℃ to 40℃", "normalizedValue": {"minC": -10, "maxC": 40}, "unit": "℃", "variant": "X2 Ultra", "condition": "official specification", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "公式ストア仕様。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "Certificate of Conformity included; no standard number", "normalizedValue": null, "unit": "", "variant": "X2 Ultra", "condition": "certificate item is not a named safety standard", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "規格番号は公開されていない。"}
+      },
+      "loadRatings": [
+        {"scope": "manufacturer-wording", "rating": "maximum", "kg": 3, "condition": "maximum in specific postures; excluding end effector; page does not define arm/body scope", "variant": "X2 Ultra", "sourceUrl": "https://store.agibot.com/products/x2-ultra"},
+        {"scope": "manufacturer-wording", "rating": "maximum", "kg": 1, "condition": "across full range ≤1kg; excluding end effector; page does not define arm/body scope", "variant": "X2 Ultra", "sourceUrl": "https://store.agibot.com/products/x2-ultra"}
+      ],
+      "priceOffers": [{"channel": "manufacturer-public", "display": "$999,999.00 USD shown as Sale price, while page also says Contact Us", "amount": 999999, "currency": "USD", "taxStatus": "unknown", "variant": "X2 Ultra", "sellerName": "AGIBOT Store", "sourceUrl": "https://store.agibot.com/products/x2-ultra"}],
+      "priceResearchStatus": "needs-review",
+      "officialUseCases": [
+        {"existingUseCaseId": "facility-wayfinding", "officialExpression": "exhibition guide / cultural and entertainment tourism ambassador", "evidenceSourceUrl": "https://store.agibot.com/products/x2-ultra", "reason": "公式ストアの展示案内・観光案内表現が既存facility-wayfindingに対応する。"},
+        {"existingUseCaseId": "customer-reception", "officialExpression": "in-store receptionist", "evidenceSourceUrl": "https://store.agibot.com/products/x2-ultra", "reason": "公式ストアがin-store receptionistを明示する。"},
+        {"existingUseCaseId": "research-development", "officialExpression": "research and education advocate", "evidenceSourceUrl": "https://store.agibot.com/products/x2-ultra", "reason": "公式ストアのresearch and education表現を既存research-developmentへ接続する。"}
+      ],
+      "useCaseGaps": ["USE_CASE_GAP agibot-x2-ultra \"entertainment performance / tourism ambassador\" https://store.agibot.com/products/x2-ultra"],
+      "usageExamples": [],
+      "usageExampleSourceUrls": [],
+      "procurement": {
+        "procurementModels": ["purchase", "inquiry"],
+        "marketAvailability": {"status": "listed-contact-price", "rawValue": "Official store listing; Add to cart; Contact Us for delivery; displayed $999,999 sale-price requires review", "sourceUrl": "https://store.agibot.com/products/x2-ultra", "evidenceSummary": "商品掲載は確認できるが、表示価格は問い合わせ文言と矛盾するため即時調達価格と断定しない。"},
+        "japanAvailability": {"status": "unknown", "rawValue": "海外発送FAQはあるが日本の正規代理店・国内価格なし", "sourceUrl": "https://store.agibot.com/pages/about-us", "evidenceSummary": "海外発送と日本の商用提供を分離。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "国内正規代理店名なし", "sourceUrl": "https://agibot.com/contact/", "evidenceSummary": "公式窓口確認。"},
+        "supportNote": {"status": "found", "rawValue": "AimDK_X2 documentation, user guide, after-sales technical support", "sourceUrl": "https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html", "evidenceSummary": "公式SDK・マニュアル導線。"}
+      },
+      "pagesReviewed": ["https://agibot.com/products/X2", "https://agibot.com/jp/products/X2", "https://store.agibot.com/products/x2-ultra", "https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html", "https://x2-aimdk.agibot.com/en/latest/operation_guide/index.html", "https://www.agibot.com/Defined%20Support%20Period.pdf", "https://store.agibot.com/pages/about-us", "https://agibot.com/contact/"],
+      "sourceCandidates": [{"url": "https://store.agibot.com/products/x2-ultra", "status": "price-conflict", "reason": "ページはContact Usを案内する一方、Sale price $999,999を表示。placeholderか現行価格か公式確認が必要。"}],
+      "fieldEvidence": {"mobility": ["https://store.agibot.com/products/x2-ultra"], "heightCm": ["https://store.agibot.com/products/x2-ultra"], "weightKg": ["https://store.agibot.com/products/x2-ultra"], "speedMps": ["https://store.agibot.com/products/x2-ultra", "https://agibot.com/jp/products/X2"], "dof": ["https://store.agibot.com/products/x2-ultra"], "runtimeMin": ["https://store.agibot.com/products/x2-ultra"], "batteryCapacityWh": ["https://store.agibot.com/products/x2-ultra"], "chargeTimeMin": ["https://store.agibot.com/products/x2-ultra"], "batterySystem": ["https://store.agibot.com/products/x2-ultra"], "controlMethod": ["https://store.agibot.com/products/x2-ultra"], "sdk": ["https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html"], "computePlatform": ["https://store.agibot.com/products/x2-ultra"], "operatingTemperature": ["https://store.agibot.com/products/x2-ultra"], "loadRatings": ["https://store.agibot.com/products/x2-ultra"], "priceOffers": ["https://store.agibot.com/products/x2-ultra"]},
+      "conflicts": ["X2 Ultra公式英語・ストアは最大1.8m/s、日本語公式は最大1.5m/s。", "公式ストアはContact Usと$999,999表示が併存し、価格はneeds-review。"],
+      "humanReviewRequired": ["$999,999表示が実価格かplaceholderか確認する。", "速度の現行出荷revision値を確認する。", "Payload Capacityの正式scopeを確認する。"]
+    },
+    {
+      "robotId": "agibot-g2",
+      "manufacturerId": "agibot",
+      "identity": {"status": "confirmed", "officialName": "AGIBOT G2", "variant": "G2", "officialProductUrl": "https://www.agibot.com/products/G2", "notes": "G2公式製品ページ、公式MWC記事、公式Longcheer導入記事を対象。報道の推測値は使用しない。"},
+      "positioningFacts": [
+        {"statement": "Industrial-grade interactive embodied-work robot", "sourceUrl": "https://www.agibot.com/products/G2"},
+        {"statement": "wheeled humanoid optimized for industrial precision assembly and continuous operations", "sourceUrl": "https://www.agibot.com/article/231/detail/44.html"},
+        {"statement": "100% automotive-grade components; full-machine IP42; sub-millimeter precision assembly; Genie RL", "sourceUrl": "https://www.agibot.com/products/G2"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "wheeled humanoid", "normalizedValue": "wheeled", "unit": "", "variant": "G2", "condition": "official portfolio article explicitly says wheeled humanoid", "sourceUrl": "https://www.agibot.com/article/231/detail/44.html", "evidenceSummary": "公式MWC記事がG2をwheeled humanoidと明記。"},
+        "heightCm": {"status": "not-published", "rawValue": "身長の数値なし", "normalizedValue": null, "unit": "cm", "variant": "G2", "condition": "公式G2製品ページ・導入記事確認", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "対象G2の身長値は公開されていない。"},
+        "weightKg": {"status": "not-published", "rawValue": "重量の数値なし", "normalizedValue": null, "unit": "kg", "variant": "G2", "condition": "公式G2製品ページ・導入記事確認", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "重量値は公開されていない。"},
+        "speedMps": {"status": "not-published", "rawValue": "速度の数値なし", "normalizedValue": null, "unit": "m/s", "variant": "G2", "condition": "continuous operationsは速度値ではない", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "G2公式ページに速度値はない。"},
+        "dof": {"status": "not-published", "rawValue": "公式G2製品ページにDoF値なし", "normalizedValue": null, "unit": "DoF", "variant": "G2", "condition": "リポジトリ記載の26DoFを公式根拠として流用しない", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "対象G2のDoFは公式製品ページ・公式導入記事から確認できない。"},
+        "payloadKg": {"status": "not-published", "rawValue": "精密力制御の説明はあるがpayload値なし", "normalizedValue": null, "unit": "kg", "variant": "G2", "condition": "荷重scopeの公式数値なし", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "payload/load ratingの数値は公開されていない。"},
+        "runtimeMin": {"status": "not-published", "rawValue": "稼働時間の数値なし", "normalizedValue": null, "unit": "min", "variant": "G2", "condition": "24/7導入事例はruntime specではない", "sourceUrl": "https://www.agibot.com/article/231/detail/60.html", "evidenceSummary": "導入記事の連続運転実績と製品runtime仕様を混同しない。"},
+        "batteryCapacityWh": {"status": "not-published", "rawValue": "バッテリー容量の数値なし", "normalizedValue": null, "unit": "Wh", "variant": "G2", "condition": "公式製品ページ確認", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "容量値は公開されていない。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "充電時間の記載なし", "normalizedValue": null, "unit": "min", "variant": "G2", "condition": "公式製品ページ確認", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "充電時間は公開されていない。"},
+        "batterySystem": {"status": "not-published", "rawValue": "バッテリー方式の記載なし", "normalizedValue": null, "unit": "", "variant": "G2", "condition": "導入記事のcontinuous operationから方式を推測しない", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "バッテリー方式・交換方式は公開されていない。"},
+        "controlMethod": {"status": "not-published", "rawValue": "操作方式の型・方式なし", "normalizedValue": null, "unit": "", "variant": "G2", "condition": "Genie RLは制御方式・SDK名として流用しない", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "対象G2の操作方式は公開されていない。"},
+        "sdk": {"status": "not-published", "rawValue": "G2固有SDKの記載なし", "normalizedValue": null, "unit": "", "variant": "G2", "condition": "Genie RL／データ収集基盤をSDKと同一視しない", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "G2向けSDK名・配布条件は確認できない。"},
+        "computePlatform": {"status": "not-published", "rawValue": "計算基盤の型番なし", "normalizedValue": null, "unit": "", "variant": "G2", "condition": "公式製品ページ確認", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "計算基盤は公開されていない。"},
+        "ipRating": {"status": "found", "rawValue": "Full Machine Protection: IP42", "normalizedValue": "IP42", "unit": "", "variant": "G2", "condition": "whole machine", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "G2公式製品ページの全体防護IP42。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "動作温度の記載なし", "normalizedValue": null, "unit": "℃", "variant": "G2", "condition": "公式製品・導入記事確認", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "動作温度は公開されていない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "automotive-grade components and IP42 are not named safety standards", "normalizedValue": null, "unit": "", "variant": "G2", "condition": "manufacturer quality claims separated from certification", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "安全規格番号・認証名は確認できない。"}
+      },
+      "loadRatings": [],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [{"existingUseCaseId": "factory-assembly-support", "officialExpression": "high-precision force-control operation / sub-millimeter precision assembly", "evidenceSourceUrl": "https://www.agibot.com/products/G2", "reason": "G2公式製品ページの精密組立表現が既存factory-assembly-supportに直接対応する。"}],
+      "useCaseGaps": ["USE_CASE_GAP agibot-g2 \"wheeled industrial precision assembly / continuous operations\" https://www.agibot.com/article/231/detail/44.html"],
+      "usageExamples": [
+        {"title": "AGIBOT and Longcheer Technology Achieve World’s First Embodied AI Deployment in Consumer Electronics Precision Manufacturing Mass-Production Line", "url": "https://www.agibot.com/article/231/detail/60.html", "publisher": "AGIBOT", "publishedAt": "2026-04-14", "summary": "Longcheerのタブレット生産ラインに複数のG2を導入。MMIT工程で搬送・検査治具への投入・良否仕分けを行い、99%超の連続運転成功率と24/7運用実績を公式発表。", "type": "deployment"}
+      ],
+      "usageExampleSourceUrls": ["https://www.agibot.com/article/231/detail/60.html"],
+      "procurement": {
+        "procurementModels": ["purchase", "inquiry", "enterprise-deployment"],
+        "marketAvailability": {"status": "enterprise-deployment", "rawValue": "公式G2製品ページは問い合わせ販売、公式記事はLongcheer量産ラインへの導入を報告", "sourceUrl": "https://www.agibot.com/article/231/detail/60.html", "evidenceSummary": "導入実績と公開一般販売価格を分離。"},
+        "japanAvailability": {"status": "unknown", "rawValue": "日本でのG2販売・代理店情報なし", "sourceUrl": "https://www.agibot.com/products/G2", "evidenceSummary": "公式グローバル問い合わせ以外の国内情報は確認できない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "国内正規代理店名なし", "sourceUrl": "https://agibot.com/contact/", "evidenceSummary": "公式問い合わせページ確認。"},
+        "supportNote": {"status": "found", "rawValue": "official product contact; G2 included in defined security update support period through 2027-01-01", "sourceUrl": "https://www.agibot.com/Defined%20Support%20Period.pdf", "evidenceSummary": "公式製品窓口とセキュリティ更新期間資料を確認。"}
+      },
+      "pagesReviewed": ["https://www.agibot.com/products/G2", "https://agibot.com/jp/products/G2", "https://www.agibot.com/article/231/detail/44.html", "https://www.agibot.com/article/231/detail/60.html", "https://www.agibot.com/article/231/detail/54.html", "https://www.agibot.com/Defined%20Support%20Period.pdf", "https://agibot.com/contact/"],
+      "sourceCandidates": [{"url": "https://www.agibot.com/article/231/detail/60.html", "status": "usage-deployment", "reason": "G2がLongcheerの実量産ラインで作業したことを公式発表。製品スペックのruntime・速度には流用しない。"}],
+      "fieldEvidence": {"mobility": ["https://www.agibot.com/article/231/detail/44.html"], "ipRating": ["https://www.agibot.com/products/G2"], "officialUseCases": ["https://www.agibot.com/products/G2"], "usageExample": ["https://www.agibot.com/article/231/detail/60.html"], "supportNote": ["https://www.agibot.com/Defined%20Support%20Period.pdf"]},
+      "conflicts": ["G2公式製品ページは詳細数値仕様をほぼ公開せず、リポジトリ既存値（DoF等）は公式根拠がないため再採用していない。"],
+      "humanReviewRequired": ["G2の身長・重量・速度・DoF・荷重・電池・計算基盤を公式データシートで確認する。", "G2の日本向け販売・保守窓口を確認する。"]
+    }
+  ]
+}
