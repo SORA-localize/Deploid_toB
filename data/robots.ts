@@ -2687,7 +2687,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: '教育・具身AI開発向けの小型二足歩行プラットフォーム。Geek / Education / Professionalの3構成を展開。',
     publishStatus: 'published',
-    updatedAt: '2026-07-16',
+    updatedAt: '2026-07-18',
     nextReviewBy: '2026-10-16',
     reliability: 'official',
     sources: [
@@ -2728,6 +2728,14 @@ export const robots: Robot[] = [
         checkedAt: '2026-07-16',
         reliability: 'official',
       },
+      {
+        title: 'Booster Robotics RoboCup solution',
+        url: 'https://www.booster.tech/robocup/',
+        publisher: 'Booster Robotics',
+        checkedAt: '2026-07-17',
+        reliability: 'official',
+        note: '全構成共通の基準歩行速度0.4m/sを確認（構成別稼働時間の測定条件として記載）。',
+      },
     ],
     images: {
       hero: {
@@ -2751,6 +2759,7 @@ export const robots: Robot[] = [
     specs: {
       heightCm: 95,
       weightKg: 19.5,
+      speedMps: 0.4,
       dof: 22,
       batterySystem: 'Geek: 2Ah / Education・Professional: 5Ah',
       sdk: 'Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo',
@@ -2782,6 +2791,7 @@ export const robots: Robot[] = [
     fieldEvidence: {
       heightCm: ['https://www.booster.tech/booster-k1/'],
       weightKg: ['https://www.booster.tech/booster-k1/'],
+      speedMps: ['https://www.booster.tech/robocup/'],
       dof: ['https://www.booster.tech/booster-k1/'],
       batterySystem: ['https://www.booster.tech/booster-k1/'],
       sdk: ['https://github.com/BoosterRobotics/booster_gym'],
@@ -3421,7 +3431,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: '産業・研究向けに公開された初代Forerunner開発プラットフォーム。公式ページは現行出荷を明示していない。',
     publishStatus: 'published',
-    updatedAt: '2026-07-16',
+    updatedAt: '2026-07-18',
     nextReviewBy: '2026-10-16',
     reliability: 'official',
     sources: [
@@ -3484,6 +3494,7 @@ export const robots: Robot[] = [
     marketAvailability: 'planned-production',
     buyerReadiness: 'requires-poc',
     specs: {
+      mobility: 'biped',
       heightCm: 178,
       weightKg: 85,
       dof: 40,
@@ -3493,6 +3504,7 @@ export const robots: Robot[] = [
     },
     procurementModels: ['inquiry'],
     fieldEvidence: {
+      mobility: ['https://gotokepler.com/productDetailK1'],
       heightCm: ['https://gotokepler.com/productDetailK1'],
       weightKg: ['https://gotokepler.com/productDetailK1'],
       dof: ['https://gotokepler.com/productDetailK1'],
