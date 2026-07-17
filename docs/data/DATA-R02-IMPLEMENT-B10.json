@@ -3033,8 +3033,8 @@
       {
         "key": "dof",
         "status": "found",
-        "action": "set",
-        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "action": "unsupported-schema",
+        "reason": "片腕ごとのDoFであり、全身の自由度として表示する現行schemaへは投影できない。",
         "currentValue": null,
         "proposedValue": 7,
         "evidence": {

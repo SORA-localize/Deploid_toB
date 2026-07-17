@@ -4394,7 +4394,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: '医療・施設運用向けの現行サービスロボットaeo。搬送、巡回、見守りなどをRaaSで提供する。',
     publishStatus: 'published',
-    updatedAt: '2026-07-16',
+    updatedAt: '2026-07-18',
     nextReviewBy: '2026-10-16',
     reliability: 'official',
     sources: [
@@ -4411,6 +4411,15 @@ export const robots: Robot[] = [
         publisher: 'Aeolus Robotics',
         checkedAt: '2026-07-16',
         reliability: 'official',
+      },
+      {
+        title: 'Aeolus Debuts Autonomous Dual-arm Humanoid Robot at CES',
+        url: 'https://www.prnewswire.com/news-releases/aeolus-debuts-autonomous-dual-arm-humanoid-robot-at-ces-301713109.html',
+        publisher: 'Aeolus Robotics / PR Newswire',
+        publishedAt: '2023-01-04',
+        checkedAt: '2026-07-17',
+        reliability: 'official',
+        note: 'Aeolusの公式発表。aeoの片腕7自由度・片腕8lb荷重・病院での医療物資配送への言及を確認。',
       },
       {
         title: '丸文とAeolus Roboticsの戦略的パートナーシップ',
@@ -4440,8 +4449,26 @@ export const robots: Robot[] = [
     description: '現行aeoは病院・介護施設・ホテルなどでの搬送、巡回、見守り、施設業務を想定するサービスロボット。過去の日本導入発表は「Aeolus Robot」とのみ記載され、現行aeoとの世代対応が確認できないため、現行機の導入実績や数値仕様としては扱わない。',
     deploymentStage: 'production',
     buyerReadiness: 'initial-adoption',
-    specs: {},
+    specs: {
+      mobility: 'wheeled',
+      controlMethod: 'モバイルアプリ操作 / AIによる空間認識・自律適応',
+    },
     procurementModels: ['raas', 'lease', 'subscription', 'inquiry', 'partner-program'],
+    loadRatings: [
+      {
+        scope: 'single-arm',
+        rating: 'maximum',
+        kg: 3.6,
+        condition: '公式表記「片腕8lb（約3.6kg）」。両腕合計・全身荷重は非公表。',
+        variant: 'aeo',
+        sourceUrl: 'https://www.prnewswire.com/news-releases/aeolus-debuts-autonomous-dual-arm-humanoid-robot-at-ces-301713109.html',
+      },
+    ],
+    fieldEvidence: {
+      mobility: ['https://www.aeolusbot.com/meet-aeo'],
+      controlMethod: ['https://www.aeolusbot.com/meet-aeo'],
+      loadRatings: ['https://www.prnewswire.com/news-releases/aeolus-debuts-autonomous-dual-arm-humanoid-robot-at-ces-301713109.html'],
+    },
     japanAvailability: 'unknown',
     supportNote: 'Aeolusは継続支援、保守、修理、ソフトウェア更新を案内。丸文の国内窓口は確認できるが、現行aeoの販売・保守条件は要確認。',
     industryTags: ['healthcare', 'facility-management', 'retail'],

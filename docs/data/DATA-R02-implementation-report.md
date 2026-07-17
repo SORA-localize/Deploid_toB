@@ -20,8 +20,8 @@ Generated: 2026-07-17
 - preserve: 1240
 - publish-status-proposal: 4
 - replace-usage-example-urls: 53
-- set: 189
-- unsupported-schema: 338
+- set: 188
+- unsupported-schema: 339
 
 ## Guardrails
 

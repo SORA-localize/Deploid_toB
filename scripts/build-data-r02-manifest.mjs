@@ -84,6 +84,15 @@ function hasSchemaCompatibleValue(key, value) {
   return false;
 }
 
+function hasSchemaCompatibleMeaning(key, evidence) {
+  if (key !== 'dof') return true;
+  const rawUnit = String(evidence.rawUnit ?? '');
+  const rawValue = String(evidence.value ?? '');
+  // 「自由度」は現行schemaではロボット全体の単一値として表示される。
+  // 片腕ごとのDoFをここへ入れると、全身自由度であるかのように誤読される。
+  return !(/dof\s*\/\s*arm/i.test(rawUnit) || /\beach\s+arm\b/i.test(rawValue));
+}
+
 function sourceCandidate(evidence, robot) {
   return {
     title: evidence.sourceTitle || `${robot.name} official source`,
@@ -114,6 +123,9 @@ function specAction(result, robot) {
     if (!supportedSpecKeys.has(result.key)) return { action: 'unsupported-schema', reason: '現行specSchemaにキーがない。' };
     if (!hasSchemaCompatibleValue(result.key, result.evidence.normalizedValue)) {
       return { action: 'unsupported-schema', reason: 'R02の正規化値が現行specSchemaの値型に適合しない。分割・型拡張・人間確認が必要。' };
+    }
+    if (!hasSchemaCompatibleMeaning(result.key, result.evidence)) {
+      return { action: 'unsupported-schema', reason: '片腕ごとのDoFであり、全身の自由度として表示する現行schemaへは投影できない。' };
     }
     if (equal(currentValue, result.evidence.normalizedValue)) return { action: 'preserve', reason: '現行値とR02正規化値が一致する。' };
     return { action: 'set', reason: '現在の公式一次資料・型・variant条件を満たす。' };

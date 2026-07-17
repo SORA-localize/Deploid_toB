@@ -1,6 +1,6 @@
 # Robot DATA-R02 Integration Plan v1
 
-Status: active / R02-02 manifest completed
+Status: active / R02-03 aeo data pilot completed
 
 Created: 2026-07-17
 
@@ -574,6 +574,6 @@ R02-10 use-case gap triage is separate from Robot rollout
 
 ## 11. 次に実行する小さい単位
 
-`R02-02`のmanifest固定後、次に実行するのは `R02-03`（aeo data pilot）だけとする。
+`R02-03`のaeo data pilot後、次に実行するのは `R02-04`（schema不足の判断）だけとする。
 
-R02-03でも対象はaeo 1機に限定する。Robotデータ以外（UI、公開状態、画像、その他のRobot）には触れず、manifestの`set`候補・source join・既存値の表示を検証してから次のバッチへ進む。
+aeoでは、現行公式ページに直接結びつく移動方式・操作方式と、片腕荷重だけを反映した。片腕7DoFは全身自由度として誤読されるため現行schemaに投影せず、manifestを`unsupported-schema`へ訂正した。UI、公開状態、画像、他Robotは変更していない。次のbatch実装前に、R02-04でこの不足をdata modelとして扱う必要があるか判断する。
