@@ -50,6 +50,13 @@ export const useCases: UseCase[] = [
         checkedAt: '2026-07-16',
         reliability: 'official',
       },
+      {
+        title: 'Apptronik goods-to-person solutions',
+        url: 'https://apptronik.com/solutions/goods-to-person',
+        publisher: 'Apptronik',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
     ],
     maturityLevel: 'pilot-phase',
     buyerReadiness: 'requires-poc',
@@ -109,6 +116,13 @@ export const useCases: UseCase[] = [
         basis: 'official-use-case',
         evidenceSourceUrls: ['https://www.galbot.com/g1/'],
         reason: '公式製品ページが倉庫でのピッキングと搬送を対象用途として示している。',
+      },
+      {
+        robotId: 'apptronik-apollo-2',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://apptronik.com/solutions/goods-to-person'],
+        reason: '現行公式ソリューションページが、保管棚から消費財を取り出し台車で出荷・仕分けエリアへ搬送するgoods-to-personタスクをApolloの対象用途として示している。',
       },
     ],
   },
@@ -1101,6 +1115,13 @@ export const useCases: UseCase[] = [
         checkedAt: '2026-07-16',
         reliability: 'official',
       },
+      {
+        title: 'Apptronik kitting solutions',
+        url: 'https://apptronik.com/solutions/kitting',
+        publisher: 'Apptronik',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
     ],
     maturityLevel: 'production-ready',
     buyerReadiness: 'requires-poc',
@@ -1176,6 +1197,13 @@ export const useCases: UseCase[] = [
         evidenceSourceUrls: ['https://neura-robotics.com/products/4ne1/'],
         reason: '現行4NE1公式ページが物流と物体搬送を対象用途として示している。',
       },
+      {
+        robotId: 'apptronik-apollo-2',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://apptronik.com/solutions/kitting'],
+        reason: '現行公式ソリューションページが、複数の棚から自動車部品を取り出し仕切り容器の正しい区画へ収めるキッティング作業をApolloの対象用途として示している。',
+      },
     ],
   },
   {
@@ -1220,7 +1248,6 @@ export const useCases: UseCase[] = [
     updatedAt: '2026-07-16',
     reliability: 'reported',
     sources: [
-      { title: 'GR-3C official product page', url: 'https://www.fftai.com/products-gr3c', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'UBTECH industrial humanoid solutions', url: 'https://www.ubtrobot.com/en/humanoid/solutions/industry', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'UBTECH Walker S official page', url: 'https://www.ubtrobot.com/en/humanoid/products/walker-s', publisher: 'UBTECH Robotics', checkedAt: '2026-06-30', reliability: 'official' },
       {
@@ -1252,6 +1279,13 @@ export const useCases: UseCase[] = [
         checkedAt: '2026-07-16',
         reliability: 'official',
       },
+      {
+        title: 'Apptronik inspection and sorting solutions',
+        url: 'https://apptronik.com/solutions/inspection-and-sorting',
+        publisher: 'Apptronik',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
     ],
     maturityLevel: 'production-ready',
     buyerReadiness: 'requires-poc',
@@ -1272,7 +1306,6 @@ export const useCases: UseCase[] = [
     whyHardToday: '合否判定モデルの構築・維持コスト、多品種対応時の再学習コストが課題。',
     japanDeploymentConditions: '品質管理基準（ISO 9001等）への適合、判定ログの保管義務の確認が必要。',
     candidateRobots: [
-      { robotId: 'fourier-gr3c', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/products-gr3c'], reason: '公式製品ページが遠隔点検を対象用途として示している。' },
       { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-s', 'https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式情報が自動車製造ラインの外観品質検査を対象用途として示している。' },
       { robotId: 'ubtech-walker-s1', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式産業ソリューションが自動車製造ラインの外観品質検査を対象用途として示している。' },
       {
@@ -1307,6 +1340,13 @@ export const useCases: UseCase[] = [
         ],
         reason: '公式発表がBaosteelのスマート製造現場での検査用途を示している。',
       },
+      {
+        robotId: 'apptronik-apollo-2',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://apptronik.com/solutions/inspection-and-sorting'],
+        reason: '現行公式ソリューションページが、自動車部品の欠陥・品質・分類基準に基づく検査と仕分けをApolloの対象用途として示している。',
+      },
     ],
   },
   {
@@ -1317,9 +1357,17 @@ export const useCases: UseCase[] = [
     subtitle: 'CNC・射出成形機など工作機械へのワーク供給・取り出し・操作パネル操作をヒューマノイドで補助する用途。',
     summary: 'CNC・射出成形機など工作機械へのワーク供給・取り出し・操作パネル操作をヒューマノイドで補助する用途。',
     publishStatus: 'draft',
-    updatedAt: '2026-06-30',
+    updatedAt: '2026-07-18',
     reliability: 'estimated',
-    sources: [],
+    sources: [
+      {
+        title: 'Apptronik machine and tool tending solutions',
+        url: 'https://apptronik.com/solutions/machine-and-tool-tending',
+        publisher: 'Apptronik',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
+    ],
     maturityLevel: 'production-ready',
     buyerReadiness: 'initial-adoption',
     environment: 'indoor-controlled',
@@ -1338,7 +1386,15 @@ export const useCases: UseCase[] = [
     environmentRequirements: '機械インターロック対応、安全柵または協働運用設計、充電スペース。',
     whyHardToday: '多品種対応時のプログラム変更コスト、例外処理（詰まり等）の自動対応が課題。',
     japanDeploymentConditions: '労働安全衛生規則・安全規格（ISO 10218）への適合確認が必要。',
-    candidateRobots: [],
+    candidateRobots: [
+      {
+        robotId: 'apptronik-apollo-2',
+        fit: 'possible',
+        basis: 'official-use-case',
+        evidenceSourceUrls: ['https://apptronik.com/solutions/machine-and-tool-tending'],
+        reason: '現行公式ソリューションページが、工作機械への材料供給・取り出し、設備監視によるマシンテンディングをApolloの対象用途として示している（バッテリー製造現場での事例を含む）。',
+      },
+    ],
   },
 
   // --- E-02: 物流（logistics）4件 ---
