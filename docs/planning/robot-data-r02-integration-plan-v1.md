@@ -1,6 +1,6 @@
 # Robot DATA-R02 Integration Plan v1
 
-Status: active / R02-00 research snapshot completed
+Status: active / R02-01 decisions completed
 
 Created: 2026-07-17
 
@@ -213,6 +213,8 @@ git diff --check
 Depends on: none。Commit: research docs only。
 
 ### R02-01 人間判断を決定ログへ固定する
+
+Status: completed 2026-07-18
 
 Files:
 
@@ -572,6 +574,6 @@ R02-10 use-case gap triage is separate from Robot rollout
 
 ## 11. 次に実行する小さい単位
 
-`R02-00`のdocs-only snapshot後、次に実行するのは `R02-01` だけとする。
+`R02-01`のdecision log固定後、次に実行するのは `R02-02` だけとする。
 
-R02-01では公開状態とデータ投影方針をdecision logへ固定するだけとし、Robotデータ、UI、公開状態、画像にはまだ触れない。判断内容を確認してからR02-02のmanifest作成へ進む。
+R02-02では実装manifestを作成・監査するだけとし、Robotデータ、UI、公開状態、画像にはまだ触れない。61機の値と保留理由をmanifestで説明できる状態にしてから、aeo pilotへ進む。

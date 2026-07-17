@@ -23,6 +23,7 @@ Last reviewed: 2026-07-16
 - `DATA-R02-B01.md`〜`DATA-R02-B10.md` — バッチ別の人間向け要約
 - `DATA-R02-publication-review.json` — lifecycleStatusとpublicationRecommendationの調査結果。publishStatusを自動変更する指示ではない
 - `DATA-R02-unresolved.md` — conflict、variant、取得不能資料、人間判断事項の集約
+- `DATA-R02-decisions.md` — 公開状態、値の採用、variant、用途、pilot順序について承認済みの実装判断
 - `DATA-R01-master-report.md` — published Robot全61機の公式情報一次調査の統合報告
 - `DATA-R01-B01-*.json`〜`DATA-R01-B14-*.json` — 項目別raw調査データ
 - `DATA-R01-B01-*.md`〜`DATA-R01-B14-*.md` — バッチ別の人間向け要約
