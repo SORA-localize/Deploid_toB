@@ -2131,7 +2131,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: '研究開発向けKUAVO 4Proの標準構成。公式マニュアルとROS SDKを公開する全身22自由度の二足機。',
     publishStatus: 'published',
-    updatedAt: '2026-07-16',
+    updatedAt: '2026-07-18',
     nextReviewBy: '2026-10-16',
     reliability: 'official',
     sources: [
@@ -2186,7 +2186,9 @@ export const robots: Robot[] = [
     specs: {
       heightCm: 166,
       weightKg: 55,
+      speedMps: 0.4,
       runtimeMin: 60,
+      chargeTimeMin: 90,
       dof: 22,
       batterySystem: '交換式60V 6Ahリチウムバッテリー（充電1.5時間以内）',
       sdk: 'KUAVO ROS SDK（ROS 1 / Pythonサンプル）',
@@ -2197,7 +2199,9 @@ export const robots: Robot[] = [
     fieldEvidence: {
       heightCm: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       weightKg: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
+      speedMps: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       runtimeMin: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
+      chargeTimeMin: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       dof: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       batterySystem: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       sdk: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/'],
@@ -3531,7 +3535,7 @@ export const robots: Robot[] = [
     category: 'humanoid',
     summary: 'KUAVO 5の二足歩行Advanced構成。腰・頭部を含む全身29自由度とROS SDKを備える開発プラットフォーム。',
     publishStatus: 'published',
-    updatedAt: '2026-07-16',
+    updatedAt: '2026-07-18',
     nextReviewBy: '2026-10-16',
     reliability: 'official',
     sources: [
@@ -3573,7 +3577,9 @@ export const robots: Robot[] = [
     specs: {
       heightCm: 173,
       weightKg: 63.5,
+      speedMps: 0.4,
       runtimeMin: 60,
+      chargeTimeMin: 90,
       dof: 29,
       batterySystem: '交換式60V 6Ahリチウムバッテリー（充電1.5時間以内）',
       sdk: 'KUAVO ROS SDK（ROS 1 / Pythonサンプル）',
@@ -3584,7 +3590,9 @@ export const robots: Robot[] = [
     fieldEvidence: {
       heightCm: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       weightKg: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
+      speedMps: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       runtimeMin: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
+      chargeTimeMin: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       dof: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       batterySystem: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       sdk: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/'],
