@@ -1,0 +1,3916 @@
+[
+  {
+    "robotId": "unitree-g1",
+    "manufacturerId": "unitree",
+    "registeredName": "G1",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics 公式サイト",
+        "publisher": "Unitree Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/g1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-store",
+        "url": "https://shop.unitree.com/products/unitree-g1",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-sdk",
+        "url": "https://github.com/unitreerobotics",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "customer-primary",
+        "url": "https://icontrol.ri.cmu.edu/news/icra2025-wbcd.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "deployment",
+          "use-cases"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "official-news",
+        "url": "https://www.unitree.com/news1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 7,
+        "documentType": "authorized-distributor",
+        "url": "https://techshare.co.jp/product/unitree/g1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "unitree-g1-edu",
+    "manufacturerId": "unitree",
+    "registeredName": "G1 EDU",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics 公式サイト",
+        "publisher": "Unitree Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/g1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-sdk",
+        "url": "https://github.com/unitreerobotics",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "customer-primary",
+        "url": "https://www.wpunj.edu/articles/news/2025-10-27/humanoid-AI-robot-computer-science-department-william-paterson-university",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "deployment",
+          "use-cases"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-store",
+        "url": "https://shop.unitree.com/products/unitree-g1",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "unitree-h1",
+    "manufacturerId": "unitree",
+    "registeredName": "H1",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics 公式サイト",
+        "publisher": "Unitree Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/mobile/h1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/app/h1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-sdk",
+        "url": "https://github.com/unitreerobotics",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-news",
+        "url": "https://www.unitree.com/news1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "official-store",
+        "url": "https://shop.unitree.com/products/unitree-h1",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 7,
+        "documentType": "authorized-distributor",
+        "url": "https://techshare.co.jp/unitree-h1-press-release/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "unitree-h1-2",
+    "manufacturerId": "unitree",
+    "registeredName": "H1-2",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics 公式サイト",
+        "publisher": "Unitree Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/mobile/h1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/app/h1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "apptronik-apollo",
+    "manufacturerId": "apptronik",
+    "registeredName": "Apollo",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://apptronik.com/",
+        "title": "Apptronik 公式サイト",
+        "publisher": "Apptronik",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-news",
+        "url": "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-news",
+        "url": "https://apptronik.com/news-collection/apptronik-and-mercedes-benz-enter-commercial-agreement",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-news",
+        "url": "https://apptronik.com/news-collection/gxo-advances-humanoid-strategy-with-apptronik",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "agility-digit",
+    "manufacturerId": "agility-robotics",
+    "registeredName": "Digit",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://agilityrobotics.com/",
+        "title": "Agility Robotics 公式サイト",
+        "publisher": "Agility Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.agilityrobotics.com/solutions",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.agilityrobotics.com/content/agility-robotics-announces-new-innovations-for-market-leading-humanoid-robot-digit",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-product",
+        "url": "https://www.agilityrobotics.com/content/digit-deployed-at-gxo-in-historic-humanoid-raas-agreement",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "official-product",
+        "url": "https://www.agilityrobotics.com/content/digit-moves-over-100k-totes",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "onex-neo",
+    "manufacturerId": "onex",
+    "registeredName": "NEO",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.1x.tech/",
+        "title": "1X Technologies 公式サイト",
+        "publisher": "1X Technologies",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.1x.tech/neo",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.1x.tech/order",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.1x.tech/discover/neo-home-robot",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-product",
+        "url": "https://www.1x.tech/ai",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "official-product",
+        "url": "https://www.1x.tech/about",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "figure-03",
+    "manufacturerId": "figure-ai",
+    "registeredName": "Figure 03",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.figure.ai/",
+        "title": "Figure AI 公式サイト",
+        "publisher": "Figure AI",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.figure.ai/figure",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-news",
+        "url": "https://www.figure.ai/news/f-03-battery-development",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-news",
+        "url": "https://www.figure.ai/news/introducing-figure-03",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-news",
+        "url": "https://www.figure.ai/news/f-03-at-bmw",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "unitree-h2",
+    "manufacturerId": "unitree",
+    "registeredName": "H2",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics 公式サイト",
+        "publisher": "Unitree Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/mobile/H2/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-store",
+        "url": "https://shop.unitree.com/products/unitree-h2",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-sdk",
+        "url": "https://github.com/unitreerobotics",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "unitree-h2-edu",
+    "manufacturerId": "unitree",
+    "registeredName": "H2 EDU",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics 公式サイト",
+        "publisher": "Unitree Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/mobile/H2/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-sdk",
+        "url": "https://github.com/unitreerobotics",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-store",
+        "url": "https://shop.unitree.com/products/unitree-h2",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "unitree-h2-plus",
+    "manufacturerId": "unitree",
+    "registeredName": "H2 Plus",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics 公式サイト",
+        "publisher": "Unitree Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/mobile/H2plus/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-store",
+        "url": "https://shop.unitree.com/products/unitree-h2-plus",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "third-party-discovery",
+        "url": "https://nvidianews.nvidia.com/news/nvidia-open-humanoid-robot-reference-design",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "boston-dynamics-atlas",
+    "manufacturerId": "boston-dynamics",
+    "registeredName": "Atlas",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://bostondynamics.com/",
+        "title": "Boston Dynamics 公式サイト",
+        "publisher": "Boston Dynamics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://bostondynamics.com/products/atlas/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-news",
+        "url": "https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "tesla-optimus",
+    "manufacturerId": "tesla",
+    "registeredName": "Optimus",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.tesla.com/",
+        "title": "Tesla 公式サイト",
+        "publisher": "Tesla",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.tesla.com/AI",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://ir.tesla.com/_flysystem/s3/sec/000162828024032603/tsla-20240723-gen.pdf",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "sanctuary-phoenix",
+    "manufacturerId": "sanctuary-ai",
+    "registeredName": "Phoenix",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.sanctuary.ai/",
+        "title": "Sanctuary AI 公式サイト",
+        "publisher": "Sanctuary AI",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-news",
+        "url": "https://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://sanctuary.ai/solutions/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://sanctuary.ai/solutions/physical-ai/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "agibot-a2",
+    "manufacturerId": "agibot",
+    "registeredName": "A2",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.agibot.com/",
+        "title": "AgiBot 公式サイト",
+        "publisher": "AgiBot",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://agibot.com/jp/products/A2",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-store",
+        "url": "https://agibot.com/products/A2",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.agibot.com/article/231/detail/32.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-product",
+        "url": "https://www.agibot.com/article/231/detail/35.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-s2",
+    "manufacturerId": "ubtech",
+    "registeredName": "Walker S2",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.ubtrobot.com/",
+        "title": "UBTECH Robotics 公式サイト",
+        "publisher": "UBTECH Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "third-party-discovery",
+        "url": "https://ga-robotics.co.jp/pr/42088/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://owebsite-cdn.ubtrobot.com/resources/file/2025/09/16/720368312926277.pdf",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-product",
+        "url": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "official-product",
+        "url": "https://www.ubtrobot.com/en/about/company-profile",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 7,
+        "documentType": "third-party-discovery",
+        "url": "https://ga-robotics.co.jp/service/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "fourier-gr2",
+    "manufacturerId": "fourier-intelligence",
+    "registeredName": "GR-2",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://fftai.com/",
+        "title": "Fourier Intelligence 公式サイト",
+        "publisher": "Fourier Intelligence",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.fftai.com/products-gr2.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-news",
+        "url": "https://www.fftai.com/newsroom-newintech/14",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-sdk",
+        "url": "https://github.com/FFTAI/fourier_aurora_sdk",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "fourier-gr3",
+    "manufacturerId": "fourier-intelligence",
+    "registeredName": "GR-3",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://fftai.com/",
+        "title": "Fourier Intelligence 公式サイト",
+        "publisher": "Fourier Intelligence",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://fftai.com/products-gr3",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://support.fftai.com/en/getting-started/general-information",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-sdk",
+        "url": "https://github.com/FFTAI/fourier_aurora_sdk",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-news",
+        "url": "https://www.fftai.com/newsroom-humanoid/26",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "official-product",
+        "url": "https://fftai.com/products-gr3series",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "booster-t1",
+    "manufacturerId": "booster-robotics",
+    "registeredName": "T1",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.booster.tech/",
+        "title": "Booster Robotics 公式サイト",
+        "publisher": "Booster Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.booster.tech/booster-t1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.booster.tech/robocup/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-sdk",
+        "url": "https://github.com/BoosterRobotics/booster_gym",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-product",
+        "url": "https://www.booster.tech/store/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "third-party-discovery",
+        "url": "https://www.tohasen-robotics.com/news/tohasen-robotics%E3%80%81booster-robotics%E7%A4%BE%E3%81%A8%E6%97%A5%E6%9C%AC%E5%9B%BD%E5%86%85%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%AD%A3%E8%A6%8F%E4%BB%A3%E7%90%86%E5%BA%97%E5%A5%91%E7%B4%84/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "kawasaki-kaleido",
+    "manufacturerId": "kawasaki-heavy-industries",
+    "registeredName": "Kaleido",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.khi.co.jp/",
+        "title": "川崎重工業 公式サイト",
+        "publisher": "川崎重工業",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "third-party-discovery",
+        "url": "https://kawasakirobotics.com/asia-oceania/blog/202511_kaleido/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "third-party-discovery",
+        "url": "https://kawasakirobotics.com/in/blog/story_22/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "neura-4ne-1",
+    "manufacturerId": "neura-robotics",
+    "registeredName": "4NE1 Gen 3",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://neura-robotics.com",
+        "title": "NEURA Robotics 公式サイト",
+        "publisher": "NEURA Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://neura-robotics.com/products/4ne1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://neura-robotics.com/neura-robotics-launches-technological-revolution/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://neura-robotics.com/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "kepler-k2",
+    "manufacturerId": "kepler-robotics",
+    "registeredName": "Forerunner K2",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.gotokepler.com",
+        "title": "Kepler Robotics 公式サイト",
+        "publisher": "Kepler Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.gotokepler.com/productDetailK2?id=2",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "third-party-discovery",
+        "url": "https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "third-party-discovery",
+        "url": "https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-humanoid-robot-lands-at-saic-gm-activity-7321418311701815298-9Hyn",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "third-party-discovery",
+        "url": "https://www.linkedin.com/posts/kepler-exploration-robotics_keplerrobotics-keplerk2-humanoidrobots-activity-7409791717769601024-bi4K",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      },
+      {
+        "priority": 7,
+        "documentType": "third-party-discovery",
+        "url": "https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-k2-humanoid-begins-work-at-veichi-activity-7397106664631554048-E29L",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "leju-kuavo",
+    "manufacturerId": "leju-robotics",
+    "registeredName": "KUAVO 4Pro Standard",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.lejurobot.com",
+        "title": "Leju Robotics 公式サイト",
+        "publisher": "Leju Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.letools.lejurobot.com/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-product",
+        "url": "https://www.lejurobot.com/en",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "pal-talos",
+    "manufacturerId": "pal-robotics",
+    "registeredName": "TALOS",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://pal-robotics.com",
+        "title": "PAL Robotics 公式サイト",
+        "publisher": "PAL Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://pal-robotics.com/robot/talos/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://pal-robotics.com/datasheet/talos/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-news",
+        "url": "https://pal-robotics.com/blog/talos-research-torque-controlled-locomotion-for-humanoids-in-unknown-environments/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-news",
+        "url": "https://pal-robotics.com/blog/memmo-memories-robots-motion-generation/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "official-product",
+        "url": "https://pal-robotics.com/contact/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 7,
+        "documentType": "official-product",
+        "url": "https://pal-robotics.com/about-us/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "unitree-r1",
+    "manufacturerId": "unitree",
+    "registeredName": "R1 AIR",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics 公式サイト",
+        "publisher": "Unitree Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/mobile/R1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-sdk",
+        "url": "https://github.com/unitreerobotics",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "unitree-r1-standard",
+    "manufacturerId": "unitree",
+    "registeredName": "R1",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics 公式サイト",
+        "publisher": "Unitree Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/mobile/R1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-sdk",
+        "url": "https://github.com/unitreerobotics",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "agibot-a2-ultra",
+    "manufacturerId": "agibot",
+    "registeredName": "A2 Ultra",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.agibot.com/",
+        "title": "AgiBot 公式サイト",
+        "publisher": "AgiBot",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://agibot.com/jp/products/A2_Ultra",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-store",
+        "url": "https://agibot.com/products/A2_Ultra",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-store",
+        "url": "https://store.agibot.com/products/a2-ultra",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-product",
+        "url": "https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "agibot-a2-max",
+    "manufacturerId": "agibot",
+    "registeredName": "A2 Max",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.agibot.com/",
+        "title": "AgiBot 公式サイト",
+        "publisher": "AgiBot",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://www.agibot.com/products/A2_Max",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-s1",
+    "manufacturerId": "ubtech",
+    "registeredName": "Walker S1",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.ubtrobot.com/",
+        "title": "UBTECH Robotics 公式サイト",
+        "publisher": "UBTECH Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://www.ubtrobot.com/en/humanoid/products/walker-s1",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://owebsite-cdn.ubtrobot.com/resources/file/2025/04/28/670407684730949.pdf",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "booster-k1",
+    "manufacturerId": "booster-robotics",
+    "registeredName": "K1",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.booster.tech/",
+        "title": "Booster Robotics 公式サイト",
+        "publisher": "Booster Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.booster.tech/booster-k1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.booster.tech/cn/booster-k1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.booster.tech/cn/education/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-sdk",
+        "url": "https://github.com/BoosterRobotics/booster_gym",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "specs"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "third-party-discovery",
+        "url": "https://www.tohasen-robotics.com/news/tohasen-robotics%E3%80%81booster-robotics%E7%A4%BE%E3%81%A8%E6%97%A5%E6%9C%AC%E5%9B%BD%E5%86%85%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%AD%A3%E8%A6%8F%E4%BB%A3%E7%90%86%E5%BA%97%E5%A5%91%E7%B4%84/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "pal-kangaroo",
+    "manufacturerId": "pal-robotics",
+    "registeredName": "KANGAROO",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://pal-robotics.com",
+        "title": "PAL Robotics 公式サイト",
+        "publisher": "PAL Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://pal-robotics.com/robot/kangaroo/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://pal-robotics.com/datasheet/kangaroo/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-news",
+        "url": "https://pal-robotics.com/blog/kangaroo-biped-research-platform-updates/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-product",
+        "url": "https://pal-robotics.com/timeline/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "official-product",
+        "url": "https://pal-robotics.com/contact/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 7,
+        "documentType": "official-product",
+        "url": "https://pal-robotics.com/about-us/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "limx-oli",
+    "manufacturerId": "limx-dynamics",
+    "registeredName": "Oli EDU",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.limxdynamics.com/",
+        "title": "LimX Dynamics 公式サイト",
+        "publisher": "LimX Dynamics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://www.limxdynamics.com/en/products/oli",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-store",
+        "url": "https://www.limxdynamics.com/en/products/oli/spec",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://limxdynamics.com/en/order",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-product",
+        "url": "https://limxdynamics.com/en/about",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "limx-luna",
+    "manufacturerId": "limx-dynamics",
+    "registeredName": "Luna",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.limxdynamics.com/",
+        "title": "LimX Dynamics 公式サイト",
+        "publisher": "LimX Dynamics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://www.limxdynamics.com/en/products/luna",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-store",
+        "url": "https://www.limxdynamics.com/en/products/luna/spec",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-news",
+        "url": "https://www.limxdynamics.com/en/news/BK000062",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-product",
+        "url": "https://limxdynamics.com/en/order",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 6,
+        "documentType": "official-product",
+        "url": "https://limxdynamics.com/en/about",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "xpeng-iron",
+    "manufacturerId": "xpeng-robotics",
+    "registeredName": "Next-Gen IRON",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.xpeng.com/",
+        "title": "XPENG Robotics 公式サイト",
+        "publisher": "XPENG Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-news",
+        "url": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "fourier-gr1",
+    "manufacturerId": "fourier-intelligence",
+    "registeredName": "GR-1",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://fftai.com/",
+        "title": "Fourier Intelligence 公式サイト",
+        "publisher": "Fourier Intelligence",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.fftai.com/products-gr1",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.fftai.com/uploads/upload/files/20250515/3f8dfafee28ab3d5c6688016d8e36eaf.pdf",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.fftai.com/solutions/9",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-x",
+    "manufacturerId": "ubtech",
+    "registeredName": "Walker X",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.ubtrobot.com/",
+        "title": "UBTECH Robotics 公式サイト",
+        "publisher": "UBTECH Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "third-party-discovery",
+        "url": "https://ga-robotics.co.jp/pr/41810/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "kepler-k1",
+    "manufacturerId": "kepler-robotics",
+    "registeredName": "Forerunner K1",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.gotokepler.com",
+        "title": "Kepler Robotics 公式サイト",
+        "publisher": "Kepler Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://gotokepler.com/productDetailK1",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://gotokepler.com/contact?type=ordering",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "leju-kuavo5",
+    "manufacturerId": "leju-robotics",
+    "registeredName": "KUAVO 5 Advanced",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.lejurobot.com",
+        "title": "Leju Robotics 公式サイト",
+        "publisher": "Leju Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.letools.lejurobot.com/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-store",
+        "url": "https://www.lejurobot.com/zh/products/kuavo-5",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "engineai-se01",
+    "manufacturerId": "engine-ai",
+    "registeredName": "SE01",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.engineai.com.cn/",
+        "title": "EngineAI 公式サイト",
+        "publisher": "EngineAI",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.engineai.com.cn/product-se01.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.engineai.com.cn/about-news-media/23.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.engineai.com.cn/product-purchase.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "engineai-pm01",
+    "manufacturerId": "engine-ai",
+    "registeredName": "PM01",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.engineai.com.cn/",
+        "title": "EngineAI 公式サイト",
+        "publisher": "EngineAI",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.engineai.com.cn/product-pm01.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.engineai.com.cn/product-purchase.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "wandercraft-calvin",
+    "manufacturerId": "wandercraft",
+    "registeredName": "Calvin-40",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.wandercraft.eu/",
+        "title": "Wandercraft 公式サイト",
+        "publisher": "Wandercraft",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://en.wandercraft.eu/calvin-40",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://en.wandercraft.eu/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "mentee-menteebotv3",
+    "manufacturerId": "mentee-robotics",
+    "registeredName": "MenteeBot",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.menteebot.com/",
+        "title": "Mentee Robotics 公式サイト",
+        "publisher": "Mentee Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.menteebot.com/bot/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "third-party-discovery",
+        "url": "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-news",
+        "url": "https://www.menteebot.com/blog/menteebot-warehouse-task/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "onex-eve",
+    "manufacturerId": "onex",
+    "registeredName": "EVE Industrial",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.1x.tech/",
+        "title": "1X Technologies 公式サイト",
+        "publisher": "1X Technologies",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.1x.tech/eve",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.1x.tech/about",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.1x.tech/discover/announcing-rebranding-from-halodi-robotics-to-1x",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 5,
+        "documentType": "official-product",
+        "url": "https://www.1x.tech/discover/1x-world-model",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "agibot-a2-lite",
+    "manufacturerId": "agibot",
+    "registeredName": "A2 Lite",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.agibot.com/",
+        "title": "AgiBot 公式サイト",
+        "publisher": "AgiBot",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://agibot.com/products/A2_Pro",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-store",
+        "url": "https://store.agibot.com/products/a2-lite",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "agibot-x1",
+    "manufacturerId": "agibot",
+    "registeredName": "X1",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.agibot.com/",
+        "title": "AgiBot 公式サイト",
+        "publisher": "AgiBot",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://agibot.com/jp/products/X1",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "agibot-x2",
+    "manufacturerId": "agibot",
+    "registeredName": "X2",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.agibot.com/",
+        "title": "AgiBot 公式サイト",
+        "publisher": "AgiBot",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://agibot.com/products/X2",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-store",
+        "url": "https://store.agibot.com/products/x2",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "agibot-x2-ultra",
+    "manufacturerId": "agibot",
+    "registeredName": "X2 Ultra",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.agibot.com/",
+        "title": "AgiBot 公式サイト",
+        "publisher": "AgiBot",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://store.agibot.com/products/x2-ultra",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-store",
+        "url": "https://agibot.com/products/X2",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-s",
+    "manufacturerId": "ubtech",
+    "registeredName": "Walker S",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.ubtrobot.com/",
+        "title": "UBTECH Robotics 公式サイト",
+        "publisher": "UBTECH Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-c",
+    "manufacturerId": "ubtech",
+    "registeredName": "Walker C",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.ubtrobot.com/",
+        "title": "UBTECH Robotics 公式サイト",
+        "publisher": "UBTECH Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://owebsite-cdn.ubtrobot.com/resources/file/2025/04/28/670407684730949.pdf",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "third-party-discovery",
+        "url": "https://ga-robotics.co.jp/pr/41810/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-tienkung",
+    "manufacturerId": "ubtech",
+    "registeredName": "Walker Tienkung",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.ubtrobot.com/",
+        "title": "UBTECH Robotics 公式サイト",
+        "publisher": "UBTECH Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "third-party-discovery",
+        "url": "https://ga-robotics.co.jp/products/walker-tienkung/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-store",
+        "url": "https://www.ubtrobot.com/en/ai-education/products/walker-tienkung",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "fourier-gr3c",
+    "manufacturerId": "fourier-intelligence",
+    "registeredName": "GR-3C",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://fftai.com/",
+        "title": "Fourier Intelligence 公式サイト",
+        "publisher": "Fourier Intelligence",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.fftai.com/products-gr3c",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "engineai-t800",
+    "manufacturerId": "engine-ai",
+    "registeredName": "T800",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.engineai.com.cn/",
+        "title": "EngineAI 公式サイト",
+        "publisher": "EngineAI",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.engineai.com.cn/product-t800.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.engineai.com.cn/about-news-media/41.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.engineai.com.cn/product-purchase.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "engineai-sa01",
+    "manufacturerId": "engine-ai",
+    "registeredName": "SA01",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.engineai.com.cn/",
+        "title": "EngineAI 公式サイト",
+        "publisher": "EngineAI",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.engineai.com.cn/product-sa01.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.engineai.com.cn/about-news-media/34.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.engineai.com.cn/product-purchase.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "robotera-l7",
+    "manufacturerId": "robotera",
+    "registeredName": "L7",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.robotera.com/",
+        "title": "RobotEra 公式サイト",
+        "publisher": "RobotEra",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.robotera.com/en/robotics/L7.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.robotera.com/application.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.robotera.com/en/Contact-to-Buy.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "robotera-q5",
+    "manufacturerId": "robotera",
+    "registeredName": "Q5",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.robotera.com/",
+        "title": "RobotEra 公式サイト",
+        "publisher": "RobotEra",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.robotera.com/q5",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.robotera.com/en/Contact-to-Buy.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "robotera-m7",
+    "manufacturerId": "robotera",
+    "registeredName": "M7",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.robotera.com/",
+        "title": "RobotEra 公式サイト",
+        "publisher": "RobotEra",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.robotera.com/en/robotics/M7.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.robotera.com/en/Contact-to-Buy.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "galbot-g1",
+    "manufacturerId": "galbot",
+    "registeredName": "Galbot G1",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.galbot.com/",
+        "title": "Galbot 公式サイト",
+        "publisher": "Galbot",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.galbot.com/g1/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://developer.galbot.com/docs/SDK/1.7.0/g1/zh/examples_python",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "aeolus-aeo",
+    "manufacturerId": "aeolus-robotics",
+    "registeredName": "aeo",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.aeolusbot.com/",
+        "title": "Aeolus Robotics 公式サイト",
+        "publisher": "Aeolus Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.aeolusbot.com/meet-aeo",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.aeolusbot.com/why-aeolus",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "third-party-discovery",
+        "url": "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000a3p3/20190213aeolus.pdf",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "identity"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "apptronik-apollo-2",
+    "manufacturerId": "apptronik",
+    "registeredName": "Apollo 2",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://apptronik.com/",
+        "title": "Apptronik 公式サイト",
+        "publisher": "Apptronik",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://apptronik.com/apollo/apollo-2",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-news",
+        "url": "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "use-cases",
+          "deployment"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "agibot-g2",
+    "manufacturerId": "agibot",
+    "registeredName": "G2",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.agibot.com/",
+        "title": "AgiBot 公式サイト",
+        "publisher": "AgiBot",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-store",
+        "url": "https://www.agibot.com/products/G2",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "official-product",
+        "url": "https://www.agibot.com/article/231/detail/44.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 4,
+        "documentType": "official-product",
+        "url": "https://www.agibot.com/article/231/detail/60.html",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      }
+    ]
+  },
+  {
+    "robotId": "unitree-g1-d",
+    "manufacturerId": "unitree",
+    "registeredName": "G1-D",
+    "candidateDocuments": [
+      {
+        "priority": 1,
+        "documentType": "official-product-index",
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics 公式サイト",
+        "publisher": "Unitree Robotics",
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity"
+        ]
+      },
+      {
+        "priority": 2,
+        "documentType": "official-product",
+        "url": "https://www.unitree.com/mobile/G1-D",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "lifecycle",
+          "identity",
+          "specs"
+        ]
+      },
+      {
+        "priority": 3,
+        "documentType": "authorized-distributor",
+        "url": "https://techshare.co.jp/g1-g1d-press-release/",
+        "title": null,
+        "publisher": null,
+        "publishedAt": null,
+        "updatedAt": null,
+        "expectedEvidence": [
+          "price",
+          "procurement"
+        ]
+      }
+    ]
+  }
+]

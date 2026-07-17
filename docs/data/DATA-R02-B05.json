@@ -1,0 +1,635 @@
+[
+  {
+    "robotId": "engineai-se01",
+    "identity": {
+      "registeredName": "SE01",
+      "officialCurrentName": "ENGINEAI SE01",
+      "recordScope": "specific-variant",
+      "variant": "SE01 (no sub-editions found)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "公式ホームページ(トップ)と公式製品ページ product-se01.html の両方で現行フラッグシップ機として継続掲載されている。購入導線・現行価格は確認できないが、製品自体の現行性は公式サイトで確認できる。",
+      "evidenceSourceUrls": [
+        "https://www.engineai.com.cn/",
+        "https://www.engineai.com.cn/product-se01.html",
+        "https://www.engineai.com.cn/about-news-media/23.html"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.engineai.com.cn/", "title": "ENGINEAI众擎机器人 公式トップ", "publisher": "EngineAI", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/product-se01.html", "title": "SE01_全球首例拟人步态全尺寸通用人形机器人-ENGINEAI众擎", "publisher": "EngineAI", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/about-news-media/23.html", "title": "SE01/PM01 公式FAQ記事 (2025-01-10)", "publisher": "EngineAI", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/product-purchase.html", "title": "EngineAI 公式購入ページ", "publisher": "EngineAI", "documentType": "official-purchase", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/about-news-media.html", "title": "EngineAI 公式ニュース一覧", "publisher": "EngineAI", "documentType": "official-news-index", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "全球首例实现拟人步态的全尺寸通用人形机器人 / walking, squats, push-ups, turning",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.engineai.com.cn/product-se01.html",
+          "sourceTitle": "SE01 official product page",
+          "publisher": "EngineAI",
+          "checkedAt": "2026-07-17",
+          "variant": "SE01",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページが「全球首例实现拟人步态的全尺寸通用人形机器人」と明記し、行走・蹲起・俯卧撑・转弯を実演動作として掲載。"
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "170cm / 1.7m",
+          "normalizedValue": 170,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.engineai.com.cn/",
+          "sourceTitle": "EngineAI 公式トップ",
+          "publisher": "EngineAI",
+          "checkedAt": "2026-07-17",
+          "variant": "SE01",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式トップのSE01要約に170cm表記。公式FAQ(about-news-media/23.html)も「1.7m」で一致。"
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "约55kg",
+          "normalizedValue": 55,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.engineai.com.cn/about-news-media/23.html",
+          "sourceTitle": "SE01/PM01 公式FAQ",
+          "publisher": "EngineAI",
+          "checkedAt": "2026-07-17",
+          "variant": "SE01",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式FAQがSE01の重量を「约55kg」と明記。"
+        }
+      },
+      "speedMps": {
+        "status": "found",
+        "evidence": {
+          "value": "常态步速2M/s",
+          "normalizedValue": 2,
+          "rawUnit": "m/s",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.engineai.com.cn/",
+          "sourceTitle": "EngineAI 公式トップ",
+          "publisher": "EngineAI",
+          "checkedAt": "2026-07-17",
+          "variant": "SE01",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式トップが常態歩行速度2m/sと明記（最大速度ではない）。"
+        }
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "全身自由度32pcs",
+          "normalizedValue": 32,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.engineai.com.cn/",
+          "sourceTitle": "EngineAI 公式トップ",
+          "publisher": "EngineAI",
+          "checkedAt": "2026-07-17",
+          "variant": "SE01",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式トップのSE01要約で全身32自由度と明記。"
+        }
+      },
+      "payloadKg": { "status": "not-published" },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "2hours Endurance",
+          "normalizedValue": 120,
+          "rawUnit": "hours",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.engineai.com.cn/product-se01.html",
+          "sourceTitle": "SE01 official product page",
+          "publisher": "EngineAI",
+          "checkedAt": "2026-07-17",
+          "variant": "SE01",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページの動力セクションに「2hours Endurance」と独立表記。稼働条件の詳細は記載なし。"
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "needs-review",
+        "evidence": {
+          "value": "1000 mAh（快拆式大容量高性能电池）",
+          "normalizedValue": null,
+          "rawUnit": "mAh",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://www.engineai.com.cn/product-se01.html",
+          "sourceTitle": "SE01 official product page",
+          "publisher": "EngineAI",
+          "checkedAt": "2026-07-17",
+          "variant": "SE01",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "「1000 mAh」表記は「80% Charge」「2hours Endurance」と並ぶ別アイコンとして独立表示されており、公称電圧が示されないためWh換算しない。「大容量」訴求と1000mAhという値の整合性も不明。"
+        }
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "快拆式大容量高性能电池；智能电源优化",
+          "normalizedValue": "クイックリリース式高性能バッテリー",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.engineai.com.cn/product-se01.html",
+          "sourceTitle": "SE01 official product page",
+          "publisher": "EngineAI",
+          "checkedAt": "2026-07-17",
+          "variant": "SE01",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページがクイックリリース式大容量高性能バッテリーを明記。化学系・電圧は非公開。"
+        }
+      },
+      "controlMethod": { "status": "not-published" },
+      "sdk": { "status": "not-published" },
+      "computePlatform": { "status": "not-published" },
+      "ipRating": { "status": "not-published" },
+      "operatingTemperature": { "status": "not-published" },
+      "safetyStandard": { "status": "not-published" }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "LiDAR＋深度カメラ＋赤外線カメラによる視聴覚知覚", "evidenceSourceUrl": "https://www.engineai.com.cn/product-se01.html", "evidenceSummary": "「激光雷达＋深度摄像头＋红外摄像头」を公式製品ページに明記。" },
+      { "feature": "6自由度五指巧緻ハンド", "evidenceSourceUrl": "https://www.engineai.com.cn/product-se01.html", "evidenceSummary": "「6自由度灵巧手」指尖・指節の多次元運動を確認。" },
+      { "feature": "高精度力覚センサー", "evidenceSourceUrl": "https://www.engineai.com.cn/product-se01.html", "evidenceSummary": "「高精度力控传感器」を明記。" },
+      { "feature": "IMUによる運動制御", "evidenceSourceUrl": "https://www.engineai.com.cn/product-se01.html", "evidenceSummary": "「运控IMU传感器」を明記。" },
+      { "feature": "航空級アルミ製ボディ（5〜10年の耐用年数訴求）", "evidenceSourceUrl": "https://www.engineai.com.cn/about-news-media/23.html", "evidenceSummary": "公式FAQが「航空级铝合金打造」「5-10年的超长使用寿命」と明記。" },
+      { "feature": "千兆イーサネット／USB3.0接続", "evidenceSourceUrl": "https://www.engineai.com.cn/product-se01.html", "evidenceSummary": "「千兆网口/USB3.0」を明記。" },
+      { "feature": "エンドツーエンドニューラルネットワークによる歩行最適化", "evidenceSourceUrl": "https://www.engineai.com.cn/product-se01.html", "evidenceSummary": "「端到端神经网络训练方式优化行走步态」を明記。" }
+    ],
+    "officialUseCases": [],
+    "useCaseGaps": [
+      { "officialExpression": "面向工业与家庭场景的全尺寸通用人形机器人（industrial and household general-purpose robot）", "evidenceSourceUrl": "https://www.engineai.com.cn/about-news-media/23.html", "reason": "既存UseCaseに「家庭用途」に対応するIDがなく、「工業用途」も具体的タスク（搬送・組立等）の指定がないため、既存IDへの強い接続はできない。" }
+    ],
+    "usageExamples": [],
+    "procurement": {
+      "procurementModels": ["inquiry"],
+      "marketAvailability": "unknown",
+      "japanAvailability": "unknown",
+      "distributorJapan": "not-published",
+      "supportNote": "EngineAI公式の問い合わせ・購入ページ(product-purchase.html)は存在するが、SE01は同ページに価格・購入リンクが掲載されていない（2026-07-17時点でPM01とSA01のみ価格表示）。"
+    },
+    "conflicts": [
+      "「1000 mAh」表記が「大容量高性能电池」という訴求と単位的に整合するか公式ページだけでは判断できない。"
+    ],
+    "unresolved": [
+      "SE01の現行公開価格・購入導線が公式サイト上に見つからない（2025年1月の創業者インタビュー記事に『15万〜20万元を計画』という発言があるが、これは第三者メディアの引用であり現行公式価格ではないため採用しない）。",
+      "自動車工場向け500台意向発注という言説はWeb検索上で確認したが、実際はUBTECH Walker Sに関する報道の誤帰属であることが判明したため、SE01の usageExamples には採用しない。"
+    ],
+    "humanReviewRequired": [
+      "SE01の現行価格・在庫・購入条件を公式問い合わせ窓口で確認する。",
+      "充電時間・計算基盤・IP等級・安全規格・操作方式（遠隔/自律）を公式データシートで再確認する。"
+    ]
+  },
+  {
+    "robotId": "engineai-pm01",
+    "identity": {
+      "registeredName": "PM01",
+      "officialCurrentName": "ENGINEAI PM01",
+      "recordScope": "product-family",
+      "variant": "commercial edition (商业版) / education edition (教育版)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "公式製品ページ・購入ページで現行販売中（¥188,000）と確認でき、さらに南京の交通協管実運用（Jiangsu Qing'an JV経由）と深圳京東之家旗艦店の接客導入という2件の実運用が、パートナー/政府の公式発表で裏付けられる。commercial/education editionで仕様が大きく異なるためproduct-family扱いとする。",
+      "evidenceSourceUrls": [
+        "https://www.engineai.com.cn/product-pm01.html",
+        "https://www.engineai.com.cn/product-purchase.html",
+        "https://www.duoluntech.com/index.php/news/detail/285.html"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.engineai.com.cn/", "title": "ENGINEAI众擎机器人 公式トップ", "publisher": "EngineAI", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/product-pm01.html", "title": "PM01_全开放通用具身智能体-ENGINEAI众擎机器人", "publisher": "EngineAI", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/product-purchase.html", "title": "EngineAI 公式購入ページ", "publisher": "EngineAI", "documentType": "official-purchase", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/about-news-media/23.html", "title": "SE01/PM01 公式FAQ記事 (2025-01-10)", "publisher": "EngineAI", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://www.njjy.gov.cn/jyyw/202604/t20260427_5830395.html", "title": "机器人交警，真的来了！", "publisher": "南京市建邺区人民政府", "documentType": "government-official", "checkedAt": "2026-07-17" },
+      { "url": "https://www.duoluntech.com/en/index.php/news/detail/285.html", "title": "Duolun Technology's Strategic Partner EngineAI Unveils T800 at CES 2026", "publisher": "多伦科技 (Duolun Technology)", "documentType": "partner-official", "checkedAt": "2026-07-17" },
+      { "url": "https://fgw.sz.gov.cn/ztzl/qtztzl/szscjmyjjfzzhfwpt/mqfc/myqyfzdt/content/post_12504986.html", "title": "众擎携手京东深业尝鲜 全球首家人形机器人主题潮品店深圳开业", "publisher": "深圳市发展和改革委员会", "documentType": "government-official", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": { "value": "bipedal humanoid; lightweight high-dynamic embodied agent", "normalizedValue": "biped", "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial/education共通", "evidenceScope": "current-family-common", "evidenceSummary": "公式製品ページが両editionともに二足具身知能体として掲載。" }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": { "value": "1400(H) x 535.55(W) x 252.66(D) mm", "normalizedValue": 140, "rawUnit": "mm", "normalizedUnit": "cm", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial/education共通", "evidenceScope": "current-family-common", "evidenceSummary": "商業版・教育版とも公式パラメータ表で高さ1400mmと一致。" }
+      },
+      "weightKg": {
+        "status": "conflict",
+        "evidence": { "value": "商业版 约42kg／教育版 约43kg（公式FAQは约40kg）", "normalizedValue": null, "rawUnit": "kg", "normalizedUnit": "kg", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial: 42kg / education: 43kg", "evidenceScope": "variant-specific", "evidenceSummary": "公式パラメータ表がedition別に42kg/43kgと明記。公式FAQ(about-news-media/23.html)は「约40kg」という別の概数を記載しており、単一値に統合しない。" }
+      },
+      "speedMps": {
+        "status": "needs-review",
+        "evidence": { "value": "＞2m/s（硬件支持）", "normalizedValue": null, "rawUnit": "m/s", "normalizedUnit": "m/s", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial/education共通", "evidenceScope": "current-family-common", "evidenceSummary": "「ハードウェアが対応する速度は2m/s超」という下限表記であり、公式の最大/通常速度の確定値ではないため、そのまま数値確定として掲載しない。" }
+      },
+      "dof": {
+        "status": "conflict",
+        "evidence": { "value": "商业版总23／教育版总24（首部関節1つ分の差）", "normalizedValue": null, "rawUnit": "DoF", "normalizedUnit": "DoF", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial: 23 / education: 24", "evidenceScope": "variant-specific", "evidenceSummary": "公式パラメータ表がedition別に総自由度23/24と明記。" }
+      },
+      "payloadKg": { "status": "not-published" },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": { "value": "约2小时", "normalizedValue": 120, "rawUnit": "hours", "normalizedUnit": "min", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial/education共通", "evidenceScope": "current-family-common", "evidenceSummary": "両editionとも公式パラメータ表でruntime約2時間。稼働条件の詳細は非公開。" }
+      },
+      "batteryCapacityWh": {
+        "status": "needs-review",
+        "evidence": { "value": "10000mAh smart battery；充電仕様54.6V 4.5A", "normalizedValue": null, "rawUnit": "mAh", "normalizedUnit": "Wh", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial/education共通", "evidenceScope": "current-family-common", "evidenceSummary": "10000mAhと54.6Vは確認できるが、54.6Vは「充電仕様」電圧であり電池の公称電圧ではないため、Wh換算値を採用しない。" }
+      },
+      "chargeTimeMin": {
+        "status": "found",
+        "evidence": { "value": "约2h充满 (commercial) ／ 约2小时充满 (education)", "normalizedValue": 120, "rawUnit": "hours", "normalizedUnit": "min", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial/education共通", "evidenceScope": "current-family-common", "evidenceSummary": "両editionとも満充電まで約2時間と明記。" }
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": { "value": "10000mAhスマートクイックリリースバッテリー", "normalizedValue": "クイックリリース式スマートバッテリー", "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial/education共通", "evidenceScope": "current-family-common", "evidenceSummary": "公式パラメータ表がクイックリリース式スマートバッテリーを両edition共通仕様として明記。" }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": { "value": "手持式遥控器（両edition共通の基本操作方式）", "normalizedValue": "ハンドヘルド式リモコン操作", "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial/education共通（教育版のみ二次開発可）", "evidenceScope": "current-family-common", "evidenceSummary": "公式パラメータ表がハンドヘルド式リモコンを基本操作として両edition共通掲載。教育版のみソフトウェア開発による制御が追加で可能（SDK欄参照）。" }
+      },
+      "sdk": {
+        "status": "conflict",
+        "evidence": { "value": "商业版：二次开发不支持／教育版：二次开发支持（ROS部署フレームワーク・GitHub学習/展開コード公開）", "normalizedValue": null, "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial: 不支持 / education: 支持", "evidenceScope": "variant-specific", "evidenceSummary": "公式パラメータ表がedition別に二次開発対応の有無を明記。教育版のみ「EngineAI ROS部署框架」とGitHub上の学習・デプロイコードが提供される。" }
+      },
+      "computePlatform": {
+        "status": "conflict",
+        "evidence": { "value": "商业版：4核高性能CPUのみ／教育版：4核CPU+NVIDIA Jetson Orin NX 16G", "normalizedValue": null, "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-pm01.html", "sourceTitle": "PM01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "commercial: 4-core CPU / education: 4-core CPU + Jetson Orin NX 16G", "evidenceScope": "variant-specific", "evidenceSummary": "公式パラメータ表で教育版のみJetson Orin NX 16Gを追加搭載。" }
+      },
+      "ipRating": { "status": "not-published" },
+      "operatingTemperature": { "status": "not-published" },
+      "safetyStandard": { "status": "not-published" }
+    },
+    "loadRatings": [],
+    "priceOffers": [
+      {
+        "channel": "manufacturer-public",
+        "display": "¥188,000",
+        "amount": 188000,
+        "currency": "CNY",
+        "taxStatus": "unknown",
+        "variant": "PM01（現行公式購入ページはedition未指定）",
+        "sellerName": "EngineAI 公式購入ページ",
+        "sourceUrl": "https://www.engineai.com.cn/product-purchase.html"
+      }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      { "feature": "前空翻・斧头舞・走る・手を振るなどの高難度モーション", "evidenceSourceUrl": "https://www.engineai.com.cn/product-pm01.html", "evidenceSummary": "公式製品ページがハイライト動作として明記。" },
+      { "feature": "地形適応型接地制御", "evidenceSourceUrl": "https://www.engineai.com.cn/product-pm01.html", "evidenceSummary": "「自适应全地形」を明記。" },
+      { "feature": "教育版：デュアル深度カメラ（頭部・腰部）＋タッチスクリーン", "evidenceSourceUrl": "https://www.engineai.com.cn/product-pm01.html", "evidenceSummary": "教育版のみ搭載と明記。" },
+      { "feature": "教育版：EngineAI ROS部署フレームワーク（デュアルモード対応）＋GitHub公開の学習/デプロイコード", "evidenceSourceUrl": "https://www.engineai.com.cn/product-pm01.html", "evidenceSummary": "「部署代码仓库：实现从模型到应用的无缝转化」を明記。" },
+      { "feature": "腰部320度超の回転機構", "evidenceSourceUrl": "https://www.engineai.com.cn/about-news-media/23.html", "evidenceSummary": "公式FAQが腰部320度回転を機構的特徴として明記。" },
+      { "feature": "インタラクティブ表示画面・リング型LEDライト（意匠要素）", "evidenceSourceUrl": "https://www.engineai.com.cn/product-pm01.html", "evidenceSummary": "「交互核心屏」「家族式星环灯」を明記。" }
+    ],
+    "officialUseCases": [
+      { "useCaseId": "research-development", "officialExpression": "面向科研教育场景的开放型人形机器人／主要用于算法的验证和二次开发", "evidenceSourceUrl": "https://www.engineai.com.cn/about-news-media/23.html", "evidenceScope": "variant-specific", "variant": "PM01 education edition", "reason": "公式FAQがPM01（特に教育版）を研究・教育、アルゴリズム検証・二次開発向けと明示している。" },
+      { "useCaseId": "research-prototype-dev", "officialExpression": "全开放平台／训练部署代码（教育版の二次開発対応）", "evidenceSourceUrl": "https://www.engineai.com.cn/product-pm01.html", "evidenceScope": "variant-specific", "variant": "PM01 education edition", "reason": "公式製品ページが教育版の二次開発対応・GitHub公開コードを明記しており、試作・実証開発用途に合致する。" }
+    ],
+    "useCaseGaps": [
+      { "officialExpression": "智慧交管（交通指挥）／门店导购・接客", "evidenceSourceUrl": "https://www.duoluntech.com/en/index.php/news/detail/285.html", "reason": "実際の交通協管・小売接客導入はDuolun Technology（パートナー）や地方政府の公式発表で確認できるが、EngineAI自身の製品ページがこれを『公式用途』として明記していないため、officialUseCasesではなくusageExamplesとして記録した。" }
+    ],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "江苏擎安机器人有限公司（众擎機器人×多伦科技の合弁）／南京市建邺区・南京市公安交通管理（交通協管の実運用）",
+        "classification": "commercial-deployment",
+        "evidenceSourceUrl": "https://www.njjy.gov.cn/jyyw/202604/t20260427_5830395.html",
+        "variant": "PM01",
+        "scopeNote": "南京市建邺区人民政府の公式記事（2026-04-27）が「近期，十多个智慧交管机器人已陆续上岗深圳、南京、长沙、荆州等地，执行常态化交通协管执勤任务」と実運用を明記（機種名は「智慧交管机器人」という総称で個別モデル名の明記なし）。多伦科技の公式サイトがこの交通管理ロボットをPM01として明記し、南京の多伦科技との3年・2000台超・1億元超のPM01調達契約による2026年春節からの南京街頭稼働を確認できる。"
+      },
+      {
+        "customerOrInstitution": "京東（JD.com）× 众擎機器人 共同出店「深業上城」旗艦店（深圳市福田区）",
+        "classification": "commercial-deployment",
+        "evidenceSourceUrl": "https://fgw.sz.gov.cn/ztzl/qtztzl/szscjmyjjfzzhfwpt/mqfc/myqyfzdt/content/post_12504986.html",
+        "variant": "PM01",
+        "scopeNote": "深圳市発展和改革委員会（政府公式ページ）が「众擎携手京东深业尝鲜 全球首家人形机器人主题潮品店深圳开业」としてPM01が接客・商品説明を担う実店舗を報告（2025-11開業）。"
+      }
+    ],
+    "procurement": {
+      "procurementModels": ["purchase", "inquiry"],
+      "marketAvailability": "company-claimed-delivery",
+      "japanAvailability": "unknown",
+      "distributorJapan": "not-published",
+      "supportNote": "公式製品・購入・開発ページ（GitHub含む）は公開されているが、日本語サポート・国内修理・部品供給条件は確認できない。"
+    },
+    "conflicts": [
+      "現行公式購入ページの¥188,000にedition（商业版/教育版）・税区分の明記がない。2025年1月の公式FAQ記事は商业版¥88,000（税込・2025-03-31までの期間限定オファー）を記載しており、現行価格とは別物として扱う。"
+    ],
+    "unresolved": [
+      "南京の実運用ロボットが厳密に『PM01』であることは、南京市政府の公式記事単体では機種名が明記されておらず、多伦科技側の公式発表・報道の組み合わせで補強している状態。EngineAI自身の公式ニュースページでこの具体的な稼働開始を報じる記事は確認できなかった。",
+      "京東之家店舗のロボットが自律移動・対話を行っているという記述は報道ベース（腾讯新聻等）であり、政府ページ自体は開店の事実を報じるのみ。自律動作の技術的な裏付けは政府ページからは確認できない。"
+    ],
+    "humanReviewRequired": [
+      "現行¥188,000のedition・税区分・納期条件を確認する。",
+      "Deploid側でPM01のcommercial/educationどちらを代表仕様とするか、または両論併記するかを確定する。"
+    ]
+  },
+  {
+    "robotId": "engineai-t800",
+    "identity": {
+      "registeredName": "T800",
+      "officialCurrentName": "ENGINEAI T800",
+      "recordScope": "product-family",
+      "variant": "Basic / Development(Eco・Open-Source) / Pro / Max",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "公式製品ページが4エディションの価格・仕様を明示し、公式ニュースが発売開始（2025-12-08）・CES2026出展（2026-01-08、Duolun公式サイトで確認）・量産ライン稼働と初回ロット出荷（2026-05-22）を報じている。現行販売中と判断する。edition間の仕様差が非常に大きいためproduct-family扱いとする。",
+      "evidenceSourceUrls": [
+        "https://www.engineai.com.cn/product-t800.html",
+        "https://www.engineai.com.cn/about-news-media/41.html",
+        "https://www.engineai.com.cn/about-news-media/59.html"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.engineai.com.cn/", "title": "ENGINEAI众擎机器人 公式トップ", "publisher": "EngineAI", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/product-t800.html", "title": "T800_ENGINEAI众擎", "publisher": "EngineAI", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/about-news-media/41.html", "title": "T800発売記事 (2025-12-08)", "publisher": "EngineAI", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/about-news-media/53.html", "title": "众擎机器人×多伦科技｜'擎安机器人'落子南京建邺 (2026-04-10)", "publisher": "EngineAI", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/about-news-media/59.html", "title": "众擎机器人迈向万台级规模化交付能力新征程，首批T800正式下线 (2026-05-22)", "publisher": "EngineAI", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/product-purchase.html", "title": "EngineAI 公式購入ページ", "publisher": "EngineAI", "documentType": "official-purchase", "checkedAt": "2026-07-17" },
+      { "url": "https://www.duoluntech.com/en/index.php/news/detail/285.html", "title": "Duolun Technology's Strategic Partner EngineAI Unveils T800 at CES 2026", "publisher": "多伦科技 (Duolun Technology)", "documentType": "partner-official", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": { "value": "众擎全尺寸高动态通用机器人", "normalizedValue": "biped", "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "T800シリーズ共通", "evidenceScope": "current-family-common", "evidenceSummary": "公式製品ページが全サイズ高ダイナミック汎用人形ロボットとして掲載。" }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": { "value": "173cm", "normalizedValue": 173, "rawUnit": "cm", "normalizedUnit": "cm", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "T800シリーズ共通", "evidenceScope": "current-family-common", "evidenceSummary": "公式パラメータ表が全edition共通で173cmと明記。" }
+      },
+      "weightKg": {
+        "status": "needs-review",
+        "evidence": { "value": "根据版本不同，重量会有变化（75kg~85kg）", "normalizedValue": null, "rawUnit": "kg", "normalizedUnit": "kg", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "T800シリーズ（edition別内訳非公開）", "evidenceScope": "current-family-common", "evidenceSummary": "公式ページはeditionごとの内訳を示さず75〜85kgという範囲のみ明記。単一値・edition別値のどちらも確定できない。" }
+      },
+      "speedMps": {
+        "status": "needs-review",
+        "evidence": { "value": "最大速度≥3m/s", "normalizedValue": null, "rawUnit": "m/s", "normalizedUnit": "m/s", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "T800シリーズ共通", "evidenceScope": "current-family-common", "evidenceSummary": "「≥3m/s」という下限表記であり、正確な最大値ではないため確定値として採用しない。" }
+      },
+      "dof": {
+        "status": "conflict",
+        "evidence": { "value": "製品概要：ハンド除き29DoF／パラメータ表：Basic・Development 25／Pro 29+14=43／Max 32+14=46", "normalizedValue": null, "rawUnit": "DoF", "normalizedUnit": "DoF", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "Basic/Development: 25, Pro: 43, Max: 46", "evidenceScope": "variant-specific", "evidenceSummary": "公式製品ページ内で製品概要の29DoFとパラメータ表のedition別値（25/43/46）が一致しない。edition別パラメータ表の値を優先しつつ、両者を併記する。" }
+      },
+      "payloadKg": { "status": "not-published" },
+      "runtimeMin": {
+        "status": "needs-review",
+        "evidence": { "value": "ハイライト表記：up to 4 hours／パラメータ表：综合续航时间4~5h", "normalizedValue": null, "rawUnit": "hours", "normalizedUnit": "min", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "T800シリーズ共通", "evidenceScope": "current-family-common", "evidenceSummary": "同一ページ内で「最大4時間」というハイライト表記と「総合稼働4〜5時間」というパラメータ表記が併存し、条件差が明示されないため単一値化しない。" }
+      },
+      "batteryCapacityWh": {
+        "status": "needs-review",
+        "evidence": { "value": "三元锂电池：满充电压71.4V、容量20Ah／固态电池（オプション）：满充电压74.8V、容量40Ah", "normalizedValue": null, "rawUnit": "V/Ah", "normalizedUnit": "Wh", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "標準：三元リチウム／オプション：固体電池", "evidenceScope": "current-family-common", "evidenceSummary": "公式表記の電圧は「満充電電圧」であり公称電圧ではないため、電圧×容量によるWh換算値を採用しない。raw値のみ保持。" }
+      },
+      "chargeTimeMin": {
+        "status": "conflict",
+        "evidence": { "value": "三元锂电池：2.5小时／固态电池：3小时", "normalizedValue": null, "rawUnit": "hours", "normalizedUnit": "min", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "電池オプション別（両方とも全edition選択可）", "evidenceScope": "current-family-common", "evidenceSummary": "電池オプションごとに充電時間が明確に異なる（2.5h／3h）ため単一値にしない。" }
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": { "value": "智能电池（快拆）；标配三元锂电池（可选配固态电池）；モジュラー固体電池アーキテクチャ", "normalizedValue": "クイックリリース式スマートバッテリー（標準：三元リチウム／オプション：固体電池）", "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "T800シリーズ共通", "evidenceScope": "current-family-common", "evidenceSummary": "全edition共通でクイックリリース式スマートバッテリー、標準三元リチウム、固体電池オプションを明記。" }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": { "value": "手持式遥控器；AI路径规划与避障", "normalizedValue": "ハンドヘルド式リモコン操作＋AI経路計画・障害物回避", "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "T800シリーズ共通", "evidenceScope": "current-family-common", "evidenceSummary": "全edition共通の基本操作方式として明記。二次開発対応の有無はedition別（SDK欄参照）。" }
+      },
+      "sdk": {
+        "status": "conflict",
+        "evidence": { "value": "Basic：二次开发「/」（不支持）／Development・Pro・Max：支持", "normalizedValue": null, "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "Basic: 不支持 / Development・Pro・Max: 支持", "evidenceScope": "variant-specific", "evidenceSummary": "公式パラメータ表がedition別に二次開発対応の有無を明記。具体的なSDK名称・提供範囲は非公開。" }
+      },
+      "computePlatform": {
+        "status": "conflict",
+        "evidence": { "value": "Basic：Intel模组（选配RK3588）／Development・Pro・Max：AGX Orin 64G（算力可定制升级至Thor）", "normalizedValue": null, "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-t800.html", "sourceTitle": "T800 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "Basic: Intel(+RK3588 optional) / Development・Pro・Max: AGX Orin 64G", "evidenceScope": "variant-specific", "evidenceSummary": "公式パラメータ表がedition別の計算基盤を明記。" }
+      },
+      "ipRating": { "status": "not-published" },
+      "operatingTemperature": { "status": "not-published" },
+      "safetyStandard": {
+        "status": "not-published",
+        "evidence": null
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "single-arm",
+        "rating": "maximum",
+        "kg": 5,
+        "condition": "公式パラメータ表「具备单手7个自由度，负载能力达5kg」。Pro/Max版のみのハンド仕様（Basic/Developmentはハンド自由度0）。",
+        "variant": "T800 Pro/Max",
+        "sourceUrl": "https://www.engineai.com.cn/product-t800.html"
+      }
+    ],
+    "priceOffers": [
+      { "channel": "manufacturer-public", "display": "18万元 (Basic Edition)", "amount": 180000, "currency": "CNY", "taxStatus": "unknown", "variant": "T800 Basic Edition", "sellerName": "EngineAI", "sourceUrl": "https://www.engineai.com.cn/product-t800.html" },
+      { "channel": "manufacturer-public", "display": "24万元 (Development Edition)", "amount": 240000, "currency": "CNY", "taxStatus": "unknown", "variant": "T800 Development(Eco/Open-Source) Edition", "sellerName": "EngineAI", "sourceUrl": "https://www.engineai.com.cn/product-t800.html" },
+      { "channel": "manufacturer-public", "display": "28万元 (Pro Edition)", "amount": 280000, "currency": "CNY", "taxStatus": "unknown", "variant": "T800 Pro Edition", "sellerName": "EngineAI", "sourceUrl": "https://www.engineai.com.cn/product-t800.html" },
+      { "channel": "manufacturer-public", "display": "36万元 (Max Edition)", "amount": 360000, "currency": "CNY", "taxStatus": "unknown", "variant": "T800 Max Edition", "sellerName": "EngineAI", "sourceUrl": "https://www.engineai.com.cn/product-t800.html" }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      { "feature": "AI経路計画・障害物回避", "evidenceSourceUrl": "https://www.engineai.com.cn/product-t800.html", "evidenceSummary": "「AI路径规划与避障」を明記。" },
+      { "feature": "全関節中空内配線", "evidenceSourceUrl": "https://www.engineai.com.cn/product-t800.html", "evidenceSummary": "「全关节中空内走线」を明記。" },
+      { "feature": "WiFi＋Bluetooth＋USB＋LAN通信", "evidenceSourceUrl": "https://www.engineai.com.cn/product-t800.html", "evidenceSummary": "全edition共通の通信仕様として明記。" },
+      { "feature": "マイク・スピーカー搭載", "evidenceSourceUrl": "https://www.engineai.com.cn/product-t800.html", "evidenceSummary": "音声入出力デバイス搭載を明記。" },
+      { "feature": "頭部・胸部・膝ライト", "evidenceSourceUrl": "https://www.engineai.com.cn/product-t800.html", "evidenceSummary": "「2个头灯+2个胸灯+膝盖灯」を明記。" },
+      { "feature": "Pro/Max版：単手7自由度・単手最大5kg負荷ハンド", "evidenceSourceUrl": "https://www.engineai.com.cn/product-t800.html", "evidenceSummary": "Pro/Max版限定のハンド仕様として明記。" },
+      { "feature": "Development/Pro/Max版：自社開発双眼カメラ＋LiDARセンシング", "evidenceSourceUrl": "https://www.engineai.com.cn/product-t800.html", "evidenceSummary": "Basic版はIntel深度カメラのみ、上位版は自社製双眼+LiDARと明記。" }
+    ],
+    "officialUseCases": [
+      { "useCaseId": "warehouse-picking", "officialExpression": "物流仓储", "evidenceSourceUrl": "https://www.engineai.com.cn/product-t800.html", "evidenceScope": "current-product", "variant": "T800シリーズ共通", "reason": "公式製品ページが「物流仓储」を応用シナリオの一つとして明示（詳細タスクの記載はアイコン程度で簡略）。" },
+      { "useCaseId": "retail-room-service", "officialExpression": "酒店服务", "evidenceSourceUrl": "https://www.engineai.com.cn/product-t800.html", "evidenceScope": "current-product", "variant": "T800シリーズ共通", "reason": "公式製品ページが「酒店服务」をシナリオとして明示。" },
+      { "useCaseId": "customer-reception", "officialExpression": "门店导购", "evidenceSourceUrl": "https://www.engineai.com.cn/product-t800.html", "evidenceScope": "current-product", "variant": "T800シリーズ共通", "reason": "公式製品ページが「门店导购」をシナリオとして明示し、受付・案内対応に相当する。" },
+      { "useCaseId": "factory-assembly-support", "officialExpression": "工厂协作", "evidenceSourceUrl": "https://www.engineai.com.cn/product-t800.html", "evidenceScope": "current-product", "variant": "T800シリーズ共通", "reason": "公式製品ページが「工厂协作」をシナリオとして明示。" },
+      { "useCaseId": "facility-security-patrol", "officialExpression": "其最新发布的众擎T800...聚焦公安交管及公共安全领域的智能化升级需求，系统布局智慧警务机器人产业生态", "evidenceSourceUrl": "https://www.engineai.com.cn/about-news-media/53.html", "evidenceScope": "current-product", "variant": "T800", "reason": "EngineAI公式ニュース記事がT800を名指しして公安・交通管理向け合弁会社の対象機体と位置付けている。ただし本記事は2026年3月設立の合弁会社設立発表であり、公道での稼働実績を示すものではない点に注意。" }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "江苏擎安机器人有限公司（众擎機器人×多伦科技の合弁、登録資本1億元、南京建邺拠点）",
+        "classification": "pilot",
+        "evidenceSourceUrl": "https://www.engineai.com.cn/about-news-media/53.html",
+        "variant": "T800",
+        "scopeNote": "2026-03-18設立・2026-04-10公式発表。公安交管・公共安全向け「智慧警务机器人产业生态」の構築を目的とし、T800を対象機体として明記。ただし本記事の時点では研究・生産・展示・応用の拠点整備段階であり、公道等での実運用が確認できるのはPM01名義の交通協管ロボット（本ロボットとは別のusageExample）である。T800自体の顧客先での稼働実績は本バッチの調査範囲では確認できなかった。"
+      }
+    ],
+    "procurement": {
+      "procurementModels": ["purchase", "inquiry"],
+      "marketAvailability": "company-claimed-delivery",
+      "japanAvailability": "unknown",
+      "distributorJapan": "not-published",
+      "supportNote": "公式サービス・購入・問い合わせ導線は公開されているが、日本語サポート・国内修理・部品供給条件は確認できない。"
+    },
+    "conflicts": [
+      "DoF: 製品概要の29（ハンド除く）とパラメータ表のedition別値（25/43/46）が一致しない。",
+      "重量: 75〜85kgの範囲のみでedition別内訳が非公開。",
+      "稼働時間: 「最大4時間」ハイライトと「4〜5時間」パラメータ表の併存。"
+    ],
+    "unresolved": [
+      "T800が顧客先で実際に稼働している一次情報（政府・顧客自身の公式発表）は本バッチの調査範囲では見つからなかった。2026-05-22の公式記事は自社生産ラインからの初回ロット出荷を報じるものであり、顧客導入事例ではない。",
+      "锋物科技との『安防4.0』提携記事(about-news-media/50.html)はT800を含む製品ファミリー全体を指しており、T800固有の使用を確定できないためofficialUseCasesには採用していない。"
+    ],
+    "humanReviewRequired": [
+      "T800の掲載variant（Basic/Development/Pro/Max）をDeploid側で確定し、edition別の仕様・価格のみを公開する運用に切り替える。",
+      "各editionの税区分・在庫・納期・日本向け販売条件を確認する。",
+      "Jiangsu Qing'an JV経由のT800公道稼働実績を継続して追跡する。"
+    ]
+  },
+  {
+    "robotId": "engineai-sa01",
+    "identity": {
+      "registeredName": "SA01",
+      "officialCurrentName": "ENGINEAI SA01",
+      "recordScope": "specific-variant",
+      "variant": "SA01（現行公式ページはEDU区分を明示せず単一製品として掲載）",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "公式製品ページ(product-sa01.html)と公式購入ページ(product-purchase.html、¥42,000)が現行販売中の単一製品として確認できる。2024年の『SA01 EDU』という呼称は初期展開時のブランディングであり、現行公式ページはSA01という単一名称のみを用いている。",
+      "evidenceSourceUrls": [
+        "https://www.engineai.com.cn/product-sa01.html",
+        "https://www.engineai.com.cn/product-purchase.html"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.engineai.com.cn/", "title": "ENGINEAI众擎机器人 公式トップ", "publisher": "EngineAI", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/product-sa01.html", "title": "SA01_高拓展性双足机器人平台-ENGINEAI众擎机器人", "publisher": "EngineAI", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/product-purchase.html", "title": "EngineAI 公式購入ページ", "publisher": "EngineAI", "documentType": "official-purchase", "checkedAt": "2026-07-17" },
+      { "url": "https://www.engineai.com.cn/about-news-media/34.html", "title": "SA01 EDU研究・交付関連の公式記事 (2024-12-04)", "publisher": "EngineAI", "documentType": "official-news", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": { "value": "高拓展性双足机器人平台；伸膝式（straight-knee）人间样步态", "normalizedValue": "biped", "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-sa01.html", "sourceTitle": "SA01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "SA01", "evidenceScope": "current-product", "evidenceSummary": "公式製品ページが高拡張性二足ロボットプラットフォームと明記。" }
+      },
+      "heightCm": {
+        "status": "needs-review",
+        "evidence": { "value": "长 × 宽 × 高（站立）：约 1350 mm × 250 mm × 350 mm", "normalizedValue": null, "rawUnit": "mm", "normalizedUnit": "cm", "sourceUrl": "https://www.engineai.com.cn/product-sa01.html", "sourceTitle": "SA01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "SA01", "evidenceScope": "current-product", "evidenceSummary": "公式表記の寸法順（長×幅×高）に従うと高さは350mmとなるが、大腿・下腿各400mm（合計800mm超）という別記載と矛盾するため、この数値をそのまま身長として採用しない。" }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": { "value": "整机重量：约 40 kg", "normalizedValue": 40, "rawUnit": "kg", "normalizedUnit": "kg", "sourceUrl": "https://www.engineai.com.cn/product-sa01.html", "sourceTitle": "SA01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "SA01", "evidenceScope": "current-product", "evidenceSummary": "公式技術パラメータ表が本体重量約40kgと明記。" }
+      },
+      "speedMps": {
+        "status": "found",
+        "evidence": { "value": "移动速度：约 1 m/s", "normalizedValue": 1, "rawUnit": "m/s", "normalizedUnit": "m/s", "sourceUrl": "https://www.engineai.com.cn/product-sa01.html", "sourceTitle": "SA01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "SA01", "evidenceScope": "current-product", "evidenceSummary": "公式技術パラメータ表に移動速度約1m/sと明記（最大値表記ではない通常値）。" }
+      },
+      "dof": {
+        "status": "found",
+        "evidence": { "value": "总自由度 12；单腿自由度 6", "normalizedValue": 12, "rawUnit": "DoF", "normalizedUnit": "DoF", "sourceUrl": "https://www.engineai.com.cn/product-sa01.html", "sourceTitle": "SA01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "SA01", "evidenceScope": "current-product", "evidenceSummary": "公式技術パラメータ表が全身12自由度、片脚6自由度と明記。" }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": { "value": "续航时间：约2小时", "normalizedValue": 120, "rawUnit": "hours", "normalizedUnit": "min", "sourceUrl": "https://www.engineai.com.cn/product-sa01.html", "sourceTitle": "SA01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "SA01", "evidenceScope": "current-product", "evidenceSummary": "公式技術パラメータ表・バッテリーセクション双方で約2時間と一致。" }
+      },
+      "batteryCapacityWh": {
+        "status": "found",
+        "evidence": { "value": "15Ah(0.819KWh)，最大电压 54.6V", "normalizedValue": 819, "rawUnit": "kWh", "normalizedUnit": "Wh", "sourceUrl": "https://www.engineai.com.cn/product-sa01.html", "sourceTitle": "SA01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "SA01", "evidenceScope": "current-product", "evidenceSummary": "公式技術パラメータ表が0.819KWhと直接明記しているため、換算不要でそのまま819Whとして採用。" }
+      },
+      "chargeTimeMin": { "status": "not-published" },
+      "batterySystem": {
+        "status": "found",
+        "evidence": { "value": "15Ah/54.6V 高能量密度リチウム電池パック；クイックリリース方式", "normalizedValue": "54.6Vリチウムクイックリリースバッテリー", "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-sa01.html", "sourceTitle": "SA01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "SA01", "evidenceScope": "current-product", "evidenceSummary": "公式ページのバッテリーセクションが電圧・容量・クイックリリース方式を明記。" }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": { "value": "开源/用户自定义平台；运动控制算法とIMUによるバランス制御", "normalizedValue": "ユーザー定義ソフトウェア制御／モーション制御プラットフォーム", "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-sa01.html", "sourceTitle": "SA01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "SA01", "evidenceScope": "current-product", "evidenceSummary": "公式ページがオープン設計・ユーザー定義制御・IMUバランス制御を明記。名称付きの遠隔操作モードは記載なし。" }
+      },
+      "sdk": {
+        "status": "needs-review",
+        "evidence": { "value": "全链路技术共享／开源设计（開発者向けのフルチェーン共有）", "normalizedValue": null, "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.engineai.com.cn/product-sa01.html", "sourceTitle": "SA01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "SA01", "evidenceScope": "current-product", "evidenceSummary": "オープンプラットフォームである旨は明記されるが、具体的なSDK名称・配布パッケージの範囲は公式ページに明記されていない。" }
+      },
+      "computePlatform": { "status": "not-published" },
+      "ipRating": { "status": "not-published" },
+      "operatingTemperature": {
+        "status": "found",
+        "evidence": { "value": "工作温度 -20℃ ~ 55℃", "normalizedValue": "-20〜55°C", "rawUnit": "℃", "normalizedUnit": "℃", "sourceUrl": "https://www.engineai.com.cn/product-sa01.html", "sourceTitle": "SA01 official product page", "publisher": "EngineAI", "checkedAt": "2026-07-17", "variant": "SA01", "evidenceScope": "current-product", "evidenceSummary": "公式技術パラメータ（電気的特性）に動作温度範囲として明記。" }
+      },
+      "safetyStandard": { "status": "not-published" }
+    },
+    "loadRatings": [
+      {
+        "scope": "manufacturer-wording",
+        "rating": "unspecified",
+        "kg": 10,
+        "condition": "公式表記は「负载能力：约 10–15 kg」。scopeおよび定格/最大の区分が公式に定義されていないため、下限10kgを代表値として記録し、上限15kgをこのconditionに保持する。",
+        "variant": "SA01",
+        "sourceUrl": "https://www.engineai.com.cn/product-sa01.html"
+      }
+    ],
+    "priceOffers": [
+      {
+        "channel": "manufacturer-public",
+        "display": "¥42,000",
+        "amount": 42000,
+        "currency": "CNY",
+        "taxStatus": "unknown",
+        "variant": "SA01（現行公式購入ページはedition未指定）",
+        "sellerName": "EngineAI 公式購入ページ",
+        "sourceUrl": "https://www.engineai.com.cn/product-purchase.html"
+      }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      { "feature": "整机开源设计（機体全体のオープンソース設計）", "evidenceSourceUrl": "https://www.engineai.com.cn/product-sa01.html", "evidenceSummary": "公式ページの核心優位性セクションに明記。" },
+      { "feature": "运动控制算法开源", "evidenceSourceUrl": "https://www.engineai.com.cn/product-sa01.html", "evidenceSummary": "モーション制御アルゴリズムのオープンソース化を明記。" },
+      { "feature": "高精度IMUによる姿勢感知・バランス制御", "evidenceSourceUrl": "https://www.engineai.com.cn/product-sa01.html", "evidenceSummary": "センシングシステムパラメータに明記。" },
+      { "feature": "クイックリリース式大容量バッテリー", "evidenceSourceUrl": "https://www.engineai.com.cn/product-sa01.html", "evidenceSummary": "「大容量快拆电池」セクションに明記。" },
+      { "feature": "研究ユーザー向け部品供給の継続提供", "evidenceSourceUrl": "https://www.engineai.com.cn/about-news-media/34.html", "evidenceSummary": "「如果因为各类科研实验致使零部件损毁，众擎可以为老客户持续提供配件」と明記。" }
+    ],
+    "officialUseCases": [
+      { "useCaseId": "research-development", "officialExpression": "使个人开发者和科研人员都能以亲民的价格获得专业级双足机器人（research and education / individual developers and researchers）", "evidenceSourceUrl": "https://www.engineai.com.cn/about-news-media/34.html", "evidenceScope": "current-product", "variant": "SA01", "reason": "公式記事が個人開発者・研究者向けの手頃な価格帯の専門的二足ロボットとして明示。" },
+      { "useCaseId": "research-prototype-dev", "officialExpression": "整机开源设计／运动控制算法开源／用户自定义", "evidenceSourceUrl": "https://www.engineai.com.cn/product-sa01.html", "evidenceScope": "current-product", "variant": "SA01", "reason": "公式製品ページのオープン設計・ユーザー定義カスタマイズが試作・実証開発用途に合致する。" }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "個人開発者・研究機関（アグリゲート販売、個別機関名は非公表）",
+        "classification": "research",
+        "evidenceSourceUrl": "https://www.engineai.com.cn/about-news-media/34.html",
+        "variant": "SA01（当時の呼称 SA01 EDU）",
+        "scopeNote": "EngineAI公式記事（2024-12-04報道、2024-07-29発売）が「不到两个月时间，订单量就以百为单位」「规模化交付」「个人开发者和科研人员」向けの販売実績を報告。個別の導入機関名は明かされておらず、2024年時点の実績である点に留意（現行の継続提供状況は本ページのみでは確認できないが、現行公式購入ページで同一製品ラインが¥42,000で販売中であることは確認済み）。"
+      }
+    ],
+    "procurement": {
+      "procurementModels": ["purchase", "inquiry"],
+      "marketAvailability": "company-claimed-delivery",
+      "japanAvailability": "unknown",
+      "distributorJapan": "not-published",
+      "supportNote": "公式記事が研究ユーザー向けの部品供給継続を明記。日本語サポート・国内代理店は確認できない。"
+    },
+    "conflicts": [
+      "寸法表記「1350×250×350mm」の順序・値が身長として不自然（大腿+下腿だけで800mmを超えるため）。"
+    ],
+    "unresolved": [
+      "現行¥42,000のedition・税区分・保証・納期・日本向け販売条件は確認できていない。2024年の発売時価格¥38,500（当時の呼称SA01 EDU）は現行価格とは別物として扱う。",
+      "10〜15kgの荷重表記のscope（片手／両手／全身）とrated/maximumの区分が公式に定義されていない。"
+    ],
+    "humanReviewRequired": [
+      "SA01の寸法表記を別の公式データシートで再確認し、身長を公開する場合はvariantを明記する。",
+      "¥42,000の版・税込/税別・保証・納期・日本販売条件を確認する。",
+      "10–15kg荷重のscope/rated/maximum定義を確認する。"
+    ]
+  }
+]

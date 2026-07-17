@@ -1,0 +1,362 @@
+[
+  {
+    "robotId": "fourier-gr3",
+    "identity": {
+      "registeredName": "GR-3",
+      "officialCurrentName": "GR-3（\"猫猫头\" / Cat Head）",
+      "recordScope": "specific-variant",
+      "variant": "GR-3 (interaction-focused variant of the GR-3 Series)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "GR-3 is the flagship model shown on the manufacturer's current live navigation (公司サイト GRx系列 > GR-3系列, https://www.fftai.com/grx/gr3), described as Fourier's first full-size 'Care-bot', with an actively maintained Developer Center spec sheet (支持.fftai.com, page title 'Robot Overview', Published Time 2026-07-10) and Aurora SDK support (GitHub, v1.3.0). The old URLs cited in the repo (fftai.com/products-gr3, /products-gr3series, /newsroom-humanoid/26) all now return 404 on the live site as of 2026-07-17; the current canonical page is /grx/gr3.",
+      "evidenceSourceUrls": [
+        "https://www.fftai.com/grx/gr3",
+        "https://www.fftai.com/grx/about",
+        "https://support.fftai.com/en/getting-started/general-information",
+        "https://support.fftai.com/en/",
+        "https://github.com/FFTAI/fourier_aurora_sdk"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.fftai.com/grx/gr3", "title": "GR-3系列 (GR-3 Series current product page)", "publisher": "Fourier Intelligence", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/grx/about", "title": "关于GRx (About GRx — product generation history)", "publisher": "Fourier Intelligence", "documentType": "official-about", "checkedAt": "2026-07-17" },
+      { "url": "https://support.fftai.com/en/getting-started/general-information", "title": "Robot Overview | Fourier (Developer Center, GR-3, v3.0.2)", "publisher": "Fourier Intelligence", "documentType": "official-spec-sheet", "checkedAt": "2026-07-17" },
+      { "url": "https://support.fftai.com/en/", "title": "Fourier Developer Center", "publisher": "Fourier Intelligence", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://github.com/FFTAI/fourier_aurora_sdk", "title": "fourier_aurora_sdk", "publisher": "Fourier Intelligence", "documentType": "official-sdk", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/resources/download", "title": "下载中心 (Download Center)", "publisher": "Fourier Intelligence", "documentType": "official-download-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/fourier/newsroom", "title": "新闻中心 (currently empty: 暂无内容)", "publisher": "Fourier Intelligence", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/fourier/contact", "title": "联系我们 (Contact)", "publisher": "Fourier Intelligence", "documentType": "official-contact", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/products-gr3", "title": "404 — dead URL, formerly GR-3 product page", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" },
+      { "url": "https://fftai.com/products-gr3series", "title": "404 — dead URL, formerly GR-3 Series page", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/newsroom-humanoid/26", "title": "404 — dead URL, formerly GR-3 Care-bot announcement", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": { "value": "biped, walking", "normalizedValue": "biped", "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "Dev docs specify 'Walking Speed 6.1 km/h', 'Max Walking Gradient 15° slope' and full leg joint tables — confirms bipedal walking robot." }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": { "value": "165 cm (standing)", "normalizedValue": 165, "rawUnit": "cm", "normalizedUnit": "cm", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "'Standing 165 cm tall' in Product Introduction; corroborated by current marketing page https://www.fftai.com/grx/gr3 which states the same 165cm figure after introducing both GR-3 and GR-3C." }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": { "value": "≈71 kg", "normalizedValue": 71, "rawUnit": "kg", "normalizedUnit": "kg", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "'Net Weight ≈71 kg' in Robot Specifications table; corroborated by /grx/gr3 marketing page." }
+      },
+      "speedMps": {
+        "status": "conflict",
+        "evidence": { "value": "6.1 km/h (dev docs) vs 5.5 km/h (marketing page)", "normalizedValue": 1.6944, "rawUnit": "km/h", "normalizedUnit": "m/s", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "Dev docs Performance Parameters table: 'Walking Speed 6.1 km/h'. CONFLICTS with current marketing page https://www.fftai.com/grx/gr3, which states walking speed as 5.5 km/h (≈1.5278 m/s) in the series-common spec block placed after both GR-3 and GR-3C are introduced. Both are official Fourier sources, checked today; not resolved." }
+      },
+      "dof": {
+        "status": "found",
+        "evidence": { "value": "55 (whole body, with optional 12-DOF dexterous hand)", "normalizedValue": 55, "rawUnit": "DoF", "normalizedUnit": "DoF", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "'Total Actuator Count: Up to 55 (with optional 12-DOF dexterous hand)'. Breakdown: head 2, waist 3, single arm 7, single leg 6, single hand base 6 (12 optional high-DOF). Confirmed 55 also on /grx/gr3 marketing page." }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": { "value": "≈3 h", "normalizedValue": 180, "rawUnit": "h", "normalizedUnit": "min", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "Battery Parameters: 'Runtime ≈3 h'. Matches /grx/gr3 marketing page ('电池续航 3H')." }
+      },
+      "batteryCapacityWh": {
+        "status": "found",
+        "evidence": { "value": "702 Wh + 234 Wh", "normalizedValue": 936, "rawUnit": "Wh", "normalizedUnit": "Wh", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "Two-pack battery: 702Wh (3.8kg) + 234Wh (1.3kg), hot-swappable, combined 936Wh." }
+      },
+      "chargeTimeMin": {
+        "status": "found",
+        "evidence": { "value": "≈1.5 h", "normalizedValue": 90, "rawUnit": "h", "normalizedUnit": "min", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "'Single Charge Time ≈1.5 h'." }
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": { "value": "Lithium-ion, 46.8V nominal / 54.6V charge limit, hot-swappable, ≥500 cycles at 80% DoD", "normalizedValue": null, "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "Battery Parameters table: Li-ion, hot-swappable, cycle life ≥500 (80% DOD), external adapter 90-260VAC in / 54.6V 12A max out." }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": { "value": "VR headset / exoskeleton teleoperation + voice interaction (echo cancellation, sound localization)", "normalizedValue": null, "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "Interaction Capabilities: 'Teleoperation: Supports immersive remote control (VR headset / exoskeleton teleoperation)'; 'Voice Interaction: Supports echo cancellation, sound source localization, voice interaction'." }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": { "value": "Aurora SDK v1.3.0", "normalizedValue": null, "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://github.com/FFTAI/fourier_aurora_sdk", "sourceTitle": "fourier_aurora_sdk", "publisher": "Fourier Intelligence", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "README lists supported models: GR-1P, GR-2, GR-3, Fourier-N1 (v1.3.0). GR-3 explicitly supported." }
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": { "value": "AMD Ryzen 7 8845HS + Radeon 780M (dev board), Ubuntu 22.04, 32GB RAM", "normalizedValue": null, "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "Central Processor: AMD Ryzen 7 8845HS, Ubuntu 22.04. Development Board Specifications: CPU AMD Ryzen 7 8845HS, GPU AMD Radeon 780M, 32GB RAM, 1TB storage." }
+      },
+      "ipRating": { "status": "not-published", "evidence": null },
+      "operatingTemperature": {
+        "status": "found",
+        "evidence": { "value": "0 to 45°C, 20%-80% humidity, non-condensing", "normalizedValue": null, "rawUnit": "°C", "normalizedUnit": "°C", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information", "sourceTitle": "Robot Overview | Fourier", "publisher": "Fourier Intelligence", "publishedAt": "2026-07-10", "checkedAt": "2026-07-17", "variant": "GR-3", "evidenceScope": "current-product", "evidenceSummary": "Operating Environment: 'Operating Temperature 0 to 45°C', 'Operating Humidity 20% to 80%, non-condensing'." }
+      },
+      "safetyStandard": { "status": "not-published", "evidence": null }
+    },
+    "loadRatings": [
+      { "scope": "single-arm", "rating": "unspecified", "kg": 3, "condition": "公式表記は約3kg。定格・最大の別は未公表。", "variant": "GR-3", "sourceUrl": "https://support.fftai.com/en/getting-started/general-information" }
+    ],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "Full-Sense (multimodal) Interaction System integrating hearing, vision, and touch", "evidenceSourceUrl": "https://support.fftai.com/en/getting-started/general-information", "evidenceSummary": "'Fourier's proprietary Full-Sense Interaction System, integrating three major modules—hearing, vision, and touch—to deliver more natural and human-like emotional interaction.'" },
+      { "feature": "3D vision + depth AI camera facial recognition with dynamic head-tracking", "evidenceSourceUrl": "https://www.fftai.com/grx/gr3", "evidenceSummary": "'内置3D视觉与深度AI相机组合的摄像头模组，可精准识别人脸；搭配动态追踪系统，实时调整头部转角' — built-in 3D vision + depth AI camera for face recognition, dynamic head-angle tracking." },
+      { "feature": "4-microphone omnidirectional array with echo cancellation and voice-source auto-orientation", "evidenceSourceUrl": "https://www.fftai.com/grx/gr3", "evidenceSummary": "'GR-3头部配备4个麦克风阵列，依托全向收声消除交互盲区，可精准捕捉用户发声位置并自动转向.'" },
+      { "feature": "31 tactile sensors across head (16) and torso (15) for real-time touch response", "evidenceSourceUrl": "https://www.fftai.com/grx/gr3", "evidenceSummary": "'GR-3头部与躯干共分布31个触觉传感器，可实时感知触摸并作出反馈.'" },
+      { "feature": "VR headset / exoskeleton immersive teleoperation", "evidenceSourceUrl": "https://support.fftai.com/en/getting-started/general-information", "evidenceSummary": "Interaction Capabilities table, Teleoperation row." },
+      { "feature": "Hot-swappable dual battery pack", "evidenceSourceUrl": "https://support.fftai.com/en/getting-started/general-information", "evidenceSummary": "Battery Parameters: 'Hot-Swappable: Supports hot-swappable battery replacement.'" },
+      { "feature": "Optional 12-DOF dexterous hand (standard is 6-DOF)", "evidenceSourceUrl": "https://support.fftai.com/en/getting-started/general-information", "evidenceSummary": "Joint Parameters: 'Single Hand Base DOF 6', 'Single Hand High DOF: Optional 12-DOF dexterous hand.'" }
+    ],
+    "officialUseCases": [
+      { "useCaseId": "customer-reception", "officialExpression": "building warm human-robot emotional connections and intelligent collaboration through natural interaction in public service spaces", "evidenceSourceUrl": "https://support.fftai.com/en/getting-started/general-information", "evidenceScope": "current-product", "variant": "GR-3", "reason": "Dev docs' Product Introduction explicitly states GR-3's design goal is interaction/companionship in '公共服务空间' (public service spaces), matching customer-reception's 受付・案内・接客 framing." }
+    ],
+    "useCaseGaps": [
+      { "officialExpression": "a social companion capable of reading emotions and conveying goodwill; care-focused interactive companionship (Care-bot)", "evidenceSourceUrl": "https://support.fftai.com/en/getting-started/general-information", "reason": "No existing useCase id specifically covers elder/companion-care interaction distinct from physical assistance (care-physical-assistance is about physical transfer/monitoring under staff supervision, not conversational companionship); flagging as a gap rather than forcing a mismatch." }
+    ],
+    "usageExamples": [],
+    "procurement": {
+      "procurementModels": ["inquiry"],
+      "marketAvailability": "unknown",
+      "japanAvailability": "unknown",
+      "note": "No manufacturer-official price found. Only general inquiry channel confirmed (business inquiry hotline/email at https://www.fftai.com/fourier/contact; company addresses in Shanghai, Zhuhai, Singapore, Kuala Lumpur — no Japan office/distributor listed). Third-party marketplaces and blogs cite GR-3 launch/pre-sale details (Aug 2025 unveil, Sept 2025 pre-sale, CES 2026 US debut) but these were not independently opened as primary sources this session; do not adopt as fact without direct verification."
+    },
+    "conflicts": [
+      { "field": "speedMps", "description": "GR-3 walking speed: dev docs (support.fftai.com, GR-3-specific) state 6.1 km/h; current marketing page (fftai.com/grx/gr3, series-common block) states 5.5 km/h. Both official, both checked 2026-07-17, unresolved." }
+    ],
+    "unresolved": [
+      "Whether the tactile/vision/audio sensor feature block on /grx/gr3 (facial recognition, mic array, tactile sensors) applies only to GR-3 or also to GR-3C could not be confirmed — treated as GR-3-specific since it appears directly under the GR-3 'Cat Head' introduction, before the GR-3C section closes off the page.",
+      "CES 2026 debut and August/September 2025 unveil/pre-sale dates are corroborated only by third-party press (PRNewswire, Interesting Engineering) and a .cn-domain search snippet, not opened directly this session; recommend independent verification via Fourier's own press materials before use as an evidence citation."
+    ],
+    "humanReviewRequired": [
+      "Resolve the 6.1km/h vs 5.5km/h walking-speed conflict with Fourier (or pick the developer-docs figure as more technically authoritative and note the marketing-page discrepancy)."
+    ]
+  },
+  {
+    "robotId": "fourier-gr3c",
+    "identity": {
+      "registeredName": "GR-3C",
+      "officialCurrentName": "GR-3C（\"宇航员\" / Astronaut）",
+      "recordScope": "specific-variant",
+      "variant": "GR-3C (function-focused variant of the GR-3 Series)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "GR-3C is explicitly named as one of the two current GR-3 Series variants ('全系列包含以交互服务为主导的GR-3和以功能服务为主导的GR-3C两款产品') on the manufacturer's current live page https://www.fftai.com/grx/gr3, checked 2026-07-17. The old standalone URL fftai.com/products-gr3c now 404s — GR-3C's current official presence is as a variant section within the GR-3 Series page, not a separate product page. This is a genuine current-product finding, not an assumption carried over from the old (now-dead) standalone page.",
+      "evidenceSourceUrls": ["https://www.fftai.com/grx/gr3", "https://www.fftai.com/grx/about"]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.fftai.com/grx/gr3", "title": "GR-3系列 (GR-3 Series current product page, includes GR-3C section)", "publisher": "Fourier Intelligence", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/grx/about", "title": "关于GRx (About GRx)", "publisher": "Fourier Intelligence", "documentType": "official-about", "checkedAt": "2026-07-17" },
+      { "url": "https://support.fftai.com/en/", "title": "Fourier Developer Center (GR-3 only; no GR-3C section)", "publisher": "Fourier Intelligence", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://github.com/FFTAI/fourier_aurora_sdk", "title": "fourier_aurora_sdk (GR-3C not listed as supported)", "publisher": "Fourier Intelligence", "documentType": "official-sdk", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/products-gr3c", "title": "404 — dead URL, formerly the standalone GR-3C page", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": { "value": "biped, walking", "normalizedValue": "biped", "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://www.fftai.com/grx/gr3", "sourceTitle": "GR-3系列", "publisher": "Fourier Intelligence", "checkedAt": "2026-07-17", "variant": "GR-3C", "evidenceScope": "current-family-common", "evidenceSummary": "GR-3C is presented as a variant of the same bipedal GR-3 Series platform; the series-common spec block (height/weight/speed/DoF/runtime/load) follows both the GR-3 and GR-3C introductions on this page." }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": { "value": "165 cm", "normalizedValue": 165, "rawUnit": "cm", "normalizedUnit": "cm", "sourceUrl": "https://www.fftai.com/grx/gr3", "sourceTitle": "GR-3系列", "publisher": "Fourier Intelligence", "checkedAt": "2026-07-17", "variant": "GR-3C", "evidenceScope": "current-family-common", "evidenceSummary": "Key Specifications block on the current page appears after both the GR-3 ('猫猫头') and GR-3C ('宇航员') introductions, with no variant-specific heading — read as series-common rather than GR-3-only." }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": { "value": "71 kg", "normalizedValue": 71, "rawUnit": "kg", "normalizedUnit": "kg", "sourceUrl": "https://www.fftai.com/grx/gr3", "sourceTitle": "GR-3系列", "publisher": "Fourier Intelligence", "checkedAt": "2026-07-17", "variant": "GR-3C", "evidenceScope": "current-family-common", "evidenceSummary": "Same series-common spec block as height." }
+      },
+      "speedMps": {
+        "status": "found",
+        "evidence": { "value": "5.5 km/h", "normalizedValue": 1.5278, "rawUnit": "km/h", "normalizedUnit": "m/s", "sourceUrl": "https://www.fftai.com/grx/gr3", "sourceTitle": "GR-3系列", "publisher": "Fourier Intelligence", "checkedAt": "2026-07-17", "variant": "GR-3C", "evidenceScope": "current-family-common", "evidenceSummary": "Series-common spec block states walking speed 5.5km/h. Note: GR-3-specific developer docs state 6.1km/h for GR-3 — that figure is NOT applied here since it is titled/scoped to GR-3 only, not the series-common marketing block." }
+      },
+      "dof": {
+        "status": "found",
+        "evidence": { "value": "55 (whole body)", "normalizedValue": 55, "rawUnit": "DoF", "normalizedUnit": "DoF", "sourceUrl": "https://www.fftai.com/grx/gr3", "sourceTitle": "GR-3系列", "publisher": "Fourier Intelligence", "checkedAt": "2026-07-17", "variant": "GR-3C", "evidenceScope": "current-family-common", "evidenceSummary": "Series-common spec block: whole-body DoF 55, head 2, waist 3, single-arm 7, single-leg 6, single-hand base 6." }
+      },
+      "payloadKg": { "status": "not-published", "evidence": null },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": { "value": "3 H", "normalizedValue": 180, "rawUnit": "h", "normalizedUnit": "min", "sourceUrl": "https://www.fftai.com/grx/gr3", "sourceTitle": "GR-3系列", "publisher": "Fourier Intelligence", "checkedAt": "2026-07-17", "variant": "GR-3C", "evidenceScope": "current-family-common", "evidenceSummary": "'电池续航 3H' in the series-common spec block." }
+      },
+      "batteryCapacityWh": { "status": "not-published", "evidence": null },
+      "chargeTimeMin": { "status": "not-published", "evidence": null },
+      "batterySystem": { "status": "not-published", "evidence": null },
+      "controlMethod": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "sdk": { "status": "not-published", "evidence": null },
+      "computePlatform": { "status": "not-published", "evidence": null },
+      "ipRating": { "status": "not-published", "evidence": null },
+      "operatingTemperature": { "status": "not-published", "evidence": null },
+      "safetyStandard": { "status": "not-published", "evidence": null }
+    },
+    "loadRatings": [
+      { "scope": "single-arm", "rating": "unspecified", "kg": 3, "condition": "GR-3系列共通の公式表記（単腕約3kg）。GR-3C固有の測定値としては未公表。", "variant": "GR-3C", "sourceUrl": "https://www.fftai.com/grx/gr3" }
+    ],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "LiDAR + reinforced shell for higher-precision operation in complex environments", "evidenceSourceUrl": "https://www.fftai.com/grx/gr3", "evidenceSummary": "'在标准版之上，GR-3C配备了激光雷达+增强外壳，确保在复杂环境下可进行更高精度的作业' — on top of the standard version, GR-3C is equipped with LiDAR + reinforced shell for higher-precision work in complex environments." },
+      { "feature": "Reinforced aluminum-alloy + engineering-plastic shell, durable and easy to maintain", "evidenceSourceUrl": "https://www.fftai.com/grx/gr3", "evidenceSummary": "Confirmed current-page description of GR-3C's shell material and 'astronaut' white-coated round-head design distinct from GR-3's softer 'Cat Head' look." }
+    ],
+    "officialUseCases": [],
+    "useCaseGaps": [
+      { "officialExpression": "supports higher-precision operation in complex environments (复杂环境下可进行更高精度的作业)", "evidenceSourceUrl": "https://www.fftai.com/grx/gr3", "reason": "Wording is general ('作业'/work) and does not name a specific task category (e.g. assembly, inspection) matching an existing useCase id such as factory-assembly-support or factory-visual-inspection. The previously-cited standalone GR-3C page that used more specific language (industrial assembly, remote inspection, full-body teleoperation) now 404s and could not be reverified — see unresolved." }
+    ],
+    "usageExamples": [],
+    "procurement": {
+      "procurementModels": ["inquiry"],
+      "marketAvailability": "unknown",
+      "japanAvailability": "unknown",
+      "note": "Same as GR-3: no manufacturer price found; general inquiry channel only; no Japan office/distributor confirmed."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "The previously-cited standalone GR-3C page (fftai.com/products-gr3c) described full-body teleoperation, industrial assembly, remote inspection use, and an optional 12-DOF dexterous hand specifically for GR-3C. That URL now returns 404 and no equivalent current official page could be found; these specific claims could NOT be reverified this session and are NOT carried into currentFeatures/specs/useCases above. Recommend re-checking if/when Fourier republishes a GR-3C-specific page or datasheet.",
+      "Whether GR-3C's actual height/weight/speed differ from the family-common figures due to the added LiDAR module and reinforced shell is not stated anywhere official; the family-common numbers are the best currently available primary-source figures, not a confirmed GR-3C-specific measurement."
+    ],
+    "humanReviewRequired": [
+      "If a live GR-3C-specific spec sheet or datasheet becomes available, re-verify battery/compute/IP/safety/control-method fields which are currently not-published for GR-3C specifically."
+    ]
+  },
+  {
+    "robotId": "fourier-gr1",
+    "identity": {
+      "registeredName": "GR-1",
+      "officialCurrentName": "GR-1（傅利叶第一代通用人形机器人 / Fourier's 1st-generation general-purpose humanoid）",
+      "recordScope": "historical-model",
+      "variant": "GR-1 (generic entry; possible Pro/Lite sub-variants unresolved)",
+      "lifecycleStatus": "superseded",
+      "publicationRecommendation": "archive",
+      "successorRobot": "fourier-gr2",
+      "reason": "As of 2026-07-17, GR-1 has NO current dedicated product page, spec sheet, brochure link, or developer-docs section on Fourier's live site. Direct checks today of every previously-cited GR-1 URL returned 404: https://www.fftai.com/products-gr1, the GR-1 brochure PDF, and the GR-1 exhibition case page (fftai.com/solutions/9). The current Developer Center homepage (support.fftai.com/en/) explicitly lists 'GR-1 Coming Soon' (i.e., no current GR-1 docs). GR-1 is mentioned ONLY on the current 'About GRx' history page (https://www.fftai.com/grx/about), which frames it as '傅利叶第一代通用人形机器人' (Fourier's 1st-generation general-purpose humanoid) within an explicit three-generation lineage (GR-1 → GR-2 → GR-3 Series, '历经三次技术迭代'). This is a positive, current, official statement that GR-1 is a past generation of an actively iterating product line, not simply an absence of information — hence 'superseded' rather than 'unknown', and 'archive' rather than 'manual-review' (which is reserved for unexplained vanishing with no generational framing at all).",
+      "evidenceSourceUrls": ["https://www.fftai.com/grx/about", "https://support.fftai.com/en/", "https://www.fftai.com/products-gr1", "https://www.fftai.com/resources/download"]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.fftai.com/grx/about", "title": "关于GRx (About GRx — generation history)", "publisher": "Fourier Intelligence", "documentType": "official-about", "checkedAt": "2026-07-17" },
+      { "url": "https://support.fftai.com/en/", "title": "Fourier Developer Center ('GR-1 Coming Soon')", "publisher": "Fourier Intelligence", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://github.com/FFTAI/fourier_aurora_sdk", "title": "fourier_aurora_sdk (lists GR-1P, not GR-1/GR-1 Lite)", "publisher": "Fourier Intelligence", "documentType": "official-sdk", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/resources/download", "title": "下载中心 — lists '通用人形机器人Fourier GR-1产品彩页' dated 2024-09-23 (title only; link path could not be resolved)", "publisher": "Fourier Intelligence", "documentType": "official-download-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/products-gr1", "title": "404 — dead URL, formerly GR-1 product page", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/uploads/upload/files/20250515/3f8dfafee28ab3d5c6688016d8e36eaf.pdf", "title": "404 — dead URL, formerly GR-1 Series brochure", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/solutions/9", "title": "404 — dead URL, formerly GR-1 exhibition/deployment case", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" },
+      { "url": "http://support.fftai.cn/main/en/concepts/about_gr1/", "title": "Domain unreachable (DNS resolution failure) — could not check old .cn mirror", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": { "status": "source-inaccessible", "evidence": null },
+      "heightCm": { "status": "source-inaccessible", "evidence": null },
+      "weightKg": { "status": "source-inaccessible", "evidence": null },
+      "speedMps": { "status": "source-inaccessible", "evidence": null },
+      "dof": { "status": "source-inaccessible", "evidence": null },
+      "payloadKg": { "status": "source-inaccessible", "evidence": null },
+      "runtimeMin": { "status": "source-inaccessible", "evidence": null },
+      "batteryCapacityWh": { "status": "source-inaccessible", "evidence": null },
+      "chargeTimeMin": { "status": "source-inaccessible", "evidence": null },
+      "batterySystem": { "status": "source-inaccessible", "evidence": null },
+      "controlMethod": { "status": "source-inaccessible", "evidence": null },
+      "sdk": {
+        "status": "needs-review",
+        "evidence": { "value": "GR-1P listed as supported in Aurora SDK v1.3.0", "normalizedValue": null, "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://github.com/FFTAI/fourier_aurora_sdk", "sourceTitle": "fourier_aurora_sdk", "publisher": "Fourier Intelligence", "checkedAt": "2026-07-17", "variant": "GR-1P (Pro)", "evidenceScope": "variant-specific", "evidenceSummary": "The currently-maintained Aurora SDK (v1.3.0) supports 'GR-1P' — the Pro variant — not plain 'GR-1' or 'GR-1 Lite'. The registered record is a generic GR-1 entry whose variant is unconfirmed, so this evidence cannot be cleanly attributed without knowing if the registered robot is the Pro configuration." }
+      },
+      "computePlatform": { "status": "source-inaccessible", "evidence": null },
+      "ipRating": { "status": "not-published", "evidence": null },
+      "operatingTemperature": { "status": "not-published", "evidence": null },
+      "safetyStandard": { "status": "not-published", "evidence": null }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "Fourier Smart Actuator (FSA), fully self-developed", "evidenceSourceUrl": "https://www.fftai.com/grx/about", "evidenceSummary": "'傅利叶第一代通用人形机器人，搭载全自研FSA执行器' — Fourier's 1st-generation general-purpose humanoid, equipped with fully self-developed FSA actuators. Note: evidenceScope is historical-only — this is the current 'About' page's retrospective description of a past generation, not a current spec sheet." },
+      { "feature": "Highly biomimetic torso structure covering the body's major degrees of freedom, with stable mobility and agility", "evidenceSourceUrl": "https://www.fftai.com/grx/about", "evidenceSummary": "'GR-1拥有高度仿生的躯干构型，覆盖人体主要自由度，具有稳定的运动能力和敏捷性，是通用人工智能的理想载体.'" }
+    ],
+    "officialUseCases": [],
+    "useCaseGaps": [],
+    "usageExamples": [],
+    "procurement": {
+      "procurementModels": ["inquiry"],
+      "marketAvailability": "unknown",
+      "japanAvailability": "unknown",
+      "note": "No current dedicated purchase channel found for GR-1 specifically. General company inquiry channel (info@fftai.com / 400 800 7671) is the only contact point confirmed live today; unclear whether it would still fulfill a GR-1 order given the model's absence from the current product lineup."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "Whether fftai.com's URL restructuring (all products-gr1/gr2/gr3/gr3c, newsroom-*, solutions/* paths now 404) reflects a deliberate site relaunch that simply dropped GR-1/GR-2 marketing, or a temporary migration issue, could not be determined this session.",
+      "GR-1 vs GR-1 Pro vs GR-1 Lite identity: the registered 'fourier-gr1' record cannot be confirmed as any specific one of these sub-variants from current official material (the About page does not distinguish them; the old GR-1 Series brochure that reportedly did is now a dead link).",
+      "The GR-1 brochure (通用人形机器人Fourier GR-1产品彩页, dated 2024-09-23) is still listed BY TITLE in the current live 下载中心 (download center), meaning Fourier has not delisted it, but its current download URL could not be located this session (the previously known URL 404s). A follow-up should click through the download center UI directly to get the live link and re-extract the spec table.",
+      "The GR-1 deployment/exhibition case (previously at fftai.com/solutions/9 — China Construction Bank lobby, an auto dealership, and a China International Import Expo appearance per prior repo research) could not be reverified from any currently-open primary source this session."
+    ],
+    "humanReviewRequired": [
+      "Decide whether 'superseded' (chosen here, based on the About page's explicit 3-generation lineage framing) or 'historical' is the more appropriate lifecycleStatus, since Fourier has not used the literal word 'discontinued' or 'succeeded by' anywhere found.",
+      "Re-attempt locating the live GR-1 brochure download link and the download-center's current href structure (this session only captured the title/date, not the working URL)."
+    ]
+  },
+  {
+    "robotId": "fourier-gr2",
+    "identity": {
+      "registeredName": "GR-2",
+      "officialCurrentName": "GR-2（傅利叶第二代通用人形机器人 / Fourier's 2nd-generation general-purpose humanoid）",
+      "recordScope": "historical-model",
+      "variant": "GR-2 (generic entry)",
+      "lifecycleStatus": "superseded",
+      "publicationRecommendation": "archive",
+      "successorRobot": "fourier-gr3",
+      "reason": "As of 2026-07-17, GR-2 has no current dedicated marketing page (fftai.com/products-gr2 and /products-gr2.html both 404 today) and no current Developer Center section ('GR-2 Coming Soon' on support.fftai.com/en/). GR-2 is described only on the current 'About GRx' history page as '傅利叶第二代通用人形机器人' (2nd generation), explicitly positioned between GR-1 and the current GR-3 Series in a stated three-generation lineage. Unlike GR-1, however, GR-2 IS still explicitly listed as a currently-supported model in the actively-maintained Aurora SDK (GitHub, v1.3.0) alongside GR-3 — i.e. there is live current evidence of continued software/developer support for already-deployed GR-2 units, even though there is no current sales/marketing page. This nuance is noted but does not change the overall lifecycle call, since marketAvailability/product-page presence (not SDK legacy support) governs 'current' vs 'superseded' per this project's definitions.",
+      "evidenceSourceUrls": ["https://www.fftai.com/grx/about", "https://support.fftai.com/en/", "https://github.com/FFTAI/fourier_aurora_sdk", "https://www.fftai.com/products-gr2.html"]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.fftai.com/grx/about", "title": "关于GRx (About GRx — generation history)", "publisher": "Fourier Intelligence", "documentType": "official-about", "checkedAt": "2026-07-17" },
+      { "url": "https://support.fftai.com/en/", "title": "Fourier Developer Center ('GR-2 Coming Soon')", "publisher": "Fourier Intelligence", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://github.com/FFTAI/fourier_aurora_sdk", "title": "fourier_aurora_sdk (lists GR-2 as currently supported)", "publisher": "Fourier Intelligence", "documentType": "official-sdk", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/resources/download", "title": "下载中心 — lists '通用人形机器人Fourier GR-2产品彩页' dated 2025-05-15 (title only; link path could not be resolved)", "publisher": "Fourier Intelligence", "documentType": "official-download-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/products-gr2.html", "title": "404 — dead URL, formerly GR-2 product page (confirmed via raw HTML fetch showing Vue SPA shell + client-side router 404)", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/products-gr2", "title": "404 — dead URL (no-.html variant)", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/uploads/upload/files/20250515/2fb8d1d0dceb49cb004fdfb6996dfd25.pdf", "title": "404 — dead URL, formerly GR-2 milestone document", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" },
+      { "url": "https://www.fftai.com/newsroom-newintech/14", "title": "404 — dead URL, formerly GR-2 announcement", "publisher": "Fourier Intelligence", "documentType": "dead-link-check", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": { "status": "source-inaccessible", "evidence": null },
+      "heightCm": { "status": "source-inaccessible", "evidence": null },
+      "weightKg": { "status": "source-inaccessible", "evidence": null },
+      "speedMps": { "status": "source-inaccessible", "evidence": null },
+      "dof": { "status": "source-inaccessible", "evidence": null },
+      "payloadKg": { "status": "source-inaccessible", "evidence": null },
+      "runtimeMin": { "status": "source-inaccessible", "evidence": null },
+      "batteryCapacityWh": { "status": "source-inaccessible", "evidence": null },
+      "chargeTimeMin": { "status": "source-inaccessible", "evidence": null },
+      "batterySystem": { "status": "source-inaccessible", "evidence": null },
+      "controlMethod": { "status": "source-inaccessible", "evidence": null },
+      "sdk": {
+        "status": "found",
+        "evidence": { "value": "GR-2 listed as supported in Aurora SDK v1.3.0", "normalizedValue": null, "rawUnit": "", "normalizedUnit": "", "sourceUrl": "https://github.com/FFTAI/fourier_aurora_sdk", "sourceTitle": "fourier_aurora_sdk", "publisher": "Fourier Intelligence", "checkedAt": "2026-07-17", "variant": "GR-2", "evidenceScope": "current-product", "evidenceSummary": "README of the actively-maintained (v1.3.0, 62 commits) Aurora SDK explicitly lists supported models: GR-1P, GR-2, GR-3, Fourier-N1. GR-2 is named without a sub-variant qualifier, unlike GR-1 (listed as GR-1P)." }
+      },
+      "computePlatform": { "status": "source-inaccessible", "evidence": null },
+      "ipRating": { "status": "not-published", "evidence": null },
+      "operatingTemperature": { "status": "not-published", "evidence": null },
+      "safetyStandard": { "status": "not-published", "evidence": null }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "Aurora SDK v1.3.0 (actively maintained) still explicitly supports GR-2 hardware", "evidenceSourceUrl": "https://github.com/FFTAI/fourier_aurora_sdk", "evidenceSummary": "Current, live software support for GR-2, independent of the marketing-page status — see specs.sdk above." },
+      { "feature": "More dexterous upper-limb operation, stronger power system, more open development platform (vs. GR-1)", "evidenceSourceUrl": "https://www.fftai.com/grx/about", "evidenceSummary": "'基于GR-1的数据积累和技术积淀，GR-2在硬件设计、框架开发、商业化等关键环节都实现了全面突破，拥有更灵巧的上肢操作、更强劲的动力系统和更开放的开发平台.' EvidenceScope: historical-only (retrospective About-page description, not a current spec sheet)." }
+    ],
+    "officialUseCases": [],
+    "useCaseGaps": [],
+    "usageExamples": [],
+    "procurement": {
+      "procurementModels": ["inquiry"],
+      "marketAvailability": "unknown",
+      "japanAvailability": "unknown",
+      "note": "No current dedicated purchase channel found for GR-2 specifically. Same general company inquiry channel as GR-1/GR-3/GR-3C is the only live contact point found."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "The GR-2 brochure (通用人形机器人Fourier GR-2产品彩页, dated 2025-05-15) is still listed BY TITLE in the current 下载中心 but its live download URL could not be located this session (previously known URL 404s).",
+      "Whether GR-2's continued Aurora SDK support (v1.3.0) means new units are still purchasable, vs. only legacy firmware/software support for previously-sold units, could not be determined from official material — noted as a currentFeature but not used to upgrade lifecycleStatus."
+    ],
+    "humanReviewRequired": [
+      "Same generational-succession judgment call as GR-1: confirm whether 'superseded' vs 'historical' is preferred wording for the public-facing site, given Fourier has not used an explicit 'discontinued' statement.",
+      "Re-attempt locating the live GR-2 brochure download link via the download-center UI."
+    ]
+  }
+]

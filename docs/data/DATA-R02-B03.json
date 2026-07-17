@@ -1,0 +1,1979 @@
+[
+  {
+    "robotId": "ubtech-walker-s2",
+    "identity": {
+      "registeredName": "Walker S2",
+      "officialCurrentName": "Walker S2 (\"Autonomous Battery Swapping for Mass Production Delivery\")",
+      "recordScope": "specific-variant",
+      "variant": "Walker S2 (current flagship of the industrial Walker S line)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "UBTECH's own current company-profile page explicitly lists 'Industrial: Walker S2, Walker S1, Walker S' as current products (checked 2026-07-17), and Walker S2 has its own live official product page whose title itself claims 'Mass Production Delivery'. GA Robotics (UBTECH's JP distributor) also actively markets Walker S2 with a dedicated current product page and a 2025-11 press release. This supersedes DATA-R01's caution: current-page marketing language ('Mass Production Delivery') is usable directly as marketAvailability evidence regardless of any old case-study ambiguity.",
+      "evidenceSourceUrls": [
+        "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+        "https://www.ubtrobot.com/en/about/company-profile",
+        "https://ga-robotics.co.jp/products/walker-s2/",
+        "https://ga-robotics.co.jp/pr/42088/",
+        "https://www.ubtrobot.com/en/humanoid/solutions/industry"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+        "title": "UBTECH Walker S2 Humanoid Robot | Autonomous Battery Swapping for Mass Production Delivery",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/about/company-profile",
+        "title": "Company Profile",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-about",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/solutions",
+        "title": "Humanoid Solutions (category index)",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "title": "Industrial humanoid solutions (deployment case table)",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-news",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://ga-robotics.co.jp/products/walker-s2/",
+        "title": "Walker S2｜産業用ヒューマノイドロボット",
+        "publisher": "GA Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://ga-robotics.co.jp/pr/42088/",
+        "title": "Walker S2 Japan announcement",
+        "publisher": "GA Robotics",
+        "documentType": "official-news",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://owebsite-cdn.ubtrobot.com/resources/file/2025/09/16/720368312926277.pdf",
+        "title": "Walker S2 brochure PDF (image-based, not machine-readable)",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://ga-robotics.co.jp/service/",
+        "title": "GA Robotics support service page",
+        "publisher": "GA Robotics",
+        "documentType": "official-support",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped, humanoid, waist +/-162 deg rotation / 125 deg forward-lean squat",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+          "sourceTitle": "Walker S2 official page",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Own product page describes waist rotation and deep-squat capability of a bipedal humanoid."
+        }
+      },
+      "heightCm": {
+        "status": "conflict",
+        "evidence": {
+          "value": "176cm (GA PR) vs 172cm (GA product page)",
+          "normalizedValue": null,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://ga-robotics.co.jp/pr/42088/",
+          "sourceTitle": "Walker S2 Japan announcement",
+          "publisher": "GA Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "GA Robotics press release (dated 2025-11, checked 2026-07-17) states 176cm; GA Robotics' own current Walker S2 product page states 172cm. Both distributor-official, both current, both checked today -- unresolved conflict, matches DATA-R01's prior finding which remains valid."
+        }
+      },
+      "weightKg": {
+        "status": "conflict",
+        "evidence": {
+          "value": "73kg (GA PR) vs ~60kg standard / ~73kg AI-expansion config (GA product page)",
+          "normalizedValue": null,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://ga-robotics.co.jp/pr/42088/",
+          "sourceTitle": "Walker S2 Japan announcement",
+          "publisher": "GA Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "GA PR states 73kg flat; GA product page distinguishes a lighter 'standard' (~60kg) vs heavier 'AI expansion' (~73kg) configuration -- not fully reconcilable as a single number."
+        }
+      },
+      "speedMps": {
+        "status": "found",
+        "evidence": {
+          "value": "2 m/s (max walking speed)",
+          "normalizedValue": 2.0,
+          "rawUnit": "m/s",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://ga-robotics.co.jp/pr/42088/",
+          "sourceTitle": "Walker S2 Japan announcement",
+          "publisher": "GA Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "GA Robotics 2025-11 press release: 'Maximum walking speed: 2 m/s'. No conflicting figure found elsewhere; matches existing repo value."
+        }
+      },
+      "dof": {
+        "status": "conflict",
+        "evidence": {
+          "value": "52 total DoF (GA PR) vs 20 standard / 41 AI-expansion (GA product page)",
+          "normalizedValue": null,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://ga-robotics.co.jp/pr/42088/",
+          "sourceTitle": "Walker S2 Japan announcement",
+          "publisher": "GA Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "GA PR states 52 DoF total. GA's own product page separately states 20 DoF (standard config) / 41 DoF (AI-expansion config) -- these numbers coincidentally resemble Walker Tienkung's TK2101/TK2301 DoF counts, raising suspicion of a possible page-content mix-up on the distributor site; flagged for human review rather than resolved."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "8h standing / 3h continuous motion",
+          "normalizedValue": 180,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://ga-robotics.co.jp/products/walker-s2/",
+          "sourceTitle": "Walker S2 product page",
+          "publisher": "GA Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "GA Robotics current Walker S2 page: 'Runtime: 8 hours standing / 3 hours continuous motion'. Recorded conservative (continuous-motion) figure as normalizedValue; standing figure (480min) noted here rather than discarded."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "needs-review",
+        "evidence": {
+          "value": "30Ah + 3Ah dual-battery pack, voltage not stated on this page",
+          "normalizedValue": null,
+          "rawUnit": "Ah",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://ga-robotics.co.jp/products/walker-s2/",
+          "sourceTitle": "Walker S2 product page",
+          "publisher": "GA Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "GA Robotics page states '30Ah + 3Ah dual battery system' but does not state pack voltage on this page, so Wh cannot be computed without guessing a voltage; not adopted as a computed figure."
+        }
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Autonomous hot-swap within 3 minutes; dual-battery dynamic balancing + dual-arm coordinated swapping; dual-battery/single-battery working modes; cloud-managed charging stations",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+          "sourceTitle": "Walker S2 official page",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Own product page: 'swap battery autonomously within 3 minutes', 'dual-battery dynamic balancing and dual-arm coordinated precision battery swapping'."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "BrainNet 2.0 cognitive engine + Co-Agent (\"World's First Industrial Agent for Humanoid Robot\"); ROSA 2.6 control OS (per distributor); multi-robot collaboration",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+          "sourceTitle": "Walker S2 official page",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Own product page names 'BrainNet 2.0' and UBTECH's 'Co-Agent' as the world's first industrial agent for humanoid robots; GA Robotics PR additionally cites 'ROSA 2.6 control OS' and 'Prov AI' task-planning/anomaly-detection agent."
+        }
+      },
+      "sdk": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "Intel Core processor (max 4.7GHz), 16GB RAM, 256GB SSD + NVIDIA Jetson AGX Orin",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://ga-robotics.co.jp/products/walker-s2/",
+          "sourceTitle": "Walker S2 product page",
+          "publisher": "GA Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Only found on GA Robotics' current Walker S2 page (distributor-official); not independently corroborated by a UBTECH-own text source (own product page's data section is image-based)."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "evidence": null
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "manufacturer-wording",
+        "rating": "unspecified",
+        "kg": 15,
+        "condition": "0-1.8m作業域における取り扱い荷重として公式表記。片腕/全身、定格/最大の別は未公表。",
+        "variant": "Walker S2",
+        "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s2"
+      }
+    ],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      {
+        "feature": "Autonomous battery hot-swap within 3 minutes via dedicated swap station, dual-arm coordinated",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+        "evidenceSummary": "'swap battery autonomously within 3 minutes'; 'dual-arm coordinated precision battery swapping'."
+      },
+      {
+        "feature": "BrainNet 2.0 + Co-Agent industrial agent system for multi-robot task collaboration",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+        "evidenceSummary": "Described as 'The World's First Industrial Agent for Humanoid Robot'."
+      },
+      {
+        "feature": "Passive binocular stereo vision with deep-learning depth estimation",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+        "evidenceSummary": "'pure RGB binocular stereo vision solution', 'deep learning-based stereo depth estimation'."
+      },
+      {
+        "feature": "Waist +/-162 deg rotation and 125 deg forward-lean for deep-squat picking",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+        "evidenceSummary": "Waist joint specification quoted directly."
+      },
+      {
+        "feature": "ROSA 2.6 control OS with cloud-based charge-station management",
+        "evidenceSourceUrl": "https://ga-robotics.co.jp/pr/42088/",
+        "evidenceSummary": "GA Robotics PR: 'ROSA 2.6 control OS' plus 'auto-swap battery system with cloud-based charge management'."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "factory-assembly-kit-transport",
+        "officialExpression": "SPS Sorting / Process Material Handling / Parcel Handling",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/solutions",
+        "evidenceScope": "current-family-common",
+        "variant": "Walker S / S1 / S2",
+        "reason": "UBTECH's Industrial Applications solutions page lists these exact use-case labels associated with the Walker S/S1/S2 family collectively."
+      },
+      {
+        "useCaseId": "factory-assembly-support",
+        "officialExpression": "Screw-bolt Tightening / Part Assembly",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/solutions",
+        "evidenceScope": "current-family-common",
+        "variant": "Walker S / S1 / S2",
+        "reason": "Same Industrial Applications solutions page; assembly/bolt-tightening tasks apply to the S-family generally, and are directly confirmed for S2 via the SANY RE deployment (bolt sleeve removal/sorting)."
+      },
+      {
+        "useCaseId": "factory-visual-inspection",
+        "officialExpression": "Quality Inspection",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/solutions",
+        "evidenceScope": "current-family-common",
+        "variant": "Walker S / S1 / S2",
+        "reason": "Listed on the Industrial Applications solutions page for the S-family."
+      }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "SANY Renewable Energy (SANY RE)",
+        "classification": "commercial-deployment",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "variant": "Walker S2",
+        "scopeNote": "Official industry-solutions page: 'precision handling and assembly operations, including autonomous bolt sleeve removal, bolt sorting and placement' in a 5G wind-power factory; described as commercial deployment."
+      },
+      {
+        "customerOrInstitution": "Foxconn",
+        "classification": "pilot",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "variant": "Walker S2 (with Wali U1500)",
+        "scopeNote": "Official industry-solutions page: automating SPS parts feeding for 'Chitu alpha' enabling a multi-agent collaborative system; described as 'production validation phase', not yet full commercial deployment."
+      }
+    ],
+    "procurement": {
+      "procurementModels": [
+        "purchase",
+        "lease",
+        "inquiry"
+      ],
+      "marketAvailability": "company-claimed-delivery",
+      "japanAvailability": "distributor-japan",
+      "note": "No manufacturer or distributor list price found (checked own product page, GA Robotics product/PR/service pages, brochure -- brochure is image-based and unreadable). Third-party retailer/blog price estimates (USD 68k-180k range, RaaS $5k/month) exist but are not manufacturer/distributor-published and are excluded per price-evidence rules. GA Robotics service page states general 'sales and rental both supported' (販売・レンタル両対応) across its Walker/Cruzr lineup including S2, with annual maintenance ~25% of purchase price -- no absolute price given."
+    },
+    "conflicts": [
+      {
+        "field": "heightCm",
+        "description": "176cm (GA PR 2025-11) vs 172cm (GA product page, current) -- both distributor-official, unresolved."
+      },
+      {
+        "field": "weightKg",
+        "description": "73kg (GA PR) vs ~60/~73kg standard/AI-expansion configs (GA product page) -- unresolved."
+      },
+      {
+        "field": "dof",
+        "description": "52 (GA PR) vs 20/41 standard/AI-expansion (GA product page) -- the 20/41 split suspiciously mirrors Walker Tienkung's TK2101/TK2301 DoF counts, suggesting a possible data mix-up on the distributor's page; not resolved this session."
+      }
+    ],
+    "unresolved": [
+      "Battery pack voltage for the 30Ah+3Ah dual-battery system is not stated on any page opened this session, so Wh cannot be computed without guessing.",
+      "Whether Walker S2 has a dedicated developer SDK (distinct from the ROSA control OS) was not confirmed; DATA-R01 referenced a 'ROS2 SDK staged rollout' claim that could not be re-located on GA Robotics' current pages this session."
+    ],
+    "humanReviewRequired": [
+      "Resolve height/weight/DoF conflicts across GA Robotics' own two pages (PR release vs product page) -- ideally by requesting a current manufacturer datasheet with machine-readable text (the official PDF brochure is image-based and could not be OCR'd this session)."
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-s1",
+    "identity": {
+      "registeredName": "Walker S1",
+      "officialCurrentName": "Walker S1",
+      "recordScope": "specific-variant",
+      "variant": "Walker S1 (mid-tier of the industrial Walker S line, between Walker S and Walker S2)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": "ubtech-walker-s2",
+      "reason": "UBTECH's current company-profile page explicitly lists Walker S1 among current Industrial products ('Walker S2, Walker S1, Walker S'), and Walker S1 has its own live official product page (checked 2026-07-17). The own product page's text explicitly frames Walker S as predecessor and Walker S2 as successor within the same family, but S1 itself remains separately listed/marketed today -- not discontinued -- so lifecycleStatus is 'current' with successorRobot recorded as an FYI on the newer sibling, not as a supersession.",
+      "evidenceSourceUrls": [
+        "https://www.ubtrobot.com/en/humanoid/products/walker-s1",
+        "https://www.ubtrobot.com/en/about/company-profile",
+        "https://www.ubtrobot.com/en/humanoid/solutions/industry"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/products/walker-s1",
+        "title": "UBTECH Walker S1",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/about/company-profile",
+        "title": "Company Profile",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-about",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/solutions",
+        "title": "Humanoid Solutions (category index)",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "title": "Industrial humanoid solutions (deployment case table, names BYD + Walker S1)",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-news",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://owebsite-cdn.ubtrobot.com/resources/file/2025/04/28/670407684730949.pdf",
+        "title": "UBTECH ROBOTICS CORP LTD corporate announcement (board composition notice, 2025-04-27) -- not a Walker S1 spec sheet",
+        "publisher": "UBTECH Robotics Corp Ltd (HKEX filer)",
+        "documentType": "official-corporate-filing",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://owebsite-cdn.ubtrobot.com/resources/image/2025/07/01/693097528242245.png",
+        "title": "Walker S1 'Specifications' section image (visually confirmed to contain only product photography, no numeric table)",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product-image",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped; end-to-end learned whole-body motion control for walking + manipulation",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s1",
+          "sourceTitle": "UBTECH Walker S1",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Own page: 'end-to-end learning-based whole-body motion control framework enable Walker S1 to achieve dexterous manipulation skills and stable walking abilities'."
+        }
+      },
+      "heightCm": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "weightKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "speedMps": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "dof": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "runtimeMin": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "batteryCapacityWh": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "batterySystem": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "LLM-based general task planning; two-stage semantic VSLAM navigation; end-to-end learned whole-body motion control",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s1",
+          "sourceTitle": "UBTECH Walker S1",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Own page: 'By utilizing the advanced planning model technology for general tasks, Walker S1 gains the ability in intention understanding and task planning'; 'a two-stage semantic navigation improves Walker S1's spatial understanding ability'."
+        }
+      },
+      "sdk": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "computePlatform": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "ipRating": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "evidence": null
+      }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      {
+        "feature": "LLM-based general task planning for intention understanding",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s1",
+        "evidenceSummary": "'Walker S1 gains the ability in intention understanding and task planning' via 'advanced planning model technology for general tasks'."
+      },
+      {
+        "feature": "Two-stage semantic VSLAM navigation",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s1",
+        "evidenceSummary": "'a two-stage semantic navigation improves Walker S1's spatial understanding ability'."
+      },
+      {
+        "feature": "End-to-end learned whole-body motion control",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s1",
+        "evidenceSummary": "Framework for 'dexterous manipulation skills and stable walking abilities'."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "factory-assembly-support",
+        "officialExpression": "Screw-bolt Tightening / Part Assembly; 'introduced into vehicle manufacturing assembly lines to assist in car production'",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s1",
+        "evidenceScope": "current-product",
+        "variant": "Walker S1",
+        "reason": "Stated directly on Walker S1's own current product page, and matches the family-common Industrial Applications solutions labels."
+      },
+      {
+        "useCaseId": "factory-assembly-kit-transport",
+        "officialExpression": "Material handling; autonomous logistics coordination with AMRs/AGVs",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "evidenceScope": "current-product",
+        "variant": "Walker S1",
+        "reason": "Industry solutions page names BYD + Walker S1 explicitly for 'autonomous logistics application that humanoid robots coordinate with autonomous logistics vehicles, AMRs/AGVs' -- a current official statement, not an old ambiguous case study, so usable directly per this batch's corrected methodology."
+      }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "BYD",
+        "classification": "commercial-deployment",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "variant": "Walker S1",
+        "scopeNote": "Official industry-solutions page explicitly names BYD + Walker S1: material handling, 'autonomous logistics application that humanoid robots coordinate with autonomous logistics vehicles, AMRs/AGVs'; classified as commercial deployment on the manufacturer's own current page. This corrects DATA-R01's caution, which had only inferred BYD via an HKEX filing rather than citing this direct official statement."
+      }
+    ],
+    "procurement": {
+      "procurementModels": [
+        "purchase",
+        "inquiry"
+      ],
+      "marketAvailability": "enterprise-deployment",
+      "japanAvailability": "inquiry-required",
+      "note": "No manufacturer price found. GA Robotics (JP distributor) has no dedicated Walker S1 product page -- https://ga-robotics.co.jp/products/walker-s1/ HTTP-redirects (checked via curl, 2026-07-17) to the Walker S2 page, indicating GA Robotics does not currently list S1 as a separately sold/rented SKU in Japan; general partnership/support coverage may still apply via inquiry."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "Numeric specs (height/weight/speed/DoF/payload/runtime/battery) are not present as machine-readable text anywhere found this session. The product page's 'Specifications' section image (cs_en.png, https://owebsite-cdn.ubtrobot.com/resources/image/2025/07/01/693097528242245.png) was directly opened and visually inspected -- it contains only front/back product photography, no numeric table overlay, confirming these values are genuinely not published in accessible form rather than merely hard to parse.",
+      "Third-party listings (humanoid.guide, qviro, originofbots) quote 172cm/76kg for Walker S1, but these are not manufacturer/distributor primary sources and were not adopted."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "ubtech-walker-x",
+    "identity": {
+      "registeredName": "Walker X",
+      "officialCurrentName": "Walker X",
+      "recordScope": "specific-variant",
+      "variant": "Walker X (commercial/service line)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "UBTECH's current company-profile page lists 'Commercial: Walker C1, Walker C, Walker X' as current products, and Walker X has its own live official product page with a full, text-readable spec table (checked 2026-07-17). No successor or discontinuation notice found.",
+      "evidenceSourceUrls": [
+        "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+        "https://www.ubtrobot.com/en/about/company-profile"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+        "title": "UBTECH Walker X (Commercial Humanoid Robot)",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/about/company-profile",
+        "title": "Company Profile",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-about",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/solutions",
+        "title": "Humanoid Solutions (category index) -- Walker X not named under Commercial Solutions detail",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://ga-robotics.co.jp/pr/41810/",
+        "title": "GA Robotics / UBTECH distributor partnership announcement",
+        "publisher": "GA Robotics",
+        "documentType": "official-news",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped; U-SLAM autonomous navigation, FPV AR navigation, 2.5D obstacle avoidance",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Own product page full spec table (text-readable, not image-based)."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "130 cm",
+          "normalizedValue": 130,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Height: 130cm'. Matches existing repo value."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "63 kg",
+          "normalizedValue": 63,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Weight: 63kg'. Matches existing repo value."
+        }
+      },
+      "speedMps": {
+        "status": "found",
+        "evidence": {
+          "value": "3 km/h max walking speed",
+          "normalizedValue": 0.8333,
+          "rawUnit": "km/h",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Max Walking Speed: 3km/h' -> 0.8333 m/s. Matches existing repo value."
+        }
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "41 (legs 6x2, arms 7x2, hands 6x2, neck 3)",
+          "normalizedValue": 41,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table breakdown quoted directly; totals 41."
+        }
+      },
+      "payloadKg": {
+        "status": "needs-review",
+        "evidence": {
+          "value": "Single arm 1.5kg extended; can carry 10kg (unspecified grip) or walk with 3kg in both hands",
+          "normalizedValue": 1.5,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Multiple different payload figures on the same page for different conditions (single-arm extended 1.5kg vs 'carry 10kg' vs 'walk with 3kg on both hands') -- not a single unambiguous payloadKg value, recorded instead as multiple loadRatings entries."
+        }
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "2h (combined working conditions)",
+          "normalizedValue": 120,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Usage time (combined working conditions): 2h'. Matches existing repo value."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "found",
+        "evidence": {
+          "value": "54.6V / 10Ah / 3.6kg lithium battery",
+          "normalizedValue": 546.0,
+          "rawUnit": "V*Ah",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Lithium battery 54.6V/10Ah/3.6kg'. Wh = 54.6V x 10Ah = 546Wh (direct arithmetic conversion of two explicitly stated official figures, not a guess)."
+        }
+      },
+      "chargeTimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "2h",
+          "normalizedValue": 120,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Charge Time: 2h'. Matches existing repo value."
+        }
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Lithium battery, 54.6V/10Ah/3.6kg",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table battery row."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "ROSA framework; U-SLAM navigation with FPV AR nav and 2.5D obstacle avoidance; AIoT smart-home interfaces",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table + feature list: 'Software Framework: ROSA'; 'U-SLAM Navigation' with 'FPV AR navigation and 2.5D obstacle avoidance'; 'open, flexible, rich and convenient AIoT interfaces'."
+        }
+      },
+      "sdk": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "Intel i7-8665U x2 @1.9GHz + NVIDIA GT1030 (384 cores); Ubuntu + Linux RT Preempt + Android; Webots simulator",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+          "sourceTitle": "UBTECH Walker X",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker X",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table compute section quoted directly. Matches existing repo value."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "evidence": null
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "single-arm",
+        "rating": "unspecified",
+        "kg": 1.5,
+        "condition": "腕を伸ばした状態での片腕operation load。定格・最大の別は未公表。",
+        "variant": "Walker X",
+        "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x"
+      },
+      {
+        "scope": "carrier",
+        "rating": "unspecified",
+        "kg": 10,
+        "condition": "公式表記『can carry 10kg of weight』。把持方法・両腕/台車等の区別は未公表。",
+        "variant": "Walker X",
+        "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x"
+      },
+      {
+        "scope": "dual-arm",
+        "rating": "unspecified",
+        "kg": 3,
+        "condition": "公式表記『walk with 3kg of weight on both hands』。",
+        "variant": "Walker X",
+        "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x"
+      }
+    ],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      {
+        "feature": "U-SLAM autonomous navigation with FPV AR navigation and 2.5D obstacle avoidance",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+        "evidenceSummary": "Navigation Tech row of spec table."
+      },
+      {
+        "feature": "AIoT smart-home interfaces (can operate refrigerators, coffee machines, vacuum cleaners and other household appliances)",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+        "evidenceSummary": "'Be able to use of refrigerators, coffee machines, vacuum cleaners and other household appliances'; 'open, flexible, rich and convenient AIoT interfaces'."
+      },
+      {
+        "feature": "28+ type emotion display system and facial/object recognition",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+        "evidenceSummary": "'28+ types of robot emotion display system'; facial recognition and object recognition listed under featured capabilities."
+      },
+      {
+        "feature": "Four-eye vision system with dual RGBD sensors",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+        "evidenceSummary": "'four-eye system and dual RGBD sensors' under Navigation & Sensors."
+      }
+    ],
+    "officialUseCases": [],
+    "useCaseGaps": [
+      {
+        "officialExpression": "Smart-home / household-appliance control via AIoT interfaces (refrigerators, coffee machines, vacuum cleaners)",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+        "reason": "No existing useCase id covers in-home appliance operation; closest candidates (customer-reception, facility-wayfinding) are about public-facing service roles, not home automation. Recorded as a gap rather than forced into an unrelated id, consistent with DATA-R01's original flag."
+      },
+      {
+        "officialExpression": "'Provide intelligent and caring service across a variety of scenarios' (deliberately generic, no named environment)",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+        "reason": "Own product page explicitly avoids naming a specific deployment scenario (no reception/hotel/hospital/mall wording found), so no existing useCase id can be connected with direct evidence; recorded as a gap rather than inferring a fit."
+      }
+    ],
+    "usageExamples": [],
+    "procurement": {
+      "procurementModels": [
+        "purchase",
+        "inquiry"
+      ],
+      "marketAvailability": "unknown",
+      "japanAvailability": "inquiry-required",
+      "note": "No manufacturer or distributor price found. GA Robotics has no dedicated Walker X product page (https://ga-robotics.co.jp/products/walker-x/ returns HTTP 404, checked via curl 2026-07-17), unlike Walker S2/C1/Tienkung/Tienkung DEX which do have dedicated GA Robotics pages. The only Japan-relevant document is the general UBTECH-GA Robotics distributor partnership announcement (naming Walker E, Walker C, and 'Walker series' generally, not Walker X specifically)."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "Whether GA Robotics' general distributor agreement (which names Walker E/Walker C/'Walker series') actually extends to individual sales support for Walker X specifically could not be confirmed -- no dedicated page exists."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "ubtech-walker-s",
+    "identity": {
+      "registeredName": "Walker S",
+      "officialCurrentName": "Walker S",
+      "recordScope": "specific-variant",
+      "variant": "Walker S (base/original tier of the industrial Walker S line; distinct from 'Walker S Lite')",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": "ubtech-walker-s1",
+      "reason": "UBTECH's current company-profile page explicitly lists Walker S among current Industrial products ('Walker S2, Walker S1, Walker S'), and Walker S has its own live official product page (checked 2026-07-17) which itself names Walker S1 and Walker S2 as later variants. Walker S remains separately marketed today (not discontinued), so lifecycleStatus is 'current'; successorRobot records the next-generation sibling as an FYI, not a supersession.",
+      "evidenceSourceUrls": [
+        "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+        "https://www.ubtrobot.com/en/about/company-profile",
+        "https://www.ubtrobot.com/en/humanoid/solutions/industry"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+        "title": "UBTECH Walker S Industrial Humanoid Robot",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/about/company-profile",
+        "title": "Company Profile",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-about",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/solutions",
+        "title": "Humanoid Solutions (category index)",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "title": "Industrial humanoid solutions (deployment case table, names NIO and Dongfeng Liuzhou + Walker S)",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-news",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped; force-compliant drive joints, rigid-flexible coupling hybrid structure; U-SLAM + 3D point cloud semantic navigation",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+          "sourceTitle": "UBTECH Walker S",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Own product page quotes locomotion and navigation architecture directly."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "1.7 meters",
+          "normalizedValue": 170,
+          "rawUnit": "m",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+          "sourceTitle": "UBTECH Walker S",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Own page: 'Height: 1.7 meters'. Matches existing repo value."
+        }
+      },
+      "weightKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "speedMps": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "41 servo joints with force feedback",
+          "normalizedValue": 41,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+          "sourceTitle": "UBTECH Walker S",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Own page: '41 servo joints with force feedback'. Matches existing repo value."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "runtimeMin": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "batteryCapacityWh": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "batterySystem": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "ROSA 2.0; GUI; Tele-operation; AIOT; multimodal large-model decision-making; 6D pose recognition + hand-eye coordination",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+          "sourceTitle": "UBTECH Walker S",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker S",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Own page: 'Robot Operating System ROSA 2.0'; 'GUI, Tele-operation & AIOT'; 'Multimodal Large Model-based Decision Making'; '6D pose recognition' and 'hand-eye coordination capabilities'. Matches existing repo value."
+        }
+      },
+      "sdk": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "computePlatform": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "ipRating": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "evidence": null
+      }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      {
+        "feature": "U-SLAM + 3D point cloud semantic navigation with RGBD visual sensors",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+        "evidenceSummary": "'U-SLAM + 3D Point Cloud Semantic navigation' with 'RGBD visual sensors'."
+      },
+      {
+        "feature": "Multimodal large-model decision making",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+        "evidenceSummary": "'Multimodal Large Model-based Decision Making'."
+      },
+      {
+        "feature": "6D pose recognition and hand-eye coordination for grasping",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+        "evidenceSummary": "'6D pose recognition' and 'hand-eye coordination capabilities'."
+      },
+      {
+        "feature": "GUI + teleoperation + AIOT control modes via ROSA 2.0",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+        "evidenceSummary": "'Robot Operating System ROSA 2.0'; 'GUI, Tele-operation & AIOT'."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "factory-assembly-support",
+        "officialExpression": "'collaborating with humans to complete automotive assembly and quality inspection tasks on a factory production line' (NIO); Screw-bolt Tightening / Part Assembly (family-common)",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "evidenceScope": "current-product",
+        "variant": "Walker S",
+        "reason": "Industry solutions page explicitly names NIO + Walker S (plain, not S Lite/S1/S2) for the 'world's first instance' of commercial humanoid deployment on an automotive line -- a current official statement usable directly per this batch's corrected methodology (contrasts with DATA-R01's caution)."
+      },
+      {
+        "useCaseId": "factory-visual-inspection",
+        "officialExpression": "'quality inspection tasks' (NIO); 'inspections, fluid filling and the application of car emblems' (Dongfeng Liuzhou)",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "evidenceScope": "current-product",
+        "variant": "Walker S",
+        "reason": "Same official industry-solutions page names Walker S explicitly for both NIO and Dongfeng Liuzhou inspection-related tasks."
+      }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "NIO",
+        "classification": "commercial-deployment",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "variant": "Walker S",
+        "scopeNote": "Official industry-solutions page: 'collaborating with humans to complete automotive assembly and quality inspection tasks on a factory production line', explicitly described as the 'world's first instance' of commercial deployment. Names 'Walker S' plainly (not S Lite/S1/S2)."
+      },
+      {
+        "customerOrInstitution": "Dongfeng Liuzhou Motor",
+        "classification": "demonstration",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/solutions/industry",
+        "variant": "Walker S",
+        "scopeNote": "Official page classifies this as a demonstration/training deployment: 'inspections, fluid filling and the application of car emblems'."
+      }
+    ],
+    "procurement": {
+      "procurementModels": [
+        "purchase",
+        "inquiry"
+      ],
+      "marketAvailability": "enterprise-deployment",
+      "japanAvailability": "inquiry-required",
+      "note": "No manufacturer price found. GA Robotics has no dedicated Walker S product page -- https://ga-robotics.co.jp/products/walker-s/ HTTP-redirects (checked via curl, 2026-07-17) to the Walker S2 page."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "Weight, max speed, payload, runtime, battery, IP rating, operating temperature and safety-standard specs are not present as readable text on the current official product page (data section presents body-part descriptions only, no numeric table); not adopted from third-party listings.",
+      "Deployments by 'Walker S Lite' (Zeekr/Geely, FAW-Volkswagen Qingdao) named on the same industry-solutions page are explicitly a different SKU per UBTECH's own naming and are NOT attributed to this robotId (ubtech-walker-s) to avoid conflating variants; recorded here only as a scoping note, not as usageExamples for Walker S."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "ubtech-walker-c",
+    "identity": {
+      "registeredName": "Walker C",
+      "officialCurrentName": "Walker C (UBTECH Walker C Humanoid Service Robot)",
+      "recordScope": "specific-variant",
+      "variant": "Walker C (commercial/service line; distinct from the newer Walker C1)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "UBTECH's current company-profile page lists 'Commercial: Walker C1, Walker C, Walker X' as current, concurrently-marketed products, and Walker C has its own live official product page with a full text-readable spec table and named deployment cases (checked 2026-07-17). Walker C1 exists as a separate, newer product (own page, own GA Robotics listing) but no official source states it replaces/discontinues Walker C -- both remain listed side by side -- so Walker C is 'current', not 'superseded'.",
+      "evidenceSourceUrls": [
+        "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "https://www.ubtrobot.com/en/about/company-profile",
+        "https://ga-robotics.co.jp/pr/41810/"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "title": "UBTECH Walker C Humanoid Service Robot",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/about/company-profile",
+        "title": "Company Profile",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-about",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/solutions",
+        "title": "Humanoid Solutions (category index) -- Commercial: Walker C, Walker C1, Cruzr S2, Cruzr 1S, CADEBOT L100",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://ga-robotics.co.jp/pr/41810/",
+        "title": "GA Robotics / UBTECH distributor partnership announcement (names Walker C at Osaka Expo China Pavilion)",
+        "publisher": "GA Robotics",
+        "documentType": "official-news",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/humanoid/products/walker-c1",
+        "title": "UBTECH Walker C1 (separate, newer commercial product -- does not state succession of Walker C)",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped; U-SLAM autonomous navigation for tour routes",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+          "sourceTitle": "UBTECH Walker C",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker C",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Own product page, text-readable spec table."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "163 cm",
+          "normalizedValue": 163,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+          "sourceTitle": "UBTECH Walker C",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker C",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Height: 163cm'. Matches existing repo value. Stated directly on the current official product page."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "43 kg",
+          "normalizedValue": 43,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+          "sourceTitle": "UBTECH Walker C",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker C",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Weight: 43kg'. Matches existing repo value."
+        }
+      },
+      "speedMps": {
+        "status": "found",
+        "evidence": {
+          "value": "6 km/h walking speed",
+          "normalizedValue": 1.6667,
+          "rawUnit": "km/h",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+          "sourceTitle": "UBTECH Walker C",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker C",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table row labelled 'Walking Speed: 6 km/h' on the current official product page. DATA-R01 had treated this as needs-review pending clarification of 'steady running pace' wording; per this batch's corrected methodology, a figure stated directly on the current official product page is usable even without further disambiguation, so recorded as found (noting the page does not explicitly qualify it as 'max' vs 'steady-state')."
+        }
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "20",
+          "normalizedValue": 20,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+          "sourceTitle": "UBTECH Walker C",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker C",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Degrees of Freedom: 20'. Matches existing repo value."
+        }
+      },
+      "payloadKg": {
+        "status": "needs-review",
+        "evidence": {
+          "value": "Arm wingspan 500mm, arm weight 5kg",
+          "normalizedValue": 5,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+          "sourceTitle": "UBTECH Walker C",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker C",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table row 'Arm Weight: 5kg' is ambiguous -- could mean the arm's own mass rather than its payload/load capacity; not confident enough to record as a load rating without risking a misattributed value."
+        }
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "Walking runtime 2h; standing runtime 4h",
+          "normalizedValue": 120,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+          "sourceTitle": "UBTECH Walker C",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker C",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Walking Runtime: 2 hours', 'Standing Runtime: 4 hours'. Recorded conservative (walking) figure; standing figure (240min) noted here."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "found",
+        "evidence": {
+          "value": "48V / 15Ah lithium battery",
+          "normalizedValue": 720.0,
+          "rawUnit": "V*Ah",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+          "sourceTitle": "UBTECH Walker C",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker C",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Battery: Lithium Battery 48V 15Ah'. Wh = 48V x 15Ah = 720Wh (direct arithmetic conversion of two explicitly stated official figures on the current product page, not a guess). DATA-R01 had marked this needs-review; per corrected methodology this is usable as found since both source numbers are stated directly on the current official page."
+        }
+      },
+      "chargeTimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "1.5 hours",
+          "normalizedValue": 90,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+          "sourceTitle": "UBTECH Walker C",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker C",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table: 'Charging Time: 1.5 hours'. Matches existing repo value."
+        }
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Lithium Battery 48V 15Ah (hot-swap capability not stated)",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+          "sourceTitle": "UBTECH Walker C",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker C",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table battery row; page does not state whether the pack is swappable."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Joint control interface + communication interface; U-SLAM autonomous navigation for tour routes; AI-powered obstacle detection; self-developed embodied interactive large model with multilingual support",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+          "sourceTitle": "UBTECH Walker C",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker C",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table + feature list quoted directly. Matches existing repo value plus adds the multilingual embodied-interaction LLM detail."
+        }
+      },
+      "sdk": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "computePlatform": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "ipRating": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "evidence": null
+      }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      {
+        "feature": "Self-developed embodied interactive large model with multilingual support",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "evidenceSummary": "'Self-developed Embodied Interactive Large Model; support multilingual interactions'."
+      },
+      {
+        "feature": "U-SLAM navigation system for autonomous tour-route positioning",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "evidenceSummary": "'U-SLAM Navigation System; enable autonomously positioning tour routes'."
+      },
+      {
+        "feature": "AI-powered obstacle detection for dynamic business environments",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "evidenceSummary": "'AI-powered obstacle detection; perceptive adaptation to dynamic business environment'."
+      },
+      {
+        "feature": "Dual RGBD + dual binocular structured-light 3D cameras, high-precision IMU",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "evidenceSummary": "'RGBD x2, All-Scenario Binocular Structured Light 3D Camera x2'; 'High-Precision Inertial Measurement Unit (IMU)'."
+      },
+      {
+        "feature": "Voice broadcasting, Q&A support, and dance/multi-DOF articulated performance",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "evidenceSummary": "Voice broadcasting and Q&A support listed; multi-DOF articulation enabling dance capabilities confirmed via the Strawberry Music Festival usage example."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "facility-wayfinding",
+        "officialExpression": "'The first embodied AI \"Tour Guide\" of China Pavilion at Expo 2025 Osaka, Kansai, Japan'",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "evidenceScope": "current-product",
+        "variant": "Walker C",
+        "reason": "Directly stated on the current official product page as a named deployment/use, not an old ambiguous case study."
+      },
+      {
+        "useCaseId": "customer-reception",
+        "officialExpression": "Welcome and greeting/reception service (Strawberry Music Festival 2025; Guangdong Spring Banquet 2025)",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "evidenceScope": "current-product",
+        "variant": "Walker C",
+        "reason": "Own product page names both events with reception/greeting framing."
+      }
+    ],
+    "useCaseGaps": [
+      {
+        "officialExpression": "Public-zone entertainment / stage performance and voice broadcasting at cultural events (music festival, provincial gala)",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "reason": "No existing useCase id specifically covers event/entertainment performance distinct from reception or wayfinding; recorded as a gap rather than force-fitting into customer-reception."
+      }
+    ],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "China Pavilion, Expo 2025 Osaka, Kansai, Japan",
+        "classification": "demonstration",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "variant": "Walker C",
+        "scopeNote": "Own product page: 'The first embodied AI \"Tour Guide\" of China Pavilion at Expo 2025 Osaka'; also corroborated by the GA Robotics distributor partnership announcement. Classified as demonstration (time-limited expo deployment) rather than ongoing commercial deployment."
+      },
+      {
+        "customerOrInstitution": "Strawberry Music Festival 2025",
+        "classification": "demonstration",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "variant": "Walker C",
+        "scopeNote": "Own product page: 'Walker C acted as the music fans and greeting visitors at the music scene'."
+      },
+      {
+        "customerOrInstitution": "Guangdong Province Spring Banquet 2025 (Hong Kong)",
+        "classification": "demonstration",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+        "variant": "Walker C",
+        "scopeNote": "Own product page: welcome and introduction services at the provincial spring gala event."
+      }
+    ],
+    "procurement": {
+      "procurementModels": [
+        "purchase",
+        "inquiry"
+      ],
+      "marketAvailability": "enterprise-pilot",
+      "japanAvailability": "inquiry-required",
+      "note": "No manufacturer price found. GA Robotics' own '/products/walker-c/' URL HTTP-redirects (checked via curl, 2026-07-17) to '/products/walker-c1/', indicating GA Robotics' current Japan catalog treats Walker C1 as the currently-sold commercial SKU rather than maintaining a separate Walker C sales page -- despite Walker C's own Expo 2025 Osaka deployment being in Japan. This is a distribution-catalog nuance, not evidence Walker C itself is discontinued (UBTECH's own global product page and company profile still list it as current)."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "Whether 'Arm Weight: 5kg' in the spec table means the arm's own mass or a load-bearing capacity could not be confirmed from page text alone; not adopted as a loadRatings entry to avoid a misattributed value.",
+      "GA Robotics' JP distributor catalog currently redirects Walker C's own product URL to Walker C1, meaning Japan-market individual sales support for Walker C (as opposed to C1) is unclear despite the Expo 2025 Osaka deployment having occurred in Japan."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "ubtech-walker-tienkung",
+    "identity": {
+      "registeredName": "Walker Tienkung",
+      "officialCurrentName": "UBTECH Walker Tienkung Humanoid Robot for Academic Research & Education",
+      "recordScope": "product-family",
+      "variant": "Walker Tienkung family: TK2101 (base, 20 DoF) / TK2201 ('Voice & Vision', 21 DoF) / TK2301 ('Embodied Intelligence', 42 DoF); GA Robotics additionally lists a separate, newer 'Walker Tienkung DEX' SKU with yet different specs",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "This is UBTECH's own product (own domain ubtrobot.com, own SDK docs domain docs.ubtrobot.com, and JP distributor GA Robotics all use the 'Walker Tienkung' name), listed under UBTECH's current 'AI Education' product category on both the company-profile page and the AI Education solutions index (checked 2026-07-17) -- not a project independently run by a third party. GA Robotics' JP page explicitly confirms it is the renamed continuation of the formerly-named 'Walker E / Walker E Pro' models. IMPORTANT CAVEAT: international/Chinese press (TechNode, heise, others, not opened as primary sources this session) separately describe a jointly-developed 'Tiangong Walker' (with the Beijing/China Humanoid Robot Innovation Center) whose quoted base specs (170cm, 20 DoF, ~$41k) closely match TK2101's specs (173cm, 20 DoF) found in UBTECH's own docs -- suggesting 'Tiangong Walker' press coverage and UBTECH's own 'Walker Tienkung' (TK2101 tier) likely refer to the same underlying product with a different English transliteration of Chinese 天工, rather than being the fully separate Beijing Innovation Center in-house research robot that ran the 2025 humanoid half-marathon under its own 'Tiangong' brand. This distinction was NOT fully resolved from primary sources this session and is flagged in unresolved/humanReviewRequired rather than asserted as fact.",
+      "evidenceSourceUrls": [
+        "https://www.ubtrobot.com/en/ai-education/products/walker-tienkung",
+        "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+        "https://docs.ubtrobot.com/walker-tienkung/en/docs/sdk/7/",
+        "https://ga-robotics.co.jp/products/walker-tienkung/",
+        "https://www.ubtrobot.com/en/about/company-profile"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.ubtrobot.com/en/ai-education/products/walker-tienkung",
+        "title": "UBTECH Walker Tienkung Humanoid Robot for Academic Research & Education",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+        "title": "Walker Tienkung model specifications (TK2101/TK2201/TK2301)",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-user-guide",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://docs.ubtrobot.com/walker-tienkung/en/docs/sdk/7/",
+        "title": "Walker Tienkung SDK -- system architecture and environment setup",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-sdk-docs",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://ga-robotics.co.jp/products/walker-tienkung/",
+        "title": "Walker Tienkung | GA Robotics (confirms rename from Walker E/E Pro)",
+        "publisher": "GA Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://ga-robotics.co.jp/products/walker-tienkung-dex/",
+        "title": "Walker Tienkung DEX | GA Robotics (separate, newer SKU with different specs)",
+        "publisher": "GA Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.ubtrobot.com/en/about/company-profile",
+        "title": "Company Profile (lists 'Education: Walker Tienkung, Yanshee')",
+        "publisher": "UBTECH Robotics",
+        "documentType": "official-about",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://ga-robotics.co.jp/products/",
+        "title": "GA Robotics product index (current JP catalog: Walker C1, Walker Tienkung DEX, Walker S2, Walker Tienkung)",
+        "publisher": "GA Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped, all variants",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+          "sourceTitle": "Walker Tienkung model specifications",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "TK2101/TK2201/TK2301 (all)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "All three model-code variants in UBTECH's own SDK/user-guide docs share the same bipedal leg architecture (6 DoF/leg x2)."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "1730 +/- 10mm (docs, all 3 variants) vs 172cm (GA Robotics distributor page)",
+          "normalizedValue": 173,
+          "rawUnit": "mm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+          "sourceTitle": "Walker Tienkung model specifications",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "TK2101/TK2201/TK2301 (all)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "UBTECH's own docs state an identical height (1730+/-10mm = ~173cm) across all three model codes; GA Robotics' JP page independently states 172cm for its 'standard configuration' -- close enough (within the docs' own +/-10mm tolerance) to treat as corroborated family-common height, unlike weight/DoF which genuinely diverge by variant."
+        }
+      },
+      "weightKg": {
+        "status": "needs-review",
+        "evidence": {
+          "value": "TK2101 64kg / TK2201 68kg / TK2301 75kg (docs) vs ~61kg 'standard' / ~73kg 'enhanced' (GA Robotics, 2-tier grouping)",
+          "normalizedValue": null,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+          "sourceTitle": "Walker Tienkung model specifications",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "TK2101/TK2201/TK2301",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Weight genuinely differs by model code per UBTECH's own docs (3-tier: 64/68/75kg). GA Robotics' JP page instead presents only a 2-tier 'standard/enhanced' split (~61kg/~73kg) that doesn't cleanly match any single docs tier -- recorded as needs-review rather than picking one number, since the single robotId record spans the whole family."
+        }
+      },
+      "speedMps": {
+        "status": "needs-review",
+        "evidence": {
+          "value": "7 km/h (GA Robotics 'standard configuration')",
+          "normalizedValue": 1.9444,
+          "rawUnit": "km/h",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://ga-robotics.co.jp/products/walker-tienkung/",
+          "sourceTitle": "Walker Tienkung | GA Robotics",
+          "publisher": "GA Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Walker Tienkung (GA 'standard' config)",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Only GA Robotics' JP page states a speed figure (7km/h) for its own 2-tier config split, not corroborated by UBTECH's own docs.ubtrobot.com pages checked this session. A separate, unconfirmed third-party press description (170cm/20DoF/'run stably at 10km/h', likely referring to the earlier 'Tiangong Walker' launch) was seen only in search snippets and NOT independently opened as a primary source -- not adopted, but flagged as a discrepancy to resolve."
+        }
+      },
+      "dof": {
+        "status": "needs-review",
+        "evidence": {
+          "value": "TK2101 20 / TK2201 21 / TK2301 42 (docs) vs 21 'standard' / 42 'enhanced' (GA Robotics)",
+          "normalizedValue": null,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+          "sourceTitle": "Walker Tienkung model specifications",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "TK2101/TK2201/TK2301",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "DoF genuinely differs by model code. GA Robotics' 2-tier framing (21/42) matches TK2201/TK2301 reasonably but omits/conflates TK2101 (20 DoF) as a separate tier -- recorded as needs-review since the single robotId record spans the whole family and no single DoF value applies to 'Walker Tienkung' generically."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "runtimeMin": {
+        "status": "needs-review",
+        "evidence": {
+          "value": ">3.5h (docs, all variants) vs 8h stationary / 3h continuous (GA Robotics)",
+          "normalizedValue": null,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+          "sourceTitle": "Walker Tienkung model specifications",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "TK2101/TK2201/TK2301",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "UBTECH's own docs state a single family-common runtime ('More than 3.5 hours') for all three model codes; GA Robotics' JP page instead states a 2-mode runtime (8h stationary / 3h continuous) not present in the docs at all. The continuous-mode figures are close (3h vs 3.5h) but not identical, and the stationary-mode figure has no docs corroboration -- recorded needs-review rather than merged."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "needs-review",
+        "evidence": {
+          "value": "Ternary lithium, 30Ah + 3Ah dual pack, 48V nominal (docs, all variants)",
+          "normalizedValue": null,
+          "rawUnit": "Ah",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+          "sourceTitle": "Walker Tienkung model specifications",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "TK2101/TK2201/TK2301 (all)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Docs give voltage (48V) and combined capacity (30Ah main + 3Ah auxiliary) consistently across all three variants, but do not state whether the two packs are in series/parallel or at the same voltage, so a single Wh figure cannot be computed without guessing how they combine; not adopted as a computed value."
+        }
+      },
+      "chargeTimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "Less than 4 hours (all variants)",
+          "normalizedValue": 240,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+          "sourceTitle": "Walker Tienkung model specifications",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "TK2101/TK2201/TK2301 (all)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "UBTECH's own docs state 'Charging time: Less than 4 hours' identically for all three model codes; no conflicting figure found elsewhere (GA Robotics' page does not address charge time)."
+        }
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Ternary lithium battery, dual-pack (30Ah main + 3Ah auxiliary), 48V nominal",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+          "sourceTitle": "Walker Tienkung model specifications",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "TK2101/TK2201/TK2301 (all)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Docs battery-parameters table, identical across all three model codes."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "ROS2-based SDK with open interfaces to all joints and sensors; URDF models; open-source RL/manipulation training frameworks",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/sdk/7/",
+          "sourceTitle": "Walker Tienkung SDK docs",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "TK2101/TK2201/TK2301 (all)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "SDK docs: 'a comprehensive set of interfaces covering motor control for all body parts, IMU, voice, battery, remote controller, and more', built on ROS2; own ai-education product page: 'Open Interfaces for All Joints & Sensors', 'High-fidelity URDF Models & Open-source Training Frameworks'."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Walker Tienkung SDK, ROS2-based, Ubuntu 22.04 (no macOS/Windows support)",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/sdk/7/",
+          "sourceTitle": "Walker Tienkung SDK docs",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "TK2101/TK2201/TK2301 (all)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Docs: SDK built on ROS2 middleware; 'Recommended platform: Ubuntu 22.04'; 'Not currently supported on macOS or Windows'."
+        }
+      },
+      "computePlatform": {
+        "status": "needs-review",
+        "evidence": {
+          "value": "TK2101: Intel i7-1355U only; TK2201: + 1x NVIDIA Orin AGX 64 (~275 TOPS per GA Robotics); TK2301: + 2x NVIDIA Orin AGX 64 (~550 TOPS per GA Robotics)",
+          "normalizedValue": null,
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+          "sourceTitle": "Walker Tienkung model specifications",
+          "publisher": "UBTECH Robotics",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "TK2101/TK2201/TK2301",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Compute genuinely differs by model code -- CPU is common (Intel i7-1355U, 10 cores/12 threads) but AI-compute tier (0/1x/2x Orin AGX 64) differs by variant per docs, corroborated in TOPS terms (275/550) by GA Robotics for its 2-tier config split. Recorded needs-review since no single value applies to the whole family, but full per-variant breakdown captured here rather than discarded."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "evidence": null
+      }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      {
+        "feature": "Fully open joint/sensor interfaces for secondary development",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/ai-education/products/walker-tienkung",
+        "evidenceSummary": "'Open Interfaces for All Joints & Sensors'; 'unrestricted secondary development'."
+      },
+      {
+        "feature": "High-fidelity URDF models and open-source RL/manipulation training frameworks",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/ai-education/products/walker-tienkung",
+        "evidenceSummary": "'High-fidelity URDF Models & Open-source Training Frameworks'; support for 'embodied manipulation policies'."
+      },
+      {
+        "feature": "ROS2-based SDK covering motor, IMU, voice, battery, and remote-controller APIs",
+        "evidenceSourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/sdk/7/",
+        "evidenceSummary": "SDK docs quoted directly."
+      },
+      {
+        "feature": "Tiered hardware configuration: base / Voice & Vision / Embodied Intelligence, differentiated mainly by onboard AI compute (single vs dual NVIDIA Jetson AGX Orin)",
+        "evidenceSourceUrl": "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+        "evidenceSummary": "TK2101 (no AI accelerator) / TK2201 (+1x Orin AGX) / TK2301 (+2x Orin AGX, standard dexterous hands)."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "'Full-size Humanoid Robot Designed for Academic Research, Education & Secondary Development'",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/ai-education/products/walker-tienkung",
+        "evidenceScope": "current-family-common",
+        "variant": "TK2101/TK2201/TK2301 (all)",
+        "reason": "Directly stated positioning on the current official AI Education product page."
+      },
+      {
+        "useCaseId": "research-prototype-dev",
+        "officialExpression": "Open motor/sensor interfaces, URDF models, open-source RL/manipulation training frameworks for embodied-AI prototyping",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/ai-education/products/walker-tienkung",
+        "evidenceScope": "current-family-common",
+        "variant": "TK2101/TK2201/TK2301 (all)",
+        "reason": "Own product page explicitly targets algorithm/actuator/policy prototyping via its open-development framing."
+      }
+    ],
+    "useCaseGaps": [
+      {
+        "officialExpression": "Classroom/curriculum education use (as distinct from open-ended research prototyping)",
+        "evidenceSourceUrl": "https://www.ubtrobot.com/en/ai-education/products/walker-tienkung",
+        "reason": "No existing useCase id specifically covers formal education/classroom deployment; the product is filed under UBTECH's 'AI Education' category alongside UGOT/uKit AI/Yanshee, but only the research-oriented ids (research-development, research-prototype-dev) had a clean match. Recorded as a gap per DATA-R01's original flag, which remains valid."
+      }
+    ],
+    "usageExamples": [],
+    "procurement": {
+      "procurementModels": [
+        "purchase",
+        "lease",
+        "inquiry"
+      ],
+      "marketAvailability": "enterprise-pilot",
+      "japanAvailability": "distributor-japan",
+      "note": "No manufacturer or distributor list price found. GA Robotics (JP distributor) explicitly offers an evaluation rental/loan service ('評価用としてのお貸出しサービスを行っております') distinct from outright purchase, and its general service page confirms nationwide onsite maintenance coverage naming 'Walker Tienkung' and 'Walker Tienkung DEX' specifically. GA Robotics also lists a separate 'Walker Tienkung DEX' SKU (https://ga-robotics.co.jp/products/walker-tienkung-dex/) with yet different specs (169cm/64.5kg, 31 DoF, NVIDIA Jetson AGX Thor 2070 TOPS, 15Ah+3Ah battery) not matching any of the docs.ubtrobot.com TK21xx/TK2301 model codes -- likely an even newer hardware revision marketed as a distinct product; NOT folded into this robotId's specs since it is sold as a separately named SKU."
+    },
+    "conflicts": [
+      {
+        "field": "weightKg",
+        "description": "UBTECH's own SDK/user-guide docs (3-tier: TK2101 64kg / TK2201 68kg / TK2301 75kg) vs GA Robotics' JP distributor page (2-tier: ~61kg standard / ~73kg enhanced) -- tiers and exact kg values don't cleanly reconcile."
+      },
+      {
+        "field": "dof",
+        "description": "Docs 3-tier (20/21/42) vs GA Robotics 2-tier (21/42) -- GA's page appears to merge or omit the TK2101 (20 DoF) base tier."
+      },
+      {
+        "field": "runtimeMin",
+        "description": "Docs state a single '>3.5h' figure for all variants; GA Robotics instead states a 2-mode '8h stationary / 3h continuous' figure not present in the docs at all."
+      }
+    ],
+    "unresolved": [
+      "The relationship between UBTECH's own 'Walker Tienkung' (TK2101/2201/2301, this robotId) and the internationally-press-covered 'Tiangong Walker' (jointly developed with the Beijing/China Humanoid Robot Innovation Center, ~$41k, reported specs 170cm/20DoF closely matching TK2101) was NOT independently confirmed from a primary UBTECH source this session -- flagged rather than asserted. This also needs to be distinguished from the fully separate, in-house 'Tiangong' research robot that the Beijing Humanoid Robot Innovation Center runs itself (e.g. the 2025 humanoid half-marathon), which does NOT appear to be a UBTECH-sold product at all.",
+      "GA Robotics lists a further 'Walker Tienkung DEX' SKU with specs matching neither TK2101/2201/2301 nor the base 'Walker Tienkung' GA page -- likely a newer hardware revision, but its exact relationship to the TK model codes in UBTECH's own docs was not resolved this session.",
+      "Battery pack combination method (30Ah main + 3Ah auxiliary at 48V) is not specified clearly enough to compute a single Wh figure without guessing."
+    ],
+    "humanReviewRequired": [
+      "Confirm with UBTECH/GA Robotics directly which model code(s) (TK2101/TK2201/TK2301/DEX) any future Deploid-published numeric spec card for 'Walker Tienkung' should represent, since the registered robotId currently spans an entire multi-variant family with no single-variant numbers usable as 'the' answer.",
+      "Independently verify (via UBTECH's own press materials, not third-party blogs) whether 'Tiangong Walker' press coverage and 'Walker Tienkung' are formally the same commercial line before citing any cross-referenced facts between the two names."
+    ]
+  }
+]

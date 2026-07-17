@@ -17,6 +17,12 @@ Last reviewed: 2026-07-16
 
 ## 全件調査成果物
 
+- `DATA-R02-master-report.md` — 2026-07-17時点でpublished Robot全61機の現行性、全16スペック、価格、用途、活用事例を公式一次資料から再調査した最新報告
+- `DATA-R02-source-plan.json` / `.md` — Robotごとに調査対象資料を優先順で整理した資料計画
+- `DATA-R02-B01.json`〜`DATA-R02-B10.json` — 全61機の最新raw調査データ。現行製品、family-common、variant固有、historicalを分離して保持する
+- `DATA-R02-B01.md`〜`DATA-R02-B10.md` — バッチ別の人間向け要約
+- `DATA-R02-publication-review.json` — lifecycleStatusとpublicationRecommendationの調査結果。publishStatusを自動変更する指示ではない
+- `DATA-R02-unresolved.md` — conflict、variant、取得不能資料、人間判断事項の集約
 - `DATA-R01-master-report.md` — published Robot全61機の公式情報一次調査の統合報告
 - `DATA-R01-B01-*.json`〜`DATA-R01-B14-*.json` — 項目別raw調査データ
 - `DATA-R01-B01-*.md`〜`DATA-R01-B14-*.md` — バッチ別の人間向け要約
@@ -25,7 +31,11 @@ Last reviewed: 2026-07-16
 - `DATA-R01-implementation-manifest-report.md` — VERIFYから実装可能値、削除候補、source join、未解決値を分離した実装準備報告
 - `DATA-R01-IMPLEMENT-B01.json`〜`DATA-R01-IMPLEMENT-B14.json` — 現行Robot/UseCaseとの差分を含むメーカー・機体バッチ別の実装manifest
 
-これらは調査対象をMECEに収録した非正本であり、`data/*.ts`へ直接コピーしない。
+R02はR01後に公式原典を再訪した最新調査だが、どちらも調査対象をMECEに収録した非正本であり、`data/*.ts`へ直接コピーしない。
+R02の `found` も、対象record/variant、evidenceScope、現行schemaへの投影、source joinを実装manifestで確認してから採用する。
+`conflict` / `needs-review` / `source-inaccessible` / `historical-only` は自動適用しない。
+
+R01を使う場合は、
 実装候補にはVERIFYデータの `verificationStatus` が `verified` または `corrected` で、
 かつ `proposedValue` がnullでないレコードだけを使用する。
 `unresolved` / `rejected`、variant未確定、取得エラーの値は推測で補完せず、UIでは省略または既定のフォールバックを使う。
