@@ -1,0 +1,3836 @@
+[
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B09",
+    "robotId": "agility-digit",
+    "identity": {
+      "registeredName": "Digit",
+      "officialCurrentName": "Digit",
+      "recordScope": "specific-variant",
+      "variant": "現行商用Digit（2023年 Next-Gen Digit 以降、2025年安全機能・グリッパー更新を含む継続改良版）",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "agilityrobotics.com のトップページで「Digit is a commercially deployed humanoid robot」と明記され、GXO・Schaeffler・Amazon・Mercado Libre・Toyota Motor Manufacturing Canadaが顧客として掲載されている。GXOとは2024年6月にRaaS商用契約を締結し、2025年11月時点で単一拠点で10万個超のトート搬送を公式発表。現行の量産・商用販売中モデルとして扱ってよい。",
+      "evidenceSourceUrls": [
+        "https://agilityrobotics.com/",
+        "https://www.agilityrobotics.com/solutions",
+        "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",
+        "https://www.agilityrobotics.com/content/digit-moves-over-100k-totes"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "bipedal Mobile Manipulation Robot / two legs, two arms",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.agilityrobotics.com/solutions",
+          "sourceTitle": "Humanoid Solutions | Agility",
+          "publisher": "Agility Robotics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式Solutionsページ・GXO発表とも二足歩行ヒューマノイドと明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Agility Robotics Digit product page",
+            "url": "https://www.agilityrobotics.com/solutions",
+            "publisher": "Agility Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "weightKg",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "speedMps",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 240,
+        "proposedValue": 240,
+        "evidence": {
+          "value": "4 hour battery life / up to four hours",
+          "normalizedValue": 240,
+          "rawUnit": "hr",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.agilityrobotics.com/content/agility-robotics-announces-new-innovations-for-market-leading-humanoid-robot-digit",
+          "sourceTitle": "Agility Robotics Announces New Innovations for Market-Leading Humanoid Robot Digit",
+          "publisher": "Agility Robotics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-03-31",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "2025-03-31付の公式記事で「expanded battery capabilities... last up to four hours」と明記。Solutionsページの4時間表記とも一致。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Digitの自律充電とArcフリート管理",
+            "url": "https://www.agilityrobotics.com/content/agility-robotics-announces-new-innovations-for-market-leading-humanoid-robot-digit",
+            "publisher": "Agility Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "バッテリー / 自律充電ドック",
+        "proposedValue": "自律充電ドック / バッテリー",
+        "evidence": {
+          "value": "autonomous docking to charging station; expanded battery capabilities",
+          "normalizedValue": "自律充電ドック / バッテリー",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.agilityrobotics.com/content/agility-robotics-announces-new-innovations-for-market-leading-humanoid-robot-digit",
+          "sourceTitle": "Agility Robotics Announces New Innovations for Market-Leading Humanoid Robot Digit",
+          "publisher": "Agility Robotics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-03-31",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "自律的に充電ステーションへドッキングする機能を公式発表。Wh単位の容量は非公開。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Digitの自律充電とArcフリート管理",
+            "url": "https://www.agilityrobotics.com/content/agility-robotics-announces-new-innovations-for-market-leading-humanoid-robot-digit",
+            "publisher": "Agility Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "自律運転 / Arcクラウドフリート管理",
+        "proposedValue": "自律運転 / Arcクラウドフリート管理",
+        "evidence": {
+          "value": "autonomous operation with Arc cloud fleet management platform, integrated with WMS/MES/WES/PLC and AMR fleets",
+          "normalizedValue": "自律運転 / Arcクラウドフリート管理",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.agilityrobotics.com/solutions",
+          "sourceTitle": "Humanoid Solutions | Agility",
+          "publisher": "Agility Robotics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Arcが企業システムと連携し自律稼働・フリート管理を行うと公式に明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Agility Robotics Digit product page",
+            "url": "https://www.agilityrobotics.com/solutions",
+            "publisher": "Agility Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "CAT1停止 / Safety PLC / E-stop / FSoE",
+        "evidence": {
+          "value": "Category 1 (CAT1) stop; Safety PLC; on-robot E-stop; wireless teach pendant with integrated E-stop; Functional Safety over EtherCAT (FSoE)",
+          "normalizedValue": "CAT1停止 / Safety PLC / E-stop / FSoE",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.agilityrobotics.com/content/agility-robotics-announces-new-innovations-for-market-leading-humanoid-robot-digit",
+          "sourceTitle": "Agility Robotics Announces New Innovations for Market-Leading Humanoid Robot Digit",
+          "publisher": "Agility Robotics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-03-31",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "2025-03-31付の公式記事で新安全機能一式を列挙。認証機関名や規格番号（ISO/ANSI等）は明記されていない。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Digitの自律充電とArcフリート管理",
+            "url": "https://www.agilityrobotics.com/content/agility-robotics-announces-new-innovations-for-market-leading-humanoid-robot-digit",
+            "publisher": "Agility Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "set",
+      "candidates": [
+        {
+          "action": "set",
+          "reason": "対象範囲・rating・条件が分離された現行荷重候補。",
+          "proposedValue": {
+            "scope": "carrier",
+            "rating": "unspecified",
+            "kg": 15.876,
+            "condition": "公式表記35lbをkg換算。定格／最大の区別は未公表。",
+            "variant": "現行商用Digit",
+            "sourceUrl": "https://www.agilityrobotics.com/solutions"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Agility Robotics Digit product page",
+              "url": "https://www.agilityrobotics.com/solutions",
+              "publisher": "Agility Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "raas",
+          "inquiry",
+          "partner-program"
+        ],
+        "proposedValue": [
+          "raas",
+          "inquiry",
+          "partner-program"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "enterprise-deployment",
+        "proposedValue": "enterprise-deployment",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": null,
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "supportNote",
+        "action": "hold-source-inaccessible",
+        "currentValue": "納品、操作研修、オンサイト対応、オンライン監視・更新を公式に案内。日本での提供条件とSLAは未確認。",
+        "proposedValue": "納品、操作研修、オンサイト対応、オンライン監視・更新を公式に案内。日本での提供条件とSLAは未確認（今回の調査でも日本語ページ・代理店情報は見つからず）。",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "warehouse-picking",
+        "officialExpression": "moving totes from cobots and placing them onto conveyors; stacking/unstacking totes, unit sorting, AMR loading/unloading, palletizing, nesting, flowrack and putwall operations",
+        "evidenceSourceUrl": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",
+        "evidenceScope": "current-product",
+        "variant": "現行商用Digit",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "agility-digit",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.agilityrobotics.com/solutions"
+          ],
+          "reason": "公式ページで倉庫自動化への接続、物流・流通、トート搬送用途が明示されている。ただし個別導入URLは現行確認できないためdeployment扱いにはしない。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GXOと複数年の商用契約を締結",
+            "url": "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",
+            "publisher": "Agility Robotics",
+            "publishedAt": "2024-06-27",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "replace-usage-example-urls",
+      "candidates": [
+        {
+          "customerOrInstitution": "GXO (Flowery Branch facility)",
+          "classification": "commercial-deployment",
+          "evidenceSourceUrl": "https://www.agilityrobotics.com/content/digit-moves-over-100k-totes",
+          "variant": "現行商用Digit",
+          "scopeNote": "2024年6月の複数年RaaS契約に基づき本番稼働し、2025年11月時点で単一拠点10万個超のトート搬送を公式発表。",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "商用運用で10万個超のトートを搬送",
+              "url": "https://www.agilityrobotics.com/content/digit-moves-over-100k-totes",
+              "publisher": "Agility Robotics",
+              "publishedAt": "2025-11-20",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "customerOrInstitution": "Schaeffler",
+          "classification": "pilot",
+          "evidenceSourceUrl": "https://agilityrobotics.com/",
+          "variant": "現行商用Digit",
+          "scopeNote": "COOのコメントとして「2030年までに100拠点へ相当数のヒューマノイドを展開する計画」が公式トップページに掲載されているが、現時点の稼働規模・拠点数は未公表のため計画段階の顧客言及として扱う。",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "Digit usage example",
+              "url": "https://agilityrobotics.com/",
+              "checkedAt": "2026-07-16",
+              "reliability": "reported"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        },
+        {
+          "customerOrInstitution": "Amazon",
+          "classification": "pilot",
+          "evidenceSourceUrl": "https://www.agilityrobotics.com/solutions",
+          "variant": "現行商用Digit",
+          "scopeNote": "Director of Engineeringの推薦コメントが公式Solutionsページに掲載されているが、稼働規模・拠点・段階の詳細は同ページに記載がない。",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Agility Robotics Digit product page",
+              "url": "https://www.agilityrobotics.com/solutions",
+              "publisher": "Agility Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "自律運転（Arcクラウドフリート管理と連携、MES/WMS/WES/PLC統合）",
+        "evidenceSourceUrl": "https://www.agilityrobotics.com/solutions",
+        "evidenceSummary": "Arcが既存の倉庫自動化・企業システムとDigitを接続すると公式に説明。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "自律充電ドッキング",
+        "evidenceSourceUrl": "https://www.agilityrobotics.com/content/agility-robotics-announces-new-innovations-for-market-leading-humanoid-robot-digit",
+        "evidenceSummary": "バッテリー残量低下時に自律的に充電ステーションへ移動する機能を2025年3月に発表。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "交換可能なエンドエフェクター",
+        "evidenceSourceUrl": "https://agilityrobotics.com/",
+        "evidenceSummary": "公式トップページでinterchangeable end effectorsと明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "新安全機能一式（CAT1停止・Safety PLC・E-stop・無線ティーチペンダント・FSoE）",
+        "evidenceSourceUrl": "https://www.agilityrobotics.com/content/agility-robotics-announces-new-innovations-for-market-leading-humanoid-robot-digit",
+        "evidenceSummary": "2025年3月発表で産業安全機能の拡充を確認。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "最適経路探索・モデル予測制御によるナビゲーション改善",
+        "evidenceSourceUrl": "https://www.agilityrobotics.com/content/digits-next-steps",
+        "evidenceSummary": "2025年10月の公式記事でグローバル最適経路探索とMPCの採用を確認。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "Digitのspec-sheet PDF本体（資料請求フォーム経由）を人手で取得し、身長・重量・全身DoFの公式数値を確認することを推奨。"
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B09",
+    "robotId": "figure-03",
+    "identity": {
+      "registeredName": "Figure 03",
+      "officialCurrentName": "Figure 03",
+      "recordScope": "specific-variant",
+      "variant": "Figure 03（2025年10月発表の第3世代、家庭・量産製造双方を想定）",
+      "lifecycleStatus": "limited-current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "figure.ai/figure に現行製品として身長・重量・速度・稼働時間・バッテリー・ペイロードが明記され、BMW Spartanburgでの部品シーケンシング実演（2026-06-30発表）が確認できる。ただし一般販売・外部調達条件は非公開でパートナー実証中心のため、marketAvailability=enterprise-pilotに整合するlimited-currentとした。",
+      "evidenceSourceUrls": [
+        "https://www.figure.ai/figure",
+        "https://www.figure.ai/news/introducing-figure-03",
+        "https://www.figure.ai/news/f-03-battery-development",
+        "https://www.figure.ai/news/f-03-at-bmw"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "bipedal humanoid, navigates stairs and tight residential spaces",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.figure.ai/figure",
+          "sourceTitle": "Figure 03 official page",
+          "publisher": "Figure AI",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページで階段・狭所を含む二足歩行を説明。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Figure 03 official page",
+            "url": "https://www.figure.ai/figure",
+            "publisher": "Figure AI",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 172.72,
+        "proposedValue": 172.72,
+        "evidence": {
+          "value": "5'8\"",
+          "normalizedValue": 172.72,
+          "rawUnit": "ft-in",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.figure.ai/figure",
+          "sourceTitle": "Figure 03 official page",
+          "publisher": "Figure AI",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに5'8\"と明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Figure 03 official page",
+            "url": "https://www.figure.ai/figure",
+            "publisher": "Figure AI",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 61,
+        "proposedValue": 61,
+        "evidence": {
+          "value": "61 KG",
+          "normalizedValue": 61,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.figure.ai/figure",
+          "sourceTitle": "Figure 03 official page",
+          "publisher": "Figure AI",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに61KGと明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Figure 03 official page",
+            "url": "https://www.figure.ai/figure",
+            "publisher": "Figure AI",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 1.2,
+        "proposedValue": 1.2,
+        "evidence": {
+          "value": "1.2 M/S",
+          "normalizedValue": 1.2,
+          "rawUnit": "m/s",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.figure.ai/figure",
+          "sourceTitle": "Figure 03 official page",
+          "publisher": "Figure AI",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに1.2 M/Sと明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Figure 03 official page",
+            "url": "https://www.figure.ai/figure",
+            "publisher": "Figure AI",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "dof",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 300,
+        "proposedValue": 300,
+        "evidence": {
+          "value": "5 HR / 5 hours of run time at peak performance",
+          "normalizedValue": 300,
+          "rawUnit": "hr",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.figure.ai/figure",
+          "sourceTitle": "Figure 03 official page",
+          "publisher": "Figure AI",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "製品ページの5HR表記とバッテリー開発記事の『5 hours of run time at peak performance』が一致。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Figure 03 official page",
+            "url": "https://www.figure.ai/figure",
+            "publisher": "Figure AI",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 2300,
+        "proposedValue": 2300,
+        "evidence": {
+          "value": "2.3 kWh",
+          "normalizedValue": 2300,
+          "rawUnit": "kWh",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://www.figure.ai/news/f-03-battery-development",
+          "sourceTitle": "F.03 Battery Development",
+          "publisher": "Figure AI",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-07-17",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "2025-07-17付の公式記事で胴体内蔵2.3kWhバッテリーを明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Figure 03のバッテリー開発",
+            "url": "https://www.figure.ai/news/f-03-battery-development",
+            "publisher": "Figure AI",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "胴体内蔵バッテリー / ワイヤレス誘導充電",
+        "proposedValue": "胴体内蔵バッテリー / 2kWワイヤレス誘導充電・急速充電（アクティブ冷却）",
+        "evidence": {
+          "value": "torso-integrated battery; 2 kW wireless inductive charging capability (per introducing-figure-03); 2kW fast charge with active cooling (per f-03-battery-development)",
+          "normalizedValue": "胴体内蔵バッテリー / 2kWワイヤレス誘導充電・急速充電（アクティブ冷却）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.figure.ai/news/introducing-figure-03",
+          "sourceTitle": "Introducing Figure 03",
+          "publisher": "Figure AI",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-10-09",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "10月発表記事はワイヤレス誘導充電、7月のバッテリー開発記事は急速充電・アクティブ冷却を強調。両者の関係（同一機構の別側面か）は文言上明確でないためconflictsに記載。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Figure 03の設計と量産方針",
+            "url": "https://www.figure.ai/news/introducing-figure-03",
+            "publisher": "Figure AI",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "Helix VLA / 自律音声対話",
+        "proposedValue": "Helix VLA / 自律音声対話",
+        "evidence": {
+          "value": "Helix VLA-driven autonomous operation with voice interaction",
+          "normalizedValue": "Helix VLA / 自律音声対話",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.figure.ai/news/introducing-figure-03",
+          "sourceTitle": "Introducing Figure 03",
+          "publisher": "Figure AI",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-10-09",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Helix VLAを中核とした音声対話・自律動作を公式に説明。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Figure 03の設計と量産方針",
+            "url": "https://www.figure.ai/news/introducing-figure-03",
+            "publisher": "Figure AI",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "hold-variant",
+      "candidates": [
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "manufacturer-wording",
+            "rating": "unspecified",
+            "kg": 20,
+            "condition": "公式ページのPayload 20kg表記。対象範囲と定格／最大の区別は未公表。",
+            "variant": "Figure 03",
+            "sourceUrl": "https://www.figure.ai/figure"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Figure 03 official page",
+              "url": "https://www.figure.ai/figure",
+              "publisher": "Figure AI",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "partner-program",
+          "inquiry",
+          "not-for-sale"
+        ],
+        "proposedValue": [
+          "partner-program",
+          "inquiry",
+          "not-for-sale"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "enterprise-pilot",
+        "proposedValue": "enterprise-pilot",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": null,
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "supportNote",
+        "action": "hold-source-inaccessible",
+        "currentValue": "問い合わせと商用パートナーシップの導線は公開。製品サポートおよび日本での導入支援条件は未公表。",
+        "proposedValue": "問い合わせ・商用パートナーシップ導線は公開。製品サポート・日本での導入支援条件は本調査でも確認できず。",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "factory-assembly-support",
+        "officialExpression": "precise picking and placement of thin-walled, individual parts; forceful manipulation requiring whole-body coordination pulling a large metal cart down the line (part sequencing at BMW)",
+        "evidenceSourceUrl": "https://www.figure.ai/news/f-03-at-bmw",
+        "evidenceScope": "current-product",
+        "variant": "Figure 03",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "figure-03",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.figure.ai/news/f-03-at-bmw"
+          ],
+          "reason": "Figure 03がBMW工場で自動車部品のシーケンシング作業を行うことを公式発表している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "BMW工場で部品シーケンシングを実施",
+            "url": "https://www.figure.ai/news/f-03-at-bmw",
+            "publisher": "Figure AI",
+            "publishedAt": "2026-06-30",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": [
+        {
+          "customerOrInstitution": "BMW Group (Spartanburg plant)",
+          "classification": "pilot",
+          "evidenceSourceUrl": "https://www.figure.ai/news/f-03-at-bmw",
+          "variant": "Figure 03",
+          "scopeNote": "2026-06-30発表。『the first demonstration of Figure 03 performing a logistics workflow』と明記され、量産・恒常運用ではなく実演段階の記述。",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "BMW工場で部品シーケンシングを実施",
+              "url": "https://www.figure.ai/news/f-03-at-bmw",
+              "publisher": "Figure AI",
+              "publishedAt": "2026-06-30",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "customerOrInstitution": "BMW Group (Spartanburg plant) — Figure 02",
+          "classification": "historical-family-only",
+          "evidenceSourceUrl": "https://www.figure.ai/news/f-03-at-bmw",
+          "variant": "Figure 02（前世代）",
+          "scopeNote": "同記事内で前世代Figure 02が2025年に『30,000台の車両組立に貢献』と紹介されているが、Figure 03とは別世代のため現行機の実績としては扱わない。",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "BMW工場で部品シーケンシングを実施",
+              "url": "https://www.figure.ai/news/f-03-at-bmw",
+              "publisher": "Figure AI",
+              "publishedAt": "2026-06-30",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "家庭内タスク向け設計（軟質外装、多密度フォームによる指詰め防止）",
+        "evidenceSourceUrl": "https://www.figure.ai/news/introducing-figure-03",
+        "evidenceSummary": "洗濯・清掃・食器洗いを想定し、硬質部品より柔軟素材を採用と公式発表。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "刷新された視覚系（フレームレート2倍、レイテンシ1/4、視野角60%拡大）",
+        "evidenceSourceUrl": "https://www.figure.ai/news/introducing-figure-03",
+        "evidenceSummary": "Figure 02比での視覚センサー性能向上を公式発表。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "触覚センサー（約3gの力を検知）",
+        "evidenceSourceUrl": "https://www.figure.ai/news/introducing-figure-03",
+        "evidenceSummary": "手部の高感度触覚センサーを公式発表。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "BotQでの量産体制（年産最大12,000台）",
+        "evidenceSourceUrl": "https://www.figure.ai/news/introducing-figure-03",
+        "evidenceSummary": "自社製造施設BotQでの量産能力を公式発表。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "音声対話によるタスク理解・実行",
+        "evidenceSourceUrl": "https://www.figure.ai/figure",
+        "evidenceSummary": "音声を通じて指示を理解し行動する旨を公式製品ページに記載。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B09",
+    "robotId": "boston-dynamics-atlas",
+    "identity": {
+      "registeredName": "Atlas",
+      "officialCurrentName": "Atlas",
+      "recordScope": "specific-variant",
+      "variant": "全電動Atlas（2024年4月発表、2025年12月23日付Sales Sheetの製品版）",
+      "lifecycleStatus": "limited-current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "bostondynamics.com/products/atlas/ と2025-12-23付Atlas-SalesSheetで現行製品として仕様を確認。2026-01-05の公式ブログで『All Atlas deployments are already fully committed for 2026』（Hyundai RMAC・Google DeepMind向け）とあり、早期採用顧客に限定출荷中。旧来の油圧式Atlasは2024年4月に公式に引退（'An Electric New Era for Atlas'）しており、現行電動Atlasとは別世代として区別する。",
+      "evidenceSourceUrls": [
+        "https://bostondynamics.com/products/atlas/",
+        "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+        "https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "fully electric bipedal humanoid",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/",
+          "sourceTitle": "Boston Dynamics Unveils New Atlas Robot to Revolutionize Industry",
+          "publisher": "Boston Dynamics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-01-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "全電動Atlasとして公式発表、二足歩行を明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas製品版の機能と提供計画",
+            "url": "https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 190,
+        "proposedValue": 190,
+        "evidence": {
+          "value": "1.9 m (6.2 ft)",
+          "normalizedValue": 190,
+          "rawUnit": "m",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+          "sourceTitle": "Atlas Sales Sheet",
+          "publisher": "Boston Dynamics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-12-23",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式Sales Sheet（2025-12-23付）に明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas公式仕様書",
+            "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 90,
+        "proposedValue": 90,
+        "evidence": {
+          "value": "90 kg (198 lbs)",
+          "normalizedValue": 90,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+          "sourceTitle": "Atlas Sales Sheet",
+          "publisher": "Boston Dynamics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-12-23",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式Sales Sheetに明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas公式仕様書",
+            "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 56,
+        "proposedValue": 56,
+        "evidence": {
+          "value": "56",
+          "normalizedValue": 56,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+          "sourceTitle": "Atlas Sales Sheet",
+          "publisher": "Boston Dynamics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-12-23",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式Sales Sheetに明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas公式仕様書",
+            "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 240,
+        "proposedValue": 240,
+        "evidence": {
+          "value": "Battery Life 4 hrs; Battery Life with Heavy Lifting 2 hrs",
+          "normalizedValue": 240,
+          "rawUnit": "hr",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+          "sourceTitle": "Atlas Sales Sheet",
+          "publisher": "Boston Dynamics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-12-23",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式Sales Sheetで通常4時間、高負荷持ち上げ時2時間と明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas公式仕様書",
+            "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 90,
+        "proposedValue": 90,
+        "evidence": {
+          "value": "Autonomous Battery Swap Time 3 min (Charge Time 1.5 hrs)",
+          "normalizedValue": 90,
+          "rawUnit": "hr",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+          "sourceTitle": "Atlas Sales Sheet",
+          "publisher": "Boston Dynamics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-12-23",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "自律バッテリー交換は3分、満充電は1.5時間（90分）と公式Sales Sheetに明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas公式仕様書",
+            "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "自律自己交換式バッテリー",
+        "proposedValue": "自律自己交換式バッテリー（充電110V、220Vオプション）",
+        "evidence": {
+          "value": "autonomous self-swappable batteries; charge power 110V (220V optional)",
+          "normalizedValue": "自律自己交換式バッテリー（充電110V、220Vオプション）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+          "sourceTitle": "Atlas Sales Sheet",
+          "publisher": "Boston Dynamics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-12-23",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "自律的にバッテリー交換ステーションへ移動し3分で交換、との公式記述。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas公式仕様書",
+            "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "自律運転 / VR遠隔操作 / タブレット / Orbit",
+        "proposedValue": "自律運転 / VR遠隔操作 / タブレット / Orbit",
+        "evidence": {
+          "value": "Autonomous / VR teleoperated / Tablet control, integrated with Orbit",
+          "normalizedValue": "自律運転 / VR遠隔操作 / タブレット / Orbit",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+          "sourceTitle": "Atlas Sales Sheet",
+          "publisher": "Boston Dynamics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-12-23",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Operating Modesとして3方式を公式Sales Sheetに明記、Orbitとの連携も確認。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas公式仕様書",
+            "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "IP67",
+        "proposedValue": "IP67",
+        "evidence": {
+          "value": "IP67",
+          "normalizedValue": "IP67",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+          "sourceTitle": "Atlas Sales Sheet",
+          "publisher": "Boston Dynamics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-12-23",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式Sales Sheetに明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas公式仕様書",
+            "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "-20～40℃",
+        "proposedValue": "-20〜40℃",
+        "evidence": {
+          "value": "-20 to 40 C (-4 to 104 F)",
+          "normalizedValue": "-20〜40℃",
+          "rawUnit": "C",
+          "normalizedUnit": "C",
+          "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+          "sourceTitle": "Atlas Sales Sheet",
+          "publisher": "Boston Dynamics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-12-23",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式Sales Sheetに明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas公式仕様書",
+            "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "safetyStandard",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "CEマーキング / フェンスレス運用・人検知セーフティシステム",
+        "evidence": {
+          "value": "CE marking; Safety System: fenceless guarding, human detection",
+          "normalizedValue": "CEマーキング / フェンスレス運用・人検知セーフティシステム",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+          "sourceTitle": "Atlas Sales Sheet",
+          "publisher": "Boston Dynamics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-12-23",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "CEマークと安全機能（フェンスレスガーディング・人検知）を公式Sales Sheetに明記。ISO番号等の個別規格名は非公開。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas公式仕様書",
+            "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "hold-variant",
+      "candidates": [
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "manufacturer-wording",
+            "rating": "unspecified",
+            "kg": 50,
+            "condition": "公式Sales SheetのWeight Capacity: Instant 50kg。定格・最大の別は未公表。",
+            "variant": "現行電動Atlas",
+            "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Atlas公式仕様書",
+              "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+              "publisher": "Boston Dynamics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "manufacturer-wording",
+            "rating": "unspecified",
+            "kg": 30,
+            "condition": "公式Sales SheetのWeight Capacity: Sustained 30kg。",
+            "variant": "現行電動Atlas",
+            "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Atlas公式仕様書",
+              "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+              "publisher": "Boston Dynamics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "single-arm",
+            "rating": "unspecified",
+            "kg": 20,
+            "condition": "公式Sales SheetのWeight Capacity: One-Handed 20kg。",
+            "variant": "現行電動Atlas",
+            "sourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Atlas公式仕様書",
+              "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+              "publisher": "Boston Dynamics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "inquiry",
+          "partner-program"
+        ],
+        "proposedValue": [
+          "inquiry",
+          "partner-program"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "enterprise-pilot",
+        "proposedValue": "enterprise-pilot",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": null,
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "supportNote",
+        "action": "hold-source-inaccessible",
+        "currentValue": "営業、サポート、トレーニングの公式導線は公開。Atlas固有の日本向け保守条件とSLAは未確認。",
+        "proposedValue": "sales@bostondynamics.com経由の営業窓口のみ公開。オンラインストアや個人向け購入経路はなく、2026年出荷分はHyundai・Google DeepMind向けに全て割当済みと公式発表。日本向け窓口は確認できず。",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "factory-machine-tending",
+        "officialExpression": "ready for a range of warehouse and factory tasks, including part sequencing, machine tending, order fulfillment, and more",
+        "evidenceSourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+        "evidenceScope": "current-product",
+        "variant": "現行電動Atlas",
+        "reason": "現在公式資料による用途relation追加候補。",
+        "action": "set",
+        "existingRelation": null,
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Atlas公式仕様書",
+            "url": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+            "publisher": "Boston Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": [
+        {
+          "customerOrInstitution": "Hyundai (Robotics Metaplant Application Center, RMAC)",
+          "classification": "pilot",
+          "evidenceSourceUrl": "https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/",
+          "variant": "現行電動Atlas",
+          "scopeNote": "2026-01-05発表。『fleets scheduled to ship to Hyundai's RMAC...in the coming months』とあり、2026年内出荷開始段階（本稼働実績は未公表）。",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Atlas製品版の機能と提供計画",
+              "url": "https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/",
+              "publisher": "Boston Dynamics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "customerOrInstitution": "Google DeepMind",
+          "classification": "research",
+          "evidenceSourceUrl": "https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/",
+          "variant": "現行電動Atlas",
+          "scopeNote": "AI基盤モデル研究向けの提供と位置づけられ、商用導入ではなく研究協業として記載。",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Atlas製品版の機能と提供計画",
+              "url": "https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/",
+              "publisher": "Boston Dynamics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "自律ナビゲーション・タスク学習（新スキルはフリート全体へ展開可能）",
+        "evidenceSourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+        "evidenceSummary": "1台が学習したスキルをフリート全体に展開できると公式Sales Sheetに記載。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Orbit連携（MES/WMS統合、フリート管理）",
+        "evidenceSourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+        "evidenceSummary": "Orbitを介したMES/WMS統合とフリートメトリクス確認を公式に説明。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "自律バッテリー交換（3分）",
+        "evidenceSourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+        "evidenceSummary": "バッテリー切れ時に自律的に交換ステーションへ移動し3分で交換完了。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "触覚センサー（指・掌）、360°カメラ視野",
+        "evidenceSourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+        "evidenceSummary": "Sensingとしてtactile fingers and palm、360° camera viewを明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "バーコードスキャナ・RFIDによるワークフロー統合",
+        "evidenceSourceUrl": "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+        "evidenceSummary": "Workflow Integrationsとして明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B09",
+    "robotId": "tesla-optimus",
+    "identity": {
+      "registeredName": "Optimus",
+      "officialCurrentName": "Optimus",
+      "recordScope": "product-family",
+      "variant": "現行社内使用世代（Gen 2.5相当）。次世代Gen 3は開発中で2026-07-17時点で未発表・未量産。",
+      "lifecycleStatus": "limited-current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "tesla.com/AI および ir.tesla.com のPDFはいずれも本セッションでWebFetchが403で拒否され直接一次資料を開けなかった（Tesla側のボット対策とみられる）。WebSearch経由の要約では、TeslaがGen 3を『開発中で、量産開始は2026年内目標』としており、2026-07-17時点で外部未公開・社内学習用途中心（マスク氏の決算説明での発言として複数メディアが報道）と繰り返し報じられている。既存レコードのspecs（mobility: biped, controlMethod: 自律AI制御）はrepositoryのTesla公式ソースと整合するが、本セッションでは一次ページを直接開いて再検証できていない。外部販売は未開始のためmarketAvailability=internal-useのまま据え置く。",
+      "evidenceSourceUrls": [
+        "https://www.tesla.com/AI",
+        "https://ir.tesla.com/_flysystem/s3/sec/000162828024032603/tsla-20240723-gen.pdf"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "bi-pedal, autonomous humanoid robot",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.tesla.com/AI",
+          "sourceTitle": "AI & Robotics | Tesla",
+          "publisher": "Tesla",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "tesla.com/AIの説明文（検索結果経由で内容確認、本セッションの直接WebFetchは403で失敗）。二足自律ヒューマノイドという記述は既存レコードと一致し、複数の独立した経路（決算資料紹介記事等）でも一貫している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Tesla Optimus official product page",
+            "url": "https://www.tesla.com/AI",
+            "publisher": "Tesla",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "weightKg",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "speedMps",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "自律AI制御",
+        "proposedValue": "自律AI制御",
+        "evidence": {
+          "value": "autonomous AI-driven control; general purpose robot capable of unsafe, repetitive or boring tasks",
+          "normalizedValue": "自律AI制御",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.tesla.com/AI",
+          "sourceTitle": "AI & Robotics | Tesla",
+          "publisher": "Tesla",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "tesla.com/AIの説明（検索結果経由）。バランス・ナビゲーション・知覚・物理世界とのインタラクションのソフトウェアスタックを構築中との記述。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Tesla Optimus official product page",
+            "url": "https://www.tesla.com/AI",
+            "publisher": "Tesla",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-applicable",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に荷重候補がない。"
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "not-for-sale"
+        ],
+        "proposedValue": [
+          "not-for-sale"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "internal-use",
+        "proposedValue": "internal-use",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": null,
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "supportNote",
+        "action": "hold-source-inaccessible",
+        "currentValue": "Optimusの外部顧客向けサポート、導入サービス、日本での提供条件は公表されていない。",
+        "proposedValue": "Optimusの外部顧客向けサポート、導入サービス、日本での提供条件は公表されていない。Gen 3量産開始は2026年内目標と報じられるが、2026-07-17時点で正式発表・外部販売は未開始。",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      }
+    ],
+    "officialUseCases": [],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": [
+        {
+          "customerOrInstitution": "Tesla（自社工場内、Gen 2/2.5相当）",
+          "classification": "research",
+          "evidenceSourceUrl": "https://ir.tesla.com/_flysystem/s3/sec/000162828024032603/tsla-20240723-gen.pdf",
+          "variant": "Gen 2/2.5相当（社内使用）",
+          "scopeNote": "2026年1月28日決算説明会でのマスク氏発言として複数メディアが『Optimus units are primarily for learning and data collection rather than performing productive tasks』と報道（一次のSEC資料は本セッションで直接開けず、二次報道の引用にとどまる）。",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Tesla施設でバッテリー搬送を自律実行",
+              "url": "https://ir.tesla.com/_flysystem/s3/sec/000162828024032603/tsla-20240723-gen.pdf",
+              "publisher": "Tesla, Inc.",
+              "publishedAt": "2024-07-23",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "Tesla施設内でのバッテリー搬送等の自律作業実行（2024年時点の実績）",
+        "evidenceSourceUrl": "https://ir.tesla.com/_flysystem/s3/sec/000162828024032603/tsla-20240723-gen.pdf",
+        "evidenceSummary": "既存レコードのソースで確認済みだが、本セッションでは再アクセス403のため直接再検証はできていない。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "tesla.com/AI、ir.tesla.comへの直接アクセス（別ネットワーク・別UA等）で一次資料を再取得し、mobility/controlMethod以外の項目を再確認することを推奨。"
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B09",
+    "robotId": "sanctuary-phoenix",
+    "identity": {
+      "registeredName": "Phoenix",
+      "officialCurrentName": "Phoenix Gen 8",
+      "recordScope": "specific-variant",
+      "variant": "Phoenix Generation 8（車輪ベース、Carbon AI搭載、高品質データ収集用途）",
+      "lifecycleStatus": "limited-current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "sanctuary.aiの公式ニュースでGen 8を『released less than eight months after Gen 7』と明記し、二足からホイールベースへ移行したと確認できる。ただし2026-06-17の公式発表『Sanctuary AI Expands Physical AI Strategy to Industrial Robotics』では、FANUC・Universal Robots等の産業用アームにPhysical AIソフトウェアを展開する方針へ重心が移り、Phoenixヒューマノイド自体は『次世代の産業用ヒューマノイドの基盤』という将来位置づけの記述にとどまる。明確な終売宣言はないためdiscontinuedとはせず、研究・データ収集中心のlimited-currentとした。",
+      "evidenceSourceUrls": [
+        "https://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/",
+        "https://sanctuary.ai/news/sanctuary-ai-expands-physical-ai-strategy-to-industrial-robotics-demonstrating-production-ready-ai-performance/"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "wheeled",
+        "proposedValue": "wheeled",
+        "evidence": {
+          "value": "wheeled base (moved away from bipedal legs per customer feedback)",
+          "normalizedValue": "wheeled",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/",
+          "sourceTitle": "Sanctuary AI releases new generation of AI robots for high quality data capture",
+          "publisher": "Sanctuary AI",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "『bi-pedal legs are too frail to support a strong torso』という顧客フィードバックに基づき車輪ベースへ移行したと公式発表。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Phoenix Gen 8 official announcement",
+            "url": "https://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/",
+            "publisher": "Sanctuary AI",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "weightKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "speedMps",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "Carbon AI / 遠隔操作・人間介入 / フリート制御",
+        "proposedValue": "Carbon AI / 遠隔操作・人間介入 / フリート制御",
+        "evidence": {
+          "value": "Carbon AI with human-in-the-loop teleoperation and fleet control",
+          "normalizedValue": "Carbon AI / 遠隔操作・人間介入 / フリート制御",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/",
+          "sourceTitle": "Sanctuary AI releases new generation of AI robots for high quality data capture",
+          "publisher": "Sanctuary AI",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Carbon AIとテレオペ・フリート制御の組み合わせを公式に説明。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Phoenix Gen 8 official announcement",
+            "url": "https://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/",
+            "publisher": "Sanctuary AI",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に荷重候補がない。"
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "partner-program",
+          "inquiry"
+        ],
+        "proposedValue": [
+          "partner-program",
+          "inquiry"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "enterprise-pilot",
+        "proposedValue": "enterprise-pilot",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": null,
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "supportNote",
+        "action": "hold-source-inaccessible",
+        "currentValue": "企業向け問い合わせとパートナー接点を公開。日本での販売、導入支援、保守、SLAは未確認。",
+        "proposedValue": "企業向け問い合わせ窓口（Commercial Inquiries）を公開。日本での販売・導入支援・保守・SLAは未確認。",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      }
+    ],
+    "officialUseCases": [],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": [
+        {
+          "customerOrInstitution": "グローバルTier 1自動車部品サプライヤー（社名非公開、ワイヤ差込タスク）",
+          "classification": "pilot",
+          "evidenceSourceUrl": "https://sanctuary.ai/news/sanctuary-ai-expands-physical-ai-strategy-to-industrial-robotics-demonstrating-production-ready-ai-performance/",
+          "variant": "Physical AIソフトウェア（産業用アーム、Phoenixハードウェアではない）",
+          "scopeNote": "2026-06-17発表。複雑なワイヤプラグ挿入タスクで『production-ready』性能を実証したとあるが、対象ハードウェアはPhoenixヒューマノイドではなく産業用ロボットアーム。",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "Phoenix usage example",
+              "url": "https://sanctuary.ai/news/sanctuary-ai-expands-physical-ai-strategy-to-industrial-robotics-demonstrating-production-ready-ai-performance/",
+              "checkedAt": "2026-07-16",
+              "reliability": "reported"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "強化されたテレメトリー（データ収集・訓練用）",
+        "evidenceSourceUrl": "https://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/",
+        "evidenceSummary": "Gen 8でテレメトリーシステムを強化と公式発表。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "深度・視覚カメラの高性能化（視野角・解像度向上）",
+        "evidenceSourceUrl": "https://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/",
+        "evidenceSummary": "公式発表でカメラ性能向上を明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "産業用ロボットアーム（FANUC、Universal Robots等）上でのPhysical AI展開、99%超の複雑タスク成功率",
+        "evidenceSourceUrl": "https://sanctuary.ai/solutions/physical-ai/",
+        "evidenceSummary": "ハードウェア非依存のPhysical AIソフトウェアとして既存アームに展開する方針を公式に説明。ワイヤ挿入タスクでサイクルタイム2.54秒、テレオペデータ5.5時間で学習完了との数値も記載。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "油圧式デクスタラスハンド（開発中）",
+        "evidenceSourceUrl": "https://sanctuary.ai/",
+        "evidenceSummary": "近接ヒトレベルの触覚を持つ油圧ハンドを『In Development』として公式サイトに掲載。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "Sanctuary AIの今後の公式発表（IR・プレスリリース）でPhoenixハードウェア開発継続の有無を継続的に確認することを推奨。"
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B09",
+    "robotId": "kawasaki-kaleido",
+    "identity": {
+      "registeredName": "Kaleido",
+      "officialCurrentName": "RHP Kaleido（最新は2025年11月発表 Kaleido 9）",
+      "recordScope": "product-family",
+      "variant": "2015年プロトタイプ〜2025年Kaleido 9までの世代横断シリーズ名。単一世代の確定仕様なし。",
+      "lifecycleStatus": "limited-current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "kawasakirobotics.comの公式ブログ（2026-01-15付、英語版）およびその日本語版で2015年プロトタイプから2023年RHP7までの開発史を確認。加えて2025年11月開催の2025国際ロボット展でKaleido 9が公式に披露されたことをkawasakirobotics.com自身の検索結果・関連ブログ（2026-03-16付『Kaleido9が目指すヒューマノイドの現在地』）で確認したが、当該記事には数値スペックの記載がなかった。身長190cm・体重99kg・自由度30等の具体的数値は複数の第三者媒体（PC Watch、マイナビ、ITmedia、BigGo等）でのみ報じられ、川崎重工自身のページ上でこれらの数値を直接確認できなかったため未採用。『脚部は販売開始を見据えて部品定格を厳守する設計へ刷新』という自社ブログの記述はあり、商用化を見据えた開発が続いている段階と判断しlimited-current（研究・展示プラットフォーム）とした。",
+      "evidenceSourceUrls": [
+        "https://kawasakirobotics.com/asia-oceania/blog/202511_kaleido/",
+        "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/",
+        "https://kawasakirobotics.com/in/blog/story_22/"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "bipedal humanoid research platform",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://kawasakirobotics.com/asia-oceania/blog/202511_kaleido/",
+          "sourceTitle": "Kaleido development history",
+          "publisher": "Kawasaki Heavy Industries",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "全世代を通じて二足歩行ロボットとして開発されていると確認。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kaleido development history",
+            "url": "https://kawasakirobotics.com/asia-oceania/blog/202511_kaleido/",
+            "publisher": "Kawasaki Heavy Industries",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "weightKg",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "hold-variant",
+        "reason": "現在製品／現在ファミリー共通／一致variantのいずれにも該当しない。",
+        "currentValue": null,
+        "proposedValue": 1.11,
+        "evidence": {
+          "value": "RHP7: walking speed approximately 4 km/h (average human walking pace)",
+          "normalizedValue": 1.11,
+          "rawUnit": "km/h",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://kawasakirobotics.com/in/blog/story_22/",
+          "sourceTitle": "RHP7 research platform",
+          "publisher": "Kawasaki Robotics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2023-03-09",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "historical-only",
+          "evidenceSummary": "RHP7（2023年）固有の値。最新世代Kaleido9への継承は未確認のためhistorical-only扱い。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "RHP7 research platform",
+            "url": "https://kawasakirobotics.com/in/blog/story_22/",
+            "publisher": "Kawasaki Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "dof",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "hold-variant",
+        "reason": "現在製品／現在ファミリー共通／一致variantのいずれにも該当しない。",
+        "currentValue": null,
+        "proposedValue": "オンボードバッテリーによる完全自立稼働（2019年以降）",
+        "evidence": {
+          "value": "2019: onboard battery achieving fully standalone (untethered) operation",
+          "normalizedValue": "オンボードバッテリーによる完全自立稼働（2019年以降）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://kawasakirobotics.com/asia-oceania/blog/202511_kaleido/",
+          "sourceTitle": "Kaleido development history",
+          "publisher": "Kawasaki Heavy Industries",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "historical-only",
+          "evidenceSummary": "2019年モデルで初めて完全な自立稼働（電源ケーブル不要）を達成したと公式に記載。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kaleido development history",
+            "url": "https://kawasakirobotics.com/asia-oceania/blog/202511_kaleido/",
+            "publisher": "Kawasaki Heavy Industries",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "HMD遠隔操縦 / LiDAR SLAMによる自律歩行",
+        "evidence": {
+          "value": "HMD-based remote teleoperation; LiDAR-based SLAM for autonomous walking (Kaleido9)",
+          "normalizedValue": "HMD遠隔操縦 / LiDAR SLAMによる自律歩行",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/",
+          "sourceTitle": "Kaleido9が目指すヒューマノイドの現在地",
+          "publisher": "川崎重工業",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-03-16",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Kaleido9の特徴としてHMDによる遠隔操縦とLiDARによる自己位置推定・自律歩行を公式ブログに記載。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "Kaleido9が目指すヒューマノイドの現在地",
+            "url": "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/",
+            "publisher": "川崎重工業",
+            "publishedAt": "2026-03-16",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に荷重候補がない。"
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "inquiry"
+        ],
+        "proposedValue": [
+          "inquiry"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": null,
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "supportNote",
+        "action": "hold-source-inaccessible",
+        "currentValue": "川崎ロボティクスの問い合わせ窓口はあるが、Kaleidoの販売、導入、保守条件は公表されていない。",
+        "proposedValue": "川崎ロボティクスの一般問い合わせ窓口はあるが、Kaleidoの販売・導入・保守条件は本調査でも公表を確認できなかった。",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      }
+    ],
+    "officialUseCases": [],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": [
+        {
+          "customerOrInstitution": "OIMACHI TRACKS開業式典（品川、2026年3月28日、テープカット補助）",
+          "classification": "demonstration",
+          "evidenceSourceUrl": "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/",
+          "variant": "Kaleido9",
+          "scopeNote": "商業施設の開業イベントでのデモンストレーション出演であり、商用導入事例ではない。",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "Kaleido usage example",
+              "url": "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/",
+              "checkedAt": "2026-07-16",
+              "reliability": "reported"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        },
+        {
+          "customerOrInstitution": "2025国際ロボット展（iREX2025）出展",
+          "classification": "demonstration",
+          "evidenceSourceUrl": "https://kawasakirobotics.com/asia-oceania/blog/202511_kaleido/",
+          "variant": "Kaleido9",
+          "scopeNote": "展示会でのお披露目であり、商用・実運用の導入事例ではない。",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Kaleido development history",
+              "url": "https://kawasakirobotics.com/asia-oceania/blog/202511_kaleido/",
+              "publisher": "Kawasaki Heavy Industries",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "転倒しても壊れにくい頑健設計（Robust Humanoid Platform）",
+        "evidenceSourceUrl": "https://kawasakirobotics.com/in/blog/story_22/",
+        "evidenceSummary": "RHP＝Robust Humanoid Platformの略で、頑健性を重視した設計思想を公式に説明。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "リアルタイム足位置補正による転倒抑制（2023年以降）",
+        "evidenceSourceUrl": "https://kawasakirobotics.com/asia-oceania/blog/202511_kaleido/",
+        "evidenceSummary": "2023年のアップデートでリアルタイム足位置補正を追加し安定性を向上と公式発表。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "LiDARによる自己位置推定・障害物認識・自律歩行（Kaleido9）",
+        "evidenceSourceUrl": "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/",
+        "evidenceSummary": "Kaleido9で周囲環境を認識しながら自律的に歩行する機能を追加と公式ブログに記載。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "HMDによる遠隔操縦機能（Kaleido9）",
+        "evidenceSourceUrl": "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/",
+        "evidenceSummary": "頭部搭載ディスプレイを用いた遠隔操縦機能を公式に説明。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "販売開始を見据えた部品定格設計への刷新（脚部）",
+        "evidenceSourceUrl": "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/",
+        "evidenceSummary": "商用化を見据えた設計変更が進行中であることを公式ブログで示唆。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "iREX2025の川崎重工公式プレスリリース原本、または展示会配布資料（PDF）を入手し、Kaleido9の数値スペックを一次資料で直接確認することを推奨。"
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B09",
+    "robotId": "neura-4ne-1",
+    "identity": {
+      "registeredName": "4NE1 Gen 3",
+      "officialCurrentName": "4NE1 Gen 3",
+      "recordScope": "specific-variant",
+      "variant": "4NE1 Gen 3（二足構成、フルサイズ。4NE1 Miniは別モデルのため対象外）",
+      "lifecycleStatus": "announced",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "NEURA公式が2026-06-05付で発行した『4NE1 Gen 3』データシート（neurarobotics.px.media配下、Adobe Illustratorメタデータで作成者Carolin Klein、ファイル名『4NE1-gen-3-cmyk』と確認）で身長・重量・速度・自由度・ハンド自由度・ペイロード・制御方式・安全機能を確認できた。neura-robotics.comのHTML製品ページ・予約ページは本セッション中すべて403で直接アクセスできなかったが、独立したWebSearchクロスチェックにより『4NE1 Gen 3.5は個別注文€98,000、20台以上のバルク注文€60,000、年内出荷予定』『4NE1 Miniは2026年春出荷』という予約ページの情報が確認できる。まだ量産出荷前の予約・reservation段階（marketAvailability=reservation）のため、lifecycleStatusはannounced（発表済みだが量産・出荷前）とした。",
+      "evidenceSourceUrls": [
+        "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "bipedal humanoid (full-size 4NE1 Gen 3)",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+          "sourceTitle": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+          "publisher": "NEURA Robotics GmbH",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-06-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式データシート表紙画像・仕様で二足歩行モデルとして確認。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+            "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+            "publisher": "NEURA Robotics GmbH",
+            "publishedAt": "2026-06-05",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 180,
+        "proposedValue": 180,
+        "evidence": {
+          "value": "180 cm / 5'11\"",
+          "normalizedValue": 180,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+          "sourceTitle": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+          "publisher": "NEURA Robotics GmbH",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-06-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式データシートに明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+            "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+            "publisher": "NEURA Robotics GmbH",
+            "publishedAt": "2026-06-05",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 80,
+        "proposedValue": 80,
+        "evidence": {
+          "value": "80 kg / 176 lbs",
+          "normalizedValue": 80,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+          "sourceTitle": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+          "publisher": "NEURA Robotics GmbH",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-06-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式データシートに明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+            "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+            "publisher": "NEURA Robotics GmbH",
+            "publishedAt": "2026-06-05",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 1.3889,
+        "proposedValue": 1.3889,
+        "evidence": {
+          "value": "5 km/h / 3.1 mph",
+          "normalizedValue": 1.3889,
+          "rawUnit": "km/h",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+          "sourceTitle": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+          "publisher": "NEURA Robotics GmbH",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-06-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式データシートに明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+            "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+            "publisher": "NEURA Robotics GmbH",
+            "publishedAt": "2026-06-05",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 55,
+        "evidence": {
+          "value": "55 degrees of freedom (whole body); Hands 12 DoF",
+          "normalizedValue": 55,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+          "sourceTitle": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+          "publisher": "NEURA Robotics GmbH",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-06-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "全身55自由度、ハンドは別途12自由度と公式データシートに明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+            "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+            "publisher": "NEURA Robotics GmbH",
+            "publishedAt": "2026-06-05",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 20,
+        "evidence": {
+          "value": "Arms Payload 20 kg / 44 lbs (application-dependent); leg-supported configurations can carry up to 100 kg",
+          "normalizedValue": 20,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+          "sourceTitle": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+          "publisher": "NEURA Robotics GmbH",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-06-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "腕部ペイロードは20kg（用途・エンドエフェクター・構成により変動）、脚支持構成では最大100kgまで可能と注釈付きで公式明記。10〜100kgという幅表記の根拠が確認できた。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+            "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+            "publisher": "NEURA Robotics GmbH",
+            "publishedAt": "2026-06-05",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "unsupported-schema",
+        "reason": "R02の正規化値が現行specSchemaの値型に適合しない。分割・型拡張・人間確認が必要。",
+        "currentValue": null,
+        "proposedValue": null,
+        "evidence": {
+          "value": "Operating Time 24/7",
+          "normalizedValue": null,
+          "rawUnit": "24/7",
+          "normalizedUnit": "continuous",
+          "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+          "sourceTitle": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+          "publisher": "NEURA Robotics GmbH",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-06-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "24時間365日連続稼働と公式データシートに明記（二重バッテリー等での交代運用を示唆、単一バッテリーの稼働時間は非公表）。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+            "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+            "publisher": "NEURA Robotics GmbH",
+            "publishedAt": "2026-06-05",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "二重バッテリー構成 / 連続運用対応",
+        "proposedValue": "二重バッテリー構成 / 連続運用対応",
+        "evidence": {
+          "value": "dual battery configuration enabling continuous 24/7 operation",
+          "normalizedValue": "二重バッテリー構成 / 連続運用対応",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://neura-robotics.com/products/4ne1/",
+          "sourceTitle": "Humanoid Robot 4NE1 for Work and Life",
+          "publisher": "NEURA Robotics",
+          "sourceType": "manufacturer-official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "既存repositoryソース（本セッションでは403のため再取得不可、公式データシートのOperating Time 24/7と整合）。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "NEURA Robotics 4NE1 Gen 3",
+            "url": "https://neura-robotics.com/products/4ne1/",
+            "publisher": "NEURA Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "自律認識・適応制御 / 音声対話 / 遠隔操作",
+        "proposedValue": "自律モード / AI音声操作 / 遠隔操作 / 経路計画・障害物回避 / 360°認識",
+        "evidence": {
+          "value": "Autonomous Mode; Control: AI Voice, Remote; Path Planning and Obstacle Avoidance; 360° Perception",
+          "normalizedValue": "自律モード / AI音声操作 / 遠隔操作 / 経路計画・障害物回避 / 360°認識",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+          "sourceTitle": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+          "publisher": "NEURA Robotics GmbH",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-06-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式データシートに制御方式一式を明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+            "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+            "publisher": "NEURA Robotics GmbH",
+            "publishedAt": "2026-06-05",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "Qualcomm（NEURA Roboticsとの共同表記）",
+        "evidence": {
+          "value": "Qualcomm (co-branded with NEURA Robotics on datasheet)",
+          "normalizedValue": "Qualcomm（NEURA Roboticsとの共同表記）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+          "sourceTitle": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+          "publisher": "NEURA Robotics GmbH",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-06-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "データシート内にQualcommロゴとNEURA Roboticsロゴが並記されている。詳細なチップ型番は記載なし。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+            "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+            "publisher": "NEURA Robotics GmbH",
+            "publishedAt": "2026-06-05",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "人検知センサー（オプション・追加費用）",
+        "evidence": {
+          "value": "Human Detection safety sensors (optional, available at an additional cost)",
+          "normalizedValue": "人検知センサー（オプション・追加費用）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+          "sourceTitle": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+          "publisher": "NEURA Robotics GmbH",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2026-06-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "安全用人検知センサーはオプション・追加費用と脚注に明記。ISO等の規格番号は非公開。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "NEURA Robotics 4NE1 Gen 3 Datasheet",
+            "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+            "publisher": "NEURA Robotics GmbH",
+            "publishedAt": "2026-06-05",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "hold-variant",
+      "candidates": [
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "single-arm",
+            "rating": "unspecified",
+            "kg": 20,
+            "condition": "公式データシートのArms Payload 20kg（用途依存、脚支持構成では最大100kgまで対応）。定格・最大の区別は未公表。",
+            "variant": "4NE1 Gen 3",
+            "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf"
+          },
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "4NE1 Gen 3 load specification",
+              "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        },
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "whole-body",
+            "rating": "maximum",
+            "kg": 100,
+            "condition": "公式データシート脚注『Leg-supported configurations can carry up to 100 kg』。",
+            "variant": "4NE1 Gen 3（脚支持構成）",
+            "sourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf"
+          },
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "4NE1 Gen 3 load specification",
+              "url": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "inquiry",
+          "partner-program"
+        ],
+        "proposedValue": [
+          "inquiry",
+          "partner-program"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "reservation",
+        "proposedValue": "reservation",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": null,
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "supportNote",
+        "action": "hold-source-inaccessible",
+        "currentValue": "予約・問い合わせ、ライフサイクル支援、Neuraverse連携を案内。4NE1の日本向け販売・保守条件は未公表。",
+        "proposedValue": "予約・問い合わせ、ライフサイクル支援、Neuraverse連携を案内（既存repositoryソースより）。4NE1 Gen 3の日本向け販売・保守条件は未公表。",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      }
+    ],
+    "officialUseCases": [],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": []
+    },
+    "currentFeatures": [
+      {
+        "feature": "Multi Cognitive Interaction（複合認知対話）",
+        "evidenceSourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+        "evidenceSummary": "公式データシートで特徴の一つとして明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Touch-Sensitive Sensor Skin（触覚センサースキン）",
+        "evidenceSourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+        "evidenceSummary": "公式データシートで特徴の一つとして明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "360-Degree Perception（全方位認識）",
+        "evidenceSourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+        "evidenceSummary": "公式データシートで特徴の一つとして明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Path Planning and Obstacle Avoidance（経路計画・障害物回避）",
+        "evidenceSourceUrl": "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf",
+        "evidenceSummary": "公式データシートで特徴の一つとして明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Neuraverse（フリート学習・スキル共有マーケットプレイス）",
+        "evidenceSourceUrl": "https://neura-robotics.com/",
+        "evidenceSummary": "既存repositoryソースで確認済みの機能（本セッションでは403のため再取得不可）。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "neura-robotics.comへの直接アクセス（別ネットワーク・別UA等）で予約ページの正式価格・納期を再確認することを推奨。"
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B09",
+    "robotId": "xpeng-iron",
+    "identity": {
+      "registeredName": "Next-Gen IRON",
+      "officialCurrentName": "Next-Gen IRON",
+      "recordScope": "specific-variant",
+      "variant": "2025年11月5日発表のNext-Gen IRON（自社工場・店舗での実証運用段階）",
+      "lifecycleStatus": "limited-current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "xpeng.com公式プレスルーム記事（2025-11-05付）で自由度・全固体電池・Turing AIチップ・SDK公開方針を確認。2026年末までの量産化目標と、Baosteelとの産業実証パートナーシップ、案内・買い物ガイド・交通誘導等の商業シナリオへの優先展開方針が公式に明記されている。外部販売は未開始でエコシステムパートナーとの実証段階のためlimited-currentとした。",
+      "evidenceSourceUrls": [
+        "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "bipedal humanoid capable of catwalk-style walking and high-difficulty human-like movements",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+          "sourceTitle": "XPENG Shares Achievements in Physical AI Emergence",
+          "publisher": "XPENG",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-11-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式プレスリリースでキャットウォーク歩行等の二足動作を確認。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "XPENG unveils Next-Gen IRON",
+            "url": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+            "publisher": "XPENG",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "weightKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "speedMps",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 82,
+        "proposedValue": 82,
+        "evidence": {
+          "value": "82 degrees of freedom throughout the body; 22 DoF in hands",
+          "normalizedValue": 82,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+          "sourceTitle": "XPENG Shares Achievements in Physical AI Emergence",
+          "publisher": "XPENG",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-11-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "全身82自由度、手部22自由度（業界最小級の高調波関節を使用した1:1人間スケールの手部）と公式発表。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "XPENG unveils Next-Gen IRON",
+            "url": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+            "publisher": "XPENG",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "全固体電池",
+        "proposedValue": "全固体電池（業界初のヒューマノイドへの実装）",
+        "evidence": {
+          "value": "all-solid-state battery (industry-first application in a humanoid robot)",
+          "normalizedValue": "全固体電池（業界初のヒューマノイドへの実装）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+          "sourceTitle": "XPENG Shares Achievements in Physical AI Emergence",
+          "publisher": "XPENG",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-11-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "全固体電池を業界で初めてヒューマノイドロボットに採用したと公式発表。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "XPENG unveils Next-Gen IRON",
+            "url": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+            "publisher": "XPENG",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "VLT・VLA・VLMを統合したPhysical AI",
+        "proposedValue": "VLT・VLA・VLMを統合したPhysical AI",
+        "evidence": {
+          "value": "VLT/VLA/VLM-integrated Physical AI",
+          "normalizedValue": "VLT・VLA・VLMを統合したPhysical AI",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+          "sourceTitle": "XPENG Shares Achievements in Physical AI Emergence",
+          "publisher": "XPENG",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-11-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "VLT・VLA・VLMを統合したPhysical AIによる制御を公式発表。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "XPENG unveils Next-Gen IRON",
+            "url": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+            "publisher": "XPENG",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "グローバル開発者向けSDKを公開予定",
+        "proposedValue": "グローバル開発者向けSDKを公開予定",
+        "evidence": {
+          "value": "XPENG IRON will open its SDK and jointly build a humanoid robot application ecosystem with global developers",
+          "normalizedValue": "グローバル開発者向けSDKを公開予定",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+          "sourceTitle": "XPENG Shares Achievements in Physical AI Emergence",
+          "publisher": "XPENG",
+          "sourceType": "manufacturer-official",
+          "publishedAt": "2025-11-05",
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "SDK公開とエコシステム構築方針を公式発表（公開時期・詳細仕様は未定）。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "XPENG unveils Next-Gen IRON",
+            "url": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+            "publisher": "XPENG",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "computePlatform",
+        "status": "conflict",
+        "action": "hold-conflict",
+        "reason": "一次資料間または資料と登録対象の競合を解消していない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に荷重候補がない。"
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "not-for-sale"
+        ],
+        "proposedValue": [
+          "not-for-sale"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "planned-production",
+        "proposedValue": "planned-production",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": null,
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "supportNote",
+        "action": "hold-source-inaccessible",
+        "currentValue": "SDK公開方針は発表済み。外部顧客向けサポート、日本での導入・保守条件は公表されていない。",
+        "proposedValue": "SDK公開方針は発表済み。外部顧客向けサポート、日本での導入・保守条件は公表されていない。",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "customer-reception",
+        "officialExpression": "prioritize entering commercial scenarios to provide services such as guided tours, shopping guides, and traffic diversion",
+        "evidenceSourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+        "evidenceScope": "current-product",
+        "variant": "Next-Gen IRON",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "xpeng-iron",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7"
+          ],
+          "reason": "公式発表が店舗での買い物案内など来訪者向けサービスを想定用途として示している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "XPENG unveils Next-Gen IRON",
+            "url": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+            "publisher": "XPENG",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": [
+        {
+          "customerOrInstitution": "Baosteel（宝鋼集団、産業現場実証）",
+          "classification": "pilot",
+          "evidenceSourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+          "variant": "Next-Gen IRON",
+          "scopeNote": "産業現場でのフィールドテストパートナーシップとして公式発表されたが、稼働開始時期・規模の詳細は同記事に記載がない。",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "XPENG unveils Next-Gen IRON",
+              "url": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+              "publisher": "XPENG",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "customerOrInstitution": "XPENG自社工場・店舗",
+          "classification": "pilot",
+          "evidenceSourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+          "variant": "Next-Gen IRON",
+          "scopeNote": "自社工場・店舗での試験運用を公式発表。外部顧客への展開は2026年末の量産化以降を予定。",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "XPENG unveils Next-Gen IRON",
+              "url": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+              "publisher": "XPENG",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "1:1人間スケールの手部（業界最小級の高調波関節を使用）",
+        "evidenceSourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+        "evidenceSummary": "公式発表で手部設計の特徴として明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "自社工場・店舗での実証運用（案内・買い物ガイド・交通誘導を優先展開）",
+        "evidenceSourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+        "evidenceSummary": "商業シナリオへの優先展開方針として公式発表。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Baosteelとの産業実証パートナーシップ",
+        "evidenceSourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+        "evidenceSummary": "産業現場での実地テストパートナーとしてBaosteelとの提携を公式発表。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "グローバル開発者向けSDK公開方針",
+        "evidenceSourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+        "evidenceSummary": "開発者エコシステム構築方針を公式発表。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  }
+]

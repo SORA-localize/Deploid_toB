@@ -11,6 +11,7 @@
     "start": "next start",
     "validate:data": "node scripts/validate-data.mjs",
     "build:data-r01-manifest": "node scripts/build-data-r01-manifest.mjs",
+    "build:data-r02-manifest": "node scripts/build-data-r02-manifest.mjs",
     "check:source-links": "node scripts/check-source-links.mjs"
   },
   "dependencies": {
