@@ -2066,6 +2066,15 @@ export const robots: Robot[] = [
         note: 'Kepler Robotics提供の発表。量産・顧客出荷、8時間稼働、双腕最大30kg、RMB 248,000を確認。',
       },
       {
+        title: 'Kepler K2 "Bumblebee" Debuts at ICRA 2025',
+        url: 'https://www.prnewswire.com/news-releases/kepler-k2-bumblebee-debuts-at-icra-2025-captivating-attendees-302471503.html',
+        publisher: 'Kepler Robotics',
+        publishedAt: '2025-05',
+        checkedAt: '2026-07-18',
+        reliability: 'official',
+        note: '二足歩行構成（Bumblebee）の体重75kg、自由度52を確認。Basic（30 DoF）・車輪開発版（135kg）とは別構成であることをDATA-R01調査で確認済み。',
+      },
+      {
         title: 'Kepler Developer Platform',
         url: 'https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index',
         publisher: 'Kepler Robotics',
@@ -2108,12 +2117,15 @@ export const robots: Robot[] = [
         },
       },
     },
-    description: 'Forerunner K2（Bumblebee）は、ローラースクリュー式リニアアクチュエータと回転アクチュエータを組み合わせる産業向け機体。Basic、二足開発、車輪開発など構成差があるため、重量・自由度・移動方式は構成を確定せず単一値で比較しない。',
+    description: 'Forerunner K2（Bumblebee）は、ローラースクリュー式リニアアクチュエータと回転アクチュエータを組み合わせる産業向け機体。公式構成表はBasic（30 DoF）・二足開発・車輪開発（135kg）に分かれるが、量産・顧客出荷が公式発表されているのは二足歩行構成のBumblebeeのみのため、本レコードはBumblebee構成の値を代表値として採用する。',
     deploymentStage: 'production',
     marketAvailability: 'company-claimed-delivery',
     buyerReadiness: 'requires-poc',
     specs: {
+      mobility: 'biped',
       heightCm: 175,
+      weightKg: 75,
+      dof: 52,
       runtimeMin: 480,
       chargeTimeMin: 60,
       batterySystem: '充電式バッテリー（約1時間充電、最大8時間稼働）',
@@ -2140,7 +2152,16 @@ export const robots: Robot[] = [
       },
     ],
     fieldEvidence: {
+      mobility: [
+        'https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html',
+      ],
       heightCm: ['https://www.gotokepler.com/productDetailK2?id=2'],
+      weightKg: [
+        'https://www.prnewswire.com/news-releases/kepler-k2-bumblebee-debuts-at-icra-2025-captivating-attendees-302471503.html',
+      ],
+      dof: [
+        'https://www.prnewswire.com/news-releases/kepler-k2-bumblebee-debuts-at-icra-2025-captivating-attendees-302471503.html',
+      ],
       runtimeMin: [
         'https://www.gotokepler.com/productDetailK2?id=2',
         'https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html',
