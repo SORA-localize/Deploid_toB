@@ -289,11 +289,13 @@ className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-
 
 ### Robot detail spec explorer
 
-- desktopは高さ480px、左ナビ11rem、右表示領域は選択項目によらず同じ外寸を維持する。
-- 左ナビは `本体・可動 / 電源・稼働 / 操作・開発 / 環境・安全` の4項目を等分する。
+- desktopは上部に横並びの下線タブ（PageTabBarと同じ視覚言語: `border-b-2` 下線、activeは `border-foreground text-foreground font-semibold`）、下に表示パネルを置く。
+- 表示パネルは `h-[420px]` 固定とし、選択項目によらず同じ外寸を維持する（グループの行数差でレイアウトを跳ねさせない）。項目グループの増減はタブの増減だけで吸収し、GUI構造は変えない。
+- タブは `本体・可動 / 電源・稼働 / 操作・開発 / 環境・安全` の4項目。tablistは `overflow-x-auto` で狭幅時の横スクロールを許可する。
 - 1グループ最大6行、値は原則2行以内。公開値がない行は省き、空グループでは `公開情報なし` を1回だけ表示する。
-- overflowは長い公式値への安全弁として右パネルだけに許可する。
-- hover、focus、clickで選択し、Arrow/Home/Endを使えるtab semanticsを持つ。
+- overflowは長い公式値への安全弁として表示パネルだけに許可する（`overflow-y-auto`）。
+- hover、focus、clickで選択し、Left/Right/Home/Endを使えるtab semantics（`role=tab` / `aria-selected` / roving tabindex）を持つ。PageTabBarはページナビ（`aria-current`）でtab semanticsを持たないため流用しない。見た目だけ揃える。
+- パネル内にグループ名の見出しは重複表示しない（選択中タブがパネル直上にあるため）。tabpanelのaccessible nameは `aria-labelledby` でタブを指す。
 - mobileは同じview modelを縦積みFactListで表示し、hover専用UIを作らない。
 
 ### Tags

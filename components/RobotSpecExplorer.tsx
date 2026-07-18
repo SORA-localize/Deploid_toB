@@ -22,9 +22,9 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     let nextIndex: number | undefined;
 
-    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+    if (event.key === 'ArrowRight') {
       nextIndex = (index + 1) % groups.length;
-    } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+    } else if (event.key === 'ArrowLeft') {
       nextIndex = (index - 1 + groups.length) % groups.length;
     } else if (event.key === 'Home') {
       nextIndex = 0;
@@ -54,12 +54,11 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
         ))}
       </div>
 
-      <div className="hidden h-[480px] min-w-0 overflow-hidden border-y border-border lg:grid lg:grid-cols-[11rem_minmax(0,1fr)]">
+      <div className="hidden min-w-0 lg:block">
         <div
           role="tablist"
           aria-label={uiText.robots.specExplorerAria}
-          aria-orientation="vertical"
-          className="grid min-h-0 grid-rows-4 border-r border-border"
+          className="flex flex-nowrap gap-0 overflow-x-auto border-b border-border"
         >
           {groups.map((group, index) => {
             const selected = index === activeIndex;
@@ -83,10 +82,10 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
                 onFocus={() => setActiveIndex(index)}
                 onKeyDown={(event) => handleKeyDown(event, index)}
                 className={cn(
-                  'border-b border-border px-4 text-left text-sm transition-colors last:border-b-0 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset',
+                  'inline-flex min-h-10 shrink-0 items-center border-b-2 px-4 py-2 text-sm transition-colors -mb-px focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset',
                   selected
-                    ? 'bg-foreground font-semibold text-background'
-                    : 'bg-background text-muted-foreground hover:bg-muted hover:text-foreground',
+                    ? 'border-foreground font-semibold text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground',
                 )}
               >
                 {group.label}
@@ -95,7 +94,7 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
           })}
         </div>
 
-        <div className="h-full min-h-0 min-w-0">
+        <div className="h-[420px] min-h-0 min-w-0">
           {groups.map((group, index) => (
             <div
               key={group.key}
@@ -104,9 +103,8 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
               aria-labelledby={`${baseId}-tab-${index}`}
               tabIndex={0}
               hidden={index !== activeIndex}
-              className="h-full min-h-0 min-w-0 overflow-y-auto px-7 py-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset"
+              className="h-full min-h-0 min-w-0 overflow-y-auto py-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset"
             >
-              <h3 className="mb-4 text-base font-semibold text-foreground">{group.label}</h3>
               {group.rows.length > 0 ? (
                 <FactList
                   rows={group.rows.map((row) => ({
