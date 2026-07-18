@@ -22,6 +22,14 @@ export const useCases: UseCase[] = [
         note: 'Digit が既存倉庫自動化に接続し、物流・流通・トート搬送に使われる公式根拠。Amazon/GXOの個別導入URLは2026-06-26時点で再確認できなかったため、deployment根拠から外した。',
       },
       {
+        title: 'GXO signs industry-first multi-year agreement with Agility Robotics',
+        url: 'https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics',
+        publisher: 'Agility Robotics',
+        checkedAt: '2026-07-17',
+        reliability: 'official',
+        note: 'GXOとの複数年契約。倉庫内トート・軽量搬送への商用展開の公式根拠。',
+      },
+      {
         title: 'Sanctuary AI solutions',
         url: 'https://sanctuary.ai/solutions/',
         publisher: 'Sanctuary AI',
@@ -31,6 +39,13 @@ export const useCases: UseCase[] = [
       {
         title: 'Calvin-40 official site',
         url: 'https://en.wandercraft.eu/',
+        publisher: 'Wandercraft',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
+      {
+        title: 'Calvin-40 official product page',
+        url: 'https://en.wandercraft.eu/calvin-40',
         publisher: 'Wandercraft',
         checkedAt: '2026-07-16',
         reliability: 'official',
@@ -94,8 +109,11 @@ export const useCases: UseCase[] = [
         robotId: 'agility-digit',
         fit: 'possible',
         basis: 'official-use-case',
-        evidenceSourceUrls: ['https://www.agilityrobotics.com/solutions'],
-        reason: '公式ページで倉庫自動化への接続、物流・流通、トート搬送用途が明示されている。ただし個別導入URLは現行確認できないためdeployment扱いにはしない。',
+        evidenceSourceUrls: [
+          'https://www.agilityrobotics.com/solutions',
+          'https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics',
+        ],
+        reason: '公式ページで倉庫自動化への接続、物流・流通、トート搬送用途が明示されている。GXOとの複数年契約も商用展開の裏付けとして確認できる。',
       },
       {
         robotId: 'sanctuary-phoenix',
@@ -108,7 +126,7 @@ export const useCases: UseCase[] = [
         robotId: 'wandercraft-calvin',
         fit: 'possible',
         basis: 'official-use-case',
-        evidenceSourceUrls: ['https://en.wandercraft.eu/'],
+        evidenceSourceUrls: ['https://en.wandercraft.eu/', 'https://en.wandercraft.eu/calvin-40'],
         reason: '公式サイトが小型部品の精密ピッキングを対象作業として示している。',
       },
       {
@@ -197,6 +215,14 @@ export const useCases: UseCase[] = [
         note: 'TALOS が研究向けプラットフォームとして明示されている公式根拠。Waterloo RoboHub導入はこの出典だけでは確認できないため、deployment根拠から外した。',
       },
       {
+        title: 'PAL Robotics robots overview',
+        url: 'https://pal-robotics.com/robots/',
+        publisher: 'PAL Robotics',
+        checkedAt: '2026-07-17',
+        reliability: 'official',
+        note: 'TALOSを含む研究プラットフォーム群の位置付けを示す公式一覧ページ。',
+      },
+      {
         title: 'KANGAROO official product page',
         url: 'https://pal-robotics.com/robot/kangaroo/',
         publisher: 'PAL Robotics',
@@ -282,6 +308,13 @@ export const useCases: UseCase[] = [
         reliability: 'official',
       },
       {
+        title: 'KUAVO ROS SDK documentation',
+        url: 'https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/',
+        publisher: 'Leju Robot',
+        checkedAt: '2026-07-16',
+        reliability: 'official',
+      },
+      {
         title: 'LimX Oli official product page',
         url: 'https://www.limxdynamics.com/en/products/oli',
         publisher: 'LimX Dynamics',
@@ -332,7 +365,7 @@ export const useCases: UseCase[] = [
         robotId: 'pal-talos',
         fit: 'possible',
         basis: 'official-use-case',
-        evidenceSourceUrls: ['https://pal-robotics.com/robot/talos/'],
+        evidenceSourceUrls: ['https://pal-robotics.com/robot/talos/', 'https://pal-robotics.com/robots/'],
         reason: '公式ページで研究向けプラットフォームとして明示されている。ただし特定研究機関への導入事例は現行確認できていない。',
       },
       {
@@ -411,8 +444,11 @@ export const useCases: UseCase[] = [
         robotId: 'leju-kuavo',
         fit: 'possible',
         basis: 'official-use-case',
-        evidenceSourceUrls: ['https://www.letools.lejurobot.com/'],
-        reason: '公式LeToolsでKUAVO 4Proを研究開発向けの構成として位置付けている。',
+        evidenceSourceUrls: [
+          'https://www.letools.lejurobot.com/',
+          'https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/',
+        ],
+        reason: '公式LeToolsでKUAVO 4Proを研究開発向けの構成として位置付けている。ROS SDKドキュメントも二次開発環境の根拠として確認できる。',
       },
       {
         robotId: 'leju-kuavo5',
@@ -582,6 +618,14 @@ export const useCases: UseCase[] = [
         reliability: 'official',
       },
       {
+        title: 'LimX Luna official product page',
+        url: 'https://www.limxdynamics.com/en/products/luna',
+        publisher: 'LimX Dynamics',
+        checkedAt: '2026-07-17',
+        reliability: 'official',
+        note: '商業空間での対話・接客対応をLunaの対象用途として明記。',
+      },
+      {
         title: 'XPENG unveils Next-Gen IRON',
         url: 'https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7',
         publisher: 'XPENG',
@@ -668,8 +712,8 @@ export const useCases: UseCase[] = [
         robotId: 'limx-luna',
         fit: 'possible',
         basis: 'official-use-case',
-        evidenceSourceUrls: ['https://www.limxdynamics.com/en/news/BK000062'],
-        reason: '公式発表で商業空間のマルチモーダル対話と観客対応を想定している。実施設への導入事例は未確認。',
+        evidenceSourceUrls: ['https://www.limxdynamics.com/en/news/BK000062', 'https://www.limxdynamics.com/en/products/luna'],
+        reason: '公式発表で商業空間のマルチモーダル対話と観客対応を想定している。公式製品ページも接客対応を対象用途として明記。実施設への導入事例は未確認。',
       },
       {
         robotId: 'xpeng-iron',
@@ -810,6 +854,15 @@ export const useCases: UseCase[] = [
       { title: 'GR-3C official product page', url: 'https://www.fftai.com/products-gr3c', publisher: 'Fourier Intelligence', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'UBTECH industrial humanoid solutions', url: 'https://www.ubtrobot.com/en/humanoid/solutions/industry', publisher: 'UBTECH Robotics', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT G2 official product page', url: 'https://www.agibot.com/products/G2', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
+      {
+        title: 'AGIBOT and Longcheer precision manufacturing deployment',
+        url: 'https://www.agibot.com/article/231/detail/60.html',
+        publisher: 'AGIBOT',
+        publishedAt: '2026-04-14',
+        checkedAt: '2026-07-17',
+        reliability: 'official',
+        note: 'Longcheerの精密製造ラインでのG2導入事例。サブミリ精度組立の実運用根拠。',
+      },
       {
         title: 'Renault Group finalises a strategic partnership with Wandercraft',
         url: 'https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft',
@@ -1001,7 +1054,7 @@ export const useCases: UseCase[] = [
       { robotId: 'fourier-gr3c', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.fftai.com/products-gr3c'], reason: '公式製品ページが産業組立を対象用途として示している。' },
       { robotId: 'ubtech-walker-s2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式産業ソリューションが精密ハンドリング、組立、製造ライン作業を対象用途として示している。' },
       { robotId: 'ubtech-walker-s', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/solutions/industry'], reason: '公式産業ソリューションが組立、ねじ・ボルト締めを対象用途として示している。' },
-      { robotId: 'agibot-g2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.agibot.com/products/G2'], reason: '公式製品ページが高精度の力制御とサブミリ精度組立を対象用途として示している。' },
+      { robotId: 'agibot-g2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.agibot.com/products/G2', 'https://www.agibot.com/article/231/detail/60.html'], reason: '公式製品ページが高精度の力制御とサブミリ精度組立を対象用途として示している。Longcheerの精密製造ラインへの導入事例も確認できる。' },
       {
         robotId: 'apptronik-apollo',
         fit: 'strong',
@@ -2428,6 +2481,14 @@ export const useCases: UseCase[] = [
       { title: 'AGIBOT A2 Ultra official product page', url: 'https://agibot.com/products/A2_Ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT X2 Ultra official store', url: 'https://store.agibot.com/products/x2-ultra', publisher: 'AgiBot', checkedAt: '2026-07-16', reliability: 'official' },
       {
+        title: 'AGIBOT X2 official product page',
+        url: 'https://www.agibot.com/products/X2',
+        publisher: 'AgiBot',
+        checkedAt: '2026-07-17',
+        reliability: 'official',
+        note: '自律ナビゲーション・障害物回避を用いた展示案内をX2 Ultraの対象用途として明記。',
+      },
+      {
         title: 'RobotEra application scenarios',
         url: 'https://www.robotera.com/application.html',
         publisher: 'RobotEra',
@@ -2466,7 +2527,7 @@ export const useCases: UseCase[] = [
       { robotId: 'ubtech-walker-c', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-c'], reason: '公式ページが展示ホールと交通施設でのスマートガイドを対象用途として示している。' },
       { robotId: 'agibot-a2', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://agibot.com/products/A2'], reason: '公式ページが展示ホールでの説明とスーパーマーケットでの案内を対象用途として示している。' },
       { robotId: 'agibot-a2-ultra', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://agibot.com/products/A2_Ultra'], reason: '公式ページが自律受付、経路案内、説明を対象用途として示している。' },
-      { robotId: 'agibot-x2-ultra', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://store.agibot.com/products/x2-ultra'], reason: '公式ストアが展示案内と文化・観光施設での案内を対象用途として示している。' },
+      { robotId: 'agibot-x2-ultra', fit: 'possible', basis: 'official-use-case', evidenceSourceUrls: ['https://store.agibot.com/products/x2-ultra', 'https://www.agibot.com/products/X2'], reason: '公式ストアが展示案内と文化・観光施設での案内を対象用途として示している。製品ページも自律ナビゲーション・障害物回避を用いた展示ガイド用途を明記。' },
       {
         robotId: 'robotera-l7',
         fit: 'possible',
@@ -2765,6 +2826,14 @@ export const useCases: UseCase[] = [
         reliability: 'official',
       },
       {
+        title: 'Booster Robotics education platform',
+        url: 'https://www.booster.tech/cn/education/',
+        publisher: 'Booster Robotics',
+        checkedAt: '2026-07-17',
+        reliability: 'official',
+        note: '教育・研究向け具身知能開発プラットフォームとしての位置付けを示す公式ページ。',
+      },
+      {
         title: 'LeTools embodied intelligence platform',
         url: 'https://www.letools.lejurobot.com/',
         publisher: 'Leju Robot',
@@ -2848,8 +2917,8 @@ export const useCases: UseCase[] = [
         robotId: 'booster-k1',
         fit: 'possible',
         basis: 'official-use-case',
-        evidenceSourceUrls: ['https://www.booster.tech/booster-k1/'],
-        reason: '公式ページで具身AIの開発プラットフォームとして位置付けられている。',
+        evidenceSourceUrls: ['https://www.booster.tech/booster-k1/', 'https://www.booster.tech/cn/education/'],
+        reason: '公式ページで具身AIの開発プラットフォームとして位置付けられている。教育・研究向けプラットフォームとしても案内されている。',
       },
       {
         robotId: 'leju-kuavo',
