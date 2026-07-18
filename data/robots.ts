@@ -791,7 +791,10 @@ export const robots: Robot[] = [
       priceOffers: ['https://www.1x.tech/order'],
       loadRatings: ['https://www.1x.tech/neo'],
     },
-    usageExampleSourceUrls: ['https://www.1x.tech/about'],
+    usageExampleSourceUrls: [
+      'https://www.1x.tech/discover/neo-home-robot',
+      'https://www.businesswire.com/news/home/20251211360340/en/1X-Announces-Strategic-Partnership-to-Make-up-to-10000-Humanoid-Robots-Available-to-EQTs-Global-Portfolio',
+    ],
     japanAvailability: 'unknown',
     supportNote: '2026年は主に米国向けに配送し、他市場は2027年以降へ拡大予定。日本への配送・保守体制は未確認。',
     comparison: {
@@ -2594,6 +2597,7 @@ export const robots: Robot[] = [
       sdk: ['https://open.agibot.com/docs/en/aimdk/a2/v2_1/dev_guide'],
       loadRatings: ['https://store.agibot.com/products/a2-ultra'],
     },
+    usageExampleSourceUrls: ['https://agibot.com/products/A2_Ultra'],
     japanAvailability: 'unknown',
     industryTags: ['manufacturing', 'research'],
     taskTags: ['assembly', 'research-task'],
@@ -3806,6 +3810,15 @@ export const robots: Robot[] = [
         checkedAt: '2026-07-16',
         reliability: 'official',
       },
+      {
+        title: 'Wandercraft and SAPA announce deployment partnership in industrial manufacturing',
+        url: 'https://www.wandercraft.eu/articles/wandercraft-and-sapa-announce-deployment-partnership-in-industrial-manufacturing-cementing-europes-emerging-championship-in-the-humanoids-race',
+        publisher: 'Wandercraft',
+        publishedAt: '2025-11-12',
+        checkedAt: '2026-07-17',
+        reliability: 'official',
+        note: '2カ国での展開を計画する「Deployment Partnership」として発表。発表時点では稼働開始前の合意段階。',
+      },
     ],
     description: 'Calvin-40は工場・物流拠点で重量物搬送、箱・クレート処理、小物ピッキングを行う自律二足ロボット。公式ページは実生産への導入と、1日8～22時間の運用を示すが、これは1充電あたりの稼働時間ではないため数値仕様には登録しない。荷重値も現行公式仕様として確認できないため省略する。',
     deploymentStage: 'limited-production',
@@ -3825,6 +3838,7 @@ export const robots: Robot[] = [
     usageExampleSourceUrls: [
       'https://en.wandercraft.eu/calvin-40',
       'https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft',
+      'https://www.wandercraft.eu/articles/wandercraft-and-sapa-announce-deployment-partnership-in-industrial-manufacturing-cementing-europes-emerging-championship-in-the-humanoids-race',
     ],
     japanAvailability: 'unknown',
     supportNote: '企業向け問い合わせ導線は公開。日本での販売、導入支援、保守、SLAは未確認。',
@@ -4401,6 +4415,7 @@ export const robots: Robot[] = [
     fieldEvidence: {
       mobility: ['https://www.engineai.com.cn/product-sa01.html'], weightKg: ['https://www.engineai.com.cn/product-sa01.html'], speedMps: ['https://www.engineai.com.cn/product-sa01.html'], dof: ['https://www.engineai.com.cn/product-sa01.html'], runtimeMin: ['https://www.engineai.com.cn/product-sa01.html'], batteryCapacityWh: ['https://www.engineai.com.cn/product-sa01.html'], batterySystem: ['https://www.engineai.com.cn/product-sa01.html'], controlMethod: ['https://www.engineai.com.cn/product-sa01.html'], operatingTemperature: ['https://www.engineai.com.cn/product-sa01.html'], loadRatings: ['https://www.engineai.com.cn/product-sa01.html'],
     },
+    usageExampleSourceUrls: ['https://www.engineai.com.cn/about-news-media/34.html'],
     japanAvailability: 'unknown',
     industryTags: ['research'],
     taskTags: ['research-task'],
@@ -4449,6 +4464,7 @@ export const robots: Robot[] = [
       dof: ['https://www.robotera.com/application.html'],
       loadRatings: ['https://www.robotera.com/application.html'],
     },
+    usageExampleSourceUrls: ['https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html'],
     japanAvailability: 'unknown',
     supportNote: '購入問い合わせ窓口は公開。製品保証、日本での販売・保守条件は未公表。',
     industryTags: ['manufacturing', 'logistics'],
@@ -4897,6 +4913,7 @@ export const robots: Robot[] = [
       },
       { title: 'AGIBOT G2 launch announcement', url: 'https://www.agibot.com/article/231/detail/44.html', publisher: 'AGIBOT', checkedAt: '2026-07-16', reliability: 'official' },
       { title: 'AGIBOT and Longcheer precision manufacturing deployment', url: 'https://www.agibot.com/article/231/detail/60.html', publisher: 'AGIBOT', publishedAt: '2026-04-14', checkedAt: '2026-07-16', reliability: 'reported' },
+      { title: 'AGIBOT 15,000th unit milestone', url: 'https://www.agibot.com/article/231/detail/82.html', publisher: 'AGIBOT', publishedAt: '2026-06-28', checkedAt: '2026-07-17', reliability: 'reported', note: 'AgiBot社累計15,000台目がG2であったこと、同一Longcheer拠点で品質検査ライブ配信約100時間累計稼働を報告。' },
     ],
     images: {
       hero: {
@@ -4920,7 +4937,7 @@ export const robots: Robot[] = [
     procurementModels: ['purchase', 'inquiry'],
     marketAvailability: 'enterprise-deployment',
     fieldEvidence: { mobility: ['https://www.agibot.com/article/231/detail/44.html'], ipRating: ['https://www.agibot.com/products/G2'] },
-    usageExampleSourceUrls: ['https://www.agibot.com/article/231/detail/60.html'],
+    usageExampleSourceUrls: ['https://www.agibot.com/article/231/detail/60.html', 'https://www.agibot.com/article/231/detail/82.html'],
     japanAvailability: 'unknown',
     supportNote: '日本サポート体制は未確認。publish gate を満たした後に改めて記載する。',
     industryTags: ['manufacturing', 'logistics'],
