@@ -289,11 +289,14 @@ className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-
 
 ### Robot detail spec explorer
 
-- desktopは上部に横並びの下線タブ（PageTabBarと同じ視覚言語: `border-b-2` 下線、activeは `border-foreground text-foreground font-semibold`）、下に表示パネルを置く。
-- 表示パネルは `h-[420px]` 固定とし、選択項目によらず同じ外寸を維持する（グループの行数差でレイアウトを跳ねさせない）。項目グループの増減はタブの増減だけで吸収し、GUI構造は変えない。
+- desktopは上部に横並びタブ、下に表示パネルを置く。タブの選択状態は各ボタン自身の `border-b-2`（activeは `border-foreground`、非activeは `border-transparent`）だけで表す。タブ行を包む共有の`border-b`は持たない（タブが並ぶ幅より右側の余白にまで線が伸びる「宙に浮いた区切り線」を避けるため）。
+- 表示パネルは固定pxを持たない。4パネルを同じグリッドセル（`grid` + 各パネル `col-start-1 row-start-1`）に重ね、非表示パネルは `display:none` にせず `invisible`（`visibility:hidden`）で残すことで、グリッドのトラック高さがその機体の4グループ中もっとも背の高いパネルへ自動で決まる。タブ切替でレイアウトが跳ねない特性は維持しつつ、機体ごとの実コンテンツ量に高さを合わせ、内容が少ない機体で下のセクション（想定用途等）との間に大きな空白を残さない。
+- 各パネルに `max-h-[440px]` + `overflow-y-auto` を安全弁として設定する（1グループ最大6行・値2行以内という制約の想定最大値+バッファ）。想定外に長い公式値が来た場合だけこの上限でスクロールし、通常時は上限に達しない。
+- パネルの上下パディングは `pt-6` のみ（タブ行と最初の行の間の余白）。下側パディングは持たない。これを包む `<section>` 側が `py-*` で次セクションとの間隔を管理しており、パネル自身が `pb` を重ねると二重に空くため。ページ内の他セクション（想定用途・活用事例等）もこの原則（内側コンポーネントは外側 `<section>` の余白と重複するpaddingを持たない）に従う。
 - タブは `本体・可動 / 電源・稼働 / 操作・開発 / 環境・安全` の4項目。tablistは `overflow-x-auto` で狭幅時の横スクロールを許可する。
-- 1グループ最大6行、値は原則2行以内。公開値がない行は省き、空グループでは `公開情報なし` を1回だけ表示する。
-- overflowは長い公式値への安全弁として表示パネルだけに許可する（`overflow-y-auto`）。
+- 1グループ最大6行、値は原則2行以内。公開値がない行は省き、空グループでは `公開情報なし` を1回だけ表示する（この1行にも罫線は付けない）。
+- `FactList`の行区切り線は最終行に付けない（`rowClassName="last:border-b-0"`）。`FactList.tsx`本体は他ページ（メーカー詳細・サイドバー等）と共用のため既定値は変えず、呼び出し側で上書きする。
+- 非active パネルは `aria-hidden="true"` + `tabIndex={-1}` + `pointer-events-none` で読み上げ・操作対象から外す（`visibility:hidden` はスクリーンリーダーからも自動的に除外されるが明示する）。
 - hover、focus、clickで選択し、Left/Right/Home/Endを使えるtab semantics（`role=tab` / `aria-selected` / roving tabindex）を持つ。PageTabBarはページナビ（`aria-current`）でtab semanticsを持たないため流用しない。見た目だけ揃える。
 - パネル内にグループ名の見出しは重複表示しない（選択中タブがパネル直上にあるため）。tabpanelのaccessible nameは `aria-labelledby` でタブを指す。
 - mobileは同じview modelを縦積みFactListで表示し、hover専用UIを作らない。

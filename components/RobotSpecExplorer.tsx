@@ -44,9 +44,9 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
           <section key={group.key}>
             <h3 className="mb-2 text-sm font-semibold text-foreground">{group.label}</h3>
             {group.rows.length > 0 ? (
-              <FactList rows={group.rows} />
+              <FactList rows={group.rows} rowClassName="last:border-b-0" />
             ) : (
-              <p className="border-b border-border py-3 text-xs text-muted-foreground">
+              <p className="py-3 text-xs text-muted-foreground">
                 {uiText.robots.publicInfoMissing}
               </p>
             )}
@@ -58,7 +58,7 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
         <div
           role="tablist"
           aria-label={uiText.robots.specExplorerAria}
-          className="flex flex-nowrap gap-0 overflow-x-auto border-b border-border"
+          className="flex flex-nowrap gap-0 overflow-x-auto"
         >
           {groups.map((group, index) => {
             const selected = index === activeIndex;
@@ -82,7 +82,7 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
                 onFocus={() => setActiveIndex(index)}
                 onKeyDown={(event) => handleKeyDown(event, index)}
                 className={cn(
-                  'inline-flex min-h-10 shrink-0 items-center border-b-2 px-4 py-2 text-sm transition-colors -mb-px focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset',
+                  'inline-flex min-h-10 shrink-0 items-center border-b-2 px-4 py-2 text-sm transition-colors focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset',
                   selected
                     ? 'border-foreground font-semibold text-foreground'
                     : 'border-transparent text-muted-foreground hover:text-foreground',
@@ -94,31 +94,46 @@ export function RobotSpecExplorer({ groups }: RobotSpecExplorerProps) {
           })}
         </div>
 
-        <div className="h-[420px] min-h-0 min-w-0">
-          {groups.map((group, index) => (
-            <div
-              key={group.key}
-              id={`${baseId}-panel-${index}`}
-              role="tabpanel"
-              aria-labelledby={`${baseId}-tab-${index}`}
-              tabIndex={0}
-              hidden={index !== activeIndex}
-              className="h-full min-h-0 min-w-0 overflow-y-auto py-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset"
-            >
-              {group.rows.length > 0 ? (
-                <FactList
-                  rows={group.rows.map((row) => ({
-                    ...row,
-                    valueClassName: 'line-clamp-2',
-                  }))}
-                />
-              ) : (
-                <p className="border-b border-border py-3 text-xs text-muted-foreground">
-                  {uiText.robots.publicInfoMissing}
-                </p>
-              )}
-            </div>
-          ))}
+        {/*
+          全パネルを同じグリッドセルに重ねて配置し、非表示パネルも
+          visibility:hidden（display:none にしない）で残すことで、
+          グリッドのトラック高さが4グループ中もっとも背の高いパネルへ
+          自動で決まる。固定pxを指定せずに「タブ切替でレイアウトが
+          跳ねない」を満たしつつ、機体ごとの実コンテンツ量に高さを
+          合わせられる。max-hは想定外に長い公式値が来た場合の安全弁。
+        */}
+        <div className="grid min-w-0">
+          {groups.map((group, index) => {
+            const selected = index === activeIndex;
+            return (
+              <div
+                key={group.key}
+                id={`${baseId}-panel-${index}`}
+                role="tabpanel"
+                aria-labelledby={`${baseId}-tab-${index}`}
+                aria-hidden={selected ? undefined : true}
+                tabIndex={selected ? 0 : -1}
+                className={cn(
+                  'col-start-1 row-start-1 min-h-0 min-w-0 max-h-[440px] overflow-y-auto pt-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset',
+                  selected ? 'visible' : 'invisible pointer-events-none',
+                )}
+              >
+                {group.rows.length > 0 ? (
+                  <FactList
+                    rows={group.rows.map((row) => ({
+                      ...row,
+                      valueClassName: 'line-clamp-2',
+                    }))}
+                    rowClassName="last:border-b-0"
+                  />
+                ) : (
+                  <p className="py-3 text-xs text-muted-foreground">
+                    {uiText.robots.publicInfoMissing}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </>
