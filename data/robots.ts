@@ -1361,20 +1361,6 @@ export const robots: Robot[] = [
         reliability: 'official',
       },
     ],
-    images: {
-      hero: {
-        src: '',
-        alt: 'Tesla Optimus',
-        credit: 'Tesla',
-        sourceUrl: 'https://electrek.co/2023/12/12/tesla-optimus-gen-2-humanoid-robot-unveiled/',
-        rights: {
-          status: 'reference-attributed',
-          sourceType: 'third-party',
-          rightsHolder: 'Tesla',
-          checkedAt: '2026-06-02',
-        },
-      },
-    },
     description: 'Optimusは危険・反復・単調作業を想定する自律二足ヒューマノイド。公式IRではTesla施設内でバッテリー搬送を含む作業を自律実行したことが確認できるが、外部向け販売条件は公表されていない。',
     deploymentStage: 'internal-use',
     marketAvailability: 'internal-use',
