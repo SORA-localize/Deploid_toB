@@ -317,6 +317,11 @@ export function canDisplayAsset(asset?: ImageAsset) {
 - `tags`, `manufacturerId`, `product name` — 会社名・製品名の事実表示は通常必要。
 - `public/favicon.svg`, `src/app/opengraph-image.tsx` — 自前資産なら問題は小さい。
 
+### 未決事項（`launch-readiness-meta-plan-v1.md` より2026-07-20転記、archive済み）
+
+- カード画像すべてに visible credit が必要か、詳細ページの credit と全体方針の明記で足りるか、未確定
+- コンテンツ別 OGP 画像に元メディア素材を直接使うか、生成したブランドカードを使うか、未確定
+
 ---
 
 ## 12. 運用フロー
