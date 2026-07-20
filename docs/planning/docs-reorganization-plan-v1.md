@@ -133,3 +133,52 @@ Branch: `docs/md-reorg-20260720`（worktree: `Deploid_toB-docs-reorg`）
 - `docs/planning/archive/` 内 68 ファイルの中身の再分類・書き換え（置き場所の統合のみ Phase 1 で判断）
 - 記事執筆テンプレート自体の改訂（robot-guide 型強制などは別タスク）
 - Notion 等外部ツールへの移行
+
+## 7. Phase 1 決定事項（2026-07-20 確定）
+
+Phase 0 ゲートでオーナーは分類軸の判断を実施者へ委任した（「自分で調査して決めてよい」）。以下は Phase 0 台帳（`docs-reorg-inventory-2026-07-20.md`）の実態に基づいて確定した3点である。
+
+### 7.1 フォルダ構成
+
+台帳の実態は「正本 32 / 計画 8 / 背景 8 / 済 14 / 削除 1」だった。たたき台どおり4棚で過不足なく収まることを確認したため、次の構成を採用する。
+
+```text
+docs/
+├── README.md      ← 入口1枚（上段 = PMダッシュボード、下段 = 棚マップ。詳細は §7.3）
+├── decisions/     ← 恒久方針・現行仕様・運用チェックリスト・継続運用ツール（= 正本）
+├── plans/         ← 進行中の作業計画のみ。完了したら即 archive へ
+├── reference/     ← 背景・経緯・調査スナップショット。市場環境調査もここに置く
+└── archive/       ← 済み（現 docs/planning/archive/ 68 件を統合し、済 14 件を追加）
+ai/rules/          ← 現状維持
+```
+
+各棚の判定基準は1問で済むようにする。「新しい実装・運用判断で従うべきか」→ Yes なら decisions。「これから実行する作業か」→ Yes なら plans。「過去の経緯・時点スナップショットとして読むか」→ Yes なら reference。どれでもなければ archive。
+
+孤立ツリーの解消: `docs/strategy/` の事業整理文書は「随時書き換える現行文書」なので decisions へ。`docs/market-environment/` は調査スナップショットの蓄積なので reference 配下へツリーごと移動。`docs/data/` の正本2件（README・tagging）は decisions へ統合し、済み2件は archive へ。`docs/superpowers/plans/` は3件とも実装済みのため archive へ移してツリーを畳む。`public/images/robots/README.md` はアセット併設が合理的なので現位置に残す。ルートの `ai_implementation_workflow_prompt.md` は現役参照ゼロを確認済みのため削除する。
+
+継続運用ツール（`robot-factcheck-research-prompt` 等、更新しながら使い回すプロンプト）は「調査の実行手順を定めた現行仕様」として decisions に置く。1回きりで消化済みのプロンプトとの区別はここで付ける。
+
+### 7.2 status frontmatter 仕様
+
+decisions / plans / reference に置く全 md の先頭に、次の2フィールドだけを付ける。
+
+```yaml
+---
+status: current | plan | reference
+updated: YYYY-MM-DD
+---
+```
+
+`status` は棚と一致させる（棚 = 分類の正、frontmatter は grep 用の写し）。`updated` は内容を実質的に変えたときだけ更新する。plans の文書は任意で `branch:` を3フィールド目に足してよいが、必須は上の2つ。archive 内の文書には遡って付けない（移動時に付いていればそのまま残す）。
+
+この仕様により「今動いている計画」は `rg --no-ignore -l 'status: plan' docs/` で機械的に列挙でき、ダッシュボードの手動更新が漏れても検算できる。
+
+### 7.3 入口（PMダッシュボード）仕様
+
+入口は `docs/README.md` の1枚に集約する。ダッシュボードと棚マップを別ファイルにすると鮮度管理が2箇所になるため、1ファイルの上下2段構成にする。
+
+- 上段「いま動いているもの」: plans 全件の表（計画名 / 一言 / branch / 開始日）。完了した計画はここから消して archive へ移す。この表と `status: plan` の grep 結果が一致することが鮮度の検算になる
+- 上段「最近の決定・反映」: decisions の直近更新 5 件程度（日付 + 一言）
+- 下段「棚マップ」: 4棚それぞれの役割1行と、decisions の主要正本へのリンク一覧（現 `docs/planning/README.md` の (a) 群に相当）
+
+更新責務は「計画の開始・完了時」と「decisions の改訂時」に該当行を触ることとし、Phase 5 で `80-doc-governance.md` の Update Order に組み込む。AI 向けの入口は従来どおり `AGENTS.md` → `ai/rules/00-index.md` とし、`00-index.md` の Current Source Of Truth 節が `docs/planning/README.md` を指している箇所を `docs/README.md` へ差し替える（Phase 5）。
