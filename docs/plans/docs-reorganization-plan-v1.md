@@ -1,3 +1,8 @@
+---
+status: plan
+updated: 2026-07-20
+---
+
 # ドキュメント再体系化 実行計画 v1
 
 Status: active（未実装・作業計画）

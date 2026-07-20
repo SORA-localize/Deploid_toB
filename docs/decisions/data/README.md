@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-07-16
+---
+
 # Deploid Data Work Guide
 
 Last reviewed: 2026-07-16

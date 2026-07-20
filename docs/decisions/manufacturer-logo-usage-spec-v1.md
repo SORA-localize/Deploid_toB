@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-07-09
+---
+
 # メーカーロゴ利用仕様 v1
 
 Last created: 2026-07-09 / Last updated: 2026-07-14（origin/main候補レビュー反映）

@@ -1,3 +1,8 @@
+---
+status: plan
+updated: 2026-07-04
+---
+
 # Responsive Phase 1 Static Audit v1
 
 Created: 2026-07-04

@@ -1,3 +1,8 @@
+---
+status: plan
+updated: 2026-07-03
+---
+
 # Responsive Surface Audit Targets v1
 
 Created: 2026-07-03

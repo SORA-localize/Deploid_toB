@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-07-10
+---
+
 # ニュース収集・記事化自動化データ契約 v1
 
 Last reviewed: 2026-07-10

@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-07-19
+---
+
 # 著作権・商標・メディア権利対策ポリシー v1
 
 Last reviewed: 2026-07-19

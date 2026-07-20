@@ -1,3 +1,8 @@
+---
+status: plan
+updated: 2026-07-08
+---
+
 # Responsive Capture Protocol v1
 
 Created: 2026-07-08

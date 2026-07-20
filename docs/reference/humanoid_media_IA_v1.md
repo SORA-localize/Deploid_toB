@@ -1,3 +1,8 @@
+---
+status: reference
+updated: 2026-07-20
+---
+
 # ヒューマノイド導入メディア — 情報設計・要件定義 v1
 
 > **2026-06-28 撤去注記（導入ガイド）**: 本書は「ガイド（知る／判断する／動く）」を中核に据えるが、`Guide` タイプと `/guides` タブは撤去済み。当初ガイドが担う想定だった「判断する」層は構造化データ（use-cases の candidateRobots evidence・compare・robots）側で担う方針に移行した。本文のガイド記述は構想の記録として残置。撤去理由・将来の復活手順は `archive/guides-retirement-v1.md`、計画は `guides-retirement-plan-v1.md`。

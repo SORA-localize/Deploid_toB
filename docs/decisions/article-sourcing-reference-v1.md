@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-06-24
+---
+
 # 記事候補ソーシング・リファレンス v1
 
 Last reviewed: 2026-06-24

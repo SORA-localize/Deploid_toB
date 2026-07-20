@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-07-20
+---
+
 # データアーキテクチャ再設計 v1（CMS見据え・保守性主眼）
 
 > **2026-06-28 撤去注記（Guide）**: `Guide` エンティティと `/guides` は撤去済み。本書の現行データ設計から Guide / `relatedGuideIds` / 「useCase ⇄ guide 双方向」「guide sources」の記述は削除済み。判断層は構造化データ（use-cases の `candidateRobots` evidence / compare / robots）側で担う。撤去理由と復活手順は `archive/guides-retirement-v1.md`、計画は `guides-retirement-plan-v1.md` を参照。

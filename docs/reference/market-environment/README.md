@@ -1,3 +1,8 @@
+---
+status: reference
+updated: 2026-07-20
+---
+
 # market-environment — 市場環境ドキュメント
 
 Deploid を取り巻く市場環境（競合・類似メディア・市場動向）の調査結果を蓄積するフォルダ。

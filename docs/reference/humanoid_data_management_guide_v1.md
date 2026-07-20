@@ -1,3 +1,8 @@
+---
+status: reference
+updated: 2026-07-20
+---
+
 # ヒューマノイド導入メディア — データ管理ガイド v1
 
 > **※ 本書は背景・経緯の参照用（非正本）。** データ運用の正本は `../decisions/data/README.md` と `../decisions/data-maintenance-checklist-v1.md`、データ設計の正本は `../decisions/data-architecture-redesign-v1.md`。本書と現行が食い違う場合は現行を優先する（本書の整合更新は行わない）。

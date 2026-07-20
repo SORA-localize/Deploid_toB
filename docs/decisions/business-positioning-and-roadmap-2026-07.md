@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-07-08
+---
+
 # Deploidの位置づけと今後の動き方（2026-07時点の整理）
 
 Last created: 2026-07-08

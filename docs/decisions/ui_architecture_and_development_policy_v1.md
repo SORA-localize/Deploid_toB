@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-07-14
+---
+
 # UIアーキテクチャ・開発方針 v1
 
 > **2026-06-28 撤去注記**: `/guides`・`GuidesBrowser`・ガイド詳細は撤去済み。本書のガイド関連記述（`GuidesBrowser`、`/guides → GuidesBrowser`、ガイド専用ブロック等）は**もう有効でない**。経緯は `archive/guides-retirement-v1.md`。

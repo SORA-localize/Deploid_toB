@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-07-20
+---
+
 # タグ運用メモ
 
 Last reviewed: 2026-07-20

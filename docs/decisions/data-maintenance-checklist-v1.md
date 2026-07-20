@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-07-20
+---
+
 # データ保守運用チェックリスト v1
 
 > **2026-06-28 撤去注記（Guide）**: `Guide` / `/guides` は撤去済み。本書からは Guide 追加手順（旧 §L）・publish gate の Guide 項・useCase⇄guide 双方向チェック・`relatedGuideIds` を**削除済み**。経緯と復活は `archive/guides-retirement-v1.md` / `archive/guides-retirement-plan-v1.md`。

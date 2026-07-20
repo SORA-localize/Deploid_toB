@@ -1,3 +1,8 @@
+---
+status: reference
+updated: 2026-07-20
+---
+
 # Korthos 調査プロファイル（2026-07-16）
 
 ## 基本情報

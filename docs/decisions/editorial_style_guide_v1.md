@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-07-01
+---
+
 # 記事編集スタイルガイド v1
 
 Last reviewed: 2026-07-01

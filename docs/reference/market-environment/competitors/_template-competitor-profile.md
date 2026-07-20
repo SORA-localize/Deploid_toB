@@ -1,3 +1,8 @@
+---
+status: reference
+updated: 2026-07-20
+---
+
 # <会社/メディア名> 調査プロファイル（YYYY-MM-DD）
 
 > コピーして `<slug>/<slug>-profile-YYYY-MM-DD.md` として使う。

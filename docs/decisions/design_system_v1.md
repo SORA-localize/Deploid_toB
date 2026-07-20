@@ -1,3 +1,8 @@
+---
+status: current
+updated: 2026-05-29
+---
+
 # Deploid デザインシステム v1
 
 Last reviewed: 2026-05-29

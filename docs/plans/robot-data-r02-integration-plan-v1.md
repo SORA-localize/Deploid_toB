@@ -1,3 +1,8 @@
+---
+status: plan
+updated: 2026-07-17
+---
+
 # Robot DATA-R02 Integration Plan v1
 
 Status: active / R02-04 schema decision completed (Option A) — proceeding to R02-08

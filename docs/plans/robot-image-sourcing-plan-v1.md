@@ -1,3 +1,8 @@
+---
+status: plan
+updated: 2026-07-08
+---
+
 # ロボット画像・メーカーロゴ調達 実行計画 v1
 
 Last created: 2026-07-08 / Last updated: 2026-07-16（読み取り専用調査と素材取得gateを分離）
