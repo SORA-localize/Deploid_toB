@@ -122,7 +122,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const lineupManufacturer = lineupRobots[0]
     ? getManufacturerForRobot(lineupRobots[0].manufacturerId)
     : undefined;
-  const hasTakeaways = !isManufacturerGuide && (report.keyTakeaways ?? []).length > 0;
+  const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
   const hasBody = (standardBody ?? '').trim().length > 0;
   const bodyHeadings = hasBody ? extractH2Headings(standardBody!) : [];
   const heroImage = getDisplayableAsset(report.heroImage);
@@ -144,7 +144,12 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   ];
 
   const toc = [
-    ...(hasTakeaways ? [{ label: uiText.reports.keyTakeaways, href: '#takeaways' }] : []),
+    ...(hasTakeaways
+      ? [{
+          label: isManufacturerGuide ? uiText.reports.guideHighlights : uiText.reports.keyTakeaways,
+          href: '#takeaways',
+        }]
+      : []),
     ...(isManufacturerGuide
       ? MANUFACTURER_GUIDE_SECTIONS.filter((section) => section.id !== 'faq' || guideContent!.faq.length > 0).map((section) => ({
           label: section.label,
@@ -278,14 +283,14 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
           {/* メインコンテンツ */}
           <div className="col-span-12 lg:col-start-3 lg:col-span-7">
 
-            {/* 要点（TL;DR） */}
+            {/* 要点（TL;DR）。メーカー解説では「注目ポイント」（強み3点）として使う */}
             {hasTakeaways && (
               <section
                 id="takeaways"
                 className="scroll-mt-site-header pt-6 pb-8 border-b border-border"
               >
                 <h2 className="mb-4 text-lg font-semibold text-foreground">
-                  {uiText.reports.keyTakeaways}
+                  {isManufacturerGuide ? uiText.reports.guideHighlights : uiText.reports.keyTakeaways}
                 </h2>
                 <ul className="space-y-2.5 text-sm text-foreground/80">
                   {(report.keyTakeaways ?? []).map((item) => (

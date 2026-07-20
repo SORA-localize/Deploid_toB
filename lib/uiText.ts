@@ -130,6 +130,7 @@ export const uiText = {
     guideDeploymentSourcePrefix: '参照: ',
     guideProcurementDeploidName: 'Deploid お問い合わせ窓口',
     guideProcurementDeploidRole: 'メーカー比較・調達検討の相談、掲載情報の確認',
+    guideHighlights: '注目ポイント',
     title: '記事',
     featured: '注目記事',
     read: '記事を読む',
