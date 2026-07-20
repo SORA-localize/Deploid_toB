@@ -6,7 +6,6 @@ Use this file for UI, layout, components, responsive behavior, interaction, visu
 
 - `docs/planning/design_system_v1.md` - visual system, layout, components, responsive rules
 - `docs/planning/ui_architecture_and_development_policy_v1.md` - UI structure, component responsibility, data/UI boundaries
-- `docs/planning/humanoid_media_build_notes_v1.md` - project design intent and anti-"AI feel" rules
 - `src/app/globals.css` - theme tokens
 - `lib/visualSemantics.ts` - semantic tone mapping
 

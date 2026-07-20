@@ -39,7 +39,7 @@ Current source-of-truth docs:
 - `docs/planning/README.md`
 - `docs/planning/design_system_v1.md`
 - `docs/planning/ui_architecture_and_development_policy_v1.md`
-- `docs/planning/humanoid_media_build_notes_v1.md`
+- `docs/archive/humanoid_media_build_notes_v1.md`
 
 Current code roots inspected:
 
@@ -106,7 +106,7 @@ Support/non-viewport files inspected or explicitly treated as non-owner context:
 
 Important note:
 
-- `docs/planning/responsive-design-implementation-plan.md` is listed as background, not as a standing implementation rule. It should not be executed as-is. This audit starts from current code and current source-of-truth docs.
+- `docs/archive/responsive-design-implementation-plan.md` is listed as background, not as a standing implementation rule. It should not be executed as-is. This audit starts from current code and current source-of-truth docs.
 
 ## 2. External Reference Stance
 
