@@ -70,7 +70,7 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 対策:
 
-- 実装前に `README.md`、`CLAUDE.md`、`docs/planning/README.md` を確認する
+- 実装前に `README.md`、`CLAUDE.md`、`docs/README.md` を確認する
 - 変更対象の周辺ファイルを最低2階層読む
 - `rg` で同名・類似機能・文言・className を検索する
 

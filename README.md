@@ -6,7 +6,7 @@
 - **デプロイ**: Vercel
 - **データ**: ローカル TS データ（`data/*.ts`）。将来 CMS 接続前提
 - **AI作業ルール**: `AGENTS.md` → `ai/rules/00-index.md`
-- **設計ドキュメント**: `docs/planning/`（まず `docs/planning/README.md`）
+- **設計ドキュメント**: `docs/`（まず `docs/README.md`）
 - **データ追加ガイド**: `docs/decisions/data/README.md`
 - **AI実装ワークフロー**: `ai/rules/10-workflow.md`（計画・実装・レビューの共通プロンプト集）
 - **データ保守ワークフロー**: `ai/rules/20-data.md` → `ai/rules/21-data-maintenance-workflow.md`
@@ -54,8 +54,11 @@ ai/rules/       # AIエージェント向けの入口・作業別ルール
 components/     # UI コンポーネント、カード、フィルター、共通レイアウト
 data/           # 配列データ + types.ts（型の真実源）
 lib/            # data.ts（取得/filter/slug lookup）, labels.ts（enum→日本語）
-docs/planning/  # 設計・意思決定ドキュメント
-docs/data/      # データ追加・タグ運用メモ
+docs/           # 設計・意思決定ドキュメント（README.md がダッシュボード）
+docs/decisions/ # 恒久方針・現行仕様・運用チェックリスト
+docs/plans/     # 進行中の作業計画
+docs/reference/ # 背景・経緯・調査スナップショット
+docs/archive/   # 実装済み・履歴参照用
 ```
 
 ## 作業規約

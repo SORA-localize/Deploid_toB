@@ -127,7 +127,7 @@ AIは局所最適な修正を作りやすいため、以下を禁止または強
 - `ai/rules/00-index.md`
 - `ai/rules/10-workflow.md`
 - 該当する work-type rule
-- `docs/planning/README.md`
+- `docs/README.md`
 - `docs/decisions/data-architecture-redesign-v1.md`
 - `docs/decisions/data-maintenance-checklist-v1.md`
 - `docs/decisions/design_system_v1.md`

@@ -41,7 +41,7 @@ Project rules:
 
 Current source-of-truth docs:
 
-- `docs/planning/README.md`
+- `docs/README.md`
 - `docs/decisions/design_system_v1.md`
 - `docs/decisions/ui_architecture_and_development_policy_v1.md`
 - `docs/archive/humanoid_media_build_notes_v1.md`
