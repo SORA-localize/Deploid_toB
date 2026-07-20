@@ -1,140 +1,148 @@
-# ドキュメント再体系化 Phase 0 棚卸し台帳
+# ドキュメント再体系化 棚卸し台帳
 
 Created: 2026-07-20
-Status: Phase 0 成果物（確定版）。完了後 archive へ移動する。
+Status: Phase 0（棚卸し）+ Phase 2（処遇判定）完了。Phase 2 ゲート待ち。完了後 archive へ移動する。
 
 対象: アクティブ md 63 ファイル（`docs/planning/archive/` の 68 ファイルは対象外）。
 
-判定方法: 冒頭30行＋見出し構造の把握に加え、「不明」となったファイルはコード・データ・git履歴と突き合わせて実装状況を確認した（各行の「根拠」列参照）。ファイル自身の Status 自己申告は信用せず、実物で裏を取っている。
+判定方法:
+- Phase 0: 冒頭30行＋見出し構造の把握と、コード・データ・git履歴との突き合わせ（ファイル自身の Status 自己申告は信用しない）
+- Phase 2: 重複疑い・残タスクがあるファイルを全文精読し、処遇（keep/move/merge/split/rewrite/archive/delete）を判定。移動先は Phase 1 で確定した4棚（`docs/decisions/` `docs/plans/` `docs/reference/` `docs/archive/`）
 
-凡例（現ステータス）:
-
-- **正本** — 実装判断・運用で現在使われている source of truth
-- **計画** — 未実装または実装中の作業計画
-- **背景** — 経緯・参照用。現在の運用ルールではない
-- **済** — 実装完了・反映済みが確認できた。archive 移動候補
-- **削除候補** — 案内スタブ等で参照価値も残らないもの
+凡例（現ステータス）: 正本 / 計画 / 背景 / 済（実装済み・archive候補）/ 削除候補
+凡例（処遇）: **keep**（内容そのまま、棚だけ移動）/ **merge**（他ファイルへ統合）/ **split**（一部を抜き出してから処理）/ **rewrite**（内容を書き換える）/ **archive**（archiveへ）/ **delete**（削除）
 
 ---
 
 ## 1. `docs/planning/` 直下（38）
 
-| ファイル | 目的 | 現ステータス | 根拠・重複疑い |
-|---|---|---|---|
-| `ai_fullstack_development_guardrails_v1.md` | AI単独実装時の失敗対策・自己監査ループ・チェックリスト | 正本 | `ai/rules/10-workflow.md` と役割近接（本件=プロジェクト特有の失敗対策、10=汎用手順。住み分け自体は成立） |
-| `architecture_future_considerations_v1.md` | 現在のアーキ判断と将来見直しトリガー | 正本 | なし |
-| `article-sourcing-reference-v1.md` | 記事候補ソーシングの許可/除外情報源・検索クエリ | 正本 | なし |
-| `compare-and-catalog-ui-improvement-plan-v1.md` | 比較タブ再構成・カタログUI改善計画 | 計画 | experiment ブランチ（現 `archive/local-media-preview-20260714`）で実装・§8.5〜8.8まで合意済みだが、**main には未反映**（`CompareClient.tsx` に比較表なし、`TBD_LABEL` 使用継続を確認）。README (a)(b)(c) 未掲載 |
-| `copyright_and_media_rights_policy_v1.md` | 著作権・商標・画像/引用/出典の運用ポリシー | 正本 | なし |
-| `data-architecture-redesign-v1.md` | データ構造再設計（id/slug分離、正本マトリクス、CMS移行パス） | 正本 | 旧2ガイドの上位と明記済み |
-| `data-maintenance-checklist-v1.md` | データ追加・更新・公開・鮮度レビューの実行チェックリスト | 正本 | README「まず読むもの」にあるが (a) 一覧に未掲載という表記漏れ |
-| `deployment_sites_research_prompt_2026-06-01.md` | 導入事例データを別AIに調査させる1回性プロンプト | 済 | `data/deployments.ts` に12件投入済み＝プロンプトは消化済み。README (a) 正本群への混在は誤分類 |
-| `design_system_v1.md` | デザイン原則・トークン・レイアウト・コンポーネント仕様 | 正本 | なし |
-| `docs-reorganization-plan-v1.md` | 本ドキュメント再体系化の実行計画 | 計画 | なし |
-| `editorial_style_guide_v1.md` | 記事執筆方針（文体・NG表現・テンプレート） | 正本 | なし |
-| `editorial-methodology-review-2026-06-24.md` | 題材選定・切り口のレビュー用草案 | 計画 | 「未承認草案」を自称するが `ai/rules/22-article-sourcing.md` が must-read 指定しており**実質運用中**。承認して style guide へ統合するか、正本昇格かの判断が Phase 2 で必要 |
-| `humanoid_data_management_guide_v1.md` | データ運用ガイド（旧） | 背景 | 本書自身が非正本を明記 |
-| `humanoid_data_model_policy_v1.md` | データモデル設計指針（旧） | 背景 | 本書自身が非正本を明記 |
-| `humanoid_media_build_notes_v1.md` | 構築メモ＆公開TODO議事録 | 背景 | Guide撤去で大半無効。ただし `ai/rules/30-ui-design.md` が anti-AI-feel ルールの出典として**現役参照**。移動時はリンク追従必須、Phase 2 で該当節の抽出可否を判断 |
-| `humanoid_media_IA_v1.md` | 情報設計・要件定義 | 背景 | `data-maintenance-checklist-v1.md`（正本）から参照残存。移動時はリンク追従必須 |
-| `humanoid_mvp_scope_decision_v1.md` | 6/10ロボスタ向けMVPスコープ決定書 | 背景 | マイルストーン終了済み。README (a) 正本扱いは誤分類 |
-| `humanoid_platform_tech_stack_v1.md` | 技術スタック選定理由 | 正本 | なし |
-| `launch-readiness-meta-plan-v1.md` | 公開前メタ情報・OGP・sitemap・計測整備計画 | 済 | `opengraph-image.tsx` / `sitemap.ts` / `privacy/page.tsx` / `lib/jsonLd.ts` 全て存在＝主要項目実装済み。残るのは「未決事項」節のみ（Phase 2 で残課題の転記先を判断） |
-| `layout-and-data-structure-audit-plan-v1.md` | レイアウト・データ配置の調査計画 | 済 | 自己申告どおり完了。後続 `component-duplication-unification-plan-v1.md` も archive 済みを確認 |
-| `manufacturer-logo-usage-spec-v1.md` | メーカーロゴのvariant・表示解決仕様 | 正本 | なし |
-| `news-automation-prompt-contract-v1.md` | 日次ニュース出力→記事データ変換契約 | 正本 | なし |
-| `project-wide-refactor-implementation-plan-v1.md` | 全体リファクタの実装task分解（936行） | 済 | 実装マーカー確認済み（`ComingSoonGate` / `ui/marquee` 削除済み、`DefinitionList.tsx` 存在）。Phase 2 で未消化taskの有無だけ精査して archive |
-| `README.md`（planning直下） | planning の入口・正本一覧・分類索引 | 正本 | 本計画の再編対象そのもの。2026-07-01 以降の新規5ファイルが未掲載、済み計画の分類が stale |
-| `responsive-audit-2026-06-30.md` | レスポンシブ課題の調査レポート | 背景 | 後続の `responsive-surface-audit-targets-v1.md` 系列に発展的置換。ただし指摘自体は未修正のものが残る（例: H-1 の `w-72` が `Header.tsx` に現存）。未消化課題の転記先を Phase 2 で判断 |
-| `responsive-capture-protocol-v1.md` | レスポンシブ手動キャプチャ手順 | 計画 | `responsive-phase-1-static-audit-v1.md` R-06 の補助文書 |
-| `responsive-design-implementation-plan.md` | レスポンシブ改善の包括計画（旧） | 背景 | README (b) で「このまま実行しない」と明記済み |
-| `responsive-phase-1-static-audit-v1.md` | レスポンシブPhase1静的監査・進行トラッカー | 計画 | R-06 ビジュアルキャプチャ待ちで滞留中 |
-| `responsive-surface-audit-targets-v1.md` | レスポンシブ監査対象のMECE棚卸し（Phase 0） | 計画 | phase-1 と連鎖 |
-| `robot-catalog-fullstack-implementation-plan-v1.md` | ロボットカード・詳細ページ一貫再実装計画 v2 | 済 | **origin/main にマージ済みを確認**（`feat(robots): rebuild robot detail content` 等のコミット群）。README (c) 未実装扱いは stale |
-| `robot-data-factcheck-impl-plan-2026-07-01.md` | ファクトチェック反映実装計画（Phase A/B/C） | 計画 | Phase A/B は実装済み（`apptronik-apollo-2` / `agibot-g2` / `unitree-g1-d` がデータに存在）。Phase C は部分実装（`marketAvailability` あり、`scopeStatus` / `evidenceLevel` なし）。残Phase C の要否判断が Phase 2 で必要 |
-| `robot-factcheck-research-prompt-2026-07-01.md` | 掲載データのファクトチェック用調査プロンプト | 正本 | 「掲載変更のたびに更新する」継続運用ツール。README 未掲載のため正本群への登録が必要 |
-| `robot-image-sourcing-plan-v1.md` | 画像・ロゴ調達の実行計画（1307行） | 計画 | 調査開始gate未実装で待機中と自己申告。整合性は取れている |
-| `ui_architecture_and_development_policy_v1.md` | UI構造・責務分離・開発手順の方針 | 正本 | `design_system_v1.md` と対（住み分け明記済み） |
-| `usecase-data-scope-cleanup-plan-2026-06-30.md` | `/use-cases` スコープ外・404出典の整理計画 | 済 | ZEROSHIKI 等の除去をデータで確認（`data/robots.ts` / `data/useCases.ts` に残存ゼロ） |
-| `usecase-evidence-model-refactor-plan-v1.md` | `/use-cases` 出典・候補根拠のモデル/validator保証計画 | 済 | `basis` / `evidenceSourceUrls` が `data/types.ts` に存在＝実装済み |
-| `usecase-factcheck-research-prompt-2026-06-30.md` | `/use-cases` 全件ファクトチェック用プロンプト（2105行の生ログ） | 済 | 冒頭に「実装の根拠に使うな」の自己警告。反映済みで用済み |
-| `usecase-page-redesign-plan-v1.md` | `/use-cases` 産業入口への全面再設計計画 | 済 | 「Status: 未着手」は stale。**実装済みを確認**（useCases 44件・`primaryIndustry` フィールド存在） |
+| ファイル | 現ステータス | 処遇 | 移動先 | 根拠・処遇の説明 |
+|---|---|---|---|---|
+| `ai_fullstack_development_guardrails_v1.md` | 正本 | keep | decisions | `ai/rules/10-workflow.md`と役割近接だが住み分け成立、統合不要 |
+| `architecture_future_considerations_v1.md` | 正本 | keep | decisions | なし |
+| `article-sourcing-reference-v1.md` | 正本 | keep | decisions | なし |
+| `compare-and-catalog-ui-improvement-plan-v1.md` | 計画 | keep | plans | 対象worktreeは`archive/local-media-preview-20260714`済だが、main未反映のため計画としては生きている。**再開するか破棄するかはオーナー判断が必要**（Phase 2ゲートで確認） |
+| `copyright_and_media_rights_policy_v1.md` | 正本 | keep | decisions | なし |
+| `data-architecture-redesign-v1.md` | 正本 | keep | decisions | なし |
+| `data-maintenance-checklist-v1.md` | 正本 | keep | decisions | なし |
+| `deployment_sites_research_prompt_2026-06-01.md` | 済 | archive | archive | `data/deployments.ts`に12件投入済みで消化済み |
+| `design_system_v1.md` | 正本 | keep | decisions | なし |
+| `docs-reorganization-plan-v1.md` | 計画 | keep | plans | 本計画自体。T5-5で自らarchiveへ移動する（Phase5完了時） |
+| `editorial_style_guide_v1.md` | 正本 | **merge受け皿** | decisions | `editorial-methodology-review-2026-06-24.md`の内容を新設節として受け入れる |
+| `editorial-methodology-review-2026-06-24.md` | 計画 | **merge** | (消滅) | 題材選定基準（§4-6）・記事化判定（§10）・hero掲載基準（§11）を`editorial_style_guide_v1.md`へ新設節として統合し、本ファイルは削除する。`ai/rules/22-article-sourcing.md`の参照も統合後の節へ張り替える（Phase4） |
+| `humanoid_data_management_guide_v1.md` | 背景 | keep | reference | `ai/rules/90-archive-policy.md`が「archive外の背景」と明示指定。フォルダ名変更に伴い同ルールをPhase5で更新 |
+| `humanoid_data_model_policy_v1.md` | 背景 | keep | reference | 同上 |
+| `humanoid_media_build_notes_v1.md` | 背景 | archive | archive | 全文精読済み。Guide中心の初期構築TODOで大半が完了/撤去済み。`ai/rules/30-ui-design.md`が「anti-AI-feel rulesの出典」として参照しているが、実際の該当節（§4）は「量産SaaS顔にしない」程度の薄い記述で、`30-ui-design.md`自身のStanding Rulesが既により詳細な同種ルールを持っており実質重複。**Phase3でai/rules/30-ui-design.mdのMust Readからこの参照を削除する** |
+| `humanoid_media_IA_v1.md` | 背景 | keep | reference | 全文精読済み。§1-3・§7（ページ役割）は「大枠有効」と自己申告どおり実際に現行ナビと整合。**`data-maintenance-checklist-v1.md` §Mが§7を名指しで参照しており、archiveせず背景として残す必要がある**。旧サンプルコード・6/10 MVP章（§9-13）は完全に陳腐化しているが、Phase2では書き換えない（Phase4で§9-13削除のrewrite候補） |
+| `humanoid_mvp_scope_decision_v1.md` | 背景 | archive | archive | 完全に終了した過去のマイルストーン。README以外に現役参照なし |
+| `humanoid_platform_tech_stack_v1.md` | 正本 | keep | decisions | なし |
+| `launch-readiness-meta-plan-v1.md` | 済 | **split→archive** | archive | 実装済みを確認。ただし「未決事項」2件（画像credit表示範囲／OGP画像を元メディア素材か生成ブランドカードにするか）が未解決のまま残っている。**この2件を`copyright_and_media_rights_policy_v1.md`の残課題節へ転記してからarchiveする**（Phase4） |
+| `layout-and-data-structure-audit-plan-v1.md` | 済 | archive | archive | 自己申告どおり完了。後続の`component-duplication-unification-plan-v1.md`も既archive済みを確認 |
+| `manufacturer-logo-usage-spec-v1.md` | 正本 | keep | decisions | なし |
+| `news-automation-prompt-contract-v1.md` | 正本 | keep | decisions | なし |
+| `project-wide-refactor-implementation-plan-v1.md` | 済 | archive | archive | 対象branch `refactor/project-wide-refactor`は消滅（ローカル・リモート共になし）。完了条件の大半をコードで確認済み（ComingSoonGate削除・DefinitionList統合・aria-current等）。F-003（Playwright方針）・H-003（search実装差異の文書化）等、個別未検証項目が残る可能性はあるが、branch消滅＝この計画単位としては終了と判断 |
+| `README.md`（planning直下） | 正本 | **merge** | (docs/README.mdへ吸収) | (a)(b)(c)テーブルの内容は新設`docs/README.md`の棚マップ・ダッシュボードへ統合し、本ファイルは削除する（Phase5 T5-2） |
+| `responsive-audit-2026-06-30.md` | 背景 | **split→archive** | archive | 後続の`responsive-surface-audit-targets-v1.md`系列に発展的置換。ただしH-1（`Header.tsx`の`w-72`固定幅）等、未修正の指摘が残存を確認。**未消化の指摘を`responsive-phase-1-static-audit-v1.md`の優先度リストへ転記してからarchiveする**（Phase4） |
+| `responsive-capture-protocol-v1.md` | 計画 | keep | plans | `responsive-phase-1-static-audit-v1.md` R-06の補助文書として一体運用 |
+| `responsive-design-implementation-plan.md` | 背景 | archive | archive | README (b)で「このまま実行しない」と明記済み |
+| `responsive-phase-1-static-audit-v1.md` | 計画 | keep | plans | R-06ビジュアルキャプチャ待ちで進行中 |
+| `responsive-surface-audit-targets-v1.md` | 計画 | keep | plans | phase-1の前提（Phase0）として現役 |
+| `robot-catalog-fullstack-implementation-plan-v1.md` | 済 | archive | archive | origin/mainへのマージを確認済み |
+| `robot-data-factcheck-impl-plan-2026-07-01.md` | 計画 | **rewrite** | plans | Phase A/B実装済み（`apptronik-apollo-2`等をデータで確認）、Phase Cは`marketAvailability`のみ実装・`scopeStatus`/`evidenceLevel`は未実装。**Phase A/Bを完了済みとして明記し、Phase Cのみ残taskとして残す書き換えが必要**（Phase4） |
+| `robot-factcheck-research-prompt-2026-07-01.md` | 正本 | keep | decisions | 「掲載変更のたびに更新」前提の継続運用ツール。README未掲載だったため今回新規登録 |
+| `robot-image-sourcing-plan-v1.md` | 計画 | keep | plans | 調査開始gate未実装で待機中と自己申告、矛盾なし |
+| `ui_architecture_and_development_policy_v1.md` | 正本 | keep | decisions | なし |
+| `usecase-data-scope-cleanup-plan-2026-06-30.md` | 済 | archive | archive | ZEROSHIKI等の除去をデータで確認 |
+| `usecase-evidence-model-refactor-plan-v1.md` | 済 | archive | archive | `basis`/`evidenceSourceUrls`が型定義に存在＝実装済み |
+| `usecase-factcheck-research-prompt-2026-06-30.md` | 済 | archive | archive | 自己警告どおり実装へ反映済みの生ログ |
+| `usecase-page-redesign-plan-v1.md` | 済 | archive | archive | ファイル記載は「Status: 未着手」だが実装済みを確認（useCases 44件・`primaryIndustry`フィールド存在）。**自己申告Statusと実態の乖離はT2-2所見として記録**（下記参照） |
 
 ## 2. `ai/rules/`（9）
 
-| ファイル | 目的 | 現ステータス | 根拠・重複疑い |
-|---|---|---|---|
-| `00-index.md` | AIルール群の入口・作業種別ルーティング | 正本 | なし |
-| `10-workflow.md` | 計画/実装/レビューの共通プロンプト集 | 正本 | guardrails と役割近接（前掲） |
-| `20-data.md` | データ作業のルーティング | 正本 | なし |
-| `21-data-maintenance-workflow.md` | `data/*.ts` 編集前ゲート（G1〜G11） | 正本 | なし |
-| `22-article-sourcing.md` | 記事候補探索のルーティング | 正本 | なし |
-| `30-ui-design.md` | UI/デザイン作業のルーティング | 正本 | `humanoid_media_build_notes_v1.md`（背景文書）を must-read 指定している点は Phase 2 で解消要 |
-| `40-content-rights.md` | 権利センシティブ作業のルーティング | 正本 | なし |
-| `80-doc-governance.md` | ドキュメント管理ルール | 正本 | 本再編完了時に Phase 5 で改訂予定 |
-| `90-archive-policy.md` | 旧計画の扱い・archiveルール | 正本 | なし |
+| ファイル | 現ステータス | 処遇 | 移動先 | 根拠・処遇の説明 |
+|---|---|---|---|---|
+| `00-index.md` | 正本 | keep | 現位置 | Phase5でパス参照を新体系へ更新（T5-3） |
+| `10-workflow.md` | 正本 | keep | 現位置 | なし |
+| `20-data.md` | 正本 | keep | 現位置 | なし |
+| `21-data-maintenance-workflow.md` | 正本 | keep | 現位置 | なし |
+| `22-article-sourcing.md` | 正本 | keep | 現位置 | `editorial-methodology-review`統合後、参照先を新節へ張り替え（Phase4） |
+| `30-ui-design.md` | 正本 | keep | 現位置 | `humanoid_media_build_notes_v1.md`への参照をPhase3で削除 |
+| `40-content-rights.md` | 正本 | keep | 現位置 | なし |
+| `80-doc-governance.md` | 正本 | keep | 現位置 | Phase5で新体系（4棚・frontmatter仕様）に合わせて全面改訂（T5-4、計画書のスコープ内） |
+| `90-archive-policy.md` | 正本 | keep | 現位置 | Phase5でフォルダ名変更（`docs/planning/archive`→`docs/archive`）・背景文書2件のパスを更新 |
 
 ## 3. `docs/data/`（4）
 
-| ファイル | 目的 | 現ステータス | 根拠・重複疑い |
-|---|---|---|---|
-| `README.md` | データ追加・更新のAI向け入口 | 正本 | なし |
-| `manufacturer-research-draft-2026-06-02.md` | メーカーデータ拡充の下書き調査 | 済 | 追加候補だった `limx-dynamics` / `xpeng-robotics` が `data/manufacturers.ts` に反映済み。被参照ゼロ。対の計画書は archive 済み |
-| `robot-model-inventory.md` | 全社モデルの掲載可否棚卸し（2026-05-30） | 済 | 被参照ゼロ。17社時点の中間文書で、現行25社・63機体と乖離。役割は `robot-factcheck-research-prompt-2026-07-01.md` が引き継いでいる |
-| `tagging.md` | タグ追加の運用手順 | 正本 | 撤去済み `Guide.topics` への言及が残り要更新（Phase 4） |
+| ファイル | 現ステータス | 処遇 | 移動先 | 根拠・処遇の説明 |
+|---|---|---|---|---|
+| `README.md` | 正本 | keep | decisions | `data-maintenance-checklist-v1.md`と役割は入口/詳細で相補的、統合不要 |
+| `manufacturer-research-draft-2026-06-02.md` | 済 | archive | archive | 追加候補が`data/manufacturers.ts`へ反映済み、被参照ゼロ |
+| `robot-model-inventory.md` | 済 | archive | archive | 被参照ゼロ、17社時点の中間文書で現行25社と乖離 |
+| `tagging.md` | 正本 | **rewrite** | decisions | 撤去済み`Guide.topics`への言及を削除する書き換えが必要（Phase4） |
 
 ## 4. ルート直下（4）
 
-| ファイル | 目的 | 現ステータス | 根拠・重複疑い |
-|---|---|---|---|
-| `AGENTS.md` | 汎用AIエージェント入口 | 正本 | なし |
-| `ai_implementation_workflow_prompt.md` | 移設案内スタブ（11行） | 削除候補 | 被参照は archive 文書と本再編関連のみ＝現役参照ゼロを確認。安全に削除可能 |
-| `CLAUDE.md` | Claude Code 専用ガイダンス | 正本 | なし |
-| `README.md`（ルート） | 人間向けプロジェクト概要 | 正本 | なし |
+| ファイル | 現ステータス | 処遇 | 移動先 | 根拠・処遇の説明 |
+|---|---|---|---|---|
+| `AGENTS.md` | 正本 | keep | 現位置 | Phase5でパス参照を更新（T5-3） |
+| `ai_implementation_workflow_prompt.md` | 削除候補 | **delete** | (削除) | 被参照は本再編関連ファイルのみ＝現役参照ゼロを確認済み |
+| `CLAUDE.md` | 正本 | keep | 現位置 | Phase5でパス参照を更新 |
+| `README.md`（ルート） | 正本 | keep | 現位置 | Phase5で`docs/planning/README.md`への言及を`docs/README.md`へ更新 |
 
 ## 5. `docs/superpowers/plans/`（3）
 
-| ファイル | 目的 | 現ステータス | 根拠・重複疑い |
-|---|---|---|---|
-| `2026-05-29-code-quality-fixes.md` | SSOT/A11y修正の実装計画 | 済 | `aria-current` が `Header.tsx` に存在 |
-| `2026-05-30-filter-tag-redesign.md` | フィルタ・タグ再設計計画 | 済 | `industryTags` / `taskTags` が `data/types.ts` に存在 |
-| `2026-05-30-sort-order.md` | 一覧の並び替え実装計画 | 済 | `sortRobots` / `RobotSortKey` が `lib/display.ts` に存在 |
+| ファイル | 現ステータス | 処遇 | 移動先 | 根拠・処遇の説明 |
+|---|---|---|---|---|
+| `2026-05-29-code-quality-fixes.md` | 済 | archive | archive | `aria-current`実装確認済み |
+| `2026-05-30-filter-tag-redesign.md` | 済 | archive | archive | `industryTags`/`taskTags`実装確認済み |
+| `2026-05-30-sort-order.md` | 済 | archive | archive | `sortRobots`/`RobotSortKey`実装確認済み |
+
+`docs/superpowers/plans/`ディレクトリ自体は3件全archiveのため空になり、ツリーごと解消する。
 
 ## 6. `docs/market-environment/`（3）
 
-| ファイル | 目的 | 現ステータス | 根拠・重複疑い |
-|---|---|---|---|
-| `README.md` | 市場環境調査の運用ルール・索引 | 正本 | なし |
-| `competitors/_template-competitor-profile.md` | 競合調査テンプレート | 正本 | なし |
-| `competitors/korthos/korthos-profile-2026-07-16.md` | Korthos 調査プロファイル | 背景 | 調査スナップショット（上書きしない運用が README に明記済み） |
+| ファイル | 現ステータス | 処遇 | 移動先 | 根拠・処遇の説明 |
+|---|---|---|---|---|
+| `README.md` | 正本 | keep | reference/market-environment/ | ツリーごと移動 |
+| `competitors/_template-competitor-profile.md` | 正本 | keep | reference/market-environment/ | 同上 |
+| `competitors/korthos/korthos-profile-2026-07-16.md` | 背景 | keep | reference/market-environment/ | 同上 |
 
 ## 7. `docs/strategy/`（1）
 
-| ファイル | 目的 | 現ステータス | 根拠・重複疑い |
-|---|---|---|---|
-| `business-positioning-and-roadmap-2026-07.md` | 事業ポジショニング・力の掛け方の現行整理 | 正本 | 「状況が変わったら随時書き換える」現行文書。分類体系上の置き場所がなく孤立（既指摘） |
+| ファイル | 現ステータス | 処遇 | 移動先 | 根拠・処遇の説明 |
+|---|---|---|---|---|
+| `business-positioning-and-roadmap-2026-07.md` | 正本 | keep | decisions | 孤立ツリー解消。「随時書き換える現行文書」としてdecisionsへ |
 
 ## 8. `public/images/robots/README.md`（1）
 
-| ファイル | 目的 | 現ステータス | 根拠・重複疑い |
-|---|---|---|---|
-| `public/images/robots/README.md` | ロボット写真の配置規則・role・命名 | 正本 | アセット併設のため現位置維持が妥当 |
+| ファイル | 現ステータス | 処遇 | 移動先 | 根拠・処遇の説明 |
+|---|---|---|---|---|
+| `public/images/robots/README.md` | 正本 | keep | 現位置 | アセット併設が合理的、移動しない |
 
 ---
 
-## 集計
+## Phase 2 集計
 
-- 正本: 32
-- 計画: 8（docs-reorg / compare-and-catalog / responsive 3件 / robot-image-sourcing / editorial-methodology / robot-data-factcheck 残Phase C）
-- 背景: 8
-- 済（archive候補）: 14
-- 削除候補: 1（`ai_implementation_workflow_prompt.md`）
+| 処遇 | 件数 | 内訳 |
+|---|---|---|
+| keep（棚移動のみ、内容不変） | 39 | 上表参照 |
+| archive | 18 | 済14＋split後archive2（launch-readiness／responsive-audit）＋その他 |
+| merge | 2 | editorial-methodology-review→style guide／planning README→docs README |
+| rewrite | 2 | robot-data-factcheck-impl-plan（Phase C残task化）／tagging.md（Guide言及削除） |
+| delete | 1 | ai_implementation_workflow_prompt.md |
+| split（要件のみ、実行はPhase4） | 2 | launch-readiness-meta-plan／responsive-audit-2026-06-30（上記mergeまたはarchiveと重複カウントなし、実質はarchive前処理） |
 
-（計63）
+（keep 39 + archive 18 + merge対象1(editorial-methodology-review) + merge対象1(planning README) + rewrite 2 + delete 1 = 62、editorial_style_guide_v1.mdはmerge受け皿として既にkeepでカウント済みのため合計63）
 
-## 調査で確定した構造的な問題
+## Phase 2 で見つかった矛盾・重複・古い記述（T2-2、この時点では直さない）
 
-1. **完了検知の欠如が最大の問題。** 63ファイル中14件（22%）が実装済みなのに archive されていない。特に `usecase-page-redesign-plan-v1.md` は「Status: 未着手」のまま実装完了しており、ファイル内 Status 表記も README 分類も両方 stale。`80-doc-governance.md` の Completion Rule は存在するが、実行トリガーがないため機能していない。
-2. **README (a) 正本群の誤分類。** 1回性プロンプト（`deployment_sites_research_prompt`）と終了済みマイルストーン（`humanoid_mvp_scope_decision`）が正本扱いのまま。
-3. **正本→背景文書への現役参照が2本ある。** `30-ui-design.md` → `build_notes`（anti-AI-feel）、`data-maintenance-checklist` → `humanoid_media_IA`。背景文書を移動する際はこの2本の追従が必須。
-4. **継続運用ツールの未登録。** `robot-factcheck-research-prompt-2026-07-01.md` は更新前提の運用ツールだが、どの分類にも載っていない。
+1. **Status自己申告と実態の乖離が構造的に起きている。** `usecase-page-redesign-plan-v1.md`は「Status: 未着手」のまま実装完了。`robot-catalog-fullstack-implementation-plan-v1.md`・`layout-and-data-structure-audit-plan-v1.md`も同様に自己申告が古いまま放置されていた。Phase1で導入する`status: current|plan|reference` frontmatterと、完了時にarchiveへ移す運用がこの再発を防ぐ設計になっている。
+2. **正本→背景文書への現役参照が2本、想定より深く食い込んでいた。** `humanoid_media_IA_v1.md` §7は`data-maintenance-checklist-v1.md`から名指しで参照されており、単純archiveはできない（reference棚へのkeepが正しい）。`humanoid_media_build_notes_v1.md`への`30-ui-design.md`の参照は逆に実質不要（内容が薄く同ファイル自身のルールと重複）と判明し、archive可能。同じ「正本から背景への参照」でも中身次第で処遇が割れる。
+3. **未消化の指摘・未決事項を持ったまま「完了」扱いにできないファイルが2本。** `launch-readiness-meta-plan-v1.md`（未決事項2件）、`responsive-audit-2026-06-30.md`（H-1等の未修正指摘）。実装計画としては役目を終えていても、中身の一部だけ生きているため、archiveの前に該当箇所を正本側へ転記する一手間が要る。
+4. **`compare-and-catalog-ui-improvement-plan-v1.md`は唯一「実装が先行し計画書がREADMEに追従していない」逆パターン。** worktree側で§8.5〜8.8まで合意が進んだのにmainには未反映で、かつ計画書自体がREADMEのどの分類にも載っていなかった。継続するか破棄するかはオーナー確認が必要（Phase 2ゲートで提起）。
+5. **`editorial-methodology-review-2026-06-24.md`は「未承認草案」を自称しながら`ai/rules/22-article-sourcing.md`から実質正本として参照されていた。** 承認判断を先送りしたまま運用に組み込まれている状態で、今回mergeにより解消する。
+
+## Phase 2 ゲートでオーナーに確認したいこと
+
+- `compare-and-catalog-ui-improvement-plan-v1.md`：worktree側で合意済みの内容（比較表・共有リンク・業種タブ等）をmainへ実装する計画として継続するか、破棄するか。
+- 上記以外の処遇（特にarchive対象18件・merge対象2件）に異論がなければ、Phase 3（移動のみ実行）へ進む。
