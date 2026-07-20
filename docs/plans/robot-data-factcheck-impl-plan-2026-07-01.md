@@ -1,9 +1,11 @@
 # ロボットデータ ファクトチェック反映 実装計画
 
-**作成日:** 2026-07-01  
-**ブランチ:** fix/usecase-data-scope-cleanup（Phase A/B）→ 新ブランチ推奨（Phase C）  
-**入力:** `docs/decisions/robot-factcheck-research-prompt-2026-07-01.md` に対する外部レビュー結果  
+**作成日:** 2026-07-01（2026-07-20 状態更新）
+**ブランチ:** fix/usecase-data-scope-cleanup（Phase A/B）→ 新ブランチ推奨（Phase C）
+**入力:** `docs/decisions/robot-factcheck-research-prompt-2026-07-01.md` に対する外部レビュー結果
 **対象ページ:** `/robots`（一覧）・`/robots/[slug]`（詳細）・`/use-cases/[slug]`（用途詳細内の候補ロボット）
+
+> **2026-07-20 状態更新**: Phase A・Bは完了を確認済み（`onex-eve`/`sanctuary-phoenix`/`robotera-q5`のmobility修正、`wandercraft-calvin`/`boston-dynamics-atlas`/`xpeng-iron`のdeploymentStage修正、`apptronik-apollo-2`/`agibot-g2`/`unitree-g1-d`の新規追加をすべてデータで確認）。Phase Cも一部完了（`MobilityType`への`wheel-legged`/`unknown`追加、`marketAvailability`フィールド追加）。**残っているのはPhase Cの`scopeStatus`と`evidenceLevel`のみ**（下記参照）。なお、この計画の後に`data/robot-catalog-r01-rollout-20260716`（DATA-R01→R02）でより網羅的な全61機再調査が実施・マージ済みのため、Phase A/Bで個別に挙げていた修正項目の大半はその過程でも再確認・反映されている。
 
 ---
 
@@ -11,11 +13,11 @@
 
 本計画は以下の3フェーズに分ける。
 
-| フェーズ | 内容 | 型変更 | 難度 |
-|---|---|---|---|
-| **A. データ修正** | 既存フィールドの値を正確な値に修正 | なし | 低 |
-| **B. 新規ロボット追加** | 高優先モデルをDBに追加（既存型の範囲内） | なし | 中 |
-| **C. データモデル拡張** | `marketAvailability`・`scopeStatus`・`evidenceLevel` 等の導入 | あり | 高 |
+| フェーズ | 内容 | 型変更 | 難度 | 状態（2026-07-20） |
+|---|---|---|---|---|
+| **A. データ修正** | 既存フィールドの値を正確な値に修正 | なし | 低 | ✅ 完了 |
+| **B. 新規ロボット追加** | 高優先モデルをDBに追加（既存型の範囲内） | なし | 中 | ✅ 完了 |
+| **C. データモデル拡張** | `marketAvailability`・`scopeStatus`・`evidenceLevel` 等の導入 | あり | 高 | 🟡 一部完了（`marketAvailability`済、`scopeStatus`/`evidenceLevel`は未実装） |
 
 Phase A・B は現ブランチで連続実施可能。Phase C は型変更を伴うため別ブランチで計画する。
 
@@ -219,7 +221,11 @@ Phase B の各コミット後に `npm run validate:data && npm run build` を必
 
 Phase A/B と同ブランチで実施しない。型変更のため影響範囲が広い。
 
-### FC-C-001：MobilityType 拡張
+**状態（2026-07-20）**: FC-C-001・FC-C-003は完了。FC-C-002（scopeStatus）・FC-C-004（evidenceLevel）・FC-C-005（UI反映）が残task。
+
+### FC-C-001：MobilityType 拡張 ✅ 完了
+
+`data/types.ts` の `MobilityType` に `wheel-legged` / `unknown` を追加済み。
 
 **対象ファイル:** `data/types.ts`  
 **変更:**
@@ -263,7 +269,9 @@ scopeNote?: string;
 
 ---
 
-### FC-C-003：marketAvailability フィールド追加
+### FC-C-003：marketAvailability フィールド追加 ✅ 完了
+
+`data/types.ts` に `marketAvailability` フィールド追加済み。
 
 **対象ファイル:** `data/types.ts`  
 **変更:**
