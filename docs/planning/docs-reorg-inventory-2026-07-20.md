@@ -1,7 +1,22 @@
 # ドキュメント再体系化 棚卸し台帳
 
 Created: 2026-07-20
-Status: Phase 0（棚卸し）+ Phase 2（処遇判定）完了。Phase 2 ゲート待ち。完了後 archive へ移動する。
+Status: Phase 0（棚卸し）+ Phase 2（処遇判定）完了。Phase 3（移動実行）へ進行中。完了後 archive へ移動する。
+
+## ブランチ横断チェック（2026-07-20 追記）
+
+他ローカルブランチが未マージのままdocs対象ファイルを触っていないか確認したところ、`data/robot-catalog-r01-rollout-20260716`（origin push済み・実装中・DATA-R01→R02のロボットデータ品質整備、51コミット・139ファイル差分）が以下7ファイルを触っていた。別セッションで詳細調査した結果:
+
+- **差分ゼロ（無条件で移動可）**: `editorial_style_guide_v1.md`、`archive/manufacturer-guide-buyer-lens-plan-v1.md`
+- **軽微差分（移動してもコンフリクトリスク低い）**: `docs/data/README.md`（+33行程度）、`docs/planning/README.md`（+2行）、`design_system_v1.md`（+15行）
+- **保留（移動を見送る）**: `copyright_and_media_rights_policy_v1.md`（416行差分、権利ポリシーの方針転換が最新コミット2026-07-19と進行中）、`robot-image-sourcing-plan-v1.md`（gate解釈の改訂が同時進行中）
+
+この2ファイルは中身が生きて動いているため、`data/robot-catalog-r01-rollout-20260716` のマージ（時期不明、R02-08/09が大半完了・R02-11最終回帰監査が未実施の段階）を待ってから移動する。Phase 3では以下の2ファイルの処遇を「保留」に変更し、他61ファイルのみ実行する。
+
+| ファイル | Phase2処遇 | Phase3実行時の扱い |
+|---|---|---|
+| `docs/planning/copyright_and_media_rights_policy_v1.md` | keep→decisions | **保留**。rollout branchマージ後に移動する |
+| `docs/planning/robot-image-sourcing-plan-v1.md` | keep→plans | **保留**。rollout branchマージ後に移動する |
 
 対象: アクティブ md 63 ファイル（`docs/planning/archive/` の 68 ファイルは対象外）。
 
