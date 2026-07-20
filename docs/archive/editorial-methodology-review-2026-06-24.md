@@ -1,7 +1,9 @@
 # Deploid 記事方法論レビュー草案
 
-Status: review draft
+Status: 承認・統合済み（2026-07-20）
 Created: 2026-06-24
+
+> **統合済み注記**: この草案は承認され、`../decisions/editorial_style_guide_v1.md` §1.5「題材選定基準」へ統合済み。以後は同ファイルが正本。本書は経緯・草案時点の記録として残す。
 
 この文書は、Deploid の記事を増やす前に、題材選定・切り口・書き方の基準を揃えるためのレビュー用草案である。承認前のため、現行の正本ではない。承認後は `../decisions/editorial_style_guide_v1.md` へ統合するか、本書を正本化する。
 
