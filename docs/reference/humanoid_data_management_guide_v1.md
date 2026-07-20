@@ -1,6 +1,6 @@
 # ヒューマノイド導入メディア — データ管理ガイド v1
 
-> **※ 本書は背景・経緯の参照用（非正本）。** データ運用の正本は `../data/README.md` と `data-maintenance-checklist-v1.md`、データ設計の正本は `data-architecture-redesign-v1.md`。本書と現行が食い違う場合は現行を優先する（本書の整合更新は行わない）。
+> **※ 本書は背景・経緯の参照用（非正本）。** データ運用の正本は `../decisions/data/README.md` と `../decisions/data-maintenance-checklist-v1.md`、データ設計の正本は `../decisions/data-architecture-redesign-v1.md`。本書と現行が食い違う場合は現行を優先する（本書の整合更新は行わない）。
 
 ## 1. この文書の目的
 
@@ -100,7 +100,7 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 
 **速報（news）も扱う。ただし全記事で `whyItMatters`（買い手にとってなぜ重要か）が必須。**
 単なる転載速報にしないことで、専門メディアと導入判断ポータルを両立させる
-（経緯は `data-architecture-redesign-v1.md` §7-2）。
+（経緯は `../decisions/data-architecture-redesign-v1.md` §7-2）。
 
 ---
 
@@ -145,7 +145,7 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 - `industries`
 - `companies`
 
-### id と slug（分離。詳細は `data-architecture-redesign-v1.md` §3）
+### id と slug（分離。詳細は `../decisions/data-architecture-redesign-v1.md` §3）
 
 | | `id` | `slug` |
 |---|---|---|
@@ -168,7 +168,7 @@ Next.jsプロジェクトでは `data/types.ts` にコピーして使う。
 2. `slug` を新値に更新
 3. `id` と参照（`*Id` / `*Ids`）は**触らない**
 
-手順の実行チェックリストは `data-maintenance-checklist-v1.md` §D。
+手順の実行チェックリストは `../decisions/data-maintenance-checklist-v1.md` §D。
 
 ### field名
 
@@ -265,7 +265,7 @@ lib/
 6. 一覧・詳細・比較で必要な最低項目が埋まっているか確認する
 7. `npm run validate:data` が通ることを確認し、`publishStatus: 'published'` にする
 
-作業種別ごとの実行チェックリストは `data-maintenance-checklist-v1.md`
+作業種別ごとの実行チェックリストは `../decisions/data-maintenance-checklist-v1.md`
 （追加 / slug変更 / 提供終了 / 公開ゲート / 鮮度レビュー / デプロイ前）。
 
 ---

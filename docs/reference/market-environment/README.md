@@ -6,7 +6,7 @@ Deploid を取り巻く市場環境（競合・類似メディア・市場動向
 ## 構造
 
 ```
-docs/market-environment/
+docs/reference/market-environment/
 ├── README.md                          ← このファイル
 ├── competitors/                       ← 競合・類似メディアの調査
 │   ├── _template-competitor-profile.md   ← 新規調査用テンプレート

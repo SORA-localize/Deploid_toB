@@ -15,20 +15,20 @@ Last reviewed: 2026-07-14
 - `data/articlePlacements.ts` — 記事タブ/home注目記事の掲載枠
 - `data/types.ts` — 型の正本
 
-各コレクションの追加・更新手順は `../planning/data-maintenance-checklist-v1.md` の対応セクション：
+各コレクションの追加・更新手順は `../data-maintenance-checklist-v1.md` の対応セクション：
 robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCases=M / deployments=N / articlePlacements=O。
-（guides=L は撤去済み。経緯は `../planning/archive/guides-retirement-v1.md`。）
+（guides=L は撤去済み。経緯は `../../archive/guides-retirement-v1.md`。）
 
 ## 事前に見るもの
 
-- `../../AGENTS.md` — 汎用AIエージェント入口
-- `../../ai/rules/00-index.md` — 作業種別ごとの参照ルール
-- `../../ai/rules/10-workflow.md` — AI作業の共通手順
-- `../../ai/rules/21-data-maintenance-workflow.md` — `data/*.ts` 追加・更新の事前確認チェックリスト
-- `../../ai/rules/20-data.md` — データ作業で読む正本のルーティング
-- `../planning/data-maintenance-checklist-v1.md` — 追加・公開・slug変更・鮮度レビューのチェックリスト
-- `../planning/data-architecture-redesign-v1.md` — id/slug分離、参照、正本設計
-- `../planning/copyright_and_media_rights_policy_v1.md` — 画像・ロゴ・引用を扱う場合
+- `../../../AGENTS.md` — 汎用AIエージェント入口
+- `../../../ai/rules/00-index.md` — 作業種別ごとの参照ルール
+- `../../../ai/rules/10-workflow.md` — AI作業の共通手順
+- `../../../ai/rules/21-data-maintenance-workflow.md` — `data/*.ts` 追加・更新の事前確認チェックリスト
+- `../../../ai/rules/20-data.md` — データ作業で読む正本のルーティング
+- `../data-maintenance-checklist-v1.md` — 追加・公開・slug変更・鮮度レビューのチェックリスト
+- `../data-architecture-redesign-v1.md` — id/slug分離、参照、正本設計
+- `../copyright_and_media_rights_policy_v1.md` — 画像・ロゴ・引用を扱う場合
 - `tagging.md` — タグ追加・表記ゆれ防止
 
 ## 基本ルール

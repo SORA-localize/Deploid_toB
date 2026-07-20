@@ -7,7 +7,7 @@ Last created: 2026-07-09 / Last updated: 2026-07-14（origin/main候補レビュ
 メーカー名表示に使うロゴのデータ構造、表示解決、素材受入、検証の現行仕様を定める。
 
 - 権利・商標判断の正本: `copyright_and_media_rights_policy_v1.md`
-- データ運用の正本: `../data/README.md` と `data-maintenance-checklist-v1.md`
+- データ運用の正本: `data/README.md` と `data-maintenance-checklist-v1.md`
 - 型と実装の正本: `data/types.ts`、`lib/manufacturerLogo.ts`、`lib/validate.ts`
 
 この文書はローカルの著作権無視プロトタイプを根拠にしない。公開候補として権利確認した素材と、origin/mainへ載せる実装だけを扱う。

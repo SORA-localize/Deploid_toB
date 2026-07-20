@@ -4,9 +4,9 @@ Use this file for images, logos, generated media, citations, article text, sourc
 
 ## Must Read
 
-- `docs/planning/copyright_and_media_rights_policy_v1.md`
-- `docs/planning/editorial_style_guide_v1.md` for article text
-- `docs/data/README.md` for asset placement
+- `docs/decisions/copyright_and_media_rights_policy_v1.md`
+- `docs/decisions/editorial_style_guide_v1.md` for article text
+- `docs/decisions/data/README.md` for asset placement
 - `public/images/robots/README.md` when adding robot photos
 
 ## Standing Rules

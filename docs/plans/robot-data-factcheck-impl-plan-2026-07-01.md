@@ -2,7 +2,7 @@
 
 **作成日:** 2026-07-01  
 **ブランチ:** fix/usecase-data-scope-cleanup（Phase A/B）→ 新ブランチ推奨（Phase C）  
-**入力:** `docs/planning/robot-factcheck-research-prompt-2026-07-01.md` に対する外部レビュー結果  
+**入力:** `docs/decisions/robot-factcheck-research-prompt-2026-07-01.md` に対する外部レビュー結果  
 **対象ページ:** `/robots`（一覧）・`/robots/[slug]`（詳細）・`/use-cases/[slug]`（用途詳細内の候補ロボット）
 
 ---

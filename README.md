@@ -7,7 +7,7 @@
 - **データ**: ローカル TS データ（`data/*.ts`）。将来 CMS 接続前提
 - **AI作業ルール**: `AGENTS.md` → `ai/rules/00-index.md`
 - **設計ドキュメント**: `docs/planning/`（まず `docs/planning/README.md`）
-- **データ追加ガイド**: `docs/data/README.md`
+- **データ追加ガイド**: `docs/decisions/data/README.md`
 - **AI実装ワークフロー**: `ai/rules/10-workflow.md`（計画・実装・レビューの共通プロンプト集）
 - **データ保守ワークフロー**: `ai/rules/20-data.md` → `ai/rules/21-data-maintenance-workflow.md`
 

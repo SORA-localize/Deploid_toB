@@ -8,8 +8,8 @@ Use this file when deciding whether an old planning document should influence cu
 - `docs/archive/` contains implemented, migrated, or temporary plans.
 - Archived docs are for context, not standing instructions.
 - The two old data docs kept outside archive are explicitly background/non-source-of-truth:
-  - `docs/planning/humanoid_data_management_guide_v1.md`
-  - `docs/planning/humanoid_data_model_policy_v1.md`
+  - `docs/reference/humanoid_data_management_guide_v1.md`
+  - `docs/reference/humanoid_data_model_policy_v1.md`
 
 ## How To Use Old Plans
 

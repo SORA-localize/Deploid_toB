@@ -37,8 +37,8 @@ Project rules:
 Current source-of-truth docs:
 
 - `docs/planning/README.md`
-- `docs/planning/design_system_v1.md`
-- `docs/planning/ui_architecture_and_development_policy_v1.md`
+- `docs/decisions/design_system_v1.md`
+- `docs/decisions/ui_architecture_and_development_policy_v1.md`
 - `docs/archive/humanoid_media_build_notes_v1.md`
 
 Current code roots inspected:

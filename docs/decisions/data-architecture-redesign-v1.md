@@ -8,7 +8,7 @@
 - **スコープ**: 本ドキュメントは **設計のみ**。実データ移行・コード変更は次フェーズ（本書 §12 に移行手順を示す）。
 - **対の成果物**: 運用面の実行チェックリストは `data-maintenance-checklist-v1.md`（追加・更新・slug変更・公開・鮮度レビューの手順）。
 - **既存ドキュメントとの関係**:
-  - `humanoid_data_management_guide_v1.md` / `humanoid_data_model_policy_v1.md` / `nextjs_data_types_v1.ts` を **上書きせず上位に立つ再設計提案**として扱う。
+  - `../reference/humanoid_data_management_guide_v1.md` / `../reference/humanoid_data_model_policy_v1.md` / `../planning/nextjs_data_types_v1.ts` を **上書きせず上位に立つ再設計提案**として扱う。
   - 本書で確定した方針は、実装フェーズで上記3ファイルへ反映する。
   - **本書が解消する2つの既存矛盾**（詳細は §1）:
     1. slug が「URL」と「外部キー」を兼任している（slug変更不可問題の正体）
@@ -243,7 +243,7 @@ placements     >── articles
 - 旧方針: 「reports は速報ではない」。
 - **新方針**: **速報（news）も扱う。ただし全記事に `whyItMatters`（買い手にとっての意味）を必須**とし、単なる転載速報にしない。
 - これにより「専門メディアとして速報を載せる」と「導入判断ポータルとしての付加価値」を両立させる。
-- `humanoid_data_management_guide_v1.md` の該当記述は参照用として残す（整合更新はしない。正本は本書）。
+- `../reference/humanoid_data_management_guide_v1.md` の該当記述は参照用として残す（整合更新はしない。正本は本書）。
 
 ### 7-3. articles の主要フィールド（案）
 

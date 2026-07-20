@@ -5,17 +5,17 @@ Use this file for data additions, data updates, article records, tags, specs, so
 ## Must Read
 
 - `ai/rules/21-data-maintenance-workflow.md` - pre-edit gate for `data/*.ts`
-- `docs/data/README.md` - data work entrypoint
-- `docs/planning/data-maintenance-checklist-v1.md` - collection-specific checklists and publish gates
-- `docs/planning/data-architecture-redesign-v1.md` - id/slug model and source-of-truth design
-- `docs/planning/copyright_and_media_rights_policy_v1.md` - images, logos, quotes, rights
+- `docs/decisions/data/README.md` - data work entrypoint
+- `docs/decisions/data-maintenance-checklist-v1.md` - collection-specific checklists and publish gates
+- `docs/decisions/data-architecture-redesign-v1.md` - id/slug model and source-of-truth design
+- `docs/decisions/copyright_and_media_rights_policy_v1.md` - images, logos, quotes, rights
 - `data/types.ts` - type-level source of truth
 - `lib/validate.ts` - machine-enforced rules
 
 For articles, also read:
 
-- `docs/planning/editorial_style_guide_v1.md`
-- `docs/planning/news-automation-prompt-contract-v1.md` when the user pastes daily news output from ChatGPT Scheduled Tasks or asks for a weekly newsletter from local published articles
+- `docs/decisions/editorial_style_guide_v1.md`
+- `docs/decisions/news-automation-prompt-contract-v1.md` when the user pastes daily news output from ChatGPT Scheduled Tasks or asks for a weekly newsletter from local published articles
 
 For tags and specs, inspect the code source of truth before editing:
 

@@ -62,7 +62,7 @@
     - フォーマット：**WebP 推奨**。JPG/PNG 可
     - ファイルサイズ：**300KB 以下**（[Squoosh](https://squoosh.app/) で圧縮）
     - 最大解像度：**1920px 幅**
-10. [ ] hero画像の `ImageAsset.rights` を記入する（`commercial-permitted` または `reference-attributed` のみ公開可。権利が確認できない画像は `src: ''` のまま公開する。詳細は `docs/planning/copyright_and_media_rights_policy_v1.md`）（自動：空src以外は検証対象）
+10. [ ] hero画像の `ImageAsset.rights` を記入する（`commercial-permitted` または `reference-attributed` のみ公開可。権利が確認できない画像は `src: ''` のまま公開する。詳細は `docs/decisions/copyright_and_media_rights_policy_v1.md`）（自動：空src以外は検証対象）
 11. [ ] `related*Ids` は **id で**結ぶ（自動：参照切れ・重複は build 失敗）。配列順は関連欄の表示順として保持されるため、重要度順に並べる。用途詳細の「関連記事」に出す記事は、タグ一致ではなく `relatedUseCaseIds` で明示する
 12. [ ] 記事タグは軸別に入れる。`section` が主題（必須・タブ）、`themeTags` は `kind:'theme'` から任意0〜4個（論点）、`industryTags` は `kind:'industry'`、`regionTags` は `kind:'region'` を使う。自動の日次記事候補は、複数トピックを1本にまとめず個別記事ごとに該当 section を選ぶ。導入・政策など単一主題の記事は該当 section が正本で theme に入れない。UIの空タブや件数都合で `section` / `themeTags` を選ばない。企業名・機種名はタグにせず `relatedManufacturerIds` / `relatedRobotIds` で結ぶ。用途との関連もタグから自動生成せず `relatedUseCaseIds` で結ぶ
 13. [ ] **本文量を確認**：速報（news-brief）でも800文字以上、分析・レポートは1,500文字以上を目安にする
@@ -282,5 +282,5 @@ AI側の実装手順:
 ## 関連ドキュメント
 
 - 設計の本体: `data-architecture-redesign-v1.md`
-- データ運用の旧ガイド（参照用）: `humanoid_data_management_guide_v1.md`（背景・経緯の参照。整合更新はしない。運用の正本は本書と `../data/README.md`）
+- データ運用の旧ガイド（参照用）: `../reference/humanoid_data_management_guide_v1.md`（背景・経緯の参照。整合更新はしない。運用の正本は本書と `data/README.md`）
 - 型の真実源: `nextjs_data_types_v1.ts` → `data/types.ts`

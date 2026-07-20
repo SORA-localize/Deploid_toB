@@ -4,8 +4,8 @@ Use this file for UI, layout, components, responsive behavior, interaction, visu
 
 ## Must Read
 
-- `docs/planning/design_system_v1.md` - visual system, layout, components, responsive rules
-- `docs/planning/ui_architecture_and_development_policy_v1.md` - UI structure, component responsibility, data/UI boundaries
+- `docs/decisions/design_system_v1.md` - visual system, layout, components, responsive rules
+- `docs/decisions/ui_architecture_and_development_policy_v1.md` - UI structure, component responsibility, data/UI boundaries
 - `src/app/globals.css` - theme tokens
 - `lib/visualSemantics.ts` - semantic tone mapping
 
