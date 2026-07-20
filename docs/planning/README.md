@@ -70,6 +70,7 @@ Last cleaned: 2026-07-01
 
 実装判断の正本ではなく、これから実行する整理・改善計画。完了後は archive へ移動するか、正本へ反映したうえで役割を更新する。
 
+- `docs-reorganization-plan-v1.md` — アクティブ md 63 ファイルの棚卸し・分類体系再設計・移動/統合・PM ダッシュボード整備の実行計画（branch: `docs/md-reorg-20260720`）
 - `robot-catalog-fullstack-implementation-plan-v1.md` — ロボットカード・詳細ページをデータ型、SSOT、resolver、validator、FactList系共通UIまで一貫して再実装する計画
 - `layout-and-data-structure-audit-plan-v1.md` — 全ページのテキスト表示レイアウトとデータ構造配置の調査実行計画
 - `project-wide-refactor-implementation-plan-v1.md` — 全体リファクタリングの実装順、最小task、完了条件を定義した実行計画
