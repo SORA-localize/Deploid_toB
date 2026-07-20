@@ -177,7 +177,6 @@ export function createRobotSearchDocument(robot: Robot, manufacturer?: Manufactu
       robot.manufacturerId,
       robot.summary,
       robot.description,
-      robot.priceNote,
       robot.distributorJapan,
       robot.supportNote,
       robot.safetyNote,

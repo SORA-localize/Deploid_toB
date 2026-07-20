@@ -11,10 +11,11 @@ Use this file for images, logos, generated media, citations, article text, sourc
 
 ## Standing Rules
 
-- Prefer official or licensed sources and record rights metadata.
+- Only source images/logos from official manufacturer channels (official site, press release, news, product page). Never from third-party sites, resellers, press coverage, or social reposts.
 - Do not hotlink external images when a local asset should be used.
 - Every `ImageAsset` needs rights metadata according to `data/types.ts`.
-- If rights are unclear, keep the record in draft or leave the image source empty according to existing conventions.
+- If usage terms are unclear but the source is official and no explicit prohibition applies, use `rights.status: 'reference-attributed'` — this is the standard production state as of `copyright_and_media_rights_policy_v1.md` §0/§7, not an MVP-only exception. If an explicit prohibition applies (`copyright_and_media_rights_policy_v1.md` §3), use `blocked` and do not publish.
+- Logos additionally follow §5 of the policy doc: never imply official/certified/partner status, never present a logo list as sponsors/partners/deployments.
 - Do not copy external article prose. Summarize and analyze in Deploid's own words.
 - Keep quotes short, attributed, and necessary.
 - Generated images must not create product, logo, or real-machine confusion.

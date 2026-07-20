@@ -1,0 +1,1371 @@
+[
+  {
+    "robotId": "booster-t1",
+    "identity": {
+      "registeredName": "T1",
+      "officialCurrentName": "Booster T1",
+      "recordScope": "product-family",
+      "variant": "Basic / Standard / Customized (identical dimensions/weight; differ in DoF via end-effector and in compute platform)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "T1 is listed as a current product on booster.tech's index and store alongside K1 and the newer T2, with its own live product page and 'Available for worldwide shipping' framing. No official discontinuation or successor statement exists for T1; T2 is an additional higher-tier flagship product sold in parallel, not a stated replacement for T1.",
+      "evidenceSourceUrls": [
+        "https://www.booster.tech/",
+        "https://www.booster.tech/booster-t1/",
+        "https://www.booster.tech/store/"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.booster.tech/",
+        "title": "Booster Robotics official homepage",
+        "publisher": "Booster Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.booster.tech/booster-t1/",
+        "title": "Booster T1 official product page",
+        "publisher": "Booster Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.booster.tech/robocup/",
+        "title": "Booster Robotics RoboCup solution",
+        "publisher": "Booster Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.booster.tech/store/",
+        "title": "Booster Robotics store / purchase inquiry",
+        "publisher": "Booster Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/BoosterRobotics/booster_gym",
+        "title": "Booster Robotics booster_gym (GitHub)",
+        "publisher": "Booster Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.booster.tech/booster-t2/",
+        "title": "Booster T2 official product page (context: confirms T1 not superseded)",
+        "publisher": "Booster Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.tohasen-robotics.com/news/tohasen-robotics%E3%80%81booster-robotics%E7%A4%BE%E3%81%A8%E6%97%A5%E6%9C%AC%E5%9B%BD%E5%86%85%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%AD%A3%E8%A6%8F%E4%BB%A3%E7%90%86%E5%BA%97%E5%A5%91%E7%B4%84/",
+        "title": "Tohasen Robotics x Booster Robotics Japan distributor agreement",
+        "publisher": "Tohasen Robotics",
+        "documentType": "distributor-official",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped (bipedal walking humanoid)",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.booster.tech/booster-t1/",
+          "sourceTitle": "Booster T1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product page and RoboCup solution page describe T1 as a bipedal walking robot (hip/knee/ankle joint ranges, walking/standing duration) common to all Basic/Standard/Customized configurations."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "~1.2m (118cm)",
+          "normalizedValue": 118,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.booster.tech/booster-t1/",
+          "sourceTitle": "Booster T1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Page states dimensions 118×47×23cm and 'Approximately 1.2m'; explicitly identical across Basic/Standard/Customized ('identical core dimensions and weight')."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "~30kg",
+          "normalizedValue": 30,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.booster.tech/booster-t1/",
+          "sourceTitle": "Booster T1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Weight ~30kg stated as common across all three configurations."
+        }
+      },
+      "speedMps": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "dof": {
+        "status": "needs-review",
+        "evidence": null
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "Walking ~2 hours; Standing ~4 hours",
+          "normalizedValue": 120,
+          "rawUnit": "hours (walking) / hours (standing)",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.booster.tech/booster-t1/",
+          "sourceTitle": "Booster T1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Official page states walking duration ~2h and standing duration ~4h for the 10.5Ah battery, not differentiated by Basic/Standard/Customized. Record uses walking figure (120min) as the primary operating mode; standing (240min) noted separately."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "10.5Ah battery (walking ~2h, standing ~4h)",
+          "normalizedValue": "10.5Ah battery (walking ~2h, standing ~4h)",
+          "rawUnit": "Ah",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.booster.tech/booster-t1/",
+          "sourceTitle": "Booster T1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Battery capacity (10.5Ah) and derived runtime figures stated as common across configurations; voltage not published so Wh cannot be computed."
+        }
+      },
+      "controlMethod": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+          "normalizedValue": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://github.com/BoosterRobotics/booster_gym",
+          "sourceTitle": "Booster Robotics booster_gym (GitHub)",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-sdk",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "booster_gym README documents T1-focused RL training pipeline with Isaac Gym/MuJoCo/Webots and real-robot deployment via Booster Robotics SDK; RoboCup solution page lists the full current toolchain (Booster Gym, Train, Deploy, Assets, RoboCup Demo) as available to T1."
+        }
+      },
+      "computePlatform": {
+        "status": "needs-review",
+        "evidence": null
+      },
+      "ipRating": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "evidence": null
+      }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": {
+      "status": "inquiry-fallback",
+      "reason": "No public price on the T1 product page or the /store page (inquiry form only, routes to sales@booster.tech). No Japan distributor price published.",
+      "checkedSources": [
+        "https://www.booster.tech/booster-t1/",
+        "https://www.booster.tech/store/"
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "Configurable end-effector: none (23 DoF) / gripper (31 DoF) / dexterous hand (41 DoF)",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "evidenceSummary": "Product page lists total DoF for Basic/Standard (23), with gripper (31), and with dexterous hand (41)."
+      },
+      {
+        "feature": "Open API + open-source framework/tools for secondary development",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "evidenceSummary": "Page advertises 'Comprehensive API Interfaces + Open-Source Framework + Open-Source Tools' via Booster Studio."
+      },
+      {
+        "feature": "Sim2Real RL pipeline (Booster Gym / Booster Train / Booster Deploy)",
+        "evidenceSourceUrl": "https://github.com/BoosterRobotics/booster_gym",
+        "evidenceSummary": "GitHub README documents Isaac Gym training, MuJoCo cross-sim testing, and Booster Robotics SDK real-robot deployment."
+      },
+      {
+        "feature": "Autonomous 3v3 RoboCup soccer perception/localization/decision pipeline",
+        "evidenceSourceUrl": "https://www.booster.tech/robocup/",
+        "evidenceSummary": "RoboCup solution page describes 'RoboCup Demo' as a complete pipeline covering perception, localization and decision-making for 3v3 matches."
+      },
+      {
+        "feature": "Onboard sensing: depth camera, 9-axis IMU, 6-mic circular array + speaker",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "evidenceSummary": "Product page sensor list."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Trusted by 50+ top global robotics teams and research institutes; developer/researcher-oriented platform",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "T1 product page frames the robot as a research/competition/secondary-development platform with named university adopters (Purdue, CMU, UC Berkeley, Tsinghua)."
+      },
+      {
+        "useCaseId": "research-prototype-dev",
+        "officialExpression": "Comprehensive API Interfaces + Open-Source Framework + Open-Source Tools",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "Official page positions T1 explicitly as an open, API-driven development platform for prototyping new motion/control algorithms."
+      }
+    ],
+    "useCaseGaps": [
+      {
+        "officialExpression": "RoboCup AdultSize humanoid soccer competition (official RoboCup partner robot)",
+        "evidenceSourceUrl": "https://www.booster.tech/robocup/",
+        "reason": "No existing UseCase models robot-sports/competition as an intended use; closest existing ids (research-development) only partially capture the competition angle."
+      }
+    ],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "Purdue University",
+        "classification": "research",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "variant": "T1",
+        "scopeNote": "Robot table-tennis research/development, named on Booster's own T1 product page."
+      },
+      {
+        "customerOrInstitution": "Carnegie Mellon University",
+        "classification": "research",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "variant": "T1",
+        "scopeNote": "FALCON reinforcement-learning framework research, named on Booster's own T1 product page."
+      },
+      {
+        "customerOrInstitution": "Tsinghua University (Hephaestus team)",
+        "classification": "demonstration",
+        "evidenceSourceUrl": "https://www.booster.tech/robocup/",
+        "variant": "T1",
+        "scopeNote": "2025 World Humanoid Robotics Games Federation championship win using T1, per Booster's RoboCup page."
+      }
+    ],
+    "procurement": {
+      "japanAvailability": "distributor-japan",
+      "distributorJapan": "Tohasen Robotics",
+      "distributorEvidenceUrl": "https://www.tohasen-robotics.com/news/tohasen-robotics%E3%80%81booster-robotics%E7%A4%BE%E3%81%A8%E6%97%A5%E6%9C%AC%E5%9B%BD%E5%86%85%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%AD%A3%E8%A6%8F%E4%BB%A3%E7%90%86%E5%BA%97%E5%A5%91%E7%B4%84/",
+      "note": "Tohasen Robotics announced (2025-11-03) an authorized distributor agreement with Booster Robotics covering T1 and the K1 series; plans Japanese-language support infrastructure 'in the first half of 2026'. Pricing, warranty, and repair-turnaround terms for Japan are not published; inquiry required."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "dof varies by end-effector configuration (23 / 31 / 41) with no single default confirmed for a generic T1 record.",
+      "computePlatform differs Basic (NVIDIA AGX Orin 200 TOPS only) vs Standard/Customized (+ Intel i7-1370P) with no single default confirmed.",
+      "No public price found on any official channel (product page or /store inquiry form)."
+    ],
+    "humanReviewRequired": [
+      "If the site wants a single scalar dof/computePlatform value for T1, editorial must pick a default configuration (e.g. Standard) rather than leaving as needs-review."
+    ]
+  },
+  {
+    "robotId": "booster-k1",
+    "identity": {
+      "registeredName": "K1",
+      "officialCurrentName": "Booster K1",
+      "recordScope": "product-family",
+      "variant": "Geek / Education / Professional (identical physical dimensions/DoF; differ in compute (48/117/200 TOPS), battery (2Ah/5Ah/5Ah), runtime (30/80/80min), warranty)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "K1 is listed as a current product on booster.tech's index and store with an active starting price ('From $5,999') and 'Buy Now' purchase flow. No discontinuation/successor statement found.",
+      "evidenceSourceUrls": [
+        "https://www.booster.tech/",
+        "https://www.booster.tech/booster-k1/",
+        "https://www.booster.tech/store/"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.booster.tech/",
+        "title": "Booster Robotics official homepage",
+        "publisher": "Booster Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.booster.tech/booster-k1/",
+        "title": "Booster K1 official product page (EN)",
+        "publisher": "Booster Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.booster.tech/cn/booster-k1/",
+        "title": "Booster K1 official product page (CN)",
+        "publisher": "Booster Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.booster.tech/cn/education/",
+        "title": "Booster Robotics education solution (CN)",
+        "publisher": "Booster Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.booster.tech/robocup/",
+        "title": "Booster Robotics RoboCup solution",
+        "publisher": "Booster Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/BoosterRobotics/booster_gym",
+        "title": "Booster Robotics booster_gym (GitHub)",
+        "publisher": "Booster Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.booster.tech/store/",
+        "title": "Booster Robotics store / purchase inquiry",
+        "publisher": "Booster Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.tohasen-robotics.com/news/tohasen-robotics%E3%80%81booster-robotics%E7%A4%BE%E3%81%A8%E6%97%A5%E6%9C%AC%E5%9B%BD%E5%86%85%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%AD%A3%E8%A6%8F%E4%BB%A3%E7%90%86%E5%BA%97%E5%A5%91%E7%B4%84/",
+        "title": "Tohasen Robotics x Booster Robotics Japan distributor agreement",
+        "publisher": "Tohasen Robotics",
+        "documentType": "distributor-official",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped (bipedal walking humanoid)",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.booster.tech/booster-k1/",
+          "sourceTitle": "Booster K1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product/RoboCup pages describe K1 as a bipedal walking robot common to all Geek/Education/Professional configurations."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "~95cm",
+          "normalizedValue": 95,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.booster.tech/booster-k1/",
+          "sourceTitle": "Booster K1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Height ~95cm stated as identical across all three variants ('all three versions share identical physical specs')."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "~19.5kg",
+          "normalizedValue": 19.5,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.booster.tech/booster-k1/",
+          "sourceTitle": "Booster K1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Weight ~19.5kg stated as identical across all three variants."
+        }
+      },
+      "speedMps": {
+        "status": "found",
+        "evidence": {
+          "value": "0.4 m/s (runtime measured at this walking speed for all variants)",
+          "normalizedValue": 0.4,
+          "rawUnit": "m/s",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.booster.tech/robocup/",
+          "sourceTitle": "Booster Robotics RoboCup solution",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "RoboCup/product pages state runtime figures as '30min at 0.4m/s' (Geek) and '80min at 0.4m/s' (Education/Professional) — the reference walking speed itself (0.4 m/s) is common to all variants even though runtime differs."
+        }
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "22 total DoF (6 per leg, 4 per arm, 2 head)",
+          "normalizedValue": 22,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.booster.tech/booster-k1/",
+          "sourceTitle": "Booster K1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "DoF breakdown identical across Geek/Education/Professional; confirmed on both EN and CN product pages."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "runtimeMin": {
+        "status": "needs-review",
+        "evidence": null
+      },
+      "batteryCapacityWh": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Geek: 2Ah / Education & Professional: 5Ah",
+          "normalizedValue": "Geek: 2Ah / Education & Professional: 5Ah",
+          "rawUnit": "Ah",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.booster.tech/booster-k1/",
+          "sourceTitle": "Booster K1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Battery capacity explicitly stated per variant on the product page; recorded as descriptive text rather than forcing a single scalar."
+        }
+      },
+      "controlMethod": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+          "normalizedValue": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://github.com/BoosterRobotics/booster_gym",
+          "sourceTitle": "Booster Robotics booster_gym (GitHub)",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-sdk",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "booster_gym README states a new RL pipeline via Booster Train now supports K1; RoboCup solution page lists K1 as covered by the same current toolchain as T1."
+        }
+      },
+      "computePlatform": {
+        "status": "needs-review",
+        "evidence": null
+      },
+      "ipRating": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "evidence": null
+      }
+    },
+    "loadRatings": [],
+    "priceOffers": [
+      {
+        "channel": "manufacturer-public",
+        "display": "From $5,999",
+        "amount": 5999,
+        "currency": "USD",
+        "taxStatus": "unknown",
+        "variant": "K1 starting price; specific Geek/Education/Professional configuration and tax treatment not stated",
+        "sellerName": "Booster Robotics",
+        "sourceUrl": "https://www.booster.tech/booster-k1/"
+      },
+      {
+        "channel": "manufacturer-public",
+        "display": "3.99万起 (starting at CNY 39,900)",
+        "amount": 39900,
+        "currency": "CNY",
+        "taxStatus": "unknown",
+        "variant": "K1 starting price (CN site); configuration and tax treatment not stated",
+        "sellerName": "Booster Robotics",
+        "sourceUrl": "https://www.booster.tech/cn/booster-k1/"
+      }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      {
+        "feature": "Graphical-to-Python and ROS2 education curriculum (L1-L4 levels)",
+        "evidenceSourceUrl": "https://www.booster.tech/cn/education/",
+        "evidenceSummary": "Education page describes a 4-level curriculum from drag-drop programming to RL gait/Sim2Real/multi-agent RL."
+      },
+      {
+        "feature": "Doubao LLM voice interaction included (free for 6 months)",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-k1/",
+        "evidenceSummary": "Product page states 'Doubao LLM included, free for 6 months'."
+      },
+      {
+        "feature": "Sim2Real RL pipeline via Booster Train/Deploy",
+        "evidenceSourceUrl": "https://github.com/BoosterRobotics/booster_gym",
+        "evidenceSummary": "GitHub README: 'new RL pipeline supporting K1 robot' via Booster Train."
+      },
+      {
+        "feature": "Onboard sensing: stereo depth camera, 9-axis IMU, 6-mic circular array + speaker",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-k1/",
+        "evidenceSummary": "Product page sensor list."
+      },
+      {
+        "feature": "Autonomous 3v3 RoboCup KidSize soccer pipeline",
+        "evidenceSourceUrl": "https://www.booster.tech/robocup/",
+        "evidenceSummary": "RoboCup page positions K1 for KidSize competition with the same perception/localization/decision pipeline as T1."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Introductory Embodied Development Platform; embodied AI education / research innovation",
+        "evidenceSourceUrl": "https://www.booster.tech/cn/education/",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "Education solution page and product page position K1 explicitly for embodied-AI education and research."
+      },
+      {
+        "useCaseId": "research-prototype-dev",
+        "officialExpression": "Programming, ROS 2, reinforcement learning, Sim2Real, real-robot verification",
+        "evidenceSourceUrl": "https://www.booster.tech/cn/education/",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "L3/L4 curriculum content explicitly covers ROS2 node development and RL/Sim2Real prototyping on K1."
+      },
+      {
+        "useCaseId": "demo-exhibition",
+        "officialExpression": "2025 World Humanoid Robotics Games Federation Center Stage lead performer",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-k1/",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "K1 product page's customer-cases section names this stage-performance role."
+      }
+    ],
+    "useCaseGaps": [
+      {
+        "officialExpression": "RoboCup KidSize humanoid soccer competition",
+        "evidenceSourceUrl": "https://www.booster.tech/robocup/",
+        "reason": "No existing UseCase models robot-sports/competition as an intended use."
+      }
+    ],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "HTWK Team (Germany)",
+        "classification": "demonstration",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-k1/",
+        "variant": "K1",
+        "scopeNote": "RoboCup 2025 KidSize category champion using K1, per Booster's own K1 product page."
+      },
+      {
+        "customerOrInstitution": "2025 World Humanoid Robotics Games Federation (organizer)",
+        "classification": "demonstration",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-k1/",
+        "variant": "K1",
+        "scopeNote": "K1 used as center-stage lead performer at the Games, per Booster's own K1 product page."
+      }
+    ],
+    "procurement": {
+      "japanAvailability": "distributor-japan",
+      "distributorJapan": "Tohasen Robotics",
+      "distributorEvidenceUrl": "https://www.tohasen-robotics.com/news/tohasen-robotics%E3%80%81booster-robotics%E7%A4%BE%E3%81%A8%E6%97%A5%E6%9C%AC%E5%9B%BD%E5%86%85%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%AD%A3%E8%A6%8F%E4%BB%A3%E7%90%86%E5%BA%97%E5%A5%91%E7%B4%84/",
+      "note": "Tohasen Robotics announced (2025-11-03) an authorized distributor agreement covering K1; national pricing, warranty, and repair terms are not published (inquiry required)."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "runtimeMin differs by variant: Geek 30min (2Ah) vs Education/Professional 80min (5Ah); no single default confirmed.",
+      "computePlatform (compute TOPS) differs by variant: Geek 48 TOPS, Education 117 TOPS, Professional 200 TOPS.",
+      "Starting prices ('From $5,999' / '3.99万起') do not specify which variant (Geek/Education/Professional) they correspond to, nor tax treatment."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "kepler-k2",
+    "identity": {
+      "registeredName": "Forerunner K2",
+      "officialCurrentName": "Kepler Forerunner K2 (\"Bumblebee\")",
+      "recordScope": "product-family",
+      "variant": "Basic (30 DoF, 75kg) / Bipedal Development (52 DoF) / Wheeled Development (52 DoF, 135kg)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "K2 is Kepler's current flagship, officially confirmed via a Kepler-issued press release (2025-09-26) to be in mass production with customer shipments underway ('several thousand units', 'hundreds of millions of yuan' in contract value), and remains the lead product on the current gotokepler.com homepage.",
+      "evidenceSourceUrls": [
+        "https://www.gotokepler.com",
+        "https://www.gotokepler.com/productDetailK2?id=2",
+        "https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.gotokepler.com",
+        "title": "Kepler Robotics official homepage",
+        "publisher": "Kepler Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.gotokepler.com/productDetailK2?id=2",
+        "title": "Kepler Forerunner K2 official product page",
+        "publisher": "Kepler Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html",
+        "title": "\"World's First Commercially Available Hybrid-Architecture Humanoid Robot Moves Into Mass Production\" — Kepler press release",
+        "publisher": "Kepler Robotics (via PR Newswire)",
+        "documentType": "official-news",
+        "publishedAt": "2025-09-26",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+        "title": "Kepler Developer Platform / Kepler OS",
+        "publisher": "Kepler Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://r.jina.ai/https://www.gotokepler.com/about",
+        "title": "Kepler Robotics company overview (About)",
+        "publisher": "Kepler Robotics",
+        "documentType": "official-about",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-humanoid-robot-lands-at-saic-gm-activity-7321418311701815298-9Hyn",
+        "title": "Kepler K2 debut at SAIC-GM (official company LinkedIn post)",
+        "publisher": "Kepler Robotics",
+        "documentType": "customer-primary",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.linkedin.com/posts/kepler-exploration-robotics_keplerrobotics-keplerk2-humanoidrobots-activity-7409791717769601024-bi4K",
+        "title": "Kepler K2 'Bumblebee' at Zhaofeng Motor (official company LinkedIn post)",
+        "publisher": "Kepler Robotics",
+        "documentType": "customer-primary",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-k2-humanoid-begins-work-at-veichi-activity-7397106664631554048-E29L",
+        "title": "Kepler K2 at VEICHI Electric (official company LinkedIn post)",
+        "publisher": "Kepler Robotics",
+        "documentType": "customer-primary",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "needs-review",
+        "evidence": null
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "175cm",
+          "normalizedValue": 175,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+          "sourceTitle": "Kepler Forerunner K2 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product page states height 175cm without configuration-specific variation."
+        }
+      },
+      "weightKg": {
+        "status": "needs-review",
+        "evidence": null
+      },
+      "speedMps": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "dof": {
+        "status": "needs-review",
+        "evidence": null
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "8-hour endurance",
+          "normalizedValue": 480,
+          "rawUnit": "hours",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+          "sourceTitle": "Kepler Forerunner K2 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product page states '1-hour charge, 8-hour endurance' as a general capability, not tied to a specific configuration; corroborated by 2025-09-26 press release ('up to eight hours of operation on a single charge')."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "chargeTimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "1-hour charge",
+          "normalizedValue": 60,
+          "rawUnit": "hours",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+          "sourceTitle": "Kepler Forerunner K2 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Stated as a general figure ('1-hour charge, 8-hour endurance'), not configuration-specific."
+        }
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Rechargeable battery (~1 hour charge, up to 8 hours endurance)",
+          "normalizedValue": "Rechargeable battery (~1 hour charge, up to 8 hours endurance)",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+          "sourceTitle": "Kepler Forerunner K2 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Descriptive text combining the official charge-time/runtime figures; no battery chemistry or Wh capacity published."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Autonomous navigation / multi-modal interaction / motion planning & control",
+          "normalizedValue": "Autonomous navigation / multi-modal interaction / motion planning & control",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+          "sourceTitle": "Kepler Forerunner K2 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product page describes visual SLAM/3D modeling, multi-modal interaction (language, vision, human-robot collaboration), and motion planning & control as common platform capabilities."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Kepler OS / Kepler Developer Platform",
+          "normalizedValue": "Kepler OS / Kepler Developer Platform",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+          "sourceTitle": "Kepler Developer Platform / Kepler OS",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-sdk",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Developer platform page describes Kepler OS's modular architecture (action/vision/voice modules), visual programming tools, multi-robot collaboration, remote online debugging, and planned OTA updates."
+        }
+      },
+      "computePlatform": {
+        "status": "needs-review",
+        "evidence": null
+      },
+      "ipRating": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "evidence": null
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "dual-arm",
+        "rating": "unspecified",
+        "kg": 25,
+        "condition": "Lower bound of official dual-arm collaborative handling range 25-30kg; rated vs maximum not distinguished.",
+        "variant": "K2 industrial configuration",
+        "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2"
+      },
+      {
+        "scope": "dual-arm",
+        "rating": "unspecified",
+        "kg": 30,
+        "condition": "Upper bound of official dual-arm collaborative handling range 25-30kg; also stated as 'up to 30kg' in the 2025-09-26 press release.",
+        "variant": "K2 industrial configuration",
+        "sourceUrl": "https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html"
+      }
+    ],
+    "priceOffers": [
+      {
+        "channel": "manufacturer-public",
+        "display": "RMB 248,000 per unit",
+        "amount": 248000,
+        "currency": "CNY",
+        "taxStatus": "unknown",
+        "variant": "Configuration not specified in the press release; official product page separately lists Basic/Bipedal Development/Wheeled Development configurations with differing specs",
+        "sellerName": "Kepler Robotics",
+        "sourceUrl": "https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html"
+      }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      {
+        "feature": "Visual SLAM with 3D modeling and autonomous navigation",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceSummary": "Product page: 'Visual SLAM capable of 3D modeling', autonomous navigation and motion planning & control."
+      },
+      {
+        "feature": "11-DoF multi-touch dexterous hand with 6-axis wrist force sensors",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceSummary": "Product page hand/sensor specs (25 contact points per finger, 6-axis force sensors per wrist)."
+      },
+      {
+        "feature": "Kepler OS modular platform: multi-robot collaboration, remote online debugging, planned OTA updates",
+        "evidenceSourceUrl": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+        "evidenceSummary": "Developer platform page details."
+      },
+      {
+        "feature": "Kepler Studio rapid deployment tool for production-line tasks",
+        "evidenceSourceUrl": "https://www.linkedin.com/posts/kepler-exploration-robotics_keplerrobotics-keplerk2-humanoidrobots-activity-7409791717769601024-bi4K",
+        "evidenceSummary": "Official company LinkedIn post on Zhaofeng Motor deployment cites 'rapid deployment via Kepler Studio' alongside component loading/unloading."
+      },
+      {
+        "feature": "Dual-arm collaborative handling",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceSummary": "Product page states dual-arm collaborative handling capacity of 25-30kg."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Research & Education; data acquisition",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceScope": "current-family-common",
+        "variant": null,
+        "reason": "Product page lists Research & Education as one of four primary application domains."
+      },
+      {
+        "useCaseId": "factory-assembly-support",
+        "officialExpression": "Intelligent Manufacturing; precision integration in intelligent manufacturing",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceScope": "current-family-common",
+        "variant": null,
+        "reason": "Product page lists Intelligent Manufacturing as a primary application domain."
+      },
+      {
+        "useCaseId": "factory-visual-inspection",
+        "officialExpression": "Product verification and quality alerting / inspection scenarios",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceScope": "current-family-common",
+        "variant": null,
+        "reason": "Product page describes vision-based inspection/quality-alert use cases enabled by the visual system."
+      }
+    ],
+    "useCaseGaps": [
+      {
+        "officialExpression": "Warehousing and logistics",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "reason": "Stated as a general application domain on the product page but no specific task is named; no existing UseCase (which are task-specific: devanning, shelf-picking, cage-loading, returns-sorting) can be connected without inferring a specific task."
+      },
+      {
+        "officialExpression": "Specialized Industries / high-risk operations",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "reason": "General domain claim without a specific task; no matching existing UseCase."
+      }
+    ],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "SAIC-GM (automotive plant, Shanghai)",
+        "classification": "pilot",
+        "evidenceSourceUrl": "https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-humanoid-robot-lands-at-saic-gm-activity-7321418311701815298-9Hyn",
+        "variant": "K2",
+        "scopeNote": "Kepler's own LinkedIn post: 'kicking off real-world tests across industrial applications' — described as tests, not confirmed commercial deployment."
+      },
+      {
+        "customerOrInstitution": "Zhaofeng Motor",
+        "classification": "commercial-deployment",
+        "evidenceSourceUrl": "https://www.linkedin.com/posts/kepler-exploration-robotics_keplerrobotics-keplerk2-humanoidrobots-activity-7409791717769601024-bi4K",
+        "variant": "K2 'Bumblebee'",
+        "scopeNote": "Kepler's own LinkedIn post: 'now working on the real production line', 'officially getting to work' — stronger than a trial framing, doing component loading/unloading."
+      },
+      {
+        "customerOrInstitution": "VEICHI Electric",
+        "classification": "pilot",
+        "evidenceSourceUrl": "https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-k2-humanoid-begins-work-at-veichi-activity-7397106664631554048-E29L",
+        "variant": "K2 'Bumblebee'",
+        "scopeNote": "Kepler's own LinkedIn post: 'entering VEICHI Electric's factory floor for real-world trials'."
+      }
+    ],
+    "procurement": {
+      "japanAvailability": "unknown",
+      "distributorJapan": null,
+      "note": "No Japan distributor or Japan-specific pricing found on official Kepler channels (homepage, product page, About, ordering contact page). Ordering is via WeChat/email contact only; Japan appears only as a country-selector option on the contact page, not as evidence of an established distributor."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "weightKg differs by configuration: Basic 75kg vs Wheeled Development 135kg; no single default confirmed.",
+      "dof differs by configuration: Basic 30 vs Bipedal/Wheeled Development 52.",
+      "mobility differs by configuration: Bipedal Development = biped, Wheeled Development = wheeled; Basic version's locomotion type is not explicitly labeled on the product page.",
+      "computePlatform '100 TOPS' appears once on the product page without confirmation that it applies uniformly to the Basic (30 DoF) configuration as well as the two development configurations.",
+      "Press-release price (RMB 248,000) does not specify which configuration it applies to."
+    ],
+    "humanReviewRequired": [
+      "Editorial should decide whether to split kepler-k2 into configuration-specific records (Basic / Bipedal Development / Wheeled Development) given the material weight/DoF/mobility divergence, or keep a single family record with these fields left as needs-review."
+    ]
+  },
+  {
+    "robotId": "kepler-k1",
+    "identity": {
+      "registeredName": "Forerunner K1",
+      "officialCurrentName": "Kepler Forerunner K1",
+      "recordScope": "specific-variant",
+      "variant": "Single known configuration (no Basic/Development split found, unlike K2)",
+      "lifecycleStatus": "limited-current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "K1's official product page is still live on gotokepler.com with an active ordering/contact channel, and remains referenced on the current homepage — it has not vanished or been marked discontinued. However the K1 page itself states the robot 'will be commercialized and mass-produced in near future', i.e. official material does not claim current mass-market shipping (unlike K2, which has a dated 2025-09-26 press release confirming mass production/customer shipping). This is treated as limited/developer-and-inquiry availability rather than full current production, and as distinct from an announced-only unreleased product since the page and ordering channel have existed since at least 2023-2024.",
+      "evidenceSourceUrls": [
+        "https://www.gotokepler.com",
+        "https://gotokepler.com/productDetailK1",
+        "https://gotokepler.com/contact?type=ordering"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.gotokepler.com",
+        "title": "Kepler Robotics official homepage",
+        "publisher": "Kepler Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://gotokepler.com/productDetailK1",
+        "title": "Kepler Forerunner K1 official product page",
+        "publisher": "Kepler Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+        "title": "Kepler Developer Platform / Kepler OS",
+        "publisher": "Kepler Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://gotokepler.com/contact?type=ordering",
+        "title": "Kepler purchase/ordering contact page",
+        "publisher": "Kepler Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://r.jina.ai/https://www.gotokepler.com/about",
+        "title": "Kepler Robotics company overview (About)",
+        "publisher": "Kepler Robotics",
+        "documentType": "official-about",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped (bipedal humanoid; page states it 'walks on complex terrain')",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Page text: 'Walk on complex terrain with ease, explore autonomously' — an explicit textual (not image-inferred) claim of legged walking locomotion. No wheeled variant is mentioned for K1, unlike K2."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "178cm",
+          "normalizedValue": 178,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Stated directly on the product page."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "85kg",
+          "normalizedValue": 85,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Stated directly on the product page."
+        }
+      },
+      "speedMps": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "40 DoF (whole body); hand adds 12 DoF separately",
+          "normalizedValue": 40,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Product page: '40 degrees of freedom in the whole body' plus '12 degrees of freedom' in the hand, kept separate per the source's own distinction."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "runtimeMin": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "batteryCapacityWh": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "batterySystem": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Autonomous navigation (Visual SLAM, path planning) / multi-modal interaction / motion planning & control",
+          "normalizedValue": "Autonomous navigation (Visual SLAM, path planning) / multi-modal interaction / motion planning & control",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Page text: 'Visual SLAM capable of 3D modeling and visual recognition', 'Powerful motion planning & control algorithm to achieve precise navigation', 'Multimodal Interaction, Hand-eye Coordination'."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Kepler Developer Platform / Kepler OS",
+          "normalizedValue": "Kepler Developer Platform / Kepler OS",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+          "sourceTitle": "Kepler Developer Platform / Kepler OS",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-sdk",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "K1 product page references the 'Kepler Developer Platform'; the shared developer-platform page (also used by K2) documents Kepler OS's modular architecture and tools."
+        }
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "100 TOPS high-computing motherboard (Nebula system); board model not disclosed",
+          "normalizedValue": 100,
+          "rawUnit": "TOPS",
+          "normalizedUnit": "TOPS",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Page text: 'Self-developed Nebula system' paired with '100TOPS high-computing motherboard'."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "evidence": null
+      }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": {
+      "status": "inquiry-fallback",
+      "reason": "No price on the K1 product page or ordering/contact page (WeChat/email contact only). A third-party 2023/2024-era estimate of US$20,000-30,000 exists but is not an official current primary source and was excluded per sourcing rules (never adopt from gray/third-party sources, especially stale ones).",
+      "checkedSources": [
+        "https://gotokepler.com/productDetailK1",
+        "https://gotokepler.com/contact?type=ordering"
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "Self-developed 'Nebula' AI/cognitive system on a 100 TOPS motherboard",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceSummary": "Product page names the Nebula system and its compute platform."
+      },
+      {
+        "feature": "Visual SLAM with 3D modeling, autonomous path planning",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceSummary": "Product page navigation/perception claims."
+      },
+      {
+        "feature": "12-DoF dexterous hand with force sensing / hand-eye coordination",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceSummary": "Product page hand specs; KEPLERGEAR planetary roller screw actuators (8,000N thrust) and rotary actuators (200 N·m peak torque, 0.01° positioning accuracy)."
+      },
+      {
+        "feature": "Kepler Developer Platform access",
+        "evidenceSourceUrl": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+        "evidenceSummary": "Shared developer-platform page (multi-robot collaboration, remote debugging, sample code) is referenced from the K1 product page."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Education & Research",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "Listed as one of six official use-case bullets on the K1 product page."
+      },
+      {
+        "useCaseId": "factory-assembly-support",
+        "officialExpression": "Automated Production Line",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "Listed as one of six official use-case bullets on the K1 product page."
+      },
+      {
+        "useCaseId": "factory-visual-inspection",
+        "officialExpression": "Smart Inspection",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "Listed as one of six official use-case bullets on the K1 product page."
+      }
+    ],
+    "useCaseGaps": [
+      {
+        "officialExpression": "Warehousing & Logistics",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "reason": "General domain bullet on the product page; no specific task named, so no existing task-specific UseCase can be connected without inference."
+      },
+      {
+        "officialExpression": "High-risk Environment",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "reason": "General domain bullet; no existing UseCase models generic high-risk-environment operation for humanoids."
+      },
+      {
+        "officialExpression": "Outdoor Tasks",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "reason": "General domain bullet; no existing UseCase models generic outdoor operation."
+      }
+    ],
+    "usageExamples": [],
+    "procurement": {
+      "japanAvailability": "unknown",
+      "distributorJapan": null,
+      "note": "No Japan distributor or Japan-specific pricing/support found on official Kepler channels. Ordering/contact page lists Japan only as a country-selector option."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "No official runtime, battery capacity, charge time, payload, IP rating, operating temperature, or safety-standard information found for K1 despite checking the product page, developer-platform page, and ordering/contact page.",
+      "No official price found; a third-party 2023/2024 estimate (US$20,000-30,000) exists but was excluded as non-primary and stale.",
+      "The K1 product page's forward-looking phrase ('will be commercialized and mass-produced in near future') is in tension with the page and ordering channel having been live for roughly 2-3 years; current shipping/production status could not be definitively resolved from official material alone."
+    ],
+    "humanReviewRequired": [
+      "Confirm with Kepler (or find a dated official statement) whether K1 has any current production/shipping status, or whether it should be treated purely as a legacy/limited developer platform superseded in practice by K2 despite no explicit succession statement."
+    ]
+  }
+]

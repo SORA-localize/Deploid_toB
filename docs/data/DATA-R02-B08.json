@@ -1,0 +1,446 @@
+[
+  {
+    "robotId": "leju-kuavo",
+    "identity": {
+      "registeredName": "KUAVO 4Pro Standard",
+      "officialCurrentName": "KUAVO 4Pro",
+      "recordScope": "specific-variant",
+      "variant": "Standard (one of Standard / Advanced / MaxA / MaxB / Showroom / Showroom Compute Edition configurations documented in the official manual)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "KUAVO 4Pro is still listed as a current product on Leju's official EN (lejurobot.com/en) and ZH (lejurobot.com/zh) sites in 2026, with an active official manual describing the Standard configuration in detail (dimensions, DoF, battery, compute). KUAVO 5 / 5-W is a newer, parallel product line — Leju's own site presents it alongside 4Pro under the same 'General Humanoid Robot Series' without any explicit successor/end-of-life statement for 4Pro, so it is not marked superseded.",
+      "evidenceSourceUrls": [
+        "https://www.lejurobot.com/en",
+        "https://www.lejurobot.com/zh",
+        "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.lejurobot.com/en", "title": "Leju Robotics official site (EN)", "publisher": "Leju Robotics", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.lejurobot.com/zh", "title": "乐聚 - 人形机器人产业化领跑者", "publisher": "Leju Robotics", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "title": "KUAVO 4Pro Standard official manual", "publisher": "Leju Robotics", "documentType": "official-manual", "checkedAt": "2026-07-17" },
+      { "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/", "title": "KUAVO SDK documentation", "publisher": "Leju Robotics", "documentType": "official-sdk-docs", "checkedAt": "2026-07-17" },
+      { "url": "http://lejuznsb.world.tmall.com/shop/view_shop.htm", "title": "Leju official Tmall flagship store", "publisher": "Leju Robotics", "documentType": "official-store", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": { "status": "found", "evidence": { "value": "二足歩行", "normalizedValue": "biped", "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 4Pro Standard official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Standard", "evidenceScope": "variant-specific", "evidenceSummary": "Manual describes a 6-DoF-per-leg bipedal walking platform." } },
+      "heightCm": { "status": "found", "evidence": { "value": "1.66m", "normalizedValue": 166, "rawUnit": "m", "normalizedUnit": "cm", "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 4Pro Standard official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Standard", "evidenceScope": "variant-specific", "evidenceSummary": "Standard edition height listed as 1.66m." } },
+      "weightKg": { "status": "found", "evidence": { "value": "55kg", "normalizedValue": 55, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 4Pro Standard official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Standard", "evidenceScope": "variant-specific", "evidenceSummary": "Standard edition weight listed as 55kg." } },
+      "speedMps": { "status": "found", "evidence": { "value": "步行 0.4 m/s / 跑步 5km/h", "normalizedValue": 0.4, "rawUnit": "m/s (walking); km/h (running)", "normalizedUnit": "m/s", "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 4Pro Standard official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Standard", "evidenceScope": "variant-specific", "evidenceSummary": "Manual states walking speed 0.4 m/s and running speed 5km/h (≈1.39 m/s); recorded value is the walking figure." } },
+      "dof": { "status": "found", "evidence": { "value": "22 DOF (excluding end-effector)", "normalizedValue": 22, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 4Pro Standard official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Standard", "evidenceScope": "variant-specific", "evidenceSummary": "22 DoF total (5 DoF/arm, 6 DoF/leg), excluding end-effector." } },
+      "payloadKg": { "status": "not-published", "evidence": null },
+      "runtimeMin": { "status": "found", "evidence": { "value": "1 hour (walking)", "normalizedValue": 60, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 4Pro Standard official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Standard", "evidenceScope": "variant-specific", "evidenceSummary": "1 hour walking runtime on a full charge." } },
+      "batteryCapacityWh": { "status": "not-published", "evidence": null },
+      "chargeTimeMin": { "status": "found", "evidence": { "value": "≤1.5 hours", "normalizedValue": 90, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 4Pro Standard official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Standard", "evidenceScope": "variant-specific", "evidenceSummary": "Charge time ≤1.5 hours." } },
+      "batterySystem": { "status": "found", "evidence": { "value": "60V 6Ah swappable lithium battery, cycle life ≥500", "normalizedValue": null, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 4Pro Standard official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Standard", "evidenceScope": "variant-specific", "evidenceSummary": "60V/6Ah swappable battery, ≥500 charge cycles." } },
+      "controlMethod": { "status": "found", "evidence": { "value": "H12 remote controller + ROS Topic/Service API control", "normalizedValue": null, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO SDK documentation", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "KUAVO humanoid line (4Pro/5, excl. 5-W)", "evidenceScope": "current-family-common", "evidenceSummary": "SDK docs describe H12 remote controller use in functional cases plus primary API-based control via ROS topics/services; applies to the KUAVO humanoid (biped) line, separate from the KUAVO 5-W wheeled interface." } },
+      "sdk": { "status": "found", "evidence": { "value": "kuavo_sdk (ROS1-based development interface, Python3)", "normalizedValue": null, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO SDK documentation", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "KUAVO humanoid line (4Pro/5, excl. 5-W)", "evidenceScope": "current-family-common", "evidenceSummary": "kuavo_sdk is a ROS1-based interface package with Python3 examples; unified control interface for locomotion, audio, and image processing." } },
+      "computePlatform": { "status": "found", "evidence": { "value": "Intel Core i9-13900H (64GB DDR5/500GB SSD) + NVIDIA Jetson Orin NX (8GB/256GB)", "normalizedValue": null, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 4Pro Standard official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Standard", "evidenceScope": "variant-specific", "evidenceSummary": "Lower unit: Intel i9-13900H 'Mofang' board; Upper unit: NVIDIA Orin NX (6-core Cortex-A78AE)." } },
+      "ipRating": { "status": "not-published", "evidence": null },
+      "operatingTemperature": { "status": "not-published", "evidence": null },
+      "safetyStandard": { "status": "not-published", "evidence": null }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "Emergency stop button", "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "evidenceSummary": "Manual lists a physical E-stop." },
+      { "feature": "Swappable battery", "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "evidenceSummary": "60V 6Ah swappable battery pack." },
+      { "feature": "Sensors: depth camera, 6-mic array, LiDAR (360°, 40m), IMU", "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "evidenceSummary": "Gemini 335L depth camera, mid-360 LiDAR, mic array, IMU." },
+      { "feature": "ROS1 SDK / API control (kuavo_sdk)", "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/", "evidenceSummary": "ROS1-based SDK with Python3 samples." }
+    ],
+    "officialUseCases": [
+      { "useCaseId": "research-development", "officialExpression": "ROS1 SDK / developer platform positioning; manual and SDK docs targeted at research/development integration", "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/", "evidenceScope": "current-family-common", "variant": "KUAVO humanoid line", "reason": "SDK and manual are explicitly aimed at developer/research integration; matches existing UseCase 'Research and Development'." }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [],
+    "procurement": {
+      "procurementModels": ["purchase", "inquiry"],
+      "marketAvailability": "developer-platform",
+      "japanAvailability": "unknown",
+      "channelsChecked": "Leju's own Tmall flagship store exists (lejuznsb.tmall.com → world.tmall.com) but requires Taobao login; could not retrieve product/price listing (source-inaccessible). No manufacturer-public price found on manual/product/SDK pages."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "Third-party press (not independently opened this session) references Leju's '100th full-size humanoid' delivered to BAIC Off-Road (北汽越野) around Jan 2025; not verified against a primary source, and unclear which KUAVO variant. Not included as a usage example pending primary-source confirmation.",
+      "Tmall official store price page is login-gated; could not confirm whether a public price is listed there."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "leju-kuavo5",
+    "identity": {
+      "registeredName": "KUAVO 5 Advanced",
+      "officialCurrentName": "KUAVO 5 / 5-W",
+      "recordScope": "specific-variant",
+      "variant": "Advanced (bipedal humanoid form; KUAVO 5-W is a separate wheeled-arm variant not covered by this record)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "KUAVO 5 / 5-W is presented as Leju's newest, currently-marketed generation ('更懂工业' — newly upgraded for industry), listed alongside KUAVO 4Pro on the official site rather than as its formal replacement. The Advanced configuration's specs are documented in a dedicated official manual page.",
+      "evidenceSourceUrls": [
+        "https://www.lejurobot.com/zh",
+        "https://www.lejurobot.com/zh/products/kuavo-5",
+        "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.lejurobot.com/zh", "title": "乐聚 - 人形机器人产业化领跑者", "publisher": "Leju Robotics", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.lejurobot.com/zh/products/kuavo-5", "title": "KUAVO 5 / 5-W official product page", "publisher": "Leju Robotics", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "title": "KUAVO 5 Advanced official manual", "publisher": "Leju Robotics", "documentType": "official-manual", "checkedAt": "2026-07-17" },
+      { "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/", "title": "KUAVO SDK documentation", "publisher": "Leju Robotics", "documentType": "official-sdk-docs", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": { "status": "found", "evidence": { "value": "二足歩行", "normalizedValue": "biped", "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 5 Advanced official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Advanced", "evidenceScope": "variant-specific", "evidenceSummary": "6-DoF-per-leg bipedal walking form (Advanced)." } },
+      "heightCm": { "status": "found", "evidence": { "value": "1.73m", "normalizedValue": 173, "rawUnit": "m", "normalizedUnit": "cm", "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 5 Advanced official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Advanced", "evidenceScope": "variant-specific", "evidenceSummary": "Advanced edition height 1.73m." } },
+      "weightKg": { "status": "found", "evidence": { "value": "63.5kg", "normalizedValue": 63.5, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 5 Advanced official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Advanced", "evidenceScope": "variant-specific", "evidenceSummary": "Advanced edition weight 63.5kg." } },
+      "speedMps": { "status": "found", "evidence": { "value": "步行 0.4 m/s / 跑步 5km/h", "normalizedValue": 0.4, "rawUnit": "m/s (walking); km/h (running)", "normalizedUnit": "m/s", "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 5 Advanced official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Advanced", "evidenceScope": "variant-specific", "evidenceSummary": "Walking 0.4 m/s, running 5km/h (≈1.39 m/s)." } },
+      "dof": { "status": "found", "evidence": { "value": "29 DOF (excluding end-effector): head 2 + arm 7×2 + leg 6×2 + waist 1", "normalizedValue": 29, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 5 Advanced official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Advanced", "evidenceScope": "variant-specific", "evidenceSummary": "29 DoF total plus a 1-DoF two-finger gripper." } },
+      "payloadKg": { "status": "not-published", "evidence": null },
+      "runtimeMin": { "status": "found", "evidence": { "value": "1 hour (walking)", "normalizedValue": 60, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 5 Advanced official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Advanced", "evidenceScope": "variant-specific", "evidenceSummary": "1 hour walking runtime." } },
+      "batteryCapacityWh": { "status": "not-published", "evidence": null },
+      "chargeTimeMin": { "status": "found", "evidence": { "value": "≤1.5 hours", "normalizedValue": 90, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 5 Advanced official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Advanced", "evidenceScope": "variant-specific", "evidenceSummary": "Charge time ≤1.5 hours." } },
+      "batterySystem": { "status": "found", "evidence": { "value": "60V 6Ah swappable lithium battery, cycle life ≥500", "normalizedValue": null, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 5 Advanced official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Advanced", "evidenceScope": "variant-specific", "evidenceSummary": "Same 60V/6Ah swappable battery spec as 4Pro." } },
+      "controlMethod": { "status": "found", "evidence": { "value": "H12 remote controller + ROS Topic/Service API control", "normalizedValue": null, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO SDK documentation", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "KUAVO humanoid line (4Pro/5, excl. 5-W)", "evidenceScope": "current-family-common", "evidenceSummary": "Same SDK/remote control docs cover both 4Pro and 5 (humanoid form); 5-W has a separate documented interface." } },
+      "sdk": { "status": "found", "evidence": { "value": "kuavo_sdk (ROS1-based development interface, Python3)", "normalizedValue": null, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO SDK documentation", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "KUAVO humanoid line (4Pro/5, excl. 5-W)", "evidenceScope": "current-family-common", "evidenceSummary": "Same ROS1/Python3 SDK family-wide for the humanoid (biped) line." } },
+      "computePlatform": { "status": "found", "evidence": { "value": "GENE-MTH6 (Intel Core Ultra 7, 64GB DDR5/512GB SSD) + ORIN-NX (8GB/256GB)", "normalizedValue": null, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 5 Advanced official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Advanced", "evidenceScope": "variant-specific", "evidenceSummary": "Lower unit GENE-MTH6 board (Core Ultra 7), upper unit ORIN-NX." } },
+      "ipRating": { "status": "not-published", "evidence": null },
+      "operatingTemperature": { "status": "needs-review", "evidence": { "value": "Camera -10~50°C; LiDAR -20~55°C", "normalizedValue": null, "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "sourceTitle": "KUAVO 5 Advanced official manual", "publisher": "Leju Robotics", "checkedAt": "2026-07-17", "variant": "Advanced", "evidenceScope": "variant-specific", "evidenceSummary": "Manual only gives component-level (camera/LiDAR) operating temperature ranges, not a whole-robot rating; needs review before treating as the robot-level spec." } },
+      "safetyStandard": { "status": "not-published", "evidence": null }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "Standard two-finger gripper (1 DoF)", "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "evidenceSummary": "Advanced configuration includes a standard 2-finger gripper." },
+      { "feature": "Sensors: stereo depth camera (IP65), LiDAR (IP67, 40-70m), 6-mic array with 360° localization, IMU", "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/", "evidenceSummary": "Component sensor list from manual." },
+      { "feature": "ROS1 SDK / API control (kuavo_sdk), shared with 4Pro", "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/", "evidenceSummary": "Same SDK across the KUAVO humanoid line." }
+    ],
+    "officialUseCases": [
+      { "useCaseId": "research-development", "officialExpression": "研究/教育 (research/education) listed among KUAVO 5 application scenarios", "evidenceSourceUrl": "https://www.lejurobot.com/zh/products/kuavo-5", "evidenceScope": "variant-specific", "variant": "KUAVO 5 / 5-W", "reason": "Product page explicitly lists research/education as an application scenario alongside industrial, inspection, guidance, and home service." }
+    ],
+    "useCaseGaps": [
+      { "officialExpression": "工业制造 (industrial manufacturing)", "evidenceSourceUrl": "https://www.lejurobot.com/zh/products/kuavo-5", "reason": "Stated generically as an application category, not tied to a specific task; no existing UseCase id matches this generic framing precisely." },
+      { "officialExpression": "户外巡检 (outdoor inspection)", "evidenceSourceUrl": "https://www.lejurobot.com/zh/products/kuavo-5", "reason": "No existing UseCase id for general outdoor inspection (existing 'factory-inspection' is indoor-factory scoped)." },
+      { "officialExpression": "商业讲解/引导 (commercial guidance)", "evidenceSourceUrl": "https://www.lejurobot.com/zh/products/kuavo-5", "reason": "Adjacent to 'customer-reception' but the source page does not detail scope precisely enough to force a confident match this session." },
+      { "officialExpression": "家庭服务 (home service)", "evidenceSourceUrl": "https://www.lejurobot.com/zh/products/kuavo-5", "reason": "No existing UseCase id targets home/domestic service." }
+    ],
+    "usageExamples": [],
+    "procurement": {
+      "procurementModels": ["purchase", "inquiry"],
+      "marketAvailability": "developer-platform",
+      "japanAvailability": "unknown",
+      "channelsChecked": "No manufacturer-public price found on manual/product pages. Official Tmall store exists but is login-gated (source-inaccessible for KUAVO 5 pricing)."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "operatingTemperature spec reflects sensor-component ratings only (camera/LiDAR), not a confirmed whole-robot IP/temperature rating."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "pal-talos",
+    "identity": {
+      "registeredName": "TALOS",
+      "officialCurrentName": "TALOS",
+      "recordScope": "specific-variant",
+      "variant": "TALOS (base platform; head and gripper are customizable)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "TALOS appears on PAL Robotics' current official product index (pal-robotics.com/robots/) in 2026 with active 'Request a quote' / 'Download Datasheet' CTAs, its own product page and datasheet. PAL's own KANGAROO blog describes KANGAROO as building upon 'previous humanoid platforms like REEM-C and TALOS,' but PAL has not published any explicit discontinuation or successor statement for TALOS itself, so it remains current rather than superseded.",
+      "evidenceSourceUrls": [
+        "https://pal-robotics.com/robots/",
+        "https://pal-robotics.com/robot/talos/",
+        "https://pal-robotics.com/datasheet/talos/"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://pal-robotics.com/robots/", "title": "Our Robots | PAL Robotics", "publisher": "PAL Robotics", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://pal-robotics.com/robot/talos/", "title": "TALOS | High-Performance Humanoid Robot", "publisher": "PAL Robotics", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://pal-robotics.com/datasheet/talos/", "title": "TALOS official datasheet (PDF)", "publisher": "PAL Robotics", "documentType": "official-datasheet", "checkedAt": "2026-07-17" },
+      { "url": "https://pal-robotics.com/blog/talos-research-torque-controlled-locomotion-for-humanoids-in-unknown-environments/", "title": "TALOS research: torque-controlled locomotion for humanoids in unknown environments", "publisher": "PAL Robotics", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://pal-robotics.com/blog/memmo-memories-robots-motion-generation/", "title": "MEMMO: memories of robots' motion generation", "publisher": "PAL Robotics", "documentType": "official-news", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": { "status": "found", "evidence": { "value": "biped", "normalizedValue": "biped", "sourceUrl": "https://pal-robotics.com/robot/talos/", "sourceTitle": "TALOS | High-Performance Humanoid Robot", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "TALOS", "evidenceScope": "current-product", "evidenceSummary": "TALOS is a bipedal humanoid research platform." } },
+      "heightCm": { "status": "found", "evidence": { "value": "175 cm", "normalizedValue": 175, "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "sourceTitle": "TALOS official datasheet", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "TALOS", "evidenceScope": "current-product", "evidenceSummary": "Datasheet lists height 175 cm." } },
+      "weightKg": { "status": "found", "evidence": { "value": "95 kg", "normalizedValue": 95, "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "sourceTitle": "TALOS official datasheet", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "TALOS", "evidenceScope": "current-product", "evidenceSummary": "Datasheet lists weight 95 kg." } },
+      "speedMps": { "status": "not-published", "evidence": null },
+      "dof": { "status": "found", "evidence": { "value": "32 DoF", "normalizedValue": 32, "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "sourceTitle": "TALOS official datasheet", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "TALOS", "evidenceScope": "current-product", "evidenceSummary": "Datasheet lists 32 DoF." } },
+      "payloadKg": { "status": "not-published", "evidence": null },
+      "runtimeMin": { "status": "found", "evidence": { "value": "1.5h walking / 3h stand-by", "normalizedValue": 90, "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "sourceTitle": "TALOS official datasheet", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "TALOS", "evidenceScope": "current-product", "evidenceSummary": "Battery autonomy: 1.5h walking mode, 3h stand-by; recorded value is walking-mode runtime." } },
+      "batteryCapacityWh": { "status": "found", "evidence": { "value": "1080 Wh (Lithium-Ion), max discharge +100A", "normalizedValue": 1080, "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "sourceTitle": "TALOS official datasheet", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "TALOS", "evidenceScope": "current-product", "evidenceSummary": "Datasheet explicitly states 1080 Wh Li-Ion battery." } },
+      "chargeTimeMin": { "status": "not-published", "evidence": null },
+      "batterySystem": { "status": "found", "evidence": { "value": "Lithium-Ion, 1080 Wh, max discharge +100A", "normalizedValue": null, "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "sourceTitle": "TALOS official datasheet", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "TALOS", "evidenceScope": "current-product", "evidenceSummary": "Li-Ion pack rated for +100A max discharge." } },
+      "controlMethod": { "status": "found", "evidence": { "value": "Fully torque-controlled (torque sensor feedback in all joints except head/wrists/grippers), EtherCAT network, ros_control loop 2kHz standard / up to 5kHz", "normalizedValue": null, "sourceUrl": "https://pal-robotics.com/robot/talos/", "sourceTitle": "TALOS | High-Performance Humanoid Robot", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "TALOS", "evidenceScope": "current-product", "evidenceSummary": "Product page describes full torque control, EtherCAT, and control loop frequency." } },
+      "sdk": { "status": "found", "evidence": { "value": "ROS (fully ROS-developed), OROCOS, ros_control, MoveIt!, Gazebo simulation model", "normalizedValue": null, "sourceUrl": "https://pal-robotics.com/robot/talos/", "sourceTitle": "TALOS | High-Performance Humanoid Robot", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "TALOS", "evidenceScope": "current-product", "evidenceSummary": "Product page confirms ROS/OROCOS/ros_control/MoveIt! stack and Gazebo model." } },
+      "computePlatform": { "status": "found", "evidence": { "value": "Intel Core i7 × 2 (control PC + multimedia PC), Ubuntu LTS + Linux RT Preempt", "normalizedValue": null, "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "sourceTitle": "TALOS official datasheet", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "TALOS", "evidenceScope": "current-product", "evidenceSummary": "Datasheet lists dual i7 PCs and OS stack." } },
+      "ipRating": { "status": "not-published", "evidence": null },
+      "operatingTemperature": { "status": "not-published", "evidence": null },
+      "safetyStandard": { "status": "not-published", "evidence": null }
+    },
+    "loadRatings": [
+      { "scope": "single-arm", "rating": "unspecified", "kg": 6, "condition": "Arm fully extended; datasheet/product page do not distinguish rated vs. maximum.", "variant": "TALOS", "sourceUrl": "https://pal-robotics.com/robot/talos/" }
+    ],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "Full torque control with torque sensors in all joints (except head/wrists/grippers)", "evidenceSourceUrl": "https://pal-robotics.com/robot/talos/", "evidenceSummary": "Enables multi-contact motions and reactive control." },
+      { "feature": "Customizable head and gripper", "evidenceSourceUrl": "https://pal-robotics.com/robot/talos/", "evidenceSummary": "Product page states head/gripper are fully customizable." },
+      { "feature": "Whole-Body Control framework, navigation, HRI skills, teleoperation", "evidenceSourceUrl": "https://pal-robotics.com/robot/talos/", "evidenceSummary": "Premium software stack listed on product page." },
+      { "feature": "Force/Torque sensing at wrists and ankles, joint temperature sensors", "evidenceSourceUrl": "https://pal-robotics.com/robot/talos/", "evidenceSummary": "Sensor suite accessible via ros_control." }
+    ],
+    "officialUseCases": [
+      { "useCaseId": "research-development", "officialExpression": "\"Advanced humanoid designed for research applications\"", "evidenceSourceUrl": "https://pal-robotics.com/robots/", "evidenceScope": "current-product", "variant": "TALOS", "reason": "Direct official framing on PAL's current product index." }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [
+      { "customerOrInstitution": "LAAS-CNRS / TOWARD / Dynamograde lab (EU research collaboration)", "classification": "research", "evidenceSourceUrl": "https://pal-robotics.com/blog/talos-research-torque-controlled-locomotion-for-humanoids-in-unknown-environments/", "variant": "TALOS", "scopeNote": "PAL's own current blog post describes joint research on generalised torque-controlled locomotion (stair-climbing, door-opening) in unknown environments; presented on PAL's current site as TALOS's own capability demonstration, not tied to an ambiguous old generation." },
+      { "customerOrInstitution": "MEMMO EU consortium (CNRS, Idiap, University of Edinburgh, Max Planck Institute, Oxford Robotics Institute, Airbus, Wandercraft, Costain, PAL Robotics); specific unit 'Pyrène' operated by LAAS-CNRS", "classification": "research", "evidenceSourceUrl": "https://pal-robotics.com/blog/memmo-memories-robots-motion-generation/", "variant": "TALOS", "scopeNote": "EU-funded research project; a LAAS-CNRS TALOS unit was tested at an Airbus facility for aircraft-manufacturing motion-generation tasks. This is an academic-industrial research project, not a commercial TALOS sale/deployment." }
+    ],
+    "procurement": {
+      "procurementModels": ["purchase", "inquiry"],
+      "marketAvailability": "research-platform",
+      "japanAvailability": "unknown",
+      "channelsChecked": "No manufacturer-public price on product/datasheet pages; site only offers 'Request a quote'."
+    },
+    "conflicts": [],
+    "unresolved": [],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "pal-kangaroo",
+    "identity": {
+      "registeredName": "KANGAROO",
+      "officialCurrentName": "KANGAROO",
+      "recordScope": "product-family",
+      "variant": "Base platform with selectable 4/5/7-DoF arm configurations (each a distinct, officially documented row in the datasheet)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "KANGAROO appears on PAL's current official index (pal-robotics.com/robots/) with active product and datasheet pages. Its 4/5/7-DoF arm configurations are clearly distinguishable by payload package on the official datasheet, so per-configuration loadRatings should be kept (not treated as an unresolved conflict) — this corrects DATA-R01's over-cautious treatment. A 'Kangaroo PRO' dual-arm variant was reported in third-party press (2025 Automatica launch) but was not found as a distinct row on the currently-open official product/datasheet pages, so it is not registered separately.",
+      "evidenceSourceUrls": [
+        "https://pal-robotics.com/robots/",
+        "https://pal-robotics.com/robot/kangaroo/",
+        "https://pal-robotics.com/datasheet/kangaroo/"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://pal-robotics.com/robots/", "title": "Our Robots | PAL Robotics", "publisher": "PAL Robotics", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://pal-robotics.com/robot/kangaroo/", "title": "Kangaroo | Biped Humanoid Robot for Locomotion Research", "publisher": "PAL Robotics", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://pal-robotics.com/datasheet/kangaroo/", "title": "KANGAROO official datasheet (PDF)", "publisher": "PAL Robotics", "documentType": "official-datasheet", "checkedAt": "2026-07-17" },
+      { "url": "https://pal-robotics.com/blog/kangaroo-biped-research-platform-updates/", "title": "Kangaroo robot - Latest updates of PAL Robotics' biped research platform", "publisher": "PAL Robotics", "documentType": "official-news", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": { "status": "found", "evidence": { "value": "biped", "normalizedValue": "biped", "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "KANGAROO", "evidenceScope": "current-family-common", "evidenceSummary": "Bipedal dynamic-locomotion research platform." } },
+      "heightCm": { "status": "conflict", "evidence": { "value": "1,58 m (product page) vs. 1.60 m (datasheet)", "normalizedValue": 158, "rawUnit": "m", "normalizedUnit": "cm", "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "KANGAROO", "evidenceScope": "current-family-common", "evidenceSummary": "Product page literally states 'Height: 1,58 m' (158cm); the official datasheet PDF text extraction instead reads 1.60 m. Both are official PAL documents; treated as an unresolved minor conflict (rounding or datasheet-revision difference) pending clarification with PAL." } },
+      "weightKg": { "status": "needs-review", "evidence": { "value": "50-65 kg range", "normalizedValue": null, "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "KANGAROO (all arm configurations)", "evidenceScope": "current-family-common", "evidenceSummary": "Official material gives only a 50-65kg range depending on arm/end-effector configuration; no single per-configuration weight figure was found, so a scalar value cannot be confidently assigned." } },
+      "speedMps": { "status": "found", "evidence": { "value": "2 m/s", "normalizedValue": 2, "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "sourceTitle": "KANGAROO official datasheet", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "KANGAROO", "evidenceScope": "current-family-common", "evidenceSummary": "Datasheet lists max speed 2 m/s, consistent with product page's dynamic-locomotion framing." } },
+      "dof": { "status": "needs-review", "evidence": { "value": "14-40 DoF depending on platform/end-effector", "normalizedValue": null, "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "sourceTitle": "KANGAROO official datasheet", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "KANGAROO (all configurations)", "evidenceScope": "current-family-common", "evidenceSummary": "Torso (2) + legs (6×2) are fixed at 14; arms (4/5/7 DoF ×2) and hand end-effector choice (parallel gripper 1 DoF, Seed RH8D 7 DoF, Inspire RH56 6 DoF) push family total up to ~40. No single scalar applies to 'KANGAROO' as a whole." } },
+      "payloadKg": { "status": "not-published", "evidence": null },
+      "runtimeMin": { "status": "found", "evidence": { "value": "3 hours", "normalizedValue": 180, "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "sourceTitle": "KANGAROO official datasheet", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "KANGAROO", "evidenceScope": "current-family-common", "evidenceSummary": "Datasheet and product-page text both state 3h autonomy." } },
+      "batteryCapacityWh": { "status": "source-inaccessible", "evidence": null },
+      "chargeTimeMin": { "status": "not-published", "evidence": null },
+      "batterySystem": { "status": "not-published", "evidence": null },
+      "controlMethod": { "status": "found", "evidence": { "value": "ros2_control-based actuator control (current/speed/position/impedance/force-torque modes)", "normalizedValue": null, "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "KANGAROO", "evidenceScope": "current-family-common", "evidenceSummary": "Product page confirms ros2_control with multiple actuator control modes; a VR-teleoperation claim in the prior repo record was not independently confirmed this session and is flagged in unresolved." } },
+      "sdk": { "status": "found", "evidence": { "value": "Ubuntu LTS + ROS 2 LTS + PAL OS, ros2_control, URDF/MJCF models, MuJoCo & mjlab simulation", "normalizedValue": null, "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "KANGAROO", "evidenceScope": "current-family-common", "evidenceSummary": "Full software stack confirmed on product page." } },
+      "computePlatform": { "status": "found", "evidence": { "value": "Intel i7 control PC (32GB/1TB) + Intel i7 multimedia PC (32GB/1TB); optional NVIDIA Jetson GPU; dual WiFi6", "normalizedValue": null, "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "KANGAROO", "evidenceScope": "current-family-common", "evidenceSummary": "Confirmed dual i7 PCs, optional Jetson GPU." } },
+      "ipRating": { "status": "not-published", "evidence": null },
+      "operatingTemperature": { "status": "not-published", "evidence": null },
+      "safetyStandard": { "status": "found", "evidence": { "value": "IEC 61508 SIL 2 (onboard + wireless emergency button); EN ISO 13849-1 PL d", "normalizedValue": null, "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research", "publisher": "PAL Robotics", "checkedAt": "2026-07-17", "variant": "KANGAROO", "evidenceScope": "current-family-common", "evidenceSummary": "Confirmed safety certifications on the current product page." } }
+    },
+    "loadRatings": [
+      { "scope": "single-arm", "rating": "unspecified", "kg": 7, "condition": "Arm extended; datasheet does not separate rated/maximum.", "variant": "KANGAROO 4 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/" },
+      { "scope": "dual-arm", "rating": "unspecified", "kg": 30, "condition": "Bi-manual, 4 DoF arms.", "variant": "KANGAROO 4 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/" },
+      { "scope": "single-arm", "rating": "unspecified", "kg": 5, "condition": "Arm extended; datasheet does not separate rated/maximum.", "variant": "KANGAROO 5 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/" },
+      { "scope": "dual-arm", "rating": "unspecified", "kg": 28, "condition": "Bi-manual, 5 DoF arms.", "variant": "KANGAROO 5 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/" },
+      { "scope": "single-arm", "rating": "unspecified", "kg": 3, "condition": "Arm extended; datasheet does not separate rated/maximum.", "variant": "KANGAROO 7 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/" },
+      { "scope": "dual-arm", "rating": "unspecified", "kg": 25, "condition": "Bi-manual, 7 DoF arms.", "variant": "KANGAROO 7 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/" }
+    ],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "RL policies for walking, running, jumping, stair climbing, push recovery, dancing", "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceSummary": "Product page lists these dynamic locomotion capabilities." },
+      { "feature": "Quick tool changer arms (ISO 9409-1 interface); optional 2-finger, Seed RH8D, or Inspire RH56 hands", "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceSummary": "Modular end-effector options confirmed." },
+      { "feature": "Onboard + wireless emergency stop", "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceSummary": "Safety e-stop confirmed on product page." },
+      { "feature": "4x RGB-D cameras (D435i), wrist/foot 6-axis F/T sensor options", "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceSummary": "Sensor suite confirmed." }
+    ],
+    "officialUseCases": [
+      { "useCaseId": "research-development", "officialExpression": "\"A must for your research on dynamic locomotion, reinforcement learning and embodied AI\"", "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceScope": "current-family-common", "variant": "KANGAROO", "reason": "Direct official framing." }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [
+      { "customerOrInstitution": "PAL Robotics (internal R&D, published at ICRA 2022)", "classification": "research", "evidenceSourceUrl": "https://pal-robotics.com/blog/kangaroo-biped-research-platform-updates/", "variant": "KANGAROO", "scopeNote": "PAL's own current blog post documents in-house whole-body inverse dynamics control research (jumping demo); this is PAL's internal R&D, not an external customer deployment." }
+    ],
+    "procurement": {
+      "procurementModels": ["purchase", "inquiry"],
+      "marketAvailability": "research-platform",
+      "japanAvailability": "unknown",
+      "channelsChecked": "No manufacturer-public price found; product page only offers 'Request a quote' / 'Download Datasheet'."
+    },
+    "conflicts": [
+      { "field": "heightCm", "description": "Product page states 1.58m (158cm); datasheet PDF text-extraction reads 1.60m (160cm). Recorded 'found' status uses the product-page figure but flags the datasheet discrepancy for review." }
+    ],
+    "unresolved": [
+      "'Kangaroo PRO' (dual-arm commercial variant) was reported by third-party press covering Automatica 2025 but not found as a distinct entry on the currently-open official product/datasheet pages — needs a follow-up check directly against PAL's site for a possible new SKU.",
+      "batteryCapacityWh could not be reliably read from the datasheet PDF (extraction returned an implausible '976 Ah' figure); needs re-check with a cleaner PDF text extraction.",
+      "Prior repo record's 'VR remote operation' claim for control method was not independently confirmed on the pages opened this session."
+    ],
+    "humanReviewRequired": [
+      "Confirm whether 'Kangaroo PRO' is a separate current SKU requiring its own catalog record."
+    ]
+  },
+  {
+    "robotId": "limx-oli",
+    "identity": {
+      "registeredName": "Oli EDU",
+      "officialCurrentName": "Oli",
+      "recordScope": "specific-variant",
+      "variant": "EDU (one of Lite / EDU / Super / Pro(175cm-Standard) columns on the official spec-comparison table)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Oli remains LimX Dynamics' current general-purpose humanoid line ('continuously iterated and optimized' per the official product page), with EDU as one of four distinguishable configurations on the current official spec table. IMPORTANT CORRECTION vs. the existing repo record: the current official spec table places EDU at 31 active DoF and ~2h battery life — the repo's registered dof=33 and runtimeMin=90 actually match the 'Super' column, not 'EDU'. This looks like a column mix-up in the prior data pass and is flagged as a conflict below.",
+      "evidenceSourceUrls": [
+        "https://www.limxdynamics.com/",
+        "https://www.limxdynamics.com/en/products/oli",
+        "https://www.limxdynamics.com/en/products/oli/spec"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.limxdynamics.com/", "title": "LimX Dynamics official site", "publisher": "LimX Dynamics", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.limxdynamics.com/en/products/oli", "title": "LimX Oli official product page", "publisher": "LimX Dynamics", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.limxdynamics.com/en/products/oli/spec", "title": "LimX Oli official specifications", "publisher": "LimX Dynamics", "documentType": "official-datasheet", "checkedAt": "2026-07-17" },
+      { "url": "https://limxdynamics.com/en/order", "title": "LimX Dynamics order/consultation page", "publisher": "LimX Dynamics", "documentType": "official-store", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": { "status": "found", "evidence": { "value": "biped", "normalizedValue": "biped", "sourceUrl": "https://www.limxdynamics.com/en/products/oli", "sourceTitle": "LimX Oli official product page", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Oli EDU", "evidenceScope": "current-family-common", "evidenceSummary": "Bipedal humanoid (legs 6 DoF each) common to all Oli variants." } },
+      "heightCm": { "status": "found", "evidence": { "value": "165cm / 5'5\"", "normalizedValue": 165, "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec", "sourceTitle": "LimX Oli official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Oli EDU (shared with Lite/Super)", "evidenceScope": "variant-specific", "evidenceSummary": "Spec table: EDU column height 165cm, same as Lite and Super; the larger 175cm variant is a separate column (Pro/Standard)." } },
+      "weightKg": { "status": "found", "evidence": { "value": "≤55kg / 121.3lbs", "normalizedValue": 55, "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec", "sourceTitle": "LimX Oli official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Oli EDU (shared with Lite/Super)", "evidenceScope": "variant-specific", "evidenceSummary": "Spec table gives an upper-bound '≤55kg' figure, not an exact weight." } },
+      "speedMps": { "status": "found", "evidence": { "value": "5km/h", "normalizedValue": 1.3889, "rawUnit": "km/h", "normalizedUnit": "m/s", "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec", "sourceTitle": "LimX Oli official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Oli EDU (shared across all Oli variants)", "evidenceScope": "variant-specific", "evidenceSummary": "Max speed 5km/h is identical across all four spec-table columns." } },
+      "dof": { "status": "conflict", "evidence": { "value": "31 (current spec table, EDU column)", "normalizedValue": 31, "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec", "sourceTitle": "LimX Oli official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Oli EDU", "evidenceScope": "variant-specific", "evidenceSummary": "Confirmed twice independently: current spec table lists Active DoF = 31 for both Lite and EDU columns; 33 is the Super column's value and 43 is the Pro/Standard column's value. The repo's existing record of dof=33 for 'Oli EDU' matches the Super column, not EDU — flagged as a correction needed." } },
+      "payloadKg": { "status": "not-published", "evidence": null },
+      "runtimeMin": { "status": "conflict", "evidence": { "value": "~2h (current spec table, Lite/EDU column)", "normalizedValue": 120, "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec", "sourceTitle": "LimX Oli official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Oli EDU", "evidenceScope": "variant-specific", "evidenceSummary": "Current spec table: battery life ~2h for Lite & EDU, ~1.5h for Super & Pro. The repo's existing runtimeMin=90 for 'Oli EDU' matches the Super/Pro ~1.5h figure, not EDU's ~2h — flagged as a correction needed." } },
+      "batteryCapacityWh": { "status": "not-published", "evidence": null },
+      "chargeTimeMin": { "status": "not-published", "evidence": null },
+      "batterySystem": { "status": "found", "evidence": { "value": "9,500mAh swappable battery module; charger 58.8V/10A", "normalizedValue": null, "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec", "sourceTitle": "LimX Oli official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Oli EDU (shared across Lite/EDU/Super/Pro)", "evidenceScope": "current-family-common", "evidenceSummary": "9,500mAh capacity and charger spec are identical across all four columns." } },
+      "controlMethod": { "status": "found", "evidence": { "value": "Self-developed bilingual (CN/EN) voice interaction; remote control; upper/lower-level motion APIs", "normalizedValue": null, "sourceUrl": "https://www.limxdynamics.com/en/products/oli", "sourceTitle": "LimX Oli official product page", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Oli EDU", "evidenceScope": "current-family-common", "evidenceSummary": "Product page confirms voice interaction system and motion API layers." } },
+      "sdk": { "status": "found", "evidence": { "value": "Modular SDK; full Python development support; open upper/lower-level APIs; URDF; Isaac Sim/MuJoCo/Gazebo compatible", "normalizedValue": null, "sourceUrl": "https://www.limxdynamics.com/en/products/oli", "sourceTitle": "LimX Oli official product page", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Oli EDU", "evidenceScope": "current-family-common", "evidenceSummary": "Confirmed on product page." } },
+      "computePlatform": { "status": "conflict", "evidence": { "value": "Motion Control: RK3588/8G/64G (confirmed common to Lite/EDU/Super); Perception: '–' for EDU on spec table (only Super/Pro standard-equip Orin NX 157TOPS/16G)", "normalizedValue": null, "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec", "sourceTitle": "LimX Oli official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Oli EDU", "evidenceScope": "variant-specific", "evidenceSummary": "The current official spec table shows a dash ('–') in EDU's Perception-compute cell (i.e., no standard Orin NX unit), while Super and Pro have Orin NX (157TOPS) standard. The repo's existing record attributes an Orin NX 157TOPS/16GB/1TB unit to Oli EDU's computePlatform, which conflicts with this reading. One earlier extraction pass hedged that Orin NX might be an optional (non-standard) add-on for EDU specifically; this ambiguity is unresolved and needs manual review directly against the live table." } },
+      "ipRating": { "status": "not-published", "evidence": null },
+      "operatingTemperature": { "status": "not-published", "evidence": null },
+      "safetyStandard": { "status": "not-published", "evidence": null }
+    },
+    "loadRatings": [
+      { "scope": "single-arm", "rating": "maximum", "kg": 3, "condition": "Official 'Maximum Load (Single Arm)' figure; identical across Lite/EDU/Super columns.", "variant": "Oli EDU", "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec" }
+    ],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "Self-developed 6-axis IMU; head-mounted and chest-mounted depth cameras", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "evidenceSummary": "Sensor suite for perception-based motion control." },
+      { "feature": "Bilingual (CN/EN) voice interaction system", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "evidenceSummary": "Self-developed natural-language voice interaction." },
+      { "feature": "Full Python development support; modular SDK with upper/lower-level open APIs", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "evidenceSummary": "Confirmed developer tooling." },
+      { "feature": "Simulator compatibility: NVIDIA Isaac Sim, MuJoCo, Gazebo", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "evidenceSummary": "Confirmed sim2real toolchain support." }
+    ],
+    "officialUseCases": [
+      { "useCaseId": "research-development", "officialExpression": "\"Scientific Research & Development\"", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "evidenceScope": "current-family-common", "variant": "Oli (all variants)", "reason": "Explicitly listed as a stated use case on the current official product page; already an existing candidate in data/useCases.ts research-development." },
+      { "useCaseId": "demo-exhibition", "officialExpression": "\"Exhibition & Event Guidance\"", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "evidenceScope": "current-family-common", "variant": "Oli (all variants)", "reason": "Explicitly listed as a stated use case on the current official product page." }
+    ],
+    "useCaseGaps": [
+      { "officialExpression": "Entertainment & Performance", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "reason": "No existing UseCase id precisely matches general entertainment/performance (distinct from Luna's stage/venue framing)." },
+      { "officialExpression": "Equipment Inspection", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "reason": "Existing 'factory-inspection' is scoped to indoor factory patrol; the source phrase is generic 'equipment inspection' without a factory-specific statement." },
+      { "officialExpression": "Industrial Operations", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "reason": "Too generic to map confidently to a specific existing task-level UseCase (e.g. factory-assembly-support vs. factory-machine-tending)." },
+      { "officialExpression": "Property Management", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli", "reason": "No existing UseCase id covers general property/facility management." }
+    ],
+    "usageExamples": [],
+    "procurement": {
+      "procurementModels": ["purchase", "inquiry"],
+      "marketAvailability": "developer-platform",
+      "japanAvailability": "unknown",
+      "channelsChecked": "'Order Consultation'/'Buy Now' CTAs route to a lead-generation contact form (bd@limxdynamics.com); no public price found."
+    },
+    "conflicts": [
+      { "field": "dof", "description": "Repo's dof=33 for Oli EDU matches the current spec table's 'Super' column, not 'EDU' (31). Recommend correcting to 31 or re-verifying which variant should be registered as 'Oli EDU'." },
+      { "field": "runtimeMin", "description": "Repo's runtimeMin=90 for Oli EDU matches the current spec table's 'Super'/'Pro' column (~1.5h), not EDU's ~2h (120min)." },
+      { "field": "computePlatform", "description": "Repo attributes an Orin NX 157TOPS perception unit to Oli EDU; current spec table shows a dash (not standard) for EDU's Perception column, with Orin NX standard only on Super and Pro columns." }
+    ],
+    "unresolved": [
+      "Whether the registered robotId 'limx-oli' (name 'Oli EDU') should in fact correspond to the spec table's 'Super' column given the dof/runtime match, or whether EDU's true current values are 31 DoF / ~2h runtime / no standard Orin NX — needs a data-correction decision, not further research."
+    ],
+    "humanReviewRequired": [
+      "Resolve the EDU vs Super column mismatch on dof, runtimeMin, and computePlatform before next publish."
+    ]
+  },
+  {
+    "robotId": "limx-luna",
+    "identity": {
+      "registeredName": "Luna",
+      "officialCurrentName": "Luna",
+      "recordScope": "specific-variant",
+      "variant": "Luna (base configuration; official spec table shows two nearly-identical configuration columns without named differentiation)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Luna is LimX Dynamics' current full-size interactive humanoid, formally (re)announced May 26, 2026 as 'All-New Full-Size Humanoid Robot Luna' with an active product page and spec sheet.",
+      "evidenceSourceUrls": [
+        "https://www.limxdynamics.com/en/products/luna",
+        "https://www.limxdynamics.com/en/products/luna/spec",
+        "https://www.limxdynamics.com/en/news/BK000062"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.limxdynamics.com/", "title": "LimX Dynamics official site", "publisher": "LimX Dynamics", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.limxdynamics.com/en/products/luna", "title": "LimX Luna official product page", "publisher": "LimX Dynamics", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.limxdynamics.com/en/products/luna/spec", "title": "LimX Luna official specifications", "publisher": "LimX Dynamics", "documentType": "official-datasheet", "checkedAt": "2026-07-17" },
+      { "url": "https://www.limxdynamics.com/en/news/BK000062", "title": "All-New Full-Size Humanoid Robot Luna, Redefining Interactive Robots (2026-05-26)", "publisher": "LimX Dynamics", "documentType": "official-news", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": { "status": "found", "evidence": { "value": "biped", "normalizedValue": "biped", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "sourceTitle": "LimX Luna official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Luna", "evidenceScope": "current-product", "evidenceSummary": "6-DoF legs, bipedal humanoid form." } },
+      "heightCm": { "status": "found", "evidence": { "value": "160cm", "normalizedValue": 160, "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "sourceTitle": "LimX Luna official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Luna", "evidenceScope": "current-product", "evidenceSummary": "Spec table height 160cm." } },
+      "weightKg": { "status": "found", "evidence": { "value": "56kg (with battery)", "normalizedValue": 56, "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "sourceTitle": "LimX Luna official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Luna", "evidenceScope": "current-product", "evidenceSummary": "Weight 56kg including battery." } },
+      "speedMps": { "status": "found", "evidence": { "value": "5km/h", "normalizedValue": 1.3889, "rawUnit": "km/h", "normalizedUnit": "m/s", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "sourceTitle": "LimX Luna official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Luna", "evidenceScope": "current-product", "evidenceSummary": "Max walking speed 5km/h." } },
+      "dof": { "status": "found", "evidence": { "value": "27 total active DoF (legs 6×2, arms 5×2, waist 3, neck 2)", "normalizedValue": 27, "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "sourceTitle": "LimX Luna official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Luna", "evidenceScope": "current-product", "evidenceSummary": "27 DoF breakdown confirmed on spec table." } },
+      "payloadKg": { "status": "not-published", "evidence": null },
+      "runtimeMin": { "status": "found", "evidence": { "value": "≈4h", "normalizedValue": 240, "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "sourceTitle": "LimX Luna official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Luna", "evidenceScope": "current-product", "evidenceSummary": "Battery life ≈4h." } },
+      "batteryCapacityWh": { "status": "not-published", "evidence": null },
+      "chargeTimeMin": { "status": "found", "evidence": { "value": "≈1h", "normalizedValue": 60, "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "sourceTitle": "LimX Luna official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Luna", "evidenceScope": "current-product", "evidenceSummary": "Charging time ≈1 hour." } },
+      "batterySystem": { "status": "found", "evidence": { "value": "10,000mAh dual battery modules; 110-220V input", "normalizedValue": null, "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "sourceTitle": "LimX Luna official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Luna", "evidenceScope": "current-product", "evidenceSummary": "Dual battery modules totalling 10,000mAh." } },
+      "controlMethod": { "status": "found", "evidence": { "value": "Remote control / tablet / LimX Studio (video-to-motion, kinesthetic teaching, preset routines, AI task editor)", "normalizedValue": null, "sourceUrl": "https://www.limxdynamics.com/en/products/luna", "sourceTitle": "LimX Luna official product page", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Luna", "evidenceScope": "current-product", "evidenceSummary": "Product page describes multiple motion-programming/control methods via LimX Studio." } },
+      "sdk": { "status": "not-published", "evidence": null },
+      "computePlatform": { "status": "found", "evidence": { "value": "Motion control: RK3588/16GB/256GB; Perception: RK3588/8GB/32GB", "normalizedValue": null, "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec", "sourceTitle": "LimX Luna official specifications", "publisher": "LimX Dynamics", "checkedAt": "2026-07-17", "variant": "Luna", "evidenceScope": "current-product", "evidenceSummary": "Two separate RK3588 units for motion control and perception, with distinct RAM/storage." } },
+      "ipRating": { "status": "not-published", "evidence": null },
+      "operatingTemperature": { "status": "not-published", "evidence": null },
+      "safetyStandard": { "status": "not-published", "evidence": null }
+    },
+    "loadRatings": [
+      { "scope": "single-arm", "rating": "maximum", "kg": 3, "condition": "Official 'Max Arm Payload' figure.", "variant": "Luna", "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec" }
+    ],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "Multimodal interaction with natural gestures during conversation", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna", "evidenceSummary": "Product page describes multimodal dialogue with gesture support." },
+      { "feature": "Swarm control synchronizing 200+ units with millisecond precision", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna", "evidenceSummary": "Confirmed group-performance capability." },
+      { "feature": "LimX Studio AI task editor (natural-language scenario description composes dance/motion/visual/voice tasks)", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna", "evidenceSummary": "Confirmed content-creation tool." },
+      { "feature": "Video-to-motion imitation and kinesthetic teaching for choreography", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna", "evidenceSummary": "Confirmed motion-programming methods." }
+    ],
+    "officialUseCases": [
+      { "useCaseId": "demo-exhibition", "officialExpression": "\"Theme parks, live stages\" with swarm/choreography performance features", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna", "evidenceScope": "current-product", "variant": "Luna", "reason": "Directly stated application for event/performance venues." },
+      { "useCaseId": "customer-reception", "officialExpression": "\"Shopping malls, museums\" with multimodal dialogue/engagement", "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna", "evidenceScope": "current-product", "variant": "Luna", "reason": "Directly stated reception/guidance-oriented venues matching existing UseCase 'Customer Reception and Guidance'." }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [],
+    "procurement": {
+      "procurementModels": ["purchase", "inquiry"],
+      "marketAvailability": "unknown",
+      "japanAvailability": "unknown",
+      "channelsChecked": "'Order Consultation' routes to lead-generation form (bd@limxdynamics.com); no public price found. BK000062 news item is a general launch announcement, not a deployment case."
+    },
+    "conflicts": [],
+    "unresolved": [
+      "Official spec table shows two configuration columns with identical values; unclear if this represents two real SKUs or a table-rendering artifact."
+    ],
+    "humanReviewRequired": []
+  }
+]

@@ -1,0 +1,1028 @@
+[
+  {
+    "robotId": "unitree-g1",
+    "batch": "B01",
+    "registeredName": "G1",
+    "officialCurrentName": "G1",
+    "recordScope": "specific-variant",
+    "variant": "G1 standard (non-EDU)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed live on the current official product page (unitree.com/g1) and official store (shop.unitree.com/products/unitree-g1) as of 2026-07-17. The Unitree homepage actively links to the G1 product/app pages.",
+    "evidenceSourceUrls": [
+      "https://www.unitree.com/g1/",
+      "https://shop.unitree.com/products/unitree-g1",
+      "https://www.unitree.com/"
+    ]
+  },
+  {
+    "robotId": "unitree-g1-d",
+    "batch": "B01",
+    "registeredName": "G1-D",
+    "officialCurrentName": "G1-D",
+    "recordScope": "product-family",
+    "variant": "Standard and Flagship (per official Unitree naming); Japan distributor TechShare uses \"Standard\" and \"Ultimate\" for what appears to be the same two-tier split",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed on the current official product page (unitree.com/mobile/G1-D), which gives clean per-variant numeric specs for Standard and Flagship, and on TechShare's 2025-12-01 reservation-sales press release. Unlike DATA-R01's wholesale withholding of specs due to an unresolved variant conflict, the current official page directly states usable per-variant numbers for most fields; only fields that genuinely vary by variant (DoF, runtime, speed) are recorded per-variant rather than forced into one number.",
+    "evidenceSourceUrls": [
+      "https://www.unitree.com/mobile/G1-D",
+      "https://techshare.co.jp/g1-g1d-press-release/",
+      "https://techshare.co.jp/product/unitree/unitree-g1-d/"
+    ]
+  },
+  {
+    "robotId": "unitree-g1-edu",
+    "batch": "B01",
+    "registeredName": "G1 EDU",
+    "officialCurrentName": "G1 EDU",
+    "recordScope": "specific-variant",
+    "variant": "G1 EDU (secondary-development-enabled configuration of the G1 chassis)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed on the same current official product page as G1 (unitree.com/g1) and on the official store, which lists \"G1 EDU edition: contact sales\" as a distinct, currently offered configuration.",
+    "evidenceSourceUrls": [
+      "https://www.unitree.com/g1/",
+      "https://shop.unitree.com/products/unitree-g1"
+    ]
+  },
+  {
+    "robotId": "unitree-h1",
+    "batch": "B01",
+    "registeredName": "H1",
+    "officialCurrentName": "H1",
+    "recordScope": "specific-variant",
+    "variant": "H1 (as distinct from H1-2 on the same product page)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Still listed on the Unitree homepage under the \"Humanoid Robot\" section (app download link) and on the official product page (unitree.com/mobile/h1) and official store as of 2026-07-17. H1-2 is a co-listed configuration, not a stated successor.",
+    "evidenceSourceUrls": [
+      "https://www.unitree.com/mobile/h1/",
+      "https://shop.unitree.com/products/unitree-h1",
+      "https://www.unitree.com/"
+    ]
+  },
+  {
+    "robotId": "unitree-h1-2",
+    "batch": "B01",
+    "registeredName": "H1-2",
+    "officialCurrentName": "H1-2",
+    "recordScope": "specific-variant",
+    "variant": "H1-2 (heavier/higher-DoF configuration co-listed with H1 on the same page)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed on the current official product page (unitree.com/mobile/h1) as a distinct, currently offered configuration alongside H1.",
+    "evidenceSourceUrls": [
+      "https://www.unitree.com/mobile/h1/"
+    ]
+  },
+  {
+    "robotId": "unitree-h2",
+    "batch": "B01",
+    "registeredName": "H2",
+    "officialCurrentName": "H2",
+    "recordScope": "specific-variant",
+    "variant": "H2 standard (non-EDU)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed on the current official product page (unitree.com/mobile/H2) and official store (shop.unitree.com/products/unitree-h2), both showing $29,900.00 USD and identical specs.",
+    "evidenceSourceUrls": [
+      "https://www.unitree.com/mobile/H2/",
+      "https://shop.unitree.com/products/unitree-h2"
+    ]
+  },
+  {
+    "robotId": "unitree-h2-edu",
+    "batch": "B01",
+    "registeredName": "H2 EDU",
+    "officialCurrentName": "H2 EDU",
+    "recordScope": "specific-variant",
+    "variant": "H2 EDU (secondary-development-enabled configuration of the H2 chassis)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed on the same current official product page as H2 (unitree.com/mobile/H2), listed as a distinct column with \"Contact Sales\" pricing and secondary-development support.",
+    "evidenceSourceUrls": [
+      "https://www.unitree.com/mobile/H2/",
+      "https://shop.unitree.com/products/unitree-h2"
+    ]
+  },
+  {
+    "robotId": "unitree-h2-plus",
+    "batch": "B01",
+    "registeredName": "H2 Plus",
+    "officialCurrentName": "H2 PLUS",
+    "recordScope": "specific-variant",
+    "variant": "H2 Plus (Isaac-ecosystem-focused configuration on the H2 body)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed on its own dedicated current official product page (unitree.com/mobile/H2plus) and official store, plus a 2026-05-31 NVIDIA official press release naming it as the body of NVIDIA's Isaac GR00T reference humanoid design.",
+    "evidenceSourceUrls": [
+      "https://www.unitree.com/mobile/H2plus/",
+      "https://shop.unitree.com/products/unitree-h2-plus",
+      "https://nvidianews.nvidia.com/news/nvidia-open-humanoid-robot-reference-design"
+    ]
+  },
+  {
+    "robotId": "unitree-r1",
+    "batch": "B01",
+    "registeredName": "R1 AIR",
+    "officialCurrentName": "R1 AIR",
+    "recordScope": "specific-variant",
+    "variant": "R1 AIR (entry tier of the R1 family, alongside R1 and R1 EDU)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed on the current official product page (unitree.com/mobile/R1) at $4,900, distinct from R1 ($5,900) and R1 EDU (contact sales) on the same page.",
+    "evidenceSourceUrls": [
+      "https://www.unitree.com/mobile/R1/"
+    ]
+  },
+  {
+    "robotId": "unitree-r1-standard",
+    "batch": "B01",
+    "registeredName": "R1",
+    "officialCurrentName": "R1",
+    "recordScope": "specific-variant",
+    "variant": "R1 standard (mid tier of the R1 family, above R1 AIR, below R1 EDU)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed on the current official product page (unitree.com/mobile/R1) at $5,900, distinct from R1 AIR ($4,900) and R1 EDU (contact sales) on the same page.",
+    "evidenceSourceUrls": [
+      "https://www.unitree.com/mobile/R1/"
+    ]
+  },
+  {
+    "robotId": "agibot-a2",
+    "batch": "B02",
+    "registeredName": "A2",
+    "officialCurrentName": "AGIBOT A2",
+    "recordScope": "specific-variant",
+    "variant": "A2 (base, no suffix)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "https://www.agibot.com/products/A2 and https://agibot.com/jp/products/A2 are live, fully-specified current pages (169cm/69kg/700Wh/40+ active DoF/2h). The 'AGIBOT A2' nav entry itself has no href (it is a category header; only A2 Ultra/A2 Lite/A2-W are directly hyperlinked from the visible nav), so A2 is not featured in the primary marketing carousel. However there is no discontinuation/successor notice, and two official news articles dated 2025-12-02 and 2026-01-19 (within the last ~7 months) still market A2 by name and state AgiBot 'achieved large-scale delivery of more than 1,000 units in 2025, ranking first in the world in the full-size bipedal humanoid field' (attributed to A2 specifically by an AgiBot SVP). Treated as current, not historical, per the instruction not to assume discontinuation just because a product is absent from the top nav links.",
+    "evidenceSourceUrls": [
+      "https://www.agibot.com/products/A2",
+      "https://agibot.com/jp/products/A2",
+      "https://www.agibot.com/article/231/detail/32.html",
+      "https://www.agibot.com/article/231/detail/35.html"
+    ]
+  },
+  {
+    "robotId": "agibot-a2-lite",
+    "batch": "B02",
+    "registeredName": "A2 Lite",
+    "officialCurrentName": "AGIBOT A2 Lite",
+    "recordScope": "specific-variant",
+    "variant": "A2 Lite",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Directly linked from current nav (/products/A2_Pro) and sold on the current store with a real, non-placeholder price ($44,560.00 USD, store.agibot.com/products/a2-lite).",
+    "evidenceSourceUrls": [
+      "https://www.agibot.com/products/A2_Pro",
+      "https://store.agibot.com/products/a2-lite"
+    ]
+  },
+  {
+    "robotId": "agibot-a2-max",
+    "batch": "B02",
+    "registeredName": "A2 Max",
+    "officialCurrentName": "AGIBOT A2-Max",
+    "recordScope": "specific-variant",
+    "variant": "A2 Max",
+    "lifecycleStatus": "announced",
+    "publicationRecommendation": "move-to-draft",
+    "successorRobot": null,
+    "reason": "Official EN page (https://www.agibot.com/products/A2_Max) and JP page (https://jp.agibot.com/products/A2_Max, checked 2026-07-17) both still show 'Coming soon' / '近日公開予定' with full detailed specs, and the site's own nav dropdown entry for A2 Max is marked 'display:none' (hidden from the visible menu, found in a2_product.html markup) even though the standalone page remains live and undated as unchanged since prior review. No store listing, no price, no deployment case exists. This matches the 'announced' definition (announced but not yet available) rather than 'current'.",
+    "evidenceSourceUrls": [
+      "https://www.agibot.com/products/A2_Max",
+      "https://jp.agibot.com/products/A2_Max"
+    ]
+  },
+  {
+    "robotId": "agibot-a2-ultra",
+    "batch": "B02",
+    "registeredName": "A2 Ultra",
+    "officialCurrentName": "AGIBOT A2 Ultra",
+    "recordScope": "specific-variant",
+    "variant": "A2 Ultra",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Directly linked from current site nav (/products/A2_Ultra) and sold on the current international store (store.agibot.com/products/a2-ultra, schema.org Offer availability=InStock). Product page markets it as 'World's First Commercially Scaled Fullsize Humanoid' with 'over a thousand units in real-world operations' and 'applied in over 20 leading enterprises', holding CR/CE-MD/CE-RED/FCC certifications.",
+    "evidenceSourceUrls": [
+      "https://www.agibot.com/products/A2_Ultra",
+      "https://store.agibot.com/products/a2-ultra"
+    ]
+  },
+  {
+    "robotId": "agibot-g2",
+    "batch": "B02",
+    "registeredName": "G2",
+    "officialCurrentName": "AGIBOT G2",
+    "recordScope": "specific-variant",
+    "variant": "G2",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Directly linked from current nav (/products/G2), and a very recent official press release (2026-06-28) states AGIBOT's 15,000th robot to roll off the production line 'is the AGIBOT G2, an industrial-grade embodied task robot designed for industrial and real-world operational scenarios,' following prior 5,000th/10,000th unit milestones — strong current mass-production evidence dated within the last month of the checkedAt date.",
+    "evidenceSourceUrls": [
+      "https://www.agibot.com/products/G2",
+      "https://www.agibot.com/article/231/detail/82.html"
+    ]
+  },
+  {
+    "robotId": "agibot-x1",
+    "batch": "B02",
+    "registeredName": "X1",
+    "officialCurrentName": "AGIBOT X1",
+    "recordScope": "specific-variant",
+    "variant": "X1",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Directly linked from current nav (/products/X1), marketed as 'Full-Stack Open-Source Robot', with active GitHub repos (agibot_x1_infer, agibot_x1_train, agibot_x1_hardware) and its own AGIBOT World Dataset / AimRT Framework open-source links in the current site nav. Genuinely open/research-oriented, not sold via store, but not discontinued or historical.",
+    "evidenceSourceUrls": [
+      "https://www.agibot.com/products/X1",
+      "https://github.com/AgibotTech"
+    ]
+  },
+  {
+    "robotId": "agibot-x2",
+    "batch": "B02",
+    "registeredName": "X2",
+    "officialCurrentName": "AGIBOT X2",
+    "recordScope": "specific-variant",
+    "variant": "X2 (base, non-Ultra)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Directly linked from current nav, sold on the current store with a real price ($24,240.00 USD, store.agibot.com/products/x2).",
+    "evidenceSourceUrls": [
+      "https://www.agibot.com/products/X2",
+      "https://store.agibot.com/products/x2"
+    ]
+  },
+  {
+    "robotId": "agibot-x2-ultra",
+    "batch": "B02",
+    "registeredName": "X2 Ultra",
+    "officialCurrentName": "AGIBOT X2 Ultra",
+    "recordScope": "specific-variant",
+    "variant": "X2 Ultra",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Directly linked from current store (store.agibot.com/products/x2-ultra, schema.org availability=InStock) and referenced as the flagship X2-series configuration on the current product page/table.",
+    "evidenceSourceUrls": [
+      "https://www.agibot.com/products/X2",
+      "https://store.agibot.com/products/x2-ultra"
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-c",
+    "batch": "B03",
+    "registeredName": "Walker C",
+    "officialCurrentName": "Walker C (UBTECH Walker C Humanoid Service Robot)",
+    "recordScope": "specific-variant",
+    "variant": "Walker C (commercial/service line; distinct from the newer Walker C1)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "UBTECH's current company-profile page lists 'Commercial: Walker C1, Walker C, Walker X' as current, concurrently-marketed products, and Walker C has its own live official product page with a full text-readable spec table and named deployment cases (checked 2026-07-17). Walker C1 exists as a separate, newer product (own page, own GA Robotics listing) but no official source states it replaces/discontinues Walker C -- both remain listed side by side -- so Walker C is 'current', not 'superseded'.",
+    "evidenceSourceUrls": [
+      "https://www.ubtrobot.com/en/humanoid/products/walker-c",
+      "https://www.ubtrobot.com/en/about/company-profile",
+      "https://ga-robotics.co.jp/pr/41810/"
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-s",
+    "batch": "B03",
+    "registeredName": "Walker S",
+    "officialCurrentName": "Walker S",
+    "recordScope": "specific-variant",
+    "variant": "Walker S (base/original tier of the industrial Walker S line; distinct from 'Walker S Lite')",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": "ubtech-walker-s1",
+    "reason": "UBTECH's current company-profile page explicitly lists Walker S among current Industrial products ('Walker S2, Walker S1, Walker S'), and Walker S has its own live official product page (checked 2026-07-17) which itself names Walker S1 and Walker S2 as later variants. Walker S remains separately marketed today (not discontinued), so lifecycleStatus is 'current'; successorRobot records the next-generation sibling as an FYI, not a supersession.",
+    "evidenceSourceUrls": [
+      "https://www.ubtrobot.com/en/humanoid/products/walker-s",
+      "https://www.ubtrobot.com/en/about/company-profile",
+      "https://www.ubtrobot.com/en/humanoid/solutions/industry"
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-s1",
+    "batch": "B03",
+    "registeredName": "Walker S1",
+    "officialCurrentName": "Walker S1",
+    "recordScope": "specific-variant",
+    "variant": "Walker S1 (mid-tier of the industrial Walker S line, between Walker S and Walker S2)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": "ubtech-walker-s2",
+    "reason": "UBTECH's current company-profile page explicitly lists Walker S1 among current Industrial products ('Walker S2, Walker S1, Walker S'), and Walker S1 has its own live official product page (checked 2026-07-17). The own product page's text explicitly frames Walker S as predecessor and Walker S2 as successor within the same family, but S1 itself remains separately listed/marketed today -- not discontinued -- so lifecycleStatus is 'current' with successorRobot recorded as an FYI on the newer sibling, not as a supersession.",
+    "evidenceSourceUrls": [
+      "https://www.ubtrobot.com/en/humanoid/products/walker-s1",
+      "https://www.ubtrobot.com/en/about/company-profile",
+      "https://www.ubtrobot.com/en/humanoid/solutions/industry"
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-s2",
+    "batch": "B03",
+    "registeredName": "Walker S2",
+    "officialCurrentName": "Walker S2 (\"Autonomous Battery Swapping for Mass Production Delivery\")",
+    "recordScope": "specific-variant",
+    "variant": "Walker S2 (current flagship of the industrial Walker S line)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "UBTECH's own current company-profile page explicitly lists 'Industrial: Walker S2, Walker S1, Walker S' as current products (checked 2026-07-17), and Walker S2 has its own live official product page whose title itself claims 'Mass Production Delivery'. GA Robotics (UBTECH's JP distributor) also actively markets Walker S2 with a dedicated current product page and a 2025-11 press release. This supersedes DATA-R01's caution: current-page marketing language ('Mass Production Delivery') is usable directly as marketAvailability evidence regardless of any old case-study ambiguity.",
+    "evidenceSourceUrls": [
+      "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+      "https://www.ubtrobot.com/en/about/company-profile",
+      "https://ga-robotics.co.jp/products/walker-s2/",
+      "https://ga-robotics.co.jp/pr/42088/",
+      "https://www.ubtrobot.com/en/humanoid/solutions/industry"
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-tienkung",
+    "batch": "B03",
+    "registeredName": "Walker Tienkung",
+    "officialCurrentName": "UBTECH Walker Tienkung Humanoid Robot for Academic Research & Education",
+    "recordScope": "product-family",
+    "variant": "Walker Tienkung family: TK2101 (base, 20 DoF) / TK2201 ('Voice & Vision', 21 DoF) / TK2301 ('Embodied Intelligence', 42 DoF); GA Robotics additionally lists a separate, newer 'Walker Tienkung DEX' SKU with yet different specs",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "This is UBTECH's own product (own domain ubtrobot.com, own SDK docs domain docs.ubtrobot.com, and JP distributor GA Robotics all use the 'Walker Tienkung' name), listed under UBTECH's current 'AI Education' product category on both the company-profile page and the AI Education solutions index (checked 2026-07-17) -- not a project independently run by a third party. GA Robotics' JP page explicitly confirms it is the renamed continuation of the formerly-named 'Walker E / Walker E Pro' models. IMPORTANT CAVEAT: international/Chinese press (TechNode, heise, others, not opened as primary sources this session) separately describe a jointly-developed 'Tiangong Walker' (with the Beijing/China Humanoid Robot Innovation Center) whose quoted base specs (170cm, 20 DoF, ~$41k) closely match TK2101's specs (173cm, 20 DoF) found in UBTECH's own docs -- suggesting 'Tiangong Walker' press coverage and UBTECH's own 'Walker Tienkung' (TK2101 tier) likely refer to the same underlying product with a different English transliteration of Chinese 天工, rather than being the fully separate Beijing Innovation Center in-house research robot that ran the 2025 humanoid half-marathon under its own 'Tiangong' brand. This distinction was NOT fully resolved from primary sources this session and is flagged in unresolved/humanReviewRequired rather than asserted as fact.",
+    "evidenceSourceUrls": [
+      "https://www.ubtrobot.com/en/ai-education/products/walker-tienkung",
+      "https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/",
+      "https://docs.ubtrobot.com/walker-tienkung/en/docs/sdk/7/",
+      "https://ga-robotics.co.jp/products/walker-tienkung/",
+      "https://www.ubtrobot.com/en/about/company-profile"
+    ]
+  },
+  {
+    "robotId": "ubtech-walker-x",
+    "batch": "B03",
+    "registeredName": "Walker X",
+    "officialCurrentName": "Walker X",
+    "recordScope": "specific-variant",
+    "variant": "Walker X (commercial/service line)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "UBTECH's current company-profile page lists 'Commercial: Walker C1, Walker C, Walker X' as current products, and Walker X has its own live official product page with a full, text-readable spec table (checked 2026-07-17). No successor or discontinuation notice found.",
+    "evidenceSourceUrls": [
+      "https://www.ubtrobot.com/en/humanoid/products/walker-x",
+      "https://www.ubtrobot.com/en/about/company-profile"
+    ]
+  },
+  {
+    "robotId": "fourier-gr1",
+    "batch": "B04",
+    "registeredName": "GR-1",
+    "officialCurrentName": "GR-1（傅利叶第一代通用人形机器人 / Fourier's 1st-generation general-purpose humanoid）",
+    "recordScope": "historical-model",
+    "variant": "GR-1 (generic entry; possible Pro/Lite sub-variants unresolved)",
+    "lifecycleStatus": "superseded",
+    "publicationRecommendation": "archive",
+    "successorRobot": "fourier-gr2",
+    "reason": "As of 2026-07-17, GR-1 has NO current dedicated product page, spec sheet, brochure link, or developer-docs section on Fourier's live site. Direct checks today of every previously-cited GR-1 URL returned 404: https://www.fftai.com/products-gr1, the GR-1 brochure PDF, and the GR-1 exhibition case page (fftai.com/solutions/9). The current Developer Center homepage (support.fftai.com/en/) explicitly lists 'GR-1 Coming Soon' (i.e., no current GR-1 docs). GR-1 is mentioned ONLY on the current 'About GRx' history page (https://www.fftai.com/grx/about), which frames it as '傅利叶第一代通用人形机器人' (Fourier's 1st-generation general-purpose humanoid) within an explicit three-generation lineage (GR-1 → GR-2 → GR-3 Series, '历经三次技术迭代'). This is a positive, current, official statement that GR-1 is a past generation of an actively iterating product line, not simply an absence of information — hence 'superseded' rather than 'unknown', and 'archive' rather than 'manual-review' (which is reserved for unexplained vanishing with no generational framing at all).",
+    "evidenceSourceUrls": [
+      "https://www.fftai.com/grx/about",
+      "https://support.fftai.com/en/",
+      "https://www.fftai.com/products-gr1",
+      "https://www.fftai.com/resources/download"
+    ]
+  },
+  {
+    "robotId": "fourier-gr2",
+    "batch": "B04",
+    "registeredName": "GR-2",
+    "officialCurrentName": "GR-2（傅利叶第二代通用人形机器人 / Fourier's 2nd-generation general-purpose humanoid）",
+    "recordScope": "historical-model",
+    "variant": "GR-2 (generic entry)",
+    "lifecycleStatus": "superseded",
+    "publicationRecommendation": "archive",
+    "successorRobot": "fourier-gr3",
+    "reason": "As of 2026-07-17, GR-2 has no current dedicated marketing page (fftai.com/products-gr2 and /products-gr2.html both 404 today) and no current Developer Center section ('GR-2 Coming Soon' on support.fftai.com/en/). GR-2 is described only on the current 'About GRx' history page as '傅利叶第二代通用人形机器人' (2nd generation), explicitly positioned between GR-1 and the current GR-3 Series in a stated three-generation lineage. Unlike GR-1, however, GR-2 IS still explicitly listed as a currently-supported model in the actively-maintained Aurora SDK (GitHub, v1.3.0) alongside GR-3 — i.e. there is live current evidence of continued software/developer support for already-deployed GR-2 units, even though there is no current sales/marketing page. This nuance is noted but does not change the overall lifecycle call, since marketAvailability/product-page presence (not SDK legacy support) governs 'current' vs 'superseded' per this project's definitions.",
+    "evidenceSourceUrls": [
+      "https://www.fftai.com/grx/about",
+      "https://support.fftai.com/en/",
+      "https://github.com/FFTAI/fourier_aurora_sdk",
+      "https://www.fftai.com/products-gr2.html"
+    ]
+  },
+  {
+    "robotId": "fourier-gr3",
+    "batch": "B04",
+    "registeredName": "GR-3",
+    "officialCurrentName": "GR-3（\"猫猫头\" / Cat Head）",
+    "recordScope": "specific-variant",
+    "variant": "GR-3 (interaction-focused variant of the GR-3 Series)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "GR-3 is the flagship model shown on the manufacturer's current live navigation (公司サイト GRx系列 > GR-3系列, https://www.fftai.com/grx/gr3), described as Fourier's first full-size 'Care-bot', with an actively maintained Developer Center spec sheet (支持.fftai.com, page title 'Robot Overview', Published Time 2026-07-10) and Aurora SDK support (GitHub, v1.3.0). The old URLs cited in the repo (fftai.com/products-gr3, /products-gr3series, /newsroom-humanoid/26) all now return 404 on the live site as of 2026-07-17; the current canonical page is /grx/gr3.",
+    "evidenceSourceUrls": [
+      "https://www.fftai.com/grx/gr3",
+      "https://www.fftai.com/grx/about",
+      "https://support.fftai.com/en/getting-started/general-information",
+      "https://support.fftai.com/en/",
+      "https://github.com/FFTAI/fourier_aurora_sdk"
+    ]
+  },
+  {
+    "robotId": "fourier-gr3c",
+    "batch": "B04",
+    "registeredName": "GR-3C",
+    "officialCurrentName": "GR-3C（\"宇航员\" / Astronaut）",
+    "recordScope": "specific-variant",
+    "variant": "GR-3C (function-focused variant of the GR-3 Series)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "GR-3C is explicitly named as one of the two current GR-3 Series variants ('全系列包含以交互服务为主导的GR-3和以功能服务为主导的GR-3C两款产品') on the manufacturer's current live page https://www.fftai.com/grx/gr3, checked 2026-07-17. The old standalone URL fftai.com/products-gr3c now 404s — GR-3C's current official presence is as a variant section within the GR-3 Series page, not a separate product page. This is a genuine current-product finding, not an assumption carried over from the old (now-dead) standalone page.",
+    "evidenceSourceUrls": [
+      "https://www.fftai.com/grx/gr3",
+      "https://www.fftai.com/grx/about"
+    ]
+  },
+  {
+    "robotId": "engineai-pm01",
+    "batch": "B05",
+    "registeredName": "PM01",
+    "officialCurrentName": "ENGINEAI PM01",
+    "recordScope": "product-family",
+    "variant": "commercial edition (商业版) / education edition (教育版)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "公式製品ページ・購入ページで現行販売中（¥188,000）と確認でき、さらに南京の交通協管実運用（Jiangsu Qing'an JV経由）と深圳京東之家旗艦店の接客導入という2件の実運用が、パートナー/政府の公式発表で裏付けられる。commercial/education editionで仕様が大きく異なるためproduct-family扱いとする。",
+    "evidenceSourceUrls": [
+      "https://www.engineai.com.cn/product-pm01.html",
+      "https://www.engineai.com.cn/product-purchase.html",
+      "https://www.duoluntech.com/index.php/news/detail/285.html"
+    ]
+  },
+  {
+    "robotId": "engineai-sa01",
+    "batch": "B05",
+    "registeredName": "SA01",
+    "officialCurrentName": "ENGINEAI SA01",
+    "recordScope": "specific-variant",
+    "variant": "SA01（現行公式ページはEDU区分を明示せず単一製品として掲載）",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "公式製品ページ(product-sa01.html)と公式購入ページ(product-purchase.html、¥42,000)が現行販売中の単一製品として確認できる。2024年の『SA01 EDU』という呼称は初期展開時のブランディングであり、現行公式ページはSA01という単一名称のみを用いている。",
+    "evidenceSourceUrls": [
+      "https://www.engineai.com.cn/product-sa01.html",
+      "https://www.engineai.com.cn/product-purchase.html"
+    ]
+  },
+  {
+    "robotId": "engineai-se01",
+    "batch": "B05",
+    "registeredName": "SE01",
+    "officialCurrentName": "ENGINEAI SE01",
+    "recordScope": "specific-variant",
+    "variant": "SE01 (no sub-editions found)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "公式ホームページ(トップ)と公式製品ページ product-se01.html の両方で現行フラッグシップ機として継続掲載されている。購入導線・現行価格は確認できないが、製品自体の現行性は公式サイトで確認できる。",
+    "evidenceSourceUrls": [
+      "https://www.engineai.com.cn/",
+      "https://www.engineai.com.cn/product-se01.html",
+      "https://www.engineai.com.cn/about-news-media/23.html"
+    ]
+  },
+  {
+    "robotId": "engineai-t800",
+    "batch": "B05",
+    "registeredName": "T800",
+    "officialCurrentName": "ENGINEAI T800",
+    "recordScope": "product-family",
+    "variant": "Basic / Development(Eco・Open-Source) / Pro / Max",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "公式製品ページが4エディションの価格・仕様を明示し、公式ニュースが発売開始（2025-12-08）・CES2026出展（2026-01-08、Duolun公式サイトで確認）・量産ライン稼働と初回ロット出荷（2026-05-22）を報じている。現行販売中と判断する。edition間の仕様差が非常に大きいためproduct-family扱いとする。",
+    "evidenceSourceUrls": [
+      "https://www.engineai.com.cn/product-t800.html",
+      "https://www.engineai.com.cn/about-news-media/41.html",
+      "https://www.engineai.com.cn/about-news-media/59.html"
+    ]
+  },
+  {
+    "robotId": "apptronik-apollo",
+    "batch": "B06",
+    "registeredName": "Apollo",
+    "officialCurrentName": null,
+    "recordScope": "historical-model",
+    "variant": "Apollo（第1世代, 2023年8月発表）",
+    "lifecycleStatus": "superseded",
+    "publicationRecommendation": "archive",
+    "successorRobot": "apptronik-apollo-2",
+    "reason": "apptronik.com に現行の 'Apollo'（第1世代）専用ページは存在しない。https://apptronik.com/apollo は HTTP 404（2026-07-17に curl -I で確認、last-modified等のCloudflareヘッダは404レスポンスのもの）。現行サイトのフッターナビゲーション上、'Apollo' カテゴリの下にあるリンクは 'Apollo 2' (/apollo/apollo-2) の1本のみで、初代Apolloへの現行導線は皆無。初代Apolloの情報は2023-2024年のnews-collection記事（Unveils Apollo, Mercedes-Benz commercial agreement, GXO PoC）としてのみ現存し、いずれも当時のプレスリリースであって現行製品ページではない。2026年6月30日公式発表 'Welcome to Robot Park' はApollo 2のみを『現行の稼働プラットフォーム』として記載し、初代Apolloへの言及はない。以上より、初代Apolloは公式の現行ラインナップには存在せず、同一ブランド内の後継 (Apollo 2) が明確なため 'superseded' と判定した（discontinuedの明示声明はないため discontinued にはしない）。",
+    "evidenceSourceUrls": [
+      "https://apptronik.com/apollo",
+      "https://apptronik.com/apollo/apollo-2",
+      "https://apptronik.com/",
+      "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+      "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work"
+    ]
+  },
+  {
+    "robotId": "apptronik-apollo-2",
+    "batch": "B06",
+    "registeredName": "Apollo 2",
+    "officialCurrentName": "Apollo 2",
+    "recordScope": "specific-variant",
+    "variant": "Apollo 2（二足構成 / 車輪ベース構成）",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "apptronik.com/apollo/apollo-2 は現行サイトの唯一の'Apollo'現行製品ページ（HTTP 200、フッターナビゲーション'Apollo'カテゴリの唯一のリンク先）。2026-06-30付け公式ニュース『Welcome to Robot Park』はApollo 2をRobot Park（Austin、約90,000平方フィート）および顧客・パートナー拠点で1年以上稼働する『workhorse』と明記し、テレオペレーションと自律実行の組み合わせでGoogle DeepMindとの学習データ収集を行っていると記載。ただし詳細スペック（身長・重量・DoF・payload・runtime等）は数値として一切公表されていない。第三者報道（The Robot Report等、参考のみ）はApollo 2自体を『データ収集・実証プラットフォーム』とし、真の商用製品はApollo 3になる見込みと伝えるが、これはApollo 2が非公開・非稼働であることを意味しない。現行サイト上の稼働実績と'pilot'/'enterprise-pilot'という現行データの位置づけは整合しており、keep-publishedとする。",
+    "evidenceSourceUrls": [
+      "https://apptronik.com/apollo/apollo-2",
+      "https://apptronik.com/",
+      "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work"
+    ]
+  },
+  {
+    "robotId": "onex-eve",
+    "batch": "B06",
+    "registeredName": "EVE Industrial",
+    "officialCurrentName": "Eve",
+    "recordScope": "specific-variant",
+    "variant": "EVE Industrial（車輪型産業用ヒューマノイド）",
+    "lifecycleStatus": "limited-current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "1x.tech/eve は現行サイトのグローバルフッターナビゲーションに『Eve Industrial』として現存するページ（HTTP 200）だが、ページ埋め込みのCMSメタデータ（Sanity CMS の _updatedAt）は2025-02-26付けで、それ以降スペック・価格等の実質更新がない。現行/neoのような仕様表・注文導線（/order相当）はEVEには存在しない。一方、公式Enterprise/Robot Fleetページ（2025-10-28更新）は背景画像に『EVE Robots sorting mail』を使用し続けており、企業向け訴求から完全に消えたわけではない。会社公式Aboutページは2022年のEVE顧客導入・自律稼働開始を明記し、2024年の1X World Model研究でも『EVE humanoids』でのデータ収集が確認できる。2025-2026年の新規発表（NEO Factory、EQT提携等）はすべてNEOのみを対象とし、EVE向けの新規オーダーページ・価格ページは見当たらない。以上より、廃止の公式宣言はないが、新規販売や仕様更新はほぼ停止し既存顧客・研究用途に限定されている状態と判断し、'limited-current' とした。ページ自体は現存するため 'historical' や 'discontinued' は採用しない。",
+    "evidenceSourceUrls": [
+      "https://www.1x.tech/eve",
+      "https://www.1x.tech/about",
+      "https://www.1x.tech/robot-fleet",
+      "https://www.1x.tech/press"
+    ]
+  },
+  {
+    "robotId": "onex-neo",
+    "batch": "B06",
+    "registeredName": "NEO",
+    "officialCurrentName": "NEO",
+    "recordScope": "specific-variant",
+    "variant": "NEO（2026年 Early Access出荷世代。NEO Beta(2024)・NEO Gammaとは別世代として現行サイトでも画像カテゴリが分離）",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "1x.tech/neo は現行トップナビゲーションから直接遷移する現行製品ページで、1x.tech/order で購入手続きが可能。公式プレスギャラリー(1x.tech/press)はNEO(18枚)をNEOGamma(4枚+動画5本)・NEOBeta(4枚+動画5本)と別カテゴリで管理しており、現行出荷世代と旧世代が公式に区別されている。2026年4月30日公式記事でHayward工場が稼働、年産1万台体制と明記。2025年12月11日公式プレスリリース(businesswire配信)でEQTとの提携により2026-2030年に最大1万台をEQTポートフォリオ企業（製造・倉庫・物流中心）へ供給する計画も確認。",
+    "evidenceSourceUrls": [
+      "https://www.1x.tech/neo",
+      "https://www.1x.tech/order",
+      "https://www.1x.tech/press",
+      "https://www.1x.tech/discover/neo-factory"
+    ]
+  },
+  {
+    "robotId": "booster-k1",
+    "batch": "B07",
+    "registeredName": "K1",
+    "officialCurrentName": "Booster K1",
+    "recordScope": "product-family",
+    "variant": "Geek / Education / Professional (identical physical dimensions/DoF; differ in compute (48/117/200 TOPS), battery (2Ah/5Ah/5Ah), runtime (30/80/80min), warranty)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "K1 is listed as a current product on booster.tech's index and store with an active starting price ('From $5,999') and 'Buy Now' purchase flow. No discontinuation/successor statement found.",
+    "evidenceSourceUrls": [
+      "https://www.booster.tech/",
+      "https://www.booster.tech/booster-k1/",
+      "https://www.booster.tech/store/"
+    ]
+  },
+  {
+    "robotId": "booster-t1",
+    "batch": "B07",
+    "registeredName": "T1",
+    "officialCurrentName": "Booster T1",
+    "recordScope": "product-family",
+    "variant": "Basic / Standard / Customized (identical dimensions/weight; differ in DoF via end-effector and in compute platform)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "T1 is listed as a current product on booster.tech's index and store alongside K1 and the newer T2, with its own live product page and 'Available for worldwide shipping' framing. No official discontinuation or successor statement exists for T1; T2 is an additional higher-tier flagship product sold in parallel, not a stated replacement for T1.",
+    "evidenceSourceUrls": [
+      "https://www.booster.tech/",
+      "https://www.booster.tech/booster-t1/",
+      "https://www.booster.tech/store/"
+    ]
+  },
+  {
+    "robotId": "kepler-k1",
+    "batch": "B07",
+    "registeredName": "Forerunner K1",
+    "officialCurrentName": "Kepler Forerunner K1",
+    "recordScope": "specific-variant",
+    "variant": "Single known configuration (no Basic/Development split found, unlike K2)",
+    "lifecycleStatus": "limited-current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "K1's official product page is still live on gotokepler.com with an active ordering/contact channel, and remains referenced on the current homepage — it has not vanished or been marked discontinued. However the K1 page itself states the robot 'will be commercialized and mass-produced in near future', i.e. official material does not claim current mass-market shipping (unlike K2, which has a dated 2025-09-26 press release confirming mass production/customer shipping). This is treated as limited/developer-and-inquiry availability rather than full current production, and as distinct from an announced-only unreleased product since the page and ordering channel have existed since at least 2023-2024.",
+    "evidenceSourceUrls": [
+      "https://www.gotokepler.com",
+      "https://gotokepler.com/productDetailK1",
+      "https://gotokepler.com/contact?type=ordering"
+    ]
+  },
+  {
+    "robotId": "kepler-k2",
+    "batch": "B07",
+    "registeredName": "Forerunner K2",
+    "officialCurrentName": "Kepler Forerunner K2 (\"Bumblebee\")",
+    "recordScope": "product-family",
+    "variant": "Basic (30 DoF, 75kg) / Bipedal Development (52 DoF) / Wheeled Development (52 DoF, 135kg)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "K2 is Kepler's current flagship, officially confirmed via a Kepler-issued press release (2025-09-26) to be in mass production with customer shipments underway ('several thousand units', 'hundreds of millions of yuan' in contract value), and remains the lead product on the current gotokepler.com homepage.",
+    "evidenceSourceUrls": [
+      "https://www.gotokepler.com",
+      "https://www.gotokepler.com/productDetailK2?id=2",
+      "https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html"
+    ]
+  },
+  {
+    "robotId": "leju-kuavo",
+    "batch": "B08",
+    "registeredName": "KUAVO 4Pro Standard",
+    "officialCurrentName": "KUAVO 4Pro",
+    "recordScope": "specific-variant",
+    "variant": "Standard (one of Standard / Advanced / MaxA / MaxB / Showroom / Showroom Compute Edition configurations documented in the official manual)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "KUAVO 4Pro is still listed as a current product on Leju's official EN (lejurobot.com/en) and ZH (lejurobot.com/zh) sites in 2026, with an active official manual describing the Standard configuration in detail (dimensions, DoF, battery, compute). KUAVO 5 / 5-W is a newer, parallel product line — Leju's own site presents it alongside 4Pro under the same 'General Humanoid Robot Series' without any explicit successor/end-of-life statement for 4Pro, so it is not marked superseded.",
+    "evidenceSourceUrls": [
+      "https://www.lejurobot.com/en",
+      "https://www.lejurobot.com/zh",
+      "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/"
+    ]
+  },
+  {
+    "robotId": "leju-kuavo5",
+    "batch": "B08",
+    "registeredName": "KUAVO 5 Advanced",
+    "officialCurrentName": "KUAVO 5 / 5-W",
+    "recordScope": "specific-variant",
+    "variant": "Advanced (bipedal humanoid form; KUAVO 5-W is a separate wheeled-arm variant not covered by this record)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "KUAVO 5 / 5-W is presented as Leju's newest, currently-marketed generation ('更懂工业' — newly upgraded for industry), listed alongside KUAVO 4Pro on the official site rather than as its formal replacement. The Advanced configuration's specs are documented in a dedicated official manual page.",
+    "evidenceSourceUrls": [
+      "https://www.lejurobot.com/zh",
+      "https://www.lejurobot.com/zh/products/kuavo-5",
+      "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/"
+    ]
+  },
+  {
+    "robotId": "limx-luna",
+    "batch": "B08",
+    "registeredName": "Luna",
+    "officialCurrentName": "Luna",
+    "recordScope": "specific-variant",
+    "variant": "Luna (base configuration; official spec table shows two nearly-identical configuration columns without named differentiation)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Luna is LimX Dynamics' current full-size interactive humanoid, formally (re)announced May 26, 2026 as 'All-New Full-Size Humanoid Robot Luna' with an active product page and spec sheet.",
+    "evidenceSourceUrls": [
+      "https://www.limxdynamics.com/en/products/luna",
+      "https://www.limxdynamics.com/en/products/luna/spec",
+      "https://www.limxdynamics.com/en/news/BK000062"
+    ]
+  },
+  {
+    "robotId": "limx-oli",
+    "batch": "B08",
+    "registeredName": "Oli EDU",
+    "officialCurrentName": "Oli",
+    "recordScope": "specific-variant",
+    "variant": "EDU (one of Lite / EDU / Super / Pro(175cm-Standard) columns on the official spec-comparison table)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Oli remains LimX Dynamics' current general-purpose humanoid line ('continuously iterated and optimized' per the official product page), with EDU as one of four distinguishable configurations on the current official spec table. IMPORTANT CORRECTION vs. the existing repo record: the current official spec table places EDU at 31 active DoF and ~2h battery life — the repo's registered dof=33 and runtimeMin=90 actually match the 'Super' column, not 'EDU'. This looks like a column mix-up in the prior data pass and is flagged as a conflict below.",
+    "evidenceSourceUrls": [
+      "https://www.limxdynamics.com/",
+      "https://www.limxdynamics.com/en/products/oli",
+      "https://www.limxdynamics.com/en/products/oli/spec"
+    ]
+  },
+  {
+    "robotId": "pal-kangaroo",
+    "batch": "B08",
+    "registeredName": "KANGAROO",
+    "officialCurrentName": "KANGAROO",
+    "recordScope": "product-family",
+    "variant": "Base platform with selectable 4/5/7-DoF arm configurations (each a distinct, officially documented row in the datasheet)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "KANGAROO appears on PAL's current official index (pal-robotics.com/robots/) with active product and datasheet pages. Its 4/5/7-DoF arm configurations are clearly distinguishable by payload package on the official datasheet, so per-configuration loadRatings should be kept (not treated as an unresolved conflict) — this corrects DATA-R01's over-cautious treatment. A 'Kangaroo PRO' dual-arm variant was reported in third-party press (2025 Automatica launch) but was not found as a distinct row on the currently-open official product/datasheet pages, so it is not registered separately.",
+    "evidenceSourceUrls": [
+      "https://pal-robotics.com/robots/",
+      "https://pal-robotics.com/robot/kangaroo/",
+      "https://pal-robotics.com/datasheet/kangaroo/"
+    ]
+  },
+  {
+    "robotId": "pal-talos",
+    "batch": "B08",
+    "registeredName": "TALOS",
+    "officialCurrentName": "TALOS",
+    "recordScope": "specific-variant",
+    "variant": "TALOS (base platform; head and gripper are customizable)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "TALOS appears on PAL Robotics' current official product index (pal-robotics.com/robots/) in 2026 with active 'Request a quote' / 'Download Datasheet' CTAs, its own product page and datasheet. PAL's own KANGAROO blog describes KANGAROO as building upon 'previous humanoid platforms like REEM-C and TALOS,' but PAL has not published any explicit discontinuation or successor statement for TALOS itself, so it remains current rather than superseded.",
+    "evidenceSourceUrls": [
+      "https://pal-robotics.com/robots/",
+      "https://pal-robotics.com/robot/talos/",
+      "https://pal-robotics.com/datasheet/talos/"
+    ]
+  },
+  {
+    "robotId": "agility-digit",
+    "batch": "B09",
+    "registeredName": "Digit",
+    "officialCurrentName": "Digit",
+    "recordScope": "specific-variant",
+    "variant": "現行商用Digit（2023年 Next-Gen Digit 以降、2025年安全機能・グリッパー更新を含む継続改良版）",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "agilityrobotics.com のトップページで「Digit is a commercially deployed humanoid robot」と明記され、GXO・Schaeffler・Amazon・Mercado Libre・Toyota Motor Manufacturing Canadaが顧客として掲載されている。GXOとは2024年6月にRaaS商用契約を締結し、2025年11月時点で単一拠点で10万個超のトート搬送を公式発表。現行の量産・商用販売中モデルとして扱ってよい。",
+    "evidenceSourceUrls": [
+      "https://agilityrobotics.com/",
+      "https://www.agilityrobotics.com/solutions",
+      "https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics",
+      "https://www.agilityrobotics.com/content/digit-moves-over-100k-totes"
+    ]
+  },
+  {
+    "robotId": "boston-dynamics-atlas",
+    "batch": "B09",
+    "registeredName": "Atlas",
+    "officialCurrentName": "Atlas",
+    "recordScope": "specific-variant",
+    "variant": "全電動Atlas（2024年4月発表、2025年12月23日付Sales Sheetの製品版）",
+    "lifecycleStatus": "limited-current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "bostondynamics.com/products/atlas/ と2025-12-23付Atlas-SalesSheetで現行製品として仕様を確認。2026-01-05の公式ブログで『All Atlas deployments are already fully committed for 2026』（Hyundai RMAC・Google DeepMind向け）とあり、早期採用顧客に限定출荷中。旧来の油圧式Atlasは2024年4月に公式に引退（'An Electric New Era for Atlas'）しており、現行電動Atlasとは別世代として区別する。",
+    "evidenceSourceUrls": [
+      "https://bostondynamics.com/products/atlas/",
+      "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+      "https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/"
+    ]
+  },
+  {
+    "robotId": "figure-03",
+    "batch": "B09",
+    "registeredName": "Figure 03",
+    "officialCurrentName": "Figure 03",
+    "recordScope": "specific-variant",
+    "variant": "Figure 03（2025年10月発表の第3世代、家庭・量産製造双方を想定）",
+    "lifecycleStatus": "limited-current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "figure.ai/figure に現行製品として身長・重量・速度・稼働時間・バッテリー・ペイロードが明記され、BMW Spartanburgでの部品シーケンシング実演（2026-06-30発表）が確認できる。ただし一般販売・外部調達条件は非公開でパートナー実証中心のため、marketAvailability=enterprise-pilotに整合するlimited-currentとした。",
+    "evidenceSourceUrls": [
+      "https://www.figure.ai/figure",
+      "https://www.figure.ai/news/introducing-figure-03",
+      "https://www.figure.ai/news/f-03-battery-development",
+      "https://www.figure.ai/news/f-03-at-bmw"
+    ]
+  },
+  {
+    "robotId": "kawasaki-kaleido",
+    "batch": "B09",
+    "registeredName": "Kaleido",
+    "officialCurrentName": "RHP Kaleido（最新は2025年11月発表 Kaleido 9）",
+    "recordScope": "product-family",
+    "variant": "2015年プロトタイプ〜2025年Kaleido 9までの世代横断シリーズ名。単一世代の確定仕様なし。",
+    "lifecycleStatus": "limited-current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "kawasakirobotics.comの公式ブログ（2026-01-15付、英語版）およびその日本語版で2015年プロトタイプから2023年RHP7までの開発史を確認。加えて2025年11月開催の2025国際ロボット展でKaleido 9が公式に披露されたことをkawasakirobotics.com自身の検索結果・関連ブログ（2026-03-16付『Kaleido9が目指すヒューマノイドの現在地』）で確認したが、当該記事には数値スペックの記載がなかった。身長190cm・体重99kg・自由度30等の具体的数値は複数の第三者媒体（PC Watch、マイナビ、ITmedia、BigGo等）でのみ報じられ、川崎重工自身のページ上でこれらの数値を直接確認できなかったため未採用。『脚部は販売開始を見据えて部品定格を厳守する設計へ刷新』という自社ブログの記述はあり、商用化を見据えた開発が続いている段階と判断しlimited-current（研究・展示プラットフォーム）とした。",
+    "evidenceSourceUrls": [
+      "https://kawasakirobotics.com/asia-oceania/blog/202511_kaleido/",
+      "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/",
+      "https://kawasakirobotics.com/in/blog/story_22/"
+    ]
+  },
+  {
+    "robotId": "neura-4ne-1",
+    "batch": "B09",
+    "registeredName": "4NE1 Gen 3",
+    "officialCurrentName": "4NE1 Gen 3",
+    "recordScope": "specific-variant",
+    "variant": "4NE1 Gen 3（二足構成、フルサイズ。4NE1 Miniは別モデルのため対象外）",
+    "lifecycleStatus": "announced",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "NEURA公式が2026-06-05付で発行した『4NE1 Gen 3』データシート（neurarobotics.px.media配下、Adobe Illustratorメタデータで作成者Carolin Klein、ファイル名『4NE1-gen-3-cmyk』と確認）で身長・重量・速度・自由度・ハンド自由度・ペイロード・制御方式・安全機能を確認できた。neura-robotics.comのHTML製品ページ・予約ページは本セッション中すべて403で直接アクセスできなかったが、独立したWebSearchクロスチェックにより『4NE1 Gen 3.5は個別注文€98,000、20台以上のバルク注文€60,000、年内出荷予定』『4NE1 Miniは2026年春出荷』という予約ページの情報が確認できる。まだ量産出荷前の予約・reservation段階（marketAvailability=reservation）のため、lifecycleStatusはannounced（発表済みだが量産・出荷前）とした。",
+    "evidenceSourceUrls": [
+      "https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf"
+    ]
+  },
+  {
+    "robotId": "sanctuary-phoenix",
+    "batch": "B09",
+    "registeredName": "Phoenix",
+    "officialCurrentName": "Phoenix Gen 8",
+    "recordScope": "specific-variant",
+    "variant": "Phoenix Generation 8（車輪ベース、Carbon AI搭載、高品質データ収集用途）",
+    "lifecycleStatus": "limited-current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "sanctuary.aiの公式ニュースでGen 8を『released less than eight months after Gen 7』と明記し、二足からホイールベースへ移行したと確認できる。ただし2026-06-17の公式発表『Sanctuary AI Expands Physical AI Strategy to Industrial Robotics』では、FANUC・Universal Robots等の産業用アームにPhysical AIソフトウェアを展開する方針へ重心が移り、Phoenixヒューマノイド自体は『次世代の産業用ヒューマノイドの基盤』という将来位置づけの記述にとどまる。明確な終売宣言はないためdiscontinuedとはせず、研究・データ収集中心のlimited-currentとした。",
+    "evidenceSourceUrls": [
+      "https://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/",
+      "https://sanctuary.ai/news/sanctuary-ai-expands-physical-ai-strategy-to-industrial-robotics-demonstrating-production-ready-ai-performance/"
+    ]
+  },
+  {
+    "robotId": "tesla-optimus",
+    "batch": "B09",
+    "registeredName": "Optimus",
+    "officialCurrentName": "Optimus",
+    "recordScope": "product-family",
+    "variant": "現行社内使用世代（Gen 2.5相当）。次世代Gen 3は開発中で2026-07-17時点で未発表・未量産。",
+    "lifecycleStatus": "limited-current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "tesla.com/AI および ir.tesla.com のPDFはいずれも本セッションでWebFetchが403で拒否され直接一次資料を開けなかった（Tesla側のボット対策とみられる）。WebSearch経由の要約では、TeslaがGen 3を『開発中で、量産開始は2026年内目標』としており、2026-07-17時点で外部未公開・社内学習用途中心（マスク氏の決算説明での発言として複数メディアが報道）と繰り返し報じられている。既存レコードのspecs（mobility: biped, controlMethod: 自律AI制御）はrepositoryのTesla公式ソースと整合するが、本セッションでは一次ページを直接開いて再検証できていない。外部販売は未開始のためmarketAvailability=internal-useのまま据え置く。",
+    "evidenceSourceUrls": [
+      "https://www.tesla.com/AI",
+      "https://ir.tesla.com/_flysystem/s3/sec/000162828024032603/tsla-20240723-gen.pdf"
+    ]
+  },
+  {
+    "robotId": "xpeng-iron",
+    "batch": "B09",
+    "registeredName": "Next-Gen IRON",
+    "officialCurrentName": "Next-Gen IRON",
+    "recordScope": "specific-variant",
+    "variant": "2025年11月5日発表のNext-Gen IRON（自社工場・店舗での実証運用段階）",
+    "lifecycleStatus": "limited-current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "xpeng.com公式プレスルーム記事（2025-11-05付）で自由度・全固体電池・Turing AIチップ・SDK公開方針を確認。2026年末までの量産化目標と、Baosteelとの産業実証パートナーシップ、案内・買い物ガイド・交通誘導等の商業シナリオへの優先展開方針が公式に明記されている。外部販売は未開始でエコシステムパートナーとの実証段階のためlimited-currentとした。",
+    "evidenceSourceUrls": [
+      "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7"
+    ]
+  },
+  {
+    "robotId": "aeolus-aeo",
+    "batch": "B10",
+    "registeredName": "aeo",
+    "officialCurrentName": "aeo (aeo™)",
+    "recordScope": "specific-variant",
+    "variant": "aeo — Aeolus's third-generation dual-arm service robot, debuted CES 2023; officially distinguished from the company's 'first single-arm robot in 2018'",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "aeo is the sole product featured on Aeolus Robotics' current official site (aeolusbot.com), with dedicated current solution pages (disinfect/care/delivery/security), a mobile app, leasing/subscription plans, and named customer testimonials presented in the present tense on the current homepage. Aeolus's own CES2023 press release (PRNewswire, 2023-01-04) explicitly frames aeo as a third-generation, dual-arm advance distinct from 'our first single-arm robot in 2018' — this resolves the ambiguity DATA-R01 flagged: the 2019 Marubun PDF almost certainly refers to that earlier single-arm generation, but the CURRENT aeolusbot.com homepage independently carries a present-tense Marubun executive testimonial explicitly describing a 'two-armed humanoid robot' — i.e. the aeo generation — which is usable as current official-page evidence per this batch's instructions regardless of the older PDF's ambiguity.",
+    "evidenceSourceUrls": [
+      "https://www.aeolusbot.com/",
+      "https://www.aeolusbot.com/meet-aeo",
+      "https://www.prnewswire.com/news-releases/aeolus-debuts-autonomous-dual-arm-humanoid-robot-at-ces-301713109.html"
+    ]
+  },
+  {
+    "robotId": "galbot-g1",
+    "batch": "B10",
+    "registeredName": "Galbot G1",
+    "officialCurrentName": "Galbot-G1 (银河通用 G1)",
+    "recordScope": "specific-variant",
+    "variant": "G1 wheeled dual-arm mobile manipulator (current generation)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed directly on Galbot's own current product page (galbot.com/g1/, accessed via a text-rendering proxy since the page is JS-rendered) and the developer manual mirror. No successor or discontinuation found.",
+    "evidenceSourceUrls": [
+      "https://www.galbot.com/g1/",
+      "https://developer.galbot.com/docs/g1/2.2.4/zh/g1"
+    ]
+  },
+  {
+    "robotId": "mentee-menteebotv3",
+    "batch": "B10",
+    "registeredName": "MenteeBot",
+    "officialCurrentName": "MenteeBot (公式サイトはバージョン表記なし。NVIDIA公式カスタマーストーリーは『MenteeBot V3.0』と明記)",
+    "recordScope": "specific-variant",
+    "variant": "MenteeBot V3 (third-generation; NVIDIA customer story explicitly names 'MenteeBot V3.0', while Mentee's own current product page displays specs without an explicit version label)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed on Mentee Robotics' own current product page (menteebot.com/bot/) and independently on NVIDIA's official customer-story page naming 'MenteeBot V3.0'. Mobileye announced a definitive agreement (2026-01-06, ~$900M) to acquire Mentee Robotics; official coverage states Mentee will operate as an independent unit within Mobileye and continue MenteeBot development toward PoC deployments in 2026 and series production targeted 2028 — this is an ownership change, not a product discontinuation.",
+    "evidenceSourceUrls": [
+      "https://www.menteebot.com/bot/",
+      "https://nvidia.com/en-us/customer-stories/mentee-robotics",
+      "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai"
+    ]
+  },
+  {
+    "robotId": "robotera-l7",
+    "batch": "B10",
+    "registeredName": "L7",
+    "officialCurrentName": "ROBOT L7 (星动L7)",
+    "recordScope": "specific-variant",
+    "variant": "L7 full-size bipedal humanoid (distinct model from Q5 wheeled and M7 upper-body-only)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Confirmed via RobotEra's own launch press release (Newsfile Corp, distributed on behalf of ROBOTERA, 2025-07-28/29) and reiterated at CES 2026 (Jan 2026) as part of the current 'Hexa-Core' lineup (L7, Q5, XHAND1). RBTX marketplace lists RobotEra itself as the seller of the L7. No discontinuation or successor found.",
+    "evidenceSourceUrls": [
+      "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+      "https://www.autonomyglobal.co/robotera-showcases-its-hexa-core-robotics-lineup-at-ces-2026/",
+      "https://rbtx.com/en-US/components/humanoid/robotera-l7-humanoid-robot-55-dof"
+    ]
+  },
+  {
+    "robotId": "robotera-m7",
+    "batch": "B10",
+    "registeredName": "M7",
+    "officialCurrentName": "ROBOTERA M7",
+    "recordScope": "specific-variant",
+    "variant": "M7 fixed upper-body-only humanoid (torso mounted on stand; distinct from L7 full-size biped and Q5 wheeled)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "manual-review",
+    "successorRobot": null,
+    "reason": "M7 appears on RobotEra's own current product navigation (confirmed via robotera.com/en/robotics/M7.html nav listing) and is sold through multiple resellers (American Satellite, Robots International, RBTX-family sites), but this session could not open a RobotEra-first-party or clearly-authorized-distributor page with M7's own numeric specs (the product page itself is JS-rendered and returned only nav/company boilerplate). Numeric specs below rely solely on convergent third-party reseller/aggregator reporting, not a directly-opened official or confirmed-authorized source, so a manual re-check of the official M7 page (with a JS-capable browser) is recommended before fully trusting the numbers.",
+    "evidenceSourceUrls": [
+      "https://www.robotera.com/en/robotics/M7.html",
+      "https://www.americansatellite.us/Robotera-M7-Upper-Body-Humanoid-Robot.htm"
+    ]
+  },
+  {
+    "robotId": "robotera-q5",
+    "batch": "B10",
+    "registeredName": "Q5",
+    "officialCurrentName": "ROBOTERA Q5",
+    "recordScope": "specific-variant",
+    "variant": "Q5 wheeled service humanoid (distinct model from L7 bipedal and M7 upper-body-only)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Q5 is listed on RobotEra's own product line (robotera.com/en/enq5) and was showcased at CES 2026 (Jan 2026) alongside L7 and XHAND1 as part of the current lineup. RBTX marketplace lists RobotEra itself as the seller. No numeric spec could be independently confirmed on RobotEra's own JS-rendered product page directly (access limitation), so specs below rely on the RBTX official-store listing and convergent CES 2026 press coverage.",
+    "evidenceSourceUrls": [
+      "https://www.robotera.com/en/enq5",
+      "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+      "https://www.autonomyglobal.co/robotera-showcases-its-hexa-core-robotics-lineup-at-ces-2026/"
+    ]
+  },
+  {
+    "robotId": "wandercraft-calvin",
+    "batch": "B10",
+    "registeredName": "Calvin-40",
+    "officialCurrentName": "Calvin-40",
+    "recordScope": "specific-variant",
+    "variant": "Calvin-40 (current industrial humanoid; distinct from Wandercraft's medical exoskeleton products Atalante X / Eve)",
+    "lifecycleStatus": "current",
+    "publicationRecommendation": "keep-published",
+    "successorRobot": null,
+    "reason": "Listed as the first of Wandercraft's 'Current Products' on the official homepage, with its own current product page, an official Renault Group partnership announcement (2025-06-06), and an official SAPA deployment-partnership announcement (2025-11-12). No successor or discontinuation notice found.",
+    "evidenceSourceUrls": [
+      "https://www.wandercraft.eu/",
+      "https://en.wandercraft.eu/calvin-40",
+      "https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft",
+      "https://www.wandercraft.eu/articles/wandercraft-and-sapa-announce-deployment-partnership-in-industrial-manufacturing-cementing-europes-emerging-championship-in-the-humanoids-race"
+    ]
+  }
+]

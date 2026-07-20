@@ -161,9 +161,6 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
             <RobotImageCarousel robot={robot} />
 
             <section id="specs" className="scroll-mt-site-header border-b border-border py-10">
-              <h2 className="mb-5 text-lg font-semibold text-foreground">
-                {uiText.robots.detailedSpecifications}
-              </h2>
               <RobotSpecExplorer groups={specGroups} />
             </section>
 

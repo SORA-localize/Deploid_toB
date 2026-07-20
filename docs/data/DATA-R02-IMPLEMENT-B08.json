@@ -1,0 +1,3162 @@
+[
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B08",
+    "robotId": "leju-kuavo",
+    "identity": {
+      "registeredName": "KUAVO 4Pro Standard",
+      "officialCurrentName": "KUAVO 4Pro",
+      "recordScope": "specific-variant",
+      "variant": "Standard (one of Standard / Advanced / MaxA / MaxB / Showroom / Showroom Compute Edition configurations documented in the official manual)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "KUAVO 4Pro is still listed as a current product on Leju's official EN (lejurobot.com/en) and ZH (lejurobot.com/zh) sites in 2026, with an active official manual describing the Standard configuration in detail (dimensions, DoF, battery, compute). KUAVO 5 / 5-W is a newer, parallel product line — Leju's own site presents it alongside 4Pro under the same 'General Humanoid Robot Series' without any explicit successor/end-of-life statement for 4Pro, so it is not marked superseded.",
+      "evidenceSourceUrls": [
+        "https://www.lejurobot.com/en",
+        "https://www.lejurobot.com/zh",
+        "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "二足歩行",
+          "normalizedValue": "biped",
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 4Pro Standard official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Standard",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Manual describes a 6-DoF-per-leg bipedal walking platform."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 4Pro Standard official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Standard構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 166,
+        "proposedValue": 166,
+        "evidence": {
+          "value": "1.66m",
+          "normalizedValue": 166,
+          "rawUnit": "m",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 4Pro Standard official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Standard",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Standard edition height listed as 1.66m."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 4Pro Standard official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Standard構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 55,
+        "proposedValue": 55,
+        "evidence": {
+          "value": "55kg",
+          "normalizedValue": 55,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 4Pro Standard official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Standard",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Standard edition weight listed as 55kg."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 4Pro Standard official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Standard構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": null,
+        "proposedValue": 0.4,
+        "evidence": {
+          "value": "步行 0.4 m/s / 跑步 5km/h",
+          "normalizedValue": 0.4,
+          "rawUnit": "m/s (walking); km/h (running)",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 4Pro Standard official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Standard",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Manual states walking speed 0.4 m/s and running speed 5km/h (≈1.39 m/s); recorded value is the walking figure."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 4Pro Standard official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Standard構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 22,
+        "proposedValue": 22,
+        "evidence": {
+          "value": "22 DOF (excluding end-effector)",
+          "normalizedValue": 22,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 4Pro Standard official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Standard",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "22 DoF total (5 DoF/arm, 6 DoF/leg), excluding end-effector."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 4Pro Standard official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Standard構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 60,
+        "proposedValue": 60,
+        "evidence": {
+          "value": "1 hour (walking)",
+          "normalizedValue": 60,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 4Pro Standard official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Standard",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "1 hour walking runtime on a full charge."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 4Pro Standard official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Standard構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": null,
+        "proposedValue": 90,
+        "evidence": {
+          "value": "≤1.5 hours",
+          "normalizedValue": 90,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 4Pro Standard official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Standard",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Charge time ≤1.5 hours."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 4Pro Standard official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Standard構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "交換式60V 6Ahリチウムバッテリー（充電1.5時間以内）",
+        "proposedValue": null,
+        "evidence": {
+          "value": "60V 6Ah swappable lithium battery, cycle life ≥500",
+          "normalizedValue": null,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 4Pro Standard official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Standard",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "60V/6Ah swappable battery, ≥500 charge cycles."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 4Pro Standard official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Standard構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": null,
+        "proposedValue": null,
+        "evidence": {
+          "value": "H12 remote controller + ROS Topic/Service API control",
+          "normalizedValue": null,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO SDK documentation",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "KUAVO humanoid line (4Pro/5, excl. 5-W)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "SDK docs describe H12 remote controller use in functional cases plus primary API-based control via ROS topics/services; applies to the KUAVO humanoid (biped) line, separate from the KUAVO 5-W wheeled interface."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO ROS SDK documentation",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "KUAVO ROS SDK（ROS 1 / Pythonサンプル）",
+        "proposedValue": null,
+        "evidence": {
+          "value": "kuavo_sdk (ROS1-based development interface, Python3)",
+          "normalizedValue": null,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO SDK documentation",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "KUAVO humanoid line (4Pro/5, excl. 5-W)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "kuavo_sdk is a ROS1-based interface package with Python3 examples; unified control interface for locomotion, audio, and image processing."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO ROS SDK documentation",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "computePlatform",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "Intel Core i9-13900H + NVIDIA Jetson Orin NX",
+        "proposedValue": null,
+        "evidence": {
+          "value": "Intel Core i9-13900H (64GB DDR5/500GB SSD) + NVIDIA Jetson Orin NX (8GB/256GB)",
+          "normalizedValue": null,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 4Pro Standard official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Standard",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Lower unit: Intel i9-13900H 'Mofang' board; Upper unit: NVIDIA Orin NX (6-core Cortex-A78AE)."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 4Pro Standard official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Standard構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に荷重候補がない。"
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "proposedValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "developer-platform",
+        "proposedValue": "developer-platform",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "channelsChecked",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "Leju's own Tmall flagship store exists (lejuznsb.tmall.com → world.tmall.com) but requires Taobao login; could not retrieve product/price listing (source-inaccessible). No manufacturer-public price found on manual/product/SDK pages.",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "ROS1 SDK / developer platform positioning; manual and SDK docs targeted at research/development integration",
+        "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+        "evidenceScope": "current-family-common",
+        "variant": "KUAVO humanoid line",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "leju-kuavo",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.letools.lejurobot.com/"
+          ],
+          "reason": "公式LeToolsでKUAVO 4Proを研究開発向けの構成として位置付けている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO ROS SDK documentation",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": []
+    },
+    "currentFeatures": [
+      {
+        "feature": "Emergency stop button",
+        "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+        "evidenceSummary": "Manual lists a physical E-stop.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Swappable battery",
+        "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+        "evidenceSummary": "60V 6Ah swappable battery pack.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Sensors: depth camera, 6-mic array, LiDAR (360°, 40m), IMU",
+        "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+        "evidenceSummary": "Gemini 335L depth camera, mid-360 LiDAR, mic array, IMU.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "ROS1 SDK / API control (kuavo_sdk)",
+        "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+        "evidenceSummary": "ROS1-based SDK with Python3 samples.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B08",
+    "robotId": "leju-kuavo5",
+    "identity": {
+      "registeredName": "KUAVO 5 Advanced",
+      "officialCurrentName": "KUAVO 5 / 5-W",
+      "recordScope": "specific-variant",
+      "variant": "Advanced (bipedal humanoid form; KUAVO 5-W is a separate wheeled-arm variant not covered by this record)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "KUAVO 5 / 5-W is presented as Leju's newest, currently-marketed generation ('更懂工业' — newly upgraded for industry), listed alongside KUAVO 4Pro on the official site rather than as its formal replacement. The Advanced configuration's specs are documented in a dedicated official manual page.",
+      "evidenceSourceUrls": [
+        "https://www.lejurobot.com/zh",
+        "https://www.lejurobot.com/zh/products/kuavo-5",
+        "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "二足歩行",
+          "normalizedValue": "biped",
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 5 Advanced official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Advanced",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "6-DoF-per-leg bipedal walking form (Advanced)."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 5 Advanced official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Advanced構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 173,
+        "proposedValue": 173,
+        "evidence": {
+          "value": "1.73m",
+          "normalizedValue": 173,
+          "rawUnit": "m",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 5 Advanced official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Advanced",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Advanced edition height 1.73m."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 5 Advanced official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Advanced構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 63.5,
+        "proposedValue": 63.5,
+        "evidence": {
+          "value": "63.5kg",
+          "normalizedValue": 63.5,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 5 Advanced official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Advanced",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Advanced edition weight 63.5kg."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 5 Advanced official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Advanced構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": null,
+        "proposedValue": 0.4,
+        "evidence": {
+          "value": "步行 0.4 m/s / 跑步 5km/h",
+          "normalizedValue": 0.4,
+          "rawUnit": "m/s (walking); km/h (running)",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 5 Advanced official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Advanced",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Walking 0.4 m/s, running 5km/h (≈1.39 m/s)."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 5 Advanced official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Advanced構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 29,
+        "proposedValue": 29,
+        "evidence": {
+          "value": "29 DOF (excluding end-effector): head 2 + arm 7×2 + leg 6×2 + waist 1",
+          "normalizedValue": 29,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 5 Advanced official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Advanced",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "29 DoF total plus a 1-DoF two-finger gripper."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 5 Advanced official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Advanced構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 60,
+        "proposedValue": 60,
+        "evidence": {
+          "value": "1 hour (walking)",
+          "normalizedValue": 60,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 5 Advanced official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Advanced",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "1 hour walking runtime."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 5 Advanced official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Advanced構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": null,
+        "proposedValue": 90,
+        "evidence": {
+          "value": "≤1.5 hours",
+          "normalizedValue": 90,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 5 Advanced official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Advanced",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Charge time ≤1.5 hours."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 5 Advanced official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Advanced構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "交換式60V 6Ahリチウムバッテリー（充電1.5時間以内）",
+        "proposedValue": null,
+        "evidence": {
+          "value": "60V 6Ah swappable lithium battery, cycle life ≥500",
+          "normalizedValue": null,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 5 Advanced official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Advanced",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Same 60V/6Ah swappable battery spec as 4Pro."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 5 Advanced official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Advanced構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": null,
+        "proposedValue": null,
+        "evidence": {
+          "value": "H12 remote controller + ROS Topic/Service API control",
+          "normalizedValue": null,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO SDK documentation",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "KUAVO humanoid line (4Pro/5, excl. 5-W)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Same SDK/remote control docs cover both 4Pro and 5 (humanoid form); 5-W has a separate documented interface."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO ROS SDK documentation",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "KUAVO ROS SDK（ROS 1 / Pythonサンプル）",
+        "proposedValue": null,
+        "evidence": {
+          "value": "kuavo_sdk (ROS1-based development interface, Python3)",
+          "normalizedValue": null,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO SDK documentation",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "KUAVO humanoid line (4Pro/5, excl. 5-W)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Same ROS1/Python3 SDK family-wide for the humanoid (biped) line."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO ROS SDK documentation",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "computePlatform",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "GENE-MTH6 + NVIDIA Jetson Orin NX",
+        "proposedValue": null,
+        "evidence": {
+          "value": "GENE-MTH6 (Intel Core Ultra 7, 64GB DDR5/512GB SSD) + ORIN-NX (8GB/256GB)",
+          "normalizedValue": null,
+          "sourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+          "sourceTitle": "KUAVO 5 Advanced official manual",
+          "publisher": "Leju Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "Advanced",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Lower unit GENE-MTH6 board (Core Ultra 7), upper unit ORIN-NX."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KUAVO 5 Advanced official manual",
+            "url": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+            "publisher": "Leju Robot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Advanced構成の寸法、重量、自由度、歩行稼働時間、バッテリー、演算構成を確認。"
+          }
+        }
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に荷重候補がない。"
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "proposedValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "developer-platform",
+        "proposedValue": "developer-platform",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "channelsChecked",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "No manufacturer-public price found on manual/product pages. Official Tmall store exists but is login-gated (source-inaccessible for KUAVO 5 pricing).",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "研究/教育 (research/education) listed among KUAVO 5 application scenarios",
+        "evidenceSourceUrl": "https://www.lejurobot.com/zh/products/kuavo-5",
+        "evidenceScope": "variant-specific",
+        "variant": "KUAVO 5 / 5-W",
+        "reason": "資料variantと登録variantが一致しない。",
+        "action": "hold-variant"
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": []
+    },
+    "currentFeatures": [
+      {
+        "feature": "Standard two-finger gripper (1 DoF)",
+        "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+        "evidenceSummary": "Advanced configuration includes a standard 2-finger gripper.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Sensors: stereo depth camera (IP65), LiDAR (IP67, 40-70m), 6-mic array with 360° localization, IMU",
+        "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/",
+        "evidenceSummary": "Component sensor list from manual.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "ROS1 SDK / API control (kuavo_sdk), shared with 4Pro",
+        "evidenceSourceUrl": "https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/",
+        "evidenceSummary": "Same SDK across the KUAVO humanoid line.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B08",
+    "robotId": "pal-talos",
+    "identity": {
+      "registeredName": "TALOS",
+      "officialCurrentName": "TALOS",
+      "recordScope": "specific-variant",
+      "variant": "TALOS (base platform; head and gripper are customizable)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "TALOS appears on PAL Robotics' current official product index (pal-robotics.com/robots/) in 2026 with active 'Request a quote' / 'Download Datasheet' CTAs, its own product page and datasheet. PAL's own KANGAROO blog describes KANGAROO as building upon 'previous humanoid platforms like REEM-C and TALOS,' but PAL has not published any explicit discontinuation or successor statement for TALOS itself, so it remains current rather than superseded.",
+      "evidenceSourceUrls": [
+        "https://pal-robotics.com/robots/",
+        "https://pal-robotics.com/robot/talos/",
+        "https://pal-robotics.com/datasheet/talos/"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "sourceUrl": "https://pal-robotics.com/robot/talos/",
+          "sourceTitle": "TALOS | High-Performance Humanoid Robot",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "TALOS",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "TALOS is a bipedal humanoid research platform."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "TALOS Humanoid Robot",
+            "url": "https://pal-robotics.com/robot/talos/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 175,
+        "proposedValue": 175,
+        "evidence": {
+          "value": "175 cm",
+          "normalizedValue": 175,
+          "sourceUrl": "https://pal-robotics.com/datasheet/talos/",
+          "sourceTitle": "TALOS official datasheet",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "TALOS",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Datasheet lists height 175 cm."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "TALOS official datasheet",
+            "url": "https://pal-robotics.com/datasheet/talos/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 95,
+        "proposedValue": 95,
+        "evidence": {
+          "value": "95 kg",
+          "normalizedValue": 95,
+          "sourceUrl": "https://pal-robotics.com/datasheet/talos/",
+          "sourceTitle": "TALOS official datasheet",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "TALOS",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Datasheet lists weight 95 kg."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "TALOS official datasheet",
+            "url": "https://pal-robotics.com/datasheet/talos/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 32,
+        "proposedValue": 32,
+        "evidence": {
+          "value": "32 DoF",
+          "normalizedValue": 32,
+          "sourceUrl": "https://pal-robotics.com/datasheet/talos/",
+          "sourceTitle": "TALOS official datasheet",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "TALOS",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Datasheet lists 32 DoF."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "TALOS official datasheet",
+            "url": "https://pal-robotics.com/datasheet/talos/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 90,
+        "proposedValue": 90,
+        "evidence": {
+          "value": "1.5h walking / 3h stand-by",
+          "normalizedValue": 90,
+          "sourceUrl": "https://pal-robotics.com/datasheet/talos/",
+          "sourceTitle": "TALOS official datasheet",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "TALOS",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Battery autonomy: 1.5h walking mode, 3h stand-by; recorded value is walking-mode runtime."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "TALOS official datasheet",
+            "url": "https://pal-robotics.com/datasheet/talos/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 1080,
+        "proposedValue": 1080,
+        "evidence": {
+          "value": "1080 Wh (Lithium-Ion), max discharge +100A",
+          "normalizedValue": 1080,
+          "sourceUrl": "https://pal-robotics.com/datasheet/talos/",
+          "sourceTitle": "TALOS official datasheet",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "TALOS",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Datasheet explicitly states 1080 Wh Li-Ion battery."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "TALOS official datasheet",
+            "url": "https://pal-robotics.com/datasheet/talos/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "リチウムイオンバッテリー（公称1080Wh）",
+        "proposedValue": null,
+        "evidence": {
+          "value": "Lithium-Ion, 1080 Wh, max discharge +100A",
+          "normalizedValue": null,
+          "sourceUrl": "https://pal-robotics.com/datasheet/talos/",
+          "sourceTitle": "TALOS official datasheet",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "TALOS",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Li-Ion pack rated for +100A max discharge."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "TALOS official datasheet",
+            "url": "https://pal-robotics.com/datasheet/talos/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "関節トルク制御 / ros_control / 遠隔操作オプション",
+        "proposedValue": null,
+        "evidence": {
+          "value": "Fully torque-controlled (torque sensor feedback in all joints except head/wrists/grippers), EtherCAT network, ros_control loop 2kHz standard / up to 5kHz",
+          "normalizedValue": null,
+          "sourceUrl": "https://pal-robotics.com/robot/talos/",
+          "sourceTitle": "TALOS | High-Performance Humanoid Robot",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "TALOS",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Product page describes full torque control, EtherCAT, and control loop frequency."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "TALOS Humanoid Robot",
+            "url": "https://pal-robotics.com/robot/talos/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "ROS / OROCOS / ros_control / MoveIt!",
+        "proposedValue": null,
+        "evidence": {
+          "value": "ROS (fully ROS-developed), OROCOS, ros_control, MoveIt!, Gazebo simulation model",
+          "normalizedValue": null,
+          "sourceUrl": "https://pal-robotics.com/robot/talos/",
+          "sourceTitle": "TALOS | High-Performance Humanoid Robot",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "TALOS",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Product page confirms ROS/OROCOS/ros_control/MoveIt! stack and Gazebo model."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "TALOS Humanoid Robot",
+            "url": "https://pal-robotics.com/robot/talos/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "computePlatform",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "Intel Core i7 PC × 2",
+        "proposedValue": null,
+        "evidence": {
+          "value": "Intel Core i7 × 2 (control PC + multimedia PC), Ubuntu LTS + Linux RT Preempt",
+          "normalizedValue": null,
+          "sourceUrl": "https://pal-robotics.com/datasheet/talos/",
+          "sourceTitle": "TALOS official datasheet",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "TALOS",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Datasheet lists dual i7 PCs and OS stack."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "TALOS official datasheet",
+            "url": "https://pal-robotics.com/datasheet/talos/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "set",
+      "candidates": [
+        {
+          "action": "set",
+          "reason": "対象範囲・rating・条件が分離された現行荷重候補。",
+          "proposedValue": {
+            "scope": "single-arm",
+            "rating": "unspecified",
+            "kg": 6,
+            "condition": "Arm fully extended; datasheet/product page do not distinguish rated vs. maximum.",
+            "variant": "TALOS",
+            "sourceUrl": "https://pal-robotics.com/robot/talos/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "TALOS Humanoid Robot",
+              "url": "https://pal-robotics.com/robot/talos/",
+              "publisher": "PAL Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "proposedValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "research-platform",
+        "proposedValue": "research-platform",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "channelsChecked",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "No manufacturer-public price on product/datasheet pages; site only offers 'Request a quote'.",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "\"Advanced humanoid designed for research applications\"",
+        "evidenceSourceUrl": "https://pal-robotics.com/robots/",
+        "evidenceScope": "current-product",
+        "variant": "TALOS",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "pal-talos",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://pal-robotics.com/robot/talos/"
+          ],
+          "reason": "公式ページで研究向けプラットフォームとして明示されている。ただし特定研究機関への導入事例は現行確認できていない。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "TALOS official use-case source",
+            "url": "https://pal-robotics.com/robots/",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "replace-usage-example-urls",
+      "candidates": [
+        {
+          "customerOrInstitution": "LAAS-CNRS / TOWARD / Dynamograde lab (EU research collaboration)",
+          "classification": "research",
+          "evidenceSourceUrl": "https://pal-robotics.com/blog/talos-research-torque-controlled-locomotion-for-humanoids-in-unknown-environments/",
+          "variant": "TALOS",
+          "scopeNote": "PAL's own current blog post describes joint research on generalised torque-controlled locomotion (stair-climbing, door-opening) in unknown environments; presented on PAL's current site as TALOS's own capability demonstration, not tied to an ambiguous old generation.",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "未知環境でのトルク制御歩行と階段昇降を研究",
+              "url": "https://pal-robotics.com/blog/talos-research-torque-controlled-locomotion-for-humanoids-in-unknown-environments/",
+              "publisher": "PAL Robotics",
+              "publishedAt": "2023-12-30",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "customerOrInstitution": "MEMMO EU consortium (CNRS, Idiap, University of Edinburgh, Max Planck Institute, Oxford Robotics Institute, Airbus, Wandercraft, Costain, PAL Robotics); specific unit 'Pyrène' operated by LAAS-CNRS",
+          "classification": "research",
+          "evidenceSourceUrl": "https://pal-robotics.com/blog/memmo-memories-robots-motion-generation/",
+          "variant": "TALOS",
+          "scopeNote": "EU-funded research project; a LAAS-CNRS TALOS unit was tested at an Airbus facility for aircraft-manufacturing motion-generation tasks. This is an academic-industrial research project, not a commercial TALOS sale/deployment.",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "航空機製造作業向けの動作生成を検証",
+              "url": "https://pal-robotics.com/blog/memmo-memories-robots-motion-generation/",
+              "publisher": "PAL Robotics",
+              "publishedAt": "2019-02-01",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "Full torque control with torque sensors in all joints (except head/wrists/grippers)",
+        "evidenceSourceUrl": "https://pal-robotics.com/robot/talos/",
+        "evidenceSummary": "Enables multi-contact motions and reactive control.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Customizable head and gripper",
+        "evidenceSourceUrl": "https://pal-robotics.com/robot/talos/",
+        "evidenceSummary": "Product page states head/gripper are fully customizable.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Whole-Body Control framework, navigation, HRI skills, teleoperation",
+        "evidenceSourceUrl": "https://pal-robotics.com/robot/talos/",
+        "evidenceSummary": "Premium software stack listed on product page.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Force/Torque sensing at wrists and ankles, joint temperature sensors",
+        "evidenceSourceUrl": "https://pal-robotics.com/robot/talos/",
+        "evidenceSummary": "Sensor suite accessible via ros_control.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B08",
+    "robotId": "pal-kangaroo",
+    "identity": {
+      "registeredName": "KANGAROO",
+      "officialCurrentName": "KANGAROO",
+      "recordScope": "product-family",
+      "variant": "Base platform with selectable 4/5/7-DoF arm configurations (each a distinct, officially documented row in the datasheet)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "KANGAROO appears on PAL's current official index (pal-robotics.com/robots/) with active product and datasheet pages. Its 4/5/7-DoF arm configurations are clearly distinguishable by payload package on the official datasheet, so per-configuration loadRatings should be kept (not treated as an unresolved conflict) — this corrects DATA-R01's over-cautious treatment. A 'Kangaroo PRO' dual-arm variant was reported in third-party press (2025 Automatica launch) but was not found as a distinct row on the currently-open official product/datasheet pages, so it is not registered separately.",
+      "evidenceSourceUrls": [
+        "https://pal-robotics.com/robots/",
+        "https://pal-robotics.com/robot/kangaroo/",
+        "https://pal-robotics.com/datasheet/kangaroo/"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "sourceUrl": "https://pal-robotics.com/robot/kangaroo/",
+          "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "KANGAROO",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Bipedal dynamic-locomotion research platform."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KANGAROO official product page",
+            "url": "https://pal-robotics.com/robot/kangaroo/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "conflict",
+        "action": "hold-conflict",
+        "reason": "一次資料間または資料と登録対象の競合を解消していない。",
+        "currentValue": 158,
+        "proposedValue": null
+      },
+      {
+        "key": "weightKg",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 2,
+        "proposedValue": 2,
+        "evidence": {
+          "value": "2 m/s",
+          "normalizedValue": 2,
+          "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/",
+          "sourceTitle": "KANGAROO official datasheet",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "KANGAROO",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Datasheet lists max speed 2 m/s, consistent with product page's dynamic-locomotion framing."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KANGAROO official datasheet",
+            "url": "https://pal-robotics.com/datasheet/kangaroo/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "dof",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 180,
+        "proposedValue": 180,
+        "evidence": {
+          "value": "3 hours",
+          "normalizedValue": 180,
+          "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/",
+          "sourceTitle": "KANGAROO official datasheet",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "KANGAROO",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Datasheet and product-page text both state 3h autonomy."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KANGAROO official datasheet",
+            "url": "https://pal-robotics.com/datasheet/kangaroo/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "source-inaccessible",
+        "action": "hold-source-inaccessible",
+        "reason": "一次資料本文を再取得できない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "ros2_control / 構成可能なアクチュエータ制御 / VR遠隔操作",
+        "proposedValue": null,
+        "evidence": {
+          "value": "ros2_control-based actuator control (current/speed/position/impedance/force-torque modes)",
+          "normalizedValue": null,
+          "sourceUrl": "https://pal-robotics.com/robot/kangaroo/",
+          "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "KANGAROO",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product page confirms ros2_control with multiple actuator control modes; a VR-teleoperation claim in the prior repo record was not independently confirmed this session and is flagged in unresolved."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KANGAROO official product page",
+            "url": "https://pal-robotics.com/robot/kangaroo/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "ROS 2 / ros2_control / PAL OS / C++・Python API",
+        "proposedValue": null,
+        "evidence": {
+          "value": "Ubuntu LTS + ROS 2 LTS + PAL OS, ros2_control, URDF/MJCF models, MuJoCo & mjlab simulation",
+          "normalizedValue": null,
+          "sourceUrl": "https://pal-robotics.com/robot/kangaroo/",
+          "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "KANGAROO",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Full software stack confirmed on product page."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KANGAROO official product page",
+            "url": "https://pal-robotics.com/robot/kangaroo/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "computePlatform",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "Intel i7 PC × 2 / NVIDIA Jetson GPU（オプション）",
+        "proposedValue": null,
+        "evidence": {
+          "value": "Intel i7 control PC (32GB/1TB) + Intel i7 multimedia PC (32GB/1TB); optional NVIDIA Jetson GPU; dual WiFi6",
+          "normalizedValue": null,
+          "sourceUrl": "https://pal-robotics.com/robot/kangaroo/",
+          "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "KANGAROO",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Confirmed dual i7 PCs, optional Jetson GPU."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KANGAROO official product page",
+            "url": "https://pal-robotics.com/robot/kangaroo/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "IEC 61508 SIL 2 / EN ISO 13849-1 PL d",
+        "proposedValue": null,
+        "evidence": {
+          "value": "IEC 61508 SIL 2 (onboard + wireless emergency button); EN ISO 13849-1 PL d",
+          "normalizedValue": null,
+          "sourceUrl": "https://pal-robotics.com/robot/kangaroo/",
+          "sourceTitle": "Kangaroo | Biped Humanoid Robot for Locomotion Research",
+          "publisher": "PAL Robotics",
+          "checkedAt": "2026-07-17",
+          "variant": "KANGAROO",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Confirmed safety certifications on the current product page."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KANGAROO official product page",
+            "url": "https://pal-robotics.com/robot/kangaroo/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "hold-variant",
+      "candidates": [
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "single-arm",
+            "rating": "unspecified",
+            "kg": 7,
+            "condition": "Arm extended; datasheet does not separate rated/maximum.",
+            "variant": "KANGAROO 4 DoF arms",
+            "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "KANGAROO official datasheet",
+              "url": "https://pal-robotics.com/datasheet/kangaroo/",
+              "publisher": "PAL Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "dual-arm",
+            "rating": "unspecified",
+            "kg": 30,
+            "condition": "Bi-manual, 4 DoF arms.",
+            "variant": "KANGAROO 4 DoF arms",
+            "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "KANGAROO official datasheet",
+              "url": "https://pal-robotics.com/datasheet/kangaroo/",
+              "publisher": "PAL Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "single-arm",
+            "rating": "unspecified",
+            "kg": 5,
+            "condition": "Arm extended; datasheet does not separate rated/maximum.",
+            "variant": "KANGAROO 5 DoF arms",
+            "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "KANGAROO official datasheet",
+              "url": "https://pal-robotics.com/datasheet/kangaroo/",
+              "publisher": "PAL Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "dual-arm",
+            "rating": "unspecified",
+            "kg": 28,
+            "condition": "Bi-manual, 5 DoF arms.",
+            "variant": "KANGAROO 5 DoF arms",
+            "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "KANGAROO official datasheet",
+              "url": "https://pal-robotics.com/datasheet/kangaroo/",
+              "publisher": "PAL Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "single-arm",
+            "rating": "unspecified",
+            "kg": 3,
+            "condition": "Arm extended; datasheet does not separate rated/maximum.",
+            "variant": "KANGAROO 7 DoF arms",
+            "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "KANGAROO official datasheet",
+              "url": "https://pal-robotics.com/datasheet/kangaroo/",
+              "publisher": "PAL Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "dual-arm",
+            "rating": "unspecified",
+            "kg": 25,
+            "condition": "Bi-manual, 7 DoF arms.",
+            "variant": "KANGAROO 7 DoF arms",
+            "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "KANGAROO official datasheet",
+              "url": "https://pal-robotics.com/datasheet/kangaroo/",
+              "publisher": "PAL Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "proposedValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "research-platform",
+        "proposedValue": "research-platform",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "channelsChecked",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "No manufacturer-public price found; product page only offers 'Request a quote' / 'Download Datasheet'.",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "\"A must for your research on dynamic locomotion, reinforcement learning and embodied AI\"",
+        "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/",
+        "evidenceScope": "current-family-common",
+        "variant": "KANGAROO",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "pal-kangaroo",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://pal-robotics.com/robot/kangaroo/"
+          ],
+          "reason": "公式ページで動的歩行、強化学習、具身AI向けの開発プラットフォームとして明示されている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KANGAROO official product page",
+            "url": "https://pal-robotics.com/robot/kangaroo/",
+            "publisher": "PAL Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": [
+        {
+          "customerOrInstitution": "PAL Robotics (internal R&D, published at ICRA 2022)",
+          "classification": "research",
+          "evidenceSourceUrl": "https://pal-robotics.com/blog/kangaroo-biped-research-platform-updates/",
+          "variant": "KANGAROO",
+          "scopeNote": "PAL's own current blog post documents in-house whole-body inverse dynamics control research (jumping demo); this is PAL's internal R&D, not an external customer deployment.",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "ジャンプと全身逆動力学制御を実機検証",
+              "url": "https://pal-robotics.com/blog/kangaroo-biped-research-platform-updates/",
+              "publisher": "PAL Robotics",
+              "publishedAt": "2022-05-31",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "RL policies for walking, running, jumping, stair climbing, push recovery, dancing",
+        "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/",
+        "evidenceSummary": "Product page lists these dynamic locomotion capabilities.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Quick tool changer arms (ISO 9409-1 interface); optional 2-finger, Seed RH8D, or Inspire RH56 hands",
+        "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/",
+        "evidenceSummary": "Modular end-effector options confirmed.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Onboard + wireless emergency stop",
+        "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/",
+        "evidenceSummary": "Safety e-stop confirmed on product page.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "4x RGB-D cameras (D435i), wrist/foot 6-axis F/T sensor options",
+        "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/",
+        "evidenceSummary": "Sensor suite confirmed.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "Confirm whether 'Kangaroo PRO' is a separate current SKU requiring its own catalog record."
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B08",
+    "robotId": "limx-oli",
+    "identity": {
+      "registeredName": "Oli EDU",
+      "officialCurrentName": "Oli",
+      "recordScope": "specific-variant",
+      "variant": "EDU (one of Lite / EDU / Super / Pro(175cm-Standard) columns on the official spec-comparison table)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Oli remains LimX Dynamics' current general-purpose humanoid line ('continuously iterated and optimized' per the official product page), with EDU as one of four distinguishable configurations on the current official spec table. IMPORTANT CORRECTION vs. the existing repo record: the current official spec table places EDU at 31 active DoF and ~2h battery life — the repo's registered dof=33 and runtimeMin=90 actually match the 'Super' column, not 'EDU'. This looks like a column mix-up in the prior data pass and is flagged as a conflict below.",
+      "evidenceSourceUrls": [
+        "https://www.limxdynamics.com/",
+        "https://www.limxdynamics.com/en/products/oli",
+        "https://www.limxdynamics.com/en/products/oli/spec"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "sourceUrl": "https://www.limxdynamics.com/en/products/oli",
+          "sourceTitle": "LimX Oli official product page",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Oli EDU",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Bipedal humanoid (legs 6 DoF each) common to all Oli variants."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Oli official product page",
+            "url": "https://www.limxdynamics.com/en/products/oli",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 165,
+        "proposedValue": 165,
+        "evidence": {
+          "value": "165cm / 5'5\"",
+          "normalizedValue": 165,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec",
+          "sourceTitle": "LimX Oli official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Oli EDU (shared with Lite/Super)",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Spec table: EDU column height 165cm, same as Lite and Super; the larger 175cm variant is a separate column (Pro/Standard)."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Oli official specifications",
+            "url": "https://www.limxdynamics.com/en/products/oli/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Oli EDU列の身長、自由度、速度、稼働時間、片腕荷重、演算構成を確認。重量は「55kg以下」のため数値項目へは登録しない。"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": null,
+        "proposedValue": 55,
+        "evidence": {
+          "value": "≤55kg / 121.3lbs",
+          "normalizedValue": 55,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec",
+          "sourceTitle": "LimX Oli official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Oli EDU (shared with Lite/Super)",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Spec table gives an upper-bound '≤55kg' figure, not an exact weight."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Oli official specifications",
+            "url": "https://www.limxdynamics.com/en/products/oli/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Oli EDU列の身長、自由度、速度、稼働時間、片腕荷重、演算構成を確認。重量は「55kg以下」のため数値項目へは登録しない。"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 1.3889,
+        "proposedValue": 1.3889,
+        "evidence": {
+          "value": "5km/h",
+          "normalizedValue": 1.3889,
+          "rawUnit": "km/h",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec",
+          "sourceTitle": "LimX Oli official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Oli EDU (shared across all Oli variants)",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Max speed 5km/h is identical across all four spec-table columns."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Oli official specifications",
+            "url": "https://www.limxdynamics.com/en/products/oli/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Oli EDU列の身長、自由度、速度、稼働時間、片腕荷重、演算構成を確認。重量は「55kg以下」のため数値項目へは登録しない。"
+          }
+        }
+      },
+      {
+        "key": "dof",
+        "status": "conflict",
+        "action": "hold-conflict",
+        "reason": "一次資料間または資料と登録対象の競合を解消していない。",
+        "currentValue": 33,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "conflict",
+        "action": "hold-conflict",
+        "reason": "一次資料間または資料と登録対象の競合を解消していない。",
+        "currentValue": 90,
+        "proposedValue": null
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "交換式バッテリーモジュール（9500mAh）",
+        "proposedValue": null,
+        "evidence": {
+          "value": "9,500mAh swappable battery module; charger 58.8V/10A",
+          "normalizedValue": null,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec",
+          "sourceTitle": "LimX Oli official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Oli EDU (shared across Lite/EDU/Super/Pro)",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "9,500mAh capacity and charger spec are identical across all four columns."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Oli official specifications",
+            "url": "https://www.limxdynamics.com/en/products/oli/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Oli EDU列の身長、自由度、速度、稼働時間、片腕荷重、演算構成を確認。重量は「55kg以下」のため数値項目へは登録しない。"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "リモコン / 音声制御 / 上位・下位モーションAPI",
+        "proposedValue": null,
+        "evidence": {
+          "value": "Self-developed bilingual (CN/EN) voice interaction; remote control; upper/lower-level motion APIs",
+          "normalizedValue": null,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/oli",
+          "sourceTitle": "LimX Oli official product page",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Oli EDU",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product page confirms voice interaction system and motion API layers."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Oli official product page",
+            "url": "https://www.limxdynamics.com/en/products/oli",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "モジュールSDK / Python / URDF / Isaac Sim・MuJoCo・Gazebo",
+        "proposedValue": null,
+        "evidence": {
+          "value": "Modular SDK; full Python development support; open upper/lower-level APIs; URDF; Isaac Sim/MuJoCo/Gazebo compatible",
+          "normalizedValue": null,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/oli",
+          "sourceTitle": "LimX Oli official product page",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Oli EDU",
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Confirmed on product page."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Oli official product page",
+            "url": "https://www.limxdynamics.com/en/products/oli",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "computePlatform",
+        "status": "conflict",
+        "action": "hold-conflict",
+        "reason": "一次資料間または資料と登録対象の競合を解消していない。",
+        "currentValue": "RK3588（8GB / 64GB）+ NVIDIA Jetson Orin NX（157 TOPS / 16GB / 1TB）",
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "hold-variant",
+      "candidates": [
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "single-arm",
+            "rating": "maximum",
+            "kg": 3,
+            "condition": "Official 'Maximum Load (Single Arm)' figure; identical across Lite/EDU/Super columns.",
+            "variant": "Oli EDU",
+            "sourceUrl": "https://www.limxdynamics.com/en/products/oli/spec"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "LimX Oli official specifications",
+              "url": "https://www.limxdynamics.com/en/products/oli/spec",
+              "publisher": "LimX Dynamics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official",
+              "note": "Oli EDU列の身長、自由度、速度、稼働時間、片腕荷重、演算構成を確認。重量は「55kg以下」のため数値項目へは登録しない。"
+            }
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "proposedValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "developer-platform",
+        "proposedValue": "developer-platform",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "channelsChecked",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "'Order Consultation'/'Buy Now' CTAs route to a lead-generation contact form (bd@limxdynamics.com); no public price found.",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "\"Scientific Research & Development\"",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli",
+        "evidenceScope": "current-family-common",
+        "variant": "Oli (all variants)",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "limx-oli",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.limxdynamics.com/en/products/oli"
+          ],
+          "reason": "Oli EDUの公式ページが科学研究・開発と、Python／モジュールSDKによる開発環境を示している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Oli official product page",
+            "url": "https://www.limxdynamics.com/en/products/oli",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "useCaseId": "demo-exhibition",
+        "officialExpression": "\"Exhibition & Event Guidance\"",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli",
+        "evidenceScope": "current-family-common",
+        "variant": "Oli (all variants)",
+        "reason": "現在公式資料による用途relation追加候補。",
+        "action": "set",
+        "existingRelation": null,
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Oli official product page",
+            "url": "https://www.limxdynamics.com/en/products/oli",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": []
+    },
+    "currentFeatures": [
+      {
+        "feature": "Self-developed 6-axis IMU; head-mounted and chest-mounted depth cameras",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli",
+        "evidenceSummary": "Sensor suite for perception-based motion control.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Bilingual (CN/EN) voice interaction system",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli",
+        "evidenceSummary": "Self-developed natural-language voice interaction.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Full Python development support; modular SDK with upper/lower-level open APIs",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli",
+        "evidenceSummary": "Confirmed developer tooling.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Simulator compatibility: NVIDIA Isaac Sim, MuJoCo, Gazebo",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/oli",
+        "evidenceSummary": "Confirmed sim2real toolchain support.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "Resolve the EDU vs Super column mismatch on dof, runtimeMin, and computePlatform before next publish."
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B08",
+    "robotId": "limx-luna",
+    "identity": {
+      "registeredName": "Luna",
+      "officialCurrentName": "Luna",
+      "recordScope": "specific-variant",
+      "variant": "Luna (base configuration; official spec table shows two nearly-identical configuration columns without named differentiation)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Luna is LimX Dynamics' current full-size interactive humanoid, formally (re)announced May 26, 2026 as 'All-New Full-Size Humanoid Robot Luna' with an active product page and spec sheet.",
+      "evidenceSourceUrls": [
+        "https://www.limxdynamics.com/en/products/luna",
+        "https://www.limxdynamics.com/en/products/luna/spec",
+        "https://www.limxdynamics.com/en/news/BK000062"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec",
+          "sourceTitle": "LimX Luna official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Luna",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "6-DoF legs, bipedal humanoid form."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official specifications",
+            "url": "https://www.limxdynamics.com/en/products/luna/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 160,
+        "proposedValue": 160,
+        "evidence": {
+          "value": "160cm",
+          "normalizedValue": 160,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec",
+          "sourceTitle": "LimX Luna official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Luna",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Spec table height 160cm."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official specifications",
+            "url": "https://www.limxdynamics.com/en/products/luna/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 56,
+        "proposedValue": 56,
+        "evidence": {
+          "value": "56kg (with battery)",
+          "normalizedValue": 56,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec",
+          "sourceTitle": "LimX Luna official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Luna",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Weight 56kg including battery."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official specifications",
+            "url": "https://www.limxdynamics.com/en/products/luna/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 1.3889,
+        "proposedValue": 1.3889,
+        "evidence": {
+          "value": "5km/h",
+          "normalizedValue": 1.3889,
+          "rawUnit": "km/h",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec",
+          "sourceTitle": "LimX Luna official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Luna",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Max walking speed 5km/h."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official specifications",
+            "url": "https://www.limxdynamics.com/en/products/luna/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 27,
+        "proposedValue": 27,
+        "evidence": {
+          "value": "27 total active DoF (legs 6×2, arms 5×2, waist 3, neck 2)",
+          "normalizedValue": 27,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec",
+          "sourceTitle": "LimX Luna official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Luna",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "27 DoF breakdown confirmed on spec table."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official specifications",
+            "url": "https://www.limxdynamics.com/en/products/luna/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 240,
+        "proposedValue": 240,
+        "evidence": {
+          "value": "≈4h",
+          "normalizedValue": 240,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec",
+          "sourceTitle": "LimX Luna official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Luna",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Battery life ≈4h."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official specifications",
+            "url": "https://www.limxdynamics.com/en/products/luna/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": 60,
+        "proposedValue": 60,
+        "evidence": {
+          "value": "≈1h",
+          "normalizedValue": 60,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec",
+          "sourceTitle": "LimX Luna official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Luna",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Charging time ≈1 hour."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official specifications",
+            "url": "https://www.limxdynamics.com/en/products/luna/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "交換式デュアルバッテリー（直接充電／交換対応）",
+        "proposedValue": null,
+        "evidence": {
+          "value": "10,000mAh dual battery modules; 110-220V input",
+          "normalizedValue": null,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec",
+          "sourceTitle": "LimX Luna official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Luna",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Dual battery modules totalling 10,000mAh."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official specifications",
+            "url": "https://www.limxdynamics.com/en/products/luna/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "リモコン / タブレット / LimX Studio",
+        "proposedValue": null,
+        "evidence": {
+          "value": "Remote control / tablet / LimX Studio (video-to-motion, kinesthetic teaching, preset routines, AI task editor)",
+          "normalizedValue": null,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/luna",
+          "sourceTitle": "LimX Luna official product page",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Luna",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Product page describes multiple motion-programming/control methods via LimX Studio."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official product page",
+            "url": "https://www.limxdynamics.com/en/products/luna",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": "RK3588モーション制御・知覚コンピュータ",
+        "proposedValue": null,
+        "evidence": {
+          "value": "Motion control: RK3588/16GB/256GB; Perception: RK3588/8GB/32GB",
+          "normalizedValue": null,
+          "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec",
+          "sourceTitle": "LimX Luna official specifications",
+          "publisher": "LimX Dynamics",
+          "checkedAt": "2026-07-17",
+          "variant": "Luna",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Two separate RK3588 units for motion control and perception, with distinct RAM/storage."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official specifications",
+            "url": "https://www.limxdynamics.com/en/products/luna/spec",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "set",
+      "candidates": [
+        {
+          "action": "set",
+          "reason": "対象範囲・rating・条件が分離された現行荷重候補。",
+          "proposedValue": {
+            "scope": "single-arm",
+            "rating": "maximum",
+            "kg": 3,
+            "condition": "Official 'Max Arm Payload' figure.",
+            "variant": "Luna",
+            "sourceUrl": "https://www.limxdynamics.com/en/products/luna/spec"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "LimX Luna official specifications",
+              "url": "https://www.limxdynamics.com/en/products/luna/spec",
+              "publisher": "LimX Dynamics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "procurementModels",
+        "action": "hold-source-inaccessible",
+        "currentValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "proposedValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "marketAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "channelsChecked",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "'Order Consultation' routes to lead-generation form (bd@limxdynamics.com); no public price found. BK000062 news item is a general launch announcement, not a deployment case.",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "demo-exhibition",
+        "officialExpression": "\"Theme parks, live stages\" with swarm/choreography performance features",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna",
+        "evidenceScope": "current-product",
+        "variant": "Luna",
+        "reason": "現在公式資料による用途relation追加候補。",
+        "action": "set",
+        "existingRelation": null,
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official product page",
+            "url": "https://www.limxdynamics.com/en/products/luna",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "useCaseId": "customer-reception",
+        "officialExpression": "\"Shopping malls, museums\" with multimodal dialogue/engagement",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna",
+        "evidenceScope": "current-product",
+        "variant": "Luna",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "limx-luna",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.limxdynamics.com/en/news/BK000062"
+          ],
+          "reason": "公式発表で商業空間のマルチモーダル対話と観客対応を想定している。実施設への導入事例は未確認。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "LimX Luna official product page",
+            "url": "https://www.limxdynamics.com/en/products/luna",
+            "publisher": "LimX Dynamics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": []
+    },
+    "currentFeatures": [
+      {
+        "feature": "Multimodal interaction with natural gestures during conversation",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna",
+        "evidenceSummary": "Product page describes multimodal dialogue with gesture support.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Swarm control synchronizing 200+ units with millisecond precision",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna",
+        "evidenceSummary": "Confirmed group-performance capability.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "LimX Studio AI task editor (natural-language scenario description composes dance/motion/visual/voice tasks)",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna",
+        "evidenceSummary": "Confirmed content-creation tool.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Video-to-motion imitation and kinesthetic teaching for choreography",
+        "evidenceSourceUrl": "https://www.limxdynamics.com/en/products/luna",
+        "evidenceSummary": "Confirmed motion-programming methods.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  }
+]

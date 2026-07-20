@@ -1,0 +1,3271 @@
+[
+  {
+    "robotId": "unitree-g1",
+    "identity": {
+      "registeredName": "G1",
+      "officialCurrentName": "G1",
+      "recordScope": "specific-variant",
+      "variant": "G1 standard (non-EDU)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed live on the current official product page (unitree.com/g1) and official store (shop.unitree.com/products/unitree-g1) as of 2026-07-17. The Unitree homepage actively links to the G1 product/app pages.",
+      "evidenceSourceUrls": [
+        "https://www.unitree.com/g1/",
+        "https://shop.unitree.com/products/unitree-g1",
+        "https://www.unitree.com/"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics official site",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.unitree.com/g1/",
+        "title": "Unitree G1 official product page",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://shop.unitree.com/products/unitree-g1",
+        "title": "Unitree G1 official shop",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/unitreerobotics",
+        "title": "Unitree Robotics GitHub (unitree_sdk2)",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://techshare.co.jp/product/unitree/g1/",
+        "title": "TechShare Unitree G1 product page",
+        "publisher": "TechShare",
+        "documentType": "authorized-distributor",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://icontrol.ri.cmu.edu/news/icra2025-wbcd.html",
+        "title": "ICL Wins ICRA2025 Bimanual Packing",
+        "publisher": "Carnegie Mellon University",
+        "documentType": "customer-primary",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.unitree.com/news1/",
+        "title": "Unitree Robotics at World Robot Conference 2024",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-news",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Official page shows G1 as a bipedal humanoid."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "1320mm (stand)",
+          "normalizedValue": 132,
+          "rawUnit": "mm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Current official page states standing height 1320mm (690mm folded). Superseded an older unitree.com/operate/g1/ page (127cm) which is historical and not used."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "About 35kg",
+          "normalizedValue": 35,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Official page states \"About 35kg\" for standard G1."
+        }
+      },
+      "speedMps": {
+        "status": "not-published",
+        "note": "Checked current product page, official store, GitHub, and TechShare distributor page — no speed value is stated for G1 on any current official source. An older unitree.com/operate/g1/ page previously showed \">2m/s\" but that is a historical page, not the current one, so not adopted."
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "23",
+          "normalizedValue": 23,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Official page: total DoF 23 for standard G1 (6/leg, 1 waist, 5/arm, no hand)."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "note": "No generic payload figure is published; only an arm-specific load figure exists — see loadRatings (About 2kg, posture-dependent)."
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "About 2h",
+          "normalizedValue": 120,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Official page states battery life \"About 2h\"."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "not-published",
+        "note": "Official page states 9000mAh capacity but does not state voltage or Wh; not converting mAh to Wh ourselves without an official voltage figure to avoid an estimated value."
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "note": "Official page states a 54V 5A charger but no explicit charge-time figure."
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "13-string lithium battery pack, quick-release smart battery, 54V/5A charger",
+          "normalizedValue": "13-string lithium battery pack, quick-release smart battery, 54V/5A charger",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Official page power section."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Manual controller / Unitree Explore app; standard G1 does not support secondary development",
+          "normalizedValue": "Manual controller / Unitree Explore app; standard G1 does not support secondary development",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://shop.unitree.com/products/unitree-g1",
+          "sourceTitle": "Unitree G1 official shop",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Store page states standard G1 \"does not support secondary development\"; app documented at unitree.com/app/g1."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Unitree SDK2 (C++) / Python interface",
+          "normalizedValue": "Unitree SDK2 (C++) / Python interface",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://github.com/unitreerobotics",
+          "sourceTitle": "unitree_sdk2 (Unitree Robotics GitHub org)",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "unitree_sdk2 repo description explicitly lists G1 among supported robots (Go2, B2, H1, G1, H2, R1, A2)."
+        }
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "8-core high-performance CPU",
+          "normalizedValue": "8-core high-performance CPU",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Official page base compute spec for standard G1."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "note": "Checked product page, store, GitHub, TechShare distributor page — no official IP rating found. Third-party blogs claim \"indoor only, no IP rating\" but that is not an official statement and was not adopted."
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "note": "No official operating temperature range found on any checked official source."
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "note": "No official safety-standard/certification number found on any checked official source."
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "single-arm",
+        "rating": "maximum",
+        "kg": 2,
+        "condition": "Official \"About 2Kg\" arm load; manufacturer notes it varies significantly with arm extension posture.",
+        "variant": "G1",
+        "sourceUrl": "https://www.unitree.com/g1/"
+      }
+    ],
+    "priceOffers": [
+      {
+        "channel": "manufacturer-public",
+        "display": "$13,500.00 USD (excluding tax/shipping)",
+        "amount": 13500,
+        "currency": "USD",
+        "taxStatus": "excluded",
+        "variant": "G1",
+        "sourceUrl": "https://shop.unitree.com/products/unitree-g1"
+      }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      {
+        "feature": "Optional Dex3-1 three-fingered dexterous hand (3 active DoF thumb, 2 each index/middle)",
+        "evidenceSourceUrl": "https://www.unitree.com/g1/",
+        "evidenceSummary": "Official page hand option section."
+      },
+      {
+        "feature": "Depth camera + 3D LiDAR perception, 4-mic array, speaker",
+        "evidenceSourceUrl": "https://www.unitree.com/g1/",
+        "evidenceSummary": "Official sensor spec section."
+      },
+      {
+        "feature": "WiFi 6 / Bluetooth 5.2 connectivity",
+        "evidenceSourceUrl": "https://www.unitree.com/g1/",
+        "evidenceSummary": "Official connectivity spec."
+      },
+      {
+        "feature": "OTA software updates (\"Upgraded Intelligent OTA\")",
+        "evidenceSourceUrl": "https://www.unitree.com/g1/",
+        "evidenceSummary": "Official page software section."
+      },
+      {
+        "feature": "Imitation-learning and reinforcement-learning driven control; UnifoLM (Unified Robot Large Model) integration",
+        "evidenceSourceUrl": "https://www.unitree.com/g1/",
+        "evidenceSummary": "Official page AI/software section."
+      },
+      {
+        "feature": "Unitree Explore mobile-app control (standard G1: no secondary development)",
+        "evidenceSourceUrl": "https://shop.unitree.com/products/unitree-g1",
+        "evidenceSummary": "Store page control/dev-support note."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Educational/research-oriented positioning, AI/learning-driven control, developer resources (GitHub SDK)",
+        "evidenceSourceUrl": "https://www.unitree.com/g1/",
+        "evidenceScope": "current-product",
+        "variant": "G1",
+        "reason": "Matches existing useCases.ts research-development candidateRobots connection for unitree-g1; confirmed directly on the current official product page."
+      }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "Carnegie Mellon University Intelligent Control Lab",
+        "classification": "research",
+        "evidenceSourceUrl": "https://icontrol.ri.cmu.edu/news/icra2025-wbcd.html",
+        "variant": "G1",
+        "scopeNote": "CMU's own official research-lab announcement (2025-05-22): first prize in ICRA 2025 bimanual-packing competition, only team running fully autonomous mode (>90% success)."
+      },
+      {
+        "customerOrInstitution": "Unitree Robotics (World Robot Conference 2024, own booth demo)",
+        "classification": "demonstration",
+        "evidenceSourceUrl": "https://www.unitree.com/news1/",
+        "variant": "G1 (mass-production version launched 2024-08-19)",
+        "scopeNote": "Manufacturer's own event/demo coverage, not an independent customer deployment."
+      }
+    ],
+    "procurement": {
+      "manufacturerPurchase": true,
+      "manufacturerStoreUrl": "https://shop.unitree.com/products/unitree-g1",
+      "japanDistributors": [
+        "TechShare (regular authorized distributor)",
+        "GMO AI & Robotics (official distributor since 2026-06-19, explicitly names G1)"
+      ],
+      "japanEvidenceSourceUrls": [
+        "https://techshare.co.jp/product/unitree/g1/",
+        "https://ai-robotics.gmo/news/article/gmo-unitree/"
+      ]
+    },
+    "conflicts": [],
+    "unresolved": [
+      "A historical unitree.com/operate/g1/ page previously showed height 127cm and speed \">2m/s\". The current unitree.com/g1/ page shows 132cm and no speed figure. Historical values are not used for this current-product record."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "unitree-g1-edu",
+    "identity": {
+      "registeredName": "G1 EDU",
+      "officialCurrentName": "G1 EDU",
+      "recordScope": "specific-variant",
+      "variant": "G1 EDU (secondary-development-enabled configuration of the G1 chassis)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed on the same current official product page as G1 (unitree.com/g1) and on the official store, which lists \"G1 EDU edition: contact sales\" as a distinct, currently offered configuration.",
+      "evidenceSourceUrls": [
+        "https://www.unitree.com/g1/",
+        "https://shop.unitree.com/products/unitree-g1"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.unitree.com/g1/",
+        "title": "Unitree G1 official product page",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://shop.unitree.com/products/unitree-g1",
+        "title": "Unitree G1 official shop",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/unitreerobotics",
+        "title": "Unitree Robotics GitHub (unitree_sdk2)",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.wpunj.edu/articles/news/2025-10-27/humanoid-AI-robot-computer-science-department-william-paterson-university",
+        "title": "Computer Science Department Welcomes Grant-Funded Robot",
+        "publisher": "William Paterson University",
+        "documentType": "customer-primary",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Same chassis as standard G1."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "1320mm (stand)",
+          "normalizedValue": 132,
+          "rawUnit": "mm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "EDU shares the standard G1 chassis dimensions."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "About 35kg+",
+          "normalizedValue": 35,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Official page states \"About 35kg+\" for G1 EDU — an open-ended lower bound, not an exact single figure, because of optional hand/compute add-ons."
+        }
+      },
+      "speedMps": {
+        "status": "not-published",
+        "note": "No speed figure published for G1/G1 EDU on any current official source."
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "23-43",
+          "normalizedValue": "23-43",
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Official page states G1 EDU total DoF range 23-43 depending on optional waist (+2) and dexterous hands (+7 each) configuration; not a single fixed value."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "note": "No generic payload figure; see loadRatings (About 3kg arm load, posture-dependent)."
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "About 2h",
+          "normalizedValue": 120,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Shared with standard G1 on the same page."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "not-published",
+        "note": "Only 9000mAh stated, no voltage/Wh; not deriving Wh ourselves."
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "note": "No charge-time figure published."
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "13-string lithium battery pack, quick-release smart battery",
+          "normalizedValue": "13-string lithium battery pack, quick-release smart battery",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Shared power spec section."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Manual controller / Unitree Explore app; secondary development supported",
+          "normalizedValue": "Manual controller / Unitree Explore app; secondary development supported",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Official page: EDU = \"YES\" for secondary development, contrasted with standard G1."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Unitree SDK2 (C++) / Python interface",
+          "normalizedValue": "Unitree SDK2 (C++) / Python interface",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://github.com/unitreerobotics",
+          "sourceTitle": "unitree_sdk2 (Unitree Robotics GitHub org)",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "unitree_sdk2 explicitly lists G1 among supported robots; EDU is the dev-enabled configuration of the same model."
+        }
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "8-core CPU baseline; expandable to multiple brands/models such as Orin",
+          "normalizedValue": "8-core CPU baseline; expandable to multiple brands/models such as Orin",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/g1/",
+          "sourceTitle": "Unitree G1 official product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Official page: \"G1 EDU Expansion: Multiple brands and models available such as Orin, etc.\""
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "note": "No official IP rating found."
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "note": "No official operating temperature found."
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "note": "No official safety-standard/certification found."
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "single-arm",
+        "rating": "maximum",
+        "kg": 3,
+        "condition": "Official \"About 3Kg\" arm load for G1 EDU; posture-dependent.",
+        "variant": "G1 EDU",
+        "sourceUrl": "https://www.unitree.com/g1/"
+      }
+    ],
+    "priceOffers": [],
+    "priceFallback": {
+      "status": "inquiry-fallback",
+      "note": "Official product page and store both state G1 EDU pricing is \"Contact sales\" (sales_global@unitree.cc) — no published number found on any official source.",
+      "sourceUrl": "https://shop.unitree.com/products/unitree-g1"
+    },
+    "currentFeatures": [
+      {
+        "feature": "Secondary development supported (contrast with standard G1)",
+        "evidenceSourceUrl": "https://www.unitree.com/g1/",
+        "evidenceSummary": "Official dev-support table."
+      },
+      {
+        "feature": "Optional Dex3-1 dexterous hand (7 active DoF), same as G1 family",
+        "evidenceSourceUrl": "https://www.unitree.com/g1/",
+        "evidenceSummary": "Shared option list."
+      },
+      {
+        "feature": "Expandable compute modules (e.g., Orin)",
+        "evidenceSourceUrl": "https://www.unitree.com/g1/",
+        "evidenceSummary": "EDU expansion note."
+      },
+      {
+        "feature": "OTA software updates",
+        "evidenceSourceUrl": "https://www.unitree.com/g1/",
+        "evidenceSummary": "Shared with standard G1."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Secondary-development-enabled research/education configuration with AI-learning-driven control",
+        "evidenceSourceUrl": "https://www.unitree.com/g1/",
+        "evidenceScope": "current-product",
+        "variant": "G1 EDU",
+        "reason": "Matches existing useCases.ts research-development candidateRobots connection for unitree-g1-edu."
+      }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "William Paterson University, Dept. of Computer Science (ASPIRE program)",
+        "classification": "research",
+        "evidenceSourceUrl": "https://www.wpunj.edu/articles/news/2025-10-27/humanoid-AI-robot-computer-science-department-william-paterson-university",
+        "variant": "G1 EDU",
+        "scopeNote": "University's own official announcement (2025-10-27): US Dept. of Education grant-funded acquisition, used for teaching/research."
+      }
+    ],
+    "procurement": {
+      "manufacturerPurchase": false,
+      "manufacturerInquiry": "sales_global@unitree.cc",
+      "japanAvailability": "unknown (no confirmed Japan distributor listing found specifically for G1 EDU)"
+    },
+    "conflicts": [],
+    "unresolved": [],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "unitree-h1",
+    "identity": {
+      "registeredName": "H1",
+      "officialCurrentName": "H1",
+      "recordScope": "specific-variant",
+      "variant": "H1 (as distinct from H1-2 on the same product page)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Still listed on the Unitree homepage under the \"Humanoid Robot\" section (app download link) and on the official product page (unitree.com/mobile/h1) and official store as of 2026-07-17. H1-2 is a co-listed configuration, not a stated successor.",
+      "evidenceSourceUrls": [
+        "https://www.unitree.com/mobile/h1/",
+        "https://shop.unitree.com/products/unitree-h1",
+        "https://www.unitree.com/"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.unitree.com/",
+        "title": "Unitree Robotics official site",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product-index",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.unitree.com/mobile/h1/",
+        "title": "Unitree H1 / H1-2 product page",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.unitree.com/app/h1/",
+        "title": "Unitree Explore APP — H1/H1-2 documentation",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-manual",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://shop.unitree.com/products/unitree-h1",
+        "title": "Unitree H1 official shop",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/unitreerobotics",
+        "title": "Unitree Robotics GitHub (unitree_sdk2)",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://techshare.co.jp/unitree-h1-press-release/",
+        "title": "TechShare Unitree H1 press release",
+        "publisher": "TechShare",
+        "documentType": "authorized-distributor",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://ai-robotics.gmo/news/article/gmo-unitree/",
+        "title": "GMO AI & Robotics x Unitree distributor announcement",
+        "publisher": "GMO AI & Robotics",
+        "documentType": "authorized-distributor",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.unitree.com/news1/",
+        "title": "Unitree Robotics at World Robot Conference 2024",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-news",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "H1/H1-2 shared product page."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "About 180cm",
+          "normalizedValue": 180,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "H1-specific figure on shared page."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "About 47kg",
+          "normalizedValue": 47,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "H1-specific figure."
+        }
+      },
+      "speedMps": {
+        "status": "found",
+        "evidence": {
+          "value": "3.3 m/s (world record); potential mobility >5m/s",
+          "normalizedValue": 3.3,
+          "rawUnit": "m/s",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "H1-specific figure; qualitative \">5m/s potential\" is not adopted as a firm spec."
+        }
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "18 (5/leg incl. hip/knee/ankle, 4/arm expandable)",
+          "normalizedValue": 18,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "H1-specific DoF breakdown from official page."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "note": "No arm/payload figure is stated for H1 specifically on the current official page (only H1-2 publishes a payload figure)."
+      },
+      "runtimeMin": {
+        "status": "not-published",
+        "note": "No runtime/battery-life figure specific to H1 found on current official sources."
+      },
+      "batteryCapacityWh": {
+        "status": "found",
+        "evidence": {
+          "value": "15Ah, max 67.2V (0.864kWh)",
+          "normalizedValue": 864,
+          "rawUnit": "kWh",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Page groups this under \"Common Specifications (Both Variants)\"."
+        }
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "note": "No charge-time figure found."
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Replaceable lithium battery pack, max 67.2V",
+          "normalizedValue": "Replaceable lithium battery pack, max 67.2V",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Common spec section."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Remote controller / Unitree Explore app (real-time telemetry, joint calibration, network setup)",
+          "normalizedValue": "Remote controller / Unitree Explore app (real-time telemetry, joint calibration, network setup)",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/app/h1/",
+          "sourceTitle": "Unitree Explore APP documentation",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "App documentation describes remote-control connection, calibration, and monitoring for H1/H1-2."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Unitree SDK2 (C++) / Python interface",
+          "normalizedValue": "Unitree SDK2 (C++) / Python interface",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://github.com/unitreerobotics",
+          "sourceTitle": "unitree_sdk2 (Unitree Robotics GitHub org)",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "unitree_sdk2 repo explicitly lists H1 among supported robots."
+        }
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "Intel Core i5 (platform functions) / Intel Core i7 (user development)",
+          "normalizedValue": "Intel Core i5 (platform functions) / Intel Core i7 (user development)",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Common compute spec confirmed on current page fetch."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "note": "No official IP rating found."
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "note": "No official operating temperature found."
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "note": "No official safety-standard/certification found."
+      }
+    },
+    "loadRatings": [],
+    "priceOffers": [
+      {
+        "channel": "manufacturer-public",
+        "display": "$90,000.00 USD (product title itself reads \"Contact us for the real price\")",
+        "amount": 90000,
+        "currency": "USD",
+        "taxStatus": "unknown",
+        "variant": "H1",
+        "sourceUrl": "https://shop.unitree.com/products/unitree-h1"
+      }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      {
+        "feature": "World's first electrically-driven humanoid robot capable of a standing backflip",
+        "evidenceSourceUrl": "https://www.unitree.com/news1/",
+        "evidenceSummary": "Unitree's own WRC2024 coverage."
+      },
+      {
+        "feature": "Remote controller + Unitree Explore app control: real-time telemetry, joint-angle calibration, network setup",
+        "evidenceSourceUrl": "https://www.unitree.com/app/h1/",
+        "evidenceSummary": "App documentation."
+      },
+      {
+        "feature": "Optional dexterous hand (e.g., Dex5-1 or other ambidextrous hands)",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/h1/",
+        "evidenceSummary": "Official page option list."
+      },
+      {
+        "feature": "3D LiDAR + depth-camera perception",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/h1/",
+        "evidenceSummary": "Official sensor spec."
+      }
+    ],
+    "officialUseCases": [],
+    "useCaseGaps": [
+      {
+        "officialExpression": "GMO AI & Robotics (Japan authorized distributor): sales, implementation, software development, and maintenance of Unitree G1/H1 for logistics, manufacturing, facility management, construction, and airport operations",
+        "evidenceSourceUrl": "https://ai-robotics.gmo/news/article/gmo-unitree/",
+        "reason": "This is the Japan distributor's own stated target-industry framing, not an Unitree official product-page use-case statement, and does not map cleanly one-to-one onto a single existing UseCase id, so recorded as a gap rather than forced onto one industry."
+      }
+    ],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "Unitree Robotics (World Robot Conference 2024, own booth demo)",
+        "classification": "demonstration",
+        "evidenceSourceUrl": "https://www.unitree.com/news1/",
+        "variant": "H1",
+        "scopeNote": "Manufacturer's own event demo (backflip capability), not an independent deployment."
+      }
+    ],
+    "procurement": {
+      "manufacturerPurchase": true,
+      "manufacturerStoreUrl": "https://shop.unitree.com/products/unitree-h1",
+      "japanDistributors": [
+        "TechShare (pre-order sales since 2023-12-06)",
+        "GMO AI & Robotics (official distributor since 2026-06-19, explicitly names H1)"
+      ],
+      "japanEvidenceSourceUrls": [
+        "https://techshare.co.jp/unitree-h1-press-release/",
+        "https://ai-robotics.gmo/news/article/gmo-unitree/"
+      ]
+    },
+    "conflicts": [
+      {
+        "field": "priceOffers",
+        "description": "Official store lists $90,000.00 USD but the product title itself says \"Contact us for the real price\", implying the listed number may not be the actual sale price. A 2023-12-06 TechShare press release cites a historical Japan pre-order price of ¥15.8M (excl. tax) at that time — not treated as a current price given the 2023 date."
+      }
+    ],
+    "unresolved": [
+      "The repo previously recorded an optional \"NVIDIA Jetson Orin NX\" compute module for H1; this could not be re-confirmed on the current official H1/H1-2 page fetch (only Intel i5/i7 was found there). Recommend manual re-check of a dedicated H1 spec-sheet/manual if the Jetson option needs to remain in the record."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "unitree-h1-2",
+    "identity": {
+      "registeredName": "H1-2",
+      "officialCurrentName": "H1-2",
+      "recordScope": "specific-variant",
+      "variant": "H1-2 (heavier/higher-DoF configuration co-listed with H1 on the same page)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed on the current official product page (unitree.com/mobile/h1) as a distinct, currently offered configuration alongside H1.",
+      "evidenceSourceUrls": [
+        "https://www.unitree.com/mobile/h1/"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.unitree.com/mobile/h1/",
+        "title": "Unitree H1 / H1-2 product page",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://www.unitree.com/app/h1/",
+        "title": "Unitree Explore APP — H1/H1-2 documentation",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-manual",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/unitreerobotics",
+        "title": "Unitree Robotics GitHub (unitree_sdk2, xr_teleoperate, unitree_lerobot)",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Shared page."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "About 178cm",
+          "normalizedValue": 178,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "H1-2-specific figure."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "About 70kg",
+          "normalizedValue": 70,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "H1-2-specific figure."
+        }
+      },
+      "speedMps": {
+        "status": "not-published",
+        "note": "No speed figure specific to H1-2 found (3.3m/s is explicitly attributed to H1 only)."
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "27 (6/leg, 7/arm)",
+          "normalizedValue": 27,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "H1-2-specific DoF breakdown."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "note": "No generic payload figure; see loadRatings (Peak ~21kg / Rated ~7kg, single-arm)."
+      },
+      "runtimeMin": {
+        "status": "not-published",
+        "note": "No runtime figure specific to H1-2 found."
+      },
+      "batteryCapacityWh": {
+        "status": "found",
+        "evidence": {
+          "value": "15Ah, max 67.2V (0.864kWh)",
+          "normalizedValue": 864,
+          "rawUnit": "kWh",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Listed under \"Common Specifications (Both Variants)\"."
+        }
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "note": "No charge-time figure found."
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Replaceable lithium battery pack, max 67.2V",
+          "normalizedValue": "Replaceable lithium battery pack, max 67.2V",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Common spec section."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Remote controller / Unitree Explore app",
+          "normalizedValue": "Remote controller / Unitree Explore app",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/app/h1/",
+          "sourceTitle": "Unitree Explore APP documentation",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Shared app documentation with H1."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Unitree SDK2 (C++) / Python interface; also explicitly supported by xr_teleoperate and unitree_lerobot repos",
+          "normalizedValue": "Unitree SDK2 (C++) / Python interface; also explicitly supported by xr_teleoperate and unitree_lerobot repos",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://github.com/unitreerobotics",
+          "sourceTitle": "Unitree Robotics GitHub org",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "GitHub org repos (unitree_sdk2, xr_teleoperate, unitree_lerobot) explicitly list H1_2 as supported."
+        }
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "Intel Core i5 (platform functions) / Intel Core i7 (user development)",
+          "normalizedValue": "Intel Core i5 (platform functions) / Intel Core i7 (user development)",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/h1/",
+          "sourceTitle": "Unitree H1 / H1-2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Common compute section on current page."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "note": "No official IP rating found."
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "note": "No official operating temperature found."
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "note": "No official safety-standard/certification found."
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "single-arm",
+        "rating": "maximum",
+        "kg": 21,
+        "condition": "Official \"Peak: About 21Kg\".",
+        "variant": "H1-2",
+        "sourceUrl": "https://www.unitree.com/mobile/h1/"
+      },
+      {
+        "scope": "single-arm",
+        "rating": "rated",
+        "kg": 7,
+        "condition": "Official \"Rated: About 7Kg\".",
+        "variant": "H1-2",
+        "sourceUrl": "https://www.unitree.com/mobile/h1/"
+      }
+    ],
+    "priceOffers": [],
+    "priceFallback": {
+      "status": "inquiry-fallback",
+      "note": "No price specific to H1-2 found on any official product page or store; H1-2 has no dedicated store listing distinct from H1.",
+      "sourceUrl": "https://www.unitree.com/mobile/h1/"
+    },
+    "currentFeatures": [
+      {
+        "feature": "Optional Dex5-1 or other dexterous hands",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/h1/",
+        "evidenceSummary": "Official option list."
+      },
+      {
+        "feature": "Higher-DoF arms (7 DoF/arm) for extended manipulation range vs H1",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/h1/",
+        "evidenceSummary": "Official arm spec comparison."
+      }
+    ],
+    "officialUseCases": [],
+    "useCaseGaps": [],
+    "usageExamples": [],
+    "procurement": {
+      "manufacturerPurchase": "unknown (no dedicated store listing found for H1-2)",
+      "japanAvailability": "unknown"
+    },
+    "conflicts": [],
+    "unresolved": [
+      "The repo previously recorded \"up to 3x NVIDIA Jetson Orin NX\" as an optional compute add-on for H1-2; this could not be re-confirmed on the current official page fetch (only Intel i5/i7 found). Recommend manual re-check against a dedicated spec sheet if this detail needs to remain."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "unitree-h2",
+    "identity": {
+      "registeredName": "H2",
+      "officialCurrentName": "H2",
+      "recordScope": "specific-variant",
+      "variant": "H2 standard (non-EDU)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed on the current official product page (unitree.com/mobile/H2) and official store (shop.unitree.com/products/unitree-h2), both showing $29,900.00 USD and identical specs.",
+      "evidenceSourceUrls": [
+        "https://www.unitree.com/mobile/H2/",
+        "https://shop.unitree.com/products/unitree-h2"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.unitree.com/mobile/H2/",
+        "title": "Unitree H2 product page",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://shop.unitree.com/products/unitree-h2",
+        "title": "Unitree H2 official shop",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/unitreerobotics",
+        "title": "Unitree Robotics GitHub (unitree_sdk2)",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Shared H2/H2 EDU spec table."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "1820x456x218mm (H×W×D)",
+          "normalizedValue": 182,
+          "rawUnit": "mm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical H2/H2 EDU figure in the spec table."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "About 70kg (with battery)",
+          "normalizedValue": 70,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical H2/H2 EDU figure."
+        }
+      },
+      "speedMps": {
+        "status": "not-published",
+        "note": "No speed figure published for H2/H2 EDU on any current official source."
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "31 (6/leg, 7/arm, 3 waist, 2 head)",
+          "normalizedValue": 31,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical H2/H2 EDU figure."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "note": "No generic payload figure; see loadRatings (Peak ~15kg / Rated ~7kg, single-arm)."
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "About 3h",
+          "normalizedValue": 180,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical H2/H2 EDU figure."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "found",
+        "evidence": {
+          "value": "15Ah, max 75.6V (0.972kWh)",
+          "normalizedValue": 972,
+          "rawUnit": "kWh",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical H2/H2 EDU figure."
+        }
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "note": "No charge-time figure found; charger is stated as included but without a time value."
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Low internal-resistance premium lithium battery, quick-release smart battery pack",
+          "normalizedValue": "Low internal-resistance premium lithium battery, quick-release smart battery pack",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical H2/H2 EDU figure."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Manual controller; standard H2 does not support secondary development",
+          "normalizedValue": "Manual controller; standard H2 does not support secondary development",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Official page distinguishes H2 (no secondary dev) from H2 EDU (secondary dev supported)."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Unitree SDK2 (C++) / Python interface",
+          "normalizedValue": "Unitree SDK2 (C++) / Python interface",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://github.com/unitreerobotics",
+          "sourceTitle": "unitree_sdk2 (Unitree Robotics GitHub org)",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "unitree_sdk2 repo explicitly lists H2 among supported robots."
+        }
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "Intel Core i5 (platform capabilities)",
+          "normalizedValue": "Intel Core i5 (platform capabilities)",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Standard H2 base compute; EDU adds i7 + optional high-power module. Store page additionally cites a \"2070 TOPS chip\" for onboard AI processing."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "note": "No official IP rating found."
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "note": "No official operating temperature found."
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "note": "No official safety-standard/certification found."
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "single-arm",
+        "rating": "maximum",
+        "kg": 15,
+        "condition": "Official \"Peak\" arm payload.",
+        "variant": "H2",
+        "sourceUrl": "https://www.unitree.com/mobile/H2/"
+      },
+      {
+        "scope": "single-arm",
+        "rating": "rated",
+        "kg": 7,
+        "condition": "Official \"Rated\" arm payload.",
+        "variant": "H2",
+        "sourceUrl": "https://www.unitree.com/mobile/H2/"
+      }
+    ],
+    "priceOffers": [
+      {
+        "channel": "manufacturer-public",
+        "display": "$29,900.00 USD",
+        "amount": 29900,
+        "currency": "USD",
+        "taxStatus": "unknown",
+        "variant": "H2",
+        "sourceUrl": "https://shop.unitree.com/products/unitree-h2"
+      }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      {
+        "feature": "2070 TOPS onboard AI compute chip supporting multiple intelligent models",
+        "evidenceSourceUrl": "https://shop.unitree.com/products/unitree-h2",
+        "evidenceSummary": "Official store product description."
+      },
+      {
+        "feature": "Bionic head with humanoid binocular wide-FOV camera, array mic, high-power speaker",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2/",
+        "evidenceSummary": "Official sensor spec section."
+      },
+      {
+        "feature": "WiFi 6 / Bluetooth 5.2 connectivity, OTA software updates",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2/",
+        "evidenceSummary": "Official connectivity/software section."
+      },
+      {
+        "feature": "Optional dexterous hand models (multiple options for H2 EDU)",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2/",
+        "evidenceSummary": "Official option list."
+      }
+    ],
+    "officialUseCases": [],
+    "useCaseGaps": [
+      {
+        "officialExpression": "\"180cm humanoid design redefines industrial aesthetics\" / general multi-scenario positioning, no specific named task",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2/",
+        "reason": "Official page markets H2 for general-purpose humanoid work without naming a specific task that maps onto an existing published UseCase."
+      }
+    ],
+    "usageExamples": [],
+    "procurement": {
+      "manufacturerPurchase": true,
+      "manufacturerStoreUrl": "https://shop.unitree.com/products/unitree-h2",
+      "japanAvailability": "inquiry-required (no dedicated Japan distributor listing found specifically for H2; GMO/TechShare announcements name G1/H1 explicitly, not H2)"
+    },
+    "conflicts": [],
+    "unresolved": [],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "unitree-h2-edu",
+    "identity": {
+      "registeredName": "H2 EDU",
+      "officialCurrentName": "H2 EDU",
+      "recordScope": "specific-variant",
+      "variant": "H2 EDU (secondary-development-enabled configuration of the H2 chassis)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed on the same current official product page as H2 (unitree.com/mobile/H2), listed as a distinct column with \"Contact Sales\" pricing and secondary-development support.",
+      "evidenceSourceUrls": [
+        "https://www.unitree.com/mobile/H2/",
+        "https://shop.unitree.com/products/unitree-h2"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.unitree.com/mobile/H2/",
+        "title": "Unitree H2 product page",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://shop.unitree.com/products/unitree-h2",
+        "title": "Unitree H2 official shop",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/unitreerobotics",
+        "title": "Unitree Robotics GitHub (unitree_sdk2)",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Shared spec table."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "1820x456x218mm (H×W×D)",
+          "normalizedValue": 182,
+          "rawUnit": "mm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical to H2."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "About 70kg (with battery)",
+          "normalizedValue": 70,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical to H2."
+        }
+      },
+      "speedMps": {
+        "status": "not-published",
+        "note": "No speed figure published."
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "31 (6/leg, 7/arm, 3 waist, 2 head)",
+          "normalizedValue": 31,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical to H2."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "note": "No generic payload figure; see loadRatings (Peak ~15kg / Rated ~7kg, single-arm, identical to H2)."
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "About 3h",
+          "normalizedValue": 180,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical to H2."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "found",
+        "evidence": {
+          "value": "15Ah, max 75.6V (0.972kWh)",
+          "normalizedValue": 972,
+          "rawUnit": "kWh",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical to H2."
+        }
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "note": "No charge-time figure found."
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Low internal-resistance premium lithium battery, quick-release smart battery pack",
+          "normalizedValue": "Low internal-resistance premium lithium battery, quick-release smart battery pack",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical to H2."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Manual controller; secondary development supported",
+          "normalizedValue": "Manual controller; secondary development supported",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Official page: EDU column explicitly supports secondary development."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Unitree SDK2 (C++) / Python interface",
+          "normalizedValue": "Unitree SDK2 (C++) / Python interface",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://github.com/unitreerobotics",
+          "sourceTitle": "unitree_sdk2 (Unitree Robotics GitHub org)",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "unitree_sdk2 lists H2 among supported robots; EDU is the dev-enabled configuration."
+        }
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "Intel Core i5 + Intel Core i7 (custom development); optional high-power module (e.g., Thor)",
+          "normalizedValue": "Intel Core i5 + Intel Core i7 (custom development); optional high-power module (e.g., Thor)",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2/",
+          "sourceTitle": "Unitree H2 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Official page EDU column lists additional i7 and optional high-power module choices."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "note": "No official IP rating found."
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "note": "No official operating temperature found."
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "note": "No official safety-standard/certification found."
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "single-arm",
+        "rating": "maximum",
+        "kg": 15,
+        "condition": "Official \"Peak\" arm payload, identical to H2.",
+        "variant": "H2 EDU",
+        "sourceUrl": "https://www.unitree.com/mobile/H2/"
+      },
+      {
+        "scope": "single-arm",
+        "rating": "rated",
+        "kg": 7,
+        "condition": "Official \"Rated\" arm payload, identical to H2.",
+        "variant": "H2 EDU",
+        "sourceUrl": "https://www.unitree.com/mobile/H2/"
+      }
+    ],
+    "priceOffers": [],
+    "priceFallback": {
+      "status": "inquiry-fallback",
+      "note": "Official product page and store both state H2 EDU pricing is \"Contact Sales\" — no published number found.",
+      "sourceUrl": "https://shop.unitree.com/products/unitree-h2"
+    },
+    "currentFeatures": [
+      {
+        "feature": "Secondary development supported",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2/",
+        "evidenceSummary": "Official dev-support column."
+      },
+      {
+        "feature": "Optional high-power compute module (e.g., Thor) for custom AI workloads",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2/",
+        "evidenceSummary": "Official compute option."
+      },
+      {
+        "feature": "Multiple dexterous-hand model options",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2/",
+        "evidenceSummary": "Official option list."
+      }
+    ],
+    "officialUseCases": [],
+    "useCaseGaps": [
+      {
+        "officialExpression": "Secondary development support / custom high-power compute module options — implies a developer/research target, but the H2 page does not use explicit \"research\" or \"education\" wording.",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2/",
+        "reason": "Capability-based inference only; no explicit official use-case statement to connect confidently to an existing UseCase id."
+      }
+    ],
+    "usageExamples": [],
+    "procurement": {
+      "manufacturerPurchase": false,
+      "manufacturerInquiry": "sales_global@unitree.cc",
+      "japanAvailability": "inquiry-required"
+    },
+    "conflicts": [],
+    "unresolved": [],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "unitree-h2-plus",
+    "identity": {
+      "registeredName": "H2 Plus",
+      "officialCurrentName": "H2 PLUS",
+      "recordScope": "specific-variant",
+      "variant": "H2 Plus (Isaac-ecosystem-focused configuration on the H2 body)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed on its own dedicated current official product page (unitree.com/mobile/H2plus) and official store, plus a 2026-05-31 NVIDIA official press release naming it as the body of NVIDIA's Isaac GR00T reference humanoid design.",
+      "evidenceSourceUrls": [
+        "https://www.unitree.com/mobile/H2plus/",
+        "https://shop.unitree.com/products/unitree-h2-plus",
+        "https://nvidianews.nvidia.com/news/nvidia-open-humanoid-robot-reference-design"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.unitree.com/mobile/H2plus/",
+        "title": "Unitree H2 PLUS official page",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://shop.unitree.com/products/unitree-h2-plus",
+        "title": "Unitree H2 Plus official shop",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-store",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/unitreerobotics",
+        "title": "Unitree Robotics GitHub (unitree_sdk2)",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://nvidianews.nvidia.com/news/nvidia-open-humanoid-robot-reference-design",
+        "title": "NVIDIA Newsroom: Open Humanoid Robot Reference Design",
+        "publisher": "NVIDIA",
+        "documentType": "official-news",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2plus/",
+          "sourceTitle": "Unitree H2 PLUS official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Same body as H2."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "1820x456x218mm (H×W×D); NVIDIA press release separately describes \"nearly 6 feet tall\"",
+          "normalizedValue": 182,
+          "rawUnit": "mm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.unitree.com/mobile/H2plus/",
+          "sourceTitle": "Unitree H2 PLUS official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Matches H2 body dimensions."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "Approximately 70kg (with battery); NVIDIA press release separately describes \"150 pounds\"",
+          "normalizedValue": 70,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.unitree.com/mobile/H2plus/",
+          "sourceTitle": "Unitree H2 PLUS official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Matches H2 body weight."
+        }
+      },
+      "speedMps": {
+        "status": "not-published",
+        "note": "No speed figure published for H2 Plus."
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "31 joint motors (6/leg, 7/arm, 3 waist, 2 head); up to 75 total body+hand DoF with optional dexterous hands",
+          "normalizedValue": 31,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.unitree.com/mobile/H2plus/",
+          "sourceTitle": "Unitree H2 PLUS official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Confirmed by both Unitree page and NVIDIA press release (31 DoF body)."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "note": "No generic payload figure; see loadRatings (Rated ~7kg / Peak ~15kg, single-arm)."
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "Approximately 3h",
+          "normalizedValue": 180,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.unitree.com/mobile/H2plus/",
+          "sourceTitle": "Unitree H2 PLUS official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Matches H2 family runtime."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "found",
+        "evidence": {
+          "value": "15Ah, max 75.6V (0.972kWh)",
+          "normalizedValue": 972,
+          "rawUnit": "kWh",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://www.unitree.com/mobile/H2plus/",
+          "sourceTitle": "Unitree H2 PLUS official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Matches H2 family battery."
+        }
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "note": "Smart charger is included but no explicit charge-time figure is stated."
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Low-resistance high-quality lithium battery, smart charger included",
+          "normalizedValue": "Low-resistance high-quality lithium battery, smart charger included",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2plus/",
+          "sourceTitle": "Unitree H2 PLUS official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Official page power section."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Handheld remote controller; remote emergency stop; secondary development supported (per manual); Isaac TeleOp for demonstration-data capture",
+          "normalizedValue": "Handheld remote controller; remote emergency stop; secondary development supported (per manual); Isaac TeleOp for demonstration-data capture",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2plus/",
+          "sourceTitle": "Unitree H2 PLUS official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Official page control/software section."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Unitree SDK2 (C++)/Python; Isaac ecosystem (Isaac Sim, Isaac Lab, Isaac ROS, Isaac GR00T)",
+          "normalizedValue": "Unitree SDK2 (C++)/Python; Isaac ecosystem (Isaac Sim, Isaac Lab, Isaac ROS, Isaac GR00T)",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://github.com/unitreerobotics",
+          "sourceTitle": "Unitree Robotics GitHub org",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "GitHub org repo coverage description explicitly lists H2 Plus among supported robot models, in addition to the Isaac-ecosystem tooling named on the product page."
+        }
+      },
+      "computePlatform": {
+        "status": "conflict",
+        "evidence": {
+          "value": "Unitree product page uses both \"Jetson™ T5000\" (summary) and \"Jetson Thor™\" (detailed section heading) for the same onboard compute; NVIDIA's own 2026-05-31 press release calls it \"NVIDIA Jetson Thor\"",
+          "normalizedValue": "Unitree product page uses both \"Jetson™ T5000\" (summary) and \"Jetson Thor™\" (detailed section heading) for the same onboard compute; NVIDIA's own 2026-05-31 press release calls it \"NVIDIA Jetson Thor\"",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/H2plus/",
+          "sourceTitle": "Unitree H2 PLUS official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Same-page naming inconsistency between \"Jetson T5000\" and \"Jetson Thor\"; NVIDIA's own separate press release favors \"Jetson Thor\" (2560-core Blackwell GPU, 2070 FP4 TFLOPS, 14-core Arm Neoverse-V3AE CPU, 128GB LPDDR5X), used alongside auxiliary PC1 (Intel i5)/PC2 (Intel i7)."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "note": "No official IP rating found."
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "note": "No official operating temperature found."
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "note": "No official safety-standard/certification found."
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "single-arm",
+        "rating": "rated",
+        "kg": 7,
+        "condition": "Official rated arm payload.",
+        "variant": "H2 Plus",
+        "sourceUrl": "https://www.unitree.com/mobile/H2plus/"
+      },
+      {
+        "scope": "single-arm",
+        "rating": "maximum",
+        "kg": 15,
+        "condition": "Official peak arm payload.",
+        "variant": "H2 Plus",
+        "sourceUrl": "https://www.unitree.com/mobile/H2plus/"
+      }
+    ],
+    "priceOffers": [
+      {
+        "channel": "manufacturer-public",
+        "display": "$100,000.00 USD (store) — product detail page states \"Please contact our sales team to purchase\"",
+        "amount": 100000,
+        "currency": "USD",
+        "taxStatus": "unknown",
+        "variant": "H2 Plus",
+        "sourceUrl": "https://shop.unitree.com/products/unitree-h2-plus"
+      }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      {
+        "feature": "Isaac TeleOp for high-quality demonstration-data capture",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2plus/",
+        "evidenceSummary": "Official software section."
+      },
+      {
+        "feature": "Isaac GR00T open foundation models support (humanoid reasoning, learning, multitask behavior)",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2plus/",
+        "evidenceSummary": "Official software section."
+      },
+      {
+        "feature": "Isaac Sim / Isaac Lab for simulation, training, testing, evaluation of robot policies",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2plus/",
+        "evidenceSummary": "Official software section."
+      },
+      {
+        "feature": "Isaac ROS accelerated middleware for deploying trained policies to the robot",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2plus/",
+        "evidenceSummary": "Official software section."
+      },
+      {
+        "feature": "Optional dexterous hands: 22 active DoF/hand, 150N grip force, >1000 tactile pixels/fingertip, >4Hz operating speed",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2plus/",
+        "evidenceSummary": "Official hand-option spec section."
+      },
+      {
+        "feature": "Remote emergency stop",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2plus/",
+        "evidenceSummary": "Official safety-control feature."
+      },
+      {
+        "feature": "Selected by NVIDIA as the robot body for its open Isaac GR00T reference humanoid design, paired with Jetson Thor compute and Sharpa Wave tactile hands; availability late 2026 from Unitree",
+        "evidenceSourceUrl": "https://nvidianews.nvidia.com/news/nvidia-open-humanoid-robot-reference-design",
+        "evidenceSummary": "NVIDIA's own 2026-05-31 press release (GTC Taipei)."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "\"Integrated R&D and Manufacturing, Embarking on Full-Stack Development\"; positioned around the Isaac ecosystem for robot-policy research",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2plus/",
+        "evidenceScope": "current-product",
+        "variant": "H2 Plus",
+        "reason": "Matches existing useCases.ts research-development candidateRobots connection for unitree-h2-plus."
+      },
+      {
+        "useCaseId": "research-ai-simulation",
+        "officialExpression": "Isaac Sim and Isaac Lab used to simulate, train, test, and evaluate robot policies",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/H2plus/",
+        "evidenceScope": "current-product",
+        "variant": "H2 Plus",
+        "reason": "Matches existing useCases.ts research-ai-simulation candidateRobots connection for unitree-h2-plus."
+      }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [],
+    "procurement": {
+      "manufacturerPurchase": false,
+      "manufacturerInquiry": "sales_global@unitree.cc",
+      "japanAvailability": "inquiry-required",
+      "notes": "NVIDIA press release states H2 Plus-based Isaac GR00T reference design availability \"late 2026 from Unitree\" — a manufacturer-availability signal, not a Japan-specific channel."
+    },
+    "conflicts": [
+      {
+        "field": "priceOffers",
+        "description": "Store lists $100,000.00 USD but the product detail page directs buyers to \"contact our sales team to purchase,\" so the listed figure may be indicative rather than final."
+      },
+      {
+        "field": "computePlatform",
+        "description": "Same official page uses both \"Jetson T5000\" and \"Jetson Thor\" for what appears to be the same chip; NVIDIA's own press release uses \"Jetson Thor\"."
+      }
+    ],
+    "unresolved": [],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "unitree-r1",
+    "identity": {
+      "registeredName": "R1 AIR",
+      "officialCurrentName": "R1 AIR",
+      "recordScope": "specific-variant",
+      "variant": "R1 AIR (entry tier of the R1 family, alongside R1 and R1 EDU)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed on the current official product page (unitree.com/mobile/R1) at $4,900, distinct from R1 ($5,900) and R1 EDU (contact sales) on the same page.",
+      "evidenceSourceUrls": [
+        "https://www.unitree.com/mobile/R1/"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.unitree.com/mobile/R1/",
+        "title": "Unitree R1 product page",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/unitreerobotics",
+        "title": "Unitree Robotics GitHub (unitree_sdk2)",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Shared R1 AIR/R1/R1 EDU spec table."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "1230x357x190mm (H×W×Thickness)",
+          "normalizedValue": 123,
+          "rawUnit": "mm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical across all three R1 variants."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "About 27kg",
+          "normalizedValue": 27,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "R1 AIR-specific figure (R1/R1 EDU are ~29kg)."
+        }
+      },
+      "speedMps": {
+        "status": "not-published",
+        "note": "No speed figure published for any R1 variant."
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "20",
+          "normalizedValue": 20,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "R1 AIR-specific figure (6/leg, 4/arm, no waist/head DoF)."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "note": "No firm payload figure; see loadRatings for the ambiguous \"arm joint maximum torque ~2kg\" figure and unresolved note."
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "About 1h",
+          "normalizedValue": 60,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical across R1 variants."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "not-published",
+        "note": "Only \"lithium battery power supply\" is stated; no Ah/voltage/Wh figure given."
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "note": "Charger is included but no explicit charge-time figure given."
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Lithium battery, quick-release smart battery pack, charger included",
+          "normalizedValue": "Lithium battery, quick-release smart battery pack, charger included",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical across R1 variants."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Fully open control interfaces for joints and sensors; supports mainstream simulation platforms",
+          "normalizedValue": "Fully open control interfaces for joints and sensors; supports mainstream simulation platforms",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Official marketing/spec text, identical across R1 variants."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Unitree SDK2 (C++) / Python interface",
+          "normalizedValue": "Unitree SDK2 (C++) / Python interface",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://github.com/unitreerobotics",
+          "sourceTitle": "unitree_sdk2 (Unitree Robotics GitHub org)",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "unitree_sdk2 repo explicitly lists R1 among supported robots."
+        }
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "8-core high-performance processor",
+          "normalizedValue": "8-core high-performance processor",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical across R1 variants (R1 EDU adds optional high-power module such as Orin)."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "note": "No official IP rating found."
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "note": "No official operating temperature found."
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "note": "No official safety-standard/certification found."
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "single-arm",
+        "rating": "unspecified",
+        "kg": 2,
+        "condition": "Official page labels this \"Arm joint maximum torque: About 2kg\" — the unit/label combination is ambiguous (torque expressed in kg rather than N·m), so it is not treated as a confirmed payload rating; recorded with this caveat. Common to all R1 variants.",
+        "variant": "R1 family (AIR/R1/R1 EDU)",
+        "sourceUrl": "https://www.unitree.com/mobile/R1/"
+      }
+    ],
+    "priceOffers": [
+      {
+        "channel": "manufacturer-public",
+        "display": "$4,900",
+        "amount": 4900,
+        "currency": "USD",
+        "taxStatus": "unknown",
+        "variant": "R1 AIR",
+        "sourceUrl": "https://www.unitree.com/mobile/R1/"
+      }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      {
+        "feature": "Monocular camera (R1 AIR specifically; R1/R1 EDU use binocular)",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/R1/",
+        "evidenceSummary": "Official sensor comparison."
+      },
+      {
+        "feature": "Fully open joint/sensor control interfaces with mainstream simulator support",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/R1/",
+        "evidenceSummary": "Official marketing/spec text."
+      },
+      {
+        "feature": "WiFi 6 / Bluetooth 5.2, 4-mic array, speaker",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/R1/",
+        "evidenceSummary": "Official connectivity/sensor spec."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-ai-simulation",
+        "officialExpression": "Fully open control interfaces for joints and sensors, with support for mainstream simulation platforms",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/R1/",
+        "evidenceScope": "current-family-common",
+        "variant": "R1 AIR",
+        "reason": "Matches existing useCases.ts research-ai-simulation candidateRobots connection for unitree-r1."
+      }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [],
+    "procurement": {
+      "manufacturerPurchase": true,
+      "japanAvailability": "inquiry-required (no dedicated Japan distributor listing found for R1 family)"
+    },
+    "conflicts": [],
+    "unresolved": [
+      "R1 family \"Arm joint maximum torque: About 2kg\" mixes torque terminology with a kg unit — ambiguous whether this is meant as a payload/load rating or a literally mislabeled torque figure. Not adopted as a firm loadRating beyond the caveat above."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "unitree-r1-standard",
+    "identity": {
+      "registeredName": "R1",
+      "officialCurrentName": "R1",
+      "recordScope": "specific-variant",
+      "variant": "R1 standard (mid tier of the R1 family, above R1 AIR, below R1 EDU)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed on the current official product page (unitree.com/mobile/R1) at $5,900, distinct from R1 AIR ($4,900) and R1 EDU (contact sales) on the same page.",
+      "evidenceSourceUrls": [
+        "https://www.unitree.com/mobile/R1/"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.unitree.com/mobile/R1/",
+        "title": "Unitree R1 product page",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/unitreerobotics",
+        "title": "Unitree Robotics GitHub (unitree_sdk2)",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "biped",
+          "normalizedValue": "biped",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Shared R1 AIR/R1/R1 EDU spec table."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "1230x357x190mm (H×W×Thickness)",
+          "normalizedValue": 123,
+          "rawUnit": "mm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical across all three R1 variants."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "About 29kg",
+          "normalizedValue": 29,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "R1/R1 EDU-specific figure (R1 AIR is ~27kg)."
+        }
+      },
+      "speedMps": {
+        "status": "not-published",
+        "note": "No speed figure published for any R1 variant."
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "26",
+          "normalizedValue": 26,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "R1-specific figure (6/leg, 5/arm, 2 waist, 2 head)."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "note": "No firm payload figure; see loadRatings for the ambiguous \"arm joint maximum torque ~2kg\" figure and unresolved note."
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "About 1h",
+          "normalizedValue": 60,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical across R1 variants."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "not-published",
+        "note": "Only \"lithium battery power supply\" is stated; no Ah/voltage/Wh figure given."
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "note": "Charger is included but no explicit charge-time figure given."
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Lithium battery, quick-release smart battery pack, charger included",
+          "normalizedValue": "Lithium battery, quick-release smart battery pack, charger included",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical across R1 variants."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Fully open control interfaces for joints and sensors; supports mainstream simulation platforms",
+          "normalizedValue": "Fully open control interfaces for joints and sensors; supports mainstream simulation platforms",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Official marketing/spec text, identical across R1 variants."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Unitree SDK2 (C++) / Python interface",
+          "normalizedValue": "Unitree SDK2 (C++) / Python interface",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://github.com/unitreerobotics",
+          "sourceTitle": "unitree_sdk2 (Unitree Robotics GitHub org)",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "unitree_sdk2 repo explicitly lists R1 among supported robots."
+        }
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "8-core high-performance processor",
+          "normalizedValue": "8-core high-performance processor",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/R1/",
+          "sourceTitle": "Unitree R1 product page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Identical across R1 variants."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "note": "No official IP rating found."
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "note": "No official operating temperature found."
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "note": "No official safety-standard/certification found."
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "single-arm",
+        "rating": "unspecified",
+        "kg": 2,
+        "condition": "Official page labels this \"Arm joint maximum torque: About 2kg\" — the unit/label combination is ambiguous, so it is not treated as a confirmed payload rating; recorded with this caveat. Common to all R1 variants.",
+        "variant": "R1 family (AIR/R1/R1 EDU)",
+        "sourceUrl": "https://www.unitree.com/mobile/R1/"
+      }
+    ],
+    "priceOffers": [
+      {
+        "channel": "manufacturer-public",
+        "display": "$5,900",
+        "amount": 5900,
+        "currency": "USD",
+        "taxStatus": "unknown",
+        "variant": "R1",
+        "sourceUrl": "https://www.unitree.com/mobile/R1/"
+      }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      {
+        "feature": "Binocular camera (R1/R1 EDU; R1 AIR uses monocular)",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/R1/",
+        "evidenceSummary": "Official sensor comparison."
+      },
+      {
+        "feature": "Additional waist (2 DoF) and head (2 DoF) vs R1 AIR",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/R1/",
+        "evidenceSummary": "Official DoF table."
+      },
+      {
+        "feature": "Fully open joint/sensor control interfaces with mainstream simulator support",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/R1/",
+        "evidenceSummary": "Official marketing/spec text."
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-ai-simulation",
+        "officialExpression": "Fully open control interfaces for joints and sensors, with support for mainstream simulation platforms",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/R1/",
+        "evidenceScope": "current-family-common",
+        "variant": "R1",
+        "reason": "Matches existing useCases.ts research-ai-simulation candidateRobots connection for unitree-r1-standard."
+      }
+    ],
+    "useCaseGaps": [],
+    "usageExamples": [],
+    "procurement": {
+      "manufacturerPurchase": true,
+      "japanAvailability": "inquiry-required (no dedicated Japan distributor listing found for R1 family)"
+    },
+    "conflicts": [],
+    "unresolved": [
+      "R1 family \"Arm joint maximum torque: About 2kg\" mixes torque terminology with a kg unit — ambiguous whether this is meant as a payload/load rating or a literally mislabeled torque figure. Not adopted as a firm loadRating beyond the caveat above."
+    ],
+    "humanReviewRequired": []
+  },
+  {
+    "robotId": "unitree-g1-d",
+    "identity": {
+      "registeredName": "G1-D",
+      "officialCurrentName": "G1-D",
+      "recordScope": "product-family",
+      "variant": "Standard and Flagship (per official Unitree naming); Japan distributor TechShare uses \"Standard\" and \"Ultimate\" for what appears to be the same two-tier split",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed on the current official product page (unitree.com/mobile/G1-D), which gives clean per-variant numeric specs for Standard and Flagship, and on TechShare's 2025-12-01 reservation-sales press release. Unlike DATA-R01's wholesale withholding of specs due to an unresolved variant conflict, the current official page directly states usable per-variant numbers for most fields; only fields that genuinely vary by variant (DoF, runtime, speed) are recorded per-variant rather than forced into one number.",
+      "evidenceSourceUrls": [
+        "https://www.unitree.com/mobile/G1-D",
+        "https://techshare.co.jp/g1-g1d-press-release/",
+        "https://techshare.co.jp/product/unitree/unitree-g1-d/"
+      ]
+    },
+    "documentsReviewed": [
+      {
+        "url": "https://www.unitree.com/mobile/G1-D",
+        "title": "Unitree G1-D official page",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-product",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://github.com/unitreerobotics",
+        "title": "Unitree Robotics GitHub (unitree_sdk2)",
+        "publisher": "Unitree Robotics",
+        "documentType": "official-sdk",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://techshare.co.jp/g1-g1d-press-release/",
+        "title": "TechShare G1(開発版)独占販売権取得・G1-D予約販売開始のお知らせ",
+        "publisher": "TechShare",
+        "documentType": "authorized-distributor",
+        "checkedAt": "2026-07-17"
+      },
+      {
+        "url": "https://techshare.co.jp/product/unitree/unitree-g1-d/",
+        "title": "TechShare Unitree G1-D product page",
+        "publisher": "TechShare",
+        "documentType": "authorized-distributor",
+        "checkedAt": "2026-07-17"
+      }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "needs-review",
+        "evidence": {
+          "value": "Standard = fixed vertical column (no locomotion, i.e. stationary); Flagship = adds a mobile base with 360° in-place rotation (wheeled/mobile)",
+          "normalizedValue": "Standard = fixed vertical column (no locomotion, i.e. stationary); Flagship = adds a mobile base with 360° in-place rotation (wheeled/mobile)",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/G1-D",
+          "sourceTitle": "Unitree G1-D official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Official page: Standard is a fixed-stand configuration; Flagship adds \"mobile baseplate functionality\" and max speed 1.5m/s with 360° in-place rotation. A single mobility value cannot represent both variants under one robotId, so this is flagged for a variant-level split rather than discarding the information."
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "1260-1680mm column vertical-travel range (Standard footprint 620x620mm; Flagship footprint 525x570mm)",
+          "normalizedValue": "1260-1680mm column vertical-travel range (Standard footprint 620x620mm; Flagship footprint 525x570mm)",
+          "rawUnit": "mm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.unitree.com/mobile/G1-D",
+          "sourceTitle": "Unitree G1-D official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Both variants share the same 1260-1680mm column lift range; footprint differs by variant. This is a lift range, not a fixed standing height like the biped models."
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "About 90kg (with battery), both Standard and Flagship",
+          "normalizedValue": 90,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.unitree.com/mobile/G1-D",
+          "sourceTitle": "Unitree G1-D official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Current official page states ~90kg for both variants; see conflicts note re: an earlier discrepancy with a prior TechShare page version."
+        }
+      },
+      "speedMps": {
+        "status": "found",
+        "evidence": {
+          "value": "1.5 m/s (Flagship only; Standard has no locomotion)",
+          "normalizedValue": 1.5,
+          "rawUnit": "m/s",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.unitree.com/mobile/G1-D",
+          "sourceTitle": "Unitree G1-D official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Official page states Flagship max speed 1.5m/s with 360° in-place rotation; Standard is a fixed stand with no mobility spec."
+        }
+      },
+      "dof": {
+        "status": "found",
+        "evidence": {
+          "value": "Standard: 17 DoF (excl. end-effector); Flagship: 19 DoF (excl. end-effector)",
+          "normalizedValue": "Standard: 17 DoF (excl. end-effector); Flagship: 19 DoF (excl. end-effector)",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/G1-D",
+          "sourceTitle": "Unitree G1-D official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Official page states both figures explicitly and unambiguously per variant; recorded as a per-variant pair rather than a single number."
+        }
+      },
+      "payloadKg": {
+        "status": "not-published",
+        "note": "No generic payload figure; see loadRatings (Approx. 3kg arm payload, both variants)."
+      },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "Standard: About 2h; Flagship: About 6h",
+          "normalizedValue": "Standard: About 2h; Flagship: About 6h",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/G1-D",
+          "sourceTitle": "Unitree G1-D official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "Official page states both figures explicitly per variant (Flagship adds a built-in 30Ah chassis battery on top of the shared 9Ah upper-body battery)."
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "not-published",
+        "note": "Official page states Ah figures (9Ah upper-body quick-release, both variants; +30Ah built-in chassis battery, Flagship only) but no voltage/Wh value, so Wh is not derived."
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "note": "No charge-time figure found."
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Upper-body 9Ah quick-release battery (both variants); Flagship additionally has a built-in 30Ah chassis battery",
+          "normalizedValue": "Upper-body 9Ah quick-release battery (both variants); Flagship additionally has a built-in 30Ah chassis battery",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/G1-D",
+          "sourceTitle": "Unitree G1-D official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Base battery system is common; Flagship adds a second chassis battery, noted in the summary."
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Teleoperation with <100ms system latency at 60Hz sampling; secondary development supported",
+          "normalizedValue": "Teleoperation with <100ms system latency at 60Hz sampling; secondary development supported",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/G1-D",
+          "sourceTitle": "Unitree G1-D official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Official control/latency spec section, common to both variants."
+        }
+      },
+      "sdk": {
+        "status": "found",
+        "evidence": {
+          "value": "Unitree SDK2 (C++) / Python interface",
+          "normalizedValue": "Unitree SDK2 (C++) / Python interface",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://github.com/unitreerobotics",
+          "sourceTitle": "Unitree Robotics GitHub org",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "GitHub org repo coverage description explicitly lists G1-D among supported robot models."
+        }
+      },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "8-core high-performance CPU; optional high-power modules (e.g., Orin NX 16GB, 100TOPS)",
+          "normalizedValue": "8-core high-performance CPU; optional high-power modules (e.g., Orin NX 16GB, 100TOPS)",
+          "rawUnit": null,
+          "normalizedUnit": null,
+          "sourceUrl": "https://www.unitree.com/mobile/G1-D",
+          "sourceTitle": "Unitree G1-D official page",
+          "publisher": "Unitree Robotics",
+          "sourceType": "official-product-page",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Official compute spec, common to both variants."
+        }
+      },
+      "ipRating": {
+        "status": "not-published",
+        "note": "No official IP rating found."
+      },
+      "operatingTemperature": {
+        "status": "not-published",
+        "note": "No official operating temperature found."
+      },
+      "safetyStandard": {
+        "status": "not-published",
+        "note": "No official safety-standard/certification found."
+      }
+    },
+    "loadRatings": [
+      {
+        "scope": "single-arm",
+        "rating": "maximum",
+        "kg": 3,
+        "condition": "Official \"Approx. 3kg\" arm payload, both Standard and Flagship; manufacturer notes it varies with arm extension posture.",
+        "variant": "G1-D (Standard/Flagship)",
+        "sourceUrl": "https://www.unitree.com/mobile/G1-D"
+      }
+    ],
+    "priceOffers": [],
+    "priceFallback": {
+      "status": "inquiry-fallback",
+      "note": "Neither the Unitree official page nor TechShare's reservation-sales press release (2025-12-01) discloses a price; TechShare directs interested parties to contact its sales team (TEL 03-5683-7293 / unitree@techshare.co.jp).",
+      "sourceUrl": "https://techshare.co.jp/g1-g1d-press-release/"
+    },
+    "currentFeatures": [
+      {
+        "feature": "End-to-end platform emphasis: data collection, model training (imitation/reinforcement learning), and inference",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/G1-D",
+        "evidenceSummary": "Official page positioning statement."
+      },
+      {
+        "feature": "Optional end-effectors: 2-finger gripper / 3-finger dexterous hand (with and without tactile) / 5-finger dexterous hand",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/G1-D",
+        "evidenceSummary": "Official end-effector option list."
+      },
+      {
+        "feature": "Flagship-only chassis sensors: LiDAR, 2x depth cameras, 2x collision sensors, 2x obstacle-detection sensors",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/G1-D",
+        "evidenceSummary": "Official Flagship sensor spec."
+      },
+      {
+        "feature": "Teleoperation with <100ms system latency at 60Hz sampling",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/G1-D",
+        "evidenceSummary": "Official control-latency spec."
+      },
+      {
+        "feature": "OTA updates and secondary-development support",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/G1-D",
+        "evidenceSummary": "Official software section."
+      }
+    ],
+    "officialUseCases": [],
+    "useCaseGaps": [
+      {
+        "officialExpression": "Target application domains stated as four generic categories: Service / Life / Retail / Industry (no specific named task within each)",
+        "evidenceSourceUrl": "https://www.unitree.com/mobile/G1-D",
+        "reason": "Too generic to map onto a specific existing published UseCase without inference; recorded as a gap rather than force-connected."
+      }
+    ],
+    "usageExamples": [],
+    "procurement": {
+      "manufacturerPurchase": false,
+      "japanDistributors": [
+        "TechShare (exclusive domestic distribution rights for Unitree G1 development version; reservation sales for G1-D opened 2025-12-01)"
+      ],
+      "japanEvidenceSourceUrls": [
+        "https://techshare.co.jp/g1-g1d-press-release/",
+        "https://techshare.co.jp/product/unitree/unitree-g1-d/"
+      ],
+      "supportNote": "TechShare is the reservation-sales/support contact in Japan; pricing and maintenance/warranty terms require direct inquiry."
+    },
+    "conflicts": [
+      {
+        "field": "weightKg / variant naming",
+        "description": "DATA-R01 (checked 2026-07-16) cited a TechShare G1-D page showing Standard ~50kg / \"Ultimate\" ~80kg, conflicting with Unitree's official ~90kg for both variants. Re-checking the TechShare G1-D product page today (2026-07-17) found no weight or price figures currently displayed there at all, so the previously-cited conflicting numbers could not be reproduced. Given the current official Unitree page unambiguously states ~90kg for both Standard and Flagship, this record uses that figure as family-common rather than continuing to withhold all G1-D specs as DATA-R01 did."
+      }
+    ],
+    "unresolved": [
+      "Naming mismatch: Unitree's own official page uses \"Standard/Flagship\"; TechShare's Japan press release uses \"Standard/Ultimate\" (vehicle mobility + elevation) for what appears to be the same two-tier split. The Flagship↔Ultimate mapping is inferred from context, not explicitly confirmed as identical by either source."
+    ],
+    "humanReviewRequired": [
+      "Confirm with Unitree/TechShare whether \"Flagship\" (official) and \"Ultimate\" (TechShare) refer to the exact same configuration before using them interchangeably in buyer-facing copy."
+    ]
+  }
+]
