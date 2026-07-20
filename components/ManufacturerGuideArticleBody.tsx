@@ -27,8 +27,7 @@ import {
 } from '@/lib/display';
 import { MANUFACTURER_GUIDE_SECTIONS, type ManufacturerGuideSectionId } from '@/lib/manufacturerGuideTemplate';
 import { Markdown, sectionHeadingClassName } from '@/components/Markdown';
-import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
-import { RobotCardRail } from '@/components/RobotCardRail';
+import { ManufacturerGuideLineup } from '@/components/ManufacturerGuideLineup';
 import { YouTubeEmbed } from '@/components/YouTubeEmbed';
 import { uiText } from '@/lib/uiText';
 
@@ -101,65 +100,6 @@ function DeploymentList({ content, sources }: { content: ManufacturerGuideConten
         );
       })}
     </dl>
-  );
-}
-
-/** ラインナップ表。機体名・リンクはDB解決済みの行を受け取る（データ取得はページ側）。 */
-function LineupTable({ rows }: { rows: ManufacturerGuideLineupDisplayRow[] }) {
-  return (
-    <div className="-mx-4 my-6 overflow-x-auto overscroll-x-contain px-4 sm:mx-0 sm:px-0">
-      <table className="min-w-[34rem] w-full border border-border text-sm">
-        <thead>
-          <tr className="bg-muted/60 text-left text-xs text-muted-foreground">
-            <th scope="col" className="px-3 py-2 font-medium">{uiText.reports.guideLineupRobot}</th>
-            <th scope="col" className="px-3 py-2 font-medium">{uiText.reports.guideLineupRole}</th>
-            <th scope="col" className="px-3 py-2 font-medium whitespace-nowrap">{uiText.reports.guideLineupPrice}</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {rows.map((row) => (
-            <tr key={row.href}>
-              <td className="px-3 py-2.5 whitespace-nowrap">
-                <Link href={row.href} className="font-medium text-foreground underline-offset-4 hover:underline">
-                  {row.name}
-                </Link>
-              </td>
-              <td className="px-3 py-2.5 leading-relaxed text-foreground/80 break-words [overflow-wrap:anywhere]">{row.roleLabel}</td>
-              <td className="px-3 py-2.5 whitespace-nowrap text-foreground/80">
-                {row.price.kind === 'contact' && row.price.href ? (
-                  <Link href={row.price.href} className="underline underline-offset-4 hover:text-foreground">
-                    {row.price.label}
-                  </Link>
-                ) : row.price.sourceUrl ? (
-                  <a
-                    href={row.price.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline underline-offset-4 hover:text-foreground"
-                  >
-                    {row.price.label}
-                  </a>
-                ) : (
-                  row.price.label
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-/** ラインナップ機体のカード横スクロール（関連ロボットと同じ FeaturedRobotCard パターン）。 */
-function LineupRobotCards({ robots, manufacturerName }: { robots: Robot[]; manufacturerName?: string }) {
-  if (robots.length === 0) return null;
-  return (
-    <RobotCardRail className="mt-6">
-      {robots.map((robot) => (
-        <FeaturedRobotCard key={robot.id} robot={robot} manufacturerName={manufacturerName} />
-      ))}
-    </RobotCardRail>
   );
 }
 
@@ -252,8 +192,7 @@ export function ManufacturerGuideArticleBody({
     'product-lineup': (
       <>
         <Markdown source={content.productLineup} />
-        <LineupRobotCards robots={lineupRobots} manufacturerName={manufacturerName} />
-        <LineupTable rows={lineupRows} />
+        <ManufacturerGuideLineup rows={lineupRows} robots={lineupRobots} manufacturerName={manufacturerName} />
         {content.videos?.map((video) => (
           <YouTubeEmbed key={video.videoId} video={video} />
         ))}

@@ -1,16 +1,19 @@
-import { Children, type ReactNode } from 'react';
+import { Children, type ReactNode, type Ref } from 'react';
 import { cn } from '@/lib/utils';
 
 interface RobotCardRailProps {
   children: ReactNode;
   className?: string;
   ariaLabel?: string;
+  /** スクロールコンテナ本体への参照。親がプログラムスクロール（例: 表ホバー連動）する場合のみ渡す。 */
+  scrollContainerRef?: Ref<HTMLDivElement>;
 }
 
 /** FeaturedRobotCard用の配置規格。見出し・データ取得・件数判断は親に残す。 */
-export function RobotCardRail({ children, className, ariaLabel }: RobotCardRailProps) {
+export function RobotCardRail({ children, className, ariaLabel, scrollContainerRef }: RobotCardRailProps) {
   return (
     <div
+      ref={scrollContainerRef}
       role={ariaLabel ? 'region' : undefined}
       aria-label={ariaLabel}
       className={cn(

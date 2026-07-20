@@ -89,6 +89,7 @@ Last cleaned: 2026-07-01
 - `archive/reports-news-explainer-ia-plan-v1.md`（`/reports` 4棚化、2026-07-01 正本 docs へ方針反映）
 - `archive/guides-retirement-plan-v1.md`（`/guides` 撤去、2026-06-28 実装）＋ 復活資産 `archive/guides-retirement-v1.md`
 - `archive/usecase-discovery-redesign-plan-v1.md`（`/use-cases` 探索体験・根拠表示整理、2026-06-30 実装）
+- `archive/manufacturer-guide-buyer-lens-plan-v1.md`（メーカー解説の注目ポイント必須化・金融指標の平易化、2026-07-17 実装・editorial_style_guide §6-1/§6-1a へ反映）
 
 ## アーカイブ
 

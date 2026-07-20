@@ -562,8 +562,8 @@ export interface ManufacturerGuideContent {
 export interface ManufacturerGuideArticle extends ArticleCommon {
   type: 'manufacturer-guide';
   manufacturerGuideContent: ManufacturerGuideContent;
-  /** レンダラーが要点(TL;DR)ブロックを持たない設計のため、設定してもレンダリングされない。型で禁止する。 */
-  keyTakeaways?: never;
+  /** 要点(TL;DR)。3〜4項目で「一言分類→価格→日本からの入手性→固有リスク」の順に書く（editorial_style_guide_v1.md §6-1）。 */
+  keyTakeaways?: string[];
 }
 
 export type Article = StandardArticle | ManufacturerGuideArticle;
