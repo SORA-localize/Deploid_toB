@@ -21,7 +21,7 @@ Status: Phase 0（棚卸し）+ Phase 2（処遇判定）完了。Phase 2 ゲー
 | `ai_fullstack_development_guardrails_v1.md` | 正本 | keep | decisions | `ai/rules/10-workflow.md`と役割近接だが住み分け成立、統合不要 |
 | `architecture_future_considerations_v1.md` | 正本 | keep | decisions | なし |
 | `article-sourcing-reference-v1.md` | 正本 | keep | decisions | なし |
-| `compare-and-catalog-ui-improvement-plan-v1.md` | 計画 | keep | plans | 対象worktreeは`archive/local-media-preview-20260714`済だが、main未反映のため計画としては生きている。**再開するか破棄するかはオーナー判断が必要**（Phase 2ゲートで確認） |
+| `compare-and-catalog-ui-improvement-plan-v1.md` | 済 | archive | archive | 訂正（初回判定ミス）: `TBD_LABEL`残存を根拠に未実装と誤判定していたが、`archive/local-media-preview-20260714`の全commit（T1〜T3b、§8.5〜8.8改訂含む）がmainに同一メッセージ・同一著者・同一タイムスタンプで存在＝squash/cherry-pick済みを確認。`TBD_LABEL`はenum不明ステータス用に意図的に残す設計（T1 Option B）だった。ブランチ内でmainに無いcommitはロゴ・画像プロトタイプ系のみで`robot-image-sourcing-plan-v1.md`の管轄 |
 | `copyright_and_media_rights_policy_v1.md` | 正本 | keep | decisions | なし |
 | `data-architecture-redesign-v1.md` | 正本 | keep | decisions | なし |
 | `data-maintenance-checklist-v1.md` | 正本 | keep | decisions | なし |
@@ -125,8 +125,8 @@ Status: Phase 0（棚卸し）+ Phase 2（処遇判定）完了。Phase 2 ゲー
 
 | 処遇 | 件数 | 内訳 |
 |---|---|---|
-| keep（棚移動のみ、内容不変） | 39 | 上表参照 |
-| archive | 18 | 済14＋split後archive2（launch-readiness／responsive-audit）＋その他 |
+| keep（棚移動のみ、内容不変） | 38 | 上表参照 |
+| archive | 19 | 済15（compare-and-catalog-ui-improvement-plan-v1.md訂正分を含む）＋split後archive2（launch-readiness／responsive-audit）＋その他 |
 | merge | 2 | editorial-methodology-review→style guide／planning README→docs README |
 | rewrite | 2 | robot-data-factcheck-impl-plan（Phase C残task化）／tagging.md（Guide言及削除） |
 | delete | 1 | ai_implementation_workflow_prompt.md |
@@ -139,10 +139,10 @@ Status: Phase 0（棚卸し）+ Phase 2（処遇判定）完了。Phase 2 ゲー
 1. **Status自己申告と実態の乖離が構造的に起きている。** `usecase-page-redesign-plan-v1.md`は「Status: 未着手」のまま実装完了。`robot-catalog-fullstack-implementation-plan-v1.md`・`layout-and-data-structure-audit-plan-v1.md`も同様に自己申告が古いまま放置されていた。Phase1で導入する`status: current|plan|reference` frontmatterと、完了時にarchiveへ移す運用がこの再発を防ぐ設計になっている。
 2. **正本→背景文書への現役参照が2本、想定より深く食い込んでいた。** `humanoid_media_IA_v1.md` §7は`data-maintenance-checklist-v1.md`から名指しで参照されており、単純archiveはできない（reference棚へのkeepが正しい）。`humanoid_media_build_notes_v1.md`への`30-ui-design.md`の参照は逆に実質不要（内容が薄く同ファイル自身のルールと重複）と判明し、archive可能。同じ「正本から背景への参照」でも中身次第で処遇が割れる。
 3. **未消化の指摘・未決事項を持ったまま「完了」扱いにできないファイルが2本。** `launch-readiness-meta-plan-v1.md`（未決事項2件）、`responsive-audit-2026-06-30.md`（H-1等の未修正指摘）。実装計画としては役目を終えていても、中身の一部だけ生きているため、archiveの前に該当箇所を正本側へ転記する一手間が要る。
-4. **`compare-and-catalog-ui-improvement-plan-v1.md`は唯一「実装が先行し計画書がREADMEに追従していない」逆パターン。** worktree側で§8.5〜8.8まで合意が進んだのにmainには未反映で、かつ計画書自体がREADMEのどの分類にも載っていなかった。継続するか破棄するかはオーナー確認が必要（Phase 2ゲートで提起）。
+4. **`compare-and-catalog-ui-improvement-plan-v1.md`は初回判定を誤り、オーナー指摘で訂正した。** `TBD_LABEL`の残存だけを見て「T1未実装」と判断したが、それは計画が意図した設計（enum不明ステータス用に温存）だった。commit履歴まで遡ってmain反映を確認すべきだった。表面的なgrep一致だけで「未実装」と判定するのは危険という教訓。
 5. **`editorial-methodology-review-2026-06-24.md`は「未承認草案」を自称しながら`ai/rules/22-article-sourcing.md`から実質正本として参照されていた。** 承認判断を先送りしたまま運用に組み込まれている状態で、今回mergeにより解消する。
 
 ## Phase 2 ゲートでオーナーに確認したいこと
 
-- `compare-and-catalog-ui-improvement-plan-v1.md`：worktree側で合意済みの内容（比較表・共有リンク・業種タブ等）をmainへ実装する計画として継続するか、破棄するか。
-- 上記以外の処遇（特にarchive対象18件・merge対象2件）に異論がなければ、Phase 3（移動のみ実行）へ進む。
+- `compare-and-catalog-ui-improvement-plan-v1.md`の扱いはオーナー指摘により解消済み（archive確定）。
+- 残りの処遇（archive対象19件・merge対象2件含む）に異論がなければ、Phase 3（移動のみ実行）へ進む。
