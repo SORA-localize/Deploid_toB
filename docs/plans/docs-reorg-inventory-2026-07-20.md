@@ -189,3 +189,19 @@ Phase 3完了後、`data/robot-catalog-r01-rollout-20260716`（DATA-R01→R02の
 - `npm run validate:data`・`npm run build`とも成功を確認
 
 集計更新: 対象ファイルは63 + 104 = 167件（うちPhase 0〜2の精査対象は元の63件のみ。新規104件はPhase 0〜2を経ずに機械的な分類ルール適用のみで配置した）。
+
+---
+
+## Phase 4 完了記録（2026-07-20）
+
+処遇一覧のmerge/rewrite/split対象5件を全て消化した。
+
+| 対象 | 処遇 | 実施内容 |
+|---|---|---|
+| `editorial-methodology-review-2026-06-24.md` | merge | `editorial_style_guide_v1.md` §1.5「題材選定基準」として統合。重複箇所（読者像・4段構成）は破棄。統合元はarchiveへ、`ai/rules/22-article-sourcing.md`等3箇所の参照先を更新 |
+| `docs/decisions/data/tagging.md` | rewrite | `Guide.topics`/`guide-topic`/`use-case-domain`の記述を削除。`lib/tagRegistry.ts`の現行4種（industry/task/region/theme）に合わせて書き換え |
+| `robot-data-factcheck-impl-plan-2026-07-01.md` | rewrite | Phase A/B完了を個別データ照合の上で明記。Phase Cは`FC-C-001`/`FC-C-003`完了、`FC-C-002`（scopeStatus）/`FC-C-004`（evidenceLevel）が未実装のまま残ることを明記 |
+| `docs/archive/launch-readiness-meta-plan-v1.md` | split→archive（archive自体はPhase3で実施済み） | 未決事項2件を`copyright_and_media_rights_policy_v1.md` §11へ転記 |
+| `docs/archive/responsive-audit-2026-06-30.md` | split→archive（archive自体はPhase3で実施済み） | 現行コードで再確認の上、未解決3件（H-1・M-4・M-7）を`responsive-phase-1-static-audit-v1.md` §0.5へ転記。解決済み1件（H-2）も記録 |
+
+`npm run validate:data`・`npm run build`とも各コミット後に成功を確認。
