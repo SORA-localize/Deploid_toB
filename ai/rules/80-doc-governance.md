@@ -20,7 +20,7 @@ Every top-level `docs/planning/*.md` file should be represented in `docs/plannin
 - Active/unimplemented plan: a plan not yet fully reflected in code or source-of-truth docs.
 - Archive candidate: completed, superseded, temporary, or no longer actionable.
 
-Archive candidates should be moved to `docs/planning/archive/` unless the user explicitly wants them kept in place as background.
+Archive candidates should be moved to `docs/archive/` unless the user explicitly wants them kept in place as background.
 
 ## Update Order
 
@@ -43,6 +43,6 @@ When changing a rule or policy:
 
 After a one-off plan is implemented:
 
-- Move it to `docs/planning/archive/`, or
+- Move it to `docs/archive/`, or
 - Reclassify it as background with an explicit non-source-of-truth label, or
 - Delete it only when the user explicitly asks and no reference value remains.

@@ -5,7 +5,7 @@ Use this file when deciding whether an old planning document should influence cu
 ## Current Versus Historical
 
 - `docs/planning/README.md` is the current planning map.
-- `docs/planning/archive/` contains implemented, migrated, or temporary plans.
+- `docs/archive/` contains implemented, migrated, or temporary plans.
 - Archived docs are for context, not standing instructions.
 - The two old data docs kept outside archive are explicitly background/non-source-of-truth:
   - `docs/planning/humanoid_data_management_guide_v1.md`
@@ -23,4 +23,4 @@ Do not use old plans to override current code, current validation, or the source
 
 ## Cleanup Rule
 
-After a one-off plan is completed, either move it to `docs/planning/archive/` or clearly label its status so future agents do not treat it as live policy.
+After a one-off plan is completed, either move it to `docs/archive/` or clearly label its status so future agents do not treat it as live policy.
