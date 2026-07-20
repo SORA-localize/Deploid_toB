@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'motion/react';
@@ -11,6 +12,9 @@ import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
 interface FeaturedRobotCardProps {
   robot: Robot;
   manufacturerName?: string;
+  /** カード外の操作（例: ラインナップ表のホバー連動）からホバー同等の演出
+   *  （グロー・暗転・画像拡大・シマー・アクセントライン）を表示する。チルトはマウス追従時のみ。 */
+  emphasized?: boolean;
 }
 
 /**
@@ -21,7 +25,7 @@ interface FeaturedRobotCardProps {
  * ホバー演出（チルト・グロー・シマー・アクセントライン）は RobotCard/UseCaseCard と同じ
  * useTiltCardEffect 経由で共通化する。
  */
-export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCardProps) {
+export function FeaturedRobotCard({ robot, manufacturerName, emphasized = false }: FeaturedRobotCardProps) {
   const cardImage = getRobotPrimaryImage(robot);
 
   const {
@@ -34,9 +38,19 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
     handleMouseLeave,
   } = useTiltCardEffect();
 
+  // emphasized はマウスが乗っていないため、グローだけ既存ハンドラ経由で点灯する
+  // （reduced-motion の抑制もハンドラ側に従う）。CSS系の演出は data-emphasized が担う。
+  // deps は emphasized のみ: ハンドラは毎レンダー新しい閉包だが安定な motion 値しか触らないため等価。
+  useEffect(() => {
+    if (emphasized) handleMouseEnter();
+    else handleMouseLeave();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [emphasized]);
+
   return (
     <motion.div
       ref={cardRef}
+      data-emphasized={emphasized ? '' : undefined}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -61,7 +75,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
             alt={cardImage.alt}
             fill
             sizes="(max-width: 640px) 100vw, 20vw"
-            className="pointer-events-none z-10 object-contain object-center transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
+            className="pointer-events-none z-10 object-contain object-center transition-transform duration-300 group-hover:scale-[1.03] group-data-[emphasized]:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
           />
         </>
       ) : (
@@ -72,7 +86,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
 
       {/* ホバー暗転 */}
       <div
-        className="pointer-events-none absolute inset-0 z-20 bg-black/0 transition-colors duration-300 group-hover:bg-black/20 motion-reduce:transition-none"
+        className="pointer-events-none absolute inset-0 z-20 bg-black/0 transition-colors duration-300 group-hover:bg-black/20 group-data-[emphasized]:bg-black/20 motion-reduce:transition-none"
         aria-hidden="true"
       />
 
@@ -95,7 +109,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
       {/* Shimmer sweep */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-0 z-50 w-[100%] -translate-x-full -skew-x-12 bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-[200%] motion-reduce:hidden"
+        className="pointer-events-none absolute inset-y-0 left-0 z-50 w-[100%] -translate-x-full -skew-x-12 bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-[200%] group-data-[emphasized]:translate-x-[200%] motion-reduce:hidden"
       />
 
       {/* 上部: ロボット名 + メーカー名 */}
@@ -109,7 +123,7 @@ export function FeaturedRobotCard({ robot, manufacturerName }: FeaturedRobotCard
       {/* Accent bottom line */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 z-[60] h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full motion-reduce:transition-none"
+        className="pointer-events-none absolute bottom-0 left-0 z-[60] h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full group-data-[emphasized]:w-full motion-reduce:transition-none"
       />
 
       <Link

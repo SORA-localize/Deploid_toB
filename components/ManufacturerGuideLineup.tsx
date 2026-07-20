@@ -4,14 +4,14 @@ import { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { Robot } from '@/data/types';
 import type { ManufacturerGuideLineupDisplayRow } from '@/lib/data';
-import { cn } from '@/lib/utils';
 import { uiText } from '@/lib/uiText';
 import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
 import { RobotCardRail } from '@/components/RobotCardRail';
 
 /**
  * メーカー解説のラインナップ（カード横スクロール＋解説表）。表の行ホバー/フォーカスで
- * 対応するカードへレールを水平スクロールし、リング（モノクロ）で強調する。
+ * 対応するカードへレールを水平スクロールし、カード側はホバー同等の演出で強調する
+ * （FeaturedRobotCard の emphasized。メーカー・注目ロボットカード共通の演出に合わせる）。
  * 対応付けキーは row.robotSlug ⇔ robot.slug（正本は lib/data.ts の resolver）。
  * ホバーが無いタッチ端末では従来どおり独立して操作できる（連動は付加的な補助）。
  */
@@ -51,12 +51,12 @@ export function ManufacturerGuideLineup({
                 if (element) cardRefs.current.set(robot.slug, element);
                 else cardRefs.current.delete(robot.slug);
               }}
-              className={cn(
-                'transition-shadow',
-                activeSlug === robot.slug && 'ring-1 ring-inset ring-foreground',
-              )}
             >
-              <FeaturedRobotCard robot={robot} manufacturerName={manufacturerName} />
+              <FeaturedRobotCard
+                robot={robot}
+                manufacturerName={manufacturerName}
+                emphasized={activeSlug === robot.slug}
+              />
             </div>
           ))}
         </RobotCardRail>
