@@ -10,7 +10,7 @@ export interface ResolvedManufacturerLogo {
 }
 
 /**
- * variantごとのfallback解決（docs/planning/manufacturer-logo-usage-spec-v1.md）。
+ * variantごとのfallback解決（docs/decisions/manufacturer-logo-usage-spec-v1.md）。
  *
  * 監査(2026-07-09)で見つかった2つの欠陥への対処を含む:
  * - 「存在する」ではなく「表示可能な」最初のアセットを返す。チェーン先頭が

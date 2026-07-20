@@ -1,0 +1,141 @@
+{
+  "batchId": "DATA-R01-B11",
+  "checkedAt": "2026-07-16",
+  "targetRobotIds": ["pal-talos", "pal-kangaroo"],
+  "schemaKeysChecked": ["mobility", "heightCm", "weightKg", "speedMps", "dof", "payloadKg", "runtimeMin", "batteryCapacityWh", "chargeTimeMin", "batterySystem", "controlMethod", "sdk", "computePlatform", "ipRating", "operatingTemperature", "safetyStandard"],
+  "robots": [
+    {
+      "robotId": "pal-talos",
+      "manufacturerId": "pal-robotics",
+      "identity": {
+        "status": "confirmed",
+        "officialName": "TALOS",
+        "variant": "TALOS high-performance humanoid research platform",
+        "officialProductUrl": "https://pal-robotics.com/robot/talos/",
+        "notes": "現行PAL Robotics製品ページとTALOS公式datasheetを確認。研究・産業用途のTALOSを別PAL製品や旧世代値と混在させていない。"
+      },
+      "positioningFacts": [
+        {"statement": "TALOS is positioned as an advanced humanoid robot designed to boost research", "sourceUrl": "https://pal-robotics.com/robot/talos/"},
+        {"statement": "PAL describes TALOS as a walking biped for tasks in environments such as the Factory of the Future", "sourceUrl": "https://pal-robotics.com/robot/talos/"},
+        {"statement": "TALOS is fully torque-controllable, configurable and developed in ROS", "sourceUrl": "https://pal-robotics.com/robot/talos/"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "Walking biped robot", "normalizedValue": "biped", "unit": "", "variant": "TALOS", "condition": "official product wording", "sourceUrl": "https://pal-robotics.com/robot/talos/", "evidenceSummary": "公式製品ページがwalking bipedと明記。"},
+        "heightCm": {"status": "found", "rawValue": "175 cm", "normalizedValue": 175, "unit": "cm", "variant": "TALOS", "condition": "official product page and datasheet agree", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "公式datasheetの175cm。"},
+        "weightKg": {"status": "found", "rawValue": "95 kg", "normalizedValue": 95, "unit": "kg", "variant": "TALOS", "condition": "official product page and datasheet agree", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "公式datasheetの95kg。"},
+        "speedMps": {"status": "not-published", "rawValue": "No numeric normal or maximum locomotion speed found on reviewed TALOS product page, datasheet or official research articles", "normalizedValue": null, "unit": "m/s", "variant": "TALOS", "condition": "walking/stair capability is not converted to speed", "sourceUrl": "https://pal-robotics.com/robot/talos/", "evidenceSummary": "速度の公式数値は確認できない。"},
+        "dof": {"status": "found", "rawValue": "32 Degrees of Freedom; legs 6×2, arms 7×2, grippers 1×2, waist 2, neck 2", "normalizedValue": 32, "unit": "DoF", "variant": "TALOS", "condition": "whole-body total; component scopes retained", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "全身32 DoFと脚・腕・グリッパー・腰・首の内訳。"},
+        "payloadKg": {"status": "not-published", "rawValue": "6kg per arm is an arm-scoped rating and is retained in loadRatings", "normalizedValue": null, "unit": "kg", "variant": "TALOS", "condition": "scalar payloadKg is not populated from arm payload", "sourceUrl": "https://pal-robotics.com/robot/talos/", "evidenceSummary": "腕荷重をscalar payloadへ流用していない。"},
+        "runtimeMin": {"status": "found", "rawValue": "Battery autonomy 1.5h walking / 3h stand-by", "normalizedValue": 90, "unit": "min", "variant": "TALOS", "condition": "normalizedValue is walking autonomy; standby value remains raw", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "歩行稼働と待機時間を分離。"},
+        "batteryCapacityWh": {"status": "found", "rawValue": "Nominal energy 1080 Wh", "normalizedValue": 1080, "unit": "Wh", "variant": "TALOS", "condition": "official nominal energy", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "公式datasheetの公称エネルギー1080Wh。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "No TALOS charge-time value found on reviewed official product, datasheet and research pages", "normalizedValue": null, "unit": "min", "variant": "TALOS", "condition": "battery autonomy is not charge time", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "充電時間は確認できない。"},
+        "batterySystem": {"status": "found", "rawValue": "Lithium-Ion battery; nominal energy 1080Wh; maximum discharge +100A", "normalizedValue": "lithium-ion battery", "unit": "", "variant": "TALOS", "condition": "official electrical features", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "リチウムイオン電池方式と1080Whを確認。"},
+        "controlMethod": {"status": "found", "rawValue": "Joint-level torque control; real-time ros_control loop; optional whole-body control, navigation, HRI skills and teleoperation", "normalizedValue": "joint-level torque control / ros_control / teleoperation options", "unit": "", "variant": "TALOS", "condition": "official product/datasheet wording", "sourceUrl": "https://pal-robotics.com/robot/talos/", "evidenceSummary": "トルク制御、ros_control、研究向けteleoperationを確認。"},
+        "sdk": {"status": "found", "rawValue": "ROS, OROCOS, ros_control, MoveIt!, URDF and Gazebo simulation model; ROS interfaces", "normalizedValue": "ROS / OROCOS / ros_control / MoveIt!", "unit": "", "variant": "TALOS", "condition": "official software and open-source material", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "ROS・OROCOS・MoveIt!・URDF/Gazeboを確認。"},
+        "computePlatform": {"status": "found", "rawValue": "Intel Core i7 ×2 control and multimedia PCs (COM Express Type-6)", "normalizedValue": "2× Intel Core i7 PCs", "unit": "", "variant": "TALOS", "condition": "official datasheet", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "制御・マルチメディア用i7×2。"},
+        "ipRating": {"status": "not-published", "rawValue": "No TALOS IP ingress-protection rating found on reviewed official pages or datasheet", "normalizedValue": null, "unit": "", "variant": "TALOS", "condition": "robust/compliant wording is not an IP rating", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "防塵防水等級は確認できない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "No whole-robot operating-temperature range found on reviewed TALOS official pages, datasheet or project pages", "normalizedValue": null, "unit": "°C", "variant": "TALOS", "condition": "sensor temperature access is not an operating range", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "機体動作温度は確認できない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "Emergency-button/service-port and compliant interaction wording found, but no named TALOS safety standard or certification number", "normalizedValue": null, "unit": "", "variant": "TALOS", "condition": "functional safety features are not a named standard", "sourceUrl": "https://pal-robotics.com/datasheet/talos/", "evidenceSummary": "安全規格名・認証番号は確認できない。"}
+      },
+      "loadRatings": [
+        {"scope": "single-arm", "rating": "unspecified", "kg": 6, "condition": "6kg with each arm fully extended; official page does not label it rated or maximum", "variant": "TALOS", "sourceUrl": "https://pal-robotics.com/robot/talos/"}
+      ],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [
+        {"existingUseCaseId": "research-development", "officialExpression": "advanced humanoid robot designed to boost your research", "evidenceSourceUrl": "https://pal-robotics.com/robot/talos/", "reason": "公式製品位置付けが研究プラットフォームであるため。"},
+        {"existingUseCaseId": "factory-assembly-support", "officialExpression": "Factory of the Future / aircraft manufacturing industry / industrial complex tasks", "evidenceSourceUrl": "https://pal-robotics.com/blog/memmo-memories-robots-motion-generation/", "reason": "公式記事がAirbus航空機製造の実験ラインでの作業を明示するため。"}
+      ],
+      "useCaseGaps": [],
+      "usageExamples": [
+        {"title": "TALOS research: torque-controlled locomotion for humanoids in unknown environments", "url": "https://pal-robotics.com/blog/talos-research-torque-controlled-locomotion-for-humanoids-in-unknown-environments/", "publisher": "PAL Robotics", "publishedAt": "2023-12-30", "summary": "PAL RoboticsとTOWARD/DynamogradeがTALOSで未知環境の自律移動・15cm階段昇降を研究し、LAAS-CNRSとの接触計画を組み合わせた。", "type": "research"},
+        {"title": "MEMMO: Giving memories to robots for a better motion generation", "url": "https://pal-robotics.com/blog/memmo-memories-robots-motion-generation/", "publisher": "PAL Robotics", "publishedAt": "2019-02-01", "summary": "EU MEMMOプロジェクトで、Airbus実験施設の航空機製造作業向けにTALOSを用いた動作生成・環境反応を検証した。", "type": "pilot"}
+      ],
+      "usageExampleSourceUrls": ["https://pal-robotics.com/blog/talos-research-torque-controlled-locomotion-for-humanoids-in-unknown-environments/", "https://pal-robotics.com/blog/memmo-memories-robots-motion-generation/"],
+      "procurement": {
+        "procurementModels": ["purchase", "inquiry", "research-partnership"],
+        "marketAvailability": {"status": "needs-review", "rawValue": "PAL presents TALOS as a configurable research/industrial platform with Request a quote; current production stock and standard shipment terms are not published", "sourceUrl": "https://pal-robotics.com/robot/talos/", "evidenceSummary": "公式購入相談はあるが、現行在庫・標準納期は非公開。"},
+        "japanAvailability": {"status": "not-published", "rawValue": "No Japan sales, shipping or local availability statement found on reviewed PAL Robotics TALOS pages, contact and company pages", "sourceUrl": "https://pal-robotics.com/contact/", "evidenceSummary": "日本での入手性は確認できない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "No domestic authorized distributor identified on reviewed PAL Robotics official pages", "sourceUrl": "https://pal-robotics.com/about-us/", "evidenceSummary": "国内正規代理店は確認できない。"},
+        "supportNote": {"status": "needs-review", "rawValue": "Official contact, software documentation and research partnership route are public; Japan support, repair SLA and field-service terms are not published", "sourceUrl": "https://pal-robotics.com/robot/talos/", "evidenceSummary": "技術・問い合わせ導線はあるが国内サポート条件は非公開。"}
+      },
+      "pagesReviewed": ["https://pal-robotics.com/robot/talos/", "https://pal-robotics.com/datasheet/talos/", "https://pal-robotics.com/blog/talos-research-torque-controlled-locomotion-for-humanoids-in-unknown-environments/", "https://pal-robotics.com/blog/memmo-memories-robots-motion-generation/", "https://pal-robotics.com/projects/memmo/", "https://pal-robotics.com/timeline/", "https://pal-robotics.com/contact/", "https://pal-robotics.com/about-us/"],
+      "sourceCandidates": [
+        {"url": "https://pal-robotics.com/robot/talos/", "status": "price-checked", "reason": "公式Request a quoteを確認したが公開価格はない。"},
+        {"url": "https://pal-robotics.com/datasheet/talos/", "status": "spec-checked", "reason": "公式TALOS datasheetでDoF、荷重、電池、計算基盤を確認した。"}
+      ],
+      "fieldEvidence": {"mobility":["https://pal-robotics.com/robot/talos/"],"heightCm":["https://pal-robotics.com/datasheet/talos/"],"weightKg":["https://pal-robotics.com/datasheet/talos/"],"speedMps":["https://pal-robotics.com/robot/talos/"],"dof":["https://pal-robotics.com/datasheet/talos/"],"payloadKg":["https://pal-robotics.com/robot/talos/"],"runtimeMin":["https://pal-robotics.com/datasheet/talos/"],"batteryCapacityWh":["https://pal-robotics.com/datasheet/talos/"],"chargeTimeMin":["https://pal-robotics.com/datasheet/talos/"],"batterySystem":["https://pal-robotics.com/datasheet/talos/"],"controlMethod":["https://pal-robotics.com/robot/talos/"],"sdk":["https://pal-robotics.com/datasheet/talos/"],"computePlatform":["https://pal-robotics.com/datasheet/talos/"],"ipRating":["https://pal-robotics.com/datasheet/talos/"],"operatingTemperature":["https://pal-robotics.com/datasheet/talos/"],"safetyStandard":["https://pal-robotics.com/datasheet/talos/"],"loadRatings":["https://pal-robotics.com/robot/talos/"],"officialUseCases":["https://pal-robotics.com/robot/talos/","https://pal-robotics.com/blog/memmo-memories-robots-motion-generation/"],"usageExample":["https://pal-robotics.com/blog/talos-research-torque-controlled-locomotion-for-humanoids-in-unknown-environments/","https://pal-robotics.com/blog/memmo-memories-robots-motion-generation/"],"procurement":["https://pal-robotics.com/robot/talos/","https://pal-robotics.com/contact/","https://pal-robotics.com/about-us/"]},
+      "conflicts": ["TALOSの荷重表現は腕scopeのみで、scalar payloadKgへ移していない。", "TALOSの稼働時間はwalking 1.5hとstand-by 3hで条件が異なる。"],
+      "humanReviewRequired": ["TALOSの日本向け販売・保守窓口と最新見積条件を公式窓口で確認する。"]
+    },
+    {
+      "robotId": "pal-kangaroo",
+      "manufacturerId": "pal-robotics",
+      "identity": {
+        "status": "confirmed",
+        "officialName": "KANGAROO",
+        "variant": "KANGAROO modular biped humanoid research platform; 4/5/7 DoF arm and end-effector configurations",
+        "officialProductUrl": "https://pal-robotics.com/robot/kangaroo/",
+        "notes": "現行KANGAROO製品ページと公式datasheet、公式研究記事を確認。構成依存値を単一variantへ統合していない。"
+      },
+      "positioningFacts": [
+        {"statement": "KANGAROO is positioned as a development-ready humanoid for dynamic locomotion, reinforcement learning and embodied AI research", "sourceUrl": "https://pal-robotics.com/robot/kangaroo/"},
+        {"statement": "PAL describes KANGAROO as a modular biped platform with configurable arm and end-effector options", "sourceUrl": "https://pal-robotics.com/robot/kangaroo/"},
+        {"statement": "PAL timeline states KANGAROO became ready for sale with two versions, KANGAROO and KANGAROO PRO", "sourceUrl": "https://pal-robotics.com/timeline/"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "Dynamic bipedal humanoid robot", "normalizedValue": "biped", "unit": "", "variant": "KANGAROO", "condition": "official product positioning", "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceSummary": "公式製品ページがdynamic bipedalと明記。"},
+        "heightCm": {"status": "found", "rawValue": "1.58m", "normalizedValue": 158, "unit": "cm", "variant": "KANGAROO platform", "condition": "official technical specification", "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceSummary": "公式ページの1.58m。"},
+        "weightKg": {"status": "needs-review", "rawValue": "50–65kg", "normalizedValue": null, "unit": "kg", "variant": "KANGAROO platform configuration", "condition": "official range; exact arm/end-effector configuration not selected", "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceSummary": "構成依存の公式重量範囲を単一値にしていない。"},
+        "speedMps": {"status": "found", "rawValue": "Speed up to 2m/s", "normalizedValue": 2, "unit": "m/s", "variant": "KANGAROO", "condition": "official maximum/upper-bound wording", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "evidenceSummary": "公式datasheetの最大2m/s。"},
+        "dof": {"status": "needs-review", "rawValue": "Total DoF 14–40 platform configuration; single arm 4, 5 or 7 DoF; torso 2 DoF; single leg 6 DoF", "normalizedValue": null, "unit": "DoF", "variant": "KANGAROO platform configuration", "condition": "configuration-dependent total", "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceSummary": "公式14–40 DoF範囲とscope別値。"},
+        "payloadKg": {"status": "not-published", "rawValue": "Arm and bi-manual payload values are retained in loadRatings with configuration scope", "normalizedValue": null, "unit": "kg", "variant": "KANGAROO platform configuration", "condition": "scalar payloadKg is not populated from arm or dual-arm ratings", "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceSummary": "構成別荷重をscalarへ流用していない。"},
+        "runtimeMin": {"status": "found", "rawValue": "3 hours autonomy", "normalizedValue": 180, "unit": "min", "variant": "KANGAROO", "condition": "official autonomy statement; task/load condition not stated", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "evidenceSummary": "公式3時間自律稼働。"},
+        "batteryCapacityWh": {"status": "needs-review", "rawValue": "Official page/datasheet state Battery 976 Ah / 15 Ah wording; no voltage-based Wh value and unit consistency requires confirmation", "normalizedValue": null, "unit": "Wh", "variant": "KANGAROO", "condition": "official battery unit/value appears ambiguous; no conversion made", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "evidenceSummary": "公式PDFの976Ah表記とページの電池表記を確認したがWh換算不可。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "No KANGAROO charge-time value found on reviewed official product, datasheet and research pages", "normalizedValue": null, "unit": "min", "variant": "KANGAROO", "condition": "autonomy is not charge time", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "evidenceSummary": "充電時間は確認できない。"},
+        "batterySystem": {"status": "needs-review", "rawValue": "Battery is listed with a 976 Ah / 15 Ah value, but chemistry, voltage and configuration-specific interpretation are not clear", "normalizedValue": null, "unit": "", "variant": "KANGAROO", "condition": "official unit/value inconsistency; no chemistry or swap method inferred", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "evidenceSummary": "電池表記の単位・値に要確認点がある。"},
+        "controlMethod": {"status": "found", "rawValue": "ros2_control with current, speed, position, impedance and optional force/torque actuator modes; VR teleoperation kit and joystick controller options", "normalizedValue": "ros2_control / configurable actuator modes / VR teleoperation", "unit": "", "variant": "KANGAROO", "condition": "official software and support configuration", "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceSummary": "ros2_control、各アクチュエータ制御、VR/joystickを確認。"},
+        "sdk": {"status": "found", "rawValue": "Ubuntu LTS + ROS 2 LTS + PAL OS; ROS 2 API C++/Python; ros2_control; URDF/MJCF; MuJoCo and mjlab; WebGUI/Rviz2", "normalizedValue": "ROS 2 / ros2_control / PAL OS / C++ and Python API", "unit": "", "variant": "KANGAROO", "condition": "official software/development tools", "sourceUrl": "https://pal-robotics.com/robot/kangaroo/", "evidenceSummary": "公式のROS2、API、シミュレーション・開発ツール。"},
+        "computePlatform": {"status": "found", "rawValue": "Control PC Intel i7 32GB RAM 1TB SSD; multimedia PC Intel i7 32GB RAM 1TB SSD; optional NVIDIA Jetson GPU", "normalizedValue": "2× Intel i7 PCs; optional NVIDIA Jetson GPU", "unit": "", "variant": "KANGAROO", "condition": "official configuration table", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "evidenceSummary": "制御・マルチメディアPCとJetson GPU option。"},
+        "ipRating": {"status": "not-published", "rawValue": "No KANGAROO IP ingress-protection rating found on reviewed official pages or datasheet", "normalizedValue": null, "unit": "", "variant": "KANGAROO", "condition": "robust wording is not an IP rating", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "evidenceSummary": "防塵防水等級は確認できない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "No whole-robot operating-temperature range found on reviewed KANGAROO official pages, datasheet and research articles", "normalizedValue": null, "unit": "°C", "variant": "KANGAROO", "condition": "component environmental limits are not published", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "evidenceSummary": "動作温度は確認できない。"},
+        "safetyStandard": {"status": "found", "rawValue": "SIL 2 based on IEC 61508; PL d based on EN ISO 13849-1; onboard and wireless emergency buttons", "normalizedValue": "IEC 61508 SIL 2 / EN ISO 13849-1 PL d", "unit": "", "variant": "KANGAROO", "condition": "official datasheet safety statement", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "evidenceSummary": "安全規格・レベルを公式PDFで確認。"}
+      },
+      "loadRatings": [
+        {"scope": "single-arm", "rating": "unspecified", "kg": 7, "condition": "4 DoF arm, arm fully extended; official table does not label rated/maximum", "variant": "KANGAROO 4 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"},
+        {"scope": "dual-arm", "rating": "unspecified", "kg": 30, "condition": "4 DoF arms, bi-manual manipulation; official table does not label rated/maximum", "variant": "KANGAROO 4 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"},
+        {"scope": "single-arm", "rating": "unspecified", "kg": 5, "condition": "5 DoF arm, arm fully extended; official table does not label rated/maximum", "variant": "KANGAROO 5 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"},
+        {"scope": "dual-arm", "rating": "unspecified", "kg": 28, "condition": "5 DoF arms, bi-manual manipulation; official table does not label rated/maximum", "variant": "KANGAROO 5 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"},
+        {"scope": "single-arm", "rating": "unspecified", "kg": 3, "condition": "7 DoF arm, arm fully extended; official table does not label rated/maximum", "variant": "KANGAROO 7 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"},
+        {"scope": "dual-arm", "rating": "unspecified", "kg": 25, "condition": "7 DoF arms, bi-manual manipulation; official table does not label rated/maximum", "variant": "KANGAROO 7 DoF arms", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/"}
+      ],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [
+        {"existingUseCaseId": "research-development", "officialExpression": "dynamic locomotion research / development-ready humanoid", "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/", "reason": "公式製品ページが動的ロコモーション研究向け開発プラットフォームと明示。"},
+        {"existingUseCaseId": "research-ai-simulation", "officialExpression": "reinforcement learning and embodied AI; MuJoCo/mjlab and RL tools", "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/", "reason": "公式製品ページがRL、embodied AI、シミュレーションツールを明示。"},
+        {"existingUseCaseId": "research-prototype-dev", "officialExpression": "customize KANGAROO to foster breakthroughs in robot learning and robotic movement", "evidenceSourceUrl": "https://pal-robotics.com/robot/kangaroo/", "reason": "研究用カスタマイズ・ロボット学習開発を既存prototype開発へ接続。"}
+      ],
+      "useCaseGaps": [],
+      "usageExamples": [
+        {"title": "Kangaroo: The dynamic robot & the latest developments", "url": "https://pal-robotics.com/blog/kangaroo-biped-research-platform-updates/", "publisher": "PAL Robotics", "publishedAt": "2022-05-31", "summary": "KANGAROOでトルク制御によるジャンプ、Whole Body Inverse Dynamics Controller、閉リンク機構の制御と実機実験を研究した。", "type": "research"}
+      ],
+      "usageExampleSourceUrls": ["https://pal-robotics.com/blog/kangaroo-biped-research-platform-updates/"],
+      "procurement": {
+        "procurementModels": ["purchase", "inquiry", "research-partnership"],
+        "marketAvailability": {"status": "needs-review", "rawValue": "PAL timeline says KANGAROO and KANGAROO PRO became ready for sale; current product page uses Request a quote and does not publish stock or shipment terms", "sourceUrl": "https://pal-robotics.com/timeline/", "evidenceSummary": "公式timelineのready for saleは確認したが、現在の在庫・納期は非公開。"},
+        "japanAvailability": {"status": "not-published", "rawValue": "No Japan sales, shipping or local availability statement found on reviewed PAL Robotics KANGAROO pages, contact and company pages", "sourceUrl": "https://pal-robotics.com/contact/", "evidenceSummary": "日本での入手性は確認できない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "No domestic authorized distributor identified on reviewed PAL Robotics official pages", "sourceUrl": "https://pal-robotics.com/about-us/", "evidenceSummary": "国内正規代理店は確認できない。"},
+        "supportNote": {"status": "found", "rawValue": "Official datasheet lists remote diagnostics/support, onsite installation and training, hardware maintenance/replacement, warranty extension and software upgrades", "sourceUrl": "https://pal-robotics.com/datasheet/kangaroo/", "evidenceSummary": "公式PDFにサポートサービス項目。日本固有条件は非公開。"}
+      },
+      "pagesReviewed": ["https://pal-robotics.com/robot/kangaroo/", "https://pal-robotics.com/datasheet/kangaroo/", "https://pal-robotics.com/blog/kangaroo-biped-research-platform-updates/", "https://pal-robotics.com/blog/humanoid-robots-era/", "https://pal-robotics.com/timeline/", "https://pal-robotics.com/contact/", "https://pal-robotics.com/about-us/"],
+      "sourceCandidates": [
+        {"url": "https://pal-robotics.com/robot/kangaroo/", "status": "price-checked", "reason": "公式Request a quote導線を確認したが公開価格はない。"},
+        {"url": "https://pal-robotics.com/datasheet/kangaroo/", "status": "spec-checked", "reason": "公式PDFで構成別DoF、速度、荷重、電池、安全規格を確認した。"}
+      ],
+      "fieldEvidence": {"mobility":["https://pal-robotics.com/robot/kangaroo/"],"heightCm":["https://pal-robotics.com/robot/kangaroo/"],"weightKg":["https://pal-robotics.com/robot/kangaroo/"],"speedMps":["https://pal-robotics.com/datasheet/kangaroo/"],"dof":["https://pal-robotics.com/robot/kangaroo/"],"payloadKg":["https://pal-robotics.com/robot/kangaroo/"],"runtimeMin":["https://pal-robotics.com/datasheet/kangaroo/"],"batteryCapacityWh":["https://pal-robotics.com/datasheet/kangaroo/"],"chargeTimeMin":["https://pal-robotics.com/datasheet/kangaroo/"],"batterySystem":["https://pal-robotics.com/datasheet/kangaroo/"],"controlMethod":["https://pal-robotics.com/robot/kangaroo/"],"sdk":["https://pal-robotics.com/robot/kangaroo/"],"computePlatform":["https://pal-robotics.com/datasheet/kangaroo/"],"ipRating":["https://pal-robotics.com/datasheet/kangaroo/"],"operatingTemperature":["https://pal-robotics.com/datasheet/kangaroo/"],"safetyStandard":["https://pal-robotics.com/datasheet/kangaroo/"],"loadRatings":["https://pal-robotics.com/datasheet/kangaroo/"],"officialUseCases":["https://pal-robotics.com/robot/kangaroo/"],"usageExample":["https://pal-robotics.com/blog/kangaroo-biped-research-platform-updates/"],"procurement":["https://pal-robotics.com/timeline/","https://pal-robotics.com/contact/","https://pal-robotics.com/about-us/","https://pal-robotics.com/datasheet/kangaroo/"]},
+      "conflicts": ["KANGAROOの身長・重量・DoF・荷重はplatform configuration依存で、単一値に統合していない。", "公式電池表記は976 Ah / 15 Ahと読み取れるが、電圧・Wh・variant対応がなく容量と方式をneeds-reviewにした。"],
+      "humanReviewRequired": ["KANGAROOの代表arm configuration（4/5/7 DoF）を公開Robotレコードで決定する。", "公式電池datasheetの976 Ah / 15 Ah表記と単位をPAL Roboticsへ確認する。", "日本向け販売・保守窓口と最新見積条件を公式窓口で確認する。"]
+    }
+  ]
+}

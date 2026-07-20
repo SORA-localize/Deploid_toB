@@ -12,6 +12,8 @@ import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
 interface FeaturedRobotCardProps {
   robot: Robot;
   manufacturerName?: string;
+  /** 初期viewport内でLCP候補になる先頭カードだけに指定する。 */
+  eagerImage?: boolean;
   /** カード外の操作（例: ラインナップ表のホバー連動）からホバー同等の演出
    *  （グロー・暗転・画像拡大・シマー・アクセントライン）を表示する。チルトはマウス追従時のみ。 */
   emphasized?: boolean;
@@ -25,7 +27,12 @@ interface FeaturedRobotCardProps {
  * ホバー演出（チルト・グロー・シマー・アクセントライン）は RobotCard/UseCaseCard と同じ
  * useTiltCardEffect 経由で共通化する。
  */
-export function FeaturedRobotCard({ robot, manufacturerName, emphasized = false }: FeaturedRobotCardProps) {
+export function FeaturedRobotCard({
+  robot,
+  manufacturerName,
+  eagerImage = false,
+  emphasized = false,
+}: FeaturedRobotCardProps) {
   const cardImage = getRobotPrimaryImage(robot);
 
   const {
@@ -66,6 +73,7 @@ export function FeaturedRobotCard({ robot, manufacturerName, emphasized = false 
             alt=""
             aria-hidden="true"
             fill
+            loading={eagerImage ? 'eager' : 'lazy'}
             sizes="(max-width: 640px) 100vw, 20vw"
             className="pointer-events-none z-0 scale-110 select-none object-cover blur-2xl brightness-[85] saturate-150"
           />
@@ -74,6 +82,7 @@ export function FeaturedRobotCard({ robot, manufacturerName, emphasized = false 
             src={cardImage.src}
             alt={cardImage.alt}
             fill
+            loading={eagerImage ? 'eager' : 'lazy'}
             sizes="(max-width: 640px) 100vw, 20vw"
             className="pointer-events-none z-10 object-contain object-center transition-transform duration-300 group-hover:scale-[1.03] group-data-[emphasized]:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
           />

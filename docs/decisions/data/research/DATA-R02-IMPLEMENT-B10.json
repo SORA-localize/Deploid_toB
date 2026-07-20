@@ -1,0 +1,3484 @@
+[
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B10",
+    "robotId": "wandercraft-calvin",
+    "identity": {
+      "registeredName": "Calvin-40",
+      "officialCurrentName": "Calvin-40",
+      "recordScope": "specific-variant",
+      "variant": "Calvin-40 (current industrial humanoid; distinct from Wandercraft's medical exoskeleton products Atalante X / Eve)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Listed as the first of Wandercraft's 'Current Products' on the official homepage, with its own current product page, an official Renault Group partnership announcement (2025-06-06), and an official SAPA deployment-partnership announcement (2025-11-12). No successor or discontinuation notice found.",
+      "evidenceSourceUrls": [
+        "https://www.wandercraft.eu/",
+        "https://en.wandercraft.eu/calvin-40",
+        "https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft",
+        "https://www.wandercraft.eu/articles/wandercraft-and-sapa-announce-deployment-partnership-in-industrial-manufacturing-cementing-europes-emerging-championship-in-the-humanoids-race"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "Autonomous industrial humanoid with autonomous navigation for task execution",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://en.wandercraft.eu/calvin-40",
+          "sourceTitle": "Calvin-40",
+          "publisher": "Wandercraft",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Calvin-40",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "現行公式ページがhumanoidかつautonomous navigationのbipedと明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "実生産ラインで産業タスクを実施",
+            "url": "https://en.wandercraft.eu/calvin-40",
+            "publisher": "Wandercraft",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "weightKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "speedMps",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "自律ナビゲーション / 全身制御",
+        "proposedValue": "自律ナビゲーション / 全身制御（荷重自動適応）",
+        "evidence": {
+          "value": "Autonomous navigation for task execution, with a certifiable safety system; full-body control algorithm that auto-adapts to the load",
+          "normalizedValue": "自律ナビゲーション / 全身制御（荷重自動適応）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://en.wandercraft.eu/calvin-40",
+          "sourceTitle": "Calvin-40",
+          "publisher": "Wandercraft",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Calvin-40",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "現行公式ページに自律ナビゲーションと荷重適応型全身制御の明記あり。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "実生産ラインで産業タスクを実施",
+            "url": "https://en.wandercraft.eu/calvin-40",
+            "publisher": "Wandercraft",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "認証取得指向の安全システム（バリアレス運用を可能にする独自セーフティ）",
+        "evidence": {
+          "value": "Industry's first certifiable safety solution, built on 10 years of experience in medical exoskeletons, enabling use without physical barriers",
+          "normalizedValue": "認証取得指向の安全システム（バリアレス運用を可能にする独自セーフティ）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://en.wandercraft.eu/calvin-40",
+          "sourceTitle": "Calvin-40",
+          "publisher": "Wandercraft",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Calvin-40",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "特定の外部安全規格番号は明記されないが、認証志向の安全システムであることを公式に明記。規格名称そのものは不明のため『found』だが規格番号は無しと注記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "実生産ラインで産業タスクを実施",
+            "url": "https://en.wandercraft.eu/calvin-40",
+            "publisher": "Wandercraft",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に荷重候補がない。"
+    },
+    "procurement": [
+      {
+        "field": "models",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": [
+          "partner-program",
+          "inquiry"
+        ],
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      },
+      {
+        "field": "note",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "公式ページに一般販売の価格・条件は無く、RenaultやSAPAのような戦略的パートナーシップ経由での導入が中心。",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "warehouse-picking",
+        "officialExpression": "Moves heavy loads, handles boxes and crates, and picks small parts with precision",
+        "evidenceSourceUrl": "https://en.wandercraft.eu/calvin-40",
+        "evidenceScope": "current-product",
+        "variant": "Calvin-40",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "wandercraft-calvin",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://en.wandercraft.eu/"
+          ],
+          "reason": "公式サイトが小型部品の精密ピッキングを対象作業として示している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "実生産ラインで産業タスクを実施",
+            "url": "https://en.wandercraft.eu/calvin-40",
+            "publisher": "Wandercraft",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "useCaseId": "factory-assembly-support",
+        "officialExpression": "Renault Group finalises a strategic partnership with Wandercraft; Calvin will allow Renault Group to relieve its workers from painful and non-ergonomic tasks... first humanoid deployed in Europe for assembly-line production tasks",
+        "evidenceSourceUrl": "https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft",
+        "evidenceScope": "current-product",
+        "variant": "Calvin-40",
+        "reason": "既存relation（deployment）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "wandercraft-calvin",
+          "fit": "strong",
+          "basis": "deployment",
+          "evidenceDeploymentIds": [
+            "wandercraft-renault-douai"
+          ],
+          "reason": "Renaultドゥエー工場でタイヤ搬送・重量物物流向けに展開される製造現場事例。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Renault工場向けの製造作業に展開",
+            "url": "https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft",
+            "publisher": "Wandercraft",
+            "publishedAt": "2025-06-06",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "replace-usage-example-urls",
+      "candidates": [
+        {
+          "customerOrInstitution": "Renault Group",
+          "classification": "commercial-deployment",
+          "evidenceSourceUrl": "https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft",
+          "variant": "Calvin-40",
+          "scopeNote": "戦略的パートナーシップとしてRenaultの生産ラインへの導入を公式発表（2025-06-06）。'hundreds of units on order'とホームページに明記。",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Renault工場向けの製造作業に展開",
+              "url": "https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft",
+              "publisher": "Wandercraft",
+              "publishedAt": "2025-06-06",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "customerOrInstitution": "SAPA (Italy-based Tier 1 automotive components / One-Shot Company)",
+          "classification": "pilot",
+          "evidenceSourceUrl": "https://www.wandercraft.eu/articles/wandercraft-and-sapa-announce-deployment-partnership-in-industrial-manufacturing-cementing-europes-emerging-championship-in-the-humanoids-race",
+          "variant": "Calvin-40",
+          "scopeNote": "2025-11-12公式発表。'Deployment Partnership'として2カ国での展開を計画（発表時点では稼働開始前の正式合意）。",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "Calvin-40 usage example",
+              "url": "https://www.wandercraft.eu/articles/wandercraft-and-sapa-announce-deployment-partnership-in-industrial-manufacturing-cementing-europes-emerging-championship-in-the-humanoids-race",
+              "checkedAt": "2026-07-16",
+              "reliability": "reported"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "自律ナビゲーション（バリアレス運用）",
+        "evidenceSourceUrl": "https://en.wandercraft.eu/calvin-40",
+        "evidenceSummary": "3Dセンサーと強化学習ベースの視覚認識スタックによる自律ナビゲーションと、物理バリア無しでの運用を可能にする認証志向の安全システムを公式に明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "全身制御による荷重自動適応",
+        "evidenceSourceUrl": "https://en.wandercraft.eu/calvin-40",
+        "evidenceSummary": "Full-body control algorithm that auto-adapts to the loadと明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "実生産ラインでの稼働（欧州初）",
+        "evidenceSourceUrl": "https://en.wandercraft.eu/calvin-40",
+        "evidenceSummary": "\"First humanoid robot to be deployed in Europe for assembly-line production tasks\"と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "12種の汎用産業・物流ユースケースを想定した学習済みモデル（うち3種は既に導入）",
+        "evidenceSourceUrl": "https://en.wandercraft.eu/calvin-40",
+        "evidenceSummary": "\"Designed and trained on an initial set of 12 generic use cases that cover 70% of industrial and logistics needs. Three of these are already being deployed\"と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "医療用外骨格由来のバランス制御技術の転用",
+        "evidenceSourceUrl": "https://www.therobotreport.com/wandercraft-unveils-new-industrial-humanoid-renault/",
+        "evidenceSummary": "The Robot Report記事がWandercraftの外骨格由来コンポーネントの再利用を報道（開発期間40日）。一次情報の公式ページでも同種の技術継承が述べられている。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B10",
+    "robotId": "mentee-menteebotv3",
+    "identity": {
+      "registeredName": "MenteeBot",
+      "officialCurrentName": "MenteeBot (公式サイトはバージョン表記なし。NVIDIA公式カスタマーストーリーは『MenteeBot V3.0』と明記)",
+      "recordScope": "specific-variant",
+      "variant": "MenteeBot V3 (third-generation; NVIDIA customer story explicitly names 'MenteeBot V3.0', while Mentee's own current product page displays specs without an explicit version label)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed on Mentee Robotics' own current product page (menteebot.com/bot/) and independently on NVIDIA's official customer-story page naming 'MenteeBot V3.0'. Mobileye announced a definitive agreement (2026-01-06, ~$900M) to acquire Mentee Robotics; official coverage states Mentee will operate as an independent unit within Mobileye and continue MenteeBot development toward PoC deployments in 2026 and series production targeted 2028 — this is an ownership change, not a product discontinuation.",
+      "evidenceSourceUrls": [
+        "https://www.menteebot.com/bot/",
+        "https://nvidia.com/en-us/customer-stories/mentee-robotics",
+        "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "Humanoid robot; 'Interacts through Voice'; bipedal form shown",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.menteebot.com/bot/",
+          "sourceTitle": "MenteeBot",
+          "publisher": "Mentee Robotics",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "MenteeBot V3",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページが二足歩行ヒューマノイドと明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "MenteeBot official product page",
+            "url": "https://www.menteebot.com/bot/",
+            "publisher": "Mentee Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 175,
+        "proposedValue": 175,
+        "evidence": {
+          "value": "175cm Height",
+          "normalizedValue": 175,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.menteebot.com/bot/",
+          "sourceTitle": "MenteeBot",
+          "publisher": "Mentee Robotics",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "MenteeBot V3",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに『175cm Height』と明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "MenteeBot official product page",
+            "url": "https://www.menteebot.com/bot/",
+            "publisher": "Mentee Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 70,
+        "proposedValue": 70,
+        "evidence": {
+          "value": "70kg Weight",
+          "normalizedValue": 70,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.menteebot.com/bot/",
+          "sourceTitle": "MenteeBot",
+          "publisher": "Mentee Robotics",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "MenteeBot V3",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに『70kg Weight』と明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "MenteeBot official product page",
+            "url": "https://www.menteebot.com/bot/",
+            "publisher": "Mentee Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 1.5,
+        "proposedValue": 1.5,
+        "evidence": {
+          "value": "Maximum speed 1.5m/s",
+          "normalizedValue": 1.5,
+          "rawUnit": "m/s",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.menteebot.com/bot/",
+          "sourceTitle": "MenteeBot",
+          "publisher": "Mentee Robotics",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "MenteeBot V3",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに『1.5m/s』と明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "MenteeBot official product page",
+            "url": "https://www.menteebot.com/bot/",
+            "publisher": "Mentee Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 40,
+        "proposedValue": 40,
+        "evidence": {
+          "value": "40 (degrees of freedom)",
+          "normalizedValue": 40,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.menteebot.com/bot/",
+          "sourceTitle": "MenteeBot",
+          "publisher": "Mentee Robotics",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "MenteeBot V3",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに『40』DoFと明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "MenteeBot official product page",
+            "url": "https://www.menteebot.com/bot/",
+            "publisher": "Mentee Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 25,
+        "evidence": {
+          "value": "Can carry up to 25kg",
+          "normalizedValue": 25,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.menteebot.com/bot/",
+          "sourceTitle": "MenteeBot",
+          "publisher": "Mentee Robotics",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "MenteeBot V3",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに『Can carry up to 25kg』と明記（腕・全身の区分は未公表のためloadRatingsではmanufacturer-wording/maximumとして記録）。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "MenteeBot official product page",
+            "url": "https://www.menteebot.com/bot/",
+            "publisher": "Mentee Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "runtimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "ホットスワップ対応バッテリー",
+        "proposedValue": "ホットスワップ対応バッテリー（24時間稼働想定）",
+        "evidence": {
+          "value": "Hot-swappable battery solution for 24/7 operations",
+          "normalizedValue": "ホットスワップ対応バッテリー（24時間稼働想定）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://nvidia.com/en-us/customer-stories/mentee-robotics",
+          "sourceTitle": "Mentee Robotics customer story",
+          "publisher": "NVIDIA",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "MenteeBot V3",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "NVIDIA公式カスタマーストーリーがMenteeBot V3.0のホットスワップ電池を明記。稼働分数の具体値は無し。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "Mentee Robotics customer story",
+            "url": "https://nvidia.com/en-us/customer-stories/mentee-robotics",
+            "publisher": "NVIDIA",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "自律実行 / 音声指示 / 教示・指示追従",
+        "proposedValue": "音声対話 / 指示追従（オンボード言語モデル）",
+        "evidence": {
+          "value": "Interacts through Voice; onboard language model follows spoken or written commands",
+          "normalizedValue": "音声対話 / 指示追従（オンボード言語モデル）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.menteebot.com/bot/",
+          "sourceTitle": "MenteeBot",
+          "publisher": "Mentee Robotics",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "MenteeBot V3",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページの『Interacts through Voice』と、NVIDIA公式カスタマーストーリーの音声・文章指示追従記述を根拠とする。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "MenteeBot official product page",
+            "url": "https://www.menteebot.com/bot/",
+            "publisher": "Mentee Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "NVIDIA Jetson AGX Orin ×2",
+        "evidence": {
+          "value": "Dual NVIDIA Jetson AGX Orin processors (edge deployment on MenteeBot V3.0)",
+          "normalizedValue": "NVIDIA Jetson AGX Orin ×2",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://nvidia.com/en-us/customer-stories/mentee-robotics",
+          "sourceTitle": "Mentee Robotics customer story",
+          "publisher": "NVIDIA",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "MenteeBot V3",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "NVIDIA公式カスタマーストーリーがMenteeBot V3.0搭載の計算基盤としてJetson AGX Orin×2を明記。Mentee自社ページには計算基盤の明記は無い。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "Mentee Robotics customer story",
+            "url": "https://nvidia.com/en-us/customer-stories/mentee-robotics",
+            "publisher": "NVIDIA",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "set",
+      "candidates": [
+        {
+          "action": "set",
+          "reason": "対象範囲・rating・条件が分離された現行荷重候補。",
+          "proposedValue": {
+            "scope": "manufacturer-wording",
+            "rating": "maximum",
+            "kg": 25,
+            "condition": "公式表記はCan carry up to 25kg。片腕・両腕・全身の範囲は未公表。",
+            "variant": "MenteeBot V3",
+            "sourceUrl": "https://www.menteebot.com/bot/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "MenteeBot official product page",
+              "url": "https://www.menteebot.com/bot/",
+              "publisher": "Mentee Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "models",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": [
+          "partner-program",
+          "inquiry"
+        ],
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      },
+      {
+        "field": "note",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "公式ページに一般販売価格は無い。Mobileyeによる買収完了（2026-01-06発表、$900M、Q1 2026close予定）後もMenteeは独立ユニットとして運営され、2026年内に顧客PoC、2028年に量産・商業化を目標とする旨が公式発表されている。",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "warehouse-picking",
+        "officialExpression": "Two MenteeBots Working Together in an Autonomous Warehouse Task",
+        "evidenceSourceUrl": "https://www.menteebot.com/blog/menteebot-warehouse-task/",
+        "evidenceScope": "current-product",
+        "variant": "MenteeBot V3",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "mentee-menteebotv3",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.menteebot.com/blog/menteebot-warehouse-task/"
+          ],
+          "reason": "公式事例で、2台のMenteeBotが箱を山積みから棚へ自律搬送している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "2台が倉庫で箱を棚へ自律搬送",
+            "url": "https://www.menteebot.com/blog/menteebot-warehouse-task/",
+            "publisher": "Mentee Robotics",
+            "publishedAt": "2025-11",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "replace-usage-example-urls",
+      "candidates": [
+        {
+          "customerOrInstitution": "Mentee Robotics (自社実証・倉庫タスクデモ、顧客名の明記なし)",
+          "classification": "demonstration",
+          "evidenceSourceUrl": "https://www.menteebot.com/blog/menteebot-warehouse-task/",
+          "variant": "MenteeBot V3",
+          "scopeNote": "自社ブログ（2025-11公開）による2台協調デモ。特定顧客・施設名の明記はないため商用導入ではなくdemonstrationとして分類。",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "2台が倉庫で箱を棚へ自律搬送",
+              "url": "https://www.menteebot.com/blog/menteebot-warehouse-task/",
+              "publisher": "Mentee Robotics",
+              "publishedAt": "2025-11",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "自社製アクチュエータ・センサー・電子系のフル統合",
+        "evidenceSourceUrl": "https://www.menteebot.com/bot/",
+        "evidenceSummary": "'Self-made actuators fully integrated on-board sensors and drivers' 'Bespoke electronics and communication'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "冗長フェイルセーフ計算系",
+        "evidenceSourceUrl": "https://www.menteebot.com/bot/",
+        "evidenceSummary": "'Advanced, redundant, reliable, fail-safe compute'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "ホットスワップバッテリーによる24時間運用",
+        "evidenceSourceUrl": "https://nvidia.com/en-us/customer-stories/mentee-robotics",
+        "evidenceSummary": "NVIDIA公式カスタマーストーリーがhot-swappable battery for 24/7 operationsと明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "自律協調（複数台での倉庫タスク）",
+        "evidenceSourceUrl": "https://www.menteebot.com/blog/menteebot-warehouse-task/",
+        "evidenceSummary": "'Two MenteeBots Working Together in an Autonomous Warehouse Task'という公式ブログタイトルが複数台協調タスクを示す。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "NVIDIA Isaac Sim/Isaac Lab/GR00T-Mimicを用いたシミュレーション学習",
+        "evidenceSourceUrl": "https://nvidia.com/en-us/customer-stories/mentee-robotics",
+        "evidenceSummary": "NVIDIA公式カスタマーストーリーがIsaac Sim、Isaac Lab、GR00T-Mimicの利用を明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B10",
+    "robotId": "robotera-l7",
+    "identity": {
+      "registeredName": "L7",
+      "officialCurrentName": "ROBOT L7 (星动L7)",
+      "recordScope": "specific-variant",
+      "variant": "L7 full-size bipedal humanoid (distinct model from Q5 wheeled and M7 upper-body-only)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed via RobotEra's own launch press release (Newsfile Corp, distributed on behalf of ROBOTERA, 2025-07-28/29) and reiterated at CES 2026 (Jan 2026) as part of the current 'Hexa-Core' lineup (L7, Q5, XHAND1). RBTX marketplace lists RobotEra itself as the seller of the L7. No discontinuation or successor found.",
+      "evidenceSourceUrls": [
+        "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+        "https://www.autonomyglobal.co/robotera-showcases-its-hexa-core-robotics-lineup-at-ces-2026/",
+        "https://rbtx.com/en-US/components/humanoid/robotera-l7-humanoid-robot-55-dof"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "Full-size bipedal humanoid capable of running, spin jumps, street dancing",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+          "sourceTitle": "ROBOTERA Unveils ROBOT L7",
+          "publisher": "ROBOTERA / Newsfile Corp",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "L7",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式プレスリリースが二足歩行（走行・跳躍を含む）を明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Unveils ROBOT L7",
+            "url": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+            "publisher": "ROBOTERA / Newsfile Corp",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 171,
+        "evidence": {
+          "value": "171 cm",
+          "normalizedValue": 171,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+          "sourceTitle": "ROBOTERA Unveils ROBOT L7",
+          "publisher": "ROBOTERA / Newsfile Corp",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "L7",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式プレスリリース（Newsfile Corp配信、ROBOTERA名義）が171cmと明記。RBTX（Robotera自身が出品者の公式ストア）でも同じ171cmを確認、独立した中国語メディア(IT之家)報道とも一致。DATA-R01が指摘した英語ページ間の身長表記競合は、本セッションで確認した複数の一次/公式情報源では再現できなかった。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Unveils ROBOT L7",
+            "url": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+            "publisher": "ROBOTERA / Newsfile Corp",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "conflict",
+        "action": "hold-conflict",
+        "reason": "一次資料間または資料と登録対象の競合を解消していない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 4,
+        "evidence": {
+          "value": "Running speed 4 m/s",
+          "normalizedValue": 4,
+          "rawUnit": "m/s",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+          "sourceTitle": "ROBOTERA Unveils ROBOT L7",
+          "publisher": "ROBOTERA / Newsfile Corp",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "L7",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式プレスリリースが4m/sのランニング速度を明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Unveils ROBOT L7",
+            "url": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+            "publisher": "ROBOTERA / Newsfile Corp",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 55,
+        "proposedValue": 55,
+        "evidence": {
+          "value": "55 total DOF (full-body)",
+          "normalizedValue": 55,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-l7-humanoid-robot-55-dof",
+          "sourceTitle": "ROBOTERA L7 | Humanoid Robot | 55 DOF",
+          "publisher": "RBTX (seller: Robotera)",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "L7",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "RobotEra自身が出品者であるRBTX公式ストアページ、および独立した中国語メディア報道（IT之家）が55自由度を明記し一致。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA L7 | Humanoid Robot | 55 DOF",
+            "url": "https://rbtx.com/en-US/components/humanoid/robotera-l7-humanoid-robot-55-dof",
+            "publisher": "RBTX (seller: Robotera)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-applicable",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 360,
+        "evidence": {
+          "value": "Operating time 6 hours",
+          "normalizedValue": 360,
+          "rawUnit": "hours",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-l7-humanoid-robot-55-dof",
+          "sourceTitle": "ROBOTERA L7 | Humanoid Robot | 55 DOF",
+          "publisher": "RBTX (seller: Robotera)",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "L7",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "RobotEra自身が出品者であるRBTX公式ストアページに6時間稼働と明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA L7 | Humanoid Robot | 55 DOF",
+            "url": "https://rbtx.com/en-US/components/humanoid/robotera-l7-humanoid-robot-55-dof",
+            "publisher": "RBTX (seller: Robotera)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "リチウムバッテリー（BMS内蔵）",
+        "evidence": {
+          "value": "High-performance lithium battery with BMS support",
+          "normalizedValue": "リチウムバッテリー（BMS内蔵）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-l7-humanoid-robot-55-dof",
+          "sourceTitle": "ROBOTERA L7 | Humanoid Robot | 55 DOF",
+          "publisher": "RBTX (seller: Robotera)",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "L7",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "RobotEra自身が出品者であるRBTX公式ストアページに明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA L7 | Humanoid Robot | 55 DOF",
+            "url": "https://rbtx.com/en-US/components/humanoid/robotera-l7-humanoid-robot-55-dof",
+            "publisher": "RBTX (seller: Robotera)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": null,
+        "proposedValue": "全身遠隔操作 / 独自VLAモデルERA-42による自律動作",
+        "evidence": {
+          "value": "Full-body teleoperation; VLA model ERA-42 drives autonomous whole-body task execution",
+          "normalizedValue": "全身遠隔操作 / 独自VLAモデルERA-42による自律動作",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.autonomyglobal.co/robotera-showcases-its-hexa-core-robotics-lineup-at-ces-2026/",
+          "sourceTitle": "ROBOTERA Showcases Its Hexa-Core Robotics Lineup at CES 2026",
+          "publisher": "Autonomy Global",
+          "sourceType": "third-party",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "L7",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "CES2026報道が'ultra-low-latency full-body teleoperation'を明記。RobotEra公式ページ側でも独自VLAモデルERA-42への言及を確認（application.html関連ページ）。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Showcases Its Hexa-Core Robotics Lineup at CES 2026",
+            "url": "https://www.autonomyglobal.co/robotera-showcases-its-hexa-core-robotics-lineup-at-ces-2026/",
+            "publisher": "Autonomy Global",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "set",
+      "candidates": [
+        {
+          "action": "set",
+          "reason": "対象範囲・rating・条件が分離された現行荷重候補。",
+          "proposedValue": {
+            "scope": "dual-arm",
+            "rating": "maximum",
+            "kg": 20,
+            "condition": "公式プレスリリース(Newsfile/ROBOTERA)は'Up to 20 kg payload per dual 7-axis biomimetic arm'。定格/最大の別は明示的にはmaximumに近い書き方（up to）。",
+            "variant": "L7",
+            "sourceUrl": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html"
+          },
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "L7 load specification",
+              "url": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "models",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      },
+      {
+        "field": "note",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "Contact-to-Buyページは問い合わせフォームのみで公開価格なし。RBTX（RobotEra自身が出品者）経由の購入も価格非表示。",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Scientific research (data collection and model training)",
+        "evidenceSourceUrl": "https://www.robotera.com/application.html",
+        "evidenceScope": "current-family-common",
+        "variant": "L7",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "robotera-l7",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.robotera.com/application.html"
+          ],
+          "reason": "公式サイトがL7を具身知能研究とアルゴリズム検証のプラットフォームとして示している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "RobotEra applications and L7 specifications",
+            "url": "https://www.robotera.com/application.html",
+            "publisher": "RobotEra",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "useCaseId": "customer-reception",
+        "officialExpression": "Enterprise reception / corporate reception",
+        "evidenceSourceUrl": "https://www.robotera.com/application.html",
+        "evidenceScope": "current-family-common",
+        "variant": "L7",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "robotera-l7",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.robotera.com/application.html"
+          ],
+          "reason": "公式サイトがL7の用途に受付・案内・顧客対応を挙げている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "RobotEra applications and L7 specifications",
+            "url": "https://www.robotera.com/application.html",
+            "publisher": "RobotEra",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "useCaseId": "facility-wayfinding",
+        "officialExpression": "Mall guidance / hospital wayfinding",
+        "evidenceSourceUrl": "https://www.robotera.com/application.html",
+        "evidenceScope": "current-family-common",
+        "variant": "L7",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "robotera-l7",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.robotera.com/application.html"
+          ],
+          "reason": "公式サイトがL7を施設案内と来訪者対応の用途に位置付けている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "RobotEra applications and L7 specifications",
+            "url": "https://www.robotera.com/application.html",
+            "publisher": "RobotEra",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "replace-usage-example-urls",
+      "candidates": [
+        {
+          "customerOrInstitution": "9 of the world's top tech giants (社名非公開)",
+          "classification": "commercial-deployment",
+          "evidenceSourceUrl": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+          "variant": "L7",
+          "scopeNote": "公式プレスリリースが'over 200 units delivered'及び'9 of the world's top tech giants'を顧客として明記するが、具体的な企業名は非公開。",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "L7 usage example",
+              "url": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+              "checkedAt": "2026-07-16",
+              "reliability": "reported"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "10軸手首（側方±45°、前後±90°）",
+        "evidenceSourceUrl": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+        "evidenceSummary": "公式プレスリリースが10-axis wrist configurationを明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "12自由度・直接駆動式五指ハンド",
+        "evidenceSourceUrl": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+        "evidenceSummary": "'12 independently actuated degrees of freedom in fully direct-drive five-fingered hand'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "2.1m球状作業空間",
+        "evidenceSourceUrl": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+        "evidenceSummary": "公式プレスリリースが'2.1-meter spherical range'を明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "全身+上半身のモジュール交換構成（L7/M7間）",
+        "evidenceSourceUrl": "https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html",
+        "evidenceSummary": "'Modular full-body + upper-body interchangeable configurations'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "独自VLA基盤モデルERA-42による自律タスク遂行",
+        "evidenceSourceUrl": "https://www.autonomyglobal.co/robotera-showcases-its-hexa-core-robotics-lineup-at-ces-2026/",
+        "evidenceSummary": "CES2026報道及びRobotEra公式サイトのトップページ記述にERA-42モデルの言及あり。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "robotera.com（英語版・中国語版）の本文がJS描画のため直接検証できず、身長以外の項目についても公式サイト本体での再確認が望ましい。"
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B10",
+    "robotId": "robotera-q5",
+    "identity": {
+      "registeredName": "Q5",
+      "officialCurrentName": "ROBOTERA Q5",
+      "recordScope": "specific-variant",
+      "variant": "Q5 wheeled service humanoid (distinct model from L7 bipedal and M7 upper-body-only)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Q5 is listed on RobotEra's own product line (robotera.com/en/enq5) and was showcased at CES 2026 (Jan 2026) alongside L7 and XHAND1 as part of the current lineup. RBTX marketplace lists RobotEra itself as the seller. No numeric spec could be independently confirmed on RobotEra's own JS-rendered product page directly (access limitation), so specs below rely on the RBTX official-store listing and convergent CES 2026 press coverage.",
+      "evidenceSourceUrls": [
+        "https://www.robotera.com/en/enq5",
+        "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+        "https://www.autonomyglobal.co/robotera-showcases-its-hexa-core-robotics-lineup-at-ces-2026/"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "wheeled",
+        "evidence": {
+          "value": "Wheeled base (no legs); super-humanoid wheeled service robot",
+          "normalizedValue": "wheeled",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+          "sourceTitle": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+          "publisher": "RBTX (seller: Robotera)",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Q5",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "RobotEra自身が出品者であるRBTX公式ストアページが車輪型であることを明記。CES2026報道も脚無し車輪型を明記し一致。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+            "url": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+            "publisher": "RBTX (seller: Robotera)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 165,
+        "evidence": {
+          "value": "1,650 mm (165 cm)",
+          "normalizedValue": 165,
+          "rawUnit": "mm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+          "sourceTitle": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+          "publisher": "RBTX (seller: Robotera)",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Q5",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "RobotEra自身が出品者であるRBTX公式ストアページに1650mmと明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+            "url": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+            "publisher": "RBTX (seller: Robotera)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 70,
+        "evidence": {
+          "value": "70 kg",
+          "normalizedValue": 70,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+          "sourceTitle": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+          "publisher": "RBTX (seller: Robotera)",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Q5",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "RobotEra自身が出品者であるRBTX公式ストアページに70kgと明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+            "url": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+            "publisher": "RBTX (seller: Robotera)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 1.5,
+        "evidence": {
+          "value": "Maximum speed 1.5 m/s",
+          "normalizedValue": 1.5,
+          "rawUnit": "m/s",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+          "sourceTitle": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+          "publisher": "RBTX (seller: Robotera)",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Q5",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "RobotEra自身が出品者であるRBTX公式ストアページに明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+            "url": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+            "publisher": "RBTX (seller: Robotera)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 44,
+        "evidence": {
+          "value": "44 DOF (full-body)",
+          "normalizedValue": 44,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+          "sourceTitle": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+          "publisher": "RBTX (seller: Robotera)",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Q5",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "RobotEra自身が出品者であるRBTX公式ストアページ及びCES2026報道が44自由度で一致。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+            "url": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+            "publisher": "RBTX (seller: Robotera)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-applicable",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 240,
+        "evidence": {
+          "value": "Operating time 4 hours",
+          "normalizedValue": 240,
+          "rawUnit": "hours",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+          "sourceTitle": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+          "publisher": "RBTX (seller: Robotera)",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Q5",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "RobotEra自身が出品者であるRBTX公式ストアページに4時間稼働と明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+            "url": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+            "publisher": "RBTX (seller: Robotera)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "リチウムバッテリー（BMS内蔵、60V系統）",
+        "evidence": {
+          "value": "High-performance lithium battery with BMS; 60V supply",
+          "normalizedValue": "リチウムバッテリー（BMS内蔵、60V系統）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+          "sourceTitle": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+          "publisher": "RBTX (seller: Robotera)",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Q5",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "RobotEra自身が出品者であるRBTX公式ストアページに明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+            "url": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+            "publisher": "RBTX (seller: Robotera)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "全身遠隔操作 / 2.4G無線 / 多言語音声認識(37言語以上)",
+        "evidence": {
+          "value": "Full-body teleoperation, 2.4G wireless control, Ethernet/USB communication, 37+ language recognition",
+          "normalizedValue": "全身遠隔操作 / 2.4G無線 / 多言語音声認識(37言語以上)",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+          "sourceTitle": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+          "publisher": "RBTX (seller: Robotera)",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "Q5",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "RobotEra自身が出品者であるRBTX公式ストアページに明記。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "ROBOTERA Q5 | Humanoid Robot | 44DOF",
+            "url": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+            "publisher": "RBTX (seller: Robotera)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "set",
+      "candidates": [
+        {
+          "action": "set",
+          "reason": "対象範囲・rating・条件が分離された現行荷重候補。",
+          "proposedValue": {
+            "scope": "single-arm",
+            "rating": "maximum",
+            "kg": 10,
+            "condition": "RobotEra自身が出品者であるRBTX公式ストアページに'Single-arm Maximum Payload: 10 kg'と明記。7軸バイオニックアームでの数値。",
+            "variant": "Q5",
+            "sourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof"
+          },
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "Q5 load specification",
+              "url": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "models",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      },
+      {
+        "field": "note",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "Contact-to-Buyページは問い合わせフォームのみで公開価格なし。",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "customer-reception",
+        "officialExpression": "Enterprise reception / corporate reception; receptionist, service assistant",
+        "evidenceSourceUrl": "https://www.robotera.com/application.html",
+        "evidenceScope": "current-family-common",
+        "variant": "Q5",
+        "reason": "現在公式資料による用途relation追加候補。",
+        "action": "set",
+        "existingRelation": null,
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "Q5 official use-case source",
+            "url": "https://www.robotera.com/application.html",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "useCaseId": "facility-wayfinding",
+        "officialExpression": "Mall guidance / hospital wayfinding",
+        "evidenceSourceUrl": "https://www.robotera.com/application.html",
+        "evidenceScope": "current-family-common",
+        "variant": "Q5",
+        "reason": "現在公式資料による用途relation追加候補。",
+        "action": "set",
+        "existingRelation": null,
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "Q5 official use-case source",
+            "url": "https://www.robotera.com/application.html",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": []
+    },
+    "currentFeatures": [
+      {
+        "feature": "3D LiDAR + ステレオカメラのデュアルモーダルセンサーフュージョン",
+        "evidenceSourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+        "evidenceSummary": "'3D LiDAR + stereo camera (dual-modal fusion)'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "QRコード認識",
+        "evidenceSourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+        "evidenceSummary": "'QR code recognition capability'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "人間の実演動画からのタスク学習",
+        "evidenceSourceUrl": "https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof",
+        "evidenceSummary": "'Supports learning new tasks from human demonstration videos'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "しゃがみ・腰ひねり・握手等の社会的ジェスチャー",
+        "evidenceSourceUrl": "https://www.autonomyglobal.co/robotera-showcases-its-hexa-core-robotics-lineup-at-ces-2026/",
+        "evidenceSummary": "CES2026報道が'squatting and object retrieval'及び'accurate replication of human motion'を明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "robotera.com本体（Q5専用ページ）の直接検証ができておらず、可能であればブラウザレンダリングでの再確認が望ましい。"
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B10",
+    "robotId": "robotera-m7",
+    "identity": {
+      "registeredName": "M7",
+      "officialCurrentName": "ROBOTERA M7",
+      "recordScope": "specific-variant",
+      "variant": "M7 fixed upper-body-only humanoid (torso mounted on stand; distinct from L7 full-size biped and Q5 wheeled)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "manual-review",
+      "successorRobot": null,
+      "reason": "M7 appears on RobotEra's own current product navigation (confirmed via robotera.com/en/robotics/M7.html nav listing) and is sold through multiple resellers (American Satellite, Robots International, RBTX-family sites), but this session could not open a RobotEra-first-party or clearly-authorized-distributor page with M7's own numeric specs (the product page itself is JS-rendered and returned only nav/company boilerplate). Numeric specs below rely solely on convergent third-party reseller/aggregator reporting, not a directly-opened official or confirmed-authorized source, so a manual re-check of the official M7 page (with a JS-capable browser) is recommended before fully trusting the numbers.",
+      "evidenceSourceUrls": [
+        "https://www.robotera.com/en/robotics/M7.html",
+        "https://www.americansatellite.us/Robotera-M7-Upper-Body-Humanoid-Robot.htm"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "hold-source-inaccessible",
+        "reason": "公式一次資料として分類されていない。",
+        "currentValue": null,
+        "proposedValue": "stationary",
+        "evidence": {
+          "value": "Fixed (non-walking) upper-body torso mounted on a vertical stand",
+          "normalizedValue": "stationary",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.americansatellite.us/Robotera-M7-Upper-Body-Humanoid-Robot.htm",
+          "sourceTitle": "RobotEra M7 Upper Body Humanoid Robot",
+          "publisher": "American Satellite (reseller)",
+          "sourceType": "reported",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "M7",
+          "evidenceScope": "variant-specific",
+          "evidenceSummary": "M7が固定式（非歩行）の上半身のみのモデルであることは複数のリセラー掲載で一致するが、RobotEra自社の一次資料で直接確認できていない。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "RobotEra M7 Upper Body Humanoid Robot",
+            "url": "https://www.americansatellite.us/Robotera-M7-Upper-Body-Humanoid-Robot.htm",
+            "publisher": "American Satellite (reseller)",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "weightKg",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "speedMps",
+        "status": "not-applicable",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-applicable",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "controlMethod",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に荷重候補がない。"
+    },
+    "procurement": [
+      {
+        "field": "models",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": [
+          "purchase",
+          "inquiry"
+        ],
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      },
+      {
+        "field": "note",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "Contact-to-Buyページは問い合わせフォームのみで公開価格なし。一部リセラー（Robots International）が$99,999.99という価格を掲示しているが、正規代理店であることが確認できないため価格として採用しない。",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Scientific research (data collection and model training)",
+        "evidenceSourceUrl": "https://www.robotera.com/application.html",
+        "evidenceScope": "current-family-common",
+        "variant": "M7",
+        "reason": "現在公式資料による用途relation追加候補。",
+        "action": "set",
+        "existingRelation": null,
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "M7 official use-case source",
+            "url": "https://www.robotera.com/application.html",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": []
+    },
+    "currentFeatures": [
+      {
+        "feature": "7自由度アーム×2、クロス軸手首、12自由度ハンド×2",
+        "evidenceSourceUrl": "https://www.americansatellite.us/Robotera-M7-Upper-Body-Humanoid-Robot.htm",
+        "evidenceSummary": "リセラー掲載情報。RobotEra自社の一次資料での直接確認はできていない。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "L7へのアップグレードパス（同一VLAモデルERA-42を共有）",
+        "evidenceSourceUrl": "https://www.robotera.com/en/robotics/M7.html",
+        "evidenceSummary": "RobotEra公式サイトのナビゲーションでM7がL7・Q5と並ぶ現行製品ラインに掲載されていることを確認（本文詳細はJS描画のため未取得）。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "M7専用ページ(robotera.com/en/robotics/M7.html)がJS描画のため本文取得できず、可能であればブラウザレンダリングでの再確認が必須。現状の数値は暫定（needs-review）として扱うこと。"
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B10",
+    "robotId": "galbot-g1",
+    "identity": {
+      "registeredName": "Galbot G1",
+      "officialCurrentName": "Galbot-G1 (银河通用 G1)",
+      "recordScope": "specific-variant",
+      "variant": "G1 wheeled dual-arm mobile manipulator (current generation)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "Confirmed directly on Galbot's own current product page (galbot.com/g1/, accessed via a text-rendering proxy since the page is JS-rendered) and the developer manual mirror. No successor or discontinuation found.",
+      "evidenceSourceUrls": [
+        "https://www.galbot.com/g1/",
+        "https://developer.galbot.com/docs/g1/2.2.4/zh/g1"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "wheeled",
+        "proposedValue": "wheeled",
+        "evidence": {
+          "value": "360° omnidirectional-wheel chassis",
+          "normalizedValue": "wheeled",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.galbot.com/g1/",
+          "sourceTitle": "Galbot-G1",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページが360度全方位車輪ベースを明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official product page",
+            "url": "https://www.galbot.com/g1/",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 173,
+        "proposedValue": 173,
+        "evidence": {
+          "value": "Standard posture height 1730mm",
+          "normalizedValue": 173,
+          "rawUnit": "mm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.galbot.com/g1/",
+          "sourceTitle": "Galbot-G1",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに1730mm、公式マニュアルのミラーでも同一値を確認。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official product page",
+            "url": "https://www.galbot.com/g1/",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 92.5,
+        "proposedValue": 92.5,
+        "evidence": {
+          "value": "92.5kg",
+          "normalizedValue": 92.5,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.galbot.com/g1/",
+          "sourceTitle": "Galbot-G1",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページ及び公式マニュアルミラーが92.5kgで一致。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official product page",
+            "url": "https://www.galbot.com/g1/",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 1.5,
+        "proposedValue": 1.5,
+        "evidence": {
+          "value": "Max speed 1.5 m/s",
+          "normalizedValue": 1.5,
+          "rawUnit": "m/s",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1",
+          "sourceTitle": "GALBOT G1 official manual",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式マニュアルミラーに1.5m/sと明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official manual",
+            "url": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "dof",
+        "status": "conflict",
+        "action": "hold-conflict",
+        "reason": "一次資料間または資料と登録対象の競合を解消していない。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-applicable",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": 480,
+        "proposedValue": 8,
+        "evidence": {
+          "value": "Full charge runtime 8h",
+          "normalizedValue": 8,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.galbot.com/g1/",
+          "sourceTitle": "Galbot-G1",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに8h稼働と明記（480分）。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official product page",
+            "url": "https://www.galbot.com/g1/",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 1440,
+        "proposedValue": 1440,
+        "evidence": {
+          "value": "48V 30Ah battery",
+          "normalizedValue": 1440,
+          "rawUnit": "V*Ah",
+          "normalizedUnit": "Wh",
+          "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1",
+          "sourceTitle": "GALBOT G1 official manual",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式マニュアルミラーが48V 30Ahと明記（48×30=1440Wh換算）。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official manual",
+            "url": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": 210,
+        "proposedValue": 3.5,
+        "evidence": {
+          "value": "Charging time 3.5 hours (54.6V 10A adapter)",
+          "normalizedValue": 3.5,
+          "rawUnit": "h",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1",
+          "sourceTitle": "GALBOT G1 official manual",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式マニュアルミラーに3.5時間（210分）と明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official manual",
+            "url": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "48Vバッテリー / 有線充電（無線ドック・予備バッテリーはオプション）",
+        "proposedValue": "48Vバッテリー（30Ah） / 有線充電",
+        "evidence": {
+          "value": "48V 30Ah battery; wired charging via 54.6V 10A adapter",
+          "normalizedValue": "48Vバッテリー（30Ah） / 有線充電",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.galbot.com/g1/",
+          "sourceTitle": "Galbot-G1",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページ及びマニュアルミラーが一致。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official product page",
+            "url": "https://www.galbot.com/g1/",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "自律運転 / 音声 / 無線コントローラー / GalbotSDK",
+        "proposedValue": "自律運転 / 音声 / 無線コントローラー / GalbotSDK",
+        "evidence": {
+          "value": "Autonomous operation, voice, wireless controller, GalbotSDK",
+          "normalizedValue": "自律運転 / 音声 / 無線コントローラー / GalbotSDK",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.galbot.com/g1/",
+          "sourceTitle": "Galbot-G1",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official product page",
+            "url": "https://www.galbot.com/g1/",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "GalbotSDK / Python API",
+        "proposedValue": "GalbotSDK（Python API）",
+        "evidence": {
+          "value": "GalbotSDK / Python API examples",
+          "normalizedValue": "GalbotSDK（Python API）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://developer.galbot.com/docs/SDK/1.7.0/g1/zh/examples_python",
+          "sourceTitle": "GALBOT SDK examples",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式開発者ドキュメントにPython APIサンプルを確認。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT SDK examples",
+            "url": "https://developer.galbot.com/docs/SDK/1.7.0/g1/zh/examples_python",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "computePlatform",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "NVIDIA AGX Orin 64GB / 275TOPS",
+        "proposedValue": "NVIDIA AGX Orin 64GB / 275TOPS",
+        "evidence": {
+          "value": "NVIDIA AGX Orin 64GB, 275TOPS",
+          "normalizedValue": "NVIDIA AGX Orin 64GB / 275TOPS",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1",
+          "sourceTitle": "GALBOT G1 official manual",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式マニュアルミラーに明記。公式製品ページとも一致。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official manual",
+            "url": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "ipRating",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "IP54",
+        "proposedValue": "IP54",
+        "evidence": {
+          "value": "Rated IP54 for industrial protection",
+          "normalizedValue": "IP54",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.galbot.com/g1/",
+          "sourceTitle": "Galbot-G1",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official product page",
+            "url": "https://www.galbot.com/g1/",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "0～40℃",
+        "proposedValue": "0～40℃ / 湿度90%以下（結露なし）",
+        "evidence": {
+          "value": "0-40°C, up to 90% humidity non-condensing",
+          "normalizedValue": "0～40℃ / 湿度90%以下（結露なし）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1",
+          "sourceTitle": "GALBOT G1 official manual",
+          "publisher": "Galbot",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "G1",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式マニュアルミラーに明記。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official manual",
+            "url": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "set",
+      "candidates": [
+        {
+          "action": "set",
+          "reason": "対象範囲・rating・条件が分離された現行荷重候補。",
+          "proposedValue": {
+            "scope": "single-arm",
+            "rating": "unspecified",
+            "kg": 5,
+            "condition": "公式仕様Dual-Arm End Payloadの片腕分（5kg）。定格/最大の区別は未公表。",
+            "variant": "G1",
+            "sourceUrl": "https://www.galbot.com/g1/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "GALBOT G1 official product page",
+              "url": "https://www.galbot.com/g1/",
+              "publisher": "Galbot",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        },
+        {
+          "action": "set",
+          "reason": "対象範囲・rating・条件が分離された現行荷重候補。",
+          "proposedValue": {
+            "scope": "dual-arm",
+            "rating": "unspecified",
+            "kg": 10,
+            "condition": "公式仕様Dual-Arm End Payloadの両腕合計（10kg）。定格/最大の区別は未公表。",
+            "variant": "G1",
+            "sourceUrl": "https://www.galbot.com/g1/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "GALBOT G1 official product page",
+              "url": "https://www.galbot.com/g1/",
+              "publisher": "Galbot",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "models",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": [
+          "inquiry"
+        ],
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      },
+      {
+        "field": "note",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "公式ページ・開発者ドキュメントに一般販売価格は無い。問い合わせ導線のみ。",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "warehouse-picking",
+        "officialExpression": "Warehouse and material handling tasks",
+        "evidenceSourceUrl": "https://www.galbot.com/g1/",
+        "evidenceScope": "current-product",
+        "variant": "G1",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "galbot-g1",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.galbot.com/g1/"
+          ],
+          "reason": "公式製品ページが倉庫でのピッキングと搬送を対象用途として示している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official product page",
+            "url": "https://www.galbot.com/g1/",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "useCaseId": "customer-reception",
+        "officialExpression": "Reception / customer-facing service tasks",
+        "evidenceSourceUrl": "https://www.galbot.com/g1/",
+        "evidenceScope": "current-product",
+        "variant": "G1",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "galbot-g1",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.galbot.com/g1/"
+          ],
+          "reason": "公式製品ページが小売現場での顧客対応を対象用途として示している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "GALBOT G1 official product page",
+            "url": "https://www.galbot.com/g1/",
+            "publisher": "Galbot",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": []
+    },
+    "currentFeatures": [
+      {
+        "feature": "双眼カメラ・デプスカメラ・3D LiDAR・力覚センサー・超音波センサー",
+        "evidenceSourceUrl": "https://www.galbot.com/g1/",
+        "evidenceSummary": "公式製品ページがdual binocular cameras、depth cameras、3D LiDAR、force sensors、ultrasonic sensorsを明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "5.5インチタッチスクリーン（1920x1080）",
+        "evidenceSourceUrl": "https://www.galbot.com/g1/",
+        "evidenceSummary": "公式製品ページに明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "昇降機構（トルソーリフト650mm）による作業空間拡張",
+        "evidenceSourceUrl": "https://www.galbot.com/g1/",
+        "evidenceSummary": "公式製品ページに'Torso lift range: 650mm'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B10",
+    "robotId": "aeolus-aeo",
+    "identity": {
+      "registeredName": "aeo",
+      "officialCurrentName": "aeo (aeo™)",
+      "recordScope": "specific-variant",
+      "variant": "aeo — Aeolus's third-generation dual-arm service robot, debuted CES 2023; officially distinguished from the company's 'first single-arm robot in 2018'",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "aeo is the sole product featured on Aeolus Robotics' current official site (aeolusbot.com), with dedicated current solution pages (disinfect/care/delivery/security), a mobile app, leasing/subscription plans, and named customer testimonials presented in the present tense on the current homepage. Aeolus's own CES2023 press release (PRNewswire, 2023-01-04) explicitly frames aeo as a third-generation, dual-arm advance distinct from 'our first single-arm robot in 2018' — this resolves the ambiguity DATA-R01 flagged: the 2019 Marubun PDF almost certainly refers to that earlier single-arm generation, but the CURRENT aeolusbot.com homepage independently carries a present-tense Marubun executive testimonial explicitly describing a 'two-armed humanoid robot' — i.e. the aeo generation — which is usable as current official-page evidence per this batch's instructions regardless of the older PDF's ambiguity.",
+      "evidenceSourceUrls": [
+        "https://www.aeolusbot.com/",
+        "https://www.aeolusbot.com/meet-aeo",
+        "https://www.prnewswire.com/news-releases/aeolus-debuts-autonomous-dual-arm-humanoid-robot-at-ces-301713109.html"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "wheeled",
+        "evidence": {
+          "value": "Autonomous mobile dual-arm robot that navigates, avoids obstacles, opens doors, and rides elevators",
+          "normalizedValue": "wheeled",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.aeolusbot.com/meet-aeo",
+          "sourceTitle": "Meet aeo",
+          "publisher": "Aeolus Robotics",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "aeo",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページが自律移動（ドア開閉・エレベーター搭乗を含む）を明記。脚部無しの移動プラットフォームであることは同ページの記述・画像から確認（車輪型として登録）。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Aeolus Robotics aeo product page",
+            "url": "https://www.aeolusbot.com/meet-aeo",
+            "publisher": "Aeolus Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "weightKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "speedMps",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "unsupported-schema",
+        "reason": "片腕ごとのDoFであり、全身の自由度として表示する現行schemaへは投影できない。",
+        "currentValue": null,
+        "proposedValue": 7,
+        "evidence": {
+          "value": "Dual arms with 7 degrees of freedom each",
+          "normalizedValue": 7,
+          "rawUnit": "DoF/arm",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.prnewswire.com/news-releases/aeolus-debuts-autonomous-dual-arm-humanoid-robot-at-ces-301713109.html",
+          "sourceTitle": "Aeolus Debuts Autonomous Dual-arm Humanoid Robot at CES",
+          "publisher": "Aeolus Robotics / PR Newswire",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "aeo",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式プレスリリース（2023-01-04）が両腕各7自由度と明記。全身自由度の総数は非公表。"
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "Aeolus Debuts Autonomous Dual-arm Humanoid Robot at CES",
+            "url": "https://www.prnewswire.com/news-releases/aeolus-debuts-autonomous-dual-arm-humanoid-robot-at-ces-301713109.html",
+            "publisher": "Aeolus Robotics / PR Newswire",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-applicable",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "モバイルアプリ操作 / AIによる空間認識・自律適応",
+        "evidence": {
+          "value": "Mobile app control; AI-based spatial awareness adapting to surroundings and people in real time",
+          "normalizedValue": "モバイルアプリ操作 / AIによる空間認識・自律適応",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.aeolusbot.com/meet-aeo",
+          "sourceTitle": "Meet aeo",
+          "publisher": "Aeolus Robotics",
+          "sourceType": "official",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": "aeo",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "公式製品ページに『Access aeo anywhere, anytime with our user-friendly mobile app』及び空間認識AIの記述あり。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Aeolus Robotics aeo product page",
+            "url": "https://www.aeolusbot.com/meet-aeo",
+            "publisher": "Aeolus Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "computePlatform",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "set",
+      "candidates": [
+        {
+          "action": "set",
+          "reason": "対象範囲・rating・条件が分離された現行荷重候補。",
+          "proposedValue": {
+            "scope": "single-arm",
+            "rating": "maximum",
+            "kg": 3.6,
+            "condition": "公式プレスリリースは'Eight pounds per single arm'（約3.6kg）。両腕合計・全身の区分は未公表。",
+            "variant": "aeo",
+            "sourceUrl": "https://www.prnewswire.com/news-releases/aeolus-debuts-autonomous-dual-arm-humanoid-robot-at-ces-301713109.html"
+          },
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "aeo load specification",
+              "url": "https://www.prnewswire.com/news-releases/aeolus-debuts-autonomous-dual-arm-humanoid-robot-at-ces-301713109.html",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "models",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": [
+          "raas",
+          "lease",
+          "subscription",
+          "inquiry",
+          "partner-program"
+        ],
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      },
+      {
+        "field": "note",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "公式サイトはRaaS/リース/サブスクリプション（CapExゼロ）を前面に打ち出し、継続支援・保守・ソフトウェア更新込みのプランを提供。価格は代理店問い合わせベース（robotatta.com等の第三者カタログも'Ask local distributor'と明記）。",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": {
+          "name": "丸文株式会社 (Marubun Corporation)",
+          "evidence": "現行公式ホームページ（aeolusbot.com）に丸文 Satoshi Fujino氏（Senior Vice President）の証言が現在形で掲載され、'we are confident that Aeolus's robotic services will become a major part of our service-oriented business...currently promoting Aeolus's highly capable, two-armed humanoid robot, for use in nursing care, hospitals, and security markets'と明記。『two-armed』の表現はaeo世代の特徴と一致し、2019年の丸文PDF（旧世代の可能性がある単腕機時代の資料）とは独立に、現行公式ページ自体が丸文の現行取扱いを裏付けている。",
+          "sourceUrl": "https://www.aeolusbot.com/"
+        },
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "healthcare-care-patrol",
+        "officialExpression": "aeo care: maintain a safe environment for residents while reducing staffing needs",
+        "evidenceSourceUrl": "https://www.aeolusbot.com/meet-aeo",
+        "evidenceScope": "current-product",
+        "variant": "aeo",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "aeolus-aeo",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.aeolusbot.com/meet-aeo"
+          ],
+          "reason": "現行公式ページが介護環境でのケアとモニタリングを対象用途として示している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Aeolus Robotics aeo product page",
+            "url": "https://www.aeolusbot.com/meet-aeo",
+            "publisher": "Aeolus Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "useCaseId": "healthcare-disinfection",
+        "officialExpression": "aeo disinfect: decrease infection risk without adding harmful chemicals",
+        "evidenceSourceUrl": "https://www.aeolusbot.com/meet-aeo",
+        "evidenceScope": "current-product",
+        "variant": "aeo",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "aeolus-aeo",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.aeolusbot.com/meet-aeo"
+          ],
+          "reason": "現行公式ページがUV-Cを用いた消毒を対象用途として示している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Aeolus Robotics aeo product page",
+            "url": "https://www.aeolusbot.com/meet-aeo",
+            "publisher": "Aeolus Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "useCaseId": "facility-security-patrol",
+        "officialExpression": "aeo security: patrol services for public and private spaces with always-on, real-time monitoring",
+        "evidenceSourceUrl": "https://www.aeolusbot.com/meet-aeo",
+        "evidenceScope": "current-product",
+        "variant": "aeo",
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "aeolus-aeo",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.aeolusbot.com/meet-aeo"
+          ],
+          "reason": "現行公式ページが公共・私有空間の自律警備巡回を対象用途として示している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Aeolus Robotics aeo product page",
+            "url": "https://www.aeolusbot.com/meet-aeo",
+            "publisher": "Aeolus Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "useCaseId": "healthcare-specimen-transport",
+        "officialExpression": "aeo delivery: free staff from deliveries; official CES press release cites medical supply delivery in hospitals",
+        "evidenceSourceUrl": "https://www.prnewswire.com/news-releases/aeolus-debuts-autonomous-dual-arm-humanoid-robot-at-ces-301713109.html",
+        "evidenceScope": "current-product",
+        "variant": "aeo",
+        "reason": "現在公式資料による用途relation追加候補。",
+        "action": "set",
+        "existingRelation": null,
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "aeo official use-case source",
+            "url": "https://www.prnewswire.com/news-releases/aeolus-debuts-autonomous-dual-arm-humanoid-robot-at-ces-301713109.html",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "replace-usage-example-urls",
+      "candidates": [
+        {
+          "customerOrInstitution": "HIMEDIC, Inc. (Kayo Kojima, General Manager of Senior Life Central Japan)",
+          "classification": "commercial-deployment",
+          "evidenceSourceUrl": "https://www.aeolusbot.com/",
+          "variant": "aeo",
+          "scopeNote": "現行公式ホームページに現在形の証言として掲載。介護施設での就労支援タスクを実施中と明記。",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "aeo usage example",
+              "url": "https://www.aeolusbot.com/",
+              "checkedAt": "2026-07-16",
+              "reliability": "reported"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        },
+        {
+          "customerOrInstitution": "GLOBESHIP Corporation (Toshikazu Yaguchi, President & CEO)",
+          "classification": "commercial-deployment",
+          "evidenceSourceUrl": "https://www.aeolusbot.com/",
+          "variant": "aeo",
+          "scopeNote": "現行公式ホームページに現在形の証言として掲載。'currently the only robot in the world that can get on and off elevators autonomously'と明記（プロパティマネジメント領域）。",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "aeo usage example",
+              "url": "https://www.aeolusbot.com/",
+              "checkedAt": "2026-07-16",
+              "reliability": "reported"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        },
+        {
+          "customerOrInstitution": "Medical Care Service, Inc. (Norio Yamamoto, President & CEO)",
+          "classification": "commercial-deployment",
+          "evidenceSourceUrl": "https://www.aeolusbot.com/",
+          "variant": "aeo",
+          "scopeNote": "現行公式ホームページに現在形の証言として掲載。介護現場での省力化を目的とした活用を明記。公式CESプレスリリースでも同社との提携が言及されている。",
+          "action": "replace-usage-example-urls",
+          "reason": "最大3件の既存Source URLだけを最終登録できる候補。Sourceメタデータの人間確認は別途必要。",
+          "source": {
+            "action": "add-source",
+            "status": "add-after-review",
+            "candidateSource": {
+              "title": "aeo usage example",
+              "url": "https://www.aeolusbot.com/",
+              "checkedAt": "2026-07-16",
+              "reliability": "reported"
+            },
+            "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "二腕構成（一方が作業、他方がドア開閉・エレベーター操作）",
+        "evidenceSourceUrl": "https://www.aeolusbot.com/meet-aeo",
+        "evidenceSummary": "'Equipped with two arms, aeo uses one to perform vital tasks... while aeo's second arm operates elevators and opens doors'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "改造無しでのエレベーター自律搭乗",
+        "evidenceSourceUrl": "https://www.aeolusbot.com/",
+        "evidenceSummary": "GLOBESHIP社CEOの証言として'currently the only robot in the world that can get on and off elevators autonomously'と現行ホームページに明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "アクセサリーマウントポイント（拡張機能）",
+        "evidenceSourceUrl": "https://www.aeolusbot.com/meet-aeo",
+        "evidenceSummary": "'A new accessory mount expands aeo's ability to take on new tasks'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "継続学習による精度向上",
+        "evidenceSourceUrl": "https://www.aeolusbot.com/meet-aeo",
+        "evidenceSummary": "'aeo improves over time as it interacts with its surroundings—increasing accuracy through learning'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "障害物回避を伴う自律ナビゲーション",
+        "evidenceSourceUrl": "https://www.aeolusbot.com/meet-aeo",
+        "evidenceSummary": "'aeo dynamically navigates the environment avoiding obstacles and reacting to people in real-time'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "モバイルアプリからの遠隔アクセス・操作",
+        "evidenceSourceUrl": "https://www.aeolusbot.com/meet-aeo",
+        "evidenceSummary": "'Access aeo anywhere, anytime with our user-friendly mobile app'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "リースプラン・CapExゼロのサブスクリプション提供",
+        "evidenceSourceUrl": "https://www.aeolusbot.com/why-aeolus",
+        "evidenceSummary": "'Imagine robotic services at zero CapEx. Experience the benefits of aeo without upfront costs'と明記。",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  }
+]

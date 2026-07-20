@@ -32,6 +32,8 @@ interface RobotCardProps {
   onFavoriteToggle?: (id: string) => void;
   /** モバイル幅で画像を大きく・テキストを名前のみに絞った縦カードにする（既定は行カード） */
   mobileVisual?: boolean;
+  /** 一覧の先頭など、初期viewport内でLCP候補になる画像だけに指定する。 */
+  eagerImage?: boolean;
 }
 
 export function RobotCard({
@@ -45,6 +47,7 @@ export function RobotCard({
   isFavorite = false,
   onFavoriteToggle,
   mobileVisual = false,
+  eagerImage = false,
 }: RobotCardProps) {
   const deploymentStageTone = getDeploymentStageTone(robot.deploymentStage);
   const cardImage = getRobotPrimaryImage(robot);
@@ -146,6 +149,7 @@ export function RobotCard({
                 alt=""
                 aria-hidden="true"
                 fill
+                loading={eagerImage ? 'eager' : 'lazy'}
                 sizes={sizes}
                 className="pointer-events-none scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
               />
@@ -153,6 +157,7 @@ export function RobotCard({
                 src={cardImage.src}
                 alt={cardImage.alt}
                 fill
+                loading={eagerImage ? 'eager' : 'lazy'}
                 sizes={sizes}
                 className="z-10 object-contain"
               />

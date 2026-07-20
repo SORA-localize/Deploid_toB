@@ -71,6 +71,7 @@ export const manufacturerCountryOrder = [
   'Japan',
   'USA',
   'China',
+  'Taiwan',
   'Germany',
   'France',
   'Canada',

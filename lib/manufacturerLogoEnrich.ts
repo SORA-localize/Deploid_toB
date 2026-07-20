@@ -5,7 +5,7 @@ import { measureImageDimensions } from '@/lib/imageDimensions';
  * サーバー側専用（fsを使うため）。getManufacturers() の結果を返す前に、
  * logo / logos.* の各アセットへ実測アスペクト比を付与する。
  * data/manufacturers.ts に寸法を手打ちしない方針のための唯一の注入経路
- * （docs/planning/manufacturer-logo-usage-spec-v1.md 参照）。
+ * （docs/decisions/manufacturer-logo-usage-spec-v1.md 参照）。
  */
 function withAspect(asset: ImageAsset | undefined): ImageAsset | undefined {
   if (!asset) return asset;

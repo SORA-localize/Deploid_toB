@@ -1,0 +1,794 @@
+[
+  {
+    "robotId": "apptronik-apollo",
+    "identity": {
+      "registeredName": "Apollo",
+      "officialCurrentName": null,
+      "recordScope": "historical-model",
+      "variant": "Apollo（第1世代, 2023年8月発表）",
+      "lifecycleStatus": "superseded",
+      "publicationRecommendation": "archive",
+      "successorRobot": "apptronik-apollo-2",
+      "reason": "apptronik.com に現行の 'Apollo'（第1世代）専用ページは存在しない。https://apptronik.com/apollo は HTTP 404（2026-07-17に curl -I で確認、last-modified等のCloudflareヘッダは404レスポンスのもの）。現行サイトのフッターナビゲーション上、'Apollo' カテゴリの下にあるリンクは 'Apollo 2' (/apollo/apollo-2) の1本のみで、初代Apolloへの現行導線は皆無。初代Apolloの情報は2023-2024年のnews-collection記事（Unveils Apollo, Mercedes-Benz commercial agreement, GXO PoC）としてのみ現存し、いずれも当時のプレスリリースであって現行製品ページではない。2026年6月30日公式発表 'Welcome to Robot Park' はApollo 2のみを『現行の稼働プラットフォーム』として記載し、初代Apolloへの言及はない。以上より、初代Apolloは公式の現行ラインナップには存在せず、同一ブランド内の後継 (Apollo 2) が明確なため 'superseded' と判定した（discontinuedの明示声明はないため discontinued にはしない）。",
+      "evidenceSourceUrls": [
+        "https://apptronik.com/apollo",
+        "https://apptronik.com/apollo/apollo-2",
+        "https://apptronik.com/",
+        "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+        "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://apptronik.com/apollo", "title": "Apollo (404 Not Found)", "publisher": "Apptronik", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/", "title": "Apptronik 公式サイト", "publisher": "Apptronik", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/news-collection/apptronik-unveils-apollo", "title": "Apptronik Unveils Apollo", "publisher": "Apptronik", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/news-collection/apptronik-and-mercedes-benz-enter-commercial-agreement", "title": "Apptronik and Mercedes-Benz Enter Commercial Agreement", "publisher": "Apptronik", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/news-collection/gxo-advances-humanoid-strategy-with-apptronik", "title": "GXO Advances Humanoid Strategy with Apptronik", "publisher": "Apptronik", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work", "title": "Welcome to Robot Park", "publisher": "Apptronik", "documentType": "official-news", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "needs-review",
+        "evidence": {
+          "value": "bipedal, wheeled, or stationary variants available",
+          "normalizedValue": "hybrid",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+          "sourceTitle": "Apptronik Unveils Apollo",
+          "publisher": "Apptronik",
+          "publishedAt": "2023-08-23",
+          "checkedAt": "2026-07-17",
+          "variant": "Apollo（初代）",
+          "evidenceScope": "historical-only",
+          "evidenceSummary": "初代Apolloは二足・車輪・据置の3構成をモジュールとして選択できると発表されたが、単一機体が同時に複数方式を切替える『hybrid』なのか、購入時に構成を選ぶ『variant選択』なのか公式に明確化されていないため needs-review とした。"
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "5 foot 8 inches",
+          "normalizedValue": 172.72,
+          "rawUnit": "ft/in",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+          "sourceTitle": "Apptronik Unveils Apollo",
+          "publisher": "Apptronik",
+          "publishedAt": "2023-08-23",
+          "checkedAt": "2026-07-17",
+          "variant": "Apollo（初代）",
+          "evidenceScope": "historical-only",
+          "evidenceSummary": "初代Apollo発表時の公式プレスリリースに明記。"
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "160 pounds",
+          "normalizedValue": 72.5748,
+          "rawUnit": "lb",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+          "sourceTitle": "Apptronik Unveils Apollo",
+          "publisher": "Apptronik",
+          "publishedAt": "2023-08-23",
+          "checkedAt": "2026-07-17",
+          "variant": "Apollo（初代）",
+          "evidenceScope": "historical-only",
+          "evidenceSummary": "初代Apollo発表時の公式プレスリリースに明記。"
+        }
+      },
+      "speedMps": { "status": "not-published" },
+      "dof": { "status": "not-published" },
+      "payloadKg": { "status": "not-published" },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "four-hour runtime per swappable battery",
+          "normalizedValue": 240,
+          "rawUnit": "hours",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+          "sourceTitle": "Apptronik Unveils Apollo",
+          "publisher": "Apptronik",
+          "publishedAt": "2023-08-23",
+          "checkedAt": "2026-07-17",
+          "variant": "Apollo（初代）",
+          "evidenceScope": "historical-only",
+          "evidenceSummary": "交換式バッテリー1本あたりの稼働時間として明記。"
+        }
+      },
+      "batteryCapacityWh": { "status": "not-published" },
+      "chargeTimeMin": { "status": "not-published", "evidence": null },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "battery-swap model (no plug-in charging required during operation)",
+          "normalizedValue": "交換式バッテリー",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+          "sourceTitle": "Apptronik Unveils Apollo",
+          "publisher": "Apptronik",
+          "publishedAt": "2023-08-23",
+          "checkedAt": "2026-07-17",
+          "variant": "Apollo（初代）",
+          "evidenceScope": "historical-only",
+          "evidenceSummary": "稼働中はプラグイン充電なしのバッテリー交換モデルと明記。"
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "unique force control architecture, designed to operate safely alongside human workers",
+          "normalizedValue": "力制御による自律・汎用作業プラットフォーム",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+          "sourceTitle": "Apptronik Unveils Apollo",
+          "publisher": "Apptronik",
+          "publishedAt": "2023-08-23",
+          "checkedAt": "2026-07-17",
+          "variant": "Apollo（初代）",
+          "evidenceScope": "historical-only",
+          "evidenceSummary": "力制御アーキテクチャによる協働安全設計を明記。"
+        }
+      },
+      "sdk": { "status": "not-published" },
+      "computePlatform": { "status": "not-published" },
+      "ipRating": { "status": "not-published" },
+      "operatingTemperature": { "status": "not-published" },
+      "safetyStandard": { "status": "not-published" }
+    },
+    "loadRatings": [
+      {
+        "scope": "manufacturer-wording",
+        "rating": "unspecified",
+        "kg": 24.9476,
+        "condition": "公式表記は55lbを持ち上げ可能。対象範囲とrated/maximumの区別は未公表。",
+        "variant": "Apollo（初代）",
+        "sourceUrl": "https://apptronik.com/news-collection/apptronik-unveils-apollo"
+      }
+    ],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      {
+        "feature": "力制御アーキテクチャによる人との協働安全設計（初代モデル）",
+        "evidenceSourceUrl": "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+        "evidenceSummary": "『unique force control architecture』により人と並んで安全に作業できると明記。現在は歴史的仕様として記録。"
+      },
+      {
+        "feature": "交換式バッテリーによる連続稼働（初代モデル）",
+        "evidenceSourceUrl": "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+        "evidenceSummary": "バッテリー交換により稼働継続、プラグイン充電待ち時間を回避と明記。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "factory-assembly-kit-transport",
+        "officialExpression": "Delivering assembly kits and parts to production lines for worker assembly",
+        "evidenceSourceUrl": "https://apptronik.com/news-collection/apptronik-and-mercedes-benz-enter-commercial-agreement",
+        "evidenceScope": "historical-only",
+        "variant": "Apollo（初代）",
+        "reason": "Mercedes-Benzとの公式商用契約発表にアセンブリキット・部品の配送タスクが明記されている。"
+      },
+      {
+        "useCaseId": "factory-visual-inspection",
+        "officialExpression": "Inspecting components simultaneously while delivering parts",
+        "evidenceSourceUrl": "https://apptronik.com/news-collection/apptronik-and-mercedes-benz-enter-commercial-agreement",
+        "evidenceScope": "historical-only",
+        "variant": "Apollo（初代）",
+        "reason": "同発表内で部品検査タスクが明記されている。"
+      },
+      {
+        "useCaseId": "warehouse-picking",
+        "officialExpression": "Transporting boxes and totes, picking individual items, scanning barcodes",
+        "evidenceSourceUrl": "https://apptronik.com/news-collection/gxo-advances-humanoid-strategy-with-apptronik",
+        "evidenceScope": "historical-only",
+        "variant": "Apollo（初代）",
+        "reason": "GXOとの早期PoC発表で倉庫内のトート・箱搬送、個品ピッキング、バーコードスキャンが明記されている。"
+      }
+    ],
+    "useCaseGaps": [
+      {
+        "officialExpression": "retail, home delivery and elder care (future potential applications)",
+        "evidenceSourceUrl": "https://apptronik.com/news-collection/apptronik-unveils-apollo",
+        "reason": "将来の応用先として列挙されているのみで、具体的な公式導入声明ではないため既存UseCaseへは接続しない。"
+      }
+    ],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "Mercedes-Benz",
+        "classification": "commercial-deployment",
+        "evidenceSourceUrl": "https://apptronik.com/news-collection/apptronik-and-mercedes-benz-enter-commercial-agreement",
+        "variant": "Apollo（初代）",
+        "scopeNote": "公式に『Apptronik's first publicly announced commercial deployment of Apollo』と明記。ただしApollo 2登場後もMercedes-Benz拠点が初代ハードウェアのままかは未確認（unresolvedに記録）。"
+      },
+      {
+        "customerOrInstitution": "GXO",
+        "classification": "pilot",
+        "evidenceSourceUrl": "https://apptronik.com/news-collection/gxo-advances-humanoid-strategy-with-apptronik",
+        "variant": "Apollo（初代）",
+        "scopeNote": "公式に『early-stage proof-of-concept program』『two phases』と明記されたパイロット。米国配送センターへの本番展開は『once ready』と条件付き。"
+      }
+    ],
+    "procurement": {
+      "japanAvailability": "unknown",
+      "distributorJapan": null,
+      "supportNote": "日本での販売・保守・価格・税区分は公式資料で確認できない。"
+    },
+    "conflicts": [],
+    "unresolved": [
+      "Mercedes-BenzおよびGXOの導入拠点がApollo 2発売後も初代Apolloハードウェアのまま稼働しているか、Apollo 2へ更新されたかは公式資料で確認できない。",
+      "初代Apolloの正式な提供終了（EOL）宣言や後継機への切替時期についての公式ステートメントは見つからなかった（サイト構成上の置き換えのみで判断）。"
+    ],
+    "humanReviewRequired": [
+      "Apptronikに直接、初代Apolloの現行提供状況（受注可否）と、Mercedes-Benz/GXO拠点の現行機種を確認する。"
+    ]
+  },
+  {
+    "robotId": "apptronik-apollo-2",
+    "identity": {
+      "registeredName": "Apollo 2",
+      "officialCurrentName": "Apollo 2",
+      "recordScope": "specific-variant",
+      "variant": "Apollo 2（二足構成 / 車輪ベース構成）",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "apptronik.com/apollo/apollo-2 は現行サイトの唯一の'Apollo'現行製品ページ（HTTP 200、フッターナビゲーション'Apollo'カテゴリの唯一のリンク先）。2026-06-30付け公式ニュース『Welcome to Robot Park』はApollo 2をRobot Park（Austin、約90,000平方フィート）および顧客・パートナー拠点で1年以上稼働する『workhorse』と明記し、テレオペレーションと自律実行の組み合わせでGoogle DeepMindとの学習データ収集を行っていると記載。ただし詳細スペック（身長・重量・DoF・payload・runtime等）は数値として一切公表されていない。第三者報道（The Robot Report等、参考のみ）はApollo 2自体を『データ収集・実証プラットフォーム』とし、真の商用製品はApollo 3になる見込みと伝えるが、これはApollo 2が非公開・非稼働であることを意味しない。現行サイト上の稼働実績と'pilot'/'enterprise-pilot'という現行データの位置づけは整合しており、keep-publishedとする。",
+      "evidenceSourceUrls": [
+        "https://apptronik.com/apollo/apollo-2",
+        "https://apptronik.com/",
+        "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://apptronik.com/apollo/apollo-2", "title": "Apollo 2", "publisher": "Apptronik", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/", "title": "Apptronik 公式サイト", "publisher": "Apptronik", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work", "title": "Welcome to Robot Park", "publisher": "Apptronik", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/solutions/goods-to-person", "title": "Solutions: Goods-to-Person", "publisher": "Apptronik", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/solutions/person-to-goods", "title": "Solutions: Person-to-Goods", "publisher": "Apptronik", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/solutions/kitting", "title": "Solutions: Kitting", "publisher": "Apptronik", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/solutions/inspection-and-sorting", "title": "Solutions: Inspection & Sorting", "publisher": "Apptronik", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/solutions/machine-and-tool-tending", "title": "Solutions: Machine & Tool Tending", "publisher": "Apptronik", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://apptronik.com/solutions/packout", "title": "Solutions: Packout", "publisher": "Apptronik", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.therobotreport.com/apptronik-unveils-apollo-2-flagship-data-collection-training-facility/", "title": "Apptronik unveils Apollo 2 and a flagship data collection and training facility", "publisher": "The Robot Report", "documentType": "third-party-news", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "A bipedal configuration enables movement through spaces built for people, while a wheeled base offers stability and efficiency for high-throughput environments.",
+          "normalizedValue": "hybrid",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://apptronik.com/apollo/apollo-2",
+          "sourceTitle": "Apollo 2",
+          "publisher": "Apptronik",
+          "checkedAt": "2026-07-17",
+          "variant": "Apollo 2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "二足・車輪ベースの2構成を選択可能なモジュラー移動方式と明記。"
+        }
+      },
+      "heightCm": { "status": "not-published" },
+      "weightKg": { "status": "not-published" },
+      "speedMps": { "status": "not-published" },
+      "dof": { "status": "not-published" },
+      "payloadKg": { "status": "not-published" },
+      "runtimeMin": { "status": "not-published" },
+      "batteryCapacityWh": { "status": "not-published" },
+      "chargeTimeMin": { "status": "not-published" },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Swappable batteries help enable 7x22 operation. Flexible charging options, including opportunity charging and tethering.",
+          "normalizedValue": "交換式バッテリー（ホットスワップ）／機会充電／テザー給電",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://apptronik.com/apollo/apollo-2",
+          "sourceTitle": "Apollo 2",
+          "publisher": "Apptronik",
+          "checkedAt": "2026-07-17",
+          "variant": "Apollo 2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "交換式バッテリーで週7日・1日22時間運用を想定、機会充電・テザー給電にも対応と明記。"
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Through a combination of teleoperation and autonomous execution, Apollo 2 robots continuously generate significant quantities of high-quality training data. Artemis coordinates perception, planning, controls, safety systems, task execution, and human-robot interaction.",
+          "normalizedValue": "遠隔操作（テレオペ）／自律実行／Artemis（知覚・計画・制御・安全・タスク実行の統合ソフトウェア）／Fleet Connect（フリート管理）",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work",
+          "sourceTitle": "Welcome to Robot Park",
+          "publisher": "Apptronik",
+          "publishedAt": "2026-06-30",
+          "checkedAt": "2026-07-17",
+          "variant": "Apollo 2",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "テレオペと自律実行の併用、Artemis/Fleet Connectソフトウェアスタックが公式に明記。"
+        }
+      },
+      "sdk": { "status": "not-published" },
+      "computePlatform": { "status": "not-published" },
+      "ipRating": { "status": "not-published" },
+      "operatingTemperature": { "status": "not-published" },
+      "safetyStandard": { "status": "not-published" }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "モジュラー移動方式（二足／車輪ベース）を切替可能", "evidenceSourceUrl": "https://apptronik.com/apollo/apollo-2", "evidenceSummary": "二足は人向け空間、車輪ベースは高スループット環境向けと明記。" },
+      { "feature": "表現力のあるLEDマウス・音声・胸部ディスプレイによる人間中心インターフェース（ステータス・バッテリー残量・充電状態・タスク進捗を表示）", "evidenceSourceUrl": "https://apptronik.com/apollo/apollo-2", "evidenceSummary": "人とのコミュニケーションを意図した設計要素として明記。" },
+      { "feature": "特許取得済みアクチュエータ、90%以上のエネルギー効率、量産性・サプライチェーン耐性を重視した設計", "evidenceSourceUrl": "https://apptronik.com/apollo/apollo-2", "evidenceSummary": "アクチュエータの効率・量産性・単一サプライヤー依存の低減が明記。" },
+      { "feature": "交換式バッテリーによる7x22運用、機会充電・テザー給電", "evidenceSourceUrl": "https://apptronik.com/apollo/apollo-2", "evidenceSummary": "ダウンタイムを最小化する電源設計として明記。" },
+      { "feature": "安全設計：物体検知で即座に停止するインパクトゾーン、可変の周辺安全ゾーン", "evidenceSourceUrl": "https://apptronik.com/apollo/apollo-2", "evidenceSummary": "ハードウェアレベルの安全ゾーンと、状況認識AIによる行動調整が明記。" },
+      { "feature": "Google DeepMindとのGemini Robotics連携によるAI基盤モデル学習", "evidenceSourceUrl": "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work", "evidenceSummary": "Robot Park・顧客/パートナー拠点でのテレオペ+自律実行データがGemini Roboticsに活用されると明記。" },
+      { "feature": "Robot Park（Austin、約9万平方フィート）を中心としたグローバルなデータ収集拠点網での1年以上の稼働実績", "evidenceSourceUrl": "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work", "evidenceSummary": "Robot Parkの稼働開始から1年以上、Apollo 2がworkhorseとして機能してきたと明記。" }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "factory-assembly-kit-transport",
+        "officialExpression": "Apollo can perform kitting tasks by retrieving automotive parts from multiple bin locations and placing each item into the correct compartment within a divided storage container.",
+        "evidenceSourceUrl": "https://apptronik.com/solutions/kitting",
+        "evidenceScope": "current-family-common",
+        "variant": "Apollo（現行＝Apollo 2、ブランド表記は無版数の'Apollo'）",
+        "reason": "現行のSolutions: Kittingページに自動車部品のキット組立が明記。現行ラインナップはApollo 2のみのため、無版数表記のAppolloは現行Apollo 2を指すと判断。"
+      },
+      {
+        "useCaseId": "factory-visual-inspection",
+        "officialExpression": "Apollo can support end-of-line inspection and sorting by examining automotive parts for defects, quality issues, or classification criteria, then placing them into the appropriate bins.",
+        "evidenceSourceUrl": "https://apptronik.com/solutions/inspection-and-sorting",
+        "evidenceScope": "current-family-common",
+        "variant": "Apollo（現行＝Apollo 2）",
+        "reason": "現行のSolutions: Inspection & Sortingページに自動車部品の外観・品質検査と仕分けが明記。"
+      },
+      {
+        "useCaseId": "factory-machine-tending",
+        "officialExpression": "Apollo can tend industrial machines by loading and unloading materials, monitoring equipment, and keeping production assets supplied and operational. In battery manufacturing environments...",
+        "evidenceSourceUrl": "https://apptronik.com/solutions/machine-and-tool-tending",
+        "evidenceScope": "current-family-common",
+        "variant": "Apollo（現行＝Apollo 2）",
+        "reason": "現行のSolutions: Machine & Tool Tendingページにバッテリー製造等でのマシンテンディングが明記。"
+      },
+      {
+        "useCaseId": "warehouse-picking",
+        "officialExpression": "Apollo helps bridge the gap between automated storage systems and outbound fulfillment... Apollo can retrieve consumer goods from storage locations, place them onto industrial carts, and transport them to shipping or staging areas.",
+        "evidenceSourceUrl": "https://apptronik.com/solutions/goods-to-person",
+        "evidenceScope": "current-family-common",
+        "variant": "Apollo（現行＝Apollo 2）",
+        "reason": "現行のSolutions: Goods-to-Personページに保管棚から出荷エリアへの搬送が明記。"
+      },
+      {
+        "useCaseId": "logistics-shelf-picking",
+        "officialExpression": "Apollo supports person-to-goods workflows by navigating warehouse aisles, identifying ordered items on racks or shelves, picking consumer goods, and placing them into totes on industrial carts.",
+        "evidenceSourceUrl": "https://apptronik.com/solutions/person-to-goods",
+        "evidenceScope": "current-family-common",
+        "variant": "Apollo（現行＝Apollo 2）",
+        "reason": "現行のSolutions: Person-to-Goodsページに棚からのピッキングが明記。"
+      }
+    ],
+    "useCaseGaps": [
+      {
+        "officialExpression": "Packout: placing picked items into cardboard boxes and positioning completed packages onto motorized conveyors for transport to the shipping dock",
+        "evidenceSourceUrl": "https://apptronik.com/solutions/packout",
+        "reason": "既存UseCaseに『梱包・パックアウト』に対応するidが無いため接続せずギャップとして記録。"
+      },
+      {
+        "officialExpression": "Retail: general-purpose automation for dynamic retail fulfillment (distribution centers, fulfillment operations)",
+        "evidenceSourceUrl": "https://apptronik.com/industries/retail",
+        "reason": "業種ページの一般的な訴求であり、既存UseCaseの粒度に合う具体タスク記述ではないためギャップとして記録。"
+      }
+    ],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "Apptronik Robot Park（Austin本社拠点）",
+        "classification": "research",
+        "evidenceSourceUrl": "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work",
+        "variant": "Apollo 2",
+        "scopeNote": "自社データ収集・AI学習拠点としての稼働。Google DeepMindとの提携でGemini Roboticsへデータ提供。"
+      },
+      {
+        "customerOrInstitution": "Mercedes-Benz / GXO / Google DeepMind（顧客・パートナー拠点）",
+        "classification": "research",
+        "evidenceSourceUrl": "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work",
+        "variant": "Apollo 2",
+        "scopeNote": "公式発表はRobot Parkに加えて『growing global network of similar facilities at customer and partner sites』としてMercedes-Benz、GXO、Google DeepMind研究拠点を名指し。ただし各拠点でのタスク内容の詳細は非公開で、データ収集目的が主眼と明記されているため research 区分とした（初代Apolloの商用パイロットとは別事象）。"
+      }
+    ],
+    "procurement": {
+      "japanAvailability": "unknown",
+      "distributorJapan": null,
+      "supportNote": "価格・出荷時期は未公表。日本サポート体制は公式資料で確認できない。"
+    },
+    "conflicts": [],
+    "unresolved": [
+      "Apollo 2の身長・重量・速度・DoF・payload・runtime・電池容量・充電時間・computeの公式データシートは未公開のまま。",
+      "第三者報道（The Robot Report等）はApollo 2を『商用製品ではなくデータ収集プラットフォーム、真の商用機はApollo 3』と伝えるが、Apptronik公式ページ自体にはApollo 3への直接的言及や名称は現時点で見当たらない（第三者情報のみで、事実確認は継続要）。"
+    ],
+    "humanReviewRequired": [
+      "Apollo 2の詳細スペックシート・価格・出荷時期・日本展開についてApptronikへ直接確認する。"
+    ]
+  },
+  {
+    "robotId": "onex-neo",
+    "identity": {
+      "registeredName": "NEO",
+      "officialCurrentName": "NEO",
+      "recordScope": "specific-variant",
+      "variant": "NEO（2026年 Early Access出荷世代。NEO Beta(2024)・NEO Gammaとは別世代として現行サイトでも画像カテゴリが分離）",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "1x.tech/neo は現行トップナビゲーションから直接遷移する現行製品ページで、1x.tech/order で購入手続きが可能。公式プレスギャラリー(1x.tech/press)はNEO(18枚)をNEOGamma(4枚+動画5本)・NEOBeta(4枚+動画5本)と別カテゴリで管理しており、現行出荷世代と旧世代が公式に区別されている。2026年4月30日公式記事でHayward工場が稼働、年産1万台体制と明記。2025年12月11日公式プレスリリース(businesswire配信)でEQTとの提携により2026-2030年に最大1万台をEQTポートフォリオ企業（製造・倉庫・物流中心）へ供給する計画も確認。",
+      "evidenceSourceUrls": [
+        "https://www.1x.tech/neo",
+        "https://www.1x.tech/order",
+        "https://www.1x.tech/press",
+        "https://www.1x.tech/discover/neo-factory"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.1x.tech/", "title": "1X Technologies 公式サイト", "publisher": "1X Technologies", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/neo", "title": "NEO Home Robot", "publisher": "1X Technologies", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/order", "title": "Order NEO", "publisher": "1X Technologies", "documentType": "official-store", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/discover/neo-home-robot", "title": "NEO Home Robot | Order Today", "publisher": "1X Technologies", "documentType": "official-news", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/ai", "title": "Artificial Intelligence", "publisher": "1X Technologies", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/discover/neos-hands", "title": "NEO's Hands | An API to the Physical World", "publisher": "1X Technologies", "documentType": "official-news", "publishedAt": "2026-07-09", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/discover/neo-factory", "title": "NEO Factory | Building Your NEO", "publisher": "1X Technologies", "documentType": "official-news", "publishedAt": "2026-04-30", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/robot-fleet", "title": "Enterprise Robots / Robot fleet", "publisher": "1X Technologies", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/press", "title": "Press Gallery", "publisher": "1X Technologies", "documentType": "official-press-kit", "checkedAt": "2026-07-17" },
+      { "url": "https://www.businesswire.com/news/home/20251211360340/en/1X-Announces-Strategic-Partnership-to-Make-up-to-10000-Humanoid-Robots-Available-to-EQTs-Global-Portfolio", "title": "1X Announces Strategic Partnership to Make up to 10,000 Humanoid Robots Available to EQT's Global Portfolio", "publisher": "1X Technologies (via Business Wire)", "documentType": "official-news", "publishedAt": "2025-12-11", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "bipedal home robot, Legs 6x2 DoF, walking speed 1.4 m/s",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.1x.tech/neo",
+          "sourceTitle": "NEO Home Robot",
+          "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17",
+          "variant": "NEO",
+          "evidenceScope": "current-product",
+          "evidenceSummary": "二足歩行、階段昇降・起立・着座等の全身動作が公式ページ・AIページで確認できる。"
+        }
+      },
+      "heightCm": {
+        "status": "found",
+        "evidence": {
+          "value": "5'6\"", "normalizedValue": 167.64, "rawUnit": "ft/in", "normalizedUnit": "cm",
+          "sourceUrl": "https://www.1x.tech/neo", "sourceTitle": "NEO Home Robot", "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17", "variant": "NEO", "evidenceScope": "current-product",
+          "evidenceSummary": "公式仕様表に明記。"
+        }
+      },
+      "weightKg": {
+        "status": "found",
+        "evidence": {
+          "value": "66 lbs", "normalizedValue": 29.9379, "rawUnit": "lb", "normalizedUnit": "kg",
+          "sourceUrl": "https://www.1x.tech/neo", "sourceTitle": "NEO Home Robot", "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17", "variant": "NEO", "evidenceScope": "current-product",
+          "evidenceSummary": "公式仕様表に明記。"
+        }
+      },
+      "speedMps": {
+        "status": "found",
+        "evidence": {
+          "value": "Walking speed 1.4 m/s (also stated: max running speed 6.2 m/s, hand speed 8.0 m/s)",
+          "normalizedValue": 1.4, "rawUnit": "m/s", "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.1x.tech/neo", "sourceTitle": "NEO Home Robot", "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17", "variant": "NEO", "evidenceScope": "current-product",
+          "evidenceSummary": "歩行速度を主要値として採用。走行最高速度・ハンド速度は別途公式値として存在するが本フィールドは歩行速度とした。"
+        }
+      },
+      "dof": {
+        "status": "conflict",
+        "evidence": [
+          {
+            "value": "Hands 22x2, Arms 7x2, Neck 3, Spine 2, Legs 6x2 (sum = 75)",
+            "normalizedValue": 75,
+            "rawUnit": "DoF",
+            "normalizedUnit": "DoF",
+            "sourceUrl": "https://www.1x.tech/neo",
+            "sourceTitle": "NEO Home Robot",
+            "publisher": "1X Technologies",
+            "checkedAt": "2026-07-17",
+            "variant": "NEO（現行製品ページ記載の内訳）",
+            "evidenceScope": "current-product",
+            "evidenceSummary": "現行製品ページのDoF内訳表では手部を22DoF×2本として計算すると合計75DoF。"
+          },
+          {
+            "value": "25 degrees of freedom per hand: 22 fully actuated DoF in the fingers and palm, plus 3 at the wrist. 'These are the hands that will ship on every NEO.'",
+            "normalizedValue": 25,
+            "rawUnit": "DoF/hand",
+            "normalizedUnit": "DoF/hand",
+            "sourceUrl": "https://www.1x.tech/discover/neos-hands",
+            "sourceTitle": "NEO's Hands | An API to the Physical World",
+            "publisher": "1X Technologies",
+            "publishedAt": "2026-07-09",
+            "checkedAt": "2026-07-17",
+            "variant": "NEO（2026-07-09公式ハンド発表）",
+            "evidenceScope": "current-product",
+            "evidenceSummary": "2026年7月9日の公式発表は片手25DoF（指・掌22＋手首3）とし、『すべてのNEOに搭載される』と明記。現行/neoページの22DoF（手のみ、手首を含むか不明）との関係は未整理。"
+          }
+        ],
+        "evidenceSummary": "同一メーカーの2つの現行公式ソースで片手DoFの記載が22と25（22+手首3）で一致しない。手首を含むかどうかの定義差の可能性があるが公式に明言されていないため conflict として両値を保持し、単一値へ丸めない。"
+      },
+      "payloadKg": { "status": "not-published" },
+      "runtimeMin": {
+        "status": "found",
+        "evidence": {
+          "value": "4 hours", "normalizedValue": 240, "rawUnit": "hours", "normalizedUnit": "min",
+          "sourceUrl": "https://www.1x.tech/neo", "sourceTitle": "NEO Home Robot", "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17", "variant": "NEO", "evidenceScope": "current-product",
+          "evidenceSummary": "公式仕様表に明記。"
+        }
+      },
+      "batteryCapacityWh": {
+        "status": "found",
+        "evidence": {
+          "value": "842 Wh", "normalizedValue": 842, "rawUnit": "Wh", "normalizedUnit": "Wh",
+          "sourceUrl": "https://www.1x.tech/neo", "sourceTitle": "NEO Home Robot", "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17", "variant": "NEO", "evidenceScope": "current-product",
+          "evidenceSummary": "公式仕様表に明記。"
+        }
+      },
+      "chargeTimeMin": {
+        "status": "not-published",
+        "evidence": null
+      },
+      "batterySystem": {
+        "status": "found",
+        "evidence": {
+          "value": "Self-charging capability when battery depletes; quick charge adds 6 minutes of charge per 1 hour of runtime",
+          "normalizedValue": "自己充電（自律的に充電器へ接続）",
+          "rawUnit": "", "normalizedUnit": "",
+          "sourceUrl": "https://www.1x.tech/neo", "sourceTitle": "NEO Home Robot", "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17", "variant": "NEO", "evidenceScope": "current-product",
+          "evidenceSummary": "自律充電に対応。充電時間は総充電時間ではなく『稼働1時間あたり6分の急速充電』という比率表記のためchargeTimeMinには採用せず、ここに定性情報として記録。"
+        }
+      },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "Autonomous by default; Expert Mode (schedule a 1X Expert to guide it for unknown chores); Remote Control - Pilot your NEO from anywhere in the world through your Mobile App & VR device; voice commands via built-in LLM",
+          "normalizedValue": "自律実行（デフォルト） / 音声 / モバイルアプリ / VR遠隔操作 / 1X Expert（スケジュール制の遠隔ガイド）",
+          "rawUnit": "", "normalizedUnit": "",
+          "sourceUrl": "https://www.1x.tech/neo", "sourceTitle": "NEO Home Robot", "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17", "variant": "NEO", "evidenceScope": "current-product",
+          "evidenceSummary": "現行/neoページのHTML本文（Expert Mode／Remote Controlセクション）で直接確認。"
+        }
+      },
+      "sdk": { "status": "not-published" },
+      "computePlatform": {
+        "status": "found",
+        "evidence": {
+          "value": "1X NEO Cortex (Nvidia Jetson Thor), up to 2070 FP4 TFLOPS",
+          "normalizedValue": "1X NEO Cortex（NVIDIA Jetson Thor）",
+          "rawUnit": "", "normalizedUnit": "",
+          "sourceUrl": "https://www.1x.tech/neo", "sourceTitle": "NEO Home Robot", "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17", "variant": "NEO", "evidenceScope": "current-product",
+          "evidenceSummary": "公式仕様表に明記。"
+        }
+      },
+      "ipRating": {
+        "status": "found",
+        "evidence": {
+          "value": "Hands IP68 (submersible, food-safe); Body IP44 (splash-proof)",
+          "normalizedValue": "手部 IP68 / 本体 IP44",
+          "rawUnit": "", "normalizedUnit": "",
+          "sourceUrl": "https://www.1x.tech/neo", "sourceTitle": "NEO Home Robot", "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17", "variant": "NEO", "evidenceScope": "current-product",
+          "evidenceSummary": "公式仕様表、および2026-07-09のNEO Hands発表でIP68・food-safeと再確認。"
+        }
+      },
+      "operatingTemperature": { "status": "not-published" },
+      "safetyStandard": { "status": "not-published", "evidence": null }
+    },
+    "loadRatings": [
+      { "scope": "single-arm", "rating": "unspecified", "kg": 8.1647, "condition": "公式表記はArm Payload 18lb。定格/最大の区別は未公表。", "variant": "NEO", "sourceUrl": "https://www.1x.tech/neo" },
+      { "scope": "whole-body", "rating": "unspecified", "kg": 69.8532, "condition": "公式表記はLift 154lb（discover記事では『over 150 lbs』とも表現）。定格/最大の区別は未公表。", "variant": "NEO", "sourceUrl": "https://www.1x.tech/neo" },
+      { "scope": "carrier", "rating": "unspecified", "kg": 24.9476, "condition": "公式表記はCarry 55lb。定格/最大の区別は未公表。", "variant": "NEO", "sourceUrl": "https://www.1x.tech/neo" }
+    ],
+    "priceOffers": [
+      { "channel": "manufacturer-public", "display": "$20,000（Early Access買い切り、3年保証・Premium Support・優先配送込み）", "amount": 20000, "currency": "USD", "taxStatus": "unknown", "variant": "NEO Early Access Ownership", "sellerName": "1X Technologies", "sourceUrl": "https://www.1x.tech/order" },
+      { "channel": "manufacturer-public", "display": "$499/月（Standardサブスクリプション、Starter Productivity Package・標準配送込み）", "amount": 499, "currency": "USD/month", "taxStatus": "unknown", "variant": "NEO Standard Subscription", "sellerName": "1X Technologies", "sourceUrl": "https://www.1x.tech/order" }
+    ],
+    "priceFallback": null,
+    "currentFeatures": [
+      { "feature": "Expert Mode: 未知の家事タスクを1X Expertが遠隔でガイドしながら学習", "evidenceSourceUrl": "https://www.1x.tech/neo", "evidenceSummary": "NEOはデフォルト自律動作、未知タスクは1X Expertのスケジュール制遠隔ガイドで対応と明記。" },
+      { "feature": "Remote Control: モバイルアプリ及びVRデバイスによる遠隔操縦", "evidenceSourceUrl": "https://www.1x.tech/neo", "evidenceSummary": "『Pilot your NEO from anywhere in the world through your Mobile App & VR device』と明記。" },
+      { "feature": "音声コマンドによる操作（オンボードLLM）", "evidenceSourceUrl": "https://www.1x.tech/ai", "evidenceSummary": "Redwood AIが音声コマンドを処理しタスク実行すると明記。" },
+      { "feature": "Redwood AI（Vision-Language-Actionモデルによる移動・操作の統合制御）", "evidenceSourceUrl": "https://www.1x.tech/ai", "evidenceSummary": "2025年6月発表のオンボードAIモデルとして明記。" },
+      { "feature": "1X World Model（行動結果を事前予測する物理予測モデル）", "evidenceSourceUrl": "https://www.1x.tech/ai", "evidenceSummary": "NEOの『認知コア』として説明されている。" },
+      { "feature": "全身動作（歩行・起立・着座・跪き・階段昇降）", "evidenceSourceUrl": "https://www.1x.tech/ai", "evidenceSummary": "公式AIページに全身移動能力の記載あり。" },
+      { "feature": "25 DoFテンダー駆動ハンド（IP68防水・食品安全設計で手洗い可能）", "evidenceSourceUrl": "https://www.1x.tech/discover/neos-hands", "evidenceSummary": "2026-07-09公式発表。今後出荷する全NEOに搭載予定。" },
+      { "feature": "Hayward工場での垂直統合生産、年産最大1万台体制", "evidenceSourceUrl": "https://www.1x.tech/discover/neo-factory", "evidenceSummary": "2026-04-30公式記事にHayward施設の生産能力が明記。" },
+      { "feature": "Charter Partner Program（大規模導入企業向けエンタープライズ窓口）", "evidenceSourceUrl": "https://www.1x.tech/robot-fleet", "evidenceSummary": "高労働需要の大企業向けフリート導入プログラムとして公式に案内。" },
+      { "feature": "EQTとの戦略提携：2026-2030年に最大1万台をEQTポートフォリオ企業（製造・倉庫・物流・施設運営・ヘルスケア中心）へ供給、2026年に米国でパイロット開始予定", "evidenceSourceUrl": "https://www.businesswire.com/news/home/20251211360340/en/1X-Announces-Strategic-Partnership-to-Make-up-to-10000-Humanoid-Robots-Available-to-EQTs-Global-Portfolio", "evidenceSummary": "2025-12-11の公式プレスリリース（Business Wire配信）に明記。個別導入は各ポートフォリオ企業との合意次第。" }
+    ],
+    "officialUseCases": [],
+    "useCaseGaps": [
+      {
+        "officialExpression": "household chores such as getting the door, laundry, dishwashing, bathroom cleaning, and general chore automation",
+        "evidenceSourceUrl": "https://www.1x.tech/neo",
+        "reason": "家庭内家事支援を対象とする既存UseCase（家庭向け）が data/useCases.ts に存在しないため、無理に接続せずギャップとして記録。"
+      },
+      {
+        "officialExpression": "manufacturing, warehousing, logistics, facility operations, and healthcare (EQT提携の対象業種として列挙)",
+        "evidenceSourceUrl": "https://www.businesswire.com/news/home/20251211360340/en/1X-Announces-Strategic-Partnership-to-Make-up-to-10000-Humanoid-Robots-Available-to-EQTs-Global-Portfolio",
+        "reason": "業種レベルの一般的な言及であり、Apollo系のような具体タスク記述（kitting/tending等）ではないため既存UseCaseへの強い接続はせず、ギャップとして記録。"
+      }
+    ],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "1X Early Access家庭ユーザー（米国、個人宅）",
+        "classification": "pilot",
+        "evidenceSourceUrl": "https://www.1x.tech/discover/neo-home-robot",
+        "variant": "NEO",
+        "scopeNote": "2026年に米国向けEarly Access配送開始という商用先行段階のpilot。具体的な個別家庭名は非公開。"
+      },
+      {
+        "customerOrInstitution": "EQTポートフォリオ企業群（製造・倉庫・物流等、企業名非公開）",
+        "classification": "pilot",
+        "evidenceSourceUrl": "https://www.businesswire.com/news/home/20251211360340/en/1X-Announces-Strategic-Partnership-to-Make-up-to-10000-Humanoid-Robots-Available-to-EQTs-Global-Portfolio",
+        "variant": "NEO",
+        "scopeNote": "公式プレスリリースは2026年に米国でパイロット開始、個々の導入可否は各ポートフォリオ企業の判断次第と明記。具体的な導入企業名・稼働開始日は未確定。"
+      }
+    ],
+    "procurement": {
+      "japanAvailability": "unknown",
+      "distributorJapan": null,
+      "supportNote": "公式FAQに『US deliveries begin in 2026... International deliveries will commence later.』と明記。日本を含む個別国名の記載はない。"
+    },
+    "conflicts": [
+      "dof: 現行/neoページの手部22DoF（×2）と、2026-07-09公式発表の片手25DoF（22+手首3）が不一致。"
+    ],
+    "unresolved": [
+      "chargeTimeMinの総充電時間（フル充電までの分数）は公式に未公表。公表されているのは『稼働1時間あたり6分』という比率のみで、推測換算はしていない。",
+      "EQT提携によるNEOの産業用途パイロットの具体的な開始企業・時期は未確定。"
+    ],
+    "humanReviewRequired": [
+      "1X Technologiesへ、NEOの手部DoF（22 vs 25）の最終仕様と、総充電時間（分）を確認する。",
+      "日本への配送・保守体制の有無と時期を確認する。"
+    ]
+  },
+  {
+    "robotId": "onex-eve",
+    "identity": {
+      "registeredName": "EVE Industrial",
+      "officialCurrentName": "Eve",
+      "recordScope": "specific-variant",
+      "variant": "EVE Industrial（車輪型産業用ヒューマノイド）",
+      "lifecycleStatus": "limited-current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "1x.tech/eve は現行サイトのグローバルフッターナビゲーションに『Eve Industrial』として現存するページ（HTTP 200）だが、ページ埋め込みのCMSメタデータ（Sanity CMS の _updatedAt）は2025-02-26付けで、それ以降スペック・価格等の実質更新がない。現行/neoのような仕様表・注文導線（/order相当）はEVEには存在しない。一方、公式Enterprise/Robot Fleetページ（2025-10-28更新）は背景画像に『EVE Robots sorting mail』を使用し続けており、企業向け訴求から完全に消えたわけではない。会社公式Aboutページは2022年のEVE顧客導入・自律稼働開始を明記し、2024年の1X World Model研究でも『EVE humanoids』でのデータ収集が確認できる。2025-2026年の新規発表（NEO Factory、EQT提携等）はすべてNEOのみを対象とし、EVE向けの新規オーダーページ・価格ページは見当たらない。以上より、廃止の公式宣言はないが、新規販売や仕様更新はほぼ停止し既存顧客・研究用途に限定されている状態と判断し、'limited-current' とした。ページ自体は現存するため 'historical' や 'discontinued' は採用しない。",
+      "evidenceSourceUrls": [
+        "https://www.1x.tech/eve",
+        "https://www.1x.tech/about",
+        "https://www.1x.tech/robot-fleet",
+        "https://www.1x.tech/press"
+      ]
+    },
+    "documentsReviewed": [
+      { "url": "https://www.1x.tech/", "title": "1X Technologies 公式サイト", "publisher": "1X Technologies", "documentType": "official-product-index", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/eve", "title": "EVE | 1X", "publisher": "1X Technologies", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/about", "title": "About", "publisher": "1X Technologies", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/discover/announcing-rebranding-from-halodi-robotics-to-1x", "title": "Announcing rebranding: From Halodi Robotics to 1X", "publisher": "1X Technologies", "documentType": "official-news", "publishedAt": "2023-07-03", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/discover/1x-world-model", "title": "1X World Model", "publisher": "1X Technologies", "documentType": "official-news", "publishedAt": "2024-09-17", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/robot-fleet", "title": "Enterprise Robots / Robot fleet", "publisher": "1X Technologies", "documentType": "official-product", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/press", "title": "Press Gallery", "publisher": "1X Technologies", "documentType": "official-press-kit", "checkedAt": "2026-07-17" },
+      { "url": "https://www.1x.tech/manufacturing", "title": "Manufacturing (NEO Factory page)", "publisher": "1X Technologies", "documentType": "official-product", "checkedAt": "2026-07-17" }
+    ],
+    "specs": {
+      "mobility": {
+        "status": "found",
+        "evidence": {
+          "value": "EVE, a wheeled factory humanoid",
+          "normalizedValue": "wheeled",
+          "rawUnit": "", "normalizedUnit": "",
+          "sourceUrl": "https://www.1x.tech/about", "sourceTitle": "About", "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17", "variant": "EVE Industrial", "evidenceScope": "current-product",
+          "evidenceSummary": "現行の会社概要ページで車輪型の工場向けヒューマノイドと明記。"
+        }
+      },
+      "heightCm": { "status": "not-published" },
+      "weightKg": { "status": "not-published" },
+      "speedMps": { "status": "not-published" },
+      "dof": { "status": "not-published" },
+      "payloadKg": { "status": "not-published" },
+      "runtimeMin": { "status": "not-published" },
+      "batteryCapacityWh": { "status": "not-published" },
+      "chargeTimeMin": { "status": "not-published" },
+      "batterySystem": { "status": "not-published" },
+      "controlMethod": {
+        "status": "found",
+        "evidence": {
+          "value": "EVE ... was deployed into customers facilities globally to start handling industrial tasks autonomously (2022)",
+          "normalizedValue": "自律による産業タスク実行",
+          "rawUnit": "", "normalizedUnit": "",
+          "sourceUrl": "https://www.1x.tech/about", "sourceTitle": "About", "publisher": "1X Technologies",
+          "checkedAt": "2026-07-17", "variant": "EVE Industrial", "evidenceScope": "current-product",
+          "evidenceSummary": "現行の会社沿革ページ（2026年時点で公開中）に2022年からの自律産業タスク実行の記載あり。事実自体は2022年時点のものだが、掲載元は現行公式ページ。"
+        }
+      },
+      "sdk": { "status": "not-published" },
+      "computePlatform": { "status": "not-published" },
+      "ipRating": { "status": "not-published" },
+      "operatingTemperature": { "status": "not-published" },
+      "safetyStandard": { "status": "not-published" }
+    },
+    "loadRatings": [],
+    "priceOffers": [],
+    "priceFallback": "inquiry-fallback",
+    "currentFeatures": [
+      { "feature": "2022年から顧客工場への導入・自律産業タスク実行", "evidenceSourceUrl": "https://www.1x.tech/about", "evidenceSummary": "会社沿革ページに明記。個別顧客名は非公開。" },
+      { "feature": "世界モデル（World Model）研究向けデータ収集プラットフォームとしての利用（家庭・オフィス環境でのモバイルマニピュレーション）", "evidenceSourceUrl": "https://www.1x.tech/discover/1x-world-model", "evidenceSummary": "2024年9月の公式記事で『thousands of hours of data on EVE humanoids』と明記。" },
+      { "feature": "企業向けEnterprise Robot Fleetページの訴求画像として現在も使用（『EVE Robots sorting mail』）", "evidenceSourceUrl": "https://www.1x.tech/robot-fleet", "evidenceSummary": "2025-10-28更新のページ埋め込みJSONにEVEの画像alt textとして記載。本文説明は伴わないため参考情報として記録。" }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "We collected thousands of hours of data on EVE humanoids performing diverse mobile manipulation tasks in homes and offices to train our world model.",
+        "evidenceSourceUrl": "https://www.1x.tech/discover/1x-world-model",
+        "evidenceScope": "current-product",
+        "variant": "EVE Industrial",
+        "reason": "公式記事がEVEを用いた世界モデル研究のデータ収集を明記しているため research-development に接続。"
+      }
+    ],
+    "useCaseGaps": [
+      {
+        "officialExpression": "handling industrial tasks autonomously (customer facility deployment, 2022)",
+        "evidenceSourceUrl": "https://www.1x.tech/about",
+        "reason": "具体的な作業内容（検査・搬送等の粒度）が公式に明記されていない一般的表現のため、既存UseCaseへの強い接続はせずギャップとして記録。"
+      }
+    ],
+    "usageExamples": [
+      {
+        "customerOrInstitution": "米国内の複数顧客（企業名非公開）",
+        "classification": "commercial-deployment",
+        "evidenceSourceUrl": "https://www.1x.tech/discover/announcing-rebranding-from-halodi-robotics-to-1x",
+        "variant": "EVE Industrial（2023年当時）",
+        "scopeNote": "公式に『the first commercial android』として2023年に米国内で規模展開されたと明記。個別企業名は非公開。"
+      },
+      {
+        "customerOrInstitution": "1X社内研究（World Model Lab）",
+        "classification": "research",
+        "evidenceSourceUrl": "https://www.1x.tech/discover/1x-world-model",
+        "variant": "EVE Industrial",
+        "scopeNote": "家庭・オフィス環境でのモバイルマニピュレーションデータ収集研究。2024年9月時点の公式記事。"
+      },
+      {
+        "customerOrInstitution": "（企業向けフリート訴求の例示画像、具体的な導入先は本文未記載）",
+        "classification": "demonstration",
+        "evidenceSourceUrl": "https://www.1x.tech/robot-fleet",
+        "variant": "EVE Industrial",
+        "scopeNote": "『EVE Robots sorting mail』という画像alt textのみで、本文による事例説明が伴わないため、参考情報（デモンストレーション相当）として区別し、主要3事例のうち補助的な位置づけとする。"
+      }
+    ],
+    "procurement": {
+      "japanAvailability": "unknown",
+      "distributorJapan": null,
+      "supportNote": "公式問い合わせ窓口はあるが、EVE個別の価格・保守体制・国内代理店は確認できない。"
+    },
+    "conflicts": [],
+    "unresolved": [
+      "EVEが現在も新規顧客向けに販売されているか、既存顧客への保守提供のみかは公式資料からは断定できない（第三者情報ではNEOへ軸足が移ったとされるが、公式の終了宣言はない）。",
+      "EVE個別の数値スペック（身長・重量・DoF・payload・runtime・電池容量・IP・安全規格）は公開データシートが見当たらない。"
+    ],
+    "humanReviewRequired": [
+      "1X Technologiesへ、EVE Industrialの現行の新規販売可否と企業向け仕様資料の有無を確認する。"
+    ]
+  }
+]

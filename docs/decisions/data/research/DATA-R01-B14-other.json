@@ -1,0 +1,441 @@
+{
+  "batchId": "DATA-R01-B14",
+  "checkedAt": "2026-07-16",
+  "targetRobotIds": ["wandercraft-calvin", "mentee-menteebotv3", "robotera-l7", "robotera-q5", "robotera-m7", "galbot-g1", "aeolus-aeo"],
+  "schemaKeysChecked": ["mobility", "heightCm", "weightKg", "speedMps", "dof", "payloadKg", "runtimeMin", "batteryCapacityWh", "chargeTimeMin", "batterySystem", "controlMethod", "sdk", "computePlatform", "ipRating", "operatingTemperature", "safetyStandard"],
+  "robots": [
+    {
+      "robotId": "wandercraft-calvin",
+      "manufacturerId": "wandercraft",
+      "identity": {
+        "status": "confirmed",
+        "officialName": "Calvin-40",
+        "variant": "Calvin-40 / current Calvin industrial humanoid platform",
+        "officialProductUrl": "https://en.wandercraft.eu/calvin-40",
+        "notes": "現行Calvin製品ページとWandercraft/Renault公式発表を確認。コード内の40kgは非公式報道由来のため、現行公式ページに数値荷重がない状態では採用していない。"
+      },
+      "positioningFacts": [
+        {"statement": "Wandercraft positions Calvin as a heavy-duty carrier robot that moves heavy loads, handles boxes and crates, and picks small parts with precision; it is described as fully autonomous and intended for factories and logistics hubs.", "sourceUrl": "https://en.wandercraft.eu/"},
+        {"statement": "The current Calvin page says it is designed for heavy loads and precision tasks, is deployed in actual production, and is the first humanoid deployed in Europe for assembly-line production tasks.", "sourceUrl": "https://en.wandercraft.eu/calvin-40"},
+        {"statement": "Calvin is trained on 12 generic industrial/logistics use cases, three of which the official page says are already deployed; the page describes continuous operation from 8 to 22 hours per day, not a per-charge battery runtime.", "sourceUrl": "https://en.wandercraft.eu/calvin-40"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "Industrial humanoid with autonomous navigation for task execution; designed to handle heavy loads and perform precision tasks", "normalizedValue": "biped", "unit": "", "variant": "Calvin-40", "condition": "official product page describes humanoid and autonomous navigation; no non-biped variant value was used", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "Calvinの現行公式ページがhumanoid、autonomous navigation、task executionを明記。"},
+        "heightCm": {"status": "not-published", "rawValue": "No current Calvin height value found on the reviewed official product and Renault partnership pages", "normalizedValue": null, "unit": "cm", "variant": "Calvin-40", "condition": "no numeric official height located", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "公式製品ページに身長数値はない。"},
+        "weightKg": {"status": "not-published", "rawValue": "No current Calvin robot weight value found on the reviewed official pages", "normalizedValue": null, "unit": "kg", "variant": "Calvin-40", "condition": "heavy-load wording is not robot weight", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "機体重量の公式公開値は確認できない。"},
+        "speedMps": {"status": "not-published", "rawValue": "No current Calvin speed value found on the reviewed official product and partnership pages", "normalizedValue": null, "unit": "m/s", "variant": "Calvin-40", "condition": "rapid deployment wording is not a speed value", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "速度の公式数値は確認できない。"},
+        "dof": {"status": "not-published", "rawValue": "No current whole-body or joint-scope DoF value found on the reviewed official pages", "normalizedValue": null, "unit": "DoF", "variant": "Calvin-40", "condition": "full-body control algorithm is described without DoF count", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "自由度の公式数値は確認できない。"},
+        "payloadKg": {"status": "not-published", "rawValue": "Calvin is described as handling heavy loads, but no numeric payload is published on the current official product page", "normalizedValue": null, "unit": "kg", "variant": "Calvin-40", "condition": "heavy-load wording is retained as positioning and not converted to scalar payload", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "報道の40kgを現行公式値へ流用せず、scalar payloadを未公開とした。"},
+        "runtimeMin": {"status": "needs-review", "rawValue": "Designed for continuous operation from 8 to 22 hours per day", "normalizedValue": null, "unit": "min", "variant": "Calvin-40", "condition": "official page describes daily continuous-operation schedule, not battery endurance or a per-charge runtime", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "8〜22時間/日は稼働設計・日次運用時間とも読めるため、電池稼働時間として正規化していない。"},
+        "batteryCapacityWh": {"status": "not-published", "rawValue": "No Calvin battery energy capacity in Wh found on the reviewed official pages", "normalizedValue": null, "unit": "Wh", "variant": "Calvin-40", "condition": "continuous-operation wording is not battery capacity", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "電池容量Whは確認できない。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "No Calvin charge duration or charger specification found on the reviewed official pages", "normalizedValue": null, "unit": "min", "variant": "Calvin-40", "condition": "continuous operation does not establish charge time", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "充電時間は確認できない。"},
+        "batterySystem": {"status": "not-published", "rawValue": "No Calvin battery chemistry, exchange mechanism or electrical specification found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "Calvin-40", "condition": "autonomous operation is not a battery-system specification", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "電源・バッテリー方式は確認できない。"},
+        "controlMethod": {"status": "found", "rawValue": "Autonomous navigation and task execution; full-body control algorithm auto-adapts to the load", "normalizedValue": "autonomous navigation / full-body control", "unit": "", "variant": "Calvin-40", "condition": "official product page", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "自律ナビゲーションと荷重適応型全身制御を確認。"},
+        "sdk": {"status": "not-published", "rawValue": "No Calvin SDK, developer API or ROS package found on the reviewed official product and partnership pages", "normalizedValue": null, "unit": "", "variant": "Calvin-40", "condition": "training/control AI description is not an SDK disclosure", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "SDKの公式公開は確認できない。"},
+        "computePlatform": {"status": "not-published", "rawValue": "3D sensor, vision/recognition stack and reinforcement-learned neural network are described; onboard compute model is not published", "normalizedValue": null, "unit": "", "variant": "Calvin-40", "condition": "AI/software architecture is not an onboard processor specification", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "計算基盤の型番・TOPSは確認できない。"},
+        "ipRating": {"status": "not-published", "rawValue": "No Calvin IP ingress-protection rating found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "Calvin-40", "condition": "industrial-grade reliability wording is not an IP rating", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "防塵防水等級は確認できない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "No Calvin operating-temperature range found on the reviewed official pages", "normalizedValue": null, "unit": "°C", "variant": "Calvin-40", "condition": "factory/logistics use is not an environmental range", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "動作温度は確認できない。"},
+        "safetyStandard": {"status": "needs-review", "rawValue": "The official page describes an industry-first certifiable safety solution and medical-device-derived quality, but no named Calvin certification or standard is provided", "normalizedValue": null, "unit": "", "variant": "Calvin-40", "condition": "certifiable safety solution is not the name of a confirmed compliance standard", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "安全ソリューションの存在は確認できるが、規格名・認証番号は非公開。"}
+      },
+      "loadRatings": [],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [
+        {"existingUseCaseId": "factory-assembly-support", "officialExpression": "assembly-line production tasks", "evidenceSourceUrl": "https://en.wandercraft.eu/calvin-40", "reason": "公式製品ページがassembly-line production tasksへの配備を明示。"},
+        {"existingUseCaseId": "factory-assembly-kit-transport", "officialExpression": "heavy loads for industry and logistics", "evidenceSourceUrl": "https://en.wandercraft.eu/calvin-40", "reason": "公式が産業・物流の重量物搬送を明示。"},
+        {"existingUseCaseId": "warehouse-picking", "officialExpression": "picks small parts with pinpoint precision", "evidenceSourceUrl": "https://en.wandercraft.eu/", "reason": "公式ホームページが小部品の精密ピッキングを明記し、既存の倉庫ピッキング用途へ接続。"}
+      ],
+      "useCaseGaps": [],
+      "usageExamples": [
+        {"title": "High torque. High reliability. Built for the industry.", "url": "https://en.wandercraft.eu/calvin-40", "publisher": "Wandercraft", "publishedAt": null, "summary": "現行公式製品ページがCalvinを実際の生産環境に配備済みと説明し、欧州の組立ライン生産タスクでの配備と3件の運用中ユースケースに言及。ただし顧客拠点・作業名・数量は同ページで非公開。", "type": "deployment"},
+        {"title": "Introducing Calvin-40", "url": "https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft", "publisher": "Wandercraft", "publishedAt": "2025-06-06", "summary": "Renault Groupとの商業提携により、Renault自身の製造業務を起点にCalvinファミリーを開発・量産化する計画を公表。完成導入済みとは区別し、pilot/partnershipとして記録。", "type": "pilot"}
+      ],
+      "usageExampleSourceUrls": ["https://en.wandercraft.eu/calvin-40", "https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft"],
+      "procurement": {
+        "procurementModels": ["partner-program", "enterprise-deployment", "inquiry"],
+        "marketAvailability": {"status": "found", "rawValue": "Official page states Calvin is deployed in actual production and hundreds of units are ordered for factories and logistics hubs; public order process and price are not published", "sourceUrl": "https://en.wandercraft.eu/", "evidenceSummary": "商用生産配備・大量発注の公式記載は確認したが、一般購入条件は非公開。"},
+        "japanAvailability": {"status": "not-published", "rawValue": "No Calvin Japan sales, shipment or local fulfillment statement found on reviewed official pages", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "日本での入手性は確認できない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "No domestic authorized Calvin distributor identified on reviewed official pages", "sourceUrl": "https://en.wandercraft.eu/", "evidenceSummary": "国内正規代理店は確認できない。"},
+        "supportNote": {"status": "found", "rawValue": "Request-a-demo/contact route and industrialization partnership are published; Japan support SLA is not", "sourceUrl": "https://en.wandercraft.eu/calvin-40", "evidenceSummary": "公式デモ・問い合わせ導線は確認したが国内サポート条件は非公開。"}
+      },
+      "pagesReviewed": ["https://en.wandercraft.eu/", "https://en.wandercraft.eu/calvin-40", "https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft", "https://www.renaultgroup.com/magazine/technologie/calvin-un-robot-de-nouvelle-generation-est-ne/"],
+      "sourceCandidates": [
+        {"url": "https://en.wandercraft.eu/calvin-40", "status": "spec-checked", "reason": "現行Calvinページの用途・運用時間・安全記載を確認したが、数値身長・重量・速度・DoF・電池容量・荷重は非公開。"},
+        {"url": "https://en.wandercraft.eu/", "status": "market-checked", "reason": "現行ホームページの生産配備・発注・用途表現を確認。"},
+        {"url": "https://www.wandercraft.eu/articles/renault-group-finalises-a-strategic-partnership-with-wandercraft", "status": "usage-checked", "reason": "Renaultとの開発・量産提携を確認。"}
+      ],
+      "fieldEvidence": {"mobility": ["https://en.wandercraft.eu/calvin-40"], "heightCm": ["https://en.wandercraft.eu/calvin-40"], "weightKg": ["https://en.wandercraft.eu/calvin-40"], "speedMps": ["https://en.wandercraft.eu/calvin-40"], "dof": ["https://en.wandercraft.eu/calvin-40"], "payloadKg": ["https://en.wandercraft.eu/calvin-40"], "runtimeMin": ["https://en.wandercraft.eu/calvin-40"], "batteryCapacityWh": ["https://en.wandercraft.eu/calvin-40"], "chargeTimeMin": ["https://en.wandercraft.eu/calvin-40"], "batterySystem": ["https://en.wandercraft.eu/calvin-40"], "controlMethod": ["https://en.wandercraft.eu/calvin-40"], "sdk": ["https://en.wandercraft.eu/calvin-40"], "computePlatform": ["https://en.wandercraft.eu/calvin-40"], "ipRating": ["https://en.wandercraft.eu/calvin-40"], "operatingTemperature": ["https://en.wandercraft.eu/calvin-40"], "safetyStandard": ["https://en.wandercraft.eu/calvin-40"], "priceOffers": ["https://en.wandercraft.eu/calvin-40"]},
+      "conflicts": ["Repository data describes a 40kg payload and 350 planned Renault units using non-official reporting; the current official Calvin pages do not publish that numeric payload or quantity, so neither was used as a found value."],
+      "humanReviewRequired": ["Confirm whether the official 8–22 hours/day statement is intended for battery endurance or daily operating schedule.", "Confirm current Calvin-40 payload, customer site details and Japan commercial channel with Wandercraft before numeric publication."]
+    },
+    {
+      "robotId": "mentee-menteebotv3",
+      "manufacturerId": "mentee-robotics",
+      "identity": {
+        "status": "confirmed",
+        "officialName": "MenteeBot",
+        "variant": "MenteeBot V3 / third-generation vertically integrated humanoid robot",
+        "officialProductUrl": "https://www.menteebot.com/bot/",
+        "notes": "Mentee公式V3製品ページとMobileye公式買収発表を確認。非公式データベースのバッテリー・計算基盤値は流用していない。"
+      },
+      "positioningFacts": [
+        {"statement": "Mentee describes MenteeBot as a vertically integrated humanoid robot with self-made actuators, onboard sensing/drivers, bespoke electronics and redundant fail-safe compute.", "sourceUrl": "https://www.menteebot.com/bot/"},
+        {"statement": "The official product page publishes 175cm height, 70kg weight, 1.5m/s speed, up to 25kg carrying capacity, 40 DoF and voice interaction.", "sourceUrl": "https://www.menteebot.com/bot/"},
+        {"statement": "Mobileye describes autonomous task execution without teleoperation, hot-swappable batteries, 24/7 operational availability and planned customer POCs in 2026 with commercialization targeted for 2028.", "sourceUrl": "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai"}
+      ],
+      "fields": {
+        "mobility": {"status": "needs-review", "rawValue": "Third-generation full-size humanoid robot; bipedal mobility is not explicitly stated in the reviewed official specification text", "normalizedValue": null, "unit": "", "variant": "MenteeBot V3", "condition": "humanoid identity is confirmed but movement mechanism/locomotion type is not named", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "公式ページはhumanoidを明記するが、移動方式をbipedとして明示していない。"},
+        "heightCm": {"status": "found", "rawValue": "175cm Height", "normalizedValue": 175, "unit": "cm", "variant": "MenteeBot V3", "condition": "official product page", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "公式仕様の175cm。"},
+        "weightKg": {"status": "found", "rawValue": "70kg Weight", "normalizedValue": 70, "unit": "kg", "variant": "MenteeBot V3", "condition": "official product page", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "公式仕様の70kg。"},
+        "speedMps": {"status": "found", "rawValue": "1.5m/s", "normalizedValue": 1.5, "unit": "m/s", "variant": "MenteeBot V3", "condition": "official page does not label this as maximum or typical", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "公式速度値を表記どおり保持し、最大/通常へ再解釈していない。"},
+        "dof": {"status": "found", "rawValue": "40", "normalizedValue": 40, "unit": "DoF", "variant": "MenteeBot V3", "condition": "whole-body scope is implied by the standalone product spec; sub-scope breakdown is not published", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "公式仕様の40 DoF。scope内訳は非公開。"},
+        "payloadKg": {"status": "not-published", "rawValue": "The official 25kg carrying statement is retained in loadRatings because scope and rating terminology are not specified", "normalizedValue": null, "unit": "kg", "variant": "MenteeBot V3", "condition": "not copied to scalar payloadKg", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "carry valueをscalarへ流用していない。"},
+        "runtimeMin": {"status": "needs-review", "rawValue": "Hot-swappable batteries enable 24/7 operational availability", "normalizedValue": null, "unit": "min", "variant": "MenteeBot V3", "condition": "24/7 availability is a system availability statement, not per-battery runtime", "sourceUrl": "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai", "evidenceSummary": "24/7を稼働時間・1充電ランタイムへ換算していない。"},
+        "batteryCapacityWh": {"status": "not-published", "rawValue": "Hot-swappable battery is published, but battery capacity/energy in Wh is not", "normalizedValue": null, "unit": "Wh", "variant": "MenteeBot V3", "condition": "no official voltage or Ah value found", "sourceUrl": "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai", "evidenceSummary": "電池容量Whは確認できない。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "Hot-swappable battery is published, but charge duration is not", "normalizedValue": null, "unit": "min", "variant": "MenteeBot V3", "condition": "battery exchange is not charge time", "sourceUrl": "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai", "evidenceSummary": "充電時間は確認できない。"},
+        "batterySystem": {"status": "found", "rawValue": "Hot-swappable batteries for continuous uptime", "normalizedValue": "hot-swappable battery", "unit": "", "variant": "MenteeBot V3", "condition": "official Mobileye release; chemistry, voltage and module capacity are not published", "sourceUrl": "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai", "evidenceSummary": "交換式電池方式を公式発表で確認。"},
+        "controlMethod": {"status": "found", "rawValue": "Voice interaction; autonomous end-to-end task execution without teleoperation; human-to-robot mentoring and natural instruction following", "normalizedValue": "autonomous / voice / mentoring and instruction following", "unit": "", "variant": "MenteeBot V3", "condition": "official product page and Mobileye release", "sourceUrl": "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai", "evidenceSummary": "音声、メンタリング、非テレオペ自律実行を確認。"},
+        "sdk": {"status": "not-published", "rawValue": "No MenteeBot SDK, developer API or ROS package found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "MenteeBot V3", "condition": "mentoring capability and AI architecture are not SDK disclosure", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "SDKの公式公開は確認できない。"},
+        "computePlatform": {"status": "not-published", "rawValue": "Heavy-duty AI workload capability and redundant fail-safe compute are described, but no processor/accelerator model or TOPS value is published", "normalizedValue": null, "unit": "", "variant": "MenteeBot V3", "condition": "generic compute capability is not a compute-platform model", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "搭載計算基盤の型番・性能値は確認できない。"},
+        "ipRating": {"status": "not-published", "rawValue": "No MenteeBot IP ingress-protection rating found on the reviewed official product, blog and Mobileye pages", "normalizedValue": null, "unit": "", "variant": "MenteeBot V3", "condition": "fail-safe wording is not an IP rating", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "防塵防水等級は確認できない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "No MenteeBot operating-temperature range found on the reviewed official pages", "normalizedValue": null, "unit": "°C", "variant": "MenteeBot V3", "condition": "industrial/home positioning is not a temperature range", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "動作温度は確認できない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "Fail-safe compute and safety-oriented autonomous interaction are described, but no named MenteeBot safety standard or certification is published", "normalizedValue": null, "unit": "", "variant": "MenteeBot V3", "condition": "safety architecture is not a compliance standard", "sourceUrl": "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai", "evidenceSummary": "安全標準・認証番号は確認できない。"}
+      },
+      "loadRatings": [
+        {"scope": "manufacturer-wording", "rating": "maximum", "kg": 25, "condition": "Official wording is ‘Can carry up to 25kg’; scope is not specified as single-arm, dual-arm or whole-body", "variant": "MenteeBot V3", "sourceUrl": "https://www.menteebot.com/bot/"}
+      ],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [
+        {"existingUseCaseId": "warehouse-picking", "officialExpression": "autonomous warehouse task; moving boxes from piles to racks", "evidenceSourceUrl": "https://www.menteebot.com/blog/menteebot-warehouse-task/", "reason": "公式ブログが倉庫での箱の移動・棚入れを具体的に示す。"},
+        {"existingUseCaseId": "factory-assembly-support", "officialExpression": "factories, warehouses and industrial environments", "evidenceSourceUrl": "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai", "reason": "Mobileye公式発表がMenteeの対象環境として工場・倉庫・産業環境を明示。"}
+      ],
+      "useCaseGaps": [],
+      "usageExamples": [
+        {"title": "Two MenteeBots Working Together in an Autonomous Warehouse Task", "url": "https://www.menteebot.com/blog/menteebot-warehouse-task/", "publisher": "Mentee Robotics", "publishedAt": "2025-11", "summary": "V3のMenteeBot 2台が8つの箱の山から複数ラックへ32箱を移動する倉庫タスクを完全自律で実行し、未編集18分の協調動作を示した公式デモ。顧客導入とは区別。", "type": "demonstration"}
+      ],
+      "usageExampleSourceUrls": ["https://www.menteebot.com/blog/menteebot-warehouse-task/"],
+      "procurement": {
+        "procurementModels": ["pilot", "partner-program", "inquiry"],
+        "marketAvailability": {"status": "needs-review", "rawValue": "Official Mobileye announcement says first on-site customer POCs are expected in 2026 and series production/commercialization is targeted for 2028; no current public order or stock terms are published", "sourceUrl": "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai", "evidenceSummary": "顧客POC・量産計画は確認できるが、現時点の一般調達条件は非公開。"},
+        "japanAvailability": {"status": "not-published", "rawValue": "No Japan sales, shipment or local fulfillment statement found on reviewed Mentee/Mobileye official pages", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "日本での入手性は確認できない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "No domestic authorized distributor identified on reviewed Mentee/Mobileye official pages", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "国内正規代理店は確認できない。"},
+        "supportNote": {"status": "needs-review", "rawValue": "Official company contact and Mobileye acquisition/go-to-market information are public; product support, warranty and Japan service terms are not", "sourceUrl": "https://www.menteebot.com/bot/", "evidenceSummary": "公式問い合わせは確認したが、導入後支援条件は非公開。"}
+      },
+      "pagesReviewed": ["https://www.menteebot.com/bot/", "https://www.menteebot.com/blog/", "https://www.menteebot.com/blog/menteebot-warehouse-task/", "https://www.menteebot.com/news/", "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai"],
+      "sourceCandidates": [
+        {"url": "https://www.menteebot.com/bot/", "status": "spec-checked", "reason": "公式V3製品ページの身長・重量・速度・DoF・carry・voiceを確認。"},
+        {"url": "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai", "status": "market-checked", "reason": "POC、量産計画、ホットスワップ電池、自律運用を確認。"},
+        {"url": "https://www.menteebot.com/blog/menteebot-warehouse-task/", "status": "usage-checked", "reason": "倉庫デモを導入事例ではなくdemonstrationとして確認。"}
+      ],
+      "fieldEvidence": {"mobility": ["https://www.menteebot.com/bot/"], "heightCm": ["https://www.menteebot.com/bot/"], "weightKg": ["https://www.menteebot.com/bot/"], "speedMps": ["https://www.menteebot.com/bot/"], "dof": ["https://www.menteebot.com/bot/"], "payloadKg": ["https://www.menteebot.com/bot/"], "runtimeMin": ["https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai"], "batteryCapacityWh": ["https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai"], "chargeTimeMin": ["https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai"], "batterySystem": ["https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai"], "controlMethod": ["https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai"], "sdk": ["https://www.menteebot.com/bot/"], "computePlatform": ["https://www.menteebot.com/bot/"], "ipRating": ["https://www.menteebot.com/bot/"], "operatingTemperature": ["https://www.menteebot.com/bot/"], "safetyStandard": ["https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai"], "loadRatings": ["https://www.menteebot.com/bot/"], "priceOffers": ["https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai"]},
+      "conflicts": ["Official product page gives 24/7 operational availability via hot-swappable batteries in the Mobileye release, but this is not a per-charge runtime."],
+      "humanReviewRequired": ["Confirm whether MenteeBot V3 is explicitly bipedal in the current hardware documentation.", "Confirm current commercial price, customer POC status and Japan availability after the Mobileye transaction."]
+    },
+    {
+      "robotId": "robotera-l7",
+      "manufacturerId": "robotera",
+      "identity": {
+        "status": "confirmed",
+        "officialName": "ROBOTERA L7 / 星动L7",
+        "variant": "L7 current full-size bipedal humanoid robot",
+        "officialProductUrl": "https://www.robotera.com/en/robotics/L7.html",
+        "notes": "RobotEraの現行英語・中国語製品導線を確認。英語ページはHeight欄に171 KGと表示する単位表記ミスがあり、中国語ページの171 CMと突合してheightを要レビューとした。"
+      },
+      "positioningFacts": [
+        {"statement": "RobotEra positions L7 as a new-generation full-size bipedal humanoid robot.", "sourceUrl": "https://www.robotera.com/application.html"},
+        {"statement": "The official Chinese product/application page publishes 55 freedom, 171 CM height and 20 KG dual-arm payload for L7.", "sourceUrl": "https://www.robotera.com/application.html"},
+        {"statement": "Official application labels include research data collection and training, manufacturing, enterprise reception, mall guidance, education/classroom and hospital guidance.", "sourceUrl": "https://www.robotera.com/application.html"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "Full-size Bipedal Humanoid Robot / 新生代全尺寸双足人形机器人", "normalizedValue": "biped", "unit": "", "variant": "L7", "condition": "official product/application page", "sourceUrl": "https://www.robotera.com/application.html", "evidenceSummary": "L7の双足・全サイズ人形位置付けを公式ページで確認。"},
+        "heightCm": {"status": "needs-review", "rawValue": "Chinese page: 171 CM; English page renders the Height value as 171 KG", "normalizedValue": 171, "unit": "cm", "variant": "L7", "condition": "official localization discrepancy; 171 CM retained as unit-correct candidate but needs manufacturer confirmation", "sourceUrl": "https://www.robotera.com/application.html", "evidenceSummary": "中国語公式ページの171 CMと英語ページの単位誤表示を併記し、確定foundにしていない。"},
+        "weightKg": {"status": "not-published", "rawValue": "No L7 body weight found on the reviewed current official product/application and purchase pages", "normalizedValue": null, "unit": "kg", "variant": "L7", "condition": "height unit error is not converted into weight", "sourceUrl": "https://www.robotera.com/application.html", "evidenceSummary": "重量の公式公開値は確認できない。"},
+        "speedMps": {"status": "not-published", "rawValue": "No L7 speed value found on the reviewed current official pages", "normalizedValue": null, "unit": "m/s", "variant": "L7", "condition": "bipedal positioning is not a speed value", "sourceUrl": "https://www.robotera.com/en/robotics/L7.html", "evidenceSummary": "速度の公式数値は確認できない。"},
+        "dof": {"status": "found", "rawValue": "55 Freedom", "normalizedValue": 55, "unit": "DoF", "variant": "L7", "condition": "whole-robot freedom count; scope breakdown is not published", "sourceUrl": "https://www.robotera.com/application.html", "evidenceSummary": "L7公式の55自由度。"},
+        "payloadKg": {"status": "not-published", "rawValue": "20 KG dual-arm payload is retained in loadRatings and not copied to scalar payloadKg", "normalizedValue": null, "unit": "kg", "variant": "L7", "condition": "dual-arm scope separated", "sourceUrl": "https://www.robotera.com/application.html", "evidenceSummary": "双腕荷重をscalarへ流用していない。"},
+        "runtimeMin": {"status": "not-published", "rawValue": "No L7 battery runtime found on the reviewed current official pages", "normalizedValue": null, "unit": "min", "variant": "L7", "condition": "application scenario labels are not runtime", "sourceUrl": "https://www.robotera.com/en/robotics/L7.html", "evidenceSummary": "稼働時間は確認できない。"},
+        "batteryCapacityWh": {"status": "not-published", "rawValue": "No L7 battery capacity in Wh/Ah found on the reviewed current official pages", "normalizedValue": null, "unit": "Wh", "variant": "L7", "condition": "STAR1 battery values were not transferred", "sourceUrl": "https://www.robotera.com/en/robotics/L7.html", "evidenceSummary": "別機体STAR1の電池値を流用せず、L7電池容量は未公開。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "No L7 charge time found on the reviewed current official pages", "normalizedValue": null, "unit": "min", "variant": "L7", "condition": "no official charger/charge duration value located", "sourceUrl": "https://www.robotera.com/en/robotics/L7.html", "evidenceSummary": "充電時間は確認できない。"},
+        "batterySystem": {"status": "not-published", "rawValue": "No L7 battery chemistry, voltage or exchange system found on the reviewed current official pages", "normalizedValue": null, "unit": "", "variant": "L7", "condition": "STAR1 battery system was not transferred", "sourceUrl": "https://www.robotera.com/en/robotics/L7.html", "evidenceSummary": "電源・電池方式は確認できない。"},
+        "controlMethod": {"status": "not-published", "rawValue": "ERA-42 VLA model is presented with L7, but a user operation/control method is not published on the reviewed L7 pages", "normalizedValue": null, "unit": "", "variant": "L7", "condition": "foundation model positioning is not an operation method", "sourceUrl": "https://www.robotera.com/application.html", "evidenceSummary": "VLAモデル記載はあるが操作方式は未公開。"},
+        "sdk": {"status": "not-published", "rawValue": "No L7 SDK, developer API or ROS package found on the reviewed current official product and purchase pages", "normalizedValue": null, "unit": "", "variant": "L7", "condition": "ERA-42 is not an SDK disclosure", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "L7固有SDKは確認できない。"},
+        "computePlatform": {"status": "needs-review", "rawValue": "ERA-42 VLA model is named on the official product page; onboard compute hardware/model is not published", "normalizedValue": null, "unit": "", "variant": "L7", "condition": "AI model name does not establish onboard compute platform", "sourceUrl": "https://www.robotera.com/application.html", "evidenceSummary": "ERA-42の存在は確認したが、CPU/GPU/TOPS等の計算基盤は未公開。"},
+        "ipRating": {"status": "not-published", "rawValue": "No L7 IP ingress-protection rating found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "L7", "condition": "full-size product positioning is not IP rating", "sourceUrl": "https://www.robotera.com/en/robotics/L7.html", "evidenceSummary": "防塵防水等級は確認できない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "No L7 operating-temperature range found on the reviewed official pages", "normalizedValue": null, "unit": "°C", "variant": "L7", "condition": "application scenarios are not environmental range", "sourceUrl": "https://www.robotera.com/en/robotics/L7.html", "evidenceSummary": "動作温度は確認できない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "No named L7 safety standard or certification number found on the reviewed official product/application and purchase pages", "normalizedValue": null, "unit": "", "variant": "L7", "condition": "no safety standard text located", "sourceUrl": "https://www.robotera.com/en/robotics/L7.html", "evidenceSummary": "安全規格・認証番号は確認できない。"}
+      },
+      "loadRatings": [
+        {"scope": "dual-arm", "rating": "unspecified", "kg": 20, "condition": "Official wording is ‘Dual-arm payload 20 KG’; rated/maximum terminology and load condition are not stated", "variant": "L7", "sourceUrl": "https://www.robotera.com/application.html"}
+      ],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [
+        {"existingUseCaseId": "research-development", "officialExpression": "Research - data collection & training", "evidenceSourceUrl": "https://www.robotera.com/application.html", "reason": "公式用途欄が研究・データ収集・モデル訓練を明示。"},
+        {"existingUseCaseId": "factory-assembly-support", "officialExpression": "Manufacturing", "evidenceSourceUrl": "https://www.robotera.com/application.html", "reason": "公式用途欄が製造を明示。"},
+        {"existingUseCaseId": "customer-reception", "officialExpression": "Enterprise reception", "evidenceSourceUrl": "https://www.robotera.com/application.html", "reason": "公式用途欄が企業受付を明示。"},
+        {"existingUseCaseId": "facility-wayfinding", "officialExpression": "Mall guidance / Hospital guidance", "evidenceSourceUrl": "https://www.robotera.com/application.html", "reason": "商業施設・病院での案内表現を既存の館内ガイド用途へ接続。"}
+      ],
+      "useCaseGaps": ["USE_CASE_GAP robotera-l7 \"Education - classroom\" https://www.robotera.com/application.html"],
+      "usageExamples": [],
+      "usageExampleSourceUrls": [],
+      "procurement": {
+        "procurementModels": ["purchase-inquiry", "inquiry"],
+        "marketAvailability": {"status": "needs-review", "rawValue": "Official product pages show Buy Now/Purchase Inquiry routes for L7, but no public price, stock, shipment or contract terms are published", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "購入導線は確認したが、公開購入可能・在庫ありとは断定していない。"},
+        "japanAvailability": {"status": "not-published", "rawValue": "No Japan sales, shipment or local fulfillment statement found on reviewed RobotEra official pages", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "日本での入手性は確認できない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "No domestic authorized RobotEra distributor identified on reviewed official pages", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "国内正規代理店は確認できない。"},
+        "supportNote": {"status": "needs-review", "rawValue": "Official purchase inquiry contact and company phone/email are public; product support and Japan service terms are not", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "公式問い合わせ先は確認したが、導入支援条件は非公開。"}
+      },
+      "pagesReviewed": ["https://www.robotera.com/en/robotics/L7.html", "https://www.robotera.com/application.html", "https://www.robotera.com/en/download1.html", "https://www.robotera.com/en/Contact-to-Buy.html", "https://www.robotera.com/lian-xi-gou-mai.html"],
+      "sourceCandidates": [
+        {"url": "https://www.robotera.com/application.html", "status": "spec-checked", "reason": "中国語公式ページでL7の55自由度、171 CM、双腕20 KGと用途を確認。"},
+        {"url": "https://www.robotera.com/en/download1.html", "status": "spec-checked", "reason": "英語公式導線を確認。Height欄の171 KG表記は単位誤表示として記録。"},
+        {"url": "https://www.robotera.com/en/Contact-to-Buy.html", "status": "price-checked", "reason": "公式購入問い合わせ導線を確認したが価格はない。"}
+      ],
+      "fieldEvidence": {"mobility": ["https://www.robotera.com/application.html"], "heightCm": ["https://www.robotera.com/application.html", "https://www.robotera.com/en/download1.html"], "weightKg": ["https://www.robotera.com/en/robotics/L7.html"], "speedMps": ["https://www.robotera.com/en/robotics/L7.html"], "dof": ["https://www.robotera.com/application.html"], "payloadKg": ["https://www.robotera.com/application.html"], "runtimeMin": ["https://www.robotera.com/en/robotics/L7.html"], "batteryCapacityWh": ["https://www.robotera.com/en/robotics/L7.html"], "chargeTimeMin": ["https://www.robotera.com/en/robotics/L7.html"], "batterySystem": ["https://www.robotera.com/en/robotics/L7.html"], "controlMethod": ["https://www.robotera.com/application.html"], "sdk": ["https://www.robotera.com/en/robotics/L7.html"], "computePlatform": ["https://www.robotera.com/application.html"], "ipRating": ["https://www.robotera.com/en/robotics/L7.html"], "operatingTemperature": ["https://www.robotera.com/en/robotics/L7.html"], "safetyStandard": ["https://www.robotera.com/en/robotics/L7.html"], "loadRatings": ["https://www.robotera.com/application.html"], "priceOffers": ["https://www.robotera.com/en/Contact-to-Buy.html"]},
+      "conflicts": ["Official English page renders the L7 height as ‘171 KG’ while the Chinese page labels it ‘171 CM’; this is treated as a unit/localization conflict, not as a weight value.", "Official product pages name ERA-42 VLA but do not publish onboard compute hardware, SDK or detailed runtime specifications."],
+      "humanReviewRequired": ["Confirm the canonical L7 height unit with RobotEra before public display.", "Obtain current L7 battery, speed, weight, safety and SDK documentation if RobotEra makes it available."]
+    },
+    {
+      "robotId": "robotera-q5",
+      "manufacturerId": "robotera",
+      "identity": {
+        "status": "confirmed",
+        "officialName": "ROBOTERA Q5 / 星动Q5",
+        "variant": "Q5 current product-line entry; product-specific public technical variant not exposed in reviewed page text",
+        "officialProductUrl": "https://www.robotera.com/q5",
+        "notes": "Q5は現行RobotEra公式製品導線・製品一覧・購入問い合わせで名称を確認。L7、STAR1、旧報道やコード内mobility値はQ5へ流用していない。"
+      },
+      "positioningFacts": [
+        {"statement": "RobotEra's current official product navigation lists ROBOTERA Q5 as a product in the product line.", "sourceUrl": "https://www.robotera.com/q5"},
+        {"statement": "The current official Q5 page is reachable as a product page and the purchase inquiry page lists Q5, but the reviewed public text does not expose Q5-specific technical values or a product-specific use-case description.", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html"}
+      ],
+      "fields": {
+        "mobility": {"status": "not-published", "rawValue": "Q5 is listed as a current RobotEra product, but the reviewed official Q5 page text does not publish its movement method", "normalizedValue": null, "unit": "", "variant": "Q5", "condition": "repository wheeled classification was not used as official evidence", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "Q5の現行製品ページを確認したが、移動方式の公式テキスト値はない。"},
+        "heightCm": {"status": "not-published", "rawValue": "No Q5 height value found on the reviewed official Q5, product-line and purchase pages", "normalizedValue": null, "unit": "cm", "variant": "Q5", "condition": "L7 height was not transferred", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "L7の171cmを流用せずQ5身長は未公開。"},
+        "weightKg": {"status": "not-published", "rawValue": "No Q5 body weight value found on the reviewed official pages", "normalizedValue": null, "unit": "kg", "variant": "Q5", "condition": "no Q5-specific weight table located", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "重量は確認できない。"},
+        "speedMps": {"status": "not-published", "rawValue": "No Q5 speed value found on the reviewed official pages", "normalizedValue": null, "unit": "m/s", "variant": "Q5", "condition": "no product-specific speed table located", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "速度は確認できない。"},
+        "dof": {"status": "not-published", "rawValue": "No Q5 DoF value found on the reviewed official pages", "normalizedValue": null, "unit": "DoF", "variant": "Q5", "condition": "L7/STAR1 DoF was not transferred", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "自由度は確認できない。"},
+        "payloadKg": {"status": "not-published", "rawValue": "No Q5 payload value found on the reviewed official pages", "normalizedValue": null, "unit": "kg", "variant": "Q5", "condition": "no Q5-specific load scope or rating located", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "荷重は確認できない。"},
+        "runtimeMin": {"status": "not-published", "rawValue": "No Q5 runtime value found on the reviewed official pages", "normalizedValue": null, "unit": "min", "variant": "Q5", "condition": "no Q5-specific battery/runtime table located", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "稼働時間は確認できない。"},
+        "batteryCapacityWh": {"status": "not-published", "rawValue": "No Q5 battery capacity value found on the reviewed official pages", "normalizedValue": null, "unit": "Wh", "variant": "Q5", "condition": "other RobotEra model values were not transferred", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "電池容量は確認できない。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "No Q5 charge time found on the reviewed official pages", "normalizedValue": null, "unit": "min", "variant": "Q5", "condition": "no Q5-specific charger information located", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "充電時間は確認できない。"},
+        "batterySystem": {"status": "not-published", "rawValue": "No Q5 battery system or power specification found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "Q5", "condition": "no Q5-specific power information located", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "電源・電池方式は確認できない。"},
+        "controlMethod": {"status": "not-published", "rawValue": "No Q5 operation/control method found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "Q5", "condition": "global ERA-42/product-line wording was not assigned to Q5 control", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "操作方式は確認できない。"},
+        "sdk": {"status": "not-published", "rawValue": "No Q5 SDK, developer API or ROS package found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "Q5", "condition": "no product-specific developer documentation located", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "SDKは確認できない。"},
+        "computePlatform": {"status": "not-published", "rawValue": "No Q5 onboard compute platform or accelerator value found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "Q5", "condition": "L7/STAR1 compute values were not transferred", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "計算基盤は確認できない。"},
+        "ipRating": {"status": "not-published", "rawValue": "No Q5 IP ingress-protection rating found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "Q5", "condition": "no product-specific technical table located", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "防塵防水等級は確認できない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "No Q5 operating-temperature range found on the reviewed official pages", "normalizedValue": null, "unit": "°C", "variant": "Q5", "condition": "no product-specific environmental table located", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "動作温度は確認できない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "No named Q5 safety standard or certification number found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "Q5", "condition": "no product-specific safety documentation located", "sourceUrl": "https://www.robotera.com/q5", "evidenceSummary": "安全規格は確認できない。"}
+      },
+      "loadRatings": [],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [],
+      "useCaseGaps": [],
+      "usageExamples": [],
+      "usageExampleSourceUrls": [],
+      "procurement": {
+        "procurementModels": ["purchase-inquiry", "inquiry"],
+        "marketAvailability": {"status": "needs-review", "rawValue": "Official product navigation and purchase inquiry list Q5, but no public price, stock, shipment or contract terms are published", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "購入問い合わせ導線は確認したが、調達可能・在庫ありとは断定していない。"},
+        "japanAvailability": {"status": "not-published", "rawValue": "No Japan sales, shipment or local fulfillment statement found on reviewed RobotEra official pages", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "日本での入手性は確認できない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "No domestic authorized RobotEra distributor identified on reviewed official pages", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "国内正規代理店は確認できない。"},
+        "supportNote": {"status": "needs-review", "rawValue": "Official purchase inquiry contact is public; Q5-specific support, warranty and Japan service terms are not", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "公式問い合わせ先は確認したがQ5固有の支援条件は非公開。"}
+      },
+      "pagesReviewed": ["https://www.robotera.com/q5", "https://www.robotera.com/en/robotics/Q5.html", "https://www.robotera.com/en/download1.html", "https://www.robotera.com/en/Contact-to-Buy.html"],
+      "sourceCandidates": [
+        {"url": "https://www.robotera.com/q5", "status": "identity-checked", "reason": "Q5現行公式製品導線を確認したが、取得できる本文は製品一覧・ニュース中心でQ5固有仕様はない。"},
+        {"url": "https://www.robotera.com/en/Contact-to-Buy.html", "status": "price-checked", "reason": "Q5を含む購入問い合わせ導線を確認したが価格はない。"}
+      ],
+      "fieldEvidence": {"mobility": ["https://www.robotera.com/q5"], "heightCm": ["https://www.robotera.com/q5"], "weightKg": ["https://www.robotera.com/q5"], "speedMps": ["https://www.robotera.com/q5"], "dof": ["https://www.robotera.com/q5"], "payloadKg": ["https://www.robotera.com/q5"], "runtimeMin": ["https://www.robotera.com/q5"], "batteryCapacityWh": ["https://www.robotera.com/q5"], "chargeTimeMin": ["https://www.robotera.com/q5"], "batterySystem": ["https://www.robotera.com/q5"], "controlMethod": ["https://www.robotera.com/q5"], "sdk": ["https://www.robotera.com/q5"], "computePlatform": ["https://www.robotera.com/q5"], "ipRating": ["https://www.robotera.com/q5"], "operatingTemperature": ["https://www.robotera.com/q5"], "safetyStandard": ["https://www.robotera.com/q5"], "priceOffers": ["https://www.robotera.com/en/Contact-to-Buy.html"]},
+      "conflicts": ["Repository currently classifies Q5 as wheeled and describes a dual-arm wheeled configuration, but the reviewed current official Q5 page text does not publish that value; it was not used as found evidence."],
+      "humanReviewRequired": ["Obtain Q5's current technical sheet and confirm the product-specific page content before public card/detail publication."]
+    },
+    {
+      "robotId": "robotera-m7",
+      "manufacturerId": "robotera",
+      "identity": {
+        "status": "confirmed",
+        "officialName": "ROBOTERA M7 / 星动M7",
+        "variant": "M7 current product-line entry; product-specific public technical variant not exposed in reviewed page text",
+        "officialProductUrl": "https://www.robotera.com/en/robotics/M7.html",
+        "notes": "M7は現行RobotEra公式製品一覧・英語製品導線・購入問い合わせで名称を確認。L7、STAR1、旧報道やコード内mobility値はM7へ流用していない。"
+      },
+      "positioningFacts": [
+        {"statement": "RobotEra's current official product navigation lists ROBOTERA M7 as a product in the product line.", "sourceUrl": "https://www.robotera.com/en/download1.html"},
+        {"statement": "The current official M7 product route and purchase inquiry page expose the product name, but the reviewed public text does not expose M7-specific technical values or a product-specific use-case description.", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html"}
+      ],
+      "fields": {
+        "mobility": {"status": "not-published", "rawValue": "M7 is listed as a current RobotEra product, but the reviewed official M7 page text does not publish its movement method", "normalizedValue": null, "unit": "", "variant": "M7", "condition": "repository bipedal classification was not used as official evidence", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "M7の移動方式の公式テキスト値は確認できない。"},
+        "heightCm": {"status": "not-published", "rawValue": "No M7 height value found on the reviewed official product-line and purchase pages", "normalizedValue": null, "unit": "cm", "variant": "M7", "condition": "L7 height was not transferred", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "L7の171cmを流用せずM7身長は未公開。"},
+        "weightKg": {"status": "not-published", "rawValue": "No M7 body weight value found on the reviewed official pages", "normalizedValue": null, "unit": "kg", "variant": "M7", "condition": "no M7-specific weight table located", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "重量は確認できない。"},
+        "speedMps": {"status": "not-published", "rawValue": "No M7 speed value found on the reviewed official pages", "normalizedValue": null, "unit": "m/s", "variant": "M7", "condition": "no M7-specific speed table located", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "速度は確認できない。"},
+        "dof": {"status": "not-published", "rawValue": "No M7 DoF value found on the reviewed official pages", "normalizedValue": null, "unit": "DoF", "variant": "M7", "condition": "L7/STAR1 DoF was not transferred", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "自由度は確認できない。"},
+        "payloadKg": {"status": "not-published", "rawValue": "No M7 payload value found on the reviewed official pages", "normalizedValue": null, "unit": "kg", "variant": "M7", "condition": "no M7-specific load scope or rating located", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "荷重は確認できない。"},
+        "runtimeMin": {"status": "not-published", "rawValue": "No M7 runtime value found on the reviewed official pages", "normalizedValue": null, "unit": "min", "variant": "M7", "condition": "no M7-specific battery/runtime table located", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "稼働時間は確認できない。"},
+        "batteryCapacityWh": {"status": "not-published", "rawValue": "No M7 battery capacity value found on the reviewed official pages", "normalizedValue": null, "unit": "Wh", "variant": "M7", "condition": "other RobotEra model values were not transferred", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "電池容量は確認できない。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "No M7 charge time found on the reviewed official pages", "normalizedValue": null, "unit": "min", "variant": "M7", "condition": "no M7-specific charger information located", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "充電時間は確認できない。"},
+        "batterySystem": {"status": "not-published", "rawValue": "No M7 battery system or power specification found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "M7", "condition": "no M7-specific power information located", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "電源・電池方式は確認できない。"},
+        "controlMethod": {"status": "not-published", "rawValue": "No M7 operation/control method found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "M7", "condition": "global ERA-42/product-line wording was not assigned to M7 control", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "操作方式は確認できない。"},
+        "sdk": {"status": "not-published", "rawValue": "No M7 SDK, developer API or ROS package found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "M7", "condition": "no product-specific developer documentation located", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "SDKは確認できない。"},
+        "computePlatform": {"status": "not-published", "rawValue": "No M7 onboard compute platform or accelerator value found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "M7", "condition": "L7/STAR1 compute values were not transferred", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "計算基盤は確認できない。"},
+        "ipRating": {"status": "not-published", "rawValue": "No M7 IP ingress-protection rating found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "M7", "condition": "no product-specific technical table located", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "防塵防水等級は確認できない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "No M7 operating-temperature range found on the reviewed official pages", "normalizedValue": null, "unit": "°C", "variant": "M7", "condition": "no product-specific environmental table located", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "動作温度は確認できない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "No named M7 safety standard or certification number found on the reviewed official pages", "normalizedValue": null, "unit": "", "variant": "M7", "condition": "no product-specific safety documentation located", "sourceUrl": "https://www.robotera.com/en/robotics/M7.html", "evidenceSummary": "安全規格は確認できない。"}
+      },
+      "loadRatings": [],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [],
+      "useCaseGaps": [],
+      "usageExamples": [],
+      "usageExampleSourceUrls": [],
+      "procurement": {
+        "procurementModels": ["purchase-inquiry", "inquiry"],
+        "marketAvailability": {"status": "needs-review", "rawValue": "Official product navigation and purchase inquiry list M7, but no public price, stock, shipment or contract terms are published", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "購入問い合わせ導線は確認したが、調達可能・在庫ありとは断定していない。"},
+        "japanAvailability": {"status": "not-published", "rawValue": "No Japan sales, shipment or local fulfillment statement found on reviewed RobotEra official pages", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "日本での入手性は確認できない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "No domestic authorized RobotEra distributor identified on reviewed official pages", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "国内正規代理店は確認できない。"},
+        "supportNote": {"status": "needs-review", "rawValue": "Official purchase inquiry contact is public; M7-specific support, warranty and Japan service terms are not", "sourceUrl": "https://www.robotera.com/en/Contact-to-Buy.html", "evidenceSummary": "公式問い合わせ先は確認したがM7固有の支援条件は非公開。"}
+      },
+      "pagesReviewed": ["https://www.robotera.com/en/robotics/M7.html", "https://www.robotera.com/en/download1.html", "https://www.robotera.com/en/Contact-to-Buy.html", "https://www.robotera.com/application.html"],
+      "sourceCandidates": [
+        {"url": "https://www.robotera.com/en/robotics/M7.html", "status": "identity-checked", "reason": "M7現行公式製品導線を確認したが、取得できる本文は製品一覧中心でM7固有仕様はない。"},
+        {"url": "https://www.robotera.com/en/Contact-to-Buy.html", "status": "price-checked", "reason": "M7を含む購入問い合わせ導線を確認したが価格はない。"}
+      ],
+      "fieldEvidence": {"mobility": ["https://www.robotera.com/en/robotics/M7.html"], "heightCm": ["https://www.robotera.com/en/robotics/M7.html"], "weightKg": ["https://www.robotera.com/en/robotics/M7.html"], "speedMps": ["https://www.robotera.com/en/robotics/M7.html"], "dof": ["https://www.robotera.com/en/robotics/M7.html"], "payloadKg": ["https://www.robotera.com/en/robotics/M7.html"], "runtimeMin": ["https://www.robotera.com/en/robotics/M7.html"], "batteryCapacityWh": ["https://www.robotera.com/en/robotics/M7.html"], "chargeTimeMin": ["https://www.robotera.com/en/robotics/M7.html"], "batterySystem": ["https://www.robotera.com/en/robotics/M7.html"], "controlMethod": ["https://www.robotera.com/en/robotics/M7.html"], "sdk": ["https://www.robotera.com/en/robotics/M7.html"], "computePlatform": ["https://www.robotera.com/en/robotics/M7.html"], "ipRating": ["https://www.robotera.com/en/robotics/M7.html"], "operatingTemperature": ["https://www.robotera.com/en/robotics/M7.html"], "safetyStandard": ["https://www.robotera.com/en/robotics/M7.html"], "priceOffers": ["https://www.robotera.com/en/Contact-to-Buy.html"]},
+      "conflicts": ["Repository currently classifies M7 as bipedal and assigns industrial/logistics tags, but the reviewed current official M7 page text does not publish movement or product-specific use-case values; those repository assumptions were not used as found evidence."],
+      "humanReviewRequired": ["Obtain M7's current technical sheet and confirm the product-specific page content before public card/detail publication."]
+    },
+    {
+      "robotId": "galbot-g1",
+      "manufacturerId": "galbot",
+      "identity": {
+        "status": "confirmed",
+        "officialName": "GALBOT G1",
+        "variant": "G1 general-purpose mobile dual-arm robot / current G1 documentation version 2.0",
+        "officialProductUrl": "https://www.galbot.com/g1/",
+        "notes": "Galbot公式G1製品ページ、公式G1クイック使用マニュアル、公式開発者SDKページを照合。G1 Lite/S1の値は流用していない。"
+      },
+      "positioningFacts": [
+        {"statement": "Galbot positions G1 as a mobile dual-arm general-purpose robot using a 360-degree omnidirectional-wheel chassis, adaptive height operation and long-reach manipulation.", "sourceUrl": "https://www.galbot.com/g1/"},
+        {"statement": "The official G1 page publishes 1730mm standard posture height, 92.5kg body weight, 1.5m/s maximum speed, 48V 30Ah battery, 8h full-charge runtime, IP54 and AGX Orin 64GB 275TOPS.", "sourceUrl": "https://www.galbot.com/g1/"},
+        {"statement": "Galbot's official developer platform publishes GalbotSDK, G1 documentation and solution packages for reception/guidance, picking and inspection workflows.", "sourceUrl": "https://developer.galbot.com/"}
+      ],
+      "fields": {
+        "mobility": {"status": "found", "rawValue": "360° omnidirectional-wheel chassis; 4-wheel omnidirectional mobile base", "normalizedValue": "wheeled", "unit": "", "variant": "G1", "condition": "official product page and manual", "sourceUrl": "https://www.galbot.com/g1/", "evidenceSummary": "全方向車輪ベースと4輪全方向移動を確認。"},
+        "heightCm": {"status": "found", "rawValue": "Standard posture height 1730mm", "normalizedValue": 173, "unit": "cm", "variant": "G1", "condition": "converted from 1730mm", "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "evidenceSummary": "公式マニュアルの1730mmを173cmへ換算。"},
+        "weightKg": {"status": "found", "rawValue": "Body weight 92.5kg", "normalizedValue": 92.5, "unit": "kg", "variant": "G1", "condition": "official G1 product/manual", "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "evidenceSummary": "公式機体重量92.5kg。"},
+        "speedMps": {"status": "found", "rawValue": "Maximum speed 1.5m/s", "normalizedValue": 1.5, "unit": "m/s", "variant": "G1", "condition": "official maximum base speed", "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "evidenceSummary": "最大速度1.5m/sを確認。"},
+        "dof": {"status": "conflict", "rawValue": "Product page: total 24 driven joints including 4 chassis drive wheels; developer manual: neck 2 + arms 7x2 + waist 3 + legs 2 = 21 DoF excluding base/end effectors", "normalizedValue": null, "unit": "DoF", "variant": "G1", "condition": "official documents use different inclusion scope and joint count", "sourceUrl": "https://www.galbot.com/g1/", "evidenceSummary": "製品ページの総数24と、開発者マニュアルの底盤・末端除外21をscope付きで保持。"},
+        "payloadKg": {"status": "not-published", "rawValue": "Official single-arm and total end-payload values are retained in loadRatings and not copied to scalar payloadKg", "normalizedValue": null, "unit": "kg", "variant": "G1", "condition": "single-arm/dual-arm scope separated", "sourceUrl": "https://www.galbot.com/g1/", "evidenceSummary": "荷重をscalarへ流用していない。"},
+        "runtimeMin": {"status": "found", "rawValue": "Full charge runtime / work duration 8h", "normalizedValue": 480, "unit": "min", "variant": "G1", "condition": "official manual says laboratory test at 60% average speed", "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "evidenceSummary": "公式8時間を480分へ換算し、実験室・平均速度60%条件を保持。"},
+        "batteryCapacityWh": {"status": "found", "rawValue": "48V × 30Ah", "normalizedValue": 1440, "unit": "Wh", "variant": "G1", "condition": "derived from official voltage and Ah: 48 × 30 = 1440Wh; chemistry not published", "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "evidenceSummary": "公式48V・30AhからV×Ahで1440Whを導出し、換算元をrawに残した。"},
+        "chargeTimeMin": {"status": "found", "rawValue": "Adapter charging time 3.5h", "normalizedValue": 210, "unit": "min", "variant": "G1", "condition": "official wired adapter charging time converted from 3.5h", "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "evidenceSummary": "3.5時間を210分へ換算。"},
+        "batterySystem": {"status": "found", "rawValue": "48V 30Ah battery; wired charger standard, wireless charging dock and spare battery optional", "normalizedValue": "48V battery with wired charging; wireless dock/backup battery optional", "unit": "", "variant": "G1", "condition": "battery chemistry and hot-swap capability are not stated in the reviewed G1 manual", "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "evidenceSummary": "電池容量、充電方式、オプション構成を確認。"},
+        "controlMethod": {"status": "found", "rawValue": "Multimodal voice/target recognition, autonomous return-to-charge, wireless controller/teaching button and developer API", "normalizedValue": "autonomous / voice / wireless controller / GalbotSDK", "unit": "", "variant": "G1", "condition": "official G1 product/manual/developer documentation", "sourceUrl": "https://www.galbot.com/g1/", "evidenceSummary": "音声・対象認識、自律帰充電、操作機器・開発APIを確認。"},
+        "sdk": {"status": "found", "rawValue": "GalbotSDK; official developer platform provides G1 SDK/Python examples and APIs", "normalizedValue": "GalbotSDK / Python API", "unit": "", "variant": "G1", "condition": "official developer documentation", "sourceUrl": "https://developer.galbot.com/docs/SDK/1.7.0/g1/zh/examples_python", "evidenceSummary": "G1のGalbotSDKとPython/APIサンプルを確認。"},
+        "computePlatform": {"status": "found", "rawValue": "NVIDIA AGX Orin 64GB 275TOPS", "normalizedValue": "NVIDIA AGX Orin 64GB / 275TOPS", "unit": "TOPS", "variant": "G1", "condition": "official G1 product/manual", "sourceUrl": "https://www.galbot.com/g1/", "evidenceSummary": "公式計算基盤AGX Orin 64GB・275TOPS。"},
+        "ipRating": {"status": "found", "rawValue": "IP54", "normalizedValue": "IP54", "unit": "", "variant": "G1", "condition": "official industrial protection statement", "sourceUrl": "https://www.galbot.com/g1/", "evidenceSummary": "公式IP54。"},
+        "operatingTemperature": {"status": "found", "rawValue": "0–40°C; humidity 0–90%RH without condensation", "normalizedValue": "0 to 40", "unit": "°C", "variant": "G1", "condition": "official G1 manual operating environment", "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "evidenceSummary": "公式動作環境の温度範囲。湿度条件もrawに残した。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "Official manual describes emergency stop, collision-sensor checks and safe-use warnings; no named G1 safety standard or certification number found", "normalizedValue": null, "unit": "", "variant": "G1", "condition": "functional safety instructions are not a compliance standard", "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "evidenceSummary": "安全機能・注意事項は確認したが規格名・認証番号はない。"}
+      },
+      "loadRatings": [
+        {"scope": "single-arm", "rating": "unspecified", "kg": 5, "condition": "Official ‘Dual-Arm End Payload: Single Arm 5kg’; rated/maximum terminology is not stated", "variant": "G1", "sourceUrl": "https://www.galbot.com/g1/"},
+        {"scope": "dual-arm", "rating": "unspecified", "kg": 10, "condition": "Official ‘Dual-Arm End Payload: Total 10kg’; rated/maximum terminology is not stated", "variant": "G1", "sourceUrl": "https://www.galbot.com/g1/"}
+      ],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [
+        {"existingUseCaseId": "factory-assembly-support", "officialExpression": "manufacturing: assembly, loading/unloading and spare-parts sorting", "evidenceSourceUrl": "https://www.galbot.com/", "reason": "Galbot公式ホームページが製造のassembly・loading/unloading等を明示。"},
+        {"existingUseCaseId": "warehouse-picking", "officialExpression": "front-end warehouses: autonomous picking and placement", "evidenceSourceUrl": "https://www.galbot.com/g1/", "reason": "G1公式ページが倉庫での自律pick/placeを明示。"},
+        {"existingUseCaseId": "healthcare-specimen-transport", "officialExpression": "pharmacy: material delivery and retrieval in clinical environments", "evidenceSourceUrl": "https://www.galbot.com/g1/", "reason": "臨床環境の薬局物料搬送・回収を既存の病院内物品搬送へ接続。"},
+        {"existingUseCaseId": "customer-reception", "officialExpression": "retail customer interaction", "evidenceSourceUrl": "https://www.galbot.com/g1/", "reason": "小売現場での顧客とのリアルタイムインタラクションを既存受付・接客用途へ接続。"}
+      ],
+      "useCaseGaps": ["USE_CASE_GAP galbot-g1 \"Home: cleaning, organizing, fetching and package handling\" https://www.galbot.com/"],
+      "usageExamples": [],
+      "usageExampleSourceUrls": [],
+      "procurement": {
+        "procurementModels": ["purchase-inquiry", "custom-delivery", "inquiry"],
+        "marketAvailability": {"status": "needs-review", "rawValue": "Official G1 product page, manual, developer platform and contact/solution routes are public; public price, stock and shipment terms are not", "sourceUrl": "https://developer.galbot.com/", "evidenceSummary": "製品・開発・カスタム納入導線は確認したが、一般購入条件は非公開。"},
+        "japanAvailability": {"status": "not-published", "rawValue": "No Japan sales, shipment or local fulfillment statement found on reviewed Galbot official pages", "sourceUrl": "https://www.galbot.com/g1/", "evidenceSummary": "日本での入手性は確認できない。"},
+        "distributorJapan": {"status": "not-published", "rawValue": "No domestic authorized Galbot distributor identified on reviewed official pages", "sourceUrl": "https://www.galbot.com/g1/", "evidenceSummary": "国内正規代理店は確認できない。"},
+        "supportNote": {"status": "found", "rawValue": "Official developer platform provides GalbotSDK, solution delivery, technical support tiers and a G1 warranty document stating 12 months free warranty from sale", "sourceUrl": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "evidenceSummary": "SDK・運用支援・12か月保証の公式記載を確認。日本向けSLAは非公開。"}
+      },
+      "pagesReviewed": ["https://www.galbot.com/g1/", "https://www.galbot.com/", "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "https://developer.galbot.com/docs/SDK/1.7.0/g1/zh/examples_python", "https://developer.galbot.com/"],
+      "sourceCandidates": [
+        {"url": "https://www.galbot.com/g1/", "status": "spec-checked", "reason": "現行G1製品仕様・用途・IP54・電池・算力・荷重を確認。"},
+        {"url": "https://developer.galbot.com/docs/g1/2.2.4/zh/g1", "status": "spec-checked", "reason": "公式マニュアルで高さ、重量、速度、充電、温度、DoF scope、保証・安全注意を確認。"},
+        {"url": "https://developer.galbot.com/", "status": "procurement-support-checked", "reason": "公式SDK、ソリューション、技術支援・納入フローを確認。"}
+      ],
+      "fieldEvidence": {"mobility": ["https://www.galbot.com/g1/"], "heightCm": ["https://developer.galbot.com/docs/g1/2.2.4/zh/g1"], "weightKg": ["https://developer.galbot.com/docs/g1/2.2.4/zh/g1"], "speedMps": ["https://developer.galbot.com/docs/g1/2.2.4/zh/g1"], "dof": ["https://www.galbot.com/g1/", "https://developer.galbot.com/docs/g1/2.2.4/zh/g1"], "payloadKg": ["https://www.galbot.com/g1/"], "runtimeMin": ["https://developer.galbot.com/docs/g1/2.2.4/zh/g1"], "batteryCapacityWh": ["https://developer.galbot.com/docs/g1/2.2.4/zh/g1"], "chargeTimeMin": ["https://developer.galbot.com/docs/g1/2.2.4/zh/g1"], "batterySystem": ["https://developer.galbot.com/docs/g1/2.2.4/zh/g1"], "controlMethod": ["https://www.galbot.com/g1/"], "sdk": ["https://developer.galbot.com/docs/SDK/1.7.0/g1/zh/examples_python"], "computePlatform": ["https://www.galbot.com/g1/"], "ipRating": ["https://www.galbot.com/g1/"], "operatingTemperature": ["https://developer.galbot.com/docs/g1/2.2.4/zh/g1"], "safetyStandard": ["https://developer.galbot.com/docs/g1/2.2.4/zh/g1"], "loadRatings": ["https://www.galbot.com/g1/"], "priceOffers": ["https://developer.galbot.com/"]},
+      "conflicts": ["Official G1 product page reports total 24 driven joints including chassis drive wheels, while official developer manual reports 21 joint DoF excluding base/end effectors; scope and source version are retained instead of choosing one value.", "Product page lists 5.5-inch touchscreen in the specification block while another current page rendering shows 6.25-inch interactive display; this display discrepancy does not affect the requested schema fields."],
+      "humanReviewRequired": ["Confirm the canonical G1 DoF definition/version before publishing a single detail-page value.", "Confirm current G1 public price and Japan channel with Galbot; no official public price was found."]
+    },
+    {
+      "robotId": "aeolus-aeo",
+      "manufacturerId": "aeolus-robotics",
+      "identity": {
+        "status": "needs-review",
+        "officialName": "aeo",
+        "variant": "Current aeo service robot; historical Japanese deployment releases use the generic name ‘Aeolus Robot’ and do not state an aeo generation",
+        "officialProductUrl": "https://www.aeolusbot.com/meet-aeo",
+        "notes": "現行Aeolus公式aeoページ、丸文の戦略パートナー発表、2020/2022導入リリースを確認。旧称の導入機と現行aeoのvariant同一性は公式に明示されていないため、旧導入値を現行仕様へ流用していない。"
+      },
+      "positioningFacts": [
+        {"statement": "Aeolus positions aeo as a service robot providing bundled disinfect, care, delivery and security solutions.", "sourceUrl": "https://www.aeolusbot.com/meet-aeo"},
+        {"statement": "The current aeo page describes two arms, autonomous navigation, elevator/door operation, spatial awareness and access through a mobile app.", "sourceUrl": "https://www.aeolusbot.com/meet-aeo"},
+        {"statement": "Aeolus' official Japanese partner Marubun describes the offering as an RaaS platform with installation, operation and maintenance, and reports Japanese care-facility and office-building deployments of the Aeolus Robot.", "sourceUrl": "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000a3p3/20190213aeolus.pdf"}
+      ],
+      "fields": {
+        "mobility": {"status": "needs-review", "rawValue": "Advanced mobile service robot with autonomous navigation; current official page does not explicitly name the base as wheeled", "normalizedValue": null, "unit": "", "variant": "Current aeo", "condition": "current page describes base mobility/elevator/door traversal but does not publish a mobility mechanism label", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "自律移動は確認できるが、現行aeoの車輪方式を公式テキストで確定できない。"},
+        "heightCm": {"status": "not-published", "rawValue": "No current aeo height value found on reviewed Aeolus and Marubun pages", "normalizedValue": null, "unit": "cm", "variant": "Current aeo", "condition": "historical/third-party height values were not transferred", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "現行aeoの身長数値は確認できない。"},
+        "weightKg": {"status": "not-published", "rawValue": "No current aeo body weight value found on reviewed official pages", "normalizedValue": null, "unit": "kg", "variant": "Current aeo", "condition": "no current technical sheet located", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "重量は確認できない。"},
+        "speedMps": {"status": "not-published", "rawValue": "No current aeo speed value found on reviewed official pages", "normalizedValue": null, "unit": "m/s", "variant": "Current aeo", "condition": "autonomous navigation is not a speed value", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "速度は確認できない。"},
+        "dof": {"status": "not-published", "rawValue": "No current aeo whole-body or arm DoF value found on reviewed official pages", "normalizedValue": null, "unit": "DoF", "variant": "Current aeo", "condition": "two-arm description is not a DoF count", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "自由度は確認できない。"},
+        "payloadKg": {"status": "not-published", "rawValue": "Current aeo delivery/care functions are described without a numeric payload value", "normalizedValue": null, "unit": "kg", "variant": "Current aeo", "condition": "no current official load rating located", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "荷重は確認できない。"},
+        "runtimeMin": {"status": "not-published", "rawValue": "Day-after-day/night-after-night operation is marketing positioning; no current per-charge runtime is published", "normalizedValue": null, "unit": "min", "variant": "Current aeo", "condition": "availability wording is not battery runtime", "sourceUrl": "https://www.aeolusbot.com/", "evidenceSummary": "稼働時間の公式数値は確認できない。"},
+        "batteryCapacityWh": {"status": "not-published", "rawValue": "No current aeo battery capacity in Wh/Ah found on reviewed official pages", "normalizedValue": null, "unit": "Wh", "variant": "Current aeo", "condition": "no current battery specification located", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "電池容量は確認できない。"},
+        "chargeTimeMin": {"status": "not-published", "rawValue": "No current aeo charge time found on reviewed official pages", "normalizedValue": null, "unit": "min", "variant": "Current aeo", "condition": "RaaS support/charging infrastructure is not charge duration", "sourceUrl": "https://www.aeolusbot.com/why-aeolus", "evidenceSummary": "充電時間は確認できない。"},
+        "batterySystem": {"status": "not-published", "rawValue": "No current aeo battery chemistry, voltage, exchange or charging system found on reviewed official pages", "normalizedValue": null, "unit": "", "variant": "Current aeo", "condition": "RaaS model is not battery-system specification", "sourceUrl": "https://www.aeolusbot.com/why-aeolus", "evidenceSummary": "電源・電池方式は確認できない。"},
+        "controlMethod": {"status": "found", "rawValue": "Autonomous spatial AI navigation with user-friendly mobile app access; two-way voice/live-view security interaction is described", "normalizedValue": "autonomous / mobile app / live monitoring", "unit": "", "variant": "Current aeo", "condition": "official current product and solution pages", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "自律移動、モバイルアプリ、監視・音声連携を確認。"},
+        "sdk": {"status": "not-published", "rawValue": "No current aeo SDK, developer API or ROS package found on reviewed official and Marubun pages", "normalizedValue": null, "unit": "", "variant": "Current aeo", "condition": "mobile app is not an SDK disclosure", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "SDKは確認できない。"},
+        "computePlatform": {"status": "not-published", "rawValue": "AI, advanced sensing, 3D vision and LiDAR are described; onboard compute model is not published", "normalizedValue": null, "unit": "", "variant": "Current aeo", "condition": "AI/sensor description is not an onboard compute platform", "sourceUrl": "https://www.marubun.co.jp/products/3019/", "evidenceSummary": "計算基盤の型番・性能値は確認できない。"},
+        "ipRating": {"status": "not-published", "rawValue": "No current aeo IP ingress-protection rating found on reviewed official and Marubun pages", "normalizedValue": null, "unit": "", "variant": "Current aeo", "condition": "disinfection accessory is not an IP rating", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "防塵防水等級は確認できない。"},
+        "operatingTemperature": {"status": "not-published", "rawValue": "No current aeo operating-temperature range found on reviewed official pages", "normalizedValue": null, "unit": "°C", "variant": "Current aeo", "condition": "healthcare/facility positioning is not a temperature range", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "動作温度は確認できない。"},
+        "safetyStandard": {"status": "not-published", "rawValue": "Spatial awareness, obstacle avoidance and live monitoring are described, but no named aeo safety standard or certification is published", "normalizedValue": null, "unit": "", "variant": "Current aeo", "condition": "functional safety features are not a compliance standard", "sourceUrl": "https://www.aeolusbot.com/meet-aeo", "evidenceSummary": "安全機能は確認したが規格名・認証番号はない。"}
+      },
+      "loadRatings": [],
+      "priceOffers": [],
+      "priceResearchStatus": "not-published",
+      "officialUseCases": [
+        {"existingUseCaseId": "healthcare-disinfection", "officialExpression": "aeo disinfect / UV-C disinfection", "evidenceSourceUrl": "https://www.aeolusbot.com/meet-aeo", "reason": "現行公式ページがaeo disinfectを明示。"},
+        {"existingUseCaseId": "healthcare-care-patrol", "officialExpression": "aeo care / care and monitoring; night patrol in care facilities", "evidenceSourceUrl": "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000qbf7/20201222aeolus.pdf", "reason": "丸文公式導入リリースが介護施設の夜間巡視を具体的に明示。"},
+        {"existingUseCaseId": "facility-security-patrol", "officialExpression": "aeo security / autonomous patrol of public and private spaces", "evidenceSourceUrl": "https://www.aeolusbot.com/solutions/Security_Patrol", "reason": "現行公式ソリューションが警備巡回を明示。"},
+        {"existingUseCaseId": "retail-room-service", "officialExpression": "aeo delivery in hotels and restaurants", "evidenceSourceUrl": "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000a3p3/20190213aeolus.pdf", "reason": "公式パートナー発表がホテル・レストランでの支援サービスをRaaS用途として明示。"}
+      ],
+      "useCaseGaps": ["USE_CASE_GAP aeolus-aeo \"hospital specimen/medical-item delivery\" https://www.aeolusbot.com/meet-aeo"],
+      "usageExamples": [
+        {"title": "除菌機能搭載「アイオロス・ロボット」を日本で初めて介護施設に導入開始", "url": "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000qbf7/20201222aeolus.pdf", "publisher": "丸文株式会社", "publishedAt": "2020-12-22", "summary": "メディカル・ケア・サービスと学研ココファンの計6施設へ順次導入し、UV除菌と夜間各居室巡視・異常通知を実施。リリース上の機体名は現行aeoとの世代対応が未記載。", "type": "deployment"},
+        {"title": "オフィスビルに「アイオロス・ロボット」を初導入～ビルメンテナンス業界の人手不足解消の第一歩へ～", "url": "https://www.marubun.co.jp/wp-content/uploads/2022/03/20220323aeolus.pdf", "publisher": "丸文株式会社", "publishedAt": "2022-03-23", "summary": "丸文とグローブシップがRaaS契約を締結し、グローブシップ本社ビルへ導入。局所/広範囲UV除菌と夜間巡回を実施予定として記録。現行aeoとのvariant対応は未記載。", "type": "deployment"}
+      ],
+      "usageExampleSourceUrls": ["https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000qbf7/20201222aeolus.pdf", "https://www.marubun.co.jp/wp-content/uploads/2022/03/20220323aeolus.pdf"],
+      "procurement": {
+        "procurementModels": ["raas", "lease", "inquiry", "partner-program"],
+        "marketAvailability": {"status": "found", "rawValue": "Aeolus offers aeo bundled solutions and flexible leasing/subscription plans; RaaS includes deployment, operation and maintenance rather than a public unit purchase price", "sourceUrl": "https://www.aeolusbot.com/why-aeolus", "evidenceSummary": "現行公式のsubscription/RaaS導線と運用支援を確認。"},
+        "japanAvailability": {"status": "needs-review", "rawValue": "Marubun has an official strategic partnership and reports Japanese deployments of the Aeolus Robot in care facilities and an office building; the releases do not identify the deployed generation as current aeo", "sourceUrl": "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000a3p3/20190213aeolus.pdf", "evidenceSummary": "日本での公式取扱い・導入は確認できるが、現行aeoとのvariant対応は要確認。"},
+        "distributorJapan": {"status": "found", "rawValue": "Marubun Corporation; official 2019 strategic partnership and handling agreement with Aeolus Robotics", "sourceUrl": "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000a3p3/20190213aeolus.pdf", "evidenceSummary": "丸文とAeolusの戦略的パートナーシップ・取扱開始を公式発表で確認。"},
+        "supportNote": {"status": "found", "rawValue": "Aeolus describes continuous support, maintenance, repairs and software updates; Marubun provides Japan contact and RaaS deployment/operation/maintenance route", "sourceUrl": "https://www.aeolusbot.com/why-aeolus", "evidenceSummary": "現行公式支援と国内パートナー窓口を確認。"}
+      },
+      "pagesReviewed": ["https://www.aeolusbot.com/", "https://www.aeolusbot.com/meet-aeo", "https://www.aeolusbot.com/why-aeolus", "https://www.aeolusbot.com/solutions/Security_Patrol", "https://www.marubun.co.jp/products/3019/", "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000a3p3/20190213aeolus.pdf", "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000qbf7/20201222aeolus.pdf", "https://www.marubun.co.jp/wp-content/uploads/2022/03/20220323aeolus.pdf", "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000x0qq/20211111aeolusdemoroom.pdf"],
+      "sourceCandidates": [
+        {"url": "https://www.aeolusbot.com/meet-aeo", "status": "spec-checked", "reason": "現行aeoの用途、二腕、移動、アプリ、AI/センサー機能を確認したが数値仕様はない。"},
+        {"url": "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000a3p3/20190213aeolus.pdf", "status": "japan-procurement-checked", "reason": "国内戦略パートナー、RaaS、用途、取扱い開始を確認。"},
+        {"url": "https://www.marubun.co.jp/wp-content/uploads/a7ijkd000000qbf7/20201222aeolus.pdf", "status": "usage-checked", "reason": "介護施設への日本初導入と具体的作業を確認。"},
+        {"url": "https://www.marubun.co.jp/wp-content/uploads/2022/03/20220323aeolus.pdf", "status": "usage-checked", "reason": "オフィスビル導入とRaaS・除菌・巡回作業を確認。"}
+      ],
+      "fieldEvidence": {"mobility": ["https://www.aeolusbot.com/meet-aeo"], "heightCm": ["https://www.aeolusbot.com/meet-aeo"], "weightKg": ["https://www.aeolusbot.com/meet-aeo"], "speedMps": ["https://www.aeolusbot.com/meet-aeo"], "dof": ["https://www.aeolusbot.com/meet-aeo"], "payloadKg": ["https://www.aeolusbot.com/meet-aeo"], "runtimeMin": ["https://www.aeolusbot.com/"], "batteryCapacityWh": ["https://www.aeolusbot.com/meet-aeo"], "chargeTimeMin": ["https://www.aeolusbot.com/why-aeolus"], "batterySystem": ["https://www.aeolusbot.com/why-aeolus"], "controlMethod": ["https://www.aeolusbot.com/meet-aeo"], "sdk": ["https://www.aeolusbot.com/meet-aeo"], "computePlatform": ["https://www.marubun.co.jp/products/3019/"], "ipRating": ["https://www.aeolusbot.com/meet-aeo"], "operatingTemperature": ["https://www.aeolusbot.com/meet-aeo"], "safetyStandard": ["https://www.aeolusbot.com/meet-aeo"], "priceOffers": ["https://www.aeolusbot.com/why-aeolus"]},
+      "conflicts": ["Current Aeolus product pages use the name aeo, while Japanese deployment releases from 2020 and 2022 use the generic name Aeolus Robot and do not specify a generation; deployment examples are linked but current-variant equivalence remains unconfirmed.", "Repository contains a 150cm height and current Japan-support assertion without a current official aeo numeric/spec source; these values were not used as found evidence."],
+      "humanReviewRequired": ["Confirm whether the 2020/2022 Japanese deployment units are the current aeo variant or an earlier Aeolus Robot generation.", "Confirm current aeo height, weight, speed, DoF, payload, battery and safety documentation with Aeolus/Marubun before public numeric display."]
+    }
+  ]
+}

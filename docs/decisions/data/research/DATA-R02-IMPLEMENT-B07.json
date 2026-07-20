@@ -1,0 +1,2310 @@
+[
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B07",
+    "robotId": "booster-t1",
+    "identity": {
+      "registeredName": "T1",
+      "officialCurrentName": "Booster T1",
+      "recordScope": "product-family",
+      "variant": "Basic / Standard / Customized (identical dimensions/weight; differ in DoF via end-effector and in compute platform)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "T1 is listed as a current product on booster.tech's index and store alongside K1 and the newer T2, with its own live product page and 'Available for worldwide shipping' framing. No official discontinuation or successor statement exists for T1; T2 is an additional higher-tier flagship product sold in parallel, not a stated replacement for T1.",
+      "evidenceSourceUrls": [
+        "https://www.booster.tech/",
+        "https://www.booster.tech/booster-t1/",
+        "https://www.booster.tech/store/"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "biped (bipedal walking humanoid)",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.booster.tech/booster-t1/",
+          "sourceTitle": "Booster T1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product page and RoboCup solution page describe T1 as a bipedal walking robot (hip/knee/ankle joint ranges, walking/standing duration) common to all Basic/Standard/Customized configurations."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "卓球・強化学習・ロボットサッカーの開発事例",
+            "url": "https://www.booster.tech/booster-t1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・稼働時間・バッテリーと、Basic / Standard / Customizedの構成差を確認。"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 118,
+        "proposedValue": 118,
+        "evidence": {
+          "value": "~1.2m (118cm)",
+          "normalizedValue": 118,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.booster.tech/booster-t1/",
+          "sourceTitle": "Booster T1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Page states dimensions 118×47×23cm and 'Approximately 1.2m'; explicitly identical across Basic/Standard/Customized ('identical core dimensions and weight')."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "卓球・強化学習・ロボットサッカーの開発事例",
+            "url": "https://www.booster.tech/booster-t1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・稼働時間・バッテリーと、Basic / Standard / Customizedの構成差を確認。"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 30,
+        "proposedValue": 30,
+        "evidence": {
+          "value": "~30kg",
+          "normalizedValue": 30,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.booster.tech/booster-t1/",
+          "sourceTitle": "Booster T1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Weight ~30kg stated as common across all three configurations."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "卓球・強化学習・ロボットサッカーの開発事例",
+            "url": "https://www.booster.tech/booster-t1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・稼働時間・バッテリーと、Basic / Standard / Customizedの構成差を確認。"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 120,
+        "proposedValue": 120,
+        "evidence": {
+          "value": "Walking ~2 hours; Standing ~4 hours",
+          "normalizedValue": 120,
+          "rawUnit": "hours (walking) / hours (standing)",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.booster.tech/booster-t1/",
+          "sourceTitle": "Booster T1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Official page states walking duration ~2h and standing duration ~4h for the 10.5Ah battery, not differentiated by Basic/Standard/Customized. Record uses walking figure (120min) as the primary operating mode; standing (240min) noted separately."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "卓球・強化学習・ロボットサッカーの開発事例",
+            "url": "https://www.booster.tech/booster-t1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・稼働時間・バッテリーと、Basic / Standard / Customizedの構成差を確認。"
+          }
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "10.5Ahバッテリー（歩行約2時間、立位約4時間）",
+        "proposedValue": "10.5Ah battery (walking ~2h, standing ~4h)",
+        "evidence": {
+          "value": "10.5Ah battery (walking ~2h, standing ~4h)",
+          "normalizedValue": "10.5Ah battery (walking ~2h, standing ~4h)",
+          "rawUnit": "Ah",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.booster.tech/booster-t1/",
+          "sourceTitle": "Booster T1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Battery capacity (10.5Ah) and derived runtime figures stated as common across configurations; voltage not published so Wh cannot be computed."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "卓球・強化学習・ロボットサッカーの開発事例",
+            "url": "https://www.booster.tech/booster-t1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・稼働時間・バッテリーと、Basic / Standard / Customizedの構成差を確認。"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "sdk",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+        "proposedValue": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+        "evidence": {
+          "value": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+          "normalizedValue": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://github.com/BoosterRobotics/booster_gym",
+          "sourceTitle": "Booster Robotics booster_gym (GitHub)",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-sdk",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "booster_gym README documents T1-focused RL training pipeline with Isaac Gym/MuJoCo/Webots and real-robot deployment via Booster Robotics SDK; RoboCup solution page lists the full current toolchain (Booster Gym, Train, Deploy, Assets, RoboCup Demo) as available to T1."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Booster Robotics booster_gym",
+            "url": "https://github.com/BoosterRobotics/booster_gym",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "computePlatform",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に荷重候補がない。"
+    },
+    "procurement": [
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "distributor-japan",
+        "proposedValue": "distributor-japan",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": "Tohasen Robotics",
+        "proposedValue": "Tohasen Robotics",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorEvidenceUrl",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "https://www.tohasen-robotics.com/news/tohasen-robotics%E3%80%81booster-robotics%E7%A4%BE%E3%81%A8%E6%97%A5%E6%9C%AC%E5%9B%BD%E5%86%85%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%AD%A3%E8%A6%8F%E4%BB%A3%E7%90%86%E5%BA%97%E5%A5%91%E7%B4%84/",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      },
+      {
+        "field": "note",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "Tohasen Robotics announced (2025-11-03) an authorized distributor agreement with Booster Robotics covering T1 and the K1 series; plans Japanese-language support infrastructure 'in the first half of 2026'. Pricing, warranty, and repair-turnaround terms for Japan are not published; inquiry required.",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Trusted by 50+ top global robotics teams and research institutes; developer/researcher-oriented platform",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "booster-t1",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.booster.tech/booster-t1/"
+          ],
+          "reason": "公式ページで開発者・研究者向けプラットフォームと、大学・研究チームによる開発事例が示されている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "卓球・強化学習・ロボットサッカーの開発事例",
+            "url": "https://www.booster.tech/booster-t1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・稼働時間・バッテリーと、Basic / Standard / Customizedの構成差を確認。"
+          }
+        }
+      },
+      {
+        "useCaseId": "research-prototype-dev",
+        "officialExpression": "Comprehensive API Interfaces + Open-Source Framework + Open-Source Tools",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "booster-t1",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.booster.tech/booster-t1/"
+          ],
+          "reason": "公式ページでAPI、オープンソースのフレームワークと開発ツールが提供されている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "卓球・強化学習・ロボットサッカーの開発事例",
+            "url": "https://www.booster.tech/booster-t1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・稼働時間・バッテリーと、Basic / Standard / Customizedの構成差を確認。"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": [
+        {
+          "customerOrInstitution": "Purdue University",
+          "classification": "research",
+          "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+          "variant": "T1",
+          "scopeNote": "Robot table-tennis research/development, named on Booster's own T1 product page.",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "卓球・強化学習・ロボットサッカーの開発事例",
+              "url": "https://www.booster.tech/booster-t1/",
+              "publisher": "Booster Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official",
+              "note": "寸法・重量・稼働時間・バッテリーと、Basic / Standard / Customizedの構成差を確認。"
+            }
+          }
+        },
+        {
+          "customerOrInstitution": "Carnegie Mellon University",
+          "classification": "research",
+          "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+          "variant": "T1",
+          "scopeNote": "FALCON reinforcement-learning framework research, named on Booster's own T1 product page.",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "卓球・強化学習・ロボットサッカーの開発事例",
+              "url": "https://www.booster.tech/booster-t1/",
+              "publisher": "Booster Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official",
+              "note": "寸法・重量・稼働時間・バッテリーと、Basic / Standard / Customizedの構成差を確認。"
+            }
+          }
+        },
+        {
+          "customerOrInstitution": "Tsinghua University (Hephaestus team)",
+          "classification": "demonstration",
+          "evidenceSourceUrl": "https://www.booster.tech/robocup/",
+          "variant": "T1",
+          "scopeNote": "2025 World Humanoid Robotics Games Federation championship win using T1, per Booster's RoboCup page.",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Booster Robotics RoboCup solution",
+              "url": "https://www.booster.tech/robocup/",
+              "publisher": "Booster Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "Configurable end-effector: none (23 DoF) / gripper (31 DoF) / dexterous hand (41 DoF)",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "evidenceSummary": "Product page lists total DoF for Basic/Standard (23), with gripper (31), and with dexterous hand (41).",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Open API + open-source framework/tools for secondary development",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "evidenceSummary": "Page advertises 'Comprehensive API Interfaces + Open-Source Framework + Open-Source Tools' via Booster Studio.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Sim2Real RL pipeline (Booster Gym / Booster Train / Booster Deploy)",
+        "evidenceSourceUrl": "https://github.com/BoosterRobotics/booster_gym",
+        "evidenceSummary": "GitHub README documents Isaac Gym training, MuJoCo cross-sim testing, and Booster Robotics SDK real-robot deployment.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Autonomous 3v3 RoboCup soccer perception/localization/decision pipeline",
+        "evidenceSourceUrl": "https://www.booster.tech/robocup/",
+        "evidenceSummary": "RoboCup solution page describes 'RoboCup Demo' as a complete pipeline covering perception, localization and decision-making for 3v3 matches.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Onboard sensing: depth camera, 9-axis IMU, 6-mic circular array + speaker",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-t1/",
+        "evidenceSummary": "Product page sensor list.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "If the site wants a single scalar dof/computePlatform value for T1, editorial must pick a default configuration (e.g. Standard) rather than leaving as needs-review."
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B07",
+    "robotId": "booster-k1",
+    "identity": {
+      "registeredName": "K1",
+      "officialCurrentName": "Booster K1",
+      "recordScope": "product-family",
+      "variant": "Geek / Education / Professional (identical physical dimensions/DoF; differ in compute (48/117/200 TOPS), battery (2Ah/5Ah/5Ah), runtime (30/80/80min), warranty)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "K1 is listed as a current product on booster.tech's index and store with an active starting price ('From $5,999') and 'Buy Now' purchase flow. No discontinuation/successor statement found.",
+      "evidenceSourceUrls": [
+        "https://www.booster.tech/",
+        "https://www.booster.tech/booster-k1/",
+        "https://www.booster.tech/store/"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "biped",
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "biped (bipedal walking humanoid)",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.booster.tech/booster-k1/",
+          "sourceTitle": "Booster K1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product/RoboCup pages describe K1 as a bipedal walking robot common to all Geek/Education/Professional configurations."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "ヒューマノイド競技大会のセンターステージに出演",
+            "url": "https://www.booster.tech/booster-k1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・自由度・構成別バッテリーと英語ページの公開開始価格を確認。"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 95,
+        "proposedValue": 95,
+        "evidence": {
+          "value": "~95cm",
+          "normalizedValue": 95,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.booster.tech/booster-k1/",
+          "sourceTitle": "Booster K1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Height ~95cm stated as identical across all three variants ('all three versions share identical physical specs')."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "ヒューマノイド競技大会のセンターステージに出演",
+            "url": "https://www.booster.tech/booster-k1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・自由度・構成別バッテリーと英語ページの公開開始価格を確認。"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 19.5,
+        "proposedValue": 19.5,
+        "evidence": {
+          "value": "~19.5kg",
+          "normalizedValue": 19.5,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://www.booster.tech/booster-k1/",
+          "sourceTitle": "Booster K1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Weight ~19.5kg stated as identical across all three variants."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "ヒューマノイド競技大会のセンターステージに出演",
+            "url": "https://www.booster.tech/booster-k1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・自由度・構成別バッテリーと英語ページの公開開始価格を確認。"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": 0.4,
+        "evidence": {
+          "value": "0.4 m/s (runtime measured at this walking speed for all variants)",
+          "normalizedValue": 0.4,
+          "rawUnit": "m/s",
+          "normalizedUnit": "m/s",
+          "sourceUrl": "https://www.booster.tech/robocup/",
+          "sourceTitle": "Booster Robotics RoboCup solution",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "RoboCup/product pages state runtime figures as '30min at 0.4m/s' (Geek) and '80min at 0.4m/s' (Education/Professional) — the reference walking speed itself (0.4 m/s) is common to all variants even though runtime differs."
+        },
+        "source": {
+          "action": "add-source",
+          "status": "add-after-review",
+          "candidateSource": {
+            "title": "Booster Robotics RoboCup solution",
+            "url": "https://www.booster.tech/robocup/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-17",
+            "reliability": "official"
+          },
+          "reviewReason": "R02の出典メタデータを人間確認してRobot.sourcesへ追加する。"
+        }
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 22,
+        "proposedValue": 22,
+        "evidence": {
+          "value": "22 total DoF (6 per leg, 4 per arm, 2 head)",
+          "normalizedValue": 22,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://www.booster.tech/booster-k1/",
+          "sourceTitle": "Booster K1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "DoF breakdown identical across Geek/Education/Professional; confirmed on both EN and CN product pages."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "ヒューマノイド競技大会のセンターステージに出演",
+            "url": "https://www.booster.tech/booster-k1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・自由度・構成別バッテリーと英語ページの公開開始価格を確認。"
+          }
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "Geek: 2Ah / Education・Professional: 5Ah",
+        "proposedValue": "Geek: 2Ah / Education & Professional: 5Ah",
+        "evidence": {
+          "value": "Geek: 2Ah / Education & Professional: 5Ah",
+          "normalizedValue": "Geek: 2Ah / Education & Professional: 5Ah",
+          "rawUnit": "Ah",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.booster.tech/booster-k1/",
+          "sourceTitle": "Booster K1 official product page",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Battery capacity explicitly stated per variant on the product page; recorded as descriptive text rather than forcing a single scalar."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "ヒューマノイド競技大会のセンターステージに出演",
+            "url": "https://www.booster.tech/booster-k1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・自由度・構成別バッテリーと英語ページの公開開始価格を確認。"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "sdk",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+        "proposedValue": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+        "evidence": {
+          "value": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+          "normalizedValue": "Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://github.com/BoosterRobotics/booster_gym",
+          "sourceTitle": "Booster Robotics booster_gym (GitHub)",
+          "publisher": "Booster Robotics",
+          "sourceType": "official-sdk",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "booster_gym README states a new RL pipeline via Booster Train now supports K1; RoboCup solution page lists K1 as covered by the same current toolchain as T1."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Booster Robotics booster_gym",
+            "url": "https://github.com/BoosterRobotics/booster_gym",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "computePlatform",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "hold-variant",
+      "candidates": [
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "currentValue": {
+            "channel": "manufacturer-public",
+            "display": "From $5,999",
+            "amount": 5999,
+            "currency": "USD",
+            "taxStatus": "unknown",
+            "variant": "K1開始価格（対象構成・税条件は未記載）",
+            "sellerName": "Booster Robotics",
+            "sourceUrl": "https://www.booster.tech/booster-k1/"
+          },
+          "proposedValue": {
+            "channel": "manufacturer-public",
+            "display": "From $5,999",
+            "amount": 5999,
+            "currency": "USD",
+            "taxStatus": "unknown",
+            "variant": "K1 starting price; specific Geek/Education/Professional configuration and tax treatment not stated",
+            "sellerName": "Booster Robotics",
+            "sourceUrl": "https://www.booster.tech/booster-k1/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "ヒューマノイド競技大会のセンターステージに出演",
+              "url": "https://www.booster.tech/booster-k1/",
+              "publisher": "Booster Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official",
+              "note": "寸法・重量・自由度・構成別バッテリーと英語ページの公開開始価格を確認。"
+            }
+          }
+        },
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "currentValue": {
+            "channel": "manufacturer-public",
+            "display": "3.99万起",
+            "amount": 39900,
+            "currency": "CNY",
+            "taxStatus": "unknown",
+            "variant": "K1開始価格（対象構成・税条件は未記載）",
+            "sellerName": "Booster Robotics",
+            "sourceUrl": "https://www.booster.tech/cn/booster-k1/"
+          },
+          "proposedValue": {
+            "channel": "manufacturer-public",
+            "display": "3.99万起 (starting at CNY 39,900)",
+            "amount": 39900,
+            "currency": "CNY",
+            "taxStatus": "unknown",
+            "variant": "K1 starting price (CN site); configuration and tax treatment not stated",
+            "sellerName": "Booster Robotics",
+            "sourceUrl": "https://www.booster.tech/cn/booster-k1/"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "Booster K1 Chinese product page",
+              "url": "https://www.booster.tech/cn/booster-k1/",
+              "publisher": "Booster Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official"
+            }
+          }
+        }
+      ]
+    },
+    "loadRatings": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に荷重候補がない。"
+    },
+    "procurement": [
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "distributor-japan",
+        "proposedValue": "distributor-japan",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": "Tohasen Robotics",
+        "proposedValue": "Tohasen Robotics",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorEvidenceUrl",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "https://www.tohasen-robotics.com/news/tohasen-robotics%E3%80%81booster-robotics%E7%A4%BE%E3%81%A8%E6%97%A5%E6%9C%AC%E5%9B%BD%E5%86%85%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E6%AD%A3%E8%A6%8F%E4%BB%A3%E7%90%86%E5%BA%97%E5%A5%91%E7%B4%84/",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      },
+      {
+        "field": "note",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "Tohasen Robotics announced (2025-11-03) an authorized distributor agreement covering K1; national pricing, warranty, and repair terms are not published (inquiry required).",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Introductory Embodied Development Platform; embodied AI education / research innovation",
+        "evidenceSourceUrl": "https://www.booster.tech/cn/education/",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "booster-k1",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.booster.tech/cn/education/"
+          ],
+          "reason": "公式教育ソリューションで、プログラミング、ROS 2、強化学習、Sim2Real、実機検証への利用が示されている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Booster Robotics education solution",
+            "url": "https://www.booster.tech/cn/education/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "useCaseId": "research-prototype-dev",
+        "officialExpression": "Programming, ROS 2, reinforcement learning, Sim2Real, real-robot verification",
+        "evidenceSourceUrl": "https://www.booster.tech/cn/education/",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "booster-k1",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.booster.tech/booster-k1/"
+          ],
+          "reason": "公式ページで具身AIの開発プラットフォームとして位置付けられている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Booster Robotics education solution",
+            "url": "https://www.booster.tech/cn/education/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "useCaseId": "demo-exhibition",
+        "officialExpression": "2025 World Humanoid Robotics Games Federation Center Stage lead performer",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-k1/",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "booster-k1",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.booster.tech/booster-k1/"
+          ],
+          "reason": "公式Customer Casesに、2025 World Humanoid Robotics Gamesのセンターステージ出演事例が掲載されている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "ヒューマノイド競技大会のセンターステージに出演",
+            "url": "https://www.booster.tech/booster-k1/",
+            "publisher": "Booster Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "寸法・重量・自由度・構成別バッテリーと英語ページの公開開始価格を確認。"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": [
+        {
+          "customerOrInstitution": "HTWK Team (Germany)",
+          "classification": "demonstration",
+          "evidenceSourceUrl": "https://www.booster.tech/booster-k1/",
+          "variant": "K1",
+          "scopeNote": "RoboCup 2025 KidSize category champion using K1, per Booster's own K1 product page.",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "ヒューマノイド競技大会のセンターステージに出演",
+              "url": "https://www.booster.tech/booster-k1/",
+              "publisher": "Booster Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official",
+              "note": "寸法・重量・自由度・構成別バッテリーと英語ページの公開開始価格を確認。"
+            }
+          }
+        },
+        {
+          "customerOrInstitution": "2025 World Humanoid Robotics Games Federation (organizer)",
+          "classification": "demonstration",
+          "evidenceSourceUrl": "https://www.booster.tech/booster-k1/",
+          "variant": "K1",
+          "scopeNote": "K1 used as center-stage lead performer at the Games, per Booster's own K1 product page.",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "ヒューマノイド競技大会のセンターステージに出演",
+              "url": "https://www.booster.tech/booster-k1/",
+              "publisher": "Booster Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official",
+              "note": "寸法・重量・自由度・構成別バッテリーと英語ページの公開開始価格を確認。"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "Graphical-to-Python and ROS2 education curriculum (L1-L4 levels)",
+        "evidenceSourceUrl": "https://www.booster.tech/cn/education/",
+        "evidenceSummary": "Education page describes a 4-level curriculum from drag-drop programming to RL gait/Sim2Real/multi-agent RL.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Doubao LLM voice interaction included (free for 6 months)",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-k1/",
+        "evidenceSummary": "Product page states 'Doubao LLM included, free for 6 months'.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Sim2Real RL pipeline via Booster Train/Deploy",
+        "evidenceSourceUrl": "https://github.com/BoosterRobotics/booster_gym",
+        "evidenceSummary": "GitHub README: 'new RL pipeline supporting K1 robot' via Booster Train.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Onboard sensing: stereo depth camera, 9-axis IMU, 6-mic circular array + speaker",
+        "evidenceSourceUrl": "https://www.booster.tech/booster-k1/",
+        "evidenceSummary": "Product page sensor list.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Autonomous 3v3 RoboCup KidSize soccer pipeline",
+        "evidenceSourceUrl": "https://www.booster.tech/robocup/",
+        "evidenceSummary": "RoboCup page positions K1 for KidSize competition with the same perception/localization/decision pipeline as T1.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": []
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B07",
+    "robotId": "kepler-k2",
+    "identity": {
+      "registeredName": "Forerunner K2",
+      "officialCurrentName": "Kepler Forerunner K2 (\"Bumblebee\")",
+      "recordScope": "product-family",
+      "variant": "Basic (30 DoF, 75kg) / Bipedal Development (52 DoF) / Wheeled Development (52 DoF, 135kg)",
+      "lifecycleStatus": "current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "K2 is Kepler's current flagship, officially confirmed via a Kepler-issued press release (2025-09-26) to be in mass production with customer shipments underway ('several thousand units', 'hundreds of millions of yuan' in contract value), and remains the lead product on the current gotokepler.com homepage.",
+      "evidenceSourceUrls": [
+        "https://www.gotokepler.com",
+        "https://www.gotokepler.com/productDetailK2?id=2",
+        "https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 175,
+        "proposedValue": 175,
+        "evidence": {
+          "value": "175cm",
+          "normalizedValue": 175,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+          "sourceTitle": "Kepler Forerunner K2 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product page states height 175cm without configuration-specific variation."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KEPLERBOT Forerunner K2 official product page",
+            "url": "https://www.gotokepler.com/productDetailK2?id=2",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "共通寸法、稼働・充電、構成別仕様、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "speedMps",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 480,
+        "proposedValue": 480,
+        "evidence": {
+          "value": "8-hour endurance",
+          "normalizedValue": 480,
+          "rawUnit": "hours",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+          "sourceTitle": "Kepler Forerunner K2 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product page states '1-hour charge, 8-hour endurance' as a general capability, not tied to a specific configuration; corroborated by 2025-09-26 press release ('up to eight hours of operation on a single charge')."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KEPLERBOT Forerunner K2 official product page",
+            "url": "https://www.gotokepler.com/productDetailK2?id=2",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "共通寸法、稼働・充電、構成別仕様、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 60,
+        "proposedValue": 60,
+        "evidence": {
+          "value": "1-hour charge",
+          "normalizedValue": 60,
+          "rawUnit": "hours",
+          "normalizedUnit": "min",
+          "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+          "sourceTitle": "Kepler Forerunner K2 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Stated as a general figure ('1-hour charge, 8-hour endurance'), not configuration-specific."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KEPLERBOT Forerunner K2 official product page",
+            "url": "https://www.gotokepler.com/productDetailK2?id=2",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "共通寸法、稼働・充電、構成別仕様、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "key": "batterySystem",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "充電式バッテリー（約1時間充電、最大8時間稼働）",
+        "proposedValue": "Rechargeable battery (~1 hour charge, up to 8 hours endurance)",
+        "evidence": {
+          "value": "Rechargeable battery (~1 hour charge, up to 8 hours endurance)",
+          "normalizedValue": "Rechargeable battery (~1 hour charge, up to 8 hours endurance)",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+          "sourceTitle": "Kepler Forerunner K2 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Descriptive text combining the official charge-time/runtime figures; no battery chemistry or Wh capacity published."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KEPLERBOT Forerunner K2 official product page",
+            "url": "https://www.gotokepler.com/productDetailK2?id=2",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "共通寸法、稼働・充電、構成別仕様、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "自律ナビゲーション / マルチモーダル対話 / 動作計画・制御",
+        "proposedValue": "Autonomous navigation / multi-modal interaction / motion planning & control",
+        "evidence": {
+          "value": "Autonomous navigation / multi-modal interaction / motion planning & control",
+          "normalizedValue": "Autonomous navigation / multi-modal interaction / motion planning & control",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+          "sourceTitle": "Kepler Forerunner K2 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Product page describes visual SLAM/3D modeling, multi-modal interaction (language, vision, human-robot collaboration), and motion planning & control as common platform capabilities."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KEPLERBOT Forerunner K2 official product page",
+            "url": "https://www.gotokepler.com/productDetailK2?id=2",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "共通寸法、稼働・充電、構成別仕様、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": "Kepler OS / Kepler Developer Platform",
+        "proposedValue": "Kepler OS / Kepler Developer Platform",
+        "evidence": {
+          "value": "Kepler OS / Kepler Developer Platform",
+          "normalizedValue": "Kepler OS / Kepler Developer Platform",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+          "sourceTitle": "Kepler Developer Platform / Kepler OS",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-sdk",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "Developer platform page describes Kepler OS's modular architecture (action/vision/voice modules), visual programming tools, multi-robot collaboration, remote online debugging, and planned OTA updates."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kepler Developer Platform",
+            "url": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "computePlatform",
+        "status": "needs-review",
+        "action": "hold-variant",
+        "reason": "R02がvariant・identityの人間確認を要求している。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "hold-variant",
+      "candidates": [
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "currentValue": null,
+          "proposedValue": {
+            "channel": "manufacturer-public",
+            "display": "RMB 248,000 per unit",
+            "amount": 248000,
+            "currency": "CNY",
+            "taxStatus": "unknown",
+            "variant": "Configuration not specified in the press release; official product page separately lists Basic/Bipedal Development/Wheeled Development configurations with differing specs",
+            "sellerName": "Kepler Robotics",
+            "sourceUrl": "https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "K2 Bumblebeeの量産・顧客出荷を開始",
+              "url": "https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html",
+              "publisher": "Kepler Robotics",
+              "publishedAt": "2025-09-26",
+              "checkedAt": "2026-07-16",
+              "reliability": "official",
+              "note": "Kepler Robotics提供の発表。量産・顧客出荷、8時間稼働、双腕最大30kg、RMB 248,000を確認。"
+            }
+          }
+        }
+      ]
+    },
+    "loadRatings": {
+      "action": "hold-variant",
+      "candidates": [
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "dual-arm",
+            "rating": "unspecified",
+            "kg": 25,
+            "condition": "Lower bound of official dual-arm collaborative handling range 25-30kg; rated vs maximum not distinguished.",
+            "variant": "K2 industrial configuration",
+            "sourceUrl": "https://www.gotokepler.com/productDetailK2?id=2"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "KEPLERBOT Forerunner K2 official product page",
+              "url": "https://www.gotokepler.com/productDetailK2?id=2",
+              "publisher": "Kepler Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "official",
+              "note": "共通寸法、稼働・充電、構成別仕様、制御機能、想定用途を確認。"
+            }
+          }
+        },
+        {
+          "action": "hold-variant",
+          "reason": "variantまたはlifecycleの確認が必要。",
+          "proposedValue": {
+            "scope": "dual-arm",
+            "rating": "unspecified",
+            "kg": 30,
+            "condition": "Upper bound of official dual-arm collaborative handling range 25-30kg; also stated as 'up to 30kg' in the 2025-09-26 press release.",
+            "variant": "K2 industrial configuration",
+            "sourceUrl": "https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html"
+          },
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "K2 Bumblebeeの量産・顧客出荷を開始",
+              "url": "https://www.prnewswire.com/news-releases/worlds-first-commercially-available-hybrid-architecture-humanoid-robot-moves-into-mass-production-kepler-marks-the-start-of-a-new-industrial-era-302568138.html",
+              "publisher": "Kepler Robotics",
+              "publishedAt": "2025-09-26",
+              "checkedAt": "2026-07-16",
+              "reliability": "official",
+              "note": "Kepler Robotics提供の発表。量産・顧客出荷、8時間稼働、双腕最大30kg、RMB 248,000を確認。"
+            }
+          }
+        }
+      ]
+    },
+    "procurement": [
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": null,
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "note",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "No Japan distributor or Japan-specific pricing found on official Kepler channels (homepage, product page, About, ordering contact page). Ordering is via WeChat/email contact only; Japan appears only as a country-selector option on the contact page, not as evidence of an established distributor.",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Research & Education; data acquisition",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceScope": "current-family-common",
+        "variant": null,
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "kepler-k2",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.gotokepler.com/productDetailK2?id=2"
+          ],
+          "reason": "公式ページで研究・教育、データ収集、開発プラットフォームへの利用が示されている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KEPLERBOT Forerunner K2 official product page",
+            "url": "https://www.gotokepler.com/productDetailK2?id=2",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "共通寸法、稼働・充電、構成別仕様、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "useCaseId": "factory-assembly-support",
+        "officialExpression": "Intelligent Manufacturing; precision integration in intelligent manufacturing",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceScope": "current-family-common",
+        "variant": null,
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "kepler-k2",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.gotokepler.com/productDetailK2?id=2"
+          ],
+          "reason": "公式ページで製造工程への精密統合と産業シナリオが想定用途として示されている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KEPLERBOT Forerunner K2 official product page",
+            "url": "https://www.gotokepler.com/productDetailK2?id=2",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "共通寸法、稼働・充電、構成別仕様、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "useCaseId": "factory-visual-inspection",
+        "officialExpression": "Product verification and quality alerting / inspection scenarios",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceScope": "current-family-common",
+        "variant": null,
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "kepler-k2",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://www.gotokepler.com/productDetailK2?id=2"
+          ],
+          "reason": "公式ページで製品検証、品質アラート、検査シナリオが想定用途として示されている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "KEPLERBOT Forerunner K2 official product page",
+            "url": "https://www.gotokepler.com/productDetailK2?id=2",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "共通寸法、稼働・充電、構成別仕様、制御機能、想定用途を確認。"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": [
+        {
+          "customerOrInstitution": "SAIC-GM (automotive plant, Shanghai)",
+          "classification": "pilot",
+          "evidenceSourceUrl": "https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-humanoid-robot-lands-at-saic-gm-activity-7321418311701815298-9Hyn",
+          "variant": "K2",
+          "scopeNote": "Kepler's own LinkedIn post: 'kicking off real-world tests across industrial applications' — described as tests, not confirmed commercial deployment.",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "自動車工場で産業用途の実地テスト",
+              "url": "https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-humanoid-robot-lands-at-saic-gm-activity-7321418311701815298-9Hyn",
+              "publisher": "Kepler Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "reported"
+            }
+          }
+        },
+        {
+          "customerOrInstitution": "Zhaofeng Motor",
+          "classification": "commercial-deployment",
+          "evidenceSourceUrl": "https://www.linkedin.com/posts/kepler-exploration-robotics_keplerrobotics-keplerk2-humanoidrobots-activity-7409791717769601024-bi4K",
+          "variant": "K2 'Bumblebee'",
+          "scopeNote": "Kepler's own LinkedIn post: 'now working on the real production line', 'officially getting to work' — stronger than a trial framing, doing component loading/unloading.",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "生産ラインで部品の投入・取り出し",
+              "url": "https://www.linkedin.com/posts/kepler-exploration-robotics_keplerrobotics-keplerk2-humanoidrobots-activity-7409791717769601024-bi4K",
+              "publisher": "Kepler Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "reported"
+            }
+          }
+        },
+        {
+          "customerOrInstitution": "VEICHI Electric",
+          "classification": "pilot",
+          "evidenceSourceUrl": "https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-k2-humanoid-begins-work-at-veichi-activity-7397106664631554048-E29L",
+          "variant": "K2 'Bumblebee'",
+          "scopeNote": "Kepler's own LinkedIn post: 'entering VEICHI Electric's factory floor for real-world trials'.",
+          "action": "hold-variant",
+          "reason": "現行モデルとのvariantまたはlifecycle一致を確認できない。",
+          "source": {
+            "action": "preserve",
+            "status": "existing",
+            "existingSource": {
+              "title": "製造施設で実環境トライアル",
+              "url": "https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-k2-humanoid-begins-work-at-veichi-activity-7397106664631554048-E29L",
+              "publisher": "Kepler Robotics",
+              "checkedAt": "2026-07-16",
+              "reliability": "reported"
+            }
+          }
+        }
+      ]
+    },
+    "currentFeatures": [
+      {
+        "feature": "Visual SLAM with 3D modeling and autonomous navigation",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceSummary": "Product page: 'Visual SLAM capable of 3D modeling', autonomous navigation and motion planning & control.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "11-DoF multi-touch dexterous hand with 6-axis wrist force sensors",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceSummary": "Product page hand/sensor specs (25 contact points per finger, 6-axis force sensors per wrist).",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Kepler OS modular platform: multi-robot collaboration, remote online debugging, planned OTA updates",
+        "evidenceSourceUrl": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+        "evidenceSummary": "Developer platform page details.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Kepler Studio rapid deployment tool for production-line tasks",
+        "evidenceSourceUrl": "https://www.linkedin.com/posts/kepler-exploration-robotics_keplerrobotics-keplerk2-humanoidrobots-activity-7409791717769601024-bi4K",
+        "evidenceSummary": "Official company LinkedIn post on Zhaofeng Motor deployment cites 'rapid deployment via Kepler Studio' alongside component loading/unloading.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Dual-arm collaborative handling",
+        "evidenceSourceUrl": "https://www.gotokepler.com/productDetailK2?id=2",
+        "evidenceSummary": "Product page states dual-arm collaborative handling capacity of 25-30kg.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "Editorial should decide whether to split kepler-k2 into configuration-specific records (Basic / Bipedal Development / Wheeled Development) given the material weight/DoF/mobility divergence, or keep a single family record with these fields left as needs-review."
+    ]
+  },
+  {
+    "schemaVersion": "DATA-R02-implementation-v1",
+    "batch": "B07",
+    "robotId": "kepler-k1",
+    "identity": {
+      "registeredName": "Forerunner K1",
+      "officialCurrentName": "Kepler Forerunner K1",
+      "recordScope": "specific-variant",
+      "variant": "Single known configuration (no Basic/Development split found, unlike K2)",
+      "lifecycleStatus": "limited-current",
+      "publicationRecommendation": "keep-published",
+      "successorRobot": null,
+      "reason": "K1's official product page is still live on gotokepler.com with an active ordering/contact channel, and remains referenced on the current homepage — it has not vanished or been marked discontinued. However the K1 page itself states the robot 'will be commercialized and mass-produced in near future', i.e. official material does not claim current mass-market shipping (unlike K2, which has a dated 2025-09-26 press release confirming mass production/customer shipping). This is treated as limited/developer-and-inquiry availability rather than full current production, and as distinct from an announced-only unreleased product since the page and ordering channel have existed since at least 2023-2024.",
+      "evidenceSourceUrls": [
+        "https://www.gotokepler.com",
+        "https://gotokepler.com/productDetailK1",
+        "https://gotokepler.com/contact?type=ordering"
+      ]
+    },
+    "specs": [
+      {
+        "key": "mobility",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": null,
+        "proposedValue": "biped",
+        "evidence": {
+          "value": "biped (bipedal humanoid; page states it 'walks on complex terrain')",
+          "normalizedValue": "biped",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Page text: 'Walk on complex terrain with ease, explore autonomously' — an explicit textual (not image-inferred) claim of legged walking locomotion. No wheeled variant is mentioned for K1, unlike K2."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kepler Forerunner K1 official product page",
+            "url": "https://gotokepler.com/productDetailK1",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Forerunnerシリーズの寸法、重量、自由度、演算性能、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "key": "heightCm",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 178,
+        "proposedValue": 178,
+        "evidence": {
+          "value": "178cm",
+          "normalizedValue": 178,
+          "rawUnit": "cm",
+          "normalizedUnit": "cm",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Stated directly on the product page."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kepler Forerunner K1 official product page",
+            "url": "https://gotokepler.com/productDetailK1",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Forerunnerシリーズの寸法、重量、自由度、演算性能、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "key": "weightKg",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 85,
+        "proposedValue": 85,
+        "evidence": {
+          "value": "85kg",
+          "normalizedValue": 85,
+          "rawUnit": "kg",
+          "normalizedUnit": "kg",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Stated directly on the product page."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kepler Forerunner K1 official product page",
+            "url": "https://gotokepler.com/productDetailK1",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Forerunnerシリーズの寸法、重量、自由度、演算性能、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "key": "speedMps",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "dof",
+        "status": "found",
+        "action": "preserve",
+        "reason": "現行値とR02正規化値が一致する。",
+        "currentValue": 40,
+        "proposedValue": 40,
+        "evidence": {
+          "value": "40 DoF (whole body); hand adds 12 DoF separately",
+          "normalizedValue": 40,
+          "rawUnit": "DoF",
+          "normalizedUnit": "DoF",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Product page: '40 degrees of freedom in the whole body' plus '12 degrees of freedom' in the hand, kept separate per the source's own distinction."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kepler Forerunner K1 official product page",
+            "url": "https://gotokepler.com/productDetailK1",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Forerunnerシリーズの寸法、重量、自由度、演算性能、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "key": "payloadKg",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "runtimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batteryCapacityWh",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "chargeTimeMin",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "batterySystem",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "controlMethod",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "自律ナビゲーション / マルチモーダル対話 / 動作計画・制御",
+        "proposedValue": "Autonomous navigation (Visual SLAM, path planning) / multi-modal interaction / motion planning & control",
+        "evidence": {
+          "value": "Autonomous navigation (Visual SLAM, path planning) / multi-modal interaction / motion planning & control",
+          "normalizedValue": "Autonomous navigation (Visual SLAM, path planning) / multi-modal interaction / motion planning & control",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Page text: 'Visual SLAM capable of 3D modeling and visual recognition', 'Powerful motion planning & control algorithm to achieve precise navigation', 'Multimodal Interaction, Hand-eye Coordination'."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kepler Forerunner K1 official product page",
+            "url": "https://gotokepler.com/productDetailK1",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Forerunnerシリーズの寸法、重量、自由度、演算性能、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "key": "sdk",
+        "status": "found",
+        "action": "set",
+        "reason": "現在の公式一次資料・型・variant条件を満たす。",
+        "currentValue": "Kepler OS / Kepler Developer Platform",
+        "proposedValue": "Kepler Developer Platform / Kepler OS",
+        "evidence": {
+          "value": "Kepler Developer Platform / Kepler OS",
+          "normalizedValue": "Kepler Developer Platform / Kepler OS",
+          "rawUnit": "",
+          "normalizedUnit": "",
+          "sourceUrl": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+          "sourceTitle": "Kepler Developer Platform / Kepler OS",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-sdk",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-family-common",
+          "evidenceSummary": "K1 product page references the 'Kepler Developer Platform'; the shared developer-platform page (also used by K2) documents Kepler OS's modular architecture and tools."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kepler Developer Platform",
+            "url": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official"
+          }
+        }
+      },
+      {
+        "key": "computePlatform",
+        "status": "found",
+        "action": "unsupported-schema",
+        "reason": "R02の正規化値が現行specSchemaの値型に適合しない。分割・型拡張・人間確認が必要。",
+        "currentValue": "100 TOPS（ボード型番は未公表）",
+        "proposedValue": 100,
+        "evidence": {
+          "value": "100 TOPS high-computing motherboard (Nebula system); board model not disclosed",
+          "normalizedValue": 100,
+          "rawUnit": "TOPS",
+          "normalizedUnit": "TOPS",
+          "sourceUrl": "https://gotokepler.com/productDetailK1",
+          "sourceTitle": "Kepler Forerunner K1 official product page",
+          "publisher": "Kepler Robotics",
+          "sourceType": "official-product",
+          "publishedAt": null,
+          "updatedAt": null,
+          "checkedAt": "2026-07-17",
+          "variant": null,
+          "evidenceScope": "current-product",
+          "evidenceSummary": "Page text: 'Self-developed Nebula system' paired with '100TOPS high-computing motherboard'."
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kepler Forerunner K1 official product page",
+            "url": "https://gotokepler.com/productDetailK1",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Forerunnerシリーズの寸法、重量、自由度、演算性能、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "key": "ipRating",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "operatingTemperature",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      },
+      {
+        "key": "safetyStandard",
+        "status": "not-published",
+        "action": "preserve",
+        "reason": "現行値も未設定であり、消去操作は不要。",
+        "currentValue": null,
+        "proposedValue": null
+      }
+    ],
+    "priceOffers": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に公開価格候補がない。価格fallbackは保存しない。"
+    },
+    "loadRatings": {
+      "action": "preserve",
+      "candidates": [],
+      "reason": "R02に荷重候補がない。"
+    },
+    "procurement": [
+      {
+        "field": "japanAvailability",
+        "action": "hold-source-inaccessible",
+        "currentValue": "unknown",
+        "proposedValue": "unknown",
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "distributorJapan",
+        "action": "hold-source-inaccessible",
+        "currentValue": null,
+        "proposedValue": null,
+        "reason": "R02 procurement値にはfieldEvidence対象外のため、一次資料URLと表示文を人間が紐付けるまで反映しない。"
+      },
+      {
+        "field": "note",
+        "action": "unsupported-schema",
+        "currentValue": null,
+        "proposedValue": "No Japan distributor or Japan-specific pricing/support found on official Kepler channels. Ordering/contact page lists Japan only as a country-selector option.",
+        "reason": "R02の補助構造であり現行Robot fieldへ直接投影できない。"
+      }
+    ],
+    "officialUseCases": [
+      {
+        "useCaseId": "research-development",
+        "officialExpression": "Education & Research",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "kepler-k1",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://gotokepler.com/productDetailK1"
+          ],
+          "reason": "公式ページで教育・研究向けのオープンプラットフォームとして位置付けられている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kepler Forerunner K1 official product page",
+            "url": "https://gotokepler.com/productDetailK1",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Forerunnerシリーズの寸法、重量、自由度、演算性能、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "useCaseId": "factory-assembly-support",
+        "officialExpression": "Automated Production Line",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "kepler-k1",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://gotokepler.com/productDetailK1"
+          ],
+          "reason": "公式ページで自動生産ラインの精密組立を想定用途として示している。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kepler Forerunner K1 official product page",
+            "url": "https://gotokepler.com/productDetailK1",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Forerunnerシリーズの寸法、重量、自由度、演算性能、制御機能、想定用途を確認。"
+          }
+        }
+      },
+      {
+        "useCaseId": "factory-visual-inspection",
+        "officialExpression": "Smart Inspection",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceScope": "current-product",
+        "variant": null,
+        "reason": "既存relation（official-use-case）を保持し、公式根拠URLのみ併合候補にする。",
+        "action": "merge-use-case-relation",
+        "existingRelation": {
+          "robotId": "kepler-k1",
+          "fit": "possible",
+          "basis": "official-use-case",
+          "evidenceSourceUrls": [
+            "https://gotokepler.com/productDetailK1"
+          ],
+          "reason": "公式ページで視覚認識を用いたスマート検査と早期異常検知が示されている。"
+        },
+        "source": {
+          "action": "preserve",
+          "status": "existing",
+          "existingSource": {
+            "title": "Kepler Forerunner K1 official product page",
+            "url": "https://gotokepler.com/productDetailK1",
+            "publisher": "Kepler Robotics",
+            "checkedAt": "2026-07-16",
+            "reliability": "official",
+            "note": "Forerunnerシリーズの寸法、重量、自由度、演算性能、制御機能、想定用途を確認。"
+          }
+        }
+      }
+    ],
+    "usageExamples": {
+      "action": "preserve",
+      "candidates": []
+    },
+    "currentFeatures": [
+      {
+        "feature": "Self-developed 'Nebula' AI/cognitive system on a 100 TOPS motherboard",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceSummary": "Product page names the Nebula system and its compute platform.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Visual SLAM with 3D modeling, autonomous path planning",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceSummary": "Product page navigation/perception claims.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "12-DoF dexterous hand with force sensing / hand-eye coordination",
+        "evidenceSourceUrl": "https://gotokepler.com/productDetailK1",
+        "evidenceSummary": "Product page hand specs; KEPLERGEAR planetary roller screw actuators (8,000N thrust) and rotary actuators (200 N·m peak torque, 0.01° positioning accuracy).",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      },
+      {
+        "feature": "Kepler Developer Platform access",
+        "evidenceSourceUrl": "https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index",
+        "evidenceSummary": "Shared developer-platform page (multi-robot collaboration, remote debugging, sample code) is referenced from the K1 product page.",
+        "action": "unsupported-schema",
+        "reason": "currentFeaturesは現行Robot schemaにないため、aeo pilot後の別設計で扱う。"
+      }
+    ],
+    "publishStatus": {
+      "action": "preserve",
+      "currentPublishStatus": "published",
+      "proposal": null
+    },
+    "humanReviewRequired": [
+      "Confirm with Kepler (or find a dated official statement) whether K1 has any current production/shipping status, or whether it should be treated purely as a legacy/limited developer platform superseded in practice by K2 despite no explicit succession statement."
+    ]
+  }
+]

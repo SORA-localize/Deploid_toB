@@ -24,16 +24,15 @@ export function RobotDetailSkeleton() {
 
             <div className="border-b border-border py-10">
               <div className="mb-5 h-5 w-24 animate-pulse bg-muted" />
-              <div className="hidden h-[480px] grid-cols-[11rem_minmax(0,1fr)] overflow-hidden border-y border-border lg:grid">
-                <div className="grid grid-rows-4 border-r border-border">
+              <div className="hidden lg:block">
+                <div className="flex gap-0 border-b border-border">
                   {Array.from({ length: 4 }).map((_, index) => (
-                    <div key={index} className="border-b border-border p-4 last:border-b-0">
+                    <div key={index} className="flex min-h-10 items-center px-4 py-2">
                       <div className="h-4 w-20 animate-pulse bg-muted" />
                     </div>
                   ))}
                 </div>
-                <div className="space-y-4 px-7 py-6">
-                  <div className="h-5 w-24 animate-pulse bg-muted" />
+                <div className="h-[420px] space-y-4 py-6">
                   {Array.from({ length: 5 }).map((_, index) => (
                     <div key={index} className="grid grid-cols-[8rem_minmax(0,1fr)] gap-4 border-b border-border py-3">
                       <div className="h-3 w-16 animate-pulse bg-muted" />

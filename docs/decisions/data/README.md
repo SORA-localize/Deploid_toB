@@ -1,6 +1,6 @@
 # Deploid Data Work Guide
 
-Last reviewed: 2026-07-14
+Last reviewed: 2026-07-16
 
 この文書は、AIでデータ追加・更新を行うときの入口です。
 実装上の正本は `data/types.ts` と `lib/*` にあります。
@@ -14,6 +14,38 @@ Last reviewed: 2026-07-14
 - `data/useCases.ts` — 用途から探す逆引き。公開データは sources と candidate evidence を必須にし、一次情報が薄い間は慎重に扱う
 - `data/articlePlacements.ts` — 記事タブ/home注目記事の掲載枠
 - `data/types.ts` — 型の正本
+
+## 全件調査成果物
+
+`research/` 配下に保存（このReadmeから見て `research/`）。
+
+- `research/DATA-R02-master-report.md` — 2026-07-17時点でpublished Robot全61機の現行性、全16スペック、価格、用途、活用事例を公式一次資料から再調査した最新報告
+- `research/DATA-R02-source-plan.json` / `.md` — Robotごとに調査対象資料を優先順で整理した資料計画
+- `research/DATA-R02-B01.json`〜`DATA-R02-B10.json` — 全61機の最新raw調査データ。現行製品、family-common、variant固有、historicalを分離して保持する
+- `research/DATA-R02-B01.md`〜`DATA-R02-B10.md` — バッチ別の人間向け要約
+- `research/DATA-R02-publication-review.json` — lifecycleStatusとpublicationRecommendationの調査結果。publishStatusを自動変更する指示ではない
+- `research/DATA-R02-unresolved.md` — conflict、variant、取得不能資料、人間判断事項の集約
+- `research/DATA-R02-decisions.md` — 公開状態、値の採用、variant、用途、pilot順序について承認済みの実装判断
+- `research/DATA-R01-master-report.md` — published Robot全61機の公式情報一次調査の統合報告
+- `research/DATA-R01-B01-*.json`〜`DATA-R01-B14-*.json` — 項目別raw調査データ
+- `research/DATA-R01-B01-*.md`〜`DATA-R01-B14-*.md` — バッチ別の人間向け要約
+- `research/DATA-R01-verification-report.md` — raw調査を公式原典と現行schemaに照合した全件検証報告
+- `research/DATA-R01-VERIFY-B01.json`〜`DATA-R01-VERIFY-B14.json` — raw値、検証結果、実装候補値、未解決理由を1対1で保持する検証データ
+- `research/DATA-R01-implementation-manifest-report.md` — VERIFYから実装可能値、削除候補、source join、未解決値を分離した実装準備報告
+- `research/DATA-R01-IMPLEMENT-B01.json`〜`DATA-R01-IMPLEMENT-B14.json` — 現行Robot/UseCaseとの差分を含むメーカー・機体バッチ別の実装manifest
+
+R02はR01後に公式原典を再訪した最新調査だが、どちらも調査対象をMECEに収録した非正本であり、`data/*.ts`へ直接コピーしない。
+R02の `found` も、対象record/variant、evidenceScope、現行schemaへの投影、source joinを実装manifestで確認してから採用する。
+`conflict` / `needs-review` / `source-inaccessible` / `historical-only` は自動適用しない。
+
+R01を使う場合は、
+実装候補にはVERIFYデータの `verificationStatus` が `verified` または `corrected` で、
+かつ `proposedValue` がnullでないレコードだけを使用する。
+`unresolved` / `rejected`、variant未確定、取得エラーの値は推測で補完せず、UIでは省略または既定のフォールバックを使う。
+実装時は候補値を現行型へ正規化し、validatorを通過させてから `data/*.ts` へ反映する。
+IMPLEMENT manifestは `npm run build:data-r01-manifest` でVERIFYと現行 `data/*.ts` から再生成する。
+manifest内の `robotPatch` は候補差分であり、`status: add-after-review` のsource metadataを先に確定する。
+`manualReview` の値を自動適用せず、UseCase relationは既存candidateへ上書きせずmergeする。
 
 各コレクションの追加・更新手順は `../data-maintenance-checklist-v1.md` の対応セクション：
 robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCases=M / deployments=N / articlePlacements=O。
@@ -119,6 +151,7 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCa
 ## 検証コマンド
 
 ```bash
+npm run build:data-r01-manifest
 npm run validate:data
 npm run build
 ```

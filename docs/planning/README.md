@@ -62,6 +62,7 @@ Last cleaned: 2026-07-01
 
 経緯・背景の参照用。運用やデータ設計の**正本ではない**。データ運用の正本は `../data/README.md` と `data-maintenance-checklist-v1.md`、データ設計の正本は `data-architecture-redesign-v1.md`。
 
+- `robot-image-sourcing-research-B1.md`〜`robot-image-sourcing-research-B6.md` — 公開Robot 61機の読み取り専用素材候補調査。候補URL・機種一致状態・公式規約の観測記録であり、権利許諾・公開可否・最終roleの正本ではない
 - `humanoid_data_management_guide_v1.md` — データ運用の背景説明（旧ガイド）
 - `humanoid_data_model_policy_v1.md` — データモデル設計指針（旧。現行は data-architecture-redesign）
 - `responsive-design-implementation-plan.md` — レスポンシブ改善の包括計画（Breadcrumb、詳細ページの1カラム化、sticky/header、比較モバイル操作、横スクロール系UIなどは現行実装へ部分反映済み。今後はこの長大計画をそのまま実行せず、個別の崩れを再調査して小さい計画にする）
@@ -72,6 +73,7 @@ Last cleaned: 2026-07-01
 
 - `docs-reorganization-plan-v1.md` — アクティブ md 63 ファイルの棚卸し・分類体系再設計・移動/統合・PM ダッシュボード整備の実行計画（branch: `docs/md-reorg-20260720`）
 - `robot-catalog-fullstack-implementation-plan-v1.md` — ロボットカード・詳細ページをデータ型、SSOT、resolver、validator、FactList系共通UIまで一貫して再実装する計画
+- `robot-data-r02-integration-plan-v1.md` — DATA-R02の全61機再調査結果を、成果物固定、人間判断、manifest、aeo pilot、低リスクbatchの順に小さく反映する実行計画
 - `layout-and-data-structure-audit-plan-v1.md` — 全ページのテキスト表示レイアウトとデータ構造配置の調査実行計画
 - `project-wide-refactor-implementation-plan-v1.md` — 全体リファクタリングの実装順、最小task、完了条件を定義した実行計画
 - `responsive-phase-1-static-audit-v1.md` — Phase 0のレスポンシブ監査台帳をもとにした、実装修正前の優先度付き静的監査
