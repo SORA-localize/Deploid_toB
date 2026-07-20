@@ -70,7 +70,16 @@ export function ManufacturerGuideLineup({
               <th scope="col" className="px-3 py-2 font-medium whitespace-nowrap">{uiText.reports.guideLineupPrice}</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border" onMouseLeave={() => setActiveSlug(null)}>
+          <tbody
+            className="divide-y divide-border"
+            onMouseLeave={() => setActiveSlug(null)}
+            onBlur={(event) => {
+              // onFocus で点けた強調の対称解除。フォーカスが表内の別行へ移る場合は維持する。
+              if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) {
+                setActiveSlug(null);
+              }
+            }}
+          >
             {rows.map((row) => (
               <tr
                 key={row.href}
