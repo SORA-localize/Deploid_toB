@@ -146,6 +146,8 @@ export function getStandardArticleBody(article: Article) {
 export interface ManufacturerGuideLineupDisplayRow {
   name: string;
   href: string;
+  /** カード横スクロールとの対応付けキー（Robot.slug が正本）。 */
+  robotSlug: string;
   roleLabel: string;
   price: RobotPriceView;
 }
@@ -161,6 +163,7 @@ export function resolveManufacturerGuideLineup(
       {
         name: robot.nameJa ?? robot.name,
         href: `/robots/${robot.slug}`,
+        robotSlug: robot.slug,
         roleLabel: row.roleLabel,
         price: resolveRobotPrice(robot),
       },
