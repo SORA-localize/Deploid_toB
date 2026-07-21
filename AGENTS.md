@@ -18,4 +18,4 @@ When rules conflict, prefer:
 3. `CLAUDE.md` / `README.md`
 4. Archived plans only for historical context
 
-Do not use `docs/planning/archive/` or unindexed one-off plans as current implementation rules unless the user explicitly names them.
+Do not use `docs/archive/` or unindexed one-off plans as current implementation rules unless the user explicitly names them.

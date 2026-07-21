@@ -3,7 +3,7 @@ import path from 'node:path';
 
 /**
  * public/配下のローカル画像ファイルの実寸をファイル本体から測定する。
- * data/*.ts に寸法を手打ちしない方針（docs/planning/manufacturer-logo-usage-spec-v1.md 参照）の
+ * data/*.ts に寸法を手打ちしない方針（docs/decisions/manufacturer-logo-usage-spec-v1.md 参照）の
  * ための唯一の測定経路。measure対象はサーバー側でのみ呼び出すこと（fsを使うため）。
  */
 export interface ImageDimensions {

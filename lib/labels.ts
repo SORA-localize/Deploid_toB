@@ -204,7 +204,7 @@ export const articleSectionLabels: Record<ArticleSection, string> = {
   entertainment: '話題・その他',
 };
 
-/** メーカー解説「導入実績」の固定5分類のラベル。docs/planning/editorial_style_guide_v1.md §6-1 参照。 */
+/** メーカー解説「導入実績」の固定5分類のラベル。docs/decisions/editorial_style_guide_v1.md §6-1 参照。 */
 export const manufacturerGuideDeploymentCategoryLabels: Record<ManufacturerGuideDeploymentCategory, string> = {
   researchEducation: '研究・教育',
   exhibitionDemo: '展示・デモ',
@@ -213,7 +213,7 @@ export const manufacturerGuideDeploymentCategoryLabels: Record<ManufacturerGuide
   commercial: '商用導入',
 };
 
-/** メーカー解説「購入・導入・相談」のチャネル種別ラベル。docs/planning/editorial_style_guide_v1.md §6-1 参照。 */
+/** メーカー解説「購入・導入・相談」のチャネル種別ラベル。docs/decisions/editorial_style_guide_v1.md §6-1 参照。 */
 export const manufacturerGuideProcurementChannelKindLabels: Record<ManufacturerGuideProcurementChannelKind, string> = {
   'official-direct': '公式販売',
   'domestic-distributor': '国内代理店',

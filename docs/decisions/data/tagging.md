@@ -1,0 +1,42 @@
+---
+status: current
+updated: 2026-07-20
+---
+
+# タグ運用メモ
+
+Last reviewed: 2026-07-20
+
+## 目的
+
+`Article.themeTags` / `Article.regionTags` / `Article.industryTags`、`Robot.industryTags` / `Robot.taskTags`、`UseCase.industryTags` / `UseCase.taskTags` は、コンテンツ拡張時に表記ゆれが起きやすい。
+タグを追加する場合は、データへ直接文字列を足す前に `lib/tagRegistry.ts` へ登録する。
+
+## タグ軸
+
+`TagKind`（`lib/tagRegistry.ts`）は現在4種類のみ。
+
+- `theme`: 記事の論点ファセット。`Article.themeTags` に任意で0〜4個入れる（section が主題、theme は角度。自動の日次記事候補は個別記事ごとに section を選び、`deployment`/`policy` は section 側）。
+- `region`: 記事の地域ファセット。地域非依存の記事では省略する。
+- `industry`: ロボット・用途・記事で使う業種ファセット。`UseCase.primaryIndustry`（必須・単一値）はこのkindを使う。検索・絞り込み用で、MECEは意図しない。
+- `task`: 用途・ロボットのタスクファセット。
+
+企業名・機種名はタグにしない。記事では `relatedManufacturerIds` / `relatedRobotIds` に id 参照で入れる。エンティティ化していない組織名は本文・タイトル・出典名などの全文検索で拾う。
+
+（`Guide` 型と `guide-topic` kindは `/guides` 撤去に伴い削除済み。`use-case-domain` kindは `usecase-page-redesign-plan-v1.md` により `UseCase.primaryIndustry`（`industry` kind）へ置き換え済み。経緯は `docs/archive/guides-retirement-v1.md` を参照。）
+
+## 追加手順
+
+1. `lib/tagRegistry.ts` に `kind`、正規化済み `value`、表示用 `label` を追加する。
+2. `data/*.ts` の該当フィールドにタグを追加する。
+3. `npm run validate:data` を実行し、未知タグ・重複・参照漏れがないことを確認する。
+4. `npm run build` を実行する。
+
+## 方針
+
+- 今はタグをunion型で厳格化しすぎない。
+- URLや検索では `value` の正規化キーを使う。
+- UI表示では `label` を使う。
+- 記事タグは `theme` / `region` / `industry` を混ぜない。`theme` は業種や地域ではなく、記事の主張・論点を表す。
+- 0件sectionを埋めるために `section` や `themeTags` を無理に変えない。UIの空タブは件数/disabledで扱い、データは記事内容に従う。
+- 意味が近いタグを増やす前に、既存タグで表現できないか確認する。

@@ -62,7 +62,7 @@ export interface ImageAsset {
   aspectRatio?: number;
 }
 
-/** メーカーロゴの種別。詳細は docs/planning/manufacturer-logo-usage-spec-v1.md 参照。
+/** メーカーロゴの種別。詳細は docs/decisions/manufacturer-logo-usage-spec-v1.md 参照。
  *  symbol: アイコン/シンボルマーク（文字を含まない、または文字が主役ではない）
  *  wordmark: 会社名を読ませる横長ワードロゴ
  *  combined: シンボル + ワードロゴの複合ロゴ（公式が1枚のアセットとして提供している場合のみ設定する。
@@ -474,7 +474,7 @@ export interface StandardArticle extends ArticleCommon {
  * メーカー解説（manufacturer-guide）専用の固定テンプレート型。
  * 見出し・セクション順は lib/manufacturerGuideTemplate.ts の MANUFACTURER_GUIDE_SECTIONS が正本で、
  * 著者はセクションごとの中身（prose と評価/分類データ）だけを埋める。
- * テンプレートの意味づけは docs/planning/editorial_style_guide_v1.md §6-1 を参照。
+ * テンプレートの意味づけは docs/decisions/editorial_style_guide_v1.md §6-1 を参照。
  */
 export type ManufacturerGuideDeploymentCategory =
   | 'researchEducation'

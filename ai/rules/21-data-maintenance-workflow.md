@@ -22,18 +22,18 @@ Purpose: let an AI agent add or update records without breaking the `id` / `slug
 ## G1. Collection And Work Type
 
 - Decide exactly one target collection: `robots` / `manufacturers` / `articles` / `useCases` / `deployments` / `articlePlacements`.
-- Decide whether this is a new record or an existing-record update using `docs/data/README.md` "更新か新規追加かの判断".
+- Decide whether this is a new record or an existing-record update using `docs/decisions/data/README.md` "更新か新規追加かの判断".
   - Same real-world entity with changed name, specs, price, status, or sources: update the existing record.
   - Officially separate model, generation, SKU, or legal entity: create a new record.
 - If unclear, do not create a new record. Present both the update option and new-record option to the user.
-- References: `docs/data/README.md`, `docs/planning/data-maintenance-checklist-v1.md`.
+- References: `docs/decisions/data/README.md`, `docs/decisions/data-maintenance-checklist-v1.md`.
 
 ## G2. Source Evidence Before Editing
 
 - Open and verify at least one official page, official press release, or reliable report.
 - Only record facts supported by the verified source. Do not infer price, specs, distributor, or deployment state.
 - Omit optional facts that cannot be confirmed. If a required field cannot be confirmed, return to G1 and ask the user.
-- References: `docs/data/README.md`, `docs/planning/data-maintenance-checklist-v1.md`, `docs/planning/copyright_and_media_rights_policy_v1.md`.
+- References: `docs/decisions/data/README.md`, `docs/decisions/data-maintenance-checklist-v1.md`, `docs/decisions/copyright_and_media_rights_policy_v1.md`.
 
 ## G3. ID And Slug
 
@@ -42,21 +42,21 @@ Purpose: let an AI agent add or update records without breaking the `id` / `slug
 - Check for collisions in the relevant `data/*.ts` file.
 - Do not duplicate the manufacturer name in robot `name` / `title` fields when `manufacturerId` already provides it.
 - For slug changes, do not touch `id` or any `*Id` / `*Ids` references. Add the old slug to `previousSlugs`.
-- References: `docs/planning/data-architecture-redesign-v1.md`, `docs/planning/data-maintenance-checklist-v1.md`.
+- References: `docs/decisions/data-architecture-redesign-v1.md`, `docs/decisions/data-maintenance-checklist-v1.md`.
 
 ## G4. Required Fields And Publish Gate
 
 - Inspect `data/types.ts` for required fields on the target collection.
-- Check the relevant publish gate in `docs/planning/data-maintenance-checklist-v1.md`.
+- Check the relevant publish gate in `docs/decisions/data-maintenance-checklist-v1.md`.
 - If publish requirements cannot be met, keep or set `publishStatus: 'draft'`.
-- References: `data/types.ts`, `docs/planning/data-maintenance-checklist-v1.md`.
+- References: `data/types.ts`, `docs/decisions/data-maintenance-checklist-v1.md`.
 
 ## G5. Reference Integrity
 
 - All `manufacturerId`, `relatedRobotIds`, `candidateRobots[].robotId`, `supersededById`, and similar `*Id` / `*Ids` fields must point to existing immutable `id` values, not slugs.
 - Confirm referenced records exist. `npm run validate:data` should catch misses, but do not rely on it as the first check.
 - If the current data model has any symmetric (two-way) relationship, update both sides. Most relationships are one-way and derived; do not invent two-way links.
-- References: `docs/planning/data-architecture-redesign-v1.md`, `docs/data/README.md`.
+- References: `docs/decisions/data-architecture-redesign-v1.md`, `docs/decisions/data/README.md`.
 
 ## G6. Sources, Reliability, And Freshness
 
@@ -64,7 +64,7 @@ Purpose: let an AI agent add or update records without breaking the `id` / `slug
 - Each `sources[]` entry should include `title`, `url`, `checkedAt`, and `reliability` according to `data/types.ts`.
 - Update record-level `reliability` and `updatedAt` to match the current edit.
 - For volatile values such as price, distributor, and availability, set a shorter `nextReviewBy` when the model supports it.
-- References: `data/types.ts`, `docs/planning/data-maintenance-checklist-v1.md`.
+- References: `data/types.ts`, `docs/decisions/data-maintenance-checklist-v1.md`.
 
 ## G7. Specs, Tags, And Enums
 
@@ -82,21 +82,21 @@ Purpose: let an AI agent add or update records without breaking the `id` / `slug
 - Every `ImageAsset` must include rights metadata required by `data/types.ts`.
 - Do not publish images with unclear rights. Keep `src: ''` or leave the record in draft according to current conventions.
 - Prefer local assets in `public/images/<collection>/...`; do not hotlink when a local asset should be used.
-- References: `docs/planning/copyright_and_media_rights_policy_v1.md`, `docs/data/README.md`, `public/images/robots/README.md`.
+- References: `docs/decisions/copyright_and_media_rights_policy_v1.md`, `docs/decisions/data/README.md`, `public/images/robots/README.md`.
 
 ## G9. Publish Status And Archive Behavior
 
 - New records normally start as `publishStatus: 'draft'`.
 - Existing-record updates should not change `publishStatus` unless that is the purpose of the task.
 - Do not delete discontinued records by default. Use `publishStatus: 'archived'` and `supersededById` where appropriate.
-- References: `docs/planning/data-maintenance-checklist-v1.md`, `docs/data/README.md`.
+- References: `docs/decisions/data-maintenance-checklist-v1.md`, `docs/decisions/data/README.md`.
 
 ## G10. Verification
 
 - Run `npm run validate:data` after data changes and confirm zero errors.
 - Run `npm run build` when UI, rendering, generated routes, or public output can be affected.
 - Do not report "問題なし" unless the stated verification actually ran.
-- References: `README.md`, `docs/data/README.md`.
+- References: `README.md`, `docs/decisions/data/README.md`.
 
 ## G11. Completion Report
 
@@ -115,7 +115,7 @@ Before editing data/*.ts, verify each gate:
 
 G1 Collection/work type:
 - One target collection is selected.
-- New record versus existing update is decided from docs/data/README.md.
+- New record versus existing update is decided from docs/decisions/data/README.md.
 - Ambiguous cases are brought to the user before creating a new id.
 
 G2 Sources:
@@ -148,7 +148,7 @@ G7 Specs/tags/enums:
 G8 Images/rights:
 - ImageAsset.rights is present where images are used.
 - Unclear-rights images are not published.
-- Local image placement follows docs/data/README.md.
+- Local image placement follows docs/decisions/data/README.md.
 
 G9 publishStatus:
 - New records start as draft unless explicitly approved.

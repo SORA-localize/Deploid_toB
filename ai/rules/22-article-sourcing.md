@@ -4,10 +4,9 @@ Use this file when searching for article candidates (news, press releases, deplo
 
 ## Must Read
 
-- `docs/planning/article-sourcing-reference-v1.md` — allowed/excluded source categories and search query patterns
-- `docs/planning/news-automation-prompt-contract-v1.md` — Scheduled Tasks output schema and CLI handoff rules for daily article batches; weekly newsletter rules use local published articles
-- `docs/planning/editorial-methodology-review-2026-06-24.md` — which subjects to prioritize and which to deprioritize (draft; not yet merged into the style guide)
-- `docs/planning/editorial_style_guide_v1.md` — what counts as a usable source once found (Step 1 of the writing workflow)
+- `docs/decisions/article-sourcing-reference-v1.md` — allowed/excluded source categories and search query patterns
+- `docs/decisions/news-automation-prompt-contract-v1.md` — Scheduled Tasks output schema and CLI handoff rules for daily article batches; weekly newsletter rules use local published articles
+- `docs/decisions/editorial_style_guide_v1.md` §1.5 — which subjects to prioritize and which to deprioritize; §3 Step 1 — what counts as a usable source once found
 
 ## Standing Rules
 

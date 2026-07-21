@@ -19,6 +19,7 @@ For every task:
 | Any implementation, refactor, review, or validation | `10-workflow.md` |
 | `data/*.ts`, article records, sources, tags, specs, images | `20-data.md`, then `21-data-maintenance-workflow.md` before editing |
 | Searching for article candidates (news/press to add) | `22-article-sourcing.md` before searching, then `21-data-maintenance-workflow.md` |
+| Writing an article body (topic already chosen, drafting `body`) | `docs/decisions/editorial_style_guide_v1.md` for tone, structure, and section templates; then `21-data-maintenance-workflow.md` to record it |
 | UI, layout, components, responsive behavior, design consistency | `30-ui-design.md` |
 | Images, logos, citations, article text, copyright-sensitive content | `40-content-rights.md` |
 | Creating, moving, or reorganizing docs, rules, plans, README/CLAUDE guidance | `80-doc-governance.md` |
@@ -26,14 +27,14 @@ For every task:
 
 ## Current Source Of Truth
 
-The current source-of-truth map is `docs/planning/README.md`. Treat its "(a) 正本・現行" group as current, "(b) 参照・背景（旧／非正本）" as background only, "(c) 未実装・作業計画" as plans that must not override current code or source-of-truth docs until implemented, and archived docs as historical context only.
+The current source-of-truth map is `docs/README.md`. Treat `docs/decisions/` as current, `docs/reference/` as background only, `docs/plans/` as plans that must not override current code or source-of-truth docs until implemented, and `docs/archive/` as historical context only.
 
 ## Current Work Posture / 現在の作業方針
 
 - The Next.js migration and major UI refactor are complete.
 - Current work should primarily be public-information-based data/article expansion, source and rights maintenance, and small SEO, analytics, or revenue-path improvements.
 - Prefer minimal changes that follow the existing `data/`, `lib/`, and component responsibilities.
-- Treat use cases cautiously while first-party evidence is thin; do not mass-produce thin pages. / use-cases は一次情報が薄い間は慎重に扱い、薄いページを量産しない。（guides タイプは撤去済み: `docs/planning/archive/guides-retirement-v1.md`）
+- Treat use cases cautiously while first-party evidence is thin; do not mass-produce thin pages. / use-cases は一次情報が薄い間は慎重に扱い、薄いページを量産しない。（guides タイプは撤去済み: `docs/archive/guides-retirement-v1.md`）
 - Confirm with the user before changing scope, product direction, or standing policy. / スコープや方針を変える前に必ずユーザーに確認する。
 
 Code-level truth wins over prose when the two differ:
@@ -52,7 +53,7 @@ Code-level truth wins over prose when the two differ:
 
 - Use explicit paths or `rg --no-ignore` when searching `docs/`.
 - Do not assume `rg --files` is complete for documentation discovery.
-- Prefer `docs/planning/README.md` and the rule files here over scanning random historical plans.
+- Prefer `docs/README.md` and the rule files here over scanning random historical plans.
 
 ## Change Discipline
 

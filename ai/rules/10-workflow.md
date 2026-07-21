@@ -127,13 +127,13 @@ AIは局所最適な修正を作りやすいため、以下を禁止または強
 - `ai/rules/00-index.md`
 - `ai/rules/10-workflow.md`
 - 該当する work-type rule
-- `docs/planning/README.md`
-- `docs/planning/data-architecture-redesign-v1.md`
-- `docs/planning/data-maintenance-checklist-v1.md`
-- `docs/planning/design_system_v1.md`
-- `docs/planning/ui_architecture_and_development_policy_v1.md`
-- `docs/planning/copyright_and_media_rights_policy_v1.md`
-- 必要に応じて `docs/planning/ai_fullstack_development_guardrails_v1.md`
+- `docs/README.md`
+- `docs/decisions/data-architecture-redesign-v1.md`
+- `docs/decisions/data-maintenance-checklist-v1.md`
+- `docs/decisions/design_system_v1.md`
+- `docs/decisions/ui_architecture_and_development_policy_v1.md`
+- `docs/decisions/copyright_and_media_rights_policy_v1.md`
+- 必要に応じて `docs/decisions/ai_fullstack_development_guardrails_v1.md`
 
 実コードの正本として確認するファイル:
 

@@ -83,7 +83,7 @@ export function getRobotById(id: string) {
 
 export function getManufacturers() {
   // ロゴのアスペクト比はデータに手打ちせず、サーバー側でファイル実測して付与する
-  // （docs/planning/manufacturer-logo-usage-spec-v1.md）。
+  // （docs/decisions/manufacturer-logo-usage-spec-v1.md）。
   return published(manufacturers).map(withMeasuredLogoAspect);
 }
 
