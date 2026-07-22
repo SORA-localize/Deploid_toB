@@ -651,12 +651,18 @@ export function validateData(): ValidationResult {
     });
     const potentialSpecRowsByGroup = new Map<string, number>();
     specSchema.forEach((entry) => {
-      if (entry.key === 'payloadKg') return;
+      if (entry.key === 'heightCm' || entry.key === 'widthCm' || entry.key === 'depthCm') return;
       potentialSpecRowsByGroup.set(
         entry.group,
         (potentialSpecRowsByGroup.get(entry.group) ?? 0) + 1,
       );
     });
+    if (r.specs.heightCm != null || r.specs.widthCm != null || r.specs.depthCm != null) {
+      potentialSpecRowsByGroup.set(
+        'body-motion',
+        (potentialSpecRowsByGroup.get('body-motion') ?? 0) + 1,
+      );
+    }
     if ((r.loadRatings?.length ?? 0) > 0) {
       potentialSpecRowsByGroup.set(
         'body-motion',

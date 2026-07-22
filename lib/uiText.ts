@@ -257,7 +257,7 @@ export const uiText = {
     coreVariables: '基本スペック',
     detailedData: '詳細データ',
     japanSupport: '国内対応',
-    dimensions: '外形寸法',
+    dimensions: '寸法',
     detailsLabel: '詳細',
     detailsAria: (name: string) => `${name}の詳細を確認する`,
     closeDetail: '詳細を閉じる',

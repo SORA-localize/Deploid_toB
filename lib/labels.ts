@@ -51,9 +51,9 @@ export const imageRoleLabels: Record<ImageRole, string> = {
 
 export const specGroupLabels: Record<SpecGroup, string> = {
   'body-motion': '本体・可動',
+  hand: 'ハンド',
   'power-runtime': '電源・稼働',
   'operation-development': '操作・開発',
-  'environment-safety': '環境・安全',
 };
 
 export const robotPriceChannelLabels: Record<RobotPriceChannel, string> = {
