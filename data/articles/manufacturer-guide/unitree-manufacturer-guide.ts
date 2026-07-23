@@ -1,0 +1,213 @@
+import type { ManufacturerGuideArticle } from '../../types';
+
+export const unitreeManufacturerGuide: ManufacturerGuideArticle = {
+  id: 'unitree-manufacturer-guide',
+  slug: 'unitree-manufacturer-guide',
+  previousSlugs: ['unitree-manufacturer-guide-vol-1-1'],
+  title: 'Unitree Robotics: buyer-focused company guide',
+  titleJa: 'メーカー解説｜Unitree Robotics 人型を年5,500台出荷、量産規模で世界最大級',
+  type: 'manufacturer-guide',
+  category: 'company-report',
+  section: 'business',
+  summary:
+    'Unitree Roboticsを、研究・教育・初期PoCの調達候補としてどう評価すべきか。価格、供給力、実装段階、日本の窓口を分けて整理する。',
+  publishStatus: 'published',
+  updatedAt: '2026-07-17',
+  reliability: 'reported',
+  publishedAt: '2026-07-12',
+  author: 'Deploid Research',
+  industryTags: ['manufacturing', 'research'],
+  themeTags: ['commercialization', 'business-model'],
+  keyTakeaways: [
+    '四足歩行ロボットで世界シェア60%超',
+    '人型ロボットを2025年に5,500台販売',
+    '入門機$4,900〜、標準機G1 $13,500〜と本体価格を公式に公開',
+  ],
+  heroImage: {
+    src: '/images/articles/unitree-manufacturer-guide/hero.jpg',
+    alt: 'Unitree G1 humanoid robot on stage at Japan Mobility Show 2025',
+    credit: 'RuinDig / Wikimedia Commons (CC BY 4.0)',
+    sourceUrl: 'https://commons.wikimedia.org/wiki/File:Japan-Mobility-Show-2025-RuinDig_0563.jpg',
+    rights: {
+      status: 'licensed',
+      sourceType: 'third-party',
+      rightsHolder: 'RuinDig (Yuki Uchida)',
+      licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
+      checkedAt: '2026-07-12',
+    },
+  },
+  relatedRobotIds: ['unitree-r1', 'unitree-r1-standard', 'unitree-g1', 'unitree-g1-edu', 'unitree-h1', 'unitree-h2', 'unitree-h2-plus'],
+  relatedManufacturerIds: ['unitree', 'agility-robotics', 'ubtech'],
+  relatedUseCaseIds: [],
+  whyItMatters:
+    'Unitreeは、ヒューマノイドを低価格で手に入れたい組織にとって最も現実的な候補の一つである。ただし、入手しやすさと、第三者の現場で業務を任せられることは別問題である。',
+  sources: [
+    {
+      title: 'Unitree G1 official page',
+      url: 'https://www.unitree.com/g1/',
+      publisher: 'Unitree Robotics',
+      checkedAt: '2026-07-12',
+      reliability: 'official',
+    },
+    {
+      title: 'Unitree H2 official shop',
+      url: 'https://shop.unitree.com/products/unitree-h2',
+      publisher: 'Unitree Robotics',
+      checkedAt: '2026-07-12',
+      reliability: 'official',
+    },
+    {
+      title: 'Unitree R1 official page',
+      url: 'https://www.unitree.com/R1',
+      publisher: 'Unitree Robotics',
+      checkedAt: '2026-07-12',
+      reliability: 'official',
+    },
+    {
+      title: '粗利率60％超の衝撃ーー中国「Unitree」、なぜ人型ロボットで稼げるのか',
+      url: 'https://36kr.jp/494285/',
+      publisher: '36Kr Japan',
+      checkedAt: '2026-07-13',
+      reliability: 'reported',
+      note: 'IPO目論見書ベースの売上・出荷・粗利率・平均販売価格・内製戦略・春晩後の需要拡大の根拠。',
+    },
+    {
+      title: "A Complete Guide To Unitree Robotics' 2026 IPO",
+      url: 'https://kraneshares.com/a-complete-guide-to-unitree-robotics-2026-ipo-why-it-matters-for-star-market-etf-kstr-humanoid-robotics-etf-koid/',
+      publisher: 'KraneShares',
+      checkedAt: '2026-07-13',
+      reliability: 'reported',
+      note: '2016年杭州設立・四足シェア60%超・人型の売上比率約52%・2026年後半の上場計画の根拠。',
+    },
+    {
+      title: '軽快に走って踊るUNITREEのヒューマノイドは中国でなぜ売れるのか',
+      url: 'https://spap.jst.go.jp/china/experiences/science/st_25118.html',
+      publisher: 'Science Portal China（JST）',
+      checkedAt: '2026-07-13',
+      reliability: 'reported',
+      note: '大学・政府機関の落札件数（2025年92件）、同済大学の10台825万元、変電所点検・消防偵察の開発案件、レンタル商流、R1級3万元の根拠。',
+    },
+    {
+      title: 'Unitree G1 製品ページ（国内正規代理店）',
+      url: 'https://techshare.co.jp/product/unitree/g1/',
+      publisher: 'TechShare',
+      checkedAt: '2026-07-13',
+      reliability: 'official',
+    },
+    {
+      title: 'Unitree ヒューマノイド取扱ページ',
+      url: 'https://tohasen.com/robot/unitree/human/',
+      publisher: 'Tohasen Robotics',
+      checkedAt: '2026-07-13',
+      reliability: 'official',
+    },
+    {
+      title: 'GMO AI＆ロボティクス商事、Unitree Roboticsの国内正規代理店に',
+      url: 'https://gmo-air.com/news/article/gmo-unitree/',
+      publisher: 'GMO AI&ロボティクス商事',
+      checkedAt: '2026-07-13',
+      reliability: 'official',
+      note: '正規代理店契約と「販売から導入支援・通信の安全性担保までワンストップ提供」の根拠。',
+    },
+    {
+      title: '化学プラントの危険作業をヒューマノイドで代替（旭化成のUnitree G1実証実験）',
+      url: 'https://gmo-air.com/news/article/asahi-kasei-poc/',
+      publisher: 'GMO AI&ロボティクス商事',
+      checkedAt: '2026-07-13',
+      reliability: 'official',
+      note: '旭化成のカゴ搬送省人化に向けたG1実証実験の根拠（発表主体はGMO AIR）。',
+    },
+    {
+      title: 'GMO／中国のヒューマノイドメーカー「Unitree」国内正規代理店に',
+      url: 'https://www.lnews.jp/2026/06/s0619605.html',
+      publisher: 'LNEWS',
+      checkedAt: '2026-07-13',
+      reliability: 'reported',
+    },
+    {
+      title: 'Notice of Availability of Designation of Chinese Military Companies',
+      url: 'https://www.federalregister.gov/documents/2026/06/10/2026-11571/notice-of-availability-of-designation-of-chinese-military-companies',
+      publisher: 'Federal Register',
+      checkedAt: '2026-07-12',
+      reliability: 'official',
+      note: '米国防総省の1260HリストにUnitreeが含まれることの一次情報。',
+    },
+  ],
+  manufacturerGuideContent: {
+    companyOverview:
+      'Unitree Robotics（宇樹科技）は、2016年に中国・杭州で設立されたロボットメーカーである。事業は四足歩行ロボット、人型ロボット、モーター・減速機・LiDARなどのロボット部品の3本柱で、四足歩行ロボットでは世界シェア60%超とされる。人型はこの会社にとって実験ではなくすでに主力であり、2025年1〜9月期には売上の約52%を人型が占めた。\n\n競争軸は一貫して価格である。中核アルゴリズムからモーターなどのコア部品までを自社でつくり、四足と人型で関節制御・機械構造・バッテリー管理を共用することで、値下げを続けても利益が出る原価構造を保っている（2025年1〜9月期の粗利率は約6割）。\n\n規模を示す数字としては、2025年に四足歩行ロボット1万8,000台超、人型5,500台を販売した。低価格で実機を入手しやすい量産メーカーであり、研究・教育・開発用途の調達で最初に名前が挙がる存在といえる。',
+    productLineup:
+      'ヒューマノイドはR1、G1、H1・H2の3系統で構成される。R1系は小型・低価格の入門機、G1系は研究・開発の標準機、H1・H2系はフルサイズ機で、H2 PlusはNVIDIAとの協業で発表されたAI開発プラットフォームとしてH2とは構成と価格帯が異なる。人型のほかに四足歩行ロボットのGoシリーズとロボット部品も販売している。\n\nいずれの系統も公式価格が公開されており、R1 AIRは$4,900〜、G1は$13,500〜、H2は$29,900〜と初期導入コストを見積もりやすい。内製による原価低減をそのまま販売価格に反映する値付けで、この価格は本体の目安のため税・送料・国内での保守や開発支援の費用は含まない。',
+    lineup: [
+      { robotId: 'unitree-r1', roleLabel: '入門機。低予算での教育・実験・展示の入口' },
+      { robotId: 'unitree-r1-standard', roleLabel: '入門機シリーズの上位構成' },
+      { robotId: 'unitree-g1', roleLabel: '標準機。研究・開発・初期PoCの第一候補' },
+      { robotId: 'unitree-g1-edu', roleLabel: '標準機G1の二次開発向け構成' },
+      { robotId: 'unitree-h1', roleLabel: 'フルサイズの先行機。運動性能の検証向け' },
+      { robotId: 'unitree-h2', roleLabel: 'フルサイズ機。現行の主力' },
+      { robotId: 'unitree-h2-plus', roleLabel: 'フルサイズ機の上位構成。AI開発・データ収集向け' },
+    ],
+    history:
+      'Unitreeの事業は四足歩行ロボットから始まった。2016年の設立後、Goシリーズなどの四足機を研究機関や設備点検の用途に量産販売してきたが、2022年から2024年の年間売上高は1億〜3億元にとどまり、当時は先行する優必選（UBTECH）の10分の1程度の規模だった。\n\n人型への転換は、四足で培った技術をそのまま持ち込む形で進んだ。フルサイズのH1から小型のG1、入門機のR1へと機体を広げるたびに価格を下げ、人型の平均販売価格は2025年1〜9月期に前年同期より3分の1以上下がり、R1系では3万元まで下がった。\n\n転機は2025年の春節番組「春晩」でのパフォーマンスである。認知が一気に広がって商業イベントやレンタルの需要が立ち上がり、2025年1〜9月期の売上高は前年までの数倍にあたる11億5,000万元へ拡大し、赤字だった事業が利益の出る段階に入った。2026年後半には株式上場を計画しており、急拡大した事業を支える体制を固める局面にある。',
+    deploymentIntro:
+      '公開情報で確認できる実装段階を、研究から商用まで5分類で整理する。',
+    deploymentStatus: {
+      researchEducation: {
+        evidence: 'confirmed',
+        body: '中国の大学・研究機関・政府機関による調達は2025年だけで92件の落札があり、前年の2.4倍に増えた。同済大学は研究・教育用途で人型10台を825万元で購入している。',
+        sourceUrls: ['https://spap.jst.go.jp/china/experiences/science/st_25118.html'],
+      },
+      exhibitionDemo: {
+        evidence: 'confirmed',
+        body: 'テレビ番組・展示会・ロボットイベントでの実演が繰り返し確認できる。パフォーマンスの披露自体が同社の認知と販売の導線になっている。',
+        sourceUrls: ['https://spap.jst.go.jp/china/experiences/science/st_25118.html'],
+      },
+      poc: {
+        evidence: 'limited',
+        body: '中国では変電所点検や消防偵察に向けた開発案件が報じられている。日本でも旭化成が化学プラントのカゴ搬送省人化に向けたG1の実証実験を進めている。いずれも本番運用の確認はない。',
+        sourceUrls: [
+          'https://spap.jst.go.jp/china/experiences/science/st_25118.html',
+          'https://gmo-air.com/news/article/asahi-kasei-poc/',
+        ],
+      },
+      internalTrial: {
+        evidence: 'none',
+        body: '自社工場や自社施設で人型を業務に投入していることを示す公開情報は確認できない。',
+      },
+      commercial: {
+        evidence: 'limited',
+        body: '中国ではレンタル業者がUnitree機を仕入れ、店舗集客やイベント出演用に貸し出す商流が報じられている。物流・製造のような作業系業務での第三者現場の長期運用は、公開情報では確認できない。',
+        sourceUrls: ['https://spap.jst.go.jp/china/experiences/science/st_25118.html'],
+      },
+    },
+    procurementChannels: [
+      {
+        kind: 'official-direct',
+        name: 'Unitree公式オンラインショップ',
+        url: 'https://shop.unitree.com/',
+        role: '本体の直販。日本への発送条件・保守対応は要確認',
+      },
+      {
+        kind: 'domestic-distributor',
+        name: 'TechShare',
+        url: 'https://techshare.co.jp/product/unitree/g1/',
+        role: '国内正規代理店。研究・開発向けに人型機を販売',
+      },
+      {
+        kind: 'domestic-distributor',
+        name: 'Tohasen Robotics',
+        url: 'https://tohasen.com/robot/unitree/human/',
+        role: '国内正規代理店。人型機の販売を取り扱う',
+      },
+      {
+        kind: 'domestic-distributor',
+        name: 'GMO AI&ロボティクス商事（GMO AIR）',
+        url: 'https://gmo-air.com/',
+        role: '国内正規代理店。販売に加え、導入支援から通信の安全性担保までのワンストップ提供を掲げる',
+      },
+    ],
+    japanProcurement:
+      '※調達リスクとして、2026年6月に米国防総省が中国の軍事関連企業として指定する「1260Hリスト」へUnitreeが追加された。日本の民生調達を直接禁止する指定ではないが、米国の取引先・投資家・海外拠点を持つ組織では問い合わせ前に影響範囲を確認しておく必要がある。',
+    faq: [],
+  },
+};
