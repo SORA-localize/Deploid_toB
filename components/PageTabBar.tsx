@@ -37,6 +37,8 @@ export function PageTabBar<T extends string>({
         const button = (
           <button
             type="button"
+            role="tab"
+            aria-selected={isActive}
             aria-current={isActive ? 'page' : undefined}
             aria-disabled={isDisabled || undefined}
             aria-label={hasCount ? `${tab.label}、${tab.count}件` : undefined}
