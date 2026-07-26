@@ -2,6 +2,8 @@
 
 Use this file for data additions, data updates, article records, tags, specs, sources, and media metadata.
 
+Migration note: Payload CMS + managed PostgreSQL is the approved target, but it is not live yet. Until the cutover criteria in `docs/plans/content-platform-migration-plan-v1.md` are complete, use the current `data/*.ts` workflow below. For migration work, also read `docs/decisions/content-platform-and-database-architecture-v2.md`.
+
 ## Must Read
 
 - `ai/rules/21-data-maintenance-workflow.md` - pre-edit gate for `data/*.ts`

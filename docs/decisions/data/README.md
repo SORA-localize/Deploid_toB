@@ -1,14 +1,16 @@
 ---
 status: current
-updated: 2026-07-16
+updated: 2026-07-26
 ---
 
 # Deploid Data Work Guide
 
-Last reviewed: 2026-07-16
+Last reviewed: 2026-07-26
 
 この文書は、AIでデータ追加・更新を行うときの入口です。
 実装上の正本は `data/types.ts` と `lib/*` にあります。
+
+> **移行期間の扱い**: Payload CMS + managed PostgreSQLへの移行方針は確定済みだが、まだcutoverしていない。移行完了までは以下の `data/*.ts` 手順を使う。移行後はPayload管理画面 / 制限付きMCPの運用へ本書を更新する。判断は [`../content-platform-and-database-architecture-v2.md`](../content-platform-and-database-architecture-v2.md)、実装順序は [`../../plans/content-platform-migration-plan-v1.md`](../../plans/content-platform-migration-plan-v1.md)。
 
 ## データの種類
 
@@ -65,6 +67,7 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCa
 - `../../../ai/rules/20-data.md` — データ作業で読む正本のルーティング
 - `../data-maintenance-checklist-v1.md` — 追加・公開・slug変更・鮮度レビューのチェックリスト
 - `../data-architecture-redesign-v1.md` — id/slug分離、参照、正本設計
+- `../content-platform-and-database-architecture-v2.md` — 移行後のCMS / DB / GitHub / MCPの役割分担
 - `../copyright_and_media_rights_policy_v1.md` — 画像・ロゴ・引用を扱う場合
 - `tagging.md` — タグ追加・表記ゆれ防止
 

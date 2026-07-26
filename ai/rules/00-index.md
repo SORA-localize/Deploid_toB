@@ -32,8 +32,9 @@ The current source-of-truth map is `docs/README.md`. Treat `docs/decisions/` as 
 ## Current Work Posture / 現在の作業方針
 
 - The Next.js migration and major UI refactor are complete.
-- Current work should primarily be public-information-based data/article expansion, source and rights maintenance, and small SEO, analytics, or revenue-path improvements.
-- Prefer minimal changes that follow the existing `data/`, `lib/`, and component responsibilities.
+- A project-wide refactor and a Payload CMS + managed PostgreSQL migration are planned but not implemented. Read `docs/decisions/content-platform-and-database-architecture-v2.md`, `docs/plans/content-platform-migration-plan-v1.md`, and `docs/plans/project-wide-refactor-roadmap-v2.md` before starting that work.
+- Until the CMS / DB cutover is complete, `data/*.ts`, `data/types.ts`, and `lib/data.ts` remain the operational source of truth. Do not write the same records to both Git and PostgreSQL as co-equal sources of truth.
+- For ordinary maintenance before cutover, prefer minimal changes that follow the existing `data/`, `lib/`, and component responsibilities.
 - Treat use cases cautiously while first-party evidence is thin; do not mass-produce thin pages. / use-cases は一次情報が薄い間は慎重に扱い、薄いページを量産しない。（guides タイプは撤去済み: `docs/archive/guides-retirement-v1.md`）
 - Confirm with the user before changing scope, product direction, or standing policy. / スコープや方針を変える前に必ずユーザーに確認する。
 

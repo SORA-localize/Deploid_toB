@@ -1,11 +1,13 @@
 ---
 status: current
-updated: 2026-07-20
+updated: 2026-07-26
 ---
 
 # データ保守運用チェックリスト v1
 
-> **2026-06-28 撤去注記（Guide）**: `Guide` / `/guides` は撤去済み。本書からは Guide 追加手順（旧 §L）・publish gate の Guide 項・useCase⇄guide 双方向チェック・`relatedGuideIds` を**削除済み**。経緯と復活は `archive/guides-retirement-v1.md` / `archive/guides-retirement-plan-v1.md`。
+> **移行期間の扱い（2026-07-26）**: Payload CMS + managed PostgreSQL への移行方針は確定したが、まだ実装されていない。移行計画のcutover完了までは本書と `data/*.ts` が日常運用の正本。cutover後はPayload管理画面 / MCP用の手順へ本書を更新し、旧TS編集手順をarchiveへ移す。判断は [`content-platform-and-database-architecture-v2.md`](content-platform-and-database-architecture-v2.md)、手順は [`../plans/content-platform-migration-plan-v1.md`](../plans/content-platform-migration-plan-v1.md) を参照。
+
+> **2026-06-28 撤去注記（Guide）**: `Guide` / `/guides` は撤去済み。本書からは Guide 追加手順（旧 §L）・publish gate の Guide 項・useCase⇄guide 双方向チェック・`relatedGuideIds` を**削除済み**。経緯と復活は [`../archive/guides-retirement-v1.md`](../archive/guides-retirement-v1.md) / [`../archive/guides-retirement-plan-v1.md`](../archive/guides-retirement-plan-v1.md)。
 
 `data-architecture-redesign-v1.md`（設計）の **運用面の実行チェックリスト**。
 日々のデータ追加・更新・slug変更・公開・定期レビューで「何を確認すれば破綻しないか」を手順化する。
@@ -287,5 +289,7 @@ AI側の実装手順:
 ## 関連ドキュメント
 
 - 設計の本体: `data-architecture-redesign-v1.md`
+- CMS / DBの判断: `content-platform-and-database-architecture-v2.md`
+- CMS / DB移行計画: `../plans/content-platform-migration-plan-v1.md`
 - データ運用の旧ガイド（参照用）: `../reference/humanoid_data_management_guide_v1.md`（背景・経緯の参照。整合更新はしない。運用の正本は本書と `data/README.md`）
 - 型の真実源: `nextjs_data_types_v1.ts` → `data/types.ts`

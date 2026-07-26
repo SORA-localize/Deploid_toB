@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-07-20
+updated: 2026-07-26
 ---
 
 # アーキテクチャ将来対応リスト
@@ -11,6 +11,15 @@ updated: 2026-07-20
 ---
 
 ## 現在の設計判断
+
+### コンテンツ基盤：Payload CMS + managed PostgreSQL へ段階移行
+
+現行の `data/*.ts` は移行完了まで有効な正本とする。移行後は Payload CMS をコンテンツの書込み窓口、managed PostgreSQL を永続化先、GitHub をコード・schema・migrationの正本とする。
+
+- 判断: [`content-platform-and-database-architecture-v2.md`](content-platform-and-database-architecture-v2.md)
+- 実装計画: [`../plans/content-platform-migration-plan-v1.md`](../plans/content-platform-migration-plan-v1.md)
+- ページからの取得はサーバー専用repository境界に集約し、直接SQLやCMS SDK呼出しを分散させない
+- Codexは制限付きMCPから原則draftを作成し、人間がレビュー・公開する
 
 ### ページヘッダーの実装方式：B（共通コンポーネント）を採用
 
@@ -55,15 +64,17 @@ updated: 2026-07-20
 
 ### 3. データ層の見直しを検討するタイミング
 
-現在、データは `data/*.ts` の静的配列 + `lib/data.ts` 経由で参照している。
+現在、データは `data/*.ts` の静的配列 + `lib/data.ts` 経由で参照している。件数だけでなく、非エンジニア編集、公開ワークフロー、クライアントバンドル、将来のアプリデータを考慮し、Payload CMS + managed PostgreSQLへの移行を決定済み。
 
 | 事象 | 対応候補 |
 |---|---|
-| データ件数が増えてビルド時間・バンドルサイズが問題になった | Headless CMS（Contentful / Sanity 等）または DB に移行 |
-| データを動的に更新したい（管理画面・CMS 連携） | API Routes または Server Actions に切り替え |
+| 移行期間中にローカルデータとCMSの差異が出た | parity検証を失敗させ、collection単位でローカル読取へ戻す |
+| DBクエリやPayload SDK呼出しがページへ散らばり始めた | `lib/content/repositories/*` に集約し、境界違反をテストで検出 |
+| 更新直後に公開表示へ反映されない | Payload hookからtag/path単位でrevalidate |
 | 外部 API からリアルタイム取得が必要になった | `fetch` with revalidate / SWR / React Query |
+| アプリデータが増えた | CMS collectionとschema / service / 権限を分ける |
 
-**移行コスト:** 中〜高。`lib/data.ts` の関数シグネチャを維持すれば呼び出し側への影響は最小化できる。
+**移行コスト:** 中〜高。既存URL・不変id・表示結果を固定し、repository境界と再実行可能importerを先に作ることで切替リスクを抑える。
 
 ---
 
@@ -82,4 +93,5 @@ updated: 2026-07-20
 
 | 日付 | 内容 |
 |---|---|
+| 2026-07-26 | コンテンツ基盤を Payload CMS + managed PostgreSQL へ移行する判断と、移行後の再検討条件を追加 |
 | 2026-06-05 | 初版作成。ページヘッダー方式（B採用）の判断根拠と将来指標を記録 |
