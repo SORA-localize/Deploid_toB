@@ -17,7 +17,7 @@ CMS / DB 移行は実施せず、現行の `data/*.ts` を正本としたまま�
 - CMS / DB 固有の抽象化を先回りして作らない
 - 現在価値があり、保存先変更後も残る責務だけを整理する
 
-詳細な作業手順は、本書の承認後に作成する実装計画を正本とする。
+詳細な作業手順は [`pre-migration-refactor-implementation-index-v1.md`](pre-migration-refactor-implementation-index-v1.md) と、そこから参照するPhase 1〜7の実装計画を正本とする。
 
 ---
 

@@ -13,6 +13,8 @@ updated: 2026-07-26
 
 **Tech Stack:** Next.js 16 App Router、React 19、TypeScript、Payload CMS、Postgres、Vitest、Playwright、Vercel、Vercel BlobまたはS3互換storage
 
+> **Deferred program prerequisite:** CMS / DB移行は未着手。開始前に [`pre-migration-refactor-implementation-index-v1.md`](pre-migration-refactor-implementation-index-v1.md) のPhase 1〜7を完了する。この前提で品質ツール、local snapshot、validator、view modelは既に存在するため、本計画で同じ基盤を作り直さない。
+
 ## Global Constraints
 
 - `id`、`slug`、`previousSlugs`、公開URLを移行都合で変更しない。
@@ -88,108 +90,64 @@ updated: 2026-07-26
 
 ---
 
-### Task 1: 品質ゲートを先に作る
+### Task 1: 移行開始前gateを確認する
 
 **Files:**
-- Modify: `package.json`
-- Modify: `package-lock.json`
-- Create: `vitest.config.ts`
-- Create: `eslint.config.mjs`
-- Create: `playwright.config.ts`
-- Create: `tests/smoke/current-data.test.ts`
-- Create: `tests/e2e/public-routes.spec.ts`
-- Create: `.github/workflows/ci.yml`
+- Modify: `docs/plans/content-platform-migration-plan-v1.md`
 
 **Interfaces:**
-- Consumes: 現行 `npm run validate:data` と `npm run build`
-- Produces: `npm run typecheck`、`npm run lint`、`npm run test`、`npm run test:e2e`、CI
+- Consumes: pre-migration refactorで追加済みの`npm run check`、local snapshot、validator、view model
+- Produces: Payload package導入前のclean/green baseline
 
-- [ ] **Step 1: 現行データのsmoke testを書く**
-
-```ts
-import { describe, expect, it } from 'vitest';
-import { robots } from '@/data/robots';
-import { manufacturers } from '@/data/manufacturers';
-
-describe('current content baseline', () => {
-  it('keeps stable IDs unique', () => {
-    expect(new Set(robots.map((robot) => robot.id)).size).toBe(robots.length);
-    expect(new Set(manufacturers.map((manufacturer) => manufacturer.id)).size)
-      .toBe(manufacturers.length);
-  });
-});
-```
-
-- [ ] **Step 2: test scriptが存在しない状態を確認する**
-
-Run: `npm run test`
-
-Expected: `Missing script: "test"` でFAIL
-
-- [ ] **Step 3: 品質ツールとscriptを追加する**
-
-`package.json` に次を追加する。
-
-```json
-{
-  "scripts": {
-    "typecheck": "tsc --noEmit --incremental false",
-    "lint": "eslint .",
-    "test": "vitest run",
-    "test:e2e": "playwright test",
-    "check": "npm run validate:data && npm run typecheck && npm run lint && npm run test && npm run build && npm run test:e2e"
-  }
-}
-```
-
-Dependencies:
+- [ ] **Step 1: pre-migration programの完了文書を確認する**
 
 ```bash
-npm install --save-dev vitest eslint eslint-config-next @playwright/test tsx
-npx playwright install chromium
+test -f docs/reference/pre-migration-refactor-results-v1.md
+rg -n "CMS / DB移行は未実施|Added gates|Remaining work" \
+  docs/reference/pre-migration-refactor-results-v1.md
 ```
 
-- [ ] **Step 4: lintとE2Eの設定を追加する**
+Expected: results文書が存在し、local TSが正本、品質ゲート完了、CMS / DBが残作業として記録されている。
 
-`eslint.config.mjs` は `eslint-config-next/core-web-vitals` と `eslint-config-next/typescript` を読み込むflat configにする。`playwright.config.ts` は `tests/e2e` を対象にし、`npm run start` を `http://127.0.0.1:3000` で起動する `webServer` を設定する。
-
-最初のE2Eとして `tests/e2e/public-routes.spec.ts` に `/` の `main` が表示され、HTTP 5xxにならないtestを追加する。これにより、E2Eが0件の状態で品質ゲートを作らない。
-
-- [ ] **Step 5: ローカル品質ゲートを実行する**
-
-Run: `npm run check`
-
-Expected: validate、typecheck、lint、unit test、buildがすべてexit 0
-
-- [ ] **Step 6: CIを追加する**
-
-`.github/workflows/ci.yml`:
-
-```yaml
-name: ci
-on:
-  pull_request:
-  push:
-    branches: [main]
-jobs:
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm run check
-```
-
-- [ ] **Step 7: commit**
+- [ ] **Step 2: clean installから全gateを実行する**
 
 ```bash
-git add package.json package-lock.json vitest.config.ts eslint.config.mjs playwright.config.ts tests/smoke/current-data.test.ts tests/e2e/public-routes.spec.ts .github/workflows/ci.yml
-git commit -m "test: establish project quality gates"
+npm ci
+npm run check
+npm audit --omit=dev
+git diff --check
+```
+
+Expected: 全gate exit 0、critical vulnerability 0。残るhighがある場合は`docs/reference/dependency-audit-2026-07-26.md`にpackage、到達可能性、追跡先がある。
+
+- [ ] **Step 3: source境界と既存migration package不在を確認する**
+
+```bash
+npm run check:data-boundaries
+rg -n "\"(payload|@payloadcms/db-postgres|@payloadcms/next)\"" package.json
+rg -n "DATABASE_URL|PAYLOAD_SECRET|CONTENT_SOURCE" .env.example
+```
+
+Expected:
+
+- data boundary checkがexit 0
+- Payload/Postgres packageは0件
+- migration用envは0件
+
+- [ ] **Step 4: working treeとbranchを確認する**
+
+```bash
+git status -sb
+git branch --show-current
+```
+
+Expected: working tree clean、CMS / DB移行専用branch上。pre-migration integrationや`main`へ直接実装しない。
+
+- [ ] **Step 5: Task 1完了を記録してcommit**
+
+```bash
+git add docs/plans/content-platform-migration-plan-v1.md
+git commit -m "docs: confirm content migration start gates"
 ```
 
 ---
