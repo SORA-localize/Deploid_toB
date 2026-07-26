@@ -22,6 +22,8 @@ Deploid全体を、次の状態へ段階的に移行する。
 - 決定: `../decisions/content-platform-and-database-architecture-v2.md`
 - 実装計画: `content-platform-migration-plan-v1.md`
 
+> **2026-07-26 実行範囲**: CMS / DB移行は保留し、現行TS構成のまま実施できる安全網・依存・データ内部・性能・Client境界・UI・セキュリティを先行する。現在の実行設計は [`pre-migration-refactor-safety-design-v1.md`](pre-migration-refactor-safety-design-v1.md) を参照。
+
 旧 `docs/archive/project-wide-refactor-implementation-plan-v1.md` は2026-06-26時点の履歴であり、本計画の入力・実行手順には使用しない。
 
 ---

@@ -10,6 +10,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 計画 | 一言 | branch | 開始日 |
 |---|---|---|---|
+| [CMS / DB移行前リファクタリング安全設計](plans/pre-migration-refactor-safety-design-v1.md) | 現行TS構成のまま、安全網→依存→データ内部→性能→Client境界→UI→セキュリティの順で改善 | `docs/refactor-planning-20260726`（設計中） | 2026-07-26 |
 | [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | `data/*.ts` から Payload CMS + managed PostgreSQLへ、URLと不変idを保って段階移行。実装は未着手 | 未定（専用branch必須） | 2026-07-26 |
 | [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | DB/CMS、品質ゲート、依存更新、性能、client境界、UI/a11y、セキュリティ、文書を優先度順に改善。実装は未着手 | phaseごとに分割 | 2026-07-26 |
 | [レスポンシブ対応](plans/responsive-phase-1-static-audit-v1.md) | Phase 1のコード実装は完了。R-06（実機スクリーンショットでの最終確認）が未実施 | 専用branchなし（mainへ直接実装） | 2026-07-03 |
