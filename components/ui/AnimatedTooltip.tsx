@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState, useSyncExternalStore } from "react";
 
 export type AnimatedTooltipPlacement = "top" | "bottom" | "left" | "right";
 
@@ -49,6 +49,29 @@ const arrowBorderSize: Record<AnimatedTooltipPlacement, string> = {
   right: "border-4",
 };
 
+// hover可能なポインタデバイス判定。useEffect + setState ではなく
+// useSyncExternalStore で表現し、変更イベントにも購読する
+// （react-hooks/set-state-in-effect回避）。
+const HOVER_MEDIA_QUERY = "(hover: hover) and (pointer: fine)";
+function subscribeHoverDevice(callback: () => void) {
+  const mediaQuery = window.matchMedia(HOVER_MEDIA_QUERY);
+  mediaQuery.addEventListener("change", callback);
+  return () => mediaQuery.removeEventListener("change", callback);
+}
+function getHoverDeviceSnapshot() {
+  return window.matchMedia(HOVER_MEDIA_QUERY).matches;
+}
+function getHoverDeviceServerSnapshot() {
+  return false;
+}
+function useHoverDevice(): boolean {
+  return useSyncExternalStore(
+    subscribeHoverDevice,
+    getHoverDeviceSnapshot,
+    getHoverDeviceServerSnapshot,
+  );
+}
+
 const getInitialTransform = (
   placement: AnimatedTooltipPlacement
 ): { opacity: number; scale: number; x: number; y: number } => {
@@ -74,21 +97,9 @@ const AnimatedTooltip = ({
 }: AnimatedTooltipProps) => {
   const shouldReduceMotion = useReducedMotion();
   const [isVisible, setIsVisible] = useState(false);
-  const [isHoverDevice, setIsHoverDevice] = useState(false);
+  const isHoverDevice = useHoverDevice();
   const tooltipId = useId();
   const delayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
-    setIsHoverDevice(mediaQuery.matches);
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsHoverDevice(e.matches);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
 
   const show = useCallback(() => {
     if (delay > 0) {

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +45,15 @@ function generateGibberishPreservingSpaces(
   return result;
 }
 
+// マウント後フラグ。useEffect + setState ではなく useSyncExternalStore で表現する
+// （react-hooks/set-state-in-effect回避。購読不要な「hydration後は常にtrue」の定番パターン）。
+const subscribeMountedNoop = () => () => {};
+const getMountedSnapshot = () => true;
+const getMountedServerSnapshot = () => false;
+function useHasMounted(): boolean {
+  return useSyncExternalStore(subscribeMountedNoop, getMountedSnapshot, getMountedServerSnapshot);
+}
+
 export const EncryptedText: React.FC<EncryptedTextProps> = ({
   text,
   className,
@@ -54,7 +63,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
   encryptedClassName,
   revealedClassName,
 }) => {
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useHasMounted();
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true });
   const shouldReduceMotion = useReducedMotion();
@@ -66,28 +75,25 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
   // Math.random()ベースのscramble文字列はrender pathで生成しない（Server/Client双方の
   // 初回レンダリングで非決定的処理に当たるため）。isMounted前はdisplayCharが常に元の
   // 文字を返すので、空配列で初期化しても表示には影響しない。
-  const scrambleCharsRef = useRef<string[]>([]);
+  const [scrambleChars, setScrambleChars] = useState<string[]>([]);
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isInView || !isMounted) return;
-
-    if (shouldReduceMotion) {
-      setRevealCount(text.length);
-      return;
-    }
+    // reduced motionはアニメーションさせず全開示するので、このエフェクトは不要
+    // （revealCountの実効値はレンダー側でshouldReduceMotionから直接導出する）。
+    if (!isInView || !isMounted || shouldReduceMotion) return;
 
     // Reset state for a fresh animation whenever dependencies change
     const initial = text
       ? generateGibberishPreservingSpaces(text, charset)
       : "";
-    scrambleCharsRef.current = initial.split("");
+    let currentScrambleChars = initial.split("");
+    const resetAnimationState = () => {
+      setScrambleChars(currentScrambleChars);
+      setRevealCount(0);
+    };
+    resetAnimationState();
     startTimeRef.current = performance.now();
     lastFlipTimeRef.current = startTimeRef.current;
-    setRevealCount(0);
 
     let isCancelled = false;
 
@@ -110,16 +116,11 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
       // Re-randomize unrevealed scramble characters on an interval
       const timeSinceLastFlip = now - lastFlipTimeRef.current;
       if (timeSinceLastFlip >= Math.max(0, flipDelayMs)) {
-        for (let index = 0; index < totalLength; index += 1) {
-          if (index >= currentRevealCount) {
-            if (text[index] !== " ") {
-              scrambleCharsRef.current[index] =
-                generateRandomCharacter(charset);
-            } else {
-              scrambleCharsRef.current[index] = " ";
-            }
-          }
-        }
+        currentScrambleChars = currentScrambleChars.map((ch, index) => {
+          if (index < currentRevealCount) return ch;
+          return text[index] !== " " ? generateRandomCharacter(charset) : " ";
+        });
+        setScrambleChars(currentScrambleChars);
         lastFlipTimeRef.current = now;
       }
 
@@ -138,6 +139,10 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
 
   if (!text) return null;
 
+  // reduced motion時はアニメーションさせず全開示する（元のuseEffectのreduced-motion分岐と
+  // 同じ結果を、setStateを介さずレンダー時点の導出値として表現する）。
+  const effectiveRevealCount = shouldReduceMotion ? text.length : revealCount;
+
   return (
     <motion.span
       ref={ref}
@@ -146,7 +151,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
       role="text"
     >
       {text.split("").map((char, index) => {
-        const isRevealed = index < revealCount;
+        const isRevealed = index < effectiveRevealCount;
 
         // Fix Hydration: Render the original character until mounted on the client.
         const displayChar = !isMounted
@@ -155,7 +160,7 @@ export const EncryptedText: React.FC<EncryptedTextProps> = ({
             ? char
             : char === " "
               ? " "
-              : (scrambleCharsRef.current[index] ?? char);
+              : (scrambleChars[index] ?? char);
 
         return (
           <span

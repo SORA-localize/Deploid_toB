@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Building2 } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 import { EncryptedText } from '@/components/ui/encrypted-text';
 import { ManufacturerMapCopy, region, type MapPoint } from '@/components/ManufacturerMapCopy';
 import { uiText } from '@/lib/uiText';
@@ -14,6 +14,28 @@ interface ManufacturerMapStageProps {
   points: MapPoint[];
   heading: string;
   subcopy: string;
+}
+
+// prefers-reduced-motion判定。JSXのrender中にref.currentを読む(react-hooks/refs違反)代わりに
+// useSyncExternalStoreで購読し、変化にも追従できる真にreactiveな値として扱う。
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+function subscribeReducedMotion(callback: () => void) {
+  const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY);
+  mediaQuery.addEventListener('change', callback);
+  return () => mediaQuery.removeEventListener('change', callback);
+}
+function getReducedMotionSnapshot() {
+  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
+}
+function getReducedMotionServerSnapshot() {
+  return false;
+}
+function usePrefersReducedMotion(): boolean {
+  return useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
 }
 
 const AUTO_SPEED = 0.18; // px/frame ≈ 10px/s
@@ -48,6 +70,7 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [copies, setCopies] = useState(3);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const panX = useRef(0);
   const copyW = useRef(0);
@@ -117,9 +140,13 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
     }, RESUME_DELAY_MS);
   };
 
+  // rAFループ（非レンダーの命令的コード）で最新値を読むため、reactiveな値をrefへ同期する。
+  // setStateを呼ばないref代入のみなのでreact-hooks/set-state-in-effectには該当しない。
   useEffect(() => {
-    reduceMotion.current =
-      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    reduceMotion.current = prefersReducedMotion;
+  }, [prefersReducedMotion]);
+
+  useEffect(() => {
     const measure = () => {
       const s = stageRef.current;
       if (!s) return;
@@ -231,7 +258,7 @@ export function ManufacturerMapStage({ svgMap, points, heading, subcopy }: Manuf
             points={points}
             activeId={activeId}
             ariaHidden={k !== 0}
-            reduceMotion={reduceMotion.current}
+            reduceMotion={prefersReducedMotion}
             onActivate={onActivate}
             onClear={onClear}
             onLinkClick={onLinkClick}

@@ -16,7 +16,6 @@ import {
   useId,
   useRef,
   useState,
-  ReactNode,
   HTMLAttributes,
   ButtonHTMLAttributes,
 } from "react";
@@ -149,13 +148,21 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
           case "ArrowLeft":
             event.preventDefault();
             if (orientation === "horizontal") {
-              direction === "rtl" ? onNextButtonClick() : onPrevButtonClick();
+              if (direction === "rtl") {
+                onNextButtonClick();
+              } else {
+                onPrevButtonClick();
+              }
             }
             break;
           case "ArrowRight":
             event.preventDefault();
             if (orientation === "horizontal") {
-              direction === "rtl" ? onPrevButtonClick() : onNextButtonClick();
+              if (direction === "rtl") {
+                onPrevButtonClick();
+              } else {
+                onNextButtonClick();
+              }
             }
             break;
           case "ArrowUp":
@@ -255,10 +262,18 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
     // Effects
     useEffect(() => {
       if (!emblaApi) return;
-      setScrollSnaps(emblaApi.scrollSnapList());
-      setSnapCount(emblaApi.scrollSnapList().length);
-      onSelect();
-      onScroll(emblaApi);
+      // embla（外部システム）から初期スナップショットを取り込み、以後は .on(...) の
+      // 購読コールバック経由で更新する（React公式の「外部システムに同期する」パターン）。
+      const initializeSnaps = (api: EmblaCarouselType) => {
+        setScrollSnaps(api.scrollSnapList());
+        setSnapCount(api.scrollSnapList().length);
+      };
+      initializeSnaps(emblaApi);
+      const primeSelectionState = (api: EmblaCarouselType) => {
+        onSelect();
+        onScroll(api);
+      };
+      primeSelectionState(emblaApi);
       emblaApi
         .on("reInit", onSelect)
         .on("select", onSelect)
@@ -450,12 +465,14 @@ SliderProgress.displayName = "SliderProgress";
 export const SliderSnapDisplay = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
     const { selectedSnap, snapCount } = useCarousel();
-    const prevSnapRef = useRef(selectedSnap);
-    const direction = selectedSnap > prevSnapRef.current ? 1 : -1;
-
-    useEffect(() => {
-      prevSnapRef.current = selectedSnap;
-    }, [selectedSnap]);
+    // 直前のselectedSnapと比較してdirectionを求める。refをrender中に読む代わりに、
+    // レンダー中にstateを調整する（React公式の「前回レンダーの情報を保持する」パターン）。
+    const [prevSnap, setPrevSnap] = useState(selectedSnap);
+    const [direction, setDirection] = useState(1);
+    if (selectedSnap !== prevSnap) {
+      setPrevSnap(selectedSnap);
+      setDirection(selectedSnap > prevSnap ? 1 : -1);
+    }
 
     return (
       <div

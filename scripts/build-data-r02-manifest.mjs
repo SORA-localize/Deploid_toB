@@ -34,10 +34,6 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function unique(values) {
-  return [...new Set(values.filter(Boolean))];
-}
-
 function equal(left, right) {
   return JSON.stringify(left) === JSON.stringify(right);
 }

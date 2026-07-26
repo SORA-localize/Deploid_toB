@@ -14,7 +14,7 @@ import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
 import { RobotCardRail } from '@/components/RobotCardRail';
 import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
-import { SidebarBlock, SidebarDivider } from '@/components/SidebarSection';
+import { SidebarBlock } from '@/components/SidebarSection';
 import { ActiveSectionProvider } from '@/lib/activeSectionContext';
 import {
   getArticles,

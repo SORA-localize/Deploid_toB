@@ -1002,16 +1002,13 @@ export function runValidationInDev(): void {
   const { errors, warnings } = validateData();
   const total = robots.length + manufacturers.length + useCases.length + articles.length;
   if (errors.length === 0 && warnings.length === 0) {
-    // eslint-disable-next-line no-console
     console.log(`[data] referential integrity: OK (${total} records)`);
     return;
   }
   if (warnings.length > 0) {
-    // eslint-disable-next-line no-console
     console.warn(`[data] warnings (${warnings.length}):\n` + warnings.map((i) => '  - ' + i).join('\n'));
   }
   if (errors.length > 0) {
-    // eslint-disable-next-line no-console
     console.error(`[data] errors (${errors.length}) — build はゲートで失敗します:\n` + errors.map((i) => '  - ' + i).join('\n'));
   }
 }

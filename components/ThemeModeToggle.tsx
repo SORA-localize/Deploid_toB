@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type MouseEvent } from 'react';
+import { useSyncExternalStore, type MouseEvent } from 'react';
 import { flushSync } from 'react-dom';
 import { useTheme } from 'next-themes';
 import { Moon, Sun } from 'lucide-react';
@@ -8,6 +8,16 @@ import { Moon, Sun } from 'lucide-react';
 type ViewTransitionDocument = Document & {
   startViewTransition?: (callback: () => void) => { ready: Promise<void> };
 };
+
+// マウント前はテーマ未解決（SSR/初回描画とhydration後で表示を分けるためのフラグ）。
+// useEffect + setState ではなく useSyncExternalStore で表現する
+// （react-hooks/set-state-in-effect回避。購読不要な「hydration後は常にtrue」の定番パターン）。
+const subscribeNoop = () => () => {};
+const getMountedSnapshot = () => true;
+const getMountedServerSnapshot = () => false;
+function useHasMounted(): boolean {
+  return useSyncExternalStore(subscribeNoop, getMountedSnapshot, getMountedServerSnapshot);
+}
 
 export function ThemeModeToggle({
   className = '',
@@ -17,11 +27,7 @@ export function ThemeModeToggle({
   tabIndex?: number;
 }) {
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useHasMounted();
 
   const isDark = mounted && resolvedTheme === 'dark';
   const label = isDark ? 'ライトモードに切り替える' : 'ダークモードに切り替える';
