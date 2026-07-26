@@ -134,7 +134,8 @@ main
 - planning docsを独立commitにする
 - 既存archive差分を隔離する
 - working treeをcleanにする
-- `validate:data`、source link check、production buildを実行する
+- `validate:data`、production buildを実行する
+- source link checkは外部サイトのtimeoutを含む診断結果として保存する
 - baselineの件数、主要URL、HTMLサイズ、route別client bundleを記録する
 - backup branchとannotated tagを作る
 
@@ -151,6 +152,7 @@ main
 - 現行data validationをunit testから呼べる境界へ整理する
 - 主要index/detail、slug redirect、sitemap、390px overflowをE2E化する
 - GitHub Actionsで同じcheckを実行する
+- source link checkはretry付きのscheduled workflowに分離し、外部timeoutだけでPRをblockしない
 - dependency automationは更新PRを作るだけにし、自動mergeしない
 
 完了条件:
@@ -297,7 +299,7 @@ npm run test:e2e
 git diff --check
 ```
 
-`typecheck`、`lint`、`test`、`test:e2e` はPhase 1で追加する。Phase 0では現存する `validate:data`、`check:source-links`、`build` を使用する。
+`typecheck`、`lint`、`test`、`test:e2e` はPhase 1で追加する。Phase 0の必須gateは現存する `validate:data` と `build`。`check:source-links` は外部サイトのrate limit、timeout、bot対策に影響されるため、失敗URLを記録して再確認する非blocking診断とする。
 
 ### 変更領域別
 
