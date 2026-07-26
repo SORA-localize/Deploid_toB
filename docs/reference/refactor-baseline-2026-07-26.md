@@ -10,6 +10,7 @@
 |---|---|
 | npm run validate:data | pass |
 | npm run build | pass |
+| npm run check:source-links | diagnostic only; external timeoutあり |
 
 ## Output
 - Generated routes: 157
@@ -36,6 +37,13 @@
 | /about | 590897 |
 | /for-manufacturers | 590897 |
 | /privacy | 590897 |
+
+## Route client gzip
+
+Verification of `.next/diagnostics/route-bundle-stats.json`:
+- All uncompressed byte counts match the "Route first-load uncompressed JavaScript" table above ✓
+- The JSON file contains only `firstLoadUncompressedJsBytes` and `firstLoadChunkPaths` fields (no gzip-compressed sizes recorded)
+- Uncompressed bytes are the raw JavaScript size before any transport compression
 
 ## Data counts
 | Collection | Count |
