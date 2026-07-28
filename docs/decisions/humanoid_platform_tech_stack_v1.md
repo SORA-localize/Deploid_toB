@@ -1,9 +1,11 @@
 ---
 status: current
-updated: 2026-07-20
+updated: 2026-07-26
 ---
 
 # ヒューマノイド導入プラットフォーム — 技術スタック v1
+
+> **2026-07-26 更新**: Next.js / React / Tailwind / Vercel の判断は継続する。CMS・DB・GitHubの役割分担は [`content-platform-and-database-architecture-v2.md`](content-platform-and-database-architecture-v2.md) が上位の正本であり、旧 Sanity / microCMS 候補比較と「閲覧サイトではDB不要」という判断を置き換えた。
 
 ---
 
@@ -21,9 +23,9 @@ updated: 2026-07-20
 
 現時点の基本思想は次の通り。
 
-1. まずは **公開品質のフロントエンド** を固める  
-2. 記事・DB的情報は **CMSまたはファイルベース** で管理する  
-3. ユーザー状態を持つ機能が必要になった時だけ **DB/API** を足す
+1. まずは **公開品質のフロントエンド** を固める
+2. 公開コンテンツは **Payload CMS + managed PostgreSQL** で管理し、公開サイトはサーバー経由で読む
+3. ユーザー状態や問い合わせ等も PostgreSQL に追加するが、コンテンツcollectionとは責務を分離する
 
 ---
 
@@ -35,14 +37,16 @@ updated: 2026-07-20
 - **UI実装**：React
 - **スタイリング**：Tailwind CSS を使ってよい。ただしデザイントークンを明示し、量産的な見た目に寄せない
 - **公開先**：Vercel を第一候補。Cloudflare Pages / Workers は必要に応じて再検討
-- **コンテンツ管理**：当面はファイルベースでもよいが、早い段階で Headless CMS 前提に寄せる
-- **DB**：最初は不要。状態を持つ機能が必要になったら追加
+- **コンテンツ管理**：現在の `data/*.ts` を移行元とし、Payload CMS の管理画面へ段階移行
+- **DB**：managed PostgreSQL をコンテンツの永続化先として導入。初期プロバイダー候補は Supabase
+- **AI編集**：Payload MCP を制限付きで接続し、Codexは原則 draft 作成まで
 
 ### 採用しない方針
 
 - Astro static を本番の前提にはしない
 - 「Markdown/JSONを手で増やし続ける」運用を長期前提にしない
-- 先にDBを作ってからUIを作る進め方はしない
+- ページやコンポーネントから直接SQL / CMS SDKを呼び、データ取得を分散させない
+- GitHubとPostgreSQLの両方を同一レコードの正本にする二重書き込みはしない
 
 ---
 
@@ -59,17 +63,17 @@ updated: 2026-07-20
 
 Next.js を選ぶ理由は以下。
 
-1. **公開サイトとして育てやすい**  
+1. **公開サイトとして育てやすい**
    ルーティング、メタ情報、静的生成、サーバー処理、デプロイの道筋が最初から揃っている。
 
-2. **SEOとの相性がよい**  
-   guides / reports / robot detail / manufacturer detail / use-case detail を検索流入の主戦場にしやすい。
+2. **SEOとの相性がよい**
+   reports / robot detail / manufacturer detail / use-case detail を検索流入の主戦場にしやすい。
 
-3. **Reactのまま将来機能を足しやすい**  
+3. **Reactのまま将来機能を足しやすい**
    API、認証、問い合わせ保存、ショートリスト保存などを後から自然に足せる。
 
-4. **CMS連携と相性がよい**  
-   Sanity、microCMS などの Headless CMS と接続しやすい。
+4. **CMS連携と相性がよい**
+   Payload を同じ Next.js アプリに統合でき、型・認証・preview・cache invalidation を同じコードベースで管理できる。
 
 ---
 
@@ -107,10 +111,11 @@ Vite を本番の前提にしない理由：
 | **Next.js** | 公開サイト本体 | ページ、一覧、詳細、SEO、将来のAPIの土台 |
 | **React** | UI実装 | 比較、絞り込み、保存導線などの体験を作る |
 | **Tailwind CSS** | 実装速度を上げるスタイル基盤 | 使ってよいが、トークン設計で意匠を制御する |
-| **CMS** | 記事・ロボット情報・メーカー情報の管理 | 「人間が更新しやすい管理面」 |
+| **Payload CMS** | 記事・ロボット情報・メーカー情報の管理 | 非エンジニア向け管理画面、draft / publish、権限、MCP |
 | **GitHub** | コード管理 | AI作業・レビュー・履歴管理の中心 |
 | **Vercel** | 公開 | Next.js との相性が最も良い第一候補 |
-| **Supabase 等のDB** | 将来の状態保存 | お気に入り、問い合わせ、認証が必要になったら追加 |
+| **managed PostgreSQL** | CMSデータと将来のアプリデータの永続化 | 初期プロバイダー候補は Supabase。責務はschema / collectionで分離 |
+| **オブジェクトストレージ** | 画像・添付ファイルの実体保存 | PostgreSQLにはメタデータと参照を保存 |
 
 ---
 
@@ -136,63 +141,57 @@ Vite を本番の前提にしない理由：
 
 ## 7. CMSの考え方
 
-今回の重要点は、DBそのものより **管理画面込みの運用**。
+今回の重要点は、DBだけでなく **管理画面・権限・公開フロー・AI接続まで含む運用**。
 
 ロボット情報や記事が増えると、TS/JSON/MDX を手で触り続けるのはすぐ辛くなる。
 
-したがって、最初から「CMSに乗せやすいデータ構造」を意識する。
+現行データモデルを維持しながら、Payload CMS + managed PostgreSQL へ移行する。
 
 ### CMSに期待する役割
 
-- guides の追加・更新
-- reports の追加・更新
+- articles の追加・更新
 - robots / manufacturers / use-cases の構造化管理
+- deployments / articlePlacements の構造化管理
 - 関連付け
   - robot ↔ manufacturer
   - robot ↔ use-case
-  - guide ↔ robot
-  - report ↔ company / robot / use-case
+  - article ↔ company / robot / use-case
+- draft / review / publish とpreview
+- 編集者・公開者・Codex用サービスアカウントの権限制御
 
-### 候補
+### 採用
 
-| 名前 | 特徴 | 向き不向き |
+| 名前 | 採用理由 |
 |---|---|---|
-| **Sanity** | 構造化コンテンツに強い。関連管理が得意 | 今回の本命候補 |
-| **microCMS** | 日本語UI・運用しやすい | 記事運用しやすい。構造化はSanityよりやや弱い |
-| Contentful | 定番 | 悪くないがやや重い |
-| Notion系CMS | 手軽 | MVPにはよいが、DBメディアとしては早めに限界が来やすい |
+| **Payload CMS** | Next.jsへの統合、TypeScript定義、管理画面、アクセス制御、version / draft、PostgreSQL adapter、MCPを一体で管理できる |
+| **managed PostgreSQL** | 現行の構造化参照と将来の問い合わせ・認証・保存機能を、責務を分けながら同じ標準DB技術で扱える |
 
-### 現時点の推奨
+### 今回採用しない候補
 
-- 第一候補：**Sanity**
-- 日本語UI優先なら：**microCMS**
+- **Sanity / microCMS / Contentful**: 十分有力だが、アプリ側の型・認証・AI接続と別サービスの設定を増やす利点が今回は小さい。
+- **Git型CMS**: Git履歴との相性はよいが、非エンジニアの公開運用、構造化参照、将来のアプリデータまで含む最終形にはしない。
+- **直接SQL管理**: 管理画面・権限・validation・draftを独自実装する必要があり、避ける。
 
 ---
 
-## 8. DBはいつ必要か
+## 8. DBの責務
 
-最初から DB を用意する必要はない。
+2026-07-26時点で、公開コンテンツを含め PostgreSQL へ移行する判断を確定した。ただし、すべてを同じ用途・権限で混在させない。
 
-### DB不要
+### コンテンツデータ
 
-- robots 一覧・詳細
-- manufacturers 一覧・詳細
-- guides
-- reports
-- use-cases
-- compare
-- フィルタ、検索、比較表示
+- Payload collectionを唯一の書込み窓口とする
+- robots / manufacturers / articles / useCases / deployments / articlePlacements 等を管理する
+- 公開サイトはサーバー専用repositoryからpublishedデータを読む
+- GitHubにはschema、migration、importer、テストを残し、運用レコードの正本にはしない
 
-### DBが必要になりやすい
+### 将来のアプリデータ
 
-- Save Shortlist / お気に入り
-- 問い合わせ履歴管理
-- 管理者以外の編集権限
-- 会員機能
-- 企業別ダッシュボード
-- 案件化、紹介、課金
+- shortlist / お気に入り
+- 問い合わせ・案件・会員・企業別ダッシュボード
+- 掲載管理・課金
 
-つまり、**閲覧サイト** の段階ではDB不要、**状態を持つプロダクト** に入ったらDBが必要。
+同じmanaged PostgreSQLを利用できるが、CMS collectionとはテーブル、サービス、権限を分ける。ブラウザからコンテンツテーブルを直接更新させない。
 
 ---
 
@@ -200,28 +199,29 @@ Vite を本番の前提にしない理由：
 
 ### Phase 0：今すぐ
 
-**スタック**：Next.js ＋ React ＋ Tailwind CSS ＋ ローカルデータ  
-**目的**：IA、ナビ、一覧、詳細、比較UIの型を固める  
-**データ管理**：`nextjs_data_types_v1.ts` を `data/types.ts` にコピーし、TSローカルデータで開始  
-**公開**：必要ならプレビュー公開
+- **スタック**：Next.js ＋ React ＋ Tailwind CSS ＋ ローカルデータ
+- **目的**：IA、ナビ、一覧、詳細、比較UIの型を固める
+- **データ管理**：`data/*.ts` と `lib/data.ts` で開始（完了済み）
+- **公開**：必要ならプレビュー公開
 
 ### Phase 1：MVP公開
 
-**スタック**：Next.js ＋ Vercel  
-**目的**：公開品質の guides / robots / manufacturers / use-cases / reports を出す  
-**データ管理**：ローカルデータ継続でもよいが、CMS移行を前提に設計  
-**フォーム**：Formspree などで十分
+- **スタック**：Next.js ＋ Vercel
+- **目的**：公開品質の robots / manufacturers / use-cases / reports を出す
+- **データ管理**：ローカルデータを移行元として固定し、品質ゲートを追加
+- **フォーム**：Formspree などで十分
 
-### Phase 2：運用しやすさを上げる
+### Phase 2：コンテンツ基盤を移行
 
-**追加**：Sanity または microCMS  
-**目的**：記事・ロボット情報・メーカー情報をブラウザから管理  
-**効果**：AIだけでなく、人間が運用しやすくなる
+- **追加**：Payload CMS + managed PostgreSQL + オブジェクトストレージ
+- **目的**：記事・ロボット情報・メーカー情報をブラウザとCodexから安全に管理
+- **移行方法**：repository境界、再実行可能importer、parity検証、collection単位cutover
+- **詳細**：[`../plans/content-platform-migration-plan-v1.md`](../plans/content-platform-migration-plan-v1.md)
 
 ### Phase 3：状態を持つ機能を追加
 
-**追加**：Supabase 等のDB、認証、保存機能  
-**対象**：shortlist、問い合わせ管理、会員機能、掲載管理
+- **追加**：アプリデータ用schema / service、認証、保存機能
+- **対象**：shortlist、問い合わせ管理、会員機能、掲載管理
 
 ---
 
@@ -241,6 +241,7 @@ WordPress は「管理画面込み」で一見相性がよさそうに見える�
 
 - 今回の主戦場は、バックエンドではなく **公開品質のフロントエンドと情報設計**。
 - ただし長く育てる前提なら、最初から **Next.js を本番の器** にした方がよい。
-- 問題の本丸は DB ではなく **コンテンツ管理**。CMSを早めに意識する。
-- DBは「状態を持つ機能」が必要になった時に足せばよい。
+- コンテンツは Payload、永続化は managed PostgreSQL、コードとschemaは GitHubを正本とする。
+- DBへ移すだけでは不十分で、管理画面・権限・validation・draft / publish・preview・MCPまで一体で整備する。
+- 公開ページはrepository境界から読み、直接SQL・直接CMS SDK・巨大な全件クライアント転送を避ける。
 - Tailwindは使ってよいが、トークン設計なしで雑に量産しない。

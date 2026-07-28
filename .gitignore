@@ -2,6 +2,10 @@
 dist/
 .next/
 
+# Playwright artifacts
+test-results/
+playwright-report/
+
 # generated types
 .astro/
 

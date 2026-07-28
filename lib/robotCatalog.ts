@@ -1,7 +1,6 @@
 import type {
   Manufacturer,
   Robot,
-  RobotLoadRating,
   RobotPriceOffer,
   Source,
   UseCase,
@@ -9,11 +8,15 @@ import type {
 import { sortRobots, sortUseCases } from '@/lib/display';
 import {
   EMPTY_VALUE_LABEL,
-  robotLoadRatingLabels,
-  robotLoadScopeLabels,
   specGroupLabels,
 } from '@/lib/labels';
-import { formatNumber, formatRuntime, formatSpecValue } from '@/lib/robotDisplay';
+import {
+  formatNumber,
+  formatRobotLoadRatings,
+  formatRuntime,
+  formatSpecValue,
+  getRobotDimensionsSummary,
+} from '@/lib/robotDisplay';
 import { specSchema, type SpecGroup } from '@/lib/specSchema';
 import { uiText } from '@/lib/uiText';
 
@@ -71,9 +74,9 @@ const priceChannelPriority: Record<RobotPriceOffer['channel'], number> = {
 
 const specGroupOrder: SpecGroup[] = [
   'body-motion',
+  'hand',
   'power-runtime',
   'operation-development',
-  'environment-safety',
 ];
 
 function unique(values: readonly string[]) {
@@ -199,8 +202,17 @@ export function createRobotCardViewModels(
 }
 
 export function getRobotBasicFacts(robot: Robot): RobotFactRow[] {
-  const keys = ['heightCm', 'weightKg', 'runtimeMin', 'mobility'] as const;
-  return keys.map((key) => {
+  const dimensions = getRobotDimensionsSummary(robot);
+  const dimensionsRow: RobotFactRow = {
+    key: 'dimensions',
+    label: '寸法',
+    value: dimensions.value,
+    valueKind: dimensions.hasData ? 'number' : 'empty',
+    sourceUrls: dimensions.sourceUrls,
+  };
+
+  const keys = ['weightKg', 'runtimeMin', 'mobility'] as const;
+  const otherRows = keys.map((key) => {
     const value = formatSpecValue(robot.specs, key);
     return {
       key,
@@ -210,117 +222,8 @@ export function getRobotBasicFacts(robot: Robot): RobotFactRow[] {
       sourceUrls: robot.fieldEvidence?.[key],
     };
   });
-}
 
-function formatLoadKg(kg: number) {
-  const displayValue = Number.isInteger(kg) ? kg : Math.round(kg * 10) / 10;
-  return `${displayValue}kg`;
-}
-
-function formatLoadVariant(variant: string) {
-  const dofArms = variant.match(/(\d+)\s*DoF\s*arms?/i);
-  return dofArms ? `${dofArms[1]}DoF腕` : variant;
-}
-
-function formatLoadCondition(condition?: string) {
-  if (!condition) return undefined;
-  if (/Sustained weight capacity|持続/i.test(condition)) return '持続';
-  if (/Instant weight capacity|瞬間/i.test(condition)) return '瞬間';
-  if (/特定姿勢/.test(condition)) return '特定姿勢';
-  if (/全作業域/.test(condition)) return '全作業域';
-  return undefined;
-}
-
-function formatLoadScope(load: RobotLoadRating) {
-  if (load.scope === 'carrier') return '運搬';
-  return load.scope === 'manufacturer-wording'
-    ? undefined
-    : robotLoadScopeLabels[load.scope];
-}
-
-function formatLoadRatingKind(load: RobotLoadRating) {
-  return load.rating === 'unspecified'
-    ? undefined
-    : robotLoadRatingLabels[load.rating];
-}
-
-function formatSingleLoadRating(load: RobotLoadRating) {
-  return [
-    formatLoadCondition(load.condition),
-    formatLoadScope(load),
-    formatLoadRatingKind(load),
-    formatLoadKg(load.kg),
-  ].filter(Boolean).join('');
-}
-
-function formatPublishedLoadRange(load: RobotLoadRating) {
-  const range = load.condition?.match(/約?\s*(\d+(?:\.\d+)?)\s*[～〜]\s*(\d+(?:\.\d+)?)\s*kg/i);
-  return range ? `約${range[1]}〜${range[2]}kg` : undefined;
-}
-
-function formatLoadGroup(
-  loads: readonly RobotLoadRating[],
-  separator = ' / ',
-) {
-  if (loads.length === 1) {
-    const publishedRange = formatPublishedLoadRange(loads[0]);
-    if (publishedRange) return publishedRange;
-  }
-
-  const scopes = new Set(loads.map((load) => load.scope));
-  const ratings = new Set(loads.map((load) => load.rating));
-  const hasRangeBounds = loads.length === 2
-    && scopes.size === 1
-    && ratings.size === 1
-    && loads.some((load) => /下限/.test(load.condition ?? ''))
-    && loads.some((load) => /上限/.test(load.condition ?? ''));
-
-  if (hasRangeBounds) {
-    const [minimum, maximum] = [...loads].sort((a, b) => a.kg - b.kg);
-    return [
-      formatLoadScope(minimum),
-      formatLoadRatingKind(minimum),
-      `${formatLoadKg(minimum.kg).replace(/kg$/, '')}〜${formatLoadKg(maximum.kg)}`,
-    ].filter(Boolean).join('');
-  }
-
-  const allSameScope = scopes.size === 1;
-  const allHaveDistinctConditions = loads.length > 1
-    && loads.every((load) => formatLoadCondition(load.condition));
-
-  if (allSameScope && !allHaveDistinctConditions) {
-    const [first] = loads;
-    const sortedLoads = [...loads].sort((a, b) => {
-      const ratingPriority = { rated: 0, maximum: 1, unspecified: 2 } as const;
-      return ratingPriority[a.rating] - ratingPriority[b.rating];
-    });
-    const values = sortedLoads.map((load) => [
-      formatLoadRatingKind(load),
-      formatLoadKg(load.kg),
-    ].filter(Boolean).join(''));
-    const scope = formatLoadScope(first);
-    return `${scope ? `${scope}${loads.length > 1 ? '：' : ''}` : ''}${values.join(separator)}`;
-  }
-
-  return loads.map(formatSingleLoadRating).join(separator);
-}
-
-function formatRobotLoadRatings(loads: readonly RobotLoadRating[]) {
-  const groups = new Map<string, RobotLoadRating[]>();
-  loads.forEach((load) => {
-    const key = load.variant ?? '';
-    const group = groups.get(key) ?? [];
-    group.push(load);
-    groups.set(key, group);
-  });
-
-  const showVariants = groups.size > 1;
-  return [...groups.entries()].map(([variant, group]) => {
-    const value = formatLoadGroup(group, showVariants ? '・' : ' / ');
-    return showVariants && variant
-      ? `${formatLoadVariant(variant)}：${value}`
-      : value;
-  }).join(' / ');
+  return [dimensionsRow, ...otherRows];
 }
 
 export function getRobotSpecGroups(robot: Robot): RobotSpecGroupView[] {
@@ -328,10 +231,10 @@ export function getRobotSpecGroups(robot: Robot): RobotSpecGroupView[] {
     specGroupOrder.map((group) => [group, []]),
   );
 
+  const dimensions = getRobotDimensionsSummary(robot);
+
   specSchema.forEach((entry) => {
-    if (entry.key === 'payloadKg') return;
-    const raw = robot.specs[entry.key];
-    if (raw == null || raw === '') return;
+    if (entry.key === 'heightCm' || entry.key === 'widthCm' || entry.key === 'depthCm') return;
     const value = formatSpecValue(robot.specs, entry.key);
     rowsByGroup.get(entry.group)!.push({
       key: entry.key,
@@ -340,15 +243,26 @@ export function getRobotSpecGroups(robot: Robot): RobotSpecGroupView[] {
       valueKind: factValueKind(value, entry.kind === 'number' || entry.kind === 'runtime'),
       sourceUrls: robot.fieldEvidence?.[entry.key],
     });
+    // 「寸法」は移動方式の直後に表示する（合意済みの並び順: 移動方式→寸法→重量→...）
+    if (entry.key === 'mobility') {
+      rowsByGroup.get('body-motion')!.push({
+        key: 'dimensions',
+        label: '寸法',
+        value: dimensions.value,
+        valueKind: dimensions.hasData ? 'number' : 'empty',
+        sourceUrls: dimensions.sourceUrls,
+      });
+    }
   });
 
-  if ((robot.loadRatings?.length ?? 0) > 0) {
+  {
+    const hasLoadRatings = (robot.loadRatings?.length ?? 0) > 0;
     rowsByGroup.get('body-motion')!.push({
       key: 'loadRatings',
-      label: '荷重',
-      value: formatRobotLoadRatings(robot.loadRatings!),
-      valueKind: 'number',
-      sourceUrls: unique(robot.loadRatings!.map((load) => load.sourceUrl)),
+      label: '可搬重量',
+      value: hasLoadRatings ? formatRobotLoadRatings(robot.loadRatings!) : EMPTY_VALUE_LABEL,
+      valueKind: hasLoadRatings ? 'number' : 'empty',
+      sourceUrls: hasLoadRatings ? unique(robot.loadRatings!.map((load) => load.sourceUrl)) : undefined,
     });
   }
 

@@ -17,7 +17,7 @@ import {
 } from './uilayouts/carousel';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Autoplay from 'embla-carousel-autoplay';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 
 interface NewsHeroCarouselProps {
@@ -36,10 +36,11 @@ function ProgressIndicators({
   const { selectedIndex } = useCarousel();
   const [active, setActive] = useState(selectedIndex);
 
-  // 表示上の整合性をとるための同期
-  useEffect(() => {
+  // 表示上の整合性をとるための同期。エフェクトではなくレンダー中に前回値と比較して
+  // 調整する（react-hooks/set-state-in-effect回避）。
+  if (active !== selectedIndex) {
     setActive(selectedIndex);
-  }, [selectedIndex]);
+  }
 
   return (
     <div className="absolute top-0 left-0 right-0 z-20 flex gap-1.5 p-3 px-4">

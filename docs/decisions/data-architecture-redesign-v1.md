@@ -1,16 +1,18 @@
 ---
 status: current
-updated: 2026-07-20
+updated: 2026-07-26
 ---
 
 # データアーキテクチャ再設計 v1（CMS見据え・保守性主眼）
 
-> **2026-06-28 撤去注記（Guide）**: `Guide` エンティティと `/guides` は撤去済み。本書の現行データ設計から Guide / `relatedGuideIds` / 「useCase ⇄ guide 双方向」「guide sources」の記述は削除済み。判断層は構造化データ（use-cases の `candidateRobots` evidence / compare / robots）側で担う。撤去理由と復活手順は `archive/guides-retirement-v1.md`、計画は `guides-retirement-plan-v1.md` を参照。
+> **2026-07-26 更新**: 本書の id / slug 分離、参照、検証、公開状態などのデータモデル判断は引き続き有効。保存先とCMSの判断は [`content-platform-and-database-architecture-v2.md`](content-platform-and-database-architecture-v2.md) が上位の正本であり、旧 Keystatic / TinaCMS 案は Payload CMS + managed PostgreSQL へ置き換えた。
+
+> **2026-06-28 撤去注記（Guide）**: `Guide` エンティティと `/guides` は撤去済み。本書の現行データ設計から Guide / `relatedGuideIds` / 「useCase ⇄ guide 双方向」「guide sources」の記述は削除済み。判断層は構造化データ（use-cases の `candidateRobots` evidence / compare / robots）側で担う。撤去理由と復活手順は [`../archive/guides-retirement-v1.md`](../archive/guides-retirement-v1.md)、計画は [`../archive/guides-retirement-plan-v1.md`](../archive/guides-retirement-plan-v1.md) を参照。
 
 ## 0. このドキュメントの位置づけ
 
-- **目的**: Deploid のデータ構造を「正本がどこにあり、何を変えれば何が追従するか」が一目で分かる形に再設計する。Git型CMS移行と長期保守に耐える骨格を定義する。
-- **スコープ**: 本ドキュメントは **設計のみ**。実データ移行・コード変更は次フェーズ（本書 §12 に移行手順を示す）。
+- **目的**: Deploid のデータ構造を「正本がどこにあり、何を変えれば何が追従するか」が一目で分かる形に再設計する。保存先に依存せず長期保守できる骨格を定義する。
+- **スコープ**: 本ドキュメントはデータモデルの設計と現行実装状況を扱う。CMS / DB への実データ移行は [`../plans/content-platform-migration-plan-v1.md`](../plans/content-platform-migration-plan-v1.md) を正本とする。
 - **対の成果物**: 運用面の実行チェックリストは `data-maintenance-checklist-v1.md`（追加・更新・slug変更・公開・鮮度レビューの手順）。
 - **既存ドキュメントとの関係**:
   - `../reference/humanoid_data_management_guide_v1.md` / `../reference/humanoid_data_model_policy_v1.md` / `../planning/nextjs_data_types_v1.ts` を **上書きせず上位に立つ再設計提案**として扱う。
@@ -23,7 +25,7 @@ updated: 2026-07-20
 
 | 論点 | 決定 |
 |---|---|
-| データ管理先 | **Git型CMS**（Keystatic/TinaCMS想定。TS/MDをリポジトリに残し編集UIを後付け） |
+| データ管理先 | **現在は `data/*.ts`、移行先は Payload CMS + managed PostgreSQL**。GitHub はコード・スキーマ・移行履歴の正本 |
 | 参照の持ち方 | **不変 id と slug を分離**。参照は id、slug は可変URL |
 | 今回の成果物 | **設計ドキュメントのみ** |
 | reports の役割 | **ヒューマノイド専門ニュースメディア**（業界最新情報・取材記事・企業レポート・分析） |
@@ -75,7 +77,7 @@ slug ──┬── URL識別子        /robots/unitree-g1
 4. **UI非依存**: データはUIレイアウトの都合を持ち込まない（列数・色・装飾的な並び順はデータに入れない。一覧・ランキングの意味的な順序は order レジストリや `featuredRank` などの明示フィールドで管理する。ただし `related*Ids` / `candidateRobots` の配列順は、その関連欄内の編集優先度として扱い、`getRelated*()`系は入力順を保持して解決する）。
 5. **出典必須・未確認は明示**: 事実値には `sources`。不明値はハードコードせず省略（UIが「要確認」を表示）。
 6. **検証可能**: 参照整合・id一意・未登録タグ・slug衝突を `validate` で機械検出。
-7. **CMS移行で呼び出し形を変えない**: ページは常に `lib/data.ts` 経由。物理配置（配列TS→個別ファイル）が変わっても上位は不変。
+7. **保存先をページから隠す**: ページは repository / query 境界を経由する。現在の `lib/data.ts` から Payload へ物理保存先が変わっても、ページ固有コードにDBアクセスを散らさない。
 
 ---
 
@@ -85,7 +87,7 @@ slug ──┬── URL識別子        /robots/unitree-g1
 
 | 層 | フィールド | 可変性 | 用途 | 例 |
 |---|---|---|---|---|
-| **安定ID** | `id` | **不変**（発番後変更禁止） | 外部キー・一意性・CMSのレコードキー（=将来のファイル名） | `unitree-g1` |
+| **安定ID** | `id` | **不変**（発番後変更禁止） | 外部キー・一意性・CMSのレコードキー | `unitree-g1` |
 | **URLスラッグ** | `slug` | 可変（いつでも変更可） | 公開URLのパスセグメントのみ | `unitree-g1` |
 | **旧スラッグ** | `previousSlugs?: string[]` | 追記のみ | slug変更時の301リダイレクト元 | `['unitree-g1-old']` |
 
@@ -95,7 +97,7 @@ slug ──┬── URL識別子        /robots/unitree-g1
 - `id` はやや陳腐化してもよい（非ユーザー向け）。安定性が陳腐化回避より優先。
 - `agibot-a2-max` 問題: id は `agibot-a2-max` のまま据え置き、slug を `agibot-a2-ultra` に変更、name を正す。参照は id なので無傷。
 
-> **なぜ opaque な ULID/nanoid にしないか**: Git型CMSでは人間がファイル名・差分を読む。`unitree-g1` のような可読IDの方が保守性が高い。一意・不変でありさえすればよく、ランダム性は不要。
+> **なぜ opaque な ULID/nanoid にしないか**: 移行時の照合、管理画面での調査、ログや差分の読解では `unitree-g1` のような可読IDの方が保守しやすい。一意・不変でありさえすればよく、ランダム性は不要。
 
 ### 3-2. 参照フィールドの改名（slug → id）
 
@@ -341,7 +343,7 @@ export const specSchema = [
   - **ファイル名を id 基準**にすることで、レコードと画像が1対1で対応し「どこに置いたか」が一意に定まる。
 - `ImageAsset.rights`（credit / sourceUrl / rights）は引き続き必須。ローカル保存＝権利クリアではない。
 - 外部URLを暫定で使う場合は「未ローカル化」として validate で警告（§10）。
-- Git型CMSへ移行後も同じディレクトリ規約を踏襲（Keystatic の image field がこの配置を生成）。
+- CMS移行後はオブジェクトストレージを画像実体の正本とし、同じ id ベースの命名規約・権利メタデータを維持する。移行完了までは現行 `public/` が正本。
 
 ---
 
@@ -486,25 +488,23 @@ summary, publishStatus, updatedAt, reliability, sources, heroImage?, seo?
 将来の事故防止のため、暗黙の前提を明文化する。
 
 - **単一ロケール方針**: 当面は日本語単一。`name` = 正本（英語正式表記）、`nameJa` = 日本語表示。**多言語collectionは作らない**。将来 i18n が要るなら別途設計（今のフィールドに各国語を混ぜない）。
-- **スケール前提**: SSG＋`lib/data.ts` の `O(n)` 逆引きは **数百レコードまで問題なし**。それを超えたら索引（Map）化やCMS側クエリへ移行。現規模（robots 約60）は余裕。
+- **スケール前提**: SSG＋`lib/data.ts` の `O(n)` 逆引きは現件数では成立している。ただし非エンジニア編集、公開ワークフロー、クライアントバンドル肥大の問題が先に顕在化したため、件数上限を待たず Payload のサーバークエリへ移行する。
 - **sample/demoデータ規約**: `contentKind:'sample'`（現状reportsのみ）を全collection共通の概念に一般化。サンプルは **本番一覧から除外可・必ず noindex・sources空を許容**。本番データと混ざらない境界を明示。
 
 ---
 
-## 12. CMS移行パス（無破壊・段階移行）
+## 12. CMS / DB 移行パス
 
-Git型CMS（Keystatic想定）への到達手順。各段階で `npm run build` と validate を通す。
+旧段階 A〜D（id、参照、specSchema、articles）は実装済み。旧段階 E「Git上の個別ファイル化」と F「Keystatic接続」は採用せず、次の方針へ置き換える。
 
-| 段階 | 内容 | 破壊性 |
-|---|---|---|
-| **A. id 導入** | 全レコードに `id`（=現slug）を追加。参照はまだ slug のまま | 非破壊（追加のみ） |
-| **B. 参照を id へ** | `manufacturerSlug` 等を `manufacturerId` に改名し id 参照に切替。validate を id ベースに | 内部のみ（URL不変） |
-| **C. specSchema 導入** | スペック項目をレジストリ化。`RobotSpecs` を Partial Record 化 | 内部のみ |
-| **D. articles 改称** | reports → articles、category 軸導入、編集ポリシー更新 | URLは別判断 |
-| **E. 個別ファイル化** | `data/robots.ts` 配列 → `content/robots/<id>.{json,md}` per-record。`lib/data.ts` は読込元だけ変更（呼び出し形は不変） | 内部のみ |
-| **F. Keystatic 接続** | `keystatic.config.ts` で各 collection をファイルにマッピング、編集UI起動 | 追加のみ |
+1. 現行品質ゲートを固定し、Payload CMS を既存 Next.js アプリへ統合する。
+2. 既存の型と不変 id を保ったまま Payload collection / PostgreSQL schema を定義する。
+3. ページから直接 Payload / SQL を呼ばず、サーバー専用 repository 境界を設ける。
+4. `data/*.ts` から再実行可能な importer で投入し、件数・slug・参照・公開URLの一致を検証する。
+5. collection 単位で読取先を切り替え、問題時は環境変数でローカルデータへ戻せる期間を設ける。
+6. 管理画面、Codex向けMCP、権限、draft / publish、preview、cache invalidation を整備した後に旧データを読み取り専用化する。
 
-> ページ側（`src/app/**`）は **A〜F を通して `lib/data.ts` 経由のまま**。物理配置が変わっても上位は無改修。これが §2-7 の「呼び出し形を変えない」の実利。
+設計判断は [`content-platform-and-database-architecture-v2.md`](content-platform-and-database-architecture-v2.md)、実装順序・完了条件・ロールバックは [`../plans/content-platform-migration-plan-v1.md`](../plans/content-platform-migration-plan-v1.md) を参照。
 
 ---
 
@@ -535,7 +535,7 @@ Git型CMS（Keystatic想定）への到達手順。各段階で `npm run build` 
 | マスター変えたら自動追従させたい | 正本マトリクス＋レジストリ横展開（§5, §8） |
 | ニュース記事を載せたい | articles へ拡張・category 軸・速報も whyItMatters 必須（§7） |
 | スペック書き換えが頻発しそう | specSchema で項目を1箇所管理（§8） |
-| 将来CMSへ移したい | Git型CMSへの無破壊6段階パス（§12） |
+| 非エンジニアとAIの双方で安全に更新したい | Payload管理画面 + 制限付きMCP + PostgreSQLへの段階移行（§12） |
 | 命名ミス（agibot-a2-max 等） | id据え置き・slug修正で参照無傷（§3-1） |
 | エラーが明示されない（build通過） | validate を build ゲート化・error/warning2段階（§10-1） |
 | 画像/ロゴが外部リンクで分散 | id基準でローカル配置を規約化（§9-1） |
@@ -551,13 +551,13 @@ Git型CMS（Keystatic想定）への到達手順。各段階で `npm run build` 
 
 ## 15. 次フェーズの最初の一手（参考）
 
-設計確定後の実装は **§12 段階A（id 導入）から**。これは純粋な追加で最も安全。A完了→validate拡張→B（参照id化）の順。1段階ずつ build と git diff を確認して進める。
+次の実装は [`../plans/content-platform-migration-plan-v1.md`](../plans/content-platform-migration-plan-v1.md) の Task 1（品質ゲート固定）から始める。既存URLと不変idを維持し、1 collection ずつ parity を確認して切り替える。
 
 > 本書は設計のみ。実装着手は別途指示を待つ。
 
 ---
 
-## 16. 実装ステータス（2026-06-12 / branch: experiment/data-refactor）
+## 16. 実装ステータス（2026-07-26）
 
 **実装済み**（各ステージ1コミット・build green）:
 
@@ -573,9 +573,9 @@ Git型CMS（Keystatic想定）への到達手順。各段階で `npm run build` 
 | canonical・JSON-LD（Product / Organization / NewsArticle）・noindex（archived / sample） | §11.7 |
 | 鮮度 warning（`nextReviewBy` 超過 or checkedAt 180日超）・外部画像 warning | §11.6, §9-1 |
 
-**先送り（未実装）**:
+**未実装**:
 
-- 段階E（`content/<collection>/<id>` レコード個別ファイル化）・段階F（Keystatic接続）→ §12
+- Payload CMS + managed PostgreSQL への移行、repository境界、管理画面、MCP → §12
 - 画像の実ローカル化作業（warning による可視化まで実施。ダウンロード・権利確認は別タスク）→ §9-1
 - specSchema への新項目追加（リーチ・把持力・充電時間等。登録は1行だが値の裏取りが別作業）→ §8-3
 - category への UI 一本化（タブ=section・バッジ=type は現状維持。置換は別フェーズ判断）→ §7-1

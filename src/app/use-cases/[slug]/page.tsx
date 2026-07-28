@@ -24,7 +24,7 @@ import {
   deploymentStatusLabels,
   useCaseCapabilityNoteLabels,
 } from '@/lib/labels';
-import { breadcrumbJsonLd, useCaseJsonLd } from '@/lib/jsonLd';
+import { breadcrumbJsonLd, buildUseCaseJsonLd } from '@/lib/jsonLd';
 import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
 import { uiText } from '@/lib/uiText';
@@ -80,7 +80,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="min-h-screen bg-background">
-      <JsonLd data={useCaseJsonLd(useCase)} />
+      <JsonLd data={buildUseCaseJsonLd(useCase)} />
       <JsonLd
         data={breadcrumbJsonLd([
           { name: uiText.useCases.breadcrumb, path: '/use-cases' },

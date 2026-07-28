@@ -1,9 +1,11 @@
 ---
 status: current
-updated: 2026-07-20
+updated: 2026-07-26
 ---
 
 # AI単独実装のためのWeb/フルスタック開発ガードレール v1
+
+> **移行期間の扱い（2026-07-26）**: 以下の `data/*.ts` / `lib/data.ts` 境界はPayload CMS + managed PostgreSQLへのcutoverまで有効。移行作業では [`content-platform-and-database-architecture-v2.md`](content-platform-and-database-architecture-v2.md) と [`../plans/content-platform-migration-plan-v1.md`](../plans/content-platform-migration-plan-v1.md) を優先し、ページから直接SQL / Payload SDKを呼ばない。
 
 ## 1. 目的
 
@@ -14,7 +16,7 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 本プロジェクトでは、特に以下を守る。
 
 - 既存のデータモデル、設計ドキュメント、UI方針を読んでから実装する
-- `data/*.ts` はデータの真実源、`lib/data.ts` は取得と関連解決の窓口として扱う
+- cutoverまでは `data/*.ts` をデータの真実源、`lib/data.ts` を取得と関連解決の窓口として扱う
 - 同じUIを焼き増ししない。共通化候補を常に確認する
 - 1フェーズごとに「実装に不備がある前提」で自己監査する
 - 不備が残っている限り、次フェーズに進まない
@@ -23,7 +25,7 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 ## 1.5 このプロジェクトにおける「フロント/バックエンド」の定義
 
-このプロジェクトはNext.js App Router + 静的データファイルで動いており、APIサーバーもDBもない。「フルスタック確認」とは以下の層を指す。
+現在の本番はNext.js App Router + 静的データファイルで動いており、APIサーバーもDBもまだ接続していない。「フルスタック確認」とはcutoverまでは以下の層を指す。移行後はデータ層がPayload / repository / PostgreSQLへ置き換わるが、ブリッジ層とフロントエンド層へ物理DBアクセスを漏らさない原則は変わらない。
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -132,12 +134,12 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 - ラベル、ステータス、タグ、フォームID、URL、上限値が散らばる
 - 本番環境とローカル環境で動作が変わる
-- 将来CMSやDBに移す時に呼び出し形を変える必要が出る
+- CMS / DB移行後のrepository境界を迂回し、保存先変更やtestが困難になる
 
 対策:
 
 - enumラベルは `lib/labels.ts` に集約する
-- データ取得、slug lookup、関連取得は `lib/data.ts` に寄せる
+- cutoverまではデータ取得、slug lookup、関連取得を `lib/data.ts` に寄せる。移行後は `lib/content/` のrepositoryへ寄せる
 - 外部サービスIDや秘密情報は環境変数に寄せる
 - UI文言も複数箇所で使うなら `lib/uiText.ts` に寄せる
 

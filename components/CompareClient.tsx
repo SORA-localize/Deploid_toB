@@ -59,9 +59,14 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
   // 表示モードはシート全体で一括切替（カード個別のフリップ/開閉は行ズレするため不採用。§8.7）。
   // URLに載せて共有リンクでも表示モードを再現する。
   const [view, setView] = useState<CompareView>(initialView);
-  useEffect(() => {
+  // URL由来のinitialViewが外部から変わったらローカルviewを追従させる。
+  // エフェクトでの同期ではなく、レンダー中に前回値と比較して調整する
+  // （react-hooks/set-state-in-effect回避。React公式の「レンダー中にstateを調整する」パターン）。
+  const [prevInitialView, setPrevInitialView] = useState(initialView);
+  if (initialView !== prevInitialView) {
+    setPrevInitialView(initialView);
     setView(initialView);
-  }, [initialView]);
+  }
   const handleSpecToggle = () => {
     const next: CompareView = view === 'specs' ? 'visual' : 'specs';
     setView(next);
@@ -94,13 +99,16 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
   // こうしないと onDragEnd 時に URL 遷移(非同期)を待つ間、dnd-kit が一旦
   // 元の順序へ戻してから整列し直すため、ドロップ時に「元位置へ戻る」違和感が出る。
   const [orderedIds, setOrderedIds] = useState<string[]>(urlSelectedIds);
-  useEffect(() => {
-    // 共有リンク/戻る・進む等で URL が外部から変わった時だけ local を追従させる。
-    // 自分の操作で書き換えた場合は値が一致するので no-op。
+  // 共有リンク/戻る・進む等で URL が外部から変わった時だけ local を追従させる。
+  // 自分の操作で書き換えた場合は値が一致するので no-op。
+  // エフェクトではなくレンダー中の調整にして react-hooks/set-state-in-effect を回避する。
+  const [prevUrlSelectedIds, setPrevUrlSelectedIds] = useState(urlSelectedIds);
+  if (prevUrlSelectedIds.join(',') !== urlSelectedIds.join(',')) {
+    setPrevUrlSelectedIds(urlSelectedIds);
     setOrderedIds((prev) =>
       prev.join(',') === urlSelectedIds.join(',') ? prev : urlSelectedIds,
     );
-  }, [urlSelectedIds]);
+  }
 
   const robotById = useMemo(
     () => new Map(robots.map((robot) => [robot.id, robot])),
@@ -211,10 +219,12 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
           manufacturers,
         )
       : [];
-  // 検索でアンカーの機体が全滅したら（行ごと消えるので）幽霊パネルを残さない
-  useEffect(() => {
-    if (menuFlyout && menuFlyoutRobots.length === 0) setMenuFlyout(null);
-  }, [menuFlyout, menuFlyoutRobots.length]);
+  // 検索でアンカーの機体が全滅したら（行ごと消えるので）幽霊パネルを残さない。
+  // menuFlyoutRobots はレンダー中に導出済みの値なので、エフェクトを介さずレンダー中に調整する
+  // （react-hooks/set-state-in-effect回避）。
+  if (menuFlyout && menuFlyoutRobots.length === 0) {
+    setMenuFlyout(null);
+  }
 
   // 並び順を local state へ即時反映し、URL も同じ値へ同期する(共有・履歴用)。
   const commitOrder = (nextIds: string[], mode: 'push' | 'replace' = 'push') => {

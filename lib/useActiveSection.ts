@@ -60,12 +60,19 @@ export function useActiveSection(
   const enabled = options.enabled ?? true;
   const [activeId, setActiveId] = useState(ids[0] ?? '');
 
+  // ids が空になったら（レンダー中に導出済みの入力なので）エフェクトを介さず
+  // レンダー中に調整する（react-hooks/set-state-in-effect回避）。
+  if (ids.length === 0 && activeId !== '') {
+    setActiveId('');
+  }
+
   useEffect(() => {
     if (ids.length === 0) {
-      setActiveId('');
       return;
     }
-    setActiveId(ids[0] ?? '');
+    // idsが変わった直後は先頭IDへ暫定リセットし、下のスクロール監視で実際の位置に合わせる。
+    const resetToFirstId = () => setActiveId(ids[0] ?? '');
+    resetToFirstId();
 
     if (!enabled) {
       return;

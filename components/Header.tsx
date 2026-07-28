@@ -47,9 +47,14 @@ export function Header() {
     openMenu();
   }, [closeMenu, isMenuOpen, openMenu]);
 
-  useEffect(() => {
+  // 経路が外部から変わったら（リンク遷移/戻る進む）モバイルメニューを閉じる。
+  // エフェクトでの同期ではなくレンダー中に前回値と比較して調整する
+  // （react-hooks/set-state-in-effect回避）。
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setIsMenuOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     if (!isMenuOpen) return;

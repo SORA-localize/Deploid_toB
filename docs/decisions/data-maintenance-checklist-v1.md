@@ -1,11 +1,13 @@
 ---
 status: current
-updated: 2026-07-20
+updated: 2026-07-28
 ---
 
 # データ保守運用チェックリスト v1
 
-> **2026-06-28 撤去注記（Guide）**: `Guide` / `/guides` は撤去済み。本書からは Guide 追加手順（旧 §L）・publish gate の Guide 項・useCase⇄guide 双方向チェック・`relatedGuideIds` を**削除済み**。経緯と復活は `archive/guides-retirement-v1.md` / `archive/guides-retirement-plan-v1.md`。
+> **移行期間の扱い（2026-07-26）**: Payload CMS + managed PostgreSQL への移行方針は確定したが、まだ実装されていない。移行計画のcutover完了までは本書と `data/*.ts` が日常運用の正本。cutover後はPayload管理画面 / MCP用の手順へ本書を更新し、旧TS編集手順をarchiveへ移す。判断は [`content-platform-and-database-architecture-v2.md`](content-platform-and-database-architecture-v2.md)、手順は [`../plans/content-platform-migration-plan-v1.md`](../plans/content-platform-migration-plan-v1.md) を参照。
+
+> **2026-06-28 撤去注記（Guide）**: `Guide` / `/guides` は撤去済み。本書からは Guide 追加手順（旧 §L）・publish gate の Guide 項・useCase⇄guide 双方向チェック・`relatedGuideIds` を**削除済み**。経緯と復活は [`../archive/guides-retirement-v1.md`](../archive/guides-retirement-v1.md) / [`../archive/guides-retirement-plan-v1.md`](../archive/guides-retirement-plan-v1.md)。
 
 `data-architecture-redesign-v1.md`（設計）の **運用面の実行チェックリスト**。
 日々のデータ追加・更新・slug変更・公開・定期レビューで「何を確認すれば破綻しないか」を手順化する。
@@ -179,8 +181,17 @@ updated: 2026-07-20
 - **タグ追加** → `lib/tagRegistry.ts` に1行 → 該当レコードに付与（未登録は build 失敗）。`value` は安定キー、`label` はUI表示用なので略称・自然な短縮表記でよい
 - **enum値追加** → 型 ＋ `lib/labels.ts`（ラベル）＋ `lib/display.ts`（順序）を更新（自動：順序網羅チェックあり）
 - **スペック項目追加** → `lib/specSchema.ts` に1行 → 該当ロボットの `specs` に値（型・スペック表・比較表が自動追従）
+- **スペック項目削除** → 先に充足件数を数える → `lib/specSchema.ts` から1行削除 → 全レコードの該当値と `fieldEvidence` も削除（`RobotSpecs` は `specSchema` 由来のため、残すと `tsc` が落ちる）。**値は全項目 optional なので、消えても `tsc` / `validate:data` / `build` はすべて成功する。ゲートは減少を検出しない**
 
 > 原則：**正本は1箇所**。直書きで増やさない（§設計5）。
+> 削除は「1行消す」作業に見えて全機分のデータ削除を伴う。件数と削除理由をcommit messageに残す。
+
+削除実績（2026-07-28時点）:
+
+- `acfaa7b` は `payloadKg` / `ipRating` / `operatingTemperature` / `safetyStandard` を削除。充足率9.8〜13.1%かつ「公式に非公開」の確認済み（`data/research/DATA-R02-master-report.md` §5）で、削除理由は成立する
+- 同commitは `batterySystem`（45機・充足率75.4%）と `batteryCapacityWh`（16機）も削除したが、commit messageに記載がない。計73件の値がゲートgreenのまま消えた
+- `batterySystem` は `9530937` で値・出典とも復元済み
+- `batteryCapacityWh` は削除のまま。新設 `batteryCapacityMah` とラベル「バッテリー容量」が重複するため、**ラベル確定が復元の前提**
 
 ---
 
@@ -287,5 +298,7 @@ AI側の実装手順:
 ## 関連ドキュメント
 
 - 設計の本体: `data-architecture-redesign-v1.md`
+- CMS / DBの判断: `content-platform-and-database-architecture-v2.md`
+- CMS / DB移行計画: `../plans/content-platform-migration-plan-v1.md`
 - データ運用の旧ガイド（参照用）: `../reference/humanoid_data_management_guide_v1.md`（背景・経緯の参照。整合更新はしない。運用の正本は本書と `data/README.md`）
 - 型の真実源: `nextjs_data_types_v1.ts` → `data/types.ts`

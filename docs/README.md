@@ -10,6 +10,9 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 計画 | 一言 | branch | 開始日 |
 |---|---|---|---|
+| [CMS / DB移行前リファクタリング実装](plans/pre-migration-refactor-implementation-index-v1.md) | 安全設計をPhase 1〜7のテスト・実装・commit・rollback単位へ分割。アプリ実装は未着手 | `refactor/integration-20260726`からphase branchを順次作成 | 2026-07-26 |
+| [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | `data/*.ts` から Payload CMS + managed PostgreSQLへ、URLと不変idを保って段階移行。実装は未着手 | 未定（専用branch必須） | 2026-07-26 |
+| [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | DB/CMS、品質ゲート、依存更新、性能、client境界、UI/a11y、セキュリティ、文書を優先度順に改善。実装は未着手 | phaseごとに分割 | 2026-07-26 |
 | [レスポンシブ対応](plans/responsive-phase-1-static-audit-v1.md) | Phase 1のコード実装は完了。R-06（実機スクリーンショットでの最終確認）が未実施 | 専用branchなし（mainへ直接実装） | 2026-07-03 |
 | [ロボットデータ ファクトチェック反映](plans/robot-data-factcheck-impl-plan-2026-07-01.md) | Phase A/Bは完了。Phase Cは`marketAvailability`のみ実装済み、`scopeStatus`/`evidenceLevel`が未着手 | 未定（型変更のため別branch推奨のまま） | 2026-07-01 |
 | [ロボットデータ R02統合](plans/robot-data-r02-integration-plan-v1.md) | 全61機再調査（DATA-R02）の反映。低リスクbatchは反映済み、個別conflict機（pal-kangaroo等）と最終回帰監査（R02-11）が残task | `data/robot-catalog-r01-rollout-20260716`（PR #3はmerge済み、残taskは別PRで継続） | 2026-07-17 |
@@ -23,11 +26,11 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 日付 | 文書 | 内容 |
 |---|---|---|
-| 2026-07-19 | [著作権・商標・メディア権利対策ポリシー](decisions/copyright_and_media_rights_policy_v1.md) | 「権利不明素材は原則非公開」から「公式チャネル取得かつ禁止表示なしなら掲載」へ方針転換（§0） |
-| 2026-07-17 | [Deploid Data Work Guide](decisions/data/README.md) | DATA-R02（全61機再調査）の成果物カタログを追加、`research/`配下に整理 |
-| 2026-07-14 | [UIアーキテクチャ・開発方針](decisions/ui_architecture_and_development_policy_v1.md) | — |
-| 2026-07-10 | [ニュース収集・記事化自動化データ契約](decisions/news-automation-prompt-contract-v1.md) | — |
-| 2026-07-09 | [メーカーロゴ利用仕様](decisions/manufacturer-logo-usage-spec-v1.md) | — |
+| 2026-07-26 | [コンテンツ基盤・DBアーキテクチャ](decisions/content-platform-and-database-architecture-v2.md) | Payload CMS + managed PostgreSQLを採用。GitHub、管理画面、Codex MCP、公開サイトの責務を確定 |
+| 2026-07-26 | [データアーキテクチャ再設計](decisions/data-architecture-redesign-v1.md) | id / slug設計は維持し、旧Git型CMS移行案を新しいPayload移行計画へ置換 |
+| 2026-07-26 | [技術スタック](decisions/humanoid_platform_tech_stack_v1.md) | CMS候補とDB不要判断を、Payload + PostgreSQLの確定構成へ更新 |
+| 2026-07-26 | [アーキテクチャ将来対応リスト](decisions/architecture_future_considerations_v1.md) | コンテンツ基盤移行の確定判断と移行後の見直し条件を追加 |
+| 2026-07-26 | [Deploid Data Work Guide](decisions/data/README.md) | cutoverまでは現行TS運用を継続する移行期間ルールを追加 |
 
 ---
 
@@ -45,6 +48,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 ### decisions の主要文書
 
+- [`content-platform-and-database-architecture-v2.md`](decisions/content-platform-and-database-architecture-v2.md) — Payload CMS、PostgreSQL、GitHub、公開サイト、Codex MCPの役割を定める移行後アーキテクチャ
 - [`data-architecture-redesign-v1.md`](decisions/data-architecture-redesign-v1.md) — id/slug分離、参照設計、正本管理、CMS移行を見据えたデータ設計
 - [`data-maintenance-checklist-v1.md`](decisions/data-maintenance-checklist-v1.md) — データ追加、slug変更、公開前確認、鮮度レビューの実行チェックリスト
 - [`data/README.md`](decisions/data/README.md) — AIでデータ追加・更新を行うときの入口
@@ -64,6 +68,8 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 ### 現行の正本（コード側）
 
+以下はCMS / DBのcutover完了まで有効。移行後の正本分担は [`content-platform-and-database-architecture-v2.md`](decisions/content-platform-and-database-architecture-v2.md) に従い、この一覧も同時に更新する。
+
 - データ型: `../data/types.ts`
 - データ取得/関連解決: `../lib/data.ts`
 - データ検証: `../lib/validate.ts` と `../scripts/validate-data.mjs`
@@ -74,7 +80,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 - 色・テーマtoken: `../src/app/globals.css`
 - semantic tone: `../lib/visualSemantics.ts`
 
-ページ実装から `data/*.ts` を直接検索せず、取得や関連解決は `lib/data.ts` 経由にする。
+ページ実装から `data/*.ts` を直接検索せず、取得や関連解決は `lib/data.ts` 経由にする。移行後もページから直接SQL / Payload SDKを呼ばず、サーバー専用repository境界を経由する。
 
 ---
 

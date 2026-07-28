@@ -651,12 +651,18 @@ export function validateData(): ValidationResult {
     });
     const potentialSpecRowsByGroup = new Map<string, number>();
     specSchema.forEach((entry) => {
-      if (entry.key === 'payloadKg') return;
+      if (entry.key === 'heightCm' || entry.key === 'widthCm' || entry.key === 'depthCm') return;
       potentialSpecRowsByGroup.set(
         entry.group,
         (potentialSpecRowsByGroup.get(entry.group) ?? 0) + 1,
       );
     });
+    if (r.specs.heightCm != null || r.specs.widthCm != null || r.specs.depthCm != null) {
+      potentialSpecRowsByGroup.set(
+        'body-motion',
+        (potentialSpecRowsByGroup.get('body-motion') ?? 0) + 1,
+      );
+    }
     if ((r.loadRatings?.length ?? 0) > 0) {
       potentialSpecRowsByGroup.set(
         'body-motion',
@@ -996,16 +1002,13 @@ export function runValidationInDev(): void {
   const { errors, warnings } = validateData();
   const total = robots.length + manufacturers.length + useCases.length + articles.length;
   if (errors.length === 0 && warnings.length === 0) {
-    // eslint-disable-next-line no-console
     console.log(`[data] referential integrity: OK (${total} records)`);
     return;
   }
   if (warnings.length > 0) {
-    // eslint-disable-next-line no-console
     console.warn(`[data] warnings (${warnings.length}):\n` + warnings.map((i) => '  - ' + i).join('\n'));
   }
   if (errors.length > 0) {
-    // eslint-disable-next-line no-console
     console.error(`[data] errors (${errors.length}) — build はゲートで失敗します:\n` + errors.map((i) => '  - ' + i).join('\n'));
   }
 }

@@ -1,12 +1,15 @@
 # Deploid
 
-日本のtoB事業者向け「ヒューマノイド導入判断ポータル」。ロボット・メーカー・用途・導入ガイド・記事を、スペック表ではなく「買い手が導入を判断するための変数」で整理する。
+日本のtoB事業者向け「ヒューマノイド導入判断ポータル」。ロボット・メーカー・用途・導入事例・記事を、スペック表ではなく「買い手が導入を判断するための変数」で整理する。
 
 - **スタック**: Next.js 16 (App Router) / React 19 / TypeScript / Tailwind CSS v4
 - **デプロイ**: Vercel
-- **データ**: ローカル TS データ（`data/*.ts`）。将来 CMS 接続前提
+- **データ（現在）**: ローカル TS データ（`data/*.ts`）。Payload CMS + managed PostgreSQLへの移行前
+- **移行後の構成**: Payload管理画面 / PostgreSQL / オブジェクトストレージ / 制限付きCodex MCP
 - **AI作業ルール**: `AGENTS.md` → `ai/rules/00-index.md`
 - **設計ドキュメント**: `docs/`（まず `docs/README.md`）
+- **CMS / DB判断**: `docs/decisions/content-platform-and-database-architecture-v2.md`
+- **全体リファクタリング**: `docs/plans/project-wide-refactor-roadmap-v2.md`
 - **データ追加ガイド**: `docs/decisions/data/README.md`
 - **AI実装ワークフロー**: `ai/rules/10-workflow.md`（計画・実装・レビューの共通プロンプト集）
 - **データ保守ワークフロー**: `ai/rules/20-data.md` → `ai/rules/21-data-maintenance-workflow.md`
@@ -28,7 +31,7 @@
 - `fix/<issue>`: 表示崩れ、検証エラー、SEO設定などの小さな修正用
 - `experiment/<name>`: UI、導線、広告枠などの検証用。採用しない前提でいつでも捨てられるようにする
 
-通常のデータ・記事更新は `content/data-maintenance` で行い、`npm run validate:data` と必要に応じて `npm run build` を通してから `main` に戻す。
+CMS / DBのcutover完了までは、通常のデータ・記事更新を `content/data-maintenance` で行い、`npm run validate:data` と必要に応じて `npm run build` を通してから `main` に戻す。
 大きめの変更は `content/<topic>` や `fix/<issue>` を `main` から切り、完了後に `main` へmergeする。
 
 ## 環境変数
@@ -52,8 +55,8 @@ src/app/        # App Router ページ（/, /robots, /manufacturers, /compare,
                 #   /use-cases, /reports, /about, /contact ＋各 [slug]）
 ai/rules/       # AIエージェント向けの入口・作業別ルール
 components/     # UI コンポーネント、カード、フィルター、共通レイアウト
-data/           # 配列データ + types.ts（型の真実源）
-lib/            # data.ts（取得/filter/slug lookup）, labels.ts（enum→日本語）
+data/           # 現行の配列データ + types.ts（CMS / DB cutoverまでのデータ正本）
+lib/            # data.ts（現行取得境界）, labels.ts（enum→日本語）
 docs/           # 設計・意思決定ドキュメント（README.md がダッシュボード）
 docs/decisions/ # 恒久方針・現行仕様・運用チェックリスト
 docs/plans/     # 進行中の作業計画
@@ -66,3 +69,5 @@ docs/archive/   # 実装済み・履歴参照用
 実装・データ保守・UI・権利まわりの詳細ルールは `AGENTS.md` と `ai/rules/00-index.md` を入口に参照する。
 
 データ追加・更新時は `ai/rules/20-data.md` と `ai/rules/21-data-maintenance-workflow.md` を読む。UI変更時は `ai/rules/30-ui-design.md`、画像・引用・記事本文を扱う時は `ai/rules/40-content-rights.md` を読む。
+
+CMS / DB移行を実装する場合は、`docs/decisions/content-platform-and-database-architecture-v2.md` と `docs/plans/content-platform-migration-plan-v1.md` を先に読む。ページから直接SQL / Payload SDKを呼ばず、サーバー専用repository境界に集約する。

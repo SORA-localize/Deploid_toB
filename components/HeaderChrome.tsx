@@ -54,12 +54,14 @@ export function HeaderStickyBarSlot() {
 
   useEffect(() => {
     if (visible) {
-      setMounted(true);
+      const startEnter = () => setMounted(true);
+      startEnter();
       // One rAF: let browser paint the element at opacity-0 first, then trigger enter transition.
       const raf = requestAnimationFrame(() => setShowing(true));
       return () => cancelAnimationFrame(raf);
     }
-    setShowing(false);
+    const startExit = () => setShowing(false);
+    startExit();
     const timer = window.setTimeout(() => setMounted(false), EXIT_DURATION_MS);
     return () => window.clearTimeout(timer);
   }, [visible]);

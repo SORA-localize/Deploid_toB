@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ExternalLink, GripVertical, Star, X } from 'lucide-react';
@@ -25,6 +25,19 @@ interface ComparisonRobotPanelProps {
    * compact: スペック一覧カードの画像ヘッダー（親がborder/roundingを持つ）
    */
   variant?: 'visual' | 'compact';
+}
+
+// pointer:fine（マウス）デバイス判定。useEffect + setState ではなく
+// useSyncExternalStore で表現する（react-hooks/set-state-in-effect回避）。
+const subscribePointerDeviceNoop = () => () => {};
+const getPointerDeviceSnapshot = () => window.matchMedia('(pointer: fine)').matches;
+const getPointerDeviceServerSnapshot = () => false;
+function usePointerDevice(): boolean {
+  return useSyncExternalStore(
+    subscribePointerDeviceNoop,
+    getPointerDeviceSnapshot,
+    getPointerDeviceServerSnapshot,
+  );
 }
 
 function CompactList({ items }: { items: string[] }) {
@@ -54,11 +67,8 @@ export function ComparisonRobotPanel({
 
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  // pointer:fine（マウス）デバイスのみ D&D を有効化。useEffect でクライアント判定し SSR との mismatch を回避。
-  const [isPointerDevice, setIsPointerDevice] = useState(false);
-  useEffect(() => {
-    setIsPointerDevice(window.matchMedia('(pointer: fine)').matches);
-  }, []);
+  // pointer:fine（マウス）デバイスのみ D&D を有効化。クライアント判定し SSR との mismatch を回避。
+  const isPointerDevice = usePointerDevice();
 
   const canDrag = isPointerDevice && !!dragHandleProps;
 

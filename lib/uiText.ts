@@ -122,6 +122,7 @@ export const uiText = {
   },
   reports: {
     breadcrumb: '記事',
+    description: 'ニュース・メーカー解説・ロボット解説を、導入判断に必要な観点で整理した記事一覧です。',
     /** メーカー解説（manufacturer-guide）テンプレート専用のUI文言 */
     guideLineupRobot: '機体',
     guideLineupRole: '位置づけ',
@@ -257,7 +258,7 @@ export const uiText = {
     coreVariables: '基本スペック',
     detailedData: '詳細データ',
     japanSupport: '国内対応',
-    dimensions: '外形寸法',
+    dimensions: '寸法',
     detailsLabel: '詳細',
     detailsAria: (name: string) => `${name}の詳細を確認する`,
     closeDetail: '詳細を閉じる',
