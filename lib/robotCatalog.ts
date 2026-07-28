@@ -1,7 +1,6 @@
 import type {
   Manufacturer,
   Robot,
-  RobotLoadRating,
   RobotPriceOffer,
   Source,
   UseCase,

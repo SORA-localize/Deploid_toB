@@ -169,9 +169,13 @@ export function SearchableDropdown({
     document.getElementById(activeOptionId)?.scrollIntoView({ block: "nearest" })
   }, [activeOptionId])
 
-  React.useEffect(() => {
+  // query が変わったら選択中インデックスをリセットする。エフェクトではなく
+  // レンダー中に前回値と比較して調整する（react-hooks/set-state-in-effect回避）。
+  const [prevQuery, setPrevQuery] = React.useState(query)
+  if (query !== prevQuery) {
+    setPrevQuery(query)
     setActiveIndex(-1)
-  }, [query])
+  }
 
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange}>

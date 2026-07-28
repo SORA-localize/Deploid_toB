@@ -2,11 +2,13 @@
 
 import { useCallback, useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { NewsCardGridSkeleton } from '@/components/NewsCardGridSkeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { NewsFeatureCard } from '@/components/NewsFeatureCard';
 import { NewsCard } from '@/components/NewsCard';
 import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
+import { PageListHeader } from '@/components/PageListHeader';
 import { ReportsHeader } from '@/components/ReportsHeader';
 import { SearchInput } from '@/components/SearchInput';
 import { CardHoverEffect } from '@/components/ui/card-hover-effect';
@@ -123,6 +125,11 @@ export function ReportsBrowser({
   return (
     <div className="bg-background">
       <ReportsHeader activeShelf={activeShelf} tabs={shelfTabs} onShelfSelect={updateShelf} />
+
+      <div className="site-container pt-5">
+        <Breadcrumbs items={[{ label: uiText.reports.breadcrumb }]} />
+        <PageListHeader title={uiText.reports.title} description={uiText.reports.description} />
+      </div>
 
       {/* ── 検索 ── */}
       <div className="border-b border-border bg-card">

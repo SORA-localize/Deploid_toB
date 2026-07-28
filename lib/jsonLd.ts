@@ -125,7 +125,10 @@ export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
 }
 
 
-export function useCaseJsonLd(useCase: UseCase) {
+// Note: named `build...` (not `useCaseJsonLd`) so the `use`-prefixed name doesn't
+// get misidentified as a React Hook by react-hooks/rules-of-hooks — this is a plain
+// data builder called from an async Server Component, not a hook.
+export function buildUseCaseJsonLd(useCase: UseCase) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',

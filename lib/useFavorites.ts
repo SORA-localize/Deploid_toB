@@ -23,8 +23,13 @@ export function useFavorites() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setFavorites(parseFavorites(localStorage.getItem(FAVORITES_KEY)));
-    setIsMounted(true);
+    // localStorage（外部システム）から初期値を読み込む。以後の変化は下の
+    // storageイベント購読エフェクトが担う（React公式の「外部システムに同期する」パターン）。
+    const loadInitialFavorites = () => {
+      setFavorites(parseFavorites(localStorage.getItem(FAVORITES_KEY)));
+      setIsMounted(true);
+    };
+    loadInitialFavorites();
   }, []);
 
   useEffect(() => {
