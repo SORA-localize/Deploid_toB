@@ -26,6 +26,34 @@ updated: 2026-07-28
 
 ---
 
+## Findings from Phase 1 review (not yet actioned)
+
+Phase 1のレビュー中に見つかった、list page header block（breadcrumb + H1 +
+description + search）に関する発見。File:lineはPhase 1完了時点（2026-07-28）の
+working treeで検証済みで、後続の変更でずれる可能性がある。
+
+- **F6-01**: `components/CompareClient.tsx:313-322`が`PageListHeader`を使わず
+  独自headerを実装している。H1が`text-2xl md:text-3xl`（他ページの固定
+  `text-2xl`より画面幅次第で大きくなる）、wrapperが`py-8`（Robots/
+  Manufacturers/UseCasesは`py-5`、Reportsは`py-4`で、実際には3種類の値が混在）。
+  Task 1のFile Structureに`CompareClient.tsx`が含まれていないため、この修正は
+  範囲外。Task 1と同様のPageListHeader統一をCompareにも適用するかは別途判断。
+- **F6-02**: Reports H1は選択中shelf tabに関わらず常に静的な「記事」。
+  shelf別ラベルは`lib/articleShelves.ts`の`ARTICLE_SHELF_TABS`
+  （すべて/ニュース/メーカー解説/ロボット解説/基礎知識）に既に存在し、動的H1化に
+  転用できる。Task 1のスコープには含まれていない新規提案。
+- **F6-03**（Task 1との関係に注意）: Reportsの`description`表示が不要では、
+  という未確定のproduct opinionがある。Task 1 Step 2は`description`を明示的に
+  保持する設計（`description={uiText.reports.description}`）になっているため、
+  このopinionを採用するならTask 1 Step 2の設計変更が必要。矛盾したまま両方を
+  計画に残さないこと。
+
+F6-01とF6-02は今回のFile Structure（下記）に未反映のため、着手時に追加が必要。
+Task 1 Step 2（Reportsへのaction prop追加）は既にこの計画自身が規定済みであり、
+本sectionの対象外。
+
+---
+
 ## File Structure
 
 ### 新規作成
@@ -48,6 +76,7 @@ updated: 2026-07-28
 | `components/PageTabBar.tsx` | tablist、roving focus、hint |
 | `components/ReportsHeader.tsx` | contextual tabsのみ |
 | `components/ReportsBrowser.tsx` | list H1/description/search |
+| `components/CompareClient.tsx` | list header統一（F6-01、要スコープ確定） |
 | `components/NewsHeroCarousel.tsx` | autoplay state/control |
 | `components/uilayouts/carousel.tsx` | semantic slides/dots、motion削除 |
 | `components/Header.tsx` | focus testで見つかった欠陥だけ修正 |
@@ -128,6 +157,7 @@ for (const route of routes) {
 ```
 
 旧search専用border bandを削除する。heroとgridのcontainer幅は維持する。
+（Phase 1 reviewでの現状確認: `ReportsBrowser.tsx:131`は本Stepの`action`未指定）
 
 - [ ] **Step 3: PageListHeaderのsemantic contractを固定する**
 
@@ -630,37 +660,6 @@ git diff --check
 git add docs/decisions/ui_architecture_and_development_policy_v1.md docs/decisions/design_system_v1.md
 git commit -m "docs: align ui policy with accessible interactions"
 ```
-
----
-
-## Findings from Phase 1 review (2026-07-28, not yet actioned)
-
-List page header block（breadcrumb + H1 + description + search）has no shared
-template despite `PageListHeader`/`Breadcrumbs` already existing as reusable
-components. Confirmed inconsistencies:
-
-- `components/CompareClient.tsx:313-322` hand-rolls its own header instead of
-  using `PageListHeader`: H1 is `text-2xl md:text-3xl` (grows on tablet+,
-  larger than every other list page's fixed `text-2xl`) and the wrapper uses
-  `py-8` vs `py-5` everywhere else (RobotsBrowser, ManufacturersBrowser,
-  UseCasesBrowser) — visibly more top/bottom whitespace than its siblings.
-- `components/ReportsBrowser.tsx` uses `PageListHeader` (added in Phase 1 to
-  fix the missing-H1 gap) but does not pass an `action` prop; its search bar
-  sits in a separate block below instead of beside the H1, unlike
-  `UseCasesBrowser.tsx` which already demonstrates the `action`-prop pattern
-  for exactly this layout.
-- Reports' H1 is a static "記事" regardless of the selected shelf tab. The
-  per-shelf labels already exist in `lib/articleShelves.ts`
-  (`ARTICLE_SHELF_TABS`: すべて/ニュース/メーカー解説/ロボット解説/基礎知識) and
-  could drive a dynamic H1 instead.
-- Product opinion (unconfirmed): Reports' `description` text may be
-  unnecessary and could be dropped.
-
-Candidate scope for this phase: extract one shared list-page-header pattern
-(or a documented convention in `docs/decisions/design_system_v1.md`, which
-currently covers the robot detail spec explorer's tabs in detail but says
-nothing about this block) that Compare and Reports both conform to, instead
-of each page hand-tuning its own spacing/sizing.
 
 ---
 

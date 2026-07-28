@@ -95,7 +95,7 @@ Homeの4MB超HTMLを最初に直すため効果は早い。しかし、E2Eとbun
 - CMS / DB方針と全体roadmapは `docs/refactor-planning-20260726` のcommit `c1f3f58` に分離済み
 - `docs/archive/manufacturer-guide-per-file-split-plan-v1.md` の既存未コミット差分は、今回の計画commitへ含めない
 - workspace直下の `README.md` はnested repository外のため、Git branchの復元対象外
-- **フォローアップ（2026-07-28、Phase 1のPR作成時に判明）**: `origin/main`がこの4コミット分local `main`より遅れている間、`refactor/integration-20260726`ベースのPRは全てこの4コミットを差分に含めてしまう（PRのbaseがGitHub上の`origin/main`で計算されるため）。`main`をfast-forward pushして`origin/main`を追いつかせるかどうかは、本refactor作業とは別に判断する。pushする場合、Vercelが`main`へのpushで本番デプロイを実行する構成になっていないか確認してから行う。
+- `origin/main`がこの4コミット分local `main`より遅れている間、`refactor/integration-20260726`ベースのPRの差分にはこの4コミットが混入する
 
 ### 4.2. Branch構成
 
@@ -123,6 +123,7 @@ main
 6. 失敗したphaseはintegrationへmergeせず、branchを保持して原因を調査する
 7. `main` 反映はphase単位でreview可能な状態になってから行う
 8. force-push、`git reset --hard`、既存commitの書換えを通常手順に含めない
+9. `main`のfast-forward pushは本refactorと分離して判断する。リポジトリはVercelプロジェクト（`team_ijw72r...`/`prj_uij9sR...`）へlink済みのため、実行前に本番デプロイ誘発の有無を確認する
 
 既存archive差分はpath限定stashに隔離し、refactor branchへ持ち込まない。内容の採否は別作業として扱う。
 
