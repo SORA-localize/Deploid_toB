@@ -53,3 +53,25 @@ Verification of `.next/diagnostics/route-bundle-stats.json`:
 | articles | 34 |
 | useCases | 44 |
 | deployments | 11 |
+
+## Known issues (found during Phase 1 review, not fixed in Phase 1)
+
+- **PPR dynamic detail routes return HTTP 200 for a nonexistent slug, not 404.**
+  Confirmed empirically on `refactor/integration-20260726` (2026-07-27): requesting
+  `/robots/<nonexistent-slug>` against a production build returns `HTTP 200` with the
+  `not-found.tsx` boundary rendered in the body, while a route with no matching page at
+  all (e.g. `/this-page-does-not-exist`) correctly returns `404`. The page component
+  does call `notFound()` correctly (`src/app/robots/[slug]/page.tsx`); the status
+  mismatch is caused by Next.js Partial Prerendering sending the static shell (and its
+  200 status) before the dynamic segment resolves to the not-found boundary during
+  streaming. This is a pre-existing platform behavior, not something introduced by
+  Phase 1's diff, and likely affects the other `[slug]` detail routes
+  (`/manufacturers/[slug]`, `/use-cases/[slug]`, `/reports/[slug]`) the same way.
+  Fixing the actual status code requires changing the route's rendering/PPR
+  configuration, which is a rendering-strategy decision, not a Phase 1 (quality gates)
+  change. Phase 1's own E2E gate was hardened instead (`tests/e2e/public-routes.spec.ts`)
+  to assert each route's real H1 content and the absence of the not-found string, so the
+  test suite itself cannot be fooled by this — but the underlying status-code behavior is
+  still open. Candidate owner: a future phase touching rendering/PPR strategy (no
+  existing phase 1–7 task currently claims this explicitly; closest is
+  `refactor-phase-04-home-performance-v1.md`, which is scoped to Home only).
