@@ -1,3 +1,8 @@
+---
+status: reference
+updated: 2026-07-28
+---
+
 # Pre-migration Refactor Baseline — 2026-07-26
 
 ## Environment
@@ -65,8 +70,9 @@ Verification of `.next/diagnostics/route-bundle-stats.json`:
   mismatch is caused by Next.js Partial Prerendering sending the static shell (and its
   200 status) before the dynamic segment resolves to the not-found boundary during
   streaming. This is a pre-existing platform behavior, not something introduced by
-  Phase 1's diff, and likely affects the other `[slug]` detail routes
-  (`/manufacturers/[slug]`, `/use-cases/[slug]`, `/reports/[slug]`) the same way.
+  Phase 1's diff. Confirmed (2026-07-28) to affect all other `[slug]` detail routes the
+  same way: `/manufacturers/<nonexistent-slug>`, `/use-cases/<nonexistent-slug>`, and
+  `/reports/<nonexistent-slug>` all return `HTTP 200` with the not-found body.
   Fixing the actual status code requires changing the route's rendering/PPR
   configuration, which is a rendering-strategy decision, not a Phase 1 (quality gates)
   change. Phase 1's own E2E gate was hardened instead (`tests/e2e/public-routes.spec.ts`)
