@@ -1,6 +1,6 @@
 ---
 status: plan
-updated: 2026-07-26
+updated: 2026-07-28
 ---
 
 # Phase 6 UI and Accessibility Implementation Plan
@@ -630,6 +630,37 @@ git diff --check
 git add docs/decisions/ui_architecture_and_development_policy_v1.md docs/decisions/design_system_v1.md
 git commit -m "docs: align ui policy with accessible interactions"
 ```
+
+---
+
+## Findings from Phase 1 review (2026-07-28, not yet actioned)
+
+List page header block（breadcrumb + H1 + description + search）has no shared
+template despite `PageListHeader`/`Breadcrumbs` already existing as reusable
+components. Confirmed inconsistencies:
+
+- `components/CompareClient.tsx:313-322` hand-rolls its own header instead of
+  using `PageListHeader`: H1 is `text-2xl md:text-3xl` (grows on tablet+,
+  larger than every other list page's fixed `text-2xl`) and the wrapper uses
+  `py-8` vs `py-5` everywhere else (RobotsBrowser, ManufacturersBrowser,
+  UseCasesBrowser) — visibly more top/bottom whitespace than its siblings.
+- `components/ReportsBrowser.tsx` uses `PageListHeader` (added in Phase 1 to
+  fix the missing-H1 gap) but does not pass an `action` prop; its search bar
+  sits in a separate block below instead of beside the H1, unlike
+  `UseCasesBrowser.tsx` which already demonstrates the `action`-prop pattern
+  for exactly this layout.
+- Reports' H1 is a static "記事" regardless of the selected shelf tab. The
+  per-shelf labels already exist in `lib/articleShelves.ts`
+  (`ARTICLE_SHELF_TABS`: すべて/ニュース/メーカー解説/ロボット解説/基礎知識) and
+  could drive a dynamic H1 instead.
+- Product opinion (unconfirmed): Reports' `description` text may be
+  unnecessary and could be dropped.
+
+Candidate scope for this phase: extract one shared list-page-header pattern
+(or a documented convention in `docs/decisions/design_system_v1.md`, which
+currently covers the robot detail spec explorer's tabs in detail but says
+nothing about this block) that Compare and Reports both conform to, instead
+of each page hand-tuning its own spacing/sizing.
 
 ---
 
