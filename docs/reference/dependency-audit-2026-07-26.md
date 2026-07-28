@@ -70,7 +70,7 @@ once those packages (or their own dependency pins) are updated.
 
 | Package | Installed | Advisory path | Action |
 |---|---:|---|---|
-| next | 16.2.6 | next, postcss (bundled), sharp (optional) | Update to 16.2.12 (fixes the `next`-authored CVEs; does **not** by itself fix the nested `postcss`/`sharp` advisories — see note above) |
+| next | 16.2.12 | postcss (bundled), sharp (optional) | **Done in Task 3** (`fix: update next to patched 16.2.12`). Updated `next@^16.2.6` → `^16.2.12`; the `next`-authored CVE is resolved. `postcss@8.4.31` (bundled) and `sharp@^0.34.5` (optional) are unchanged in `16.2.12` — those advisories remain open, as anticipated. See "Task 3 results" section below |
 | shadcn | **REMOVED** (was 4.10.0) | ~~MCP/Hono/ts-morph/ajv/express subtree (hono, brace-expansion, fast-uri, @hono/node-server, @modelcontextprotocol/sdk, js-yaml (partial), body-parser)~~ — resolved | **Done in Task 2** (`chore: remove shadcn package runtime dependency`). The `src/app/globals.css:3` `@import "shadcn/tailwind.css";` line was deleted (no local re-implementation of any shadcn custom CSS — `accordion-down/up` keyframes, `no-scrollbar`, etc. all had 0 source usage). `components/ui/select.tsx` had its two shadcn-specific Tailwind variant usages ported to standard Tailwind arbitrary data-variant syntax: `data-open:` → `data-[state=open]:`, `data-closed:` → `data-[state=closed]:`, `data-disabled:` → `data-[disabled]:`. `npm uninstall shadcn` then removed the package and its entire MCP/Hono/ts-morph/ajv/express transitive subtree. See "Task 2 results" section below for the full before/after audit delta |
 | budoux | 0.8.4 | budoux → google-artifactregistry-auth → google-auth-library → gcp-metadata/gtoken → gaxios (moderate), gaxios → uuid (moderate), google-artifactregistry-auth → js-yaml (moderate range only) | `budoux` **is** imported at runtime (`lib/typography.ts:1` — `import { loadDefaultJapaneseParser } from 'budoux'`) for Japanese text-wrapping. Unlike `shadcn`, this package cannot simply be deleted; its own `dependencies` list `google-artifactregistry-auth` (a publish/registry-auth helper) as a runtime dependency, which is almost certainly dead weight inside `budoux` itself. No local action available beyond watching for a `budoux` release that drops or updates that dependency, or `npm overrides` on `gaxios`/`uuid` if upgrading in place |
 
@@ -122,9 +122,9 @@ open as of this update.
 
 | Package | Severity | `npm explain` direct path | Runtime reachability | Fixed version | Fix commit |
 |---|---|---|---|---|---|
-| next | high | root project → `next@^16.2.6` | Yes — the entire app runs on `next` | 16.2.12 (current `latest`) | TBD |
-| postcss (nested) | high | root project → `next@16.2.6` → bundled `postcss@8.4.31` | Build/SSR-internal to `next`'s own tooling; not imported by app code directly, but still shipped in the production install | Not resolved by `next@16.2.12` alone (still pins 8.4.31); needs an `overrides`/`resolutions` entry or a later `next` release | TBD |
-| sharp | high | root project → `next@16.2.6` → optional `sharp@^0.34.5` | Yes — `next/image` is used in 10+ components and `next.config.mjs` configures `images.formats`, so sharp actively processes images via the Image Optimization route | Not resolved by `next@16.2.12` alone (still pins `^0.34.5`); needs `sharp@>=0.35.0` via `overrides` | TBD |
+| next | high | ~~root project → `next@^16.2.6`~~ | **RESOLVED (Task 3)** — the `next`-authored CVE for `9.3.4-canary.0 – 16.3.0-preview.7` is cleared by updating to `16.2.12`. `next` still appears in `npm audit` output after Task 3, but now only as a *parent* entry ("Depends on vulnerable versions of postcss/sharp") — it no longer carries its own direct advisory | 16.2.12 | `fix: update next to patched 16.2.12` |
+| postcss (nested) | high | root project → `next@16.2.12` → bundled `postcss@8.4.31` | Build/SSR-internal to `next`'s own tooling; not imported by app code directly, but still shipped in the production install | **Still open.** Confirmed via `npm view next@16.2.12 dependencies.postcss` → `8.4.31`, unchanged from `16.2.6`. Needs an `overrides`/`resolutions` entry or a later `next` release. Out of scope for Task 3 (see brief); left for Task 4 | TBD |
+| sharp | high | root project → `next@16.2.12` → optional `sharp@^0.34.5` | Yes — `next/image` is used in 10+ components and `next.config.mjs` configures `images.formats`, so sharp actively processes images via the Image Optimization route | **Still open.** Confirmed via `npm view next@16.2.12 optionalDependencies.sharp` → `^0.34.5`, unchanged from `16.2.6`. Needs `sharp@>=0.35.0` via `overrides`. Out of scope for Task 3 (see brief); left for Task 4 | TBD |
 | hono | high | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0` → `hono@^4.11.4`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥4.12.27 (per advisory ranges) | `chore: remove shadcn package runtime dependency` |
 | brace-expansion | high | ~~root project → `shadcn@^4.10.0` → `ts-morph` → `@ts-morph/common` → `minimatch@^10.2.2` → `brace-expansion@^5.0.5`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥5.0.8 (per advisory range `<=5.0.7`) | `chore: remove shadcn package runtime dependency` |
 | fast-uri | high | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk` → `ajv-formats`/`ajv@^8.x` → `fast-uri@^3.0.1`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥3.1.4/≥3.1.5 (per advisory ranges) | `chore: remove shadcn package runtime dependency` |
@@ -189,19 +189,106 @@ advisories" table above): `next` (high), `postcss` nested copy (high), `sharp` (
 `js-yaml` (high, now reached only via the `budoux` path), `gaxios` (moderate), `uuid`
 (moderate). These are tracked as open follow-up work for later tasks in this phase.
 
+## Task 3 results — Next.js patch update (2026-07-29)
+
+Task 3 of this phase (`refactor-phase-02-dependency-security-v1/task-3-brief.md`)
+updated `next` and `eslint-config-next` to the patched `16.2.12` release, scoped
+exactly per the brief (no React/React DOM/TypeScript/Tailwind changes).
+
+### Pre-check (Step 1)
+
+```
+npm view next@16.2.12 version        → 16.2.12
+npm ls next eslint-config-next       → next@16.2.6 (direct + deduped under
+                                        @vercel/analytics); eslint-config-next@16.2.12
+                                        (already at target — a prior task/install had
+                                        already bumped the devDependency declaration to
+                                        `^16.2.12` in package.json, but the installed
+                                        `next` itself was still 16.2.6)
+```
+
+### What changed
+
+- `package.json`: `"next": "^16.2.6"` → `"next": "^16.2.12"`. `eslint-config-next` was
+  already declared as `^16.2.12` in `package.json`, so `npm install --save-dev
+  eslint-config-next@16.2.12` made no further change there.
+- `package-lock.json`: `next` bumped `16.2.6` → `16.2.12`, plus its platform-specific
+  transitive binaries (`@next/env`, `@next/swc-darwin-arm64`, `@next/swc-darwin-x64`,
+  `@next/swc-linux-arm64-gnu`, `@next/swc-linux-arm64-musl`, `@next/swc-linux-x64-gnu`,
+  `@next/swc-linux-x64-musl`, `@next/swc-win32-arm64-msvc`, `@next/swc-win32-x64-msvc`)
+  bumped in lockstep. No other package's version changed in the lockfile — verified by
+  extracting every changed package name from `git diff -- package-lock.json`, which
+  returned only `next`/`@next/*` entries plus the top-level `resolved`/`integrity`/
+  `version` fields belonging to them.
+- No `react`, `react-dom`, `typescript`, or `tailwind*` version changed (confirmed by
+  inspecting the full `package.json`/`package-lock.json` diff).
+
+### Verification performed (Step 3–4)
+
+- `npm ls next eslint-config-next` after install → `next@16.2.12` (direct + deduped
+  under `@vercel/analytics`), `eslint-config-next@16.2.12`.
+- `npm view next@16.2.12 dependencies.postcss` → `8.4.31` and `npm view next@16.2.12
+  optionalDependencies.sharp` → `^0.34.5` — both unchanged from `16.2.6`, confirming the
+  brief's expectation that this update does **not** touch the nested `postcss`/`sharp`
+  advisories.
+- `npm run check` (validate:data → typecheck → lint → test → build → test:e2e) run
+  **twice**, both **exit 0**. `next build` banner confirms `▲ Next.js 16.2.12
+  (Turbopack)`. Lint: 0 errors, 6 pre-existing warnings (`no-img-element` /
+  `exhaustive-deps`), identical to the Task 2 baseline — unrelated to this change. Unit
+  tests: 21/21 passed. E2E: 20/20 passed both runs (no flake this time).
+
+### Audit delta (`npm audit --omit=dev --json` → `.metadata.vulnerabilities`)
+
+| Severity | Before (Task 2 end state) | After (Task 3) | Δ |
+|---|---:|---:|---:|
+| critical | 0 | 0 | 0 |
+| high | 4 | 4 | 0 |
+| moderate | 2 | 3 | +1 |
+| low | 0 | 0 | 0 |
+| **total** | **6** | **7** | **+1** |
+
+This total going *up* by one looks surprising at first glance, so here is the
+package-level breakdown (`npm audit --omit=dev --json` → `.vulnerabilities`, each row's
+`via` chain):
+
+| Package | Severity | Via | Status |
+|---|---|---|---|
+| next | high | `postcss`, `sharp` (as parent/depender only) | **Own CVE resolved.** Pre-Task-3, `next` was flagged as a `direct dependency` with its own advisory (`9.3.4-canary.0 – 16.3.0-preview.7`, installed `16.2.6`). Post-Task-3, `next` only appears because it *depends on* the still-vulnerable `postcss`/`sharp` — it no longer carries a direct advisory of its own |
+| postcss (nested) | high | `postcss` (self) | Unchanged — still `8.4.31` under `next`, as expected (see "Remaining advisories" above) |
+| sharp | high | `sharp` (self) | Unchanged — still `^0.34.5` under `next`, as expected |
+| js-yaml | high | `js-yaml` (self, via `budoux`) | Unchanged, unrelated to this task |
+| gaxios | moderate | `uuid` | Unchanged, unrelated to this task |
+| uuid | moderate | `uuid` (self) | Unchanged, unrelated to this task |
+| **@vercel/analytics** | **moderate** | `next` | **New.** `@vercel/analytics` depends on `next` and is deduped onto the same (still-vulnerable-via-postcss/sharp) `next` install, so `npm audit`'s tree walk now also surfaces `@vercel/analytics` as an indirect path to the *same* underlying `postcss`/`sharp` issues. This is not a new vulnerability class — it is the existing `postcss`/`sharp` advisories becoming reachable via one additional dependency edge after the version bump changed `npm audit`'s resolved tree. No action available until `postcss`/`sharp` are fixed (Task 4 scope) |
+
+Net effect: the `next`-specific advisory that motivated this task is confirmed gone
+(4 high before and after, but the composition changed — `next`'s own CVE dropped out,
+`postcss`/`sharp`/`js-yaml` remain the 4 high entries). The `+1` moderate is the
+`@vercel/analytics` entry above, an artifact of the same open `postcss`/`sharp` issues
+becoming visible via a second path — not a regression introduced by this task and not
+something in scope to fix here. `postcss` and `sharp` remain open, exactly as the
+brief anticipated, and are left for Task 4 (likely via an `overrides` entry).
+
 ## Commands
 
 ```bash
+npm view next@16.2.12 version
+npm view next@16.2.12 dependencies.postcss optionalDependencies.sharp
 npm audit --omit=dev --json
 npm audit --omit=dev
 npm explain <package>
 npm run check
+npm install next@16.2.12
+npm install --save-dev eslint-config-next@16.2.12
 npm uninstall shadcn
 npm ls shadcn --depth=0
+npm ls next eslint-config-next
 rg -n "shadcn/tailwind.css|data-(open|closed|disabled):" src components
 ```
 
 Task 1 (audit-only) made no `package.json`/`package-lock.json`/source changes. Task 2
-(this update) modified `package.json`, `package-lock.json`, `src/app/globals.css`, and
-`components/ui/select.tsx`, and is the first task in this phase to land an actual fix
-rather than documentation.
+modified `package.json`, `package-lock.json`, `src/app/globals.css`, and
+`components/ui/select.tsx` (the first task in this phase to land an actual fix rather
+than documentation). Task 3 (this update) modified `package.json` and
+`package-lock.json` (updating `next` to `16.2.12`; `eslint-config-next` was already at
+`16.2.12` in `package.json`) plus this audit document.
