@@ -71,7 +71,7 @@ once those packages (or their own dependency pins) are updated.
 | Package | Installed | Advisory path | Action |
 |---|---:|---|---|
 | next | 16.2.6 | next, postcss (bundled), sharp (optional) | Update to 16.2.12 (fixes the `next`-authored CVEs; does **not** by itself fix the nested `postcss`/`sharp` advisories — see note above) |
-| shadcn | 4.10.0 | MCP/Hono/ts-morph/ajv/express subtree (hono, brace-expansion, fast-uri, @hono/node-server, @modelcontextprotocol/sdk, js-yaml (partial), body-parser) | No runtime import found anywhere in the app (`rg` for `from ['"]shadcn`, `require(['"]shadcn`, `npx shadcn`, `npm exec shadcn` → 0 hits outside `node_modules`/lockfile). It is used only as a dev-time CLI (`npx shadcn add ...`) that copies component source into `components/ui/*`. `src/app/globals.css:3` imports `shadcn/tailwind.css`, and `components/ui/select.tsx` uses shadcn/Radix-flavored `data-open:`, `data-closed:`, and `data-disabled:` Tailwind variants. Replace both with standard Tailwind arbitrary data-variant syntax (e.g. `data-[state=open]:`) before removing the `shadcn` package from `dependencies` |
+| shadcn | **REMOVED** (was 4.10.0) | ~~MCP/Hono/ts-morph/ajv/express subtree (hono, brace-expansion, fast-uri, @hono/node-server, @modelcontextprotocol/sdk, js-yaml (partial), body-parser)~~ — resolved | **Done in Task 2** (`chore: remove shadcn package runtime dependency`). The `src/app/globals.css:3` `@import "shadcn/tailwind.css";` line was deleted (no local re-implementation of any shadcn custom CSS — `accordion-down/up` keyframes, `no-scrollbar`, etc. all had 0 source usage). `components/ui/select.tsx` had its two shadcn-specific Tailwind variant usages ported to standard Tailwind arbitrary data-variant syntax: `data-open:` → `data-[state=open]:`, `data-closed:` → `data-[state=closed]:`, `data-disabled:` → `data-[disabled]:`. `npm uninstall shadcn` then removed the package and its entire MCP/Hono/ts-morph/ajv/express transitive subtree. See "Task 2 results" section below for the full before/after audit delta |
 | budoux | 0.8.4 | budoux → google-artifactregistry-auth → google-auth-library → gcp-metadata/gtoken → gaxios (moderate), gaxios → uuid (moderate), google-artifactregistry-auth → js-yaml (moderate range only) | `budoux` **is** imported at runtime (`lib/typography.ts:1` — `import { loadDefaultJapaneseParser } from 'budoux'`) for Japanese text-wrapping. Unlike `shadcn`, this package cannot simply be deleted; its own `dependencies` list `google-artifactregistry-auth` (a publish/registry-auth helper) as a runtime dependency, which is almost certainly dead weight inside `budoux` itself. No local action available beyond watching for a `budoux` release that drops or updates that dependency, or `npm overrides` on `gaxios`/`uuid` if upgrading in place |
 
 ## Step 2 findings — usage search (verbatim confirmation of brief expectations)
@@ -115,24 +115,79 @@ past the vulnerable range and unaffected.
 
 ## Remaining advisories
 
-Ledger to be filled in as later tasks in this phase land fixes. One row per advisory
-still open after this documentation task (none have been fixed yet — this task is
-audit-only, no `package.json`/`package-lock.json` changes were made).
+Ledger filled in as later tasks in this phase land fixes. Rows below marked
+**RESOLVED (Task 2)** were cleared by removing the `shadcn` package entirely — see
+"Task 2 results" below for the full before/after audit delta. All other rows are still
+open as of this update.
 
 | Package | Severity | `npm explain` direct path | Runtime reachability | Fixed version | Fix commit |
 |---|---|---|---|---|---|
 | next | high | root project → `next@^16.2.6` | Yes — the entire app runs on `next` | 16.2.12 (current `latest`) | TBD |
 | postcss (nested) | high | root project → `next@16.2.6` → bundled `postcss@8.4.31` | Build/SSR-internal to `next`'s own tooling; not imported by app code directly, but still shipped in the production install | Not resolved by `next@16.2.12` alone (still pins 8.4.31); needs an `overrides`/`resolutions` entry or a later `next` release | TBD |
 | sharp | high | root project → `next@16.2.6` → optional `sharp@^0.34.5` | Yes — `next/image` is used in 10+ components and `next.config.mjs` configures `images.formats`, so sharp actively processes images via the Image Optimization route | Not resolved by `next@16.2.12` alone (still pins `^0.34.5`); needs `sharp@>=0.35.0` via `overrides` | TBD |
-| hono | high | root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0` → `hono@^4.11.4` (also via peer from `@hono/node-server`) | No — `shadcn` has no runtime import in this app; this is a dev-CLI-only transitive dependency | ≥4.12.27 (per advisory ranges) | TBD |
-| brace-expansion | high | root project → `shadcn@^4.10.0` → `ts-morph` → `@ts-morph/common` → `minimatch@^10.2.2` → `brace-expansion@^5.0.5` | No — same shadcn CLI-only subtree | ≥5.0.8 (per advisory range `<=5.0.7`) | TBD |
-| fast-uri | high | root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk` → `ajv-formats`/`ajv@^8.x` → `fast-uri@^3.0.1` | No — same shadcn CLI-only subtree | ≥3.1.4/≥3.1.5 (per advisory ranges) | TBD |
-| @hono/node-server | moderate | root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0` → `@hono/node-server@^1.19.9` | No — same shadcn CLI-only subtree | ≥2.0.5 | TBD |
-| @modelcontextprotocol/sdk | moderate | root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0` | No — same shadcn CLI-only subtree | ≥1.30.0 (pulls in fixed `@hono/node-server`) | TBD |
+| hono | high | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0` → `hono@^4.11.4`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥4.12.27 (per advisory ranges) | `chore: remove shadcn package runtime dependency` |
+| brace-expansion | high | ~~root project → `shadcn@^4.10.0` → `ts-morph` → `@ts-morph/common` → `minimatch@^10.2.2` → `brace-expansion@^5.0.5`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥5.0.8 (per advisory range `<=5.0.7`) | `chore: remove shadcn package runtime dependency` |
+| fast-uri | high | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk` → `ajv-formats`/`ajv@^8.x` → `fast-uri@^3.0.1`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥3.1.4/≥3.1.5 (per advisory ranges) | `chore: remove shadcn package runtime dependency` |
+| @hono/node-server | moderate | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0` → `@hono/node-server@^1.19.9`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥2.0.5 | `chore: remove shadcn package runtime dependency` |
+| @modelcontextprotocol/sdk | moderate | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥1.30.0 (pulls in fixed `@hono/node-server`) | `chore: remove shadcn package runtime dependency` |
 | gaxios | moderate | root project → `budoux@^0.8.4` → `google-artifactregistry-auth@^3.5.0` → `google-auth-library` → `gcp-metadata`/`gtoken` → `gaxios@^6.1.1`/`^6.0.0` | Indirect — `budoux` itself is runtime-reachable (`lib/typography.ts`), but the `google-artifactregistry-auth` subtree it pulls in is registry/publish tooling, not exercised by any code path this app calls | Depends on `uuid` fix upstream in `gaxios`; no direct override identified yet | TBD |
 | uuid | moderate | root project → `budoux` → ... → `gaxios@6.7.1` → `uuid@^9.0.1` | Indirect, same as gaxios above | ≥11.1.1 | TBD |
-| js-yaml | high | root project → `shadcn@^4.10.0` → `cosmiconfig@^9.0.0` → `js-yaml@^4.1.0`; also root project → `budoux` → `google-artifactregistry-auth` → `js-yaml@^4.1.0` | No (shadcn path) / Indirect (budoux path, same reasoning as gaxios) | ≥4.3.0 | TBD |
-| body-parser | low | root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk` → `express@^5.2.1`/`express-rate-limit@^8.2.1` → `body-parser@^2.2.1` | No — same shadcn CLI-only subtree | ≥2.3.0 | TBD |
+| js-yaml | high | ~~root project → `shadcn@^4.10.0` → `cosmiconfig@^9.0.0` → `js-yaml@^4.1.0`~~; also root project → `budoux` → `google-artifactregistry-auth` → `js-yaml@^4.1.0` | shadcn path **RESOLVED (Task 2)**; budoux path still Indirect (same reasoning as gaxios) — package remains flagged in `npm audit` via the budoux path alone | ≥4.3.0 | shadcn path: `chore: remove shadcn package runtime dependency`; budoux path: TBD |
+| body-parser | low | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk` → `express@^5.2.1`/`express-rate-limit@^8.2.1` → `body-parser@^2.2.1`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥2.3.0 | `chore: remove shadcn package runtime dependency` |
+
+## Task 2 results — shadcn package removal (2026-07-29)
+
+Task 2 of this phase (`refactor-phase-02-dependency-security-v1/task-2-brief.md`)
+removed the `shadcn` package's runtime dependency entirely, following Task 1's finding
+that it has zero TypeScript/CLI usage in this repo — its only two touchpoints were a
+CSS `@import` and two package-specific Tailwind variant strings.
+
+### What changed
+
+- `src/app/globals.css`: removed the line `@import "shadcn/tailwind.css";`. No local
+  copies of any shadcn custom CSS (`accordion-down`/`accordion-up` keyframes,
+  `no-scrollbar` utility, etc.) were added, since Task 1 confirmed 0 source usage of
+  those constructs.
+- `components/ui/select.tsx`: replaced the shadcn/Radix-preset-specific Tailwind
+  variants with standard Tailwind arbitrary data-variant syntax:
+  - `data-open:` → `data-[state=open]:`
+  - `data-closed:` → `data-[state=closed]:`
+  - `data-disabled:` → `data-[disabled]:`
+- `npm uninstall shadcn` — removed `shadcn@4.10.0` and its full transitive subtree
+  (MCP SDK, ts-morph, ajv/ajv-formats, express/express-rate-limit, cosmiconfig, hono,
+  etc.) from `package.json` and `package-lock.json`.
+
+### Verification performed
+
+- `npm run build` passed (exit 0) both before and after `npm uninstall shadcn`.
+- `rg -n "shadcn/tailwind.css|data-(open|closed|disabled):" src components` returned
+  0 matches after the edits (previously 3 matches: 1 CSS import + 2 variant usages).
+- `npm ls shadcn --depth=0` → `(empty)` (previously `shadcn@4.10.0`).
+- `npm run check` (validate:data → typecheck → lint → unit tests → build → e2e) passed
+  with exit 0. Lint surfaced only pre-existing warnings unrelated to this change (6
+  `no-img-element`/`exhaustive-deps` warnings, 0 errors). One e2e run hit a flaky
+  30s timeout on the `/robots` axe-accessibility test under back-to-back-run system
+  load; an isolated rerun of `npm run test:e2e` and a subsequent full `npm run check`
+  both passed all 20 e2e tests cleanly — not related to the CSS/variant changes.
+
+### Audit delta (`npm audit --omit=dev --json` → `.metadata.vulnerabilities`)
+
+| Severity | Before (Task 1 baseline, 2026-07-29) | After (Task 2, 2026-07-29) | Δ |
+|---|---:|---:|---:|
+| critical | 0 | 0 | 0 |
+| high | 7 | 4 | −3 |
+| moderate | 4 | 2 | −2 |
+| low | 1 | 0 | −1 |
+| **total** | **12** | **6** | **−6** |
+
+Advisories removed (all were exclusively reached via the `shadcn` subtree):
+`hono` (high), `brace-expansion` (high), `fast-uri` (high), `@hono/node-server`
+(moderate), `@modelcontextprotocol/sdk` (moderate), `body-parser` (low).
+
+Advisories remaining after Task 2 (all unrelated to `shadcn`, per the "Remaining
+advisories" table above): `next` (high), `postcss` nested copy (high), `sharp` (high),
+`js-yaml` (high, now reached only via the `budoux` path), `gaxios` (moderate), `uuid`
+(moderate). These are tracked as open follow-up work for later tasks in this phase.
 
 ## Commands
 
@@ -141,9 +196,12 @@ npm audit --omit=dev --json
 npm audit --omit=dev
 npm explain <package>
 npm run check
+npm uninstall shadcn
+npm ls shadcn --depth=0
+rg -n "shadcn/tailwind.css|data-(open|closed|disabled):" src components
 ```
 
-No fixes were applied as part of this task (`npm audit fix` / `npm audit fix --force`
-were **not** run against the working tree; a `--dry-run` was used only to inspect what
-each would change, and its output informed the "Fixed version" column above). No
-`package.json`, `package-lock.json`, or source files were modified.
+Task 1 (audit-only) made no `package.json`/`package-lock.json`/source changes. Task 2
+(this update) modified `package.json`, `package-lock.json`, `src/app/globals.css`, and
+`components/ui/select.tsx`, and is the first task in this phase to land an actual fix
+rather than documentation.
