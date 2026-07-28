@@ -61,6 +61,7 @@ export const robots: Robot[] = [
       sdk: 'Unitree SDK 2（C++）/ Pythonインターフェース',
       computePlatform: '8コア高性能CPU',
       batterySwapMethod: '手動交換式',
+      batterySystem: '13直列リチウム電池 / クイックリリース式スマートバッテリー',
     },
     procurementModels: ['purchase', 'inquiry'],
     priceOffers: [
@@ -71,6 +72,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://www.unitree.com/g1/'], heightCm: ['https://www.unitree.com/g1/'], weightKg: ['https://www.unitree.com/g1/'], dof: ['https://www.unitree.com/g1/'], runtimeMin: ['https://www.unitree.com/g1/'], controlMethod: ['https://shop.unitree.com/products/unitree-g1'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/g1/'], priceOffers: ['https://shop.unitree.com/products/unitree-g1'], loadRatings: ['https://www.unitree.com/g1/'],
+      batterySystem: ['https://www.unitree.com/g1/'],
     },
     usageExampleSourceUrls: ['https://icontrol.ri.cmu.edu/news/icra2025-wbcd.html', 'https://www.unitree.com/news1/'],
     japanAvailability: 'distributor-japan',
@@ -136,6 +138,7 @@ export const robots: Robot[] = [
       controlMethod: '手動コントローラー / Unitree Exploreアプリ（二次開発対応）',
       sdk: 'Unitree SDK 2（C++）/ Pythonインターフェース',
       computePlatform: '8コア高性能CPU / 高演算モジュール選択可',
+      batterySystem: '13直列リチウム電池 / クイックリリース式スマートバッテリー',
     },
     procurementModels: ['inquiry'],
     loadRatings: [
@@ -143,6 +146,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://www.unitree.com/g1/'], heightCm: ['https://www.unitree.com/g1/'], weightKg: ['https://www.unitree.com/g1/'], runtimeMin: ['https://www.unitree.com/g1/'], controlMethod: ['https://www.unitree.com/g1/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/g1/'], loadRatings: ['https://www.unitree.com/g1/'],
+      batterySystem: ['https://www.unitree.com/g1/'],
     },
     usageExampleSourceUrls: ['https://www.wpunj.edu/articles/news/2025-10-27/humanoid-AI-robot-computer-science-department-william-paterson-university'],
     japanAvailability: 'unknown',
@@ -210,10 +214,12 @@ export const robots: Robot[] = [
       controlMethod: 'リモートコントローラー / Unitree Exploreアプリ',
       sdk: 'Unitree SDK 2（C++）/ Pythonインターフェース',
       computePlatform: 'Intel Core i5/i7 / NVIDIA Jetson Orin NX選択可',
+      batterySystem: '交換式リチウムバッテリー / 最大67.2V',
     },
     procurementModels: ['purchase', 'inquiry'],
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/h1/'], heightCm: ['https://www.unitree.com/mobile/h1/'], weightKg: ['https://www.unitree.com/mobile/h1/'], speedMps: ['https://www.unitree.com/mobile/h1/'], dof: ['https://www.unitree.com/mobile/h1/'], controlMethod: ['https://www.unitree.com/app/h1/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/mobile/h1/'],
+      batterySystem: ['https://www.unitree.com/mobile/h1/'],
     },
     usageExampleSourceUrls: ['https://www.unitree.com/news1/'],
     japanAvailability: 'distributor-japan',
@@ -283,6 +289,7 @@ export const robots: Robot[] = [
       controlMethod: 'リモートコントローラー / Unitree Exploreアプリ',
       sdk: 'Unitree SDK2（C++）/ Pythonインターフェース（xr_teleoperate、unitree_lerobotでも対応）',
       computePlatform: 'Intel Core i5/i7 / NVIDIA Jetson Orin NX最大3基選択可',
+      batterySystem: 'リチウムバッテリー / 最大67.2V',
     },
     procurementModels: ['inquiry'],
     loadRatings: [
@@ -291,6 +298,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/h1/'], heightCm: ['https://www.unitree.com/mobile/h1/'], weightKg: ['https://www.unitree.com/mobile/h1/'], dof: ['https://www.unitree.com/mobile/h1/'], controlMethod: ['https://www.unitree.com/app/h1/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/mobile/h1/'], loadRatings: ['https://www.unitree.com/mobile/h1/'],
+      batterySystem: ['https://www.unitree.com/mobile/h1/'],
     },
     japanAvailability: 'unknown',
     industryTags: ['research'],
@@ -371,6 +379,7 @@ export const robots: Robot[] = [
       weightKg: 73,
       runtimeMin: 240,
       controlMethod: '力制御による自律・汎用作業プラットフォーム',
+      batterySystem: '交換式バッテリー（1本あたり約4時間）',
     },
     procurementModels: ['partner-program', 'inquiry'],
     loadRatings: [
@@ -389,6 +398,7 @@ export const robots: Robot[] = [
       runtimeMin: ['https://apptronik.com/news-collection/apptronik-unveils-apollo'],
       controlMethod: ['https://apptronik.com/news-collection/apptronik-unveils-apollo'],
       loadRatings: ['https://apptronik.com/news-collection/apptronik-unveils-apollo'],
+      batterySystem: ['https://apptronik.com/news-collection/apptronik-unveils-apollo'],
     },
     usageExampleSourceUrls: [
       'https://apptronik.com/news-collection/apptronik-and-mercedes-benz-enter-commercial-agreement',
@@ -545,6 +555,7 @@ export const robots: Robot[] = [
       runtimeMin: 240,
       controlMethod: '自律運転 / Arcクラウドフリート管理',
       mobility: 'biped',
+      batterySystem: 'バッテリー / 自律充電ドック',
     },
     procurementModels: ['raas', 'inquiry', 'partner-program'],
     loadRatings: [
@@ -564,6 +575,7 @@ export const robots: Robot[] = [
       runtimeMin: ['https://www.agilityrobotics.com/solutions'],
       controlMethod: ['https://www.agilityrobotics.com/solutions'],
       loadRatings: ['https://www.agilityrobotics.com/solutions'],
+      batterySystem: ['https://www.agilityrobotics.com/content/agility-robotics-announces-new-innovations-for-market-leading-humanoid-robot-digit'],
     },
     usageExampleSourceUrls: [
       'https://www.agilityrobotics.com/content/gxo-signs-industry-first-multi-year-agreement-with-agility-robotics',
@@ -714,6 +726,7 @@ export const robots: Robot[] = [
       controlMethod: '自律実行 / 音声 / モバイルアプリ / VR遠隔操作 / 1X Expert',
       computePlatform: '1X NEO Cortex（NVIDIA Jetson Thor）',
       mobility: 'biped',
+      batterySystem: '自己充電（充電器へ自律接続）',
     },
     procurementModels: ['purchase', 'subscription', 'inquiry'],
     priceOffers: [
@@ -774,6 +787,7 @@ export const robots: Robot[] = [
       mobility: ['https://www.1x.tech/ai'],
       priceOffers: ['https://www.1x.tech/order'],
       loadRatings: ['https://www.1x.tech/neo'],
+      batterySystem: ['https://www.1x.tech/neo'],
     },
     usageExampleSourceUrls: [
       'https://www.1x.tech/discover/neo-home-robot',
@@ -918,6 +932,7 @@ export const robots: Robot[] = [
       runtimeMin: 300,
       controlMethod: 'Helix VLA / 自律音声対話',
       mobility: 'biped',
+      batterySystem: '胴体内蔵バッテリー / ワイヤレス誘導充電',
     },
     procurementModels: ['partner-program', 'inquiry', 'not-for-sale'],
     loadRatings: [
@@ -938,6 +953,7 @@ export const robots: Robot[] = [
       runtimeMin: ['https://www.figure.ai/news/f-03-battery-development'],
       controlMethod: ['https://www.figure.ai/news/introducing-figure-03'],
       loadRatings: ['https://www.figure.ai/figure'],
+      batterySystem: ['https://www.figure.ai/news/introducing-figure-03'],
     },
     usageExampleSourceUrls: ['https://www.figure.ai/news/f-03-at-bmw'],
     japanAvailability: 'unknown',
@@ -1003,6 +1019,7 @@ export const robots: Robot[] = [
       controlMethod: '手動コントローラー（二次開発非対応）',
       sdk: 'Unitree SDK 2（C++）/ Pythonインターフェース',
       computePlatform: 'Intel Core i5/i7',
+      batterySystem: '低内部抵抗リチウム電池 / クイックリリース式スマートバッテリー',
     },
     procurementModels: ['purchase'],
     priceOffers: [
@@ -1014,6 +1031,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/H2/'], heightCm: ['https://www.unitree.com/mobile/H2/'], weightKg: ['https://www.unitree.com/mobile/H2/'], dof: ['https://www.unitree.com/mobile/H2/'], runtimeMin: ['https://www.unitree.com/mobile/H2/'], controlMethod: ['https://www.unitree.com/mobile/H2/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/mobile/H2/'], priceOffers: ['https://shop.unitree.com/products/unitree-h2'], loadRatings: ['https://www.unitree.com/mobile/H2/'],
+      batterySystem: ['https://www.unitree.com/mobile/H2/'],
     },
     japanAvailability: 'inquiry-required',
     industryTags: ['research'],
@@ -1077,6 +1095,7 @@ export const robots: Robot[] = [
       controlMethod: '手動コントローラー（二次開発対応）',
       sdk: 'Unitree SDK 2（C++）/ Pythonインターフェース',
       computePlatform: 'Intel Core i5/i7 / 高演算モジュール選択可',
+      batterySystem: '低内部抵抗リチウム電池 / クイックリリース式スマートバッテリー',
     },
     procurementModels: ['inquiry'],
     loadRatings: [
@@ -1085,6 +1104,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/H2/'], heightCm: ['https://www.unitree.com/mobile/H2/'], weightKg: ['https://www.unitree.com/mobile/H2/'], dof: ['https://www.unitree.com/mobile/H2/'], runtimeMin: ['https://www.unitree.com/mobile/H2/'], controlMethod: ['https://www.unitree.com/mobile/H2/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/mobile/H2/'], loadRatings: ['https://www.unitree.com/mobile/H2/'],
+      batterySystem: ['https://www.unitree.com/mobile/H2/'],
     },
     japanAvailability: 'inquiry-required',
     industryTags: ['research'],
@@ -1167,6 +1187,7 @@ export const robots: Robot[] = [
       mobility: 'biped',
       controlMethod: 'ハンドヘルドコントローラー / 遠隔非常停止 / Isaac TeleOp',
       sdk: 'Unitree SDK2（C++）/ Python / Isaacエコシステム（Isaac Sim、Isaac Lab、Isaac ROS、Isaac GR00T）',
+      batterySystem: '低内部抵抗リチウム電池 / クイックリリース式スマートバッテリー',
     },
     procurementModels: ['inquiry'],
     loadRatings: [
@@ -1175,6 +1196,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/H2plus/'], heightCm: ['https://www.unitree.com/mobile/H2plus/'], weightKg: ['https://www.unitree.com/mobile/H2plus/'], dof: ['https://www.unitree.com/mobile/H2plus/'], runtimeMin: ['https://www.unitree.com/mobile/H2plus/'], controlMethod: ['https://www.unitree.com/mobile/H2plus/'], sdk: ['https://github.com/unitreerobotics'], loadRatings: ['https://www.unitree.com/mobile/H2plus/'],
+      batterySystem: ['https://www.unitree.com/mobile/H2plus/'],
     },
     japanAvailability: 'inquiry-required',
     industryTags: ['research'],
@@ -1246,6 +1268,7 @@ export const robots: Robot[] = [
       controlMethod: '自律運転 / VR遠隔操作 / タブレット / Orbit',
       dof: 56,
       mobility: 'biped',
+      batterySystem: '自律自己交換式バッテリー',
     },
     procurementModels: ['inquiry', 'partner-program'],
     loadRatings: [
@@ -1287,6 +1310,7 @@ export const robots: Robot[] = [
         'https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/',
       ],
       loadRatings: ['https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf'],
+      batterySystem: ['https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf'],
     },
     japanAvailability: 'unknown',
     supportNote: '営業、サポート、トレーニングの公式導線は公開。Atlas固有の日本向け保守条件とSLAは未確認。',
@@ -1492,11 +1516,13 @@ export const robots: Robot[] = [
       runtimeMin: 120,
       mobility: 'biped',
       controlMethod: 'リモート / スマートフォン / コンピューター操作',
+      batterySystem: '交換式バッテリー（化学系は未公表）',
     },
     procurementModels: ['inquiry'],
     marketAvailability: 'unknown',
     fieldEvidence: {
       mobility: ['https://agibot.com/products/A2'], heightCm: ['https://agibot.com/products/A2'], weightKg: ['https://agibot.com/products/A2'], runtimeMin: ['https://agibot.com/products/A2'], controlMethod: ['https://agibot.com/products/A2'],
+      batterySystem: ['https://agibot.com/products/A2'],
     },
     usageExampleSourceUrls: ['https://www.agibot.com/article/231/detail/32.html', 'https://www.agibot.com/article/231/detail/35.html'],
     japanAvailability: 'unknown',
@@ -1559,6 +1585,7 @@ export const robots: Robot[] = [
       runtimeMin: 180,
       mobility: 'biped',
       controlMethod: '自律タスク実行 / 複数台協調',
+      batterySystem: 'デュアル・ホットスワップ対応バッテリー',
     },
     procurementModels: ['purchase', 'lease', 'inquiry'],
     marketAvailability: 'company-claimed-delivery',
@@ -1572,6 +1599,7 @@ export const robots: Robot[] = [
       runtimeMin: ['https://ga-robotics.co.jp/products/walker-s2/'],
       controlMethod: ['https://www.ubtrobot.com/en/humanoid/products/walker-s2'],
       loadRatings: ['https://owebsite-cdn.ubtrobot.com/resources/file/2025/09/16/720368312926277.pdf'],
+      batterySystem: ['https://www.ubtrobot.com/en/humanoid/products/walker-s2'],
     },
     usageExampleSourceUrls: ['https://www.ubtrobot.com/en/humanoid/solutions/industry'],
     japanAvailability: 'distributor-japan',
@@ -1637,6 +1665,7 @@ export const robots: Robot[] = [
     specs: {
       controlMethod: '遠隔操作 / リードスルー / 直接指令',
       sdk: 'Fourier Toolkit / Aurora SDK',
+      batterySystem: '着脱式バッテリー',
     },
     procurementModels: ['purchase', 'inquiry'],
     loadRatings: [
@@ -1646,6 +1675,7 @@ export const robots: Robot[] = [
       controlMethod: ['https://www.fftai.com/newsroom-newintech/14'],
       sdk: ['https://github.com/FFTAI/fourier_aurora_sdk'],
       loadRatings: ['https://www.fftai.com/newsroom-newintech/14'],
+      batterySystem: ['https://www.fftai.com/newsroom-newintech/14'],
     },
     japanAvailability: 'inquiry-required',
     industryTags: ['research'],
@@ -1703,6 +1733,7 @@ export const robots: Robot[] = [
       controlMethod: 'VR / 外骨格による遠隔操作 + 音声対話',
       sdk: 'Aurora SDK',
       computePlatform: 'AMD Ryzen 7 8845HS / Radeon 780M',
+      batterySystem: '46.8V リチウムイオン・ホットスワップ対応バッテリー',
     },
     procurementModels: ['purchase', 'inquiry'],
     loadRatings: [
@@ -1710,6 +1741,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://support.fftai.com/en/getting-started/general-information'], heightCm: ['https://support.fftai.com/en/getting-started/general-information'], weightKg: ['https://support.fftai.com/en/getting-started/general-information'], speedMps: ['https://support.fftai.com/en/getting-started/general-information'], dof: ['https://support.fftai.com/en/getting-started/general-information'], runtimeMin: ['https://support.fftai.com/en/getting-started/general-information'], chargeTimeMin: ['https://support.fftai.com/en/getting-started/general-information'], controlMethod: ['https://support.fftai.com/en/getting-started/general-information'], sdk: ['https://github.com/FFTAI/fourier_aurora_sdk'], computePlatform: ['https://support.fftai.com/en/getting-started/general-information'], loadRatings: ['https://support.fftai.com/en/getting-started/general-information'],
+      batterySystem: ['https://support.fftai.com/en/getting-started/general-information'],
     },
     japanAvailability: 'unknown',
     industryTags: ['healthcare', 'research', 'retail'],
@@ -1796,6 +1828,7 @@ export const robots: Robot[] = [
       runtimeMin: 120,
       sdk: 'Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo',
       mobility: 'biped',
+      batterySystem: '10.5Ahバッテリー（歩行約2時間、立位約4時間）',
     },
     procurementModels: ['purchase', 'inquiry'],
     fieldEvidence: {
@@ -1807,6 +1840,7 @@ export const robots: Robot[] = [
         'https://github.com/BoosterRobotics/booster_gym',
       ],
       mobility: ['https://www.booster.tech/booster-t1/'],
+      batterySystem: ['https://www.booster.tech/booster-t1/'],
     },
     usageExampleSourceUrls: ['https://www.booster.tech/booster-t1/'],
     japanAvailability: 'distributor-japan',
@@ -1954,6 +1988,7 @@ export const robots: Robot[] = [
       controlMethod: '自律認識・適応制御 / 音声対話 / 遠隔操作',
       computePlatform: 'Qualcomm（NEURA Roboticsとの共同表記、詳細型番は非公開）',
       mobility: 'biped',
+      batterySystem: '二重バッテリー構成 / 連続運用対応',
     },
     procurementModels: ['inquiry', 'partner-program'],
     loadRatings: [
@@ -1975,6 +2010,7 @@ export const robots: Robot[] = [
       computePlatform: ['https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf'],
       mobility: ['https://neura-robotics.com/products/4ne1/'],
       loadRatings: ['https://neurarobotics.px.media/plk/cE/NEURA_Robotics_4NE1_Datasheet_Web.pdf'],
+      batterySystem: ['https://neura-robotics.com/products/4ne1/'],
     },
     japanAvailability: 'unknown',
     supportNote: '予約・問い合わせ、ライフサイクル支援、Neuraverse連携を案内。4NE1の日本向け販売・保守条件は未公表。',
@@ -2081,6 +2117,7 @@ export const robots: Robot[] = [
       chargeTimeMin: 60,
       controlMethod: '自律ナビゲーション / マルチモーダル対話 / 動作計画・制御',
       sdk: 'Kepler OS / Kepler Developer Platform',
+      batterySystem: '充電式バッテリー（約1時間充電、最大8時間稼働）',
     },
     procurementModels: ['purchase', 'inquiry'],
     loadRatings: [
@@ -2120,6 +2157,7 @@ export const robots: Robot[] = [
       controlMethod: ['https://www.gotokepler.com/productDetailK2?id=2'],
       sdk: ['https://www.gotokepler.com/apps/mobile/pages/developerPlatform/index'],
       loadRatings: ['https://www.gotokepler.com/productDetailK2?id=2'],
+      batterySystem: ['https://www.gotokepler.com/productDetailK2?id=2'],
     },
     usageExampleSourceUrls: [
       'https://www.linkedin.com/posts/kepler-exploration-robotics_kepler-humanoid-robot-lands-at-saic-gm-activity-7321418311701815298-9Hyn',
@@ -2207,6 +2245,7 @@ export const robots: Robot[] = [
       sdk: 'KUAVO ROS SDK（ROS 1 / Pythonサンプル）',
       computePlatform: 'Intel Core i9-13900H + NVIDIA Jetson Orin NX',
       mobility: 'biped',
+      batterySystem: '交換式60V 6Ahリチウムバッテリー（充電1.5時間以内）',
     },
     procurementModels: ['purchase', 'inquiry'],
     fieldEvidence: {
@@ -2219,6 +2258,7 @@ export const robots: Robot[] = [
       sdk: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/'],
       computePlatform: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       mobility: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
+      batterySystem: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/KUAVO_4PRO%20%E6%A0%87%E5%87%86%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
     },
     japanAvailability: 'unknown',
     supportNote: '公式マニュアルとSDKは公開。日本の販売、修理、部品供給、SLAは未確認。',
@@ -2315,6 +2355,7 @@ export const robots: Robot[] = [
       sdk: 'ROS / OROCOS / ros_control / MoveIt!',
       computePlatform: 'Intel Core i7 PC × 2',
       mobility: 'biped',
+      batterySystem: 'リチウムイオンバッテリー（公称1080Wh）',
     },
     procurementModels: ['purchase', 'inquiry'],
     loadRatings: [
@@ -2337,6 +2378,7 @@ export const robots: Robot[] = [
       computePlatform: ['https://pal-robotics.com/datasheet/talos/'],
       mobility: ['https://pal-robotics.com/robot/talos/'],
       loadRatings: ['https://pal-robotics.com/robot/talos/'],
+      batterySystem: ['https://pal-robotics.com/datasheet/talos/'],
     },
     usageExampleSourceUrls: [
       'https://pal-robotics.com/blog/talos-research-torque-controlled-locomotion-for-humanoids-in-unknown-environments/',
@@ -2405,6 +2447,7 @@ export const robots: Robot[] = [
       controlMethod: '手動コントローラー / 関節・センサー制御インターフェース公開',
       sdk: 'Unitree SDK 2（C++）/ Pythonインターフェース',
       computePlatform: '8コア高性能プロセッサー',
+      batterySystem: 'リチウム電池 / クイックリリース式スマートバッテリー',
     },
     procurementModels: ['purchase'],
     priceOffers: [
@@ -2412,6 +2455,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/R1/'], heightCm: ['https://www.unitree.com/mobile/R1/'], weightKg: ['https://www.unitree.com/mobile/R1/'], dof: ['https://www.unitree.com/mobile/R1/'], runtimeMin: ['https://www.unitree.com/mobile/R1/'], controlMethod: ['https://www.unitree.com/mobile/R1/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/mobile/R1/'], priceOffers: ['https://www.unitree.com/mobile/R1/'],
+      batterySystem: ['https://www.unitree.com/mobile/R1/'],
     },
     japanAvailability: 'inquiry-required',
     industryTags: ['research'],
@@ -2473,6 +2517,7 @@ export const robots: Robot[] = [
       controlMethod: '手動コントローラー / 関節・センサー制御インターフェース公開',
       sdk: 'Unitree SDK 2（C++）/ Pythonインターフェース',
       computePlatform: '8コア高性能プロセッサー',
+      batterySystem: 'リチウム電池 / クイックリリース式スマートバッテリー',
     },
     procurementModels: ['purchase'],
     priceOffers: [
@@ -2480,6 +2525,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://www.unitree.com/mobile/R1/'], heightCm: ['https://www.unitree.com/mobile/R1/'], weightKg: ['https://www.unitree.com/mobile/R1/'], dof: ['https://www.unitree.com/mobile/R1/'], runtimeMin: ['https://www.unitree.com/mobile/R1/'], controlMethod: ['https://www.unitree.com/mobile/R1/'], sdk: ['https://github.com/unitreerobotics'], computePlatform: ['https://www.unitree.com/mobile/R1/'], priceOffers: ['https://www.unitree.com/mobile/R1/'],
+      batterySystem: ['https://www.unitree.com/mobile/R1/'],
     },
     japanAvailability: 'inquiry-required',
     industryTags: ['research'],
@@ -2607,6 +2653,7 @@ export const robots: Robot[] = [
       speedMps: 1.0,
       runtimeMin: 120,
       mobility: 'biped',
+      batterySystem: '交換式バッテリー（化学系・電圧は未公表）',
     },
     procurementModels: ['inquiry'],
     marketAvailability: 'planned-production',
@@ -2615,6 +2662,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://www.agibot.com/products/A2_Max'], heightCm: ['https://www.agibot.com/products/A2_Max'], weightKg: ['https://www.agibot.com/products/A2_Max'], speedMps: ['https://www.agibot.com/products/A2_Max'], runtimeMin: ['https://www.agibot.com/products/A2_Max'], loadRatings: ['https://www.agibot.com/products/A2_Max'],
+      batterySystem: ['https://www.agibot.com/products/A2_Max'],
     },
     japanAvailability: 'unknown',
     industryTags: ['manufacturing', 'logistics'],
@@ -2784,6 +2832,7 @@ export const robots: Robot[] = [
       dof: 22,
       sdk: 'Booster Robotics SDK / Booster Gym / Booster Train / Booster Deploy / RoboCup Demo',
       mobility: 'biped',
+      batterySystem: 'Geek: 2Ah / Education・Professional: 5Ah',
     },
     procurementModels: ['purchase', 'inquiry'],
     priceOffers: [
@@ -2819,6 +2868,7 @@ export const robots: Robot[] = [
         'https://www.booster.tech/booster-k1/',
         'https://www.booster.tech/cn/booster-k1/',
       ],
+      batterySystem: ['https://www.booster.tech/booster-k1/'],
     },
     usageExampleSourceUrls: ['https://www.booster.tech/booster-k1/'],
     japanAvailability: 'distributor-japan',
@@ -3061,6 +3111,7 @@ export const robots: Robot[] = [
       sdk: 'モジュールSDK / Python / URDF / Isaac Sim・MuJoCo・Gazebo',
       computePlatform: 'RK3588（8GB / 64GB）',
       mobility: 'biped',
+      batterySystem: '交換式バッテリーモジュール（9500mAh）',
     },
     procurementModels: ['purchase', 'inquiry'],
     loadRatings: [
@@ -3087,6 +3138,7 @@ export const robots: Robot[] = [
       computePlatform: ['https://www.limxdynamics.com/en/products/oli/spec'],
       mobility: ['https://www.limxdynamics.com/en/products/oli'],
       loadRatings: ['https://www.limxdynamics.com/en/products/oli/spec'],
+      batterySystem: ['https://www.limxdynamics.com/en/products/oli', 'https://www.limxdynamics.com/en/products/oli/spec'],
     },
     japanAvailability: 'unknown',
     supportNote: '公式の注文相談、マニュアル、開発資料は公開。日本の販売、修理、部品供給、オンサイト対応、SLAは未確認。',
@@ -3174,6 +3226,7 @@ export const robots: Robot[] = [
       controlMethod: 'リモコン / タブレット / LimX Studio',
       computePlatform: 'RK3588モーション制御・知覚コンピュータ',
       mobility: 'biped',
+      batterySystem: '交換式デュアルバッテリー（直接充電／交換対応）',
     },
     procurementModels: ['purchase', 'inquiry'],
     loadRatings: [
@@ -3197,6 +3250,7 @@ export const robots: Robot[] = [
       computePlatform: ['https://www.limxdynamics.com/en/products/luna/spec'],
       mobility: ['https://www.limxdynamics.com/en/products/luna/spec'],
       loadRatings: ['https://www.limxdynamics.com/en/products/luna/spec'],
+      batterySystem: ['https://www.limxdynamics.com/en/products/luna/spec'],
     },
     japanAvailability: 'unknown',
     supportNote: '公式の注文相談・製品資料は公開。日本の販売、修理、部品供給、オンサイト対応、SLAは未確認。',
@@ -3252,6 +3306,7 @@ export const robots: Robot[] = [
       controlMethod: 'VLT・VLA・VLMを統合したPhysical AI',
       sdk: 'グローバル開発者向けSDKを公開予定',
       mobility: 'biped',
+      batterySystem: '全固体電池',
     },
     procurementModels: ['not-for-sale'],
     fieldEvidence: {
@@ -3259,6 +3314,7 @@ export const robots: Robot[] = [
       controlMethod: ['https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7'],
       sdk: ['https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7'],
       mobility: ['https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7'],
+      batterySystem: ['https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7'],
     },
     japanAvailability: 'unknown',
     supportNote: 'SDK公開方針は発表済み。外部顧客向けサポート、日本での導入・保守条件は公表されていない。',
@@ -3403,6 +3459,7 @@ export const robots: Robot[] = [
       chargeTimeMin: 120,
       controlMethod: '自律ナビゲーション / AloTインターフェース / ROSA',
       computePlatform: 'Intel i7-8665U ×2 + NVIDIA GT1030',
+      batterySystem: '着脱式リチウムバッテリー（54.6V / 10Ah / 3.6kg）',
     },
     procurementModels: ['purchase', 'inquiry'],
     marketAvailability: 'unknown',
@@ -3420,6 +3477,7 @@ export const robots: Robot[] = [
       controlMethod: ['https://www.ubtrobot.com/en/humanoid/products/walker-x'],
       computePlatform: ['https://www.ubtrobot.com/en/humanoid/products/walker-x'],
       loadRatings: ['https://www.ubtrobot.com/en/humanoid/products/walker-x'],
+      batterySystem: ['https://www.ubtrobot.com/en/humanoid/products/walker-x'],
     },
     japanAvailability: 'inquiry-required',
     industryTags: ['retail', 'facility-management'],
@@ -3588,6 +3646,7 @@ export const robots: Robot[] = [
       sdk: 'KUAVO ROS SDK（ROS 1 / Pythonサンプル）',
       computePlatform: 'GENE-MTH6 + NVIDIA Jetson Orin NX',
       mobility: 'biped',
+      batterySystem: '交換式60V 6Ahリチウムバッテリー（充電1.5時間以内）',
     },
     procurementModels: ['purchase', 'inquiry'],
     fieldEvidence: {
@@ -3600,6 +3659,7 @@ export const robots: Robot[] = [
       sdk: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/4%E5%BC%80%E5%8F%91%E6%8E%A5%E5%8F%A3/SDK%E4%BB%8B%E7%BB%8D/'],
       computePlatform: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
       mobility: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
+      batterySystem: ['https://kuavo.lejurobot.com/manual/basic_usage/kuavo-ros-control/docs/1%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/%E4%BA%94%E4%BB%A3%E4%BA%A7%E5%93%81/KUAVO_5%20%E8%BF%9B%E9%98%B6%E7%89%88%E4%BA%A7%E5%93%81%E4%BB%8B%E7%BB%8D/'],
     },
     japanAvailability: 'unknown',
     supportNote: '公式マニュアルとSDKは公開。日本の販売、修理、部品供給、SLAは未確認。',
@@ -3641,11 +3701,13 @@ export const robots: Robot[] = [
       speedMps: 2.0,
       runtimeMin: 120,
       mobility: 'biped',
+      batterySystem: 'クイックリリース対応バッテリー',
     },
     procurementModels: ['inquiry'],
     marketAvailability: 'unknown',
     fieldEvidence: {
       mobility: ['https://www.engineai.com.cn/product-se01.html'], heightCm: ['https://www.engineai.com.cn/'], weightKg: ['https://www.engineai.com.cn/about-news-media/23.html'], speedMps: ['https://www.engineai.com.cn/'], dof: ['https://www.engineai.com.cn/'], runtimeMin: ['https://www.engineai.com.cn/product-se01.html'],
+      batterySystem: ['https://www.engineai.com.cn/product-se01.html'],
     },
     japanAvailability: 'unknown',
     industryTags: [],
@@ -3682,6 +3744,7 @@ export const robots: Robot[] = [
       runtimeMin: 120,
       chargeTimeMin: 120,
       controlMethod: 'ハンドヘルド式リモコン操作',
+      batterySystem: 'クイックリリース式スマートバッテリー（10000mAh）',
     },
     procurementModels: ['purchase'],
     fieldEvidence: {
@@ -3690,6 +3753,7 @@ export const robots: Robot[] = [
       runtimeMin: ['https://www.engineai.com.cn/product-pm01.html'],
       chargeTimeMin: ['https://www.engineai.com.cn/product-pm01.html'],
       controlMethod: ['https://www.engineai.com.cn/product-pm01.html'],
+      batterySystem: ['https://www.engineai.com.cn/product-pm01.html'],
     },
     japanAvailability: 'unknown',
     industryTags: [],
@@ -3844,6 +3908,7 @@ export const robots: Robot[] = [
       controlMethod: '自律実行 / 音声対話（オンボード言語モデルによる指示追従） / 教示追従',
       computePlatform: 'NVIDIA Jetson AGX Orin ×2',
       mobility: 'biped',
+      batterySystem: 'ホットスワップ対応バッテリー（24時間稼働想定）',
     },
     procurementModels: ['partner-program', 'inquiry'],
     loadRatings: [
@@ -3868,6 +3933,7 @@ export const robots: Robot[] = [
       computePlatform: ['https://nvidia.com/en-us/customer-stories/mentee-robotics'],
       mobility: ['https://www.menteebot.com/bot/'],
       loadRatings: ['https://www.menteebot.com/bot/'],
+      batterySystem: ['https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai', 'https://nvidia.com/en-us/customer-stories/mentee-robotics'],
     },
     usageExampleSourceUrls: ['https://www.menteebot.com/blog/menteebot-warehouse-task/'],
     japanAvailability: 'unknown',
@@ -3938,7 +4004,7 @@ export const robots: Robot[] = [
     description: 'A2 Liteは身長169cm、重量63kg、最大0.8m/s、23自由度の二足機。無線リモコン、AimMaster、オプションのVR遠隔操作に対応する。稼働時間は立位／歩行条件と公式ページ間で値が異なるため単一値では登録しない。',
     deploymentStage: 'pilot',
     buyerReadiness: 'limited-today',
-    specs: { heightCm: 169, weightKg: 63, speedMps: 0.8, dof: 23, mobility: 'biped', chargeTimeMin: 120, controlMethod: '無線リモコン / AimMaster / VR遠隔操作（オプション）', computePlatform: '14コア高性能CPU（高演算ボードなし）', },
+    specs: { heightCm: 169, weightKg: 63, speedMps: 0.8, dof: 23, mobility: 'biped', chargeTimeMin: 120, controlMethod: '無線リモコン / AimMaster / VR遠隔操作（オプション）', computePlatform: '14コア高性能CPU（高演算ボードなし）', batterySystem: '13直列リチウム電池 / クイックリリース式スマートバッテリー' },
     procurementModels: ['purchase', 'inquiry'],
     marketAvailability: 'unknown',
     priceOffers: [
@@ -3949,6 +4015,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://agibot.com/products/A2_Pro'], heightCm: ['https://agibot.com/products/A2_Pro'], weightKg: ['https://agibot.com/products/A2_Pro'], speedMps: ['https://store.agibot.com/products/a2-lite'], dof: ['https://agibot.com/products/A2_Pro'], chargeTimeMin: ['https://agibot.com/products/A2_Pro'], controlMethod: ['https://store.agibot.com/products/a2-lite'], computePlatform: ['https://store.agibot.com/products/a2-lite'], priceOffers: ['https://store.agibot.com/products/a2-lite'], loadRatings: ['https://store.agibot.com/products/a2-lite'],
+      batterySystem: ['https://agibot.com/products/A2_Pro'],
     },
     japanAvailability: 'unknown',
     industryTags: ['retail'],
@@ -4010,7 +4077,7 @@ export const robots: Robot[] = [
     description: 'AgiBot X2は身長131cm、重量35kg、約2時間稼働の二足機。500Whの交換式バッテリー、ハンドヘルドコントローラーとモバイルアプリに対応する。荷重は特定姿勢で最大3kg、全作業域で最大1kgと条件を分けて公表している。',
     deploymentStage: 'pilot',
     buyerReadiness: 'limited-today',
-    specs: { mobility: 'biped', heightCm: 131, weightKg: 35, runtimeMin: 120, chargeTimeMin: 90, controlMethod: 'ハンドヘルドコントローラー / モバイルアプリ', computePlatform: 'RK3588デュアルボード（高演算ボードなし）', },
+    specs: { mobility: 'biped', heightCm: 131, weightKg: 35, runtimeMin: 120, chargeTimeMin: 90, controlMethod: 'ハンドヘルドコントローラー / モバイルアプリ', computePlatform: 'RK3588デュアルボード（高演算ボードなし）', batterySystem: '直接充電 / 交換式バッテリー' },
     procurementModels: ['purchase', 'inquiry'],
     marketAvailability: 'unknown',
     priceOffers: [
@@ -4022,6 +4089,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://agibot.com/products/X2'], heightCm: ['https://store.agibot.com/products/x2'], weightKg: ['https://store.agibot.com/products/x2'], runtimeMin: ['https://store.agibot.com/products/x2'], chargeTimeMin: ['https://store.agibot.com/products/x2'], controlMethod: ['https://store.agibot.com/products/x2'], computePlatform: ['https://store.agibot.com/products/x2'], priceOffers: ['https://store.agibot.com/products/x2'], loadRatings: ['https://store.agibot.com/products/x2'],
+      batterySystem: ['https://store.agibot.com/products/x2'],
     },
     japanAvailability: 'unknown',
     industryTags: ['research'],
@@ -4048,7 +4116,7 @@ export const robots: Robot[] = [
     description: 'X2 Ultraは身長131cm、重量39kg、30自由度、約2時間稼働の二足機。500Wh交換式バッテリー、Orin NX、AimDK_X2を搭載する。速度は英語・日本語の公式ページで最大値が異なるため登録しない。',
     deploymentStage: 'pilot',
     buyerReadiness: 'limited-today',
-    specs: { heightCm: 131, weightKg: 39, runtimeMin: 120, dof: 30, mobility: 'biped', chargeTimeMin: 90, controlMethod: 'ハンドヘルドコントローラー / モバイルアプリ / 二次開発', sdk: 'AimDK_X2 SDK', computePlatform: 'RK3588デュアルボード + NVIDIA Orin NX 157TOPS', },
+    specs: { heightCm: 131, weightKg: 39, runtimeMin: 120, dof: 30, mobility: 'biped', chargeTimeMin: 90, controlMethod: 'ハンドヘルドコントローラー / モバイルアプリ / 二次開発', sdk: 'AimDK_X2 SDK', computePlatform: 'RK3588デュアルボード + NVIDIA Orin NX 157TOPS', batterySystem: '直接充電 / 交換式バッテリー / 自動充電ドック（オプション）' },
     procurementModels: ['purchase', 'inquiry'],
     loadRatings: [
       { scope: 'manufacturer-wording', rating: 'maximum', kg: 3, condition: '特定姿勢で最大3kg。エンドエフェクタを除き、腕／全身scopeは未定義。', variant: 'X2 Ultra', sourceUrl: 'https://store.agibot.com/products/x2-ultra' },
@@ -4056,6 +4124,7 @@ export const robots: Robot[] = [
     ],
     fieldEvidence: {
       mobility: ['https://store.agibot.com/products/x2-ultra'], heightCm: ['https://store.agibot.com/products/x2-ultra'], weightKg: ['https://store.agibot.com/products/x2-ultra'], dof: ['https://store.agibot.com/products/x2-ultra'], runtimeMin: ['https://store.agibot.com/products/x2-ultra'], chargeTimeMin: ['https://store.agibot.com/products/x2-ultra'], controlMethod: ['https://store.agibot.com/products/x2-ultra'], sdk: ['https://x2-aimdk.agibot.com/en/latest/get_sdk/index.html'], computePlatform: ['https://store.agibot.com/products/x2-ultra'], loadRatings: ['https://store.agibot.com/products/x2-ultra'],
+      batterySystem: ['https://store.agibot.com/products/x2-ultra'],
     },
     japanAvailability: 'unknown',
     industryTags: ['research', 'facility-management'],
@@ -4116,7 +4185,7 @@ export const robots: Robot[] = [
     description: 'Walker Cはサービス用途向けの二足ヒューマノイド。公式仕様で身長163cm、重量43kg、20自由度、最大6km/h、歩行時2時間稼働（立位4時間）、48V15Ah（720Wh）リチウム電池、約90分の充電、U-SLAMによる自律ナビゲーションを確認できる。Walker C1とは別モデルとして扱う。',
     deploymentStage: 'pilot',
     buyerReadiness: 'requires-poc',
-    specs: { mobility: 'biped', heightCm: 163, weightKg: 43, speedMps: 1.6667, dof: 20, runtimeMin: 120, chargeTimeMin: 90, controlMethod: '関節・通信インターフェース / U-SLAM自律ナビゲーション' },
+    specs: { mobility: 'biped', heightCm: 163, weightKg: 43, speedMps: 1.6667, dof: 20, runtimeMin: 120, chargeTimeMin: 90, controlMethod: '関節・通信インターフェース / U-SLAM自律ナビゲーション', batterySystem: 'リチウムバッテリー（48V15Ah、交換方式は未公表）' },
     procurementModels: ['purchase', 'inquiry'],
     fieldEvidence: {
       mobility: ['https://www.ubtrobot.com/en/humanoid/products/walker-c'],
@@ -4127,6 +4196,7 @@ export const robots: Robot[] = [
       runtimeMin: ['https://www.ubtrobot.com/en/humanoid/products/walker-c'],
       chargeTimeMin: ['https://www.ubtrobot.com/en/humanoid/products/walker-c'],
       controlMethod: ['https://www.ubtrobot.com/en/humanoid/products/walker-c'],
+      batterySystem: ['https://www.ubtrobot.com/en/humanoid/products/walker-c'],
     },
     usageExampleSourceUrls: ['https://www.ubtrobot.com/en/humanoid/products/walker-c'],
     japanAvailability: 'inquiry-required',
@@ -4204,6 +4274,7 @@ export const robots: Robot[] = [
       chargeTimeMin: 240,
       controlMethod: 'ROS2ベースSDKによる全関節・センサーへのオープンインターフェース / URDFモデル / オープンソース学習フレームワーク',
       sdk: 'Walker Tienkung SDK（ROS2ベース、Ubuntu 22.04のみ対応）',
+      batterySystem: '三元リチウムバッテリー（主30Ah＋補助3Ah、48V公称）',
     },
     procurementModels: ['purchase', 'inquiry'],
     fieldEvidence: {
@@ -4212,6 +4283,7 @@ export const robots: Robot[] = [
       chargeTimeMin: ['https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/'],
       controlMethod: ['https://docs.ubtrobot.com/walker-tienkung/en/docs/sdk/7/'],
       sdk: ['https://docs.ubtrobot.com/walker-tienkung/en/docs/sdk/7/'],
+      batterySystem: ['https://docs.ubtrobot.com/walker-tienkung/en/docs/user-guide/6/'],
     },
     japanAvailability: 'distributor-japan',
     distributorJapan: 'GA Robotics（GMO グループ）',
@@ -4287,12 +4359,14 @@ export const robots: Robot[] = [
       mobility: 'biped',
       heightCm: 173,
       controlMethod: 'ハンドヘルド式リモコン操作＋AI経路計画・障害物回避',
+      batterySystem: 'クイックリリース式スマートバッテリー（標準：三元リチウム／オプション：固体電池）',
     },
     procurementModels: ['inquiry'],
     fieldEvidence: {
       mobility: ['https://www.engineai.com.cn/product-t800.html'],
       heightCm: ['https://www.engineai.com.cn/product-t800.html'],
       controlMethod: ['https://www.engineai.com.cn/product-t800.html'],
+      batterySystem: ['https://www.engineai.com.cn/product-t800.html'],
     },
     japanAvailability: 'unknown',
     industryTags: [],
@@ -4319,13 +4393,14 @@ export const robots: Robot[] = [
     description: 'SA01は研究・教育向けの二足プラットフォーム。公式情報で重量40kg、最大1m/s、12自由度、約2時間稼働、819Whクイックリリース電池、ユーザー定義制御、-20～55℃の動作温度を確認できる。寸法表記は不整合があるため身長を掲載しない。',
     deploymentStage: 'prototype',
     buyerReadiness: 'limited-today',
-    specs: { mobility: 'biped', weightKg: 40, speedMps: 1, dof: 12, runtimeMin: 120, controlMethod: 'ユーザー定義ソフトウェア制御 / モーション制御プラットフォーム', },
+    specs: { mobility: 'biped', weightKg: 40, speedMps: 1, dof: 12, runtimeMin: 120, controlMethod: 'ユーザー定義ソフトウェア制御 / モーション制御プラットフォーム', batterySystem: '54.6V リチウム・クイックリリース対応バッテリー' },
     procurementModels: ['purchase', 'inquiry'],
     loadRatings: [
       { scope: 'manufacturer-wording', rating: 'unspecified', kg: 10, condition: '公式表記は約10～15kg。scopeと定格・最大の別が未定義のため、下限10kgを代表値として記録。', variant: 'SA01', sourceUrl: 'https://www.engineai.com.cn/product-sa01.html' },
     ],
     fieldEvidence: {
       mobility: ['https://www.engineai.com.cn/product-sa01.html'], weightKg: ['https://www.engineai.com.cn/product-sa01.html'], speedMps: ['https://www.engineai.com.cn/product-sa01.html'], dof: ['https://www.engineai.com.cn/product-sa01.html'], runtimeMin: ['https://www.engineai.com.cn/product-sa01.html'], controlMethod: ['https://www.engineai.com.cn/product-sa01.html'], loadRatings: ['https://www.engineai.com.cn/product-sa01.html'],
+      batterySystem: ['https://www.engineai.com.cn/product-sa01.html'],
     },
     usageExampleSourceUrls: ['https://www.engineai.com.cn/about-news-media/34.html'],
     japanAvailability: 'unknown',
@@ -4355,7 +4430,7 @@ export const robots: Robot[] = [
     description: 'L7はRobotEraの現行フルサイズ二足ヒューマノイド。公式ページで身長171cm、走行速度4m/s、稼働時間6時間、55自由度、両腕荷重20kg、研究データ収集、製造、企業受付、商業・病院案内の用途を確認できる。従来指摘されていた身長の英語ページ間競合は、複数の一次・公式情報源で171cmが一致したため解消した。',
     deploymentStage: 'pilot',
     buyerReadiness: 'requires-poc',
-    specs: { mobility: 'biped', heightCm: 171, speedMps: 4, runtimeMin: 360, dof: 55, },
+    specs: { mobility: 'biped', heightCm: 171, speedMps: 4, runtimeMin: 360, dof: 55, batterySystem: 'リチウムバッテリー（BMS内蔵）' },
     procurementModels: ['purchase', 'inquiry'],
     loadRatings: [
       {
@@ -4374,6 +4449,7 @@ export const robots: Robot[] = [
       runtimeMin: ['https://rbtx.com/en-US/components/humanoid/robotera-l7-humanoid-robot-55-dof'],
       dof: ['https://www.robotera.com/application.html'],
       loadRatings: ['https://www.robotera.com/application.html'],
+      batterySystem: ['https://rbtx.com/en-US/components/humanoid/robotera-l7-humanoid-robot-55-dof'],
     },
     usageExampleSourceUrls: ['https://finance.yahoo.com/news/robotera-unveils-robot-l7-full-014200227.html'],
     japanAvailability: 'unknown',
@@ -4410,6 +4486,7 @@ export const robots: Robot[] = [
       dof: 44,
       runtimeMin: 240,
       controlMethod: '全身遠隔操作 / 2.4G無線 / 多言語音声認識(37言語以上)',
+      batterySystem: 'リチウムバッテリー（BMS内蔵、60V系統）',
     },
     procurementModels: ['purchase', 'inquiry'],
     fieldEvidence: {
@@ -4420,6 +4497,7 @@ export const robots: Robot[] = [
       dof: ['https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof'],
       runtimeMin: ['https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof'],
       controlMethod: ['https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof'],
+      batterySystem: ['https://rbtx.com/en-US/components/humanoid/robotera-q5-humanoid-robot-44dof'],
     },
     japanAvailability: 'unknown',
     supportNote: '購入問い合わせ窓口は公開。Q5固有の保証、日本での販売・保守条件は未公表。',
@@ -4524,6 +4602,7 @@ export const robots: Robot[] = [
       controlMethod: '自律運転 / 音声 / 無線コントローラー / GalbotSDK',
       sdk: 'GalbotSDK / Python API',
       computePlatform: 'NVIDIA AGX Orin 64GB / 275TOPS',
+      batterySystem: '48Vバッテリー / 有線充電（無線ドック・予備バッテリーはオプション）',
     },
     procurementModels: ['inquiry'],
     loadRatings: [
@@ -4555,6 +4634,7 @@ export const robots: Robot[] = [
       sdk: ['https://developer.galbot.com/docs/SDK/1.7.0/g1/zh/examples_python'],
       computePlatform: ['https://www.galbot.com/g1/'],
       loadRatings: ['https://www.galbot.com/g1/'],
+      batterySystem: ['https://developer.galbot.com/docs/g1/2.2.4/zh/g1'],
     },
     japanAvailability: 'unknown',
     supportNote: '製品マニュアル、SDK、問い合わせ導線は公開。日本での販売、修理、部品供給、SLAは未確認。',
@@ -4767,6 +4847,7 @@ export const robots: Robot[] = [
     specs: {
       mobility: 'hybrid',
       controlMethod: '遠隔操作 / 自律実行 / Artemis',
+      batterySystem: '交換式バッテリー / 機会充電 / テザー給電',
     },
     procurementModels: ['inquiry'],
     fieldEvidence: {
@@ -4774,6 +4855,7 @@ export const robots: Robot[] = [
       controlMethod: [
         'https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work',
       ],
+      batterySystem: ['https://apptronik.com/apollo/apollo-2'],
     },
     usageExampleSourceUrls: [
       'https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work',
@@ -4909,6 +4991,7 @@ export const robots: Robot[] = [
       controlMethod: 'テレオペレーション（システム遅延100ms未満、60Hzサンプリング） / 二次開発対応',
       sdk: 'Unitree SDK2（C++）/ Pythonインターフェース',
       computePlatform: '8コア高性能CPU / 高演算モジュールオプション（Orin NX 16GB、100TOPS等）',
+      batterySystem: '上半身9Ahクイックリリースバッテリー（両構成共通）。Flagshipはシャーシ内蔵30Ahバッテリーを追加搭載。',
     },
     procurementModels: ['purchase', 'inquiry'],
     fieldEvidence: {
@@ -4916,6 +4999,7 @@ export const robots: Robot[] = [
       controlMethod: ['https://www.unitree.com/mobile/G1-D'],
       sdk: ['https://github.com/unitreerobotics'],
       computePlatform: ['https://www.unitree.com/mobile/G1-D'],
+      batterySystem: ['https://www.unitree.com/mobile/G1-D'],
     },
     japanAvailability: 'distributor-japan',
     supportNote: '国内は TechShare が予約販売窓口。保守・保証条件は個別確認が必要。',

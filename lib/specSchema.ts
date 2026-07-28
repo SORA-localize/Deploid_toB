@@ -43,6 +43,7 @@ export const specSchema = [
   { key: 'batteryCapacityMah',   group: 'power-runtime',         label: 'バッテリー容量', unit: ' mAh',  kind: 'number' },
   { key: 'chargeTimeMin',        group: 'power-runtime',         label: '充電時間',       unit: ' 分',   kind: 'number' },
   { key: 'batterySwapMethod',    group: 'power-runtime',         label: '電池交換',       unit: '',      kind: 'text' },
+  { key: 'batterySystem',        group: 'power-runtime',         label: '電源方式',       unit: '',      kind: 'text' },
   { key: 'controlMethod',        group: 'operation-development', label: '操作方法',       unit: '',      kind: 'text' },
   { key: 'sdk',                  group: 'operation-development', label: 'SDK',            unit: '',      kind: 'text' },
   { key: 'computePlatform',      group: 'operation-development', label: 'プロセッサー',   unit: '',      kind: 'text' },
