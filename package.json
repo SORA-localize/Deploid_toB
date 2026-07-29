@@ -13,12 +13,13 @@
     "build:data-r01-manifest": "node --experimental-strip-types scripts/build-data-r01-manifest.mjs",
     "build:data-r02-manifest": "node --experimental-strip-types scripts/build-data-r02-manifest.mjs",
     "check:source-links": "node --experimental-strip-types scripts/check-source-links.mjs",
+    "check:data-boundaries": "node scripts/check-data-import-boundaries.mjs",
     "typecheck": "tsc --noEmit --incremental false",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "npm run validate:data && npm run typecheck && npm run lint && npm run test && npm run build && npm run test:e2e"
+    "check": "npm run validate:data && npm run check:data-boundaries && npm run typecheck && npm run lint && npm run test && npm run build && npm run test:e2e"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
