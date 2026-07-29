@@ -3,13 +3,13 @@
 // console に出す。`npm run validate:data`（scripts/validate-data.mjs）からも実行される。
 import fs from 'node:fs';
 import path from 'node:path';
-import { deployments } from '../data/deployments.ts';
-import { manufacturers } from '../data/manufacturers.ts';
-import { articlePlacements } from '../data/articlePlacements.ts';
 import { articles } from '../data/articles.ts';
 import { robots } from '../data/robots.ts';
 import type { CandidateEvidenceBasis, ImageAsset, RightsStatus } from '../data/types.ts';
 import { useCases } from '../data/useCases.ts';
+import { manufacturers } from '../data/manufacturers.ts';
+import type { ContentSnapshot } from './data/contentSnapshot.ts';
+import { localContentSnapshot } from './data/localContentSnapshot.ts';
 import {
   articleCategoryOrder,
   articleSectionOrder,
@@ -71,7 +71,15 @@ export interface ValidationResult {
   warnings: string[];
 }
 
-export function validateData(): ValidationResult {
+export function validateSnapshotMonolith(snapshot: ContentSnapshot): ValidationResult {
+  const {
+    articlePlacements,
+    articles,
+    deployments,
+    manufacturers,
+    robots,
+    useCases,
+  } = snapshot;
   const errors: string[] = [];
   const warnings: string[] = [];
   // 参照整合は不変 id で取る（slug は可変URLであり外部キーではない）
@@ -419,7 +427,7 @@ export function validateData(): ValidationResult {
   const identifierPattern = /^[a-z0-9]+(-[a-z0-9]+)*$/;
   const dup = <T extends { id: string; slug: string; previousSlugs?: string[] }>(
     name: string,
-    arr: T[],
+    arr: readonly T[],
   ) => {
     const seenIds = new Set<string>();
     const seenSlugs = new Set<string>();
@@ -992,6 +1000,10 @@ export function validateData(): ValidationResult {
   }
 
   return { errors, warnings };
+}
+
+export function validateData(): ValidationResult {
+  return validateSnapshotMonolith(localContentSnapshot);
 }
 
 let didRun = false;

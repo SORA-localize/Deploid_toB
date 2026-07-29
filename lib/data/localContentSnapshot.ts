@@ -1,13 +1,13 @@
 import {
   articleIndexPlacementLimits,
   articlePlacements,
-} from '@/data/articlePlacements';
-import { articles } from '@/data/articles';
-import { deployments } from '@/data/deployments';
-import { manufacturers } from '@/data/manufacturers';
-import { robots } from '@/data/robots';
-import { useCases } from '@/data/useCases';
-import type { ContentSnapshot } from '@/lib/data/contentSnapshot';
+} from '../../data/articlePlacements.ts';
+import { articles } from '../../data/articles.ts';
+import { deployments } from '../../data/deployments.ts';
+import { manufacturers } from '../../data/manufacturers.ts';
+import { robots } from '../../data/robots.ts';
+import { useCases } from '../../data/useCases.ts';
+import type { ContentSnapshot } from './contentSnapshot.ts';
 
 export const localContentSnapshot = {
   robots,
