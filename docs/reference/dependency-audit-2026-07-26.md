@@ -98,7 +98,7 @@ anywhere in the app, but one CSS `@import` and two Tailwind data-variant usages 
 migrated to standard Tailwind arbitrary data-variant syntax (e.g. `data-[state=open]:`)
 before the `shadcn` package can be safely removed from `dependencies` — this repo does
 not yet have that migration; it is out of scope for this (documentation-only) task and
-is left for a follow-up Task in this phase.
+is left for a follow-up Task in this phase (superseded by Task 2 — see below).
 
 Additionally checked, since `next` and `sharp` are also listed in the brief's `npm
 explain` step: `next/image` is actively used across the app (10 files, e.g.
@@ -160,6 +160,18 @@ CSS `@import` and two package-specific Tailwind variant strings.
 - `npm uninstall shadcn` — removed `shadcn@4.10.0` and its full transitive subtree
   (MCP SDK, ts-morph, ajv/ajv-formats, express/express-rate-limit, cosmiconfig, hono,
   etc.) from `package.json` and `package-lock.json`.
+
+### shadcn CLI caveat (added during final-review fixup)
+
+The shadcn CLI remains usable via `npx shadcn@latest ...` to scaffold new components
+(it is not an installed dependency — `npx` fetches it on demand, and `components.json`
+intentionally still points at `ui.shadcn.com/schema.json` for this purpose). However,
+since this task removed shadcn's custom Tailwind variant CSS, any newly-scaffolded
+component using `data-open:`/`data-closed:`/`data-checked:`/`data-selected:` variants
+must be manually ported to standard Tailwind arbitrary-variant syntax (e.g.
+`data-[state=open]:`) before those styles will take effect — the CLI has no way to
+know those variants are undefined in this project, so the scaffolded code will compile
+without error but render with no visual effect until ported.
 
 ### Verification performed
 
@@ -452,3 +464,27 @@ plus this audit document. Task 4 (this update) added an `overrides` block to
 `package.json` (`uuid`, `js-yaml`, `postcss`, `sharp`) and the corresponding
 `package-lock.json` changes, closing out every remaining advisory in this phase; no
 `npm update` output was committed (attempted, reverted per Step 3 above).
+
+## Override removal criteria (added during final-review fixup)
+
+The four `overrides` entries added in Task 4 were re-scoped to their actual parent
+dependency (instead of being bare top-level entries) per final-review feedback, so
+that they no longer silently blind future Dependabot update PRs by forcing every
+future compatible bump back down. See `package.json`'s `overrides` block: `sharp` and
+`postcss` are now nested under `"next"`, `uuid` is nested under `"gaxios"`, and
+`js-yaml` is nested under `"google-artifactregistry-auth"`. Each override should be
+removed once it is no longer needed:
+
+- **`sharp` / `postcss` (nested under `next`):** remove once a future `next` release
+  declares a `sharp`/`postcss` dependency range that already includes these patched
+  versions (`^0.35.3` / `^8.5.24` or later) — check `npm view next@<version>
+  optionalDependencies.sharp` and `npm view next@<version> dependencies.postcss`.
+- **`uuid` (nested under `gaxios`):** remove once `gaxios` bumps its own declared
+  `uuid` dependency range to include an unaffected version (`^11.1.1` or later) —
+  check `npm view gaxios@<version> dependencies.uuid`.
+- **`js-yaml` (nested under `google-artifactregistry-auth`):** remove once
+  `google-artifactregistry-auth` bumps its own declared `js-yaml` dependency range to
+  include an unaffected version (`^4.3.0` or later) — check `npm view
+  google-artifactregistry-auth@<version> dependencies.js-yaml`.
+
+Revisit at the next dependency audit.

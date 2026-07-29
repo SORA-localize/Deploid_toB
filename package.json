@@ -66,9 +66,15 @@
     "vitest": "^4.1.10"
   },
   "overrides": {
-    "uuid": "^11.1.1",
-    "js-yaml": "^4.3.0",
-    "postcss": "^8.5.24",
-    "sharp": "^0.35.3"
+    "next": {
+      "sharp": "^0.35.3",
+      "postcss": "^8.5.24"
+    },
+    "gaxios": {
+      "uuid": "^11.1.1"
+    },
+    "google-artifactregistry-auth": {
+      "js-yaml": "^4.3.0"
+    }
   }
 }
