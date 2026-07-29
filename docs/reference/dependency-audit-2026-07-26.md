@@ -115,25 +115,29 @@ past the vulnerable range and unaffected.
 
 ## Remaining advisories
 
-Ledger filled in as later tasks in this phase land fixes. Rows below marked
-**RESOLVED (Task 2)** were cleared by removing the `shadcn` package entirely — see
-"Task 2 results" below for the full before/after audit delta. All other rows are still
-open as of this update.
+**Status after Task 4: all remaining advisories resolved. `npm audit --omit=dev`
+reports 0 critical / 0 high / 0 moderate / 0 low (0 total).** See "Task 4 results"
+below for the full investigation, the four `overrides` entries that closed the gap,
+and verification evidence (including a runtime smoke test of the `sharp` native
+codec path). The table below is kept as a historical ledger — rows marked
+**RESOLVED (Task 2)** were cleared by removing the `shadcn` package entirely (see
+"Task 2 results"); rows marked **RESOLVED (Task 4)** were cleared by the
+`package.json` `overrides` added in that task (see "Task 4 results").
 
 | Package | Severity | `npm explain` direct path | Runtime reachability | Fixed version | Fix commit |
 |---|---|---|---|---|---|
 | next | high | ~~root project → `next@^16.2.6`~~ | **RESOLVED (Task 3)** — the `next`-authored CVE for `9.3.4-canary.0 – 16.3.0-preview.7` is cleared by updating to `16.2.12`. `next` still appears in `npm audit` output after Task 3, but now only as a *parent* entry ("Depends on vulnerable versions of postcss/sharp") — it no longer carries its own direct advisory | 16.2.12 | `fix: update next to patched 16.2.12` |
-| postcss (nested) | high | root project → `next@16.2.12` → bundled `postcss@8.4.31` | Build/SSR-internal to `next`'s own tooling; not imported by app code directly, but still shipped in the production install | **Still open.** Confirmed via `npm view next@16.2.12 dependencies.postcss` → `8.4.31`, unchanged from `16.2.6`. Needs an `overrides`/`resolutions` entry or a later `next` release. Out of scope for Task 3 (see brief); left for Task 4 | TBD |
-| sharp | high | root project → `next@16.2.12` → optional `sharp@^0.34.5` | Yes — `next/image` is used in 10+ components and `next.config.mjs` configures `images.formats`, so sharp actively processes images via the Image Optimization route | **Still open.** Confirmed via `npm view next@16.2.12 optionalDependencies.sharp` → `^0.34.5`, unchanged from `16.2.6`. Needs `sharp@>=0.35.0` via `overrides`. Out of scope for Task 3 (see brief); left for Task 4 | TBD |
+| postcss (nested) | high | ~~root project → `next@16.2.12` → bundled `postcss@8.4.31`~~ | **RESOLVED (Task 4)** — was build/SSR-internal to `next`'s own tooling, not imported by app code directly, but still shipped in the production install | `overrides.postcss: "^8.5.24"` in `package.json`, verified with `npm run check` (full build + e2e) | `fix: update vulnerable transitive dependencies` |
+| sharp | high | ~~root project → `next@16.2.12` → optional `sharp@^0.34.5`~~ | **RESOLVED (Task 4)** — genuinely runtime-reachable (`next/image` used in 10+ components, `next.config.mjs` configures `images.formats`); verified fixed version still works at runtime, not just at build time (see "Task 4 results") | `overrides.sharp: "^0.35.3"` in `package.json`, verified with `npm run check` **and** a manual runtime request against `/_next/image` (both JPEG-fallback and AVIF-encode paths) | `fix: update vulnerable transitive dependencies` |
 | hono | high | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0` → `hono@^4.11.4`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥4.12.27 (per advisory ranges) | `chore: remove shadcn package runtime dependency` |
-| brace-expansion | high | ~~root project → `shadcn@^4.10.0` → `ts-morph` → `@ts-morph/common` → `minimatch@^10.2.2` → `brace-expansion@^5.0.5`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥5.0.8 (per advisory range `<=5.0.7`) | `chore: remove shadcn package runtime dependency` |
-| fast-uri | high | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk` → `ajv-formats`/`ajv@^8.x` → `fast-uri@^3.0.1`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥3.1.4/≥3.1.5 (per advisory ranges) | `chore: remove shadcn package runtime dependency` |
-| @hono/node-server | moderate | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0` → `@hono/node-server@^1.19.9`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥2.0.5 | `chore: remove shadcn package runtime dependency` |
-| @modelcontextprotocol/sdk | moderate | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥1.30.0 (pulls in fixed `@hono/node-server`) | `chore: remove shadcn package runtime dependency` |
-| gaxios | moderate | root project → `budoux@^0.8.4` → `google-artifactregistry-auth@^3.5.0` → `google-auth-library` → `gcp-metadata`/`gtoken` → `gaxios@^6.1.1`/`^6.0.0` | Indirect — `budoux` itself is runtime-reachable (`lib/typography.ts`), but the `google-artifactregistry-auth` subtree it pulls in is registry/publish tooling, not exercised by any code path this app calls | Depends on `uuid` fix upstream in `gaxios`; no direct override identified yet | TBD |
-| uuid | moderate | root project → `budoux` → ... → `gaxios@6.7.1` → `uuid@^9.0.1` | Indirect, same as gaxios above | ≥11.1.1 | TBD |
-| js-yaml | high | ~~root project → `shadcn@^4.10.0` → `cosmiconfig@^9.0.0` → `js-yaml@^4.1.0`~~; also root project → `budoux` → `google-artifactregistry-auth` → `js-yaml@^4.1.0` | shadcn path **RESOLVED (Task 2)**; budoux path still Indirect (same reasoning as gaxios) — package remains flagged in `npm audit` via the budoux path alone | ≥4.3.0 | shadcn path: `chore: remove shadcn package runtime dependency`; budoux path: TBD |
-| body-parser | low | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk` → `express@^5.2.1`/`express-rate-limit@^8.2.1` → `body-parser@^2.2.1`~~ | **RESOLVED (Task 2)** — removed with `shadcn` | ≥2.3.0 | `chore: remove shadcn package runtime dependency` |
+| brace-expansion | high | ~~root project → `shadcn@^4.10.0` → `ts-morph` → `@ts-morph/common` → `minimatch@^10.2.2` → `brace-expansion@^5.0.5`~~ | **RESOLVED (Task 2)** — removed with `shadcn` (the package still exists in the tree post-Task-2/4, but only under **dev-only** paths — `eslint`'s and `vercel` CLI's own nested `minimatch`/`ts-morph` copies — confirmed by `npm explain brace-expansion` showing exclusively `dev` markers; it no longer appears in `npm audit --omit=dev` at all) | ≥5.0.8 (per advisory range `<=5.0.7`) | `chore: remove shadcn package runtime dependency` |
+| fast-uri | high | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk` → `ajv-formats`/`ajv@^8.x` → `fast-uri@^3.0.1`~~ | **RESOLVED (Task 2)** — removed with `shadcn`. Confirmed fully gone: `npm explain fast-uri` now errors with "No dependencies found matching fast-uri" (not present anywhere in the tree, dev or prod) | ≥3.1.4/≥3.1.5 (per advisory ranges) | `chore: remove shadcn package runtime dependency` |
+| @hono/node-server | moderate | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0` → `@hono/node-server@^1.19.9`~~ | **RESOLVED (Task 2)** — removed with `shadcn`. Confirmed fully gone via `npm explain @hono/node-server` ("No dependencies found") | ≥2.0.5 | `chore: remove shadcn package runtime dependency` |
+| @modelcontextprotocol/sdk | moderate | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk@^1.26.0`~~ | **RESOLVED (Task 2)** — removed with `shadcn`. Confirmed fully gone via `npm explain @modelcontextprotocol/sdk` ("No dependencies found") | ≥1.30.0 (pulls in fixed `@hono/node-server`) | `chore: remove shadcn package runtime dependency` |
+| gaxios | moderate | ~~root project → `budoux@^0.8.4` → `google-artifactregistry-auth@^3.5.0` → `google-auth-library` → `gcp-metadata`/`gtoken` → `gaxios@^6.1.1`/`^6.0.0`~~ | **RESOLVED (Task 4)** — was indirect: `budoux` itself is runtime-reachable (`lib/typography.ts`), but the `google-artifactregistry-auth` subtree it pulls in is registry/publish-auth tooling with zero references from any code path this app calls (confirmed: `grep -rl "google-artifactregistry-auth" node_modules/budoux/` matches only `budoux`'s own `package.json`, never its `dist`/`module` runtime output) | Cleared as a side effect of the `uuid` override (gaxios's own advisory was "depends on vulnerable uuid") | `fix: update vulnerable transitive dependencies` |
+| uuid | moderate | ~~root project → `budoux` → ... → `gaxios@6.7.1` → `uuid@^9.0.1`~~ | **RESOLVED (Task 4)** — same reasoning as gaxios; dead-weight subtree, not runtime-reachable, but fixed anyway since a compatible override was verified safe | `overrides.uuid: "^11.1.1"` in `package.json`. Verified safe: the only `uuid` usage in the entire tree is `gaxios`'s `uuid.v4()` call (`node_modules/gaxios/build/src/gaxios.js:417`), and `v4` is unchanged across uuid 9→11 | `fix: update vulnerable transitive dependencies` |
+| js-yaml | high | ~~root project → `shadcn@^4.10.0` → `cosmiconfig@^9.0.0` → `js-yaml@^4.1.0`~~; ~~root project → `budoux` → `google-artifactregistry-auth` → `js-yaml@^4.1.0`~~ | shadcn path **RESOLVED (Task 2)**; budoux path **RESOLVED (Task 4)** — same dead-weight reasoning as gaxios/uuid above | `overrides.js-yaml: "^4.3.0"` in `package.json` — same major (4.x), pure patch-level fix; `eslint`'s own nested copy was already on `4.3.0`, so this override just deduped the root copy up to match it | `chore: remove shadcn package runtime dependency` (shadcn path); `fix: update vulnerable transitive dependencies` (budoux path) |
+| body-parser | low | ~~root project → `shadcn@^4.10.0` → `@modelcontextprotocol/sdk` → `express@^5.2.1`/`express-rate-limit@^8.2.1` → `body-parser@^2.2.1`~~ | **RESOLVED (Task 2)** — removed with `shadcn`. Confirmed fully gone via `npm explain body-parser` ("No dependencies found") | ≥2.3.0 | `chore: remove shadcn package runtime dependency` |
 
 ## Task 2 results — shadcn package removal (2026-07-29)
 
@@ -269,6 +273,145 @@ becoming visible via a second path — not a regression introduced by this task 
 something in scope to fix here. `postcss` and `sharp` remain open, exactly as the
 brief anticipated, and are left for Task 4 (likely via an `overrides` entry).
 
+## Task 4 results — remaining transitive advisories closed via `overrides` (2026-07-29)
+
+Task 4 of this phase (`refactor-phase-02-dependency-security-v1/task-4-brief.md`)
+addressed the four advisories left open after Task 3 (`next`/`postcss`/`sharp`/
+`js-yaml`) plus the two moderate advisories in the `budoux` chain
+(`gaxios`/`uuid`). **Result: `npm audit --omit=dev` now reports 0 critical / 0 high /
+0 moderate / 0 low (0 total)** — a full resolution, not a partial one.
+
+### Step 1 — current advisory enumeration
+
+`npm audit --omit=dev --json` on branch head (post-Task-3, pre-Task-4) showed 7
+advisories (0 critical, 4 high, 3 moderate, 0 low): `next` (high, parent-only —
+depends on `postcss`/`sharp`), `postcss` (high), `sharp` (high), `js-yaml` (high, via
+`budoux`), `@vercel/analytics` (moderate, parent-only — depends on `next`), `gaxios`
+(moderate, via `uuid`), `uuid` (moderate). This matches the "Remaining advisories"
+table exactly, confirming no drift since Task 3 landed.
+
+The brief's Step 1 command list (`npm explain brace-expansion fast-uri hono js-yaml
+postcss sharp uuid body-parser gaxios`) was adapted per the task instructions, since
+several of those packages were already fully resolved by Task 2's `shadcn` removal:
+
+- `npm explain fast-uri`, `npm explain hono`, `npm explain body-parser`, `npm explain
+  @modelcontextprotocol/sdk`, `npm explain @hono/node-server` → all four error with
+  `"No dependencies found matching <package>"` — **fully gone from the tree**, dev or
+  prod (not merely absent from the production audit).
+- `npm explain brace-expansion` → still present, but **exclusively under dev-only
+  paths** (`eslint`'s own nested `minimatch`, and the `vercel` CLI's bundled
+  `ts-morph`/`@ts-morph/common` copies across a dozen `@vercel/*` sub-packages) — it
+  does not appear in `npm audit --omit=dev` at all, confirming it carries zero
+  production risk post-shadcn-removal.
+- `npm explain postcss`, `npm explain sharp`, `npm explain js-yaml`, `npm explain
+  gaxios`, `npm explain uuid`, `npm explain @vercel/analytics`, `npm explain next` →
+  ran against the actual current advisory set (see dependency paths in the "Remaining
+  advisories" table above). Confirms Task 1's finding: the `gaxios`/`uuid` chain is
+  `budoux@0.8.4` → `google-artifactregistry-auth@3.5.0` → `google-auth-library@9.15.1`
+  → `gcp-metadata@6.1.1`/`gtoken@7.1.0` → `gaxios@6.7.1` → `uuid@9.0.1`, **not** via
+  `shadcn` (already removed). Same chain carries `js-yaml@4.1.1` as a sibling dependency
+  of `google-artifactregistry-auth`.
+- Confirmed `google-artifactregistry-auth` is dead weight inside `budoux`: `npm view
+  budoux dependencies` → `{commander, google-artifactregistry-auth, linkedom}`, but
+  `grep -rl "google-artifactregistry-auth" node_modules/budoux/` matches only
+  `budoux`'s own `package.json` — never its `dist/index.js` or `module/index.js`
+  runtime entry points (`budoux`'s own `package.json` reveals
+  `google-artifactregistry-auth` is used only in its `prepare`/publish script, i.e. a
+  devDependency mistakenly declared as a runtime dependency upstream). This subtree
+  is installed but never executed by any code path this app calls.
+
+### Step 2 — `npm audit fix --dry-run --omit=dev`
+
+```
+js-yaml   fix available via `npm audit fix`            (safe — no top-level major bump)
+uuid      fix available via `npm audit fix`            (safe — no top-level major bump)
+postcss   fix available via `npm audit fix --force`    — "Will install next@9.3.3, which is a breaking change"
+sharp     fix available via `npm audit fix --force`    — "Will install next@9.3.3, which is a breaking change"
+```
+
+Per npm's own algorithm, `js-yaml` and `uuid` are fixable without forcing a
+top-level major-version change (both are purely transitive, so npm can bump them past
+their parent's declared semver range without touching any direct dependency).
+`postcss`/`sharp` are only offered a fix via `--force`, and that fix is a **downgrade
+of `next` to `9.3.3`** — an unacceptable multi-major regression, correctly rejected
+per the task's hard constraint. **`npm audit fix` and `npm audit fix --force` were
+never run for real** — only `--dry-run` was used to inspect candidates, per explicit
+instruction from the task dispatcher (stricter than the brief, which only prohibited
+the `--force` variant).
+
+### Step 3 — `npm update` (reverted)
+
+`npm update` was attempted as the brief's Step 3 "safe, semver-respecting" option.
+**Result: catastrophic regression** — `npm audit` (all deps, not `--omit=dev`) went
+from 48 to a claimed "46 vulnerabilities (1 low, 11 moderate, 33 high, **1
+critical**)" immediately after the update, with 251 packages added, 183 removed, 161
+changed, and a ~5,600-line lockfile rewrite. This was **immediately reverted** via
+`git checkout -- package-lock.json` followed by `npm ci` to resync `node_modules`,
+restoring the `--omit=dev` audit to the expected 7-advisory, 0-critical baseline. Per
+the brief's explicit guidance ("if this command shifts unrelated direct dependency
+ranges you don't want, don't commit that — revert and instead target the specific
+safe transitive bump"), `npm update`'s output was discarded entirely and not
+committed. The devDependency tree (dominated by `vercel@54.10.3`'s huge transitive
+graph) is evidently far more volatile than the `--omit=dev` production tree this task
+is scoped to; `npm update`'s blanket semver-range-respecting bump across *all*
+dependencies (including dev) is not a safe instrument here.
+
+### Step 3 (revised) — targeted `overrides` for the four remaining packages
+
+Since `npm update` was unusable and `npm audit fix --force` was prohibited, each of
+the four remaining advisories was resolved with a manually verified, narrowly-scoped
+`package.json` `overrides` entry — each checked for API/behavioral compatibility
+*before* being added, then verified with a full `npm run check` after:
+
+| Package | Override | Why safe |
+|---|---|---|
+| `uuid` | `^11.1.1` | Only one instance in the entire tree (`gaxios@6.7.1`'s `uuid@^9.0.1`, not runtime-reachable per Step 1). `npm explain uuid` confirmed a single consumer. Inspected `node_modules/gaxios/build/src/gaxios.js:417` — the only call is `uuid_1.v4()`, and `v4` is unchanged across uuid 9→11 |
+| `js-yaml` | `^4.3.0` | Same major version (4.x) as the vulnerable `4.1.1` — the advisory fix landed as a patch release, not a breaking one. `eslint`'s own nested copy was already independently on `4.3.0`, so this override merely deduped the root/`budoux`-path copy up to match it (verified via `npm ls js-yaml` pre/post) |
+| `postcss` | `^8.5.24` | Same major (8.x) as `next`'s pinned `8.4.31`. Verified via full `npm run check` (build + 20/20 e2e, including layout/CSS-dependent `mobile-overflow` and `accessibility-smoke` tests) that CSS processing was unaffected |
+| `sharp` | `^0.35.3` | Highest-risk override (native addon, genuinely runtime-reachable via `next/image`). Verified with `npm run check` **and** a manual runtime smoke test: started `npm run start`, requested `/_next/image?url=...unitree-g1-hero.jpg&w=750&q=75` twice — once with a default `Accept` header (got back a valid resized JPEG, `Content-Type: image/jpeg`, 10,731 bytes) and once with `Accept: image/avif` (got back a valid `ISO Media, AVIF Image` file, `Content-Type: image/avif`, 5,647 bytes) — confirming `sharp@0.35.3`'s native AVIF encoder loads and runs correctly under `next@16.2.12`'s Image Optimization route, not just that the build compiles |
+
+`npm install` after adding all four overrides produced a **tightly scoped**
+`package-lock.json` diff (verified by diffing the full `packages` maps before/after):
+only `sharp` + its platform binaries (`@img/sharp-*`, all bumped `0.34.5`/`1.2.4` →
+`0.35.3`/`1.3.2` in lockstep, as expected for a single logical package), `postcss`
+(`8.5.23` → `8.5.24`, consolidating `next`'s previously-separate nested `8.4.31` copy
+into the shared root copy), `js-yaml` (`4.1.1` → `4.3.0`), `uuid` (`9.0.1` →
+`11.1.1`), and `semver` (`7.8.1` → `7.8.5`, a transitive dependency of `sharp@0.35.3`
+itself, deduped against `eslint-import-resolver-typescript`'s existing `semver`
+requirement — a benign patch bump with no advisory implications). **No** `next`,
+`react`, `react-dom`, `typescript`, `tailwind*`, or other direct dependency changed
+version.
+
+### Step 4 — gates and final audit
+
+```
+npm run check           → exit 0 (validate:data → typecheck → lint → test → build → test:e2e)
+                           Lint: 0 errors, 6 pre-existing warnings (no-img-element /
+                           exhaustive-deps), identical to the Task 2/3 baseline.
+                           Unit tests: 21/21. E2E: 20/20 (including axe-core
+                           accessibility and mobile-overflow layout checks, which
+                           exercise the postcss-processed CSS output).
+npm audit --omit=dev    → "found 0 vulnerabilities"
+git diff --check        → exit 0 (no whitespace/EOL issues)
+```
+
+### Audit delta (`npm audit --omit=dev --json` → `.metadata.vulnerabilities`)
+
+| Severity | Before (Task 3 end state) | After (Task 4) | Δ |
+|---|---:|---:|---:|
+| critical | 0 | 0 | 0 |
+| high | 4 | 0 | −4 |
+| moderate | 3 | 0 | −3 |
+| low | 0 | 0 | 0 |
+| **total** | **7** | **0** | **−7** |
+
+All 7 remaining advisories from the Task 3 end state are cleared: `next` (its
+parent-only flag disappears once `postcss`/`sharp` are fixed), `postcss`, `sharp`,
+`js-yaml`, `@vercel/analytics` (same — parent-only flag via `next`), `gaxios`, `uuid`.
+**Global constraint met and exceeded: critical is 0 (as required), and there is no
+remaining `high` severity to document a rationale for — every advisory in this phase
+is now fixed rather than accepted-as-risk.**
+
 ## Commands
 
 ```bash
@@ -276,6 +419,7 @@ npm view next@16.2.12 version
 npm view next@16.2.12 dependencies.postcss optionalDependencies.sharp
 npm audit --omit=dev --json
 npm audit --omit=dev
+npm audit fix --dry-run --omit=dev
 npm explain <package>
 npm run check
 npm install next@16.2.12
@@ -283,12 +427,28 @@ npm install --save-dev eslint-config-next@16.2.12
 npm uninstall shadcn
 npm ls shadcn --depth=0
 npm ls next eslint-config-next
+npm update                      # Task 4: attempted, caused a regression, reverted
+git checkout -- package-lock.json
+npm ci
+npm view budoux dependencies
+npm view google-auth-library versions --json
+npm view google-auth-library@9.15.1 dependencies.gaxios
+grep -rl "google-artifactregistry-auth" node_modules/budoux/
+npm ls uuid
+npm ls js-yaml
+npm install                     # Task 4: after adding `overrides` to package.json
+npm run start -- --hostname 127.0.0.1   # Task 4: manual sharp runtime smoke test
+curl "http://localhost:3000/_next/image?url=%2Fimages%2Frobots%2Funitree-g1-hero.jpg&w=750&q=75"
+curl -H "Accept: image/avif,image/webp,*/*" "http://localhost:3000/_next/image?url=%2Fimages%2Frobots%2Funitree-g1-hero.jpg&w=750&q=75"
 rg -n "shadcn/tailwind.css|data-(open|closed|disabled):" src components
 ```
 
 Task 1 (audit-only) made no `package.json`/`package-lock.json`/source changes. Task 2
 modified `package.json`, `package-lock.json`, `src/app/globals.css`, and
 `components/ui/select.tsx` (the first task in this phase to land an actual fix rather
-than documentation). Task 3 (this update) modified `package.json` and
-`package-lock.json` (updating `next` to `16.2.12`; `eslint-config-next` was already at
-`16.2.12` in `package.json`) plus this audit document.
+than documentation). Task 3 modified `package.json` and `package-lock.json` (updating
+`next` to `16.2.12`; `eslint-config-next` was already at `16.2.12` in `package.json`)
+plus this audit document. Task 4 (this update) added an `overrides` block to
+`package.json` (`uuid`, `js-yaml`, `postcss`, `sharp`) and the corresponding
+`package-lock.json` changes, closing out every remaining advisory in this phase; no
+`npm update` output was committed (attempted, reverted per Step 3 above).
