@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const allowed = new Set(['lib/data/localContentSnapshot.ts']);
-const roots = ['components', 'lib', 'scripts', 'src'];
+const roots = ['components', 'lib', 'scripts', 'src', 'tests'];
 const extensions = new Set(['.ts', '.tsx', '.js', '.mjs']);
 const valueImport =
   /import\s+(?!type\b)[^;]*from\s+['"](?:@\/data\/|\.\.\/data\/|\.\.\/\.\.\/data\/)(articles|articlePlacements|deployments|manufacturers|robots|useCases)(?:\.ts)?['"]/g;
