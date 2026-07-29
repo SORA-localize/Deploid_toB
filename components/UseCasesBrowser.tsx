@@ -10,12 +10,12 @@ import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { UseCaseCard } from '@/components/UseCaseCard';
 import { UseCasesHeader } from '@/components/UseCasesHeader';
-import type { UseCase } from '@/data/types';
+import type { UseCase, UseCaseMaturity } from '@/data/types';
 import { createUseCaseSearchIndex, searchUseCaseSlugs } from '@/lib/searchIndex';
 import { maturityLabels } from '@/lib/labels';
 import { SearchInput } from '@/components/SearchInput';
 import { toTagOptions } from '@/lib/tags';
-import { sortUseCases } from '@/lib/display';
+import { sortUseCases, useCaseMaturityOrder } from '@/lib/display';
 import { uiText } from '@/lib/uiText';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import type { UseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
@@ -29,7 +29,6 @@ interface UseCasesBrowserProps {
   robotNameById: Record<string, string>;
 }
 
-const MATURITY_ORDER = ['production-ready', 'pilot-phase', 'early-stage'] as const;
 const HOVER_OPEN_DELAY_MS = 100;
 const HOVER_CLOSE_DELAY_MS = 150;
 
@@ -115,8 +114,8 @@ export function UseCasesBrowser({
   }, [byIndustry, selectedTask, matchedSlugs]);
 
   const groupedByMaturity = useMemo(() => {
-    const entries: [string, UseCase[]][] = [];
-    for (const level of MATURITY_ORDER) {
+    const entries: [UseCaseMaturity, UseCase[]][] = [];
+    for (const level of useCaseMaturityOrder) {
       const items = sortUseCases(filtered.filter((u) => u.maturityLevel === level));
       if (items.length > 0) entries.push([level, items]);
     }

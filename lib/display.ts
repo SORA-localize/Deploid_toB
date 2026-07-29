@@ -14,6 +14,7 @@ import type {
   Robot,
   RobotCategory,
   UseCase,
+  UseCaseMaturity,
 } from '@/data/types';
 
 export const robotCategoryOrder: RobotCategory[] = [
@@ -264,6 +265,12 @@ export function sortManufacturers(
     return compareNames(a.name, b.name);
   });
 }
+
+export const useCaseMaturityOrder: readonly UseCaseMaturity[] = [
+  'production-ready',
+  'pilot-phase',
+  'early-stage',
+];
 
 export function sortUseCases(useCases: UseCase[]): UseCase[] {
   return [...useCases].sort((a, b) => {

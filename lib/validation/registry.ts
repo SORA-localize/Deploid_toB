@@ -4,11 +4,13 @@ import {
   articleCategoryOrder,
   articleSectionOrder,
   manufacturerGuideDeploymentCategoryOrder,
+  useCaseMaturityOrder,
 } from '../display.ts';
 import {
   articleCategoryLabels,
   articleSectionLabels,
   manufacturerGuideDeploymentCategoryLabels,
+  maturityLabels,
 } from '../labels.ts';
 import type { ValidationCollector } from './types.ts';
 
@@ -42,4 +44,5 @@ export function validateRegistries(collector: ValidationCollector): void {
     manufacturerGuideDeploymentCategoryLabels,
     manufacturerGuideDeploymentCategoryOrder,
   );
+  checkLabelOrderSync(collector, 'useCaseMaturity', maturityLabels, useCaseMaturityOrder);
 }
