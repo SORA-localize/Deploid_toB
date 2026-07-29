@@ -1,8 +1,3 @@
-import { deployments } from '@/data/deployments';
-import { manufacturers } from '@/data/manufacturers';
-import { articles } from '@/data/articles';
-import { robots } from '@/data/robots';
-import { useCases } from '@/data/useCases';
 import type { Article, ManufacturerGuideContent, Robot } from '@/data/types';
 import { runValidationInDev } from './validate';
 import { byArticlePublishedDesc } from '@/lib/display';
@@ -14,6 +9,15 @@ import {
   resolveSameManufacturerRobots,
 } from '@/lib/robotCatalog';
 import type { RobotPriceView } from '@/lib/robotCatalog';
+import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
+
+const {
+  articles,
+  deployments,
+  manufacturers,
+  robots,
+  useCases,
+} = localContentSnapshot;
 
 // dev時のみ：参照整合（存在しないid参照・双方向のズレ・id/slug重複）をconsoleで通知
 runValidationInDev();
@@ -22,12 +26,12 @@ runValidationInDev();
 // - 参照（*Id / *Ids）・お気に入り・比較は不変の id で解決する（get*ById / *For* 系）
 // - 公開URLのパス解決のみ可変の slug を使う（get*BySlug 系）
 
-const published = <T extends { publishStatus: string }>(items: T[]) =>
+const published = <T extends { publishStatus: string }>(items: readonly T[]) =>
   items.filter((item) => item.publishStatus === 'published');
 
 // archived は「提供終了」として詳細・関連欄に残す（無言で消さない。設計 §6.5-1）。
 // draft はどのサーフェスにも出さない。一覧・比較・sitemap は published のみ。
-const visibleInDetail = <T extends { publishStatus: string }>(items: T[]) =>
+const visibleInDetail = <T extends { publishStatus: string }>(items: readonly T[]) =>
   items.filter(
     (item) => item.publishStatus === 'published' || item.publishStatus === 'archived',
   );
@@ -39,7 +43,7 @@ export interface SlugResolution<T> {
 }
 
 const resolveBySlug = <T extends { slug: string; previousSlugs?: string[] }>(
-  records: T[],
+  records: readonly T[],
   slug: string,
 ): SlugResolution<T> => {
   const record = records.find((item) => item.slug === slug);

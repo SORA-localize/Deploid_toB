@@ -1,6 +1,11 @@
-import { articleIndexPlacementLimits, articlePlacements } from '@/data/articlePlacements';
 import type { Article, ArticlePlacementSlot } from '@/data/types';
 import { byArticlePublishedDesc } from '@/lib/display';
+import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
+
+const {
+  articlePlacements,
+  articleIndexPlacementLimits,
+} = localContentSnapshot;
 
 const reportsIndexSurface = 'reports-index';
 
