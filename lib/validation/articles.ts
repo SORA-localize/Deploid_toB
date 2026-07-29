@@ -15,7 +15,9 @@ import type { ValidationCollector } from './types.ts';
 
 // manufacturer-guide は本文を manufacturerGuideContent に持つ固定テンプレート型。
 // 型では表現しきれない「非空文字であること」「prose に見出しを持ち込まないこと」をここで確認する。
-function validateManufacturerGuideContent(
+// monolith ではこのブロックが robots/manufacturers/useCases の各ループより前に位置していたため、
+// orchestrator が validateArticles（本ループ）や validateArticlePlacements とは別に単独で呼ぶ。
+export function validateManufacturerGuideContent(
   snapshot: ContentSnapshot,
   collector: ValidationCollector,
 ): void {
@@ -104,7 +106,9 @@ function validateManufacturerGuideContent(
   }
 }
 
-function validateArticlePlacements(
+// monolith ではこのブロックが articles 本ループの後（deployments ループの後）に位置していたため、
+// orchestrator が validateArticles（本ループ）とは別に、全collection validatorの最後に呼ぶ。
+export function validateArticlePlacements(
   snapshot: ContentSnapshot,
   collector: ValidationCollector,
 ): void {
@@ -158,6 +162,9 @@ function validateArticlePlacements(
   }
 }
 
+// articles collection の本ループのみ（manufacturer-guide本文check と articlePlacements は
+// monolithでの相対位置を保つため、それぞれ validateManufacturerGuideContent /
+// validateArticlePlacements として別に export し、orchestrator が個別に呼ぶ）。
 export function validateArticles(snapshot: ContentSnapshot, collector: ValidationCollector): void {
   const { articles } = snapshot;
   const {
@@ -168,8 +175,6 @@ export function validateArticles(snapshot: ContentSnapshot, collector: Validatio
     useCaseIds,
     visibleRobotIds,
   } = buildReferenceIndex(snapshot);
-
-  validateManufacturerGuideContent(snapshot, collector);
 
   for (const article of articles) {
     checkDate(collector, 'article', article.slug, 'updatedAt', article.updatedAt);
@@ -256,6 +261,4 @@ export function validateArticles(snapshot: ContentSnapshot, collector: Validatio
       }
     });
   }
-
-  validateArticlePlacements(snapshot, collector);
 }

@@ -8,13 +8,21 @@ import {
 } from './common.ts';
 import type { ValidationCollector } from './types.ts';
 
+// manufacturer鮮度チェック。monolith では検証全体の先頭に hoist されていたため、
+// orchestrator が他の全チェックより先に呼ぶ（このファイル内の validateManufacturers とは別呼出）。
+export function validateManufacturerFreshness(
+  snapshot: ContentSnapshot,
+  collector: ValidationCollector,
+  now: number,
+): void {
+  snapshot.manufacturers.forEach((m) => checkFreshness(collector, 'manufacturer', m, now));
+}
+
 export function validateManufacturers(
   snapshot: ContentSnapshot,
   collector: ValidationCollector,
 ): void {
   const { manufacturers } = snapshot;
-
-  manufacturers.forEach((m) => checkFreshness(collector, 'manufacturer', m));
 
   for (const m of manufacturers) {
     checkDate(collector, 'manufacturer', m.slug, 'updatedAt', m.updatedAt);

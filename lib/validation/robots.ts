@@ -29,12 +29,20 @@ const robotLoadRatingKinds = new Set(['rated', 'maximum', 'unspecified']);
 const robotPriceTaxStatuses = new Set(['included', 'excluded', 'unknown']);
 const robotEvidenceFields = new Set(['priceOffers', 'loadRatings']);
 
+// robot鮮度チェック。monolith では検証全体の先頭に hoist されていたため、
+// orchestrator が他の全チェックより先に呼ぶ（このファイル内の validateRobots とは別呼出）。
+export function validateRobotFreshness(
+  snapshot: ContentSnapshot,
+  collector: ValidationCollector,
+  now: number,
+): void {
+  snapshot.robots.forEach((r) => checkFreshness(collector, 'robot', r, now));
+}
+
 export function validateRobots(snapshot: ContentSnapshot, collector: ValidationCollector): void {
   const { robots } = snapshot;
   const { manufacturerIds, publishedManufacturerIds, publishedRobotIds, robotIds, visibleRobotIds } =
     buildReferenceIndex(snapshot);
-
-  robots.forEach((r) => checkFreshness(collector, 'robot', r));
 
   for (const r of robots) {
     checkReference({

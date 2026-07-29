@@ -201,6 +201,8 @@ export function checkTags(
 }
 
 // 鮮度チェック（warning）: nextReviewBy 超過、または最新 checkedAt が既定日数超（設計 §11.6）
+// `now` は呼出元（orchestrator）が検証実行全体で1度だけ計算した値を渡す
+// （分割前 lib/validate.ts と同様、レコード毎の Date.now() 呼び出しによる非決定性を避ける）。
 export function checkFreshness(
   collector: ValidationCollector,
   kind: string,
@@ -210,8 +212,8 @@ export function checkFreshness(
     nextReviewBy?: string;
     sources: readonly { checkedAt: string }[];
   },
+  now: number,
 ): void {
-  const now = Date.now();
   if (record.publishStatus !== 'published') return;
   if (record.nextReviewBy) {
     if (isoDatePattern.test(record.nextReviewBy) && Date.parse(record.nextReviewBy) < now) {
