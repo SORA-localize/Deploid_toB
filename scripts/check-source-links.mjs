@@ -1,10 +1,8 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { articles } from '../data/articles.ts';
-import { deployments } from '../data/deployments.ts';
-import { manufacturers } from '../data/manufacturers.ts';
-import { robots } from '../data/robots.ts';
-import { useCases } from '../data/useCases.ts';
+import { localContentSnapshot } from '../lib/data/localContentSnapshot.ts';
+
+const { articles, deployments, manufacturers, robots, useCases } = localContentSnapshot;
 
 const execFileAsync = promisify(execFile);
 
