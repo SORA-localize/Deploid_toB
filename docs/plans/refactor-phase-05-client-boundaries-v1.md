@@ -1,6 +1,6 @@
 ---
 status: plan
-updated: 2026-07-26
+updated: 2026-07-31
 ---
 
 # Phase 5 Client Boundaries Implementation Plan
@@ -19,11 +19,33 @@ updated: 2026-07-26
 - filter/share URLのparameter名と意味を維持する。
 - browser back/forwardでfilter、compare選択、viewが復元される。
 - raw `Robot`、`Manufacturer`、`UseCase`、`Article`配列をcatalog client propsへ渡さない。
-- `sources`、`fieldEvidence`、本文、未使用mediaをcatalog view modelへ含めない。
+- `sources`、`fieldEvidence`、本文、未使用mediaをcatalog view modelへ含めない。この制約は**key名だけでなく値の中身にも及ぶ**。本文をJSON keyとして持たなくても、連結済みのsearch textとして同じ文字列をclientへ送るのは違反とする。
 - 現行件数ではpagination/filterをclientで完結する。
 - `router.push`/`router.replace`によるfilterごとのRSC再取得を廃止する。
 - cardの情報、リンク、favorite、compare、popover機能を維持する。
 - `/reports`、`/robots`、`/manufacturers`、`/use-cases`のfirst-load JSをPhase 1 baselineから30%以上削減する。
+
+### Catalog検索範囲（2026-07-31決定）
+
+**原則:** catalog view modelの`searchText`は、**そのcardが表示する情報**と**その一覧が絞り込みに使うfacet**だけを対象とする。詳細ページにしか無い本文は一覧の検索対象にしない。
+
+`lib/search.ts`の`create*SearchDocument()`は`description`、`comparison.*`、`supportNote`／`vendorRiskNote`等の本文fieldを`fields`に含む。これをそのまま連結してVMへ載せると、上のGlobal Constraintに反するうえ、first-load JS 30%削減目標とも正面衝突する。実測値:
+
+| route | VM全体 | うちsearchText | 本文除外時の削減 |
+|---|---|---|---|
+| `/robots`（57件） | 67,185字 | 28,357字（42.2%） | VM全体の **-27.7%** |
+| `/manufacturers`（25件） | 24,171字 | 11,401字（47.2%） | VM全体の **-38.8%** |
+
+したがってcatalogの`searchText`は`lib/search.ts`のsearch documentを再利用せず、`lib/catalog/search.ts`がcollectionごとに対象fieldを明示的に列挙して生成する。対象は次の通り。
+
+| collection | searchTextへ含める | 含めない |
+|---|---|---|
+| robots | 機種名（`nameJa`/`name`）、メーカー名、`manufacturerId`、`distributorJapan`、category／stage／readiness／availability／mobility／procurementの各label、card facts（用途・サイズ・価格・稼働時間）の値、`industryTags`、`taskTags` | `summary`、`description`、`comparison.*`、`supportNote`、`safetyNote`、`vendorRiskNote` |
+| manufacturers | 社名（`nameJa`/`name`）、`country`、`hqCity`、`foundedYear`、国内代理店名、取扱ロボット名、companyType／companyStatus／japanPresenceのlabel | `description`、`distributorNote`、`supportNote`、`procurementNote`、`vendorRiskNote`、代理店`note` |
+| use-cases | `title`、`description`（cardに表示するため対象）、maturity label、`robotNames`、`primaryIndustry`、`industryTags`、`taskTags` | `candidateRobots`の詳細、`capabilityNotes`、`sources` |
+| reports | `title`、`summary`（cardに表示するため対象）、種別label、`themeTags` | `body`、`manufacturerGuideContent`、`sources` |
+
+**受け入れるトレードオフ:** 一覧の検索範囲は現行より狭くなる。現在は紹介文中の語（例「バッテリー」）でも部分一致でhitするが、今後はhitしない。現行実装は関連度ranking無しの単純部分一致（`lib/search.ts`の`matchesSearchDocument`）であり、注記中の一語が偶然一致した無関係なrecordが機種名一致と同列に並ぶ状態でもある。本文全文検索を維持する場合はserver側の検索APIが必要になるが、本phaseは「API routeを追加しない」制約下にあるためscope外とし、将来の別planへ委ねる。検索窓のplaceholder（`lib/uiText.ts`の「ロボット名・メーカー・用途キーワードで検索」「メーカー名・地域・取扱ロボットで検索」）は本決定後の挙動と整合するため変更しない。
 
 ---
 
@@ -35,7 +57,7 @@ updated: 2026-07-26
 |---|---|
 | `lib/catalog/urlState.ts` | History API storeとReact hook |
 | `lib/catalog/urlSearch.ts` | server/client共通の初期query serialize |
-| `lib/catalog/search.ts` | 小規模catalog用normalized search |
+| `lib/catalog/search.ts` | 小規模catalog用normalized search、およびcollectionごとのcatalog searchText生成（対象fieldはここで明示列挙する。Task 2で作成しTask 3で拡張する） |
 | `lib/viewModels/shared.ts` | serializable image/logo/fact型 |
 | `lib/viewModels/logo.ts` | domain logoからdisplay logoへのserver変換 |
 | `lib/viewModels/robots.ts` | robot list VM |
@@ -282,6 +304,7 @@ git commit -m "refactor: keep catalog filters in browser URL state"
 - Create: `lib/viewModels/shared.ts`
 - Create: `lib/viewModels/robots.ts`
 - Create: `lib/viewModels/manufacturers.ts`
+- Create: `lib/catalog/search.ts`
 - Create: `tests/unit/view-models/robots.test.ts`
 - Create: `tests/unit/view-models/manufacturers.test.ts`
 - Modify: `lib/robotFilters.ts`
@@ -420,19 +443,43 @@ import { getManufacturers, getRobots, getUseCases } from '@/lib/data';
 import { createRobotCatalogItems } from '@/lib/viewModels/robots';
 
 describe('robot catalog view models', () => {
+  const items = createRobotCatalogItems(getRobots(), getManufacturers(), getUseCases());
+  const json = JSON.stringify(items);
+
   it('exclude editorial evidence and full domain records', () => {
-    const json = JSON.stringify(
-      createRobotCatalogItems(getRobots(), getManufacturers(), getUseCases()),
-    );
     expect(json).not.toContain('"sources"');
     expect(json).not.toContain('"fieldEvidence"');
     expect(json).not.toContain('"comparison"');
     expect(json).not.toContain('"priceOffers"');
   });
+
+  it('exclude body text content, not just its keys', () => {
+    // key名の不在だけでは、連結済みsearch textとして本文が載っている場合を検出できない。
+    // 実recordの本文値そのものがJSONに現れないことを固定する。
+    const robots = getRobots();
+    for (const robot of robots) {
+      for (const text of [
+        robot.description,
+        robot.summary,
+        robot.supportNote,
+        robot.safetyNote,
+        robot.vendorRiskNote,
+        ...robot.comparison.strengths,
+        ...robot.comparison.constraints,
+        ...robot.comparison.bestFit,
+        ...robot.comparison.notFit,
+      ]) {
+        if (!text || text.length < 12) continue;
+        expect(json).not.toContain(text);
+      }
+    }
+  });
 });
 ```
 
-Manufacturer testは`"sources"`、`"headquarters"`、`"description"`、`"notes"`がJSONに含まれないことをassertする。両testで`"sourceUrl"`と`"rights"`も含まれないことをassertし、表示用logo/imageだけがserializeされることを固定する。
+Manufacturer testは`"sources"`、`"headquarters"`、`"description"`、`"notes"`がJSONに含まれないことをassertする。両testで`"sourceUrl"`と`"rights"`も含まれないことをassertし、表示用logo/imageだけがserializeされることを固定する。Manufacturer側にも同じ本文値assertionを置き、`description`、`distributorNote`、`supportNote`、`procurementNote`、`vendorRiskNote`、代理店`note`の実値がJSONに現れないことを固定する。
+
+短い文字列は他fieldと偶然一致しうるため、値assertionは12文字以上のものだけを対象とする。
 
 - [ ] **Step 3: server factoriesを実装する**
 
@@ -470,9 +517,7 @@ export function createRobotCatalogItems(
         industryTags: [...robot.industryTags],
         japanAvailability: robot.japanAvailability,
         deploymentStage: robot.deploymentStage,
-        searchText: createCatalogSearchText(
-          createRobotSearchDocument(robot, manufacturer),
-        ),
+        searchText: createRobotCatalogSearchText(robot, manufacturer, card.facts),
       },
     };
   });
@@ -480,6 +525,53 @@ export function createRobotCatalogItems(
 ```
 
 `createCatalogLogo(manufacturer, variant)`は`resolveManufacturerLogo`をserverで呼び、`src`、`alt`、`credit`、`aspectRatio`、`resolvedVariant`だけを返す。Manufacturer factoryは`getDomesticDistributorDisplay`、`getManufacturerEstablishedRegionLabel`、`getManufacturerConsultationRoute`、`getRepresentativeRobotLabel`をserverで解決し、`ManufacturerCatalogItem`へ詰める。
+
+`searchText`は`lib/search.ts`の`createRobotSearchDocument()`／`createManufacturerSearchDocument()`を**使わない**。それらの`fields`には本文が含まれ、Global Constraintの「Catalog検索範囲」に反するため。代わりに`lib/catalog/search.ts`へcollectionごとのbuilderを置き、対象fieldを直接列挙する。
+
+```ts
+// lib/catalog/search.ts
+import { normalizeSearchText } from '@/lib/search';
+import {
+  buyerReadinessLabels,
+  deploymentStageLabels,
+  japanAvailabilityLabels,
+  mobilityLabels,
+  procurementLabels,
+  robotCategoryLabels,
+} from '@/lib/labels';
+import type { Manufacturer, Robot } from '@/data/types';
+import type { CatalogFact } from '@/lib/viewModels/shared';
+
+function joinSearchText(parts: ReadonlyArray<string | number | undefined>) {
+  return normalizeSearchText(parts.filter(Boolean).join(' '));
+}
+
+export function createRobotCatalogSearchText(
+  robot: Robot,
+  manufacturer: Manufacturer | undefined,
+  facts: readonly CatalogFact[],
+) {
+  return joinSearchText([
+    robot.nameJa,
+    robot.name,
+    manufacturer?.nameJa,
+    manufacturer?.name,
+    robot.manufacturerId,
+    robot.distributorJapan,
+    robotCategoryLabels[robot.category],
+    deploymentStageLabels[robot.deploymentStage],
+    buyerReadinessLabels[robot.buyerReadiness],
+    japanAvailabilityLabels[robot.japanAvailability],
+    robot.specs.mobility ? mobilityLabels[robot.specs.mobility] : undefined,
+    ...robot.procurementModels.map((model) => procurementLabels[model]),
+    ...facts.map((fact) => fact.value),
+    ...robot.industryTags,
+    ...robot.taskTags,
+  ]);
+}
+```
+
+`createManufacturerCatalogSearchText(manufacturer, robotsForManufacturer)`も同じ形で、社名、`country`、`hqCity`、`foundedYear`、国内代理店名、取扱ロボット名、companyType／companyStatus／japanPresenceのlabelだけを連結する。`description`や`*Note`は渡さない。
 
 - [ ] **Step 4: filtersとcardsをVM入力へ変更する**
 
@@ -536,7 +628,7 @@ git commit -m "refactor: send catalog view models to robot and manufacturer clie
 ### Task 3: Use case / Reports一覧をview model化する
 
 **Files:**
-- Create: `lib/catalog/search.ts`
+- Modify: `lib/catalog/search.ts`（Task 2で作成済み。use-case／article用builderを追加する）
 - Create: `lib/viewModels/useCases.ts`
 - Create: `lib/viewModels/articles.ts`
 - Create: `tests/unit/view-models/use-cases.test.ts`
@@ -561,28 +653,47 @@ git commit -m "refactor: send catalog view models to robot and manufacturer clie
 
 - [ ] **Step 1: small catalog search contractを書く**
 
-```ts
-// lib/catalog/search.ts
-import {
-  normalizeSearchText,
-  type SearchDocument,
-} from '@/lib/search';
+`matchesCatalogSearch`をTask 2で作成済みの`lib/catalog/search.ts`へ追加する。
 
+```ts
+// lib/catalog/search.ts（追記）
 export function matchesCatalogSearch(searchText: string, query: string) {
   const terms = normalizeSearchText(query).split(/\s+/).filter(Boolean);
   if (terms.length === 0) return true;
   const haystack = normalizeSearchText(searchText);
   return terms.every((term) => haystack.includes(term));
 }
+```
 
-export function createCatalogSearchText(document: SearchDocument) {
-  return normalizeSearchText([
-    document.title,
-    ...document.fields,
-    ...document.tags.flatMap((tag) => tag.searchValues),
-  ].join(' '));
+use-case／article用のsearchText builderも同じfileへ追加する。robots／manufacturersと同様、`lib/search.ts`のsearch documentは再利用せず、対象fieldを直接列挙する。
+
+```ts
+export function createUseCaseCatalogSearchText(
+  useCase: UseCase,
+  robotNames: readonly string[],
+) {
+  return joinSearchText([
+    useCase.titleJa ?? useCase.title,
+    useCase.description, // cardに表示するため対象
+    useCaseMaturityLabels[useCase.maturity],
+    useCase.primaryIndustry,
+    ...robotNames,
+    ...useCase.industryTags,
+    ...useCase.taskTags,
+  ]);
+}
+
+export function createArticleCatalogSearchText(article: Article) {
+  return joinSearchText([
+    article.titleJa ?? article.title,
+    article.summary, // cardに表示するため対象
+    articleTypeLabels[article.type],
+    ...article.themeTags,
+  ]);
 }
 ```
+
+`description`／`summary`はcardが表示する情報のためsearchTextへ含める（Global Constraintの「Catalog検索範囲」表を参照）。`body`、`manufacturerGuideContent`、`capabilityNotes`、`sources`は含めない。
 
 VM testで日本語、英語、メーカー名、複数語queryが現行代表recordへhitすることを固定する。typo fuzzy matchingは新contractに含めず、検索UIの説明も部分一致として扱う。
 
@@ -628,7 +739,9 @@ export interface ArticleCatalogItem {
 
 Use case JSONに`candidateRobots`、`sources`、`capabilityNotes`がないことをassertする。Article JSONに`body`、`manufacturerGuideContent`、`sources`、`relatedRobotIds`がないことをassertする。
 
-Factoryは既存のlabel、tone、media、evidence helperをserverで解決する。`getDisplayableAsset()`の戻り値は`{ src, alt }`へ写像し、rights/source metadataを含めない。filterの`searchText`は既存`createUseCaseSearchDocument`または`createArticleSearchDocument`を`createCatalogSearchText()`へ渡して生成する。
+Factoryは既存のlabel、tone、media、evidence helperをserverで解決する。`getDisplayableAsset()`の戻り値は`{ src, alt }`へ写像し、rights/source metadataを含めない。filterの`searchText`はStep 1の`createUseCaseCatalogSearchText()`／`createArticleCatalogSearchText()`で生成する（`createUseCaseSearchDocument`／`createArticleSearchDocument`は本文を含むため使わない）。
+
+Task 2と同じく、両testに本文値assertionを置く。use-caseは`capabilityNotes`、articleは`body`／`manufacturerGuideContent`の実値（12文字以上）がJSONに現れないことを固定する。
 
 - [ ] **Step 4: placementsをserver引数化する**
 
@@ -881,6 +994,8 @@ for (const [name, value] of Object.entries(catalogViewModelFixtures)) {
 ```
 
 `catalogViewModelFixtures`は実dataから5 factoryの結果を作る。
+
+key名assertionに加えて、**本文値のaggregate assertion**も置く。全collectionの本文field（robot: `description`／`summary`／`comparison.*`／各note、manufacturer: `description`／各note、use-case: `capabilityNotes`、article: `body`／`manufacturerGuideContent`）から12文字以上の実値を集め、5 factoryいずれのJSONにも現れないことを固定する。これがGlobal Constraint「Catalog検索範囲」のhard gateであり、key名だけのassertionでは検出できない連結済みsearch text経由の流出を止める唯一の自動検査になる。
 
 - [ ] **Step 2: client budget scriptを追加する**
 
