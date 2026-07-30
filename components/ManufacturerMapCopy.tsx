@@ -2,6 +2,8 @@
 
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import Link from 'next/link';
+import { getCountryDisplay } from '@/lib/countryRegistry';
+import { createArcPath } from '@/lib/worldMap';
 import { uiText } from '@/lib/uiText';
 
 export interface ManufacturerArc {
@@ -30,29 +32,14 @@ export interface MapPoint {
   arcs: ManufacturerArc[];
 }
 
-// country(英語表記) → 地域名(日本語)・ISO Alpha-3
-const REGION: Record<string, { name: string; a3: string }> = {
-  USA: { name: '米国', a3: 'USA' },
-  China: { name: '中国', a3: 'CHN' },
-  Japan: { name: '日本', a3: 'JPN' },
-  Germany: { name: 'ドイツ', a3: 'DEU' },
-  Norway: { name: 'ノルウェー', a3: 'NOR' },
-  Canada: { name: 'カナダ', a3: 'CAN' },
-  Spain: { name: 'スペイン', a3: 'ESP' },
-  France: { name: 'フランス', a3: 'FRA' },
-  Israel: { name: 'イスラエル', a3: 'ISR' },
-  Hungary: { name: 'ハンガリー', a3: 'HUN' },
+// country(英語表記) → 地域名(日本語)・ISO Alpha-3。lib/countryRegistry の getCountryDisplay に委譲。
+// NOTE(task-3): ManufacturerMapStage.tsx が引き続きこの `region` を import している。
+// Task 3 で同コンポーネントをリワークする際、直接 getCountryDisplay を使う形に置き換えて
+// このエクスポートは削除できる。
+export const region = (country: string) => {
+  const { name, alpha3 } = getCountryDisplay(country);
+  return { name, a3: alpha3 };
 };
-export const region = (country: string) =>
-  REGION[country] ?? { name: country, a3: country.slice(0, 3).toUpperCase() };
-
-function arcPath(x1: number, y1: number, x2: number, y2: number) {
-  const dist = Math.hypot(x2 - x1, y2 - y1);
-  const lift = Math.min(dist * 0.35, 26);
-  const cx = (x1 + x2) / 2;
-  const cy = Math.min(y1, y2) - lift;
-  return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
-}
 
 interface ManufacturerMapCopyProps {
   svgMap: string;
@@ -96,7 +83,10 @@ export function ManufacturerMapCopy({
           aria-hidden="true"
         >
           {active.arcs.map((arc, i) => {
-            const d = arcPath(active.leftPct, active.topPct, arc.leftPct, arc.topPct);
+            const d = createArcPath(
+              { x: active.leftPct, y: active.topPct },
+              { x: arc.leftPct, y: arc.topPct },
+            );
             return (
               <g key={i}>
                 <path
@@ -142,7 +132,7 @@ export function ManufacturerMapCopy({
       {points.map((p) => {
         const isActive = p.id === activeId;
         const isCluster = p.members.length > 1;
-        const r = region(p.members[0].country);
+        const r = getCountryDisplay(p.members[0].country);
         const href = isCluster ? '/manufacturers' : `/manufacturers/${p.members[0].slug}`;
         const label = isCluster
           ? uiText.home.worldMap.clusterAriaLabel(r.name, p.members.length)
