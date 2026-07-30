@@ -3,6 +3,8 @@ import {
   HEADQUARTERS_CLUSTER_DISTANCE,
   clusterProjectedManufacturers,
   createArcPath,
+  deOverlap,
+  pushAway,
 } from '@/lib/worldMap';
 
 const item = (slug: string, x: number, y: number) => ({
@@ -41,5 +43,28 @@ describe('clusterProjectedManufacturers', () => {
   it('creates a deterministic quadratic arc path', () => {
     expect(createArcPath({ x: 10, y: 20 }, { x: 30, y: 20 }))
       .toBe('M 10 20 Q 20 13 30 20');
+  });
+});
+
+describe('deOverlap / pushAway (no input mutation)', () => {
+  it('deOverlap does not mutate its input array or element objects', () => {
+    const input = [
+      item('a', 10, 10),
+      item('b', 10.5, 10),
+      item('c', 11, 10),
+    ];
+    const clone = structuredClone(input);
+    deOverlap(input, 5);
+    expect(input).toEqual(clone);
+  });
+
+  it('pushAway does not mutate its movable/fixed input arrays or element objects', () => {
+    const movable = [item('a', 10, 10), item('b', 11, 10)];
+    const fixed = [item('f1', 10.2, 10), item('f2', 10.8, 10)];
+    const movableClone = structuredClone(movable);
+    const fixedClone = structuredClone(fixed);
+    pushAway(movable, fixed, 5);
+    expect(movable).toEqual(movableClone);
+    expect(fixed).toEqual(fixedClone);
   });
 });

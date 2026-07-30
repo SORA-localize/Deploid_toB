@@ -7,6 +7,10 @@ export interface ProjectedManufacturer extends Point {
   slug: string;
 }
 
+// 1.8の根拠: 実データ上、この閾値で合流させる必要があるunitree/agibotペアの距離は ~1.732。
+// 次に近い「合流させてはいけない」ペアは ~3.464 離れている（ちょうど約1.9倍・~1.7の余裕）。
+// 1.8はunitree/agibotのすぐ上（合流を取りこぼさない）かつ次点ペアの約半分（誤合流しない）に位置し、
+// 両側に安全マージンを持つ。
 export const HEADQUARTERS_CLUSTER_DISTANCE = 1.8;
 export const ARC_END_MIN_DISTANCE = 2.6;
 

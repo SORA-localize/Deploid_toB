@@ -74,7 +74,10 @@ export function ManufacturerMapStage({ mapAssetSrc, points, heading, subcopy }: 
   const subcopyLines = subcopy.split('\n');
 
   return (
-    <div className="relative h-[240px] sm:h-[320px] md:h-[clamp(320px,65vh,880px)] w-full select-none overflow-hidden bg-neutral-950">
+    <div
+      data-world-map-stage
+      className="relative h-[240px] sm:h-[320px] md:h-[clamp(320px,65vh,880px)] w-full select-none overflow-hidden bg-neutral-950"
+    >
       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
         <ManufacturerMapCopy
           mapAssetSrc={mapAssetSrc}

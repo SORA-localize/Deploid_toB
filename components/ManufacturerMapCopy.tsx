@@ -51,13 +51,13 @@ export function ManufacturerMapCopy({
   const active = points.find((p) => p.id === activeId) ?? null;
 
   return (
-    <div data-world-map-canvas className="relative h-full min-w-full aspect-[2/1] shrink-0">
+    <div data-world-map-canvas className="relative h-full w-full shrink-0">
       <img
         src={mapAssetSrc}
         alt=""
         aria-hidden="true"
         draggable={false}
-        className="pointer-events-none h-full w-full object-cover opacity-90 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
+        className="pointer-events-none h-full w-full object-fill opacity-90 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
       />
 
       {/* 導入事例の弧（アクティブ点のみ） */}
