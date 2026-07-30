@@ -16,12 +16,13 @@
     "check:data-boundaries": "node scripts/check-data-import-boundaries.mjs",
     "generate:world-map": "node scripts/generate-world-map-asset.mjs",
     "check:world-map-asset": "node scripts/generate-world-map-asset.mjs --check",
+    "check:home-payload": "node scripts/check-home-payload.mjs",
     "typecheck": "tsc --noEmit --incremental false",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "npm run validate:data && npm run check:data-boundaries && npm run typecheck && npm run lint && npm run test && npm run build && npm run test:e2e"
+    "check": "npm run validate:data && npm run check:data-boundaries && npm run typecheck && npm run lint && npm run test && npm run build && npm run check:home-payload && npm run test:e2e"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
