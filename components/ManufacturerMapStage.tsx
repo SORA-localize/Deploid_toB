@@ -100,7 +100,7 @@ export function ManufacturerMapStage({ mapAssetSrc, points, heading, subcopy }: 
       />
 
       {/* 見出し（左上） */}
-      <div className="pointer-events-none absolute inset-0">
+      <div className="pointer-events-none absolute inset-0 z-20">
         <div className="site-container h-full pt-10 md:pt-16">
           <div className="max-w-2xl">
             <p className="mb-3 font-mono text-xs uppercase tracking-wider text-neutral-400">
@@ -133,12 +133,12 @@ export function ManufacturerMapStage({ mapAssetSrc, points, heading, subcopy }: 
       </div>
 
       {/* CTA（右下） */}
-      <div className="absolute inset-x-0 bottom-0">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20">
         <div className="site-container pb-6 md:pb-10">
           <div className="flex flex-wrap justify-end gap-3">
             <Link
               href="/robots"
-              className="inline-flex items-center gap-2 bg-white px-4 py-3 text-xs font-medium text-neutral-900 transition-colors hover:bg-neutral-200 sm:px-6 sm:py-4 sm:text-sm"
+              className="pointer-events-auto inline-flex items-center gap-2 bg-white px-4 py-3 text-xs font-medium text-neutral-900 transition-colors hover:bg-neutral-200 sm:px-6 sm:py-4 sm:text-sm"
             >
               {uiText.home.worldMap.ctaRobots}
             </Link>
@@ -148,7 +148,7 @@ export function ManufacturerMapStage({ mapAssetSrc, points, heading, subcopy }: 
 
       {/* 情報カード（左下）。単独＝1社、クラスタ＝複数社を縦スタック。モバイルでは非表示 */}
       {active && ar && (
-        <div className="hidden sm:block pointer-events-none absolute inset-x-0 bottom-24 lg:bottom-0">
+        <div className="hidden sm:block pointer-events-none absolute inset-x-0 bottom-24 lg:bottom-0 z-20">
           <div className="site-container pb-4 md:pb-10">
             <div
               key={active.id}
