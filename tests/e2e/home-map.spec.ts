@@ -21,6 +21,39 @@ const VIEWPORTS = [
   { name: 'desktop-wide', width: 1920, height: 1080 },
 ];
 
+test('hero heading paints above manufacturer points regardless of overlapping hitboxes', async ({ page }) => {
+  // Point marker hitboxes (h-8 w-8) are intentionally larger than their visible
+  // dot/badge and can geometrically overlap the heading's bounding box even when
+  // everything renders correctly (the visible mark sits centered in a padded,
+  // mostly-transparent tap target). A bounding-box-only check would therefore
+  // false-positive on correct code. What actually matters is stacking order, so
+  // assert it directly: the heading's positioned wrapper must have a higher
+  // z-index than the point markers, guaranteeing the heading always paints on
+  // top wherever a marker happens to be placed.
+  await page.goto('/');
+
+  const headingZIndex = await page.evaluate(() => {
+    const heading = document.querySelector('[data-world-map-stage] h1');
+    if (!heading) return null;
+    let node: Element | null = heading;
+    while (node && node !== document.body) {
+      const z = getComputedStyle(node).zIndex;
+      if (z !== 'auto') return Number(z);
+      node = node.parentElement;
+    }
+    return null;
+  });
+
+  const pointZIndex = await page.evaluate(() => {
+    const point = document.querySelector('[data-world-map-point]');
+    return point ? Number(getComputedStyle(point).zIndex) : null;
+  });
+
+  expect(headingZIndex).not.toBeNull();
+  expect(pointZIndex).not.toBeNull();
+  expect(headingZIndex as number).toBeGreaterThan(pointZIndex as number);
+});
+
 for (const viewport of VIEWPORTS) {
   test(`manufacturer points stay within the map stage bounds at ${viewport.name}`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });

@@ -100,7 +100,7 @@ export function ManufacturerMapStage({ mapAssetSrc, points, heading, subcopy }: 
       />
 
       {/* 見出し（左上） */}
-      <div className="pointer-events-none absolute inset-0">
+      <div className="pointer-events-none absolute inset-0 z-20">
         <div className="site-container h-full pt-10 md:pt-16">
           <div className="max-w-2xl">
             <p className="mb-3 font-mono text-xs uppercase tracking-wider text-neutral-400">
@@ -133,7 +133,7 @@ export function ManufacturerMapStage({ mapAssetSrc, points, heading, subcopy }: 
       </div>
 
       {/* CTA（右下） */}
-      <div className="absolute inset-x-0 bottom-0">
+      <div className="absolute inset-x-0 bottom-0 z-20">
         <div className="site-container pb-6 md:pb-10">
           <div className="flex flex-wrap justify-end gap-3">
             <Link
@@ -148,7 +148,7 @@ export function ManufacturerMapStage({ mapAssetSrc, points, heading, subcopy }: 
 
       {/* 情報カード（左下）。単独＝1社、クラスタ＝複数社を縦スタック。モバイルでは非表示 */}
       {active && ar && (
-        <div className="hidden sm:block pointer-events-none absolute inset-x-0 bottom-24 lg:bottom-0">
+        <div className="hidden sm:block pointer-events-none absolute inset-x-0 bottom-24 lg:bottom-0 z-20">
           <div className="site-container pb-4 md:pb-10">
             <div
               key={active.id}
