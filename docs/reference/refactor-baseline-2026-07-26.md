@@ -81,3 +81,10 @@ Verification of `.next/diagnostics/route-bundle-stats.json`:
   still open. Candidate owner: a future phase touching rendering/PPR strategy (no
   existing phase 1–7 task currently claims this explicitly; closest is
   `refactor-phase-04-home-performance-v1.md`, which is scoped to Home only).
+
+## Phase 4 after
+- Home raw HTML bytes: 326367（before: 4206770）
+- Reduction: 3880403 bytes（92.24%減）
+- Embedded world-map SVG data URI occurrences: 0（before: 4）
+- World map DOM copies: 1
+- Continuous requestAnimationFrame loop: removed
