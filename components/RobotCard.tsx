@@ -85,6 +85,7 @@ export function RobotCard({
   return (
     <motion.div
       ref={cardRef}
+      data-catalog-item
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

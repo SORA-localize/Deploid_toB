@@ -3,7 +3,6 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { NewsCardGridSkeleton } from '@/components/NewsCardGridSkeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { NewsFeatureCard } from '@/components/NewsFeatureCard';
 import { NewsCard } from '@/components/NewsCard';
@@ -29,26 +28,23 @@ import { uiText } from '@/lib/uiText';
 import {
   ARTICLE_SHELF_TABS,
   getArticleShelf,
+  normalizeArticleShelfParam,
   type ArticleShelf,
 } from '@/lib/articleShelves';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
-import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
+import { useCatalogUrlState } from '@/lib/catalog/urlState';
 import { cn } from '@/lib/utils';
 
 interface ReportsBrowserProps {
   reports: Article[];
-  activeShelf: ArticleShelf;
-  initialQuery: string;
-  initialPageParam: string | null;
+  initialSearch: string;
 }
 
-export function ReportsBrowser({
-  reports,
-  activeShelf,
-  initialQuery,
-  initialPageParam,
-}: ReportsBrowserProps) {
-  const { updateParams, isPending } = useUrlParamUpdater();
+export function ReportsBrowser({ reports, initialSearch }: ReportsBrowserProps) {
+  const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
+  const activeShelf = normalizeArticleShelfParam(searchParams.get('kind'));
+  const query = searchParams.get('q') ?? '';
+  const pageParam = searchParams.get(ARTICLE_PAGE_PARAM);
   const perPage = useArticlesPerPage();
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -61,11 +57,11 @@ export function ReportsBrowser({
 
   const searchIndex = useMemo(() => createArticleSearchIndex(reports), [reports]);
   const matchedSlugs = useMemo(
-    () => searchArticleSlugs(searchIndex, initialQuery),
-    [searchIndex, initialQuery],
+    () => searchArticleSlugs(searchIndex, query),
+    [searchIndex, query],
   );
 
-  const hasActiveFilters = Boolean(initialQuery.trim());
+  const hasActiveFilters = Boolean(query.trim());
 
   const gridReports = useMemo(
     () => filterArticles({ reports: sorted, shelf: activeShelf, matchedSlugs }),
@@ -93,8 +89,8 @@ export function ReportsBrowser({
 
   const pageCount = getArticlePageCount(gridReports.length, perPage);
   const activePage = useMemo(
-    () => normalizeReportPageParam(initialPageParam, pageCount),
-    [initialPageParam, pageCount],
+    () => normalizeReportPageParam(pageParam, pageCount),
+    [pageParam, pageCount],
   );
   const paginatedReports = useMemo(
     () => getArticlePageItems(gridReports, activePage, perPage),
@@ -137,7 +133,7 @@ export function ReportsBrowser({
           <SearchInput
             id="reports-search"
             label={uiText.filters.keywordSearch}
-            value={initialQuery}
+            value={query}
             onChange={(nextQuery) =>
               updateParams({ q: nextQuery, [ARTICLE_PAGE_PARAM]: null }, 'replace')
             }
@@ -168,9 +164,7 @@ export function ReportsBrowser({
 
         {/* ── 記事グリッド ── */}
         <div ref={gridRef} className="site-container py-4 scroll-mt-site-header">
-          {isPending ? (
-            <NewsCardGridSkeleton gridClassName={browserGridClassNames.reports} />
-          ) : gridReports.length === 0 ? (
+          {gridReports.length === 0 ? (
             <EmptyState message={uiText.emptyStates.reports} />
           ) : (
             <div className="space-y-3">

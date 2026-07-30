@@ -5,6 +5,7 @@ import { UseCaseCardGridSkeleton } from '@/components/UseCaseCardGridSkeleton';
 import { UseCasesBrowser } from '@/components/UseCasesBrowser';
 import { getDeploymentsForUseCase, getRobots, getUseCases } from '@/lib/data';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
+import { toInitialSearch } from '@/lib/catalog/urlSearch';
 import { createPageMetadata } from '@/lib/metadata';
 import { createUseCaseSearchIndex, searchUseCaseSlugs } from '@/lib/searchIndex';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
@@ -90,7 +91,7 @@ async function CachedUseCasesList({
   return (
     <UseCasesBrowser
       useCases={useCases}
-      initialFilters={resolveFilters(useCases, { industry, task, q: query })}
+      initialSearch={toInitialSearch({ industry, task, q: query })}
       cardEvidenceByUseCaseId={cardEvidenceByUseCaseId}
       robotNameById={robotNameById}
     />

@@ -4,11 +4,8 @@ import { ManufacturerCardGridSkeleton } from '@/components/ManufacturerCardGridS
 import { ManufacturersBrowser } from '@/components/ManufacturersBrowser';
 import { getManufacturers, getRobots } from '@/lib/data';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
+import { toInitialSearch } from '@/lib/catalog/urlSearch';
 import { createPageMetadata } from '@/lib/metadata';
-import {
-  getManufacturerFilterOptions,
-  normalizeManufacturerFilters,
-} from '@/lib/manufacturerFilters';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 
 export const metadata = createPageMetadata({
@@ -30,20 +27,12 @@ async function ManufacturersContent({ searchParams }: { searchParams: RouteSearc
   const manufacturers = getManufacturers();
   const robots = getRobots();
   const params = await pickSearchParams(searchParams, ['country', 'route', 'q'] as const);
-  const filterOptions = getManufacturerFilterOptions(manufacturers);
-  const filters = normalizeManufacturerFilters({
-    country: params.country,
-    consultationRoute: params.route,
-    query: params.q,
-    countries: filterOptions.countries,
-    consultationRoutes: filterOptions.consultationRoutes,
-  });
 
   return (
     <ManufacturersBrowser
       manufacturers={manufacturers}
       robots={robots}
-      initialFilters={filters}
+      initialSearch={toInitialSearch(params)}
     />
   );
 }

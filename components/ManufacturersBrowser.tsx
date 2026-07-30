@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { ManufacturerCardGridSkeleton } from '@/components/ManufacturerCardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { ManufacturerCard } from '@/components/ManufacturerCard';
@@ -19,20 +18,30 @@ import {
 import { manufacturerConsultationRouteLabels } from '@/lib/manufacturerDisplay';
 import { browserFilterGridClassNames, browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { uiText } from '@/lib/uiText';
-import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
+import { useCatalogUrlState } from '@/lib/catalog/urlState';
 
 interface ManufacturersBrowserProps {
   manufacturers: Manufacturer[];
   robots: Robot[];
-  initialFilters: ReturnType<typeof normalizeManufacturerFilters>;
+  initialSearch: string;
 }
 
-export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: ManufacturersBrowserProps) {
-  const { updateParams, isPending } = useUrlParamUpdater();
+export function ManufacturersBrowser({ manufacturers, robots, initialSearch }: ManufacturersBrowserProps) {
+  const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
 
   const robotsByManufacturer = useMemo(() => groupRobotsByManufacturer(robots), [robots]);
   const filterOptions = useMemo(() => getManufacturerFilterOptions(manufacturers), [manufacturers]);
-  const filters = initialFilters;
+  const filters = useMemo(
+    () =>
+      normalizeManufacturerFilters({
+        country: searchParams.get('country'),
+        consultationRoute: searchParams.get('route'),
+        query: searchParams.get('q'),
+        countries: filterOptions.countries,
+        consultationRoutes: filterOptions.consultationRoutes,
+      }),
+    [searchParams, filterOptions],
+  );
 
   const countryOptions = useMemo(
     () => [
@@ -122,9 +131,7 @@ export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: 
           </p>
         </div>
 
-        {isPending ? (
-          <ManufacturerCardGridSkeleton gridClassName={browserGridClassNames.manufacturers} />
-        ) : filtered.length === 0 ? (
+        {filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
         ) : (
           <div className={browserGridClassNames.manufacturers}>

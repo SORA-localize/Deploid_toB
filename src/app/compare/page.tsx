@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { CompareClient } from '@/components/CompareClient';
 import { getManufacturers, getRobots } from '@/lib/data';
-import { normalizeCompareRobotIds } from '@/lib/compareParams';
+import { toInitialSearch } from '@/lib/catalog/urlSearch';
 import { createPageMetadata } from '@/lib/metadata';
 
 export const metadata = createPageMetadata({
@@ -19,14 +19,12 @@ async function CompareContent({
   const robots = getRobots();
   const manufacturers = getManufacturers();
   const { compare, view } = await searchParams;
-  const selectedIds = normalizeCompareRobotIds(compare, robots);
 
   return (
     <CompareClient
       robots={robots}
       manufacturers={manufacturers}
-      selectedIds={selectedIds}
-      initialView={view === 'specs' ? 'specs' : 'visual'}
+      initialSearch={toInitialSearch({ compare: compare ?? null, view: view ?? null })}
     />
   );
 }

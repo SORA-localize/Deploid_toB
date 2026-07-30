@@ -3,7 +3,7 @@ import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { ReportsBrowser } from '@/components/ReportsBrowser';
 import { getArticles } from '@/lib/data';
 import { ARTICLE_PAGE_PARAM } from '@/lib/articlePagination';
-import { normalizeArticleShelfParam } from '@/lib/articleShelves';
+import { toInitialSearch } from '@/lib/catalog/urlSearch';
 import { createPageMetadata } from '@/lib/metadata';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 
@@ -17,16 +17,8 @@ export const metadata = createPageMetadata({
 async function ReportsContent({ searchParams }: { searchParams: RouteSearchParams }) {
   const reports = getArticles();
   const params = await pickSearchParams(searchParams, ['kind', 'q', ARTICLE_PAGE_PARAM]);
-  const activeShelf = normalizeArticleShelfParam(params.kind);
 
-  return (
-    <ReportsBrowser
-      reports={reports}
-      activeShelf={activeShelf}
-      initialQuery={params.q ?? ''}
-      initialPageParam={params[ARTICLE_PAGE_PARAM]}
-    />
-  );
+  return <ReportsBrowser reports={reports} initialSearch={toInitialSearch(params)} />;
 }
 
 export default function ReportsPage({

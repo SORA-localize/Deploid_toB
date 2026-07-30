@@ -5,7 +5,6 @@ import type { KeyboardEvent } from 'react';
 import { HoverCard as HoverCardPrimitive } from 'radix-ui';
 import { X } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { UseCaseCardGridSkeleton } from '@/components/UseCaseCardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { UseCaseCard } from '@/components/UseCaseCard';
@@ -14,17 +13,17 @@ import type { UseCase, UseCaseMaturity } from '@/data/types';
 import { createUseCaseSearchIndex, searchUseCaseSlugs } from '@/lib/searchIndex';
 import { maturityLabels } from '@/lib/labels';
 import { SearchInput } from '@/components/SearchInput';
-import { toTagOptions } from '@/lib/tags';
+import { getUseCaseIndustryTagOptions, getUseCaseTaskTagOptions, toTagOptions } from '@/lib/tags';
 import { sortUseCases, useCaseMaturityOrder } from '@/lib/display';
 import { uiText } from '@/lib/uiText';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import type { UseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
-import type { UseCaseFilters } from '@/lib/useCaseFilters';
-import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
+import { normalizeUseCaseFilters } from '@/lib/useCaseFilters';
+import { useCatalogUrlState } from '@/lib/catalog/urlState';
 
 interface UseCasesBrowserProps {
   useCases: UseCase[];
-  initialFilters: UseCaseFilters;
+  initialSearch: string;
   cardEvidenceByUseCaseId: Record<string, UseCaseCardEvidenceSummary | undefined>;
   robotNameById: Record<string, string>;
 }
@@ -61,12 +60,29 @@ function taskOptionClassName(selected: boolean, surface: 'popover' | 'inline') {
 
 export function UseCasesBrowser({
   useCases,
-  initialFilters,
+  initialSearch,
   cardEvidenceByUseCaseId,
   robotNameById,
 }: UseCasesBrowserProps) {
-  const { updateParams, isPending } = useUrlParamUpdater();
-  const { query, industry: selectedIndustry, task: selectedTask } = initialFilters;
+  const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
+  const filterValues = useMemo(
+    () => ({
+      industryValues: getUseCaseIndustryTagOptions(useCases).map((option) => option.value),
+      taskValues: getUseCaseTaskTagOptions(useCases).map((option) => option.value),
+    }),
+    [useCases],
+  );
+  const { query, industry: selectedIndustry, task: selectedTask } = useMemo(
+    () =>
+      normalizeUseCaseFilters({
+        industry: searchParams.get('industry'),
+        task: searchParams.get('task'),
+        query: searchParams.get('q'),
+        industryValues: filterValues.industryValues,
+        taskValues: filterValues.taskValues,
+      }),
+    [searchParams, filterValues],
+  );
   const tabListRef = useRef<HTMLDivElement>(null);
 
   const industryTabOptions = useMemo(
@@ -352,9 +368,7 @@ export function UseCasesBrowser({
       </div>
 
       <div className="site-container min-h-[60vh] py-5">
-        {isPending ? (
-          <UseCaseCardGridSkeleton gridClassName={browserGridClassNames.useCases} />
-        ) : filtered.length === 0 ? (
+        {filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.useCases} />
         ) : (
           groupedByMaturity.map(([level, cases]) => (

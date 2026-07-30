@@ -5,6 +5,7 @@ import { ListPageSkeletonShell } from '@/components/ListPageSkeletonShell';
 import { RobotsBrowser } from '@/components/RobotsBrowser';
 import { getManufacturers, getRobotCardViewModels, getRobots } from '@/lib/data';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
+import { toInitialSearch } from '@/lib/catalog/urlSearch';
 import { createPageMetadata } from '@/lib/metadata';
 import {
   getRobotFilterOptions,
@@ -50,7 +51,12 @@ async function CachedRobotsList({
       robots={robots}
       manufacturers={manufacturers}
       cardViewModels={getRobotCardViewModels(robots)}
-      initialFilters={{ industry, manufacturer, availability, query }}
+      initialSearch={toInitialSearch({
+        industry,
+        manufacturer: manufacturer === 'all' ? null : manufacturer,
+        availability: availability === 'all' ? null : availability,
+        q: query,
+      })}
     />
   );
 }

@@ -3,7 +3,6 @@
 import { useCallback, useMemo } from 'react';
 import { ActiveFilterChips } from '@/components/ActiveFilterChips';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { CardGridSkeleton } from '@/components/CardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { PageTabBar, type PageTab } from '@/components/PageTabBar';
@@ -23,18 +22,18 @@ import {
 import { normalizeSearchText } from '@/lib/search';
 import { browserFilterGridClassNames, browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { uiText } from '@/lib/uiText';
-import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
+import { useCatalogUrlState } from '@/lib/catalog/urlState';
 import { useFavorites } from '@/lib/useFavorites';
 
 interface RobotsBrowserProps {
   robots: Robot[];
   manufacturers: Manufacturer[];
   cardViewModels: Record<string, RobotCardViewModel>;
-  initialFilters: ReturnType<typeof normalizeRobotFilters>;
+  initialSearch: string;
 }
 
-export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialFilters }: RobotsBrowserProps) {
-  const { updateParams, isPending } = useUrlParamUpdater();
+export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialSearch }: RobotsBrowserProps) {
+  const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
   const { favorites, toggleFavorite } = useFavorites();
 
   const manufacturerById = useMemo(
@@ -42,7 +41,19 @@ export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialFi
     [manufacturers],
   );
   const filterOptions = useMemo(() => getRobotFilterOptions(robots), [robots]);
-  const filters = initialFilters;
+  const filters = useMemo(
+    () =>
+      normalizeRobotFilters({
+        manufacturer: searchParams.get('manufacturer'),
+        availability: searchParams.get('availability'),
+        industry: searchParams.get('industry'),
+        query: searchParams.get('q'),
+        manufacturers,
+        industryValues: filterOptions.industries.map((option) => option.value),
+        availabilityValues: filterOptions.availabilityValues,
+      }),
+    [searchParams, manufacturers, filterOptions],
+  );
 
   // ファセット件数: 選ぶ前に該当数を見せて0件デッドエンドを防ぐ。
   // 0件選択肢は選択不可にするが、選択中の値は解除操作を塞がないよう無効化しない。
@@ -224,9 +235,7 @@ export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialFi
           </p>
         </div>
 
-        {isPending ? (
-          <CardGridSkeleton gridClassName={browserGridClassNames.robots} />
-        ) : resultCount === 0 ? (
+        {resultCount === 0 ? (
           <EmptyState
             message={uiText.emptyStates.robots}
             variant="muted"
