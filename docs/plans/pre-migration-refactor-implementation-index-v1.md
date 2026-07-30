@@ -1,6 +1,6 @@
 ---
 status: plan
-updated: 2026-07-26
+updated: 2026-07-30
 ---
 
 # CMS / DB移行前リファクタリング実装インデックス v1
@@ -222,3 +222,9 @@ git switch --detach pre-refactor-20260726
 - importer / exporter / parity checker
 - draft / preview / publish
 - Codex MCP
+
+---
+
+## 9. Backlog（Phase 7完了後）
+
+- **HomeのworldMap動き復活**（2026-07-30、ユーザー要望）: Phase 4で自動スクロール／ドラッグを完全に削除したが、これは容量削減（4.2MB→326KB）の必須要件ではなかった（主因はTask 1のstatic asset化）。単一canvas・単一DOM・static asset・アクセシビリティ制約を維持したまま動きを復活させる再設計を、Phase 5〜7完了後に別plan（`refactor-phase-08-home-map-motion-v1.md`等）として起票する。詳細は[`refactor-phase-04-home-performance-v1.md`](refactor-phase-04-home-performance-v1.md)のFollow-up節を参照。

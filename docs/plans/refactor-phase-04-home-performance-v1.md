@@ -1,6 +1,6 @@
 ---
 status: plan
-updated: 2026-07-26
+updated: 2026-07-30
 ---
 
 # Phase 4 Home Performance Implementation Plan
@@ -565,3 +565,15 @@ wc -c .next/server/app/index.html
 ```
 
 Expected: forbidden実装0件、Home HTML < 500,000 bytes、single map E2E PASS。
+
+---
+
+## Follow-up（保留、Phase 4完了後に判明）
+
+Phase 4完了・merge後、ユーザーから実機確認で次の指摘があった（2026-07-30）。
+
+- **自動スクロール／ドラッグの削除は容量削減に必須ではなかった。** 4.2MB→326KBの主因はTask 1（SVGを3重inline data URIから単一static assetへ）であり、Task 3の「単一canvas化・複製DOM除去」は主にGlobal Constraint「同じpoint/arc/link DOMを複製しない」（アクセシビリティ・保守性目的）に基づく別軸の判断だった。よって、static asset化・単一DOM構造を維持したまま、何らかの形で連続的な動き（自動スクロールやドラッグ）を復活させることは技術的に可能。
+- ユーザー意向: **動きは復活させたいが、Phase 5〜7がすべて完了してから着手する。** 旧実装（3コピーDOM + 手動pan/rAF）への回帰ではなく、単一canvas・単一DOM・static assetの制約を維持した新しい実装アプローチで再設計すること。
+- 本Phase内では、見出し/CTA/detail cardがmap pointのz-indexより下に隠れる形での回帰（`z-[6]`のpointが`z-index:auto`のtext層より常に前面に出るCSS stacking挙動）が別途発見・修正済み（hotfixコミット、`refactor/04-home-performance`ブランチ）。この修正はアニメーション復活作業とは独立で、そのまま維持してよい。
+
+次の一歩（Phase 7完了後）: 新規plan文書（`refactor-phase-08-home-map-motion-v1.md`等）を作成し、静的asset・単一DOM・アクセシビリティ制約を満たす形での動き復活を設計すること。
