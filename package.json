@@ -14,6 +14,8 @@
     "build:data-r02-manifest": "node --experimental-strip-types scripts/build-data-r02-manifest.mjs",
     "check:source-links": "node --experimental-strip-types scripts/check-source-links.mjs",
     "check:data-boundaries": "node scripts/check-data-import-boundaries.mjs",
+    "generate:world-map": "node scripts/generate-world-map-asset.mjs",
+    "check:world-map-asset": "node scripts/generate-world-map-asset.mjs --check",
     "typecheck": "tsc --noEmit --incremental false",
     "lint": "eslint .",
     "test": "vitest run",
