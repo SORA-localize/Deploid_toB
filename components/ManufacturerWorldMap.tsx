@@ -122,7 +122,7 @@ export function ManufacturerWorldMap({ manufacturers, heading, subcopy }: Manufa
   return (
     <section className="relative w-full border-b border-border">
       <ManufacturerMapStage
-        svgMap="/generated/world-map.svg"
+        mapAssetSrc="/generated/world-map.svg"
         points={points}
         heading={heading}
         subcopy={subcopy}

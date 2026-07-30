@@ -1,6 +1,5 @@
 'use client';
 
-import type { MouseEvent as ReactMouseEvent } from 'react';
 import Link from 'next/link';
 import { getCountryDisplay } from '@/lib/countryRegistry';
 import { createArcPath } from '@/lib/worldMap';
@@ -32,42 +31,29 @@ export interface MapPoint {
   arcs: ManufacturerArc[];
 }
 
-// country(英語表記) → 地域名(日本語)・ISO Alpha-3。lib/countryRegistry の getCountryDisplay に委譲。
-// NOTE(task-3): ManufacturerMapStage.tsx が引き続きこの `region` を import している。
-// Task 3 で同コンポーネントをリワークする際、直接 getCountryDisplay を使う形に置き換えて
-// このエクスポートは削除できる。
-export const region = (country: string) => {
-  const { name, alpha3 } = getCountryDisplay(country);
-  return { name, a3: alpha3 };
-};
-
 interface ManufacturerMapCopyProps {
-  svgMap: string;
+  mapAssetSrc: string;
   points: MapPoint[];
   activeId: string | null;
-  ariaHidden?: boolean;
   reduceMotion: boolean;
   onActivate: (id: string) => void;
   onClear: () => void;
-  onLinkClick: (e: ReactMouseEvent) => void;
 }
 
 export function ManufacturerMapCopy({
-  svgMap,
+  mapAssetSrc,
   points,
   activeId,
-  ariaHidden,
   reduceMotion,
   onActivate,
   onClear,
-  onLinkClick,
 }: ManufacturerMapCopyProps) {
   const active = points.find((p) => p.id === activeId) ?? null;
 
   return (
-    <div className="relative h-full aspect-[2/1] shrink-0" aria-hidden={ariaHidden || undefined}>
+    <div data-world-map-canvas className="relative h-full min-w-full aspect-[2/1] shrink-0">
       <img
-        src={svgMap}
+        src={mapAssetSrc}
         alt=""
         aria-hidden="true"
         draggable={false}
@@ -128,7 +114,7 @@ export function ManufacturerMapCopy({
           />
         ))}
 
-      {/* 描画点（単独＝ドット / クラスタ＝件数バッジ）。href維持(SEO)・tabIndex=-1 */}
+      {/* 描画点（単独＝ドット / クラスタ＝件数バッジ）。href維持(SEO)・キーボードでフォーカス可能 */}
       {points.map((p) => {
         const isActive = p.id === activeId;
         const isCluster = p.members.length > 1;
@@ -141,7 +127,7 @@ export function ManufacturerMapCopy({
           <Link
             key={p.id}
             href={href}
-            tabIndex={ariaHidden ? -1 : 0}
+            data-world-map-point
             aria-label={label}
             draggable={false}
             className="group absolute z-[6] -translate-x-1/2 -translate-y-1/2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
@@ -150,7 +136,6 @@ export function ManufacturerMapCopy({
             onPointerLeave={onClear}
             onFocus={() => onActivate(p.id)}
             onBlur={onClear}
-            onClick={onLinkClick}
           >
             <span className="relative flex h-8 w-8 items-center justify-center">
               <span
