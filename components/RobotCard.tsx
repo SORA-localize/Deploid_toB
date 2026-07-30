@@ -3,27 +3,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Star, CameraOff } from 'lucide-react';
-import { motion } from 'motion/react';
 import { CardFactGrid, type CardFactItem, type CardFactItems } from '@/components/CardFactGrid';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
-import type { ImageAsset, ManufacturerLogos, Robot } from '@/data/types';
-import type { RobotCardFact, RobotCardViewModel } from '@/lib/robotCatalog';
-import { getRobotPrimaryImage } from '@/lib/robotMedia';
-import { deploymentStageLabels } from '@/lib/labels';
+import type { RobotCatalogItem } from '@/lib/viewModels/robots';
+import type { CatalogFact } from '@/lib/viewModels/shared';
 import { uiText } from '@/lib/uiText';
-import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
 import { cn } from '@/lib/utils';
-import {
-  getDeploymentStageTone,
-  getVisualToneTextClassName,
-} from '@/lib/visualSemantics';
+import { getVisualToneTextClassName } from '@/lib/visualSemantics';
 
 interface RobotCardProps {
-  robot: Robot;
-  viewModel: RobotCardViewModel;
-  manufacturerName?: string;
-  manufacturerLogo?: ImageAsset;
-  manufacturerLogos?: ManufacturerLogos;
+  item: RobotCatalogItem;
   /** メーカー詳細ページ内の取り扱いロボット一覧など、同一メーカー文脈で
    *  メーカー表示が冗長になる面ではメーカー行ごと隠す（仕様L7） */
   hideManufacturer?: boolean;
@@ -37,11 +26,7 @@ interface RobotCardProps {
 }
 
 export function RobotCard({
-  robot,
-  viewModel,
-  manufacturerName,
-  manufacturerLogo,
-  manufacturerLogos,
+  item,
   hideManufacturer = false,
   showFavorite = false,
   isFavorite = false,
@@ -49,16 +34,14 @@ export function RobotCard({
   mobileVisual = false,
   eagerImage = false,
 }: RobotCardProps) {
-  const deploymentStageTone = getDeploymentStageTone(robot.deploymentStage);
-  const cardImage = getRobotPrimaryImage(robot);
-  const toCardFactItem = (fact: RobotCardFact): CardFactItem => ({
+  const toCardFactItem = (fact: CatalogFact): CardFactItem => ({
     key: fact.key,
     label: fact.label,
     value: fact.href ? (
       <Link
         href={fact.href}
         className="pointer-events-auto underline underline-offset-2 hover:text-muted-foreground"
-        aria-label={`${robot.nameJa ?? robot.name}の価格を問い合わせる`}
+        aria-label={`${item.name}の価格を問い合わせる`}
       >
         {fact.value}
       </Link>
@@ -66,51 +49,21 @@ export function RobotCard({
     valueClassName: fact.href ? 'overflow-visible' : undefined,
   });
   const cardFacts: CardFactItems = [
-    toCardFactItem(viewModel.facts[0]),
-    toCardFactItem(viewModel.facts[1]),
-    toCardFactItem(viewModel.facts[2]),
-    toCardFactItem(viewModel.facts[3]),
+    toCardFactItem(item.facts[0]),
+    toCardFactItem(item.facts[1]),
+    toCardFactItem(item.facts[2]),
+    toCardFactItem(item.facts[3]),
   ];
 
-  const {
-    cardRef,
-    rotateX,
-    rotateY,
-    glowOpacity,
-    handleMouseMove,
-    handleMouseEnter,
-    handleMouseLeave,
-  } = useTiltCardEffect();
-
   return (
-    <motion.div
-      ref={cardRef}
+    <div
       data-catalog-item
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX,
-        rotateY,
-        transformPerspective: 1000,
-      }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
         "robot-card group relative isolate flex flex-col h-full overflow-hidden border transition-[border-color,box-shadow,filter,opacity] duration-300",
         "border-border bg-card text-card-foreground",
         "hover:border-ring hover:shadow-lg",
       )}
     >
-      {/* Glow effect */}
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-30"
-        style={{
-          opacity: glowOpacity,
-          background: 'radial-gradient(circle at center, var(--card-spotlight) 0%, transparent 70%)',
-        }}
-      />
-
       {/* Shimmer sweep */}
       <div
         aria-hidden="true"
@@ -122,13 +75,13 @@ export function RobotCard({
           type="button"
           aria-label={
             isFavorite
-              ? uiText.favorites.ariaRemove(robot.nameJa ?? robot.name)
-              : uiText.favorites.ariaAdd(robot.nameJa ?? robot.name)
+              ? uiText.favorites.ariaRemove(item.name)
+              : uiText.favorites.ariaAdd(item.name)
           }
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            onFavoriteToggle?.(robot.id);
+            onFavoriteToggle?.(item.id);
           }}
           className="absolute top-3 right-3 z-40 p-1 text-muted-foreground transition-colors hover:text-foreground pointer-events-auto"
         >
@@ -142,11 +95,11 @@ export function RobotCard({
 
       {(() => {
         const renderImageContent = (sizes: string) =>
-          cardImage ? (
+          item.image ? (
             <div className="relative h-full w-full">
               {/* ぼかし背景: 余白をニュートラルに埋める */}
               <Image
-                src={cardImage.src}
+                src={item.image.src}
                 alt=""
                 aria-hidden="true"
                 fill
@@ -155,8 +108,8 @@ export function RobotCard({
                 className="pointer-events-none scale-110 select-none object-cover blur-2xl brightness-75 saturate-150"
               />
               <Image
-                src={cardImage.src}
-                alt={cardImage.alt}
+                src={item.image.src}
+                alt={item.image.alt}
                 fill
                 loading={eagerImage ? 'eager' : 'lazy'}
                 sizes={sizes}
@@ -189,17 +142,16 @@ export function RobotCard({
           <div className="flex min-w-0 flex-1 flex-col p-3">
             <div className="flex items-start justify-between mb-1.5">
               <h3 className="line-clamp-2 text-base font-semibold text-card-foreground">
-                <Link href={`/robots/${robot.slug}`} className="hover:underline">
-                  {robot.nameJa ?? robot.name}
+                <Link href={item.href} className="hover:underline">
+                  {item.name}
                 </Link>
               </h3>
             </div>
             {hideManufacturer ? null : (
               <div className="inline-block pointer-events-none md:pointer-events-auto">
                 <ManufacturerLogoName
-                  name={manufacturerName ?? robot.manufacturerId}
-                  logo={manufacturerLogo}
-                  logos={manufacturerLogos}
+                  name={item.manufacturer.name}
+                  resolvedLogo={item.manufacturer}
                   variant="combined"
                   className="mb-1 text-xs text-muted-foreground"
                   targetAreaPx={16 * 64}
@@ -215,15 +167,15 @@ export function RobotCard({
         const mobileRowContent = (
           <div className="flex min-w-0 flex-1 flex-col p-3">
             <h3 className="line-clamp-2 text-base font-semibold text-card-foreground">
-              <Link href={`/robots/${robot.slug}`} className="hover:underline">
-                {robot.nameJa ?? robot.name}
+              <Link href={item.href} className="hover:underline">
+                {item.name}
               </Link>
             </h3>
             <dl className="mt-1.5 text-[11px]">
               <div>
                 <dt className="text-muted-foreground/80">{uiText.robots.deploymentStage}</dt>
-                <dd className={cn('font-medium', getVisualToneTextClassName(deploymentStageTone))}>
-                  {deploymentStageLabels[robot.deploymentStage]}
+                <dd className={cn('font-medium', getVisualToneTextClassName(item.stage.tone))}>
+                  {item.stage.label}
                 </dd>
               </div>
             </dl>
@@ -252,8 +204,8 @@ export function RobotCard({
               {mobileImageBox}
               <div className="flex min-w-0 flex-1 flex-col p-2.5">
                 <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-card-foreground">
-                  <Link href={`/robots/${robot.slug}`} className="hover:underline">
-                    {robot.nameJa ?? robot.name}
+                  <Link href={item.href} className="hover:underline">
+                    {item.name}
                   </Link>
                 </h3>
               </div>
@@ -275,11 +227,11 @@ export function RobotCard({
       />
 
       <Link
-        href={`/robots/${robot.slug}`}
+        href={item.href}
         className="absolute inset-0 z-10"
         aria-hidden="true"
         tabIndex={-1}
       />
-    </motion.div>
+    </div>
   );
 }

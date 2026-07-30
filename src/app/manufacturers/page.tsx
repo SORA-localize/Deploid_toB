@@ -7,6 +7,7 @@ import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { toInitialSearch } from '@/lib/catalog/urlSearch';
 import { createPageMetadata } from '@/lib/metadata';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
+import { createManufacturerCatalogItems } from '@/lib/viewModels/manufacturers';
 
 export const metadata = createPageMetadata({
   title: 'メーカー',
@@ -24,14 +25,12 @@ function ManufacturersPageSkeleton() {
 }
 
 async function ManufacturersContent({ searchParams }: { searchParams: RouteSearchParams }) {
-  const manufacturers = getManufacturers();
-  const robots = getRobots();
+  const items = createManufacturerCatalogItems(getManufacturers(), getRobots());
   const params = await pickSearchParams(searchParams, ['country', 'route', 'q'] as const);
 
   return (
     <ManufacturersBrowser
-      manufacturers={manufacturers}
-      robots={robots}
+      items={items}
       initialSearch={toInitialSearch(params)}
     />
   );

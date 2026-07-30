@@ -8,11 +8,10 @@ import { ManufacturerCard } from '@/components/ManufacturerCard';
 import { ManufacturersHeader } from '@/components/ManufacturersHeader';
 import { SelectControl } from '@/components/SelectControl';
 import { SearchInput } from '@/components/SearchInput';
-import type { Manufacturer, Robot } from '@/data/types';
+import type { ManufacturerCatalogItem } from '@/lib/viewModels/manufacturers';
 import {
   filterManufacturers,
   getManufacturerFilterOptions,
-  groupRobotsByManufacturer,
   normalizeManufacturerFilters,
 } from '@/lib/manufacturerFilters';
 import { manufacturerConsultationRouteLabels } from '@/lib/manufacturerDisplay';
@@ -21,16 +20,14 @@ import { uiText } from '@/lib/uiText';
 import { useCatalogUrlState } from '@/lib/catalog/urlState';
 
 interface ManufacturersBrowserProps {
-  manufacturers: Manufacturer[];
-  robots: Robot[];
+  items: ManufacturerCatalogItem[];
   initialSearch: string;
 }
 
-export function ManufacturersBrowser({ manufacturers, robots, initialSearch }: ManufacturersBrowserProps) {
+export function ManufacturersBrowser({ items, initialSearch }: ManufacturersBrowserProps) {
   const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
 
-  const robotsByManufacturer = useMemo(() => groupRobotsByManufacturer(robots), [robots]);
-  const filterOptions = useMemo(() => getManufacturerFilterOptions(manufacturers), [manufacturers]);
+  const filterOptions = useMemo(() => getManufacturerFilterOptions(items), [items]);
   const filters = useMemo(
     () =>
       normalizeManufacturerFilters({
@@ -61,10 +58,7 @@ export function ManufacturersBrowser({ manufacturers, robots, initialSearch }: M
     [filterOptions.consultationRoutes],
   );
 
-  const filtered = useMemo(
-    () => filterManufacturers({ manufacturers, robotsByManufacturer, filters }),
-    [manufacturers, robotsByManufacturer, filters],
-  );
+  const filtered = useMemo(() => filterManufacturers({ items, filters }), [items, filters]);
 
   const activeChips = useMemo(() => {
     const chips: import('@/components/ActiveFilterChips').ActiveFilterChip[] = [];
@@ -135,12 +129,8 @@ export function ManufacturersBrowser({ manufacturers, robots, initialSearch }: M
           <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
         ) : (
           <div className={browserGridClassNames.manufacturers}>
-            {filtered.map((manufacturer) => (
-              <ManufacturerCard
-                key={manufacturer.id}
-                manufacturer={manufacturer}
-                robots={robotsByManufacturer.get(manufacturer.id) ?? []}
-              />
+            {filtered.map((item) => (
+              <ManufacturerCard key={item.id} item={item} />
             ))}
           </div>
         )}

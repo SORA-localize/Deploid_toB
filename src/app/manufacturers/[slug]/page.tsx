@@ -14,14 +14,15 @@ import {
   getManufacturers,
   getArticlesForManufacturer,
   getArticles,
-  getRobotCardViewModels,
   getRobotsByManufacturerId,
+  getUseCases,
 } from '@/lib/data';
 import { sortRobots } from '@/lib/display';
 import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { breadcrumbJsonLd, manufacturerJsonLd } from '@/lib/jsonLd';
 import { createPageMetadata } from '@/lib/metadata';
 import { uiText } from '@/lib/uiText';
+import { createRobotCatalogItems } from '@/lib/viewModels/robots';
 
 export function generateStaticParams() {
   return getManufacturers().map((manufacturer) => ({ slug: manufacturer.slug }));
@@ -50,7 +51,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
   const robots = sortRobots(getRobotsByManufacturerId(manufacturer.id), 'name', [manufacturer]);
   const reports = getArticlesForManufacturer(manufacturer.id);
-  const cardViewModels = getRobotCardViewModels(robots);
+  const robotItems = createRobotCatalogItems(robots, [manufacturer], getUseCases());
   const sampleReports = getArticles()
     .filter((report) => report.contentKind === 'sample')
     .slice(0, 3);
@@ -102,11 +103,7 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
             </span>
           }
         >
-          <ManufacturerRobotsGrid
-            robots={robots}
-            manufacturer={manufacturer}
-            cardViewModels={cardViewModels}
-          />
+          <ManufacturerRobotsGrid items={robotItems} />
         </ManufacturerDetailSection>
 
         {displayedReports.length > 0 && (

@@ -1,32 +1,13 @@
-import type { Manufacturer, Robot } from '@/data/types';
-import {
-  manufacturerCountryOrder,
-  sortByDisplayOrder,
-  sortManufacturers,
-} from '@/lib/display';
-import {
-  getManufacturerConsultationRoute,
-  manufacturerConsultationRouteOrder,
-} from '@/lib/manufacturerDisplay';
-import { createManufacturerSearchDocument, matchesSearchDocument } from '@/lib/search';
+import { manufacturerCountryOrder, sortByDisplayOrder } from '@/lib/display';
+import { manufacturerConsultationRouteOrder, type ManufacturerConsultationRoute } from '@/lib/manufacturerDisplay';
 import { isOneOf } from '@/lib/typeGuards';
+import type { ManufacturerCatalogItem } from '@/lib/viewModels/manufacturers';
+import { matchesCatalogSearchText } from '@/lib/viewModels/shared';
 
-export function groupRobotsByManufacturer(robots: readonly Robot[]) {
-  const byManufacturer = new Map<string, Robot[]>();
-
-  robots.forEach((robot) => {
-    const existing = byManufacturer.get(robot.manufacturerId) ?? [];
-    existing.push(robot);
-    byManufacturer.set(robot.manufacturerId, existing);
-  });
-
-  return byManufacturer;
-}
-
-export function getManufacturerFilterOptions(manufacturers: readonly Manufacturer[]) {
+export function getManufacturerFilterOptions(items: readonly ManufacturerCatalogItem[]) {
   return {
     countries: sortByDisplayOrder(
-      Array.from(new Set(manufacturers.map((manufacturer) => manufacturer.country))),
+      Array.from(new Set(items.map((item) => item.filter.country))),
       manufacturerCountryOrder,
     ),
     consultationRoutes: manufacturerConsultationRouteOrder,
@@ -44,7 +25,7 @@ export function normalizeManufacturerFilters({
   consultationRoute: string | null | undefined;
   query: string | null | undefined;
   countries: readonly string[];
-  consultationRoutes: readonly ReturnType<typeof getManufacturerConsultationRoute>[];
+  consultationRoutes: readonly ManufacturerConsultationRoute[];
 }) {
   return {
     country: country && countries.includes(country) ? country : 'all',
@@ -54,34 +35,19 @@ export function normalizeManufacturerFilters({
 }
 
 export function filterManufacturers({
-  manufacturers,
-  robotsByManufacturer,
+  items,
   filters,
 }: {
-  manufacturers: readonly Manufacturer[];
-  robotsByManufacturer: Map<string, Robot[]>;
+  items: readonly ManufacturerCatalogItem[];
   filters: ReturnType<typeof normalizeManufacturerFilters>;
 }) {
-  const searchDocuments = new Map(
-    manufacturers.map((manufacturer) => [
-      manufacturer.slug,
-      createManufacturerSearchDocument(
-        manufacturer,
-        robotsByManufacturer.get(manufacturer.id) ?? [],
-      ),
-    ]),
-  );
-
-  const base = manufacturers.filter((manufacturer) => {
-    if (filters.country !== 'all' && manufacturer.country !== filters.country) return false;
-    if (
-      filters.consultationRoute !== 'all' &&
-      getManufacturerConsultationRoute(manufacturer) !== filters.consultationRoute
-    ) {
+  const base = items.filter((item) => {
+    if (filters.country !== 'all' && item.filter.country !== filters.country) return false;
+    if (filters.consultationRoute !== 'all' && item.filter.consultationRoute !== filters.consultationRoute) {
       return false;
     }
-    return matchesSearchDocument(filters.query, searchDocuments.get(manufacturer.slug));
+    return matchesCatalogSearchText(filters.query, item.filter.searchText);
   });
 
-  return sortManufacturers([...base], 'name');
+  return [...base].sort((a, b) => a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'base' }));
 }
