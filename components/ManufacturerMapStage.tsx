@@ -133,12 +133,12 @@ export function ManufacturerMapStage({ mapAssetSrc, points, heading, subcopy }: 
       </div>
 
       {/* CTA（右下） */}
-      <div className="absolute inset-x-0 bottom-0 z-20">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20">
         <div className="site-container pb-6 md:pb-10">
           <div className="flex flex-wrap justify-end gap-3">
             <Link
               href="/robots"
-              className="inline-flex items-center gap-2 bg-white px-4 py-3 text-xs font-medium text-neutral-900 transition-colors hover:bg-neutral-200 sm:px-6 sm:py-4 sm:text-sm"
+              className="pointer-events-auto inline-flex items-center gap-2 bg-white px-4 py-3 text-xs font-medium text-neutral-900 transition-colors hover:bg-neutral-200 sm:px-6 sm:py-4 sm:text-sm"
             >
               {uiText.home.worldMap.ctaRobots}
             </Link>
