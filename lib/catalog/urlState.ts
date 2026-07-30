@@ -5,7 +5,10 @@ import { useCallback, useMemo, useSyncExternalStore } from 'react';
 export type UrlParamValue = string | null | undefined;
 export type UrlUpdateMode = 'push' | 'replace';
 
-const URL_CHANGE_EVENT = 'deploid:urlchange';
+// Exported so listeners outside the catalog filter tree (e.g. analytics page-view
+// reporting) can react to pushState/replaceState calls made by updateCatalogUrl,
+// which next/navigation's usePathname()/useSearchParams() do NOT observe.
+export const URL_CHANGE_EVENT = 'deploid:urlchange';
 
 function normalizeInitialSearch(initialSearch: string) {
   if (!initialSearch) return '';
