@@ -7,200 +7,160 @@ updated: 2026-08-01
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 一覧・比較画面へraw domain record全体を渡す構造と、client filter後にRSCを再取得する二重処理を解消する。
+**Goal:** catalog一覧・比較画面へraw domain recordを渡す構造をやめ、server側で生成した表示用view modelだけをclientへ渡す。併せて、実測で判明したclient bundleへの生data流出と重量依存を除去する。
 
-**Architecture:** server pageでdisplay/filter用view modelを生成し、client browserは小さいserializable objectだけを受け取る。現在の件数ではclient filterを維持し、URL同期はHistory API + `useSyncExternalStore`で完結させる。cardの常時motion依存を外し、favorite、popover、carousel、DnDだけをclient interactionとして残す。
+**Architecture:** server pageがdisplay/filter用view modelを生成し、client browserは小さいserializable objectだけを受け取る。現行件数ではclient filterを維持し、URL同期はHistory API + `useSyncExternalStore`で完結させる。catalog cardのmotion依存を外し、favorite・popover・carousel・DnDだけをclient interactionとして残す。
 
-**Tech Stack:** React 19、Next.js App Router、History API、TypeScript、Vitest/Testing Library、Playwright
+**Tech Stack:** React 19、Next.js App Router（PPR / Cache Components）、History API、TypeScript、Vitest/Testing Library、Playwright
+
+---
+
+## この計画の書き直しについて（2026-08-01）
+
+初版は**実測せずに書かれていた**。その結果、4巡の外部レビューで次が判明した。
+
+| 初版の前提 | 実測結果 |
+|---|---|
+| 「first-load JS総量を30%削減」は達成可能 | 総量の64%は全route共通の共有フロア。`/use-cases`はroute固有JSを11,490バイトに収めろという要求になっていた |
+| `/reports`が重い理由は不明 | client componentのimport chain経由で**生dataset 968,993バイト**が全userへ配信されていた |
+| MiniSearchは80KB | 実chunk 18,690バイト（80KBは`node_modules`のソースサイズ） |
+| motionは`PageTabBar`だけ | route別に4経路。`/use-cases`は`PageTabBar`を経由しない |
+| `lib/search.ts`は`/robots`だけ | catalog 5 route**すべて**に載っている |
+| field名markerで流出を検知できる | 10 chunkにhit、8件は誤検知 |
+
+**この計画は実測値から書き直したものである。** taskは推定インパクト順ではなく**実測インパクト順**に並べ、各taskの完了条件を測定コマンドで表現する。
+
+初版が3巡連続で起こした故障モードは「散文で決めたことがcode例・step・表のどれかに反映されない」だった。対策は`scripts/check-plan-snippets.mjs`（Task 2）で、この計画書の`ts`/`tsx` blockを`tsc --noEmit`にかける。目視確認では防げないことが実証済みである。
+
+---
+
+## 実測baseline（2026-08-01、branch `refactor/05-client-boundaries` HEAD `020f2ca`）
+
+Task 1・Task 2は`f42ecbf`までで実装済み。以下はその状態でのフレッシュbuild実測値。
+
+### route固有JS
+
+「route固有JS」= そのrouteのfirst-load chunkのうち、共有フロアに含まれないものの合計バイト数。
+共有フロア = `/privacy`のfirst-load chunk 9本（**591,394バイト**、react-dom 226,356を含む）。`/about`、`/for-manufacturers`、`/_not-found`も同値であり、Phase 5では変更しない。
+
+| route | first-load総量 | route固有JS |
+|---|---:|---:|
+| `/reports` | 1,825,083 | **1,233,689** |
+| `/robots` | 917,181 | **325,787** |
+| `/use-cases` | 859,601 | **268,207** |
+| `/manufacturers` | 769,805 | **178,411** |
+
+### route固有chunkの内訳（削減対象）
+
+| バイト | 中身 | 載っているroute | 担当task |
+|---:|---|---|---|
+| 968,993 | 生dataset（`fieldEvidence`×60、`vendorRiskNote`×26、record slug 133件全部） | `/reports` | Task 1 |
+| 134,910 | `motion/react`（`0p8sjtw7eybcn.js`） | `/robots`、`/reports` | Task 3・4 |
+| 134,910 | `motion/react`（`1mbvphip_2888.js`。上とmd5不一致の別copy） | `/use-cases` | Task 3 |
+| 53,958 | `lib/search.ts` + `lib/tags` + `lib/labels`（`02r_vm-d2k0jh.js`） | `/robots` | Task 5・6 |
+| 39,249 | 同上（`3u6ssx-c-te-r.js`） | `/reports` | Task 5・8 |
+| 36,038 | 同上 + `useTiltCardEffect`（`2xct9rviqvmx5.js`） | `/use-cases` | Task 3・5・7 |
+| 33,414 | 同上（`2amlnznk5pu5d.js`） | `/manufacturers` | Task 5・6 |
+| 18,690 | MiniSearch（`0ugbjz6g929ty.js`） | `/use-cases`、`/reports` | **削除しない**（後述） |
+| 37,465 | `lib/uiText.ts`（`2cf5hudnrg616.js`） | catalog 8 route共有 | 対象外 |
+
+`lib/search.ts`のchunkはroute間で30,127〜53,958とばらつく。chunkはmoduleと1:1ではなく、周辺moduleが同居しているためである。**したがって「chunkサイズ＝そのmoduleの削減量」ではない。** `lib/search.ts`本体の削減量は5 routeで共通に現れる下限（`/compare`の30,127）を上回らないと見るのが安全で、各taskでは差分を必ず実測する。
+
+### 生data流出の経路（Task 1）
+
+```
+components/ReportsBrowser.tsx ('use client')
+  → lib/articlePlacements.ts:3   import { localContentSnapshot }
+    → lib/data/localContentSnapshot.ts   ← robots / manufacturers / articles / useCases / deployments 全部
+```
+
+`data/articlePlacements.ts`自体は1,684バイトだが、`localContentSnapshot`経由で`data/*.ts`（836,534バイト）全体が引き込まれている。`/reports`のroute固有JSの**79%**。
+
+### motion経路（Task 3・4）
+
+値レベルのimportを辿った実測結果。**単一経路ではない。**
+
+| route | 経路 |
+|---|---|
+| `/robots` | `RobotsBrowser` → `PageTabBar:4` → `ui/AnimatedTooltip:4`（`AnimatePresence, motion, useReducedMotion`） |
+| `/use-cases` | `UseCasesBrowser` → `UseCaseCard:4`（`motion`）、`UseCaseCard:10` → `lib/useTiltCardEffect` |
+| `/reports` | ① `ReportsBrowser` → `ReportsHeader` → `PageTabBar` → `ui/AnimatedTooltip`<br>② `ReportsBrowser` → `NewsHeroCarousel:21`（`useReducedMotion`のみ）<br>③ `NewsHeroCarousel` → `uilayouts/carousel:9`（`AnimatePresence, motion`）<br>④ `ReportsBrowser:13` → `ui/card-hover-effect:4`（`AnimatePresence, motion`） |
+| `/manufacturers` | なし |
+
+`uilayouts/carousel.tsx`は646行あるが、motionを使うのは`SliderSnapDisplay`（L465-505、**利用者0の死んだexport**）と`SliderDotButton`（L506-557、`layoutId`によるactive dotのスライド）の2箇所だけである。autoplay・swipe・keyboardは`embla-carousel`が担っておりmotionに依存しない。
+
+### `lib/search.ts`のclient側到達経路（Task 5・6・7・8）
+
+`import type`を除いた値importだけを辿った結果。
+
+| 経路 | 使っているexport | 担当task |
+|---|---|---|
+| `components/RobotsBrowser.tsx:20` | `normalizeSearchText` | Task 5 |
+| `components/CompareClient.tsx:41` | `normalizeSearchText` | Task 5 |
+| `lib/robotFilters.ts:6` / `lib/manufacturerFilters.ts:5` → `lib/viewModels/shared.ts:3` | `normalizeSearchText` | Task 5 |
+| `components/UseCasesBrowser.tsx` → `lib/useCaseFilters.ts:2` | `createUseCaseSearchDocument`, `matchesSearchDocument` | Task 7 |
+| `components/{UseCases,Reports}Browser.tsx` → `lib/searchIndex.ts:3` | `createUseCaseSearchDocument`, `createReportSearchDocument` | Task 7・8 |
+| `lib/viewModels/robots.ts:5` / `manufacturers.ts:9`（server専用） | `createRobotSearchDocument`, `createManufacturerSearchDocument` | Task 6 |
+
+全taskの完了後、`lib/search.ts`の利用者は0になる。Task 10で削除する。
+
+### Task 2の実装状況（実測との差分）
+
+`f42ecbf`は`lib/viewModels/{shared,logo,robots,manufacturers}.ts`を作り、`RobotCard`／`ManufacturerCard`のmotionを外し、page側でVMを生成する所までを実装した。**次は未実装である。**
+
+- `lib/catalog/search.ts` — **存在しない**（`lib/catalog/`は`urlSearch.ts`と`urlState.ts`のみ）
+- `scripts/check-catalog-payload.mjs` — 存在しない
+- `scripts/check-data-import-boundaries.mjs`の`lib/viewModels/**`ルール — 未追加
+- catalog searchTextのwhitelist化 — 未実装。`lib/viewModels/robots.ts:73`は現在も`createCatalogSearchText(createRobotSearchDocument(robot, manufacturer))`であり、`description`／`comparison.*`／各Noteの本文が`searchText`へ連結されてclientへ渡っている
+
+したがって**Global Constraint「本文をVMへ含めない」は現在も未達**である。Task 6が担当する。
+
+---
 
 ## Global Constraints
 
-- DB query、server action、API route、async repositoryを追加しない。
-- filter/share URLのparameter名と意味を維持する。
-- browser back/forwardでfilter、compare選択、viewが復元される。
-- raw `Robot`、`Manufacturer`、`UseCase`、`Article`配列をcatalog client propsへ渡さない。
-- `sources`、`fieldEvidence`、本文、未使用mediaをcatalog view modelへ含めない。この制約は**key名だけでなく値の中身にも及ぶ**。本文をJSON keyとして持たなくても、連結済みのsearch textとして同じ文字列をclientへ送るのは違反とする。
-- 現行件数ではpagination/filterをclientで完結する。
-- `router.push`/`router.replace`によるfilterごとのRSC再取得を廃止する。
-- cardの情報、リンク、favorite、compare、popover機能を維持する。
-- `/reports`、`/robots`、`/manufacturers`、`/use-cases`の**route固有JS**を下記の上限以下にする（2026-08-01改訂。旧「総量から30%削減」は達成不能だったため差し替え）。
+数値で書けるものは数値で書く。「禁止事項」だけで書くと違反の大小が区別できず、13KBの違反と969KBの違反へ同じ労力を割くことになる（初版で実際に起きた）。
 
-### JS削減目標の再定義（2026-08-01決定）
+1. DB query、server action、API route、async repositoryを追加しない。
+2. filter/share URLのparameter名と意味を維持する。browser back/forwardでfilter・compare選択・viewが復元される。
+3. raw `Robot`／`Manufacturer`／`UseCase`／`Article`配列をcatalog client propsへ渡さない。
+4. `sources`、`fieldEvidence`、本文、未使用mediaをcatalog view modelへ含めない。**この制約はkey名だけでなく値の中身にも及ぶ**（連結済みsearch textとして同じ文字列を送るのも違反）。
+5. **route固有JS ≤ 180,000バイト**（`/reports`、`/robots`、`/manufacturers`、`/use-cases`）。共有フロア591,394はPhase 5の対象外。
+6. **client chunk 1本あたり record slug < 5件**、かつ**単一chunk ≤ 340,000バイト**。
+7. **catalog view modelのJSONサイズ**（`Buffer.byteLength`）を collection ごとにgateする。上限はTask 6で実測してから確定する。
+8. `router.push`／`router.replace`によるfilterごとのRSC再取得を廃止する。
+9. cardの情報、link、favorite、compare、popover機能を維持する。
+10. 現行件数ではpagination/filterをclientで完結する。**300件を超えたら本phaseのarchitectureを再検討する**（client filterの前提が崩れる件数）。
 
-初版の「first-load JS総量をPhase 1 baselineから30%削減」は**算術的に達成不能**だった。first-load JSの大半はPhase 5が触れない全route共通の共有フロアだからである。実測（Task 1+2適用後）:
+### 上限180,000の根拠と限界
 
-| route | first-load総量 | 共有フロア | route固有 | 旧目標（総量-30%） | 旧目標が要求するroute固有 |
-|---|---|---|---|---|---|
-| `/robots` | 917,181 | 591,394 | 325,787 | 646,159 | 54,765 |
-| `/manufacturers` | 769,805 | 591,394 | 178,411 | 637,214 | 45,820 |
-| `/use-cases` | 859,601 | 591,394 | 268,207 | 602,884 | **11,490** |
-| `/reports` | 1,825,083 | 591,394 | 1,233,689 | 785,122 | 193,728 |
+`/manufacturers`の現在値178,411を基準にした。ただし**この値には削減対象が33,414バイト（`lib/search.ts`）含まれている**ため、「同じ手法を適用すれば到達可能」という以上の意味はない。Task 5完了後に`/manufacturers`は約145,000へ下がる見込みである。
 
-共有フロア591,394バイトは`/privacy`、`/about`、`/for-manufacturers`、`/_not-found`の4つのstatic routeすべてで完全に一致する値であり、react-dom（226KB）を含む全route共通の下限である。旧目標は総量基準だったため、Phase 5が制御できる36%の部分に対して83〜96%の削減を要求していた。`/use-cases`ではfilter・card・tab・paginationを持つclient componentを11,490バイトに収めろという要求になり、達成不能である。
+Task 10で4 routeの実測値を取り直し、**最大値 + 15%**へ締め直す。誰も近づかない上限はgateとして働かない。
 
-したがって**目標をroute固有JS（first-load chunkのうち共有フロアに含まれないもの）の絶対値上限へ再定義する**。
+### baselineの扱い
 
-| route | 現在のroute固有 | 上限 | 削減対象（すべて実測で経路特定済み） |
-|---|---|---|---|
-| `/reports` | 1,233,689 | **180,000** | 生data 968,993（Task 4）＋motion 4経路（Task 5: `ReportsHeader`→`PageTabBar`、`NewsHeroCarousel`、`uilayouts/carousel`、`ui/card-hover-effect`） |
-| `/robots` | 325,787 | **180,000** | motion 134,910（Task 5: `PageTabBar`→`ui/AnimatedTooltip`）＋`lib/search.ts`全体の巻き込み 53,958（Task 5: `normalizeSearchText`切り出し）→ 136,919見込み |
-| `/use-cases` | 268,207 | **180,000** | motion 134,910（Task 5: `UseCaseCard`が`motion/react`を直接import。**`PageTabBar`は経由しない**）→ 133,297見込み |
-| `/manufacturers` | 178,411 | **180,000** | 既に達成済み |
+Phase 1 baseline（`docs/reference/refactor-baseline-2026-07-26.md`）は相対削減率の判定に使わない。理由は2つ。
 
-**上限180,000の根拠と、その限界:** `/manufacturers`の実績値178,411を基準にした。ただしこのrouteが軽いのは手法の成果だけではなく、構造的に2つの重い依存を持たないためでもある。
+- 測定条件が現行buildと同一である保証がない。特に`/reports`は当時1,121,603バイト（route固有 530,706）と記録されているが、`ReportsBrowser → articlePlacements → localContentSnapshot`のimport chainは当時から存在しており、968,993バイトのchunkが入る余地がない。数値が信用できない。
+- 一方で共有フロアは590,897 → 591,394（+0.08%）でほぼ一致しており、framework層の測定条件は比較可能である。
 
-1. `PageTabBar`を使わない（motion chunk 134,910が乗らない）
-2. `@/lib/search`をimportしない（`RobotsBrowser.tsx:20`が`normalizeSearchText`のためだけにimportし、53,958のchunkを生んでいる。`ManufacturersBrowser`にこのimportは無い）
+したがって**絶対値だけをgateとし、総量は参考値として記録する**。
 
-したがって「同じ手法を適用すれば自動的に到達する」値ではない。**両方の依存を明示的に断つTask 5を経て初めて到達可能になる**（`/robots` 136,919、`/use-cases` 133,297の見込み）。Task 5完了時点で実測し、届かないrouteがあれば内訳を取り直してTask 8で対処する。上限そのものを緩めるのは最後の手段とする。
+---
 
-**共有フロア591,394の内訳（後続phaseの候補）:** 本phaseのscope外だが、「手を付けられない」わけではない。調査で判明した分を記録する。
+## 実装しないこと
 
-- `37mz4g7000ovi.js`（70,848バイト、sonner×126・lucide・motion・`@vercel/analytics`）は`src/app/layout.tsx`の`<Toaster />`により`/privacy`にも配信されている。toast UIはcatalog／compareの操作feedback用であり、全route必須ではない。必要なrouteのlayoutへ下ろすか`next/dynamic`で遅延化する余地がある。
-- `0lhgyw8-y7hhl.js`（154,015バイト）は中身未特定。フロア削減を本格的に検討するなら、まずこのchunkの内訳を取るtaskが必要。
+計画外の膨張を止めるため明示する。
 
-フロアのうち少なくとも約71KBは手を付けられる。後続phaseの独立planとして起票する。
+- **共有フロア591,394の削減。** react-dom 226,356を含み、Phase 5の責務外。ただしTask 10で後続phase向けに1点だけ記録する（後述）。
+- **MiniSearchの廃止。** 削減効果は実測18,690バイトにすぎず、`/reports`の生data 968,993や motion 134,910と2桁違う。日本語検索品質（`fuzzy: 0.2`のタイポ許容、`Intl.Segmenter('ja')`の語境界分割）を落とす対価に見合わない。**索引する文字列だけをcatalog searchTextへ差し替え、index optionは一切変更しない**（Task 7・8）。
+- **本文全文検索の代替実装。** Task 6でcatalog検索範囲が狭まるが、代替（build時生成の静的JSONを`public/`へ置きfetchする方式）は後続phaseの独立taskとして起票する。
+- **`searchText`の重複排除（`searchExtra`方式）。** 差分の約4,300字はRSC payloadでありroute固有JS 180,000には1バイトも寄与しない。かつMiniSearchが1文書1テキストを要求するため、4 collectionで2方式を併存させることになる。**4 collectionすべてで明示的な`searchText`を維持する。**
+- **`/compare`のroute固有JS上限。** Global Constraint 5の対象は4 catalog routeのみ。`/compare`はview model化（Task 9）の対象だが、バイト上限は課さない。
+- **detail route（`/robots/[slug]`等）のリファクタ。** `ManufacturerLogoName`の既存`logo`/`logos` propsはdetail page向けに維持する。
 
-**baselineの扱い:** Phase 1 baselineは測定条件が現行buildと同一である保証がないため、相対削減率の判定には使わない。Task 8で現行build条件による測定値を`docs/reference/refactor-baseline-2026-07-26.md`へ追記し、以後はroute固有JSの絶対値だけをhard gateとする。総量は参考値として記録する。
-
-### Catalog検索範囲（2026-07-31決定、2026-08-01改訂）
-
-**原則:** catalog view modelの`searchText`は、**そのcardが実際に描画する文字列**と**その一覧のfacet選択肢のlabel**だけを対象とする。詳細ページにしか無い本文は一覧の検索対象にしない。id、slug、内部enum値は表示もfacet labelでもないため含めない（enumはlabel経由で引ける）。
-
-`lib/search.ts`の`create*SearchDocument()`は本文fieldを`fields`に含む。これをそのまま連結してVMへ載せると上のGlobal Constraintに反する。実測値:
-
-| route | VM全体 | うちsearchText | 本文除外時の削減 |
-|---|---|---|---|
-| `/robots`（57件） | 67,185字 | 28,357字（42.2%） | VM全体の **-27.7%** |
-| `/manufacturers`（25件） | 24,171字 | 11,401字（47.2%） | VM全体の **-38.8%** |
-
-したがってcatalogの`searchText`は`lib/search.ts`のsearch documentを再利用せず、`lib/catalog/search.ts`がcollectionごとに対象fieldを明示的に列挙して生成する。
-
-**この表は実データ（`data/types.ts`の型定義とcard componentの描画内容）と突き合わせて作成すること。** 初版はrobots／manufacturersのみ実測で決め、use-cases／reportsを実データ確認なしに横展開した結果、存在しないfield名を書き、実際に存在する本文fieldを取りこぼした。
-
-| collection | searchTextへ含める | 含めない |
-|---|---|---|
-| robots | 機種名（`nameJa`/`name`）、メーカー名、`distributorJapan`、category／stage／readiness／availability／mobility／procurementの各label、card facts（用途・サイズ・価格・稼働時間）の値、`industryTags`、`taskTags` | `summary`、`description`、`comparison.*`、`supportNote`、`safetyNote`、`vendorRiskNote`、`manufacturerId`（内部id） |
-| manufacturers | 社名（`nameJa`/`name`）、`country`、`hqCity`、`foundedYear`、国内代理店名、取扱ロボット名、companyType／companyStatus／japanPresenceのlabel | `description`、`distributorNote`、`supportNote`、`procurementNote`、`vendorRiskNote`、代理店`note` |
-| use-cases | `titleJa`/`title`、`subtitle`、`summary`（`UseCaseCard.tsx:68`が`subtitle ?? summary`を描画）、maturity label、代表ロボット名、`primaryIndustry`、`industryTags`、`taskTags` | `overview`、`whyItMatters`、`whyHardToday`、`environmentRequirements`、`japanDeploymentConditions`、`capabilityNotes`、`sources` |
-| reports | `titleJa`/`title`、`summary`、種別label、`themeTags` | `whyItMatters`、`keyTakeaways`、`body`、`manufacturerGuideContent`、`sources` |
-
-`UseCase`に`description`fieldは存在しない（実フィールドは`subtitle?`／`summary`／`overview`／`whyItMatters`／`whyHardToday`／`environmentRequirements`／`japanDeploymentConditions`／`capabilityNotes`）。report側の本文は`body`／`manufacturerGuideContent`ではなく`whyItMatters`／`keyTakeaways`が`createReportSearchDocument`へ入っている。
-
-reportsの`summary`を全件持つ理由は「cardに表示するから」では**ない**。`NewsCard`は`summary`を描画せず、描画するのは`NewsFeatureCard.tsx:54`と`NewsHeroCarousel.tsx:131`、つまりhero/featureに選ばれた数件だけである。それでも全件に持たせるのは、**placementがserver側で決まりVMの形をplacement依存にしたくないため、かつ記事数が少なく全件保持のコストが許容範囲だから**。この理由付けを誤ると、次に同じ判断をする人が誤って一般化する。
-
-**受け入れるトレードオフ（2件、別々の劣化）:**
-
-1. **本文検索の喪失。** 一覧の検索範囲は現行より狭くなる。現在は紹介文中の語（例「バッテリー」）でも部分一致でhitするが、今後はhitしない。**このサイトには全体検索ページが存在しない**（`src/app`に`search`ルート無し）ため、一覧から本文検索を外すとサイトから本文検索が完全に消える。退避先は無い。robots／manufacturersの現行実装は関連度ranking無しの単純部分一致（`lib/search.ts`の`matchesSearchDocument`）であり、注記中の一語が偶然一致した無関係なrecordが機種名一致と同列に並ぶ状態でもある。
-2. ~~MiniSearchの喪失~~ → **撤回。MiniSearchは維持する（2026-08-01決定）。**
-
-  一度は「first-load JS削減のためMiniSearchを廃止し`includes()`部分一致へ置換する」と決定したが、削減効果を実測したところ**18,690バイト**（chunk `0ugbjz6g929ty.js`。`/use-cases`と`/reports`の両方に載る）にすぎなかった。同じrouteに乗る`PageTabBar`経由のmotion 134,910バイト、`/reports`の生データ968,993バイトと比べて2桁小さく、日本語検索品質（`fuzzy: 0.2`のタイポ許容、`Intl.Segmenter('ja')`の語境界分割）を落とす対価に見合わない。廃止を決めた際の「30%削減目標のため」という根拠自体が、上記「JS削減目標の再定義」の通り誤った目標設定に基づいていた。
-
-  **したがってMiniSearchは残し、索引対象をwhitelist後のfieldへ絞る。** `lib/searchIndex.ts`の`create*SearchIndex`は`lib/search.ts`のsearch documentではなく、`lib/catalog/search.ts`のcatalog searchTextを索引する。これにより本文流出は止まり、検索品質は維持される。Task 6で実施する。
-
-本文全文検索を復活させる場合、build時生成の静的JSONを`public/`へ置き検索窓focus時にfetchする方式が「API routeを追加しない」制約下でも成立する（first-load JSにもRSC payloadにも乗らない）。本phaseのscope外とし、後続phaseの独立taskとして起票する。
-
-**検索窓placeholder:** `lib/uiText.ts`のrobots「ロボット名・メーカー・用途キーワードで検索」とmanufacturers「メーカー名・地域・取扱ロボットで検索」は本決定後の挙動と整合するため変更しない。reportsの「タイトル・トピック・キーワードで検索」は本文検索を想起させるため、Task 3で文言を再検討する。0件時の空状態文言も併せて確認する。
-
-**CMS移行との関係:** whitelistを明示列挙する形にしておくと、将来PostgreSQLの全文検索（`tsvector`／`pg_trgm`）へ移る際に「どのcolumnを索引するか」の仕様がそのまま引き継げる。汎用search documentの再利用のままだと移行時に同じ判断をやり直すことになる。
-
-**`lib/search.ts`／`lib/searchIndex.ts`の行き先:** catalogがこれらを使わなくなると`createReportSearchDocument`等の利用者が消える。Task 3完了時点で残存利用者を`rg`で洗い出し、削除するか後続phaseの削除対象として記録するかを決める。放置すると「2つの検索定義が併存し片方だけメンテされる」という次の事故の種になる。
-
-### 制約のゲート設計
-
-`searchText`の肥大は**Task 5の`check-client-budgets.mjs`では検知できない**。同scriptが見るのは`firstLoadUncompressedJsBytes`（JS chunkのサイズ）だが、server componentからclient componentへ渡るprops（VM）はJS chunkではなくRSC flight payloadに載るためである。実測でも、Task 2適用後の`/robots`のVMデータはJS chunkにもprerendered HTMLにも現れない（PPRでrequest時にstreamされる）。
-
-流出には**2つの独立した経路**があり、それぞれ別のgateが要る。
-
-| 経路 | 例 | 載る場所 |
-|---|---|---|
-| A. VM factory経由 | 本文を連結した`searchText`をpropsで渡す | RSC flight payload |
-| B. import chain経由 | client componentが`localContentSnapshot`をimportする | JS chunk |
-
-**「一番壊れやすい制約のgateは、その制約に最初に触れるtaskへ置く」**をこのplanの構造ルールとし、下記すべてをTask 3で導入する。
-
-経路A（VM側）:
-
-1. **payload byte budget** — `scripts/check-home-payload.mjs`（`.next/server/app/index.html`のバイト数をgateする既存の先例）と同形の`scripts/check-catalog-payload.mjs`。何が増えても発火するため、field列挙の抜けに依存しない。文字数ではなく`Buffer.byteLength`で測る（日本語はUTF-8で1文字3バイトのため、文字数では実転送量を約3倍過小評価する）。
-2. **正規化を揃えた本文値assertion** — 下記の通り両辺を同じ関数で正規化する。
-
-経路B（bundle側）:
-
-3. **record slugカウント** — buildされたclient chunkに、record由来のslugが閾値を超えて含まれないことを確認する。**field名では判定しない**（理由は下記）。
-4. **size異常検査** — 単一chunkが250,000バイトを超えたら失敗。marker非依存のbackstop。
-5. **静的import graph検査** — `'use client'` moduleから`data/**`および`lib/data/localContentSnapshot`へ到達しないことを検証する。buildが不要で、結果ではなく**原因側**を直接見る。
-
-両経路の共通防御:
-
-6. **import境界の遮断** — `lib/viewModels/**`と`lib/catalog/**`から`lib/search.ts`／`lib/searchIndex.ts`のimportを禁止する。既存の`scripts/check-data-import-boundaries.mjs`と同形。
-7. **計画書のcode blockの型検査** — 上記「計画書自身の型検査」を参照。
-
-**経路Bが必要な理由:** 1〜2はいずれも**VM factoryの出力しか見ていない**。しかしPhase 5最大の制約違反はfactoryを経由しない。`components/ReportsBrowser.tsx` → `lib/articlePlacements.ts:3` → `lib/data/localContentSnapshot`のchainにより、`.next/static/chunks/3r7-bj8a3uy6f.js`が968,993バイトの生dataそのものになっている。VM側のgateを厚くしただけではbundle側が無防備になる。
-
-**field名markerを使わない理由（実測）:** `fieldEvidence`／`vendorRiskNote`／`usageExampleSourceUrls`を現ビルドに当てると、`fieldEvidence`だけで3 chunkにhitし、うち2つ（7,364バイトと13,510バイト）は生datasetではない。field名は`lib/uiText.ts`のUIラベルkeyや`lib/search.ts`のbuilder内のproperty accessとしても出現するため、**field名の出現とrecord値の流出を区別できない**。
-
-さらにcoverageの穴がある。3つのmarkerはいずれも`Robot`／`Manufacturer`が宣言するfieldであり、`data/articles.ts`（228,785バイト）や`data/useCases.ts`（177,085バイト）が単独で漏れても検知できない。現在の違反が捕まるのは`localContentSnapshot`が4 collectionを束ねているからで、設計ではなく偶然である。
-
-record slugカウントは実測で誤検知0だった。
-
-```
-total slugs: 133
-  968993  3r7-bj8a3uy6f.js  distinct-slugs=133
-  （他のchunkはすべて0）
-```
-
-slugは全recordが`BaseRecord`から持つため、collectionが増えても自動的にcoverageへ入る。閾値は5とする（UIファイルがslugを1〜2個ハードコードすることはありうるため）。
-
-**値assertionの正規化について（重要）:** `expect(JSON.stringify(vm)).not.toContain(rawText)`は**実測で7.9%取りこぼす**。現行の違反実装に対し12文字以上の本文値343件を検査したところ、343件すべてが実際にsearchTextへ含まれているのに、raw文字列比較で検出できたのは316件だった。原因は`createSearchDocument`→`uniqueSearchValues`が各値に`.normalize('NFKC').trim()`をかけるため、全角括弧・全角数字を含む本文が原文と一致しないこと（例「移動速度3.3m/s（潜在能力5m/s超）」）。加えて新builderは連結後に`normalizeSearchText`（`toLowerCase()`を含む）をかけるためASCIIを含む本文はほぼ全て素通りし、`JSON.stringify`のescape（`"`／`\n`／`\\`）でも一致しなくなる。必ず両辺を同じ関数で正規化し、JSON文字列ではなく`searchText`自体を対象にすること。
-
-```ts
-const haystack = normalizeSearchText(items.map((i) => i.filter.searchText).join(' '));
-expect(haystack).not.toContain(normalizeSearchText(text));
-```
-
-### 計画書自身の型検査（2026-08-01決定）
-
-この計画は3巡連続で**同じ故障モード**を起こした。散文で「実データと突き合わせよ」と決めた直後に、その節のcode例が存在しないfieldを参照していた。
-
-| 巡 | 内容 |
-|---|---|
-| 1 | `UseCase.description`が存在しないと指摘 → 表は修正、code例は未修正 |
-| 2 | 表と code例の食い違い（`manufacturerId`）を指摘 → 当該箇所は修正、別箇所に同型が残存 |
-| 3 | Task 6 Step 1のcode例に`useCase.description`、`useCaseMaturityLabels`、`useCase.maturity`（実際は`subtitle`／`summary`、`maturityLabels`、`maturityLevel`）|
-
-「Global Constraints ⇄ Task 対応表を目視確認する」という前回の対策は**この種の誤りを検出できない**。対応表が追跡するのは「どのtaskが担当するか」であり、「そのtaskのcode例が実型と一致するか」ではないからである。実際、対応表を新設した改訂で上記3巡目の誤りが混入した。
-
-**したがって計画書のcode blockを機械的に型検査する。**
-
-```
-scripts/check-plan-snippets.mjs
-  docs/plans/*.md の ```ts / ```tsx block を .plan-snippets/ へ抽出し、
-  tsc --noEmit にかける
-```
-
-抽出したsnippetは`data/types.ts`と`lib/**`をimportできる状態でcompileする。これにより`useCase.description`も`useCase.maturity`も実装着手前に落ちる。過去3巡の誤りはすべてこれで防げていた。
-
-snippetは断片であり単体ではcompileできないものが多いため、次のいずれかを満たすblockだけを対象とする。
-
-- 先頭行が`// <path>`形式のfile pathコメントで始まる（そのpathのmoduleとして検査）
-- 明示的に`// @plan-check`を付けたblock
-
-対象外のblockには`// @plan-check-skip`を付け、理由を併記する。skipを増やすほどgateは形骸化するため、skipの総数をscriptが出力し、増加に気づけるようにする。
-
-Task 3で導入する。
-
-### 見送った案: searchTextの重複排除（searchExtra）
-
-whitelist後の`searchText`の大半が同一item内の重複であることは実測で確認した（robots: 7,346字のうちVMから復元できないのは3,065字）。VMに`searchText`を持たせず、client側で`item.name`／`facts`等からhaystackを組み、復元できない分だけを`searchExtra`として持たせる案を検討したが、**採用しない**（2026-08-01決定）。
-
-理由:
-
-1. **削減がgateに効かない。** 差分の約4,300字はRSC payloadであり、本phaseのhard gateである route固有JS 180,000バイトには1バイトも寄与しない。
-2. **MiniSearch維持と噛み合わない。** MiniSearchは1文書につき1本のテキストを索引する。use-cases／reportsでMiniSearchを維持すると決めた以上、それらには`searchText`相当が必要になる。robots／manufacturersだけ別モデルにすると`lib/catalog/search.ts`が2つの検索モデルを抱える。
-3. **一貫性のコストが上回る。** 4 collectionで2方式を併存させる保守コストは、`searchText`を持つことによる payload 増より高い。
-
-**4 collectionすべてで明示的な`searchText`を維持する。** 本文除外による削減（robots -27.7%、manufacturers -38.8%）はそのまま得られる。`searchExtra`と、それに付随する検索対象field集合のpin testは導入しない。
-
+---
 
 ## File Structure
 
@@ -208,427 +168,1049 @@ whitelist後の`searchText`の大半が同一item内の重複であることは�
 
 | Path | Responsibility |
 |---|---|
-| `lib/catalog/urlState.ts` | History API storeとReact hook |
-| `lib/catalog/urlSearch.ts` | server/client共通の初期query serialize |
-| `lib/catalog/search.ts` | collectionごとのcatalog searchText生成（対象fieldをここで明示列挙する）とnormalized search。Task 2で作成、Task 3でwhitelist是正、Task 6でuse-case/article対応 |
-| `lib/viewModels/shared.ts` | serializable image/logo/fact型 |
-| `lib/viewModels/logo.ts` | domain logoからdisplay logoへのserver変換 |
-| `lib/viewModels/robots.ts` | robot list VM |
-| `lib/viewModels/manufacturers.ts` | manufacturer list VM |
+| `lib/catalog/search.ts` | collectionごとのcatalog searchText生成（対象fieldをここで明示列挙する）と部分一致判定 |
+| `lib/normalizeSearchText.ts` | `normalizeSearchText`だけを持つ最小module（client graphへ`lib/search.ts`全体を持ち込まないため） |
+| `lib/useMediaQuery.ts` | motion package不要のmedia query hook |
 | `lib/viewModels/useCases.ts` | use-case list VM |
 | `lib/viewModels/articles.ts` | report list/hero VM |
 | `lib/viewModels/compare.ts` | compare VM |
-| `lib/useMediaQuery.ts` | motion package不要のmedia query hook |
-| `components/FavoriteButton.tsx` | favoriteだけのclient island |
 | `components/compare/CompareMenu.tsx` | selection menu |
 | `components/compare/CompareSheet.tsx` | comparison cards/table |
 | `components/compare/CompareViewToggle.tsx` | view state |
-| `tests/components/catalog-url-state.test.tsx` | push/replace/popstate |
-| `tests/unit/view-models/*.test.ts` | serialization/filter contract |
-| `tests/e2e/catalog-url-state.spec.ts` | URL共有とback/forward |
-| `scripts/check-catalog-payload.mjs` | VM factory出力のbyte budget（Task 3） |
-| `scripts/check-client-bundle-content.mjs` | client chunkのrecord slugカウント＋size異常検査（Task 3） |
-| `scripts/check-client-import-graph.mjs` | `'use client'`から`data/**`への到達検査（Task 3） |
-| `scripts/check-plan-snippets.mjs` | 計画書code blockの`tsc --noEmit`（Task 3） |
-| `lib/normalizeSearchText.ts` | `lib/search.ts`から切り出した正規化関数（Task 5） |
-| `scripts/check-client-budgets.mjs` | route固有JS budget（Task 8） |
+| `scripts/check-client-bundle-content.mjs` | client chunkのrecord slug数とchunkサイズをgate |
+| `scripts/check-client-import-graph.mjs` | `'use client'` moduleから`data/**`へ到達しないことをgate |
+| `scripts/check-plan-snippets.mjs` | 計画書の`ts`/`tsx` blockを`tsc --noEmit`にかける |
+| `scripts/check-catalog-payload.mjs` | catalog VMのJSONバイト数をgate |
+| `scripts/check-client-budgets.mjs` | route固有JSのバイト数をgate |
+| `tests/unit/view-models/use-cases.test.ts` | serialization/filter contract |
+| `tests/unit/view-models/articles.test.ts` | serialization/filter contract |
+| `tests/unit/view-models/compare.test.ts` | serialization contract |
 
 ### 変更
 
 | Path | Responsibility |
 |---|---|
-| `lib/useUrlParamUpdater.ts` | 削除。新storeへ置換 |
-| `lib/robotFilters.ts` | Robot VMをfilter |
-| `lib/manufacturerFilters.ts` | Manufacturer VMをfilter |
-| `lib/useCaseFilters.ts` | UseCase VMをfilter |
-| `lib/articleFilters.ts` | Article VMをfilter |
-| `components/RobotCard.tsx` | Robot VM props、motion削除 |
-| `components/ManufacturerCard.tsx` | Manufacturer VM props、motion削除 |
-| `components/ManufacturerLogoName.tsx` | 解決済みdisplay logoを受付 |
-| `components/UseCaseCard.tsx` | UseCase VM props、motion削除 |
-| `components/NewsCard.tsx` | Article VM props |
-| `components/NewsFeatureCard.tsx` | Article VM props |
-| `components/NewsHeroCarousel.tsx` | Article VM props、motion hook削除 |
-| `components/*Browser.tsx` | VM + local URL state |
+| `lib/articlePlacements.ts` | `localContentSnapshot` importを外しserver引数化 |
+| `lib/search.ts` | `normalizeSearchText`を新moduleへ移しre-export。Task 10で削除 |
+| `lib/searchIndex.ts` | catalog searchTextを索引する（MiniSearch本体は維持） |
+| `lib/viewModels/shared.ts` | `lib/search.ts`依存を外す |
+| `lib/viewModels/robots.ts` / `manufacturers.ts` | whitelist searchTextへ差し替え |
+| `lib/useCaseFilters.ts` / `lib/articleFilters.ts` | VM入力へ変更 |
+| `components/ui/AnimatedTooltip.tsx` | motion → CSS transition |
+| `components/UseCaseCard.tsx` | UseCase VM props、motion/tilt削除 |
+| `components/ui/card-hover-effect.tsx` | motion → CSS transition |
+| `components/uilayouts/carousel.tsx` | `SliderDotButton`をCSS化、死んだ`SliderSnapDisplay`を削除 |
+| `components/NewsHeroCarousel.tsx` | Article VM props、`useReducedMotion` → `useMediaQuery` |
+| `components/{UseCases,Reports}Browser.tsx` | VM props |
+| `components/{NewsCard,NewsFeatureCard}.tsx` | Article VM props |
 | `components/CompareClient.tsx` | coordinatorへ縮小 |
-| `components/ComparisonRobotPanel.tsx` | Compare VM props |
-| `components/FavoriteCard.tsx` | Compare VM props |
-| `src/app/{robots,manufacturers,use-cases,reports,compare}/page.tsx` | server VM生成 |
-| `package.json` | client budget gate |
+| `components/ComparisonRobotPanel.tsx` / `FavoriteCard.tsx` | Compare VM props |
+| `src/app/{reports,use-cases,compare}/page.tsx` | server VM生成 |
+| `scripts/check-data-import-boundaries.mjs` | `lib/search.ts`のimport境界ruleを追加 |
+| `package.json` | 新gateを`check` pipelineへ配線 |
+| `docs/reference/refactor-baseline-2026-07-26.md` | Phase 5 after値を追記 |
+| `docs/README.md` | 「いま動いているもの」表（phase完了時に更新） |
+
+### 削除
+
+| Path | 理由 |
+|---|---|
+| `lib/search.ts` | Task 10。全taskの完了後に利用者0になる |
+
+> **`lib/useTiltCardEffect.ts`は削除しない。** Task 3で`UseCaseCard`からの利用は消えるが、`components/FeaturedRobotCard.tsx:10`（Home）が使い続ける。HomeはPhase 4完了済みで本phaseの対象外である。
 
 ---
 
-### Task 1: URL状態をHistory API storeへ置換する
+## 順序制約
+
+- Task 1 → Task 2: gateは違反が0になってから入れる。赤いgateやallowlistを持ち込まない。allowlistはentry追加のハードルが担保できず、chunk名がbuildごとに変わるためgate対象と対応も取れない。
+- Task 5 → Task 6: `lib/catalog/search.ts`は`normalizeSearchText`を新moduleから取る。Task 5が先。
+- Task 3・4 → Task 7・8: `UseCaseCard`／`NewsHeroCarousel`はmotion除去（Task 3・4）とVM化（Task 7・8）で2回触る。挙動変更と構造変更を同じcommitに混ぜないため分ける。
+- Task 3 → Task 4: どちらも`components/NewsHeroCarousel.tsx`周辺に触れる。Task 3を完了させてからTask 4に入る。
+- Task 6・7・8・9 → Task 10: `lib/search.ts`の削除は全利用者が消えてから。
+
+---
+
+### Task 1: `/reports`の生data流出を止める
+
+**Goal:** `components/ReportsBrowser.tsx`（`'use client'`）から`lib/data/localContentSnapshot`へ至るimport chainを切り、968,993バイトのclient chunkを除去する。**Phase 5で最大の削減であり、かつGlobal Constraint 3・4の違反そのもの。**
+
+**問題:** `lib/articlePlacements.ts:3`が`localContentSnapshot`をmodule scopeでimportしているため、この関数をimportするだけで`data/*.ts`全体（836,534バイト）がclient bundleへ入る。
 
 **Files:**
-- Create: `lib/catalog/urlState.ts`
-- Create: `tests/components/catalog-url-state.test.tsx`
-- Create: `tests/e2e/catalog-url-state.spec.ts`
-- Delete: `lib/useUrlParamUpdater.ts`
-- Modify: `components/RobotsBrowser.tsx`
-- Modify: `components/ManufacturersBrowser.tsx`
-- Modify: `components/UseCasesBrowser.tsx`
+- Modify: `lib/articlePlacements.ts`
 - Modify: `components/ReportsBrowser.tsx`
+- Modify: `src/app/reports/page.tsx`
+
+**Interfaces:**
+- Produces: `getArticleIndexPlacementReports({ articles, placements, limits }): { heroReports: T[]; featureReports: T[] }`
+- Removes: `lib/articlePlacements.ts`からの`localContentSnapshot` import
+
+- [ ] **Step 1: 現状を実測して記録する**
+
+```bash
+npm run build
+node -e "
+const s=require('./.next/diagnostics/route-bundle-stats.json');
+const fs=require('fs');
+const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
+const e=s.find(x=>x.route==='/reports');
+for(const p of e.firstLoadChunkPaths.filter(p=>!floor.has(p))) console.log(fs.statSync(p).size, p);
+"
+```
+
+Expected: 968,993バイトのchunkが1本出る。この出力をcommit messageへ残す。
+
+- [ ] **Step 2: `lib/articlePlacements.ts`をserver引数化する**
+
+`localContentSnapshot`のimportを削除し、`articlePlacements`と`articleIndexPlacementLimits`を引数で受ける。`Article`固有の型ではなく`{ id: string; publishedAt: string }`で受けることで、Task 8のVM化後もsignatureを変えずに済む。
+
+```ts
+// lib/articlePlacements.ts
+import type { ArticlePlacement, ArticlePlacementSlot } from '@/data/types';
+import { byArticlePublishedDesc } from '@/lib/display';
+
+const reportsIndexSurface = 'reports-index';
+
+interface PlacementInput<T> {
+  articles: readonly T[];
+  placements: readonly ArticlePlacement[];
+  limits: Readonly<Record<ArticlePlacementSlot, number>>;
+}
+
+export function getArticleIndexPlacementReports<T extends { id: string; publishedAt: string }>({
+  articles,
+  placements,
+  limits,
+}: PlacementInput<T>): { heroReports: T[]; featureReports: T[] } {
+  const sortedArticles = [...articles].sort(byArticlePublishedDesc);
+  const articlesById = new Map(articles.map((article) => [article.id, article]));
+  const usedIds = new Set<string>();
+
+  const resolveSlot = (slot: ArticlePlacementSlot): T[] => {
+    const limit = limits[slot];
+    const slotArticles: T[] = [];
+
+    placements
+      .filter((placement) => placement.surface === reportsIndexSurface && placement.slot === slot)
+      .sort((a, b) => a.order - b.order)
+      .forEach((placement) => {
+        if (slotArticles.length >= limit || usedIds.has(placement.articleId)) return;
+        const article = articlesById.get(placement.articleId);
+        if (!article) return;
+        slotArticles.push(article);
+        usedIds.add(article.id);
+      });
+
+    for (const article of sortedArticles) {
+      if (slotArticles.length >= limit) break;
+      if (usedIds.has(article.id)) continue;
+      slotArticles.push(article);
+      usedIds.add(article.id);
+    }
+
+    return slotArticles;
+  };
+
+  return { heroReports: resolveSlot('hero'), featureReports: resolveSlot('feature') };
+}
+```
+
+`byArticlePublishedDesc`（`lib/display.ts:237`）は現在`(a: Article, b: Article)`を要求しており、上のgenericでは型が合わない。**引数型を`{ publishedAt: string }`へ広げる。**
+
+```ts
+// lib/display.ts:237
+export const byArticlePublishedDesc = (
+  a: { publishedAt: string },
+  b: { publishedAt: string },
+) => b.publishedAt.localeCompare(a.publishedAt);
+```
+
+`Article`は`publishedAt: ISODate`（`= string`）を持つため、既存の利用側は変わらない。
+
+- [ ] **Step 3: `src/app/reports/page.tsx`でplacementを解決する**
+
+```tsx
+// src/app/reports/page.tsx（ReportsContentのみ抜粋）
+// @plan-check-skip: 既存importと関数外の文脈を省いた抜粋のため単体compileできない
+async function ReportsContent({ searchParams }: { searchParams: RouteSearchParams }) {
+  const reports = getArticles();
+  const params = await pickSearchParams(searchParams, ['kind', 'q', ARTICLE_PAGE_PARAM]);
+  const { heroReports, featureReports } = getArticleIndexPlacementReports({
+    articles: reports,
+    placements: localContentSnapshot.articlePlacements,
+    limits: localContentSnapshot.articleIndexPlacementLimits,
+  });
+
+  return (
+    <ReportsBrowser
+      reports={reports}
+      heroReports={heroReports}
+      featureReports={featureReports}
+      initialSearch={toInitialSearch(params)}
+    />
+  );
+}
+```
+
+追加するimport:
+
+```ts
+import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
+import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
+```
+
+- [ ] **Step 4: `ReportsBrowser`をprops受けに変える**
+
+`components/ReportsBrowser.tsx`から次を削除する。
+
+```ts
+// @plan-check-skip: 削除対象の既存コード片
+import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
+
+const { heroReports, featureReports } = useMemo(
+  () => getArticleIndexPlacementReports(sorted),
+  [sorted],
+);
+```
+
+props型へ追加する。`Article[]`のままでよい（VM化はTask 8が担当。ここではimport chainを切ることだけを行う）。
+
+```ts
+// @plan-check-skip: Article は既存importに依存する抜粋
+interface ReportsBrowserProps {
+  reports: Article[];
+  heroReports: Article[];
+  featureReports: Article[];
+  initialSearch: string;
+}
+```
+
+`sorted`（`useMemo`で`reports`をsortしたもの）はgrid/tab集計に使うため残す。
+
+- [ ] **Step 5: gateを実測する**
+
+```bash
+npm run build
+node -e "
+const s=require('./.next/diagnostics/route-bundle-stats.json');
+const fs=require('fs');
+const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
+const e=s.find(x=>x.route==='/reports');
+const own=e.firstLoadChunkPaths.filter(p=>!floor.has(p)).reduce((a,p)=>a+fs.statSync(p).size,0);
+console.log('/reports route-specific =', own);
+"
+rg -l 'fieldEvidence|vendorRiskNote' .next/static/chunks/
+```
+
+**完了条件:** `/reports`のroute固有JSが 1,233,689 → 約 264,696 になり、`rg`が0件を返す。
+
+- [ ] **Step 6: 回帰確認**
+
+```bash
+npm run test
+npm run test:e2e -- tests/e2e/public-routes.spec.ts
+```
+
+手動: `/reports`のhero carousel、feature card、shelf tab、pagination、検索が現行と同じ並びで表示されること。特に**hero/featureに出る記事のidと順序が変わっていないこと**を変更前後で比較し、記録する（Task 8の完了確認で再度使う）。
+
+- [ ] **Step 7: commit**
+
+```bash
+git add lib/articlePlacements.ts components/ReportsBrowser.tsx src/app/reports/page.tsx
+git commit -m "perf: stop shipping the local content snapshot to the reports client"
+```
+
+---
+
+### Task 2: bundle流出gateと計画書の型検査を導入する
+
+**Goal:** Task 1で違反が0になった状態でgateを入れる。以降の全taskがこれに守られる。
+
+**問題:** Phase 5最大の違反（Task 1の968,993バイト）は、view model factoryを一切経由していなかった。VM側の検証だけではbundle側が無防備になる。流出には独立した2経路がある。
+
+| 経路 | 例 | 載る場所 | gate |
+|---|---|---|---|
+| A. VM factory経由 | 本文を連結した`searchText`をpropsで渡す | RSC flight payload | Task 6（`check:catalog-payload`＋値assertion） |
+| B. import chain経由 | client componentが`localContentSnapshot`をimportする | JS chunk | **本task** |
+
+**field名markerを使わない理由（実測）:** `fieldEvidence`／`vendorRiskNote`／`usageExampleSourceUrls`を現ビルドへ当てると10 chunkにhitし、少なくとも8件は誤検知だった（`lib/uiText.ts`のUIラベルkey、`lib/search.ts`のbuilder内のproperty access）。field名の出現とrecord値の流出を区別できない。さらに3つとも`Robot`／`Manufacturer`のfieldであり、`data/articles.ts`（228,785）や`data/useCases.ts`（177,085）が単独で漏れても検知できない。
+
+**record slugカウントは実測で誤検知0だった。**
+
+```
+total slugs: 133
+  968993  3r7-bj8a3uy6f.js  distinct-slugs=133
+  （他のchunkはすべて0）
+```
+
+slugは全recordが`BaseRecord`から持つため、collectionが増えても自動的にcoverageへ入る。
+
+**Files:**
+- Create: `scripts/check-client-bundle-content.mjs`
+- Create: `scripts/check-client-import-graph.mjs`
+- Create: `scripts/check-plan-snippets.mjs`
+- Create: `scripts/plan-snippet-skip-baseline.json`
+- Create: `tsconfig.plan-snippets.json`
+- Modify: `package.json`
+- Modify: `.gitignore`
+
+**Interfaces:**
+- Produces: `npm run check:bundle-content`、`npm run check:client-imports`、`npm run check:plan-snippets`
+
+- [ ] **Step 1: bundle内容gateを書く**
+
+`.mjs`から`.ts`を読むには`--experimental-strip-types`が要る（`scripts/validate-data.mjs`と同じ）。
+
+```js
+// scripts/check-client-bundle-content.mjs
+import fs from 'node:fs';
+import path from 'node:path';
+import { getArticles, getManufacturers, getRobots, getUseCases } from '../lib/data.ts';
+
+const MAX_DISTINCT_SLUGS_PER_CHUNK = 5;
+const MAX_CHUNK_BYTES = 340_000;
+const chunkDir = '.next/static/chunks';
+
+const slugs = [
+  ...getRobots(),
+  ...getManufacturers(),
+  ...getUseCases(),
+  ...getArticles(),
+].map((record) => `"${record.slug}"`);
+
+function walk(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const absolute = path.join(directory, entry.name);
+    if (entry.isDirectory()) return walk(absolute);
+    return entry.name.endsWith('.js') ? [absolute] : [];
+  });
+}
+
+const failures = [];
+for (const file of walk(chunkDir)) {
+  const bytes = fs.statSync(file).size;
+  const source = fs.readFileSync(file, 'utf8');
+  const hits = slugs.filter((slug) => source.includes(slug)).length;
+
+  if (hits >= MAX_DISTINCT_SLUGS_PER_CHUNK) {
+    failures.push(`${file}: ${hits} distinct record slugs (limit ${MAX_DISTINCT_SLUGS_PER_CHUNK - 1})`);
+  }
+  if (bytes > MAX_CHUNK_BYTES) {
+    failures.push(`${file}: ${bytes} bytes (limit ${MAX_CHUNK_BYTES})`);
+  }
+}
+
+if (failures.length > 0) {
+  console.error(`[bundle-content] violations:\n${failures.map((line) => `  - ${line}`).join('\n')}`);
+  process.exitCode = 1;
+} else {
+  console.log('[bundle-content] OK');
+}
+```
+
+閾値の根拠を記す。
+
+- **slug 5件:** UIファイルがslugを1〜2個ハードコードすることはありうる。実測では違反chunk以外は全て0件で、余裕は十分ある。5件未満の流出（例: client componentが3機種のrecordを直書き）は検出できないが、それはStep 2のimport graph gateが担当する。
+- **340,000バイト:** 現ビルドの最大の正常chunkは共有フロアの`142mv7fk8lxom.js`（**226,356バイト**、react-dom）。その1.5倍。react-domがframework更新で太っても誤爆しない幅を取る。
+
+- [ ] **Step 2: import graph gateを書く（原因側の検出）**
+
+Step 1がbuild成果物（結果）を見るのに対し、これはsource（原因）を見る。buildが不要で、違反箇所がファイル名で分かる。5件未満の流出も捕まる。
+
+```js
+// scripts/check-client-import-graph.mjs
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root = process.cwd();
+const roots = ['components', 'lib', 'src'];
+const extensions = new Set(['.ts', '.tsx']);
+const forbidden = /^(@\/data\/|@\/lib\/data\/localContentSnapshot)/;
+const importPattern = /^\s*import\s+(?!type\b)([\s\S]*?)from\s+['"]([^'"]+)['"]/gm;
+
+function filesUnder(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const absolute = path.join(directory, entry.name);
+    if (entry.isDirectory()) return filesUnder(absolute);
+    return extensions.has(path.extname(entry.name)) ? [absolute] : [];
+  });
+}
+
+function resolveSpecifier(specifier, fromFile) {
+  const base = specifier.startsWith('@/')
+    ? specifier.slice(2)
+    : path.normalize(path.join(path.dirname(path.relative(root, fromFile)), specifier));
+  for (const suffix of ['.ts', '.tsx', '/index.ts', '/index.tsx']) {
+    if (fs.existsSync(path.join(root, base + suffix))) return base + suffix;
+  }
+  return null;
+}
+
+/** `import type` と、named specifier がすべて `type X` の import を除いた値import。 */
+function valueImportsOf(file) {
+  const source = fs.readFileSync(file, 'utf8');
+  const specifiers = [];
+  importPattern.lastIndex = 0;
+  let match;
+  while ((match = importPattern.exec(source)) !== null) {
+    const [, clause, specifier] = match;
+    if (!specifier.startsWith('@/') && !specifier.startsWith('.')) continue;
+    const braced = clause.match(/\{([\s\S]*?)\}/);
+    const outsideBraces = clause.replace(/\{[\s\S]*?\}/, '').trim().replace(/,$/, '');
+    const namedValues = braced
+      ? braced[1].split(',').map((part) => part.trim()).filter((part) => part && !part.startsWith('type '))
+      : [];
+    if (outsideBraces || namedValues.length > 0 || !braced) specifiers.push(specifier);
+  }
+  return specifiers;
+}
+
+const allFiles = roots.flatMap((directory) => filesUnder(path.join(root, directory)));
+const clientEntries = allFiles.filter((file) =>
+  /^\s*['"]use client['"]/m.test(fs.readFileSync(file, 'utf8')),
+);
+
+const failures = [];
+for (const entry of clientEntries) {
+  const seen = new Set();
+  const stack = [[entry, [path.relative(root, entry)]]];
+  while (stack.length > 0) {
+    const [file, chain] = stack.pop();
+    if (seen.has(file)) continue;
+    seen.add(file);
+    for (const specifier of valueImportsOf(file)) {
+      if (forbidden.test(specifier)) {
+        failures.push(`${chain.join(' -> ')} -> ${specifier}`);
+        continue;
+      }
+      const resolved = resolveSpecifier(specifier, file);
+      if (resolved) stack.push([path.join(root, resolved), [...chain, resolved]]);
+    }
+  }
+}
+
+if (failures.length > 0) {
+  console.error(
+    `[client-imports] 'use client' modules must not reach raw data:\n${failures.map((line) => `  - ${line}`).join('\n')}`,
+  );
+  process.exitCode = 1;
+} else {
+  console.log(`[client-imports] OK (${clientEntries.length} client entry modules)`);
+}
+```
+
+- [ ] **Step 3: 計画書の型検査を書く**
+
+初版が3巡連続で起こした故障モードは「散文で決めたことがcode例と食い違う」だった。3巡目には`useCase.description`（存在しないfield）、`useCaseMaturityLabels`（存在しない識別子）、`useCase.maturity`（実際は`maturityLevel`）が同じStepに同居していた。**対応表の目視確認ではこの種の誤りは検出できない。**
+
+```js
+// scripts/check-plan-snippets.mjs
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const outDir = '.plan-snippets';
+const planDir = 'docs/plans';
+const baselinePath = 'scripts/plan-snippet-skip-baseline.json';
+const fence = /```(ts|tsx)\n([\s\S]*?)```/g;
+
+fs.rmSync(outDir, { recursive: true, force: true });
+fs.mkdirSync(outDir, { recursive: true });
+
+let extracted = 0;
+let skipped = 0;
+
+for (const name of fs.readdirSync(planDir).filter((file) => file.endsWith('.md'))) {
+  const markdown = fs.readFileSync(path.join(planDir, name), 'utf8');
+  fence.lastIndex = 0;
+  let match;
+  let index = 0;
+  while ((match = fence.exec(markdown)) !== null) {
+    const [, language, body] = match;
+    index += 1;
+    if (body.includes('@plan-check-skip')) {
+      skipped += 1;
+      continue;
+    }
+    fs.writeFileSync(path.join(outDir, `${name.replace(/\.md$/, '')}-${index}.${language}`), body);
+    extracted += 1;
+  }
+}
+
+console.log(`[plan-snippets] extracted=${extracted} skipped=${skipped}`);
+
+const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+if (skipped > baseline.skipped) {
+  console.error(`[plan-snippets] skip count increased: ${baseline.skipped} -> ${skipped}`);
+  process.exitCode = 1;
+}
+
+try {
+  execFileSync('npx', ['tsc', '--noEmit', '--project', 'tsconfig.plan-snippets.json'], {
+    stdio: 'inherit',
+  });
+} catch {
+  process.exitCode = 1;
+}
+```
+
+**検査は既定でON、除外は明示的に行う。** opt-in（`@plan-check`を付けたblockだけ検査）にすると、新しく書いたblockが既定で素通りする。今回の故障モードはまさに「新しく書いたcode例が実型と違う」なので、既定をOFFにしてはならない。
+
+compileできない断片には`// @plan-check-skip: <理由>`を1行入れる。skip総数は`scripts/plan-snippet-skip-baseline.json`（`{"skipped": N}`）と比較し、**増えたら失敗させる**。ログ行は読まれないが、失敗するdiffは読まれる。
+
+**skipには2種類あり、扱いが違う。**
+
+| 種類 | 例 | 扱い |
+|---|---|---|
+| 恒久的（断片） | 既存importや関数外の文脈を省いた抜粋 | そのまま残る |
+| 一時的（前方参照） | まだ作っていないmoduleをimportするsnippet | **そのmoduleを作るtaskでskip markerを外し、baselineを減らす** |
+
+一時的skipは現時点で7箇所ある。
+
+| snippet | 前方参照している物 | markerを外すtask |
+|---|---|---|
+| Task 6 `lib/catalog/search.ts` | `@/lib/normalizeSearchText` | Task 6 |
+| Task 6 `tests/unit/view-models/robots.test.ts` | `@/lib/normalizeSearchText` | Task 6 |
+| Task 7 `createUseCaseCatalogSearchText` | `@/lib/catalog/search`の`joinSearchText` | Task 7 |
+| Task 7 `tests/unit/view-models/use-cases.test.ts` | `@/lib/viewModels/useCases` | Task 7 |
+| Task 8 `createArticleCatalogSearchText` | `@/lib/catalog/search`の`joinSearchText` | Task 8 |
+| Task 8 `tests/unit/view-models/articles.test.ts` | `@/lib/viewModels/articles` | Task 8 |
+| Task 9 `tests/unit/view-models/compare.test.ts` | `@/lib/viewModels/compare` | Task 9 |
+
+**該当taskの完了条件に「skip markerを外してbaselineを減らす」を含める。** baselineが減る方向は失敗にしないため、この運用は成立する。
+
+この7箇所を優先して一時的skipにしたのは、**3巡連続で誤りが出たのがsearchText builderとVM test（存在しないfield名・label map名の参照）だから**である。恒久的skipにしてしまうと、再発を防ぐという型検査の目的を果たさない。
+
+`tsconfig.plan-snippets.json`:
+
+```json
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "include": [".plan-snippets/**/*"]
+}
+```
+
+- [ ] **Step 4: baselineと`.gitignore`と`package.json`を更新する**
+
+`scripts/plan-snippet-skip-baseline.json`をStep 5の実行結果で作る（初期値は実測したskip数）。`.gitignore`へ`.plan-snippets/`を追加する。
+
+```json
+{
+  "check:bundle-content": "node --experimental-strip-types scripts/check-client-bundle-content.mjs",
+  "check:client-imports": "node scripts/check-client-import-graph.mjs",
+  "check:plan-snippets": "node scripts/check-plan-snippets.mjs"
+}
+```
+
+`check` pipelineへ挿入する。build不要なものはbuildの前に置く。
+
+```
+validate:data && check:data-boundaries && check:client-imports && check:world-map-asset
+  && typecheck && lint && check:plan-snippets && test
+  && build && check:home-payload && check:bundle-content && test:e2e
+```
+
+- [ ] **Step 5: 全gateを実行する**
+
+```bash
+npm run check:client-imports
+npm run check:plan-snippets
+npm run build && npm run check:bundle-content
+```
+
+**完了条件:** 3つともexit 0。**allowlistを持たせない。** Task 1で違反が0になっているため不要である。
+
+`check:plan-snippets`がこの時点で未発見の不一致を落とす可能性がある。**落ちた箇所を計画書側で修正することがこのStepの完了条件に含まれる。**
+
+- [ ] **Step 6: commit**
+
+```bash
+git add scripts/check-client-bundle-content.mjs scripts/check-client-import-graph.mjs \
+  scripts/check-plan-snippets.mjs scripts/plan-snippet-skip-baseline.json \
+  tsconfig.plan-snippets.json package.json .gitignore docs/plans
+git commit -m "test: gate client bundle contents, client import graph and plan snippets"
+```
+
+---
+
+### Task 3: card系componentのmotion依存を外す
+
+**Goal:** `ui/AnimatedTooltip`、`UseCaseCard`、`ui/card-hover-effect`のmotion依存をCSSへ置換する。
+
+**問題:** `f42ecbf`は`RobotCard`／`ManufacturerCard`からmotionを外したが、`/robots`のJSは-0.6%しか動かなかった。原因は`RobotsBrowser → PageTabBar → ui/AnimatedTooltip`という別経路が残っていたためである。**手法の失敗ではない。**
+
+置換方式は`RobotCard`／`ManufacturerCard`で実証済みのもの（CSS transition + Tailwind `motion-reduce:` utility）を使う。
+
+**Files:**
+- Modify: `components/ui/AnimatedTooltip.tsx`
+- Modify: `components/UseCaseCard.tsx`
+- Modify: `components/ui/card-hover-effect.tsx`
+
+**Interfaces:**
+- 変更しない: `AnimatedTooltipProps`（`content`／`placement`／`delay`／`children`／`className`）、`CardHoverEffect`のprops、`UseCaseCard`のprops
+
+- [ ] **Step 1: `AnimatedTooltip`をCSSへ置換する**
+
+現行は`AnimatePresence` + `motion.span`でmount/unmount時のfade/scale/slideを表現している。CSSで同じことをするには**常時mountして可視stateをclassで切り替える**。これでenterもexitもtransitionが効く。
+
+`display: none`（`hidden`属性やTailwindの`hidden`）を使うとtransitionが効かないため使わない。非表示時は`opacity-0` + `pointer-events-none`で隠し、支援技術からは`aria-describedby`が可視時だけ張られることで制御する。
+
+`motion/react`のimportを削除する。`useReducedMotion`は使わず`motion-reduce:`に任せる。
+
+```tsx
+// components/ui/AnimatedTooltip.tsx
+// @plan-check-skip: 既存の hooks / 定数 / import を省いた描画部の抜粋
+const enterFrom: Record<AnimatedTooltipPlacement, string> = {
+  top: 'translate-y-1',
+  bottom: '-translate-y-1',
+  left: 'translate-x-1',
+  right: '-translate-x-1',
+};
+
+return (
+  <span
+    className="relative inline-flex"
+    onBlur={hide}
+    onFocus={show}
+    onKeyDown={handleKeyDown}
+    onMouseEnter={isHoverDevice ? show : undefined}
+    onMouseLeave={isHoverDevice ? hide : undefined}
+  >
+    <span aria-describedby={isVisible ? tooltipId : undefined}>{children}</span>
+
+    <span
+      aria-hidden={!isVisible}
+      className={cn(
+        'pointer-events-none absolute z-50 w-max max-w-xs rounded-md bg-foreground px-3 py-1.5 text-background text-sm shadow-md',
+        'transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none',
+        isVisible ? 'scale-100 opacity-100' : cn('scale-95 opacity-0', enterFrom[placement]),
+        placementStyles[placement],
+        className,
+      )}
+      id={tooltipId}
+      role="tooltip"
+    >
+      {content}
+      <span
+        aria-hidden="true"
+        className={cn('absolute block h-0 w-0', arrowBorderSize[placement], arrowStyles[placement])}
+      />
+    </span>
+  </span>
+);
+```
+
+既存の`useHoverDevice`（`useSyncExternalStore`）、`show`／`hide`／`handleKeyDown`、`delay`のtimer処理はそのまま残す。`placementStyles`／`arrowStyles`／`arrowBorderSize`も変更しない。`SPRING`と`getInitialTransform`は不要になるので削除する。
+
+- [ ] **Step 2: `UseCaseCard`のmotionとtiltを外す**
+
+`RobotCard`と同じ形にする。`motion.div` → 通常の`div`、`useTiltCardEffect`由来の`rotateX`／`rotateY`／`glowOpacity`とpointer追従glow（`motion.div`のradial-gradient層）を削除。shimmerとaccent lineはCSSのみで動いているためそのまま残す。
+
+削除する行:
+
+```tsx
+// @plan-check-skip: 削除対象の既存コード片
+import { motion } from 'motion/react';
+import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
+
+// root要素の onMouseMove / onMouseEnter / onMouseLeave と
+// style={{ rotateX, rotateY, transformPerspective: 1000 }} と transition={{...}}
+```
+
+root要素は次にする。
+
+```tsx
+// @plan-check-skip: 子要素を省いた root 要素のみの抜粋
+<div className="card-data group relative isolate flex h-full min-h-[148px] flex-col overflow-hidden">
+```
+
+`lib/useTiltCardEffect.ts`は`components/FeaturedRobotCard.tsx:10`が使い続けるため**削除しない**。
+
+- [ ] **Step 3: `card-hover-effect`をCSSへ置換する**
+
+52行の小さいcomponent。`AnimatePresence` + `motion.span`によるhover highlightを、常時mountした`span`のopacity transitionへ置換する。Step 1と同じく`display: none`は使わない。`ReportsBrowser.tsx:171`の利用箇所とprops（`className`）は変更しない。
+
+- [ ] **Step 4: 削減を実測する**
+
+```bash
+npm run build
+rg -n "motion/react" components/ui/AnimatedTooltip.tsx components/UseCaseCard.tsx components/ui/card-hover-effect.tsx
+node -e "
+const s=require('./.next/diagnostics/route-bundle-stats.json');
+const fs=require('fs');
+const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
+for(const r of ['/robots','/manufacturers','/use-cases','/reports']){
+  const e=s.find(x=>x.route===r);
+  const own=e.firstLoadChunkPaths.filter(p=>!floor.has(p)).reduce((a,p)=>a+fs.statSync(p).size,0);
+  console.log(r.padEnd(16), String(own).padStart(9));
+}"
+```
+
+**完了条件:** `rg`が0件。`/robots`と`/use-cases`からmotion chunkが消える。`/reports`は`NewsHeroCarousel` → `uilayouts/carousel`経由が残るためTask 4まで消えない見込みで、実測値を記録する。
+
+削減量は実測値をそのまま記録する。**chunkはmoduleと1:1ではないため、134,910がそのまま減るとは限らない。**
+
+- [ ] **Step 5: 回帰確認とcommit**
+
+```bash
+npm run test && npm run test:e2e -- tests/e2e/public-routes.spec.ts tests/e2e/accessibility-smoke.spec.ts
+```
+
+手動確認（390 / 1440幅のscreenshotを添付）:
+- `/robots`と`/reports`のtab barでtooltipがhover・focus両方で出る。Escapeで閉じる。`aria-describedby`が可視時だけ張られる
+- hoverの無いdevice（`(hover: hover)`不成立）でfocus時のみ出る
+- `/use-cases`のcardでshimmerとaccent lineが残り、tilt/glowだけが消えている
+- `prefers-reduced-motion: reduce`でtransitionが無効になる
+
+```bash
+git add components/ui/AnimatedTooltip.tsx components/UseCaseCard.tsx components/ui/card-hover-effect.tsx
+git commit -m "perf: replace card and tooltip motion with CSS transitions"
+```
+
+---
+
+### Task 4: carousel系のmotion依存を外す
+
+**Goal:** `/reports`に残る最後のmotion経路を外す。
+
+**問題:** `NewsHeroCarousel:21`は`useReducedMotion`だけのために`motion/react`をimportしている。`uilayouts/carousel.tsx:9`は`AnimatePresence, motion`をimportしているが、実際に使うのは2箇所だけである。
+
+- `SliderSnapDisplay`（L465-505）— **利用者0の死んだexport**（`rg`で確認済み）
+- `SliderDotButton`（L506-557）— `layoutId`によるactive dotのスライド。`NewsHeroCarousel.tsx:155`が使用
+
+autoplay・swipe・keyboard操作は`embla-carousel`（と`embla-carousel-autoplay`）が担っておりmotionに依存しない。**carousel本体のロジックには触らない。**
+
+**Files:**
+- Create: `lib/useMediaQuery.ts`
+- Modify: `components/NewsHeroCarousel.tsx`
+- Modify: `components/uilayouts/carousel.tsx`
+
+**Interfaces:**
+- Produces: `useMediaQuery(query: string): boolean`
+- 変更しない: `SliderDotButton`のprops（`className`／`activeClass`）、`Carousel`／`Slider`／`SliderContainer`／`SliderPrevButton`／`SliderNextButton`／`useCarousel`
+
+- [ ] **Step 1: `useMediaQuery`を追加する**
+
+SSR時は`false`を返し、hydration mismatchを避けるため`useSyncExternalStore`で書く（`AnimatedTooltip`の`useHoverDevice`と同じ方式）。
+
+```ts
+// lib/useMediaQuery.ts
+'use client';
+
+import { useCallback, useSyncExternalStore } from 'react';
+
+export function useMediaQuery(query: string): boolean {
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      const mediaQuery = window.matchMedia(query);
+      mediaQuery.addEventListener('change', onStoreChange);
+      return () => mediaQuery.removeEventListener('change', onStoreChange);
+    },
+    [query],
+  );
+  const getSnapshot = useCallback(() => window.matchMedia(query).matches, [query]);
+  const getServerSnapshot = useCallback(() => false, []);
+
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+```
+
+- [ ] **Step 2: `NewsHeroCarousel`の`useReducedMotion`を置換する**
+
+`import { useReducedMotion } from 'motion/react';`を削除し、次へ置換する。
+
+```ts
+// @plan-check-skip: component 本体を省いた差し替え箇所の抜粋
+import { useMediaQuery } from '@/lib/useMediaQuery';
+
+const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+```
+
+`prefersReducedMotion`の既存利用箇所（autoplay停止判定）はそのまま。`motion/react`の`useReducedMotion`はSSRで`null`を返しうるが`useMediaQuery`は`false`を返す。**autoplayを止める条件に使っているため、どちらもfalsyで判定は変わらない。**
+
+- [ ] **Step 3: 死んだ`SliderSnapDisplay`を削除する**
+
+```bash
+rg -n "SliderSnapDisplay" components src tests
+```
+
+Expected: `components/uilayouts/carousel.tsx`の定義だけ。それ以外が0件なら`export const SliderSnapDisplay = ...`のblock（L465-505）と、そこでしか使われていないlocal stateを削除する。
+
+- [ ] **Step 4: `SliderDotButton`をCSSへ置換する**
+
+`layoutId`は「activeなdotが位置を保ったままスライドする」共有layout animationを作っている。CSSでは**indicatorを1つだけdot列の中に絶対配置し、`translate`でactive indexの位置へ動かす**。
+
+```tsx
+// components/uilayouts/carousel.tsx
+// @plan-check-skip: forwardRef の外側と useCarousel の分割代入を省いた描画部の抜粋
+<div
+  ref={ref}
+  className={cn('relative flex gap-2', className)}
+  style={{ '--dot-index': selectedIndex } as CSSProperties}
+  {...props}
+>
+  {scrollSnaps.map((_, index) => (
+    <button
+      key={`${carouselId}-dot-${index}`}
+      type="button"
+      onClick={() => onDotButtonClick(index)}
+      aria-label={`スライド ${index + 1} へ`}
+      aria-current={index === selectedIndex ? 'true' : undefined}
+      className={cn(
+        'relative inline-flex p-0 m-0',
+        orientation === 'vertical' ? 'h-6 w-1' : 'w-6 h-1',
+      )}
+    >
+      <div
+        className={cn(
+          'bg-neutral-500/40 rounded-full',
+          orientation === 'vertical' ? 'h-6 w-1' : 'w-6 h-1',
+        )}
+      />
+    </button>
+  ))}
+  <div
+    aria-hidden="true"
+    className={cn(
+      'pointer-events-none absolute left-0 top-0 rounded-full bg-black dark:bg-white',
+      'transition-transform duration-400 ease-in-out motion-reduce:transition-none',
+      orientation === 'vertical' ? 'h-6 w-1' : 'w-6 h-1',
+      activeClass,
+    )}
+    style={
+      orientation === 'vertical'
+        ? { transform: 'translateY(calc(var(--dot-index) * (1.5rem + 0.5rem)))' }
+        : { transform: 'translateX(calc(var(--dot-index) * (1.5rem + 0.5rem)))' }
+    }
+  />
+</div>
+```
+
+`1.5rem`はdotの長辺（`w-6`/`h-6`）、`0.5rem`は`gap-2`に対応する。**dotサイズかgapを変えるときはこの計算も併せて変える**ため、両方を`carousel.tsx`内の定数へ寄せる。
+
+`CSSProperties`は`react`からtype importする。カスタムプロパティを`style`へ渡すため`as CSSProperties`のcastが要る。
+
+`AnimatePresence`／`motion`のimportを削除する。
+
+- [ ] **Step 5: 削減を実測する**
+
+```bash
+npm run build
+rg -n "motion/react" components lib
+node -e "
+const s=require('./.next/diagnostics/route-bundle-stats.json');
+const fs=require('fs');
+const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
+for(const r of ['/robots','/manufacturers','/use-cases','/reports']){
+  const e=s.find(x=>x.route===r);
+  const own=e.firstLoadChunkPaths.filter(p=>!floor.has(p)).reduce((a,p)=>a+fs.statSync(p).size,0);
+  console.log(r.padEnd(16), String(own).padStart(9));
+}"
+```
+
+**完了条件:** catalog 4 routeにmotion chunkが載っていない。`rg -n "motion/react"`の残存は`components/HomeContentNavigator.tsx`、`components/FeaturedRobotCard.tsx`、`components/ui/encrypted-text.tsx`（いずれもHome／Phase 5対象外）だけになる。
+
+`motion/react`を`package.json`のdependenciesから外せるかも確認する。**Home側の利用者が残るためこの時点では外せない見込み**であり、結果を記録して後続phaseへ送る。
+
+- [ ] **Step 6: 回帰確認とcommit**
+
+```bash
+npm run test && npm run build
+npm run test:e2e -- tests/e2e/public-routes.spec.ts
+```
+
+手動確認（390 / 1440幅のscreenshot）:
+- `/reports`のhero carouselが自動再生し、prev/nextボタンとswipeで動く
+- dot indicatorがactive slideへスライドし、`aria-current`が正しいdotに付く
+- keyboard（Tab → Enter/Space）でdotを選択できる
+- `prefers-reduced-motion: reduce`でautoplayが止まり、indicatorのtransitionも無効になる
+- **`/robots/[slug]`の`RobotImageCarousel`（同じmoduleの利用者）が壊れていない**
+
+```bash
+git add lib/useMediaQuery.ts components/NewsHeroCarousel.tsx components/uilayouts/carousel.tsx
+git commit -m "perf: replace carousel motion with CSS and drop the dead snap display"
+```
+
+---
+
+### Task 5: `normalizeSearchText`を独立moduleへ切り出す
+
+**Goal:** `lib/search.ts`全体をclient graphへ引き込む経路のうち、`normalizeSearchText`だけを使っている3経路を断つ。
+
+**問題:** `lib/search.ts`は4つの`create*SearchDocument()`と`lib/tags`／`lib/labels`を抱えている。`normalizeSearchText`（実質1行の正規化関数）を使うためだけにこれをimportすると、catalog 5 routeすべてに30,127〜53,958バイトのchunkが乗る。
+
+```
+components/RobotsBrowser.tsx:20                                → normalizeSearchText
+components/CompareClient.tsx:41                                → normalizeSearchText
+lib/robotFilters.ts:6 / lib/manufacturerFilters.ts:5
+  → lib/viewModels/shared.ts:3                                 → normalizeSearchText
+```
+
+**3経路すべてを断たないと1バイトも減らない。** `lib/viewModels/shared.ts`経由は`/robots`・`/manufacturers`・`/use-cases`・`/reports`のすべてに効く。
+
+残る2経路（`lib/useCaseFilters.ts:2`、`lib/searchIndex.ts:3`）は`create*SearchDocument`を使っているためTask 7・8が担当する。
+
+**Files:**
+- Create: `lib/normalizeSearchText.ts`
+- Modify: `lib/search.ts`
+- Modify: `lib/viewModels/shared.ts`
+- Modify: `components/RobotsBrowser.tsx`
 - Modify: `components/CompareClient.tsx`
 
 **Interfaces:**
-- Produces:
-  - `useCatalogUrlState(initialSearch): { searchParams; updateParams }`
-  - `updateCatalogUrl(updates, mode): void`
-- Removes: `isPending`とfilter時のRSC navigation
+- Produces: `normalizeSearchText(value: SearchPrimitive): string`（`lib/normalizeSearchText.ts`）
+- `lib/search.ts`は同名をre-exportし続ける（既存利用者を壊さない）
 
-- [ ] **Step 1: hook contract testを書く**
+- [ ] **Step 1: 新moduleを作る**
 
-```tsx
-// tests/components/catalog-url-state.test.tsx
-import { act, renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
-import { useCatalogUrlState } from '@/lib/catalog/urlState';
-
-describe('useCatalogUrlState', () => {
-  beforeEach(() => {
-    window.history.replaceState(null, '', '/robots?q=old');
-  });
-
-  it('replaces a parameter without navigating the document', () => {
-    const { result } = renderHook(() => useCatalogUrlState('?q=old'));
-    act(() => result.current.updateParams({ q: 'new', industry: 'logistics' }, 'replace'));
-    expect(window.location.pathname).toBe('/robots');
-    expect(window.location.search).toBe('?q=new&industry=logistics');
-    expect(result.current.searchParams.get('q')).toBe('new');
-  });
-
-  it('deletes null and blank values', () => {
-    const { result } = renderHook(() => useCatalogUrlState('?q=old'));
-    act(() => result.current.updateParams({ q: ' ', industry: null }));
-    expect(window.location.search).toBe('');
-  });
-
-  it('reacts to popstate', () => {
-    const { result } = renderHook(() => useCatalogUrlState('?q=old'));
-    act(() => {
-      window.history.replaceState(null, '', '/robots?q=back');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-    expect(result.current.searchParams.get('q')).toBe('back');
-  });
-});
-```
-
-- [ ] **Step 2: testがmodule未存在で失敗することを確認する**
-
-Run: `npm run test -- tests/components/catalog-url-state.test.tsx`
-
-Expected: module not foundでFAIL。
-
-- [ ] **Step 3: URL storeを実装する**
+`lib/search.ts`の現行実装をそのまま移す。他moduleへの依存を持たせない。
 
 ```ts
-// lib/catalog/urlState.ts
-'use client';
+// lib/normalizeSearchText.ts
+export type SearchPrimitive = string | number | null | undefined;
 
-import { useCallback, useMemo, useSyncExternalStore } from 'react';
-
-export type UrlParamValue = string | null | undefined;
-export type UrlUpdateMode = 'push' | 'replace';
-
-const URL_CHANGE_EVENT = 'deploid:urlchange';
-
-function normalizeInitialSearch(initialSearch: string) {
-  if (!initialSearch) return '';
-  return initialSearch.startsWith('?') ? initialSearch : `?${initialSearch}`;
-}
-
-function subscribe(onStoreChange: () => void) {
-  window.addEventListener('popstate', onStoreChange);
-  window.addEventListener(URL_CHANGE_EVENT, onStoreChange);
-  return () => {
-    window.removeEventListener('popstate', onStoreChange);
-    window.removeEventListener(URL_CHANGE_EVENT, onStoreChange);
-  };
-}
-
-function getBrowserSnapshot() {
-  return window.location.search;
-}
-
-export function updateCatalogUrl(
-  updates: Record<string, UrlParamValue>,
-  mode: UrlUpdateMode = 'push',
-) {
-  const params = new URLSearchParams(window.location.search);
-  for (const [key, value] of Object.entries(updates)) {
-    const normalized = value?.trim();
-    if (!normalized) params.delete(key);
-    else params.set(key, normalized);
-  }
-  const query = params.toString();
-  const href = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
-  const method = mode === 'replace' ? 'replaceState' : 'pushState';
-  window.history[method](window.history.state, '', href);
-  window.dispatchEvent(new Event(URL_CHANGE_EVENT));
-}
-
-export function useCatalogUrlState(initialSearch: string) {
-  const serverSnapshot = normalizeInitialSearch(initialSearch);
-  const search = useSyncExternalStore(subscribe, getBrowserSnapshot, () => serverSnapshot);
-  const searchParams = useMemo(() => new URLSearchParams(search), [search]);
-  const updateParams = useCallback(updateCatalogUrl, []);
-  return { searchParams, updateParams };
+export function normalizeSearchText(value: SearchPrimitive): string {
+  return String(value ?? '')
+    .normalize('NFKC')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
 }
 ```
 
-- [ ] **Step 4: browserを1つずつ移行する**
+- [ ] **Step 2: `lib/search.ts`をre-exportへ変える**
 
-各browser propの`initialFilters`/`initialQuery`/`selectedIds`を`initialSearch: string`へ置換する。filterは毎renderで`searchParams`から正規化する。
+`lib/search.ts`内の`normalizeSearchText`と`SearchPrimitive`の定義を削除し、新moduleからimportして再exportする。**この時点では`lib/search.ts`のexport面は変わらない。**
 
 ```ts
-const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
-const filters = normalizeRobotFilters({
-  manufacturer: searchParams.get('manufacturer'),
-  availability: searchParams.get('availability'),
-  industry: searchParams.get('industry'),
-  query: searchParams.get('q'),
-  manufacturerValues,
-  availabilityValues,
-  industryValues,
-});
+// lib/search.ts
+// @plan-check-skip: 既存の残りのexportを省いた冒頭の抜粋
+import { normalizeSearchText, type SearchPrimitive } from '@/lib/normalizeSearchText';
+
+export { normalizeSearchText };
+export type { SearchPrimitive };
 ```
 
-`isPending`、`CardGridSkeleton`分岐を削除する。compareは`compare`と`view`を`searchParams`から毎render解決する。
+- [ ] **Step 3: 3経路のimportを差し替える**
 
-- [ ] **Step 5: server pageからinitial searchを渡す**
-
-各pageで既に取得しているparamsを次でserializeする。
+`lib/viewModels/shared.ts:3`、`components/RobotsBrowser.tsx:20`、`components/CompareClient.tsx:41`の3行を次へ差し替える。
 
 ```ts
-// lib/catalog/urlSearch.ts
-export function toInitialSearch(entries: Record<string, string | null>) {
-  const params = new URLSearchParams();
-  Object.entries(entries).forEach(([key, value]) => {
-    if (value) params.set(key, value);
-  });
-  return params.toString();
-}
+// @plan-check-skip: 3ファイル共通の1行差し替え
+import { normalizeSearchText } from '@/lib/normalizeSearchText';
 ```
 
-このhelperは`lib/catalog/urlSearch.ts`へ置き、server/clientどちらからも使えるpure functionにする。対象parameter以外を含めない。
+`lib/viewModels/shared.ts:2`の`import type { SearchDocument } from '@/lib/search';`は型importなのでbundleへ影響しない。Task 6で`createCatalogSearchText`ごと消えるためここでは触らない。
 
-- [ ] **Step 6: E2Eを書く**
-
-```ts
-// tests/e2e/catalog-url-state.spec.ts
-import { expect, test } from '@playwright/test';
-
-test('robot filters update immediately and survive back/forward', async ({ page }) => {
-  await page.goto('/robots');
-  const before = await page.locator('[data-catalog-item]').count();
-  await page.getByRole('tab', { name: /物流/ }).click();
-  await expect(page).toHaveURL(/industry=logistics/);
-  const filtered = await page.locator('[data-catalog-item]').count();
-  expect(filtered).toBeLessThan(before);
-  await page.goBack();
-  await expect(page).not.toHaveURL(/industry=logistics/);
-  await expect(page.locator('[data-catalog-item]')).toHaveCount(before);
-  await page.goForward();
-  await expect(page).toHaveURL(/industry=logistics/);
-  await expect(page.locator('[data-catalog-item]')).toHaveCount(filtered);
-});
-```
-
-- [ ] **Step 7: old updaterを削除してgateを実行する**
+- [ ] **Step 4: 削減を実測する**
 
 ```bash
-rg -n "useUrlParamUpdater|useRouter\\(|router\\.(push|replace)" components lib
-npm run test -- tests/components/catalog-url-state.test.tsx
 npm run build
+node -e "
+const s=require('./.next/diagnostics/route-bundle-stats.json');
+const fs=require('fs');
+const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
+for(const r of ['/robots','/manufacturers','/use-cases','/reports','/compare']){
+  const e=s.find(x=>x.route===r);
+  const own=e.firstLoadChunkPaths.filter(p=>!floor.has(p)).reduce((a,p)=>a+fs.statSync(p).size,0);
+  console.log(r.padEnd(16), String(own).padStart(9));
+}"
+```
+
+**完了条件:** `/robots`・`/manufacturers`・`/compare`のroute固有JSが減る。減らない場合は`lib/search.ts`へ到達する経路が他に残っているので、`scripts/check-client-import-graph.mjs`の`forbidden`を一時的に`@/lib/search`へ向けて実行し、経路を特定してから進む。
+
+**`/use-cases`と`/reports`はこの時点では減らない見込み**（`lib/useCaseFilters.ts`と`lib/searchIndex.ts`が残るため）。実測値を記録し、Task 7・8で再測する。
+
+- [ ] **Step 5: 回帰確認とcommit**
+
+```bash
+npm run typecheck && npm run lint && npm run test && npm run build
 npm run test:e2e -- tests/e2e/catalog-url-state.spec.ts
 ```
 
-Expected: catalog browser内のold updater/router navigation 0件、test PASS。
-
-- [ ] **Step 8: commit**
+手動: `/robots`の検索窓と`/compare`のmenu検索が現行と同じ結果を返す。
 
 ```bash
-git add lib/catalog lib/useUrlParamUpdater.ts components src/app tests/components tests/e2e/catalog-url-state.spec.ts
-git commit -m "refactor: keep catalog filters in browser URL state"
+git add lib/normalizeSearchText.ts lib/search.ts lib/viewModels/shared.ts \
+  components/RobotsBrowser.tsx components/CompareClient.tsx
+git commit -m "refactor: isolate normalizeSearchText from the search document module"
 ```
 
 ---
 
-### Task 2: Robot / Manufacturer一覧をview model化する
+### Task 6: catalog searchTextをwhitelist化する
 
-> **状態: 実装済み（commit `f42ecbf`）。** このtaskはgate類が計画へ追加される前にcommitされている。
-> gate（payload budget、import境界、bundle内容検査、計画書の型検査）はTask 3が担当する。
-> 本節のStepは実装済みの記録として残す。ただしStep 3のsearchText builderは
-> `manufacturerId`を含めない形へ修正済みであり、Task 3で実装を合わせる。
+**Goal:** catalog view modelの`searchText`から本文を除去する。**Global Constraint 4の未達分。**
+
+**問題:** `lib/viewModels/robots.ts:73`は現在も`createCatalogSearchText(createRobotSearchDocument(robot, manufacturer))`である。`createRobotSearchDocument`の`fields`には`robot.summary`、`robot.description`、`robot.comparison.strengths/constraints/bestFit/notFit`、`supportNote`、`safetyNote`、`vendorRiskNote`が含まれる。連結すると、JSONのkeyとしては現れないが**本文の中身そのものがclientへ渡るJSONに残る**。
+
+実測:
+
+| route | VM全体 | うちsearchText | 本文除外時の削減 |
+|---|---:|---:|---:|
+| `/robots`（57件） | 67,185字 | 28,357字（42.2%） | VM全体の **-27.7%** |
+| `/manufacturers`（25件） | 24,171字 | 11,401字（47.2%） | VM全体の **-38.8%** |
+
+**原則:** catalog view modelの`searchText`は、**そのcardが実際に描画する文字列**と**その一覧のfacet選択肢のlabel**だけを対象とする。詳細ページにしか無い本文は一覧の検索対象にしない。id、slug、内部enum値は表示でもfacet labelでもないため含めない（enumはlabel経由で引ける）。
+
+**対象field（`data/types.ts`とcard componentの描画内容で検証済み）:**
+
+| collection | 含める | 含めない |
+|---|---|---|
+| robots | `nameJa`/`name`、メーカー名、`distributorJapan`、category／stage／readiness／availability／mobility／procurementの各label、card 4 factsの値、`industryTags`、`taskTags` | `summary`、`description`、`comparison.*`、`supportNote`、`safetyNote`、`vendorRiskNote`、`manufacturerId`（内部id） |
+| manufacturers | `nameJa`/`name`、`country`、`hqCity`、`foundedYear`、国内代理店名、取扱ロボット名、companyType／companyStatus／japanPresenceのlabel | `description`、`distributorNote`、`supportNote`、`procurementNote`、`vendorRiskNote`、代理店`note`、`website`、`contactUrl` |
+
+use-cases／reportsはTask 7・8で同じ形にする。
+
+**受け入れるトレードオフ:** 一覧の検索範囲が狭くなる。現在は紹介文中の語（例「バッテリー」）でも部分一致でhitするが、今後はhitしない。**このサイトには全体検索ページが存在しない**（`src/app`に`search` routeなし）ため、退避先は無い。復活方式は「実装しないこと」に記載。
 
 **Files:**
-- Create: `lib/viewModels/shared.ts`
-- Create: `lib/viewModels/robots.ts`
-- Create: `lib/viewModels/manufacturers.ts`
 - Create: `lib/catalog/search.ts`
 - Create: `scripts/check-catalog-payload.mjs`
-- Create: `tests/unit/view-models/robots.test.ts`
-- Create: `tests/unit/view-models/manufacturers.test.ts`
-- Modify: `scripts/check-data-import-boundaries.mjs`（`lib/viewModels/**`→`lib/search.ts`／`lib/searchIndex.ts`のimport禁止を追加）
-- Modify: `package.json`（`check:catalog-payload`を追加し`check`へ組み込む）
-- Modify: `lib/robotFilters.ts`
-- Modify: `lib/manufacturerFilters.ts`
-- Modify: `components/RobotsBrowser.tsx`
-- Modify: `components/ManufacturersBrowser.tsx`
-- Modify: `components/RobotCard.tsx`
-- Modify: `components/ManufacturerCard.tsx`
-- Modify: `components/ManufacturerLogoName.tsx`
-- Modify: `src/app/robots/page.tsx`
-- Modify: `src/app/manufacturers/page.tsx`
+- Modify: `lib/viewModels/shared.ts`
+- Modify: `lib/viewModels/robots.ts`
+- Modify: `lib/viewModels/manufacturers.ts`
+- Modify: `lib/robotFilters.ts` / `lib/manufacturerFilters.ts`
+- Modify: `scripts/check-data-import-boundaries.mjs`
+- Modify: `tests/unit/view-models/robots.test.ts`
+- Modify: `tests/unit/view-models/manufacturers.test.ts`
+- Modify: `package.json`
 
 **Interfaces:**
 - Produces:
-  - `createRobotCatalogItems(robots, manufacturers, useCases): RobotCatalogItem[]`
-  - `createManufacturerCatalogItems(manufacturers, robots): ManufacturerCatalogItem[]`
+  - `createRobotCatalogSearchText(robot, manufacturer, facts): string`
+  - `createManufacturerCatalogSearchText(manufacturer, robotsForManufacturer): string`
+  - `matchesCatalogSearch(searchText: string, query: string): boolean`
+- Removes: `lib/viewModels/shared.ts`の`createCatalogSearchText`と`matchesCatalogSearchText`
 
-- [ ] **Step 1: serializable VM typesを定義する**
+- [ ] **Step 1: 失敗するtestを書く**
 
-```ts
-// lib/viewModels/shared.ts
-import type { ManufacturerLogoVariant } from '@/lib/manufacturerLogo';
-import type { VisualTone } from '@/lib/visualSemantics';
+key名の不在だけでは、連結済みsearch textとして本文が載っている場合を検出できない。**JSON文字列ではなく`searchText`自体を、両辺同じ関数で正規化して比較する。**
 
-export interface CatalogImage {
-  src: string;
-  alt: string;
-}
-
-export interface CatalogLogoAsset {
-  src: string;
-  alt: string;
-  credit?: string;
-  aspectRatio?: number;
-}
-
-export interface CatalogLogo {
-  asset?: CatalogLogoAsset;
-  resolvedVariant?: ManufacturerLogoVariant;
-}
-
-export interface CatalogTag {
-  label: string;
-  tone: VisualTone;
-}
-
-export interface CatalogFact {
-  key: string;
-  label: string;
-  value: string;
-  href?: string;
-}
-```
-
-```ts
-// lib/viewModels/logo.ts
-import type { Manufacturer } from '@/data/types';
-import {
-  resolveManufacturerLogo,
-  type ManufacturerLogoVariant,
-} from '@/lib/manufacturerLogo';
-import type { CatalogLogo } from './shared';
-
-export function createCatalogLogo(
-  manufacturer: Manufacturer | undefined,
-  variant: ManufacturerLogoVariant,
-): CatalogLogo {
-  if (!manufacturer) return {};
-  const { asset, resolvedVariant } = resolveManufacturerLogo(manufacturer, variant);
-  return {
-    asset: asset
-      ? {
-          src: asset.src,
-          alt: asset.alt,
-          credit: asset.credit,
-          aspectRatio: asset.aspectRatio,
-        }
-      : undefined,
-    resolvedVariant,
-  };
-}
-```
-
-```ts
-// lib/viewModels/robots.ts
-export interface RobotCatalogItem {
-  id: string;
-  slug: string;
-  href: string;
-  name: string;
-  image?: CatalogImage;
-  manufacturer: CatalogLogo & { id: string; name: string };
-  stage: CatalogTag;
-  facts: [CatalogFact, CatalogFact, CatalogFact, CatalogFact];
-  filter: {
-    manufacturerId: string;
-    industryTags: string[];
-    japanAvailability: string;
-    deploymentStage: string;
-    searchText: string;
-  };
-}
-```
-
-```ts
-// lib/viewModels/manufacturers.ts
-export interface ManufacturerCatalogItem {
-  id: string;
-  slug: string;
-  href: string;
-  name: string;
-  website: string;
-  logo: CatalogLogo;
-  filter: {
-    country: string;
-    consultationRoute: string;
-    searchText: string;
-  };
-  facts: {
-    establishedRegion: string;
-    representativeRobot: string;
-    consultationRoute: string;
-    distributors: Array<{ name: string; website?: string }>;
-    distributorLabel: string;
-    hasDistributor: boolean;
-  };
-}
-```
-
-- [ ] **Step 2: forbidden field testを書く**
+raw文字列比較（`expect(JSON.stringify(vm)).not.toContain(rawText)`）は**実測で7.9%取りこぼす**。現行の違反実装に対し12文字以上の本文値343件を検査したところ、343件すべてが実際にsearchTextへ含まれているのに、raw比較で検出できたのは316件だった。原因は`uniqueSearchValues`が各値へ`.normalize('NFKC').trim()`をかけるため全角括弧・全角数字を含む本文が原文と一致しないこと（例「移動速度3.3m/s（潜在能力5m/s超）」）、builderが連結後に`toLowerCase()`を含む正規化をかけること、`JSON.stringify`のescape（`"`／`\n`／`\\`）である。
 
 ```ts
 // tests/unit/view-models/robots.test.ts
+// @plan-check-skip: Task 5 で作る @/lib/normalizeSearchText を参照する。Task 6 でこのmarkerを外しbaselineを減らす
 import { describe, expect, it } from 'vitest';
 import { getManufacturers, getRobots, getUseCases } from '@/lib/data';
-import { normalizeSearchText } from '@/lib/search';
+import { normalizeSearchText } from '@/lib/normalizeSearchText';
 import { createRobotCatalogItems } from '@/lib/viewModels/robots';
 
-describe('robot catalog view models', () => {
+describe('robot catalog search text', () => {
   const items = createRobotCatalogItems(getRobots(), getManufacturers(), getUseCases());
-  const json = JSON.stringify(items);
 
-  it('exclude editorial evidence and full domain records', () => {
-    expect(json).not.toContain('"sources"');
-    expect(json).not.toContain('"fieldEvidence"');
-    expect(json).not.toContain('"comparison"');
-    expect(json).not.toContain('"priceOffers"');
-  });
+  it('excludes body text values, not just their keys', () => {
+    const haystack = normalizeSearchText(items.map((item) => item.filter.searchText).join(' '));
 
-  it('exclude body text content, not just its keys', () => {
-    // key名の不在だけでは、連結済みsearch textとして本文が載っている場合を検出できない。
-    // JSON文字列ではなくsearchText自体を、両辺同じ関数で正規化して比較する。
-    // raw文字列比較では実測7.9%取りこぼす（Global Constraints「制約のゲート設計」参照）。
-    const haystack = normalizeSearchText(
-      items.map((item) => item.filter.searchText).join(' '),
-    );
     for (const robot of getRobots()) {
-      for (const text of [
+      const bodyValues = [
         robot.description,
         robot.summary,
         robot.supportNote,
@@ -638,99 +1220,66 @@ describe('robot catalog view models', () => {
         ...robot.comparison.constraints,
         ...robot.comparison.bestFit,
         ...robot.comparison.notFit,
-      ]) {
-        if (!text || text.length < 12) continue;
-        expect(haystack).not.toContain(normalizeSearchText(text));
+      ];
+
+      for (const value of bodyValues) {
+        // 12文字未満は他fieldと偶然一致しうるため対象外。
+        if (!value || value.length < 12) continue;
+        expect(haystack).not.toContain(normalizeSearchText(value));
       }
     }
   });
 });
 ```
 
-Manufacturer testは`"sources"`、`"headquarters"`、`"description"`、`"notes"`がJSONに含まれないことをassertする。両testで`"sourceUrl"`と`"rights"`も含まれないことをassertし、表示用logo/imageだけがserializeされることを固定する。Manufacturer側にも同じ正規化済み本文値assertionを置き、`description`、`distributorNote`、`supportNote`、`procurementNote`、`vendorRiskNote`、代理店`note`の実値が現れないことを固定する。
+`tests/unit/view-models/manufacturers.test.ts`にも同形のitを置く。対象は`description`、`distributorNote`、`supportNote`、`procurementNote`、`vendorRiskNote`、`domesticDistributors?.[].note`。
 
-短い文字列は他fieldと偶然一致しうるため、値assertionは12文字以上のものだけを対象とする。
+既存の`"sources"`／`"fieldEvidence"`／`"comparison"`／`"priceOffers"`のkey名assertionはそのまま残す。
 
-このassertionは「今の型にある本文field」を人手で列挙しているため、fieldが増えても追随しない。そのためStep 2ではpayload budgetとimport境界も併せて導入する（下記Step 2b）。
+- [ ] **Step 2: testが失敗することを確認する**
 
-- [ ] **Step 2b: payload budgetとimport境界を導入する**
-
-`scripts/check-catalog-payload.mjs`を`scripts/check-home-payload.mjs`と同形で作る。5 factoryの出力を`JSON.stringify`し、collectionごとに文字数上限をgateする。初期値は本文除外後の実測値に約15%の余裕を足して設定し、実測値と併せてcommit messageへ残す。
-
-`scripts/check-data-import-boundaries.mjs`へ、`lib/viewModels/**`が`lib/search.ts`／`lib/searchIndex.ts`をimportしないruleを追加する。今回の事故の根本原因は汎用search documentの再利用であり、これを機械的に止める。`lib/catalog/search.ts`は`normalizeSearchText`のためにimportしてよい（対象fieldを自前で列挙するfileであり、search documentは使わない）。
-
-`package.json`へ`check:catalog-payload`を追加し、`check`のpipelineへ`check:home-payload`の直後に挿入する。
-
-- [ ] **Step 3: server factoriesを実装する**
-
-`createRobotCatalogItems`は既存helperをserverで呼ぶ。
-
-```ts
-export function createRobotCatalogItems(
-  robots: readonly Robot[],
-  manufacturers: readonly Manufacturer[],
-  useCases: readonly UseCase[],
-): RobotCatalogItem[] {
-  const manufacturerById = new Map(manufacturers.map((item) => [item.id, item]));
-  return robots.map((robot) => {
-    const manufacturer = manufacturerById.get(robot.manufacturerId);
-    const image = getRobotPrimaryImage(robot);
-    const card = createRobotCardViewModel(robot, useCases);
-    return {
-      id: robot.id,
-      slug: robot.slug,
-      href: `/robots/${robot.slug}`,
-      name: robot.nameJa ?? robot.name,
-      image: image ? { src: image.src, alt: image.alt } : undefined,
-      manufacturer: {
-        id: robot.manufacturerId,
-        name: manufacturer?.nameJa ?? manufacturer?.name ?? robot.manufacturerId,
-        ...createCatalogLogo(manufacturer, 'combined'),
-      },
-      stage: {
-        label: deploymentStageLabels[robot.deploymentStage],
-        tone: getDeploymentStageTone(robot.deploymentStage),
-      },
-      facts: card.facts.map(({ key, label, value, href }) => ({ key, label, value, href })) as RobotCatalogItem['facts'],
-      filter: {
-        manufacturerId: robot.manufacturerId,
-        industryTags: [...robot.industryTags],
-        japanAvailability: robot.japanAvailability,
-        deploymentStage: robot.deploymentStage,
-        searchText: createRobotCatalogSearchText(robot, manufacturer, card.facts),
-      },
-    };
-  });
-}
+```bash
+npm run test -- tests/unit/view-models/robots.test.ts tests/unit/view-models/manufacturers.test.ts
 ```
 
-`createCatalogLogo(manufacturer, variant)`は`resolveManufacturerLogo`をserverで呼び、`src`、`alt`、`credit`、`aspectRatio`、`resolvedVariant`だけを返す。Manufacturer factoryは`getDomesticDistributorDisplay`、`getManufacturerEstablishedRegionLabel`、`getManufacturerConsultationRoute`、`getRepresentativeRobotLabel`をserverで解決し、`ManufacturerCatalogItem`へ詰める。
+Expected: 本文値assertionでFAIL。現行実装が本文を含んでいるため。
 
-`searchText`は`lib/search.ts`の`createRobotSearchDocument()`／`createManufacturerSearchDocument()`を**使わない**。それらの`fields`には本文が含まれ、Global Constraintの「Catalog検索範囲」に反するため。代わりに`lib/catalog/search.ts`へcollectionごとのbuilderを置き、対象fieldを直接列挙する。
+- [ ] **Step 3: `lib/catalog/search.ts`を作る**
+
+`lib/search.ts`の`create*SearchDocument()`は**使わない**。対象fieldを直接列挙する。
+
+`industryTags`／`taskTags`／`distributorJapan`／`hqCity`／`foundedYear`／`domesticDistributors`／`nameJa`はoptionalなので`??`と`filter(Boolean)`で処理する（`data/types.ts`で確認済み）。
 
 ```ts
 // lib/catalog/search.ts
-import { normalizeSearchText } from '@/lib/search';
+// @plan-check-skip: Task 5 で作る @/lib/normalizeSearchText を参照する。Task 6 でこのmarkerを外しbaselineを減らす
+import type { Manufacturer, Robot } from '@/data/types';
 import {
   buyerReadinessLabels,
+  companyStatusLabels,
+  companyTypeLabels,
   deploymentStageLabels,
   japanAvailabilityLabels,
+  japanPresenceLabels,
   mobilityLabels,
   procurementLabels,
   robotCategoryLabels,
 } from '@/lib/labels';
-import type { Manufacturer, Robot } from '@/data/types';
+import { normalizeSearchText } from '@/lib/normalizeSearchText';
 import type { CatalogFact } from '@/lib/viewModels/shared';
 
-function joinSearchText(parts: ReadonlyArray<string | number | undefined>) {
+export type SearchPart = string | number | undefined;
+
+export function joinSearchText(parts: readonly SearchPart[]): string {
   return normalizeSearchText(parts.filter(Boolean).join(' '));
 }
 
+/** 一覧の検索対象は「cardが描画する文字列」と「facet選択肢のlabel」だけ。本文とidは含めない。 */
 export function createRobotCatalogSearchText(
   robot: Robot,
   manufacturer: Manufacturer | undefined,
   facts: readonly CatalogFact[],
-) {
+): string {
   return joinSearchText([
     robot.nameJa,
     robot.name,
@@ -744,484 +1293,194 @@ export function createRobotCatalogSearchText(
     robot.specs.mobility ? mobilityLabels[robot.specs.mobility] : undefined,
     ...robot.procurementModels.map((model) => procurementLabels[model]),
     ...facts.map((fact) => fact.value),
-    ...robot.industryTags,
-    ...robot.taskTags,
+    ...(robot.industryTags ?? []),
+    ...(robot.taskTags ?? []),
   ]);
 }
-```
 
-`createManufacturerCatalogSearchText(manufacturer, robotsForManufacturer)`も同じ形で、社名、`country`、`hqCity`、`foundedYear`、国内代理店名、取扱ロボット名、companyType／companyStatus／japanPresenceのlabelだけを連結する。`description`や`*Note`は渡さない。
-
-- [ ] **Step 4: filtersとcardsをVM入力へ変更する**
-
-`filterRobots`、facet関数は`RobotCatalogItem`を受け、`item.filter.*`だけを見る。`RobotCard`は`item` propだけを受け、`getRobotPrimaryImage`やlabel/tone解決を呼ばない。
-
-```tsx
-interface RobotCardProps {
-  item: RobotCatalogItem;
-  showFavorite?: boolean;
-  isFavorite?: boolean;
-  onFavoriteToggle?: (id: string) => void;
-  mobileVisual?: boolean;
-  eagerImage?: boolean;
+export function createManufacturerCatalogSearchText(
+  manufacturer: Manufacturer,
+  robotsForManufacturer: readonly Robot[],
+): string {
+  return joinSearchText([
+    manufacturer.nameJa,
+    manufacturer.name,
+    manufacturer.country,
+    manufacturer.hqCity,
+    manufacturer.foundedYear,
+    companyTypeLabels[manufacturer.companyType],
+    companyStatusLabels[manufacturer.companyStatus],
+    japanPresenceLabels[manufacturer.japanPresence],
+    ...(manufacturer.domesticDistributors ?? []).map((distributor) => distributor.name),
+    ...robotsForManufacturer.flatMap((robot) => [robot.nameJa, robot.name]),
+  ]);
 }
-```
 
-`ManufacturerCard`も`item: ManufacturerCatalogItem`だけを受ける。`ManufacturerLogoName`には`resolvedLogo?: CatalogLogo` propを追加する。指定時は`resolveManufacturerLogo`を再実行せず`resolvedLogo.asset`を描画し、既存の`logo`/`logos` propsはdetail page向けに維持する。
-
-- [ ] **Step 5: catalog cardのmotion依存を外す**
-
-`RobotCard`と`ManufacturerCard`から`motion/react`と`useTiltCardEffect`を削除し、rootを通常の`div`へ変える。pointer追従glowを削除し、既存のCSS `hover:border`、shadow、shimmer、accent lineは維持する。
-
-- [ ] **Step 6: server pagesでVMを生成する**
-
-```tsx
-const items = createRobotCatalogItems(getRobots(), getManufacturers(), getUseCases());
-return <RobotsBrowser items={items} initialSearch={initialSearch} />;
-```
-
-```tsx
-const items = createManufacturerCatalogItems(getManufacturers(), getRobots());
-return <ManufacturersBrowser items={items} initialSearch={initialSearch} />;
-```
-
-- [ ] **Step 7: testsとE2Eを実行する**
-
-```bash
-npm run test -- tests/unit/view-models/robots.test.ts tests/unit/view-models/manufacturers.test.ts
-npm run build
-npm run test:e2e -- tests/e2e/public-routes.spec.ts tests/e2e/catalog-url-state.spec.ts
-```
-
-Expected: VM JSONにforbidden fieldなし、一覧表示/favorite/filterがPASS。
-
-- [ ] **Step 8: commit**
-
-```bash
-git add lib/viewModels lib/robotFilters.ts lib/manufacturerFilters.ts components/RobotCard.tsx components/ManufacturerCard.tsx components/ManufacturerLogoName.tsx components/RobotsBrowser.tsx components/ManufacturersBrowser.tsx src/app/robots/page.tsx src/app/manufacturers/page.tsx tests/unit/view-models
-git commit -m "refactor: send catalog view models to robot and manufacturer clients"
-```
-
----
-
-### Task 3: 制約のgateを導入する
-
-**Goal:** Task 2でVM化した内容を守るgateを揃える。Task 4以降の大きな削減に着手する前に、退行を機械的に検出できる状態にする。
-
-**gateの設計方針:** 検出手段は**record値の流出**を見るものにし、**field名の出現**では判定しない。field名ベースの判定は実測で機能しないことが確認済みである（下記Step 3参照）。
-
-**Files:**
-- Create: `scripts/check-catalog-payload.mjs`
-- Create: `scripts/check-client-bundle-content.mjs`
-- Create: `scripts/check-client-import-graph.mjs`
-- Create: `scripts/check-plan-snippets.mjs`
-- Modify: `scripts/check-data-import-boundaries.mjs`
-- Modify: `lib/catalog/search.ts`
-- Modify: `lib/viewModels/robots.ts`
-- Modify: `tests/unit/view-models/robots.test.ts`
-- Modify: `tests/unit/view-models/manufacturers.test.ts`
-- Modify: `package.json`
-
-**Interfaces:**
-- Produces: `npm run check:catalog-payload`、`npm run check:bundle-content`、`npm run check:client-imports`、`npm run check:plan-snippets`
-
-- [ ] **Step 1: searchText builderをwhitelistへ揃える**
-
-Task 2の実装は`manufacturerId`をsearchTextへ含めている。Global Constraintsの表は内部idを除外と定めているため、`lib/catalog/search.ts`の`createRobotCatalogSearchText`から`robot.manufacturerId`を外す。facetでの絞り込みは`item.filter.manufacturerId`が担っており、検索文字列に含める必要はない。
-
-`searchExtra`方式は採用しない（Global Constraintsの「見送った案」を参照）。`filter.searchText`は4 collectionすべてで維持する。
-
-- [ ] **Step 2: payload byte budgetを導入する**
-
-`scripts/check-catalog-payload.mjs`を`scripts/check-home-payload.mjs`と同形で作る。factoryの出力を`JSON.stringify`し、`Buffer.byteLength`でcollectionごとにgateする。文字数ではなくバイト数で測る（日本語はUTF-8で1文字3バイトのため、文字数では実転送量を約3倍過小評価する）。
-
-初期上限は本文除外後の実測値に約15%の余裕を足して設定し、実測値をcommit messageへ残す。
-
-- [ ] **Step 3: bundle内容検査をrecord slugカウント方式で実装する**
-
-**field名マーカー方式は採用しない。** 実測で機能しないことを確認済みである。
-
-現ビルドに`fieldEvidence`／`vendorRiskNote`／`usageExampleSourceUrls`を当てたところ、`fieldEvidence`だけで3 chunkにhitし、うち2つ（7,364バイトと13,510バイト）は生datasetではなかった。原因はfield名が`lib/uiText.ts`のUIラベルkeyや`lib/search.ts`のbuilder内の property access として出現するためで、**field名の出現とrecord値の流出を区別できない**。
-
-さらにcoverageの穴がある。3つのmarkerはいずれも`Robot`／`Manufacturer`が宣言するfieldであり、`data/articles.ts`（228,785バイト）や`data/useCases.ts`（177,085バイト）が単独で漏れても検知できない。現在の違反が捕まるのは`localContentSnapshot`が4 collectionを束ねているからで、設計ではなく偶然である。
-
-代わりに**record slugの出現数**で判定する。実測結果:
-
-```
-total slugs: 133
-  968993  3r7-bj8a3uy6f.js  distinct-slugs=133
-  （他のchunkはすべて0）
-```
-
-誤検知0、全collection carbon。閾値も明快である。
-
-```js
-// scripts/check-client-bundle-content.mjs
-const slugs = [...getRobots(), ...getManufacturers(), ...getUseCases(), ...getArticles()]
-  .map((record) => `"${record.slug}"`);
-
-// UIファイルがslugを1〜2個ハードコードすることはありうるため、閾値は5とする。
-const MAX_DISTINCT_SLUGS_PER_CHUNK = 5;
-```
-
-slugはすべてのrecordが`BaseRecord`から持つため、collectionが増えても自動的にcoverageへ入る。
-
-- [ ] **Step 4: サイズ異常gateを足す**
-
-marker非依存のbackstopとして、単一chunkが250,000バイトを超えたら失敗させる。今回の968,993は一発で落ちる。検出手段が将来無効化されても、異常な大きさのchunkは必ず捕まる。
-
-閾値250,000の根拠: 現ビルドの最大の正常chunkは154,015バイト。約1.6倍の余裕を持たせた。
-
-- [ ] **Step 5: 静的importグラフ検査を足す（原因側の検出）**
-
-`scripts/check-client-import-graph.mjs`を作る。`'use client'`を持つmoduleから`data/**`および`lib/data/localContentSnapshot`へ到達しないことを検証する。**buildが不要で、結果ではなく原因を直接見る。**
-
-Step 3・4がbuild成果物（結果）を見るのに対し、これはsource（原因）を見る。両方あることで、違反の検出と原因特定が同時に済む。
-
-- [ ] **Step 6: 既知違反をallowlistで管理する**
-
-Step 3〜5のgateは、この時点では`/reports`の違反により失敗する。**赤いgateをcommitするのではなく、既知違反をallowlistで明示する。**
-
-```js
-const ALLOWED = {
-  'components/ReportsBrowser.tsx': 'Task 4で解消。lib/articlePlacements.ts経由のlocalContentSnapshot',
-};
-```
-
-pipelineは常にgreenを保ちつつ、許可した違反がコードに明示的に残り、消し忘れがdiffで見える。**Task 4の完了条件は「allowlistが空になること」**として機械的に確認できる。
-
-- [ ] **Step 7: import境界を追加する**
-
-`scripts/check-data-import-boundaries.mjs`へ、`lib/viewModels/**`が`lib/search.ts`／`lib/searchIndex.ts`をimportしないruleを追加する。
-
-**`lib/catalog/search.ts`への免除は設けない。** Task 5で`normalizeSearchText`を`lib/search.ts`から独立moduleへ切り出すため、免除は不要になる（Task 5 Step 1参照）。免除を残すと、`lib/search.ts`全体をclient graphへ引き込む経路が塞がらない。
-
-- [ ] **Step 8: 計画書のcode blockを型検査する**
-
-`scripts/check-plan-snippets.mjs`を作る。Global Constraintsの「計画書自身の型検査」節の仕様に従い、`docs/plans/*.md`の`ts`／`tsx` blockを抽出して`tsc --noEmit`にかける。
-
-既知の誤り（Task 6 Step 1の`useCase.description`等）は計画側で修正済みだが、**このgateを入れた時点で未発見の不一致が落ちる可能性がある**。落ちた箇所を修正することがこのStepの完了条件に含まれる。
-
-- [ ] **Step 9: 本文値assertionの正規化を直す**
-
-`tests/unit/view-models/*.test.ts`の本文値assertionを、両辺`normalizeSearchText`で正規化し、JSON文字列ではなく`searchText`自体を対象にする形へ修正する（Global Constraintsの「制約のゲート設計」参照）。raw文字列比較は実測7.9%取りこぼす。
-
-- [ ] **Step 10: package.jsonへ配線する**
-
-```json
-{
-  "check:catalog-payload": "node scripts/check-catalog-payload.mjs",
-  "check:bundle-content": "node scripts/check-client-bundle-content.mjs",
-  "check:client-imports": "node scripts/check-client-import-graph.mjs",
-  "check:plan-snippets": "node scripts/check-plan-snippets.mjs"
-}
-```
-
-`check`のpipelineへ次の順で挿入する。build不要なものはbuildの前に置く。
-
-```
-… typecheck && lint && check:plan-snippets && check:client-imports && test
-   && check:catalog-payload && build && check:home-payload && check:bundle-content
-   && check:client-budgets && test:e2e
-```
-
-- [ ] **Step 11: 全gateを実行する**
-
-```bash
-npm run check:plan-snippets
-npm run check:client-imports
-npm run test -- tests/unit/view-models
-npm run typecheck && npm run lint && npm run build
-npm run check:catalog-payload
-npm run check:bundle-content
-```
-
-Expected: すべてgreen（`/reports`の違反はStep 6のallowlistで明示的に許可された状態）。
-
-- [ ] **Step 12: commit**
-
-```bash
-git add scripts/check-catalog-payload.mjs scripts/check-client-bundle-content.mjs \
-  scripts/check-client-import-graph.mjs scripts/check-plan-snippets.mjs \
-  scripts/check-data-import-boundaries.mjs lib/catalog/search.ts lib/viewModels \
-  tests/unit/view-models package.json docs/plans
-git commit -m "test: gate catalog payload, client imports and bundle contents"
-```
-
----
-### Task 4: `/reports`の生data流出を止める
-
-**Goal:** `components/ReportsBrowser.tsx`（`'use client'`）から`lib/data/localContentSnapshot`へ至るimport chainを切り、968,993バイトのclient chunkを除去する。**Phase 5で最大の削減であり、かつGlobal Constraint違反そのもの。**
-
-**現状の経路（実測）:**
-
-```
-components/ReportsBrowser.tsx ('use client')
-  → lib/articlePlacements.ts:3   import { localContentSnapshot }
-    → lib/data/localContentSnapshot   ← robots / manufacturers / useCases / articles 全部
-```
-
-`.next/static/chunks/3r7-bj8a3uy6f.js` = 968,993バイト（`fieldEvidence`×60、`vendorRiskNote`×26、`unitree-g1`×32）。`/reports`のroute固有JS 1,233,689バイトの**79%**。propsですらなく、dataset全体がJS bundleとして全userへ配信されている。
-
-**Files:**
-- Modify: `lib/articlePlacements.ts`
-- Modify: `components/ReportsBrowser.tsx`
-- Modify: `src/app/reports/page.tsx`
-- Modify: `tests/unit/`（placement関連testがあれば）
-
-- [ ] **Step 1: allowlistの現状を確認する**
-
-Task 3 Step 6で`components/ReportsBrowser.tsx`はallowlistへ登録済みである。**このtaskの完了条件はallowlistからこのentryを削除してもgateがgreenであること。**
-
-```bash
-npm run check:client-imports   # allowlist込みでgreen
-npm run build && npm run check:bundle-content
-```
-
-allowlistのentryをコメントアウトして失敗することを先に確認し、違反が実在することを固定する。
-
-- [ ] **Step 2: `lib/articlePlacements.ts`をserver引数化する**
-
-`localContentSnapshot`のimportを削除し、signatureを次へ変更する。
-
-```ts
-export function getArticleIndexPlacementReports<T extends { id: string; publishedAt: string }>({
-  articles,
-  placements,
-  limits,
-}: {
-  articles: readonly T[];
-  placements: readonly ArticlePlacement[];
-  limits: Readonly<Record<ArticlePlacementSlot, number>>;
-}) {
-  // 現行のhero/feature selectionをTのidentityを保って返す
-}
-```
-
-- [ ] **Step 3: `src/app/reports/page.tsx`だけがsnapshotを読む**
-
-`localContentSnapshot.articlePlacements`とlimitsをserver pageで解決し、結果をclientへ渡す。`ReportsBrowser`は`reports`／`heroReports`／`featureReports`を受け取り、placement moduleをimportしない。
-
-このtask時点ではまだArticle VM化（Task 6）が済んでいないため、`ReportsBrowser`のprops型は現行のまま（`Article[]`）でよい。**目的はimport chainを切ることであり、VM化はTask 6が担当する。** 生dataがbundleへ入る経路を先に潰すことで、最大の削減を最短で得る。
-
-- [ ] **Step 4: allowlistを空にしてgateがgreenになることを確認する**
-
-`scripts/check-client-import-graph.mjs`と`scripts/check-client-bundle-content.mjs`のallowlistから`components/ReportsBrowser.tsx`のentryを**削除**し、その状態でgreenになることを確認する。**allowlistが空になることがこのtaskの完了条件である。**
-
-```bash
-npm run check:client-imports   # allowlist空でgreen
-npm run build
-npm run check:bundle-content   # Expected: 違反chunk 0件
-node -e "const s=require('./.next/diagnostics/route-bundle-stats.json');console.log(s.find(x=>x.route==='/reports').firstLoadUncompressedJsBytes)"
-```
-
-route固有JSの削減幅を実測し、commit messageへ記録する。
-
-- [ ] **Step 5: 回帰確認**
-
-```bash
-npm run test
-npm run test:e2e -- tests/e2e/public-routes.spec.ts
-```
-
-hero/feature/pagination/検索の表示が現行と一致することを確認する。
-
-- [ ] **Step 6: commit**
-
-```bash
-git add lib/articlePlacements.ts components/ReportsBrowser.tsx src/app/reports/page.tsx
-git commit -m "perf: stop shipping the local content snapshot to the reports client"
-```
-
----
-
-### Task 5: catalog routeのmotionと重量importを外す
-
-**Goal:** `/robots`、`/use-cases`、`/reports`のroute固有JSから、motion依存と`lib/search.ts`全体の巻き込みを除去する。
-
-**現状の経路（すべて実測で特定）:**
-
-motion経路はrouteごとに異なり、**単一の経路ではない**。改訂前の本taskは`PageTabBar`だけを対象にしていたが、それでは`/use-cases`は1バイトも減らず、`/reports`も4経路のうち1本しか潰せない。
-
-| route | motion経路 | `PageTabBar`経由か |
-|---|---|---|
-| `/robots` | `RobotsBrowser` → `PageTabBar` → `ui/AnimatedTooltip` | はい |
-| `/use-cases` | `UseCasesBrowser` → `UseCaseCard` → `motion/react`（直接import）、および `lib/useTiltCardEffect` | **いいえ** |
-| `/reports` | ① `ReportsBrowser` → `ReportsHeader` → `PageTabBar` → `ui/AnimatedTooltip`<br>② `ReportsBrowser` → `NewsHeroCarousel`<br>③ `NewsHeroCarousel` → `uilayouts/carousel`<br>④ `ReportsBrowser` → `ui/card-hover-effect` | ①のみ |
-| `/manufacturers` | なし（178,411バイトが軽い理由の1つ） | — |
-
-`/use-cases`のmotion chunk（`1mbvphip_2888.js`）と`/robots`・`/reports`のそれ（`0p8sjtw7eybcn.js`）は**同サイズだがmd5が一致しない別ファイル**である。motionが2重にbundleされているため、片方だけ消しても残る。
-
-**もう1つの重量import:** `components/RobotsBrowser.tsx:20`が`normalizeSearchText`のためだけに`@/lib/search`をimportしており、これだけで53,958バイトの`/robots`専用chunk（`02r_vm-d2k0jh.js`。`lib/search.ts`＋`lib/tags`＋`lib/labels`、4つの`create*SearchDocument`込み）が生じている。用途は`filters.query`の空文字判定1箇所（L120）のみ。`ManufacturersBrowser`にこのimportは無く、これも178,411が軽い理由である。
-
-**Files:**
-- Create: `lib/normalizeSearchText.ts`
-- Modify: `lib/search.ts`
-- Modify: `lib/catalog/search.ts`
-- Modify: `components/RobotsBrowser.tsx`
-- Modify: `components/ui/AnimatedTooltip.tsx`
-- Modify: `components/UseCaseCard.tsx`
-- Modify: `components/NewsHeroCarousel.tsx`
-- Modify: `components/ui/card-hover-effect.tsx`
-- Modify: `components/uilayouts/carousel.tsx`
-- Modify: `lib/useTiltCardEffect.ts`（利用者が消えれば削除）
-
-- [ ] **Step 1: `normalizeSearchText`を独立moduleへ切り出す**
-
-`lib/normalizeSearchText.ts`を新設し、`normalizeSearchText`とその依存だけを置く。`lib/search.ts`はそこからre-exportする（既存の利用者を壊さない）。`components/RobotsBrowser.tsx`と`lib/catalog/search.ts`のimportを新moduleへ差し替える。
-
-これによりTask 3 Step 7で保留していた「`lib/catalog/search.ts`のimport境界免除」が不要になる。免除を撤廃し、`lib/viewModels/**`と`lib/catalog/**`の両方から`lib/search.ts`のimportを禁止する。
-
-削減見込み: `/robots` -53,958。
-
-- [ ] **Step 2: 各motion経路をCSSベースへ置換する**
-
-対象は上表の全経路。`AnimatePresence`／`motion`／`useReducedMotion`／`useTiltCardEffect`を、CSS transitionと`motion-reduce:` utilityへ置き換える。Task 2で`RobotCard`／`ManufacturerCard`に適用した方式と同じ。
-
-置換順に実施し、各段階でroute固有JSを計測して効果を記録する。
-
-1. `components/ui/AnimatedTooltip.tsx`（`/robots`と`/reports`に効く）
-2. `components/UseCaseCard.tsx`と`lib/useTiltCardEffect.ts`（`/use-cases`に効く）
-3. `components/NewsHeroCarousel.tsx`と`components/uilayouts/carousel.tsx`（`/reports`）
-4. `components/ui/card-hover-effect.tsx`（`/reports`）
-
-carouselはautoplay・swipe・keyboard操作を持つため、置換にあたり`embla-carousel`の既存機能で代替できるかを先に確認する。embla自体はmotionに依存しない。
-
-表示・keyboard操作・aria属性・`prefers-reduced-motion`時の挙動は現行と同一に保つ。
-
-- [ ] **Step 3: 利用者が消えたmoduleを片付ける**
-
-```bash
-rg -n "useTiltCardEffect|AnimatedTooltip" components lib
-rg -n "motion/react" components lib
-```
-
-`lib/useTiltCardEffect.ts`の利用者が0になれば削除する。`motion/react`が`package.json`のdependenciesから外せる状態になったかも確認する（compare画面のDnD等、catalog外の利用者が残る可能性がある）。
-
-- [ ] **Step 4: 削減を実測する**
-
-```bash
-npm run build
-node -e "
-const s=require('./.next/diagnostics/route-bundle-stats.json');
-const fs=require('fs');
-const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
-for(const r of ['/robots','/manufacturers','/use-cases','/reports']){
-  const e=s.find(x=>x.route===r);
-  const own=e.firstLoadChunkPaths.filter(p=>!floor.has(p)).reduce((a,p)=>a+fs.statSync(p).size,0);
-  console.log(r.padEnd(16), String(own).padStart(9), own<=180000?'OK':'OVER');
-}"
-```
-
-想定値: `/robots` 325,787 − 134,910 − 53,958 = 136,919。`/use-cases` 268,207 − 134,910 = 133,297。
-
-- [ ] **Step 5: 回帰確認とcommit**
-
-```bash
-npm run test && npm run build
-npm run test:e2e -- tests/e2e/public-routes.spec.ts
-```
-
-tab切替、tooltip表示、carousel操作（autoplay・swipe・keyboard）、card hover、reduced-motion時の挙動をscreenshotで確認する。
-
-```bash
-git add lib/normalizeSearchText.ts lib/search.ts lib/catalog/search.ts components lib/useTiltCardEffect.ts
-git commit -m "perf: drop motion and search-module weight from catalog routes"
-```
-
----
-### Task 6: Use case / Reports一覧をview model化する
-
-> **前提:** Task 4で`localContentSnapshot`のimport chainは既に切れており、Task 3でgateが揃っている。
-> このtaskはVM化そのものに集中する。placementのserver引数化はTask 4で完了済みのため、
-> 本節のStep 4は「Task 4の結果を前提にReportsBrowserのpropsをVMへ差し替える」だけになる。
->
-> **MiniSearchは維持する**（Global Constraintsの決定を参照）。`create*SearchIndex`が索引する
-> 対象を`lib/search.ts`のsearch documentから`lib/catalog/search.ts`のcatalog searchTextへ
-> 差し替えることで、本文流出を止めつつ日本語検索品質（`fuzzy: 0.2`、`Intl.Segmenter('ja')`）を保つ。
-
-**Files:**
-- Modify: `lib/catalog/search.ts`（Task 2で作成済み。use-case／article用builderを追加する）
-- Modify: `lib/searchIndex.ts`（索引対象をcatalog searchTextへ差し替え）
-- Create: `lib/viewModels/useCases.ts`
-- Create: `lib/viewModels/articles.ts`
-- Create: `tests/unit/view-models/use-cases.test.ts`
-- Create: `tests/unit/view-models/articles.test.ts`
-- Modify: `lib/useCaseFilters.ts`
-- Modify: `lib/articleFilters.ts`
-- Modify: `lib/articlePlacements.ts`
-- Modify: `components/UseCasesBrowser.tsx`
-- Modify: `components/ReportsBrowser.tsx`
-- Modify: `components/UseCaseCard.tsx`
-- Modify: `components/NewsCard.tsx`
-- Modify: `components/NewsFeatureCard.tsx`
-- Modify: `components/NewsHeroCarousel.tsx`
-- Modify: `src/app/use-cases/page.tsx`
-- Modify: `src/app/reports/page.tsx`
-
-**Interfaces:**
-- Produces:
-  - `createUseCaseCatalogItems(...)`
-  - `createArticleCatalogItems(articles)`
-  - `matchesCatalogSearch(searchText, query)`
-
-- [ ] **Step 1: small catalog search contractを書く**
-
-`matchesCatalogSearch`をTask 2で作成済みの`lib/catalog/search.ts`へ追加する。
-
-```ts
-// lib/catalog/search.ts（追記）
-export function matchesCatalogSearch(searchText: string, query: string) {
-  const terms = normalizeSearchText(query).split(/\s+/).filter(Boolean);
+/** 空白区切りの全語がsearchTextに含まれるか。関連度rankingは持たない。 */
+export function matchesCatalogSearch(searchText: string, query: string): boolean {
+  const terms = normalizeSearchText(query).split(' ').filter(Boolean);
   if (terms.length === 0) return true;
   const haystack = normalizeSearchText(searchText);
   return terms.every((term) => haystack.includes(term));
 }
 ```
 
-use-case／article用のsearchText builderも同じfileへ追加する。robots／manufacturersと同様、`lib/search.ts`のsearch documentは再利用せず、対象fieldを直接列挙する。
+- [ ] **Step 4: view modelとfilterを差し替える**
+
+`lib/viewModels/robots.ts`:
 
 ```ts
-export function createUseCaseCatalogSearchText(
-  useCase: UseCase,
-  robotNames: readonly string[],
-) {
-  return joinSearchText([
-    useCase.titleJa ?? useCase.title,
-    useCase.subtitle, // UseCaseCardが subtitle ?? summary を描画するため対象
-    useCase.summary,
-    maturityLabels[useCase.maturityLevel],
-    useCase.primaryIndustry,
-    ...robotNames,
-    ...useCase.industryTags,
-    ...useCase.taskTags,
-  ]);
-}
+// @plan-check-skip: factory 本体を省いた差し替え箇所の抜粋
+import { createRobotCatalogSearchText } from '@/lib/catalog/search';
 
-export function createArticleCatalogSearchText(article: Article) {
-  return joinSearchText([
-    article.titleJa ?? article.title,
-    article.summary, // cardに表示するため対象
-    articleTypeLabels[article.type],
-    ...article.themeTags,
-  ]);
+searchText: createRobotCatalogSearchText(robot, manufacturer, card.facts),
+```
+
+`import { createRobotSearchDocument } from '@/lib/search';`と`createCatalogSearchText`のimportを削除する。
+
+`lib/viewModels/manufacturers.ts`も同様に`createManufacturerCatalogSearchText(manufacturer, manufacturerRobots)`へ差し替え、`createManufacturerSearchDocument`のimportを削除する。
+
+`lib/viewModels/shared.ts`から`createCatalogSearchText`と`matchesCatalogSearchText`、および`import type { SearchDocument } from '@/lib/search';`を削除する。
+
+`lib/robotFilters.ts:6`と`lib/manufacturerFilters.ts:5`の`matchesCatalogSearchText(query, item.filter.searchText)`を`matchesCatalogSearch(item.filter.searchText, query)`へ差し替える。**引数順が逆になる点に注意。**
+
+- [ ] **Step 5: testが通ることを確認し、VMサイズを実測する**
+
+```bash
+npm run test -- tests/unit/view-models
+node --experimental-strip-types -e "
+const d = await import('./lib/data.ts');
+const { createRobotCatalogItems } = await import('./lib/viewModels/robots.ts');
+const { createManufacturerCatalogItems } = await import('./lib/viewModels/manufacturers.ts');
+const robots = createRobotCatalogItems(d.getRobots(), d.getManufacturers(), d.getUseCases());
+const mfrs = createManufacturerCatalogItems(d.getManufacturers(), d.getRobots());
+console.log('robots VM bytes =', Buffer.byteLength(JSON.stringify(robots)));
+console.log('mfrs   VM bytes =', Buffer.byteLength(JSON.stringify(mfrs)));
+" --input-type=module
+```
+
+Expected: testがPASS。出力したバイト数をStep 6の上限設定に使う。
+
+- [ ] **Step 6: payload byte budgetを導入する**
+
+`scripts/check-home-payload.mjs`と同形。**文字数ではなく`Buffer.byteLength`で測る**（日本語はUTF-8で1文字3バイトのため、文字数では実転送量を約3倍過小評価する）。
+
+```js
+// scripts/check-catalog-payload.mjs
+import { getManufacturers, getRobots, getUseCases } from '../lib/data.ts';
+import { createManufacturerCatalogItems } from '../lib/viewModels/manufacturers.ts';
+import { createRobotCatalogItems } from '../lib/viewModels/robots.ts';
+
+// maxBytes は Task 6 Step 5 の実測値 * 1.15。Task 7・8 で use-case / article を追加する。
+const budgets = [
+  {
+    name: 'robots',
+    maxBytes: 0,
+    bytes: () =>
+      Buffer.byteLength(
+        JSON.stringify(createRobotCatalogItems(getRobots(), getManufacturers(), getUseCases())),
+      ),
+  },
+  {
+    name: 'manufacturers',
+    maxBytes: 0,
+    bytes: () =>
+      Buffer.byteLength(
+        JSON.stringify(createManufacturerCatalogItems(getManufacturers(), getRobots())),
+      ),
+  },
+];
+
+let failed = false;
+for (const budget of budgets) {
+  const actual = budget.bytes();
+  console.log(`[catalog-payload] ${budget.name}: ${actual}/${budget.maxBytes}`);
+  if (actual > budget.maxBytes) failed = true;
+}
+if (failed) process.exitCode = 1;
+```
+
+`maxBytes: 0`はplaceholderではなく、**Step 5で実測した値を入れてからcommitする**。実測値と上限をcommit messageへ残す。
+
+`package.json`へ配線する。
+
+```json
+{
+  "check:catalog-payload": "node --experimental-strip-types scripts/check-catalog-payload.mjs"
 }
 ```
 
-対象fieldはGlobal Constraintsの「Catalog検索範囲」表に従う。use-caseは`subtitle`／`summary`（`UseCaseCard`が`subtitle ?? summary`を描画）まで、reportは`summary`までを含め、`overview`／`whyItMatters`／`whyHardToday`／`environmentRequirements`／`japanDeploymentConditions`／`capabilityNotes`／`keyTakeaways`／`body`／`manufacturerGuideContent`／`sources`は含めない。`UseCase`に`description`fieldは存在しない。
+`check` pipelineの`test`の直後へ挿入する（buildは不要）。
 
-VM testで日本語、英語、メーカー名、複数語queryが現行代表recordへhitすることを固定する。MiniSearchは維持するため、`fuzzy: 0.2`のタイポ許容と`Intl.Segmenter('ja')`の語境界分割は現行どおり働く。testはcatalog searchTextを索引した状態で代表queryがhitすることを確認する。
+- [ ] **Step 7: import境界ruleを追加する**
 
-- [ ] **Step 2: VM typesを定義する**
+今回の事故の根本原因は「汎用search documentの再利用」である。機械的に止める。`scripts/check-data-import-boundaries.mjs`へ、`lib/viewModels/**`と`lib/catalog/**`が`lib/search.ts`／`lib/searchIndex.ts`を値importしないruleを足す。
+
+**免除は設けない。** `lib/catalog/search.ts`は`normalizeSearchText`を`lib/normalizeSearchText.ts`から取るため免除は不要である（Task 5）。
+
+`components/**`と`lib/**`全体への拡大は、`lib/useCaseFilters.ts`と`lib/searchIndex.ts`が残っている間はできない。**Task 8 Step 5で拡大する。**
+
+- [ ] **Step 8: 回帰確認とcommit**
+
+```bash
+npm run typecheck && npm run lint && npm run test
+npm run check:catalog-payload && npm run check:data-boundaries
+npm run build && npm run test:e2e -- tests/e2e/catalog-url-state.spec.ts
+```
+
+手動: `/robots`で「Unitree」「G1」「物流」「二足」「限定販売中」が現行同様にhitすること。**逆に、紹介文にしか無い語（例「バッテリー」）がhitしなくなることを確認し、意図した変更として記録する。**
+
+`lib/uiText.ts`のplaceholder（robots「ロボット名・メーカー・用途キーワードで検索」、manufacturers「メーカー名・地域・取扱ロボットで検索」）は本決定後の挙動と整合するため変更しない。0件時の空状態文言を確認する。
+
+```bash
+git add lib/catalog/search.ts lib/viewModels lib/robotFilters.ts lib/manufacturerFilters.ts \
+  scripts/check-catalog-payload.mjs scripts/check-data-import-boundaries.mjs \
+  tests/unit/view-models package.json
+git commit -m "refactor: build catalog search text from displayed fields only"
+```
+
+---
+
+### Task 7: Use case一覧をview model化する
+
+**Goal:** `/use-cases`へraw `UseCase[]`を渡すのをやめ、view modelだけを渡す。
+
+**MiniSearchは維持する。** 削減効果は実測18,690バイトにすぎず、`/reports`の生data 968,993やmotion 134,910と2桁違う。日本語検索品質（`fuzzy: 0.2`のタイポ許容、`Intl.Segmenter('ja')`の語境界分割）を落とす対価に見合わない。**`createUseCaseSearchIndex`が索引する文字列だけをcatalog searchTextへ差し替える。index構築のoption（`prefix`／`fuzzy`／`combineWith`／tokenizer）は一切変更しない。**
+
+**Files:**
+- Create: `lib/viewModels/useCases.ts`
+- Create: `tests/unit/view-models/use-cases.test.ts`
+- Modify: `lib/catalog/search.ts`
+- Modify: `lib/searchIndex.ts`
+- Modify: `lib/useCaseFilters.ts`
+- Modify: `components/UseCasesBrowser.tsx`
+- Modify: `components/UseCaseCard.tsx`
+- Modify: `src/app/use-cases/page.tsx`
+- Modify: `scripts/check-catalog-payload.mjs`
+
+**Interfaces:**
+- Produces:
+  - `createUseCaseCatalogItems(useCases, robots): UseCaseCatalogItem[]`
+  - `createUseCaseCatalogSearchText(useCase, robotNames): string`
+
+- [ ] **Step 1: VM型とsearchText builderを定義する**
+
+`UseCase`に`description` fieldは**存在しない**。実fieldは`title`／`titleJa?`／`subtitle?`／`summary`（`BaseRecord`由来）／`overview`／`whyItMatters`／`whyHardToday`／`environmentRequirements`／`japanDeploymentConditions`／`capabilityNotes`／`maturityLevel`／`primaryIndustry`／`industryTags`／`taskTags`／`candidateRobots`／`atAGlance`／`requiredCapabilities`／`buyerReadiness`／`environment`。
+
+`UseCaseCard.tsx:68`が描画するのは`subtitle ?? summary`である。したがって**両方をsearchTextに含める**。maturityのlabel mapは`maturityLabels`（`lib/labels.ts:223`）、fieldは`maturityLevel`である。
 
 ```ts
+// lib/viewModels/useCases.ts
+import type { CatalogTag } from '@/lib/viewModels/shared';
+
 export interface UseCaseCatalogItem {
   id: string;
   slug: string;
   href: string;
   title: string;
-  description: string;
-  maturity: CatalogTag & { value: string };
+  /** cardは subtitle ?? summary を描画する。VMでは解決済みの1本にする。 */
+  lead: string;
+  maturity: CatalogTag;
   evidence?: CatalogTag;
   robotNames: string[];
   filter: {
@@ -1234,6 +1493,173 @@ export interface UseCaseCatalogItem {
 ```
 
 ```ts
+// lib/catalog/search.ts（追記）
+// @plan-check-skip: Task 6 で作る @/lib/catalog/search の joinSearchText を参照する。Task 7 でこのmarkerを外しbaselineを減らす
+import type { UseCase } from '@/data/types';
+import { joinSearchText } from '@/lib/catalog/search';
+import { maturityLabels } from '@/lib/labels';
+
+export function createUseCaseCatalogSearchText(
+  useCase: UseCase,
+  robotNames: readonly string[],
+): string {
+  return joinSearchText([
+    useCase.titleJa,
+    useCase.title,
+    useCase.subtitle,
+    useCase.summary,
+    maturityLabels[useCase.maturityLevel],
+    useCase.primaryIndustry,
+    ...robotNames,
+    ...useCase.industryTags,
+    ...useCase.taskTags,
+  ]);
+}
+```
+
+`overview`／`whyItMatters`／`whyHardToday`／`environmentRequirements`／`japanDeploymentConditions`／`capabilityNotes`／`sources`は含めない。
+
+- [ ] **Step 2: 失敗するtestを書く**
+
+```ts
+// tests/unit/view-models/use-cases.test.ts
+// @plan-check-skip: Task 7 で作る @/lib/viewModels/useCases を参照する。Task 7 でこのmarkerを外しbaselineを減らす
+import { describe, expect, it } from 'vitest';
+import { getRobots, getUseCases } from '@/lib/data';
+import { normalizeSearchText } from '@/lib/normalizeSearchText';
+import { createUseCaseCatalogItems } from '@/lib/viewModels/useCases';
+
+describe('use case catalog view models', () => {
+  const items = createUseCaseCatalogItems(getUseCases(), getRobots());
+
+  it('excludes editorial fields', () => {
+    const json = JSON.stringify(items);
+    expect(json).not.toContain('"sources"');
+    expect(json).not.toContain('"candidateRobots"');
+    expect(json).not.toContain('"capabilityNotes"');
+  });
+
+  it('excludes body text values, not just their keys', () => {
+    const haystack = normalizeSearchText(items.map((item) => item.filter.searchText).join(' '));
+
+    for (const useCase of getUseCases()) {
+      const bodyValues: string[] = [
+        useCase.overview,
+        useCase.whyItMatters,
+        useCase.whyHardToday,
+        useCase.environmentRequirements,
+        useCase.japanDeploymentConditions,
+        ...Object.values(useCase.capabilityNotes),
+      ];
+
+      for (const value of bodyValues) {
+        if (typeof value !== 'string' || value.length < 12) continue;
+        expect(haystack).not.toContain(normalizeSearchText(value));
+      }
+    }
+  });
+});
+```
+
+- [ ] **Step 3: factoryを実装する**
+
+`UseCasesBrowser`／`UseCaseCard`が現在client側で解決しているもの（maturity label/tone、evidence summary、robot names、`subtitle ?? summary`）をそのままserver側へ移し、`UseCaseCatalogItem`へ詰める。既存のlabel・tone・evidence helperを再利用する。
+
+- [ ] **Step 4: filterとMiniSearchをVM入力へ変える**
+
+`lib/useCaseFilters.ts`から`import { createUseCaseSearchDocument, matchesSearchDocument } from '@/lib/search';`を削除する。filterは`UseCaseCatalogItem`を受け、`item.filter.*`だけを見る。テキスト絞り込みは現行どおりMiniSearchの結果slug集合（`matchedSlugs`）で行う。
+
+`lib/searchIndex.ts`の`createUseCaseSearchIndex`のsignatureを`readonly UseCaseCatalogItem[]`へ変え、索引textを差し替える。
+
+```ts
+// lib/searchIndex.ts
+// @plan-check-skip: index 生成関数の内側だけの抜粋
+index.addAll(
+  useCases.map((useCase) => ({
+    id: useCase.slug,
+    // 索引対象は catalog searchText（本文を含まない）。MiniSearch の option は変更しない。
+    text: useCase.filter.searchText,
+  })),
+);
+```
+
+`SEARCH_OPTIONS`（`prefix: true`、`fuzzy: 0.2`、`combineWith: 'AND'`）と`tokenizeJa`は**変更しない**。
+
+- [ ] **Step 5: componentとpageをVMへ変える**
+
+`UseCasesBrowser`は`items: UseCaseCatalogItem[]`を受ける。`UseCaseCard`は`item: UseCaseCatalogItem`だけを受け、label/tone解決を呼ばない。`src/app/use-cases/page.tsx`で`createUseCaseCatalogItems(getUseCases(), getRobots())`を生成して渡す。`src/app/use-cases/page.tsx:10`の`createUseCaseSearchIndex` importは削除する。
+
+- [ ] **Step 6: payload budgetへuse-caseを足す**
+
+`scripts/check-catalog-payload.mjs`の`budgets`へ`useCases`を追加し、上限は実測値 + 15%とする。
+
+- [ ] **Step 7: 実測と回帰確認**
+
+```bash
+npm run test -- tests/unit/view-models/use-cases.test.ts
+npm run check:catalog-payload
+npm run typecheck && npm run lint && npm run build && npm run check:bundle-content
+rg -n "from '@/lib/search'" lib components
+node -e "
+const s=require('./.next/diagnostics/route-bundle-stats.json');
+const fs=require('fs');
+const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
+const e=s.find(x=>x.route==='/use-cases');
+console.log('/use-cases route-specific =', e.firstLoadChunkPaths.filter(p=>!floor.has(p)).reduce((a,p)=>a+fs.statSync(p).size,0));
+"
+npm run test:e2e -- tests/e2e/public-routes.spec.ts tests/e2e/catalog-url-state.spec.ts
+```
+
+**完了条件:** `/use-cases`のroute固有JSが`lib/search.ts`分だけ減る。`rg`の残りが`lib/searchIndex.ts`（Task 8で解消）だけになる。
+
+手動: `/use-cases`の検索で日本語・英語・ロボット名・複数語queryが現行同様にhitし、**タイポ許容（`fuzzy: 0.2`）が維持されている**こと（例「ロボツト」で「ロボット」がhitする）。tab、pagination、空状態を確認する。
+
+- [ ] **Step 8: commit**
+
+```bash
+git add lib/viewModels/useCases.ts lib/catalog/search.ts lib/searchIndex.ts lib/useCaseFilters.ts \
+  components/UseCasesBrowser.tsx components/UseCaseCard.tsx src/app/use-cases/page.tsx \
+  scripts/check-catalog-payload.mjs tests/unit/view-models/use-cases.test.ts
+git commit -m "refactor: send catalog view models to the use case client"
+```
+
+---
+
+### Task 8: Reports一覧をview model化する
+
+**Goal:** `/reports`へraw `Article[]`を渡すのをやめ、view modelだけを渡す。Task 1で意図的に残した`Article[]` propsを解消する。
+
+**MiniSearchは維持する**（Task 7と同じ方針）。
+
+**Files:**
+- Create: `lib/viewModels/articles.ts`
+- Create: `tests/unit/view-models/articles.test.ts`
+- Modify: `lib/catalog/search.ts`
+- Modify: `lib/searchIndex.ts`
+- Modify: `lib/articleFilters.ts`
+- Modify: `components/ReportsBrowser.tsx`
+- Modify: `components/NewsCard.tsx` / `NewsFeatureCard.tsx` / `NewsHeroCarousel.tsx`
+- Modify: `src/app/reports/page.tsx`
+- Modify: `lib/uiText.ts`
+- Modify: `scripts/check-catalog-payload.mjs`
+- Modify: `scripts/check-data-import-boundaries.mjs`
+
+**Interfaces:**
+- Produces:
+  - `createArticleCatalogItems(articles): ArticleCatalogItem[]`
+  - `createArticleCatalogSearchText(article): string`
+
+- [ ] **Step 1: VM型とsearchText builderを定義する**
+
+`Article = StandardArticle | ManufacturerGuideArticle`。両方が`ArticleCommon extends BaseRecord`を継承する。本文は`whyItMatters`／`keyTakeaways`（`ArticleCommon`）、`body`（`StandardArticle`のみ）、`manufacturerGuideContent`（`ManufacturerGuideArticle`のみ）である。**`createReportSearchDocument`が実際に索引していた本文は`whyItMatters`と`keyTakeaways`であり、`body`／`manufacturerGuideContent`は元から入っていない。**
+
+`summary`を全件に持たせる理由は「cardに表示するから」では**ない**。`NewsCard`は`summary`を描画せず、描画するのは`NewsFeatureCard.tsx:54`と`NewsHeroCarousel.tsx:131`、つまりhero/featureに選ばれた数件だけである。それでも全件に持たせるのは、**placementがserver側で決まりVMの形をplacement依存にしたくないため、かつ記事数が少なく全件保持のコストが許容範囲だから**。この理由付けを誤ると、次に同じ判断をする人が誤って一般化する。
+
+```ts
+// lib/viewModels/articles.ts
+import type { ArticleShelf } from '@/lib/articleShelves';
+import type { CatalogImage, CatalogTag } from '@/lib/viewModels/shared';
+
 export interface ArticleCatalogItem {
   id: string;
   slug: string;
@@ -1241,8 +1667,7 @@ export interface ArticleCatalogItem {
   title: string;
   summary: string;
   publishedAt: string;
-  label: string;
-  typeTone: VisualTone;
+  type: CatalogTag;
   shelf: ArticleShelf;
   themeTags: string[];
   heroImage?: CatalogImage;
@@ -1250,86 +1675,158 @@ export interface ArticleCatalogItem {
 }
 ```
 
-- [ ] **Step 3: factoriesとforbidden field testsを実装する**
+```ts
+// lib/catalog/search.ts（追記）
+// @plan-check-skip: Task 6 で作る @/lib/catalog/search の joinSearchText を参照する。Task 8 でこのmarkerを外しbaselineを減らす
+import type { Article } from '@/data/types';
+import { joinSearchText } from '@/lib/catalog/search';
+import { articleTypeLabels } from '@/lib/labels';
 
-Use case JSONに`candidateRobots`、`sources`、`capabilityNotes`がないことをassertする。Article JSONに`body`、`manufacturerGuideContent`、`sources`、`relatedRobotIds`がないことをassertする。
+export function createArticleCatalogSearchText(article: Article): string {
+  return joinSearchText([
+    article.titleJa,
+    article.title,
+    article.summary,
+    articleTypeLabels[article.type],
+    ...(article.themeTags ?? []),
+  ]);
+}
+```
 
-Factoryは既存のlabel、tone、media、evidence helperをserverで解決する。`getDisplayableAsset()`の戻り値は`{ src, alt }`へ写像し、rights/source metadataを含めない。filterの`searchText`はStep 1の`createUseCaseCatalogSearchText()`／`createArticleCatalogSearchText()`で生成する（`createUseCaseSearchDocument`／`createArticleSearchDocument`は本文を含むため使わない）。
+`whyItMatters`／`keyTakeaways`／`body`／`manufacturerGuideContent`／`sources`／`relatedRobotIds`は含めない。
 
-Task 2と同じく、両testに**正規化を揃えた**本文値assertionを置く（両辺`normalizeSearchText`、対象はJSON文字列ではなくsearch text自体）。
+- [ ] **Step 2: 失敗するtestを書く**
 
-- use-case: `overview`／`whyItMatters`／`whyHardToday`／`environmentRequirements`／`japanDeploymentConditions`／`capabilityNotes`
-- article: `whyItMatters`／`keyTakeaways`／`body`／`manufacturerGuideContent`
+```ts
+// tests/unit/view-models/articles.test.ts
+// @plan-check-skip: Task 8 で作る @/lib/viewModels/articles を参照する。Task 8 でこのmarkerを外しbaselineを減らす
+import { describe, expect, it } from 'vitest';
+import { getArticles } from '@/lib/data';
+import { normalizeSearchText } from '@/lib/normalizeSearchText';
+import { createArticleCatalogItems } from '@/lib/viewModels/articles';
 
-`whyItMatters`と`keyTakeaways`が`createReportSearchDocument`の実際の本文fieldであり、初版planが挙げていた`body`／`manufacturerGuideContent`はそこに入っていない。両方をassertion対象に含める。
+describe('article catalog view models', () => {
+  const items = createArticleCatalogItems(getArticles());
 
-- [ ] **Step 4: placement結果をVMへ差し替える**
+  it('excludes editorial fields', () => {
+    const json = JSON.stringify(items);
+    expect(json).not.toContain('"sources"');
+    expect(json).not.toContain('"body"');
+    expect(json).not.toContain('"manufacturerGuideContent"');
+    expect(json).not.toContain('"relatedRobotIds"');
+  });
 
-`lib/articlePlacements.ts`のserver引数化と`localContentSnapshot` importの削除は**Task 4で完了済み**である。このtaskで再度行わない。
+  it('excludes body text values, not just their keys', () => {
+    const haystack = normalizeSearchText(items.map((item) => item.searchText).join(' '));
 
-Task 4時点では`ReportsBrowser`は生の`Article[]`（`reports`／`heroReports`／`featureReports`）を受け取っている。ここではその3つのprop名を維持したまま、型を`ArticleCatalogItem[]`へ差し替える。prop名がTask 4で確定しているため、このstepのdiffは型の差し替えだけになる。
+    for (const article of getArticles()) {
+      const bodyValues = [article.whyItMatters, ...(article.keyTakeaways ?? [])];
+      for (const value of bodyValues) {
+        if (!value || value.length < 12) continue;
+        expect(haystack).not.toContain(normalizeSearchText(value));
+      }
+    }
+  });
+});
+```
 
-`src/app/reports/page.tsx`はTask 4で既に`localContentSnapshot.articlePlacements`とlimitsを解決している。その結果を`createArticleCatalogItems()`へ通してから渡す形に変える。
+- [ ] **Step 3: factoryを実装し、hero/feature/gridをVMへ変える**
 
-- [ ] **Step 5: cards/browserをVMへ変更する**
+`getDisplayableAsset()`の戻り値は`{ src, alt }`へ写像し、rights/source metadataを含めない。
 
-UseCasesBrowserは`UseCaseCatalogItem[]`、ReportsBrowserは`ArticleCatalogItem[]`を受ける。
+`src/app/reports/page.tsx`はTask 1で作ったplacement解決の**後**にVM化する。`getArticleIndexPlacementReports`は`{ id, publishedAt }`を要求するgenericなので、VMをそのまま渡せる。
 
-**MiniSearchは維持する。** `lib/searchIndex.ts`の`createUseCaseSearchIndex`／`createArticleSearchIndex`は残し、索引する文字列だけを差し替える。現在は`lib/search.ts`の`create*SearchDocument()`（本文を含む）を索引しているため、これを`lib/catalog/search.ts`のcatalog searchTextへ変える。index構築のoption（`prefix: true`、`fuzzy: 0.2`、`combineWith: 'AND'`、`Intl.Segmenter('ja')`のtokenizer）は一切変更しない。
+```tsx
+// src/app/reports/page.tsx
+// @plan-check-skip: 既存importと関数外の文脈を省いた抜粋
+const items = createArticleCatalogItems(getArticles());
+const { heroReports, featureReports } = getArticleIndexPlacementReports({
+  articles: items,
+  placements: localContentSnapshot.articlePlacements,
+  limits: localContentSnapshot.articleIndexPlacementLimits,
+});
 
-これにより本文流出は止まり、タイポ許容と日本語語境界分割は保たれる。削減効果が18,690バイトにすぎないMiniSearch本体の除去は、日本語検索品質を落とす対価に見合わないため行わない（Global Constraintsの「受け入れるトレードオフ」2を参照）。
+return (
+  <ReportsBrowser
+    reports={items}
+    heroReports={heroReports}
+    featureReports={featureReports}
+    initialSearch={toInitialSearch(params)}
+  />
+);
+```
 
-`lib/search.ts`の`create*SearchDocument()`の残存利用者を`rg`で洗い出す。catalogが使わなくなって利用者が消えるexportは、このtaskで削除するか後続phaseの削除対象として文書化するかを決める（放置すると検索定義が二重に残り、片方だけメンテされる事故につながる）。
+`ReportsBrowser`のprops型を`ArticleCatalogItem[]`へ変える。`NewsCard`／`NewsFeatureCard`／`NewsHeroCarousel`も`ArticleCatalogItem`を受ける。
 
-併せてreportsの検索placeholder（`lib/uiText.ts`の「タイトル・トピック・キーワードで検索」）が本文検索を想起させないか再検討し、0件時の空状態文言も確認する。検索範囲が本文を含まなくなったことと文言が整合するかを見る。
+- [ ] **Step 4: MiniSearchの索引対象を差し替える**
 
-UseCaseCardとNewsHeroCarouselのmotion除去は**Task 5で完了済み**のため、このtaskでは扱わない。ここではpropsをVMへ差し替えることに集中する。
+Task 7と同形。`createArticleSearchIndex`のsignatureを`readonly ArticleCatalogItem[]`へ変え、`text: article.searchText`とする。option（`prefix`／`fuzzy`／`combineWith`／`tokenizeJa`）は変更しない。
 
-- [ ] **Step 6: testsとE2Eを実行する**
+`lib/searchIndex.ts`から`import { createReportSearchDocument, createUseCaseSearchDocument } from '@/lib/search';`を削除する。**この時点で`lib/search.ts`のclient側到達経路が0になる。**
+
+- [ ] **Step 5: import境界ruleを全面適用する**
+
+`scripts/check-data-import-boundaries.mjs`のruleを、`components/**`と`lib/**`（`lib/search.ts`自身を除く）から`lib/search.ts`を値importしないところまで広げる。
 
 ```bash
-npm run test -- tests/unit/view-models/use-cases.test.ts tests/unit/view-models/articles.test.ts
-npm run build
+rg -n "from '@/lib/search'|from './search'" components lib src tests
+```
+
+Expected: 0件。
+
+- [ ] **Step 6: payload budgetへreportsを足し、実測する**
+
+```bash
+npm run test -- tests/unit/view-models
+npm run check:catalog-payload && npm run check:data-boundaries
+npm run typecheck && npm run lint && npm run build && npm run check:bundle-content
+node -e "
+const s=require('./.next/diagnostics/route-bundle-stats.json');
+const fs=require('fs');
+const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
+for(const r of ['/robots','/manufacturers','/use-cases','/reports']){
+  const e=s.find(x=>x.route===r);
+  const own=e.firstLoadChunkPaths.filter(p=>!floor.has(p)).reduce((a,p)=>a+fs.statSync(p).size,0);
+  console.log(r.padEnd(16), String(own).padStart(9), own<=180000?'OK':'OVER');
+}"
+```
+
+**完了条件:** 4 routeすべてがroute固有JS ≤ 180,000。超えるrouteがある場合は、そのrouteのroute固有chunkを1本ずつsize順に出して原因moduleを特定し、**上限を緩める前に原因を記録する**。
+
+- [ ] **Step 7: 回帰確認**
+
+```bash
 npm run test:e2e -- tests/e2e/public-routes.spec.ts tests/e2e/catalog-url-state.spec.ts
 ```
 
-Expected: Reports/use-case search、tabs、pagination、hero placementが維持される。
+手動: `/reports`のhero carousel、feature card、shelf tab、pagination、検索。**hero/featureに出る記事のidと順序がTask 1 Step 6で記録した値と一致すること。** タイポ許容が維持されていること。
 
-- [ ] **Step 7: client graphを確認する**
-
-`MiniSearch`と`create*SearchIndex`は**維持する**ため検索対象に含めない（改訂前は0件を要求していたが、MiniSearch廃止の撤回と矛盾していた）。確認するのは生dataと本文の流出、およびmotionの残存である。
-
-```bash
-# 生Article/UseCase配列がclient propsへ渡っていないこと
-rg -n "(useCases|reports): (UseCase|Article)\\[\\]" components
-# 本文を含むsearch documentがclient graphへ入っていないこと
-rg -n "from '@/lib/search'" components lib/viewModels lib/catalog
-# Task 5で除去したmotionが戻っていないこと
-rg -n "motion/react|useTiltCardEffect" components/UseCaseCard.tsx components/NewsHeroCarousel.tsx
-# MiniSearchが索引するのがcatalog searchTextであること
-rg -n "createUseCaseSearchIndex|createArticleSearchIndex" lib/searchIndex.ts
-```
-
-Expected: 1〜3番目は0件。4番目は`lib/catalog/search.ts`のsearchTextを受ける形になっていること。
+`lib/uiText.ts`のreports placeholder「タイトル・トピック・キーワードで検索」は本文検索を想起させるため、この時点で文言を再検討する。0件時の空状態文言も併せて確認する。
 
 - [ ] **Step 8: commit**
 
 ```bash
-git add lib/catalog/search.ts lib/viewModels lib/useCaseFilters.ts lib/articleFilters.ts lib/articlePlacements.ts components/UseCasesBrowser.tsx components/ReportsBrowser.tsx components/UseCaseCard.tsx components/NewsCard.tsx components/NewsFeatureCard.tsx components/NewsHeroCarousel.tsx src/app/use-cases/page.tsx src/app/reports/page.tsx tests/unit/view-models
-git commit -m "refactor: send catalog view models to reports and use cases"
+git add lib/viewModels/articles.ts lib/catalog/search.ts lib/searchIndex.ts lib/articleFilters.ts \
+  components/ReportsBrowser.tsx components/NewsCard.tsx components/NewsFeatureCard.tsx \
+  components/NewsHeroCarousel.tsx src/app/reports/page.tsx lib/uiText.ts \
+  scripts/check-catalog-payload.mjs scripts/check-data-import-boundaries.mjs \
+  tests/unit/view-models/articles.test.ts
+git commit -m "refactor: send catalog view models to the reports client"
 ```
 
 ---
 
-### Task 7: Compareをview modelと責務別componentへ分割する
+### Task 9: Compareをview modelと責務別componentへ分割する
+
+**Goal:** `/compare`へraw `Robot[]`を渡すのをやめる。`CompareClient`を責務別に分割する。
 
 **Files:**
 - Create: `lib/viewModels/compare.ts`
-- Create: `lib/useMediaQuery.ts`
 - Create: `components/compare/CompareMenu.tsx`
 - Create: `components/compare/CompareSheet.tsx`
 - Create: `components/compare/CompareViewToggle.tsx`
 - Create: `tests/unit/view-models/compare.test.ts`
+- Create: `tests/e2e/compare.spec.ts`（既存が無い場合）
 - Modify: `components/CompareClient.tsx`
 - Modify: `components/ComparisonRobotPanel.tsx`
 - Modify: `components/FavoriteCard.tsx`
@@ -1337,17 +1834,16 @@ git commit -m "refactor: send catalog view models to reports and use cases"
 - Modify: `src/app/compare/page.tsx`
 
 **Interfaces:**
-- Produces: `CompareRobotViewModel[]`
-- `CompareClient`: URL/favorite state coordinator
-- `CompareMenu`: search/selection
-- `CompareSheet`: order/DnD/visual-spec rendering
+- Produces: `createCompareRobotViewModels(robots, manufacturers): CompareRobotViewModel[]`
 
 - [ ] **Step 1: Compare VMを定義する**
+
+比較表は`comparison.strengths`等を**実際に描画する**ため、compare VMではこれを含める。Global Constraint 4は「一覧の`searchText`へ本文を連結しない」であり、描画する値をVMへ載せることは対象外である。
 
 ```ts
 // lib/viewModels/compare.ts
 import type { ComparisonSpecGroup } from '@/lib/robotDisplay';
-import type { CatalogImage, CatalogLogo } from './shared';
+import type { CatalogImage, CatalogLogo } from '@/lib/viewModels/shared';
 
 export interface CompareRobotViewModel {
   id: string;
@@ -1355,6 +1851,7 @@ export interface CompareRobotViewModel {
   name: string;
   manufacturer: CatalogLogo & { id: string; name: string };
   image?: CatalogImage;
+  /** menu検索用。lib/catalog/search.ts の createRobotCatalogSearchText と同じ範囲。 */
   searchText: string;
   specGroups: ComparisonSpecGroup[];
   comparison: {
@@ -1368,96 +1865,57 @@ export interface CompareRobotViewModel {
 
 `createCompareRobotViewModels(robots, manufacturers)`は`getComparisonSpecGroups`、`getRobotPrimaryImage`、manufacturer lookupをserverで実行する。
 
-- [ ] **Step 2: forbidden field testを書く**
+- [ ] **Step 2: 禁止field testを書く**
 
 ```ts
-it('does not serialize raw evidence or pricing records', () => {
-  const json = JSON.stringify(createCompareRobotViewModels(getRobots(), getManufacturers()));
-  expect(json).not.toContain('"sources"');
-  expect(json).not.toContain('"fieldEvidence"');
-  expect(json).not.toContain('"priceOffers"');
-  expect(json).not.toContain('"usageExampleSourceUrls"');
+// tests/unit/view-models/compare.test.ts
+// @plan-check-skip: Task 9 で作る @/lib/viewModels/compare を参照する。Task 9 でこのmarkerを外しbaselineを減らす
+import { describe, expect, it } from 'vitest';
+import { getManufacturers, getRobots } from '@/lib/data';
+import { createCompareRobotViewModels } from '@/lib/viewModels/compare';
+
+describe('compare view models', () => {
+  it('does not serialize raw evidence or pricing records', () => {
+    const json = JSON.stringify(createCompareRobotViewModels(getRobots(), getManufacturers()));
+    expect(json).not.toContain('"sources"');
+    expect(json).not.toContain('"fieldEvidence"');
+    expect(json).not.toContain('"priceOffers"');
+    expect(json).not.toContain('"usageExampleSourceUrls"');
+  });
 });
 ```
 
-- [ ] **Step 3: child componentsをVM入力へ変更する**
+- [ ] **Step 3: child componentをVM入力へ変える**
 
-`ComparisonRobotPanel`は`robot: CompareRobotViewModel`を受け、次を置換する。
+`ComparisonRobotPanel`は`robot: CompareRobotViewModel`を受け、image → `robot.image`、link → `robot.href`、specs → `robot.specGroups`、manufacturer → `robot.manufacturer`、drawer lists → `robot.comparison`へ置換する。`FavoriteCard`と`MenuRobotButton`もVMだけを受ける。
 
-- image: `robot.image`
-- link: `robot.href`
-- specs: `robot.specGroups`
-- manufacturer: `robot.manufacturer`
-- drawer lists: `robot.comparison`
+`ComparisonRobotPanel`のpointer判定はTask 4で作った`useMediaQuery`を使う。
 
-`FavoriteCard`と`MenuRobotButton`もVMだけを受ける。
+- [ ] **Step 4: coordinatorを4責務へ分ける**
 
-- [ ] **Step 4: coordinatorを3責務へ分ける**
+`CompareClient`に残すstate: `searchParams`から解決したselected IDs/view、favorites、`menuQuery`、child callbackでURLを更新する関数。
 
-`CompareClient`へ残すstate:
+- `CompareMenu`へ: manufacturer grouping、menu search、flyout/open state、mobile manufacturer select
+- `CompareSheet`へ: ordered IDs、DnD sensors/overlay、selected cards、visual/specs layout
+- `CompareViewToggle`へ: visual/specs button、toast、`onChange(view)`
 
-- `searchParams`から解決したselected IDs/view
-- favorites
-- `menuQuery`
-- child callbackでURLを更新する関数
+各fileを250行未満にする。共有stateは新しいcontextへ隠さず、typed propsで渡す。**DnD sensorの設定値は変えない**（責務移動のみ）。
 
-`CompareMenu`へ移す:
-
-- manufacturer grouping
-- menu search
-- flyout/open state
-- mobile manufacturer select
-
-`CompareSheet`へ移す:
-
-- ordered IDs
-- DnD sensors/overlay
-- selected cards
-- visual/specs layout
-
-`CompareViewToggle`へ移す:
-
-- visual/specs button
-- toast
-- `onChange(view)`
-
-各fileを250行未満にする。共有stateは新しいcontextへ隠さず、typed propsで渡す。
-
-- [ ] **Step 5: media query hookを追加する**
-
-```ts
-// lib/useMediaQuery.ts
-'use client';
-
-import { useEffect, useState } from 'react';
-
-export function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(false);
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    const update = () => setMatches(media.matches);
-    update();
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
-  }, [query]);
-  return matches;
-}
-```
-
-ComparisonRobotPanelのpointer判定とNewsHeroCarouselのreduced motionにこのhookを使う。
-
-- [ ] **Step 6: pageからVMだけを渡す**
+- [ ] **Step 5: pageからVMだけを渡す**
 
 ```tsx
+// src/app/compare/page.tsx
+// @plan-check-skip: 既存importと関数外の文脈を省いた抜粋
 const items = createCompareRobotViewModels(getRobots(), getManufacturers());
 return <CompareClient items={items} initialSearch={toInitialSearch({ compare, view })} />;
 ```
 
-- [ ] **Step 7: testsとcompare E2Eを実行する**
-
-既存compare操作を次で固定する。
+- [ ] **Step 6: E2Eを書いて検証する**
 
 ```ts
+// tests/e2e/compare.spec.ts
+import { expect, test } from '@playwright/test';
+
 test('compare selection, view and order survive URL navigation', async ({ page }) => {
   await page.goto('/compare');
   await page.getByRole('button', { name: /Unitree G1/ }).click();
@@ -1469,85 +1927,66 @@ test('compare selection, view and order survive URL navigation', async ({ page }
 });
 ```
 
-Run:
-
 ```bash
 npm run test -- tests/unit/view-models/compare.test.ts
-npm run build
+npm run typecheck && npm run lint && npm run build && npm run check:bundle-content
 npm run test:e2e -- tests/e2e/compare.spec.ts
 ```
 
-- [ ] **Step 8: commit**
+手動: 機種選択、DnDによる並べ替え、visual/specs切替、favorite、mobile幅でのmenu操作。
+
+- [ ] **Step 7: commit**
 
 ```bash
-git add lib/viewModels/compare.ts lib/useMediaQuery.ts components/CompareClient.tsx components/ComparisonRobotPanel.tsx components/FavoriteCard.tsx components/compare src/app/compare/page.tsx tests/unit/view-models/compare.test.ts tests/e2e/compare.spec.ts
+git add lib/viewModels/compare.ts components/CompareClient.tsx components/ComparisonRobotPanel.tsx \
+  components/FavoriteCard.tsx components/compare src/app/compare/page.tsx \
+  tests/unit/view-models/compare.test.ts tests/e2e/compare.spec.ts
 git commit -m "refactor: split compare client around display view models"
 ```
 
 ---
 
-### Task 8: raw propsとclient budgetをhard gate化する
+### Task 10: route固有JSをhard gate化し、後片付けする
+
+**Goal:** 実測値から上限を確定してgateにし、利用者が消えたmoduleを削除する。
 
 **Files:**
 - Create: `scripts/check-client-budgets.mjs`
-- Create: `tests/unit/view-models/catalog-serialization.test.ts`
 - Modify: `package.json`
 - Modify: `docs/reference/refactor-baseline-2026-07-26.md`
+- Modify: `docs/README.md`
+- Modify: `docs/plans/pre-migration-refactor-implementation-index-v1.md`
+- Delete: `lib/search.ts`
 
-**Interfaces:**
-- Consumes: `.next/diagnostics/route-bundle-stats.json`
-- Produces: `npm run check:client-budgets`
+- [ ] **Step 1: route固有JSを実測する**
 
-- [ ] **Step 1: aggregate serialization testを書く**
-
-```ts
-const forbiddenKeys = [
-  '"sources"',
-  '"fieldEvidence"',
-  '"body"',
-  '"manufacturerGuideContent"',
-  '"usageExampleSourceUrls"',
-];
-
-for (const [name, value] of Object.entries(catalogViewModelFixtures)) {
-  it(`${name} excludes raw-only fields`, () => {
-    const json = JSON.stringify(value);
-    forbiddenKeys.forEach((key) => expect(json).not.toContain(key));
-  });
-}
+```bash
+npm run build
+node -e "
+const s=require('./.next/diagnostics/route-bundle-stats.json');
+const fs=require('fs');
+const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
+for(const r of ['/robots','/manufacturers','/use-cases','/reports','/compare']){
+  const e=s.find(x=>x.route===r);
+  const own=e.firstLoadChunkPaths.filter(p=>!floor.has(p)).reduce((a,p)=>a+fs.statSync(p).size,0);
+  console.log(r.padEnd(16), 'total=', e.firstLoadUncompressedJsBytes, 'own=', own);
+}"
 ```
 
-`catalogViewModelFixtures`は実dataから5 factoryの結果を作る。
+- [ ] **Step 2: budget scriptを書く**
 
-key名assertionに加えて、**本文値のaggregate assertion**も置く。全collectionの本文fieldから12文字以上の実値を集め、5 factoryいずれのsearch textにも現れないことを固定する。
-
-- robot: `description`／`summary`／`comparison.*`／`supportNote`／`safetyNote`／`vendorRiskNote`
-- manufacturer: `description`／`distributorNote`／`supportNote`／`procurementNote`／`vendorRiskNote`／代理店`note`
-- use-case: `overview`／`whyItMatters`／`whyHardToday`／`environmentRequirements`／`japanDeploymentConditions`／`capabilityNotes`
-- article: `whyItMatters`／`keyTakeaways`／`body`／`manufacturerGuideContent`
-
-比較は必ず**両辺を`normalizeSearchText`で正規化**し、JSON文字列ではなくsearch text自体を対象にする（raw文字列比較は実測7.9%取りこぼす。Global Constraints「制約のゲート設計」参照）。
-
-このassertionは人手のfield列挙に依存するため単独では不十分であり、Task 3で導入する各gate（`check:catalog-payload`のbyte budget、`check:data-boundaries`のimport禁止rule、`check:bundle-content`のrecord slugカウントとsize異常検査、`check:client-imports`の静的import graph、`check:plan-snippets`の型検査）と合わせて守る。Task 8ではこれらが`npm run check`に揃って組み込まれていることを確認する。
-
-- [ ] **Step 2: client budget scriptを追加する**
+上限は**Step 1で測った4 routeの最大値 + 15%**とする。180,000は初期目標であり、実測がそれを下回るなら締め直す。誰も近づかない上限はgateとして働かない。
 
 ```js
 // scripts/check-client-budgets.mjs
 import fs from 'node:fs';
 
-const stats = JSON.parse(
-  fs.readFileSync('.next/diagnostics/route-bundle-stats.json', 'utf8'),
-);
-// route固有JS（first-load chunkのうち共有フロアに含まれないもの）の上限。
-// 総量ではなくroute固有を測る理由はGlobal Constraintsの「JS削減目標の再定義」を参照。
-const ROUTE_SPECIFIC_MAX = 180_000;
-const routes = ['/reports', '/robots', '/manufacturers', '/use-cases'];
+const stats = JSON.parse(fs.readFileSync('.next/diagnostics/route-bundle-stats.json', 'utf8'));
+const floor = new Set(stats.find((entry) => entry.route === '/privacy').firstLoadChunkPaths);
 
-// 共有フロアは、client componentを持たないstatic routeのchunk集合として求める。
-const floor = new Set(
-  stats.find((item) => item.route === '/privacy').firstLoadChunkPaths,
-);
+// Task 10 Step 1 の実測最大値 * 1.15。共有フロアはPhase 5の対象外なので除外して測る。
+const MAX_ROUTE_SPECIFIC_BYTES = 0;
+const routes = ['/reports', '/robots', '/manufacturers', '/use-cases'];
 
 let failed = false;
 for (const route of routes) {
@@ -1558,136 +1997,167 @@ for (const route of routes) {
     continue;
   }
   const own = entry.firstLoadChunkPaths
-    .filter((chunkPath) => !floor.has(chunkPath))
-    .reduce((total, chunkPath) => total + fs.statSync(chunkPath).size, 0);
-  console.log(
-    `[client-budget] ${route}: route-specific=${own}/${ROUTE_SPECIFIC_MAX}` +
-      ` (total=${entry.firstLoadUncompressedJsBytes})`,
-  );
-  if (own > ROUTE_SPECIFIC_MAX) failed = true;
+    .filter((chunk) => !floor.has(chunk))
+    .reduce((total, chunk) => total + fs.statSync(chunk).size, 0);
+  console.log(`[client-budget] ${route}: ${own}/${MAX_ROUTE_SPECIFIC_BYTES}`);
+  if (own > MAX_ROUTE_SPECIFIC_BYTES) failed = true;
 }
 if (failed) process.exitCode = 1;
 ```
 
-上限180,000の根拠はGlobal Constraintsの「JS削減目標の再定義」を参照。総量は参考値としてlogへ出すが、gateはroute固有だけにかける。
+**共有フロアを引いて測る**ことで、framework更新でフロアが動いてもgateが誤爆しない。`MAX_ROUTE_SPECIFIC_BYTES`はStep 1の実測値を入れてからcommitする。
 
-Task 4・Task 5完了後の想定値:
+`package.json`の`check` pipelineへ`check:bundle-content`の直後に挿入する。
 
-| route | Task 2時点 | Task 4後 | Task 5後 | 上限 |
-|---|---|---|---|---|
-| `/reports` | 1,233,689 | 264,696 | 129,786 | 180,000 |
-| `/robots` | 325,787 | 325,787 | 190,877 | 180,000 |
-| `/use-cases` | 268,207 | 268,207 | 133,297 | 180,000 |
-| `/manufacturers` | 178,411 | 178,411 | 178,411 | 180,000 |
-
-`/robots`はTask 5後も190,877で上限をわずかに超える見込みである。Task 6・Task 7の副次的な削減で収まるかを実測し、収まらない場合は残る差分の内訳を調査してこのstepで対処する。上限そのものを緩めるのは最後の手段とし、緩める場合は`/manufacturers`の実績値を基準にした根拠を書き直す。
-
-- [ ] **Step 3: package scriptsへ追加する**
-
-```json
-{
-  "check:client-budgets": "node scripts/check-client-budgets.mjs",
-  "check": "npm run validate:data && npm run check:data-boundaries && npm run check:world-map-asset && npm run typecheck && npm run lint && npm run test && npm run check:catalog-payload && npm run build && npm run check:home-payload && npm run check:bundle-content && npm run check:client-budgets && npm run test:e2e"
-}
-```
-
-- [ ] **Step 4: source boundaryを検索する**
+- [ ] **Step 3: `lib/search.ts`を削除する**
 
 ```bash
-rg -n "interface (RobotsBrowser|ManufacturersBrowser|UseCasesBrowser|ReportsBrowser|CompareClient)Props" components
-rg -n "(robots|manufacturers|useCases|reports): (Robot|Manufacturer|UseCase|Article)\\[\\]" components
+rg -n "from '@/lib/search'|from './search'" components lib src tests scripts
 ```
 
-Expected: 2つ目の検索結果0件。
+Expected: 0件。0件なら`lib/search.ts`を削除する。1件でも残る場合は削除せず、残存利用者と理由を`docs/reference/refactor-baseline-2026-07-26.md`へ記録して後続phaseへ送る。
 
-- [ ] **Step 5: full gateとafter計測を実行する**
+`lib/searchIndex.ts`は**残す**（MiniSearch維持）。
+
+- [ ] **Step 4: raw props境界を再確認する**
 
 ```bash
-npm run check
-node scripts/check-client-budgets.mjs
+rg -n "(robots|manufacturers|useCases|reports): (Robot|Manufacturer|UseCase|Article)\[\]" components
+rg -n "useUrlParamUpdater|router\.(push|replace)" components lib
 ```
 
-Expected: 4routeがbudget以下、全gate exit 0。
+Expected: どちらも0件。
 
-- [ ] **Step 6: baseline文書へafter値を記録する**
+- [ ] **Step 5: baseline文書へafter値を記録する**
 
-routeごとにbefore、after、bytes、percentageを記録する。RSC/HTMLについてもcatalog pageの`.next/server/app/**/index.html`実測値を併記する。
+`docs/reference/refactor-baseline-2026-07-26.md`へ「Phase 5 after」節を追加し、route別にbefore／after／削減バイト／削減率を記録する。**総量とroute固有JSの両方**を載せ、共有フロアの値も併記する。
+
+併せて後続phase向けに1点記録する。共有フロアの`37mz4g7000ovi.js`（70,848バイト）は`sonner`（toast）・`lucide`・`motion`・`@vercel/analytics`を含み、`src/app/layout.tsx`の`<Toaster />`により`/privacy`のような静的ページにも配信されている。**Phase 5の対象外だが、フロアのうち手を付けられる部分として記録する。**
+
+`motion/react`がdependenciesから外せなかった場合は、残存利用者（Home側）も併記する。
+
+- [ ] **Step 6: doc governanceに従って片付ける**
+
+`ai/rules/80-doc-governance.md`のCompletion Ruleに従い、phase完了時に:
+
+1. この計画書を`docs/archive/`へ移動する（**移動と内容変更は別commit。移動が先**）
+2. `docs/README.md`の「いま動いているもの」表から行を削除する
+3. `docs/plans/pre-migration-refactor-implementation-index-v1.md`のPhase 5行を更新する
+4. 移動後に`rg --no-ignore -l 'refactor-phase-05-client-boundaries-v1'`で参照を洗い、live referenceを直す（`docs/archive/`内の参照は直さない）
 
 - [ ] **Step 7: commit**
 
 ```bash
-git add scripts/check-client-budgets.mjs tests/unit/view-models/catalog-serialization.test.ts package.json docs/reference/refactor-baseline-2026-07-26.md
-git commit -m "test: enforce catalog client budgets"
+git add scripts/check-client-budgets.mjs package.json docs/reference/refactor-baseline-2026-07-26.md
+git commit -m "test: enforce catalog route-specific JS budgets"
+
+git rm lib/search.ts
+git commit -m "chore: remove the unused search document module"
 ```
-
----
-
-## Global Constraints ⇄ Task 対応表
-
-各制約がどのtaskのどのstepで実装・検証されるかを固定する。planを編集したら必ず併せて更新する。
-
-**この表だけでは再発を防げない。** 対応表が追跡するのは「どのtaskが担当するか」であって「そのtaskのcode例が実型と一致するか」ではない。実際、この表を新設した改訂で`useCase.description`（存在しないfield）を含むcode例が混入した。**一次の防御はTask 3 Step 8の`check:plan-snippets`（計画書のcode blockを`tsc --noEmit`にかける）であり、この表はその補完である。**
-
-| Global Constraint | 実装 | 検証 |
-|---|---|---|
-| DB query／server action／API route／async repositoryを追加しない | 全task | Task 8 Step 4のsource検索 |
-| filter/share URLのparameter名と意味を維持 | Task 1 | Task 1 Step 6 E2E |
-| back/forwardでfilter・compare・viewが復元 | Task 1、Task 7 | Task 1 Step 6、Task 7 Step 7 E2E |
-| raw配列をcatalog client propsへ渡さない | Task 2（robots/mfr）、Task 6（use-case/report）、Task 7（compare） | Task 8 Step 4の`rg`、Phase completion |
-| `sources`／`fieldEvidence`／本文／未使用mediaをVMへ含めない（**値の中身にも及ぶ**） | Task 2、Task 3 Step 1-3、Task 6 | Task 3の4層gate（下記） |
-| ↳ VM factory経由の流出 | Task 3 Step 1-2 | Task 3 Step 3-4（field集合pin、payload byte budget）、正規化済み値assertion |
-| ↳ import chain経由の流出 | Task 4 | Task 3 Step 5-6（import境界、bundle内容検査） |
-| 現行件数ではpagination/filterをclientで完結 | Task 1、Task 6 | 既存E2E |
-| filterごとのRSC再取得を廃止 | Task 1 | Task 1 Step 7の`rg` |
-| card情報・link・favorite・compare・popoverを維持 | Task 2、Task 5、Task 6、Task 7 | 各taskのE2Eとscreenshot |
-| route固有JSを180,000バイト以下にする | Task 4（-968,993）、Task 5（motion 4経路＋`lib/search.ts`切り出し） | Task 8の`check:client-budgets` |
-| catalog検索範囲をcard表示＋facet labelに限定 | Task 3 Step 1、Task 6 Step 1 | Task 3 Step 8の`check:plan-snippets`（型検査）、Task 3 Step 9の正規化済み値assertion |
-| MiniSearchを維持し索引対象だけ差し替え | Task 6 Step 5 | Task 6 Step 7の`rg`、検索E2E |
-| 計画書のcode例が実型と一致する | Task 3 Step 8 | `check:plan-snippets`（`tsc --noEmit`） |
-
-**意図的に制約違反となる期間:** Task 4完了時点で`ReportsBrowser`は生の`Article[]`をpropsで受け続ける（Task 4はimport chainを切ることだけを担当し、VM化はTask 6）。この間、制約「raw配列をcatalog client propsへ渡さない」は`/reports`について未達である。Task 3 Step 6のallowlistで明示し、Task 6完了時にallowlistを空にすることで解消を機械的に確認する。
 
 ---
 
 ## Phase completion
 
+`docs/plans/pre-migration-refactor-implementation-index-v1.md` §4のPhase完了gateに従う。
+
 ```bash
+git status -sb
+git diff --check
 npm run check
-rg -n "useUrlParamUpdater" components lib
-rg -n "(robots|manufacturers|useCases|reports): (Robot|Manufacturer|UseCase|Article)\\[\\]" components
-rg -n "from '@/lib/search'" components lib/viewModels lib/catalog
-# Task 5で除去したmotion経路が戻っていないこと（4 route分すべて）
+git diff --stat refactor/integration-20260726...HEAD
+git log --oneline refactor/integration-20260726..HEAD
+```
+
+Phase 5固有の追加確認:
+
+```bash
+# raw配列がclient propsへ渡っていない
+rg -n "(robots|manufacturers|useCases|reports): (Robot|Manufacturer|UseCase|Article)\[\]" components
+# 本文を含むsearch documentがclient graphに無い
+rg -n "from '@/lib/search'|from './search'" components lib src tests
+# 旧URL updaterとRSC再取得が無い
+rg -n "useUrlParamUpdater|router\.(push|replace)" components lib
+# DB query / server action / API route / async repository を追加していない
+rg -n "'use server'|\"use server\"" components lib src
+fd -t f 'route\.(ts|tsx)$' src/app
+# catalog routeにmotionが戻っていない
 rg -n "motion/react|useTiltCardEffect" \
-  components/ui/AnimatedTooltip.tsx components/PageTabBar.tsx \
+  components/ui/AnimatedTooltip.tsx components/PageTabBar.tsx components/ReportsHeader.tsx \
   components/RobotCard.tsx components/ManufacturerCard.tsx components/UseCaseCard.tsx \
-  components/NewsHeroCarousel.tsx components/ui/card-hover-effect.tsx \
-  components/uilayouts/carousel.tsx components/ReportsHeader.tsx
+  components/NewsHeroCarousel.tsx components/ui/card-hover-effect.tsx components/uilayouts/carousel.tsx
 ```
 
 Expected: すべて0件。
 
-bundle内容とimport graphは`npm run check`の`check:bundle-content`／`check:client-imports`が見る。**両scriptのallowlistが空であること**を確認する（空でなければ、どのtaskで解消予定か記録が残っているはずである）。
+`npm run check`のpipelineに次の5つが揃っていることを確認する。**それぞれ別の経路を測っており、1つでも欠けると本phaseの制約を守れない。**
 
-`npm run check`のpipelineに次の3つが揃っていることを確認する。**それぞれ別の経路を測っており、1つでも欠けると本phaseの制約を守れない。**
-
-| gate | 導入 | 測る対象 | 検知できない経路 |
+| gate | 導入 | 測る対象 | これ単独では検知できないもの |
 |---|---|---|---|
-| `check:catalog-payload` | Task 3 | VM factoryの出力（RSC payloadへ載る量） | import chain経由でbundleへ入る生data |
-| `check:bundle-content` | Task 3 | client chunkの中身（生dataのmarker） | VM経由で連結された本文 |
-| `check:client-budgets` | Task 8 | route固有JSのバイト数 | RSC payloadの肥大 |
-
-さらにGlobal Constraints ⇄ Task 対応表を1行ずつ確認し、各制約に実装taskと検証手段が両方存在することを確かめる。
+| `check:client-imports` | Task 2 | source（`'use client'`から`data/**`への到達） | build時のchunk構成 |
+| `check:bundle-content` | Task 2 | client chunkのrecord slug数とサイズ | VM経由で連結された本文 |
+| `check:plan-snippets` | Task 2 | 計画書のcode例と実型の一致 | 実装そのもの |
+| `check:catalog-payload` | Task 6 | VM factory出力のバイト数（RSC payload） | import chain経由の流出 |
+| `check:client-budgets` | Task 10 | route固有JSのバイト数 | RSC payloadの肥大 |
 
 **route固有JSの最終確認:**
 
 ```bash
-node -e "
-const s=require('./.next/diagnostics/route-bundle-stats.json');
-const fs=require('fs');
-const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
-for(const r of ['/robots','/manufacturers','/use-cases','/reports']){
-  const e=s.find(x=>x.route===r);
-  const own=e.firstLoadChunkPaths.filter(p=>!floor.has(p)).reduce((a,p)=>a+fs.statSync(p).size,0);
-  console.log(r.padEnd(16), String(own).padStart(9), own<=180000?'OK':'OVER');
-}"
+npm run check:client-budgets
 ```
+
+---
+
+## リスクと軽減策
+
+| リスク | 影響 | 軽減策 |
+|---|---|---|
+| chunkはmoduleと1:1ではないため、削減見込みが外れる | task完了条件を満たせない | 各taskで**削減後を必ず実測**し、見込みではなく実測値を記録する。外れたら次taskへ進む前に原因chunkを特定する |
+| Task 3・4のCSS置換でtooltip/carousel/hoverの挙動が変わる | UX劣化 | 390/1440幅のscreenshotと`accessibility-smoke.spec.ts`。`prefers-reduced-motion`とkeyboard操作を個別に確認 |
+| Task 6で検索範囲が狭まる | 本文中の語で検索できなくなる。**退避先が無い**（全体検索ページが存在しない） | 意図した仕様変更として記録。placeholderと0件時文言を確認。復活方式は後続phaseへ起票 |
+| Task 8でhero/feature placementの並びが変わる | 記事の露出が変わる | Task 1 Step 6でhero/feature記事idと順序を記録し、Task 8 Step 7で一致を確認 |
+| Task 4の`useReducedMotion` → `useMediaQuery`でSSR時の値が`null`→`false`に変わる | autoplayの初期挙動 | どちらもfalsyで判定が変わらないことをcode上で確認。hydration後の挙動をscreenshotで確認 |
+| `lib/search.ts`削除後にdetail pageやscriptが壊れる | build失敗 | Task 10 Step 3の`rg`が0件のときだけ削除する。1件でも残れば削除しない |
+| Task 9のcompare分割でDnDが壊れる | 比較操作の破綻 | E2Eと手動確認。分割は責務移動のみでDnD sensorの設定値は変えない |
+| `check:plan-snippets`のskipが増えてgateが形骸化する | 計画書の誤りが再び素通りする | skip総数をbaselineと比較し、増加を失敗にする。検査は既定でON |
+
+---
+
+## 手動確認チェックリスト
+
+各routeについて、390 / 768 / 1280 / 1440幅で確認する。
+
+**`/robots`**
+- [ ] card表示、favorite、compare追加、popoverが現行と同じ
+- [ ] tab tooltipがhover・focus両方で出てEscapeで閉じる
+- [ ] 検索: 機種名・メーカー名・用途タグ・stage labelがhitする
+- [ ] 検索: 紹介文中の語がhitしなくなっている（意図した変更）
+- [ ] filter変更でURLが更新され、back/forwardで復元される
+
+**`/manufacturers`**
+- [ ] card表示、logo、代理店表示が現行と同じ
+- [ ] 検索: 社名・国・都市・取扱ロボット名がhitする
+
+**`/use-cases`**
+- [ ] cardのtitle・lead（`subtitle ?? summary`）・maturity・robot namesが現行と同じ
+- [ ] tilt/glowが消え、shimmerとaccent lineが残っている
+- [ ] 検索: タイポ許容（`fuzzy: 0.2`）が維持されている
+
+**`/reports`**
+- [ ] hero carouselが自動再生し、prev/next・swipe・dotで操作できる
+- [ ] hero/featureに出る記事のidと順序がTask 1 Step 6の記録と同じ
+- [ ] shelf tab、pagination、空状態
+- [ ] 検索: タイポ許容が維持されている
+
+**`/compare`**
+- [ ] 機種選択、DnD並べ替え、visual/specs切替、favorite
+- [ ] mobile幅でmenuが操作できる
+- [ ] reload・back/forwardで選択とviewが復元される
+
+**`/robots/[slug]`（副作用確認）**
+- [ ] `RobotImageCarousel`が壊れていない（Task 4で同じmoduleに触れるため）
+
+**共通**
+- [ ] `prefers-reduced-motion: reduce`で全routeのtransitionとautoplayが止まる
+- [ ] console errorとhydration errorが出ない
+- [ ] 横スクロールが発生しない（`mobile-overflow.spec.ts`と併せて）
