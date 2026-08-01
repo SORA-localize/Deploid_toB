@@ -1,6 +1,6 @@
 ---
 status: plan
-updated: 2026-07-31
+updated: 2026-08-01
 ---
 
 # Phase 5 Client Boundaries Implementation Plan
@@ -25,27 +25,67 @@ updated: 2026-07-31
 - cardの情報、リンク、favorite、compare、popover機能を維持する。
 - `/reports`、`/robots`、`/manufacturers`、`/use-cases`のfirst-load JSをPhase 1 baselineから30%以上削減する。
 
-### Catalog検索範囲（2026-07-31決定）
+### Catalog検索範囲（2026-07-31決定、2026-08-01改訂）
 
-**原則:** catalog view modelの`searchText`は、**そのcardが表示する情報**と**その一覧が絞り込みに使うfacet**だけを対象とする。詳細ページにしか無い本文は一覧の検索対象にしない。
+**原則:** catalog view modelの`searchText`は、**そのcardが実際に描画する文字列**と**その一覧のfacet選択肢のlabel**だけを対象とする。詳細ページにしか無い本文は一覧の検索対象にしない。id、slug、内部enum値は表示もfacet labelでもないため含めない（enumはlabel経由で引ける）。
 
-`lib/search.ts`の`create*SearchDocument()`は`description`、`comparison.*`、`supportNote`／`vendorRiskNote`等の本文fieldを`fields`に含む。これをそのまま連結してVMへ載せると、上のGlobal Constraintに反するうえ、first-load JS 30%削減目標とも正面衝突する。実測値:
+`lib/search.ts`の`create*SearchDocument()`は本文fieldを`fields`に含む。これをそのまま連結してVMへ載せると上のGlobal Constraintに反する。実測値:
 
 | route | VM全体 | うちsearchText | 本文除外時の削減 |
 |---|---|---|---|
 | `/robots`（57件） | 67,185字 | 28,357字（42.2%） | VM全体の **-27.7%** |
 | `/manufacturers`（25件） | 24,171字 | 11,401字（47.2%） | VM全体の **-38.8%** |
 
-したがってcatalogの`searchText`は`lib/search.ts`のsearch documentを再利用せず、`lib/catalog/search.ts`がcollectionごとに対象fieldを明示的に列挙して生成する。対象は次の通り。
+したがってcatalogの`searchText`は`lib/search.ts`のsearch documentを再利用せず、`lib/catalog/search.ts`がcollectionごとに対象fieldを明示的に列挙して生成する。
+
+**この表は実データ（`data/types.ts`の型定義とcard componentの描画内容）と突き合わせて作成すること。** 初版はrobots／manufacturersのみ実測で決め、use-cases／reportsを実データ確認なしに横展開した結果、存在しないfield名を書き、実際に存在する本文fieldを取りこぼした。
 
 | collection | searchTextへ含める | 含めない |
 |---|---|---|
-| robots | 機種名（`nameJa`/`name`）、メーカー名、`manufacturerId`、`distributorJapan`、category／stage／readiness／availability／mobility／procurementの各label、card facts（用途・サイズ・価格・稼働時間）の値、`industryTags`、`taskTags` | `summary`、`description`、`comparison.*`、`supportNote`、`safetyNote`、`vendorRiskNote` |
+| robots | 機種名（`nameJa`/`name`）、メーカー名、`distributorJapan`、category／stage／readiness／availability／mobility／procurementの各label、card facts（用途・サイズ・価格・稼働時間）の値、`industryTags`、`taskTags` | `summary`、`description`、`comparison.*`、`supportNote`、`safetyNote`、`vendorRiskNote`、`manufacturerId`（内部id） |
 | manufacturers | 社名（`nameJa`/`name`）、`country`、`hqCity`、`foundedYear`、国内代理店名、取扱ロボット名、companyType／companyStatus／japanPresenceのlabel | `description`、`distributorNote`、`supportNote`、`procurementNote`、`vendorRiskNote`、代理店`note` |
-| use-cases | `title`、`description`（cardに表示するため対象）、maturity label、`robotNames`、`primaryIndustry`、`industryTags`、`taskTags` | `candidateRobots`の詳細、`capabilityNotes`、`sources` |
-| reports | `title`、`summary`（cardに表示するため対象）、種別label、`themeTags` | `body`、`manufacturerGuideContent`、`sources` |
+| use-cases | `titleJa`/`title`、`subtitle`、`summary`（`UseCaseCard.tsx:68`が`subtitle ?? summary`を描画）、maturity label、代表ロボット名、`primaryIndustry`、`industryTags`、`taskTags` | `overview`、`whyItMatters`、`whyHardToday`、`environmentRequirements`、`japanDeploymentConditions`、`capabilityNotes`、`sources` |
+| reports | `titleJa`/`title`、`summary`、種別label、`themeTags` | `whyItMatters`、`keyTakeaways`、`body`、`manufacturerGuideContent`、`sources` |
 
-**受け入れるトレードオフ:** 一覧の検索範囲は現行より狭くなる。現在は紹介文中の語（例「バッテリー」）でも部分一致でhitするが、今後はhitしない。現行実装は関連度ranking無しの単純部分一致（`lib/search.ts`の`matchesSearchDocument`）であり、注記中の一語が偶然一致した無関係なrecordが機種名一致と同列に並ぶ状態でもある。本文全文検索を維持する場合はserver側の検索APIが必要になるが、本phaseは「API routeを追加しない」制約下にあるためscope外とし、将来の別planへ委ねる。検索窓のplaceholder（`lib/uiText.ts`の「ロボット名・メーカー・用途キーワードで検索」「メーカー名・地域・取扱ロボットで検索」）は本決定後の挙動と整合するため変更しない。
+`UseCase`に`description`fieldは存在しない（実フィールドは`subtitle?`／`summary`／`overview`／`whyItMatters`／`whyHardToday`／`environmentRequirements`／`japanDeploymentConditions`／`capabilityNotes`）。report側の本文は`body`／`manufacturerGuideContent`ではなく`whyItMatters`／`keyTakeaways`が`createReportSearchDocument`へ入っている。
+
+reportsの`summary`を全件持つ理由は「cardに表示するから」では**ない**。`NewsCard`は`summary`を描画せず、描画するのは`NewsFeatureCard.tsx:54`と`NewsHeroCarousel.tsx:131`、つまりhero/featureに選ばれた数件だけである。それでも全件に持たせるのは、**placementがserver側で決まりVMの形をplacement依存にしたくないため、かつ記事数が少なく全件保持のコストが許容範囲だから**。この理由付けを誤ると、次に同じ判断をする人が誤って一般化する。
+
+**受け入れるトレードオフ（2件、別々の劣化）:**
+
+1. **本文検索の喪失。** 一覧の検索範囲は現行より狭くなる。現在は紹介文中の語（例「バッテリー」）でも部分一致でhitするが、今後はhitしない。**このサイトには全体検索ページが存在しない**（`src/app`に`search`ルート無し）ため、一覧から本文検索を外すとサイトから本文検索が完全に消える。退避先は無い。robots／manufacturersの現行実装は関連度ranking無しの単純部分一致（`lib/search.ts`の`matchesSearchDocument`）であり、注記中の一語が偶然一致した無関係なrecordが機種名一致と同列に並ぶ状態でもある。
+2. **MiniSearchの喪失（reports／use-casesのみ、本文除外とは独立した劣化）。** `lib/searchIndex.ts`はMiniSearchを`prefix: true`、`fuzzy: 0.2`、`combineWith: 'AND'`、`Intl.Segmenter('ja')`の語境界分割で構成し、`ReportsBrowser.tsx:58`と`UseCasesBrowser.tsx:121`が使用している。Task 3はこれを`includes()`部分一致へ置換するため、**タイポ許容と日本語の語境界分割を失う**（例:「ロボット導入」で「ロボットの導入」がhitしなくなる）。これはsearchTextのfield絞り込みとは直交する判断であり（whitelist後のfieldだけをMiniSearchで索引することも技術的には可能）、first-load JS 30%削減のためMiniSearch（80KBのES module）をclient bundleから外す判断として**廃止を採用する**（2026-08-01決定）。
+
+本文全文検索を復活させる場合、build時生成の静的JSONを`public/`へ置き検索窓focus時にfetchする方式が「API routeを追加しない」制約下でも成立する（first-load JSにもRSC payloadにも乗らない）。本phaseのscope外とし、後続phaseの独立taskとして起票する。
+
+**検索窓placeholder:** `lib/uiText.ts`のrobots「ロボット名・メーカー・用途キーワードで検索」とmanufacturers「メーカー名・地域・取扱ロボットで検索」は本決定後の挙動と整合するため変更しない。reportsの「タイトル・トピック・キーワードで検索」は本文検索を想起させるため、Task 3で文言を再検討する。0件時の空状態文言も併せて確認する。
+
+**CMS移行との関係:** whitelistを明示列挙する形にしておくと、将来PostgreSQLの全文検索（`tsvector`／`pg_trgm`）へ移る際に「どのcolumnを索引するか」の仕様がそのまま引き継げる。汎用search documentの再利用のままだと移行時に同じ判断をやり直すことになる。
+
+**`lib/search.ts`／`lib/searchIndex.ts`の行き先:** catalogがこれらを使わなくなると`createReportSearchDocument`等の利用者が消える。Task 3完了時点で残存利用者を`rg`で洗い出し、削除するか後続phaseの削除対象として記録するかを決める。放置すると「2つの検索定義が併存し片方だけメンテされる」という次の事故の種になる。
+
+### 制約のゲート設計
+
+`searchText`の肥大は**Task 5の`check-client-budgets.mjs`では検知できない**。同scriptが見るのは`firstLoadUncompressedJsBytes`（JS chunkのサイズ）だが、server componentからclient componentへ渡るprops（VM）はJS chunkではなくRSC flight payloadに載るためである。実測でも、Task 2適用後の`/robots`のVMデータはJS chunkにもprerendered HTMLにも現れない（PPRでrequest時にstreamされる）。
+
+したがって次の3層で守る。**「一番壊れやすい制約のゲートは、その制約に最初に触れるtaskへ置く」**をこのplanの構造ルールとする。
+
+1. **payload文字数budget（Task 2で導入）** — `scripts/check-home-payload.mjs`（`.next/server/app/index.html`のバイト数をgateする既存の先例）と同形の`scripts/check-catalog-payload.mjs`を作る。何が増えても発火するため、field列挙の抜けに依存しない。
+2. **import境界の遮断（Task 2で導入）** — `lib/viewModels/**`から`lib/search.ts`／`lib/searchIndex.ts`のimportを禁止する。今回の事故の根本原因は「汎用search documentの再利用」であり、ここを機械的に止めるのが最も効く。既存の`scripts/check-data-import-boundaries.mjs`と同形。
+3. **正規化を揃えた本文値assertion（Task 2／3／5）** — 下記の通り両辺を同じ関数で正規化する。
+
+**値assertionの正規化について（重要）:** `expect(JSON.stringify(vm)).not.toContain(rawText)`は**実測で7.9%取りこぼす**。現行の違反実装に対し12文字以上の本文値343件を検査したところ、343件すべてが実際にsearchTextへ含まれているのに、raw文字列比較で検出できたのは316件だった。原因は`createSearchDocument`→`uniqueSearchValues`が各値に`.normalize('NFKC').trim()`をかけるため、全角括弧・全角数字を含む本文が原文と一致しないこと（例「移動速度3.3m/s（潜在能力5m/s超）」）。加えて新builderは連結後に`normalizeSearchText`（`toLowerCase()`を含む）をかけるためASCIIを含む本文はほぼ全て素通りし、`JSON.stringify`のescape（`"`／`\n`／`\\`）でも一致しなくなる。必ず両辺を同じ関数で正規化し、JSON文字列ではなく`searchText`自体を対象にすること。
+
+```ts
+const haystack = normalizeSearchText(items.map((i) => i.filter.searchText).join(' '));
+expect(haystack).not.toContain(normalizeSearchText(text));
+```
+
+### searchTextの重複排除
+
+whitelist後の`searchText`は、その大半が**同じitem内に既にserialize済みのデータの重複**である（実測: robotsのwhitelist searchText 7,346字のうち、VMに存在しないのは3,065字のみ）。`searchText`をVMに持たせず、client側で`item.name`／`manufacturer.name`／`stage.label`／`facts.map((f) => f.value)`／`filter.industryTags`からhaystackを組み、VMに無い分（英語名、`taskTags`、`distributorJapan`、各label）だけを`searchExtra`として持たせれば、robotsでさらに約4,300字削減できる。57件×20field程度の`includes`は1キーストロークあたり無視できるコストであり、`useMemo`でitems単位にmemo化できる。
+
+原則としても整合する。「cardに表示する情報を検索対象にする」なら、その情報は既にpropsにある。別fieldへ文字列copyを作るのは原則の自己矛盾である。Task 2で採用する。
 
 ---
 
@@ -305,8 +345,11 @@ git commit -m "refactor: keep catalog filters in browser URL state"
 - Create: `lib/viewModels/robots.ts`
 - Create: `lib/viewModels/manufacturers.ts`
 - Create: `lib/catalog/search.ts`
+- Create: `scripts/check-catalog-payload.mjs`
 - Create: `tests/unit/view-models/robots.test.ts`
 - Create: `tests/unit/view-models/manufacturers.test.ts`
+- Modify: `scripts/check-data-import-boundaries.mjs`（`lib/viewModels/**`→`lib/search.ts`／`lib/searchIndex.ts`のimport禁止を追加）
+- Modify: `package.json`（`check:catalog-payload`を追加し`check`へ組み込む）
 - Modify: `lib/robotFilters.ts`
 - Modify: `lib/manufacturerFilters.ts`
 - Modify: `components/RobotsBrowser.tsx`
@@ -455,9 +498,12 @@ describe('robot catalog view models', () => {
 
   it('exclude body text content, not just its keys', () => {
     // key名の不在だけでは、連結済みsearch textとして本文が載っている場合を検出できない。
-    // 実recordの本文値そのものがJSONに現れないことを固定する。
-    const robots = getRobots();
-    for (const robot of robots) {
+    // JSON文字列ではなくsearchText自体を、両辺同じ関数で正規化して比較する。
+    // raw文字列比較では実測7.9%取りこぼす（Global Constraints「制約のゲート設計」参照）。
+    const haystack = normalizeSearchText(
+      items.map((item) => item.filter.searchText).join(' '),
+    );
+    for (const robot of getRobots()) {
       for (const text of [
         robot.description,
         robot.summary,
@@ -470,16 +516,26 @@ describe('robot catalog view models', () => {
         ...robot.comparison.notFit,
       ]) {
         if (!text || text.length < 12) continue;
-        expect(json).not.toContain(text);
+        expect(haystack).not.toContain(normalizeSearchText(text));
       }
     }
   });
 });
 ```
 
-Manufacturer testは`"sources"`、`"headquarters"`、`"description"`、`"notes"`がJSONに含まれないことをassertする。両testで`"sourceUrl"`と`"rights"`も含まれないことをassertし、表示用logo/imageだけがserializeされることを固定する。Manufacturer側にも同じ本文値assertionを置き、`description`、`distributorNote`、`supportNote`、`procurementNote`、`vendorRiskNote`、代理店`note`の実値がJSONに現れないことを固定する。
+Manufacturer testは`"sources"`、`"headquarters"`、`"description"`、`"notes"`がJSONに含まれないことをassertする。両testで`"sourceUrl"`と`"rights"`も含まれないことをassertし、表示用logo/imageだけがserializeされることを固定する。Manufacturer側にも同じ正規化済み本文値assertionを置き、`description`、`distributorNote`、`supportNote`、`procurementNote`、`vendorRiskNote`、代理店`note`の実値が現れないことを固定する。
 
 短い文字列は他fieldと偶然一致しうるため、値assertionは12文字以上のものだけを対象とする。
+
+このassertionは「今の型にある本文field」を人手で列挙しているため、fieldが増えても追随しない。そのためStep 2ではpayload budgetとimport境界も併せて導入する（下記Step 2b）。
+
+- [ ] **Step 2b: payload budgetとimport境界を導入する**
+
+`scripts/check-catalog-payload.mjs`を`scripts/check-home-payload.mjs`と同形で作る。5 factoryの出力を`JSON.stringify`し、collectionごとに文字数上限をgateする。初期値は本文除外後の実測値に約15%の余裕を足して設定し、実測値と併せてcommit messageへ残す。
+
+`scripts/check-data-import-boundaries.mjs`へ、`lib/viewModels/**`が`lib/search.ts`／`lib/searchIndex.ts`をimportしないruleを追加する。今回の事故の根本原因は汎用search documentの再利用であり、これを機械的に止める。`lib/catalog/search.ts`は`normalizeSearchText`のためにimportしてよい（対象fieldを自前で列挙するfileであり、search documentは使わない）。
+
+`package.json`へ`check:catalog-payload`を追加し、`check`のpipelineへ`check:home-payload`の直後に挿入する。
 
 - [ ] **Step 3: server factoriesを実装する**
 
@@ -693,7 +749,7 @@ export function createArticleCatalogSearchText(article: Article) {
 }
 ```
 
-`description`／`summary`はcardが表示する情報のためsearchTextへ含める（Global Constraintの「Catalog検索範囲」表を参照）。`body`、`manufacturerGuideContent`、`capabilityNotes`、`sources`は含めない。
+対象fieldはGlobal Constraintsの「Catalog検索範囲」表に従う。use-caseは`subtitle`／`summary`（`UseCaseCard`が`subtitle ?? summary`を描画）まで、reportは`summary`までを含め、`overview`／`whyItMatters`／`whyHardToday`／`environmentRequirements`／`japanDeploymentConditions`／`capabilityNotes`／`keyTakeaways`／`body`／`manufacturerGuideContent`／`sources`は含めない。`UseCase`に`description`fieldは存在しない。
 
 VM testで日本語、英語、メーカー名、複数語queryが現行代表recordへhitすることを固定する。typo fuzzy matchingは新contractに含めず、検索UIの説明も部分一致として扱う。
 
@@ -741,7 +797,12 @@ Use case JSONに`candidateRobots`、`sources`、`capabilityNotes`がないこと
 
 Factoryは既存のlabel、tone、media、evidence helperをserverで解決する。`getDisplayableAsset()`の戻り値は`{ src, alt }`へ写像し、rights/source metadataを含めない。filterの`searchText`はStep 1の`createUseCaseCatalogSearchText()`／`createArticleCatalogSearchText()`で生成する（`createUseCaseSearchDocument`／`createArticleSearchDocument`は本文を含むため使わない）。
 
-Task 2と同じく、両testに本文値assertionを置く。use-caseは`capabilityNotes`、articleは`body`／`manufacturerGuideContent`の実値（12文字以上）がJSONに現れないことを固定する。
+Task 2と同じく、両testに**正規化を揃えた**本文値assertionを置く（両辺`normalizeSearchText`、対象はJSON文字列ではなくsearch text自体）。
+
+- use-case: `overview`／`whyItMatters`／`whyHardToday`／`environmentRequirements`／`japanDeploymentConditions`／`capabilityNotes`
+- article: `whyItMatters`／`keyTakeaways`／`body`／`manufacturerGuideContent`
+
+`whyItMatters`と`keyTakeaways`が`createReportSearchDocument`の実際の本文fieldであり、初版planが挙げていた`body`／`manufacturerGuideContent`はそこに入っていない。両方をassertion対象に含める。
 
 - [ ] **Step 4: placementsをserver引数化する**
 
@@ -766,6 +827,10 @@ export function getArticleIndexPlacementReports<T extends { id: string; publishe
 - [ ] **Step 5: cards/browserをVMへ変更する**
 
 UseCasesBrowserは`UseCaseCatalogItem[]`、ReportsBrowserは`ArticleCatalogItem[]`を受ける。検索は`matchesCatalogSearch(item.filter.searchText, query)`または`item.searchText`を使い、`create*SearchIndex`と`MiniSearch`をclient graphから外す。
+
+これはGlobal Constraintsの「受け入れるトレードオフ」2で決定済みの**独立した機能劣化**である。タイポ許容（`fuzzy: 0.2`）と`Intl.Segmenter('ja')`による日本語語境界分割を失うため、置換前後で代表queryの挙動差をこのtaskのcommit messageへ記録する。併せてreportsの検索placeholder（`lib/uiText.ts`の「タイトル・トピック・キーワードで検索」）が本文検索を想起させないか再検討し、0件時の空状態文言も確認する。
+
+`MiniSearch`をclient graphから外した後、`lib/searchIndex.ts`と`lib/search.ts`の残存利用者を`rg`で洗い出す。利用者が消えるexportは、このtaskで削除するか後続phaseの削除対象として文書化するかを決める（放置すると検索定義が二重に残る）。
 
 UseCaseCardから`motion/react`と`useTiltCardEffect`を削除し、通常の`div`へ変更する。NewsHeroCarouselの`useReducedMotion`はTask 4の`useMediaQuery('(prefers-reduced-motion: reduce)')`へ置換する。
 
@@ -995,7 +1060,16 @@ for (const [name, value] of Object.entries(catalogViewModelFixtures)) {
 
 `catalogViewModelFixtures`は実dataから5 factoryの結果を作る。
 
-key名assertionに加えて、**本文値のaggregate assertion**も置く。全collectionの本文field（robot: `description`／`summary`／`comparison.*`／各note、manufacturer: `description`／各note、use-case: `capabilityNotes`、article: `body`／`manufacturerGuideContent`）から12文字以上の実値を集め、5 factoryいずれのJSONにも現れないことを固定する。これがGlobal Constraint「Catalog検索範囲」のhard gateであり、key名だけのassertionでは検出できない連結済みsearch text経由の流出を止める唯一の自動検査になる。
+key名assertionに加えて、**本文値のaggregate assertion**も置く。全collectionの本文fieldから12文字以上の実値を集め、5 factoryいずれのsearch textにも現れないことを固定する。
+
+- robot: `description`／`summary`／`comparison.*`／`supportNote`／`safetyNote`／`vendorRiskNote`
+- manufacturer: `description`／`distributorNote`／`supportNote`／`procurementNote`／`vendorRiskNote`／代理店`note`
+- use-case: `overview`／`whyItMatters`／`whyHardToday`／`environmentRequirements`／`japanDeploymentConditions`／`capabilityNotes`
+- article: `whyItMatters`／`keyTakeaways`／`body`／`manufacturerGuideContent`
+
+比較は必ず**両辺を`normalizeSearchText`で正規化**し、JSON文字列ではなくsearch text自体を対象にする（raw文字列比較は実測7.9%取りこぼす。Global Constraints「制約のゲート設計」参照）。
+
+このassertionは人手のfield列挙に依存するため単独では不十分であり、Task 2で導入した`check:catalog-payload`（文字数budget）と`check:data-boundaries`のimport禁止ruleと合わせて3層で守る。Task 5ではこの3つが`npm run check`に揃って組み込まれていることを確認する。
 
 - [ ] **Step 2: client budget scriptを追加する**
 
@@ -1082,6 +1156,9 @@ npm run check
 rg -n "useUrlParamUpdater|motion/react|MiniSearch" \
   components/{RobotsBrowser,ManufacturersBrowser,UseCasesBrowser,ReportsBrowser,RobotCard,ManufacturerCard,UseCaseCard}.tsx
 rg -n "(robots|manufacturers|useCases|reports): (Robot|Manufacturer|UseCase|Article)\\[\\]" components
+rg -n "from '@/lib/search'|from '@/lib/searchIndex'" lib/viewModels
 ```
 
-Expected: 対象一覧で0件、4route client budget達成、URL back/forward E2E PASS。
+Expected: 対象一覧で0件、`lib/viewModels`からのsearch module import 0件、4route client budget達成、catalog payload budget達成、URL back/forward E2E PASS。
+
+`npm run check`のpipelineに`check:catalog-payload`（Task 2導入）と`check:client-budgets`（Task 5導入）の両方が含まれていることを確認する。前者はRSC payload、後者はJS chunkを測る別軸のgateであり、片方だけでは本phaseの制約を守れない。
