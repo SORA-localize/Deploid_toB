@@ -23,7 +23,33 @@ updated: 2026-08-01
 - 現行件数ではpagination/filterをclientで完結する。
 - `router.push`/`router.replace`によるfilterごとのRSC再取得を廃止する。
 - cardの情報、リンク、favorite、compare、popover機能を維持する。
-- `/reports`、`/robots`、`/manufacturers`、`/use-cases`のfirst-load JSをPhase 1 baselineから30%以上削減する。
+- `/reports`、`/robots`、`/manufacturers`、`/use-cases`の**route固有JS**を下記の上限以下にする（2026-08-01改訂。旧「総量から30%削減」は達成不能だったため差し替え）。
+
+### JS削減目標の再定義（2026-08-01決定）
+
+初版の「first-load JS総量をPhase 1 baselineから30%削減」は**算術的に達成不能**だった。first-load JSの大半はPhase 5が触れない全route共通の共有フロアだからである。実測（Task 1+2適用後）:
+
+| route | first-load総量 | 共有フロア | route固有 | 旧目標（総量-30%） | 旧目標が要求するroute固有 |
+|---|---|---|---|---|---|
+| `/robots` | 917,181 | 591,394 | 325,787 | 646,159 | 54,765 |
+| `/manufacturers` | 769,805 | 591,394 | 178,411 | 637,214 | 45,820 |
+| `/use-cases` | 859,601 | 591,394 | 268,207 | 602,884 | **11,490** |
+| `/reports` | 1,825,083 | 591,394 | 1,233,689 | 785,122 | 193,728 |
+
+共有フロア591,394バイトは`/privacy`、`/about`、`/for-manufacturers`、`/_not-found`の4つのstatic routeすべてで完全に一致する値であり、react-dom（226KB）を含む全route共通の下限である。旧目標は総量基準だったため、Phase 5が制御できる36%の部分に対して83〜96%の削減を要求していた。`/use-cases`ではfilter・card・tab・paginationを持つclient componentを11,490バイトに収めろという要求になり、達成不能である。
+
+したがって**目標をroute固有JS（first-load chunkのうち共有フロアに含まれないもの）の絶対値上限へ再定義する**。
+
+| route | 現在のroute固有 | 上限 | 主な削減対象 |
+|---|---|---|---|
+| `/reports` | 1,233,689 | **180,000** | `localContentSnapshot`経由の生データ968,993（Task 4）、`PageTabBar`のmotion 134,910（Task 5） |
+| `/robots` | 325,787 | **180,000** | `PageTabBar`のmotion 134,910（Task 5） |
+| `/use-cases` | 268,207 | **180,000** | `PageTabBar`のmotion 134,910（Task 5） |
+| `/manufacturers` | 178,411 | **180,000** | 既に達成済み（Task 2で-15.4%。`PageTabBar`を使わないためmotionが乗らない） |
+
+上限180,000は、現在の`/manufacturers`（178,411、既にVM化とmotion除去を終えたroute）を基準に設定した。同じ手法を他routeへ適用すれば到達可能な値であることが実証済みの数値であり、baselineの測定条件差に依存しない。
+
+**baselineの扱い:** Phase 1 baselineは測定条件が現行buildと同一である保証がないため、相対削減率の判定には使わない。Task 8で現行build条件による測定値を`docs/reference/refactor-baseline-2026-07-26.md`へ追記し、以後はroute固有JSの絶対値だけをhard gateとする。総量は参考値として記録する。
 
 ### Catalog検索範囲（2026-07-31決定、2026-08-01改訂）
 
@@ -54,7 +80,11 @@ reportsの`summary`を全件持つ理由は「cardに表示するから」では
 **受け入れるトレードオフ（2件、別々の劣化）:**
 
 1. **本文検索の喪失。** 一覧の検索範囲は現行より狭くなる。現在は紹介文中の語（例「バッテリー」）でも部分一致でhitするが、今後はhitしない。**このサイトには全体検索ページが存在しない**（`src/app`に`search`ルート無し）ため、一覧から本文検索を外すとサイトから本文検索が完全に消える。退避先は無い。robots／manufacturersの現行実装は関連度ranking無しの単純部分一致（`lib/search.ts`の`matchesSearchDocument`）であり、注記中の一語が偶然一致した無関係なrecordが機種名一致と同列に並ぶ状態でもある。
-2. **MiniSearchの喪失（reports／use-casesのみ、本文除外とは独立した劣化）。** `lib/searchIndex.ts`はMiniSearchを`prefix: true`、`fuzzy: 0.2`、`combineWith: 'AND'`、`Intl.Segmenter('ja')`の語境界分割で構成し、`ReportsBrowser.tsx:58`と`UseCasesBrowser.tsx:121`が使用している。Task 3はこれを`includes()`部分一致へ置換するため、**タイポ許容と日本語の語境界分割を失う**（例:「ロボット導入」で「ロボットの導入」がhitしなくなる）。これはsearchTextのfield絞り込みとは直交する判断であり（whitelist後のfieldだけをMiniSearchで索引することも技術的には可能）、first-load JS 30%削減のためMiniSearch（80KBのES module）をclient bundleから外す判断として**廃止を採用する**（2026-08-01決定）。
+2. ~~MiniSearchの喪失~~ → **撤回。MiniSearchは維持する（2026-08-01決定）。**
+
+  一度は「first-load JS削減のためMiniSearchを廃止し`includes()`部分一致へ置換する」と決定したが、削減効果を実測したところ**18,690バイト**（`/use-cases`のchunk `0ugbjz6g929ty.js`）にすぎなかった。同じrouteに乗る`PageTabBar`経由のmotion 134,910バイト、`/reports`の生データ968,993バイトと比べて2桁小さく、日本語検索品質（`fuzzy: 0.2`のタイポ許容、`Intl.Segmenter('ja')`の語境界分割）を落とす対価に見合わない。廃止を決めた際の「30%削減目標のため」という根拠自体が、上記「JS削減目標の再定義」の通り誤った目標設定に基づいていた。
+
+  **したがってMiniSearchは残し、索引対象をwhitelist後のfieldへ絞る。** `lib/searchIndex.ts`の`create*SearchIndex`は`lib/search.ts`のsearch documentではなく、`lib/catalog/search.ts`のcatalog searchTextを索引する。これにより本文流出は止まり、検索品質は維持される。Task 6で実施する。
 
 本文全文検索を復活させる場合、build時生成の静的JSONを`public/`へ置き検索窓focus時にfetchする方式が「API routeを追加しない」制約下でも成立する（first-load JSにもRSC payloadにも乗らない）。本phaseのscope外とし、後続phaseの独立taskとして起票する。
 
@@ -68,11 +98,22 @@ reportsの`summary`を全件持つ理由は「cardに表示するから」では
 
 `searchText`の肥大は**Task 5の`check-client-budgets.mjs`では検知できない**。同scriptが見るのは`firstLoadUncompressedJsBytes`（JS chunkのサイズ）だが、server componentからclient componentへ渡るprops（VM）はJS chunkではなくRSC flight payloadに載るためである。実測でも、Task 2適用後の`/robots`のVMデータはJS chunkにもprerendered HTMLにも現れない（PPRでrequest時にstreamされる）。
 
-したがって次の3層で守る。**「一番壊れやすい制約のゲートは、その制約に最初に触れるtaskへ置く」**をこのplanの構造ルールとする。
+したがって次の4層で守る。**「一番壊れやすい制約のゲートは、その制約に最初に触れるtaskへ置く」**をこのplanの構造ルールとする。すべてTask 3で導入する。
 
-1. **payload文字数budget（Task 2で導入）** — `scripts/check-home-payload.mjs`（`.next/server/app/index.html`のバイト数をgateする既存の先例）と同形の`scripts/check-catalog-payload.mjs`を作る。何が増えても発火するため、field列挙の抜けに依存しない。
-2. **import境界の遮断（Task 2で導入）** — `lib/viewModels/**`から`lib/search.ts`／`lib/searchIndex.ts`のimportを禁止する。今回の事故の根本原因は「汎用search documentの再利用」であり、ここを機械的に止めるのが最も効く。既存の`scripts/check-data-import-boundaries.mjs`と同形。
-3. **正規化を揃えた本文値assertion（Task 2／3／5）** — 下記の通り両辺を同じ関数で正規化する。
+1. **payload byte budget** — `scripts/check-home-payload.mjs`（`.next/server/app/index.html`のバイト数をgateする既存の先例）と同形の`scripts/check-catalog-payload.mjs`を作る。何が増えても発火するため、field列挙の抜けに依存しない。文字数ではなく`Buffer.byteLength`で測る（日本語は1文字3バイトのため、文字数だと実際の転送量を3倍過小評価する）。
+2. **import境界の遮断** — `lib/viewModels/**`から`lib/search.ts`／`lib/searchIndex.ts`のimportを禁止する。既存の`scripts/check-data-import-boundaries.mjs`と同形。
+3. **正規化を揃えた本文値assertion** — 下記の通り両辺を同じ関数で正規化する。
+4. **build成果物の内容検査** — 実際にbuildされたclient chunkに生dataのmarkerが無いことを確認する。
+
+**第4層が必要な理由:** 上の1〜3はいずれも**VM factoryの出力しか見ていない**。しかしPhase 5最大の制約違反は、factoryを経由せずclient componentのimport chain経由でbundleへ入っている（`components/ReportsBrowser.tsx` → `lib/articlePlacements.ts:3` → `lib/data/localContentSnapshot`）。実測では`.next/static/chunks/3r7-bj8a3uy6f.js`が968,993バイトで、`fieldEvidence`×60、`vendorRiskNote`×26、`unitree-g1`×32を含む生dataそのものである。1〜3のどれもこれを検知できない。
+
+```bash
+# client chunkに生dataのmarkerが無いこと
+rg -l 'fieldEvidence|vendorRiskNote' .next/static/chunks/*.js
+# Expected: 0件
+```
+
+VM側のgateを厚くしただけではbundle側が無防備になる。**VM経由の流出（1〜3）とimport経由の流出（4）は別経路であり、両方を塞ぐ必要がある。**
 
 **値assertionの正規化について（重要）:** `expect(JSON.stringify(vm)).not.toContain(rawText)`は**実測で7.9%取りこぼす**。現行の違反実装に対し12文字以上の本文値343件を検査したところ、343件すべてが実際にsearchTextへ含まれているのに、raw文字列比較で検出できたのは316件だった。原因は`createSearchDocument`→`uniqueSearchValues`が各値に`.normalize('NFKC').trim()`をかけるため、全角括弧・全角数字を含む本文が原文と一致しないこと（例「移動速度3.3m/s（潜在能力5m/s超）」）。加えて新builderは連結後に`normalizeSearchText`（`toLowerCase()`を含む）をかけるためASCIIを含む本文はほぼ全て素通りし、`JSON.stringify`のescape（`"`／`\n`／`\\`）でも一致しなくなる。必ず両辺を同じ関数で正規化し、JSON文字列ではなく`searchText`自体を対象にすること。
 
@@ -85,7 +126,9 @@ expect(haystack).not.toContain(normalizeSearchText(text));
 
 whitelist後の`searchText`は、その大半が**同じitem内に既にserialize済みのデータの重複**である（実測: robotsのwhitelist searchText 7,346字のうち、VMに存在しないのは3,065字のみ）。`searchText`をVMに持たせず、client側で`item.name`／`manufacturer.name`／`stage.label`／`facts.map((f) => f.value)`／`filter.industryTags`からhaystackを組み、VMに無い分（英語名、`taskTags`、`distributorJapan`、各label）だけを`searchExtra`として持たせれば、robotsでさらに約4,300字削減できる。57件×20field程度の`includes`は1キーストロークあたり無視できるコストであり、`useMemo`でitems単位にmemo化できる。
 
-原則としても整合する。「cardに表示する情報を検索対象にする」なら、その情報は既にpropsにある。別fieldへ文字列copyを作るのは原則の自己矛盾である。Task 2で採用する。
+原則としても整合する。「cardに表示する情報を検索対象にする」なら、その情報は既にpropsにある。別fieldへ文字列copyを作るのは原則の自己矛盾である。**Task 3 Step 2で実装し、Step 3で検索対象field集合をtestで固定する。**
+
+**この方式が持ち込む結合:** cardの表示内容を変えると検索範囲が暗黙に変わる。これは原則（表示＝検索対象）の裏返しであり、結合を消すのではなく可視化する方針を採る。Task 3 Step 3のfield集合pin testにより、cardのfactを増減させるとtestが落ち、実装者へ「検索範囲も変わるが意図通りか」を確認させる。
 
 ---
 
@@ -97,7 +140,7 @@ whitelist後の`searchText`は、その大半が**同じitem内に既にserializ
 |---|---|
 | `lib/catalog/urlState.ts` | History API storeとReact hook |
 | `lib/catalog/urlSearch.ts` | server/client共通の初期query serialize |
-| `lib/catalog/search.ts` | 小規模catalog用normalized search、およびcollectionごとのcatalog searchText生成（対象fieldはここで明示列挙する。Task 2で作成しTask 3で拡張する） |
+| `lib/catalog/search.ts` | 小規模catalog用normalized search、およびcollectionごとのcatalog searchText生成（対象fieldはここで明示列挙する。Task 2で作成、Task 3でsearchExtra化、Task 6でuse-case/article対応） |
 | `lib/viewModels/shared.ts` | serializable image/logo/fact型 |
 | `lib/viewModels/logo.ts` | domain logoからdisplay logoへのserver変換 |
 | `lib/viewModels/robots.ts` | robot list VM |
@@ -113,7 +156,9 @@ whitelist後の`searchText`は、その大半が**同じitem内に既にserializ
 | `tests/components/catalog-url-state.test.tsx` | push/replace/popstate |
 | `tests/unit/view-models/*.test.ts` | serialization/filter contract |
 | `tests/e2e/catalog-url-state.spec.ts` | URL共有とback/forward |
-| `scripts/check-client-budgets.mjs` | route JS budget |
+| `scripts/check-catalog-payload.mjs` | VM factory出力のbyte budget（Task 3） |
+| `scripts/check-client-bundle-content.mjs` | client chunkの生data marker検査（Task 3） |
+| `scripts/check-client-budgets.mjs` | route固有JS budget（Task 8） |
 
 ### 変更
 
@@ -340,6 +385,11 @@ git commit -m "refactor: keep catalog filters in browser URL state"
 
 ### Task 2: Robot / Manufacturer一覧をview model化する
 
+> **状態: 実装済み（commit `f42ecbf`）。** このtaskはgate類が計画へ追加される前にcommitされている。
+> gate（payload budget、import境界、bundle内容検査）と`searchExtra`はTask 3が担当する。
+> 本節のStepは実装済みの記録として残す。ただしStep 3のsearchText builderは
+> `manufacturerId`を含めない形へ修正済みであり、Task 3で実装を合わせる。
+
 **Files:**
 - Create: `lib/viewModels/shared.ts`
 - Create: `lib/viewModels/robots.ts`
@@ -483,6 +533,7 @@ export interface ManufacturerCatalogItem {
 // tests/unit/view-models/robots.test.ts
 import { describe, expect, it } from 'vitest';
 import { getManufacturers, getRobots, getUseCases } from '@/lib/data';
+import { normalizeSearchText } from '@/lib/search';
 import { createRobotCatalogItems } from '@/lib/viewModels/robots';
 
 describe('robot catalog view models', () => {
@@ -612,7 +663,6 @@ export function createRobotCatalogSearchText(
     robot.name,
     manufacturer?.nameJa,
     manufacturer?.name,
-    robot.manufacturerId,
     robot.distributorJapan,
     robotCategoryLabels[robot.category],
     deploymentStageLabels[robot.deploymentStage],
@@ -681,10 +731,278 @@ git commit -m "refactor: send catalog view models to robot and manufacturer clie
 
 ---
 
-### Task 3: Use case / Reports一覧をview model化する
+### Task 3: 制約のgateを4層で導入する
+
+**Goal:** Task 2でVM化した内容を守るgateを揃える。Task 4以降の大きな削減に着手する前に、退行を機械的に検出できる状態にする。
+
+**Files:**
+- Create: `scripts/check-catalog-payload.mjs`
+- Create: `scripts/check-client-bundle-content.mjs`
+- Modify: `scripts/check-data-import-boundaries.mjs`
+- Modify: `lib/viewModels/shared.ts`（`searchExtra`対応）
+- Modify: `lib/viewModels/robots.ts`
+- Modify: `lib/viewModels/manufacturers.ts`
+- Modify: `lib/catalog/search.ts`
+- Modify: `lib/robotFilters.ts`
+- Modify: `lib/manufacturerFilters.ts`
+- Modify: `tests/unit/view-models/robots.test.ts`
+- Modify: `tests/unit/view-models/manufacturers.test.ts`
+- Modify: `package.json`
+
+**Interfaces:**
+- Produces: `npm run check:catalog-payload`、`npm run check:bundle-content`
+- Produces: `buildCatalogHaystack(item): string`（client側でVM既存fieldから検索文字列を組む）
+
+- [ ] **Step 1: searchText builderをwhitelistへ揃える**
+
+Task 2の実装は`manufacturerId`をsearchTextへ含めている。Global Constraintsの表は内部idを除外と定めているため、`lib/catalog/search.ts`の`createRobotCatalogSearchText`から`robot.manufacturerId`を外す。facetでの絞り込みは`item.filter.manufacturerId`が担っており、検索文字列に含める必要はない。
+
+- [ ] **Step 2: searchTextの重複排除（searchExtra）を実装する**
+
+`filter.searchText`を廃止し、`filter.searchExtra`へ置き換える。`searchExtra`にはVMの他fieldから復元できない値だけを入れる。
+
+```ts
+// lib/viewModels/robots.ts
+filter: {
+  manufacturerId: robot.manufacturerId,
+  industryTags: [...robot.industryTags],
+  japanAvailability: robot.japanAvailability,
+  deploymentStage: robot.deploymentStage,
+  // VMの他fieldから復元できない検索対象だけを持つ
+  searchExtra: createRobotCatalogSearchExtra(robot, manufacturer),
+},
+```
+
+```ts
+// lib/catalog/search.ts
+export function buildCatalogHaystack(item: RobotCatalogItem) {
+  return normalizeSearchText([
+    item.name,
+    item.manufacturer.name,
+    item.stage.label,
+    ...item.facts.map((fact) => fact.value),
+    ...item.filter.industryTags,
+    item.filter.searchExtra,
+  ].join(' '));
+}
+```
+
+client側は`useMemo`でitemsごとにhaystackを1度だけ組む。実測でrobotsのsearchText 7,346字のうちVMから復元できないのは3,065字のみであり、約4,300字削減できる。
+
+- [ ] **Step 3: 検索対象field集合をtestで固定する**
+
+`searchExtra`方式は「cardの表示内容を変えると検索範囲が暗黙に変わる」結合を持つ。この結合は消すのではなく**可視化**する。
+
+```ts
+it('pins the searchable field set', () => {
+  expect(getSearchableFieldKeys(items[0])).toEqual([
+    'name', 'manufacturer.name', 'stage.label',
+    'facts.use-case', 'facts.size', 'facts.price', 'facts.runtime',
+    'industryTags', 'searchExtra',
+  ]);
+});
+```
+
+cardのfactを1つ外すとこのtestが落ち、「検索範囲も変わるが意図通りか」を実装者へ強制的に確認させる。
+
+- [ ] **Step 4: payload byte budgetを導入する**
+
+`scripts/check-catalog-payload.mjs`を`scripts/check-home-payload.mjs`と同形で作る。5 factoryの出力を`JSON.stringify`し、`Buffer.byteLength`でcollectionごとにgateする。文字数ではなくバイト数で測る（日本語はUTF-8で1文字3バイトのため、文字数では実転送量を約3倍過小評価する）。
+
+初期上限は本文除外後の実測値に約15%の余裕を足して設定し、実測値をcommit messageへ残す。
+
+- [ ] **Step 5: import境界を追加する**
+
+`scripts/check-data-import-boundaries.mjs`へ、`lib/viewModels/**`が`lib/search.ts`／`lib/searchIndex.ts`をimportしないruleを追加する。`lib/catalog/search.ts`は`normalizeSearchText`のためのimportを許可する（対象fieldを自前で列挙するfileであり、search documentは使わない）。
+
+- [ ] **Step 6: build成果物の内容検査を導入する**
+
+`scripts/check-client-bundle-content.mjs`を作る。`.next/static/chunks/*.js`を走査し、生dataのmarkerが含まれるchunkがあれば失敗させる。
+
+```js
+const MARKERS = ['fieldEvidence', 'vendorRiskNote', 'usageExampleSourceUrls'];
+```
+
+markerは「表示用VMには絶対に現れないが生recordには必ずある」fieldから選ぶ。**このtask時点では`/reports`の違反により失敗する**のが正しい。Task 4がこれをgreenにする。したがってこのStepでは、scriptを追加し`package.json`へ配線したうえで、既知の失敗として`docs/reference/`へ現状を記録し、Task 4完了時にgreenになることを完了条件とする。
+
+- [ ] **Step 7: package.jsonへ配線する**
+
+```json
+{
+  "check:catalog-payload": "node scripts/check-catalog-payload.mjs",
+  "check:bundle-content": "node scripts/check-client-bundle-content.mjs"
+}
+```
+
+`check`のpipelineへ`check:home-payload`の直後に`check:catalog-payload`を、`build`の後に`check:bundle-content`を挿入する。
+
+- [ ] **Step 8: gateを実行して現状を記録する**
+
+```bash
+npm run test -- tests/unit/view-models
+npm run typecheck && npm run lint && npm run build
+npm run check:catalog-payload
+npm run check:bundle-content   # /reports の違反により失敗する想定
+```
+
+- [ ] **Step 9: commit**
+
+```bash
+git add scripts/check-catalog-payload.mjs scripts/check-client-bundle-content.mjs \
+  scripts/check-data-import-boundaries.mjs lib/viewModels lib/catalog/search.ts \
+  lib/robotFilters.ts lib/manufacturerFilters.ts tests/unit/view-models package.json
+git commit -m "test: gate catalog payload, import boundary and bundle content"
+```
+
+---
+
+### Task 4: `/reports`の生data流出を止める
+
+**Goal:** `components/ReportsBrowser.tsx`（`'use client'`）から`lib/data/localContentSnapshot`へ至るimport chainを切り、968,993バイトのclient chunkを除去する。**Phase 5で最大の削減であり、かつGlobal Constraint違反そのもの。**
+
+**現状の経路（実測）:**
+
+```
+components/ReportsBrowser.tsx ('use client')
+  → lib/articlePlacements.ts:3   import { localContentSnapshot }
+    → lib/data/localContentSnapshot   ← robots / manufacturers / useCases / articles 全部
+```
+
+`.next/static/chunks/3r7-bj8a3uy6f.js` = 968,993バイト（`fieldEvidence`×60、`vendorRiskNote`×26、`unitree-g1`×32）。`/reports`のroute固有JS 1,233,689バイトの**79%**。propsですらなく、dataset全体がJS bundleとして全userへ配信されている。
+
+**Files:**
+- Modify: `lib/articlePlacements.ts`
+- Modify: `components/ReportsBrowser.tsx`
+- Modify: `src/app/reports/page.tsx`
+- Modify: `tests/unit/`（placement関連testがあれば）
+
+- [ ] **Step 1: 現状をtestで固定する**
+
+`npm run build`後に`scripts/check-client-bundle-content.mjs`が`/reports`のchunkで失敗することを確認し、失敗出力を記録する。これがこのtaskのred状態である。
+
+- [ ] **Step 2: `lib/articlePlacements.ts`をserver引数化する**
+
+`localContentSnapshot`のimportを削除し、signatureを次へ変更する。
+
+```ts
+export function getArticleIndexPlacementReports<T extends { id: string; publishedAt: string }>({
+  articles,
+  placements,
+  limits,
+}: {
+  articles: readonly T[];
+  placements: readonly ArticlePlacement[];
+  limits: Readonly<Record<ArticlePlacementSlot, number>>;
+}) {
+  // 現行のhero/feature selectionをTのidentityを保って返す
+}
+```
+
+- [ ] **Step 3: `src/app/reports/page.tsx`だけがsnapshotを読む**
+
+`localContentSnapshot.articlePlacements`とlimitsをserver pageで解決し、結果をclientへ渡す。`ReportsBrowser`は`reports`／`heroReports`／`featureReports`を受け取り、placement moduleをimportしない。
+
+このtask時点ではまだArticle VM化（Task 6）が済んでいないため、`ReportsBrowser`のprops型は現行のまま（`Article[]`）でよい。**目的はimport chainを切ることであり、VM化はTask 6が担当する。** 生dataがbundleへ入る経路を先に潰すことで、最大の削減を最短で得る。
+
+- [ ] **Step 4: gateがgreenになることを確認する**
+
+```bash
+npm run build
+npm run check:bundle-content   # Expected: 0件
+node -e "const s=require('./.next/diagnostics/route-bundle-stats.json');console.log(s.find(x=>x.route==='/reports').firstLoadUncompressedJsBytes)"
+```
+
+route固有JSの削減幅を実測し、commit messageへ記録する。
+
+- [ ] **Step 5: 回帰確認**
+
+```bash
+npm run test
+npm run test:e2e -- tests/e2e/public-routes.spec.ts
+```
+
+hero/feature/pagination/検索の表示が現行と一致することを確認する。
+
+- [ ] **Step 6: commit**
+
+```bash
+git add lib/articlePlacements.ts components/ReportsBrowser.tsx src/app/reports/page.tsx
+git commit -m "perf: stop shipping the local content snapshot to the reports client"
+```
+
+---
+
+### Task 5: `PageTabBar`のmotion依存を外す
+
+**Goal:** `/robots`、`/use-cases`、`/reports`に乗っている134,910バイトのmotion chunkを除去する。
+
+**現状の経路（実測）:**
+
+```
+components/RobotsBrowser.tsx → components/PageTabBar.tsx:4
+  → components/ui/AnimatedTooltip.tsx:4  import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+```
+
+`PageTabBar`を使わない`/manufacturers`だけがこのchunkを持たない（178,411バイト）ことが、経路の裏付けになっている。Task 2でcardからmotionを外してもなお`/robots`のJSが-0.6%しか動かなかった理由はこれである。**手法の失敗ではなく、別経路が残っていたため。**
+
+**Files:**
+- Modify: `components/ui/AnimatedTooltip.tsx`
+- Modify: `components/PageTabBar.tsx`
+
+- [ ] **Step 1: `AnimatedTooltip`の利用者を洗い出す**
+
+```bash
+rg -n "AnimatedTooltip" components src
+```
+
+`PageTabBar`以外の利用者があれば、それらの表示要件も満たす形で置換する。
+
+- [ ] **Step 2: CSSベースへ置換する**
+
+`AnimatePresence`／`motion`／`useReducedMotion`を、CSS transitionと`motion-reduce:`utilityへ置き換える。tooltipのfade/slideは`transition-opacity`と`data-*`属性で表現できる。`prefers-reduced-motion`はTailwindの`motion-reduce:`が担う（Task 2で`RobotCard`に適用した方式と同じ）。
+
+表示・keyboard操作・aria属性は現行と同一に保つ。
+
+- [ ] **Step 3: 削減を実測する**
+
+```bash
+npm run build
+node -e "
+const s=require('./.next/diagnostics/route-bundle-stats.json');
+const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
+const fs=require('fs');
+for(const r of ['/robots','/manufacturers','/use-cases','/reports']){
+  const e=s.find(x=>x.route===r);
+  const own=e.firstLoadChunkPaths.filter(p=>!floor.has(p)).reduce((a,p)=>a+fs.statSync(p).size,0);
+  console.log(r, 'route-specific=', own);
+}"
+```
+
+- [ ] **Step 4: 回帰確認とcommit**
+
+```bash
+npm run test && npm run build
+npm run test:e2e -- tests/e2e/public-routes.spec.ts
+git add components/ui/AnimatedTooltip.tsx components/PageTabBar.tsx
+git commit -m "perf: drop the motion dependency from the page tab bar"
+```
+
+tab切替、tooltip表示、keyboard操作、reduced-motion時の挙動をscreenshotで確認する。
+
+---
+### Task 6: Use case / Reports一覧をview model化する
+
+> **前提:** Task 4で`localContentSnapshot`のimport chainは既に切れており、Task 3でgateが揃っている。
+> このtaskはVM化そのものに集中する。placementのserver引数化はTask 4で完了済みのため、
+> 本節のStep 4は「Task 4の結果を前提にReportsBrowserのpropsをVMへ差し替える」だけになる。
+>
+> **MiniSearchは維持する**（Global Constraintsの決定を参照）。`create*SearchIndex`が索引する
+> 対象を`lib/search.ts`のsearch documentから`lib/catalog/search.ts`のcatalog searchTextへ
+> 差し替えることで、本文流出を止めつつ日本語検索品質（`fuzzy: 0.2`、`Intl.Segmenter('ja')`）を保つ。
 
 **Files:**
 - Modify: `lib/catalog/search.ts`（Task 2で作成済み。use-case／article用builderを追加する）
+- Modify: `lib/searchIndex.ts`（索引対象をcatalog searchTextへ差し替え）
 - Create: `lib/viewModels/useCases.ts`
 - Create: `lib/viewModels/articles.ts`
 - Create: `tests/unit/view-models/use-cases.test.ts`
@@ -826,11 +1144,15 @@ export function getArticleIndexPlacementReports<T extends { id: string; publishe
 
 - [ ] **Step 5: cards/browserをVMへ変更する**
 
-UseCasesBrowserは`UseCaseCatalogItem[]`、ReportsBrowserは`ArticleCatalogItem[]`を受ける。検索は`matchesCatalogSearch(item.filter.searchText, query)`または`item.searchText`を使い、`create*SearchIndex`と`MiniSearch`をclient graphから外す。
+UseCasesBrowserは`UseCaseCatalogItem[]`、ReportsBrowserは`ArticleCatalogItem[]`を受ける。
 
-これはGlobal Constraintsの「受け入れるトレードオフ」2で決定済みの**独立した機能劣化**である。タイポ許容（`fuzzy: 0.2`）と`Intl.Segmenter('ja')`による日本語語境界分割を失うため、置換前後で代表queryの挙動差をこのtaskのcommit messageへ記録する。併せてreportsの検索placeholder（`lib/uiText.ts`の「タイトル・トピック・キーワードで検索」）が本文検索を想起させないか再検討し、0件時の空状態文言も確認する。
+**MiniSearchは維持する。** `lib/searchIndex.ts`の`createUseCaseSearchIndex`／`createArticleSearchIndex`は残し、索引する文字列だけを差し替える。現在は`lib/search.ts`の`create*SearchDocument()`（本文を含む）を索引しているため、これを`lib/catalog/search.ts`のcatalog searchTextへ変える。index構築のoption（`prefix: true`、`fuzzy: 0.2`、`combineWith: 'AND'`、`Intl.Segmenter('ja')`のtokenizer）は一切変更しない。
 
-`MiniSearch`をclient graphから外した後、`lib/searchIndex.ts`と`lib/search.ts`の残存利用者を`rg`で洗い出す。利用者が消えるexportは、このtaskで削除するか後続phaseの削除対象として文書化するかを決める（放置すると検索定義が二重に残る）。
+これにより本文流出は止まり、タイポ許容と日本語語境界分割は保たれる。削減効果が18,690バイトにすぎないMiniSearch本体の除去は、日本語検索品質を落とす対価に見合わないため行わない（Global Constraintsの「受け入れるトレードオフ」2を参照）。
+
+`lib/search.ts`の`create*SearchDocument()`の残存利用者を`rg`で洗い出す。catalogが使わなくなって利用者が消えるexportは、このtaskで削除するか後続phaseの削除対象として文書化するかを決める（放置すると検索定義が二重に残り、片方だけメンテされる事故につながる）。
+
+併せてreportsの検索placeholder（`lib/uiText.ts`の「タイトル・トピック・キーワードで検索」）が本文検索を想起させないか再検討し、0件時の空状態文言も確認する。検索範囲が本文を含まなくなったことと文言が整合するかを見る。
 
 UseCaseCardから`motion/react`と`useTiltCardEffect`を削除し、通常の`div`へ変更する。NewsHeroCarouselの`useReducedMotion`はTask 4の`useMediaQuery('(prefers-reduced-motion: reduce)')`へ置換する。
 
@@ -862,7 +1184,7 @@ git commit -m "refactor: send catalog view models to reports and use cases"
 
 ---
 
-### Task 4: Compareをview modelと責務別componentへ分割する
+### Task 7: Compareをview modelと責務別componentへ分割する
 
 **Files:**
 - Create: `lib/viewModels/compare.ts`
@@ -1027,7 +1349,7 @@ git commit -m "refactor: split compare client around display view models"
 
 ---
 
-### Task 5: raw propsとclient budgetをhard gate化する
+### Task 8: raw propsとclient budgetをhard gate化する
 
 **Files:**
 - Create: `scripts/check-client-budgets.mjs`
@@ -1069,7 +1391,7 @@ key名assertionに加えて、**本文値のaggregate assertion**も置く。全
 
 比較は必ず**両辺を`normalizeSearchText`で正規化**し、JSON文字列ではなくsearch text自体を対象にする（raw文字列比較は実測7.9%取りこぼす。Global Constraints「制約のゲート設計」参照）。
 
-このassertionは人手のfield列挙に依存するため単独では不十分であり、Task 2で導入した`check:catalog-payload`（文字数budget）と`check:data-boundaries`のimport禁止ruleと合わせて3層で守る。Task 5ではこの3つが`npm run check`に揃って組み込まれていることを確認する。
+このassertionは人手のfield列挙に依存するため単独では不十分であり、Task 3で導入した`check:catalog-payload`（byte budget）、`check:data-boundaries`のimport禁止rule、`check:bundle-content`（client chunkの生data marker検査）と合わせて4層で守る。Task 8ではこの4つが`npm run check`に揃って組み込まれていることを確認する。
 
 - [ ] **Step 2: client budget scriptを追加する**
 
@@ -1080,41 +1402,55 @@ import fs from 'node:fs';
 const stats = JSON.parse(
   fs.readFileSync('.next/diagnostics/route-bundle-stats.json', 'utf8'),
 );
-const budgets = {
-  '/reports': 785_122,
-  '/robots': 646_159,
-  '/manufacturers': 637_214,
-  '/use-cases': 602_884,
-};
+// route固有JS（first-load chunkのうち共有フロアに含まれないもの）の上限。
+// 総量ではなくroute固有を測る理由はGlobal Constraintsの「JS削減目標の再定義」を参照。
+const ROUTE_SPECIFIC_MAX = 180_000;
+const routes = ['/reports', '/robots', '/manufacturers', '/use-cases'];
+
+// 共有フロアは、client componentを持たないstatic routeのchunk集合として求める。
+const floor = new Set(
+  stats.find((item) => item.route === '/privacy').firstLoadChunkPaths,
+);
 
 let failed = false;
-for (const [route, maxBytes] of Object.entries(budgets)) {
+for (const route of routes) {
   const entry = stats.find((item) => item.route === route);
   if (!entry) {
     console.error(`[client-budget] missing route: ${route}`);
     failed = true;
     continue;
   }
-  const actual = entry.firstLoadUncompressedJsBytes;
-  console.log(`[client-budget] ${route}: ${actual}/${maxBytes}`);
-  if (actual > maxBytes) failed = true;
+  const own = entry.firstLoadChunkPaths
+    .filter((chunkPath) => !floor.has(chunkPath))
+    .reduce((total, chunkPath) => total + fs.statSync(chunkPath).size, 0);
+  console.log(
+    `[client-budget] ${route}: route-specific=${own}/${ROUTE_SPECIFIC_MAX}` +
+      ` (total=${entry.firstLoadUncompressedJsBytes})`,
+  );
+  if (own > ROUTE_SPECIFIC_MAX) failed = true;
 }
 if (failed) process.exitCode = 1;
 ```
 
-BudgetsはPhase 1 baselineの30%削減値:
+上限180,000の根拠はGlobal Constraintsの「JS削減目標の再定義」を参照。総量は参考値としてlogへ出すが、gateはroute固有だけにかける。
 
-- reports: 1,121,603 → 785,122
-- robots: 923,085 → 646,159
-- manufacturers: 910,306 → 637,214
-- use-cases: 861,263 → 602,884
+Task 4・Task 5完了後の想定値:
+
+| route | Task 2時点 | Task 4後 | Task 5後 | 上限 |
+|---|---|---|---|---|
+| `/reports` | 1,233,689 | 264,696 | 129,786 | 180,000 |
+| `/robots` | 325,787 | 325,787 | 190,877 | 180,000 |
+| `/use-cases` | 268,207 | 268,207 | 133,297 | 180,000 |
+| `/manufacturers` | 178,411 | 178,411 | 178,411 | 180,000 |
+
+`/robots`はTask 5後も190,877で上限をわずかに超える見込みである。Task 6・Task 7の副次的な削減で収まるかを実測し、収まらない場合は残る差分の内訳を調査してこのstepで対処する。上限そのものを緩めるのは最後の手段とし、緩める場合は`/manufacturers`の実績値を基準にした根拠を書き直す。
 
 - [ ] **Step 3: package scriptsへ追加する**
 
 ```json
 {
   "check:client-budgets": "node scripts/check-client-budgets.mjs",
-  "check": "npm run validate:data && npm run check:data-boundaries && npm run check:world-map-asset && npm run typecheck && npm run lint && npm run test && npm run build && npm run check:home-payload && npm run check:client-budgets && npm run test:e2e"
+  "check": "npm run validate:data && npm run check:data-boundaries && npm run check:world-map-asset && npm run typecheck && npm run lint && npm run test && npm run check:catalog-payload && npm run build && npm run check:home-payload && npm run check:bundle-content && npm run check:client-budgets && npm run test:e2e"
 }
 ```
 
@@ -1149,16 +1485,64 @@ git commit -m "test: enforce catalog client budgets"
 
 ---
 
+## Global Constraints ⇄ Task 対応表
+
+各制約がどのtaskのどのstepで実装・検証されるかを固定する。**この表はPhase completionで1行ずつ目視確認する。**
+
+初版と改訂版はいずれも、散文で決めた内容がtaskのstepやcode例へ反映されないまま残る不整合を起こした（`manufacturerId`を表で除外しながらcode例では渡していた、`searchExtra`が散文にしか存在しなかった）。この表はその再発を防ぐためのもので、planを編集したら必ず併せて更新する。
+
+| Global Constraint | 実装 | 検証 |
+|---|---|---|
+| DB query／server action／API route／async repositoryを追加しない | 全task | Task 8 Step 4のsource検索 |
+| filter/share URLのparameter名と意味を維持 | Task 1 | Task 1 Step 6 E2E |
+| back/forwardでfilter・compare・viewが復元 | Task 1、Task 7 | Task 1 Step 6、Task 7 Step 7 E2E |
+| raw配列をcatalog client propsへ渡さない | Task 2（robots/mfr）、Task 6（use-case/report）、Task 7（compare） | Task 8 Step 4の`rg`、Phase completion |
+| `sources`／`fieldEvidence`／本文／未使用mediaをVMへ含めない（**値の中身にも及ぶ**） | Task 2、Task 3 Step 1-3、Task 6 | Task 3の4層gate（下記） |
+| ↳ VM factory経由の流出 | Task 3 Step 1-2 | Task 3 Step 3-4（field集合pin、payload byte budget）、正規化済み値assertion |
+| ↳ import chain経由の流出 | Task 4 | Task 3 Step 5-6（import境界、bundle内容検査） |
+| 現行件数ではpagination/filterをclientで完結 | Task 1、Task 6 | 既存E2E |
+| filterごとのRSC再取得を廃止 | Task 1 | Task 1 Step 7の`rg` |
+| card情報・link・favorite・compare・popoverを維持 | Task 2、Task 5、Task 6、Task 7 | 各taskのE2Eとscreenshot |
+| route固有JSを180,000バイト以下にする | Task 4（-968,993）、Task 5（-134,910） | Task 8の`check:client-budgets` |
+| catalog検索範囲をcard表示＋facet labelに限定 | Task 3 Step 1、Task 6 | Task 3 Step 3のfield集合pin |
+| MiniSearchを維持し索引対象だけ差し替え | Task 6 | Task 6の検索E2E |
+
+---
+
 ## Phase completion
 
 ```bash
 npm run check
-rg -n "useUrlParamUpdater|motion/react|MiniSearch" \
-  components/{RobotsBrowser,ManufacturersBrowser,UseCasesBrowser,ReportsBrowser,RobotCard,ManufacturerCard,UseCaseCard}.tsx
+rg -n "useUrlParamUpdater" components lib
 rg -n "(robots|manufacturers|useCases|reports): (Robot|Manufacturer|UseCase|Article)\\[\\]" components
 rg -n "from '@/lib/search'|from '@/lib/searchIndex'" lib/viewModels
+rg -l 'fieldEvidence|vendorRiskNote' .next/static/chunks/*.js
+rg -n "motion/react" components/ui/AnimatedTooltip.tsx components/PageTabBar.tsx \
+  components/RobotCard.tsx components/ManufacturerCard.tsx components/UseCaseCard.tsx
 ```
 
-Expected: 対象一覧で0件、`lib/viewModels`からのsearch module import 0件、4route client budget達成、catalog payload budget達成、URL back/forward E2E PASS。
+Expected: すべて0件。
 
-`npm run check`のpipelineに`check:catalog-payload`（Task 2導入）と`check:client-budgets`（Task 5導入）の両方が含まれていることを確認する。前者はRSC payload、後者はJS chunkを測る別軸のgateであり、片方だけでは本phaseの制約を守れない。
+`npm run check`のpipelineに次の3つが揃っていることを確認する。**それぞれ別の経路を測っており、1つでも欠けると本phaseの制約を守れない。**
+
+| gate | 導入 | 測る対象 | 検知できない経路 |
+|---|---|---|---|
+| `check:catalog-payload` | Task 3 | VM factoryの出力（RSC payloadへ載る量） | import chain経由でbundleへ入る生data |
+| `check:bundle-content` | Task 3 | client chunkの中身（生dataのmarker） | VM経由で連結された本文 |
+| `check:client-budgets` | Task 8 | route固有JSのバイト数 | RSC payloadの肥大 |
+
+さらにGlobal Constraints ⇄ Task 対応表を1行ずつ確認し、各制約に実装taskと検証手段が両方存在することを確かめる。
+
+**route固有JSの最終確認:**
+
+```bash
+node -e "
+const s=require('./.next/diagnostics/route-bundle-stats.json');
+const fs=require('fs');
+const floor=new Set(s.find(x=>x.route==='/privacy').firstLoadChunkPaths);
+for(const r of ['/robots','/manufacturers','/use-cases','/reports']){
+  const e=s.find(x=>x.route===r);
+  const own=e.firstLoadChunkPaths.filter(p=>!floor.has(p)).reduce((a,p)=>a+fs.statSync(p).size,0);
+  console.log(r.padEnd(16), String(own).padStart(9), own<=180000?'OK':'OVER');
+}"
+```
