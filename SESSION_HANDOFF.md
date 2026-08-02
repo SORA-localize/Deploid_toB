@@ -223,10 +223,9 @@ import chain経由のbundle流出を検知できない。**両方が要る。**
 ## 10. 環境メモ
 
 - `npm run check` が全gateのpipeline。個別scriptは `package.json` を参照
-- e2eは`npm run test:e2e`。**port 3000で別checkoutのサーバが動いていると、失敗せずに
-  そのサーバへ当たって「通ってしまう」**（`playwright.config.ts`が`reuseExistingServer: !CI`）。
-  2026-08-02に実際に発生し、親checkout（integration branch）の旧ビルドに対してe2eが緑になった。
-  **検証前に `lsof -a -p $(lsof -ti:3000 | head -1) -d cwd -Fn` でcwdを確認するか、
-  別portの一時configで走らせること。**
+- e2eは`npm run test:e2e`。**専用port 3399で毎回自前のサーバを起動する**（`reuseExistingServer: false`）。
+  2026-08-02まではport 3000を既存サーバごと再利用しており、親checkoutのサーバに当たって
+  **いま書いたコードを一度もテストしないまま全件緑になる**状態だった。実際に発生したため修正済み。
+  portが塞がっている場合はエラーで止まる（静かに間違えるより安全）。
 - Node 22系。`data/*.ts`を読むscriptは`--experimental-strip-types`付き
 - Vercelプロジェクトへlink済み（safety design §4.3 ルール9）
