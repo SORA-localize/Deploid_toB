@@ -47,7 +47,7 @@ snippetCheck: true
 | 6 | `check-client-import-graph.mjs`が拡張子付きspecifier（repo内に55箇所）を**黙って辿らない**。再exportも追わない | 末尾`.ts`を落としてから解決。判定を解決後パスへ。再export・副作用importも辺に含め、未解決specifierは失敗させる |
 | 7 | plan-snippets gateの実効カバレッジが不明瞭 | Task 2直後は34 block中9個だけであることと、gateの本体が「各taskでmarkerを外す手順」であることを明記 |
 
-**外部レビューで追加された6件（同日）。** 上の7件は内部監査で潰したもので、次の6件は5巡目・6巡目直前の外部レビューが見つけたものである。**「計画の事実関係はすべて正確だった」という内部監査の結論は誤りだった。**
+**外部レビューで追加された7件。** 上の7件は内部監査で潰したもので、次の7件は5巡目以降の外部レビューが見つけたものである。**「計画の事実関係はすべて正確だった」という内部監査の結論は誤りだった。**
 
 | # | 問題 | 修正 |
 |---|---|---|
@@ -55,8 +55,9 @@ snippetCheck: true
 | 9 | route固有chunkの内訳表が**削減対象しか載せておらず、残りを説明していなかった**（`/robots` 99,454、`/manufacturers` 107,532が未帰属）。budgetの可否を判定できない | 「どのtaskも触らないchunk（残存フロア）」節を追加。中身をminified識別子から同定 |
 | 10 | budgetで**本当に詰まるのは`/robots`**（motion全除去でも190,877で超過）なのに、計画は最も余裕のある`/reports`を軸に書かれていた | 「budgetが本当に詰まるrouteは`/robots`である」節を追加。保守的見積もりでも160,750で成立することと、その達成が`lib/search.ts`除去に全面依存することを明記 |
 | 11 | 「RSC payloadは静的成果物に現れない」というgate設計の前提が**どこにも書かれておらず、理由も`PPRのため`と誤認していた**（実際は`searchParams`のdynamic boundaryのため。同じPPR設定でもHomeとdetail routeには現れる） | Task 2の流出経路表の下に実測付きで根拠を追記。前提が依存する2条件（catalog routeがdynamicであること、`'use cache'`境界がmaterializeしないこと）も明記 |
-| 12 | この節の散文が「**次の3件**」のまま表は4行（#8〜#11）だった。**「散文と表が食い違う」という故障モードを記録している当の節で再発していた** | 「次の4件」へ修正 |
+| 12 | この節の散文が「**次の3件**」のまま表は4行（#8〜#11）だった。**「散文と表が食い違う」という故障モードを記録している当の節で再発していた** | 件数を表の行数に合わせた（その後 #12・#13 の追加で、現在の本文は「次の6件」）|
 | 13 | catalog-payload testの`@plan-check-skip`の理由（「use-cases / articlesのVMがまだ無い」）が**snippet自身のimportと一致していなかった**（robots / manufacturersしか参照していない）。3巡連続で誤りが出た現場のVM testが不要にType検査から外れていた | markerを削除。型検査カバレッジが9→10へ。併せてwhitelist化前の実測値（robots 101,449 / manufacturers 37,271バイト）をTask 6 Step 5へ記録 |
+| 14 | Task 6 Step 5に追加した予測が、**字ベースの割合をバイトの実測値へ掛けていた**（73,000 / 22,800）。8行下で自分が禁じている換算であり、**#12を直したcommit自身が同じ故障モードを持ち込んだ**。正しい着地は約62,000〜65,000 / 17,000〜19,000で、記載値のままだとTask 6 Step 5のトリップワイヤが正しい実装で誤発火する | バイト実測（`searchText`はバイトで58.4% / 64.4%、字では42.5% / 47.5%）に基づく表とレンジへ差し替え |
 
 ---
 
@@ -910,7 +911,7 @@ compileできない断片には`// @plan-check-skip: <理由>`を1行入れる�
 
 **`include`を`.plan-snippets/**/*`だけにしてはならない。** `extends`は`include`を継承せず置き換えるため、`next-env.d.ts`とambient型が外れる。実測すると、snippetがimportした先の**既存ファイル**が落ちる（`lib/media.ts(23,17): Cannot find name 'process'`）。snippetの誤りではないので、指示どおり「落ちた箇所を計画書側で修正する」と誤った修正へ誘導される。`next-env.d.ts`と`types: ["node"]`を明示すれば消える。
 
-**この設定で10個のsnippetが実際に通ることを確認済み**（2026-08-02時点）。唯一落ちるのは`lib/articlePlacements.ts`のsnippetで、原因は`byArticlePublishedDesc`がまだ`(a: Article, b: Article)`だから。**Task 1 Step 2の引数型を広げる変更を入れると解消し、その状態で`npm run typecheck`（プロジェクト全体）も通る**ことまで確認した。順序制約「Task 1 → Task 2」が実在することの裏付けである。
+**この設定で、抽出される10個のうち9個が現時点で通ることを確認済み**（2026-08-02時点）。落ちる1個は`lib/articlePlacements.ts`のsnippetで、原因は`byArticlePublishedDesc`がまだ`(a: Article, b: Article)`だから。**Task 1 Step 2の引数型を広げる変更を入れると10個すべてが通り、その状態で`npm run typecheck`（プロジェクト全体）も通る**ことまで確認した。順序制約「Task 1 → Task 2」が実在することの裏付けである。
 
 - [ ] **Step 4: baselineと`.gitignore`と`package.json`を更新する**
 
@@ -1613,7 +1614,18 @@ robots        101,449 バイト
 manufacturers  37,271 バイト
 ```
 
-Step 6のbudget testはこの時点でも実行できる（`@/lib/viewModels/{robots,manufacturers}`しか参照しないため）。上の数値はそれを実行して得たものである。**Task 6のwhitelist化でこれがどれだけ減るかが削減効果**であり、冒頭の文字数ベースの見積もり（robots -27.7%、manufacturers -38.8%）が正しければ robots は約73,000、manufacturers は約22,800まで下がる。**乖離したら見積もりの前提を疑い、原因を記録してから上限を決める。**
+Step 6のbudget testはこの時点でも実行できる（`@/lib/viewModels/{robots,manufacturers}`しか参照しないため）。上の数値はそれを実行して得たものである。**Task 6のwhitelist化でこれがどれだけ減るかが削減効果**である。
+
+**見積もりはバイトで立てる。字数ベースの割合をバイトへ掛けてはならない。** 冒頭の表（robots -27.7%、manufacturers -38.8%）の単位は**字**であり、そのままバイトへ適用すると削減を過小評価する。実測すると`searchText`の占める割合は次のとおり大きく違う。
+
+| collection | searchText（字） | searchText（バイト） | 本文の密度 | payload全体の密度 |
+|---|---:|---:|---:|---:|
+| robots | 28,529（42.5%） | 59,283（**58.4%**） | 2.08 B/字 | 1.51 B/字 |
+| manufacturers | 11,477（47.5%） | 23,989（**64.4%**） | 2.09 B/字 | 1.54 B/字 |
+
+除去対象の日本語本文は約2.08バイト/字で、JSON構造・slug・英字keyを含むpayload全体（約1.51バイト/字）より密度が高い。**したがってバイトでの削減率は字での削減率より大きくなる。**
+
+本文除外後の着地は **robots 62,000〜65,000、manufacturers 17,000〜19,000** を見込む。`searchText`を全除去した場合の下限は実測で **robots 42,338、manufacturers 13,358**。**この範囲を外れたら見積もりの前提を疑い、原因を記録してから上限を決める。**
 
 > **plain nodeでVM factoryを実行することはできない。** `lib/data.ts`も`lib/viewModels/*.ts`も`@/`エイリアスと拡張子なし相対importを使っており、Nodeはどちらも解決しない（実測: `Cannot find package '@/lib' imported from .../lib/viewModels/robots.ts`）。`--experimental-strip-types`は型を剥がすだけで、module解決は変えない。**計測もgateもvitest上で行う。**
 
