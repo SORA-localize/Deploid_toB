@@ -47,7 +47,7 @@ snippetCheck: true
 | 6 | `check-client-import-graph.mjs`が拡張子付きspecifier（repo内に55箇所）を**黙って辿らない**。再exportも追わない | 末尾`.ts`を落としてから解決。判定を解決後パスへ。再export・副作用importも辺に含め、未解決specifierは失敗させる |
 | 7 | plan-snippets gateの実効カバレッジが不明瞭 | Task 2直後は34 block中9個だけであることと、gateの本体が「各taskでmarkerを外す手順」であることを明記 |
 
-**外部レビューで追加された7件。** 上の7件は内部監査で潰したもので、次の7件は5巡目以降の外部レビューが見つけたものである。**「計画の事実関係はすべて正確だった」という内部監査の結論は誤りだった。**
+**外部レビューで追加された7件と、Task 1の実装で判明した1件。** 上の7件は内部監査で潰したもの、続く7件は5巡目以降の外部レビュー、#15はTask 1を実装して初めて分かったものである。**「計画の事実関係はすべて正確だった」という内部監査の結論は誤りだった。**
 
 | # | 問題 | 修正 |
 |---|---|---|
@@ -58,6 +58,7 @@ snippetCheck: true
 | 12 | この節の散文が「**次の3件**」のまま表は4行（#8〜#11）だった。**「散文と表が食い違う」という故障モードを記録している当の節で再発していた** | 件数を表の行数に合わせた（その後 #12・#13 の追加で、現在の本文は「次の6件」）|
 | 13 | catalog-payload testの`@plan-check-skip`の理由（「use-cases / articlesのVMがまだ無い」）が**snippet自身のimportと一致していなかった**（robots / manufacturersしか参照していない）。3巡連続で誤りが出た現場のVM testが不要にType検査から外れていた | markerを削除。型検査カバレッジが9→10へ。併せてwhitelist化前の実測値（robots 101,449 / manufacturers 37,271バイト）をTask 6 Step 5へ記録 |
 | 14 | Task 6 Step 5に追加した予測が、**字ベースの割合をバイトの実測値へ掛けていた**（73,000 / 22,800）。8行下で自分が禁じている換算であり、**#12を直したcommit自身が同じ故障モードを持ち込んだ**。正しい着地は約62,000〜65,000 / 17,000〜19,000で、記載値のままだとTask 6 Step 5のトリップワイヤが正しい実装で誤発火する | バイト実測（`searchText`はバイトで58.4% / 64.4%、字では42.5% / 47.5%）に基づく表とレンジへ差し替え |
+| 15 | 内訳表が968,993を**全量「生dataset」と書いていた**。Task 1完了後の実測で、実際は生data 705,431 + `budoux` 263,562の同居と判明。`budoux`はどのtaskも担当しておらず、**`/reports`の着地は354,099でbudget 180,000の約2倍**になる | 内訳表・残存フロア表・Task 1完了条件を実測値へ更新し、「`/reports`はbudouxを外さないと180,000に届かない」節を追加。`rg`の完了条件も実態（3→2 chunk）へ修正 |
 
 ---
 
@@ -83,7 +84,8 @@ snippetCheck: true
 
 | バイト | 中身 | 載っているroute | 担当task |
 |---:|---|---|---|
-| 968,993 | 生dataset（`fieldEvidence`×60、`vendorRiskNote`×26、record slug 133件全部） | `/reports` | Task 1 |
+| 705,431 | 生dataset（`fieldEvidence`×60、`vendorRiskNote`×26、record slug全部） | `/reports` | Task 1（**完了。実測値**） |
+| 263,562 | `budoux`（日本語分かち書きモデル）。上と同じchunk（968,993）に同居していた | `/reports` | **担当taskなし。後述** |
 | 134,910 | `motion/react`（`0p8sjtw7eybcn.js`） | `/robots`、`/reports` | Task 3・4 |
 | 134,910 | `motion/react`（`1mbvphip_2888.js`。上とmd5不一致の別copy） | `/use-cases` | Task 3 |
 | 53,958 | `lib/search.ts` + `lib/tags` + `lib/labels`（`02r_vm-d2k0jh.js`） | `/robots` | Task 5・6 |
@@ -103,6 +105,7 @@ snippetCheck: true
 |---:|---|---|
 | 56,917 | Radix/shadcn UI primitives（`data-slot`、`aria-expanded`） | `/robots`、`/manufacturers` |
 | 41,104 | floating-ui（`referenceHidden`。popover配置） | `/robots`、`/use-cases`、`/manufacturers` |
+| 263,562 | **`budoux`**（`ReportsBrowser` → `NewsCard` → `BudouXText` → `lib/typography` → `budoux`） | `/reports` |
 | 32,096 | `embla-carousel`（`/reports` hero。**Task 4はmotionだけを外し、emblaは残す**） | `/reports` |
 | 9,511 / 2,286 / 1,433 | route entry等の小chunk | 各1 route |
 
@@ -113,7 +116,7 @@ route別の残存フロア（`lib/uiText.ts` 37,465を含む、MiniSearchを除�
 | `/manufacturers` | 144,997 | 56,917 + 41,104 + 9,511 + 37,465 |
 | `/robots` | **136,919** | 56,917 + 41,104 + 1,433 + 37,465 |
 | `/use-cases` | 97,259 | 41,104 + 37,465 + MiniSearch 18,690 |
-| `/reports` | 90,537 | 32,096 + 2,286 + 37,465 + MiniSearch 18,690 |
+| `/reports` | **354,099** | **budoux 263,562** + 32,096 + 2,286 + 37,465 + MiniSearch 18,690 |
 
 ### budgetが本当に詰まるrouteは`/robots`である
 
@@ -125,6 +128,27 @@ route別の残存フロア（`lib/uiText.ts` 37,465を含む、MiniSearchを除�
 | `/use-cases` | 268,207 | 133,297 | Task 3時点で ≤180,000 |
 | `/manufacturers` | 178,411 | 178,411（motion無し） | motionでは動かない。`lib/search.ts`分で下がる |
 | `/robots` | 325,787 | **190,877** | **超過。`lib/search.ts`の削減に依存する** |
+
+### `/reports`はbudouxを外さないと180,000に届かない（Task 1後に判明）
+
+Task 1完了時点の実測は **528,258**。ここから本計画が落とせるのは motion 134,910（Task 3・4）と `lib/search.ts`系 39,249（Task 5・8）だけで、**着地は 354,099**。budget 180,000 の**約2倍**である。
+
+差の全量が `budoux` 263,562 で、**どのtaskも担当していない**。経路は次のとおり。
+
+```
+components/ReportsBrowser.tsx ('use client')
+  → components/NewsCard.tsx:4      import { BudouXText }
+    → components/BudouXText.tsx:2  import { parseJapaneseText } from '@/lib/typography'
+      → lib/typography.ts:1        import { loadDefaultJapaneseParser } from 'budoux'
+```
+
+`NewsCard.tsx:59`は`<BudouXText text={report.titleJa ?? report.title} />`で記事タイトルの改行位置を整えている。**分かち書きはserverで実行でき、clientに必要なのは分割済みの文字列配列だけ**なので、Phase 5の方針（serverでview modelを作りclientへ渡す）と同じ形で外せる。**Task 8で`ArticleCatalogItem`に分割済みタイトルを持たせるのが自然だが、方式の決定は未了である。**
+
+`budoux`を外せば`/reports`の着地は 354,099 − 263,562 = **90,537** となり、4 route中もっとも余裕がある側に戻る。
+
+**Task 8の完了条件「4 routeすべて ≤180,000」は、この決定を経ないと満たせない。**
+
+---
 
 `/robots`が180,000を切れるかは`lib/search.ts`系chunk（53,958）がどれだけ落ちるかで決まる。上で「削減量は`/compare`の30,127を上回らないと見るのが安全」と書いた保守的な見積もりでも **190,877 − 30,127 = 160,750 ≤ 180,000** で成立し、全量落ちれば残存フロアの136,919まで下がる。**したがってGlobal Constraint 5は保守側の見積もりでも達成可能**だが、**その達成はTask 5〜8で`lib/search.ts`のclient到達を0にすることに全面的に依存している**。Task 3・4だけでは`/robots`は満たせない。
 
@@ -489,7 +513,11 @@ console.log('/reports route-specific =', own);
 rg -l 'fieldEvidence|vendorRiskNote' .next/static/chunks/
 ```
 
-**完了条件:** `/reports`のroute固有JSが 1,233,689 → 約 264,696 になり、`rg`が0件を返す。
+**完了条件（実測で更新済み）:** `/reports`のroute固有JSが **1,233,689 → 528,258**（-705,431）になり、**chunk内のrecord slugが0件**になる。
+
+> **当初の見込み（264,696）には届かない。** 968,993のchunkは生datasetだけではなく、`budoux`のモデル263,562が同居していた。生dataは完全に消えている（`data/*.ts`の全178 slugをchunk全体へ照合して0件）。
+>
+> **`rg 'fieldEvidence|vendorRiskNote'`は0件にならない。** 実測で3 chunkにhitし、本taskが消せるのは1本だけである（残りは`/compare`と`/use-cases/[slug]`のfirst-load。後者はdetail routeでPhase 5の対象外）。これは「field名markerは誤検知する」という本計画自身の判断（だからgateをslugカウントにした）と整合する。**判定はバイト数とslugカウントで行い、`rg`は3→2に減ったことの確認材料として扱う。**
 
 - [ ] **Step 6: 回帰確認**
 
