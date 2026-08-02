@@ -4,7 +4,7 @@
 > 恒久的な情報（制約・task・実測値）は計画書側にあり、ここには**重複させない**。
 > ここに書くのは「計画書を読んでも分からないこと」だけ。
 
-作成: 2026-08-01 / 対象branch: `refactor/05-client-boundaries`
+作成: 2026-08-01 / 更新: 2026-08-02 / 対象branch: `refactor/05-client-boundaries`
 
 ---
 
@@ -22,7 +22,7 @@
 
 ---
 
-## 1. 未コミットの変更はない（2026-08-01 22:50 時点）
+## 1. 未コミットの変更はない（2026-08-02 時点）
 
 計画書の書き直し（1,693行 → 2,163行、5 task → 10 task）は commit `cf9864c` で保存済み。
 書き直しの主体は人間（ユーザー）。AIによる改訂commit（`a1fb180`〜`020f2ca`）を踏まえたうえで、
@@ -93,6 +93,22 @@ commit済みは2 task分のみ。**いずれも旧計画のtask番号**であり
 **未達の制約:** `lib/viewModels/robots.ts:73` は現在も
 `createCatalogSearchText(createRobotSearchDocument(...))` であり、本文が`searchText`へ連結されて
 clientへ渡っている。Global Constraint「本文をVMへ含めない」は**未達**。新計画のTask 6が担当。
+
+### 新計画の進捗（2026-08-02）
+
+| commit | 内容 |
+|---|---|
+| `1bed216`〜`0b596c4` | 計画書の修正4件（内部監査7件＋外部レビュー7件の反映。コードは変更していない） |
+| `263aa0c` | **新Task 1 完了。** `/reports`の生data 705,431バイト除去。route固有JS 1,233,689 → 528,258 |
+| `0d6826f` | Task 1の実測を計画書へ反映（改訂履歴 #15） |
+
+復元点: **tag `phase05-task01-20260802`**（Task 1 完了時点）。
+
+**Task 1で判明した重要な差分:** 968,993のchunkは生dataだけでなく`budoux`のモデル263,562が同居していた。
+`ReportsBrowser → NewsCard → BudouXText → lib/typography → budoux` の経路で、**どのtaskも担当していない**。
+このままだと`/reports`の着地は354,099でbudget 180,000の約2倍。計画書の
+「`/reports`はbudouxを外さないと180,000に届かない」節を参照。**方式は未決定**（Task 8でVMに
+分割済みタイトルを持たせるのが自然、というところまで）。
 
 ---
 
@@ -180,20 +196,23 @@ import chain経由のbundle流出を検知できない。**両方が要る。**
 
 ## 9. 次の一手
 
-**新計画のTask 1に着手する** — `/reports`の生data 968,993バイト除去。
-Phase 5最大の削減であり、かつGlobal Constraint違反そのもの。
+**新計画のTask 2に着手する** — gate 4本の導入（`check:client-bundle-content` /
+`check:client-import-graph` / `check:plan-snippets` / catalog-payload vitest はTask 6）。
 
-以降は新計画のtask順に進める。実行方式は計画書冒頭が指定する
-`superpowers:subagent-driven-development`。
+Task 1は`263aa0c`で完了済み。gate 5本は計画書のコードのまま実行検証済みで、
+**報告される違反はTask 1が消した1件だけ**だったため、いま入れれば全部緑で入る。
 
-着手前の準備は済んでいる（計画書commit済み、台帳リセット済み、baseline実測済み）。
+Task 8に入る前に、budoux（上記）の方式を決めること。
 
 ---
 
 ## 10. 環境メモ
 
 - `npm run check` が全gateのpipeline。個別scriptは `package.json` を参照
-- e2eは`npm run test:e2e`。**port 3000で別の`next dev`が動いていると失敗する**
-  （このセッションで実際に発生。別portでの検証が必要になった）
+- e2eは`npm run test:e2e`。**port 3000で別checkoutのサーバが動いていると、失敗せずに
+  そのサーバへ当たって「通ってしまう」**（`playwright.config.ts`が`reuseExistingServer: !CI`）。
+  2026-08-02に実際に発生し、親checkout（integration branch）の旧ビルドに対してe2eが緑になった。
+  **検証前に `lsof -a -p $(lsof -ti:3000 | head -1) -d cwd -Fn` でcwdを確認するか、
+  別portの一時configで走らせること。**
 - Node 22系。`data/*.ts`を読むscriptは`--experimental-strip-types`付き
 - Vercelプロジェクトへlink済み（safety design §4.3 ルール9）
