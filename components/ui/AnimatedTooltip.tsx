@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 import { useCallback, useId, useRef, useState, useSyncExternalStore } from "react";
 
@@ -19,12 +18,6 @@ export interface AnimatedTooltipProps {
   /** Placement of the tooltip relative to the trigger */
   placement?: AnimatedTooltipPlacement;
 }
-
-const SPRING = {
-  type: "spring" as const,
-  duration: 0.25,
-  bounce: 0.1,
-};
 
 const placementStyles: Record<AnimatedTooltipPlacement, string> = {
   top: "bottom-full left-1/2 -translate-x-1/2 mb-2",
@@ -72,20 +65,13 @@ function useHoverDevice(): boolean {
   );
 }
 
-const getInitialTransform = (
-  placement: AnimatedTooltipPlacement
-): { opacity: number; scale: number; x: number; y: number } => {
-  const base = { opacity: 0, scale: 0.95, x: 0, y: 0 };
-  switch (placement) {
-    case "top":
-      return { ...base, y: 4 };
-    case "bottom":
-      return { ...base, y: -4 };
-    case "left":
-      return { ...base, x: 4 };
-    case "right":
-      return { ...base, x: -4 };
-  }
+// 非表示時のずらし方向。旧実装の initial/exit transform（4px）と同じ向きに合わせる。
+// placementStyles 側の中央寄せ（-translate-x-1/2 等）とは別軸なので競合しない。
+const enterFrom: Record<AnimatedTooltipPlacement, string> = {
+  top: "translate-y-1",
+  bottom: "-translate-y-1",
+  left: "translate-x-1",
+  right: "-translate-x-1",
 };
 
 const AnimatedTooltip = ({
@@ -95,7 +81,6 @@ const AnimatedTooltip = ({
   children,
   className,
 }: AnimatedTooltipProps) => {
-  const shouldReduceMotion = useReducedMotion();
   const [isVisible, setIsVisible] = useState(false);
   const isHoverDevice = useHoverDevice();
   const tooltipId = useId();
@@ -128,8 +113,6 @@ const AnimatedTooltip = ({
     [hide]
   );
 
-  const initialTransform = getInitialTransform(placement);
-
   return (
     <span
       className="relative inline-flex"
@@ -143,44 +126,32 @@ const AnimatedTooltip = ({
         {children}
       </span>
 
-      <AnimatePresence>
-        {isVisible && (
-          <motion.span
-            animate={
-              shouldReduceMotion
-                ? { opacity: 1 }
-                : { opacity: 1, scale: 1, x: 0, y: 0 }
-            }
-            className={cn(
-              "absolute z-50 w-max max-w-xs rounded-md bg-foreground px-3 py-1.5 text-background text-sm shadow-md",
-              placementStyles[placement],
-              className
-            )}
-            exit={
-              shouldReduceMotion
-                ? { opacity: 0, transition: { duration: 0 } }
-                : {
-                    ...initialTransform,
-                    transition: { duration: 0.15 },
-                  }
-            }
-            id={tooltipId}
-            initial={shouldReduceMotion ? { opacity: 0 } : initialTransform}
-            role="tooltip"
-            transition={shouldReduceMotion ? { duration: 0 } : SPRING}
-          >
-            {content}
-            <span
-              aria-hidden="true"
-              className={cn(
-                "absolute block h-0 w-0",
-                arrowBorderSize[placement],
-                arrowStyles[placement]
-              )}
-            />
-          </motion.span>
+      {/* 常時mountし可視状態をclassで切り替える。display:none だと transition が効かず
+          exit のアニメーションが表現できないため、opacity と pointer-events で隠す。 */}
+      <span
+        aria-hidden={!isVisible}
+        className={cn(
+          "pointer-events-none absolute z-50 w-max max-w-xs rounded-md bg-foreground px-3 py-1.5 text-background text-sm shadow-md",
+          "transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none",
+          isVisible
+            ? "scale-100 opacity-100"
+            : cn("scale-95 opacity-0", enterFrom[placement]),
+          placementStyles[placement],
+          className
         )}
-      </AnimatePresence>
+        id={tooltipId}
+        role="tooltip"
+      >
+        {content}
+        <span
+          aria-hidden="true"
+          className={cn(
+            "absolute block h-0 w-0",
+            arrowBorderSize[placement],
+            arrowStyles[placement]
+          )}
+        />
+      </span>
     </span>
   );
 };

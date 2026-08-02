@@ -1,104 +1,52 @@
-import type { Article, ArticlePlacementSlot } from '@/data/types';
+import type { ArticlePlacement, ArticlePlacementSlot } from '@/data/types';
 import { byArticlePublishedDesc } from '@/lib/display';
-import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
-
-const {
-  articlePlacements,
-  articleIndexPlacementLimits,
-} = localContentSnapshot;
 
 const reportsIndexSurface = 'reports-index';
 
-function sortArticlesByPublishedAt(articles: readonly Article[]) {
-  return [...articles].sort(byArticlePublishedDesc);
+interface PlacementInput<T> {
+  articles: readonly T[];
+  placements: readonly ArticlePlacement[];
+  limits: Readonly<Record<ArticlePlacementSlot, number>>;
 }
 
-function getArticlesById(articles: readonly Article[]) {
-  return new Map(articles.map((article) => [article.id, article]));
-}
-
-function appendPlacedArticles({
-  articlesById,
-  selectedArticles,
-  usedIds,
-  slot,
-  limit,
-}: {
-  articlesById: Map<string, Article>;
-  selectedArticles: Article[];
-  usedIds: Set<string>;
-  slot: ArticlePlacementSlot;
-  limit: number;
-}) {
-  articlePlacements
-    .filter((placement) => placement.surface === reportsIndexSurface && placement.slot === slot)
-    .sort((a, b) => a.order - b.order)
-    .forEach((placement) => {
-      if (selectedArticles.length >= limit || usedIds.has(placement.articleId)) return;
-      const article = articlesById.get(placement.articleId);
-      if (!article) return;
-      selectedArticles.push(article);
-      usedIds.add(article.id);
-    });
-}
-
-function appendLatestArticles({
-  sortedArticles,
-  selectedArticles,
-  usedIds,
-  limit,
-}: {
-  sortedArticles: readonly Article[];
-  selectedArticles: Article[];
-  usedIds: Set<string>;
-  limit: number;
-}) {
-  for (const article of sortedArticles) {
-    if (selectedArticles.length >= limit) break;
-    if (usedIds.has(article.id)) continue;
-    selectedArticles.push(article);
-    usedIds.add(article.id);
-  }
-}
-
-function resolvePlacementSlot({
+/**
+ * 配置指定を先に埋め、残りを公開日の新しい順で補う。
+ * データを直接読まず引数で受けるのは、client componentからこの関数へ到達しても
+ * `localContentSnapshot`（= `data/*.ts` 全体）がbundleへ入らないようにするため。
+ */
+export function getArticleIndexPlacementReports<T extends { id: string; publishedAt: string }>({
   articles,
-  sortedArticles,
-  usedIds,
-  slot,
-}: {
-  articles: readonly Article[];
-  sortedArticles: readonly Article[];
-  usedIds: Set<string>;
-  slot: ArticlePlacementSlot;
-}) {
-  const limit = articleIndexPlacementLimits[slot];
-  const articlesById = getArticlesById(articles);
-  const slotArticles: Article[] = [];
-
-  appendPlacedArticles({ articlesById, selectedArticles: slotArticles, usedIds, slot, limit });
-  appendLatestArticles({ sortedArticles, selectedArticles: slotArticles, usedIds, limit });
-
-  return slotArticles;
-}
-
-export function getArticleIndexPlacementReports(articles: readonly Article[]) {
-  const sortedArticles = sortArticlesByPublishedAt(articles);
+  placements,
+  limits,
+}: PlacementInput<T>): { heroReports: T[]; featureReports: T[] } {
+  const sortedArticles = [...articles].sort(byArticlePublishedDesc);
+  const articlesById = new Map(articles.map((article) => [article.id, article]));
   const usedIds = new Set<string>();
 
-  return {
-    heroReports: resolvePlacementSlot({
-      articles,
-      sortedArticles,
-      usedIds,
-      slot: 'hero',
-    }),
-    featureReports: resolvePlacementSlot({
-      articles,
-      sortedArticles,
-      usedIds,
-      slot: 'feature',
-    }),
-  };
-}
+  const resolveSlot = (slot: ArticlePlacementSlot): T[] => {
+    const limit = limits[slot];
+    const slotArticles: T[] = [];
 
+    placements
+      .filter((placement) => placement.surface === reportsIndexSurface && placement.slot === slot)
+      .sort((a, b) => a.order - b.order)
+      .forEach((placement) => {
+        if (slotArticles.length >= limit || usedIds.has(placement.articleId)) return;
+        const article = articlesById.get(placement.articleId);
+        if (!article) return;
+        slotArticles.push(article);
+        usedIds.add(article.id);
+      });
+
+    for (const article of sortedArticles) {
+      if (slotArticles.length >= limit) break;
+      if (usedIds.has(article.id)) continue;
+      slotArticles.push(article);
+      usedIds.add(article.id);
+    }
+
+    return slotArticles;
+  };
+
+  return { heroReports: resolveSlot('hero'), featureReports: resolveSlot('feature') };
+}

@@ -2,43 +2,31 @@
 
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
-import { motion } from 'motion/react';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { CardFactGrid, type CardFactItems } from '@/components/CardFactGrid';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
-import type { Manufacturer, Robot } from '@/data/types';
-import {
-  getDomesticDistributorDisplay,
-  getManufacturerEstablishedRegionLabel,
-  getManufacturerConsultationRoute,
-  getRepresentativeRobotLabel,
-  manufacturerConsultationRouteLabels,
-} from '@/lib/manufacturerDisplay';
-import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
+import type { ManufacturerCatalogItem } from '@/lib/viewModels/manufacturers';
 import { uiText } from '@/lib/uiText';
 
 interface ManufacturerCardProps {
-  manufacturer: Manufacturer;
-  robots: Robot[];
+  item: ManufacturerCatalogItem;
 }
 
-export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps) {
-  const consultationRoute = getManufacturerConsultationRoute(manufacturer);
-  const domesticDistributor = getDomesticDistributorDisplay(manufacturer);
-  const distributorValue = domesticDistributor.hasDistributor ? (
+export function ManufacturerCard({ item }: ManufacturerCardProps) {
+  const distributorValue = item.facts.hasDistributor ? (
     <div className="pointer-events-auto min-w-0">
-      {domesticDistributor.distributors.length === 1 ? (
-        domesticDistributor.distributors[0].website ? (
+      {item.facts.distributors.length === 1 ? (
+        item.facts.distributors[0].website ? (
           <a
-            href={domesticDistributor.distributors[0].website}
+            href={item.facts.distributors[0].website}
             target="_blank"
             rel="noopener noreferrer"
             className="block truncate font-normal hover:text-muted-foreground"
           >
-            {domesticDistributor.label}
+            {item.facts.distributorLabel}
           </a>
         ) : (
-          <span className="block truncate font-normal">{domesticDistributor.label}</span>
+          <span className="block truncate font-normal">{item.facts.distributorLabel}</span>
         )
       ) : (
         <PopoverPrimitive.Root>
@@ -47,7 +35,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
               type="button"
               className="block max-w-full truncate text-left font-normal hover:text-muted-foreground"
             >
-              {domesticDistributor.label}
+              {item.facts.distributorLabel}
             </button>
           </PopoverPrimitive.Trigger>
           <PopoverPrimitive.Portal>
@@ -56,7 +44,7 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
               sideOffset={4}
               className="z-[var(--z-dropdown)] min-w-44 border border-border bg-popover p-2 text-popover-foreground shadow-sm"
             >
-              {domesticDistributor.distributors.map((distributor) =>
+              {item.facts.distributors.map((distributor) =>
                 distributor.website ? (
                   <a
                     key={distributor.name}
@@ -83,24 +71,24 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
       href="/contact"
       className="pointer-events-auto block min-w-0 truncate text-left font-normal text-signal hover:text-signal/80"
     >
-      {domesticDistributor.label}
+      {item.facts.distributorLabel}
     </Link>
   );
   const facts: CardFactItems = [
     {
       key: 'established-region',
       label: uiText.manufacturers.establishedRegion,
-      value: getManufacturerEstablishedRegionLabel(manufacturer),
+      value: item.facts.establishedRegion,
     },
     {
       key: 'representative-robot',
       label: uiText.manufacturers.representativeRobot,
-      value: getRepresentativeRobotLabel(robots),
+      value: item.facts.representativeRobot,
     },
     {
       key: 'consultation-route',
       label: uiText.manufacturers.consultationRoute,
-      value: manufacturerConsultationRouteLabels[consultationRoute],
+      value: item.facts.consultationRoute,
     },
     {
       key: 'domestic-distributors',
@@ -109,35 +97,10 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
       valueClassName: 'overflow-visible',
     },
   ];
-  const {
-    cardRef,
-    rotateX,
-    rotateY,
-    glowOpacity,
-    handleMouseMove,
-    handleMouseEnter,
-    handleMouseLeave,
-  } = useTiltCardEffect();
 
   return (
-    <motion.div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      style={{ rotateX, rotateY, transformPerspective: 1000 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="card-data group relative overflow-hidden"
-    >
-      {/* Glow + shimmer はRobotCardと同じ演出（lib/useTiltCardEffect.ts参照） */}
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-30"
-        style={{
-          opacity: glowOpacity,
-          background: 'radial-gradient(circle at center, var(--card-spotlight) 0%, transparent 70%)',
-        }}
-      />
+    <div className="card-data group relative overflow-hidden">
+      {/* Shimmer + accent line はRobotCardと同じ演出（ホバー追従グローはJS依存を外すため削除） */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-y-0 left-0 z-30 w-[100%] -translate-x-full -skew-x-12 bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-[200%] motion-reduce:hidden"
@@ -150,25 +113,24 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
       {/* カード全体を詳細ページへのリンクにする正規導線。
           z-10 の内容ラッパーは pointer-events-none なので、空白クリックは z-0 の全面リンクへ貫通し、
           内側の外部HPリンク・代理店リンク/メニューだけ pointer-events-auto で捕捉する。
-          z-30/z-40 の glow/shimmer/下線装飾は pointer-events-none なのでクリックを妨げない。 */}
+          z-30/z-40 の shimmer/下線装飾は pointer-events-none なのでクリックを妨げない。 */}
       <Link
-        href={`/manufacturers/${manufacturer.slug}`}
-        aria-label={manufacturer.nameJa ?? manufacturer.name}
+        href={item.href}
+        aria-label={item.name}
         className="absolute inset-0 z-0"
       />
       <div className="relative z-10 p-4 sm:p-6 pointer-events-none">
         <div className="flex items-start justify-between gap-4 mb-5">
           <h2 className="min-w-0 text-xl font-semibold text-foreground">
             <a
-              href={manufacturer.website}
+              href={item.website}
               target="_blank"
               rel="noopener noreferrer"
               className="group pointer-events-auto flex min-w-0 items-center gap-1 text-foreground hover:text-muted-foreground"
             >
               <ManufacturerLogoName
-                name={manufacturer.nameJa ?? manufacturer.name}
-                logo={manufacturer.logo}
-                logos={manufacturer.logos}
+                name={item.name}
+                resolvedLogo={item.logo}
                 variant="combined"
                 targetAreaPx={32 * 120}
                 maxHeightPx={32}
@@ -182,6 +144,6 @@ export function ManufacturerCard({ manufacturer, robots }: ManufacturerCardProps
 
         <CardFactGrid items={facts} />
       </div>
-    </motion.div>
+    </div>
   );
 }

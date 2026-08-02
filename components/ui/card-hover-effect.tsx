@@ -1,7 +1,6 @@
 'use client';
 
 import { Children, type ReactNode, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
 interface CardHoverEffectProps {
@@ -27,23 +26,17 @@ export function CardHoverEffect({
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
         >
-          <AnimatePresence>
-            {hoveredIndex === index && (
-              <motion.span
-                className="absolute inset-0 block h-full w-full rounded-lg bg-muted"
-                layoutId="report-card-hover-background"
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: 1,
-                  transition: { duration: 0.15 },
-                }}
-                exit={{
-                  opacity: 0,
-                  transition: { duration: 0.15, delay: 0.2 },
-                }}
-              />
+          {/* 常時mountしてopacityだけ切り替える。display:none だと transition が効かない。
+              旧実装は layoutId でハイライトがcard間をスライドしていたが、CSSでは別要素間の
+              位置遷移を表現できないため、card毎のcross-fadeになる。 */}
+          <span
+            aria-hidden="true"
+            className={cn(
+              'pointer-events-none absolute inset-0 block h-full w-full rounded-lg bg-muted',
+              'transition-opacity duration-150 ease-out motion-reduce:transition-none',
+              hoveredIndex === index ? 'opacity-100' : 'opacity-0',
             )}
-          </AnimatePresence>
+          />
           <div className="relative z-10 h-full">{child}</div>
         </div>
       ))}

@@ -1,6 +1,6 @@
 import MiniSearch from 'minisearch';
-import type { Article, UseCase } from '@/data/types';
-import { createReportSearchDocument, createUseCaseSearchDocument } from '@/lib/search';
+import type { ArticleCatalogItem } from '@/lib/viewModels/articles';
+import type { UseCaseCatalogItem } from '@/lib/viewModels/useCases';
 
 // 日本語は空白で区切られないため、MiniSearch 既定のトークナイザでは語に分割できない。
 // Intl.Segmenter('ja') の単語境界分割をインデックス時・検索時の両方で使う（同一トークナイザが必須）。
@@ -32,7 +32,9 @@ export type UseCaseSearchIndex = MiniSearch<SearchIndexDocument>;
 
 const SEARCH_OPTIONS = { prefix: true, fuzzy: 0.2, combineWith: 'AND' as const };
 
-export function createArticleSearchIndex(reports: readonly Article[]): ArticleSearchIndex {
+export function createArticleSearchIndex(
+  reports: readonly ArticleCatalogItem[],
+): ArticleSearchIndex {
   const index = new MiniSearch<SearchIndexDocument>({
     fields: ['text'],
     tokenize: tokenizeJa,
@@ -41,8 +43,8 @@ export function createArticleSearchIndex(reports: readonly Article[]): ArticleSe
   index.addAll(
     reports.map((report) => ({
       id: report.slug,
-      // 検索対象テキストは lib/search.ts の SearchDocument に集約（title/summary/whyItMatters/タグlabel 等）。
-      text: createReportSearchDocument(report).fields.join(' '),
+      // 索引対象は catalog searchText（本文を含まない）。MiniSearch の option は変更しない。
+      text: report.searchText,
     })),
   );
   return index;
@@ -54,7 +56,9 @@ export function searchArticleSlugs(index: ArticleSearchIndex, query: string): Se
   return new Set(index.search(query).map((result) => String(result.id)));
 }
 
-export function createUseCaseSearchIndex(useCases: readonly UseCase[]): UseCaseSearchIndex {
+export function createUseCaseSearchIndex(
+  useCases: readonly UseCaseCatalogItem[],
+): UseCaseSearchIndex {
   const index = new MiniSearch<SearchIndexDocument>({
     fields: ['text'],
     tokenize: tokenizeJa,
@@ -63,7 +67,8 @@ export function createUseCaseSearchIndex(useCases: readonly UseCase[]): UseCaseS
   index.addAll(
     useCases.map((useCase) => ({
       id: useCase.slug,
-      text: createUseCaseSearchDocument(useCase).fields.join(' '),
+      // 索引対象は catalog searchText（本文を含まない）。MiniSearch の option は変更しない。
+      text: useCase.filter.searchText,
     })),
   );
   return index;

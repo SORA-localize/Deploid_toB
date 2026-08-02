@@ -6,7 +6,6 @@ import {
   EmblaPluginType 
 } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
-import { AnimatePresence, motion } from "motion/react";
 import {
   createContext,
   forwardRef,
@@ -461,43 +460,6 @@ export const SliderProgress = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivE
 );
 SliderProgress.displayName = "SliderProgress";
 
-// ============= SNAP DISPLAY =============
-export const SliderSnapDisplay = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
-    const { selectedSnap, snapCount } = useCarousel();
-    // 直前のselectedSnapと比較してdirectionを求める。refをrender中に読む代わりに、
-    // レンダー中にstateを調整する（React公式の「前回レンダーの情報を保持する」パターン）。
-    const [prevSnap, setPrevSnap] = useState(selectedSnap);
-    const [direction, setDirection] = useState(1);
-    if (selectedSnap !== prevSnap) {
-      setPrevSnap(selectedSnap);
-      setDirection(selectedSnap > prevSnap ? 1 : -1);
-    }
-
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          "mix-blend-difference overflow-hidden flex gap-1 items-center",
-          className,
-        )}
-        {...props}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selectedSnap}
-            custom={direction}
-            initial={{ y: direction * 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: direction * -20, opacity: 0 }}>
-            {selectedSnap + 1}
-          </motion.div>
-        </AnimatePresence>
-        <span>/ {snapCount}</span>
-      </div>
-    );
-  },
-);
-SliderSnapDisplay.displayName = "SliderSnapDisplay";
 
 interface SliderDotButtonProps extends HTMLAttributes<HTMLDivElement> {
   activeClass?: string;
@@ -512,11 +474,47 @@ export const SliderDotButton = forwardRef<HTMLDivElement, SliderDotButtonProps>(
       onDotButtonClick,
       carouselId,
     } = useCarousel();
+
+    // indicator の位置は定数計算せず active dot の実測 offset から取る。
+    // 呼び出し元が className で gap を上書きできる（NewsHeroCarousel は gap-1.5）ため、
+    // gap や dot サイズを定数に埋め込むと上書きされた瞬間にずれる。
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const dotRefs = useRef<(HTMLButtonElement | null)[]>([]);
+    const [indicatorOffset, setIndicatorOffset] = useState(0);
+
+    useEffect(() => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      const measure = () => {
+        const active = dotRefs.current[selectedIndex];
+        if (!active) return;
+        setIndicatorOffset(
+          orientation === "vertical" ? active.offsetTop : active.offsetLeft,
+        );
+      };
+
+      measure();
+      const observer = new ResizeObserver(measure);
+      observer.observe(container);
+      return () => observer.disconnect();
+    }, [selectedIndex, orientation, scrollSnaps.length]);
+
     return (
-      <div ref={ref} className={cn("flex gap-2", className)} {...props}>
+      <div
+        ref={(node) => {
+          containerRef.current = node;
+          if (typeof ref === "function") ref(node);
+          else if (ref) ref.current = node;
+        }}
+        className={cn("relative flex gap-2", className)}
+        {...props}>
         {scrollSnaps.map((_, index) => (
           <button
             key={`${carouselId}-dot-${index}`}
+            ref={(node) => {
+              dotRefs.current[index] = node;
+            }}
             type="button"
             onClick={() => onDotButtonClick(index)}
             aria-label={`スライド ${index + 1} へ`}
@@ -531,27 +529,23 @@ export const SliderDotButton = forwardRef<HTMLDivElement, SliderDotButtonProps>(
                 orientation === "vertical" ? "h-6 w-1" : "w-6 h-1",
               )}
             />
-            {index === selectedIndex && (
-              <AnimatePresence mode="wait">
-                <motion.div
-                  transition={{
-                    layout: {
-                      duration: 0.4,
-                      ease: "easeInOut",
-                      delay: 0.04,
-                    },
-                  }}
-                  layoutId={`hover-${carouselId}`}
-                  className={cn(
-                    "absolute z-10 w-full h-full left-0 top-0 dark:bg-white bg-black rounded-full",
-                    orientation === "vertical" ? "h-6 w-1" : "w-6 h-1",
-                    activeClass,
-                  )}
-                />
-              </AnimatePresence>
-            )}
           </button>
         ))}
+        <div
+          aria-hidden="true"
+          className={cn(
+            "pointer-events-none absolute left-0 top-0 z-10 rounded-full dark:bg-white bg-black",
+            "transition-transform duration-400 ease-in-out motion-reduce:transition-none",
+            orientation === "vertical" ? "h-6 w-1" : "w-6 h-1",
+            activeClass,
+          )}
+          style={{
+            transform:
+              orientation === "vertical"
+                ? `translateY(${indicatorOffset}px)`
+                : `translateX(${indicatorOffset}px)`,
+          }}
+        />
       </div>
     );
   },

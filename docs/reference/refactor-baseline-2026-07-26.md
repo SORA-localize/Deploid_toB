@@ -88,3 +88,56 @@ Verification of `.next/diagnostics/route-bundle-stats.json`:
 - Embedded world-map SVG data URI occurrences: 0（before: 4）
 - World map DOM copies: 1
 - Continuous requestAnimationFrame loop: removed
+
+## Phase 5 after
+
+測定日 2026-08-02、branch `refactor/05-client-boundaries`。
+「route固有JS」= そのrouteのfirst-load chunkから共有フロア（`/privacy`のchunk集合）を
+引いた合計バイト数。共有フロアはPhase 5の対象外なので引いて測る。
+
+| route | first-load総量 before | after | route固有JS before | after | 削減 | 削減率 |
+|---|---:|---:|---:|---:|---:|---:|
+| `/reports` | 1,825,083 | 719,545 | 1,233,689 | **131,150** | -1,102,539 | **-89.4%** |
+| `/use-cases` | 859,601 | 716,411 | 268,207 | **128,016** | -140,191 | **-52.3%** |
+| `/robots` | 917,181 | 773,675 | 325,787 | **185,280** | -140,507 | **-43.1%** |
+| `/manufacturers` | 769,805 | 761,235 | 178,411 | **172,840** | -5,571 | **-3.1%** |
+| `/compare` | 843,296 | — | 251,902 | 247,676 | -4,226 | -1.7% |
+
+共有フロア: 591,394 → 588,395（9 chunk）。Phase 5では触っていない。
+
+### RSC payload（view modelのJSONバイト数）
+
+| collection | before | after |
+|---|---:|---:|
+| robots | 101,449 | 57,882 |
+| manufacturers | 37,271 | 15,627 |
+| useCases | — | 16,093（Task 7で新設） |
+| articles | — | 56,415（Task 8で新設。`titleSegments`を含む） |
+
+上限は `tests/unit/view-models/catalog-payload.test.ts` でgateしている。
+
+### budget を 180,000 から 215,000 へ変更した理由
+
+当初の180,000は着手前の`/manufacturers`の値（178,411）を借りたもので、計画書自身が
+「同じ手法を適用すれば到達可能という以上の意味はない」と暫定値であることを明記していた。
+
+実測の最大は`/robots` 185,280。内訳は Radix/shadcn 57,053 ＋ floating-ui 41,104 ＋
+日本語UI文字列（`lib/tags`・`lib/labels`・`lib/uiText`）71,218 ＋ route entry 15,905 で、
+**Phase 5の残タスクはどれもこれらを扱わない**。UI文字列をclientから剥がすには全client
+componentを props経由へ作り替える必要があり、実測で78経路が参照している。Phase 5の
+範囲を超えるため、Task 10の規定「実測最大値 + 15%」に従って215,000で確定した。
+
+### 後続phase向けの記録
+
+- **共有フロアの`3_4rbxe62x5-h.js`（67,853バイト）** は `sonner`（toast）・`lucide`・
+  `@vercel/analytics` を含み、`src/app/layout.tsx` の `<Toaster />` により `/privacy` の
+  ような静的ページにも配信されている。Phase 5の対象外だが、フロアのうち手を付けられる部分。
+- **`motion/react` は dependencies から外せなかった。** catalog 4 routeからは消えたが、
+  Home側の `lib/useTiltCardEffect.ts` / `components/FeaturedRobotCard.tsx` /
+  `components/ui/encrypted-text.tsx` / `components/HomeContentNavigator.tsx` が使い続ける。
+- **`/compare` のview model化（旧Task 9）は未実施。** `CompareClient` が raw `Robot[]` /
+  `Manufacturer[]` を受け取る状態が残る。`/compare` にバイト上限は課しておらず削減効果も
+  0だが、CMS移行の観点では対応が要る。後続phaseへ起票する。
+- **catalog一覧の本文全文検索は失われた。** 検索対象は「cardが描画する文字列」と
+  「facet選択肢のlabel」に限定した。サイト全体検索ページが存在しないため退避先が無い。
+  復活させる場合はbuild時生成の静的JSONを`public/`へ置いてfetchする方式が候補。

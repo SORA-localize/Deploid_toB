@@ -5,12 +5,11 @@ import type { KeyboardEvent } from 'react';
 import { HoverCard as HoverCardPrimitive } from 'radix-ui';
 import { X } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { UseCaseCardGridSkeleton } from '@/components/UseCaseCardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { UseCaseCard } from '@/components/UseCaseCard';
 import { UseCasesHeader } from '@/components/UseCasesHeader';
-import type { UseCase, UseCaseMaturity } from '@/data/types';
+import type { UseCaseMaturity } from '@/data/types';
 import { createUseCaseSearchIndex, searchUseCaseSlugs } from '@/lib/searchIndex';
 import { maturityLabels } from '@/lib/labels';
 import { SearchInput } from '@/components/SearchInput';
@@ -18,15 +17,13 @@ import { toTagOptions } from '@/lib/tags';
 import { sortUseCases, useCaseMaturityOrder } from '@/lib/display';
 import { uiText } from '@/lib/uiText';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
-import type { UseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
-import type { UseCaseFilters } from '@/lib/useCaseFilters';
-import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
+import { normalizeUseCaseFilters } from '@/lib/useCaseFilters';
+import type { UseCaseCatalogItem } from '@/lib/viewModels/useCases';
+import { useCatalogUrlState } from '@/lib/catalog/urlState';
 
 interface UseCasesBrowserProps {
-  useCases: UseCase[];
-  initialFilters: UseCaseFilters;
-  cardEvidenceByUseCaseId: Record<string, UseCaseCardEvidenceSummary | undefined>;
-  robotNameById: Record<string, string>;
+  useCases: UseCaseCatalogItem[];
+  initialSearch: string;
 }
 
 const HOVER_OPEN_DELAY_MS = 100;
@@ -61,16 +58,36 @@ function taskOptionClassName(selected: boolean, surface: 'popover' | 'inline') {
 
 export function UseCasesBrowser({
   useCases,
-  initialFilters,
-  cardEvidenceByUseCaseId,
-  robotNameById,
+  initialSearch,
 }: UseCasesBrowserProps) {
-  const { updateParams, isPending } = useUrlParamUpdater();
-  const { query, industry: selectedIndustry, task: selectedTask } = initialFilters;
+  const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
+  const filterValues = useMemo(
+    () => ({
+      industryValues: toTagOptions(
+        useCases.flatMap((u) => u.filter.industryTags),
+        'industry',
+      ).map((option) => option.value),
+      taskValues: toTagOptions(useCases.flatMap((u) => u.filter.taskTags), 'task').map(
+        (option) => option.value,
+      ),
+    }),
+    [useCases],
+  );
+  const { query, industry: selectedIndustry, task: selectedTask } = useMemo(
+    () =>
+      normalizeUseCaseFilters({
+        industry: searchParams.get('industry'),
+        task: searchParams.get('task'),
+        query: searchParams.get('q'),
+        industryValues: filterValues.industryValues,
+        taskValues: filterValues.taskValues,
+      }),
+    [searchParams, filterValues],
+  );
   const tabListRef = useRef<HTMLDivElement>(null);
 
   const industryTabOptions = useMemo(
-    () => toTagOptions(useCases.map((u) => u.primaryIndustry), 'industry'),
+    () => toTagOptions(useCases.map((u) => u.filter.primaryIndustry), 'industry'),
     [useCases],
   );
 
@@ -81,15 +98,15 @@ export function UseCasesBrowser({
       { options: ReturnType<typeof toTagOptions>; counts: Record<string, number>; total: number }
     > = {};
     for (const tab of industryTabOptions) {
-      const subset = useCases.filter((u) => u.primaryIndustry === tab.value);
+      const subset = useCases.filter((u) => u.filter.primaryIndustry === tab.value);
       const counts: Record<string, number> = {};
       for (const u of subset) {
-        for (const tag of u.taskTags) {
+        for (const tag of u.filter.taskTags) {
           counts[tag] = (counts[tag] ?? 0) + 1;
         }
       }
       result[tab.value] = {
-        options: toTagOptions(subset.flatMap((u) => u.taskTags), 'task'),
+        options: toTagOptions(subset.flatMap((u) => u.filter.taskTags), 'task'),
         counts,
         total: subset.length,
       };
@@ -99,7 +116,7 @@ export function UseCasesBrowser({
 
   const byIndustry = useMemo(() => {
     if (!selectedIndustry) return useCases;
-    return useCases.filter((u) => u.primaryIndustry === selectedIndustry);
+    return useCases.filter((u) => u.filter.primaryIndustry === selectedIndustry);
   }, [useCases, selectedIndustry]);
 
   const searchIndex = useMemo(() => createUseCaseSearchIndex(useCases), [useCases]);
@@ -108,13 +125,13 @@ export function UseCasesBrowser({
   const filtered = useMemo(() => {
     return byIndustry.filter((u) => {
       if (matchedSlugs && !matchedSlugs.has(u.slug)) return false;
-      if (selectedTask && !(u.taskTags as readonly string[]).includes(selectedTask)) return false;
+      if (selectedTask && !u.filter.taskTags.includes(selectedTask)) return false;
       return true;
     });
   }, [byIndustry, selectedTask, matchedSlugs]);
 
   const groupedByMaturity = useMemo(() => {
-    const entries: [UseCaseMaturity, UseCase[]][] = [];
+    const entries: [UseCaseMaturity, UseCaseCatalogItem[]][] = [];
     for (const level of useCaseMaturityOrder) {
       const items = sortUseCases(filtered.filter((u) => u.maturityLevel === level));
       if (items.length > 0) entries.push([level, items]);
@@ -352,9 +369,7 @@ export function UseCasesBrowser({
       </div>
 
       <div className="site-container min-h-[60vh] py-5">
-        {isPending ? (
-          <UseCaseCardGridSkeleton gridClassName={browserGridClassNames.useCases} />
-        ) : filtered.length === 0 ? (
+        {filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.useCases} />
         ) : (
           groupedByMaturity.map(([level, cases]) => (
@@ -364,15 +379,7 @@ export function UseCasesBrowser({
               </h3>
               <div className={browserGridClassNames.useCases}>
                 {cases.map((u) => (
-                  <UseCaseCard
-                    key={u.id}
-                    useCase={u}
-                    evidenceSummary={cardEvidenceByUseCaseId[u.id]}
-                    robotNames={u.candidateRobots
-                      .slice(0, 2)
-                      .map((r) => robotNameById[r.robotId])
-                      .filter((n): n is string => !!n)}
-                  />
+                  <UseCaseCard key={u.id} item={u} />
                 ))}
               </div>
             </section>

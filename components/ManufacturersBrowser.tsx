@@ -2,37 +2,43 @@
 
 import { useMemo } from 'react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { ManufacturerCardGridSkeleton } from '@/components/ManufacturerCardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { ManufacturerCard } from '@/components/ManufacturerCard';
 import { ManufacturersHeader } from '@/components/ManufacturersHeader';
 import { SelectControl } from '@/components/SelectControl';
 import { SearchInput } from '@/components/SearchInput';
-import type { Manufacturer, Robot } from '@/data/types';
+import type { ManufacturerCatalogItem } from '@/lib/viewModels/manufacturers';
 import {
   filterManufacturers,
   getManufacturerFilterOptions,
-  groupRobotsByManufacturer,
   normalizeManufacturerFilters,
 } from '@/lib/manufacturerFilters';
 import { manufacturerConsultationRouteLabels } from '@/lib/manufacturerDisplay';
 import { browserFilterGridClassNames, browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { uiText } from '@/lib/uiText';
-import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
+import { useCatalogUrlState } from '@/lib/catalog/urlState';
 
 interface ManufacturersBrowserProps {
-  manufacturers: Manufacturer[];
-  robots: Robot[];
-  initialFilters: ReturnType<typeof normalizeManufacturerFilters>;
+  items: ManufacturerCatalogItem[];
+  initialSearch: string;
 }
 
-export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: ManufacturersBrowserProps) {
-  const { updateParams, isPending } = useUrlParamUpdater();
+export function ManufacturersBrowser({ items, initialSearch }: ManufacturersBrowserProps) {
+  const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
 
-  const robotsByManufacturer = useMemo(() => groupRobotsByManufacturer(robots), [robots]);
-  const filterOptions = useMemo(() => getManufacturerFilterOptions(manufacturers), [manufacturers]);
-  const filters = initialFilters;
+  const filterOptions = useMemo(() => getManufacturerFilterOptions(items), [items]);
+  const filters = useMemo(
+    () =>
+      normalizeManufacturerFilters({
+        country: searchParams.get('country'),
+        consultationRoute: searchParams.get('route'),
+        query: searchParams.get('q'),
+        countries: filterOptions.countries,
+        consultationRoutes: filterOptions.consultationRoutes,
+      }),
+    [searchParams, filterOptions],
+  );
 
   const countryOptions = useMemo(
     () => [
@@ -52,10 +58,7 @@ export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: 
     [filterOptions.consultationRoutes],
   );
 
-  const filtered = useMemo(
-    () => filterManufacturers({ manufacturers, robotsByManufacturer, filters }),
-    [manufacturers, robotsByManufacturer, filters],
-  );
+  const filtered = useMemo(() => filterManufacturers({ items, filters }), [items, filters]);
 
   const activeChips = useMemo(() => {
     const chips: import('@/components/ActiveFilterChips').ActiveFilterChip[] = [];
@@ -122,18 +125,12 @@ export function ManufacturersBrowser({ manufacturers, robots, initialFilters }: 
           </p>
         </div>
 
-        {isPending ? (
-          <ManufacturerCardGridSkeleton gridClassName={browserGridClassNames.manufacturers} />
-        ) : filtered.length === 0 ? (
+        {filtered.length === 0 ? (
           <EmptyState message={uiText.emptyStates.manufacturers} variant="muted" size="large" />
         ) : (
           <div className={browserGridClassNames.manufacturers}>
-            {filtered.map((manufacturer) => (
-              <ManufacturerCard
-                key={manufacturer.id}
-                manufacturer={manufacturer}
-                robots={robotsByManufacturer.get(manufacturer.id) ?? []}
-              />
+            {filtered.map((item) => (
+              <ManufacturerCard key={item.id} item={item} />
             ))}
           </div>
         )}

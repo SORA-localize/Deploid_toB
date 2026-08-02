@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { UseCaseCard } from '@/components/UseCaseCard';
-import type { UseCase } from '@/data/types';
+import type { UseCaseCatalogItem } from '@/lib/viewModels/useCases';
 
 interface FeaturedUseCasesGridProps {
-  useCases: UseCase[];
+  useCases: UseCaseCatalogItem[];
 }
 
 export function FeaturedUseCasesGrid({ useCases }: FeaturedUseCasesGridProps) {
@@ -23,7 +23,7 @@ export function FeaturedUseCasesGrid({ useCases }: FeaturedUseCasesGridProps) {
       <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {useCases.map((useCase) => (
           <div key={useCase.id} className="w-[220px] shrink-0">
-            <UseCaseCard useCase={useCase} />
+            <UseCaseCard item={useCase} />
           </div>
         ))}
       </div>

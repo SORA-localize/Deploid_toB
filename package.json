@@ -14,15 +14,19 @@
     "build:data-r02-manifest": "node --experimental-strip-types scripts/build-data-r02-manifest.mjs",
     "check:source-links": "node --experimental-strip-types scripts/check-source-links.mjs",
     "check:data-boundaries": "node scripts/check-data-import-boundaries.mjs",
+    "check:client-imports": "node scripts/check-client-import-graph.mjs",
     "generate:world-map": "node scripts/generate-world-map-asset.mjs",
     "check:world-map-asset": "node scripts/generate-world-map-asset.mjs --check",
     "check:home-payload": "node scripts/check-home-payload.mjs",
+    "check:bundle-content": "node --experimental-strip-types scripts/check-client-bundle-content.mjs",
+    "check:plan-snippets": "node scripts/check-plan-snippets.mjs",
+    "check:client-budgets": "node scripts/check-client-budgets.mjs",
     "typecheck": "tsc --noEmit --incremental false",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "npm run validate:data && npm run check:data-boundaries && npm run check:world-map-asset && npm run typecheck && npm run lint && npm run test && npm run build && npm run check:home-payload && npm run test:e2e"
+    "check": "npm run validate:data && npm run check:data-boundaries && npm run check:client-imports && npm run check:world-map-asset && npm run typecheck && npm run lint && npm run check:plan-snippets && npm run test && npm run build && npm run check:home-payload && npm run check:bundle-content && npm run check:client-budgets && npm run test:e2e"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
