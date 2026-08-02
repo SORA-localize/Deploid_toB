@@ -606,7 +606,7 @@ git commit -m "docs: enforce local documentation links"
   - `docs/plans/refactor-phase-02-dependency-security-v1.md`
   - `docs/plans/refactor-phase-03-data-internals-v1.md`
   - `docs/plans/refactor-phase-04-home-performance-v1.md`
-  - `docs/plans/refactor-phase-05-client-boundaries-v1.md`
+  - `docs/archive/refactor-phase-05-client-boundaries-v1.md`（Phase 5完了時にarchive済み）
   - `docs/plans/refactor-phase-06-ui-accessibility-v1.md`
   - `docs/plans/refactor-phase-07-security-cleanup-v1.md`
   - To: `docs/archive/`
@@ -753,7 +753,7 @@ git mv docs/plans/refactor-phase-01-quality-gates-v1.md docs/archive/
 git mv docs/plans/refactor-phase-02-dependency-security-v1.md docs/archive/
 git mv docs/plans/refactor-phase-03-data-internals-v1.md docs/archive/
 git mv docs/plans/refactor-phase-04-home-performance-v1.md docs/archive/
-git mv docs/plans/refactor-phase-05-client-boundaries-v1.md docs/archive/
+# Phase 5 は完了時にarchive済み（2026-08-02）
 git mv docs/plans/refactor-phase-06-ui-accessibility-v1.md docs/archive/
 git mv docs/plans/refactor-phase-07-security-cleanup-v1.md docs/archive/
 ```

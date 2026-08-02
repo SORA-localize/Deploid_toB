@@ -13,7 +13,7 @@
 | # | ファイル | 何が書いてあるか |
 |---|---|---|
 | 1 | 本ファイル | git状態、経緯、決定の理由、既知の罠 |
-| 2 | `docs/plans/refactor-phase-05-client-boundaries-v1.md` | **Phase 5の正本**。制約・実測baseline・Task 1〜10 |
+| 2 | `docs/archive/refactor-phase-05-client-boundaries-v1.md` | Phase 5の正本。**完了しarchive済み**。実績は `docs/reference/refactor-baseline-2026-07-26.md` の「Phase 5 after」 |
 | 3 | `docs/plans/pre-migration-refactor-implementation-index-v1.md` | プログラム全体（Phase 0〜7）の正本 |
 | 4 | `docs/plans/pre-migration-refactor-safety-design-v1.md` | branch運用・安全設計のルール |
 | 5 | `.superpowers/sdd/refactor-phase-05-client-boundaries-v1/progress.md` | 実行台帳（旧task番号ベース。§5参照） |
