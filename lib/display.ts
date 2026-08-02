@@ -4,7 +4,6 @@ import type {
   DeploymentStage,
   JapanAvailability,
   JapanPresence,
-  Article,
   Manufacturer,
   ArticleSection,
   ArticleCategory,
@@ -234,8 +233,10 @@ export function sortRobots(
 // ─── 記事並び替え ────────────────────────────────────────────────
 
 /** 記事を公開日の新しい順に並べるコンパレータ（正本）。各所での直書きを禁止し本関数を使う。 */
-export const byArticlePublishedDesc = (a: Article, b: Article) =>
-  b.publishedAt.localeCompare(a.publishedAt);
+export const byArticlePublishedDesc = (
+  a: { publishedAt: string },
+  b: { publishedAt: string },
+) => b.publishedAt.localeCompare(a.publishedAt);
 
 // ─── メーカー並び替え ────────────────────────────────────────────
 

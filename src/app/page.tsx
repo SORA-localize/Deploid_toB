@@ -24,6 +24,7 @@ import {
   defaultSiteTitle,
 } from '@/lib/metadata';
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
+import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
 import { uiText } from '@/lib/uiText';
 
 export const metadata = createPageMetadata({
@@ -96,7 +97,11 @@ export default function HomePage() {
     { src: '/images/home/use-cases/warehouse-workers-aisle.jpg', alt: 'Workers walking through a warehouse aisle', label: 'Warehouse', objectPosition: 'center' },
   ];
 
-  const { heroReports, featureReports } = getArticleIndexPlacementReports(getArticles());
+  const { heroReports, featureReports } = getArticleIndexPlacementReports({
+    articles: getArticles(),
+    placements: localContentSnapshot.articlePlacements,
+    limits: localContentSnapshot.articleIndexPlacementLimits,
+  });
 
   const manufacturerById = Object.fromEntries(
     manufacturers.map((m) => [m.id, m])

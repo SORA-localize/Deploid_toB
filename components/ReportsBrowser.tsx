@@ -22,7 +22,6 @@ import {
   ARTICLE_PAGE_PARAM,
 } from '@/lib/articlePagination';
 import { useArticlesPerPage } from '@/lib/useArticlesPerPage';
-import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
 import { createArticleSearchIndex, searchArticleSlugs } from '@/lib/searchIndex';
 import { uiText } from '@/lib/uiText';
 import {
@@ -37,10 +36,17 @@ import { cn } from '@/lib/utils';
 
 interface ReportsBrowserProps {
   reports: Article[];
+  heroReports: Article[];
+  featureReports: Article[];
   initialSearch: string;
 }
 
-export function ReportsBrowser({ reports, initialSearch }: ReportsBrowserProps) {
+export function ReportsBrowser({
+  reports,
+  heroReports,
+  featureReports,
+  initialSearch,
+}: ReportsBrowserProps) {
   const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
   const activeShelf = normalizeArticleShelfParam(searchParams.get('kind'));
   const query = searchParams.get('q') ?? '';
@@ -49,11 +55,6 @@ export function ReportsBrowser({ reports, initialSearch }: ReportsBrowserProps) 
   const gridRef = useRef<HTMLDivElement>(null);
 
   const sorted = useMemo(() => [...reports].sort(byArticlePublishedDesc), [reports]);
-
-  const { heroReports, featureReports } = useMemo(
-    () => getArticleIndexPlacementReports(sorted),
-    [sorted],
-  );
 
   const searchIndex = useMemo(() => createArticleSearchIndex(reports), [reports]);
   const matchedSlugs = useMemo(
