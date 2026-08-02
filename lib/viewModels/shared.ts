@@ -1,6 +1,6 @@
 import type { ManufacturerLogoVariant } from '@/lib/manufacturerLogo';
 import type { SearchDocument } from '@/lib/search';
-import { normalizeSearchText } from '@/lib/search';
+import { normalizeSearchText } from '@/lib/normalizeSearchText';
 import type { VisualTone } from '@/lib/visualSemantics';
 
 export interface CatalogImage {

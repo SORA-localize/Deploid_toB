@@ -38,7 +38,7 @@ import { useCatalogUrlState } from '@/lib/catalog/urlState';
 import { useFavorites } from '@/lib/useFavorites';
 import { cn } from '@/lib/utils';
 import { sortManufacturers, sortRobots } from '@/lib/display';
-import { normalizeSearchText } from '@/lib/search';
+import { normalizeSearchText } from '@/lib/normalizeSearchText';
 
 type CompareView = 'visual' | 'specs';
 

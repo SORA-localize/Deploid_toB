@@ -15,9 +15,13 @@ import {
   maturityLabels,
 } from '@/lib/labels';
 import { getTagLabel, getTagSearchValues, normalizeTagKey, type TagKind } from '@/lib/tags';
+import { normalizeSearchText, type SearchPrimitive } from '@/lib/normalizeSearchText';
+
+// 既存の利用者を壊さないため export面は維持する。実体は lib/normalizeSearchText.ts。
+export { normalizeSearchText };
+export type { SearchPrimitive };
 
 export type SearchCollection = 'robots' | 'manufacturers' | 'reports' | 'useCases';
-export type SearchPrimitive = string | number | null | undefined;
 export type SearchValueInput = SearchPrimitive | readonly SearchValueInput[];
 
 export interface SearchDocument {
@@ -45,10 +49,6 @@ interface SearchDocumentInput {
   url: string;
   fields: readonly SearchValueInput[];
   tags?: readonly SearchDocumentTagInput[];
-}
-
-export function normalizeSearchText(value: SearchPrimitive) {
-  return String(value ?? '').normalize('NFKC').trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
 function isSearchValueArray(value: SearchValueInput): value is readonly SearchValueInput[] {

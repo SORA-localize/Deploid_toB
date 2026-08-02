@@ -17,7 +17,7 @@ import {
   getRobotFilterOptions,
   normalizeRobotFilters,
 } from '@/lib/robotFilters';
-import { normalizeSearchText } from '@/lib/search';
+import { normalizeSearchText } from '@/lib/normalizeSearchText';
 import { browserFilterGridClassNames, browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { uiText } from '@/lib/uiText';
 import { useCatalogUrlState } from '@/lib/catalog/urlState';
