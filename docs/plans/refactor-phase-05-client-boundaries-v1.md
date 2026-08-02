@@ -1,6 +1,7 @@
 ---
 status: plan
 updated: 2026-08-01
+snippetCheck: true
 ---
 
 # Phase 5 Client Boundaries Implementation Plan
@@ -32,11 +33,35 @@ updated: 2026-08-01
 
 初版が3巡連続で起こした故障モードは「散文で決めたことがcode例・step・表のどれかに反映されない」だった。対策は`scripts/check-plan-snippets.mjs`（Task 2）で、この計画書の`ts`/`tsx` blockを`tsc --noEmit`にかける。目視確認では防げないことが実証済みである。
 
+### 5巡目の修正（2026-08-02）
+
+書き直し版に対し、**gate scriptを実際に走らせる**観点で監査した。7件を修正した。計画の事実関係（実測baseline、file:line参照、field名、label map名）は再検証して**すべて正確**だった。
+
+| # | 問題 | 修正 |
+|---|---|---|
+| 1 | Task 2・6のgate scriptが`lib/data.ts`／`lib/viewModels/*.ts`をimportしており、Nodeがmodule解決できず**起動しない**（実測確認） | bundle-content gateは`data/*.ts`を直読み。payload budgetはvitest testへ移した |
+| 2 | Task 1がsignatureを変える`getArticleIndexPlacementReports`の**第2の呼び出し元`src/app/page.tsx:99`が計画に無い** | Filesとstepとcommitへ追加。`lib/display.ts`も抜けていたので追加 |
+| 3 | `check:plan-snippets`が`docs/plans/*.md`を全走査し、**無関係な8文書・87 blockを巻き込む** | front-matter `snippetCheck: true`のopt-in方式へ |
+| 4 | `tsconfig.plan-snippets.json`が`include`を置き換えるため`next-env.d.ts`が外れ、**既存ファイルが誤って落ちる**（実測） | `include`に`next-env.d.ts`、`types: ["node"]`を追加。9 snippetが通ることを実測確認 |
+| 5 | Task 4のdot indicatorがgapを定数計算しており、**唯一の呼び出し元が`gap-1.5`で上書きしているためズレる** | offsetをDOM（`offsetLeft`／`offsetTop`）から測る方式へ |
+| 6 | `check-client-import-graph.mjs`が拡張子付きspecifier（repo内に55箇所）を**黙って辿らない**。再exportも追わない | 末尾`.ts`を落としてから解決。判定を解決後パスへ。再export・副作用importも辺に含め、未解決specifierは失敗させる |
+| 7 | plan-snippets gateの実効カバレッジが不明瞭 | Task 2直後は34 block中9個だけであることと、gateの本体が「各taskでmarkerを外す手順」であることを明記 |
+
+**外部レビューで追加された3件（同日）。** 上の7件は内部監査で潰したもので、次の3件は5巡目の外部レビューが見つけたものである。**「計画の事実関係はすべて正確だった」という内部監査の結論は誤りだった。**
+
+| # | 問題 | 修正 |
+|---|---|---|
+| 8 | 実測baseline節が「**Task 1・Task 2は実装済み**」と書いており、旧task番号が残っていた。この計画のTask 1・2は未着手であり、**baseline表の直前で自己矛盾していた**（3巡連続で出た内部整合の故障モードそのもの） | 「旧計画のTask 1・2」と明示し、番号が対応しないこと・本計画は全task未着手であることを追記。`### Task 2の実装状況`の見出しも`### f42ecbfの実装状況`へ |
+| 9 | route固有chunkの内訳表が**削減対象しか載せておらず、残りを説明していなかった**（`/robots` 99,454、`/manufacturers` 107,532が未帰属）。budgetの可否を判定できない | 「どのtaskも触らないchunk（残存フロア）」節を追加。中身をminified識別子から同定 |
+| 10 | budgetで**本当に詰まるのは`/robots`**（motion全除去でも190,877で超過）なのに、計画は最も余裕のある`/reports`を軸に書かれていた | 「budgetが本当に詰まるrouteは`/robots`である」節を追加。保守的見積もりでも160,750で成立することと、その達成が`lib/search.ts`除去に全面依存することを明記 |
+
 ---
 
 ## 実測baseline（2026-08-01、branch `refactor/05-client-boundaries` HEAD `020f2ca`）
 
-Task 1・Task 2は`f42ecbf`までで実装済み。以下はその状態でのフレッシュbuild実測値。
+**旧計画**のTask 1・2（commit `611b5a7` / `918f058` / `f42ecbf`）まで実装済みの状態での、フレッシュbuild実測値である。
+
+> **番号は対応しない。** ここで言う「旧Task 1・2」はcatalog filterのHistory API化とRobot/Manufacturer一覧のVM化であり、**この計画書のTask 1（`/reports`の生data除去）・Task 2（gate導入）とは別物**である。本計画のTask 1〜10は**すべて未着手**である（`lib/articlePlacements.ts:3`に`localContentSnapshot` importが残存、`scripts/`に新gateが1本も無いことで確認できる）。詳細は`SESSION_HANDOFF.md` §4・§5。
 
 ### route固有JS
 
@@ -65,6 +90,43 @@ Task 1・Task 2は`f42ecbf`までで実装済み。以下はその状態での�
 | 37,465 | `lib/uiText.ts`（`2cf5hudnrg616.js`） | catalog 8 route共有 | 対象外 |
 
 `lib/search.ts`のchunkはroute間で30,127〜53,958とばらつく。chunkはmoduleと1:1ではなく、周辺moduleが同居しているためである。**したがって「chunkサイズ＝そのmoduleの削減量」ではない。** `lib/search.ts`本体の削減量は5 routeで共通に現れる下限（`/compare`の30,127）を上回らないと見るのが安全で、各taskでは差分を必ず実測する。
+
+### どのtaskも触らないchunk（残存フロア）
+
+上の表は削減対象しか載せておらず、**route固有JSの残りを説明していなかった**。budgetの可否はこの残りで決まるため明示する。中身はminified chunk内の識別子から同定した。
+
+| バイト | 中身（同定根拠） | 載っているroute |
+|---:|---|---|
+| 56,917 | Radix/shadcn UI primitives（`data-slot`、`aria-expanded`） | `/robots`、`/manufacturers` |
+| 41,104 | floating-ui（`referenceHidden`。popover配置） | `/robots`、`/use-cases`、`/manufacturers` |
+| 32,096 | `embla-carousel`（`/reports` hero。**Task 4はmotionだけを外し、emblaは残す**） | `/reports` |
+| 9,511 / 2,286 / 1,433 | route entry等の小chunk | 各1 route |
+
+route別の残存フロア（`lib/uiText.ts` 37,465を含む、MiniSearchを除く）:
+
+| route | 残存フロア | 内訳 |
+|---|---:|---|
+| `/manufacturers` | 144,997 | 56,917 + 41,104 + 9,511 + 37,465 |
+| `/robots` | **136,919** | 56,917 + 41,104 + 1,433 + 37,465 |
+| `/use-cases` | 97,259 | 41,104 + 37,465 + MiniSearch 18,690 |
+| `/reports` | 90,537 | 32,096 + 2,286 + 37,465 + MiniSearch 18,690 |
+
+### budgetが本当に詰まるrouteは`/robots`である
+
+`/reports`は削減幅が最大だが、**budgetに対しては最も余裕がある**。逆に`/robots`は最大のtask（motion除去）を完了してもまだ超過する。
+
+| route | Task 1後 | motion除去後 | 判定 |
+|---|---:|---:|---|
+| `/reports` | 264,696 | **129,786** | Task 4時点で既に ≤180,000 |
+| `/use-cases` | 268,207 | 133,297 | Task 3時点で ≤180,000 |
+| `/manufacturers` | 178,411 | 178,411（motion無し） | motionでは動かない。`lib/search.ts`分で下がる |
+| `/robots` | 325,787 | **190,877** | **超過。`lib/search.ts`の削減に依存する** |
+
+`/robots`が180,000を切れるかは`lib/search.ts`系chunk（53,958）がどれだけ落ちるかで決まる。上で「削減量は`/compare`の30,127を上回らないと見るのが安全」と書いた保守的な見積もりでも **190,877 − 30,127 = 160,750 ≤ 180,000** で成立し、全量落ちれば残存フロアの136,919まで下がる。**したがってGlobal Constraint 5は保守側の見積もりでも達成可能**だが、**その達成はTask 5〜8で`lib/search.ts`のclient到達を0にすることに全面的に依存している**。Task 3・4だけでは`/robots`は満たせない。
+
+Task 8 Step 6で4 routeを一括判定するのはこの理由による。Task 3・4の完了時点で`/robots`が超過していても、それは想定内であり計画の失敗ではない。
+
+Task 10で上限を「実測最大値 + 15%」へ締め直すとき、**最大値を出すのは`/robots`（見込み136,919〜160,750）**である。
 
 ### 生data流出の経路（Task 1）
 
@@ -104,12 +166,12 @@ components/ReportsBrowser.tsx ('use client')
 
 全taskの完了後、`lib/search.ts`の利用者は0になる。Task 10で削除する。
 
-### Task 2の実装状況（実測との差分）
+### `f42ecbf`の実装状況（実測との差分）
 
-`f42ecbf`は`lib/viewModels/{shared,logo,robots,manufacturers}.ts`を作り、`RobotCard`／`ManufacturerCard`のmotionを外し、page側でVMを生成する所までを実装した。**次は未実装である。**
+`f42ecbf`（**旧**計画のTask 2）は`lib/viewModels/{shared,logo,robots,manufacturers}.ts`を作り、`RobotCard`／`ManufacturerCard`のmotionを外し、page側でVMを生成する所までを実装した。**次は未実装である。**
 
 - `lib/catalog/search.ts` — **存在しない**（`lib/catalog/`は`urlSearch.ts`と`urlState.ts`のみ）
-- `scripts/check-catalog-payload.mjs` — 存在しない
+- catalog payload budget（`tests/unit/view-models/catalog-payload.test.ts`）— 存在しない
 - `scripts/check-data-import-boundaries.mjs`の`lib/viewModels/**`ルール — 未追加
 - catalog searchTextのwhitelist化 — 未実装。`lib/viewModels/robots.ts:73`は現在も`createCatalogSearchText(createRobotSearchDocument(robot, manufacturer))`であり、`description`／`comparison.*`／各Noteの本文が`searchText`へ連結されてclientへ渡っている
 
@@ -137,6 +199,8 @@ components/ReportsBrowser.tsx ('use client')
 `/manufacturers`の現在値178,411を基準にした。ただし**この値には削減対象が33,414バイト（`lib/search.ts`）含まれている**ため、「同じ手法を適用すれば到達可能」という以上の意味はない。Task 5完了後に`/manufacturers`は約145,000へ下がる見込みである。
 
 Task 10で4 routeの実測値を取り直し、**最大値 + 15%**へ締め直す。誰も近づかない上限はgateとして働かない。
+
+**ただし基準にすべきrouteは`/manufacturers`ではなく`/robots`である。** 上の「budgetが本当に詰まるrouteは`/robots`である」を参照。`/manufacturers`の残存フロア144,997に対し`/robots`は136,919で、削減後の最大値を出すのは`/robots`側になる見込み（`lib/search.ts`の落ち方次第で136,919〜160,750）。
 
 ### baselineの扱い
 
@@ -180,8 +244,8 @@ Phase 1 baseline（`docs/reference/refactor-baseline-2026-07-26.md`）は相対�
 | `scripts/check-client-bundle-content.mjs` | client chunkのrecord slug数とchunkサイズをgate |
 | `scripts/check-client-import-graph.mjs` | `'use client'` moduleから`data/**`へ到達しないことをgate |
 | `scripts/check-plan-snippets.mjs` | 計画書の`ts`/`tsx` blockを`tsc --noEmit`にかける |
-| `scripts/check-catalog-payload.mjs` | catalog VMのJSONバイト数をgate |
 | `scripts/check-client-budgets.mjs` | route固有JSのバイト数をgate |
+| `tests/unit/view-models/catalog-payload.test.ts` | catalog VMのJSONバイト数をgate（**scriptではなくvitest**。理由はTask 6 Step 6） |
 | `tests/unit/view-models/use-cases.test.ts` | serialization/filter contract |
 | `tests/unit/view-models/articles.test.ts` | serialization/filter contract |
 | `tests/unit/view-models/compare.test.ts` | serialization contract |
@@ -239,8 +303,12 @@ Phase 1 baseline（`docs/reference/refactor-baseline-2026-07-26.md`）は相対�
 
 **Files:**
 - Modify: `lib/articlePlacements.ts`
+- Modify: `lib/display.ts`（`byArticlePublishedDesc`の引数型を広げる。Step 2）
 - Modify: `components/ReportsBrowser.tsx`
 - Modify: `src/app/reports/page.tsx`
+- Modify: `src/app/page.tsx`（**Home。`getArticleIndexPlacementReports`の第2の呼び出し元**）
+
+> **Homeも触る。** `src/app/page.tsx:99`が`getArticleIndexPlacementReports(getArticles())`を呼んでいる。signatureを変える以上、Phase 4完了済みでも合わせないとtypecheckが落ちる。**変更はcall siteの引数だけ**で、Homeの描画・placement解決結果は変わらない。
 
 **Interfaces:**
 - Produces: `getArticleIndexPlacementReports({ articles, placements, limits }): { heroReports: T[]; featureReports: T[] }`
@@ -328,7 +396,7 @@ export const byArticlePublishedDesc = (
 
 `Article`は`publishedAt: ISODate`（`= string`）を持つため、既存の利用側は変わらない。
 
-- [ ] **Step 3: `src/app/reports/page.tsx`でplacementを解決する**
+- [ ] **Step 3: page側でplacementを解決する（`/reports`とHomeの2箇所）**
 
 ```tsx
 // src/app/reports/page.tsx（ReportsContentのみ抜粋）
@@ -359,6 +427,20 @@ async function ReportsContent({ searchParams }: { searchParams: RouteSearchParam
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
 import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
 ```
+
+**同じ差し替えを`src/app/page.tsx:99`（Home）にも行う。** Homeはserver componentなのでbundleへの影響はないが、signature変更に追随しないとtypecheckが落ちる。
+
+```tsx
+// src/app/page.tsx（呼び出し1行の差し替えのみ）
+// @plan-check-skip: 既存importと関数外の文脈を省いた抜粋
+const { heroReports, featureReports } = getArticleIndexPlacementReports({
+  articles: getArticles(),
+  placements: localContentSnapshot.articlePlacements,
+  limits: localContentSnapshot.articleIndexPlacementLimits,
+});
+```
+
+Homeにも`localContentSnapshot`のimportを追加する。**Home側の出力（hero/featureに選ばれる記事とその順序）は変わらない**ことをStep 6で確認する。
 
 - [ ] **Step 4: `ReportsBrowser`をprops受けに変える**
 
@@ -414,10 +496,13 @@ npm run test:e2e -- tests/e2e/public-routes.spec.ts
 
 手動: `/reports`のhero carousel、feature card、shelf tab、pagination、検索が現行と同じ並びで表示されること。特に**hero/featureに出る記事のidと順序が変わっていないこと**を変更前後で比較し、記録する（Task 8の完了確認で再度使う）。
 
+**Home（`/`）も同じ観点で確認する。** 同じ関数の呼び出し元であり、引数化で挙動が変わっていないことを保証する必要がある。hero/featureに出る記事のidと順序を変更前後で比較する。
+
 - [ ] **Step 7: commit**
 
 ```bash
-git add lib/articlePlacements.ts components/ReportsBrowser.tsx src/app/reports/page.tsx
+git add lib/articlePlacements.ts lib/display.ts components/ReportsBrowser.tsx \
+  src/app/reports/page.tsx src/app/page.tsx
 git commit -m "perf: stop shipping the local content snapshot to the reports client"
 ```
 
@@ -431,7 +516,7 @@ git commit -m "perf: stop shipping the local content snapshot to the reports cli
 
 | 経路 | 例 | 載る場所 | gate |
 |---|---|---|---|
-| A. VM factory経由 | 本文を連結した`searchText`をpropsで渡す | RSC flight payload | Task 6（`check:catalog-payload`＋値assertion） |
+| A. VM factory経由 | 本文を連結した`searchText`をpropsで渡す | RSC flight payload | Task 6（`tests/unit/view-models/catalog-payload.test.ts`＋値assertion） |
 | B. import chain経由 | client componentが`localContentSnapshot`をimportする | JS chunk | **本task** |
 
 **field名markerを使わない理由（実測）:** `fieldEvidence`／`vendorRiskNote`／`usageExampleSourceUrls`を現ビルドへ当てると10 chunkにhitし、少なくとも8件は誤検知だった（`lib/uiText.ts`のUIラベルkey、`lib/search.ts`のbuilder内のproperty access）。field名の出現とrecord値の流出を区別できない。さらに3つとも`Robot`／`Manufacturer`のfieldであり、`data/articles.ts`（228,785）や`data/useCases.ts`（177,085）が単独で漏れても検知できない。
@@ -445,6 +530,10 @@ total slugs: 133
 ```
 
 slugは全recordが`BaseRecord`から持つため、collectionが増えても自動的にcoverageへ入る。
+
+この133は`lib/data.ts`のgetter（published のみ）で数えた値である。Step 1のscriptは`data/*.ts`を直接読むため**178件**（下書き＋`deployments`を含む）を照合する。母数が増えるだけで判定方向は変わらない。
+
+**照合はdouble quote前提**（`"${record.slug}"`）である。現ビルドのSWC minifierはこの形で出力しており実測で機能したが、minifierがsingle quoteを吐くようになると**静かに素通りする**。gateが常に0件を返し続ける状態は「違反が無い」と「検知できていない」の区別が付かないため、Task 10 Step 1のbuildで**意図的に1 chunkへslugを混ぜて落ちることを1度だけ確認する**（確認後は戻す）。
 
 **Files:**
 - Create: `scripts/check-client-bundle-content.mjs`
@@ -462,21 +551,32 @@ slugは全recordが`BaseRecord`から持つため、collectionが増えても自
 
 `.mjs`から`.ts`を読むには`--experimental-strip-types`が要る（`scripts/validate-data.mjs`と同じ）。
 
+**ただし`lib/data.ts`は使えない。** Nodeはtsconfigの`paths`（`@/`）も拡張子なし相対importも解決しないため、`lib/data.ts`を読むと`ERR_MODULE_NOT_FOUND`で落ちる（実測済み。`Cannot find module '.../lib/validate' imported from .../lib/data.ts`）。`scripts/validate-data.mjs`が動くのは、`lib/validate.ts`とその依存が**すべて明示的な`.ts`付き相対import**で書かれているからであって、`--experimental-strip-types`があれば何でも読めるからではない。
+
+`data/*.ts`は依存が浅く、plain nodeで読めることを実測で確認済み。**slugの正本としてこちらを直接読む。**
+
 ```js
 // scripts/check-client-bundle-content.mjs
 import fs from 'node:fs';
 import path from 'node:path';
-import { getArticles, getManufacturers, getRobots, getUseCases } from '../lib/data.ts';
+import { articles } from '../data/articles.ts';
+import { deployments } from '../data/deployments.ts';
+import { manufacturers } from '../data/manufacturers.ts';
+import { robots } from '../data/robots.ts';
+import { useCases } from '../data/useCases.ts';
 
 const MAX_DISTINCT_SLUGS_PER_CHUNK = 5;
 const MAX_CHUNK_BYTES = 340_000;
 const chunkDir = '.next/static/chunks';
 
+// data/*.ts を直接読むため下書き（publishStatus !== 'published'）も含む。
+// lib/data.ts の getter は published のみを返すので、こちらの方が coverage が広い。
 const slugs = [
-  ...getRobots(),
-  ...getManufacturers(),
-  ...getUseCases(),
-  ...getArticles(),
+  ...robots,
+  ...manufacturers,
+  ...useCases,
+  ...articles,
+  ...deployments,
 ].map((record) => `"${record.slug}"`);
 
 function walk(directory) {
@@ -526,8 +626,31 @@ import path from 'node:path';
 const root = process.cwd();
 const roots = ['components', 'lib', 'src'];
 const extensions = new Set(['.ts', '.tsx']);
-const forbidden = /^(@\/data\/|@\/lib\/data\/localContentSnapshot)/;
-const importPattern = /^\s*import\s+(?!type\b)([\s\S]*?)from\s+['"]([^'"]+)['"]/gm;
+const ignoredExtensions = new Set(['.css', '.json', '.svg', '.png', '.jpg', '.webp']);
+
+/**
+ * 判定はspecifier文字列ではなく**解決後のrepo相対パス**で行う。
+ * `@/data/robots` も `../../data/robots.ts` も同じ `data/robots.ts` になるため、
+ * 書き方の違いで素通りしない。
+ */
+const forbidden = new Set([
+  'data/articles.ts',
+  'data/articlePlacements.ts',
+  'data/deployments.ts',
+  'data/manufacturers.ts',
+  'data/robots.ts',
+  'data/useCases.ts',
+  'lib/data/localContentSnapshot.ts',
+]);
+
+const fromPatterns = [
+  // import x, { y } from '...'
+  /^\s*import\s+(?!type\b)([\s\S]*?)from\s+['"]([^'"]+)['"]/gm,
+  // export { y } from '...' / export * from '...' — 再exportもgraphの辺である
+  /^\s*export\s+(?!type\b)(\*|\{[\s\S]*?\})\s*from\s+['"]([^'"]+)['"]/gm,
+];
+// import './side-effect'
+const sideEffectPattern = /^\s*import\s+['"]([^'"]+)['"]/gm;
 
 function filesUnder(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -537,32 +660,49 @@ function filesUnder(directory) {
   });
 }
 
+/**
+ * specifierの末尾`.ts`/`.tsx`を落としてから解決する。
+ * この repo は `lib/validation/**`・`lib/data/**` で拡張子付き相対importを使っており
+ * （55箇所）、落とさないと `x.ts.ts` を探して null になり**辺が黙って消える**。
+ */
 function resolveSpecifier(specifier, fromFile) {
-  const base = specifier.startsWith('@/')
-    ? specifier.slice(2)
-    : path.normalize(path.join(path.dirname(path.relative(root, fromFile)), specifier));
+  const withoutExtension = specifier.replace(/\.(ts|tsx)$/, '');
+  const base = withoutExtension.startsWith('@/')
+    ? withoutExtension.slice(2)
+    : path.normalize(path.join(path.dirname(path.relative(root, fromFile)), withoutExtension));
   for (const suffix of ['.ts', '.tsx', '/index.ts', '/index.tsx']) {
     if (fs.existsSync(path.join(root, base + suffix))) return base + suffix;
   }
   return null;
 }
 
-/** `import type` と、named specifier がすべて `type X` の import を除いた値import。 */
-function valueImportsOf(file) {
+/** `import type` と、named specifier がすべて `type X` のものを除いた値参照。再exportと副作用importも辺として拾う。 */
+function valueSpecifiersOf(file) {
   const source = fs.readFileSync(file, 'utf8');
   const specifiers = [];
-  importPattern.lastIndex = 0;
-  let match;
-  while ((match = importPattern.exec(source)) !== null) {
-    const [, clause, specifier] = match;
-    if (!specifier.startsWith('@/') && !specifier.startsWith('.')) continue;
-    const braced = clause.match(/\{([\s\S]*?)\}/);
-    const outsideBraces = clause.replace(/\{[\s\S]*?\}/, '').trim().replace(/,$/, '');
-    const namedValues = braced
-      ? braced[1].split(',').map((part) => part.trim()).filter((part) => part && !part.startsWith('type '))
-      : [];
-    if (outsideBraces || namedValues.length > 0 || !braced) specifiers.push(specifier);
+
+  for (const pattern of fromPatterns) {
+    pattern.lastIndex = 0;
+    let match;
+    while ((match = pattern.exec(source)) !== null) {
+      const [, clause, specifier] = match;
+      if (!specifier.startsWith('@/') && !specifier.startsWith('.')) continue;
+      const braced = clause.match(/\{([\s\S]*?)\}/);
+      const outsideBraces = clause.replace(/\{[\s\S]*?\}/, '').trim().replace(/,$/, '');
+      const namedValues = braced
+        ? braced[1].split(',').map((part) => part.trim()).filter((part) => part && !part.startsWith('type '))
+        : [];
+      if (outsideBraces || namedValues.length > 0 || !braced) specifiers.push(specifier);
+    }
   }
+
+  sideEffectPattern.lastIndex = 0;
+  let match;
+  while ((match = sideEffectPattern.exec(source)) !== null) {
+    const specifier = match[1];
+    if (specifier.startsWith('@/') || specifier.startsWith('.')) specifiers.push(specifier);
+  }
+
   return specifiers;
 }
 
@@ -572,6 +712,8 @@ const clientEntries = allFiles.filter((file) =>
 );
 
 const failures = [];
+const unresolved = new Set();
+
 for (const entry of clientEntries) {
   const seen = new Set();
   const stack = [[entry, [path.relative(root, entry)]]];
@@ -579,13 +721,19 @@ for (const entry of clientEntries) {
     const [file, chain] = stack.pop();
     if (seen.has(file)) continue;
     seen.add(file);
-    for (const specifier of valueImportsOf(file)) {
-      if (forbidden.test(specifier)) {
-        failures.push(`${chain.join(' -> ')} -> ${specifier}`);
+    for (const specifier of valueSpecifiersOf(file)) {
+      const resolved = resolveSpecifier(specifier, file);
+      if (!resolved) {
+        if (!ignoredExtensions.has(path.extname(specifier))) {
+          unresolved.add(`${path.relative(root, file)} -> ${specifier}`);
+        }
         continue;
       }
-      const resolved = resolveSpecifier(specifier, file);
-      if (resolved) stack.push([path.join(root, resolved), [...chain, resolved]]);
+      if (forbidden.has(resolved)) {
+        failures.push(`${chain.join(' -> ')} -> ${resolved}`);
+        continue;
+      }
+      stack.push([path.join(root, resolved), [...chain, resolved]]);
     }
   }
 }
@@ -595,14 +743,33 @@ if (failures.length > 0) {
     `[client-imports] 'use client' modules must not reach raw data:\n${failures.map((line) => `  - ${line}`).join('\n')}`,
   );
   process.exitCode = 1;
-} else {
+}
+
+// 解決できないlocal specifierは「違反が無い」ではなく「見えていない」。
+// 黙って素通りさせるとgateの意味が消えるため失敗させる。
+if (unresolved.size > 0) {
+  console.error(
+    `[client-imports] unresolved local specifiers (graphの穴):\n${[...unresolved].map((line) => `  - ${line}`).join('\n')}`,
+  );
+  process.exitCode = 1;
+}
+
+if (failures.length === 0 && unresolved.size === 0) {
   console.log(`[client-imports] OK (${clientEntries.length} client entry modules)`);
 }
 ```
 
+**このgateが捕まえないもの（承知のうえで残す）:**
+
+- **動的`import()`。** 静的解析していない。catalog routeでは使っていないが、将来使われたら穴になる。
+- **`node_modules`経由の再export。** bare specifierは辿らない。
+- 逆に、**解決できないlocal specifierは失敗させる**。「違反0件」と「経路が見えていない」を区別できない状態を許すと、gateは通るのに流出する。初回実行で出た分は解決するか`ignoredExtensions`へ明示的に足す。
+
 - [ ] **Step 3: 計画書の型検査を書く**
 
 初版が3巡連続で起こした故障モードは「散文で決めたことがcode例と食い違う」だった。3巡目には`useCase.description`（存在しないfield）、`useCaseMaturityLabels`（存在しない識別子）、`useCase.maturity`（実際は`maturityLevel`）が同じStepに同居していた。**対応表の目視確認ではこの種の誤りは検出できない。**
+
+**対象はfront-matterで`snippetCheck: true`を宣言した計画書だけにする。** `docs/plans/*.md`を全部走査してはならない。実測で、この計画書以外に**8文書・87個のts blockが存在する**（`content-platform-migration-plan-v1.md` 14、`refactor-phase-03` 17、`refactor-phase-06` 15、`refactor-phase-04` 10、`refactor-phase-01` 9、`refactor-phase-07` 8、`robot-image-sourcing-plan-v1.md` 8、`robot-data-factcheck-impl-plan` 6）。いずれもcompileを意図して書かれていないため必ず落ち、Task 2が「完了済みphaseを含む無関係な8文書のsnippet修正」に膨らむ。front-matterの`status:`は全文書`plan`で識別に使えないため、明示的なopt-in fieldを使う。
 
 ```js
 // scripts/check-plan-snippets.mjs
@@ -614,15 +781,20 @@ const outDir = '.plan-snippets';
 const planDir = 'docs/plans';
 const baselinePath = 'scripts/plan-snippet-skip-baseline.json';
 const fence = /```(ts|tsx)\n([\s\S]*?)```/g;
+// front-matter の `snippetCheck: true` を宣言した計画書だけを対象にする。
+const optIn = /^---\n[\s\S]*?^snippetCheck:\s*true\s*$[\s\S]*?^---$/m;
 
 fs.rmSync(outDir, { recursive: true, force: true });
 fs.mkdirSync(outDir, { recursive: true });
 
 let extracted = 0;
 let skipped = 0;
+const checkedFiles = [];
 
 for (const name of fs.readdirSync(planDir).filter((file) => file.endsWith('.md'))) {
   const markdown = fs.readFileSync(path.join(planDir, name), 'utf8');
+  if (!optIn.test(markdown)) continue;
+  checkedFiles.push(name);
   fence.lastIndex = 0;
   let match;
   let index = 0;
@@ -638,7 +810,15 @@ for (const name of fs.readdirSync(planDir).filter((file) => file.endsWith('.md')
   }
 }
 
-console.log(`[plan-snippets] extracted=${extracted} skipped=${skipped}`);
+console.log(
+  `[plan-snippets] files=${checkedFiles.join(',') || '(none)'} extracted=${extracted} skipped=${skipped}`,
+);
+
+// opt-in文書が1本も無い状態でexit 0を返すと、gateは「常に通る」だけの飾りになる。
+if (checkedFiles.length === 0) {
+  console.error('[plan-snippets] no plan declares `snippetCheck: true`');
+  process.exitCode = 1;
+}
 
 const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
 if (skipped > baseline.skipped) {
@@ -666,7 +846,7 @@ compileできない断片には`// @plan-check-skip: <理由>`を1行入れる�
 | 恒久的（断片） | 既存importや関数外の文脈を省いた抜粋 | そのまま残る |
 | 一時的（前方参照） | まだ作っていないmoduleをimportするsnippet | **そのmoduleを作るtaskでskip markerを外し、baselineを減らす** |
 
-一時的skipは現時点で7箇所ある。
+一時的skipは現時点で8箇所ある。
 
 | snippet | 前方参照している物 | markerを外すtask |
 |---|---|---|
@@ -676,11 +856,20 @@ compileできない断片には`// @plan-check-skip: <理由>`を1行入れる�
 | Task 7 `tests/unit/view-models/use-cases.test.ts` | `@/lib/viewModels/useCases` | Task 7 |
 | Task 8 `createArticleCatalogSearchText` | `@/lib/catalog/search`の`joinSearchText` | Task 8 |
 | Task 8 `tests/unit/view-models/articles.test.ts` | `@/lib/viewModels/articles` | Task 8 |
+| Task 8 `tests/unit/view-models/catalog-payload.test.ts` | `@/lib/viewModels/{useCases,articles}` | Task 8 |
 | Task 9 `tests/unit/view-models/compare.test.ts` | `@/lib/viewModels/compare` | Task 9 |
 
 **該当taskの完了条件に「skip markerを外してbaselineを減らす」を含める。** baselineが減る方向は失敗にしないため、この運用は成立する。
 
-この7箇所を優先して一時的skipにしたのは、**3巡連続で誤りが出たのがsearchText builderとVM test（存在しないfield名・label map名の参照）だから**である。恒久的skipにしてしまうと、再発を防ぐという型検査の目的を果たさない。
+この8箇所を優先して一時的skipにしたのは、**3巡連続で誤りが出たのがsearchText builderとVM test（存在しないfield名・label map名の参照）だから**である。恒久的skipにしてしまうと、再発を防ぐという型検査の目的を果たさない。
+
+**Task 2時点の実効カバレッジは低い。この数字を承知したうえで導入する。**
+
+この計画書のts/tsx blockは全34個、うちskip markerが付いているのは25個（恒久17・一時8）。**Task 2直後に型検査されるのは9個だけ**（`lib/articlePlacements.ts`、`lib/display.ts:237`、Task 1のimport追加、`lib/useMediaQuery.ts`、`lib/normalizeSearchText.ts`、`lib/viewModels/{useCases,articles,compare}.ts`の型定義3本、`compare.spec.ts`）。**再発した誤りの現場であるsearchText builderとVM testは、上の表のtaskでmarkerを外すまで検査されない。**
+
+この34/25/9は`scripts/check-plan-snippets.mjs`と同じ抽出ロジックで数えた実測値である。編集で増減するため、baselineを作るStep 5の出力を正とする。
+
+したがってこのgateの価値は「Task 2で一斉に誤りを洗い出す」ことではなく、**「Task 6・7・8・9の着手時にmarkerを外す手順が強制され、その時点で誤りが機械的に落ちる」**ことにある。各taskの完了条件に組み込まれていることがgateの本体であり、script単体ではない。
 
 `tsconfig.plan-snippets.json`:
 
@@ -690,11 +879,16 @@ compileできない断片には`// @plan-check-skip: <理由>`を1行入れる�
   "compilerOptions": {
     "noEmit": true,
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "types": ["node"]
   },
-  "include": [".plan-snippets/**/*"]
+  "include": ["next-env.d.ts", ".plan-snippets/**/*"]
 }
 ```
+
+**`include`を`.plan-snippets/**/*`だけにしてはならない。** `extends`は`include`を継承せず置き換えるため、`next-env.d.ts`とambient型が外れる。実測すると、snippetがimportした先の**既存ファイル**が落ちる（`lib/media.ts(23,17): Cannot find name 'process'`）。snippetの誤りではないので、指示どおり「落ちた箇所を計画書側で修正する」と誤った修正へ誘導される。`next-env.d.ts`と`types: ["node"]`を明示すれば消える。
+
+**この設定で9個のsnippetが実際に通ることを確認済み**（2026-08-01時点）。唯一落ちるのは`lib/articlePlacements.ts`のsnippetで、原因は`byArticlePublishedDesc`がまだ`(a: Article, b: Article)`だから。**Task 1 Step 2の引数型を広げる変更を入れると解消し、その状態で`npm run typecheck`（プロジェクト全体）も通る**ことまで確認した。順序制約「Task 1 → Task 2」が実在することの裏付けである。
 
 - [ ] **Step 4: baselineと`.gitignore`と`package.json`を更新する**
 
@@ -944,20 +1138,55 @@ Expected: `components/uilayouts/carousel.tsx`の定義だけ。それ以外が0�
 
 - [ ] **Step 4: `SliderDotButton`をCSSへ置換する**
 
-`layoutId`は「activeなdotが位置を保ったままスライドする」共有layout animationを作っている。CSSでは**indicatorを1つだけdot列の中に絶対配置し、`translate`でactive indexの位置へ動かす**。
+`layoutId`は「activeなdotが位置を保ったままスライドする」共有layout animationを作っている。CSSでは**indicatorを1つだけdot列の中に絶対配置し、`translate`でactive dotの位置へ動かす**。
+
+**offsetは定数計算ではなくDOMから測る。** dot列のgapとサイズを定数（`1.5rem + 0.5rem`など）で埋め込む実装は、**呼び出し元がgapを上書きした瞬間に壊れる**。実際に唯一の利用箇所である`components/NewsHeroCarousel.tsx:155`は
+
+```tsx
+// @plan-check-skip: 既存の呼び出し1行
+<SliderDotButton className="gap-1.5" activeClass="bg-white" />
+```
+
+と書いており、`cn()`（tailwind-merge）によって`gap-1.5`（0.375rem）が既定の`gap-2`（0.5rem）に勝つ。定数で計算するとdot 1つあたり0.125remずつ、N個目で(N-1)×0.125remずれる。現行の`layoutId`実装はindicatorをactive buttonの内側に描くためこの影響を受けない。**置換で新しく持ち込む不具合であり、CSS化そのものの制約ではない。**
+
+active buttonの`offsetLeft`／`offsetTop`を読めば、gap・dotサイズ・responsive classの変更すべてに追従する。
+
+```tsx
+// components/uilayouts/carousel.tsx
+// @plan-check-skip: forwardRef の外側と useCarousel の分割代入を省いた抜粋
+const dotRefs = useRef<(HTMLButtonElement | null)[]>([]);
+const containerRef = useRef<HTMLDivElement>(null);
+const [indicatorOffset, setIndicatorOffset] = useState(0);
+
+useEffect(() => {
+  const container = containerRef.current;
+  if (!container) return;
+
+  const measure = () => {
+    const active = dotRefs.current[selectedIndex];
+    if (!active) return;
+    setIndicatorOffset(orientation === 'vertical' ? active.offsetTop : active.offsetLeft);
+  };
+
+  measure();
+  const observer = new ResizeObserver(measure);
+  observer.observe(container);
+  return () => observer.disconnect();
+}, [selectedIndex, orientation, scrollSnaps.length]);
+```
+
+描画部:
 
 ```tsx
 // components/uilayouts/carousel.tsx
 // @plan-check-skip: forwardRef の外側と useCarousel の分割代入を省いた描画部の抜粋
-<div
-  ref={ref}
-  className={cn('relative flex gap-2', className)}
-  style={{ '--dot-index': selectedIndex } as CSSProperties}
-  {...props}
->
+<div ref={containerRef} className={cn('relative flex gap-2', className)} {...props}>
   {scrollSnaps.map((_, index) => (
     <button
       key={`${carouselId}-dot-${index}`}
+      ref={(node) => {
+        dotRefs.current[index] = node;
+      }}
       type="button"
       onClick={() => onDotButtonClick(index)}
       aria-label={`スライド ${index + 1} へ`}
@@ -983,20 +1212,21 @@ Expected: `components/uilayouts/carousel.tsx`の定義だけ。それ以外が0�
       orientation === 'vertical' ? 'h-6 w-1' : 'w-6 h-1',
       activeClass,
     )}
-    style={
-      orientation === 'vertical'
-        ? { transform: 'translateY(calc(var(--dot-index) * (1.5rem + 0.5rem)))' }
-        : { transform: 'translateX(calc(var(--dot-index) * (1.5rem + 0.5rem)))' }
-    }
+    style={{
+      transform:
+        orientation === 'vertical'
+          ? `translateY(${indicatorOffset}px)`
+          : `translateX(${indicatorOffset}px)`,
+    }}
   />
 </div>
 ```
 
-`1.5rem`はdotの長辺（`w-6`/`h-6`）、`0.5rem`は`gap-2`に対応する。**dotサイズかgapを変えるときはこの計算も併せて変える**ため、両方を`carousel.tsx`内の定数へ寄せる。
+`forwardRef`の`ref`は`containerRef`とマージする必要がある（既存の`ref`引数を捨てない）。初回renderの`indicatorOffset`は0で、これは`selectedIndex === 0`のときのactive dot位置と一致するため、mount時のちらつきは出ない。
 
-`CSSProperties`は`react`からtype importする。カスタムプロパティを`style`へ渡すため`as CSSProperties`のcastが要る。
+`duration-400`はTailwind v4（`^4.1.12`）の動的ユーティリティとして有効である（v3では存在しないclassだった）。
 
-`AnimatePresence`／`motion`のimportを削除する。
+`AnimatePresence`／`motion`のimportを削除する。`useEffect`／`useRef`／`useState`は既に同fileでimport済み。
 
 - [ ] **Step 5: 削減を実測する**
 
@@ -1028,6 +1258,7 @@ npm run test:e2e -- tests/e2e/public-routes.spec.ts
 手動確認（390 / 1440幅のscreenshot）:
 - `/reports`のhero carouselが自動再生し、prev/nextボタンとswipeで動く
 - dot indicatorがactive slideへスライドし、`aria-current`が正しいdotに付く
+- **最後のdotでindicatorがdotの真上に重なる**（`className="gap-1.5"`の上書きに追従できているかの確認。定数計算だとここで最大にずれる）
 - keyboard（Tab → Enter/Space）でdotを選択できる
 - `prefers-reduced-motion: reduce`でautoplayが止まり、indicatorのtransitionも無効になる
 - **`/robots/[slug]`の`RobotImageCarousel`（同じmoduleの利用者）が壊れていない**
@@ -1123,7 +1354,7 @@ for(const r of ['/robots','/manufacturers','/use-cases','/reports','/compare']){
 }"
 ```
 
-**完了条件:** `/robots`・`/manufacturers`・`/compare`のroute固有JSが減る。減らない場合は`lib/search.ts`へ到達する経路が他に残っているので、`scripts/check-client-import-graph.mjs`の`forbidden`を一時的に`@/lib/search`へ向けて実行し、経路を特定してから進む。
+**完了条件:** `/robots`・`/manufacturers`・`/compare`のroute固有JSが減る。減らない場合は`lib/search.ts`へ到達する経路が他に残っているので、`scripts/check-client-import-graph.mjs`の`forbidden`へ一時的に`'lib/search.ts'`を足して実行し、経路を特定してから進む（`forbidden`は解決後のrepo相対パスのSetである）。
 
 **`/use-cases`と`/reports`はこの時点では減らない見込み**（`lib/useCaseFilters.ts`と`lib/searchIndex.ts`が残るため）。実測値を記録し、Task 7・8で再測する。
 
@@ -1172,7 +1403,7 @@ use-cases／reportsはTask 7・8で同じ形にする。
 
 **Files:**
 - Create: `lib/catalog/search.ts`
-- Create: `scripts/check-catalog-payload.mjs`
+- Create: `tests/unit/view-models/catalog-payload.test.ts`
 - Modify: `lib/viewModels/shared.ts`
 - Modify: `lib/viewModels/robots.ts`
 - Modify: `lib/viewModels/manufacturers.ts`
@@ -1180,7 +1411,8 @@ use-cases／reportsはTask 7・8で同じ形にする。
 - Modify: `scripts/check-data-import-boundaries.mjs`
 - Modify: `tests/unit/view-models/robots.test.ts`
 - Modify: `tests/unit/view-models/manufacturers.test.ts`
-- Modify: `package.json`
+
+> `package.json`は変更しない。payload budgetをvitest testにしたため、`check` pipelineへ足す行が無い（Step 6）。
 
 **Interfaces:**
 - Produces:
@@ -1348,28 +1580,25 @@ searchText: createRobotCatalogSearchText(robot, manufacturer, card.facts),
 
 ```bash
 npm run test -- tests/unit/view-models
-node --experimental-strip-types -e "
-const d = await import('./lib/data.ts');
-const { createRobotCatalogItems } = await import('./lib/viewModels/robots.ts');
-const { createManufacturerCatalogItems } = await import('./lib/viewModels/manufacturers.ts');
-const robots = createRobotCatalogItems(d.getRobots(), d.getManufacturers(), d.getUseCases());
-const mfrs = createManufacturerCatalogItems(d.getManufacturers(), d.getRobots());
-console.log('robots VM bytes =', Buffer.byteLength(JSON.stringify(robots)));
-console.log('mfrs   VM bytes =', Buffer.byteLength(JSON.stringify(mfrs)));
-" --input-type=module
 ```
 
-Expected: testがPASS。出力したバイト数をStep 6の上限設定に使う。
+Expected: testがPASS。この時点でStep 6のbudget testを`maxBytes`未設定のまま書き、`console.log`が出す実測バイト数を上限設定に使う。
+
+> **plain nodeでVM factoryを実行することはできない。** `lib/data.ts`も`lib/viewModels/*.ts`も`@/`エイリアスと拡張子なし相対importを使っており、Nodeはどちらも解決しない（実測: `Cannot find package '@/lib' imported from .../lib/viewModels/robots.ts`）。`--experimental-strip-types`は型を剥がすだけで、module解決は変えない。**計測もgateもvitest上で行う。**
 
 - [ ] **Step 6: payload byte budgetを導入する**
 
-`scripts/check-home-payload.mjs`と同形。**文字数ではなく`Buffer.byteLength`で測る**（日本語はUTF-8で1文字3バイトのため、文字数では実転送量を約3倍過小評価する）。
+**scriptではなくvitest testとして書く。** 理由は上記のmodule解決である。`vitest.config.ts`は`vite-tsconfig-paths`を読み込んでおり`@/`が解決される。既存のVM contract testと同じ場所に置くことで、`npm run check`のpipelineへ新しい行を足す必要もなくなる（`test`に含まれる）。
 
-```js
-// scripts/check-catalog-payload.mjs
-import { getManufacturers, getRobots, getUseCases } from '../lib/data.ts';
-import { createManufacturerCatalogItems } from '../lib/viewModels/manufacturers.ts';
-import { createRobotCatalogItems } from '../lib/viewModels/robots.ts';
+**文字数ではなく`Buffer.byteLength`で測る**（日本語はUTF-8で1文字3バイトのため、文字数では実転送量を約3倍過小評価する）。
+
+```ts
+// tests/unit/view-models/catalog-payload.test.ts
+// @plan-check-skip: Task 6 時点では use-cases / articles の VM がまだ無い。Task 8 でこのmarkerを外しbaselineを減らす
+import { describe, expect, it } from 'vitest';
+import { getManufacturers, getRobots, getUseCases } from '@/lib/data';
+import { createManufacturerCatalogItems } from '@/lib/viewModels/manufacturers';
+import { createRobotCatalogItems } from '@/lib/viewModels/robots';
 
 // maxBytes は Task 6 Step 5 の実測値 * 1.15。Task 7・8 で use-case / article を追加する。
 const budgets = [
@@ -1391,26 +1620,21 @@ const budgets = [
   },
 ];
 
-let failed = false;
-for (const budget of budgets) {
-  const actual = budget.bytes();
-  console.log(`[catalog-payload] ${budget.name}: ${actual}/${budget.maxBytes}`);
-  if (actual > budget.maxBytes) failed = true;
-}
-if (failed) process.exitCode = 1;
+describe('catalog payload budgets', () => {
+  for (const budget of budgets) {
+    it(`${budget.name} stays within its byte budget`, () => {
+      const actual = budget.bytes();
+      // 実測値をログへ残す。上限を締め直すときはこの出力を使う。
+      console.log(`[catalog-payload] ${budget.name}: ${actual}/${budget.maxBytes}`);
+      expect(actual).toBeLessThanOrEqual(budget.maxBytes);
+    });
+  }
+});
 ```
 
 `maxBytes: 0`はplaceholderではなく、**Step 5で実測した値を入れてからcommitする**。実測値と上限をcommit messageへ残す。
 
-`package.json`へ配線する。
-
-```json
-{
-  "check:catalog-payload": "node --experimental-strip-types scripts/check-catalog-payload.mjs"
-}
-```
-
-`check` pipelineの`test`の直後へ挿入する（buildは不要）。
+`package.json`への配線は不要。`npm run check`の`test`が拾う。
 
 - [ ] **Step 7: import境界ruleを追加する**
 
@@ -1424,7 +1648,7 @@ if (failed) process.exitCode = 1;
 
 ```bash
 npm run typecheck && npm run lint && npm run test
-npm run check:catalog-payload && npm run check:data-boundaries
+npm run check:data-boundaries
 npm run build && npm run test:e2e -- tests/e2e/catalog-url-state.spec.ts
 ```
 
@@ -1434,8 +1658,7 @@ npm run build && npm run test:e2e -- tests/e2e/catalog-url-state.spec.ts
 
 ```bash
 git add lib/catalog/search.ts lib/viewModels lib/robotFilters.ts lib/manufacturerFilters.ts \
-  scripts/check-catalog-payload.mjs scripts/check-data-import-boundaries.mjs \
-  tests/unit/view-models package.json
+  scripts/check-data-import-boundaries.mjs tests/unit/view-models
 git commit -m "refactor: build catalog search text from displayed fields only"
 ```
 
@@ -1456,7 +1679,7 @@ git commit -m "refactor: build catalog search text from displayed fields only"
 - Modify: `components/UseCasesBrowser.tsx`
 - Modify: `components/UseCaseCard.tsx`
 - Modify: `src/app/use-cases/page.tsx`
-- Modify: `scripts/check-catalog-payload.mjs`
+- Modify: `tests/unit/view-models/catalog-payload.test.ts`
 
 **Interfaces:**
 - Produces:
@@ -1591,13 +1814,13 @@ index.addAll(
 
 - [ ] **Step 6: payload budgetへuse-caseを足す**
 
-`scripts/check-catalog-payload.mjs`の`budgets`へ`useCases`を追加し、上限は実測値 + 15%とする。
+`tests/unit/view-models/catalog-payload.test.ts`の`budgets`へ`useCases`を追加し、上限は実測値 + 15%とする。
 
 - [ ] **Step 7: 実測と回帰確認**
 
 ```bash
 npm run test -- tests/unit/view-models/use-cases.test.ts
-npm run check:catalog-payload
+npm run test -- tests/unit/view-models/catalog-payload.test.ts
 npm run typecheck && npm run lint && npm run build && npm run check:bundle-content
 rg -n "from '@/lib/search'" lib components
 node -e "
@@ -1619,7 +1842,7 @@ npm run test:e2e -- tests/e2e/public-routes.spec.ts tests/e2e/catalog-url-state.
 ```bash
 git add lib/viewModels/useCases.ts lib/catalog/search.ts lib/searchIndex.ts lib/useCaseFilters.ts \
   components/UseCasesBrowser.tsx components/UseCaseCard.tsx src/app/use-cases/page.tsx \
-  scripts/check-catalog-payload.mjs tests/unit/view-models/use-cases.test.ts
+  tests/unit/view-models/catalog-payload.test.ts tests/unit/view-models/use-cases.test.ts
 git commit -m "refactor: send catalog view models to the use case client"
 ```
 
@@ -1641,7 +1864,7 @@ git commit -m "refactor: send catalog view models to the use case client"
 - Modify: `components/NewsCard.tsx` / `NewsFeatureCard.tsx` / `NewsHeroCarousel.tsx`
 - Modify: `src/app/reports/page.tsx`
 - Modify: `lib/uiText.ts`
-- Modify: `scripts/check-catalog-payload.mjs`
+- Modify: `tests/unit/view-models/catalog-payload.test.ts`
 - Modify: `scripts/check-data-import-boundaries.mjs`
 
 **Interfaces:**
@@ -1778,7 +2001,7 @@ Expected: 0件。
 
 ```bash
 npm run test -- tests/unit/view-models
-npm run check:catalog-payload && npm run check:data-boundaries
+npm run check:data-boundaries
 npm run typecheck && npm run lint && npm run build && npm run check:bundle-content
 node -e "
 const s=require('./.next/diagnostics/route-bundle-stats.json');
@@ -1809,8 +2032,8 @@ npm run test:e2e -- tests/e2e/public-routes.spec.ts tests/e2e/catalog-url-state.
 git add lib/viewModels/articles.ts lib/catalog/search.ts lib/searchIndex.ts lib/articleFilters.ts \
   components/ReportsBrowser.tsx components/NewsCard.tsx components/NewsFeatureCard.tsx \
   components/NewsHeroCarousel.tsx src/app/reports/page.tsx lib/uiText.ts \
-  scripts/check-catalog-payload.mjs scripts/check-data-import-boundaries.mjs \
-  tests/unit/view-models/articles.test.ts
+  scripts/check-data-import-boundaries.mjs \
+  tests/unit/view-models/articles.test.ts tests/unit/view-models/catalog-payload.test.ts
 git commit -m "refactor: send catalog view models to the reports client"
 ```
 
@@ -2097,7 +2320,7 @@ Expected: すべて0件。
 | `check:client-imports` | Task 2 | source（`'use client'`から`data/**`への到達） | build時のchunk構成 |
 | `check:bundle-content` | Task 2 | client chunkのrecord slug数とサイズ | VM経由で連結された本文 |
 | `check:plan-snippets` | Task 2 | 計画書のcode例と実型の一致 | 実装そのもの |
-| `check:catalog-payload` | Task 6 | VM factory出力のバイト数（RSC payload） | import chain経由の流出 |
+| `catalog-payload.test.ts`（vitest） | Task 6 | VM factory出力のバイト数（RSC payload） | import chain経由の流出 |
 | `check:client-budgets` | Task 10 | route固有JSのバイト数 | RSC payloadの肥大 |
 
 **route固有JSの最終確認:**
@@ -2120,6 +2343,8 @@ npm run check:client-budgets
 | `lib/search.ts`削除後にdetail pageやscriptが壊れる | build失敗 | Task 10 Step 3の`rg`が0件のときだけ削除する。1件でも残れば削除しない |
 | Task 9のcompare分割でDnDが壊れる | 比較操作の破綻 | E2Eと手動確認。分割は責務移動のみでDnD sensorの設定値は変えない |
 | `check:plan-snippets`のskipが増えてgateが形骸化する | 計画書の誤りが再び素通りする | skip総数をbaselineと比較し、増加を失敗にする。検査は既定でON |
+| gate scriptが`lib/*.ts`をimportできず動かない | Task 2・6が着手時に止まる | Nodeは`@/`も拡張子なし相対importも解決しない（実測確認済み）。**bundle-content gateは`data/*.ts`を直接読み、payload budgetはvitest testにする**。plain nodeから読めるのは依存が浅いmoduleだけ |
+| CSS化したdot indicatorが呼び出し元のgap上書きでずれる | hero carouselの見た目が崩れる | offsetを定数計算せずDOMから測る（Task 4 Step 4）。最後のdotで重なることを手動確認する |
 
 ---
 
