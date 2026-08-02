@@ -585,7 +585,9 @@ slugは全recordが`BaseRecord`から持つため、collectionが増えても自
 
 この133は`lib/data.ts`のgetter（published のみ）で数えた値である。Step 1のscriptは`data/*.ts`を直接読むため**178件**（下書き＋`deployments`を含む）を照合する。母数が増えるだけで判定方向は変わらない。
 
-**照合はdouble quote前提**（`"${record.slug}"`）である。現ビルドのSWC minifierはこの形で出力しており実測で機能したが、minifierがsingle quoteを吐くようになると**静かに素通りする**。gateが常に0件を返し続ける状態は「違反が無い」と「検知できていない」の区別が付かないため、Task 10 Step 1のbuildで**意図的に1 chunkへslugを混ぜて落ちることを1度だけ確認する**（確認後は戻す）。
+**照合はdouble quote前提**（`"${record.slug}"`）である。現ビルドのSWC minifierはこの形で出力しており実測で機能したが、minifierがsingle quoteを吐くようになると**静かに素通りする**。gateが常に0件を返し続ける状態は「違反が無い」と「検知できていない」の区別が付かないため、**意図的に1 chunkへslugを混ぜて落ちることを確認する**（確認後は戻す）。
+
+**実施済み（Task 2実装時）:** `.next/static/chunks/`へslug 6件を含むファイルを置いて実行し、`6 distinct record slugs (limit 4)`でexit 1になることを確認した。削除後は再びOK。
 
 **Files:**
 - Create: `scripts/check-client-bundle-content.mjs`
@@ -605,24 +607,22 @@ slugは全recordが`BaseRecord`から持つため、collectionが増えても自
 
 **ただし`lib/data.ts`は使えない。** Nodeはtsconfigの`paths`（`@/`）も拡張子なし相対importも解決しないため、`lib/data.ts`を読むと`ERR_MODULE_NOT_FOUND`で落ちる（実測済み。`Cannot find module '.../lib/validate' imported from .../lib/data.ts`）。`scripts/validate-data.mjs`が動くのは、`lib/validate.ts`とその依存が**すべて明示的な`.ts`付き相対import**で書かれているからであって、`--experimental-strip-types`があれば何でも読めるからではない。
 
-`data/*.ts`は依存が浅く、plain nodeで読めることを実測で確認済み。**slugの正本としてこちらを直接読む。**
+`data/*.ts`は依存が浅くplain nodeで読めるが、**直接importすると既存の`check:data-boundaries`に抵触する**（`scripts/`もrootsに含まれ、`../data/robots.ts`形式の値importを禁止している。実装時に実際に落ちた）。allowlistを増やす代わりに、**正規の入口である`lib/data/localContentSnapshot.ts`から読む**。この moduleは依存がすべて`.ts`付き相対importなのでplain nodeで解決でき、かつ`check:data-boundaries`の`allowed`に既に入っている。
 
 ```js
 // scripts/check-client-bundle-content.mjs
 import fs from 'node:fs';
 import path from 'node:path';
-import { articles } from '../data/articles.ts';
-import { deployments } from '../data/deployments.ts';
-import { manufacturers } from '../data/manufacturers.ts';
-import { robots } from '../data/robots.ts';
-import { useCases } from '../data/useCases.ts';
+import { localContentSnapshot } from '../lib/data/localContentSnapshot.ts';
 
 const MAX_DISTINCT_SLUGS_PER_CHUNK = 5;
 const MAX_CHUNK_BYTES = 340_000;
 const chunkDir = '.next/static/chunks';
 
-// data/*.ts を直接読むため下書き（publishStatus !== 'published'）も含む。
-// lib/data.ts の getter は published のみを返すので、こちらの方が coverage が広い。
+// data/*.ts の正規の入口から読む。直接 import すると check:data-boundaries に抵触し、
+// lib/data.ts は `@/` エイリアスを使うため plain node で解決できない。
+// getter（published のみ）ではなく snapshot を使うので、下書きも照合対象に入る。
+const { robots, manufacturers, useCases, articles, deployments } = localContentSnapshot;
 const slugs = [
   ...robots,
   ...manufacturers,

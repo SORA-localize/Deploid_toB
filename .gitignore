@@ -40,3 +40,5 @@ tsconfig.tsbuildinfo
 public/images/_local-prototype/
 docs/planning/local-prototype-image-fill-plan-v1.md
 .worktrees/
+.plan-snippets/
+tsconfig.plan-snippets.tsbuildinfo
