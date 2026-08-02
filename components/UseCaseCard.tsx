@@ -1,13 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'motion/react';
 import { TagChip } from '@/components/TagChip';
 import type { UseCase } from '@/data/types';
 import type { UseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
 import { maturityLabels } from '@/lib/labels';
 import { getUseCaseMaturityTone } from '@/lib/visualSemantics';
-import { useTiltCardEffect } from '@/lib/useTiltCardEffect';
 
 interface UseCaseCardProps {
   useCase: UseCase;
@@ -19,38 +17,13 @@ interface UseCaseCardProps {
 // （以前の featured/list 2バリアントは、横幅いっぱいの行カードがグリッドと噛み合わず
 //   カードが肥大化する原因だったため統合した）。
 export function UseCaseCard({ useCase: u, evidenceSummary, robotNames }: UseCaseCardProps) {
-  const {
-    cardRef,
-    rotateX,
-    rotateY,
-    glowOpacity,
-    handleMouseMove,
-    handleMouseEnter,
-    handleMouseLeave,
-  } = useTiltCardEffect();
-
   const maturityTone = getUseCaseMaturityTone(u.maturityLevel);
   const maturityLabel = maturityLabels[u.maturityLevel];
 
   return (
-    <motion.div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      style={{ rotateX, rotateY, transformPerspective: 1000 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="card-data group relative isolate flex h-full min-h-[148px] flex-col overflow-hidden"
-    >
-      {/* Glow + shimmer + accent line はRobotCard/ManufacturerCardと同じ演出（lib/useTiltCardEffect.ts参照） */}
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-30"
-        style={{
-          opacity: glowOpacity,
-          background: 'radial-gradient(circle at center, var(--card-spotlight) 0%, transparent 70%)',
-        }}
-      />
+    <div className="card-data group relative isolate flex h-full min-h-[148px] flex-col overflow-hidden">
+      {/* Shimmer + accent line はRobotCard/ManufacturerCardと同じ演出。
+          tilt と pointer追従glow は motion 依存だったため除去した（RobotCard と同じ判断）。 */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-y-0 left-0 z-30 w-[100%] -translate-x-full -skew-x-12 bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-[200%] motion-reduce:hidden"
@@ -83,6 +56,6 @@ export function UseCaseCard({ useCase: u, evidenceSummary, robotNames }: UseCase
           )}
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }
