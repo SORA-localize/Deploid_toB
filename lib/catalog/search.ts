@@ -1,4 +1,4 @@
-import type { Manufacturer, Robot } from '@/data/types';
+import type { Manufacturer, Robot, UseCase } from '@/data/types';
 import {
   buyerReadinessLabels,
   companyStatusLabels,
@@ -6,6 +6,7 @@ import {
   deploymentStageLabels,
   japanAvailabilityLabels,
   japanPresenceLabels,
+  maturityLabels,
   mobilityLabels,
   procurementLabels,
   robotCategoryLabels,
@@ -73,5 +74,23 @@ export function createManufacturerCatalogSearchText(
     japanPresenceLabels[manufacturer.japanPresence],
     ...(manufacturer.domesticDistributors ?? []).map((distributor) => distributor.name),
     ...robotsForManufacturer.flatMap((robot) => [robot.nameJa, robot.name]),
+  ]);
+}
+
+export function createUseCaseCatalogSearchText(
+  useCase: UseCase,
+  robotNames: readonly string[],
+): string {
+  return joinSearchText([
+    useCase.titleJa,
+    useCase.title,
+    // card は subtitle ?? summary を描画するので両方を対象にする。
+    useCase.subtitle,
+    useCase.summary,
+    maturityLabels[useCase.maturityLevel],
+    ...robotNames,
+    ...getTagSearchValues([useCase.primaryIndustry], 'industry'),
+    ...getTagSearchValues(useCase.industryTags, 'industry'),
+    ...getTagSearchValues(useCase.taskTags, 'task'),
   ]);
 }

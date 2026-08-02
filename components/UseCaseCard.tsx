@@ -2,23 +2,17 @@
 
 import Link from 'next/link';
 import { TagChip } from '@/components/TagChip';
-import type { UseCase } from '@/data/types';
-import type { UseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
-import { maturityLabels } from '@/lib/labels';
-import { getUseCaseMaturityTone } from '@/lib/visualSemantics';
+import type { UseCaseCatalogItem } from '@/lib/viewModels/useCases';
 
 interface UseCaseCardProps {
-  useCase: UseCase;
-  evidenceSummary?: UseCaseCardEvidenceSummary;
-  robotNames?: string[];
+  item: UseCaseCatalogItem;
 }
 
 // robots/manufacturers と同じグリッド密度で並ぶことを前提にしたコンパクトな縦カード
 // （以前の featured/list 2バリアントは、横幅いっぱいの行カードがグリッドと噛み合わず
 //   カードが肥大化する原因だったため統合した）。
-export function UseCaseCard({ useCase: u, evidenceSummary, robotNames }: UseCaseCardProps) {
-  const maturityTone = getUseCaseMaturityTone(u.maturityLevel);
-  const maturityLabel = maturityLabels[u.maturityLevel];
+export function UseCaseCard({ item }: UseCaseCardProps) {
+  const { evidence, robotNames } = item;
 
   return (
     <div className="card-data group relative isolate flex h-full min-h-[148px] flex-col overflow-hidden">
@@ -33,23 +27,23 @@ export function UseCaseCard({ useCase: u, evidenceSummary, robotNames }: UseCase
         className="pointer-events-none absolute bottom-0 left-0 z-40 h-[2px] w-0 bg-primary transition-all duration-500 group-hover:w-full motion-reduce:transition-none"
       />
 
-      <Link href={`/use-cases/${u.slug}`} className="relative z-10 flex h-full flex-col p-4">
+      <Link href={item.href} className="relative z-10 flex h-full flex-col p-4">
         <h4 className="mb-1.5 line-clamp-2 text-base font-semibold text-foreground">
-          {u.titleJa ?? u.title}
+          {item.title}
         </h4>
         <p className="mb-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-          {u.subtitle ?? u.summary}
+          {item.lead}
         </p>
         <div className="mt-auto flex min-w-0 flex-wrap items-center gap-1.5 pt-2">
-          <TagChip tone={maturityTone} className="shrink-0 px-1.5 py-0 text-[10px]">
-            {maturityLabel}
+          <TagChip tone={item.maturity.tone} className="shrink-0 px-1.5 py-0 text-[10px]">
+            {item.maturity.label}
           </TagChip>
-          {evidenceSummary && (
-            <TagChip tone={evidenceSummary.tone} className="min-w-0 max-w-full truncate px-1.5 py-0 text-[10px]">
-              {evidenceSummary.label}
+          {evidence && (
+            <TagChip tone={evidence.tone} className="min-w-0 max-w-full truncate px-1.5 py-0 text-[10px]">
+              {evidence.label}
             </TagChip>
           )}
-          {robotNames && robotNames.length > 0 && (
+          {robotNames.length > 0 && (
             <span className="min-w-0 truncate text-[11px] text-muted-foreground/80">
               {robotNames.join('・')}
             </span>

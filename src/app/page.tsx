@@ -24,6 +24,7 @@ import {
   defaultSiteTitle,
 } from '@/lib/metadata';
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
+import { createUseCaseCatalogItems } from '@/lib/viewModels/useCases';
 import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
 import { uiText } from '@/lib/uiText';
 
@@ -61,7 +62,7 @@ export default function HomePage() {
   const featuredRobots = sortRobots(getRobots(), 'home-featured').slice(0, 5);
 
   // 用途から探す：用途一覧と同じカードを、Homeではプレビューとして全件表示する。
-  const homeUseCases = sortUseCases(getUseCases());
+  const homeUseCases = createUseCaseCatalogItems(sortUseCases(getUseCases()), getRobots());
 
   // HomeContentNavigator 用プレビュー画像の型（component側の PreviewAsset と同形）。
   type PreviewAsset = { src: string; alt: string; label: string; objectPosition?: string };

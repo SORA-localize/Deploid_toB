@@ -12,7 +12,6 @@ import type {
   ManufacturerGuideProcurementChannelKind,
   Robot,
   RobotCategory,
-  UseCase,
   UseCaseMaturity,
 } from '@/data/types';
 
@@ -273,7 +272,7 @@ export const useCaseMaturityOrder: readonly UseCaseMaturity[] = [
   'early-stage',
 ];
 
-export function sortUseCases(useCases: UseCase[]): UseCase[] {
+export function sortUseCases<T extends { title: string; titleJa?: string }>(useCases: readonly T[]): T[] {
   return [...useCases].sort((a, b) => {
     const nameA = a.titleJa ?? a.title;
     const nameB = b.titleJa ?? b.title;

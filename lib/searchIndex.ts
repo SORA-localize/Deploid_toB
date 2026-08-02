@@ -1,6 +1,7 @@
 import MiniSearch from 'minisearch';
-import type { Article, UseCase } from '@/data/types';
-import { createReportSearchDocument, createUseCaseSearchDocument } from '@/lib/search';
+import type { Article } from '@/data/types';
+import { createReportSearchDocument } from '@/lib/search';
+import type { UseCaseCatalogItem } from '@/lib/viewModels/useCases';
 
 // 日本語は空白で区切られないため、MiniSearch 既定のトークナイザでは語に分割できない。
 // Intl.Segmenter('ja') の単語境界分割をインデックス時・検索時の両方で使う（同一トークナイザが必須）。
@@ -54,7 +55,9 @@ export function searchArticleSlugs(index: ArticleSearchIndex, query: string): Se
   return new Set(index.search(query).map((result) => String(result.id)));
 }
 
-export function createUseCaseSearchIndex(useCases: readonly UseCase[]): UseCaseSearchIndex {
+export function createUseCaseSearchIndex(
+  useCases: readonly UseCaseCatalogItem[],
+): UseCaseSearchIndex {
   const index = new MiniSearch<SearchIndexDocument>({
     fields: ['text'],
     tokenize: tokenizeJa,
@@ -63,7 +66,8 @@ export function createUseCaseSearchIndex(useCases: readonly UseCase[]): UseCaseS
   index.addAll(
     useCases.map((useCase) => ({
       id: useCase.slug,
-      text: createUseCaseSearchDocument(useCase).fields.join(' '),
+      // 索引対象は catalog searchText（本文を含まない）。MiniSearch の option は変更しない。
+      text: useCase.filter.searchText,
     })),
   );
   return index;

@@ -1,7 +1,6 @@
-import type { UseCase } from '@/data/types';
-import { createUseCaseSearchDocument, matchesSearchDocument } from '@/lib/search';
+import { matchesCatalogSearch } from '@/lib/catalog/matchSearch';
 import { matchesTag, normalizeTagKey } from '@/lib/tags';
-import { USE_CASE_FACETS } from '@/lib/facetConfig';
+import type { UseCaseCatalogItem } from '@/lib/viewModels/useCases';
 
 export interface UseCaseFilters {
   industry: string | null;
@@ -33,29 +32,18 @@ export function normalizeUseCaseFilters({
 }
 
 export function getUseCaseFilterResult(
-  useCases: readonly UseCase[],
+  useCases: readonly UseCaseCatalogItem[],
   filters: UseCaseFilters,
   matchedSlugs?: ReadonlySet<string> | null,
 ) {
-  const searchDocuments = matchedSlugs === undefined
-    ? new Map(useCases.map((useCase) => [useCase.slug, createUseCaseSearchDocument(useCase)]))
-    : null;
-
   const filtered = useCases.filter((useCase) => {
     if (matchedSlugs !== undefined) {
       if (matchedSlugs && !matchedSlugs.has(useCase.slug)) return false;
-    } else if (!matchesSearchDocument(filters.query, searchDocuments?.get(useCase.slug))) {
+    } else if (!matchesCatalogSearch(useCase.filter.searchText, filters.query)) {
       return false;
     }
-    const facetValues: Record<string, string | null> = {
-      industry: filters.industry,
-      task: filters.task,
-    };
-    for (const facet of USE_CASE_FACETS) {
-      if (!matchesTag(facet.getValues(useCase), facetValues[facet.key] ?? null)) {
-        return false;
-      }
-    }
+    if (!matchesTag(useCase.filter.industryTags, filters.industry)) return false;
+    if (!matchesTag(useCase.filter.taskTags, filters.task)) return false;
     return true;
   });
 
