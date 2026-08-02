@@ -1,21 +1,19 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import type { Article } from '@/data/types';
-import { getArticleCardLabel } from '@/lib/articleShelves';
-import { getDisplayableAsset } from '@/lib/media';
+import type { ArticleCatalogItem } from '@/lib/viewModels/articles';
 import { cn } from '@/lib/utils';
 
 interface NewsFeatureCardProps {
-  report: Article;
+  report: ArticleCatalogItem;
   className?: string;
 }
 
 export function NewsFeatureCard({ report, className }: NewsFeatureCardProps) {
-  const hero = getDisplayableAsset(report.heroImage);
+  const hero = report.heroImage;
 
   return (
     <Link
-      href={`/reports/${report.slug}`}
+      href={report.href}
       className={cn(
         'group relative block h-full overflow-hidden rounded-xl border border-border bg-muted/30 transition-colors hover:border-foreground/30',
         className,
@@ -41,13 +39,13 @@ export function NewsFeatureCard({ report, className }: NewsFeatureCardProps) {
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <span className="rounded-sm bg-signal px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-signal-foreground">
-              {getArticleCardLabel(report)}
+              {report.type.label}
             </span>
             <time className="font-mono text-xs text-white/60">{report.publishedAt}</time>
           </div>
 
           <h2 className="line-clamp-2 text-base font-bold leading-tight text-white transition-colors group-hover:text-signal motion-reduce:transition-none">
-            {report.titleJa ?? report.title}
+            {report.title}
           </h2>
 
           <p className="hidden line-clamp-2 text-xs leading-relaxed text-white/75 transition-colors group-hover:text-white motion-reduce:transition-none 2xl:block">

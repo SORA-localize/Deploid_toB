@@ -1,5 +1,6 @@
-import type { Manufacturer, Robot, UseCase } from '@/data/types';
+import type { Article, Manufacturer, Robot, UseCase } from '@/data/types';
 import {
+  articleTypeLabels,
   buyerReadinessLabels,
   companyStatusLabels,
   companyTypeLabels,
@@ -92,5 +93,17 @@ export function createUseCaseCatalogSearchText(
     ...getTagSearchValues([useCase.primaryIndustry], 'industry'),
     ...getTagSearchValues(useCase.industryTags, 'industry'),
     ...getTagSearchValues(useCase.taskTags, 'task'),
+  ]);
+}
+
+export function createArticleCatalogSearchText(article: Article): string {
+  return joinSearchText([
+    article.titleJa,
+    article.title,
+    article.summary,
+    articleTypeLabels[article.type],
+    ...getTagSearchValues(article.themeTags ?? [], 'theme'),
+    ...getTagSearchValues(article.industryTags ?? [], 'industry'),
+    ...getTagSearchValues(article.regionTags ?? [], 'region'),
   ]);
 }

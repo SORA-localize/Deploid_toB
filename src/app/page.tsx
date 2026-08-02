@@ -24,6 +24,7 @@ import {
   defaultSiteTitle,
 } from '@/lib/metadata';
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
+import { createArticleCatalogItems } from '@/lib/viewModels/articles';
 import { createUseCaseCatalogItems } from '@/lib/viewModels/useCases';
 import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
 import { uiText } from '@/lib/uiText';
@@ -99,7 +100,7 @@ export default function HomePage() {
   ];
 
   const { heroReports, featureReports } = getArticleIndexPlacementReports({
-    articles: getArticles(),
+    articles: createArticleCatalogItems(getArticles()),
     placements: localContentSnapshot.articlePlacements,
     limits: localContentSnapshot.articleIndexPlacementLimits,
   });

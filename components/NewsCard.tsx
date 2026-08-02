@@ -3,21 +3,16 @@ import Link from 'next/link';
 import { ArrowRight, Calendar } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
 import { TagChip } from '@/components/TagChip';
-import type { Article } from '@/data/types';
-import { getArticleCardLabel } from '@/lib/articleShelves';
-import { getDisplayableAsset } from '@/lib/media';
-import { getArticleTypeTone } from '@/lib/visualSemantics';
+import type { ArticleCatalogItem } from '@/lib/viewModels/articles';
 import { cn } from '@/lib/utils';
 
 interface NewsCardProps {
-  report: Article;
-  /** タイトルの分かち書き結果。server側で segmentJapaneseLines() を呼んで渡す（budoux をclientへ持ち込まないため）。 */
-  titleSegments: string[][];
+  report: ArticleCatalogItem;
   className?: string;
 }
 
-export function NewsCard({ report, titleSegments, className }: NewsCardProps) {
-  const hero = getDisplayableAsset(report.heroImage);
+export function NewsCard({ report, className }: NewsCardProps) {
+  const hero = report.heroImage;
 
   return (
     <div
@@ -39,7 +34,7 @@ export function NewsCard({ report, titleSegments, className }: NewsCardProps) {
         ) : (
           <div className="flex h-full items-center justify-center">
             <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/50">
-              {getArticleCardLabel(report)}
+              {report.type.label}
             </span>
           </div>
         )}
@@ -48,8 +43,8 @@ export function NewsCard({ report, titleSegments, className }: NewsCardProps) {
       {/* テキストエリア */}
       <div className="flex flex-1 flex-col p-3 sm:p-4 min-w-0">
         <div className="mb-2 flex items-center gap-2">
-          <TagChip tone={getArticleTypeTone(report.type)} className="text-[10px]">
-            {getArticleCardLabel(report)}
+          <TagChip tone={report.type.tone} className="text-[10px]">
+            {report.type.label}
           </TagChip>
           <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
             <Calendar className="h-3 w-3" />
@@ -58,12 +53,12 @@ export function NewsCard({ report, titleSegments, className }: NewsCardProps) {
         </div>
 
         <h3 className="mb-2 line-clamp-3 text-sm font-semibold leading-snug text-foreground">
-          <BudouXText segments={titleSegments} />
+          <BudouXText segments={report.titleSegments} />
         </h3>
 
         <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">
           <div className="flex flex-wrap gap-1">
-            {(report.themeTags ?? []).slice(0, 2).map((tag) => (
+            {report.themeTags.slice(0, 2).map((tag) => (
               <TagChip key={tag} kind="theme" value={tag} className="text-[10px]" />
             ))}
           </div>

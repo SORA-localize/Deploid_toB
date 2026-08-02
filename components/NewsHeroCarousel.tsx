@@ -1,8 +1,6 @@
 'use client';
 
-import type { Article } from '@/data/types';
-import { getArticleCardLabel } from '@/lib/articleShelves';
-import { getDisplayableAsset } from '@/lib/media';
+import type { ArticleCatalogItem } from '@/lib/viewModels/articles';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -21,7 +19,7 @@ import { useMemo, useState } from 'react';
 import { useMediaQuery } from '@/lib/useMediaQuery';
 
 interface NewsHeroCarouselProps {
-  reports: Article[];
+  reports: ArticleCatalogItem[];
   className?: string;
 }
 
@@ -88,10 +86,10 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
         {/* outer overflow-hidden div に height:100% を渡し、inner flex div に h-full を渡すことで高さチェーンを繋ぐ */}
         <SliderContainer className="cursor-grab active:cursor-grabbing h-full" style={{ height: '100%' }}>
           {reports.map((report) => {
-            const hero = getDisplayableAsset(report.heroImage);
+            const hero = report.heroImage;
             return (
               <Slider key={report.id} className="w-full h-full">
-                <Link href={`/reports/${report.slug}`} className="group block relative w-full h-full overflow-hidden">
+                <Link href={report.href} className="group block relative w-full h-full overflow-hidden">
                   {/* Background Image */}
                   {hero ? (
                     <Image
@@ -116,7 +114,7 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
                     <div className="max-w-4xl space-y-3">
                       <div className="flex items-center gap-3">
                         <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest bg-signal text-signal-foreground rounded-sm">
-                          {getArticleCardLabel(report)}
+                          {report.type.label}
                         </span>
                         <time className="text-xs text-white/60 font-mono">
                           {report.publishedAt}
@@ -124,7 +122,7 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
                       </div>
 
                       <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight transition-colors group-hover:text-signal line-clamp-2">
-                        {report.titleJa || report.title}
+                        {report.title}
                       </h2>
 
                       <p className="text-sm md:text-base text-white/80 line-clamp-2 max-w-2xl hidden transition-colors group-hover:text-white md:block">

@@ -8,7 +8,7 @@ import { ManufacturerDetailStickyHeader } from '@/components/ManufacturerDetailS
 import { ManufacturerFactSheet } from '@/components/ManufacturerFactSheet';
 import { ManufacturerRobotsGrid } from '@/components/ManufacturerRobotsGrid';
 import { NewsCard } from '@/components/NewsCard';
-import { segmentJapaneseLines } from '@/lib/typography';
+import { createArticleCatalogItems } from '@/lib/viewModels/articles';
 import { SourceList } from '@/components/SourceList';
 import {
   resolveManufacturerDetailBySlug,
@@ -113,12 +113,8 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
             title={uiText.manufacturers.relatedReports}
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-              {displayedReports.map((report) => (
-                <NewsCard
-                  key={report.id}
-                  report={report}
-                  titleSegments={segmentJapaneseLines(report.titleJa ?? report.title)}
-                />
+              {createArticleCatalogItems(displayedReports).map((report) => (
+                <NewsCard key={report.id} report={report} />
               ))}
             </div>
           </ManufacturerDetailSection>

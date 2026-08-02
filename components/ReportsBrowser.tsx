@@ -11,8 +11,8 @@ import { PageListHeader } from '@/components/PageListHeader';
 import { ReportsHeader } from '@/components/ReportsHeader';
 import { SearchInput } from '@/components/SearchInput';
 import { CardHoverEffect } from '@/components/ui/card-hover-effect';
-import type { Article } from '@/data/types';
 import { filterArticles } from '@/lib/articleFilters';
+import type { ArticleCatalogItem } from '@/lib/viewModels/articles';
 import { byArticlePublishedDesc } from '@/lib/display';
 import {
   getArticlePageCount,
@@ -26,7 +26,6 @@ import { createArticleSearchIndex, searchArticleSlugs } from '@/lib/searchIndex'
 import { uiText } from '@/lib/uiText';
 import {
   ARTICLE_SHELF_TABS,
-  getArticleShelf,
   normalizeArticleShelfParam,
   type ArticleShelf,
 } from '@/lib/articleShelves';
@@ -35,15 +34,9 @@ import { useCatalogUrlState } from '@/lib/catalog/urlState';
 import { cn } from '@/lib/utils';
 
 interface ReportsBrowserProps {
-  reports: Article[];
-  heroReports: Article[];
-  featureReports: Article[];
-  /**
-   * 記事id -> タイトルの分かち書き結果。server側で生成して渡す。
-   * budoux（実測263,562バイト）を client bundle へ持ち込まないため。
-   * Task 8 で ArticleCatalogItem を導入したら、その1フィールドへ移す。
-   */
-  titleSegments: Record<string, string[][]>;
+  reports: ArticleCatalogItem[];
+  heroReports: ArticleCatalogItem[];
+  featureReports: ArticleCatalogItem[];
   initialSearch: string;
 }
 
@@ -51,7 +44,6 @@ export function ReportsBrowser({
   reports,
   heroReports,
   featureReports,
-  titleSegments,
   initialSearch,
 }: ReportsBrowserProps) {
   const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
@@ -80,7 +72,7 @@ export function ReportsBrowser({
     const countBase = filterArticles({ reports: sorted, matchedSlugs });
     const countByShelf = new Map<ArticleShelf, number>();
     for (const article of countBase) {
-      const shelf = getArticleShelf(article);
+      const shelf = article.shelf;
       countByShelf.set(shelf, (countByShelf.get(shelf) ?? 0) + 1);
     }
     return ARTICLE_SHELF_TABS.map((tab) => {
@@ -178,7 +170,7 @@ export function ReportsBrowser({
             <div className="space-y-3">
               <CardHoverEffect className={browserGridClassNames.reports}>
                 {paginatedReports.map((r) => (
-                  <NewsCard key={r.id} report={r} titleSegments={titleSegments[r.id] ?? []} />
+                  <NewsCard key={r.id} report={r} />
                 ))}
               </CardHoverEffect>
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { getManufacturers, getRobots, getUseCases } from '@/lib/data';
+import { getArticles, getManufacturers, getRobots, getUseCases } from '@/lib/data';
+import { createArticleCatalogItems } from '@/lib/viewModels/articles';
 import { createManufacturerCatalogItems } from '@/lib/viewModels/manufacturers';
 import { createRobotCatalogItems } from '@/lib/viewModels/robots';
 import { createUseCaseCatalogItems } from '@/lib/viewModels/useCases';
@@ -18,6 +19,7 @@ import { createUseCaseCatalogItems } from '@/lib/viewModels/useCases';
  *   robots        55,001 バイト（whitelist化前 101,449）
  *   manufacturers 15,627 バイト（whitelist化前 37,271）
  *   useCases      16,093 バイト（Task 7 で新設）
+ *   articles      56,415 バイト（Task 8 で新設。titleSegments を含む）
  */
 const budgets = [
   {
@@ -33,6 +35,11 @@ const budgets = [
     maxBytes: 19_000,
     bytes: () =>
       Buffer.byteLength(JSON.stringify(createUseCaseCatalogItems(getUseCases(), getRobots()))),
+  },
+  {
+    name: 'articles',
+    maxBytes: 65_000,
+    bytes: () => Buffer.byteLength(JSON.stringify(createArticleCatalogItems(getArticles()))),
   },
   {
     name: 'manufacturers',
