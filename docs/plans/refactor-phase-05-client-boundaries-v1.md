@@ -47,7 +47,7 @@ snippetCheck: true
 | 6 | `check-client-import-graph.mjs`が拡張子付きspecifier（repo内に55箇所）を**黙って辿らない**。再exportも追わない | 末尾`.ts`を落としてから解決。判定を解決後パスへ。再export・副作用importも辺に含め、未解決specifierは失敗させる |
 | 7 | plan-snippets gateの実効カバレッジが不明瞭 | Task 2直後は34 block中9個だけであることと、gateの本体が「各taskでmarkerを外す手順」であることを明記 |
 
-**外部レビューで追加された4件（同日）。** 上の7件は内部監査で潰したもので、次の3件は5巡目の外部レビューが見つけたものである。**「計画の事実関係はすべて正確だった」という内部監査の結論は誤りだった。**
+**外部レビューで追加された6件（同日）。** 上の7件は内部監査で潰したもので、次の6件は5巡目・6巡目直前の外部レビューが見つけたものである。**「計画の事実関係はすべて正確だった」という内部監査の結論は誤りだった。**
 
 | # | 問題 | 修正 |
 |---|---|---|
@@ -55,6 +55,8 @@ snippetCheck: true
 | 9 | route固有chunkの内訳表が**削減対象しか載せておらず、残りを説明していなかった**（`/robots` 99,454、`/manufacturers` 107,532が未帰属）。budgetの可否を判定できない | 「どのtaskも触らないchunk（残存フロア）」節を追加。中身をminified識別子から同定 |
 | 10 | budgetで**本当に詰まるのは`/robots`**（motion全除去でも190,877で超過）なのに、計画は最も余裕のある`/reports`を軸に書かれていた | 「budgetが本当に詰まるrouteは`/robots`である」節を追加。保守的見積もりでも160,750で成立することと、その達成が`lib/search.ts`除去に全面依存することを明記 |
 | 11 | 「RSC payloadは静的成果物に現れない」というgate設計の前提が**どこにも書かれておらず、理由も`PPRのため`と誤認していた**（実際は`searchParams`のdynamic boundaryのため。同じPPR設定でもHomeとdetail routeには現れる） | Task 2の流出経路表の下に実測付きで根拠を追記。前提が依存する2条件（catalog routeがdynamicであること、`'use cache'`境界がmaterializeしないこと）も明記 |
+| 12 | この節の散文が「**次の3件**」のまま表は4行（#8〜#11）だった。**「散文と表が食い違う」という故障モードを記録している当の節で再発していた** | 「次の4件」へ修正 |
+| 13 | catalog-payload testの`@plan-check-skip`の理由（「use-cases / articlesのVMがまだ無い」）が**snippet自身のimportと一致していなかった**（robots / manufacturersしか参照していない）。3巡連続で誤りが出た現場のVM testが不要にType検査から外れていた | markerを削除。型検査カバレッジが9→10へ。併せてwhitelist化前の実測値（robots 101,449 / manufacturers 37,271バイト）をTask 6 Step 5へ記録 |
 
 ---
 
@@ -867,7 +869,7 @@ compileできない断片には`// @plan-check-skip: <理由>`を1行入れる�
 | 恒久的（断片） | 既存importや関数外の文脈を省いた抜粋 | そのまま残る |
 | 一時的（前方参照） | まだ作っていないmoduleをimportするsnippet | **そのmoduleを作るtaskでskip markerを外し、baselineを減らす** |
 
-一時的skipは現時点で8箇所ある。
+一時的skipは現時点で7箇所ある。
 
 | snippet | 前方参照している物 | markerを外すtask |
 |---|---|---|
@@ -877,18 +879,17 @@ compileできない断片には`// @plan-check-skip: <理由>`を1行入れる�
 | Task 7 `tests/unit/view-models/use-cases.test.ts` | `@/lib/viewModels/useCases` | Task 7 |
 | Task 8 `createArticleCatalogSearchText` | `@/lib/catalog/search`の`joinSearchText` | Task 8 |
 | Task 8 `tests/unit/view-models/articles.test.ts` | `@/lib/viewModels/articles` | Task 8 |
-| Task 8 `tests/unit/view-models/catalog-payload.test.ts` | `@/lib/viewModels/{useCases,articles}` | Task 8 |
 | Task 9 `tests/unit/view-models/compare.test.ts` | `@/lib/viewModels/compare` | Task 9 |
 
 **該当taskの完了条件に「skip markerを外してbaselineを減らす」を含める。** baselineが減る方向は失敗にしないため、この運用は成立する。
 
-この8箇所を優先して一時的skipにしたのは、**3巡連続で誤りが出たのがsearchText builderとVM test（存在しないfield名・label map名の参照）だから**である。恒久的skipにしてしまうと、再発を防ぐという型検査の目的を果たさない。
+この7箇所を優先して一時的skipにしたのは、**3巡連続で誤りが出たのがsearchText builderとVM test（存在しないfield名・label map名の参照）だから**である。恒久的skipにしてしまうと、再発を防ぐという型検査の目的を果たさない。
 
 **Task 2時点の実効カバレッジは低い。この数字を承知したうえで導入する。**
 
-この計画書のts/tsx blockは全34個、うちskip markerが付いているのは25個（恒久17・一時8）。**Task 2直後に型検査されるのは9個だけ**（`lib/articlePlacements.ts`、`lib/display.ts:237`、Task 1のimport追加、`lib/useMediaQuery.ts`、`lib/normalizeSearchText.ts`、`lib/viewModels/{useCases,articles,compare}.ts`の型定義3本、`compare.spec.ts`）。**再発した誤りの現場であるsearchText builderとVM testは、上の表のtaskでmarkerを外すまで検査されない。**
+この計画書のts/tsx blockは全34個、うちskip markerが付いているのは24個（恒久17・一時7）。**Task 2直後に型検査されるのは10個だけ**（`lib/articlePlacements.ts`、`lib/display.ts:237`、Task 1のimport追加、`lib/useMediaQuery.ts`、`lib/normalizeSearchText.ts`、`lib/viewModels/{useCases,articles,compare}.ts`の型定義3本、`catalog-payload.test.ts`、`compare.spec.ts`）。**再発した誤りの現場であるsearchText builderとVM testは、上の表のtaskでmarkerを外すまで検査されない。**
 
-この34/25/9は`scripts/check-plan-snippets.mjs`と同じ抽出ロジックで数えた実測値である。編集で増減するため、baselineを作るStep 5の出力を正とする。
+この34/24/10は`scripts/check-plan-snippets.mjs`と同じ抽出ロジックで数えた実測値である。編集で増減するため、baselineを作るStep 5の出力を正とする。
 
 したがってこのgateの価値は「Task 2で一斉に誤りを洗い出す」ことではなく、**「Task 6・7・8・9の着手時にmarkerを外す手順が強制され、その時点で誤りが機械的に落ちる」**ことにある。各taskの完了条件に組み込まれていることがgateの本体であり、script単体ではない。
 
@@ -909,7 +910,7 @@ compileできない断片には`// @plan-check-skip: <理由>`を1行入れる�
 
 **`include`を`.plan-snippets/**/*`だけにしてはならない。** `extends`は`include`を継承せず置き換えるため、`next-env.d.ts`とambient型が外れる。実測すると、snippetがimportした先の**既存ファイル**が落ちる（`lib/media.ts(23,17): Cannot find name 'process'`）。snippetの誤りではないので、指示どおり「落ちた箇所を計画書側で修正する」と誤った修正へ誘導される。`next-env.d.ts`と`types: ["node"]`を明示すれば消える。
 
-**この設定で9個のsnippetが実際に通ることを確認済み**（2026-08-01時点）。唯一落ちるのは`lib/articlePlacements.ts`のsnippetで、原因は`byArticlePublishedDesc`がまだ`(a: Article, b: Article)`だから。**Task 1 Step 2の引数型を広げる変更を入れると解消し、その状態で`npm run typecheck`（プロジェクト全体）も通る**ことまで確認した。順序制約「Task 1 → Task 2」が実在することの裏付けである。
+**この設定で10個のsnippetが実際に通ることを確認済み**（2026-08-02時点）。唯一落ちるのは`lib/articlePlacements.ts`のsnippetで、原因は`byArticlePublishedDesc`がまだ`(a: Article, b: Article)`だから。**Task 1 Step 2の引数型を広げる変更を入れると解消し、その状態で`npm run typecheck`（プロジェクト全体）も通る**ことまで確認した。順序制約「Task 1 → Task 2」が実在することの裏付けである。
 
 - [ ] **Step 4: baselineと`.gitignore`と`package.json`を更新する**
 
@@ -1605,6 +1606,15 @@ npm run test -- tests/unit/view-models
 
 Expected: testがPASS。この時点でStep 6のbudget testを`maxBytes`未設定のまま書き、`console.log`が出す実測バイト数を上限設定に使う。
 
+**whitelist化前の実測値（2026-08-02、`f42ecbf` 時点）:**
+
+```
+robots        101,449 バイト
+manufacturers  37,271 バイト
+```
+
+Step 6のbudget testはこの時点でも実行できる（`@/lib/viewModels/{robots,manufacturers}`しか参照しないため）。上の数値はそれを実行して得たものである。**Task 6のwhitelist化でこれがどれだけ減るかが削減効果**であり、冒頭の文字数ベースの見積もり（robots -27.7%、manufacturers -38.8%）が正しければ robots は約73,000、manufacturers は約22,800まで下がる。**乖離したら見積もりの前提を疑い、原因を記録してから上限を決める。**
+
 > **plain nodeでVM factoryを実行することはできない。** `lib/data.ts`も`lib/viewModels/*.ts`も`@/`エイリアスと拡張子なし相対importを使っており、Nodeはどちらも解決しない（実測: `Cannot find package '@/lib' imported from .../lib/viewModels/robots.ts`）。`--experimental-strip-types`は型を剥がすだけで、module解決は変えない。**計測もgateもvitest上で行う。**
 
 - [ ] **Step 6: payload byte budgetを導入する**
@@ -1615,7 +1625,6 @@ Expected: testがPASS。この時点でStep 6のbudget testを`maxBytes`未設�
 
 ```ts
 // tests/unit/view-models/catalog-payload.test.ts
-// @plan-check-skip: Task 6 時点では use-cases / articles の VM がまだ無い。Task 8 でこのmarkerを外しbaselineを減らす
 import { describe, expect, it } from 'vitest';
 import { getManufacturers, getRobots, getUseCases } from '@/lib/data';
 import { createManufacturerCatalogItems } from '@/lib/viewModels/manufacturers';
