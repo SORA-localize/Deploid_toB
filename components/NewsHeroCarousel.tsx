@@ -18,7 +18,7 @@ import {
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { useMemo, useState } from 'react';
-import { useReducedMotion } from 'motion/react';
+import { useMediaQuery } from '@/lib/useMediaQuery';
 
 interface NewsHeroCarouselProps {
   reports: Article[];
@@ -66,7 +66,7 @@ function ProgressIndicators({
 }
 
 export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const autoplayPlugins = useMemo(
     () => (prefersReducedMotion ? [] : [Autoplay({ delay: 5000, stopOnInteraction: true })]),
     [prefersReducedMotion],
@@ -83,7 +83,7 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
         aria-label="注目記事カルーセル"
       >
         {/* リッチなインジケーター */}
-        <ProgressIndicators count={reports.length} reducedMotion={Boolean(prefersReducedMotion)} />
+        <ProgressIndicators count={reports.length} reducedMotion={prefersReducedMotion} />
 
         {/* outer overflow-hidden div に height:100% を渡し、inner flex div に h-full を渡すことで高さチェーンを繋ぐ */}
         <SliderContainer className="cursor-grab active:cursor-grabbing h-full" style={{ height: '100%' }}>
