@@ -20,6 +20,10 @@ const forbidden = new Set([
   'data/robots.ts',
   'data/useCases.ts',
   'lib/data/localContentSnapshot.ts',
+  // budoux の日本語分かち書きモデルは実測263,562バイト。2026-08-02 まで
+  // ReportsBrowser -> NewsCard -> BudouXText -> lib/typography 経由で /reports へ
+  // 配信されていた。分かち書きは server で済ませ、client へは string[][] を渡す。
+  'lib/typography.ts',
 ]);
 
 const fromPatterns = [

@@ -11,10 +11,12 @@ import { cn } from '@/lib/utils';
 
 interface NewsCardProps {
   report: Article;
+  /** タイトルの分かち書き結果。server側で segmentJapaneseLines() を呼んで渡す（budoux をclientへ持ち込まないため）。 */
+  titleSegments: string[][];
   className?: string;
 }
 
-export function NewsCard({ report, className }: NewsCardProps) {
+export function NewsCard({ report, titleSegments, className }: NewsCardProps) {
   const hero = getDisplayableAsset(report.heroImage);
 
   return (
@@ -56,7 +58,7 @@ export function NewsCard({ report, className }: NewsCardProps) {
         </div>
 
         <h3 className="mb-2 line-clamp-3 text-sm font-semibold leading-snug text-foreground">
-          <BudouXText text={report.titleJa ?? report.title} />
+          <BudouXText segments={titleSegments} />
         </h3>
 
         <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">

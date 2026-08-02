@@ -38,6 +38,12 @@ interface ReportsBrowserProps {
   reports: Article[];
   heroReports: Article[];
   featureReports: Article[];
+  /**
+   * 記事id -> タイトルの分かち書き結果。server側で生成して渡す。
+   * budoux（実測263,562バイト）を client bundle へ持ち込まないため。
+   * Task 8 で ArticleCatalogItem を導入したら、その1フィールドへ移す。
+   */
+  titleSegments: Record<string, string[][]>;
   initialSearch: string;
 }
 
@@ -45,6 +51,7 @@ export function ReportsBrowser({
   reports,
   heroReports,
   featureReports,
+  titleSegments,
   initialSearch,
 }: ReportsBrowserProps) {
   const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
@@ -171,7 +178,7 @@ export function ReportsBrowser({
             <div className="space-y-3">
               <CardHoverEffect className={browserGridClassNames.reports}>
                 {paginatedReports.map((r) => (
-                  <NewsCard key={r.id} report={r} />
+                  <NewsCard key={r.id} report={r} titleSegments={titleSegments[r.id] ?? []} />
                 ))}
               </CardHoverEffect>
 
