@@ -2,7 +2,7 @@ import { manufacturerCountryOrder, sortByDisplayOrder } from '@/lib/display';
 import { manufacturerConsultationRouteOrder, type ManufacturerConsultationRoute } from '@/lib/manufacturerDisplay';
 import { isOneOf } from '@/lib/typeGuards';
 import type { ManufacturerCatalogItem } from '@/lib/viewModels/manufacturers';
-import { matchesCatalogSearchText } from '@/lib/viewModels/shared';
+import { matchesCatalogSearch } from '@/lib/catalog/matchSearch';
 
 export function getManufacturerFilterOptions(items: readonly ManufacturerCatalogItem[]) {
   return {
@@ -46,7 +46,7 @@ export function filterManufacturers({
     if (filters.consultationRoute !== 'all' && item.filter.consultationRoute !== filters.consultationRoute) {
       return false;
     }
-    return matchesCatalogSearchText(filters.query, item.filter.searchText);
+    return matchesCatalogSearch(item.filter.searchText, filters.query);
   });
 
   return [...base].sort((a, b) => a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'base' }));

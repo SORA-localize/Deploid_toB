@@ -1,11 +1,11 @@
 import type { Manufacturer, Robot, UseCase } from '@/data/types';
+import { createRobotCatalogSearchText } from '@/lib/catalog/search';
 import { deploymentStageLabels } from '@/lib/labels';
 import { createRobotCardViewModel } from '@/lib/robotCatalog';
 import { getRobotPrimaryImage } from '@/lib/robotMedia';
-import { createRobotSearchDocument } from '@/lib/search';
 import { getDeploymentStageTone } from '@/lib/visualSemantics';
 import { createCatalogLogo } from './logo';
-import { createCatalogSearchText, type CatalogFact, type CatalogImage, type CatalogLogo, type CatalogTag } from './shared';
+import type { CatalogFact, CatalogImage, CatalogLogo, CatalogTag } from './shared';
 
 export interface RobotCatalogItem {
   id: string;
@@ -70,7 +70,7 @@ export function createRobotCatalogItems(
         industryTags: [...(robot.industryTags ?? [])],
         japanAvailability: robot.japanAvailability,
         deploymentStage: robot.deploymentStage,
-        searchText: createCatalogSearchText(createRobotSearchDocument(robot, manufacturer)),
+        searchText: createRobotCatalogSearchText(robot, manufacturer, card.facts),
       },
     };
   });

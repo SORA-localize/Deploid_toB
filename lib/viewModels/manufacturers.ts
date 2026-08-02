@@ -1,4 +1,5 @@
 import type { Manufacturer, Robot } from '@/data/types';
+import { createManufacturerCatalogSearchText } from '@/lib/catalog/search';
 import {
   getDomesticDistributorDisplay,
   getManufacturerConsultationRoute,
@@ -6,9 +7,8 @@ import {
   getRepresentativeRobotLabel,
   manufacturerConsultationRouteLabels,
 } from '@/lib/manufacturerDisplay';
-import { createManufacturerSearchDocument } from '@/lib/search';
 import { createCatalogLogo } from './logo';
-import { createCatalogSearchText, type CatalogLogo } from './shared';
+import type { CatalogLogo } from './shared';
 
 export interface ManufacturerCatalogItem {
   id: string;
@@ -69,9 +69,7 @@ export function createManufacturerCatalogItems(
       filter: {
         country: manufacturer.country,
         consultationRoute,
-        searchText: createCatalogSearchText(
-          createManufacturerSearchDocument(manufacturer, manufacturerRobots),
-        ),
+        searchText: createManufacturerCatalogSearchText(manufacturer, manufacturerRobots),
       },
       facts: {
         establishedRegion: getManufacturerEstablishedRegionLabel(manufacturer),

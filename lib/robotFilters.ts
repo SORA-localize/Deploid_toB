@@ -3,7 +3,7 @@ import { isPreReleaseDeploymentStage, japanAvailabilityOrder, sortByDisplayOrder
 import { matchesTag, normalizeTagKey, toTagOptions } from '@/lib/tags';
 import { isOneOf } from '@/lib/typeGuards';
 import type { RobotCatalogItem } from '@/lib/viewModels/robots';
-import { matchesCatalogSearchText } from '@/lib/viewModels/shared';
+import { matchesCatalogSearch } from '@/lib/catalog/matchSearch';
 
 export function getRobotFilterOptions(items: readonly RobotCatalogItem[]) {
   const availabilityValues = sortByDisplayOrder(
@@ -74,7 +74,7 @@ function matchesRobotFilters(
   ) {
     return false;
   }
-  return matchesCatalogSearchText(filters.query, item.filter.searchText);
+  return matchesCatalogSearch(item.filter.searchText, filters.query);
 }
 
 export function filterRobots({
