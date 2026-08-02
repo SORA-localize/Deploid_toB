@@ -98,19 +98,33 @@ clientへ渡っている。Global Constraint「本文をVMへ含めない」は*
 
 | commit | 内容 |
 |---|---|
-| `1bed216`〜`0b596c4` | 計画書の修正4件（内部監査7件＋外部レビュー7件の反映。コードは変更していない） |
-| `263aa0c` | **新Task 1 完了。** `/reports`の生data 705,431バイト除去。route固有JS 1,233,689 → 528,258 |
-| `0d6826f` | Task 1の実測を計画書へ反映（改訂履歴 #15） |
+| `1bed216`〜`0b596c4` | 計画書の修正（内部監査7件＋外部レビュー7件。コード変更なし） |
+| `263aa0c` | **Task 1** `/reports`の生data 705,431バイト除去 |
+| `0d6826f` | Task 1の実測を計画書へ反映（budoux発見。改訂履歴 #15） |
+| `4687a80` | 引き継ぎメモ更新 |
+| `779901f` | **Task 2** gate 3本導入。全て緑 |
+| `df3d223` | **Task 3** card系のmotion除去 |
+| `d6d57b0` | **Task 4** carousel系のmotion除去 |
+| `c1ca425` | **Task 5** `normalizeSearchText`分離 |
+| `b167fa1` | **budoux除去**（計画に担当taskが無かった作業） |
 
-復元点: **tag `phase05-task01-20260802`**（Task 1 完了時点）。
+復元点tag: `phase05-task01`〜`task05-20260802`、`phase05-budoux-20260802`。
 
-**Task 1で判明した重要な差分:** 968,993のchunkは生dataだけでなく`budoux`のモデル263,562が同居していた。
-`ReportsBrowser → NewsCard → BudouXText → lib/typography → budoux` の経路で、**どのtaskも担当していない**。
-このままだと`/reports`の着地は354,099でbudget 180,000の約2倍。計画書の
-「`/reports`はbudouxを外さないと180,000に届かない」節を参照。**方式は未決定**（Task 8でVMに
-分割済みタイトルを持たせるのが自然、というところまで）。
+**現在のroute固有JS（着手前 → 現在）:**
 
----
+| route | 着手前 | 現在 | budget 180,000 |
+|---|---:|---:|---|
+| `/reports` | 1,233,689 | **135,713** | 達成 |
+| `/use-cases` | 268,207 | **129,672** | 達成 |
+| `/manufacturers` | 178,411 | **172,833** | 達成 |
+| `/robots` | 325,787 | **184,569** | 4,569超過。**追加作業はしない（決定済み）** |
+
+`/robots`の残りはRadix・floating-ui・日本語UI文字列で、Task 6〜9はどれも扱わない。
+180,000は計画書自身が暫定値と書いていた数字なので、Task 10で実測から確定する。
+
+**Task 6〜9はバイトではなくCMS移行のためのVM化である。** Task 6は「VM構造変更」と
+「searchTextのwhitelist化（＝本文検索の喪失）」を束ねており、後者はJS目標に0バイトしか
+寄与しない不可逆なproduct判断。**着手前に分割の可否を決めること**（計画書のTask 6冒頭に注記あり）。
 
 ## 5. SDD台帳（リセット済み）
 
@@ -196,13 +210,13 @@ import chain経由のbundle流出を検知できない。**両方が要る。**
 
 ## 9. 次の一手
 
-**新計画のTask 2に着手する** — gate 4本の導入（`check:client-bundle-content` /
-`check:client-import-graph` / `check:plan-snippets` / catalog-payload vitest はTask 6）。
+**Task 6の分割可否を決める** — VM構造変更だけ実施するか、searchTextのwhitelist化も含めるか。
+判断材料は計画書のTask 6冒頭の注記。
 
-Task 1は`263aa0c`で完了済み。gate 5本は計画書のコードのまま実行検証済みで、
-**報告される違反はTask 1が消した1件だけ**だったため、いま入れれば全部緑で入る。
+その後はTask 6（VM化のみ）→ 7 → 8 → 9 → 10の順。Task 10で実測から budget を確定する。
 
-Task 8に入る前に、budoux（上記）の方式を決めること。
+**budgetのためにやることはもう残っていない。** Task 1〜5とbudoux除去で
+`/robots`を除き達成済み。以降はCMS移行のための構造変更である。
 
 ---
 

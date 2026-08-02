@@ -62,6 +62,51 @@ snippetCheck: true
 
 ---
 
+## 実装記録（2026-08-02、Task 1〜5 と budoux 除去まで）
+
+**このsectionが実測の正本である。** 以下の「実測baseline」節は着手前の値であり、参考として残す。
+
+| route | 着手前 | 現在 | 削減 | budget 180,000 |
+|---|---:|---:|---:|---|
+| `/reports` | 1,233,689 | **135,713** | -89.0% | 達成 |
+| `/use-cases` | 268,207 | **129,672** | -51.7% | 達成 |
+| `/manufacturers` | 178,411 | **172,833** | -3.1% | 達成 |
+| `/robots` | 325,787 | **184,569** | -43.3% | **4,569 超過** |
+| `/compare` | 251,902 | 246,210 | -2.3% | 上限なし |
+
+| task | commit | 実測 |
+|---|---|---|
+| Task 1 | `263aa0c` | `/reports` -705,431。968,993のchunkは生data 705,431 + budoux 263,562の同居だった |
+| Task 2 | `779901f` | gate 3本導入。全て緑。bundle-content は negative test 済み |
+| Task 3 | `df3d223` | `/robots` -139,391、`/use-cases` -138,586 |
+| Task 4 | `d6d57b0` | `/reports` -139,055。catalog 4 routeから`motion/react`が消えた |
+| Task 5 | `c1ca425` | `/robots` -1,827、`/manufacturers` -5,578、`/compare` -5,692 |
+| budoux除去 | `b167fa1` | `/reports` -253,106。計画に担当taskが無かった |
+
+復元点: tag `phase05-task01/02/03/04/05-20260802`、`phase05-budoux-20260802`。
+
+### Task 5 の削減が見込みより小さかった理由
+
+chunk 53,958 の大半は`lib/search.ts`ではなく **`lib/tags` + `lib/labels`（日本語UI文字列）**だった。`lib/search.ts`の除去自体は成功しており、client到達は残り2経路（Task 7・8の担当）まで減っている。計画書が「chunkはmoduleと1:1ではない」と警告していたとおりの結果である。
+
+### `/robots`は180,000に届かない（実測で確定）
+
+Task 5完了後の`/robots` 184,569 の内訳は次のとおりで、**残るTask 6〜9はどれもこれらを扱わない**。
+
+| バイト | 中身 |
+|---:|---|
+| 56,917 | Radix/shadcn UI primitives |
+| 47,650 | `lib/tags` + `lib/labels`（日本語UI文字列） |
+| 41,104 | floating-ui |
+| 37,465 | `lib/uiText`（日本語UI文字列） |
+| 1,433 | route entry |
+
+labels/tags/uiTextをclientから剥がすには全client componentが文字列をpropsで受ける形にする必要があり、実測で**78経路**が参照している。Phase 5の範囲を超える。
+
+**決定（2026-08-02、人間の裁定）:** 180,000は計画書自身が暫定値と明記していた数字（「同じ手法を適用すれば到達可能という以上の意味はない」）であり、Task 10の規定「実測最大値 + 15%へ締め直す」に従って**実測から確定する**。`/robots`の184,569を基準にすると上限は約212,000。180,000へ収めるための追加作業は行わない。
+
+---
+
 ## 実測baseline（2026-08-01、branch `refactor/05-client-boundaries` HEAD `020f2ca`）
 
 **旧計画**のTask 1・2（commit `611b5a7` / `918f058` / `f42ecbf`）まで実装済みの状態での、フレッシュbuild実測値である。
@@ -1097,7 +1142,13 @@ for(const r of ['/robots','/manufacturers','/use-cases','/reports']){
 }"
 ```
 
-**完了条件:** `rg`が0件。`/robots`と`/use-cases`からmotion chunkが消える。`/reports`は`NewsHeroCarousel` → `uilayouts/carousel`経由が残るためTask 4まで消えない見込みで、実測値を記録する。
+**完了条件:** `rg`が0件。`/robots`と`/use-cases`からmotion chunkが消える。
+
+> **実測（`df3d223`）:** `/robots` 325,787 → 186,396（-139,391）、`/use-cases` 268,207 → 129,621（-138,586）。見込み（190,877 / 133,297）より良い。
+>
+> **`AnimatedTooltip`はアプリ内で描画されていない。** `PageTabBar`が`tab.description`を持つタブにだけ付けるが、その propを渡す呼び出し元が無い。手動確認項目「tab tooltipがhover・focus両方で出る」は**実行不能**。代わりに`tests/unit/components/animated-tooltip.test.tsx`で挙動を固定した。
+>
+> **`card-hover-effect`は挙動が変わる。** `layoutId`によるcard間スライドはCSSで表現できないため、card毎のcross-fadeになる。`/reports`は`NewsHeroCarousel` → `uilayouts/carousel`経由が残るためTask 4まで消えない見込みで、実測値を記録する。
 
 削減量は実測値をそのまま記録する。**chunkはmoduleと1:1ではないため、134,910がそのまま減るとは限らない。**
 
@@ -1295,7 +1346,11 @@ for(const r of ['/robots','/manufacturers','/use-cases','/reports']){
 }"
 ```
 
-**完了条件:** catalog 4 routeにmotion chunkが載っていない。`rg -n "motion/react"`の残存は`components/HomeContentNavigator.tsx`、`components/FeaturedRobotCard.tsx`、`components/ui/encrypted-text.tsx`（いずれもHome／Phase 5対象外）だけになる。
+**完了条件:** catalog 4 routeにmotion chunkが載っていない。
+
+> **実測（`d6d57b0`）:** `/reports` 527,823 → 388,768（-139,055）。`motion/react`の残存はHome側4ファイルのみでdependenciesからは外せない。
+>
+> **dot indicatorは定数計算では壊れる。** 実測でgapは6px（`gap-1.5`）であり、計画の定数式（1.5rem + 0.5rem = 32px）とは合わない。`offsetLeft`を`ResizeObserver`付きで実測する実装に変更した。`tests/e2e/hero-carousel-dots.spec.ts`で回帰を防ぐ。`rg -n "motion/react"`の残存は`components/HomeContentNavigator.tsx`、`components/FeaturedRobotCard.tsx`、`components/ui/encrypted-text.tsx`（いずれもHome／Phase 5対象外）だけになる。
 
 `motion/react`を`package.json`のdependenciesから外せるかも確認する。**Home側の利用者が残るためこの時点では外せない見込み**であり、結果を記録して後続phaseへ送る。
 
@@ -1405,7 +1460,9 @@ for(const r of ['/robots','/manufacturers','/use-cases','/reports','/compare']){
 }"
 ```
 
-**完了条件:** `/robots`・`/manufacturers`・`/compare`のroute固有JSが減る。減らない場合は`lib/search.ts`へ到達する経路が他に残っているので、`scripts/check-client-import-graph.mjs`の`forbidden`へ一時的に`'lib/search.ts'`を足して実行し、経路を特定してから進む（`forbidden`は解決後のrepo相対パスのSetである）。
+**完了条件:** `/robots`・`/manufacturers`・`/compare`のroute固有JSが減る。
+
+> **実測（`c1ca425`）:** `/robots` -1,827、`/manufacturers` -5,578、`/compare` -5,692。**見込みより大幅に小さい。** 理由は上記「Task 5の削減が見込みより小さかった理由」を参照。減らない場合は`lib/search.ts`へ到達する経路が他に残っているので、`scripts/check-client-import-graph.mjs`の`forbidden`へ一時的に`'lib/search.ts'`を足して実行し、経路を特定してから進む（`forbidden`は解決後のrepo相対パスのSetである）。
 
 **`/use-cases`と`/reports`はこの時点では減らない見込み**（`lib/useCaseFilters.ts`と`lib/searchIndex.ts`が残るため）。実測値を記録し、Task 7・8で再測する。
 
@@ -1427,6 +1484,21 @@ git commit -m "refactor: isolate normalizeSearchText from the search document mo
 ---
 
 ### Task 6: catalog searchTextをwhitelist化する
+
+> **要判断: このtaskは2つの独立した作業を束ねている。着手前に分割の可否を決めること。**
+>
+> | 束ねられているもの | CMS移行への寄与 | route固有JS | ユーザー影響 |
+> |---|---|---|---|
+> | VMへの構造変更 | **本体** | 0 | なし |
+> | `searchText`のwhitelist化 | なし | **0** | **本文検索の喪失。退避先なし** |
+>
+> `searchText`はRSC payloadでありJS chunkには載らない。したがってwhitelist化は
+> **Global Constraint 5に1バイトも寄与しない**（本計画が`searchExtra`方式を却下した理由と同じ）。
+> 一方で「本文中の語で検索できなくなる」という不可逆なproduct判断だけを持っている。
+>
+> Task 1〜5とbudoux除去でbudget目標は`/robots`を除き達成済みであり、**Task 6〜9はバイトではなく
+> CMS移行のためのVM化**である。VM構造変更だけを実施し、whitelist化は代替（build時生成の静的JSONを
+> `public/`へ置く案）とセットで独立に判断するのが妥当。
 
 **Goal:** catalog view modelの`searchText`から本文を除去する。**Global Constraint 4の未達分。**
 
