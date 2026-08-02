@@ -47,13 +47,14 @@ snippetCheck: true
 | 6 | `check-client-import-graph.mjs`が拡張子付きspecifier（repo内に55箇所）を**黙って辿らない**。再exportも追わない | 末尾`.ts`を落としてから解決。判定を解決後パスへ。再export・副作用importも辺に含め、未解決specifierは失敗させる |
 | 7 | plan-snippets gateの実効カバレッジが不明瞭 | Task 2直後は34 block中9個だけであることと、gateの本体が「各taskでmarkerを外す手順」であることを明記 |
 
-**外部レビューで追加された3件（同日）。** 上の7件は内部監査で潰したもので、次の3件は5巡目の外部レビューが見つけたものである。**「計画の事実関係はすべて正確だった」という内部監査の結論は誤りだった。**
+**外部レビューで追加された4件（同日）。** 上の7件は内部監査で潰したもので、次の3件は5巡目の外部レビューが見つけたものである。**「計画の事実関係はすべて正確だった」という内部監査の結論は誤りだった。**
 
 | # | 問題 | 修正 |
 |---|---|---|
 | 8 | 実測baseline節が「**Task 1・Task 2は実装済み**」と書いており、旧task番号が残っていた。この計画のTask 1・2は未着手であり、**baseline表の直前で自己矛盾していた**（3巡連続で出た内部整合の故障モードそのもの） | 「旧計画のTask 1・2」と明示し、番号が対応しないこと・本計画は全task未着手であることを追記。`### Task 2の実装状況`の見出しも`### f42ecbfの実装状況`へ |
 | 9 | route固有chunkの内訳表が**削減対象しか載せておらず、残りを説明していなかった**（`/robots` 99,454、`/manufacturers` 107,532が未帰属）。budgetの可否を判定できない | 「どのtaskも触らないchunk（残存フロア）」節を追加。中身をminified識別子から同定 |
 | 10 | budgetで**本当に詰まるのは`/robots`**（motion全除去でも190,877で超過）なのに、計画は最も余裕のある`/reports`を軸に書かれていた | 「budgetが本当に詰まるrouteは`/robots`である」節を追加。保守的見積もりでも160,750で成立することと、その達成が`lib/search.ts`除去に全面依存することを明記 |
+| 11 | 「RSC payloadは静的成果物に現れない」というgate設計の前提が**どこにも書かれておらず、理由も`PPRのため`と誤認していた**（実際は`searchParams`のdynamic boundaryのため。同じPPR設定でもHomeとdetail routeには現れる） | Task 2の流出経路表の下に実測付きで根拠を追記。前提が依存する2条件（catalog routeがdynamicであること、`'use cache'`境界がmaterializeしないこと）も明記 |
 
 ---
 
@@ -518,6 +519,26 @@ git commit -m "perf: stop shipping the local content snapshot to the reports cli
 |---|---|---|---|
 | A. VM factory経由 | 本文を連結した`searchText`をpropsで渡す | RSC flight payload | Task 6（`tests/unit/view-models/catalog-payload.test.ts`＋値assertion） |
 | B. import chain経由 | client componentが`localContentSnapshot`をimportする | JS chunk | **本task** |
+
+**経路AをVM factoryの出力で測る（＝build成果物から測らない）根拠。** catalog 4 routeは`searchParams`を`await`するdynamic boundaryを持つため、RSC payloadはprerendered shellにも`*.segment.rsc`にも現れない。実測:
+
+```
+$ grep -c "unitree-g1" .next/server/app/robots.html
+0
+$ grep -rl "unitree-g1" .next/server/app --include="*.html"
+.next/server/app/index.html
+.next/server/app/manufacturers/unitree.html
+.next/server/app/robots/unitree-g1-edu.html   ← Home と detail には現れる
+```
+
+**「PPRだから現れない」のではない。** 同じPPR（`cacheComponents: true`）設定下でもHomeとdetail routeの静的出力にはrecord dataが入っている。dynamic boundaryの有無が効いている。
+
+したがってRSC payloadを静的成果物から測るgateは書けず、**VM factoryの戻り値を直接測るしかない**（Task 6のvitest budget）。
+
+**この前提は2つの条件に依存する。崩れたらgate構成を見直す。**
+
+1. catalog routeがdynamicであり続けること。将来`searchParams`をやめて全静的化すると、RSC payloadが静的出力へ現れるようになる（そのときは静的成果物側のgateを足せる）。
+2. `src/app/robots/page.tsx:53`と`src/app/use-cases/page.tsx:75`の`'use cache'`境界の出力がmaterializeしないこと。現ビルドでは`.next/cache/`が生成されておらず該当しないが、**永続cache handlerを持つデプロイ環境ではこの境界にVM payloadが載りうる**。Task 6のbudgetはVM本体を測るので上限自体は有効だが、「client到達量＝VMサイズ」という等式は成り立たなくなる。
 
 **field名markerを使わない理由（実測）:** `fieldEvidence`／`vendorRiskNote`／`usageExampleSourceUrls`を現ビルドへ当てると10 chunkにhitし、少なくとも8件は誤検知だった（`lib/uiText.ts`のUIラベルkey、`lib/search.ts`のbuilder内のproperty access）。field名の出現とrecord値の流出を区別できない。さらに3つとも`Robot`／`Manufacturer`のfieldであり、`data/articles.ts`（228,785）や`data/useCases.ts`（177,085）が単独で漏れても検知できない。
 
