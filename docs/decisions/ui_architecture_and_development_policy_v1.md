@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-07-14
+updated: 2026-08-03
 ---
 
 # UIアーキテクチャ・開発方針 v1
@@ -61,7 +61,9 @@ UI開発方針とデザインシステムは別文書にする。
 | 領域 | 主なファイル | 役割 |
 |---|---|---|
 | Shell | `Header`, `Footer`, `Breadcrumbs`, `layout.tsx` | 全ページ共通の外枠 |
-| 一覧ブラウザ | `RobotsBrowser`, `ManufacturersBrowser`, `UseCasesBrowser`, `ReportsBrowser`, `GuidesBrowser` | 検索、filter、tag、一覧表示 |
+| 一覧ヘッダ | `PageListHeader` | 全 index route の H1＋検索＋説明文（**正本。独自ヘッダを組まない**） |
+| 追従ヘッダ | `ContextualPageHeader`, `HeaderChrome`（`HeaderStickyBarSlot`） | スクロール時の絞り込み帯。本文の再掲に留める |
+| 一覧ブラウザ | `RobotsBrowser`, `ManufacturersBrowser`, `UseCasesBrowser`, `ReportsBrowser`, `CompareClient` | 検索、filter、tag、一覧表示 |
 | カード | `RobotCard`, `FeaturedRobotCard`, `FavoriteCard`, `TagChip`, `EmptyState` | 再利用される表示単位 |
 | fact表示 | `FactList`, `CardFactGrid`, `ComparisonSpecList` | 短いラベル–値、カード、比較の役割別表示 |
 | ロボットレール | `RobotCardRail` | `FeaturedRobotCard` の幅・gap・snap・横スクロール |
@@ -109,7 +111,7 @@ UI開発方針とデザインシステムは別文書にする。
 - `/manufacturers` → `ManufacturersBrowser`
 - `/use-cases` → `UseCasesBrowser`
 - `/reports` → `ReportsBrowser`
-- `/guides` → `GuidesBrowser`
+- `/compare` → `CompareClient`
 
 ルール：
 
@@ -265,11 +267,12 @@ UIは、存在しないデータを捏造しない。
 - Compareのような密度UIは、desktopで3ペイン、mobileでは縦積み
 - 横スクロールは表やタブなど固定フォーマットUIに限定する
 
-チェック対象：
+チェック対象（幅は `design_system_v1.md` §8 と揃える）：
 
-- 360px幅
+- 390px幅（`tests/e2e/mobile-overflow.spec.ts` が回帰を見る）
 - 768px幅
 - 1280px幅
+- 1440px幅
 - 長い日本語
 - 長い英語製品名
 - 画像なし
@@ -288,18 +291,48 @@ UIは、存在しないデータを捏造しない。
 - decorative logo image は `alt=""` + `aria-hidden`
 - link と button の使い分けを守る
 
+### フォーカスの契約
+
+- **overlay（メニュー・dialog・popover）を閉じたら、開いた場所へフォーカスを戻す。**
+  戻さないとフォーカスは `body` へ落ち、キーボード利用者は Tab を先頭から押し直すことになる。
+  実装は Radix の既定と各コンポーネントの `restoreFocusRef` で足りている（Phase 6 Task 4 で実測）。
+  **PASS しているコンポーネントへ独自の focus 制御を足さない。**
+- **フォーカスを保持している領域を、スクロールやフィルタ更新を理由に unmount しない。**
+  詳細は `design_system_v1.md` の追従ヘッダの項。
+- `setTimeout` でフォーカスのタイミングを推測しない。Radix の lifecycle event か
+  `requestAnimationFrame` を1回だけ使う。
+
+### ページ内タブとナビゲーションの区別
+
+- **URL が変わる絞り込み**（`/reports?kind=news` 等）は `role="group"` + `aria-current="page"`。
+  `role=tab` / `aria-selected` / roving tabindex を**付けない**。付けると支援技術の利用者は
+  パネルの差し替えを予期するが、実際にはページ遷移が起きる。到達は Tab、選択は Enter/Space。
+- **同一ページ内で panel を差し替えるもの**（ロボット詳細のスペックタブ）だけが tab semantics を持つ。
+- この区別は `tests/components/page-tab-bar.test.tsx` が固定している。
+  過去に一度 tab semantics が入って差し戻された経緯があるため、テストごと消さないこと。
+
+### 自動的に動くもの
+
+- autoplay には停止／再開の手段を常設する（WCAG 2.2.2）。
+- reduced motion では autoplay と progress animation を止める。詳細は `design_system_v1.md`。
+
 現在できていること：
 
 - `CompareClient` の選択・削除・accordionにaria属性がある。
 - `FilterChipGroup` に `role="group"` と `aria-pressed` がある。
 - `ContactForm` にlabelがある。
 - `ManufacturerLogoName` のロゴは装飾扱い。
+- carousel に停止／再開ボタン、`aria-live` の現在位置、スライドごとの位置がある。
+- nav の現在ページが `aria-current="page"`。
+- overlay 3系統（モバイルメニュー / 比較ドロワー / 検索つきドロップダウン）の
+  focus 復元を e2e で固定している（`tests/e2e/focus-restoration.spec.ts`）。
 
 今後の課題：
 
-- keyboard focus時の視認性をもう少し明確にする。
-- carouselの現在スロットを `aria-current` 相当で補強する。
-- navの現在ページを `aria-current="page"` にする。
+- **`color-contrast` 違反 218箇所**（`/robots` 96・`/manufacturers` 85・`/use-cases` 17・
+  `/` 16・`/reports` 3・`/compare` 1）。テーマトークンの見直しを伴うため独立した計画が要る。
+  axe gate の閾値を `serious` へ上げられるのはこれを片付けた後。現状は `critical` で運用する。
+- `/reports` の主軸タブが追従ヘッダの中にしかなく、ページ先頭から Tab で到達できない。
 
 ---
 
