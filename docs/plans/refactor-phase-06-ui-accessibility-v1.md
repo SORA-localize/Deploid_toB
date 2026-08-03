@@ -1,6 +1,6 @@
 ---
 status: plan
-updated: 2026-07-28
+updated: 2026-08-03
 ---
 
 # Phase 6 UI and Accessibility Implementation Plan
@@ -51,6 +51,35 @@ working treeで検証済みで、後続の変更でずれる可能性がある�
 F6-01とF6-02は今回のFile Structure（下記）に未反映のため、着手時に追加が必要。
 Task 1 Step 2（Reportsへのaction prop追加）は既にこの計画自身が規定済みであり、
 本sectionの対象外。
+
+### 着手時の決定（2026-08-03）
+
+着手前に現行コードへ照合し、未決だった2点を人間が決定した。
+
+- **F6-01 → 採用。** `components/CompareClient.tsx:315-319` は現在も独自headerで、
+  `py-8` ＋ `h1 text-2xl md:text-3xl`。他のlist pageは `PageListHeader`（既定 `mb-5`）を
+  使う。**Compareも `PageListHeader` へ統一する。** 見出し階層を揃えるのは本phaseの
+  目的そのものであり、範囲外にする理由がない。Task 1 の Files へ `CompareClient.tsx` を追加する。
+- **F6-03 → 不採用（現状維持）。** Reports の `description` は残す。削除を支持する
+  根拠が「未確定のproduct opinion」以上に示されていない。Task 1 Step 2 の設計
+  （`description={uiText.reports.description}`）をそのまま実装する。**これで計画内の
+  矛盾は解消した。**
+- **F6-02 は本phaseでは扱わない。** Reports H1 の動的化（shelf別ラベル）は新規提案で
+  あり、Global Constraint「全index/detail routeに一意なH1を1つだけ置く」を満たすのに
+  必須ではない。後続phaseへ送る。
+
+### Phase 4・5 完了により不要になった項目（2026-08-03 実測）
+
+本計画は 2026-07-28 付で、Phase 4・5 より前に書かれている。着手時の実測で次が判明した。
+
+| 計画の記述 | 現状 |
+|---|---|
+| `components/uilayouts/carousel.tsx`「motion削除」 | **Phase 5 Task 4 で完了済み**（`motion/react` 0件） |
+| `components/NewsHeroCarousel.tsx` の motion 依存 | **Phase 5 Task 4 で完了済み**（0件。`lib/useMediaQuery.ts` へ置換） |
+| `tests/components/` を新規作成 | **既存**（`catalog-url-state.test.tsx` / `google-analytics-page-view.test.tsx`）。追加は新規作成ではなくファイル追加 |
+| `tests/e2e/accessibility.spec.ts` を新規作成 | 既存の `tests/e2e/accessibility-smoke.spec.ts` と重複する。**既存を拡張する**形にし、新規ファイルは作らない |
+
+carousel と NewsHeroCarousel は motion 除去済みだが、**autoplay の pause/resume control は未実装**である（`components/NewsHeroCarousel.tsx:69` は `Autoplay({ delay: 5000, stopOnInteraction: true })` を渡すだけで、明示的な一時停止ボタンを持たない）。Task 3 はこの部分が本体として残る。
 
 ---
 
