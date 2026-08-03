@@ -74,12 +74,37 @@ Task 1 着手後、タスクごとに前提のずれが出たため、**残り�
 
 | Task | 判定 | 根拠（実測） |
 |---|---|---|
-| 1 | **完了**（`88bccd0`） | H1 は着手時点で9 route とも通っていた。実際の作業は `/reports` と `/compare` の構造統一 |
+| 1 | **完了**（`88bccd0` → `04d2ef2` → `f845272`） | H1 は着手時点で9 route とも通っていた。実際の作業は `/reports` と `/compare` の構造統一。着手後にユーザー指摘で検索窓の整列を2回直した |
 | 2 | **実施しない** | 下記「Task 2 を実施しない理由」 |
-| 3 | **縮小して実施** | `motion/react` 除去は Phase 5 Task 4 で完了済み。残るのは pause/resume と現在位置の告知 |
+| 3 | **完了**（`e59cdf8` + slide semantics） | `motion/react` 除去は Phase 5 Task 4 で完了済み。本体は pause/resume と現在位置の告知だった |
 | 4 | **完了（対象は差し替え）** | 想定していた3ファイルは実測で全てPASS。実際の欠陥は追従バーで、`components/HeaderChrome.tsx` を修正した |
-| 5 | **分割して実施** | axe の閾値引き上げは現状 **218箇所**の違反で即座に赤くなる。下記参照 |
-| 6 | **実施** | Tasks 1〜5 の結果を反映する。内容は着手時に確定する |
+| 5 | **分割。5a 未着手** | axe の閾値引き上げは現状 **218箇所**の違反で即座に赤くなる。下記参照 |
+| 6 | **未着手（内容は確定済み）** | Tasks 1〜5 の結果を反映する。書く項目は Task 6 Step 1 に列挙した |
+
+### e2e の navigation timeout（2026-08-03、再調査中に再発）
+
+テストが59件へ増えた時点で、**3回に1回、毎回別のテストで** `page.goto` が 30秒 timeout する
+現象が再発した（41件へ増やした際に `workers: 2` で一度収めたのと同じもの）。
+
+原因はテスト対象の単一 `next start` プロセス。PPR の初回レンダリングは route ごとに実費が
+かかり、複数 worker が同じ重い route へ**同時に初回アクセス**すると SSR が詰まる。
+
+timeout を延ばして隠さず、`tests/warmRoutes.ts` を `globalSetup` に置いて
+**計測前に各 route を1回ずつ順番に叩き、初回コストを払い切る**形にした。
+4回連続で全通過し、実行時間も 38〜42秒 → 20〜22秒で安定した。
+
+**Task 5a で visual regression（12枚 × 撮影）を足すと再び重くなる。** 落ちたらまずここを疑う。
+
+### この突合表の読み方（2026-08-03、失敗の記録）
+
+最初の突合コミット `2ae14c6` は **61行の追記のみで削除が0行**だった。判定基準が
+「参照先のファイルが実在するか」であって「**書かれた作業が今も成立するか**」ではなかったため、
+本文の矛盾がそのまま残った。Task 4 を「前提のずれなし」としたのがその例で、実際には
+同じ文書内の Task 2 の決定（tab semantics を入れない）と正面から矛盾する test 例
+（`role="tab"` + 矢印キー）が本文に残っていた。**誤った判定が次の作業範囲を汚染した。**
+
+再調査（2026-08-03）で Task 1・3・5a と File Structure にも同じ腐りを確認し、本文ごと書き直した。
+**以降、タスク完了時は「本文のコード例が実装と一致するか」を1行ずつ照合してから判定を書くこと。**
 
 ### Task 2 を実施しない理由（2026-08-03、人間が決定）
 
@@ -102,8 +127,8 @@ Global Constraint「keyboardだけでtabsを操作できる」は**既に満た�
 ### Task 3 の縮小（2026-08-03 実測）
 
 - **`Removes: carousel primitiveの`motion/react`` は達成済み。** Phase 5 Task 4 で除去し、`components/uilayouts/carousel.tsx` の該当は 0 件
-- **残る本体は pause/resume control と現在位置の告知。** `components/NewsHeroCarousel.tsx:69` は `Autoplay({ delay: 5000, stopOnInteraction: true })` を渡すだけで明示的な一時停止手段を持たず、`aria-live` も 0 件
-- **計画の test 例が参照する `tests/fixtures/articleCatalogFixture` は存在しない。** また `NewsHeroCarousel` の props は Phase 5 Task 8 で `Article[]` から `ArticleCatalogItem[]` へ変わっている。fixture は新しい型で作る
+- **残る本体は pause/resume control と現在位置の告知。** 着手時点の `NewsHeroCarousel` は `Autoplay({ delay: 5000, stopOnInteraction: true })` を渡すだけで明示的な一時停止手段を持たず、`aria-live` も 0 件だった
+- **計画の test 例が参照する `tests/fixtures/articleCatalogFixture` は存在しない。** また `NewsHeroCarousel` の props は Phase 5 Task 8 で `Article[]` から `ArticleCatalogItem[]` へ変わっている。→ **fixture は作らず、e2e で検証する形に変えた**（理由は Task 3 Step 1）
 
 ### Task 5 の分割（2026-08-03 実測）
 
@@ -140,7 +165,7 @@ Global Constraint「keyboardだけでtabsを操作できる」は**既に満た�
 | `tests/components/` を新規作成 | **既存**（`catalog-url-state.test.tsx` / `google-analytics-page-view.test.tsx`）。追加は新規作成ではなくファイル追加 |
 | `tests/e2e/accessibility.spec.ts` を新規作成 | 既存の `tests/e2e/accessibility-smoke.spec.ts` と重複する。**既存を拡張する**形にし、新規ファイルは作らない |
 
-carousel と NewsHeroCarousel は motion 除去済みだが、**autoplay の pause/resume control は未実装**である（`components/NewsHeroCarousel.tsx:69` は `Autoplay({ delay: 5000, stopOnInteraction: true })` を渡すだけで、明示的な一時停止ボタンを持たない）。Task 3 はこの部分が本体として残る。
+carousel と NewsHeroCarousel は motion 除去済みだが、着手時点で **autoplay の pause/resume control は未実装**だった。Task 3 はこの部分が本体として残り、`e59cdf8` で実装した。
 
 ---
 
@@ -150,32 +175,37 @@ carousel と NewsHeroCarousel は motion 除去済みだが、**autoplay の pau
 
 | Path | Responsibility |
 |---|---|
-| `components/CarouselAutoplayButton.tsx` | pause/resume control |
-| `tests/components/page-tab-bar.test.tsx` | `role="group"` + `aria-current` の固定（tab semantics の再導入を落とす。Task 2 の代替） |
-| `tests/components/news-hero-carousel.test.tsx` | pause/reduced motion |
-| `tests/e2e/headings.spec.ts` | H1 uniqueness |
-| `tests/e2e/keyboard-navigation.spec.ts` | tabs/carousel/pagination |
-| `tests/e2e/focus-restoration.spec.ts` | menu/dialog/popover |
-| ~~`tests/e2e/accessibility.spec.ts`~~ | **作らない。** 既存 `accessibility-smoke.spec.ts` を拡張する |
-| `tests/e2e/visual-regression.spec.ts` | 4 viewport screenshots |
+| Path | Responsibility | 状態 |
+|---|---|---|
+| `components/CarouselAutoplayButton.tsx` | pause/resume control | 作成済（Task 3） |
+| `tests/e2e/headings.spec.ts` | H1 uniqueness | 作成済（Task 1） |
+| `tests/e2e/carousel-autoplay.spec.ts` | pause/resume・現在位置・slide semantics・reduced motion | 作成済（Task 3） |
+| `tests/components/page-tab-bar.test.tsx` | `role="group"` + `aria-current` の固定（tab semantics の再導入を落とす。Task 2 の代替） | 作成済（Task 4） |
+| `tests/e2e/keyboard-navigation.spec.ts` | tabs / carousel / pagination / 検索窓 | 作成済（Task 4） |
+| `tests/e2e/focus-restoration.spec.ts` | menu / dialog / popover | 作成済（Task 4） |
+| `tests/e2e/visual-regression.spec.ts` | 4 viewport screenshots | **未作成（Task 5a）** |
+| ~~`tests/components/news-hero-carousel.test.tsx`~~ | **作らなかった。** carousel は embla の実挙動（5秒待って進まない等）を見ないと検証にならず、jsdom では測れない。**e2e の `carousel-autoplay.spec.ts` で代替した** | — |
+| ~~`tests/e2e/accessibility.spec.ts`~~ | **作らない。** 既存 `accessibility-smoke.spec.ts` を拡張する | — |
 
 ### 変更
 
-| Path | Responsibility |
-|---|---|
-| ~~`components/PageTabBar.tsx`~~ | **変更しない**（Task 2 不実施） |
-| `components/ReportsHeader.tsx` | contextual tabsのみ |
-| `components/ReportsBrowser.tsx` | list H1/description/search |
-| `components/CompareClient.tsx` | list header統一（F6-01。**採用決定・Task 1 で完了**） |
-| `components/NewsHeroCarousel.tsx` | autoplay state/control |
-| `components/uilayouts/carousel.tsx` | semantic slides/dots（motion削除は Phase 5 で完了済み） |
-| ~~`components/Header.tsx`~~ | **変更しない**（Task 4 実測でPASS） |
-| ~~`components/ComparisonRobotPanel.tsx`~~ | **変更しない**（Task 4 実測でPASS。Radix 既定で足りる） |
-| ~~`components/ui/searchable-dropdown.tsx`~~ | **変更しない**（Task 4 実測でPASS） |
-| `components/HeaderChrome.tsx` | フォーカス保持中の追従バーを消さない（Task 4 で実施） |
-| `src/app/globals.css` | focus-visible/reduced-motion調整 |
-| `docs/decisions/ui_architecture_and_development_policy_v1.md` | 実装後のheader/carousel規則 |
-| `docs/decisions/design_system_v1.md` | interaction規則 |
+| Path | Responsibility | 状態 |
+|---|---|---|
+| `components/PageListHeader.tsx` | 一覧ヘッダの正本。`description: ReactNode`・`headingId`・`items-center` 整列 | 変更済（Task 1） |
+| `components/ReportsBrowser.tsx` | list H1/description/search。検索窓を見出し行へ、可視ラベルは持たせない | 変更済（Task 1） |
+| `components/CompareClient.tsx` | list header統一（F6-01。**採用決定・Task 1 で完了**） | 変更済（Task 1） |
+| `components/NewsHeroCarousel.tsx` | autoplay control・現在位置の告知・slide semantics | 変更済（Task 3） |
+| `lib/uiText.ts` | carousel の文言（label / pause / resume / position） | 変更済（Task 3） |
+| `components/HeaderChrome.tsx` | フォーカス保持中の追従バーを消さない | 変更済（Task 4） |
+| `docs/decisions/design_system_v1.md` | interaction規則・一覧ヘッダ規則 | **未着手（Task 6）** |
+| `docs/decisions/ui_architecture_and_development_policy_v1.md` | 実装後のheader/carousel規則 | **未着手（Task 6）** |
+| ~~`components/PageTabBar.tsx`~~ | **変更しない**（Task 2 不実施） | — |
+| ~~`components/ReportsHeader.tsx`~~ | **変更不要だった。** 元から contextual tabs だけを描画しており、Task 1 で触る必要がなかった | — |
+| ~~`components/uilayouts/carousel.tsx`~~ | **変更不要だった。** motion 削除は Phase 5 で完了済み。slide semantics は `Slider` が `{...props}` を透過するため呼び出し側（`NewsHeroCarousel`）だけで足りた | — |
+| ~~`components/Header.tsx`~~ | **変更しない**（Task 4 実測でPASS） | — |
+| ~~`components/ComparisonRobotPanel.tsx`~~ | **変更しない**（Task 4 実測でPASS。Radix 既定で足りる） | — |
+| ~~`components/ui/searchable-dropdown.tsx`~~ | **変更しない**（Task 4 実測でPASS） | — |
+| ~~`src/app/globals.css`~~ | **触らない。** 本phaseで一度も変更しておらず、focus-visible / reduced-motion に不具合の実測がない（Task 4 で focus ring は全系統PASS、`motion-reduce:` は各所で機能）。配色は Task 5b。Task 5a の目視で問題が出たときだけ戻す | — |
 
 ---
 
@@ -184,13 +214,14 @@ carousel と NewsHeroCarousel は motion 除去済みだが、**autoplay の pau
 **Files:**
 - Create: `tests/e2e/headings.spec.ts`
 - Modify: `components/ReportsBrowser.tsx`
-- Modify: `components/ReportsHeader.tsx`
 - Modify: `components/PageListHeader.tsx`
+- Modify: `components/CompareClient.tsx`（F6-01 の採用決定に伴う。当初 Files に無く、着手時に追加した）
+- ~~Modify: `components/ReportsHeader.tsx`~~ — **変更不要だった**（元から contextual tabs だけを描画していた）
 
 **Interfaces:**
 - Produces: index/detail routeごとにvisible H1 1件
 
-- [ ] **Step 1: H1 uniqueness testを書く**
+- [x] **Step 1: H1 uniqueness testを書く**
 
 ```ts
 // tests/e2e/headings.spec.ts
@@ -217,16 +248,11 @@ for (const route of routes) {
 }
 ```
 
-- [ ] **Step 2: Reports layoutを標準list構造へ合わせる**
+- [x] **Step 2: Reports layoutを標準list構造へ合わせる**
 
 `ReportsHeader`はsticky contextual tabsだけを担当する。`ReportsBrowser`はheader直後の`site-container`にBreadcrumbsとPageListHeaderを置く。
 
 ```tsx
-<ReportsHeader
-  activeShelf={activeShelf}
-  tabs={shelfTabs}
-  onShelfSelect={updateShelf}
-/>
 <div className="site-container py-5">
   <Breadcrumbs items={[{ label: uiText.reports.breadcrumb }]} />
   <PageListHeader
@@ -235,7 +261,6 @@ for (const route of routes) {
     action={
       <SearchInput
         id="reports-search"
-        label={uiText.filters.keywordSearch}
         value={query}
         onChange={(nextQuery) =>
           updateParams({ q: nextQuery, [ARTICLE_PAGE_PARAM]: null }, 'replace')
@@ -247,40 +272,64 @@ for (const route of routes) {
 </div>
 ```
 
+> **`label` を渡してはならない（`04d2ef2`）。** 当初この Step は
+> `label={uiText.filters.keywordSearch}` を渡す例を載せていたが、**それが不具合の原因だった。**
+> `PageListHeader` の行は見出しと action を揃えるので、可視ラベルを付けると
+> **ラベルの行**が H1 と揃い、入力欄はその分（実測36px）下へ押し出される。
+> `/reports` だけ検索窓が H1 より沈んで説明文へ食い込んで見えていた。
+> 他3ページ（robots / manufacturers / use-cases）は元から `label` を渡していない。
+> 支援技術には `SearchField` の `aria-label` が届くのでアクセシビリティは落ちない。
+
 旧search専用border bandを削除する。heroとgridのcontainer幅は維持する。
-（Phase 1 reviewでの現状確認: `ReportsBrowser.tsx:131`は本Stepの`action`未指定）
 
-- [ ] **Step 3: PageListHeaderのsemantic contractを固定する**
-
-`PageListHeader`へ任意の`headingId`を追加する。
+- [x] **Step 3: PageListHeaderのsemantic contractを固定する**
 
 ```ts
 interface PageListHeaderProps {
   title: string;
-  description: string;
+  /** 文字列なら <p> で描画。複数要素が要るときだけ node を渡す。 */
+  description: ReactNode;
   headingId?: string;
   className?: string;
   action?: ReactNode;
 }
+
+export const pageListHeaderDescriptionClassName =
+  'text-sm text-muted-foreground max-w-3xl leading-relaxed';
 ```
 
 H1へ`id={headingId}`を渡し、wrapperを`<header>`へ変更する。nested landmarkを避けるため、呼び出し側で別`header`に入れない。
 
-- [ ] **Step 4: testと全route smokeを実行する**
+`description` が `string` ではなく `ReactNode` なのは、`/compare` が画面幅で本文を出し分けるため。
+node を渡す側は `pageListHeaderDescriptionClassName` で体裁を揃える。
+
+**整列は `sm:items-center`（`f845272`）。`items-baseline` は使わない。**
+action に入るのは検索窓のようなコントロールで、最低タッチ領域 44px を満たすため実測45px あり、
+H1 の 32px より 13px 高い。文字基準で揃えるとこの差が上3px・下10px と偏って配分され、
+検索窓の下線だけが見出しより下へ垂れる。修正後は上下7pxずつ・中心のずれ0px。
+
+- [x] **Step 4: testと全route smokeを実行する**
 
 ```bash
 npm run build
-npm run test:e2e -- tests/e2e/headings.spec.ts tests/e2e/public-routes.spec.ts
+npx playwright test tests/e2e/headings.spec.ts tests/e2e/public-routes.spec.ts
 ```
 
 Expected: 全route H1 1件。
 
-- [ ] **Step 5: commit**
+- [x] **Step 5: commit**
 
-```bash
-git add components/ReportsBrowser.tsx components/ReportsHeader.tsx components/PageListHeader.tsx tests/e2e/headings.spec.ts
-git commit -m "fix: standardize reports list heading structure"
+実際は3コミットに分かれた。着手後にユーザーが画面で気づいた整列崩れを2回直したため。
+
 ```
+88bccd0  refactor: unify list page headings and header structure
+04d2ef2  fix: drop the visible search label that pushed the reports search out of line
+f845272  fix: center list page headings against their search control
+```
+
+**教訓:** 検索窓の整列崩れは全gate緑のまま出荷され、人間が画面を見て初めて見つかった。
+H1 の**個数**は測っていたが**位置関係**は誰も測っていなかった。Task 5a の visual regression が
+埋めるべき穴はここ。
 
 ---
 
@@ -293,7 +342,10 @@ git commit -m "fix: standardize reports list heading structure"
 - `PageTabBar` が切り替えるのは URL が変わる絞り込みであり、同一ページ内で tabpanel を差し替える tab/tablist パターンには当たらない
 - Global Constraint「keyboardだけでtabsを操作できる」は**既に満たされている**（`<button>` なので Tab で到達し Enter/Space で選択できる）
 
-**代替として実施すること:** 現状のキーボード操作が壊れていないことを固定する component test を **Task 4** で追加する。`role="group"` と `aria-current` を assert し、tab semantics へ戻す変更が入ったら落ちるようにする。
+**代替として実施したこと（完了・`0c8d463`）:** `tests/components/page-tab-bar.test.tsx` を Task 4 で追加した。
+`role="group"` であること、`role=tab` / `tablist` が **0件**であること、active に `aria-current="page"` が付き
+`aria-selected` が付かないこと、全タブが `tabindex` を持たない（roving tabindex でない）こと、
+`aria-disabled` のタブが `disabled` 属性を持たずフォーカス可能なままであることを assert する。6件。
 
 方針そのものを変える場合（`PageTabBar` に tab semantics を持たせる）は `design_system_v1.md:305` の書き換えを伴うため、本計画の範囲外。
 
@@ -303,122 +355,113 @@ git commit -m "fix: standardize reports list heading structure"
 
 **Files:**
 - Create: `components/CarouselAutoplayButton.tsx`
-- Create: `tests/components/news-hero-carousel.test.tsx`
+- Create: `tests/e2e/carousel-autoplay.spec.ts`
 - Modify: `components/NewsHeroCarousel.tsx`
-- Modify: `components/uilayouts/carousel.tsx`
+- Modify: `lib/uiText.ts`
+- ~~Create: `tests/components/news-hero-carousel.test.tsx`~~ — **作らなかった**（下記 Step 1）
+- ~~Modify: `components/uilayouts/carousel.tsx`~~ — **変更不要だった**（下記 Step 4・5）
 
 **Interfaces:**
-- Produces: visible pause/resume button、`aria-live=polite` current position
+- Produces: visible pause/resume button、`aria-live=polite` current position、slide ごとの位置
 
 > **`Removes: carousel primitiveの motion/react` は削除した。** Phase 5 Task 4 で除去済みで、`components/uilayouts/carousel.tsx` の該当は 0 件。
-> **計画の test 例が参照する `tests/fixtures/articleCatalogFixture` は存在しない。** `NewsHeroCarousel` の props も Phase 5 Task 8 で `Article[]` から `ArticleCatalogItem[]` へ変わっているため、fixture は新しい型で作る。
 
-- [ ] **Step 1: pause control testを書く**
+- [x] **Step 1: pause control testを e2e で書く**
 
-```tsx
-// tests/components/news-hero-carousel.test.tsx
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
-import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
-import { articleCatalogFixture } from '../fixtures/articleCatalogFixture';
+> **当初の計画（component test + `articleCatalogFixture` + `@testing-library/user-event` 導入）は採らなかった。**
+> 検証したいのは「停止したら本当に5秒たっても進まないか」「reduced motion で autoplay を積まないか」で、
+> これは embla の実挙動そのもの。jsdom にはレイアウトもタイマー駆動の transform も無く、
+> **測れないものをモックで測る形になる。** `user-event` の新規導入も不要になった（未導入のまま）。
 
-describe('NewsHeroCarousel', () => {
-  it('lets the user pause and resume autoplay', async () => {
-    const user = userEvent.setup();
-    render(<NewsHeroCarousel reports={articleCatalogFixture} />);
-    const pause = screen.getByRole('button', { name: '自動再生を停止' });
-    await user.click(pause);
-    expect(screen.getByRole('button', { name: '自動再生を開始' })).toBeVisible();
-  });
-});
-```
+`tests/e2e/carousel-autoplay.spec.ts` に4件。
 
-Testing Libraryの`user-event`をPhase 1で未導入なら、このtaskで`npm install --save-dev @testing-library/user-event@^14`する。
+1. 停止 → 6秒待って `aria-current` のドットが動かない → 再開でラベルが戻る
+2. 現在位置が `aria-live` で `N件中1件目` と読める → ドット操作で `N件中3件目` へ
+3. 各スライドが `role="group"` + `aria-roledescription="slide"` + 自分の位置を持つ
+4. reduced motion では autoplay を積まないので**停止ボタン自体を描画しない**（操作対象が無い）
 
-- [ ] **Step 2: autoplay pluginをstable refにする**
+- [x] **Step 2: reduced motion のときは autoplay plugin を積まない**
 
 ```ts
-const autoplay = useRef(
-  Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true }),
+const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+const autoplayPlugins = useMemo(
+  () => (prefersReducedMotion ? [] : [Autoplay({ delay: 5000, stopOnInteraction: true })]),
+  [prefersReducedMotion],
 );
-const [isPlaying, setIsPlaying] = useState(!prefersReducedMotion);
-
-useEffect(() => {
-  if (prefersReducedMotion) {
-    autoplay.current.stop();
-    setIsPlaying(false);
-  }
-}, [prefersReducedMotion]);
 ```
 
-pluginsは`prefersReducedMotion ? [] : [autoplay.current]`。toggleは`play()`/`stop()`を呼びstateを同期する。
+> **当初の `useRef(Autoplay(...))` + `useEffect` で stop する形は採らなかった。**
+> plugin を積んでから止めるより、積まない方が状態が1つ減る。停止ボタンも
+> 「plugin が無ければ null を返す」だけで済む（操作対象が無いのにボタンを出さない）。
 
-- [ ] **Step 3: visible controlを追加する**
+- [x] **Step 3: visible controlを追加する**
 
 ```tsx
 // components/CarouselAutoplayButton.tsx
-interface CarouselAutoplayButtonProps {
-  playing: boolean;
-  onToggle: () => void;
-}
-
-export function CarouselAutoplayButton({
-  playing,
-  onToggle,
-}: CarouselAutoplayButtonProps) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-label={playing ? '自動再生を停止' : '自動再生を開始'}
-      className="inline-flex h-10 min-w-10 items-center justify-center rounded-full border border-white/20 bg-black/50 px-3 text-xs text-white backdrop-blur-md focus-visible:ring-2 focus-visible:ring-white"
-    >
-      {playing ? '停止' : '再生'}
-    </button>
-  );
+export function CarouselAutoplayButton({ className }: { className?: string }) {
+  const { emblaApi } = useCarousel();
+  const autoplay = emblaApi?.plugins()?.autoplay;
+  const [isPlaying, setIsPlaying] = useState(true);
+  // ...
+  if (!autoplay) return null;   // reduced motion 等
 }
 ```
 
-Prev/nextと同じ常時visible control groupへ置く。
+> **props は `{ playing, onToggle }` ではなく `{ className }` だけ。**
+> 当初案は親に state を持たせる形だったが、`<Carousel>` の context から `emblaApi` を
+> 取れるので、親は `<CarouselAutoplayButton />` と置くだけでよい。
+>
+> **実装中に判明した重要な挙動（`e59cdf8`）:** embla の `autoplay:play` / `autoplay:stop`
+> イベントが listener へ届かず、`stop()` は効いている（6.5秒進まない）のにボタンの表示だけが
+> 古いまま残る事象を実測した。`useSyncExternalStore` でも `emblaApi.on(...)` でも再現。
+> **クリックハンドラ内で state を直接更新する**ことで解決した。event 購読も残してあるが従。
+> ここを「イベントに任せる」形へ戻すと表示が壊れる。
 
-- [ ] **Step 4: slide semanticsとcurrent announcementを追加する**
+文言は `uiText.home.carousel` に置く。`自動再生を停止する` / `自動再生を再開する`
+（当初案の `自動再生を停止` / `自動再生を開始` ではない）。表示は Pause / Play アイコン。
 
-`Slider`へ`role="group"`、`aria-roledescription="slide"`、`aria-label`を渡せるようにし、NewsHeroCarouselで`${index + 1} / ${reports.length}`を指定する。
+- [x] **Step 4: slide semanticsとcurrent announcementを追加する**
+
+現在位置は `uiText.home.carousel.position` = `${total}件中${current}件目`
+（当初案の `${index + 1} / ${count}` ではない。日本語UIに合わせた）。
 
 ```tsx
-<span className="sr-only" aria-live="polite" aria-atomic="true">
-  {selectedIndex + 1} / {count}
-</span>
+<p aria-live="polite" aria-atomic="true" className="sr-only">
+  {uiText.home.carousel.position(selectedIndex + 1, total)}
+</p>
 ```
 
-dot buttonは`aria-label={`${index + 1}枚目を表示`}`、`aria-current`を維持する。
+slide semantics は **`Slider` が `{...props}` を透過するので呼び出し側だけで足りる**
+（`carousel.tsx` の変更は不要だった）。全スライドが同時に DOM にあり、live region は
+位置が「変わったとき」しか鳴らないため、1枚ずつが自分の位置を持つ。
 
-- [ ] **Step 5: carousel primitiveからmotionを外す**
+```tsx
+<Slider role="group" aria-roledescription="slide"
+        aria-label={uiText.home.carousel.position(index + 1, reports.length)}>
+```
 
-`components/uilayouts/carousel.tsx`の`AnimatePresence`と`motion` importを削除する。
+> **dot button の `aria-label` は変更しない。** 当初案は `${index + 1}枚目を表示` としていたが、
+> 既存の `スライド ${index + 1} へ` で用は足りており、変えると既存テストが落ちるだけで
+> 利用者の得が無い。
 
-- `SliderSnapDisplay`: 通常の`span`でcurrent numberを表示
-- `SliderDotButton`: active markerを通常の`span` + `transition-colors`で表示
+- [x] ~~**Step 5: carousel primitiveからmotionを外す**~~
 
-scale modeのEmbla tweenはDOM transform実装なので維持する。
+**Phase 5 Task 4 で完了済み。** `components/uilayouts/carousel.tsx` の `motion/react` は 0 件。
 
-- [ ] **Step 6: testとkeyboard E2Eを実行する**
+- [x] **Step 6: testを実行する**
 
 ```bash
-npm run test -- tests/components/news-hero-carousel.test.tsx
 npm run build
-npm run test:e2e -- tests/e2e/keyboard-navigation.spec.ts
+npx playwright test tests/e2e/carousel-autoplay.spec.ts tests/e2e/keyboard-navigation.spec.ts
 ```
 
-Expected: pause/resume、prev/next、ArrowLeft/RightがPASS。reduced motion contextでは「自動再生を開始」状態。
+- [x] **Step 7: commit**
 
-- [ ] **Step 7: commit**
-
-```bash
-git add components/CarouselAutoplayButton.tsx components/NewsHeroCarousel.tsx components/uilayouts/carousel.tsx tests/components/news-hero-carousel.test.tsx package.json package-lock.json
-git commit -m "fix: add accessible carousel playback controls"
 ```
+e59cdf8  feat: add a pause control and position announcement to the hero carousel
+```
+
+slide semantics は再調査（2026-08-03）で本 Step のやり残しとして見つかり、後追いで実装した。
 
 ---
 
@@ -568,6 +611,14 @@ for (const viewport of viewports) {
   }
 }
 ```
+
+着手前に確認済み（2026-08-03）:
+
+- `page.locator('main')` は成立する（`src/app/layout.tsx:66` に `<main id="main-content">`）
+- `emulateMedia({ reducedMotion: 'reduce' })` で carousel は autoplay plugin を積まない（Task 3 Step 2）ため、
+  スクリーンショットは常に1枚目で安定する。**これを外すと撮影ごとにスライドが変わって落ちる**
+- `/reports` の1ページあたり件数は `useArticlesPerPage()` で画面幅により変わる。
+  viewport ごとに baseline を持つので問題ないが、**同じ baseline を使い回さないこと**
 
 - [ ] **Step 3: baseline snapshotsをreview付きで生成する**
 

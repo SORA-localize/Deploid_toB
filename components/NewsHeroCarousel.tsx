@@ -102,10 +102,19 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
 
         {/* outer overflow-hidden div に height:100% を渡し、inner flex div に h-full を渡すことで高さチェーンを繋ぐ */}
         <SliderContainer className="cursor-grab active:cursor-grabbing h-full" style={{ height: '100%' }}>
-          {reports.map((report) => {
+          {reports.map((report, index) => {
             const hero = report.heroImage;
             return (
-              <Slider key={report.id} className="w-full h-full">
+              <Slider
+                key={report.id}
+                className="w-full h-full"
+                // 全スライドが同時に DOM にあるため、読み上げで線形に辿ると
+                // どこからどこまでが1枚なのか分からない。位置の live region は
+                // 「変わったとき」しか鳴らないので、入った時点の文脈をここで持たせる。
+                role="group"
+                aria-roledescription="slide"
+                aria-label={uiText.home.carousel.position(index + 1, reports.length)}
+              >
                 <Link href={report.href} className="group block relative w-full h-full overflow-hidden">
                   {/* Background Image */}
                   {hero ? (

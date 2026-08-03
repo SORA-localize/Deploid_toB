@@ -2,6 +2,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
+  // 各 route の初回レンダリングを計測前に済ませる。詳細は tests/warmRoutes.ts。
+  globalSetup: './tests/warmRoutes.ts',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,

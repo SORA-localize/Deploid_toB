@@ -40,6 +40,20 @@ test('hero carousel announces the current position', async ({ page }) => {
   await expect(status).toHaveText(/^\d+件中3件目$/);
 });
 
+test('each slide carries its own position for screen readers', async ({ page }) => {
+  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+
+  // 全スライドが同時に DOM にある。live region は位置が「変わったとき」しか鳴らないため、
+  // 読み上げで線形に辿る利用者向けに1枚ずつが自分の位置を持つ。
+  const slides = page.locator('[aria-roledescription="slide"]');
+  const count = await slides.count();
+  expect(count).toBeGreaterThan(1);
+
+  await expect(slides.first()).toHaveAttribute('role', 'group');
+  await expect(slides.first()).toHaveAttribute('aria-label', `${count}件中1件目`);
+  await expect(slides.nth(1)).toHaveAttribute('aria-label', `${count}件中2件目`);
+});
+
 test.describe('reduced motion', () => {
   test('no autoplay control is rendered when motion is reduced', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });

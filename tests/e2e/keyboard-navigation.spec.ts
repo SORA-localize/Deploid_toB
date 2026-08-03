@@ -98,6 +98,21 @@ test('the hero carousel can be advanced without a pointer', async ({ page }) => 
   await expect(status).toHaveText(/^\d+件中2件目$/);
 });
 
+test('pagination can be operated without a pointer', async ({ page }) => {
+  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+
+  const pagination = page.getByRole('navigation', { name: '記事一覧のページネーション' });
+  await expect(pagination).toBeVisible();
+  await expect(pagination.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
+
+  const next = pagination.getByRole('button', { name: '次のページ' });
+  await next.focus();
+  await page.keyboard.press('Enter');
+
+  await expect(page).toHaveURL(/page=2/);
+  await expect(pagination.getByRole('button', { name: '2' })).toHaveAttribute('aria-current', 'page');
+});
+
 test('the catalog search field is reachable from the page heading', async ({ page }) => {
   await page.goto('/robots', { waitUntil: 'domcontentloaded' });
 
