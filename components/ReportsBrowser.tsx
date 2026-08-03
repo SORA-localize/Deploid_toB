@@ -130,7 +130,6 @@ export function ReportsBrowser({
           action={
             <SearchInput
               id="reports-search"
-              label={uiText.filters.keywordSearch}
               value={query}
               onChange={(nextQuery) =>
                 updateParams({ q: nextQuery, [ARTICLE_PAGE_PARAM]: null }, 'replace')
