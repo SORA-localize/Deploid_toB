@@ -32,7 +32,15 @@ export function PageListHeader({
 }: PageListHeaderProps) {
   return (
     <header className={className}>
-      <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 mb-2">
+      {/*
+        見出しと action は箱の中央で揃える。action に入るのは検索窓のような
+        コントロールで、実測で 45px（テキスト20px + 上下padding各12px + 下線1px。
+        最低タッチ領域 44px を満たすための高さ）あり、H1 の 32px より 13px 高い。
+        items-baseline（文字同士の流儀）だと、この差が上3px・下10px と偏って配分され、
+        検索窓の下線だけが見出しより下へ垂れる。文字とコントロールを並べる場合は
+        箱基準で揃える。
+      */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-6 mb-2">
         <h1 id={headingId} className="text-2xl font-semibold text-foreground">
           {title}
         </h1>
