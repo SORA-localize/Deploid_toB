@@ -5,12 +5,11 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  // GitHub-hosted runners typically have 2 vCPUs; an unbounded worker count
-  // (Playwright's local default scales with core count) can saturate the
-  // single `next start` server under test and produce navigation timeouts
-  // unrelated to any route's actual behavior. Cap CI only; local runs keep
-  // Playwright's own default.
-  workers: process.env.CI ? 2 : undefined,
+  // 並列度のボトルネックはCPUではなく、テスト対象である単一の `next start` プロセス。
+  // worker を増やすと重いrouteのSSRが詰まり、実際の挙動とは無関係な navigation timeout が
+  // 毎回別のテストで出る（2026-08-03、テストを41件へ増やした際に発生。--workers=1 なら
+  // 各1〜2秒で全件通る）。ローカルもCIと同じ 2 に固定する。
+  workers: 2,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: 'http://127.0.0.1:3399',

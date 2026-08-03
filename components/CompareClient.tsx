@@ -22,6 +22,10 @@ import {
 } from '@dnd-kit/sortable';
 import { ChevronRight, Link2, Star } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
+import {
+  PageListHeader,
+  pageListHeaderDescriptionClassName,
+} from '@/components/PageListHeader';
 import { SelectControl } from '@/components/SelectControl';
 import { MenuRobotButton } from '@/components/compare/CompareParts';
 import { ComparisonRobotPanel } from '@/components/ComparisonRobotPanel';
@@ -312,20 +316,25 @@ export function CompareClient({ robots, manufacturers, initialSearch }: CompareC
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="site-container py-8">
+      <div className="site-container py-5">
         <Breadcrumbs items={[{ label: uiText.compare.breadcrumb }]} />
 
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-semibold leading-tight text-foreground mb-2">
-            {uiText.compare.title}
-          </h1>
-          <p className="text-sm text-muted-foreground max-w-3xl hidden md:block">
-            {uiText.compare.desktopDescription}
-          </p>
-          <p className="text-sm text-muted-foreground max-w-3xl md:hidden">
-            {uiText.compare.mobileDescription}
-          </p>
-        </div>
+        {/* 説明文は画面幅で内容が異なる（desktopは左メニュー＋右パネルの操作、mobileは別導線）
+            ため、文字列ではなくnodeで渡す。体裁は他の一覧ページと同じclassへ揃える。 */}
+        <PageListHeader
+          className="mb-8"
+          title={uiText.compare.title}
+          description={
+            <>
+              <p className={`${pageListHeaderDescriptionClassName} hidden md:block`}>
+                {uiText.compare.desktopDescription}
+              </p>
+              <p className={`${pageListHeaderDescriptionClassName} md:hidden`}>
+                {uiText.compare.mobileDescription}
+              </p>
+            </>
+          }
+        />
 
         <DndContext
           id="compare-sheet-sort"

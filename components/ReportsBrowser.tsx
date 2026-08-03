@@ -122,25 +122,23 @@ export function ReportsBrowser({
     <div className="bg-background">
       <ReportsHeader activeShelf={activeShelf} tabs={shelfTabs} onShelfSelect={updateShelf} />
 
-      <div className="site-container pt-5">
+      <div className="site-container py-5">
         <Breadcrumbs items={[{ label: uiText.reports.breadcrumb }]} />
-        <PageListHeader title={uiText.reports.title} description={uiText.reports.description} />
-      </div>
-
-      {/* ── 検索 ── */}
-      <div className="border-b border-border bg-card">
-        <div className="site-container py-4">
-          <SearchInput
-            id="reports-search"
-            label={uiText.filters.keywordSearch}
-            value={query}
-            onChange={(nextQuery) =>
-              updateParams({ q: nextQuery, [ARTICLE_PAGE_PARAM]: null }, 'replace')
-            }
-            placeholder={uiText.searchPlaceholders.reports}
-            className="w-full sm:w-72 md:w-96"
-          />
-        </div>
+        <PageListHeader
+          title={uiText.reports.title}
+          description={uiText.reports.description}
+          action={
+            <SearchInput
+              id="reports-search"
+              label={uiText.filters.keywordSearch}
+              value={query}
+              onChange={(nextQuery) =>
+                updateParams({ q: nextQuery, [ARTICLE_PAGE_PARAM]: null }, 'replace')
+              }
+              placeholder={uiText.searchPlaceholders.reports}
+            />
+          }
+        />
       </div>
 
       <div>
