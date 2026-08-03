@@ -40,7 +40,7 @@ updated: 2026-07-30
 | 3 | [現行データ内部](refactor-phase-03-data-internals-v1.md) | `refactor/03-data-internals` | Phase 2 | 完了 |
 | 4 | [Home性能](refactor-phase-04-home-performance-v1.md) | `refactor/04-home-performance` | Phase 3 | 完了 |
 | 5 | [Client境界と一覧](../archive/refactor-phase-05-client-boundaries-v1.md) | `refactor/05-client-boundaries` | Phase 4 | **完了（2026-08-02）**。実績は [baseline](../reference/refactor-baseline-2026-07-26.md) の「Phase 5 after」。`/compare` のVM化のみ後続phaseへ送った |
-| 6 | [UI・アクセシビリティ](refactor-phase-06-ui-accessibility-v1.md) | `refactor/06-ui-accessibility` | Phase 5 | 未着手 |
+| 6 | [UI・アクセシビリティ](refactor-phase-06-ui-accessibility-v1.md) | `refactor/06-ui-accessibility` | Phase 5 | **進行中（2026-08-03）。Task 5a のみ残り。** Task 2 は不実施（決定）、5b は後続phaseへ。branch は未push・未マージ。詳細は `SESSION_HANDOFF.md` |
 | 7 | [設定・セキュリティ・後片付け](refactor-phase-07-security-cleanup-v1.md) | `refactor/07-security-cleanup` | Phase 6 | 未着手 |
 
 順序を入れ替えない。特に、依存更新を品質ゲートより前に行わず、Client propsの縮小をlocal data/validator境界より前に行わない。
@@ -56,6 +56,13 @@ Phase 5 は budget 目標と catalog 4 route の view model 化を達成して�
 | 2 | **catalog 一覧の本文検索の代替** | Task 6 で検索対象を「cardが描画する文字列＋facet label」へ限定した。サイト全体検索ページが無いため退避先が無い。復活させる場合は build 時生成の静的 JSON を `public/` へ置く方式が候補 | baseline「Phase 5 after」 |
 | 4 | **`color-contrast` 218箇所の是正**（Phase 6 Task 5b） | axe の閾値を critical から serious へ上げると全6 routeで違反。`/robots` 96・`/manufacturers` 85・`/use-cases` 17・`/` 16・`/reports` 3・`/compare` 1。全件 `color-contrast` で、`src/app/globals.css` のテーマトークンと配色設計に関わるためテスト追加の範囲を超える。**独立した計画が必要** | Phase 6計画の「Task 5 の分割」節 |
 | 3 | **共有フロア 588,395 の削減** | `3_4rbxe62x5-h.js`（67,853）が `sonner`・`lucide`・`@vercel/analytics` を含み、`layout.tsx` の `<Toaster />` により `/privacy` のような静的ページにも配信されている。`motion/react` も Home 側 4 ファイルが使い続けるため dependencies から外せていない | 同上 |
+
+### Phase 6 からの繰り越し（2026-08-03 起票）
+
+| # | 内容 | 理由 | 参照 |
+|---|---|---|---|
+| 5 | **`/reports` 主軸タブの到達性** | 記事の絞り込みタブ（すべて/ニュース/メーカー解説…）が追従ヘッダの中にしかなく、スクロールするまで DOM に存在しない。ページ先頭から Tab で到達できない。「追従ヘッダは本文の再掲に留める」という規定に反するが、本文のどこへ移すかはレイアウト判断を伴う。**フォーカスが消える不具合自体は Phase 6 Task 4 で解消済み** | `design_system_v1.md` 追従ヘッダの項 |
+| 6 | **Reports H1 の動的化**（F6-02） | 選択中の shelf に関わらず H1 が常に静的な「記事」。shelf 別ラベルは `ARTICLE_SHELF_TABS` に既にある。Global Constraint を満たすのに必須ではないため Phase 6 では扱わなかった | Phase 6計画 F6-02 |
 
 
 ---

@@ -1,10 +1,10 @@
-# Phase 5 セッション引き継ぎ
+# Phase 6 セッション引き継ぎ
 
 > **この文書は一時ファイル。** 引き継ぎ完了後は削除してよい。
 > 恒久的な情報（制約・task・実測値）は計画書側にあり、ここには**重複させない**。
 > ここに書くのは「計画書を読んでも分からないこと」だけ。
 
-作成: 2026-08-01 / 更新: 2026-08-02 / 対象branch: `refactor/05-client-boundaries`
+作成: 2026-08-03 / 対象branch: `refactor/06-ui-accessibility`
 
 ---
 
@@ -12,220 +12,163 @@
 
 | # | ファイル | 何が書いてあるか |
 |---|---|---|
-| 1 | 本ファイル | git状態、経緯、決定の理由、既知の罠 |
-| 2 | `docs/archive/refactor-phase-05-client-boundaries-v1.md` | Phase 5の正本。**完了しarchive済み**。実績は `docs/reference/refactor-baseline-2026-07-26.md` の「Phase 5 after」 |
+| 1 | 本ファイル | git状態、決定の理由、既知の罠 |
+| 2 | `docs/plans/refactor-phase-06-ui-accessibility-v1.md` | Phase 6 の正本。**Task 5a だけ未着手** |
 | 3 | `docs/plans/pre-migration-refactor-implementation-index-v1.md` | プログラム全体（Phase 0〜7）の正本 |
 | 4 | `docs/plans/pre-migration-refactor-safety-design-v1.md` | branch運用・安全設計のルール |
-| 5 | `.superpowers/sdd/refactor-phase-05-client-boundaries-v1/progress.md` | 実行台帳（旧task番号ベース。§5参照） |
+| 5 | `docs/decisions/design_system_v1.md` §4 / `ui_architecture_and_development_policy_v1.md` §9 | **Phase 6 で書いた UI 契約。実装前に読むこと** |
 
 `AGENTS.md` → `ai/rules/00-index.md` → 各work-type ruleも通常どおり適用される。
 
 ---
 
-## 1. 未コミットの変更はない（2026-08-02 時点）
+## 1. 未コミットの変更はない
 
-計画書の書き直し（1,693行 → 2,163行、5 task → 10 task）は commit `cf9864c` で保存済み。
-書き直しの主体は人間（ユーザー）。AIによる改訂commit（`a1fb180`〜`020f2ca`）を踏まえたうえで、
-実測値から構成し直したもの。理由は計画書冒頭「この計画の書き直しについて」節にある。
-
-**main checkout側の同名ファイルは旧972行版のまま。** 書き直し版はこのworktreeのbranchにのみ
-存在する。ファイルを開くときはパスを確認すること。
+`npm run check` 全通過（unit 59 / e2e 59 / lint は既存warning 4件のみ、errorは0）。
 
 ---
 
-## 2. 何の一部か
-
-CMS/DB移行（Payload CMS + Supabase Postgres）の**前段**として走る、7 phaseのリファクタプログラム。
-移行そのものは `docs/plans/content-platform-migration-plan-v1.md` に保留中。
-今は「移行を妨げている問題を、`data/*.ts` を正本のまま段階的に解消する」段階。
+## 2. git の位置関係
 
 ```
-main（= origin/main。PR#5でPhase 2相当まで反映済み）
-└ backup/pre-refactor-20260726 ＋ tag pre-refactor-20260726  ← 復元点
-   └ refactor/integration-20260726   ← mainより26 commit先行
-      ├ refactor/01-quality-gates       ✅ merge済み
-      ├ refactor/02-dependency-security ✅ merge済み
-      ├ refactor/03-data-internals      ✅ merge済み
-      ├ refactor/04-home-performance    ✅ merge済み
-      ├ refactor/05-client-boundaries   ← 現在地
-      ├ refactor/06-ui-accessibility    未着手
-      └ refactor/07-security-cleanup    未着手
+origin/main = df53b11（PR #6 で Phase 2〜5 ＋ 世界地図まで反映済み。本番デプロイ済み）
+│
+└ 0f92b2a "feat: center the world map on Japan"   ← main に含まれる。ここが分岐元
+   └ refactor/06-ui-accessibility   ← 現在地。12 commit 先行。**未push**
 ```
 
-**Phase 3・4分はintegrationに溜まったままmainへ未反映。** これはPhase 5の作業とは独立の判断事項
-（safety design §4.3 ルール9: Vercelプロジェクトへlink済みのため、mainへのpush前に本番デプロイ
-誘発の有無を確認する）。
+- `refactor/integration-20260726` は **main に取り込み済み**。もう先行していない。
+- Phase 6 branch は main に含まれるコミットから分岐しているので、main へのマージは素直に通る。
+- **`main` への push は本番デプロイを誘発する**（Vercel link 済み。safety design §4.3 ルール9）。
+  人間の承認なしに push しないこと。
+
+### 作業場所
+
+```
+worktree: /Users/hori/Desktop/Humanoid_curation_website/Deploid_toB/.worktrees/refactor-06-ui-accessibility
+branch:   refactor/06-ui-accessibility
+```
+
+**main checkout（`Deploid_toB/` 直下）で作業しないこと。** safety design が integration への直接
+commit を禁止している。シェルの作業ディレクトリは `cd` で持続するため、取り違えると
+同じパスの別バージョンを見て誤った結論を出す（このプログラムで実際に2回起きた）。
+
+**ユーザーに画面確認を頼むときは、dev server を必ずこの worktree で起動してもらうこと。**
+親 checkout で起動すると、いま書いた変更が一切入っていない画面を見せることになる（実際に起きた）。
 
 ---
 
-## 3. 作業場所
+## 3. Phase 6 の進捗
 
-```
-worktree: /Users/hori/Desktop/Humanoid_curation_website/Deploid_toB/.worktrees/refactor-05-client-boundaries
-branch:   refactor/05-client-boundaries（integration HEAD 68cda0e から分岐）
-```
+| Task | 状態 | commit |
+|---|---|---|
+| 1 見出しと一覧ヘッダ構造の統一 | ✅ 完了 | `88bccd0` `04d2ef2` `f845272` |
+| 2 PageTabBar へ tab semantics | ⛔ **実施しない**（人間が決定） | — |
+| 3 carousel の pause と現在位置 | ✅ 完了 | `e59cdf8` ＋ `5f41685`(slide semantics) |
+| 4 focus 復元と keyboard journey | ✅ 完了 | `0c8d463` |
+| 5a 4幅 visual regression | ⬜ **未着手。ここから** | — |
+| 5b color-contrast 218箇所 | ⏭ 後続phaseへ（index に起票済み） | — |
+| 6 decision docs への明文化 | ✅ 完了 | `5056cb4` `ceb837a` |
 
-`.worktrees/` は `.gitignore` 済み（commit `68cda0e`）。
-**main checkoutで作業しないこと。** safety designがintegrationへの直接commitを禁止している。
-
-シェルの作業ディレクトリは`cd`で持続する。main checkoutとworktreeを取り違えると、
-同じパスの別バージョンを見て誤った結論を出す（このセッションで実際に起きた）。
-
----
-
-## 4. 実装済みのもの
-
-commit済みは2 task分のみ。**いずれも旧計画のtask番号**であり、新計画のTask 1〜10とは無関係。
-
-| commit | 内容 |
-|---|---|
-| `611b5a7` | catalog filterをHistory API化。`lib/catalog/urlState.ts`・`urlSearch.ts`新設、`lib/useUrlParamUpdater.ts`削除 |
-| `918f058` | 上の副作用修正。`pushState`ではGA page viewが飛ばなくなる問題（`next/navigation`のhookが生の`history.pushState`を観測しないため） |
-| `f42ecbf` | Robot/Manufacturer一覧のview model化。`lib/viewModels/{shared,logo,robots,manufacturers}.ts`新設、card系のmotion除去 |
-| `a1fb180`〜`020f2ca` | 計画書の改訂4件（コードは変更していない） |
-
-**現存するファイル:** `lib/catalog/{urlState,urlSearch}.ts`、`lib/viewModels/{shared,logo,robots,manufacturers}.ts`
-
-**存在しないファイル**（計画に出てくるが未実装。誤って「あるはず」と思わないこと）:
-`lib/catalog/search.ts`、`scripts/check-catalog-payload.mjs`、`scripts/check-plan-snippets.mjs`、
-`scripts/check-client-bundle-content.mjs`、`scripts/check-client-import-graph.mjs`
-
-**未達の制約:** `lib/viewModels/robots.ts:73` は現在も
-`createCatalogSearchText(createRobotSearchDocument(...))` であり、本文が`searchText`へ連結されて
-clientへ渡っている。Global Constraint「本文をVMへ含めない」は**未達**。新計画のTask 6が担当。
-
-### 新計画の進捗（2026-08-02）
-
-| commit | 内容 |
-|---|---|
-| `1bed216`〜`0b596c4` | 計画書の修正（内部監査7件＋外部レビュー7件。コード変更なし） |
-| `263aa0c` | **Task 1** `/reports`の生data 705,431バイト除去 |
-| `0d6826f` | Task 1の実測を計画書へ反映（budoux発見。改訂履歴 #15） |
-| `4687a80` | 引き継ぎメモ更新 |
-| `779901f` | **Task 2** gate 3本導入。全て緑 |
-| `df3d223` | **Task 3** card系のmotion除去 |
-| `d6d57b0` | **Task 4** carousel系のmotion除去 |
-| `c1ca425` | **Task 5** `normalizeSearchText`分離 |
-| `b167fa1` | **budoux除去**（計画に担当taskが無かった作業） |
-
-復元点tag: `phase05-task01`〜`task05-20260802`、`phase05-budoux-20260802`。
-
-**現在のroute固有JS（着手前 → 現在）:**
-
-| route | 着手前 | 現在 | budget 180,000 |
-|---|---:|---:|---|
-| `/reports` | 1,233,689 | **135,713** | 達成 |
-| `/use-cases` | 268,207 | **129,672** | 達成 |
-| `/manufacturers` | 178,411 | **172,833** | 達成 |
-| `/robots` | 325,787 | **184,569** | 4,569超過。**追加作業はしない（決定済み）** |
-
-`/robots`の残りはRadix・floating-ui・日本語UI文字列で、Task 6〜9はどれも扱わない。
-180,000は計画書自身が暫定値と書いていた数字なので、Task 10で実測から確定する。
-
-**Task 6〜9はバイトではなくCMS移行のためのVM化である。** Task 6は「VM構造変更」と
-「searchTextのwhitelist化（＝本文検索の喪失）」を束ねており、後者はJS目標に0バイトしか
-寄与しない不可逆なproduct判断。**着手前に分割の可否を決めること**（計画書のTask 6冒頭に注記あり）。
-
-## 5. SDD台帳（リセット済み）
-
-`.superpowers/sdd/refactor-phase-05-client-boundaries-v1/` に実行台帳がある
-（`superpowers:subagent-driven-development` skillが使う。git ignore対象）。
-
-計画書のtask番号振り直しに合わせて**台帳はリセット済み**。
-
-| ファイル | 内容 |
-|---|---|
-| `progress.md` | 新計画用。リセットの経緯と、旧task↔commitの対応表のみ。進捗記録は空 |
-| `progress-old-plan-archive.md` | 旧計画の台帳。経緯の参照用 |
-| `task-{1,2}-{brief,report}.md`、`review-*.diff` | 旧計画のもの。新計画とは対応しない |
-
-**旧台帳のtask番号を新計画へ読み替えないこと。** 新Task 1は `/reports` の生data除去であり、
-旧計画には存在しなかった作業。読み替えると完了済みtaskを再実行することになる
-（skillが「最も高コストな失敗」と警告しているもの）。
+**Task 6 を 5a より先にやった。** 5a が Task 6 へ渡す内容は「確認幅 390/768/1280/1440」の1行だけで
+既に確定しており、知識移転を後回しにする理由がなかったため。
 
 ---
 
-## 6. 決定済みの事項（再検討しないこと）
-
-いずれも実測と人間の裁定を経ている。理由の詳細は計画書側にある。
+## 4. 決定済みの事項（再検討しないこと）
 
 | 決定 | 一行要約 |
 |---|---|
-| MiniSearchは**維持** | 削減は実測18,690バイトのみ。日本語検索品質（fuzzy 0.2、`Intl.Segmenter('ja')`）を落とす対価に見合わない。索引する文字列だけをcatalog searchTextへ差し替える |
-| JS目標は**route固有JSの絶対値** | 旧「総量から30%削減」は算術的に達成不能だった（共有フロア591,394が総量の64%） |
-| `searchExtra`方式は**見送り** | 削減分はRSC payloadでありJS目標に寄与しない。4 collectionで`searchText`統一 |
-| catalog検索範囲を**card表示＋facet labelに限定** | 本文全文検索は失われる。サイト全体検索ページが存在しないため退避先も無い。代替は後続phase |
-| bundle検査は**record slugカウント** | field名markerは実測で10 chunkにhit・8件誤検知。slug方式は133/133で誤検知0 |
+| **Task 2 は実施しない** | `PageTabBar` に `role=tab` を付けない。URL が変わるナビゲーションであり、ページ内パネルの差し替えではない。`design_system_v1.md:305` が明記しており、PR #5 で一度入って差し戻された経緯もある |
+| axe の閾値は **critical のまま** | serious へ上げると全6 route で 218件。全て `color-contrast`。「違反0の状態で gate を入れる」原則に反する |
+| `tests/components/news-hero-carousel.test.tsx` は **作らない** | 検証したいのは embla の実挙動（5秒待って進まない等）で、jsdom では測れない。e2e で代替済み |
+| `src/app/globals.css` は **触らない** | 本phaseで一度も変更しておらず、focus-visible / reduced-motion に不具合の実測がない。配色は Task 5b |
+| `/reports` の主軸タブが追従ヘッダの中だけにある件 | **既知の逸脱として規定に明記のうえ繰り越し**。本文のどこへ移すかはレイアウト判断が要る |
 
 ---
 
-## 7. 既知の罠
+## 5. 既知の罠
 
-**① 計画書の散文とコード例が食い違う（3巡連続で発生）**
+### ① 計画書の腐り（このプログラム最大の故障モード。**3回**発生）
 
-「散文で決めたことがコード例・step・表のどれかに反映されない」という故障モードが3回起きた。
-3回目は`useCase.description`（存在しないfield。実際は`subtitle`/`summary`）を、
-「`UseCase`に`description`は存在しない」と書いた3段落上のコード例で使っていた。
+**症状:** 「散文で決めたことが、コード例・step・表のどれかに反映されない」。
 
-対策は新計画のTask 2にある`scripts/check-plan-snippets.mjs`（計画書の`ts` blockを`tsc --noEmit`に
-かける）。**目視確認と対応表では防げないことが実証済み。**
+3回目が最悪だった。Task 1 Step 2 のコード例が `SearchInput` へ `label=` を渡す形のまま
+残っており、**それはユーザーが画面で見つけた不具合の原因そのもの**で、`04d2ef2` で削除した
+ものだった。計画に従って実装するとバグが再発する状態だった。
 
-**② `data/types.ts` を見ずにフィールド名を書かない**
+**原因は突合の判定基準。** 「参照先のファイルが実在するか」で判定していたため、
+本文の矛盾が残った。Task 4 を「前提のずれなし」と判定したのがその例で、実際には
+同じ文書内の Task 2 の決定と正面から矛盾する test 例（`role="tab"` + 矢印キー）が
+本文にあった。**誤った判定が次の作業範囲を汚染する。**
 
-`UseCase`の実フィールドは `atAGlance` `buyerReadiness` `candidateRobots` `capabilityNotes`
-`environment` `environmentRequirements` `industryTags` `japanDeploymentConditions` `maturityLevel`
-`overview` `primaryIndustry` `requiredCapabilities` `subtitle` `taskTags` `title` `titleJa`
-`whyHardToday` `whyItMatters` ＋ `BaseRecord`（`id` `slug` `summary` ほか）。
-`description`は無い。labelは`maturityLabels`（`useCaseMaturityLabels`ではない）。
+**対策（必ず守ること）:** タスク完了時に
 
-**③ 測定は必ずフレッシュビルドで**
+1. 本文のコード例を**現物と1行ずつ照合**する（ファイルの実在確認では不十分）
+2. 注記を追記して終わりにしない。**本文を書き換える**
+3. 「やらなかった」ものは打ち消し線＋理由を残す。黙って消さない
 
-`.next/` が古いまま計測すると誤った結論に至る。ルート固有JSは
-`route-bundle-stats.json` の `firstLoadChunkPaths` から共有フロア（`/privacy`のchunk集合）を
-引いて算出する。総量（`firstLoadUncompressedJsBytes`）を見ると共有フロアに埋もれて差分が見えない。
+`npm run check:plan-snippets` は front-matter に `snippetCheck: true` を書いた計画書の
+`ts` block だけを `tsc --noEmit` にかける。Phase 6 計画は現状 **opt-in していない**
+（コード例が実装の抜粋であって単体でコンパイルできる形ではないため）。人力照合が要る。
 
-**④ RSC payloadとJS chunkは別物**
+### ② e2e の navigation timeout
 
-server→client propsはJS chunkではなくRSC flight payloadに載る。PPRのため
-prerendered HTMLにも現れず、request時にstreamされる。
-`check-client-budgets`（JS）で`searchText`の肥大は検知できない。逆にVM側のgateでは
-import chain経由のbundle流出を検知できない。**両方が要る。**
+テストが59件へ増えた時点で、**3回に1回、毎回別のテストで** `page.goto` が30秒 timeout した。
+
+原因はテスト対象の単一 `next start` プロセス。PPR の初回レンダリングは route ごとに実費が
+かかり、複数 worker が同じ重い route へ**同時に初回アクセス**すると SSR が詰まる。
+
+`tests/warmRoutes.ts` を `globalSetup` に置き、計測前に各 route を1回ずつ順番に叩いて
+初回コストを払い切る形で解決した。38〜42秒 → 20〜22秒で安定。
+
+**Task 5a で visual regression（12枚の撮影）を足すと再び重くなる。** 落ちたらまずここを疑う。
+timeout を延ばして隠す前に、warm 対象の route が足りているかを見ること。
+
+### ③ embla の autoplay イベントが listener へ届かない
+
+`autoplay:play` / `autoplay:stop` を購読しても呼ばれず、`stop()` は効いている
+（6.5秒進まない）のにボタンの表示だけが古いまま残る事象を実測した。
+`useSyncExternalStore` でも `emblaApi.on(...)` でも再現。
+
+**クリックハンドラ内で state を直接更新すること。** イベント購読だけに任せる形へ
+「きれいに」書き直すと表示が壊れる。`components/CarouselAutoplayButton.tsx` にコメントで残してある。
+
+### ④ 全gate緑でも見た目の不具合は出る
+
+Task 1 の検索窓ズレは、H1 の**個数**は測っていたが**位置関係**を誰も測っていなかったために
+出荷され、ユーザーが画面を見て初めて見つかった。**Task 5a の visual regression が埋めるべき穴はここ。**
+
+### ⑤ decision docs が実装から遅れる
+
+Phase 5 が削除したモジュール（`lib/search.ts`・`useUrlParamUpdater`・`FacetFilterBar`＋
+`facetConfig`）への参照が、`status: current` の5ファイルに11箇所残っていた。`5056cb4` で是正済み。
+
+**削除を伴う phase の完了時は、`docs/decisions/` と `ai/rules/` を grep すること。**
 
 ---
 
-## 8. 経緯（なぜ実装が止まって計画改訂に入ったか）
+## 6. 次の一手
 
-セッションはPhase 4のUIバグメモ整理から始まり、Phase 5に着手。旧Task 1・2を実装した。
+**Task 5a（4幅 visual regression）。** 計画書の Task 5a は再調査済みで、着手前の確認事項
+（`<main>` の実在、reduced motion で carousel が1枚目に固定される理由、`/reports` の
+1ページ件数が画面幅で変わること）も本文に書いてある。
 
-旧Task 2のコードレビューで「計画書のコード例通りに実装するとGlobal Constraint違反になる」
-という指摘が出た。計画そのものに矛盾があったため、実装を止めて計画修正へ切り替えた。
+この task の本体は **12枚のスクリーンショットを人間が目視する工程**。
+overflow・重なり・切れ・要素の欠落を見てもらってから baseline を commit する。
 
-以降、外部AIレビューを3巡回した（改訂commit `a1fb180` → `3f11870` → `4ec93dd` → `020f2ca`）。
-各巡で判明したことは計画書冒頭の表にまとまっている。根本原因は
-**初版が実測せずに書かれていたこと**。
-
-その後ユーザーが計画書を実測値から全面的に書き直した（§1の未コミット変更）。
+その後: Phase 6 完了 → main へマージ（**要承認。本番デプロイ**）→ Phase 7。
 
 ---
 
-## 9. 次の一手
-
-**Task 6の分割可否を決める** — VM構造変更だけ実施するか、searchTextのwhitelist化も含めるか。
-判断材料は計画書のTask 6冒頭の注記。
-
-その後はTask 6（VM化のみ）→ 7 → 8 → 9 → 10の順。Task 10で実測から budget を確定する。
-
-**budgetのためにやることはもう残っていない。** Task 1〜5とbudoux除去で
-`/robots`を除き達成済み。以降はCMS移行のための構造変更である。
-
----
-
-## 10. 環境メモ
+## 7. 環境メモ
 
 - `npm run check` が全gateのpipeline。個別scriptは `package.json` を参照
-- e2eは`npm run test:e2e`。**専用port 3399で毎回自前のサーバを起動する**（`reuseExistingServer: false`）。
-  2026-08-02まではport 3000を既存サーバごと再利用しており、親checkoutのサーバに当たって
-  **いま書いたコードを一度もテストしないまま全件緑になる**状態だった。実際に発生したため修正済み。
-  portが塞がっている場合はエラーで止まる（静かに間違えるより安全）。
-- Node 22系。`data/*.ts`を読むscriptは`--experimental-strip-types`付き
-- Vercelプロジェクトへlink済み（safety design §4.3 ルール9）
+- e2e は専用 port 3399 で毎回自前のサーバを起動する（`reuseExistingServer: false`）。
+  既存サーバを再利用すると親checkoutのサーバに当たり、**いま書いたコードを一度も
+  テストしないまま全件緑になる**（2026-08-02に実際に発生したため修正済み）
+- `workers: 2` は固定。増やすと①②の timeout が出る
+- Node 22系。`data/*.ts` を読む script は `--experimental-strip-types` 付き。
+  この形式では tsconfig の `paths`（`@/`）と拡張子なし import が解決できない
+- Vercel プロジェクトへ link 済み（safety design §4.3 ルール9）
+- lint の warning 4件（`@next/next/no-img-element`）は Phase 6 以前からの既存。errorは0
