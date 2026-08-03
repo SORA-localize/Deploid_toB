@@ -68,6 +68,67 @@ Task 1 Step 2（Reportsへのaction prop追加）は既にこの計画自身が�
   あり、Global Constraint「全index/detail routeに一意なH1を1つだけ置く」を満たすのに
   必須ではない。後続phaseへ送る。
 
+### 全タスクの現状突合（2026-08-03 実測）
+
+Task 1 着手後、タスクごとに前提のずれが出たため、**残り全タスクを一度に現行コードへ突合した**。本計画は 2026-07-28 付で、Phase 4・5 とその間のレビュー結果を反映していない。
+
+| Task | 判定 | 根拠（実測） |
+|---|---|---|
+| 1 | **完了**（`88bccd0`） | H1 は着手時点で9 route とも通っていた。実際の作業は `/reports` と `/compare` の構造統一 |
+| 2 | **実施しない** | 下記「Task 2 を実施しない理由」 |
+| 3 | **縮小して実施** | `motion/react` 除去は Phase 5 Task 4 で完了済み。残るのは pause/resume と現在位置の告知 |
+| 4 | **実施** | 対象3ファイルはすべて実在。前提のずれなし |
+| 5 | **分割して実施** | axe の閾値引き上げは現状 **218箇所**の違反で即座に赤くなる。下記参照 |
+| 6 | **実施** | Tasks 1〜5 の結果を反映する。内容は着手時に確定する |
+
+### Task 2 を実施しない理由（2026-08-03、人間が決定）
+
+計画は `PageTabBar` へ `role=tablist` / `role=tab` / roving tabindex を入れるとしているが、**正本ドキュメントがこれを明確に禁じている。**
+
+`docs/decisions/design_system_v1.md:305`:
+
+> hover、focus、clickで選択し、Left/Right/Home/Endを使えるtab semantics（`role=tab` / `aria-selected` / roving tabindex）を持つ。**PageTabBarはページナビ（`aria-current`）でtab semanticsを持たないため流用しない。見た目だけ揃える。**
+
+さらに PR #5（Phase 1）は「an earlier fix had briefly given it（tab semantics）」を `role="group"` + `aria-current` へ **restore した**と記録している。つまり**一度実施して差し戻された変更**である。
+
+設計上の理由: `PageTabBar` が切り替えるのはページ内パネルではなく **URL が変わる絞り込み**（`/reports?kind=news` 等）。WAI-ARIA の tab/tablist は同一ページ内で tabpanel を差し替えるパターンを指し、ナビゲーションには `aria-current` を使うのが正しい。`role="tab"` を付けると支援技術の利用者は「パネルが切り替わる」と予期するが、実際にはページ遷移が起きる。
+
+`design_system_v1.md:305` が tab semantics を求めているのは**ロボット詳細のスペックタブ**で、そちらは実際にパネルを差し替える。混同しないこと。
+
+Global Constraint「keyboardだけでtabsを操作できる」は**既に満たされている**。タブは `<button>` で Tab キーで到達でき Enter/Space で選択できる。矢印キーは `role="group"` のナビゲーションでは必須ではない（roving tabindex は tablist / toolbar / radiogroup 用のパターン）。
+
+**代替:** 現状のキーボード操作が壊れていないことを component テストで固定する（Task 4 に含める）。
+
+### Task 3 の縮小（2026-08-03 実測）
+
+- **`Removes: carousel primitiveの`motion/react`` は達成済み。** Phase 5 Task 4 で除去し、`components/uilayouts/carousel.tsx` の該当は 0 件
+- **残る本体は pause/resume control と現在位置の告知。** `components/NewsHeroCarousel.tsx:69` は `Autoplay({ delay: 5000, stopOnInteraction: true })` を渡すだけで明示的な一時停止手段を持たず、`aria-live` も 0 件
+- **計画の test 例が参照する `tests/fixtures/articleCatalogFixture` は存在しない。** また `NewsHeroCarousel` の props は Phase 5 Task 8 で `Article[]` から `ArticleCatalogItem[]` へ変わっている。fixture は新しい型で作る
+
+### Task 5 の分割（2026-08-03 実測）
+
+計画は axe の閾値を critical から **serious** へ上げるとしているが、現状の実測は次のとおり。
+
+| route | serious/critical |
+|---|---:|
+| `/robots` | 96 |
+| `/manufacturers` | 85 |
+| `/use-cases` | 17 |
+| `/` | 16 |
+| `/reports` | 3 |
+| `/compare` | 1 |
+
+**全件 `color-contrast`。合計218箇所。** そのまま gate 化すると赤いまま入る。Phase 5 が定めた「赤い gate や allowlist を持ち込まない」（違反0の状態で gate を入れる）に反する。
+
+配色そのものの問題であり、`src/app/globals.css` のテーマトークンとデザインシステムに関わる。**テスト追加タスクの範囲を超える。**
+
+したがって Task 5 を2つに分ける。
+
+- **Task 5a（本phaseで実施）:** visual regression（390/768/1280/1440）を追加する。axe は現行の critical 閾値を維持し、対象 route に `/compare` を追加する（現状 critical は 0 件なので緑で入る）
+- **Task 5b（後続phaseへ）:** `color-contrast` 218箇所の是正。テーマトークンの見直しを伴うため独立した計画が要る。**Phase 6 では閾値を上げない**
+
+---
+
 ### Phase 4・5 完了により不要になった項目（2026-08-03 実測）
 
 本計画は 2026-07-28 付で、Phase 4・5 より前に書かれている。着手時の実測で次が判明した。

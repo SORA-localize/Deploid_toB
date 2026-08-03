@@ -54,6 +54,7 @@ Phase 5 は budget 目標と catalog 4 route の view model 化を達成して�
 |---|---|---|---|
 | 1 | **`/compare` の view model 化**（旧 Task 9） | `CompareClient` が raw `Robot[]` / `Manufacturer[]` を受け取る状態が残る。`/compare` にバイト上限は課しておらず削減効果は0だが、CMS移行では対応が要る。Phase 5 最大のリファクタで、DnD・favorite・URL復元が絡み壊れ方が静か | archive済み計画の Task 9 |
 | 2 | **catalog 一覧の本文検索の代替** | Task 6 で検索対象を「cardが描画する文字列＋facet label」へ限定した。サイト全体検索ページが無いため退避先が無い。復活させる場合は build 時生成の静的 JSON を `public/` へ置く方式が候補 | baseline「Phase 5 after」 |
+| 4 | **`color-contrast` 218箇所の是正**（Phase 6 Task 5b） | axe の閾値を critical から serious へ上げると全6 routeで違反。`/robots` 96・`/manufacturers` 85・`/use-cases` 17・`/` 16・`/reports` 3・`/compare` 1。全件 `color-contrast` で、`src/app/globals.css` のテーマトークンと配色設計に関わるためテスト追加の範囲を超える。**独立した計画が必要** | Phase 6計画の「Task 5 の分割」節 |
 | 3 | **共有フロア 588,395 の削減** | `3_4rbxe62x5-h.js`（67,853）が `sonner`・`lucide`・`@vercel/analytics` を含み、`layout.tsx` の `<Toaster />` により `/privacy` のような静的ページにも配信されている。`motion/react` も Home 側 4 ファイルが使い続けるため dependencies から外せていない | 同上 |
 
 
