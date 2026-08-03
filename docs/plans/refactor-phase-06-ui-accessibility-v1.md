@@ -156,19 +156,19 @@ carousel と NewsHeroCarousel は motion 除去済みだが、**autoplay の pau
 | `tests/e2e/headings.spec.ts` | H1 uniqueness |
 | `tests/e2e/keyboard-navigation.spec.ts` | tabs/carousel/pagination |
 | `tests/e2e/focus-restoration.spec.ts` | menu/dialog/popover |
-| `tests/e2e/accessibility.spec.ts` | serious/critical axe |
+| ~~`tests/e2e/accessibility.spec.ts`~~ | **作らない。** 既存 `accessibility-smoke.spec.ts` を拡張する |
 | `tests/e2e/visual-regression.spec.ts` | 4 viewport screenshots |
 
 ### 変更
 
 | Path | Responsibility |
 |---|---|
-| `components/PageTabBar.tsx` | tablist、roving focus、hint |
+| ~~`components/PageTabBar.tsx`~~ | **変更しない**（Task 2 不実施） |
 | `components/ReportsHeader.tsx` | contextual tabsのみ |
 | `components/ReportsBrowser.tsx` | list H1/description/search |
-| `components/CompareClient.tsx` | list header統一（F6-01、要スコープ確定） |
+| `components/CompareClient.tsx` | list header統一（F6-01。**採用決定・Task 1 で完了**） |
 | `components/NewsHeroCarousel.tsx` | autoplay state/control |
-| `components/uilayouts/carousel.tsx` | semantic slides/dots、motion削除 |
+| `components/uilayouts/carousel.tsx` | semantic slides/dots（motion削除は Phase 5 で完了済み） |
 | `components/Header.tsx` | focus testで見つかった欠陥だけ修正 |
 | `components/ComparisonRobotPanel.tsx` | dialog focus contract |
 | `components/ui/searchable-dropdown.tsx` | popover focus contract |
@@ -283,124 +283,18 @@ git commit -m "fix: standardize reports list heading structure"
 
 ---
 
-### Task 2: 横スクロールtabsをkeyboard対応にする
+### Task 2: 実施しない（2026-08-03 決定）
 
-**Files:**
-- Create: `tests/components/page-tab-bar.test.tsx`
-- Modify: `components/PageTabBar.tsx`
-- Modify: `components/ContextualPageHeader.tsx`
+**この task は実施しない。** 詳細な理由は冒頭「Task 2 を実施しない理由」節。要約:
 
-**Interfaces:**
-- Produces: `role=tablist`、`role=tab`、roving `tabIndex`、Arrow/Home/End
+- `docs/decisions/design_system_v1.md:305` が「**PageTabBar はページナビ（`aria-current`）で tab semantics を持たないため流用しない**」と明記している
+- PR #5（Phase 1）は、一度入れた tab semantics を `role="group"` + `aria-current` へ **restore した**と記録している。**一度実施して差し戻された変更**である
+- `PageTabBar` が切り替えるのは URL が変わる絞り込みであり、同一ページ内で tabpanel を差し替える tab/tablist パターンには当たらない
+- Global Constraint「keyboardだけでtabsを操作できる」は**既に満たされている**（`<button>` なので Tab で到達し Enter/Space で選択できる）
 
-- [ ] **Step 1: component testを書く**
+**代替として実施すること:** 現状のキーボード操作が壊れていないことを固定する component test を **Task 4** で追加する。`role="group"` と `aria-current` を assert し、tab semantics へ戻す変更が入ったら落ちるようにする。
 
-```tsx
-// tests/components/page-tab-bar.test.tsx
-import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
-import { PageTabBar } from '@/components/PageTabBar';
-
-const tabs = [
-  { value: 'all', label: 'すべて' },
-  { value: 'news', label: 'ニュース' },
-  { value: 'analysis', label: '分析' },
-] as const;
-
-describe('PageTabBar', () => {
-  it('exposes tab semantics and arrow navigation', () => {
-    const onSelect = vi.fn();
-    render(
-      <PageTabBar
-        tabs={tabs}
-        activeValue="all"
-        onSelect={onSelect}
-        ariaLabel="記事分類"
-      />,
-    );
-    const tablist = screen.getByRole('tablist', { name: '記事分類' });
-    const all = screen.getByRole('tab', { name: 'すべて' });
-    expect(tablist).toBeVisible();
-    expect(all).toHaveAttribute('aria-selected', 'true');
-    fireEvent.keyDown(all, { key: 'ArrowRight' });
-    expect(screen.getByRole('tab', { name: 'ニュース' })).toHaveFocus();
-  });
-});
-```
-
-- [ ] **Step 2: 現行componentで失敗することを確認する**
-
-Run: `npm run test -- tests/components/page-tab-bar.test.tsx`
-
-Expected: `tablist`/`tab`が見つからずFAIL。
-
-- [ ] **Step 3: semanticとroving focusを実装する**
-
-`PageTabBar`で`ariaLabel`を捨てず、rootへ使う。
-
-```tsx
-const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-const enabledTabs = tabs
-  .map((tab, tabIndex) => ({ tab, tabIndex }))
-  .filter(({ tab }) => !tab.disabled);
-
-const focusTab = (index: number) => {
-  const normalized =
-    ((index % enabledTabs.length) + enabledTabs.length) % enabledTabs.length;
-  tabRefs.current[enabledTabs[normalized].tabIndex]?.focus();
-};
-
-<div
-  role="tablist"
-  aria-label={ariaLabel}
-  aria-describedby={`${id}-hint`}
-  className="flex flex-nowrap overflow-x-auto gap-0"
->
-```
-
-各button:
-
-```tsx
-role="tab"
-aria-selected={isActive}
-tabIndex={isActive ? 0 : -1}
-ref={(node) => { tabRefs.current[index] = node; }}
-onKeyDown={(event) => {
-  const enabledIndex = enabledTabs.findIndex(({ tabIndex }) => tabIndex === index);
-  if (event.key === 'ArrowRight') focusTab(enabledIndex + 1);
-  if (event.key === 'ArrowLeft') focusTab(enabledIndex - 1);
-  if (event.key === 'Home') focusTab(0);
-  if (event.key === 'End') focusTab(enabledTabs.length - 1);
-}}
-```
-
-Arrow/Home/Endでは`preventDefault()`する。focus移動だけでは選択せず、Enter/Space/clickで`onSelect`する。
-
-- [ ] **Step 4: scroll hintを追加する**
-
-```tsx
-<p id={`${id}-hint`} className="sr-only">
-  左右キーで項目間を移動し、Enterキーで選択できます。
-</p>
-```
-
-`useId()`で安定したidを作る。ContextualPageHeaderのoverflow containerへ`overscroll-x-contain`を追加する。
-
-- [ ] **Step 5: testsを実行する**
-
-```bash
-npm run test -- tests/components/page-tab-bar.test.tsx
-npm run build
-```
-
-Expected: PASS。
-
-- [ ] **Step 6: commit**
-
-```bash
-git add components/PageTabBar.tsx components/ContextualPageHeader.tsx tests/components/page-tab-bar.test.tsx
-git commit -m "fix: add keyboard semantics to page tabs"
-```
+方針そのものを変える場合（`PageTabBar` に tab semantics を持たせる）は `design_system_v1.md:305` の書き換えを伴うため、本計画の範囲外。
 
 ---
 
@@ -414,7 +308,9 @@ git commit -m "fix: add keyboard semantics to page tabs"
 
 **Interfaces:**
 - Produces: visible pause/resume button、`aria-live=polite` current position
-- Removes: carousel primitiveの`motion/react`
+
+> **`Removes: carousel primitiveの motion/react` は削除した。** Phase 5 Task 4 で除去済みで、`components/uilayouts/carousel.tsx` の該当は 0 件。
+> **計画の test 例が参照する `tests/fixtures/articleCatalogFixture` は存在しない。** `NewsHeroCarousel` の props も Phase 5 Task 8 で `Article[]` から `ArticleCatalogItem[]` へ変わっているため、fixture は新しい型で作る。
 
 - [ ] **Step 1: pause control testを書く**
 
@@ -613,7 +509,7 @@ git commit -m "fix: guarantee keyboard focus restoration"
 
 ---
 
-### Task 5: axeと4 viewport visual regressionを追加する
+### Task 5a: 4 viewport visual regressionを追加する（axeの閾値は上げない）
 
 **Files:**
 - Create: `tests/e2e/accessibility.spec.ts`
@@ -623,7 +519,16 @@ git commit -m "fix: guarantee keyboard focus restoration"
 - Modify: `src/app/globals.css`
 
 **Interfaces:**
-- Produces: serious/critical axe gate、390/768/1280/1440 visual snapshots
+- Produces: 390/768/1280/1440 visual snapshots、既存 axe gate への `/compare` 追加
+
+> **axe の閾値は critical のまま維持する。** 計画は serious へ上げるとしていたが、実測で全6 route に
+> `color-contrast` 違反が **218箇所**ある（`/robots` 96・`/manufacturers` 85・`/use-cases` 17・
+> `/` 16・`/reports` 3・`/compare` 1）。そのまま gate 化すると赤いまま入り、Phase 5 が定めた
+> 「違反0の状態で gate を入れる」に反する。配色は `src/app/globals.css` のテーマトークンの問題で、
+> テスト追加タスクの範囲を超える。**Task 5b として後続phaseへ送る**（index の繰り越し表に起票済み）。
+>
+> **新規ファイル `tests/e2e/accessibility.spec.ts` は作らない。** 既存の
+> `tests/e2e/accessibility-smoke.spec.ts` と重複するため、そちらへ `/compare` を足す。
 
 - [ ] **Step 1: axe testを追加する**
 
@@ -729,7 +634,7 @@ git commit -m "test: add accessibility and responsive visual gates"
 
 - `PageListHeader`: index H1/description/action
 - `ContextualPageHeader`: sticky filter/tabs、H1を持たない
-- `PageTabBar`: tablist + roving focus
+- `PageTabBar`: ページナビ semantics（`role="group"` + `aria-current`）。tab semantics は持たない
 - carousel: prev/next + pause/resume + current position
 - card: pointer追従tiltをlist標準にしない
 - focus: modal/popover close後はtriggerへ復元
