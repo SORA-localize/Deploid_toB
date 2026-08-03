@@ -513,11 +513,12 @@ git commit -m "fix: keep the sticky filter bar alive while it holds keyboard foc
 ### Task 5a: 4 viewport visual regressionを追加する（axeの閾値は上げない）
 
 **Files:**
-- Create: `tests/e2e/accessibility.spec.ts`
+- ~~Create: `tests/e2e/accessibility.spec.ts`~~ — **作らない。** 既存 `tests/e2e/accessibility-smoke.spec.ts` を拡張する
+- Modify: `tests/e2e/accessibility-smoke.spec.ts`（`/compare` を対象に追加。閾値は critical のまま）
 - Create: `tests/e2e/visual-regression.spec.ts`
 - Create: `tests/e2e/visual-regression.spec.ts-snapshots/*`
 - Modify: `playwright.config.ts`
-- Modify: `src/app/globals.css`
+- ~~Modify: `src/app/globals.css`~~ — 配色の是正は Task 5b。ここでは触らない
 
 **Interfaces:**
 - Produces: 390/768/1280/1440 visual snapshots、既存 axe gate への `/compare` 追加
@@ -531,24 +532,11 @@ git commit -m "fix: keep the sticky filter bar alive while it holds keyboard foc
 > **新規ファイル `tests/e2e/accessibility.spec.ts` は作らない。** 既存の
 > `tests/e2e/accessibility-smoke.spec.ts` と重複するため、そちらへ `/compare` を足す。
 
-- [ ] **Step 1: axe testを追加する**
+- [ ] **Step 1: 既存 axe gate に `/compare` を足す**
 
-```ts
-// tests/e2e/accessibility.spec.ts
-import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
-
-for (const route of ['/', '/robots', '/manufacturers', '/use-cases', '/reports', '/compare']) {
-  test(`${route} has no serious or critical axe violations`, async ({ page }) => {
-    await page.goto(route);
-    const result = await new AxeBuilder({ page }).analyze();
-    const blocking = result.violations.filter(
-      ({ impact }) => impact === 'serious' || impact === 'critical',
-    );
-    expect(blocking).toEqual([]);
-  });
-}
-```
+`tests/e2e/accessibility-smoke.spec.ts` の route 配列へ `/compare` を追加するだけ。
+**閾値は `critical` のまま**で、`serious` へは上げない（理由は上のブロック）。
+`/compare` の critical は現状 0 件なので緑で入る。
 
 - [ ] **Step 2: visual testを追加する**
 
@@ -590,22 +578,17 @@ npx playwright test tests/e2e/visual-regression.spec.ts --update-snapshots
 
 12枚を目視し、overflow、重なり、切れ、H1/search/tabs/mapの欠落がないことを確認してからcommitする。
 
-- [ ] **Step 4: axe違反とresponsive差分を修正する**
+- [ ] **Step 4: 目視で見つかった responsive 差分だけ修正する**
 
-修正優先:
+修正対象は overflow / 重なり / 切れ / 要素の欠落。
 
-1. missing label/name
-2. color contrast
-3. landmark/heading
-4. focus-visible
-5. overflow/clipping
-
+**`color-contrast` はここで直さない**（Task 5b。テーマトークンの見直しを伴う）。
 新規色を直書きせず既存semantic tokenを使う。意図したvisual差分だけsnapshotを更新する。
 
 - [ ] **Step 5: full UI gateを実行する**
 
 ```bash
-npm run test:e2e -- tests/e2e/headings.spec.ts tests/e2e/keyboard-navigation.spec.ts tests/e2e/focus-restoration.spec.ts tests/e2e/accessibility.spec.ts tests/e2e/mobile-overflow.spec.ts tests/e2e/visual-regression.spec.ts
+npm run check
 ```
 
 Expected: 全test PASS。
@@ -613,7 +596,7 @@ Expected: 全test PASS。
 - [ ] **Step 6: commit**
 
 ```bash
-git add tests/e2e playwright.config.ts src/app/globals.css
+git add tests/e2e playwright.config.ts
 git commit -m "test: add accessibility and responsive visual gates"
 ```
 
@@ -631,11 +614,20 @@ git commit -m "test: add accessibility and responsive visual gates"
 
 - [ ] **Step 1: current rulesを更新する**
 
-次をdecisionへ明記する。
+次をdecisionへ明記する。**このタスクの本体は「Task 1・4 で塞いだ実装のずれを、規定として書く」こと。**
+規定が無いままだと同じずれがまた出る（実際 `/reports` と `/compare` は独自ヘッダを持っていた）。
 
-- `PageListHeader`: index H1/description/action
+- `PageListHeader`: 一覧ヘッダは必ずこれを使い、独自実装を作らない。構成は H1（24px）＋右に action ＋下に説明文
+- **一覧ヘッダの整列（Task 1 で判明。現状 decision に記述ゼロ）**
+  - 見出しと action は **箱の中央**（`items-center`）で揃える。`items-baseline` は使わない
+  - 理由: action に入るのは検索窓などのコントロールで、最低タッチ領域 44px を満たすため実測45px あり、H1 の 32px より 13px 高い。文字基準で揃えるとこの差が上3px・下10px と偏り、検索窓の下線だけが見出しより下へ垂れる
+  - 一覧の検索窓に可視ラベルを付けない（`aria-label` で代替）。ラベル分の高さがヘッダ行の整列を崩す
 - `ContextualPageHeader`: sticky filter/tabs、H1を持たない
+- **追従バーのフォーカス契約（Task 4 で判明）**
+  - キーボードフォーカスを保持している領域を、スクロール量だけで消してはならない
+  - 判定は `:focus-visible` に限る（クリックでもボタンはフォーカスを受け取るため、ポインタ利用者にバーが残り続けてしまう）
 - `PageTabBar`: ページナビ semantics（`role="group"` + `aria-current`）。tab semantics は持たない
+- **絞り込みタブの置き場所**: `/reports` は追従ヘッダの中だけ（先頭から Tab で到達できない）、`/robots` は本文に直置きで揃っていない。どちらを標準とするか決めて書く
 - carousel: prev/next + pause/resume + current position
 - card: pointer追従tiltをlist標準にしない
 - focus: modal/popover close後はtriggerへ復元
