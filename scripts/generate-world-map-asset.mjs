@@ -2,9 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import DottedMap from 'dotted-map';
+import { WORLD_MAP_OPTIONS } from '../lib/worldMap.ts';
 
 const outputPath = path.join(process.cwd(), 'public/generated/world-map.svg');
-const map = new DottedMap({ height: 100, grid: 'diagonal' });
+const map = new DottedMap({ ...WORLD_MAP_OPTIONS });
 const svg = `${map.getSVG({
   radius: 0.22,
   color: '#ffffff45',

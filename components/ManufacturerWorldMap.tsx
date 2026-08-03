@@ -3,6 +3,7 @@ import { ManufacturerMapStage } from '@/components/ManufacturerMapStage';
 import type { MapPoint } from '@/components/ManufacturerMapCopy';
 import {
   ARC_END_MIN_DISTANCE,
+  WORLD_MAP_OPTIONS,
   clusterProjectedManufacturers,
   pushAway,
   type Point,
@@ -43,7 +44,7 @@ interface ManufacturerWorldMapProps {
 // クライアントへは固定パスの背景SVGと算出済みの座標のみを渡す。
 // 操作（ホバー/フォーカス/自動デモ）と弧アニメは子のクライアントコンポーネントが担当する。
 export function ManufacturerWorldMap({ manufacturers, heading, subcopy }: ManufacturerWorldMapProps) {
-  const map = new DottedMap({ height: 100, grid: 'diagonal' });
+  const map = new DottedMap({ ...WORLD_MAP_OPTIONS });
   const { width, height } = map.image;
 
   const toPct = (x: number, y: number) => ({

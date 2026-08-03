@@ -1,3 +1,19 @@
+/**
+ * DottedMap の生成オプション（正本）。
+ *
+ * **背景アセットの生成（scripts/generate-world-map-asset.mjs）と、拠点座標の投影
+ * （components/ManufacturerWorldMap.tsx）は必ず同じ設定を使うこと。** 片方だけ変えると
+ * 背景と点がずれる。両者が別々に `new DottedMap({...})` を書いていたため、ここへ集約した。
+ *
+ * center は日本（東経139度）。既定のメルカトルは経度0度が中心で日本が右端へ寄るため、
+ * 「日本から見た世界」を主題にするこのサイトでは中央へ寄せる。
+ */
+export const WORLD_MAP_OPTIONS = {
+  height: 100,
+  grid: 'diagonal',
+  projection: { name: 'mercator', center: { lat: 0, lng: 139 } },
+} as const;
+
 export interface Point {
   x: number;
   y: number;
