@@ -78,7 +78,7 @@ Task 1 着手後、タスクごとに前提のずれが出たため、**残り�
 | 2 | **実施しない** | 下記「Task 2 を実施しない理由」 |
 | 3 | **完了**（`e59cdf8` + slide semantics） | `motion/react` 除去は Phase 5 Task 4 で完了済み。本体は pause/resume と現在位置の告知だった |
 | 4 | **完了（対象は差し替え）** | 想定していた3ファイルは実測で全てPASS。実際の欠陥は追従バーで、`components/HeaderChrome.tsx` を修正した |
-| 5 | **分割。5a 未着手** | axe の閾値引き上げは現状 **218箇所**の違反で即座に赤くなる。下記参照 |
+| 5 | **分割。5a 完了（2026-08-03）** | axe の閾値引き上げは現状 **218箇所**の違反で即座に赤くなる。下記参照 |
 | 6 | **未着手（内容は確定済み）** | Tasks 1〜5 の結果を反映する。書く項目は Task 6 Step 1 に列挙した |
 
 ### e2e の navigation timeout（2026-08-03、再調査中に再発）
@@ -183,7 +183,7 @@ carousel と NewsHeroCarousel は motion 除去済みだが、着手時点で **
 | `tests/components/page-tab-bar.test.tsx` | `role="group"` + `aria-current` の固定（tab semantics の再導入を落とす。Task 2 の代替） | 作成済（Task 4） |
 | `tests/e2e/keyboard-navigation.spec.ts` | tabs / carousel / pagination / 検索窓 | 作成済（Task 4） |
 | `tests/e2e/focus-restoration.spec.ts` | menu / dialog / popover | 作成済（Task 4） |
-| `tests/e2e/visual-regression.spec.ts` | 4 viewport screenshots | **未作成（Task 5a）** |
+| `tests/e2e/visual-regression.spec.ts` | 4 viewport screenshots | 作成済（Task 5a） |
 | ~~`tests/components/news-hero-carousel.test.tsx`~~ | **作らなかった。** carousel は embla の実挙動（5秒待って進まない等）を見ないと検証にならず、jsdom では測れない。**e2e の `carousel-autoplay.spec.ts` で代替した** | — |
 | ~~`tests/e2e/accessibility.spec.ts`~~ | **作らない。** 既存 `accessibility-smoke.spec.ts` を拡張する | — |
 
@@ -575,13 +575,13 @@ git commit -m "fix: keep the sticky filter bar alive while it holds keyboard foc
 > **新規ファイル `tests/e2e/accessibility.spec.ts` は作らない。** 既存の
 > `tests/e2e/accessibility-smoke.spec.ts` と重複するため、そちらへ `/compare` を足す。
 
-- [ ] **Step 1: 既存 axe gate に `/compare` を足す**
+- [x] **Step 1: 既存 axe gate に `/compare` を足す**
 
 `tests/e2e/accessibility-smoke.spec.ts` の route 配列へ `/compare` を追加するだけ。
 **閾値は `critical` のまま**で、`serious` へは上げない（理由は上のブロック）。
 `/compare` の critical は現状 0 件なので緑で入る。
 
-- [ ] **Step 2: visual testを追加する**
+- [x] **Step 2: visual testを追加する**
 
 ```ts
 // tests/e2e/visual-regression.spec.ts
@@ -620,7 +620,7 @@ for (const viewport of viewports) {
 - `/reports` の1ページあたり件数は `useArticlesPerPage()` で画面幅により変わる。
   viewport ごとに baseline を持つので問題ないが、**同じ baseline を使い回さないこと**
 
-- [ ] **Step 3: baseline snapshotsをreview付きで生成する**
+- [x] **Step 3: baseline snapshotsをreview付きで生成する**
 
 ```bash
 npm run build
@@ -629,14 +629,22 @@ npx playwright test tests/e2e/visual-regression.spec.ts --update-snapshots
 
 12枚を目視し、overflow、重なり、切れ、H1/search/tabs/mapの欠落がないことを確認してからcommitする。
 
-- [ ] **Step 4: 目視で見つかった responsive 差分だけ修正する**
+**結果（2026-08-03、人間レビュー済み）:** Home・Reportsは4幅ともoverflow/重なり/切れ/欠落なし。
+`/robots` のみ、768pxで`lib/catalogLayoutClasses.ts:3`のgrid-cols-2が1024pxまで据え置きのため、
+390px/1280pxの約2倍（14714px対7013px/7090px）縦長になる点を発見。overflow等の4分類には
+該当せず、独立した設計判断（列数breakpointの追加）が要るため**今回は直さないと人間が決定**。
+index の繰り越し表（#7）に起票済み。
+
+- [x] **Step 4: 目視で見つかった responsive 差分だけ修正する**
 
 修正対象は overflow / 重なり / 切れ / 要素の欠落。
 
 **`color-contrast` はここで直さない**（Task 5b。テーマトークンの見直しを伴う）。
 新規色を直書きせず既存semantic tokenを使う。意図したvisual差分だけsnapshotを更新する。
 
-- [ ] **Step 5: full UI gateを実行する**
+**結果:** 修正対象の欠陥は見つからなかった（上記Step 3参照）。baselineをそのままcommitした。
+
+- [x] **Step 5: full UI gateを実行する**
 
 ```bash
 npm run check
@@ -644,12 +652,17 @@ npm run check
 
 Expected: 全test PASS。
 
-- [ ] **Step 6: commit**
+**結果:** unit 59 passed / e2e 72 passed（既存59 + visual-regression 12 + `/compare` axe 1） / lint 0 errors（既存warning 4件のみ）。
+
+- [x] **Step 6: commit**
 
 ```bash
 git add tests/e2e playwright.config.ts
 git commit -m "test: add accessibility and responsive visual gates"
 ```
+
+**結果:** `playwright.config.ts` の変更は不要だった（既定設定のままで全12テスト安定）。
+実際のcommitは `4929fc1`（test変更）+ `a74d92d`（docs: 未push記述の是正と繰り越し#7の起票）。
 
 ---
 
