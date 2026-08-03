@@ -57,7 +57,11 @@ export function ManufacturerMapCopy({
         alt=""
         aria-hidden="true"
         draggable={false}
-        className="pointer-events-none h-full w-full object-fill opacity-90 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
+        // object-fill は枠の比率へ引き伸ばすため、画面幅ごとに大陸の形が変わる
+        // （実測: 390px で -17.9%、768px で -33.7%、1440px で +24.3%）。
+        // アセットは viewBox="0 0 198 100" の固定比率なので object-cover で比率を保ち、
+        // 余った分は stage 側の overflow-hidden で切る。
+        className="pointer-events-none h-full w-full object-cover opacity-90 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
       />
 
       {/* 導入事例の弧（アクティブ点のみ） */}
