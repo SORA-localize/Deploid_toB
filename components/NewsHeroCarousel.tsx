@@ -16,7 +16,9 @@ import {
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { useMemo, useState } from 'react';
+import { CarouselAutoplayButton } from '@/components/CarouselAutoplayButton';
 import { useMediaQuery } from '@/lib/useMediaQuery';
+import { uiText } from '@/lib/uiText';
 
 interface NewsHeroCarouselProps {
   reports: ArticleCatalogItem[];
@@ -63,6 +65,20 @@ function ProgressIndicators({
   );
 }
 
+/**
+ * 現在位置を支援技術へ伝える。視覚的にはドットとプログレスバーが担うが、
+ * どちらも `aria-hidden` 相当の装飾なので、読み上げ用の live region を別に持つ。
+ * `polite` にして操作の読み上げを遮らない。
+ */
+function CarouselPositionStatus({ total }: { total: number }) {
+  const { selectedIndex } = useCarousel();
+  return (
+    <p aria-live="polite" aria-atomic="true" className="sr-only">
+      {uiText.home.carousel.position(selectedIndex + 1, total)}
+    </p>
+  );
+}
+
 export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) {
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const autoplayPlugins = useMemo(
@@ -78,10 +94,11 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
         options={{ loop: true }}
         plugins={autoplayPlugins}
         className="w-full h-full"
-        aria-label="注目記事カルーセル"
+        aria-label={uiText.home.carousel.label}
       >
         {/* リッチなインジケーター */}
         <ProgressIndicators count={reports.length} reducedMotion={prefersReducedMotion} />
+        <CarouselPositionStatus total={reports.length} />
 
         {/* outer overflow-hidden div に height:100% を渡し、inner flex div に h-full を渡すことで高さチェーンを繋ぐ */}
         <SliderContainer className="cursor-grab active:cursor-grabbing h-full" style={{ height: '100%' }}>
@@ -139,6 +156,8 @@ export function NewsHeroCarousel({ reports, className }: NewsHeroCarouselProps) 
         {/* Navigation Controls: ホバー時のみ表示してスッキリさせる */}
         <div className="absolute bottom-6 right-6 flex items-center gap-4 z-10 opacity-100 transition-opacity duration-300 motion-reduce:transition-none md:opacity-0 md:group-hover/carousel:opacity-100 md:focus-within:opacity-100">
           <div className="flex items-center gap-2">
+            {/* autoplay を積んでいないとき（reduced motion）はボタン側が null を返す。 */}
+            <CarouselAutoplayButton />
             <SliderPrevButton className="h-10 w-10 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 backdrop-blur-md transition-colors border border-white/10">
               <ChevronLeft className="h-5 w-5" />
             </SliderPrevButton>
