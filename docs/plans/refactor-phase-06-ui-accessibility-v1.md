@@ -77,7 +77,7 @@ Task 1 着手後、タスクごとに前提のずれが出たため、**残り�
 | 1 | **完了**（`88bccd0`） | H1 は着手時点で9 route とも通っていた。実際の作業は `/reports` と `/compare` の構造統一 |
 | 2 | **実施しない** | 下記「Task 2 を実施しない理由」 |
 | 3 | **縮小して実施** | `motion/react` 除去は Phase 5 Task 4 で完了済み。残るのは pause/resume と現在位置の告知 |
-| 4 | **実施** | 対象3ファイルはすべて実在。前提のずれなし |
+| 4 | **完了（対象は差し替え）** | 想定していた3ファイルは実測で全てPASS。実際の欠陥は追従バーで、`components/HeaderChrome.tsx` を修正した |
 | 5 | **分割して実施** | axe の閾値引き上げは現状 **218箇所**の違反で即座に赤くなる。下記参照 |
 | 6 | **実施** | Tasks 1〜5 の結果を反映する。内容は着手時に確定する |
 
@@ -151,7 +151,7 @@ carousel と NewsHeroCarousel は motion 除去済みだが、**autoplay の pau
 | Path | Responsibility |
 |---|---|
 | `components/CarouselAutoplayButton.tsx` | pause/resume control |
-| `tests/components/page-tab-bar.test.tsx` | tab semantics/keyboard |
+| `tests/components/page-tab-bar.test.tsx` | `role="group"` + `aria-current` の固定（tab semantics の再導入を落とす。Task 2 の代替） |
 | `tests/components/news-hero-carousel.test.tsx` | pause/reduced motion |
 | `tests/e2e/headings.spec.ts` | H1 uniqueness |
 | `tests/e2e/keyboard-navigation.spec.ts` | tabs/carousel/pagination |
@@ -169,9 +169,10 @@ carousel と NewsHeroCarousel は motion 除去済みだが、**autoplay の pau
 | `components/CompareClient.tsx` | list header統一（F6-01。**採用決定・Task 1 で完了**） |
 | `components/NewsHeroCarousel.tsx` | autoplay state/control |
 | `components/uilayouts/carousel.tsx` | semantic slides/dots（motion削除は Phase 5 で完了済み） |
-| `components/Header.tsx` | focus testで見つかった欠陥だけ修正 |
-| `components/ComparisonRobotPanel.tsx` | dialog focus contract |
-| `components/ui/searchable-dropdown.tsx` | popover focus contract |
+| ~~`components/Header.tsx`~~ | **変更しない**（Task 4 実測でPASS） |
+| ~~`components/ComparisonRobotPanel.tsx`~~ | **変更しない**（Task 4 実測でPASS。Radix 既定で足りる） |
+| ~~`components/ui/searchable-dropdown.tsx`~~ | **変更しない**（Task 4 実測でPASS） |
+| `components/HeaderChrome.tsx` | フォーカス保持中の追従バーを消さない（Task 4 で実施） |
 | `src/app/globals.css` | focus-visible/reduced-motion調整 |
 | `docs/decisions/ui_architecture_and_development_policy_v1.md` | 実装後のheader/carousel規則 |
 | `docs/decisions/design_system_v1.md` | interaction規則 |
@@ -426,86 +427,86 @@ git commit -m "fix: add accessible carousel playback controls"
 **Files:**
 - Create: `tests/e2e/keyboard-navigation.spec.ts`
 - Create: `tests/e2e/focus-restoration.spec.ts`
-- Modify: `components/Header.tsx`
-- Modify: `components/ComparisonRobotPanel.tsx`
-- Modify: `components/ui/searchable-dropdown.tsx`
+- Create: `tests/components/page-tab-bar.test.tsx`（Task 2 の代替）
+- Modify: `components/HeaderChrome.tsx`（実測で見つかった唯一の欠陥）
+- ~~Modify: `components/Header.tsx` / `components/ComparisonRobotPanel.tsx` / `components/ui/searchable-dropdown.tsx`~~ — **実測で全てPASS。変更しない**
 
 **Interfaces:**
-- Consumes: mobile menu、compare dialog、searchable dropdown
-- Produces: open時focus移動、Escape close、triggerへfocus restoration
+- Consumes: mobile menu、compare dialog、searchable dropdown、追従ヘッダ内の絞り込みタブ
+- Produces: open時focus移動、Escape close、triggerへfocus restoration、フォーカス保持中の領域を消さない契約
 
-- [ ] **Step 1: focus E2Eを書く**
+- [x] **Step 1: focus E2Eを書く**
 
-```ts
-// tests/e2e/focus-restoration.spec.ts
-import { expect, test } from '@playwright/test';
+対象は3系統（モバイルメニュー＝自前実装、比較の詳細ドロワー＝Radix Dialog、検索つきドロップダウン＝Radix Popover）。
+各系統で「開いたら中へfocusが入る」「Escapeでtriggerへ戻る」「選択後もtriggerへ戻る」を書く。
 
-test('mobile menu restores focus to its trigger', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
-  const trigger = page.getByRole('button', { name: /メニュー/ });
-  await trigger.click();
-  await page.keyboard.press('Escape');
-  await expect(trigger).toBeFocused();
-});
+locatorの注意: Radix Select の trigger も `role="combobox"` を持つため、検索欄は
+名前（`メーカーの選択肢を検索`）で特定しないと strict mode violation になる。
 
-test('compare detail dialog restores focus', async ({ page }) => {
-  await page.goto('/compare?compare=unitree-g1');
-  const trigger = page.getByRole('button', { name: /詳細/ }).first();
-  await trigger.click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(trigger).toBeFocused();
-});
-```
+- [x] **Step 2: keyboard journeyを書く**
 
-searchable dropdownについてもtrigger click → option focus → Escape → trigger focusを追加する。
+**計画時のtest例（`role="tab"` + 矢印キー）は使えない。** Task 2 を実施しないと決めたため、
+絞り込みタブは `role="group"` + `aria-current` のままである。正しい操作系は
+**Tab で到達し Enter で選ぶ**で、矢印キーではない。テストはその契約を検証する。
+意味論そのものは `tests/components/page-tab-bar.test.tsx`（Task 2 の代替）が固定する。
 
-- [ ] **Step 2: keyboard journeyを書く**
+もうひとつの前提ずれ: **記事の絞り込みタブは追従ヘッダの中だけにあり、
+少しスクロールするまで DOM に存在しない**（`ContextualPageHeader` → `HeaderStickyBarSlot`）。
+テストは実利用と同じく先にスクロールして出す。
 
-```ts
-// tests/e2e/keyboard-navigation.spec.ts
-test('reports tabs and carousel work without pointer input', async ({ page }) => {
-  await page.goto('/reports');
-  const activeTab = page.getByRole('tab', { selected: true });
-  await activeTab.focus();
-  await page.keyboard.press('ArrowRight');
-  await expect(page.getByRole('tab').nth(1)).toBeFocused();
-  await page.keyboard.press('Enter');
-  await expect(page.getByRole('tab').nth(1)).toHaveAttribute('aria-selected', 'true');
-
-  const carousel = page.getByRole('region', { name: '注目記事カルーセル' });
-  await carousel.focus();
-  await page.keyboard.press('ArrowRight');
-  await expect(carousel.locator('[aria-live="polite"]')).toContainText('2 /');
-});
-```
-
-- [ ] **Step 3: 現行Radix/native focus behaviorを実測する**
+- [x] **Step 3: 現行Radix/native focus behaviorを実測する**
 
 ```bash
 npm run build
-npm run test:e2e -- tests/e2e/focus-restoration.spec.ts tests/e2e/keyboard-navigation.spec.ts
+npx playwright test tests/e2e/focus-restoration.spec.ts tests/e2e/keyboard-navigation.spec.ts
 ```
 
-PASSしたcomponentへ不要なcustom focus codeを足さない。FAILしたsurfaceだけ修正する。
+結果（2026-08-03）。**Step 4 で想定していた3ファイルはいずれも欠陥なし。**
 
-- [ ] **Step 4: focus欠陥を修正する**
+| surface | 実測 |
+|---|---|
+| モバイルメニュー（`Header.tsx`） | PASS。既存の `restoreFocusRef` + rAF で正しく戻る |
+| 比較の詳細ドロワー（Radix Dialog） | PASS。Radix 既定の focus 復帰で足りる |
+| 検索つきドロップダウン（Radix Popover） | PASS |
+| 追従ヘッダ内の絞り込みタブ | **FAIL** |
 
-- Header: 既存`restoreFocusRef`を維持し、navigation clickだけ`restoreFocus:false`
-- Dialog: Radix `onCloseAutoFocus`で`event.preventDefault()`後に保存triggerへfocus
-- Searchable dropdown: `onCloseAutoFocus`でtrigger refへfocus
-- portal contentには一意なTitle/Descriptionを設定
+- [x] **Step 4: focus欠陥を修正する**
 
-`setTimeout`でfocusを推測せず、Radix lifecycle eventまたは`requestAnimationFrame`を1回だけ使う。
+実測で見つかった欠陥はひとつだけで、想定していた場所ではなかった。
 
-- [ ] **Step 5: testsとcommit**
+**症状:** 記事一覧で絞り込みタブをキーボードで選ぶと、フォーカスが `body` へ落ちる。
+
+```
+選択前  scrollY 400   docHeight 1932   role=group 1個
+選択後  scrollY 0     docHeight 1479   role=group 0個   activeElement BODY
+```
+
+**機序:** 絞り込むとヒーローが消える → scroll anchoring がページ先頭へ戻す → `scrollY` が 0 になり
+追従バーが非表示条件に入る → 押したばかりのタブごと DOM から外れる。
+キーボード利用者は絞り込むたびに文書の先頭から Tab をやり直すことになる。
+
+**修正:** `components/HeaderChrome.tsx` の `HeaderStickyBarSlot` が、
+**キーボードフォーカスを保持している間はバーを消さない**ようにする。
+個別ページではなく追従バーの機構側で守る（全カタログページに効く）。
+
+判定は `:focus-visible` に限る。クリックでもボタンはフォーカスを受け取るため、
+単に「フォーカスがある」で判定するとマウス利用者にもバーが残り続ける。
+両方向をテストで固定する（キーボード＝残す / ポインタ＝従来どおり消える）。
+
+- [x] **Step 5: testsとcommit**
 
 ```bash
-npm run test:e2e -- tests/e2e/focus-restoration.spec.ts tests/e2e/keyboard-navigation.spec.ts
-git add components/Header.tsx components/ComparisonRobotPanel.tsx components/ui/searchable-dropdown.tsx tests/e2e
-git commit -m "fix: guarantee keyboard focus restoration"
+npm run check
+git add components/HeaderChrome.tsx tests/e2e/focus-restoration.spec.ts \
+        tests/e2e/keyboard-navigation.spec.ts tests/components/page-tab-bar.test.tsx
+git commit -m "fix: keep the sticky filter bar alive while it holds keyboard focus"
 ```
+
+**結果:** unit 59 passed / e2e 57 passed / lint 0 errors（既存warning 4件のみ）。
+
+**Task 6 へ持ち越す観察:** 絞り込みタブの置き場所がページ間で揃っていない。
+`/reports` は追従ヘッダの中だけ（先頭からは Tab で到達できない）、`/robots` は本文に直置き。
+到達性の差は規定の空白から来ているので、Task 6 で扱う。
 
 ---
 
