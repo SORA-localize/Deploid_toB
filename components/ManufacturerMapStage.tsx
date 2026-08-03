@@ -78,7 +78,14 @@ export function ManufacturerMapStage({ mapAssetSrc, points, heading, subcopy }: 
       data-world-map-stage
       className="relative h-[240px] sm:h-[320px] md:h-[clamp(320px,65vh,880px)] w-full select-none overflow-hidden bg-neutral-950"
     >
-      <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+      {/*
+        isolate で stacking context を閉じる。これが無いと canvas 内の拠点ドット
+        （z-[5]/z-[6]）が stage の文脈へ参加し、z-index を持たない可読性スクリムより
+        前面に描かれる。結果、地図だけが減光されドットだけ素の明るさで残り、
+        見出しと同じ階層・彩度に見える（1440px ではクラスタバッジが見出しに重なる）。
+        スクリムは DOM 上この要素より後にあるため、閉じれば自然に上へ来る。
+      */}
+      <div className="isolate absolute inset-0 flex items-center justify-center overflow-hidden">
         <ManufacturerMapCopy
           mapAssetSrc={mapAssetSrc}
           points={points}
