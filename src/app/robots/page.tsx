@@ -3,14 +3,26 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { CardGridSkeleton } from '@/components/CardGridSkeleton';
 import { ListPageSkeletonShell } from '@/components/ListPageSkeletonShell';
 import { RobotsBrowser } from '@/components/RobotsBrowser';
-import { getManufacturers, getRobotCardViewModels, getRobots } from '@/lib/data';
+import { getManufacturers, getRobots, getUseCases } from '@/lib/data';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
+import { toInitialSearch } from '@/lib/catalog/urlSearch';
+import { sortRobots } from '@/lib/display';
 import { createPageMetadata } from '@/lib/metadata';
 import {
   getRobotFilterOptions,
   normalizeRobotFilters,
 } from '@/lib/robotFilters';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
+import { createRobotCatalogItems } from '@/lib/viewModels/robots';
+
+/** 一覧の並び順（'featured'）はここで一度だけ確定させ、以降（filterRobots等）は
+ *  相対順序を保つだけにする。VM化でクライアント側はRobot/Manufacturerを持たないため
+ *  sortRobots('featured')をここで済ませてからcreateRobotCatalogItemsへ渡す。 */
+function createFeaturedRobotCatalogItems() {
+  const manufacturers = getManufacturers();
+  const robots = sortRobots(getRobots(), 'featured', manufacturers);
+  return createRobotCatalogItems(robots, manufacturers, getUseCases());
+}
 
 export const metadata = createPageMetadata({
   title: 'ロボット',
@@ -42,35 +54,36 @@ async function CachedRobotsList({
   cacheLife('hours');
   cacheTag('robots-list');
 
-  const robots = getRobots();
-  const manufacturers = getManufacturers();
+  const items = createFeaturedRobotCatalogItems();
 
   return (
     <RobotsBrowser
-      robots={robots}
-      manufacturers={manufacturers}
-      cardViewModels={getRobotCardViewModels(robots)}
-      initialFilters={{ industry, manufacturer, availability, query }}
+      items={items}
+      initialSearch={toInitialSearch({
+        industry,
+        manufacturer: manufacturer === 'all' ? null : manufacturer,
+        availability: availability === 'all' ? null : availability,
+        q: query,
+      })}
     />
   );
 }
 
 async function RobotsContent({ searchParams }: { searchParams: RouteSearchParams }) {
-  const robots = getRobots();
-  const manufacturers = getManufacturers();
+  const items = createFeaturedRobotCatalogItems();
   const params = await pickSearchParams(searchParams, [
     'industry',
     'manufacturer',
     'availability',
     'q',
   ] as const);
-  const filterOptions = getRobotFilterOptions(robots);
+  const filterOptions = getRobotFilterOptions(items);
   const filters = normalizeRobotFilters({
     industry: params.industry,
     manufacturer: params.manufacturer,
     availability: params.availability,
     query: params.q,
-    manufacturers,
+    items,
     industryValues: filterOptions.industries.map((option) => option.value),
     availabilityValues: filterOptions.availabilityValues,
   });

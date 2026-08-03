@@ -24,6 +24,9 @@ import {
   defaultSiteTitle,
 } from '@/lib/metadata';
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
+import { createArticleCatalogItems } from '@/lib/viewModels/articles';
+import { createUseCaseCatalogItems } from '@/lib/viewModels/useCases';
+import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
 import { uiText } from '@/lib/uiText';
 
 export const metadata = createPageMetadata({
@@ -60,7 +63,7 @@ export default function HomePage() {
   const featuredRobots = sortRobots(getRobots(), 'home-featured').slice(0, 5);
 
   // 用途から探す：用途一覧と同じカードを、Homeではプレビューとして全件表示する。
-  const homeUseCases = sortUseCases(getUseCases());
+  const homeUseCases = createUseCaseCatalogItems(sortUseCases(getUseCases()), getRobots());
 
   // HomeContentNavigator 用プレビュー画像の型（component側の PreviewAsset と同形）。
   type PreviewAsset = { src: string; alt: string; label: string; objectPosition?: string };
@@ -96,7 +99,11 @@ export default function HomePage() {
     { src: '/images/home/use-cases/warehouse-workers-aisle.jpg', alt: 'Workers walking through a warehouse aisle', label: 'Warehouse', objectPosition: 'center' },
   ];
 
-  const { heroReports, featureReports } = getArticleIndexPlacementReports(getArticles());
+  const { heroReports, featureReports } = getArticleIndexPlacementReports({
+    articles: createArticleCatalogItems(getArticles()),
+    placements: localContentSnapshot.articlePlacements,
+    limits: localContentSnapshot.articleIndexPlacementLimits,
+  });
 
   const manufacturerById = Object.fromEntries(
     manufacturers.map((m) => [m.id, m])

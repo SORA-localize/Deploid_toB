@@ -1,7 +1,8 @@
 'use client';
 
-import type { MouseEvent as ReactMouseEvent } from 'react';
 import Link from 'next/link';
+import { getCountryDisplay } from '@/lib/countryRegistry';
+import { createArcPath } from '@/lib/worldMap';
 import { uiText } from '@/lib/uiText';
 
 export interface ManufacturerArc {
@@ -30,60 +31,36 @@ export interface MapPoint {
   arcs: ManufacturerArc[];
 }
 
-// country(英語表記) → 地域名(日本語)・ISO Alpha-3
-const REGION: Record<string, { name: string; a3: string }> = {
-  USA: { name: '米国', a3: 'USA' },
-  China: { name: '中国', a3: 'CHN' },
-  Japan: { name: '日本', a3: 'JPN' },
-  Germany: { name: 'ドイツ', a3: 'DEU' },
-  Norway: { name: 'ノルウェー', a3: 'NOR' },
-  Canada: { name: 'カナダ', a3: 'CAN' },
-  Spain: { name: 'スペイン', a3: 'ESP' },
-  France: { name: 'フランス', a3: 'FRA' },
-  Israel: { name: 'イスラエル', a3: 'ISR' },
-  Hungary: { name: 'ハンガリー', a3: 'HUN' },
-};
-export const region = (country: string) =>
-  REGION[country] ?? { name: country, a3: country.slice(0, 3).toUpperCase() };
-
-function arcPath(x1: number, y1: number, x2: number, y2: number) {
-  const dist = Math.hypot(x2 - x1, y2 - y1);
-  const lift = Math.min(dist * 0.35, 26);
-  const cx = (x1 + x2) / 2;
-  const cy = Math.min(y1, y2) - lift;
-  return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
-}
-
 interface ManufacturerMapCopyProps {
-  svgMap: string;
+  mapAssetSrc: string;
   points: MapPoint[];
   activeId: string | null;
-  ariaHidden?: boolean;
   reduceMotion: boolean;
   onActivate: (id: string) => void;
   onClear: () => void;
-  onLinkClick: (e: ReactMouseEvent) => void;
 }
 
 export function ManufacturerMapCopy({
-  svgMap,
+  mapAssetSrc,
   points,
   activeId,
-  ariaHidden,
   reduceMotion,
   onActivate,
   onClear,
-  onLinkClick,
 }: ManufacturerMapCopyProps) {
   const active = points.find((p) => p.id === activeId) ?? null;
 
   return (
-    <div className="relative h-full aspect-[2/1] shrink-0" aria-hidden={ariaHidden || undefined}>
+    <div data-world-map-canvas className="relative h-full w-full shrink-0">
       <img
-        src={svgMap}
+        src={mapAssetSrc}
         alt=""
         aria-hidden="true"
         draggable={false}
+        // object-fill は枠の比率へ引き伸ばすため、画面幅ごとに大陸の形が変わる
+        // （実測: 390px で -17.9%、768px で -33.7%、1440px で +24.3%）。
+        // アセットは viewBox="0 0 198 100" の固定比率なので object-cover で比率を保ち、
+        // 余った分は stage 側の overflow-hidden で切る。
         className="pointer-events-none h-full w-full object-cover opacity-90 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
       />
 
@@ -96,7 +73,10 @@ export function ManufacturerMapCopy({
           aria-hidden="true"
         >
           {active.arcs.map((arc, i) => {
-            const d = arcPath(active.leftPct, active.topPct, arc.leftPct, arc.topPct);
+            const d = createArcPath(
+              { x: active.leftPct, y: active.topPct },
+              { x: arc.leftPct, y: arc.topPct },
+            );
             return (
               <g key={i}>
                 <path
@@ -138,11 +118,11 @@ export function ManufacturerMapCopy({
           />
         ))}
 
-      {/* 描画点（単独＝ドット / クラスタ＝件数バッジ）。href維持(SEO)・tabIndex=-1 */}
+      {/* 描画点（単独＝ドット / クラスタ＝件数バッジ）。href維持(SEO)・キーボードでフォーカス可能 */}
       {points.map((p) => {
         const isActive = p.id === activeId;
         const isCluster = p.members.length > 1;
-        const r = region(p.members[0].country);
+        const r = getCountryDisplay(p.members[0].country);
         const href = isCluster ? '/manufacturers' : `/manufacturers/${p.members[0].slug}`;
         const label = isCluster
           ? uiText.home.worldMap.clusterAriaLabel(r.name, p.members.length)
@@ -151,7 +131,7 @@ export function ManufacturerMapCopy({
           <Link
             key={p.id}
             href={href}
-            tabIndex={ariaHidden ? -1 : 0}
+            data-world-map-point
             aria-label={label}
             draggable={false}
             className="group absolute z-[6] -translate-x-1/2 -translate-y-1/2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
@@ -160,7 +140,6 @@ export function ManufacturerMapCopy({
             onPointerLeave={onClear}
             onFocus={() => onActivate(p.id)}
             onBlur={onClear}
-            onClick={onLinkClick}
           >
             <span className="relative flex h-8 w-8 items-center justify-center">
               <span

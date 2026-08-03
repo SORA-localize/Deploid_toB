@@ -1,6 +1,7 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import { AlertCircle, Building2, CheckCircle2, MapPin } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
+import { segmentJapaneseLines } from '@/lib/typography';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { CandidateRobotList } from '@/components/CandidateRobotList';
 import { ConsultationCta } from '@/components/ConsultationCta';
@@ -103,7 +104,7 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
 
         <div className="mt-6 mb-6">
           <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-3 leading-tight">
-            <BudouXText text={useCase.titleJa ?? useCase.title} />
+            <BudouXText segments={segmentJapaneseLines(useCase.titleJa ?? useCase.title)} />
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
             {useCase.subtitle ?? useCase.summary}

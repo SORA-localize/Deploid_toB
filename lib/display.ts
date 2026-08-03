@@ -4,7 +4,6 @@ import type {
   DeploymentStage,
   JapanAvailability,
   JapanPresence,
-  Article,
   Manufacturer,
   ArticleSection,
   ArticleCategory,
@@ -13,7 +12,7 @@ import type {
   ManufacturerGuideProcurementChannelKind,
   Robot,
   RobotCategory,
-  UseCase,
+  UseCaseMaturity,
 } from '@/data/types';
 
 export const robotCategoryOrder: RobotCategory[] = [
@@ -233,8 +232,10 @@ export function sortRobots(
 // ─── 記事並び替え ────────────────────────────────────────────────
 
 /** 記事を公開日の新しい順に並べるコンパレータ（正本）。各所での直書きを禁止し本関数を使う。 */
-export const byArticlePublishedDesc = (a: Article, b: Article) =>
-  b.publishedAt.localeCompare(a.publishedAt);
+export const byArticlePublishedDesc = (
+  a: { publishedAt: string },
+  b: { publishedAt: string },
+) => b.publishedAt.localeCompare(a.publishedAt);
 
 // ─── メーカー並び替え ────────────────────────────────────────────
 
@@ -265,7 +266,13 @@ export function sortManufacturers(
   });
 }
 
-export function sortUseCases(useCases: UseCase[]): UseCase[] {
+export const useCaseMaturityOrder: readonly UseCaseMaturity[] = [
+  'production-ready',
+  'pilot-phase',
+  'early-stage',
+];
+
+export function sortUseCases<T extends { title: string; titleJa?: string }>(useCases: readonly T[]): T[] {
   return [...useCases].sort((a, b) => {
     const nameA = a.titleJa ?? a.title;
     const nameB = b.titleJa ?? b.title;

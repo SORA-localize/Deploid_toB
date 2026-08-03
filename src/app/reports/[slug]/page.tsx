@@ -5,6 +5,7 @@ import { ArrowRight, Calendar, User } from 'lucide-react';
 import { ArticleRelatedSidebar } from '@/components/ArticleRelatedSidebar';
 import { ArticleToc } from '@/components/ArticleToc';
 import { BudouXText } from '@/components/BudouXText';
+import { segmentJapaneseLines } from '@/lib/typography';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
@@ -213,7 +214,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                   {getArticleCardLabel(report)}
                 </div>
                 <h1 className="mb-3 text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white">
-                  <BudouXText text={reportHeadingTitle} />
+                  <BudouXText segments={segmentJapaneseLines(reportHeadingTitle)} />
                 </h1>
                 <p className="mb-4 text-sm sm:text-base leading-relaxed text-white/80">
                   {report.summary}
@@ -245,7 +246,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
               {getArticleCardLabel(report)}
             </div>
             <h1 className="mb-4 max-w-4xl text-2xl md:text-3xl font-semibold leading-tight text-foreground">
-              <BudouXText text={reportHeadingTitle} />
+              <BudouXText segments={segmentJapaneseLines(reportHeadingTitle)} />
             </h1>
             <p className="mb-5 max-w-3xl text-sm leading-relaxed text-foreground/80">
               {report.summary}

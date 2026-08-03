@@ -1,17 +1,21 @@
-import type { Manufacturer, Robot } from '@/data/types';
-import { isPreReleaseDeploymentStage, japanAvailabilityOrder, sortByDisplayOrder, sortRobots } from '@/lib/display';
-import { createRobotSearchDocument, matchesSearchDocument } from '@/lib/search';
-import { getRobotIndustryTagOptions, matchesTag, normalizeTagKey } from '@/lib/tags';
+import type { DeploymentStage } from '@/data/types';
+import { isPreReleaseDeploymentStage, japanAvailabilityOrder, sortByDisplayOrder } from '@/lib/display';
+import { matchesTag, normalizeTagKey, toTagOptions } from '@/lib/tags';
 import { isOneOf } from '@/lib/typeGuards';
+import type { RobotCatalogItem } from '@/lib/viewModels/robots';
+import { matchesCatalogSearch } from '@/lib/catalog/matchSearch';
 
-export function getRobotFilterOptions(robots: readonly Robot[]) {
+export function getRobotFilterOptions(items: readonly RobotCatalogItem[]) {
   const availabilityValues = sortByDisplayOrder(
-    Array.from(new Set(robots.map((robot) => robot.japanAvailability))),
+    Array.from(new Set(items.map((item) => item.filter.japanAvailability))),
     japanAvailabilityOrder,
   );
 
   return {
-    industries: getRobotIndustryTagOptions(robots),
+    industries: toTagOptions(
+      items.flatMap((item) => item.filter.industryTags),
+      'industry',
+    ),
     availabilityValues,
   };
 }
@@ -21,7 +25,7 @@ export function normalizeRobotFilters({
   manufacturer,
   availability,
   query,
-  manufacturers,
+  items,
   industryValues,
   availabilityValues,
 }: {
@@ -29,11 +33,11 @@ export function normalizeRobotFilters({
   manufacturer: string | null | undefined;
   availability: string | null | undefined;
   query: string | null | undefined;
-  manufacturers: readonly Manufacturer[];
+  items: readonly RobotCatalogItem[];
   industryValues: readonly string[];
-  availabilityValues: readonly Robot['japanAvailability'][];
+  availabilityValues: readonly string[];
 }) {
-  const manufacturerIds = new Set(manufacturers.map((item) => item.id));
+  const manufacturerIds = new Set(items.map((item) => item.filter.manufacturerId));
   const normalizedIndustry = industry ? normalizeTagKey(industry) : null;
 
   return {
@@ -49,50 +53,47 @@ export function normalizeRobotFilters({
 type RobotFilters = ReturnType<typeof normalizeRobotFilters>;
 type RobotFilterAxis = 'industry' | 'manufacturer' | 'availability';
 
-function buildSearchDocuments(robots: readonly Robot[], manufacturers: readonly Manufacturer[]) {
-  const manufacturerById = new Map(manufacturers.map((manufacturer) => [manufacturer.id, manufacturer]));
-  return new Map(
-    robots.map((robot) => [
-      robot.slug,
-      createRobotSearchDocument(robot, manufacturerById.get(robot.manufacturerId)),
-    ]),
-  );
-}
-
 /** 1体のロボットが現在のフィルタに合致するか。excludeAxis はファセット件数計算用（その軸だけ判定から外す）。 */
 function matchesRobotFilters(
-  robot: Robot,
+  item: RobotCatalogItem,
   filters: RobotFilters,
-  searchDocument: ReturnType<typeof createRobotSearchDocument> | undefined,
   excludeAxis?: RobotFilterAxis,
 ) {
-  if (excludeAxis !== 'industry' && !matchesTag(robot.industryTags ?? [], filters.industry)) return false;
-  if (excludeAxis !== 'manufacturer' && filters.manufacturer !== 'all' && robot.manufacturerId !== filters.manufacturer) return false;
-  if (excludeAxis !== 'availability' && filters.availability !== 'all' && robot.japanAvailability !== filters.availability) return false;
-  return matchesSearchDocument(filters.query, searchDocument);
+  if (excludeAxis !== 'industry' && !matchesTag(item.filter.industryTags, filters.industry)) return false;
+  if (
+    excludeAxis !== 'manufacturer' &&
+    filters.manufacturer !== 'all' &&
+    item.filter.manufacturerId !== filters.manufacturer
+  ) {
+    return false;
+  }
+  if (
+    excludeAxis !== 'availability' &&
+    filters.availability !== 'all' &&
+    item.filter.japanAvailability !== filters.availability
+  ) {
+    return false;
+  }
+  return matchesCatalogSearch(item.filter.searchText, filters.query);
 }
 
 export function filterRobots({
-  robots,
-  manufacturers,
+  items,
   filters,
 }: {
-  robots: readonly Robot[];
-  manufacturers: readonly Manufacturer[];
+  items: readonly RobotCatalogItem[];
   filters: RobotFilters;
 }) {
-  const searchDocuments = buildSearchDocuments(robots, manufacturers);
-  const filtered = robots.filter((robot) =>
-    matchesRobotFilters(robot, filters, searchDocuments.get(robot.slug)),
-  );
+  const filtered = items.filter((item) => matchesRobotFilters(item, filters));
 
   // 販売中/開発中は相互排他のビュー（タブ）ではなく、常時表示する2セクション。
-  const releaseCandidates = sortRobots([...filtered], 'featured', manufacturers);
-  const activeRobots = releaseCandidates.filter(
-    (robot) => !isPreReleaseDeploymentStage(robot.deploymentStage),
+  // items はサーバー側（createRobotCatalogItemsへ渡すrobotsの並び）で既に 'featured' 順に
+  // ソート済みという前提。フィルタは相対順序を保つので、ここでは再ソートしない。
+  const activeRobots = filtered.filter(
+    (item) => !isPreReleaseDeploymentStage(item.filter.deploymentStage as DeploymentStage),
   );
-  const preReleaseRobots = releaseCandidates.filter((robot) =>
-    isPreReleaseDeploymentStage(robot.deploymentStage),
+  const preReleaseRobots = filtered.filter((item) =>
+    isPreReleaseDeploymentStage(item.filter.deploymentStage as DeploymentStage),
   );
 
   return { activeRobots, preReleaseRobots };
@@ -104,23 +105,23 @@ export function filterRobots({
  * industry タグは意図的に非MECE（tagRegistry 参照）のため、1体が複数の選択肢に数えられる。
  */
 export function getRobotFacetCounts({
-  robots,
-  manufacturers,
+  items,
   filters,
 }: {
-  robots: readonly Robot[];
-  manufacturers: readonly Manufacturer[];
+  items: readonly RobotCatalogItem[];
   filters: RobotFilters;
 }) {
-  const searchDocuments = buildSearchDocuments(robots, manufacturers);
   const candidatesFor = (axis: RobotFilterAxis) =>
-    robots.filter((robot) => matchesRobotFilters(robot, filters, searchDocuments.get(robot.slug), axis));
+    items.filter((item) => matchesRobotFilters(item, filters, axis));
 
-  const countBy = (items: readonly Robot[], getKeys: (robot: Robot) => readonly string[]) => {
+  const countBy = (
+    candidates: readonly RobotCatalogItem[],
+    getKeys: (item: RobotCatalogItem) => readonly string[],
+  ) => {
     const counts = new Map<string, number>();
-    for (const robot of items) {
+    for (const item of candidates) {
       // 1体を同じ選択肢に二重加算しない（正規化で同一キーに潰れるタグ対策）
-      for (const key of new Set(getKeys(robot))) {
+      for (const key of new Set(getKeys(item))) {
         counts.set(key, (counts.get(key) ?? 0) + 1);
       }
     }
@@ -134,15 +135,15 @@ export function getRobotFacetCounts({
   // 選択肢の value は normalizeTagKey 済み（lib/tags.ts の toTagOptions）なので、集計キーも正規化して揃える
   return {
     industry: {
-      counts: countBy(industryCandidates, (robot) => (robot.industryTags ?? []).map(normalizeTagKey)),
+      counts: countBy(industryCandidates, (item) => item.filter.industryTags.map(normalizeTagKey)),
       allCount: industryCandidates.length,
     },
     manufacturer: {
-      counts: countBy(manufacturerCandidates, (robot) => [robot.manufacturerId]),
+      counts: countBy(manufacturerCandidates, (item) => [item.filter.manufacturerId]),
       allCount: manufacturerCandidates.length,
     },
     availability: {
-      counts: countBy(availabilityCandidates, (robot) => [robot.japanAvailability]),
+      counts: countBy(availabilityCandidates, (item) => [item.filter.japanAvailability]),
       allCount: availabilityCandidates.length,
     },
   };

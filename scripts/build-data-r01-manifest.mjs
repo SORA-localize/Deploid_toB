@@ -2,10 +2,10 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { manufacturers } from '../data/manufacturers.ts';
-import { robots } from '../data/robots.ts';
-import { useCases } from '../data/useCases.ts';
+import { localContentSnapshot } from '../lib/data/localContentSnapshot.ts';
 import { specSchema } from '../lib/specSchema.ts';
+
+const { manufacturers, robots, useCases } = localContentSnapshot;
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dataDir = path.join(rootDir, 'docs', 'data');

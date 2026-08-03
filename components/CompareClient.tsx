@@ -33,24 +33,28 @@ import { SortableCompareCard } from '@/components/SortableCompareCard';
 import type { Manufacturer, Robot } from '@/data/types';
 import { getComparisonSpecGroups } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
-import { MAX_COMPARE_ROBOTS } from '@/lib/compareParams';
-import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
+import { MAX_COMPARE_ROBOTS, normalizeCompareRobotIds } from '@/lib/compareParams';
+import { useCatalogUrlState } from '@/lib/catalog/urlState';
 import { useFavorites } from '@/lib/useFavorites';
 import { cn } from '@/lib/utils';
 import { sortManufacturers, sortRobots } from '@/lib/display';
-import { normalizeSearchText } from '@/lib/search';
+import { normalizeSearchText } from '@/lib/normalizeSearchText';
 
 type CompareView = 'visual' | 'specs';
 
 interface CompareClientProps {
   robots: Robot[];
   manufacturers: Manufacturer[];
-  selectedIds: string[];
-  initialView: CompareView;
+  initialSearch: string;
 }
 
-export function CompareClient({ robots, manufacturers, selectedIds, initialView }: CompareClientProps) {
-  const { updateParams } = useUrlParamUpdater();
+export function CompareClient({ robots, manufacturers, initialSearch }: CompareClientProps) {
+  const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
+  const urlSelectedIds = useMemo(
+    () => normalizeCompareRobotIds(searchParams.get('compare'), robots),
+    [searchParams, robots],
+  );
+  const initialView: CompareView = searchParams.get('view') === 'specs' ? 'specs' : 'visual';
   const { favorites, toggleFavorite, isMounted } = useFavorites();
   const [mobileManufacturerId, setMobileManufacturerId] = useState('');
   // D&D はシート内の並べ替え専用（カラム間の移動はクリック操作。§8.7）
@@ -92,8 +96,6 @@ export function CompareClient({ robots, manufacturers, selectedIds, initialView 
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-
-  const urlSelectedIds = selectedIds;
 
   // 並べ替え順の真実源はこの local state。URL は commitOrder で副作用同期する。
   // こうしないと onDragEnd 時に URL 遷移(非同期)を待つ間、dnd-kit が一旦

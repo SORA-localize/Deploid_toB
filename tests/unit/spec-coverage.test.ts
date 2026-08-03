@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { robots } from '@/data/robots';
+import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
 import { specSchema, type SpecKey } from '@/lib/specSchema';
+
+const { robots } = localContentSnapshot;
 
 /**
  * スペック値の「静かな消失」検出。

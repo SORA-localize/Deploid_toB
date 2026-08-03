@@ -3,52 +3,55 @@
 import { useCallback, useMemo } from 'react';
 import { ActiveFilterChips } from '@/components/ActiveFilterChips';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
-import { CardGridSkeleton } from '@/components/CardGridSkeleton';
 import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { PageTabBar, type PageTab } from '@/components/PageTabBar';
 import { SelectControl } from '@/components/SelectControl';
 import { RobotCard } from '@/components/RobotCard';
 import { SearchInput } from '@/components/SearchInput';
-import type { Manufacturer, Robot } from '@/data/types';
-import type { RobotCardViewModel } from '@/lib/robotCatalog';
+import type { RobotCatalogItem } from '@/lib/viewModels/robots';
 import { japanAvailabilityLabels } from '@/lib/labels';
-import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import {
   filterRobots,
   getRobotFacetCounts,
   getRobotFilterOptions,
   normalizeRobotFilters,
 } from '@/lib/robotFilters';
-import { normalizeSearchText } from '@/lib/search';
+import { normalizeSearchText } from '@/lib/normalizeSearchText';
 import { browserFilterGridClassNames, browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { uiText } from '@/lib/uiText';
-import { useUrlParamUpdater } from '@/lib/useUrlParamUpdater';
+import { useCatalogUrlState } from '@/lib/catalog/urlState';
 import { useFavorites } from '@/lib/useFavorites';
 
 interface RobotsBrowserProps {
-  robots: Robot[];
-  manufacturers: Manufacturer[];
-  cardViewModels: Record<string, RobotCardViewModel>;
-  initialFilters: ReturnType<typeof normalizeRobotFilters>;
+  items: RobotCatalogItem[];
+  initialSearch: string;
 }
 
-export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialFilters }: RobotsBrowserProps) {
-  const { updateParams, isPending } = useUrlParamUpdater();
+export function RobotsBrowser({ items, initialSearch }: RobotsBrowserProps) {
+  const { searchParams, updateParams } = useCatalogUrlState(initialSearch);
   const { favorites, toggleFavorite } = useFavorites();
 
-  const manufacturerById = useMemo(
-    () => new Map(manufacturers.map((manufacturer) => [manufacturer.id, manufacturer])),
-    [manufacturers],
+  const filterOptions = useMemo(() => getRobotFilterOptions(items), [items]);
+  const filters = useMemo(
+    () =>
+      normalizeRobotFilters({
+        manufacturer: searchParams.get('manufacturer'),
+        availability: searchParams.get('availability'),
+        industry: searchParams.get('industry'),
+        query: searchParams.get('q'),
+        items,
+        industryValues: filterOptions.industries.map((option) => option.value),
+        availabilityValues: filterOptions.availabilityValues,
+      }),
+    [searchParams, items, filterOptions],
   );
-  const filterOptions = useMemo(() => getRobotFilterOptions(robots), [robots]);
-  const filters = initialFilters;
 
   // ファセット件数: 選ぶ前に該当数を見せて0件デッドエンドを防ぐ。
   // 0件選択肢は選択不可にするが、選択中の値は解除操作を塞がないよう無効化しない。
   const facetCounts = useMemo(
-    () => getRobotFacetCounts({ robots, manufacturers, filters }),
-    [robots, manufacturers, filters],
+    () => getRobotFacetCounts({ items, filters }),
+    [items, filters],
   );
   const facetOption = useCallback(
     (
@@ -84,28 +87,34 @@ export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialFi
     ],
     [filterOptions.industries, facetCounts.industry, filters.industry],
   );
-  const manufacturerOptions = useMemo(
-    () => [
+  const manufacturerOptions = useMemo(() => {
+    const nameById = new Map<string, string>();
+    items.forEach((item) => nameById.set(item.manufacturer.id, item.manufacturer.name));
+    return [
       { value: 'all', label: uiText.common.allManufacturers },
-      ...[...manufacturers]
-        .sort((a, b) => a.name.localeCompare(b.name, 'en'))
-        .map((m) => facetOption('manufacturer', m.id, m.name, filters.manufacturer)),
-    ],
-    [manufacturers, facetOption, filters.manufacturer],
-  );
+      ...Array.from(nameById.entries())
+        .sort(([, aName], [, bName]) => aName.localeCompare(bName, 'en'))
+        .map(([id, name]) => facetOption('manufacturer', id, name, filters.manufacturer)),
+    ];
+  }, [items, facetOption, filters.manufacturer]);
   const availabilityOptions = useMemo(
     () => [
       { value: 'all', label: uiText.common.allStatus },
       ...filterOptions.availabilityValues.map((value) =>
-        facetOption('availability', value, japanAvailabilityLabels[value], filters.availability),
+        facetOption(
+          'availability',
+          value,
+          japanAvailabilityLabels[value as keyof typeof japanAvailabilityLabels],
+          filters.availability,
+        ),
       ),
     ],
     [filterOptions.availabilityValues, facetOption, filters.availability],
   );
 
   const { activeRobots, preReleaseRobots } = useMemo(
-    () => filterRobots({ robots, manufacturers, filters }),
-    [robots, manufacturers, filters],
+    () => filterRobots({ items, filters }),
+    [items, filters],
   );
   const hasActiveFilters =
     normalizeSearchText(filters.query) !== '' ||
@@ -113,14 +122,15 @@ export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialFi
     filters.manufacturer !== 'all' ||
     filters.availability !== 'all';
   const resultCount = activeRobots.length + preReleaseRobots.length;
-  const leadingImageRobotId = [...activeRobots, ...preReleaseRobots]
-    .find((robot) => getRobotPrimaryImage(robot))?.id;
+  const leadingImageItemId = [...activeRobots, ...preReleaseRobots].find((item) => item.image)?.id;
 
   // 業種はタブでアクティブ表示されるため、チップからは外す（二重表示防止）。
   const activeChips = useMemo(() => {
     const chips: import('@/components/ActiveFilterChips').ActiveFilterChip[] = [];
     if (filters.manufacturer !== 'all') {
-      const label = manufacturers.find((m) => m.id === filters.manufacturer)?.name ?? filters.manufacturer;
+      const label =
+        items.find((item) => item.manufacturer.id === filters.manufacturer)?.manufacturer.name ??
+        filters.manufacturer;
       chips.push({ key: 'manufacturer', label, onRemove: () => updateParams({ manufacturer: null }) });
     }
     if (filters.availability !== 'all') {
@@ -128,39 +138,32 @@ export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialFi
       chips.push({ key: 'availability', label, onRemove: () => updateParams({ availability: null }) });
     }
     return chips;
-  }, [filters, manufacturers, updateParams]);
+  }, [filters, items, updateParams]);
 
-  const renderRobotGrid = (items: readonly Robot[]) => (
+  const renderRobotGrid = (robotItems: readonly RobotCatalogItem[]) => (
     <div className={browserGridClassNames.robots}>
-      {items.map((robot) => {
-        const manufacturer = manufacturerById.get(robot.manufacturerId);
-        return (
-          <RobotCard
-            key={robot.id}
-            robot={robot}
-            viewModel={cardViewModels[robot.id]}
-            manufacturerName={manufacturer?.name ?? robot.manufacturerId}
-            manufacturerLogo={manufacturer?.logo}
-            manufacturerLogos={manufacturer?.logos}
-            showFavorite={true}
-            isFavorite={favorites.includes(robot.id)}
-            onFavoriteToggle={toggleFavorite}
-            mobileVisual
-            eagerImage={robot.id === leadingImageRobotId}
-          />
-        );
-      })}
+      {robotItems.map((item) => (
+        <RobotCard
+          key={item.id}
+          item={item}
+          showFavorite={true}
+          isFavorite={favorites.includes(item.id)}
+          onFavoriteToggle={toggleFavorite}
+          mobileVisual
+          eagerImage={item.id === leadingImageItemId}
+        />
+      ))}
     </div>
   );
 
-  const renderRobotSection = (title: string, items: readonly Robot[]) => {
-    if (items.length === 0) return null;
+  const renderRobotSection = (title: string, robotItems: readonly RobotCatalogItem[]) => {
+    if (robotItems.length === 0) return null;
     return (
       <section className="space-y-3">
         <h2 className="px-1 text-sm font-semibold text-foreground">
           {title}
         </h2>
-        {renderRobotGrid(items)}
+        {renderRobotGrid(robotItems)}
       </section>
     );
   };
@@ -224,9 +227,7 @@ export function RobotsBrowser({ robots, manufacturers, cardViewModels, initialFi
           </p>
         </div>
 
-        {isPending ? (
-          <CardGridSkeleton gridClassName={browserGridClassNames.robots} />
-        ) : resultCount === 0 ? (
+        {resultCount === 0 ? (
           <EmptyState
             message={uiText.emptyStates.robots}
             variant="muted"

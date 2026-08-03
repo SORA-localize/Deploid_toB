@@ -1,6 +1,6 @@
 ---
 status: plan
-updated: 2026-07-26
+updated: 2026-07-30
 ---
 
 # CMS / DB移行前リファクタリング実装インデックス v1
@@ -32,18 +32,30 @@ updated: 2026-07-26
 
 設計判断の正本は [`pre-migration-refactor-safety-design-v1.md`](pre-migration-refactor-safety-design-v1.md)。本書は実行順とbranch gateの正本で、各phaseの具体的なファイル、テスト、commitは次の計画を正本とする。
 
-| 順序 | 計画 | Branch | 前提 |
-|---:|---|---|---|
-| 0 | 本書 §2 Git baseline | `docs/refactor-planning-20260726` | 完了済み |
-| 1 | [品質ゲート](refactor-phase-01-quality-gates-v1.md) | `refactor/01-quality-gates` | Phase 0 |
-| 2 | [依存・脆弱性](refactor-phase-02-dependency-security-v1.md) | `refactor/02-dependency-security` | Phase 1 |
-| 3 | [現行データ内部](refactor-phase-03-data-internals-v1.md) | `refactor/03-data-internals` | Phase 2 |
-| 4 | [Home性能](refactor-phase-04-home-performance-v1.md) | `refactor/04-home-performance` | Phase 3 |
-| 5 | [Client境界と一覧](refactor-phase-05-client-boundaries-v1.md) | `refactor/05-client-boundaries` | Phase 4 |
-| 6 | [UI・アクセシビリティ](refactor-phase-06-ui-accessibility-v1.md) | `refactor/06-ui-accessibility` | Phase 5 |
-| 7 | [設定・セキュリティ・後片付け](refactor-phase-07-security-cleanup-v1.md) | `refactor/07-security-cleanup` | Phase 6 |
+| 順序 | 計画 | Branch | 前提 | 状態 |
+|---:|---|---|---|---|
+| 0 | 本書 §2 Git baseline | `docs/refactor-planning-20260726` | 完了済み | 完了 |
+| 1 | [品質ゲート](refactor-phase-01-quality-gates-v1.md) | `refactor/01-quality-gates` | Phase 0 | 完了 |
+| 2 | [依存・脆弱性](refactor-phase-02-dependency-security-v1.md) | `refactor/02-dependency-security` | Phase 1 | 完了 |
+| 3 | [現行データ内部](refactor-phase-03-data-internals-v1.md) | `refactor/03-data-internals` | Phase 2 | 完了 |
+| 4 | [Home性能](refactor-phase-04-home-performance-v1.md) | `refactor/04-home-performance` | Phase 3 | 完了 |
+| 5 | [Client境界と一覧](../archive/refactor-phase-05-client-boundaries-v1.md) | `refactor/05-client-boundaries` | Phase 4 | **完了（2026-08-02）**。実績は [baseline](../reference/refactor-baseline-2026-07-26.md) の「Phase 5 after」。`/compare` のVM化のみ後続phaseへ送った |
+| 6 | [UI・アクセシビリティ](refactor-phase-06-ui-accessibility-v1.md) | `refactor/06-ui-accessibility` | Phase 5 | 未着手 |
+| 7 | [設定・セキュリティ・後片付け](refactor-phase-07-security-cleanup-v1.md) | `refactor/07-security-cleanup` | Phase 6 | 未着手 |
 
 順序を入れ替えない。特に、依存更新を品質ゲートより前に行わず、Client propsの縮小をlocal data/validator境界より前に行わない。
+
+### Phase 5 からの繰り越し（2026-08-02 起票）
+
+Phase 5 は budget 目標と catalog 4 route の view model 化を達成して完了したが、次の3件を
+後続 phase へ送った。**Phase 6 の着手前に、どの phase が引き取るかを決めること。**
+
+| # | 内容 | 理由 | 参照 |
+|---|---|---|---|
+| 1 | **`/compare` の view model 化**（旧 Task 9） | `CompareClient` が raw `Robot[]` / `Manufacturer[]` を受け取る状態が残る。`/compare` にバイト上限は課しておらず削減効果は0だが、CMS移行では対応が要る。Phase 5 最大のリファクタで、DnD・favorite・URL復元が絡み壊れ方が静か | archive済み計画の Task 9 |
+| 2 | **catalog 一覧の本文検索の代替** | Task 6 で検索対象を「cardが描画する文字列＋facet label」へ限定した。サイト全体検索ページが無いため退避先が無い。復活させる場合は build 時生成の静的 JSON を `public/` へ置く方式が候補 | baseline「Phase 5 after」 |
+| 3 | **共有フロア 588,395 の削減** | `3_4rbxe62x5-h.js`（67,853）が `sonner`・`lucide`・`@vercel/analytics` を含み、`layout.tsx` の `<Toaster />` により `/privacy` のような静的ページにも配信されている。`motion/react` も Home 側 4 ファイルが使い続けるため dependencies から外せていない | 同上 |
+
 
 ---
 
@@ -222,3 +234,9 @@ git switch --detach pre-refactor-20260726
 - importer / exporter / parity checker
 - draft / preview / publish
 - Codex MCP
+
+---
+
+## 9. Backlog（Phase 7完了後）
+
+- **HomeのworldMap動き復活**（2026-07-30、ユーザー要望）: Phase 4で自動スクロール／ドラッグを完全に削除したが、これは容量削減（4.2MB→326KB）の必須要件ではなかった（主因はTask 1のstatic asset化）。単一canvas・単一DOM・static asset・アクセシビリティ制約を維持したまま動きを復活させる再設計を、Phase 5〜7完了後に別plan（`refactor-phase-08-home-map-motion-v1.md`等）として起票する。詳細は[`refactor-phase-04-home-performance-v1.md`](refactor-phase-04-home-performance-v1.md)のFollow-up節を参照。

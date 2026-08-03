@@ -2,8 +2,11 @@ import { Suspense } from 'react';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { ReportsBrowser } from '@/components/ReportsBrowser';
 import { getArticles } from '@/lib/data';
+import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
+import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
+import { createArticleCatalogItems } from '@/lib/viewModels/articles';
 import { ARTICLE_PAGE_PARAM } from '@/lib/articlePagination';
-import { normalizeArticleShelfParam } from '@/lib/articleShelves';
+import { toInitialSearch } from '@/lib/catalog/urlSearch';
 import { createPageMetadata } from '@/lib/metadata';
 import { pickSearchParams, type RouteSearchParams } from '@/lib/searchParams';
 
@@ -15,16 +18,21 @@ export const metadata = createPageMetadata({
 });
 
 async function ReportsContent({ searchParams }: { searchParams: RouteSearchParams }) {
-  const reports = getArticles();
+  const reports = createArticleCatalogItems(getArticles());
   const params = await pickSearchParams(searchParams, ['kind', 'q', ARTICLE_PAGE_PARAM]);
-  const activeShelf = normalizeArticleShelfParam(params.kind);
+  // getArticleIndexPlacementReports は { id, publishedAt } を要求する generic なので VM をそのまま渡せる。
+  const { heroReports, featureReports } = getArticleIndexPlacementReports({
+    articles: reports,
+    placements: localContentSnapshot.articlePlacements,
+    limits: localContentSnapshot.articleIndexPlacementLimits,
+  });
 
   return (
     <ReportsBrowser
       reports={reports}
-      activeShelf={activeShelf}
-      initialQuery={params.q ?? ''}
-      initialPageParam={params[ARTICLE_PAGE_PARAM]}
+      heroReports={heroReports}
+      featureReports={featureReports}
+      initialSearch={toInitialSearch(params)}
     />
   );
 }
