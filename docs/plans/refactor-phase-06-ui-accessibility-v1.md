@@ -79,7 +79,7 @@ Task 1 着手後、タスクごとに前提のずれが出たため、**残り�
 | 3 | **完了**（`e59cdf8` + slide semantics） | `motion/react` 除去は Phase 5 Task 4 で完了済み。本体は pause/resume と現在位置の告知だった |
 | 4 | **完了（対象は差し替え）** | 想定していた3ファイルは実測で全てPASS。実際の欠陥は追従バーで、`components/HeaderChrome.tsx` を修正した |
 | 5 | **分割。5a 完了（2026-08-03）** | axe の閾値引き上げは現状 **218箇所**の違反で即座に赤くなる。下記参照 |
-| 6 | **未着手（内容は確定済み）** | Tasks 1〜5 の結果を反映する。書く項目は Task 6 Step 1 に列挙した |
+| 6 | **完了**（`5056cb4` + `ceb837a`） | Tasks 1〜5 の結果を反映する。書く項目は Task 6 Step 1 に列挙した |
 
 ### e2e の navigation timeout（2026-08-03、再調査中に再発）
 
@@ -197,8 +197,8 @@ carousel と NewsHeroCarousel は motion 除去済みだが、着手時点で **
 | `components/NewsHeroCarousel.tsx` | autoplay control・現在位置の告知・slide semantics | 変更済（Task 3） |
 | `lib/uiText.ts` | carousel の文言（label / pause / resume / position） | 変更済（Task 3） |
 | `components/HeaderChrome.tsx` | フォーカス保持中の追従バーを消さない | 変更済（Task 4） |
-| `docs/decisions/design_system_v1.md` | interaction規則・一覧ヘッダ規則 | **未着手（Task 6）** |
-| `docs/decisions/ui_architecture_and_development_policy_v1.md` | 実装後のheader/carousel規則 | **未着手（Task 6）** |
+| `docs/decisions/design_system_v1.md` | interaction規則・一覧ヘッダ規則 | 変更済（Task 6） |
+| `docs/decisions/ui_architecture_and_development_policy_v1.md` | 実装後のheader/carousel規則 | 変更済（Task 6） |
 | ~~`components/PageTabBar.tsx`~~ | **変更しない**（Task 2 不実施） | — |
 | ~~`components/ReportsHeader.tsx`~~ | **変更不要だった。** 元から contextual tabs だけを描画しており、Task 1 で触る必要がなかった | — |
 | ~~`components/uilayouts/carousel.tsx`~~ | **変更不要だった。** motion 削除は Phase 5 で完了済み。slide semantics は `Slider` が `{...props}` を透過するため呼び出し側（`NewsHeroCarousel`）だけで足りた | — |
@@ -676,7 +676,7 @@ git commit -m "test: add accessibility and responsive visual gates"
 - Consumes: Tasks 1〜5の実装
 - Produces: current UI rules
 
-- [ ] **Step 1: current rulesを更新する**
+- [x] **Step 1: current rulesを更新する**
 
 次をdecisionへ明記する。**このタスクの本体は「Task 1・4 で塞いだ実装のずれを、規定として書く」こと。**
 規定が無いままだと同じずれがまた出る（実際 `/reports` と `/compare` は独自ヘッダを持っていた）。
@@ -699,19 +699,25 @@ git commit -m "test: add accessibility and responsive visual gates"
 
 存在しない旧Guides route/class名はcurrent sectionから削除し、履歴として必要なら`docs/reference/`へ移す。
 
-- [ ] **Step 2: docs linkと全gateを実行する**
+- [x] **Step 2: docs linkと全gateを実行する**
 
 ```bash
 npm run check
 git diff --check
 ```
 
-- [ ] **Step 3: commit**
+- [x] **Step 3: commit**
 
 ```bash
 git add docs/decisions/ui_architecture_and_development_policy_v1.md docs/decisions/design_system_v1.md
 git commit -m "docs: align ui policy with accessible interactions"
 ```
+
+**結果:** 実際のcommitは `5056cb4`（Phase 5 で削除済みのモジュールへの参照11箇所を是正）
++ `ceb837a`（Task 1〜5 の結果をdecisionへ明記）。`design_system_v1.md`と
+`ui_architecture_and_development_policy_v1.md`の両方に、上記Step 1で列挙した項目
+（PageListHeader整列、追従バーのフォーカス契約、PageTabBarのsemantics区別、
+carousel autoplay、絞り込みタブの置き場所の差）がすべて反映済み。
 
 ---
 
