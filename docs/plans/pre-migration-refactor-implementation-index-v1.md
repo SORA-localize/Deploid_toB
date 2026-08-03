@@ -40,7 +40,7 @@ updated: 2026-07-30
 | 3 | [現行データ内部](refactor-phase-03-data-internals-v1.md) | `refactor/03-data-internals` | Phase 2 | 完了 |
 | 4 | [Home性能](refactor-phase-04-home-performance-v1.md) | `refactor/04-home-performance` | Phase 3 | 完了 |
 | 5 | [Client境界と一覧](../archive/refactor-phase-05-client-boundaries-v1.md) | `refactor/05-client-boundaries` | Phase 4 | **完了（2026-08-02）**。実績は [baseline](../reference/refactor-baseline-2026-07-26.md) の「Phase 5 after」。`/compare` のVM化のみ後続phaseへ送った |
-| 6 | [UI・アクセシビリティ](refactor-phase-06-ui-accessibility-v1.md) | `refactor/06-ui-accessibility` | Phase 5 | **進行中（2026-08-03）。Task 5a のみ残り。** Task 2 は不実施（決定）、5b は後続phaseへ。branch は push済み・未マージ。詳細は `SESSION_HANDOFF.md` |
+| 6 | [UI・アクセシビリティ](refactor-phase-06-ui-accessibility-v1.md) | `refactor/06-ui-accessibility` | Phase 5 | **完了（2026-08-03）。** Task 2 は不実施（決定）、5b は後続phaseへ（繰り越し#4）。繰り越し#5〜#7も本phase起票。branch は push済み・未マージ、main へのマージは要承認（本番デプロイ誘発） |
 | 7 | [設定・セキュリティ・後片付け](refactor-phase-07-security-cleanup-v1.md) | `refactor/07-security-cleanup` | Phase 6 | 未着手 |
 
 順序を入れ替えない。特に、依存更新を品質ゲートより前に行わず、Client propsの縮小をlocal data/validator境界より前に行わない。
