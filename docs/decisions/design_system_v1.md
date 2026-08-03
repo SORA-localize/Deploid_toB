@@ -334,10 +334,10 @@ tones：
 
 ルール：
 
-- searchはページ内filterとして扱う（記事は MiniSearch=`lib/searchIndex.ts`、他は `lib/search.ts` の部分一致）。
-- URL共有するfilterは `useUrlParamUpdater` でURLに同期する（旧 `useUrlFilters` は廃止）。
+- searchはページ内filterとして扱う（記事は MiniSearch=`lib/searchIndex.ts`、他は `lib/catalog/matchSearch.ts` の部分一致）。検索テキストは server 側の `lib/catalog/search.ts` で field を明示列挙して組み立てる。
+- URL共有するfilterは `useCatalogUrlState`（`lib/catalog/urlState.ts`）でURLに同期する（旧 `useUrlFilters` / `useUrlParamUpdater` は廃止）。
 - **主軸タブ（PageTabBar）は軸を固定する**。記事の `section` のような主分類は、検索・ファセット条件に応じて件数を表示してよいが、タブ自体は非表示にしない。0件の非アクティブタブは disabled 表示にし、active タブと「すべて」は選択可能なまま残す。
-- **ファセット（SelectControl）は設定駆動の `FacetFilterBar`＋`lib/facetConfig.ts` で組む**。選択肢は他の選択で絞った部分集合から件数つきで導出し（`ラベル (件数)`）、0件は `disabled` で無効化して行き止まりを防ぐ。**他ファセットは自動リセットしない**（選択は保持）。
+- **ファセットは各 browser component が `SelectControl` を直接置く**（設定駆動の `FacetFilterBar`＋`lib/facetConfig.ts` は Phase 5 で削除。設定表が全 collection のラベルを client bundle へ載せていたため）。選択肢は他の選択で絞った部分集合から件数つきで導出し（`ラベル (件数)`）、0件は `disabled` で無効化して行き止まりを防ぐ。**他ファセットは自動リセットしない**（選択は保持）。
 - ドロップダウンのパネル幅はトリガー幅に固定する（内容で伸ばさない）。Select と SearchableDropdown の閉じた見た目を揃える。
 - chip buttonは `aria-pressed`。
 - **選択中インジケーター（ActiveFilterChips）はプレーンテキスト**。border/background/shadow を付けない。`text-muted-foreground hover:text-foreground` のみ。TagChip とは別物。

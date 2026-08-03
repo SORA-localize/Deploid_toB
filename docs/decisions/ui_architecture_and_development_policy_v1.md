@@ -65,13 +65,13 @@ UI開発方針とデザインシステムは別文書にする。
 | カード | `RobotCard`, `FeaturedRobotCard`, `FavoriteCard`, `TagChip`, `EmptyState` | 再利用される表示単位 |
 | fact表示 | `FactList`, `CardFactGrid`, `ComparisonSpecList` | 短いラベル–値、カード、比較の役割別表示 |
 | ロボットレール | `RobotCardRail` | `FeaturedRobotCard` の幅・gap・snap・横スクロール |
-| 入力 | `SearchInput`, `SelectControl`, `FacetFilterBar`, `FilterChipGroup`, `ContactForm` | 絞り込み・問い合わせ |
+| 入力 | `SearchInput`, `SelectControl`, `FilterChipGroup`, `ContactForm` | 絞り込み・問い合わせ |
 | 詳細 | `RobotImageCarousel`, `Markdown`, `ManufacturerLogoName` | 詳細ページ固有の補助部品 |
 | データ取得 | `lib/data.ts` | published filter、slug lookup、関連取得 |
 | ラベル | `lib/labels.ts` | enum表示名 |
-| 検索 | `lib/search.ts` | collection別 search document |
+| 検索 | `lib/catalog/search.ts`（server専用の検索テキスト組み立て）, `lib/catalog/matchSearch.ts`（client側の一致判定） | collection別 search document |
 | タグ | `lib/tags.ts` | tag正規化、表示、候補生成 |
-| URL filter | `lib/useUrlParamUpdater.ts` | 一覧のURL連動filter（旧 `useUrlFilters` は廃止） |
+| URL filter | `lib/catalog/urlState.ts`（`useCatalogUrlState`） | 一覧のURL連動filter（旧 `useUrlFilters` / `useUrlParamUpdater` は廃止） |
 | メディア権利 | `lib/media.ts` | 画像・ロゴ表示可否のgate |
 
 ---
@@ -84,7 +84,7 @@ UI開発方針とデザインシステムは別文書にする。
 | 静的データ | `data/*.ts` |
 | データ取得・関連解決 | `lib/data.ts` |
 | enumラベル | `lib/labels.ts` |
-| 検索対象 | `lib/search.ts` |
+| 検索対象 | `lib/catalog/search.ts` |
 | タグ正規化 | `lib/tags.ts` |
 | メディア表示可否 | `lib/media.ts` |
 | 共通UI部品 | `components/*.tsx` |
@@ -115,8 +115,8 @@ UI開発方針とデザインシステムは別文書にする。
 
 - page側は `lib/data.ts` から取得する。
 - 一覧の検索・filter・chip状態は browser component に閉じる。
-- URL共有したいfilterだけ `useUrlParamUpdater` を使う（読み取りは Server 側 searchParams / `useSearchParams`）。
-- 主軸タブは `PageTabBar`、補助絞り込みは `FacetFilterBar` / `SelectControl` に分ける。主軸タブの種類は固定し、検索・ファセット条件から導出した件数と0件disabledだけを連動させる。
+- URL共有したいfilterだけ `useCatalogUrlState`（`lib/catalog/urlState.ts`）を使う。初期値は Server 側 searchParams から `toInitialSearch` で渡し、以降は `history.pushState` + `useSyncExternalStore` で同期する（`useSearchParams` は使わない。Server Component の再実行を伴うため）。
+- 主軸タブは `PageTabBar`、補助絞り込みは `SelectControl` に分ける。主軸タブの種類は固定し、検索・ファセット条件から導出した件数と0件disabledだけを連動させる。
 - `PageTabBar` は表示部品に留める。件数計算、URL更新、検索状態の解釈は browser/header 側で行う。
 - ページから `data/*.ts` を直接importしない。
 
@@ -157,7 +157,7 @@ Client Component が必要なもの：
 既存の良い例：
 
 - `SearchInput`
-- `SelectControl` / `FacetFilterBar`
+- `SelectControl`
 - `FilterChipGroup`
 - `TagChip`
 - `EmptyState`
@@ -212,7 +212,7 @@ UIは、存在しないデータを捏造しない。
 
 - 未確認値は `TBD_LABEL` または「要確認」系の表示にする。
 - UI表示名は `lib/labels.ts` を通す。
-- 検索対象は `lib/search.ts` に追加する。
+- 検索対象は `lib/catalog/search.ts` に追加する。field は明示列挙する（オブジェクト全体を投げ込まない。client bundle へ全文が載るため）。
 - タグ表示・正規化は `lib/tags.ts` に追加する。
 - 画像・ロゴは `lib/media.ts` のgateを通す。
 - ロボットのカード・詳細・比較・JSON-LD用画像は `Robot.images` を正本にし、共通resolverで解決する。
@@ -332,7 +332,7 @@ UIは、存在しないデータを捏造しない。
 
 1. Storybook相当の軽量カタログページを検討する。
 2. Playwrightで主要ページのスクリーンショット回帰を検討する。
-3. 一覧フィルタは設定駆動の `FacetFilterBar`＋`lib/facetConfig.ts`（件数つき・0件無効化・URLは `useUrlParamUpdater`）へ集約し、`SelectControl` のパネル幅をトリガー幅に統一済み（reports 先行。robots/manufacturers/use-cases は順次寄せる。guides の `FilterChipGroup` も要検討）。
+3. 一覧フィルタは各 browser component が `SelectControl` を直接組む形に戻した（件数つき・0件無効化は維持。URLは `useCatalogUrlState`）。設定駆動の `FacetFilterBar`＋`lib/facetConfig.ts` は Phase 5 で削除した——設定表が全 collection のラベルを1つのモジュールへ集め、client bundle に載っていたため。`SelectControl` のパネル幅はトリガー幅に統一済み。
 4. detailページのaside / source list / related list を整理する。
 
 今はやらない：
