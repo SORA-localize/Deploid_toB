@@ -96,6 +96,32 @@ guardrailsのfail-safe grep）は **PR #15 で対応済み**。
   - `env.analyticsEnabled`
   - `env.vercelAnalyticsEnabled`
 
+> **⚠️ このtaskは本番のanalyticsを停止させる。Vercelの環境変数を先に入れること。**
+>
+> 現在の `lib/env.ts` はIDをフォールバックで持っている（`|| 'G-PLLDR4X5TV'`、`|| 'x4ow976y5y'`）。
+> `src/app/layout.tsx` の `enabled` はproduction判定だけなので、**環境変数が未設定でも本番では
+> analyticsが動いている**。これは 2026-08-04 時点の実態。
+>
+> Step 3 でフォールバックを外すと、判定は
+> `analyticsEnabled = isProductionRuntime && analyticsRequested && (ga || clarity)` になる。
+> Vercelに次が入っていなければ **deploy した瞬間にGA/Clarityが黙って止まる**。計測が切れても
+> ビルドもtestも緑のままなので、気づくのは数日後になる。
+>
+> ```
+> NEXT_PUBLIC_ANALYTICS_ENABLED=true
+> NEXT_PUBLIC_GA_MEASUREMENT_ID=<現在のID>
+> NEXT_PUBLIC_CLARITY_PROJECT_ID=<現在のID>
+> NEXT_PUBLIC_VERCEL_ANALYTICS_ENABLED=<有効にするならtrue>
+> ```
+>
+> 現在のIDは `lib/env.ts` と `.env.example` と `README.md` に書かれている（消す前に控える）。
+> なお **GA measurement ID と Clarity project ID は公開前提の識別子**で、view-source すれば誰でも
+> 見える。秘密情報ではないため、漏洩としての緊急対応は要らない。このtaskの目的は
+> 「未設定なら送信しない」を成立させることであって、IDを隠すことではない。
+>
+> **Step 0（実装前）: Vercel の Production / Preview 両方へ上記を設定し、反映を確認する。**
+> 設定後にdeployしてもanalyticsが動き続けることを確認してから Step 1 へ進む。
+
 - [ ] **Step 1: env parser testを書く**
 
 ```ts
@@ -646,6 +672,16 @@ git commit -m "docs: enforce local documentation links"
   - `docs/plans/refactor-phase-07-security-cleanup-v1.md`
   - To: `docs/archive/`
 
+> **archive へ移す前に、生きた情報が本書だけに残っていないか確認すること。**
+> `docs/archive/` は内容凍結の棚で、移した後は更新できない（`ai/rules/80-doc-governance.md`）。
+>
+> 積み残しは [`../decisions/deferred-work-register-v1.md`](../decisions/deferred-work-register-v1.md)
+> へ移設済み（2026-08-04、PR #17）。移動前に次を確認する。
+>
+> - 登録簿の10件が最新か（本phaseで #9・#10 を片付けたなら状態を更新、完了なら行ごと削除）
+> - 本書の Task 3 が残した `MAX_SHARED_FLOOR_BYTES` の新しい値が、登録簿 #3 に反映されているか
+> - 移動後、`rg --no-ignore -l '<old path>'` で live な参照を洗い、`docs/archive/` 内は直さない
+
 **Interfaces:**
 - Consumes: 全phaseの実測値
 - Produces: current docsと履歴の分離
@@ -670,6 +706,15 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const root = process.cwd();
+
+/**
+ * 2026-07-26 の着手前実測（`docs/reference/refactor-baseline-2026-07-26.md`）。
+ *
+ * この値は「Phase 1〜7 全体で何が変わったか」の起点であり、Phase 7 単独の before ではない。
+ * 例えば vulnerabilities 13 は **Phase 2 で既に 0 になっている**（2026-08-04 実測）。
+ * レポートに「13 → 0」と出るのは正しいが、Phase 7 の成果ではない。読み手が誤解しないよう、
+ * 生成する Markdown 側に「program 全体の before/after」と明記する。
+ */
 const baseline = {
   vulnerabilities: 13,
   homeHtml: 4_206_770,
@@ -723,6 +768,20 @@ const percent = (before, after) =>
   `${(((after - before) / before) * 100).toFixed(1)}%`;
 const totalVulnerabilities = audit.metadata.vulnerabilities.total;
 
+// 共有フロア = 全routeに共通して現れるchunk。gate（check-client-budgets.mjs）と同じ定義。
+let floorChunks = null;
+for (const entry of routeStats) {
+  const chunks = new Set(entry.firstLoadChunkPaths);
+  floorChunks =
+    floorChunks === null
+      ? chunks
+      : new Set([...floorChunks].filter((chunk) => chunks.has(chunk)));
+}
+const sharedFloorBytes = [...(floorChunks ?? [])].reduce(
+  (total, chunk) => total + fs.statSync(chunk).size,
+  0,
+);
+
 const rows = [
   ['Runtime vulnerabilities', baseline.vulnerabilities, totalVulnerabilities],
   ['Home raw HTML bytes', baseline.homeHtml, homeHtml],
@@ -741,15 +800,34 @@ const markdown = `# Pre-migration Refactor Results v1
 CMS / DB移行は未実施。\`data/*.ts\`が引き続き正本。
 
 ## Before / After
+
+**Phase 1〜7 全体**の before / after。before は 2026-07-26 の着手前実測
+（\`../reference/refactor-baseline-2026-07-26.md\`）で、Phase 7 単独の before ではない。
+例えば vulnerabilities は Phase 2 の時点で 0 になっている。
+
+first-load JS は **共有フロアを含む総量**。gate（\`scripts/check-client-budgets.mjs\`）は
+「route固有（総量 − 共有フロア）」と「共有フロア」を別々に測っており、指標が違う。
+route の増減を追うときは gate 側の数字を見ること。
+
 | Metric | Before | After | Change |
 |---|---:|---:|---:|
 ${rows.map(([label, before, after]) => `| ${label} | ${before} | ${after} | ${percent(before, after)} |`).join('\n')}
+| 共有フロア（全routeが必ず読むJS） | 計測外 | ${sharedFloorBytes} | Phase 5 起票時 588,395 |
 
 ## Added gates
 validate、data boundaries、docs links、typecheck、lint、unit、dead code、build、home payload、client budgets、E2E、axe、visual regression。
 
+各gateは「赤にできること」を確認した上で入れている（PR #15 以降の運用）。
+
 ## Remaining work
-Payload CMS + managed PostgreSQL移行は\`content-platform-migration-plan-v1.md\`で別実施。CSP enforceはreport-only互換性確認後の別判断。
+未完了の項目は [\`../decisions/deferred-work-register-v1.md\`](../decisions/deferred-work-register-v1.md) が唯一の一覧。
+**この文書には転記しない**（2か所に置くと必ず片方が腐る）。
+
+Payload CMS + managed PostgreSQL移行は\`../plans/content-platform-migration-plan-v1.md\`で別program。
+ただし同計画は 2026-07-26 付で、**Phase 3・5・6 が作った層（\`lib/data/\`、\`lib/viewModels/\`、
+\`lib/catalog/\`、分割後の \`lib/validation/\`）を反映していない**。着手時に必ず現行実装へ突合すること。
+
+CSP enforceはreport-only互換性確認後の別判断。
 `;
 
 fs.writeFileSync(
