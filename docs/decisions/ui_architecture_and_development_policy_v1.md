@@ -327,12 +327,12 @@ UIは、存在しないデータを捏造しない。
 - overlay 3系統（モバイルメニュー / 比較ドロワー / 検索つきドロップダウン）の
   focus 復元を e2e で固定している（`tests/e2e/focus-restoration.spec.ts`）。
 
-今後の課題：
+今後の課題（詳細と実測値は [`deferred-work-register-v1.md`](deferred-work-register-v1.md) が正本）：
 
-- **`color-contrast` 違反 218箇所**（`/robots` 96・`/manufacturers` 85・`/use-cases` 17・
-  `/` 16・`/reports` 3・`/compare` 1）。テーマトークンの見直しを伴うため独立した計画が要る。
+- **`color-contrast` 違反 218箇所**（登録簿 #4）。テーマトークンの見直しを伴うため独立した計画が要る。
   axe gate の閾値を `serious` へ上げられるのはこれを片付けた後。現状は `critical` で運用する。
-- `/reports` の主軸タブが追従ヘッダの中にしかなく、ページ先頭から Tab で到達できない。
+- `/reports` の主軸タブが追従ヘッダの中にしかなく、ページ先頭から Tab で到達できない（登録簿 #5）。
+- `/robots` グリッドが 768px で2列のまま（登録簿 #7）。壊れてはいないため対象外と決定済み。
 
 ---
 

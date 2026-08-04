@@ -40,31 +40,20 @@ updated: 2026-07-30
 | 3 | [現行データ内部](refactor-phase-03-data-internals-v1.md) | `refactor/03-data-internals` | Phase 2 | 完了 |
 | 4 | [Home性能](refactor-phase-04-home-performance-v1.md) | `refactor/04-home-performance` | Phase 3 | 完了 |
 | 5 | [Client境界と一覧](../archive/refactor-phase-05-client-boundaries-v1.md) | `refactor/05-client-boundaries` | Phase 4 | **完了（2026-08-02）**。実績は [baseline](../reference/refactor-baseline-2026-07-26.md) の「Phase 5 after」。`/compare` のVM化のみ後続phaseへ送った |
-| 6 | [UI・アクセシビリティ](refactor-phase-06-ui-accessibility-v1.md) | `refactor/06-ui-accessibility` | Phase 5 | **完了（2026-08-03）。** Task 2 は不実施（決定）、5b は後続phaseへ（繰り越し#4）。繰り越し#5〜#7も本phase起票。[PR #14](https://github.com/SORA-localize/Deploid_toB/pull/14) 作成済み・未マージ。main へのマージは要承認（本番デプロイ誘発） |
+| 6 | [UI・アクセシビリティ](refactor-phase-06-ui-accessibility-v1.md) | `refactor/06-ui-accessibility` | Phase 5 | **完了（2026-08-03）・main反映済み（2026-08-04、[PR #14](https://github.com/SORA-localize/Deploid_toB/pull/14)）。** Task 2 は不実施（決定）、5b は登録簿 #4 へ。登録簿 #5〜#7 も本phase起票 |
+| — | 検証gateの修復（Phase 1〜6監査） | `fix/verification-gates-20260803` | Phase 6 | **完了・main反映済み（2026-08-04、[PR #15](https://github.com/SORA-localize/Deploid_toB/pull/15)）。** client budgetを全16 route＋共有フロア上限595,000へ、home payload上限を実測比1.15倍へ、guardrailsのfail-safe grepを実行可能に。phase番号は持たない後追い修正 |
 | 7 | [設定・セキュリティ・後片付け](refactor-phase-07-security-cleanup-v1.md) | `refactor/07-security-cleanup` | Phase 6 | 未着手 |
 
 順序を入れ替えない。特に、依存更新を品質ゲートより前に行わず、Client propsの縮小をlocal data/validator境界より前に行わない。
 
-### Phase 5 からの繰り越し（2026-08-02 起票）
+### 積み残し
 
-Phase 5 は budget 目標と catalog 4 route の view model 化を達成して完了したが、次の3件を
-後続 phase へ送った。**Phase 6 の着手前に、どの phase が引き取るかを決めること。**
+各 phase が「今はやらない」と判断した項目は、**[`../decisions/deferred-work-register-v1.md`](../decisions/deferred-work-register-v1.md) を唯一の一覧とする。**
 
-| # | 内容 | 理由 | 参照 |
-|---|---|---|---|
-| 1 | **`/compare` の view model 化**（旧 Task 9） | `CompareClient` が raw `Robot[]` / `Manufacturer[]` を受け取る状態が残る。`/compare` にバイト上限は課しておらず削減効果は0だが、CMS移行では対応が要る。Phase 5 最大のリファクタで、DnD・favorite・URL復元が絡み壊れ方が静か | archive済み計画の Task 9 |
-| 2 | **catalog 一覧の本文検索の代替** | Task 6 で検索対象を「cardが描画する文字列＋facet label」へ限定した。サイト全体検索ページが無いため退避先が無い。復活させる場合は build 時生成の静的 JSON を `public/` へ置く方式が候補 | baseline「Phase 5 after」 |
-| 4 | **`color-contrast` 218箇所の是正**（Phase 6 Task 5b） | axe の閾値を critical から serious へ上げると全6 routeで違反。`/robots` 96・`/manufacturers` 85・`/use-cases` 17・`/` 16・`/reports` 3・`/compare` 1。全件 `color-contrast` で、`src/app/globals.css` のテーマトークンと配色設計に関わるためテスト追加の範囲を超える。**独立した計画が必要** | Phase 6計画の「Task 5 の分割」節 |
-| 3 | **共有フロア 588,395 の削減** | `3_4rbxe62x5-h.js`（67,853）が `sonner`・`lucide`・`@vercel/analytics` を含み、`layout.tsx` の `<Toaster />` により `/privacy` のような静的ページにも配信されている。`motion/react` も Home 側 4 ファイルが使い続けるため dependencies から外せていない | 同上 |
-
-### Phase 6 からの繰り越し（2026-08-03 起票）
-
-| # | 内容 | 理由 | 参照 |
-|---|---|---|---|
-| 5 | **`/reports` 主軸タブの到達性** | 記事の絞り込みタブ（すべて/ニュース/メーカー解説…）が追従ヘッダの中にしかなく、スクロールするまで DOM に存在しない。ページ先頭から Tab で到達できない。「追従ヘッダは本文の再掲に留める」という規定に反するが、本文のどこへ移すかはレイアウト判断を伴う。**フォーカスが消える不具合自体は Phase 6 Task 4 で解消済み** | `design_system_v1.md` 追従ヘッダの項 |
-| 6 | **Reports H1 の動的化**（F6-02） | 選択中の shelf に関わらず H1 が常に静的な「記事」。shelf 別ラベルは `ARTICLE_SHELF_TABS` に既にある。Global Constraint を満たすのに必須ではないため Phase 6 では扱わなかった | Phase 6計画 F6-02 |
-| 7 | **`/robots` グリッドが768pxだけ2列のまま1024pxまで据え置き** | `lib/catalogLayoutClasses.ts:3` の `browserGridClassNames.robots` は `grid-cols-2 ... lg:grid-cols-3`で、640〜1024px（`sm:`〜`lg:`未満）に列数を上げるbreakpointが無い。768px viewportでは390pxと同じ2列のままカードだけ幅広になり、ページ高さが390px/1280pxの約2倍（14714px対7013px/7090px、Task 5aのvisual regressionで実測）になる。overflow/重なり/切れ/欠落のいずれにも該当しないため、Task 5aでは対象外（人間が決定・2026-08-03） | `tests/e2e/visual-regression.spec.ts-snapshots/robots-768*.png` |
-
+以前はここに繰り越し表（#1〜#7）を、§9 に Backlog（#8）を、Phase 7 計画に引き取り表（#9〜#10）を
+置いていた。3か所に分かれた結果、**ユーザー自身の要望である #8（Home 世界地図の動きの復活）が
+最も埋もれていた**（2026-08-04 に発見）。本書は Phase 7 Task 6 で `docs/archive/` へ移り内容凍結
+されるため、生き続ける `docs/decisions/` へ移した。ここには重複させない。
 
 ---
 
@@ -248,4 +237,5 @@ git switch --detach pre-refactor-20260726
 
 ## 9. Backlog（Phase 7完了後）
 
-- **HomeのworldMap動き復活**（2026-07-30、ユーザー要望）: Phase 4で自動スクロール／ドラッグを完全に削除したが、これは容量削減（4.2MB→326KB）の必須要件ではなかった（主因はTask 1のstatic asset化）。単一canvas・単一DOM・static asset・アクセシビリティ制約を維持したまま動きを復活させる再設計を、Phase 5〜7完了後に別plan（`refactor-phase-08-home-map-motion-v1.md`等）として起票する。詳細は[`refactor-phase-04-home-performance-v1.md`](refactor-phase-04-home-performance-v1.md)のFollow-up節を参照。
+[`../decisions/deferred-work-register-v1.md`](../decisions/deferred-work-register-v1.md) を参照。
+Home worldMap の動き復活（ユーザー要望）は同登録簿の #8。**着手は最後**（2026-08-04 ユーザー再確認）。

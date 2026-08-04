@@ -62,6 +62,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 - [`news-automation-prompt-contract-v1.md`](decisions/news-automation-prompt-contract-v1.md) — ChatGPT Scheduled Tasksの日次出力→記事データ変換契約
 - [`robot-factcheck-research-prompt-2026-07-01.md`](decisions/robot-factcheck-research-prompt-2026-07-01.md) — 掲載データのファクトチェック用調査プロンプト（継続運用ツール、掲載変更のたびに更新）
 - [`ai_fullstack_development_guardrails_v1.md`](decisions/ai_fullstack_development_guardrails_v1.md) — AI実装時の安全策と自己監査
+- [`deferred-work-register-v1.md`](decisions/deferred-work-register-v1.md) — リファクタ中に「今はやらない」と判断した項目の唯一の一覧（積み残し登録簿）
 - [`architecture_future_considerations_v1.md`](decisions/architecture_future_considerations_v1.md) — 現在のアーキ判断と将来見直しトリガー
 - [`humanoid_platform_tech_stack_v1.md`](decisions/humanoid_platform_tech_stack_v1.md) — 技術スタック選定理由
 - [`business-positioning-and-roadmap-2026-07.md`](decisions/business-positioning-and-roadmap-2026-07.md) — 事業ポジショニング・今後の動き方（随時書き換える現行文書）
