@@ -138,7 +138,7 @@ Deploid は、ヒューマノイド導入を検討する事業者向けの buyer
 | floating ボタン | — | `rounded-full` | — |
 
 - 実装: `src/app/globals.css @layer components` の `.card-data` / `.card-editorial` を使う。
-- **更新 2026-06-21**：マウス追従の3Dチルト＋グロー＋シマー＋ホバー下線という演出は、`RobotCard`専用ではなく`lib/useTiltCardEffect.ts`の共通フックとして切り出し、`RobotCard`/`ManufacturerCard`/`UseCaseCard`の一覧カード全種で共有する。新しいカード種別を増やす場合もこのフックを使い、演出ロジックを複製しない。
+- **更新 2026-08-04（実装と再同期）**：マウス追従の3Dチルト＋グローは`lib/useTiltCardEffect.ts`が提供するが、現在これを使うのは`FeaturedRobotCard`のみ（`rg -l "useTiltCardEffect"`で確認）。`RobotCard`/`ManufacturerCard`/`UseCaseCard`はJS依存を外すため2026-06-21以降にチルト/グローを外し、シマー＋ホバー下線だけを`CardHoverEffects`（`components/CardHoverEffects.tsx`）という別コンポーネントに集約している。新しい一覧カードを増やす場合、マウス追従の演出まで要るなら`useTiltCardEffect`、シマー＋下線の静的演出だけでよいなら`CardHoverEffects`を使い、演出ロジックを複製しない。
 
 **画像・ロゴが無いときのプレースホルダー（更新 2026-06-21）**
 
@@ -305,7 +305,7 @@ className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-
 - 価格はメーカー公開価格、国内正規代理店公開価格、問い合わせの順で解決し、推測価格を表示しない。
 - 「国内」「段階」「可搬」、概要文、固定 `min-height` はdesktopカードへ追加しない。
 - specは捏造しない。未確認は `TBD_LABEL`。
-- ホバー時のチルト/グロー/シマー演出は`lib/useTiltCardEffect.ts`を使う（他カード種別と共通）。
+- ホバー時のシマー＋下線演出は`components/CardHoverEffects.tsx`を使う（`ManufacturerCard`/`UseCaseCard`と共通）。マウス追従のチルト/グローは持たない（JS依存を外すため2026-06-21以降に削除。`FeaturedRobotCard`のみ`lib/useTiltCardEffect.ts`を使う）。
 - favoriteは任意機能としてpropsで渡す。
 
 ### FactList / CardFactGrid / ComparisonSpecList
