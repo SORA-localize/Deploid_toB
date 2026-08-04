@@ -23,6 +23,45 @@ updated: 2026-07-26
 - dead-code toolのfalse positiveを無言ignoreせず、理由を設定へコメントする。
 - 外部source link checkは引き続きscheduledで、PR gateへ戻さない。
 - program完了時にcurrent docsと実装を一致させる。
+- **gateを追加・変更したら、それが赤くなるところを一度は確認する。** 緑しか見ていないgateは、
+  動いていることが確認されていないgateと同じ。PR #15 参照。
+
+---
+
+## Phase 1〜6監査からの引き取り（2026-08-03起票、PR #15で一部対応済み）
+
+| # | 内容 | 状態 |
+|---|---|---|
+| ③④ | client budgetが4 routeしか見ず、共有フロアに上限が無かった | **PR #15で対応済み**（全16 route＋フロア595,000） |
+| ⑤ | home payload上限500,000が実測203,094の2.5倍 | **PR #15で対応済み**（235,000） |
+| ⑥ | guardrailsのfail-safe grepが`--include`で一度も実行できていなかった | **PR #15で対応済み** |
+| ② | e2e 5specが`waitUntil: 'domcontentloaded'`直後にclickしhydration raceを起こす | **本phaseで対応**（下記） |
+| ⑨ | lintに`--max-warnings`が無く、`<img>` warning 4件が恒常的に残る | 本phaseのTask 4と併せて判断 |
+| ⑦ | axeが`critical`のみ。`serious`まで見ると`color-contrast` 218件 | 繰り越し#4のまま。独立計画 |
+
+### ②の扱い
+
+`tests/e2e/` の5 spec（`focus-restoration` / `keyboard-navigation` / `carousel-autoplay` /
+`headings` / `home-world-map`）が `page.goto(..., { waitUntil: 'domcontentloaded' })` を明示
+指定している。Playwrightの既定は `load` で、`domcontentloaded` はそれより**早い**signal。
+hydration前にclickが飛ぶため、`focus-restoration › moves focus into the drawer on open` が
+不定期に落ちる。
+
+実測（2026-08-03、Phase 6 tip）:
+
+- 単体8回: 0/8 失敗
+- フルスイート`--retries=0` 4回: 1/4 失敗
+- CI（ubuntu-latest）: 観測した2 runとも1回目失敗→retryで通過（`1 flaky`表示）
+- hydrationの死に窓: ボタン可視65ms → click有効119ms（ローカル）。**54ms**
+
+**ユーザー影響は無い**（54msは人間が踏めない）。`retries: 2` が吸収しており、CIは緑。
+よって緊急性は無く、e2eを触るついでに直す。放置し続ける場合の唯一の損失は「flaky 1件」が
+常態化して2件目以降に気づかなくなること。**「flakyは1件まで許容、増えたら直す」を運用ルール
+として明示するなら、放置も正当な判断**。書かずに放置すると単なる忘却になる。
+
+対応: 5 specから `{ waitUntil: 'domcontentloaded' }` を落として既定の `load` へ戻す。
+それでも窓は残るため、click後にstateを待つ assertion（`expect(...).toPass()` 等）が要るか
+実測で判断する。検証は「修正前は約4回に1回落ちる／修正後は`--retries=0`で連続N回緑」。
 
 ---
 
@@ -409,10 +448,25 @@ npm run check:client-budgets
 
 Expected: share/view toastが表示され、non-compare routeのclient bytesが増えない。
 
-- [ ] **Step 4: commit**
+**このtaskの効果は「共有フロアが減ること」に出る。** `check:client-budgets` の
+`[client-budget] shared floor: <実測>/595000` を before/after で記録すること。route固有の
+数字ではなくフロアが動く。
+
+- [ ] **Step 4: `MAX_SHARED_FLOOR_BYTES` を新しい実測値へ下げる**
 
 ```bash
-git add src/app/layout.tsx components/CompareClient.tsx
+# scripts/check-client-budgets.mjs の MAX_SHARED_FLOOR_BYTES を
+# 「Step 3 で得た実測フロア + 1.1%」へ更新する
+npm run check:client-budgets
+```
+
+削った分だけ上限も下げないと、余裕だけが増えて「落ちないgate」へ戻る。これは PR #15
+（Phase 1〜6監査、2026-08-03）が指摘し、当のスクリプトのコメントにも申し送りがある。
+
+- [ ] **Step 5: commit**
+
+```bash
+git add src/app/layout.tsx components/CompareClient.tsx scripts/check-client-budgets.mjs
 git commit -m "perf: scope toast runtime to compare"
 ```
 
