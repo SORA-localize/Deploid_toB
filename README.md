@@ -24,7 +24,8 @@
 | `npm run start` | ビルド結果をローカル起動 |
 | `npm run validate:data` | データ整合チェックのみ実行 |
 | `npm run check` | 全ゲートを通す（CIと同じ） |
-| `npm run check:dead-code` | 未使用ファイル・export・依存の検査（knip） |
+| `npm run check:dead-code` | 未使用ファイル・依存の検査（knip） |
+| `npm run check:docs` | Markdown のローカルリンク切れ検査 |
 
 ### `check:dead-code` の範囲と ignore
 
@@ -46,6 +47,17 @@
 
 **無言で ignore を増やさないこと。** 追加するときは、ここに実際の使用箇所を書く。理由の無い
 ignore が溜まると、この gate は「何も見つけない gate」になる。
+
+### `check:docs` の範囲
+
+`README.md` / `AGENTS.md` / `CLAUDE.md` / `docs/` / `ai/` の Markdown を対象に、
+**ローカルリンクの実在**だけを検査する。
+
+- **外部URLは見ない。** 到達性は相手側の都合で変わり、PR gate に混ぜると自分の変更と
+  無関係に赤くなる。外部 source link は `check:source-links` として scheduled workflow に分けてある。
+- **コードフェンス内は見ない。** 例示として存在しないパスを書くことがある。
+- **`docs/archive/` は警告のみで落とさない。** archive は内容凍結の棚（`ai/rules/80-doc-governance.md`）で、
+  リンク切れを直すには凍結を破るしかない。直せない gate は無視されるようになる。
 
 ## ブランチ運用
 
