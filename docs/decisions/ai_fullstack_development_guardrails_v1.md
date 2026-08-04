@@ -147,13 +147,14 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 
 ```bash
 # コンポーネント内の日本語文字列直書き（ラベル・文言）
-rg --no-ignore "['\"][　-鿿][^'\"]*['\"]" components src --include="*.tsx" -l
+rg --no-ignore "['\"][　-鿿][^'\"]*['\"]" components src -g "*.tsx" -l
 
 # ArticleType/ArticleSection/ArticleShelf の値をコンポーネント内で直比較
 rg "article\.type\s*===|article\.section\s*===" components src
 
-# 旧URLパラメータ名の残留
-rg "section=|theme=|industry=|region=" src components lib --include="*.ts" --include="*.tsx"
+# 旧URLパラメータ名の残留（クエリ文字列としての出現に限る。`industry={...}` のような
+# JSX props に当てないため、`?`/`&` の直後だけを見る）
+rg "[?&](section|theme|industry|region)=" src components lib -g "*.ts" -g "*.tsx"
 
 # labels.ts を通さず enum 値を日本語化
 rg "'(analysis|market-analysis|tech-update|deployment-report|news-brief)'" components src
@@ -297,10 +298,10 @@ git diff --cached --name-only     # stageした差分を確認
 
 ```bash
 # 'use client' のついたファイルを確認し、不要なものがないか見る
-rg "'use client'" components lib src --include="*.tsx" --include="*.ts" -l
+rg "'use client'" components lib src -g "*.tsx" -g "*.ts" -l
 
 # Client Component 内で lib/data.ts を直接呼んでいないか確認
-rg "getArticles\|getManufacturers\|getRobots\|getUseCases" components --include="*.tsx"
+rg "getArticles|getManufacturers|getRobots|getUseCases" components -g "*.tsx"
 ```
 
 ---
@@ -436,7 +437,7 @@ npm run build
 
 | 確認 | コマンド |
 |---|---|
-| page.tsx がデータを lib/data.ts 経由で取っているか | `rg "from '@/data/" src/app --include="*.tsx"` |
+| page.tsx がデータを lib/data.ts 経由で取っているか | `rg "from '@/data/" src/app -g "*.tsx"` |
 | URLパラメータ正規化関数が通っているか | 変更した page.tsx のパラメータ読取箇所を目視 |
 | metadata が更新されているか | ブラウザのタブタイトル・description を確認 |
 
@@ -472,25 +473,34 @@ npm run build
 
 ### 4.4 共通のAIミス確認（grep）
 
-実装後に以下を流してゼロヒットを確認する:
+実装後に以下を流してゼロヒットを確認する。
+
+> **`rg` の終了コードを潰さないこと。** これらを `| head` や `| grep -v` へ繋ぐと、`rg` 自体が
+> エラーで死んでも終了コードはパイプ末尾のものになり、「何も出ない＝ゼロヒット＝合格」と
+> 読めてしまう。実際、2026-08-03 の Phase 1〜6 監査まで、ここの全コマンドは
+> `rg: unrecognized flag --include` で一度も実行できていなかった（`--include` は grep のフラグで
+> `rg` には無い。`rg` は `-g` を使う）。エラーが出たら合格ではなく、**コマンドが壊れている**。
 
 ```bash
 # 旧URLパラメータ名の残留（?section= / ?theme= / ?industry= / ?region=）
-rg "section=|theme=|industry=|region=" src components lib --include="*.ts" --include="*.tsx" \
-  | grep -v "ARTICLE_FACETS\|tagRegistry\|// "
+# クエリ文字列としての出現に限る。`industry={...}` のような JSX props に当てない。
+rg "[?&](section|theme|industry|region)=" src components lib -g "*.ts" -g "*.tsx"
 
 # ArticleType / ArticleSection 値のコンポーネント内直比較
 rg "article\.(type|section)\s*===\s*['\"]" components src
 
-# data/*.ts をコンポーネントから直接 import
-rg "from '@/data/(?!types)" components --include="*.tsx"
+# data/*.ts をコンポーネントから直接 import（先読みを使うので -P が要る）
+rg -P "from '@/data/(?!types)" components -g "*.tsx"
 
-# lib/data.ts を Client Component から直接呼び出し
-rg "getArticles\|getManufacturers\|getRobots\|getUseCases\|getUseCases" components --include="*.tsx"
+# lib/data.ts を Client Component から直接呼び出し（rg の OR は `|`。`\|` はリテラル）
+rg "getArticles|getManufacturers|getRobots|getUseCases" components -g "*.tsx"
 
 # 旧型名・旧パラメータ名の残留
-rg "ArticleSectionFilter|activeSection|ARTICLE_SECTION_TABS|normalizeArticleSectionParam" \
-  components src lib --include="*.ts" --include="*.tsx"
+# `activeSection` は外した。TOC の `activeSectionContext` と
+# `uiText.robots.activeSection`（「販売中・限定販売」）に恒常的に当たり、
+# 誤検知が常態化するとチェック自体が無視されるため。
+rg "ArticleSectionFilter|ARTICLE_SECTION_TABS|normalizeArticleSectionParam" \
+  components src lib -g "*.ts" -g "*.tsx"
 ```
 
 ---
