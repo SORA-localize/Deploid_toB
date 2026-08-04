@@ -28,40 +28,21 @@ updated: 2026-07-26
 
 ---
 
-## Phase 1〜6監査からの引き取り（2026-08-03起票、PR #15で一部対応済み）
+## Phase 1〜6監査からの引き取り（2026-08-03起票）
 
-| # | 内容 | 状態 |
+監査の全指摘は「gateが緑になることは確認されているが、**赤にできることは一度も確認されていない**」
+という同じ構造だった。うち3件（client budgetの対象範囲と共有フロア上限、home payload上限、
+guardrailsのfail-safe grep）は **PR #15 で対応済み**。
+
+本phaseが引き取るのは次の2件。詳細と実測値は
+[`../decisions/deferred-work-register-v1.md`](../decisions/deferred-work-register-v1.md) を正本とする。
+
+| 登録簿# | 内容 | 本phaseでの扱い |
 |---|---|---|
-| ③④ | client budgetが4 routeしか見ず、共有フロアに上限が無かった | **PR #15で対応済み**（全16 route＋フロア595,000） |
-| ⑤ | home payload上限500,000が実測203,094の2.5倍 | **PR #15で対応済み**（235,000） |
-| ⑥ | guardrailsのfail-safe grepが`--include`で一度も実行できていなかった | **PR #15で対応済み** |
-| ② | e2e 5specが`waitUntil: 'domcontentloaded'`直後にclickしhydration raceを起こす | **本phaseで対応**（下記） |
-| ⑨ | lintに`--max-warnings`が無く、`<img>` warning 4件が恒常的に残る | 本phaseのTask 4と併せて判断 |
-| ⑦ | axeが`critical`のみ。`serious`まで見ると`color-contrast` 218件 | 繰り越し#4のまま。独立計画 |
+| 9 | e2e 5specが `waitUntil: 'domcontentloaded'` 直後にclickしhydration raceを起こす | e2eを触るついでに対応。ユーザー影響は無く緊急性も無い |
+| 10 | lintに `--max-warnings` が無く、`<img>` warning 4件が恒常的に残る | Task 4（dead code / 依存の継続検査）と併せて判断 |
 
-### ②の扱い
-
-`tests/e2e/` の5 spec（`focus-restoration` / `keyboard-navigation` / `carousel-autoplay` /
-`headings` / `home-world-map`）が `page.goto(..., { waitUntil: 'domcontentloaded' })` を明示
-指定している。Playwrightの既定は `load` で、`domcontentloaded` はそれより**早い**signal。
-hydration前にclickが飛ぶため、`focus-restoration › moves focus into the drawer on open` が
-不定期に落ちる。
-
-実測（2026-08-03、Phase 6 tip）:
-
-- 単体8回: 0/8 失敗
-- フルスイート`--retries=0` 4回: 1/4 失敗
-- CI（ubuntu-latest）: 観測した2 runとも1回目失敗→retryで通過（`1 flaky`表示）
-- hydrationの死に窓: ボタン可視65ms → click有効119ms（ローカル）。**54ms**
-
-**ユーザー影響は無い**（54msは人間が踏めない）。`retries: 2` が吸収しており、CIは緑。
-よって緊急性は無く、e2eを触るついでに直す。放置し続ける場合の唯一の損失は「flaky 1件」が
-常態化して2件目以降に気づかなくなること。**「flakyは1件まで許容、増えたら直す」を運用ルール
-として明示するなら、放置も正当な判断**。書かずに放置すると単なる忘却になる。
-
-対応: 5 specから `{ waitUntil: 'domcontentloaded' }` を落として既定の `load` へ戻す。
-それでも窓は残るため、click後にstateを待つ assertion（`expect(...).toPass()` 等）が要るか
-実測で判断する。検証は「修正前は約4回に1回落ちる／修正後は`--retries=0`で連続N回緑」。
+`color-contrast` 218件（登録簿 #4）は本phaseでも扱わない。独立した計画が要る。
 
 ---
 
