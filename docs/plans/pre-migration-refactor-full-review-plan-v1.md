@@ -1,6 +1,6 @@
 ---
 status: plan
-updated: 2026-08-04
+updated: 2026-08-05
 ---
 
 # 移行前リファクタリング（Phase 1〜7）レビュー計画
@@ -647,3 +647,64 @@ $ for p in / /privacy /compare; do
   「backup時点にはvitest/tsconfig-pathsが無くtoolchainが動かない」というつまずきがあり、
   「ほぼゼロコストで即実行できる」という当初の見立ては誤りだった。データファイルの
   テキスト解析へ回避策を切り替えて実行し、着手前後で公開URL 130件・差分0件を確認した。
+
+---
+
+## 6. 実行結果の総括（2026-08-05）
+
+§3のR1〜R19を、データ層→ブリッジ層→フロントエンド層→ゲート/設定層→テスト層の順に
+実行した。各層の完了時にコミット済み状態で `npm run check`（14ゲート＋e2e 79件）を
+再実行し、exit 0を確認してから次の層へ進んだ。
+
+### 層別の結果
+
+| 層 | 対象 | 結果 |
+|---|---|---|
+| データ層 | `lib/data.ts` `lib/data/`(2) `lib/validate.ts` `lib/validation/`(10) `data/types.ts`、commit `9530937` | 問題なし |
+| ブリッジ層 | `src/app/`(12) `lib/env.ts` | 問題なし |
+| フロントエンド層 | `components/`(35) | 軽微なDRY重複1件 → 修正 |
+| ゲート/設定層 | `scripts/`(13) `.github/`(3) root(11) `ai/`(2) | 問題なし |
+| テスト層 | `tests/`(37、画像除く) | 問題なし |
+
+### 見つけて直したもの
+
+**`RobotCard`/`UseCaseCard`/`ManufacturerCard`のホバー演出（シマー＋下線）が3ファイルに
+逐語重複**（md5一致で確認）。`components/CardHoverEffects.tsx`へ抽出し3ファイルへ適用
+（commit `22afed6`）。抽出の過程で、design_system_v1.mdが「`useTiltCardEffect`を3カード
+種で共有」と書いていたが実際に使うのは`FeaturedRobotCard`のみという記述齟齬も見つかり、
+同時に修正した（commit `9057a3a`）。
+
+### 見つけたが対象外だったもの（検算の記録）
+
+- design_system/ui_architectureの規定循環（§1測定6）: 影響範囲をR8/R9/R11/R19に確定し、
+  各行に「規定文と無関係にテスト内容を直接確認する」注記を追加。実際にfocus-restoration・
+  page-tab-bar・mobile-overflow・carousel-autoplayの各テストを読み、規定の言い換えでなく
+  実DOM/実ブラウザを検証する本物のテストであることを確認した。
+- guardrails §4.4のgrep不備: PR #15（`d81a67c`）で既に修正済みであることを確認。
+- `batteryCapacityWh`未復元: 引き続き未解決。今回のレビュー対象（backup以降の差分）より
+  前のコミットが原因のため対象外だが、`docs/decisions/deferred-work-register-v1.md`への
+  追記が別途必要（本レビューのスコープ外、要フォローアップ）。
+- 世界地図の点数「14」: 25メーカーとの食い違いを一度疑ったが、地理的クラスタリング
+  （`lib/worldMap.ts`の`clusterProjectedManufacturers`、閾値1.8の導出根拠つき）による
+  ものと判明。誤りではなかった。
+
+### この実行自体から得られた副次的な確認
+
+テスト層で、`tests/unit/validation/validation-parity.test.ts`が「かつて `f(x) === f(x)`
+の自明比較で何を壊しても検知できないテストだった」という自己記録を持っていることを発見した。
+guardrails §4.4のgrep不備と同じ種類の欠陥（見た目は検証しているが実際には機能しない）が、
+このプロジェクトの別の場所でも過去に発生し、既に発見・修正されていたことになる。
+`tests/unit/spec-coverage.test.ts`も同様に、本レビューが追った実際のインシデント
+（`acfaa7b`のサイレント削除）に対する恒久対策として存在することを確認した
+（`MIN_POPULATED.batterySystem: 45`、`MIN_ROBOTS: 63`とも現在のデータに一致）。
+
+### 結論
+
+Phase 1〜7の移行前リファクタリングは、本計画のR1〜R19の基準に照らして健全と判断する。
+唯一の修正はコンポーネント3ファイルの軽微な重複除去であり、データ・URL・挙動を変える
+性質のものではない。R1（着手前後で公開URLが1件も増減していない）が、ユーザーの当初の
+懸念（「本当にミスなくできているのか」）への最も直接的な回答になる。
+
+未解決として残るのは、本レビューの対象外と判定した既知項目（`batteryCapacityWh`、
+色コントラスト218件、worldMap動きの復活、その他 `deferred-work-register-v1.md` 記載分）
+のみであり、いずれもレビュー開始前から認識されていたものである。
