@@ -43,10 +43,22 @@ CMS / DBのcutover完了までは、通常のデータ・記事更新を `conten
 | `NEXT_PUBLIC_SITE_URL` | No | sitemap / metadata 用の公開URL。未設定時は `http://localhost:3000` |
 | `NEXT_PUBLIC_FORMSPREE_FORM_ID` | Yes | Contactフォーム送信用のFormspree form ID。未設定時はフォームを送信不可にする |
 | `NEXT_PUBLIC_MEDIA_USAGE_POLICY` | No | 画像・ロゴの表示ポリシー。未設定時は `reference-attributed`。厳格運用時は `commercial-strict` |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | No | GA4 Measurement ID。未設定時は `G-PLLDR4X5TV` |
-| `NEXT_PUBLIC_CLARITY_PROJECT_ID` | No | Microsoft Clarity Project ID。未設定時は `x4ow976y5y` |
+| `NEXT_PUBLIC_ANALYTICS_ENABLED` | No | GA / Clarity の明示的な有効化。`true` かつ ID が1つ以上あり、かつ production runtime のときだけ送信する。未設定時は送信しない |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | No | GA4 Measurement ID（`G-` 始まり）。未設定時は GA を読み込まない |
+| `NEXT_PUBLIC_CLARITY_PROJECT_ID` | No | Microsoft Clarity Project ID（英数字）。未設定時は Clarity を読み込まない |
+| `NEXT_PUBLIC_VERCEL_ANALYTICS_ENABLED` | No | Vercel Analytics の有効化。`true` かつ production runtime のときだけ計測する。未設定時は計測しない |
 
 Vercelでは Project Settings の Environment Variables に設定する。
+
+analytics についての約束:
+
+- **未設定なら何も送信しない。** ソースにフォールバックの ID を持たない。
+- **production runtime だけ。** ここでの production runtime は「`NODE_ENV=production` かつ
+  （`VERCEL_ENV=production` または `VERCEL_ENV` 自体が無い）」。Vercel の preview は
+  `NODE_ENV=production` でビルドされるため、preview の計測が本番へ混ざらないようにしている。
+- **production で不正な形式の ID は起動時に失敗させる。** タイポは「計測できているつもりで
+  何も取れていない」状態を作り、気づくまでが長い。検査は production runtime に限り、
+  ローカル開発は壊れた値でも止めない。
 
 ## 構成
 

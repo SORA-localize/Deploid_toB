@@ -72,9 +72,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AnalyticsScripts
           gaMeasurementId={env.gaMeasurementId}
           clarityProjectId={env.clarityProjectId}
-          enabled={env.isVercelProduction || (env.isProd && !process.env.VERCEL_ENV)}
+          enabled={env.analyticsEnabled}
         />
-        <Analytics />
+        {env.vercelAnalyticsEnabled ? <Analytics /> : null}
       </body>
     </html>
   );

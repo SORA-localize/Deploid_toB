@@ -9,7 +9,9 @@ interface AnalyticsScriptsProps {
 }
 
 export function AnalyticsScripts({ gaMeasurementId, clarityProjectId, enabled }: AnalyticsScriptsProps) {
-  if (!enabled) return null;
+  // ID が1つも無ければ描画しない。呼び出し側の `enabled` 計算が変わっても、
+  // 「ID なしで script を出す」状態にはならないようにここでも閉じる。
+  if (!enabled || (!gaMeasurementId && !clarityProjectId)) return null;
 
   return (
     <>
