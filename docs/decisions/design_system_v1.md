@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-05-29
+updated: 2026-08-03
 ---
 
 # Deploid デザインシステム v1
@@ -182,12 +182,60 @@ Compareのような横幅が必要な画面：
 基本構成：
 
 1. Breadcrumbs
-2. Title + summary
-3. Search
-4. Filters
-5. Result count / mode chips
-6. Grid or list
-7. EmptyState
+2. **一覧ヘッダ（`PageListHeader`）** — H1 ＋ 右に検索 ＋ 下に説明文
+3. Filters
+4. Result count / mode chips
+5. Grid or list
+6. EmptyState
+
+検索は独立した帯を持たず、一覧ヘッダの見出し行に置く（下記）。
+
+#### 一覧ヘッダ（`PageListHeader`）
+
+**全 index route はこれを使う。独自のヘッダを組まない。**
+
+```
+┌─────────────────────────────────────────────┐
+│  ロボット                    [ 検索…      ]  │  ← 見出し行（箱の中央で揃える）
+│  導入検討に必要な仕様を横断で比較できます。      │  ← 説明文
+└─────────────────────────────────────────────┘
+```
+
+- H1 は `text-2xl` 固定。画面幅で変えない（`md:text-3xl` 等を足さない）。
+- 右の `action` には検索窓のようなコントロールを1つだけ置く。
+- **見出しと `action` は `sm:items-center`（箱の中央）で揃える。`items-baseline` は使わない。**
+  `action` に入るコントロールは最低タッチ領域 44px を満たすため実測45pxあり、H1 の 32px より
+  13px 高い。文字基準で揃えるとこの差が上3px・下10px と偏って配分され、検索窓の下線だけが
+  見出しより下へ垂れて見える。文字とコントロールを並べる場合は箱基準で揃える。
+- **`action` の検索窓に可視ラベルを付けない。** ラベルを付けるとラベルの行が H1 と揃い、
+  入力欄がその分（実測36px）下へ押し出される。読み上げには `SearchField` の `aria-label` が届く。
+- `description` は既定で `<p>`。画面幅で本文を出し分ける等、複数要素が要るときだけ node を渡し、
+  その場合は `pageListHeaderDescriptionClassName` で体裁を揃える。
+- wrapper は `<header>`。`<main>` 配下で使うので banner landmark にはならない。
+  呼び出し側でさらに `<header>` に入れない。
+
+> 経緯: この規定が無かったため `/reports` は独自ラベル＋検索の別枠、`/compare` は独自ヘッダ
+> （H1 30px・`py-8`）に分岐していた。実装は Phase 6 Task 1 で統一した。
+
+#### 追従ヘッダ（`ContextualPageHeader`）
+
+- スクロール時にグローバルヘッダ下へ出す絞り込み帯。**H1 を持たない。**
+- **キーボードフォーカスを保持している間は、スクロール量を理由に消してはならない。**
+  消すと、押したばかりのコントロールごと DOM から外れ、フォーカスが `body` へ落ちる。
+  キーボード利用者は絞り込むたびに文書の先頭から Tab をやり直すことになる。
+- 判定は `:focus-visible` に限る。クリックでもボタンはフォーカスを受け取るため、
+  単に「フォーカスがある」で判定するとポインタ利用者にも帯が残り続ける。
+- **追従ヘッダは本文にあるものの再掲に留める。そこにしか無いコントロールを置かない。**
+  帯はスクロールするまで DOM に存在しないため、置くとページ先頭から Tab で到達できなくなる。
+  現状は `/manufacturers` `/use-cases` がページタイトル＋選択中チップの再掲、
+  `/robots` は主軸タブを本文に直置きしており、この規定を満たしている。
+
+> 実測（Phase 6 Task 4）: `/reports` で絞り込むとヒーローが消え、scroll anchoring が
+> ページ先頭へ戻すため `scrollY` が 0 になり、帯が非表示条件に入っていた。
+>
+> **既知の例外: `/reports` の主軸タブ（すべて/ニュース/メーカー解説…）は追従ヘッダの中にしかない。**
+> 上の規定に反するが、本文のどこへ移すかはレイアウト判断を伴うため Phase 6 では扱わず、
+> 繰り越しとした。フォーカスが消える不具合自体は上のフォーカス契約で解消済み。
 
 ### Detail Page
 
@@ -292,6 +340,22 @@ className="border border-neutral-300 bg-neutral-50 overflow-hidden hover:border-
 - credit/sourceを表示する。
 - dotには現在位置が分かるaccessible nameと `aria-current` を付ける。
 
+#### 自動送りするカルーセル（Home / Reports のヒーロー）
+
+WCAG 2.2.2（Pause, Stop, Hide）。5秒間隔で自動送りするため、次を満たす。
+
+- **明示的な停止／再開ボタンを常設する。** hover や drag で止まるだけでは足りない。
+- **reduced motion では autoplay plugin を積まない。** 積んでから止めるのではなく積まない。
+  操作対象が無いので停止ボタン自体も描画しない（押せないボタンを出さない）。
+- 現在位置を `aria-live="polite"` の sr-only 領域で伝える。ドットとプログレスバーは装飾扱い。
+- **各スライドが自分の位置を持つ**（`role="group"` + `aria-roledescription="slide"` + `aria-label`）。
+  全スライドが同時に DOM にあり、live region は位置が「変わったとき」しか鳴らないため、
+  読み上げで線形に辿る利用者には入った時点の文脈が要る。
+
+> 実装上の注意（Phase 6 Task 3 で実測）: embla の `autoplay:play` / `autoplay:stop` イベントが
+> listener へ届かず、`stop()` は効いているのにボタンの表示だけが古いまま残る事象がある。
+> **クリックハンドラ内で state を直接更新すること。** イベント購読だけに任せると表示が壊れる。
+
 ### Robot detail spec explorer
 
 - desktopは上部に横並びタブ、下に表示パネルを置く。タブの選択状態は各ボタン自身の `border-b-2`（activeは `border-foreground`、非activeは `border-transparent`）だけで表す。タブ行を包む共有の`border-b`は持たない（タブが並ぶ幅より右側の余白にまで線が伸びる「宙に浮いた区切り線」を避けるため）。
@@ -334,10 +398,10 @@ tones：
 
 ルール：
 
-- searchはページ内filterとして扱う（記事は MiniSearch=`lib/searchIndex.ts`、他は `lib/search.ts` の部分一致）。
-- URL共有するfilterは `useUrlParamUpdater` でURLに同期する（旧 `useUrlFilters` は廃止）。
+- searchはページ内filterとして扱う（記事は MiniSearch=`lib/searchIndex.ts`、他は `lib/catalog/matchSearch.ts` の部分一致）。検索テキストは server 側の `lib/catalog/search.ts` で field を明示列挙して組み立てる。
+- URL共有するfilterは `useCatalogUrlState`（`lib/catalog/urlState.ts`）でURLに同期する（旧 `useUrlFilters` / `useUrlParamUpdater` は廃止）。
 - **主軸タブ（PageTabBar）は軸を固定する**。記事の `section` のような主分類は、検索・ファセット条件に応じて件数を表示してよいが、タブ自体は非表示にしない。0件の非アクティブタブは disabled 表示にし、active タブと「すべて」は選択可能なまま残す。
-- **ファセット（SelectControl）は設定駆動の `FacetFilterBar`＋`lib/facetConfig.ts` で組む**。選択肢は他の選択で絞った部分集合から件数つきで導出し（`ラベル (件数)`）、0件は `disabled` で無効化して行き止まりを防ぐ。**他ファセットは自動リセットしない**（選択は保持）。
+- **ファセットは各 browser component が `SelectControl` を直接置く**（設定駆動の `FacetFilterBar`＋`lib/facetConfig.ts` は Phase 5 で削除。設定表が全 collection のラベルを client bundle へ載せていたため）。選択肢は他の選択で絞った部分集合から件数つきで導出し（`ラベル (件数)`）、0件は `disabled` で無効化して行き止まりを防ぐ。**他ファセットは自動リセットしない**（選択は保持）。
 - ドロップダウンのパネル幅はトリガー幅に固定する（内容で伸ばさない）。Select と SearchableDropdown の閉じた見た目を揃える。
 - chip buttonは `aria-pressed`。
 - **選択中インジケーター（ActiveFilterChips）はプレーンテキスト**。border/background/shadow を付けない。`text-muted-foreground hover:text-foreground` のみ。TagChip とは別物。
@@ -416,6 +480,10 @@ tones：
 ---
 
 ## 8. Responsive
+
+レイアウトの確認幅は **390 / 768 / 1280 / 1440px** の4つ。この4幅で document overflow を
+許可しない（横スクロールを出さない）。回帰は `tests/e2e/mobile-overflow.spec.ts`（390px）と
+visual regression が担う。
 
 標準グリッド：
 

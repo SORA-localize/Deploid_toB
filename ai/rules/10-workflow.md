@@ -140,7 +140,7 @@ AIは局所最適な修正を作りやすいため、以下を禁止または強
 - Data: `data/types.ts`, `data/*.ts`, `lib/data.ts`, `lib/validate.ts`
 - Labels/display/tags/specs: `lib/labels.ts`, `lib/display.ts`, `lib/tagRegistry.ts`, `lib/specSchema.ts`
 - UI text/theme: `lib/uiText.ts`, `src/app/globals.css`, `lib/visualSemantics.ts`
-- Search/filter/state: `lib/search*.ts`, `lib/*Filters.ts`, `lib/useUrlParamUpdater.ts`
+- Search/filter/state: `lib/searchIndex.ts`, `lib/catalog/search.ts`, `lib/catalog/matchSearch.ts`, `lib/*Filters.ts`, `lib/catalog/urlState.ts`
 - Routes/layout: `src/app/**/page.tsx`, `src/app/layout.tsx`, `src/app/sitemap.ts`, `src/app/robots.ts`
 - Shared components: `components/`, especially cards, filters, detail sidebars, form controls, layout shells
 - Runtime/config/deps: `package.json`, `next.config.*`, `.env.example`, README environment section

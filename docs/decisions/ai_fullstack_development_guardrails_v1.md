@@ -50,7 +50,7 @@ AIだけでWeb開発やフルスタック開発を進めると、短時間で動
 │ フロントエンド層（Client Component / 状態管理）         │
 │  components/*.tsx      — UIコンポーネント              │
 │  lib/article*.ts       — 記事フィルタ・棚・ページング  │
-│  lib/useUrlParamUpdater.ts — URL state更新             │
+│  lib/catalog/urlState.ts — URL state更新               │
 │  lib/*Filters.ts       — フィルタロジック              │
 │  lib/searchIndex.ts    — MiniSearch インデックス       │
 └─────────────────────────────────────────────────────┘
@@ -477,7 +477,7 @@ npm run build
 ```bash
 # 旧URLパラメータ名の残留（?section= / ?theme= / ?industry= / ?region=）
 rg "section=|theme=|industry=|region=" src components lib --include="*.ts" --include="*.tsx" \
-  | grep -v "facetConfig\|ARTICLE_FACETS\|tagRegistry\|// "
+  | grep -v "ARTICLE_FACETS\|tagRegistry\|// "
 
 # ArticleType / ArticleSection 値のコンポーネント内直比較
 rg "article\.(type|section)\s*===\s*['\"]" components src

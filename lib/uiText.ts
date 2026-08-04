@@ -278,5 +278,12 @@ export const uiText = {
       singleAriaLabel: (manufacturerName: string, regionName: string) =>
         `${manufacturerName}（${regionName}）の詳細を見る`,
     },
+    carousel: {
+      label: '注目記事カルーセル',
+      pauseAutoplay: '自動再生を停止する',
+      resumeAutoplay: '自動再生を再開する',
+      /** aria-live で現在位置を伝える。視覚的にはドットが担う。 */
+      position: (current: number, total: number) => `${total}件中${current}件目`,
+    },
   },
 } as const;
