@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/app/**/{page,layout,route,loading,not-found,error,global-error,sitemap,robots,manifest,opengraph-image}.{ts,tsx}",
+    "scripts/*.mjs",
+    "tests/**/*.{ts,tsx}"
+  ],
+  "project": [
+    "components/**/*.{ts,tsx}",
+    "data/**/*.ts",
+    "lib/**/*.{ts,tsx}",
+    "src/**/*.{ts,tsx}",
+    "scripts/**/*.mjs"
+  ],
+  "include": ["files", "dependencies", "unlisted"],
+  "ignoreDependencies": [
+    "tailwindcss",
+    "tw-animate-css",
+    "@radix-ui/colors",
+    "postcss",
+    "postcss-load-config"
+  ]
+}

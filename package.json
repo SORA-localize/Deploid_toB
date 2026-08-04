@@ -20,13 +20,14 @@
     "check:home-payload": "node scripts/check-home-payload.mjs",
     "check:bundle-content": "node --experimental-strip-types scripts/check-client-bundle-content.mjs",
     "check:plan-snippets": "node scripts/check-plan-snippets.mjs",
+    "check:dead-code": "knip",
     "check:client-budgets": "node scripts/check-client-budgets.mjs",
     "typecheck": "tsc --noEmit --incremental false",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 4",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check": "npm run validate:data && npm run check:data-boundaries && npm run check:client-imports && npm run check:world-map-asset && npm run typecheck && npm run lint && npm run check:plan-snippets && npm run test && npm run build && npm run check:home-payload && npm run check:bundle-content && npm run check:client-budgets && npm run test:e2e"
+    "check": "npm run validate:data && npm run check:data-boundaries && npm run check:client-imports && npm run check:world-map-asset && npm run typecheck && npm run lint && npm run check:plan-snippets && npm run check:dead-code && npm run test && npm run build && npm run check:home-payload && npm run check:bundle-content && npm run check:client-budgets && npm run test:e2e"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -67,9 +68,9 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.2.12",
     "jsdom": "^28.1.0",
+    "knip": "^5.88.1",
     "tailwindcss": "^4.1.12",
     "typescript": "^6.0.3",
-    "vercel": "^54.10.3",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.10"
   },

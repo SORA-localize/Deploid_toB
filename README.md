@@ -23,6 +23,29 @@
 | `npm run build` | 本番ビルド（SSG） |
 | `npm run start` | ビルド結果をローカル起動 |
 | `npm run validate:data` | データ整合チェックのみ実行 |
+| `npm run check` | 全ゲートを通す（CIと同じ） |
+| `npm run check:dead-code` | 未使用ファイル・export・依存の検査（knip） |
+
+### `check:dead-code` の範囲と ignore
+
+検査するのは **未使用ファイル・未使用依存・未宣言依存の3つ**（`knip.json` の `include`）。
+未使用 export は対象外にしている。実測で86件出るが、その多くは `lib/labels.ts` や
+`lib/display.ts` のように「enum に対する表 = 正本」として意図的に全件揃えているもので、
+未参照であること自体は欠陥ではない。混ぜると gate が常に赤になり、無視されるようになる。
+整理するなら export 単位ではなく「その enum 値ごと使わないと決める」判断が要るため、
+別途扱う。
+
+`ignoreDependencies` は、**knip が CSS を辿らないために誤検知するもの**だけを挙げている。
+「使っていないが消せない」ものは1つも入っていない。
+
+| 依存 | 実際の使用箇所 |
+|---|---|
+| `@radix-ui/colors` | `src/app/globals.css` が `@import "@radix-ui/colors/slate.css"` で読む。消すとテーマトークンが解決できず配色が壊れる |
+| `tailwindcss` / `tw-animate-css` | `globals.css` から解決 |
+| `postcss` / `postcss-load-config` | `postcss.config.mjs` の設定形式と型注釈 |
+
+**無言で ignore を増やさないこと。** 追加するときは、ここに実際の使用箇所を書く。理由の無い
+ignore が溜まると、この gate は「何も見つけない gate」になる。
 
 ## ブランチ運用
 
