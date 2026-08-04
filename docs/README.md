@@ -10,9 +10,9 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 計画 | 一言 | branch | 開始日 |
 |---|---|---|---|
-| [CMS / DB移行前リファクタリング実装](plans/pre-migration-refactor-implementation-index-v1.md) | 安全設計をPhase 1〜7のテスト・実装・commit・rollback単位へ分割。アプリ実装は未着手 | `refactor/integration-20260726`からphase branchを順次作成 | 2026-07-26 |
-| [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | `data/*.ts` から Payload CMS + managed PostgreSQLへ、URLと不変idを保って段階移行。実装は未着手 | 未定（専用branch必須） | 2026-07-26 |
-| [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | DB/CMS、品質ゲート、依存更新、性能、client境界、UI/a11y、セキュリティ、文書を優先度順に改善。実装は未着手 | phaseごとに分割 | 2026-07-26 |
+| [CMS / DB移行前リファクタリング実装](plans/pre-migration-refactor-implementation-index-v1.md) | **Phase 1〜6 は main 反映済み。Phase 7 が最後**（実測は [結果](reference/pre-migration-refactor-results-v1.md)）。積み残しは [登録簿](decisions/deferred-work-register-v1.md) | `refactor/07-security-cleanup` | 2026-07-26 |
+| [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | `data/*.ts` から Payload CMS + managed PostgreSQLへ、URLと不変idを保って段階移行。実装は未着手。**2026-07-26付でPhase 3・5・6が作った層を反映していない——着手時に現行実装へ突合すること** | 未定（専用branch必須） | 2026-07-26 |
+| [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | 上位ロードマップ。**Phase番号は移行前リファクタの1〜7とは別体系**（本書のPhase 1はCMS/DB移行を指す）。移行前スコープは実装インデックス側が正本 | phaseごとに分割 | 2026-07-26 |
 | [レスポンシブ対応](plans/responsive-phase-1-static-audit-v1.md) | Phase 1のコード実装は完了。R-06（実機スクリーンショットでの最終確認）が未実施 | 専用branchなし（mainへ直接実装） | 2026-07-03 |
 | [ロボットデータ ファクトチェック反映](plans/robot-data-factcheck-impl-plan-2026-07-01.md) | Phase A/Bは完了。Phase Cは`marketAvailability`のみ実装済み、`scopeStatus`/`evidenceLevel`が未着手 | 未定（型変更のため別branch推奨のまま） | 2026-07-01 |
 | [ロボットデータ R02統合](plans/robot-data-r02-integration-plan-v1.md) | 全61機再調査（DATA-R02）の反映。低リスクbatchは反映済み、個別conflict機（pal-kangaroo等）と最終回帰監査（R02-11）が残task | `data/robot-catalog-r01-rollout-20260716`（PR #3はmerge済み、残taskは別PRで継続） | 2026-07-17 |

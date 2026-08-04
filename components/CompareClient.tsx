@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
 import {
   closestCenter,
   DndContext,
@@ -701,6 +702,12 @@ export function CompareClient({ robots, manufacturers, initialSearch }: CompareC
           </DragOverlay>
         </DndContext>
       </div>
+      {/*
+        toast を出すのは compare だけなので、Toaster もここに置く。root layout に置くと
+        sonner の runtime が全 route の共有フロアへ載り、/privacy のような静的ページまで
+        配信されていた（積み残し登録簿 #3）。
+      */}
+      <Toaster />
     </div>
   );
 }
