@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-08-04
+updated: 2026-08-05
 ---
 
 # 積み残し登録簿 v1
@@ -37,8 +37,8 @@ Phase 5・6 の実行中、積み残しは3か所に分散していた。実装�
 | 6 | [Reports H1 の動的化](#6-reports-h1-の動的化) | Phase 6 | 低 | 未着手 |
 | 7 | [`/robots` グリッドが 768px で2列](#7-robots-グリッドが-768px-で2列) | Phase 6 | 低 | 未着手・人間が対象外と決定 |
 | 8 | [Home 世界地図の動きの復活](#8-home-世界地図の動きの復活) | Phase 4 | **最後** | 未着手・ユーザー要望 |
-| 9 | [e2e の hydration race](#9-e2e-の-hydration-race) | 監査 | 低 | Phase 7 で対応 |
-| 10 | [lint の `--max-warnings` 未設定](#10-lint-の---max-warnings-未設定) | 監査 | 低 | Phase 7 で判断 |
+| 9 | [e2e の hydration race](#9-e2e-の-hydration-race) | 監査 | 低 | Phase 7完了・未対応のまま残存 |
+| 10 | [`batteryCapacityWh` の未復元](#10-batterycapacitywh-の未復元) | 全体レビュー | 中 | 未着手 |
 
 ---
 
@@ -193,19 +193,33 @@ retries 自体は Playwright / Cypress とも公式機能で、CI での使用�
 **放置も正当な判断**。ただしその場合は「**flaky は1件まで許容、増えたら直す**」を運用ルールと
 して明示すること。書かずに放置すると単なる忘却になり、2件目以降に気づけなくなる。
 
-**Phase 7 で対応予定**（e2e を触るついで）。
+**Phase 7 は対応せずに完了した**（2026-08-04 マージ）。以前は「Phase 7で対応予定」と
+書いていたが、Task 1〜6は analytics/security headers/Toaster/dead code/docs links/results の
+6件で、この項目には触れていない。約束を果たさずに完了したので、この行を実態に合わせて訂正した
+（全体レビューで発見、2026-08-05）。対象5ファイルへの該当箇所数を`grep -c`で数え直したところ
+`carousel-autoplay.spec.ts`4箇所・`headings.spec.ts`1箇所・`focus-restoration.spec.ts`7箇所・
+`keyboard-navigation.spec.ts`7箇所・`home-world-map.spec.ts`1箇所の計20箇所（ファイル数5は
+変わらず）。**着手時期は未定のまま**、次にe2eを触る機会に対応する。
 
 ---
 
-## 10. lint の `--max-warnings` 未設定
+## 10. `batteryCapacityWh` の未復元
 
-`eslint .` に `--max-warnings` の指定が無く、warning は CI を止めない。現在 `<img>` に関する
-warning が4件恒常的に残っている（`Footer` / `Header` / `ManufacturerMapCopy` / `uilayouts/carousel`）。
+commit `acfaa7b`（2026-07-22）が `batterySystem`（45機）と `batteryCapacityWh`（16機）を
+commit message に記載せず削除した。`batterySystem` は commit `9530937` で復元済みだが、
+`batteryCapacityWh` は今も削除されたまま。`grep -c "batteryCapacityWh" data/robots.ts
+lib/specSchema.ts` はいずれも `0`（2026-08-05 実測）。同じ commit で `lib/specSchema.ts` は
+`batteryCapacityWh`（Wh 単位）を `batteryCapacityMah`（mAh 単位）へ差し替えており、
+両者は同じラベル「バッテリー容量」を使う設計になっている。
 
-**判断が要る点**: `next/image` へ寄せるか、`no-img-element` を意図的に無効化して 0 warning に
-するか。ロゴ・地図の表示要件と `lib/media.ts` の gate に関わるため、機械的な置換はできない。
+**なぜ後回しにしたか**: 値を戻すだけの単純作業ではない。`batteryCapacityWh` を復元すると
+同じラベルが2フィールドに付くため、ラベルを分けるか単位表記をどう扱うかの確定が復元の
+前提になる（[`data-maintenance-checklist-v1.md`](data-maintenance-checklist-v1.md) §I 原文）。
 
-**Phase 7 Task 4（dead code / 依存の継続検査）と併せて判断する。**
+**いつやるか**: ラベル方針が決まり次第。16機分の値自体は `acfaa7b` 以前の履歴から復元できる。
+
+出典: [`data-maintenance-checklist-v1.md`](data-maintenance-checklist-v1.md) §I（原記録）、
+全体レビュー計画 R16 節（発見・登録簿への追記、2026-08-05）
 
 ---
 
