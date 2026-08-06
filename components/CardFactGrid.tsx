@@ -29,7 +29,7 @@ export function CardFactGrid({ items, className }: CardFactGridProps) {
           key={item.key ?? index}
           className="min-w-0 border-b border-border py-2"
         >
-          <dt className="mb-0.5 text-left text-muted-foreground/80">{item.label}</dt>
+          <dt className="mb-0.5 text-left text-muted-foreground/90">{item.label}</dt>
           <dd
             className={cn(
               'min-w-0 break-words text-left font-medium leading-snug text-foreground [overflow-wrap:anywhere]',
