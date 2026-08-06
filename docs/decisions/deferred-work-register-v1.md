@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-08-05
+updated: 2026-08-06
 ---
 
 # 積み残し登録簿 v1
@@ -38,7 +38,7 @@ Phase 5・6 の実行中、積み残しは3か所に分散していた。実装�
 | 7 | [`/robots` グリッドが 768px で2列](#7-robots-グリッドが-768px-で2列) | Phase 6 | 低 | 未着手・人間が対象外と決定 |
 | 8 | [Home 世界地図の動きの復活](#8-home-世界地図の動きの復活) | Phase 4 | **最後** | 未着手・ユーザー要望 |
 | 9 | [e2e の hydration race](#9-e2e-の-hydration-race) | 監査 | 低 | Phase 7完了・未対応のまま残存 |
-| 10 | [`batteryCapacityWh` の未復元](#10-batterycapacitywh-の未復元) | 全体レビュー | 中 | 未着手 |
+| 10 | [`batteryCapacityMah` の未反映](#10-batterycapacitymah-の未反映) | 全体レビュー | 中 | 20/63機反映済み・23機要人力判断 |
 
 ---
 
@@ -203,23 +203,38 @@ retries 自体は Playwright / Cypress とも公式機能で、CI での使用�
 
 ---
 
-## 10. `batteryCapacityWh` の未復元
+## 10. `batteryCapacityMah` の未反映
 
 commit `acfaa7b`（2026-07-22）が `batterySystem`（45機）と `batteryCapacityWh`（16機）を
-commit message に記載せず削除した。`batterySystem` は commit `9530937` で復元済みだが、
-`batteryCapacityWh` は今も削除されたまま。`grep -c "batteryCapacityWh" data/robots.ts
-lib/specSchema.ts` はいずれも `0`（2026-08-05 実測）。同じ commit で `lib/specSchema.ts` は
-`batteryCapacityWh`（Wh 単位）を `batteryCapacityMah`（mAh 単位）へ差し替えており、
-両者は同じラベル「バッテリー容量」を使う設計になっている。
+commit message に記載せず削除し、`batteryCapacityWh`（Wh 単位）を新設 `batteryCapacityMah`
+（mAh 単位）へ差し替えた。`batterySystem` は commit `9530937` で復元済みだが、mAh 側は
+Unitree G1（9000mAh）1機分しか埋まっていなかった。
 
-**なぜ後回しにしたか**: 値を戻すだけの単純作業ではない。`batteryCapacityWh` を復元すると
-同じラベルが2フィールドに付くため、ラベルを分けるか単位表記をどう扱うかの確定が復元の
-前提になる（[`data-maintenance-checklist-v1.md`](data-maintenance-checklist-v1.md) §I 原文）。
+**2026-08-06 に方針決定・一部反映済み**。ユーザー提供の将来DB用データ（57メーカー・197機種、
+mAh単位で統一）と `docs/decisions/data/research/DATA-R02-*` を突合した結果、Wh は
+「多くの機種で mAh/Ah しか公表されておらず、電圧不明でWh換算できない」ことが判明。
+Wh 側は復元せず **mAh へ一本化**すると決定（詳細:
+[`deferred-work-register-followup-v1.md`](../plans/deferred-work-register-followup-v1.md) DEC-04）。
+`docs/plans/robot-data-r02-integration-plan-v1.md` の未完了task `R02-09` の再開として実施した。
 
-**いつやるか**: ラベル方針が決まり次第。16機分の値自体は `acfaa7b` 以前の履歴から復元できる。
+**現状**（PR [#20](https://github.com/SORA-localize/Deploid_toB/pull/20)）: 20/63機に
+`batteryCapacityMah` を反映済み（Unitree 8機、AgiBot 2機、UBTECH 2機、LimX 2機、Leju 2機、
+EngineAI 1機、RobotEra 1機、Galbot 1機。既存sourceのURLで裏付け、`validate:data` /
+`build` / `spec-coverage.test.ts`（floor 20 に更新）で確認済み）。
+
+**除外**: `pal-kangaroo`。ソースCSVは15000mAhだが、公式ページを実際に開くと
+「976 Ah」という非現実的な値が記載されており、既存のR02調査（PDF文字化けでの
+`source-inaccessible`判定）と符合する矛盾が見つかった。誤ったcitationを書くより
+保留を選び、値は未反映のまま。
+
+**残task**: 23機（`booster-t1`の`T1`に対しCSVが`T1 Basic`/`T1 Standard`/`T1 Customized`の
+3行を持つ、等）はCSV側のvariant名がDeploidの代表レコードとどう対応するか一次資料の
+個別確認が必要で自動反映していない。一覧は
+[`deferred-work-register-followup-v1.md`](../plans/deferred-work-register-followup-v1.md)
+Task B-1 を参照。
 
 出典: [`data-maintenance-checklist-v1.md`](data-maintenance-checklist-v1.md) §I（原記録）、
-全体レビュー計画 R16 節（発見・登録簿への追記、2026-08-05）
+[`deferred-work-register-followup-v1.md`](../plans/deferred-work-register-followup-v1.md)（発見・反映、2026-08-06）
 
 ---
 

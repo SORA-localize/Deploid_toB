@@ -32,7 +32,7 @@ const MIN_POPULATED: Record<SpecKey, number> = {
   handType: 1,
   tactileSensor: 0,
   runtimeMin: 35,
-  batteryCapacityMah: 1,
+  batteryCapacityMah: 20,
   chargeTimeMin: 15,
   batterySwapMethod: 1,
   batterySystem: 45,
