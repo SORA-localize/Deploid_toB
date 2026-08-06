@@ -10,20 +10,18 @@ import { expect, test } from '@playwright/test';
  * `tests/components/page-tab-bar.test.tsx` が固定している。
  */
 
-/**
- * 記事の絞り込みタブは追従ヘッダの中だけにあり、少しスクロールするまで DOM に存在しない
- * （`components/ContextualPageHeader.tsx` → `HeaderStickyBarSlot`）。
- * キーボードでも Space / PageDown でスクロールできるので到達はできるが、
- * ページ先頭からは Tab だけでは辿り着けない。テストは実際の利用と同じく先にスクロールする。
- */
-async function revealStickyFilterTabs(page: import('@playwright/test').Page) {
-  await page.evaluate(() => window.scrollTo(0, 400));
+test('reports filter tabs are reachable from the top of the page without scrolling', async ({ page }) => {
+  // 積み残し登録簿 #5 の回帰ガード。以前はスクロールするまで DOM に存在しなかった
+  // （ContextualPageHeader → HeaderStickyBarSlot 経由）。現在は本文内で position:sticky に
+  // なっており（components/ReportsHeader.tsx）、ページ先頭・スクロール量0の時点で存在する。
+  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
   await expect(page.getByRole('group', { name: '記事' })).toBeVisible();
-}
+});
 
 test('reports filter tabs are reachable and selectable with the keyboard', async ({ page }) => {
   await page.goto('/reports', { waitUntil: 'domcontentloaded' });
-  await revealStickyFilterTabs(page);
 
   const tabs = page.getByRole('group', { name: '記事' }).getByRole('button');
   await expect(tabs.first()).toHaveAttribute('aria-current', 'page');
@@ -41,35 +39,22 @@ test('reports filter tabs are reachable and selectable with the keyboard', async
 
 test('selecting a filter tab does not destroy keyboard focus', async ({ page }) => {
   await page.goto('/reports', { waitUntil: 'domcontentloaded' });
-  await revealStickyFilterTabs(page);
 
   const tabs = page.getByRole('group', { name: '記事' }).getByRole('button');
   const target = tabs.nth(1);
   await target.focus();
   await page.keyboard.press('Enter');
 
-  // 絞り込むとヒーローが消え、scroll anchoring がページ先頭へ戻す。追従バーが
-  // スクロール量だけで消えると、押したばかりのタブごとフォーカスが body へ落ちる。
+  // 絞り込むとヒーローが消え、scroll anchoring がページ先頭へ戻す。タブ行は
+  // position:sticky で常時マウントのため、以前のようにスクロール量だけを理由に
+  // DOM から外れてフォーカスが body へ落ちることはない。
   await page.waitForTimeout(600);
   await expect(page.getByRole('group', { name: '記事' })).toBeVisible();
   await expect(target).toBeFocused();
 });
 
-test('the sticky bar still hides on scroll for pointer users', async ({ page }) => {
-  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
-  await revealStickyFilterTabs(page);
-
-  // クリックでもボタンはフォーカスを受け取る。上の保護が `:focus-visible` 限定でないと、
-  // マウス利用者にも追従バーが残り続けてしまう。
-  await page.getByRole('group', { name: '記事' }).getByRole('button').nth(1).click();
-
-  await expect(page).toHaveURL(/kind=news/);
-  await expect(page.getByRole('group', { name: '記事' })).toHaveCount(0);
-});
-
 test('a disabled filter tab is reachable but does not navigate', async ({ page }) => {
   await page.goto('/reports', { waitUntil: 'domcontentloaded' });
-  await revealStickyFilterTabs(page);
 
   // aria-disabled にしてあるので Tab では飛ばされず、理由を読み上げられる。
   const disabled = page.locator('[role="group"] button[aria-disabled="true"]').first();

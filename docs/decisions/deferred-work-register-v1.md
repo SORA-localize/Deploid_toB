@@ -33,12 +33,13 @@ Phase 5・6 の実行中、積み残しは3か所に分散していた。実装�
 | 2 | [一覧の本文検索の代替](#2-一覧の本文検索の代替) | Phase 5 | 低 | 未着手 |
 | 3 | [共有フロア 588,660 の削減](#3-共有フロア-588660-の削減) | Phase 5 | 中 | **Phase 7 Task 3 で一部対応** |
 | 4 | [`color-contrast` 218箇所の是正](#4-color-contrast-218箇所の是正) | Phase 6 | 中 | 未着手・独立計画が要る |
-| 5 | [`/reports` 主軸タブの到達性](#5-reports-主軸タブの到達性) | Phase 6 | 中 | 未着手 |
-| 6 | [Reports H1 の動的化](#6-reports-h1-の動的化) | Phase 6 | 低 | 未着手 |
 | 7 | [`/robots` グリッドが 768px で2列](#7-robots-グリッドが-768px-で2列) | Phase 6 | 低 | 未着手・人間が対象外と決定 |
 | 8 | [Home 世界地図の動きの復活](#8-home-世界地図の動きの復活) | Phase 4 | **最後** | 未着手・ユーザー要望 |
 | 9 | [e2e の hydration race](#9-e2e-の-hydration-race) | 監査 | 低 | Phase 7完了・未対応のまま残存 |
 | 10 | [`batteryCapacityMah` の未反映](#10-batterycapacitymah-の未反映) | 全体レビュー | 中 | 20/63機反映済み・23機要人力判断 |
+| 11 | [`/reports` visual-regressionのLinuxベースライン未更新](#11-reports-visual-regressionのlinuxベースライン未更新) | 全体レビュー | 低 | 未着手 |
+
+`#5`・`#6`は解消済みのため行ごと削除（[PR #21](https://github.com/SORA-localize/Deploid_toB/pull/21)・[PR #20](https://github.com/SORA-localize/Deploid_toB/pull/20)、2026-08-06）。
 
 ---
 
@@ -109,31 +110,6 @@ axe の閾値を `critical` から `serious` へ上げると全6 route で違反
 なると全数把握ができなくなるため、移行前に片付けるほうが安い。
 
 出典: Phase 6 計画の Task 5b。[`ui_architecture_and_development_policy_v1.md`](ui_architecture_and_development_policy_v1.md) §9 からも参照
-
----
-
-## 5. `/reports` 主軸タブの到達性
-
-記事の絞り込みタブ（すべて / ニュース / メーカー解説…）が追従ヘッダの中にしかなく、
-スクロールするまで DOM に存在しない。ページ先頭から Tab で到達できない。
-
-「追従ヘッダは本文の再掲に留める」という [`design_system_v1.md`](design_system_v1.md) の規定に反する。
-
-**なぜ後回しにしたか**: 本文のどこへ移すかがレイアウト判断を伴う。
-
-**なお**: フォーカスが消える不具合自体は Phase 6 Task 4 で解消済み（`HeaderStickyBarSlot` が
-`:focus-visible` を持つ間はバーを消さない）。残るのは「そもそも到達できない」ほう。
-
----
-
-## 6. Reports H1 の動的化
-
-選択中の shelf に関わらず H1 が常に静的な「記事」。shelf 別ラベルは `ARTICLE_SHELF_TABS` に既にある。
-
-**なぜ後回しにしたか**: Phase 6 の Global Constraint（全 index/detail route に一意な H1 を1つ）を
-満たすのに必須ではない。
-
-出典: Phase 6 計画 F6-02
 
 ---
 
@@ -235,6 +211,34 @@ Task B-1 を参照。
 
 出典: [`data-maintenance-checklist-v1.md`](data-maintenance-checklist-v1.md) §I（原記録）、
 [`deferred-work-register-followup-v1.md`](../plans/deferred-work-register-followup-v1.md)（発見・反映、2026-08-06）
+
+---
+
+## 11. `/reports` visual-regressionのLinuxベースライン未更新
+
+`#5`（`/reports`主軸タブの到達性）の修正で、タブ行を浮遊オーバーレイから本文内の
+`position: sticky`要素へ変更した（[PR #21](https://github.com/SORA-localize/Deploid_toB/pull/21)）。
+これに伴い`tests/e2e/visual-regression.spec.ts`の`/reports`ベースライン画像が
+実際のレイアウト変化により古くなった。
+
+`-darwin.png`（4viewport）は開発機（macOS）で`--update-snapshots`により再生成し、
+目視確認済み（overflow・重なり・切れ・欠落なし）。
+
+**`-linux.png`（CIが使う側）は未更新。** 開発機にDocker/Linux環境が無く、CIが失敗時に
+保存する成果物（トレース・動画込みで82MB）から該当4枚のPNGだけを取り出すダウンロードも
+この回線では30分以上かかる見込みで断念した。
+
+**なぜ後回しにしたか**: ユーザーがVercelプレビューで実機確認し、コードとdarwin側の
+検証（自動テスト・目視）で実質的な正しさは確認済みと判断したため、Linux画像の更新を
+待たずにPR #21をマージした。
+
+**いつやるか**: Docker（`mcr.microsoft.com/playwright`公式イメージ等）が使える環境、または
+Linuxマシンで`npx playwright test tests/e2e/visual-regression.spec.ts -g reports --update-snapshots`
+を実行し、生成された`tests/e2e/visual-regression.spec.ts-snapshots/reports-*-chromium-linux.png`
+をcommitする。それまでCIの`verify`ジョブは`/reports`の4viewportで恒常的に赤くなる
+（他のテストは影響を受けない）。
+
+出典: PR [#21](https://github.com/SORA-localize/Deploid_toB/pull/21) のCI実行結果（2026-08-06）
 
 ---
 
