@@ -90,26 +90,48 @@ Home 側 4 ファイルが使い続けるため dependencies から外せてい�
 
 axe の閾値を `critical` から `serious` へ上げると全6 route で違反する。
 
-| route | 件数 |
-|---|---:|
-| `/robots` | 96 |
-| `/manufacturers` | 85 |
-| `/use-cases` | 17 |
-| `/` | 16 |
-| `/reports` | 3 |
-| `/compare` | 1 |
+| route | 件数（2026-08-03） | 件数（2026-08-06再測） |
+|---|---:|---:|
+| `/robots` | 96 | 96 |
+| `/manufacturers` | 85 | 85 |
+| `/use-cases` | 17 | 17 |
+| `/` | 16 | 16 |
+| `/reports` | 3 | 4 |
+| `/compare` | 1 | 1 |
+| **合計** | 218 | **219** |
 
-全件 `color-contrast`。`src/app/globals.css` のテーマトークンと配色設計に関わる。
+全件 `color-contrast`。`/reports`が3→4件になったのは`#6`（H1動的化）等の差分による誤差で、
+本質的な件数構成は変わっていない。
+
+**2026-08-06 実測: 根本原因を特定した（Task D、`docs/plans/deferred-work-register-followup-v1.md`）。**
+`axe`の`failureSummary`から前景色・背景色のペアを全219件について集計した結果、単一デザイン
+トークンの問題ではなく、**3種類の原因に集約できる**：
+
+| 原因 | 件数 | 割合 | 内容 |
+|---|---:|---:|---|
+| `text-muted-foreground/80` on 白 | 161 | 73% | `components/CardFactGrid.tsx:32`の`dt`（fact値ラベル）。RobotCard/ManufacturerCard/UseCaseCard共通のため`/robots``/manufacturers``/use-cases``/`の4routeに波及 |
+| `text-muted-foreground/70` on `--muted` | 35 | 16% | `components/RobotCard.tsx:119`の画像欠落プレースホルダー文言。`/robots`のみ |
+| `--signal`/`--signal-foreground`（#29a383/#fff） | 15 | 7% | `components/NewsFeatureCard.tsx:41`ほかのタグバッジ。トークン自体が3.15:1でAA未達（不透明度は無関係） |
+| その他（`/60`,`/50`,`/40`等） | 8 | 4% | `ComparisonRobotPanel`/`CompareClient`/`Breadcrumbs`/`ContactForm`等に散在、各1-2箇所 |
+
+**検証方法**: `--muted-foreground`（slate-11 `#60646c`）はそのまま白背景に置けば5.94:1でAA通過する
+（このセッションの前回調査で確認済み）。`#808389`（161件側の前景色）はこの値を80%不透明度で
+白に合成した理論値と完全一致し、`#8e9197`（35件側）も70%を`--muted`（`#f9f9fb`）に合成した理論値と
+完全一致した（手計算で検算済み）。**トークンの色自体は問題なく、不透明度修飾子が可読性を壊している。**
 
 **なぜ後回しにしたか**: テスト追加タスクの範囲を超える。Phase 6 は「違反 0 の状態で gate を
 入れる」原則を守り、閾値を上げなかった。
 
-**いつやるか**: **独立した計画が要る。** axe gate を `serious` へ上げられるのはこれを片付けた後。
+**いつやるか**: 根本原因は特定済みなので、次はOption提示を伴う実装計画が書ける状態。
+`CardFactGrid.tsx`1箇所の不透明度調整で全体の73%が解消する見込みだが、**実際にAA通過するか
+（`/80`をどこまで上げれば4.5:1を超えるか）は未検証**。axe gate を `serious` へ上げられるのは
+これを片付けた後。
 
 **注意**: 静的生成のうちは全数がビルド時に確定して数えられる。CMS/DB へ移行して内容が動的に
 なると全数把握ができなくなるため、移行前に片付けるほうが安い。
 
-出典: Phase 6 計画の Task 5b。[`ui_architecture_and_development_policy_v1.md`](ui_architecture_and_development_policy_v1.md) §9 からも参照
+出典: Phase 6 計画の Task 5b。[`ui_architecture_and_development_policy_v1.md`](ui_architecture_and_development_policy_v1.md) §9、
+Task D実測（`docs/plans/deferred-work-register-followup-v1.md`、2026-08-06）
 
 ---
 

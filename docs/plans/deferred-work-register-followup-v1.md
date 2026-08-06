@@ -276,19 +276,27 @@ npm run test:unit -- page-tab-bar
 
 ---
 
-### Task D（`#4`）color-contrast — 調査task（修正taskではない）
+### Task D（`#4`）color-contrast — 調査task（修正taskではない） — **完了（2026-08-06）**
 
-**Files**: 変更なし。
+**Files**: 変更なし（調査のみ実施）。
 
-**Problem**: §2.4の通り、根本原因が未特定。
+**Problem**: §2.4の通り、根本原因が未特定だった。
 
-**Change**: `axe`を`serious`閾値で実行し、実際の違反要素（selector・色の組み合わせ・route別内訳）を取得する。既存の`tests/e2e/accessibility-smoke.spec.ts`は`critical`のみを見ているため、別途一時スクリプトまたはPlaywright単発実行で`result.violations`を`serious`以上でフィルタして出力する。
+**実施内容**: `npm run start`で本番ビルドを起動し、`@axe-core/playwright`を6 route全てに対して実行、`serious`/`critical`の`color-contrast`違反219件（前回218件から`/reports`が+1、`#6`実装等の差分による誤差）全件の`failureSummary`から前景色・背景色ペアを抽出・集計した（一時スクリプト、非commit）。
 
-**Completion**: 218箇所（またはその時点の実数）の内訳が「どの要素が」「どの色の組み合わせで」「何:1か」まで分かる状態になる。これができて初めて、単一トークン起因か個別コンポーネント起因かが判断でき、次の実行計画（このplanのTask Dの後継）が書ける。
+**結果**: 単一トークンでも完全に無秩序でもなく、**3原因に集約**。
+- `text-muted-foreground/80` on 白（161件・73%）: `components/CardFactGrid.tsx:32`の`dt`（RobotCard/ManufacturerCard/UseCaseCard共通コンポーネント）
+- `text-muted-foreground/70` on `--muted`（35件・16%）: `components/RobotCard.tsx:119`の画像欠落プレースホルダー
+- `--signal`/`--signal-foreground`トークンペア（15件・7%）: `components/NewsFeatureCard.tsx:41`ほかのバッジ。不透明度は無関係で、トークン自体が3.15:1
+- 残り8件（4%）: 5コンポーネントに`/60`〜`/40`が散在
 
-**このtaskでやらないこと**: 実際の色修正、axe gate閾値の変更。
+前景色の実測値（`#808389`、`#8e9197`）は、`--muted-foreground`（`#60646c`、単体では5.94:1でAA通過）を
+それぞれ80%・70%不透明度で背景色に合成した理論値と手計算で完全一致した。トークンの色自体は
+正しく、**不透明度修飾子が可読性を壊している**と確認できた。
 
-**Validation**: 出力したselector一覧を`src/app/globals.css`のトークン一覧・該当コンポーネントと突合する。
+**Completion**: 達成。詳細は[`deferred-work-register-v1.md`](../decisions/deferred-work-register-v1.md) `#4`に反映済み。
+
+**このtaskでやらないこと（実施せず）**: 実際の色修正、axe gate閾値の変更、`CardFactGrid.tsx`の不透明度を上げた場合に実際4.5:1へ到達するかの検証。次の実行計画で扱う。
 
 ---
 
