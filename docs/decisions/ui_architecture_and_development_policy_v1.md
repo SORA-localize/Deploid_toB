@@ -327,10 +327,14 @@ UIは、存在しないデータを捏造しない。
 - overlay 3系統（モバイルメニュー / 比較ドロワー / 検索つきドロップダウン）の
   focus 復元を e2e で固定している（`tests/e2e/focus-restoration.spec.ts`）。
 
+**axe gate は `serious` 以上**（`tests/e2e/accessibility-smoke.spec.ts`）。2026-08-06 に `critical` から
+引き上げた。それまで上げられなかったのは `color-contrast` が219件あったためだが、内訳を実測すると
+テーマトークンの色そのものではなく、**繰り返し描画されるカード内の不透明度修飾子**（196件）と
+`--signal` の色（15件）に集約でき、いずれも解消して0件になった。閾値を下げたくなったら、それは
+違反を隠す操作なので原因を直すこと。
+
 今後の課題（詳細と実測値は [`deferred-work-register-v1.md`](deferred-work-register-v1.md) が正本）：
 
-- **`color-contrast` 違反 218箇所**（登録簿 #4）。テーマトークンの見直しを伴うため独立した計画が要る。
-  axe gate の閾値を `serious` へ上げられるのはこれを片付けた後。現状は `critical` で運用する。
 - `/robots` グリッドが 768px で2列のまま（登録簿 #7）。壊れてはいないため対象外と決定済み。
 
 ---

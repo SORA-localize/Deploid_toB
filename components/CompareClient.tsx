@@ -643,7 +643,7 @@ export function CompareClient({ robots, manufacturers, initialSearch }: CompareC
                           <p className="text-xs font-medium text-muted-foreground">
                             {uiText.favorites.empty}
                           </p>
-                          <p className="mt-1 text-xs text-muted-foreground/70">
+                          <p className="mt-1 text-xs text-muted-foreground/90">
                             {uiText.favorites.emptySub}
                           </p>
                         </div>

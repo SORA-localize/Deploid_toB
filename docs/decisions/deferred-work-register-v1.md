@@ -32,12 +32,11 @@ Phase 5・6 の実行中、積み残しは3か所に分散していた。実装�
 | 1 | [`/compare` の view model 化](#1-compare-の-view-model-化) | Phase 5 | 中 | 未着手 |
 | 2 | [一覧の本文検索の代替](#2-一覧の本文検索の代替) | Phase 5 | 低 | 未着手 |
 | 3 | [共有フロア 588,660 の削減](#3-共有フロア-588660-の削減) | Phase 5 | 中 | **Phase 7 Task 3 で一部対応** |
-| 4 | [`color-contrast` の是正](#4-color-contrast-の是正) | Phase 6 | 中 | 219→23件へ削減済み・残23件は別判断 |
 | 7 | [`/robots` グリッドが 768px で2列](#7-robots-グリッドが-768px-で2列) | Phase 6 | 低 | 未着手・人間が対象外と決定 |
 | 8 | [Home 世界地図の動きの復活](#8-home-世界地図の動きの復活) | Phase 4 | **最後** | 未着手・ユーザー要望 |
 | 10 | [`batteryCapacityMah` の未反映](#10-batterycapacitymah-の未反映) | 全体レビュー | 中 | 20/63機反映済み・23機要人力判断 |
 
-`#5`・`#6`・`#9`・`#11`は解消済みのため行ごと削除（すべて2026-08-06）。
+`#4`・`#5`・`#6`・`#9`・`#11`は解消済みのため行ごと削除（すべて2026-08-06）。
 
 - `#5`（`/reports`主軸タブの到達性）: [PR #21](https://github.com/SORA-localize/Deploid_toB/pull/21)
 - `#6`（Reports H1の動的化）: [PR #20](https://github.com/SORA-localize/Deploid_toB/pull/20)
@@ -47,6 +46,10 @@ Phase 5・6 の実行中、積み残しは3か所に分散していた。実装�
   実例をもって撤回した
 - `#11`（Linuxベースライン陳腐化）: [PR #22](https://github.com/SORA-localize/Deploid_toB/pull/22)で
   `.github/workflows/update-visual-baselines.yml`を追加して恒久対応
+- `#4`（color-contrast）: 219件→**0件**。`--muted-foreground`の不透明度修飾子（196件）と
+  `--signal`の色（15件）、残る8件の弱い装飾テキストを順に解消し、
+  `tests/e2e/accessibility-smoke.spec.ts`の閾値を`critical`から**`serious`へ引き上げた**。
+  引き上げ後に違反を意図的に戻してゲートが実際に赤くなることも確認済み
 
 ---
 
@@ -90,67 +93,6 @@ Home 側 4 ファイルが使い続けるため dependencies から外せてい�
 下げないと余裕だけが増え、監査が指摘した「落ちない gate」へ戻る。
 
 **残る分**: `motion/react` は Home 4ファイルが使用中。#8 の実装方針とも関係する。
-
----
-
-## 4. `color-contrast` の是正
-
-axe の閾値を `critical` から `serious` へ上げると全6 route で違反していた。
-
-| route | 2026-08-03 | 2026-08-06調査時 | 2026-08-06修正後 |
-|---|---:|---:|---:|
-| `/robots` | 96 | 96 | 3 |
-| `/manufacturers` | 85 | 85 | 9 |
-| `/use-cases` | 17 | 17 | **0** |
-| `/` | 16 | 16 | 6 |
-| `/reports` | 3 | 4 | 4 |
-| `/compare` | 1 | 1 | 1 |
-| **合計** | 218 | **219** | **23** |
-
-### 原因（2026-08-06 実測、Task D）
-
-`axe`の`failureSummary`から前景色・背景色のペアを全219件について集計した。単一トークンの
-問題ではなく、**繰り返し描画されるカード内の少数の不透明度修飾子**が件数を増幅していた：
-
-| 原因 | 件数 | 発生源 |
-|---|---:|---|
-| `text-muted-foreground/80` on 白 | 134 | `components/CardFactGrid.tsx`の`dt`（RobotCard/ManufacturerCard共通） |
-| `text-muted-foreground/70` on `--muted` | 35 | `components/RobotCard.tsx`の画像欠落プレースホルダー |
-| `text-muted-foreground/80` on 白 | 27 | `components/UseCaseCard.tsx`のロボット名 |
-| `--signal`関連（#29a383） | 15 | `NewsFeatureCard`等のバッジ、`ManufacturerCard`の`text-signal`リンク |
-| その他 | 8 | `PageTabBar`(`opacity-75`)、`HomeContentNavigator`、`CompareClient` |
-
-`--muted-foreground`（slate-11 `#60646c`）は白背景でそのまま置けば5.94:1でAA通過する。
-違反していた前景色`#808389`・`#8e9197`は、この値を80%・70%不透明度で背景に合成した理論値と
-手計算で完全一致した。**トークンの色は正しく、不透明度修飾子が可読性を壊していた。**
-
-### 修正済み（196件、89%）
-
-上位3つの発生源を`/90`へ変更（[commit](https://github.com/SORA-localize/Deploid_toB/commits/main)、3ファイル3行）。
-`/90`は light mode で4.5:1を超える実測上の最小値（白背景89%で4.63:1、`--muted`背景90%で4.53:1）。
-dark mode は変更前から通過しており、`/90`でさらに改善するため、片方のテーマを犠牲にしていない。
-`design_system_v1.md` §3の「タイトルとメタデータの差を意図的につける」階層も、`text-foreground`
-より明確に薄いまま維持している。
-
-**副次的に確認できたこと**: この変更で visual-regression のベースライン更新は**不要**だった
-（12/12パス）。色差が`maxDiffPixelRatio`の閾値内に収まるため、`#11`のLinuxベースライン問題を
-悪化させない。
-
-### 残り23件（別判断が要る）
-
-| 内容 | 件数 | なぜ今直さないか |
-|---|---:|---|
-| `--signal`（#29a383）と白の組み合わせ | 15 | **不透明度では解決不能**（100%でも3.15:1）。トークンの色そのものか、フォントサイズ・太さの変更が要る。ブランドカラーの変更を伴うためデザイン判断 |
-| `PageTabBar`/`HomeContentNavigator`/`CompareClient` | 8 | 低不透明度が「非アクティブ状態」を表す意味を持つ箇所を含む。上げると active/inactive の区別が弱まるため、状態表現の再設計とセットで判断する |
-
-**いつやるか**: axe gate を `serious` へ上げるには、この23件の方針決定が要る。
-`tests/e2e/accessibility-smoke.spec.ts` は現状 `critical` のみを見ている。
-
-**注意**: 静的生成のうちは全数がビルド時に確定して数えられる。CMS/DB へ移行して内容が動的に
-なると全数把握ができなくなるため、移行前に片付けるほうが安い。
-
-出典: Phase 6 計画の Task 5b。[`ui_architecture_and_development_policy_v1.md`](ui_architecture_and_development_policy_v1.md) §9、
-Task D実測・修正（[`deferred-work-register-followup-v1.md`](../plans/deferred-work-register-followup-v1.md)、2026-08-06）
 
 ---
 
