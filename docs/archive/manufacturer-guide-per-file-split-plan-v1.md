@@ -1,13 +1,11 @@
----
-status: plan
-updated: 2026-07-22
----
-
 # メーカー解説の記事別ファイル分割 計画 v1
 
-Status: active / 自己監査で3つの破綻を検出し修正済み。実装未着手。
+Status: completed / archived
 Created: 2026-07-22
-Branch: 未定（`data/articles.ts` の内部構造のみ変更。別branch推奨だが小規模）
+Completed: 2026-07-23（コミット `b925535`）
+Branch: main（直接実装。専用branchなし）
+
+3記事とも `data/articles/manufacturer-guide/<id>.ts` に分割済み。§7の4検証（tsc / validate:data / build / check-source-links）すべてパス。news系31記事・robot-guide・robots/manufacturers本体は対象外のまま（§1, §10参照、後続の段階として残す）。
 
 `data-architecture-redesign-v1.md` §12 の段階E（個別ファイル化）を、まずメーカー解説3記事に限定して適用する。呼び出し形（`lib/data.ts` 経由）は不変。
 
