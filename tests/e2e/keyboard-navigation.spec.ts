@@ -8,20 +8,28 @@ import { expect, test } from '@playwright/test';
  * したがって矢印キーではなく **Tab で各タブへ到達し Enter で選ぶ** のが正しい操作系で、
  * ここではその契約を検証する。意味論そのものは
  * `tests/components/page-tab-bar.test.tsx` が固定している。
+ *
+ * **`waitUntil: 'domcontentloaded'` を指定しないこと**（既定の `load` を使う）。
+ * `domcontentloaded` は hydration より早く発火するため、直後の `focus()` が
+ * React の hydration に上書きされて「フォーカスが当たらない」flaky を生む
+ * （積み残し登録簿 #9 の hydration race）。以前このファイルは、スクロールしてから
+ * 追従バーの出現を待つヘルパーを挟んでおり、その待ちが偶然 hydration 待ちを
+ * 兼ねていた。#5 対応でタブが常時 DOM に存在するようになりヘルパーを外したところ、
+ * 隠れていた race がそのまま表面化して CI で 2 回 flaky になった（2026-08-06 実測）。
  */
 
 test('reports filter tabs are reachable from the top of the page without scrolling', async ({ page }) => {
   // 積み残し登録簿 #5 の回帰ガード。以前はスクロールするまで DOM に存在しなかった
   // （ContextualPageHeader → HeaderStickyBarSlot 経由）。現在は本文内で position:sticky に
   // なっており（components/ReportsHeader.tsx）、ページ先頭・スクロール量0の時点で存在する。
-  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+  await page.goto('/reports');
 
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
   await expect(page.getByRole('group', { name: '記事' })).toBeVisible();
 });
 
 test('reports filter tabs are reachable and selectable with the keyboard', async ({ page }) => {
-  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+  await page.goto('/reports');
 
   const tabs = page.getByRole('group', { name: '記事' }).getByRole('button');
   await expect(tabs.first()).toHaveAttribute('aria-current', 'page');
@@ -38,7 +46,7 @@ test('reports filter tabs are reachable and selectable with the keyboard', async
 });
 
 test('selecting a filter tab does not destroy keyboard focus', async ({ page }) => {
-  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+  await page.goto('/reports');
 
   const tabs = page.getByRole('group', { name: '記事' }).getByRole('button');
   const target = tabs.nth(1);
@@ -54,7 +62,7 @@ test('selecting a filter tab does not destroy keyboard focus', async ({ page }) 
 });
 
 test('a disabled filter tab is reachable but does not navigate', async ({ page }) => {
-  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+  await page.goto('/reports');
 
   // aria-disabled にしてあるので Tab では飛ばされず、理由を読み上げられる。
   const disabled = page.locator('[role="group"] button[aria-disabled="true"]').first();
@@ -67,7 +75,7 @@ test('a disabled filter tab is reachable but does not navigate', async ({ page }
 });
 
 test('the hero carousel can be advanced without a pointer', async ({ page }) => {
-  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+  await page.goto('/reports');
 
   const status = page.locator('[aria-live="polite"]').filter({ hasText: /件中/ }).first();
   await expect(status).toHaveText(/^\d+件中1件目$/);
@@ -84,7 +92,7 @@ test('the hero carousel can be advanced without a pointer', async ({ page }) => 
 });
 
 test('pagination can be operated without a pointer', async ({ page }) => {
-  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+  await page.goto('/reports');
 
   const pagination = page.getByRole('navigation', { name: '記事一覧のページネーション' });
   await expect(pagination).toBeVisible();
@@ -99,7 +107,7 @@ test('pagination can be operated without a pointer', async ({ page }) => {
 });
 
 test('the catalog search field is reachable from the page heading', async ({ page }) => {
-  await page.goto('/robots', { waitUntil: 'domcontentloaded' });
+  await page.goto('/robots');
 
   const search = page.getByRole('searchbox').first();
   await search.focus();
