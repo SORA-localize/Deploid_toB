@@ -116,7 +116,7 @@ export function RobotCard({
           ) : (
             <>
               <CameraOff className="w-6 h-6 mb-1.5 opacity-20" />
-              <span className="text-xs text-muted-foreground/70">
+              <span className="text-xs text-muted-foreground/90">
                 {uiText.robots.mainImageMissing}
               </span>
             </>
