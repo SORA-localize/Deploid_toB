@@ -32,7 +32,7 @@ Phase 5・6 の実行中、積み残しは3か所に分散していた。実装�
 | 1 | [`/compare` の view model 化](#1-compare-の-view-model-化) | Phase 5 | 中 | 未着手 |
 | 2 | [一覧の本文検索の代替](#2-一覧の本文検索の代替) | Phase 5 | 低 | 未着手 |
 | 3 | [共有フロア 588,660 の削減](#3-共有フロア-588660-の削減) | Phase 5 | 中 | **Phase 7 Task 3 で一部対応** |
-| 4 | [`color-contrast` 218箇所の是正](#4-color-contrast-218箇所の是正) | Phase 6 | 中 | 未着手・独立計画が要る |
+| 4 | [`color-contrast` の是正](#4-color-contrast-の是正) | Phase 6 | 中 | 219→23件へ削減済み・残23件は別判断 |
 | 7 | [`/robots` グリッドが 768px で2列](#7-robots-グリッドが-768px-で2列) | Phase 6 | 低 | 未着手・人間が対象外と決定 |
 | 8 | [Home 世界地図の動きの復活](#8-home-世界地図の動きの復活) | Phase 4 | **最後** | 未着手・ユーザー要望 |
 | 9 | [e2e の hydration race](#9-e2e-の-hydration-race) | 監査 | 低 | Phase 7完了・未対応のまま残存 |
@@ -86,52 +86,64 @@ Home 側 4 ファイルが使い続けるため dependencies から外せてい�
 
 ---
 
-## 4. `color-contrast` 218箇所の是正
+## 4. `color-contrast` の是正
 
-axe の閾値を `critical` から `serious` へ上げると全6 route で違反する。
+axe の閾値を `critical` から `serious` へ上げると全6 route で違反していた。
 
-| route | 件数（2026-08-03） | 件数（2026-08-06再測） |
-|---|---:|---:|
-| `/robots` | 96 | 96 |
-| `/manufacturers` | 85 | 85 |
-| `/use-cases` | 17 | 17 |
-| `/` | 16 | 16 |
-| `/reports` | 3 | 4 |
-| `/compare` | 1 | 1 |
-| **合計** | 218 | **219** |
+| route | 2026-08-03 | 2026-08-06調査時 | 2026-08-06修正後 |
+|---|---:|---:|---:|
+| `/robots` | 96 | 96 | 3 |
+| `/manufacturers` | 85 | 85 | 9 |
+| `/use-cases` | 17 | 17 | **0** |
+| `/` | 16 | 16 | 6 |
+| `/reports` | 3 | 4 | 4 |
+| `/compare` | 1 | 1 | 1 |
+| **合計** | 218 | **219** | **23** |
 
-全件 `color-contrast`。`/reports`が3→4件になったのは`#6`（H1動的化）等の差分による誤差で、
-本質的な件数構成は変わっていない。
+### 原因（2026-08-06 実測、Task D）
 
-**2026-08-06 実測: 根本原因を特定した（Task D、`docs/plans/deferred-work-register-followup-v1.md`）。**
-`axe`の`failureSummary`から前景色・背景色のペアを全219件について集計した結果、単一デザイン
-トークンの問題ではなく、**3種類の原因に集約できる**：
+`axe`の`failureSummary`から前景色・背景色のペアを全219件について集計した。単一トークンの
+問題ではなく、**繰り返し描画されるカード内の少数の不透明度修飾子**が件数を増幅していた：
 
-| 原因 | 件数 | 割合 | 内容 |
-|---|---:|---:|---|
-| `text-muted-foreground/80` on 白 | 161 | 73% | `components/CardFactGrid.tsx:32`の`dt`（fact値ラベル）。RobotCard/ManufacturerCard/UseCaseCard共通のため`/robots``/manufacturers``/use-cases``/`の4routeに波及 |
-| `text-muted-foreground/70` on `--muted` | 35 | 16% | `components/RobotCard.tsx:119`の画像欠落プレースホルダー文言。`/robots`のみ |
-| `--signal`/`--signal-foreground`（#29a383/#fff） | 15 | 7% | `components/NewsFeatureCard.tsx:41`ほかのタグバッジ。トークン自体が3.15:1でAA未達（不透明度は無関係） |
-| その他（`/60`,`/50`,`/40`等） | 8 | 4% | `ComparisonRobotPanel`/`CompareClient`/`Breadcrumbs`/`ContactForm`等に散在、各1-2箇所 |
+| 原因 | 件数 | 発生源 |
+|---|---:|---|
+| `text-muted-foreground/80` on 白 | 134 | `components/CardFactGrid.tsx`の`dt`（RobotCard/ManufacturerCard共通） |
+| `text-muted-foreground/70` on `--muted` | 35 | `components/RobotCard.tsx`の画像欠落プレースホルダー |
+| `text-muted-foreground/80` on 白 | 27 | `components/UseCaseCard.tsx`のロボット名 |
+| `--signal`関連（#29a383） | 15 | `NewsFeatureCard`等のバッジ、`ManufacturerCard`の`text-signal`リンク |
+| その他 | 8 | `PageTabBar`(`opacity-75`)、`HomeContentNavigator`、`CompareClient` |
 
-**検証方法**: `--muted-foreground`（slate-11 `#60646c`）はそのまま白背景に置けば5.94:1でAA通過する
-（このセッションの前回調査で確認済み）。`#808389`（161件側の前景色）はこの値を80%不透明度で
-白に合成した理論値と完全一致し、`#8e9197`（35件側）も70%を`--muted`（`#f9f9fb`）に合成した理論値と
-完全一致した（手計算で検算済み）。**トークンの色自体は問題なく、不透明度修飾子が可読性を壊している。**
+`--muted-foreground`（slate-11 `#60646c`）は白背景でそのまま置けば5.94:1でAA通過する。
+違反していた前景色`#808389`・`#8e9197`は、この値を80%・70%不透明度で背景に合成した理論値と
+手計算で完全一致した。**トークンの色は正しく、不透明度修飾子が可読性を壊していた。**
 
-**なぜ後回しにしたか**: テスト追加タスクの範囲を超える。Phase 6 は「違反 0 の状態で gate を
-入れる」原則を守り、閾値を上げなかった。
+### 修正済み（196件、89%）
 
-**いつやるか**: 根本原因は特定済みなので、次はOption提示を伴う実装計画が書ける状態。
-`CardFactGrid.tsx`1箇所の不透明度調整で全体の73%が解消する見込みだが、**実際にAA通過するか
-（`/80`をどこまで上げれば4.5:1を超えるか）は未検証**。axe gate を `serious` へ上げられるのは
-これを片付けた後。
+上位3つの発生源を`/90`へ変更（[commit](https://github.com/SORA-localize/Deploid_toB/commits/main)、3ファイル3行）。
+`/90`は light mode で4.5:1を超える実測上の最小値（白背景89%で4.63:1、`--muted`背景90%で4.53:1）。
+dark mode は変更前から通過しており、`/90`でさらに改善するため、片方のテーマを犠牲にしていない。
+`design_system_v1.md` §3の「タイトルとメタデータの差を意図的につける」階層も、`text-foreground`
+より明確に薄いまま維持している。
+
+**副次的に確認できたこと**: この変更で visual-regression のベースライン更新は**不要**だった
+（12/12パス）。色差が`maxDiffPixelRatio`の閾値内に収まるため、`#11`のLinuxベースライン問題を
+悪化させない。
+
+### 残り23件（別判断が要る）
+
+| 内容 | 件数 | なぜ今直さないか |
+|---|---:|---|
+| `--signal`（#29a383）と白の組み合わせ | 15 | **不透明度では解決不能**（100%でも3.15:1）。トークンの色そのものか、フォントサイズ・太さの変更が要る。ブランドカラーの変更を伴うためデザイン判断 |
+| `PageTabBar`/`HomeContentNavigator`/`CompareClient` | 8 | 低不透明度が「非アクティブ状態」を表す意味を持つ箇所を含む。上げると active/inactive の区別が弱まるため、状態表現の再設計とセットで判断する |
+
+**いつやるか**: axe gate を `serious` へ上げるには、この23件の方針決定が要る。
+`tests/e2e/accessibility-smoke.spec.ts` は現状 `critical` のみを見ている。
 
 **注意**: 静的生成のうちは全数がビルド時に確定して数えられる。CMS/DB へ移行して内容が動的に
 なると全数把握ができなくなるため、移行前に片付けるほうが安い。
 
 出典: Phase 6 計画の Task 5b。[`ui_architecture_and_development_policy_v1.md`](ui_architecture_and_development_policy_v1.md) §9、
-Task D実測（`docs/plans/deferred-work-register-followup-v1.md`、2026-08-06）
+Task D実測・修正（[`deferred-work-register-followup-v1.md`](../plans/deferred-work-register-followup-v1.md)、2026-08-06）
 
 ---
 
