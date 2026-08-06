@@ -120,8 +120,6 @@ export function ReportsBrowser({
 
   return (
     <div className="bg-background">
-      <ReportsHeader activeShelf={activeShelf} tabs={shelfTabs} onShelfSelect={updateShelf} />
-
       <div className="site-container py-5">
         <Breadcrumbs items={[{ label: uiText.reports.breadcrumb }]} />
         <PageListHeader
@@ -139,6 +137,8 @@ export function ReportsBrowser({
           }
         />
       </div>
+
+      <ReportsHeader activeShelf={activeShelf} tabs={shelfTabs} onShelfSelect={updateShelf} />
 
       <div>
         {/* ── ヒーロー + フィーチャー枠（フィルタ未適用の「すべて」タブのみ） ── */}
