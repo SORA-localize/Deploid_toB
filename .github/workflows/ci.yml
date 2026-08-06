@@ -5,6 +5,11 @@ on:
   pull_request:
   push:
     branches: [main, refactor/integration-20260726]
+  # 任意の ref で手動実行できるようにする。
+  # GitHub は GITHUB_TOKEN による push では workflow を起動しない（無限ループ防止）ため、
+  # update-visual-baselines.yml が baseline を commit しても CI は自動で走らない。
+  # baseline 更新後に緑を確認する手段がこれ。
+  workflow_dispatch:
 
 permissions:
   contents: read
