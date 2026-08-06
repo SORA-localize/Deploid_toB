@@ -12,6 +12,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 |---|---|---|---|
 | [CMS / DB移行前リファクタリング実装](plans/pre-migration-refactor-implementation-index-v1.md) | **Phase 1〜7 すべて main 反映済み**（実測は [結果](reference/pre-migration-refactor-results-v1.md)）。積み残しは [登録簿](decisions/deferred-work-register-v1.md) | 完了（`main`） | 2026-07-26 |
 | [移行前リファクタ 全体レビュー](plans/pre-migration-refactor-full-review-plan-v1.md) | Phase 1〜7実装が14の規定文書に照らして適切だったかを検証する計画。R1（挙動保存）は公開URL diff完了・差分0件。R2〜R19は未実行 | `main`（レビューのみ、専用branchなし） | 2026-08-04 |
+| [積み残し登録簿フォローアップ](plans/deferred-work-register-followup-v1.md) | 登録簿#4/#5/#6/#10の実行計画。#10はR02統合計画のR02-09再開として位置づけ、mAh/Wh併存のDEC-04が未決 | `main`（専用branchなし） | 2026-08-05 |
 | [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | `data/*.ts` から Payload CMS + managed PostgreSQLへ、URLと不変idを保って段階移行。実装は未着手。**2026-07-26付でPhase 3・5・6が作った層を反映していない——着手時に現行実装へ突合すること** | 未定（専用branch必須） | 2026-07-26 |
 | [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | 上位ロードマップ。**Phase番号は移行前リファクタの1〜7とは別体系**（本書のPhase 1はCMS/DB移行を指す）。移行前スコープは実装インデックス側が正本 | phaseごとに分割 | 2026-07-26 |
 | [レスポンシブ対応](plans/responsive-phase-1-static-audit-v1.md) | Phase 1のコード実装は完了。R-06（実機スクリーンショットでの最終確認）が未実施 | 専用branchなし（mainへ直接実装） | 2026-07-03 |
