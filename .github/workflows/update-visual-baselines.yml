@@ -14,6 +14,11 @@
 #
 # 使い方:
 #   gh workflow run update-visual-baselines.yml --ref <branch>
+#
+# **実行後に CI は自動で走らない。** GitHub は GITHUB_TOKEN による push では workflow を
+# 起動しない（無限ループ防止）ため、下の commit に対する CI run は作られない。緑になったことを
+# 確認するには CI を手動で起こすこと:
+#   gh workflow run ci.yml --ref <branch>
 name: Update visual baselines (Linux)
 
 on:
