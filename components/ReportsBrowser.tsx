@@ -117,6 +117,10 @@ export function ReportsBrowser({
   };
 
   const showHero = activeShelf === 'all' && !hasActiveFilters && heroReports.length > 0;
+  const pageTitle =
+    activeShelf === 'all'
+      ? uiText.reports.title
+      : (shelfTabs.find((tab) => tab.value === activeShelf)?.label ?? uiText.reports.title);
 
   return (
     <div className="bg-background">
@@ -125,7 +129,7 @@ export function ReportsBrowser({
       <div className="site-container py-5">
         <Breadcrumbs items={[{ label: uiText.reports.breadcrumb }]} />
         <PageListHeader
-          title={uiText.reports.title}
+          title={pageTitle}
           description={uiText.reports.description}
           action={
             <SearchInput
