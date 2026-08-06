@@ -1,6 +1,6 @@
 ---
 status: plan
-updated: 2026-08-05
+updated: 2026-08-06
 ---
 
 # 積み残し登録簿フォローアップ実行計画 v1
@@ -141,7 +141,17 @@ commitの時系列（`git log`で実測）:
 
 これらは**Wh換算という条件を外せば`needs-review`/`not-published`の理由（電圧不明でWh計算不可）がそのまま解消し、mAh/Ahの生値として採用候補になる**。つまりmAhをスキーマの主軸にする方が、R02が既に集めた生データの活用率が上がる。
 
-**残る論点: 既にWhとして確定していた9〜10機分（1X NEO 842Wh、FFTAI 936Wh、PAL Talos 1080Wh、Figure 03 2300Wh、Galbot G1 1440Wh、Fourier系500Wh×2、UBTECH Walker C 720Wh/Walker X 546Wh等、`found`かつ換算不要）をどう扱うか。** これは`data-maintenance-checklist-v1.md`§Iの「ラベル確定が復元の前提」がまさに指す論点で、実装前に人間判断が要る（§3.2 DEC-04）。
+**発見7（2026-08-06追記）: ユーザー提供の将来DB用CSVが、mAh一本化を裏付けた。**
+
+ユーザーから`/Users/hori/Downloads/ロボDB/ロボDB - 発表済みロボット.csv`（リポジトリ外、リファクタリング完了後にこれを元にDBを作る予定とのこと）を提示された。実測した内容:
+
+- ヘッダ行の電源・稼働列は「稼働時間(分)／**バッテリー容量(mAh)**／充電時間(分)／電池交換」の4列で、Wh列は無い（197データ行・57メーカー・201行全体で確認、Wh列・Wh表記は0件）
+- **`R02`の生値と複数機体で一致**: AgiBot A2 Ultra 14400（=R02の14.4Ah）、UBTECH Walker X 10000（=R02の54.6V×10Ah＝546Wh相当の同一Ah値）、UBTECH Walker C 15000（=R02の48V×15Ah＝720Wh相当の同一Ah値）、LimX Oli 9500／Luna 10000（=R02のmAh生値そのまま）、EngineAI SE01 1000／PM01 10000／T800 20000・40000、Booster T1 10500（いずれもR02のAh/mAh生値と一致）
+- **重要な非対称性**: R02で`found`（Wh直接記載・換算不要）だった機体のうち、このCSVに現れるもの（1X NEO、PAL Talos、Figure 03、Fourier GR-1/GR-2、UBTECH Walker C/X等）は、**Wh値をmAhへ換算した数値ではなく「未公表」のまま**になっている。PAL Kangarooに至ってはR02が`source-inaccessible`（PDF文字化けで976Ahという非現実的な値しか取れず断念）と判定した機体だが、このCSVでは`15000`という別ソースからのクリーンな値が入っており、R02より新しい独自調査であることも分かる
+- **ソースURLはほぼ記載なし**（201行中`http`を含む行は1件のみ）。スペック値としての精度はR02と相互検証できたが、`ai/rules/21-data-maintenance-workflow.md` G2/G6が要求する出典URLはこのCSV単体では満たせない
+- **規模は現行データベースを大きく超える**: 57メーカー・197機種（現行`data/robots.ts`は63機・約25メーカー）。「リファクタリング後にこれを元にDBを作る」というユーザーの発言と整合し、これは移行後の拡張版カタログであって、現行`data/robots.ts`への即時一括インポート対象ではない
+
+**結論（DEC-04はこの発見により決着）**: マンファクチャラーがmAh/Ahしか公表していない場合、ユーザー自身の裏取りでも「Whへ換算して埋める」のではなく「未公表として空欄にする」方針を一貫して取っている（1X NEO・PAL Talos・Figure 03・Fourier系など、複数機体で確認）。これは筆者が§3.2で提案していたOption B（Wh行を別途復元して併存）と逆の方針であり、**Option A（mAhへ一本化。Wh側は当面追わない）を正とする**。詳細は§3.2 DEC-04（決定済み）に反映。
 
 ### 2.3 `#5` `/reports`タブ到達性 — 修正方向が文書側に既に明記されていた
 
@@ -191,48 +201,37 @@ commitの時系列（`git log`で実測）:
 
 **適用するゲート**: `ai/rules/21-data-maintenance-workflow.md` G1〜G11（`data/robots.ts`編集のため）。特にG2（出典を実際に開いて確認）は、R02調査時点（2026-07-17〜18）のURLが今も生きているか再確認することを意味する。R02の日付をそのまま`checkedAt`に流用しない。
 
-#### DEC-04（この計画で新たに必要になった決定）: mAhとWhの共存方針
+#### DEC-04（決定済み・2026-08-06）: mAhへ一本化
 
-`data-maintenance-checklist-v1.md`§Iが指摘する「ラベル確定」そのもの。§2.2で判明した通り、Wh側は9〜10機分の確定値（`found`、変換不要）が既にR02にあり、mAh側は追加で5〜7機分の生値（`needs-review`だがWh変換を前提にしなければ生値として有効）がある。
+`data-maintenance-checklist-v1.md`§Iが指摘する「ラベル確定」そのもの。§2.2発見7（ユーザー提供の将来DB用CSV、57メーカー・197機種）で、マンファクチャラーがmAh/Ahしか公表していない機体について、ユーザー自身が「Whへ換算して埋める」のではなく「未公表として空欄にする」方針を複数機体（1X NEO・PAL Talos・Figure 03・Fourier系等）で一貫して取っていることを確認した。ユーザーからも「（CSVの型に）統一する」と明示の指示があった。
 
-| Option | 内容 | 長所 | 短所 |
-|---|---|---|---|
-| **A. mAhへ一本化** | `batteryCapacityMah`のみ運用。Wh側の確定値9〜10機分は当面据え置き（新規mAh調査が要る） | スキーマ変更ゼロ。ユーザーの現行収集方針と直接一致。`power-runtime`グループの枠を消費しない | 既にR02で裏取り済みの9〜10機分のWh確定値を、再調査なしでは使えない |
-| **B. Wh行を復元し2フィールド併存** | `batteryCapacityWh`を`lib/specSchema.ts`へ1行追加（`power-runtime`が6/6になり以後同グループへの追加は不可）。Whが分かる機体はWh行、mAhが分かる機体はMah行に入れる | 既存の確定値（Wh・mAh双方）を無駄にしない。今後mAhしか取れない機体が増えても問題なし | 詳細ページのスペック表に似たラベルの行が2つ並ぶ（表示上の整理が要る）。`power-runtime`グループが以後拡張不可になる |
+**決定: `batteryCapacityMah`単独運用とする。`batteryCapacityWh`をスキーマへ復元しない。** 既にR02で確定していたWh値9〜10機分（1X NEO 842Wh、FFTAI 936Wh、PAL Talos 1080Wh、Figure 03 2300Wh、Galbot G1 1440Wh、Fourier系500Wh×2、UBTECH Walker C 720Wh/Walker X 546Wh等）は、mAh生値が別途判明しない限り当面「未公表」のまま扱う。スキーマ変更（`lib/specSchema.ts`への行追加）は不要になった。
 
-**推奨: Option B。** 理由は、Aだと直前まで公開されていて実測でも実在が確認できるデータ（§2.2発見2の9〜10機分）を、代替データが無いまま失うことになるため。`lib/specSchema.ts`のコメント（「追加は1行」）と`data-architecture-redesign-v1.md`§8の設計思想（スキーマ追加は軽い操作という前提）とも整合する。ただし**これは製品判断であり、着手前にユーザー確認が必要**（`ai/rules/00-index.md`「スコープや方針を変える前に必ずユーザーに確認する」）。
+**将来DB用CSVの扱いについて（この計画の対象外・別途整理が必要）**: 同CSVは57メーカー・197機種と現行`data/robots.ts`（63機・約25メーカー）を大きく上回り、リポジトリ外（`~/Downloads/ロボDB/`）にある個人の調査ファイルで、フィールド単位のsource URLもほぼ持たない（201行中1件のみ）。「リファクタリング後にこれを元にDBを作る」というユーザーの発言から、これは今回のPhase 1〜7リファクタや`content-platform-migration-plan-v1.md`のcutoverそのものとは別の、将来のカタログ拡張作業の元データと理解した。**この計画のTask Bは、現行63機のうち値がR02から個別に裏取りできる範囲に限定し、197機種への拡張やこのCSVからの一括インポートは対象外とする**（`ai/rules/21-data-maintenance-workflow.md` G2「一次情報の裏取り」を満たさないまま転記しない）。CSV自体をどう正本化するか（`docs/decisions/data/research/`配下への取り込み等）はユーザー判断であり、この計画では提案しない。
 
-#### Task B-1 出典の再検証（DEC-04決定後、実装前）
+#### Task B-1 出典の再検証
 
 **Files**: 変更なし（調査のみ）
 
-**Change**: `DATA-R02-B01〜B10.md`のうちbatteryCapacity関連行を持つ全ロボットについて、対応するsource URLへ実際にアクセスし、404/403でないこと・値が変わっていないことを確認する（G2/G6）。同時に、B0Xファイルの行とrobotIdの対応をこの段階で確定し、grep結果からの推測をやめる。
+**Change**: `DATA-R02-B01〜B10.md`のうちbatteryCapacityMah関連行を持つ全ロボットについて、対応するsource URLへ実際にアクセスし、404/403でないこと・値が変わっていないことを確認する（G2/G6）。同時に、B0Xファイルの行とrobotIdの対応をこの段階で確定し、grep結果からの推測をやめる。ユーザー提供CSVの値と一致するかも突合し（§2.2発見7で確認した一致パターンの全数版）、不一致があれば個別に扱う。CSV自体にsource URLが無いため、出典はR02またはこのtaskで新たに確認したURLを正とする。
 
 **Completion**: 対象robotId・値・source URL・確認日の一覧ができる。アクセス不能なURLはR02-09の`hold-source-inaccessible`として別扱いにする。
 
-#### Task B-2 スキーマ変更（Option B採用時のみ）
-
-**Files**: `lib/specSchema.ts`
-
-**Change**: `batteryCapacityWh`を`power-runtime`グループへ1行追加（`unit: ' Wh'`、`kind: 'number'`）。ラベル衝突を避けるため`batteryCapacityMah`とは別ラベルにする（例: 「バッテリー容量」のままだと2行が同じラベルになるため、片方を「バッテリー容量（Wh）」「バッテリー容量（mAh）」のように区別するか、詳細ページ側の表示で単位を主語にする調整が要る。具体的な文言は実装時にdesign_system_v1.mdのラベル規約と照合して決める）。
-
-**Completion**: `tsc`・`npm run validate:data`が通り、`RobotSpecs`型に新フィールドが反映される。
-
-#### Task B-3 データ反映（R02-08の残バッチと同じ単位で実施）
+#### Task B-2 データ反映（R02-08の残バッチと同じ単位で実施）
 
 **Files**: `data/robots.ts`（対象robotIdのみ）、必要なsource追加
 
-**Change**: Task B-1で確定した値を、R02-08と同じ「1メーカーまたは5〜8機体単位・1batch1commit」の粒度で反映する。`conflict`/`needs-review`（電圧不明以外の理由のもの）/`source-inaccessible`は自動採用せず個別保留。
+**Change**: Task B-1で確定した値を、R02-08と同じ「1メーカーまたは5〜8機体単位・1batch1commit」の粒度で`batteryCapacityMah`へ反映する。`conflict`/`needs-review`（電圧不明以外の理由のもの）/`source-inaccessible`は自動採用せず個別保留。
 
 **Completion**: 対象robotIdと変更フィールドがcommit本文に列挙される。対象外ロボットのdiff 0件。
 
-#### Task B-4 テスト・登録簿の更新
+#### Task B-3 テスト・登録簿の更新
 
 **Files**: `tests/unit/spec-coverage.test.ts`、`docs/decisions/deferred-work-register-v1.md`
 
-**Change**: `MIN_POPULATED.batteryCapacityMah`（および採用時は`batteryCapacityWh`）を実装後の実件数に更新。登録簿`#10`を完了として書き換えるか削除（登録簿自身の運用ルールに従う）。
+**Change**: `MIN_POPULATED.batteryCapacityMah`を実装後の実件数に更新。登録簿`#10`を完了として書き換えるか削除（登録簿自身の運用ルールに従う）。`batteryCapacityWh`を復元しないと決めた経緯（DEC-04）も登録簿の本文に残す。
 
-**Validation（B-2〜B-4共通）**:
+**Validation（B-1〜B-3共通）**:
 
 ```bash
 npm run validate:data
@@ -300,21 +299,21 @@ npm run test:unit -- page-tab-bar
 Task A（#6）      … 依存なし。単独で実施可
 Task D（#4）      … 依存なし。調査のみなので他タスクと並行可
 
-Task B-1（出典再検証）
-  └─ DEC-04（ユーザー判断）
-      ├─ Option A採用 → Task B-3（mAhのみ反映）→ Task B-4
-      └─ Option B採用 → Task B-2（スキーマ変更）→ Task B-3 → Task B-4
+Task B-1（出典再検証、DEC-04決定済みによりスキーマ変更taskは不要）
+  └─ Task B-2（mAhデータ反映）
+      └─ Task B-3（テスト・登録簿更新）
 
 Task C（#5）      … 依存なし。ただしTask Bと同じdata/robots.tsは触らないため独立して進められる
 ```
 
-Task BはDEC-04の決定が出るまでB-2以降に進めない。Task AとTask Dは他の判断を待たずに着手できる。
+DEC-04は2026-08-06のユーザー確認で決着済み（mAhへ一本化）。Task Bはスキーマ変更を経由せずB-1から直接着手できる。Task A・C・Dも互いに依存せず並行して進められる。
 
 ---
 
 ## 6. この計画の既知の弱点
 
-- Task Bの§2.2発見6で挙げたmAh/Ah生値の機体対応は、grepの行順から推測した部分があり、Task B-1で必ず再確認する前提で書いている。この計画の時点では**robotId確定値として扱っていない**。
+- Task Bの§2.2発見6で挙げたmAh/Ah生値の機体対応は、grepの行順から推測した部分があり、Task B-1で必ず再確認する前提で書いている。この計画の時点では**robotId確定値として扱っていない**。ユーザー提供CSV（発見7）との突合で複数機体は一致を確認できたが、全数の突合はTask B-1側の作業として残る。
+- ユーザー提供CSV（`~/Downloads/ロボDB/`）はリポジトリ外のファイルで、この計画は該当ファイルの1回のReadで判定している。CSV自体が今後更新される可能性、および201行中196行が読み込んだ内容の書き起こしに基づく点（値の転記ミスがあれば計画側の記述も引き継ぐ）は留意が必要。
 - `docs/plans/content-platform-migration-plan-v1.md`（970行）は全文を読んでいない。バッテリー関連のgrepヒットが無いことのみを根拠に対象外としており、他の観点（例: 移行後のspecSchema運用）まで完全に無関係とは言い切れない。
 - Task Dは調査taskであり、実際の修正規模・リスクはaxe実行結果が出るまで不明。「独立した計画が要る」という登録簿の見立てを追認しただけで、その計画自体はこの文書に含まれていない。
 - Task Cの「本文直置き」という方針は`design_system_v1.md`が示す参照実装（`/robots`）に倣ったものだが、`ReportsBrowser`固有のレイアウト（ヒーロー・フィーチャー枠の有無で`showHero`が切り替わる等）との干渉は実装時に初めて分かる可能性がある。
