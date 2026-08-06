@@ -17,7 +17,7 @@ const routes = [
 
 for (const route of routes) {
   test(`${route} exposes one visible h1`, async ({ page }) => {
-    await page.goto(route, { waitUntil: 'domcontentloaded' });
+    await page.goto(route);
     const headings = page.getByRole('heading', { level: 1 });
     await expect(headings).toHaveCount(1);
     await expect(headings).toBeVisible();

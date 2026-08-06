@@ -11,7 +11,7 @@ const WIDTHS = [390, 768, 1280, 1440] as const;
 for (const width of WIDTHS) {
   test(`home world map keeps its aspect ratio and layering @${width}`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.goto('/');
     await page.locator('[data-world-map-stage]').waitFor();
 
     // 1) 地図が引き伸ばされていないこと。

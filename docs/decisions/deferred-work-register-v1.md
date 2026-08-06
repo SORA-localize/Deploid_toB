@@ -35,12 +35,18 @@ Phase 5・6 の実行中、積み残しは3か所に分散していた。実装�
 | 4 | [`color-contrast` の是正](#4-color-contrast-の是正) | Phase 6 | 中 | 219→23件へ削減済み・残23件は別判断 |
 | 7 | [`/robots` グリッドが 768px で2列](#7-robots-グリッドが-768px-で2列) | Phase 6 | 低 | 未着手・人間が対象外と決定 |
 | 8 | [Home 世界地図の動きの復活](#8-home-世界地図の動きの復活) | Phase 4 | **最後** | 未着手・ユーザー要望 |
-| 9 | [e2e の hydration race](#9-e2e-の-hydration-race) | 監査 | **中** | 真因確定・1ファイル解消済み・残4ファイル13箇所 |
 | 10 | [`batteryCapacityMah` の未反映](#10-batterycapacitymah-の未反映) | 全体レビュー | 中 | 20/63機反映済み・23機要人力判断 |
 
-`#5`・`#6`・`#11`は解消済みのため行ごと削除（`#5`/`#6`は[PR #21](https://github.com/SORA-localize/Deploid_toB/pull/21)・[PR #20](https://github.com/SORA-localize/Deploid_toB/pull/20)、
-`#11`（Linuxベースライン陳腐化）は[PR #22](https://github.com/SORA-localize/Deploid_toB/pull/22)で
-`.github/workflows/update-visual-baselines.yml`を追加して恒久対応、いずれも2026-08-06）。
+`#5`・`#6`・`#9`・`#11`は解消済みのため行ごと削除（すべて2026-08-06）。
+
+- `#5`（`/reports`主軸タブの到達性）: [PR #21](https://github.com/SORA-localize/Deploid_toB/pull/21)
+- `#6`（Reports H1の動的化）: [PR #20](https://github.com/SORA-localize/Deploid_toB/pull/20)
+- `#9`（e2eのhydration race）: [PR #22](https://github.com/SORA-localize/Deploid_toB/pull/22)＋
+  `fix/e2e-hydration-race-20260806`。全5ファイル20箇所の`waitUntil: 'domcontentloaded'`を除去。
+  「retriesが吸収しているので放置も正当」という当初の結論は、retriesがflakyの増加を隠していた
+  実例をもって撤回した
+- `#11`（Linuxベースライン陳腐化）: [PR #22](https://github.com/SORA-localize/Deploid_toB/pull/22)で
+  `.github/workflows/update-visual-baselines.yml`を追加して恒久対応
 
 ---
 
@@ -180,61 +186,6 @@ static asset の制約を維持した新設計。別 plan（`refactor-phase-08-h
 **関連**: #3 の `motion/react` 依存はこの実装方針に影響する。
 
 出典: [`refactor-phase-04-home-performance-v1.md`](../plans/refactor-phase-04-home-performance-v1.md) の Follow-up 節
-
----
-
-## 9. e2e の hydration race
-
-`tests/e2e/` の5 spec（`focus-restoration` / `keyboard-navigation` / `carousel-autoplay` /
-`headings` / `home-world-map`）が `page.goto(..., { waitUntil: 'domcontentloaded' })` を明示指定
-している。Playwright の既定は `load` で、`domcontentloaded` はそれより**早い** signal。
-hydration 前に click が飛ぶため `focus-restoration › moves focus into the drawer on open` が
-不定期に落ちる。
-
-実測（2026-08-03）:
-
-- 単体8回: 0/8 失敗
-- フルスイート `--retries=0` 4回: 1/4 失敗
-- CI（ubuntu-latest）: 観測した2 run とも1回目失敗 → retry で通過（`1 flaky` 表示）
-- hydration の死に窓: ボタン可視 65ms → click 有効 119ms。**54ms**
-
-**ユーザー影響は無い**（54ms は人間が踏めない）。`retries: 2` が吸収しており CI は緑。
-retries 自体は Playwright / Cypress とも公式機能で、CI での使用は一般的な実務。
-
-**Phase 7 は対応せずに完了した**（2026-08-04 マージ）。以前は「Phase 7で対応予定」と
-書いていたが、Task 1〜6は analytics/security headers/Toaster/dead code/docs links/results の
-6件で、この項目には触れていない（全体レビューで発見、2026-08-05）。
-
-### 2026-08-06 更新: 「放置も正当」という結論は取り下げる
-
-以前ここには「**放置も正当な判断**。`retries: 2` が吸収しており CI は緑」と書いていた。
-この判断は**2つの点で誤りだったと実証された**。
-
-**1. retries は問題を隠すだけで、隠れている間に悪化する。**
-`#5`（`/reports`タブ到達性）の対応で `keyboard-navigation.spec.ts` から
-`revealStickyFilterTabs` ヘルパーを削除したところ、CI で新しい flaky が2回連続で発生した
-（`a disabled filter tab is reachable but does not navigate`）。原因は、このヘルパーが持つ
-`await expect(...).toBeVisible()` が**偶然 hydration 待ちとして機能していた**こと。
-race は元からそこにあり、ヘルパーが覆い隠していただけだった。`retries` があるために
-「flaky が1件から2件に増えた」ことに気づくのが CI ログの精読まで遅れた。
-
-**2. 真因を消せば直る。** `waitUntil: 'domcontentloaded'` の指定を外す（Playwright 既定の
-`load` に戻す）だけで解消した。`keyboard-navigation.spec.ts` の7箇所を除去した結果、
-ローカル `--repeat-each=6 --retries=0` で42/42、CI でも flaky 表示が消えた
-（[PR #22](https://github.com/SORA-localize/Deploid_toB/pull/22)）。retries に頼らず
-原因を除去する方が、コストも低く確実だった。
-
-**現状**: `keyboard-navigation.spec.ts` は解消済み（実コード0箇所）。残りは4ファイル13箇所。
-
-| ファイル | 残数 | 備考 |
-|---|---:|---|
-| `focus-restoration.spec.ts` | 7 | うち1つ（mobile menu › moves focus into the drawer on open）は**現在も CI で flaky** |
-| `carousel-autoplay.spec.ts` | 4 | 自動送り5秒間隔を扱うため、`load` 待ちが延びた際の挙動を繰り返し実行で確認すること |
-| `headings.spec.ts` | 1 | |
-| `home-world-map.spec.ts` | 1 | |
-
-**いつやるか**: 優先度を低→中へ上げる。CI で現に flaky が出ており、かつ修正方法と
-その有効性が実証済みで、1ファイルあたり1回の機械的な置換で済むため。
 
 ---
 
