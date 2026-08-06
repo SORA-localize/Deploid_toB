@@ -35,11 +35,12 @@ Phase 5・6 の実行中、積み残しは3か所に分散していた。実装�
 | 4 | [`color-contrast` の是正](#4-color-contrast-の是正) | Phase 6 | 中 | 219→23件へ削減済み・残23件は別判断 |
 | 7 | [`/robots` グリッドが 768px で2列](#7-robots-グリッドが-768px-で2列) | Phase 6 | 低 | 未着手・人間が対象外と決定 |
 | 8 | [Home 世界地図の動きの復活](#8-home-世界地図の動きの復活) | Phase 4 | **最後** | 未着手・ユーザー要望 |
-| 9 | [e2e の hydration race](#9-e2e-の-hydration-race) | 監査 | 低 | Phase 7完了・未対応のまま残存 |
+| 9 | [e2e の hydration race](#9-e2e-の-hydration-race) | 監査 | **中** | 真因確定・1ファイル解消済み・残4ファイル13箇所 |
 | 10 | [`batteryCapacityMah` の未反映](#10-batterycapacitymah-の未反映) | 全体レビュー | 中 | 20/63機反映済み・23機要人力判断 |
-| 11 | [`/reports` visual-regressionのLinuxベースライン未更新](#11-reports-visual-regressionのlinuxベースライン未更新) | 全体レビュー | 低 | 未着手 |
 
-`#5`・`#6`は解消済みのため行ごと削除（[PR #21](https://github.com/SORA-localize/Deploid_toB/pull/21)・[PR #20](https://github.com/SORA-localize/Deploid_toB/pull/20)、2026-08-06）。
+`#5`・`#6`・`#11`は解消済みのため行ごと削除（`#5`/`#6`は[PR #21](https://github.com/SORA-localize/Deploid_toB/pull/21)・[PR #20](https://github.com/SORA-localize/Deploid_toB/pull/20)、
+`#11`（Linuxベースライン陳腐化）は[PR #22](https://github.com/SORA-localize/Deploid_toB/pull/22)で
+`.github/workflows/update-visual-baselines.yml`を追加して恒久対応、いずれも2026-08-06）。
 
 ---
 
@@ -200,16 +201,40 @@ hydration 前に click が飛ぶため `focus-restoration › moves focus into t
 **ユーザー影響は無い**（54ms は人間が踏めない）。`retries: 2` が吸収しており CI は緑。
 retries 自体は Playwright / Cypress とも公式機能で、CI での使用は一般的な実務。
 
-**放置も正当な判断**。ただしその場合は「**flaky は1件まで許容、増えたら直す**」を運用ルールと
-して明示すること。書かずに放置すると単なる忘却になり、2件目以降に気づけなくなる。
-
 **Phase 7 は対応せずに完了した**（2026-08-04 マージ）。以前は「Phase 7で対応予定」と
 書いていたが、Task 1〜6は analytics/security headers/Toaster/dead code/docs links/results の
-6件で、この項目には触れていない。約束を果たさずに完了したので、この行を実態に合わせて訂正した
-（全体レビューで発見、2026-08-05）。対象5ファイルへの該当箇所数を`grep -c`で数え直したところ
-`carousel-autoplay.spec.ts`4箇所・`headings.spec.ts`1箇所・`focus-restoration.spec.ts`7箇所・
-`keyboard-navigation.spec.ts`7箇所・`home-world-map.spec.ts`1箇所の計20箇所（ファイル数5は
-変わらず）。**着手時期は未定のまま**、次にe2eを触る機会に対応する。
+6件で、この項目には触れていない（全体レビューで発見、2026-08-05）。
+
+### 2026-08-06 更新: 「放置も正当」という結論は取り下げる
+
+以前ここには「**放置も正当な判断**。`retries: 2` が吸収しており CI は緑」と書いていた。
+この判断は**2つの点で誤りだったと実証された**。
+
+**1. retries は問題を隠すだけで、隠れている間に悪化する。**
+`#5`（`/reports`タブ到達性）の対応で `keyboard-navigation.spec.ts` から
+`revealStickyFilterTabs` ヘルパーを削除したところ、CI で新しい flaky が2回連続で発生した
+（`a disabled filter tab is reachable but does not navigate`）。原因は、このヘルパーが持つ
+`await expect(...).toBeVisible()` が**偶然 hydration 待ちとして機能していた**こと。
+race は元からそこにあり、ヘルパーが覆い隠していただけだった。`retries` があるために
+「flaky が1件から2件に増えた」ことに気づくのが CI ログの精読まで遅れた。
+
+**2. 真因を消せば直る。** `waitUntil: 'domcontentloaded'` の指定を外す（Playwright 既定の
+`load` に戻す）だけで解消した。`keyboard-navigation.spec.ts` の7箇所を除去した結果、
+ローカル `--repeat-each=6 --retries=0` で42/42、CI でも flaky 表示が消えた
+（[PR #22](https://github.com/SORA-localize/Deploid_toB/pull/22)）。retries に頼らず
+原因を除去する方が、コストも低く確実だった。
+
+**現状**: `keyboard-navigation.spec.ts` は解消済み（実コード0箇所）。残りは4ファイル13箇所。
+
+| ファイル | 残数 | 備考 |
+|---|---:|---|
+| `focus-restoration.spec.ts` | 7 | うち1つ（mobile menu › moves focus into the drawer on open）は**現在も CI で flaky** |
+| `carousel-autoplay.spec.ts` | 4 | 自動送り5秒間隔を扱うため、`load` 待ちが延びた際の挙動を繰り返し実行で確認すること |
+| `headings.spec.ts` | 1 | |
+| `home-world-map.spec.ts` | 1 | |
+
+**いつやるか**: 優先度を低→中へ上げる。CI で現に flaky が出ており、かつ修正方法と
+その有効性が実証済みで、1ファイルあたり1回の機械的な置換で済むため。
 
 ---
 
@@ -245,34 +270,6 @@ Task B-1 を参照。
 
 出典: [`data-maintenance-checklist-v1.md`](data-maintenance-checklist-v1.md) §I（原記録）、
 [`deferred-work-register-followup-v1.md`](../plans/deferred-work-register-followup-v1.md)（発見・反映、2026-08-06）
-
----
-
-## 11. `/reports` visual-regressionのLinuxベースライン未更新
-
-`#5`（`/reports`主軸タブの到達性）の修正で、タブ行を浮遊オーバーレイから本文内の
-`position: sticky`要素へ変更した（[PR #21](https://github.com/SORA-localize/Deploid_toB/pull/21)）。
-これに伴い`tests/e2e/visual-regression.spec.ts`の`/reports`ベースライン画像が
-実際のレイアウト変化により古くなった。
-
-`-darwin.png`（4viewport）は開発機（macOS）で`--update-snapshots`により再生成し、
-目視確認済み（overflow・重なり・切れ・欠落なし）。
-
-**`-linux.png`（CIが使う側）は未更新。** 開発機にDocker/Linux環境が無く、CIが失敗時に
-保存する成果物（トレース・動画込みで82MB）から該当4枚のPNGだけを取り出すダウンロードも
-この回線では30分以上かかる見込みで断念した。
-
-**なぜ後回しにしたか**: ユーザーがVercelプレビューで実機確認し、コードとdarwin側の
-検証（自動テスト・目視）で実質的な正しさは確認済みと判断したため、Linux画像の更新を
-待たずにPR #21をマージした。
-
-**いつやるか**: Docker（`mcr.microsoft.com/playwright`公式イメージ等）が使える環境、または
-Linuxマシンで`npx playwright test tests/e2e/visual-regression.spec.ts -g reports --update-snapshots`
-を実行し、生成された`tests/e2e/visual-regression.spec.ts-snapshots/reports-*-chromium-linux.png`
-をcommitする。それまでCIの`verify`ジョブは`/reports`の4viewportで恒常的に赤くなる
-（他のテストは影響を受けない）。
-
-出典: PR [#21](https://github.com/SORA-localize/Deploid_toB/pull/21) のCI実行結果（2026-08-06）
 
 ---
 
