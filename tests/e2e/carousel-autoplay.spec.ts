@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
 // 明示的な停止手段が要る。あわせて現在位置を live region で伝える。
 
 test('hero carousel can be paused and resumed', async ({ page }) => {
-  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+  await page.goto('/reports');
   const dots = page.locator('button[aria-label^="スライド"]');
   await expect(dots.first()).toBeVisible();
 
@@ -31,7 +31,7 @@ test('hero carousel can be paused and resumed', async ({ page }) => {
 });
 
 test('hero carousel announces the current position', async ({ page }) => {
-  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+  await page.goto('/reports');
   const status = page.locator('[aria-live="polite"]').filter({ hasText: /件中/ }).first();
   await expect(status).toHaveText(/^\d+件中1件目$/);
 
@@ -41,7 +41,7 @@ test('hero carousel announces the current position', async ({ page }) => {
 });
 
 test('each slide carries its own position for screen readers', async ({ page }) => {
-  await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+  await page.goto('/reports');
 
   // 全スライドが同時に DOM にある。live region は位置が「変わったとき」しか鳴らないため、
   // 読み上げで線形に辿る利用者向けに1枚ずつが自分の位置を持つ。
@@ -57,7 +57,7 @@ test('each slide carries its own position for screen readers', async ({ page }) 
 test.describe('reduced motion', () => {
   test('no autoplay control is rendered when motion is reduced', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/reports', { waitUntil: 'domcontentloaded' });
+    await page.goto('/reports');
     await expect(page.locator('button[aria-label^="スライド"]').first()).toBeVisible();
     // autoplay 自体を積まないため、停止ボタンも出さない（操作対象が無い）。
     await expect(page.getByRole('button', { name: /自動再生を/ })).toHaveCount(0);
