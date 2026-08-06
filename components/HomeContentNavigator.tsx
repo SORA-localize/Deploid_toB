@@ -137,7 +137,7 @@ export function HomeContentNavigator({
                   <div className="min-w-0">
                     <div className="flex items-baseline justify-between gap-4">
                       <h3 className="text-lg font-semibold text-foreground">{item.title}</h3>
-                      <span className="hidden whitespace-nowrap text-[11px] uppercase tracking-[0.16em] text-muted-foreground/70 sm:inline">
+                      <span className="hidden whitespace-nowrap text-[11px] uppercase tracking-[0.16em] text-muted-foreground/90 sm:inline">
                         {item.stat}
                       </span>
                     </div>

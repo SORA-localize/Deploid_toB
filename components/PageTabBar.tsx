@@ -60,7 +60,7 @@ export function PageTabBar<T extends string>({
             {hasCount && (
               <span
                 aria-hidden="true"
-                className="ml-1 min-w-4 text-right text-xs tabular-nums opacity-75"
+                className="ml-1 min-w-4 text-right text-xs tabular-nums opacity-90"
               >
                 {tab.count}
               </span>

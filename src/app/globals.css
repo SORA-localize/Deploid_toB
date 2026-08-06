@@ -45,7 +45,7 @@
   --border-subtle: var(--slate-5);
   --border-strong: var(--slate-8);
 
-  --signal: #29a383;
+  --signal: #21846a;
   --signal-foreground: #ffffff;
   --signal-muted: color-mix(in srgb, var(--signal) 8%, transparent);
   --signal-border: color-mix(in srgb, var(--signal) 28%, transparent);
