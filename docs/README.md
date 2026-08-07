@@ -10,9 +10,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 計画 | 一言 | branch | 開始日 |
 |---|---|---|---|
-| [CMS / DB移行前リファクタリング実装](plans/pre-migration-refactor-implementation-index-v1.md) | **Phase 1〜7 すべて main 反映済み**（実測は [結果](reference/pre-migration-refactor-results-v1.md)）。積み残しは [登録簿](decisions/deferred-work-register-v1.md) | 完了（`main`） | 2026-07-26 |
-| [移行前リファクタ 全体レビュー](plans/pre-migration-refactor-full-review-plan-v1.md) | Phase 1〜7実装が14の規定文書に照らして適切だったかを検証する計画。R1（挙動保存）は公開URL diff完了・差分0件。R2〜R19は未実行 | `main`（レビューのみ、専用branchなし） | 2026-08-04 |
-| [積み残し登録簿フォローアップ](plans/deferred-work-register-followup-v1.md) | 登録簿#4/#5/#6/#10の実行計画。#10はR02統合計画のR02-09再開として位置づけ、mAh/Wh併存のDEC-04が未決 | `main`（専用branchなし） | 2026-08-05 |
+| [積み残し登録簿フォローアップ](plans/deferred-work-register-followup-v1.md) | 登録簿#4/#5/#6/#10の実行計画。**#4・#5・#6は解消済み**。残るのは#10のバッテリー23機（CSVのvariant名とレコードの対応を人が決める） | `main`（専用branchなし） | 2026-08-05 |
 | [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | `data/*.ts` から Payload CMS + managed PostgreSQLへ、URLと不変idを保って段階移行。実装は未着手。**2026-07-26付でPhase 3・5・6が作った層を反映していない——着手時に現行実装へ突合すること** | 未定（専用branch必須） | 2026-07-26 |
 | [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | 上位ロードマップ。**Phase番号は移行前リファクタの1〜7とは別体系**（本書のPhase 1はCMS/DB移行を指す）。移行前スコープは実装インデックス側が正本 | phaseごとに分割 | 2026-07-26 |
 | [レスポンシブ対応](plans/responsive-phase-1-static-audit-v1.md) | Phase 1のコード実装は完了。R-06（実機スクリーンショットでの最終確認）が未実施 | 専用branchなし（mainへ直接実装） | 2026-07-03 |
@@ -33,6 +31,20 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 | 2026-07-26 | [技術スタック](decisions/humanoid_platform_tech_stack_v1.md) | CMS候補とDB不要判断を、Payload + PostgreSQLの確定構成へ更新 |
 | 2026-07-26 | [アーキテクチャ将来対応リスト](decisions/architecture_future_considerations_v1.md) | コンテンツ基盤移行の確定判断と移行後の見直し条件を追加 |
 | 2026-07-26 | [Deploid Data Work Guide](decisions/data/README.md) | cutoverまでは現行TS運用を継続する移行期間ルールを追加 |
+
+---
+
+## 直近で完了したもの
+
+進行中ではないが、経緯を追う起点になるもの。本体は `docs/archive/` にある。
+
+| 完了 | 内容 |
+|---|---|
+| 2026-08-04 | [CMS / DB移行前リファクタリング Phase 1〜7](archive/pre-migration-refactor-implementation-index-v1.md)。実測値は [結果](reference/pre-migration-refactor-results-v1.md) |
+| 2026-08-05 | [同リファクタの全体レビュー](archive/pre-migration-refactor-full-review-plan-v1.md)。14の規定文書に照らしてR1〜R19を5層に分けて実行し、健全と結論。唯一の修正はコンポーネント3ファイルの重複除去 |
+| 2026-08-06 | 積み残し登録簿の `#4`（color-contrast 219件→0件、axe gateを`serious`へ）・`#5`（/reportsタブ到達性）・`#6`（Reports H1）・`#9`（e2e hydration race）・`#11`（Linuxベースライン自動再生成） |
+
+残る積み残しは [登録簿](decisions/deferred-work-register-v1.md) が正本。
 
 ---
 

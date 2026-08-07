@@ -13,7 +13,7 @@ updated: 2026-07-26
 
 **Tech Stack:** Next.js 16 App Router、React 19、TypeScript、Payload CMS、Postgres、Vitest、Playwright、Vercel、Vercel BlobまたはS3互換storage
 
-> **Deferred program prerequisite:** CMS / DB移行は未着手。開始前に [`pre-migration-refactor-implementation-index-v1.md`](pre-migration-refactor-implementation-index-v1.md) のPhase 1〜7を完了する。この前提で品質ツール、local snapshot、validator、view modelは既に存在するため、本計画で同じ基盤を作り直さない。
+> **Deferred program prerequisite:** CMS / DB移行は未着手。開始前に [`pre-migration-refactor-implementation-index-v1.md`](../archive/pre-migration-refactor-implementation-index-v1.md) のPhase 1〜7を完了する。この前提で品質ツール、local snapshot、validator、view modelは既に存在するため、本計画で同じ基盤を作り直さない。
 
 ## Global Constraints
 
