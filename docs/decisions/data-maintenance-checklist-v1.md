@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-07-28
+updated: 2026-08-07
 ---
 
 # データ保守運用チェックリスト v1
@@ -51,7 +51,7 @@ updated: 2026-07-28
 5. [ ] ロゴの表示用途・商用利用・改変可否・期限・クレジット条件を確認し、`rights` と `licenseUrl` / `permissionNote` に根拠を記録する
 6. [ ] 国内代理店があれば `domesticDistributors`（name 必須・URL は形式チェック）
 7. [ ] `headquarters`（lat/lng）はワールドマップ用（任意）。設定すると Home ワールドマップにドットが表示される
-8. [ ] **その国が初登場**の場合は `components/ManufacturerMapCopy.tsx` の `REGION` 定数に `'CountryName': { name: '日本語名', a3: 'ISO3文字コード' }` を追加する（手動。漏れてもビルドは通るが、地図カードの国名がフォールバック表示になる）
+8. [ ] **その国が初登場**の場合は `lib/countryRegistry.ts` の `countries` に `'CountryName': { name: '日本語名', alpha3: 'ISO3文字コード' }` を追加する（手動。漏れてもビルドは通るが、地図カードの国名がフォールバック表示になる）
 9. [ ] build 通過 → `published`
 10. [ ] 件数が増減した場合、`/for-manufacturers` の掲載数表示が古くなる。`lib/site.ts` の `siteMeta.dataAsOf` を更新する（手動・即時でなくまとめて更新でも可）
 
@@ -278,7 +278,7 @@ AI側の実装手順:
 3. [ ] `manufacturerId`（arc 始点）・`robotId`（任意・判明時）は **id** 参照（自動：参照切れは build 失敗）
 4. [ ] **`sources` 必須**（自動：空だと build 失敗）
 5. [ ] `siteName`（任意）・`startedAt`（YYYY または YYYY-MM）を可能な範囲で記入。`location` は施設のおおよその座標（番地不要・市区町村レベルで可。施設名が非公開の場合は都市中心座標で代替する）
-6. [ ] **導入先の country がメーカーリストに存在しない新しい国**の場合は `components/ManufacturerMapCopy.tsx` の `REGION` 定数に追加する（→ セクション B-7 と同じ対応）
+6. [ ] **導入先の country がメーカーリストに存在しない新しい国**の場合は `lib/countryRegistry.ts` の `countries` に追加する（→ セクション B-7 と同じ対応）
 7. [ ] **この事例が裏付けになる用途があれば `relatedUseCaseIds`（任意・id参照）に追記する**（自動：参照切れは build 失敗）。該当する用途が無ければ空のままでよい。無理な紐付けはしない。複数の事例が同じニッチに集中している場合は、新しい `UseCase` を起こす根拠として検討する（→ セクション M）。逆引きは `lib/data.ts` の `getDeploymentsForUseCase()` がuseCase詳細ページの「実際の導入事例」セクション用に行う
 8. [ ] build 通過 → `published`
 

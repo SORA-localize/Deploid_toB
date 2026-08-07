@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-08-06
+updated: 2026-08-07
 ---
 
 # UIアーキテクチャ・開発方針 v1
@@ -67,7 +67,7 @@ UI開発方針とデザインシステムは別文書にする。
 | カード | `RobotCard`, `FeaturedRobotCard`, `FavoriteCard`, `TagChip`, `EmptyState` | 再利用される表示単位 |
 | fact表示 | `FactList`, `CardFactGrid`, `ComparisonSpecList` | 短いラベル–値、カード、比較の役割別表示 |
 | ロボットレール | `RobotCardRail` | `FeaturedRobotCard` の幅・gap・snap・横スクロール |
-| 入力 | `SearchInput`, `SelectControl`, `FilterChipGroup`, `ContactForm` | 絞り込み・問い合わせ |
+| 入力 | `SearchInput`, `SelectControl`, `ContactForm` | 絞り込み・問い合わせ |
 | 詳細 | `RobotImageCarousel`, `Markdown`, `ManufacturerLogoName` | 詳細ページ固有の補助部品 |
 | データ取得 | `lib/data.ts` | published filter、slug lookup、関連取得 |
 | ラベル | `lib/labels.ts` | enum表示名 |
@@ -160,7 +160,6 @@ Client Component が必要なもの：
 
 - `SearchInput`
 - `SelectControl`
-- `FilterChipGroup`
 - `TagChip`
 - `EmptyState`
 - `ManufacturerLogoName`
@@ -319,7 +318,7 @@ UIは、存在しないデータを捏造しない。
 現在できていること：
 
 - `CompareClient` の選択・削除・accordionにaria属性がある。
-- `FilterChipGroup` に `role="group"` と `aria-pressed` がある。
+- `PageTabBar` に `role="group"` と `aria-current="page"` がある（URL が変わるナビゲーションのため `role=tab` は使わない。§9「ページ内タブとナビゲーションの区別」）。
 - `ContactForm` にlabelがある。
 - `ManufacturerLogoName` のロゴは装飾扱い。
 - carousel に停止／再開ボタン、`aria-live` の現在位置、スライドごとの位置がある。
