@@ -44,7 +44,7 @@ function checkExpectation(label, actual, expected) {
 
 const importedRobots = readImport('robots');
 const importedManufacturers = readImport('manufacturers');
-const { robots, manufacturers } = localContentSnapshot;
+const { robots, manufacturers, useCases, articles } = localContentSnapshot;
 
 // ── 母集団 ───────────────────────────────────────────────────────────────────
 
@@ -122,13 +122,94 @@ for (const row of live) {
 const matchedIds = new Set(matchedRows.map((m) => m.robot.id));
 const orphans = robots.filter((robot) => !matchedIds.has(robot.id));
 
+// ── シリーズ manifest（DEC-S08）────────────────────────────────────────────────
+//
+// 「A群14件」と「素の名前の親レコード7件」は別の走査で作られており一致しない。
+// 件数（191 か 192 か）と参照移行はこの manifest が確定するまで決められない。
+// 手で数えずここで出す。
+section('シリーズ manifest（DEC-S08。移管元と参照を確定させる）');
+
+// ファミリ名だけでは一意に決まらない。'R1' は Unitree と Galaxea の両方に存在し、
+// メーカーを付けないと unitree-r1-standard へ誤マッチする。必ず [maker, family] で持つ。
+const SERIES_FAMILIES_A = [
+  ['Booster Robotics', 'T1'],
+  ['Booster Robotics', 'K1'],
+  ['Booster Robotics', 'T2'],
+  ['EngineAI', 'T800'],
+  ['EngineAI', 'PM01'],
+  ['Unitree Robotics', 'G1-D'],
+  ['Unitree Robotics', 'H2-D'],
+  ['AgiBot', 'A2'],
+  ['NEURA Robotics', '4NE1'],
+  ['Leju Robotics', 'KUAVO 4PRO'],
+  ['Leju Robotics', 'KUAVO 5'],
+  ['LimX Dynamics', 'Oli'],
+  ['Noetix Robotics', 'Bumi'],
+  ['Galaxea Dynamics', 'R1'],
+];
+
+const seriesRows = [];
+for (const [maker, family] of SERIES_FAMILIES_A) {
+  const variants = live.filter(
+    (row) =>
+      row.maker === maker &&
+      normalize(row.model).startsWith(normalize(family)) &&
+      normalize(row.model) !== normalize(family),
+  );
+  const owner = manufacturers.find((m) => normalize(m.name) === normalize(maker));
+  const existing = owner
+    ? robots.find(
+        (robot) => robot.manufacturerId === owner.id && normalize(robot.name) === normalize(family),
+      )
+    : undefined;
+
+  seriesRows.push({ family, maker, existing, variants: variants.length });
+}
+
+const transferable = seriesRows.filter((row) => row.existing);
+for (const row of seriesRows) {
+  const from = row.existing ? `移管 ← ${row.existing.id}（${row.existing.publishStatus}）` : '新規作成';
+  console.log(`  [A] ${row.maker.padEnd(20)} ${row.family.padEnd(12)} ${String(row.variants).padStart(2)}構成  ${from}`);
+}
+const transferableCount = transferable.length;
+console.log(`\n  A群 ${seriesRows.length} 件 / うち移管 ${transferable.length} 件 / 新規 ${seriesRows.length - transferable.length} 件`);
+
+// 移管対象を指している他コレクションの参照。ここが0にならないと Robot を消せない。
+const transferIds = new Set(transferable.map((row) => row.existing.id));
+const inbound = [];
+for (const useCase of useCases) {
+  for (const candidate of useCase.candidateRobots ?? []) {
+    if (transferIds.has(candidate.robotId)) inbound.push(`useCase ${useCase.slug}.candidateRobots -> ${candidate.robotId}`);
+  }
+}
+for (const article of articles) {
+  for (const id of article.relatedRobotIds ?? []) {
+    if (transferIds.has(id)) inbound.push(`article ${article.slug}.relatedRobotIds -> ${id}`);
+  }
+}
+for (const robot of robots) {
+  if (robot.supersededById && transferIds.has(robot.supersededById)) {
+    inbound.push(`robot ${robot.id}.supersededById -> ${robot.supersededById}`);
+  }
+}
+
+const inboundCount = inbound.length;
+console.log(`\n  移管対象IDを指す参照: ${inbound.length} 件（すべて移行先を決めるまで Robot を消せない）`);
+for (const line of inbound) console.log(`     ${line}`);
+
+console.log(`\n  完了時 robots = ${robots.length} − 移管${transferable.length} + 分割1 + 追加${additions.length} = ${robots.length - transferable.length + 1 + additions.length}`);
+
+
 section('ロボット（計画 §3）');
 allOk = checkExpectation('現行 data/robots.ts', robots.length, 63) && allOk;
 allOk = checkExpectation('一致した行', matchedRows.length, 43) && allOk;
 allOk = checkExpectation('一致した Deploid レコード', matchedIds.size, 42) && allOk;
 allOk = checkExpectation('追加', additions.length, 134) && allOk;
 allOk = checkExpectation('Deploid 側で一致しない', orphans.length, 21) && allOk;
-allOk = checkExpectation('完了時のレコード数', robots.length + additions.length + 1, 198) && allOk;
+// 移管分を引く。63 + 134 + 1 = 198 は誤り（Series へ移る6件を数え落とす）。
+allOk = checkExpectation('A群のうち移管', transferableCount, 6) && allOk;
+allOk = checkExpectation('移管IDを指す参照', inboundCount, 16) && allOk;
+allOk = checkExpectation('完了時のレコード数', robots.length - transferableCount + 1 + additions.length, 192) && allOk;
 
 // 1レコードに複数行が当たる = variant 分割が要る（§3、apptronik-apollo-2 の Biped / Wheeled）
 const rowsPerRecord = new Map();

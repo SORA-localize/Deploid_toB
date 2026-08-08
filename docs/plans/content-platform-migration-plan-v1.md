@@ -33,8 +33,8 @@ updated: 2026-08-08
 
 | 計画の記載 | 実装の現状 | 判断 |
 |---|---|---|
-| `lib/content/contracts.ts`（source/repository境界とsnapshot型） | **`lib/data/contentSnapshot.ts`** が `ContentSnapshot` 型を提供済み | 既存を使う。`lib/content/` を新設しない |
-| `lib/content/localSource.ts`（移行期間のTS reader） | **`lib/data/localContentSnapshot.ts`** が全collectionを結合済み | 既存を使う |
+| `lib/content/contracts.ts`（source/repository境界とsnapshot型） | **`lib/data/contentSnapshot.ts`** が `ContentSnapshot` 型を提供済み | 型は既存を import する。**repository 契約は `lib/content/` に新設する**（既存は型だけで境界を持たない） |
+| `lib/content/localSource.ts`（移行期間のTS reader） | **`lib/data/localContentSnapshot.ts`** が全collectionを結合済み | **既存を source として再利用しつつ、`lib/content/` に repository / query 境界を新設する。** 既存は配列 snapshot だけで query・slug解決・pagination を持たないため、Task 4 で `lib/content/` を作るのは重複ではない |
 | `lib/validation/collections/*.ts`（collection単位のdomain validation） | **`lib/validation/*.ts`** に9本（`robots` / `manufacturers` / `useCases` / `articles` / `deployments` / `common` / `registry` / `types` / `validateContentSnapshot`）が既存 | 既存の平置きを使う。`collections/` サブディレクトリを作らない |
 | `lib/validation/crossCollection.ts`（collection横断） | 同名で既存 | 既存を拡張する |
 
@@ -45,7 +45,7 @@ updated: 2026-08-08
 
 | 計画の記載 | 実際 |
 |---|---|
-| `next.config.mjs` | **`next.config.ts`** |
+| `next.config.ts` | **`next.config.ts`** |
 
 ### D. 計画が知らないコレクション（2件・2026-08-08 決定）
 
@@ -99,7 +99,7 @@ test・snapshot・repository・import order・cache tag のいずれにも無い
 `docs/plans/robot-data-import-plan-v1.md` の §0 G-2 は10コレクションを要求するため、
 **このままでは②が永久に着手できない。**
 
-### M-2. 削除5フィールドの実行主体がいない（Critical）
+### M-2. 削除4フィールドの実行主体がいない（Critical）
 
 ②の DEC-S05・S06 は `Robot` から `buyerReadiness` / `marketAvailability` / `safetyNote` /
 `vendorRiskNote` を落とすとするが、**①のどの Task も実行しない**。Task 3 は現行 `data/types.ts` の
@@ -139,7 +139,7 @@ down または復旧を検証する Task を追加する。**
 
 **現行 config を保持したまま `export default withPayload(nextConfig)` だけを加える。**
 
-なお `next.config.mjs` という記載は誤りで、実際は `next.config.ts`（突合結果 §C）。
+なお `next.config.ts` という記載は誤りで、実際は `next.config.ts`（突合結果 §C）。
 Task 2 の Files と commit command が未修正のまま。
 
 ### M-6. `tsx` が devDependency に無い（Medium）
@@ -226,7 +226,7 @@ find / create / update / delete で、独立した publish capability は無い�
 | Path | Responsibility |
 |---|---|
 | `package.json` / lockfile | Payload、DB adapter、test、migration commands |
-| `next.config.mjs` | `withPayload`統合 |
+| `next.config.ts` | `withPayload`統合 |
 | `tsconfig.json` | `@payload-config` alias、生成型 |
 | `.env.example` | DB、Payload、content source、storage設定 |
 | `.gitignore` | rollback snapshot等の一時artifact除外 |
@@ -306,6 +306,32 @@ provider・環境別の接続先・secret の管理者・バックアップ方�
 
 ---
 
+### Task 0.5: 上位正本を新schemaへ先行更新する
+
+**Files:**
+- Modify: `docs/decisions/content-platform-and-database-architecture-v2.md`（§5.1 に `robotSeries` / `distributors`）
+- Modify: `docs/decisions/data-maintenance-checklist-v1.md`（§F から `buyerReadiness`、`candidateRobots` に `seriesId`）
+- Modify: `ai/rules/21-data-maintenance-workflow.md`（対象collection、編集先）
+
+**②は「上位正本を計画より優先する」と書いている。** その正本が旧schemaのままだと、
+Task 3 の実装時点で正本と計画が衝突する。**schema を書く前に正本を直す。**
+
+| 文書 | 現状 | 直す内容 |
+|---|---|---|
+| `content-platform-and-database-architecture-v2.md` §5.1 | CMS管理対象に `robotSeries` / `distributors` が無い | 2件を追加 |
+| `data-maintenance-checklist-v1.md` §F | Robot の公開ゲートが `buyerReadiness` を要求。`candidateRobots` を `robotId` のみに限定 | `buyerReadiness` を外し、`seriesId` を許す |
+| `ai/rules/21-data-maintenance-workflow.md` | 対象collectionが6種類、編集先が `data/*.ts` | 10種類へ。編集先は cutover 後に Payload |
+
+**cutover 後（Task 9）に回さない。** 回すと Task 3〜8 の間ずっと矛盾したまま作業することになる。
+
+- [ ] **Step 1: 3文書を更新して `updated` を上げる**
+- [ ] **Step 2: `npm run check:docs` が緑であることを確認**
+- [ ] **Step 3: commit**
+
+**完了条件:** 3文書が新schemaを反映し、②の「正本を計画より優先する」が成立する。
+
+---
+
 ### Task 1: 移行開始前gateを確認する
 
 **Files:**
@@ -378,7 +404,7 @@ git commit -m "docs: confirm content migration start gates"
 - Create: `src/app/(payload)/layout.tsx`
 - Create: `src/app/(payload)/admin/importMap.js`
 - Create: `tests/e2e/payload-admin.spec.ts`
-- Modify: `next.config.mjs`
+- Modify: `next.config.ts`
 - Modify: `tsconfig.json`
 - Modify: `.env.example`
 - Modify: `package.json`
@@ -438,7 +464,7 @@ const nextConfig = {
 export default withPayload(nextConfig);   // ← 変更はこの1行だけ
 ```
 
-**ファイル名は `next.config.ts`。** `next.config.mjs` ではない（突合結果 §C）。
+**ファイル名は `next.config.ts`。** `next.config.ts` ではない（突合結果 §C）。
 
 - [ ] **Step 5: 環境変数契約を追加する**
 
@@ -489,7 +515,7 @@ Expected: 現行157ページ相当とPayload routesがbuildされ、exit 0
 - [ ] **Step 8: commit**
 
 ```bash
-git add payload.config.ts collections/Admins.ts src/app/'(payload)' tests/e2e/payload-admin.spec.ts next.config.mjs tsconfig.json .env.example package.json package-lock.json .github/workflows/ci.yml
+git add payload.config.ts collections/Admins.ts src/app/'(payload)' tests/e2e/payload-admin.spec.ts next.config.ts tsconfig.json .env.example package.json package-lock.json .github/workflows/ci.yml
 git commit -m "feat: embed Payload CMS in the Next.js app"
 ```
 
@@ -510,7 +536,7 @@ git commit -m "feat: embed Payload CMS in the Next.js app"
 - Create: `globals/SiteSettings.ts`
 - Create: `lib/payload/access.ts`
 - Modify: `payload.config.ts`
-- Modify: `data/types.ts`（削除5フィールド、`RobotSeries` / `Distributor` 型、`Robot.seriesId`、`UseCaseCandidateRobot.seriesId`）
+- Modify: `data/types.ts`（削除4フィールド、`RobotSeries` / `Distributor` 型、`Robot.seriesId`、`UseCaseCandidateRobot.seriesId`）
 - Modify: `lib/catalog/search.ts`（`buyerReadinessLabels[robot.buyerReadiness]` の除去）
 - Modify: `lib/labels.ts` / `lib/visualSemantics.ts`（`marketAvailabilityLabels` / 未使用 tone の除去）
 - Modify: `scripts/build-data-r01-manifest.mjs` / `scripts/build-data-r02-manifest.mjs`
@@ -518,13 +544,13 @@ git commit -m "feat: embed Payload CMS in the Next.js app"
 - Test: `tests/content/payload-schema.test.ts`
 
 **Interfaces:**
-- Consumes: `data/types.ts` の現行field semantics（**ただし §D の削除5フィールドは写さない**）
+- Consumes: `data/types.ts` の現行field semantics（**ただし §D の削除4フィールドは写さない**）
 - Produces: Payload collections 10本、relationship fields、draft/version、role-based access
 
 **`data/types.ts` をそのまま写さない。** 現行型には削除が決まっているフィールドが含まれる。
 写すと Payload schema へ再導入され、②の §0 G-4 が永久に通らなくなる。
 
-**このTaskが `Robot` から削除する5フィールド**（`robot-data-import-plan-v1.md` DEC-S05・S06）:
+**このTaskが `Robot` から削除する4フィールド**（`robot-data-import-plan-v1.md` DEC-S05・S06）:
 
 | フィールド | 現状 | 削除にあたって一緒に消すもの |
 |---|---|---|

@@ -14,7 +14,15 @@ import os from 'node:os';
 /** 1セル。`strike` は取り消し線、`checked` はチェックボックスの状態 */
 export interface Cell {
   text: string;
+  /** 先頭のリンク。後方互換のために残す。複数ある場合は `urls[0]` と同じ */
   url: string | null;
+  /**
+   * セル内のすべてのURL。`<a href>` と、`<br>` 区切りの素テキストURLの両方を拾う。
+   * 代理店シートの「情報源」列は 51/57 行が複数URLを持つが、大半はリンクではなく
+   * `<br>` で区切られた素テキスト。`<br>` を区切りに変換しないと1本の壊れた
+   * 文字列（`https://a/https://b/`）になり、出典として使えない。
+   */
+  urls: string[];
   strike: boolean;
   checked: boolean;
 }
@@ -31,7 +39,7 @@ export interface RobotImportRow {
 }
 
 /** 列名をそのままキーにした1行。URL列はリンクが無ければ null */
-export type SheetRecord = Record<string, string | boolean | null>;
+export type SheetRecord = Record<string, string | boolean | null | string[]>;
 
 /**
  * 原本の置き場。ブラウザは同名フォルダがあると「ロボDB 2」のように連番を付けるため、
@@ -129,13 +137,23 @@ export function parseSheet(html: string): Cell[][] {
     [...row[1].matchAll(/<t[dh]([^>]*)>([\s\S]*?)<\/t[dh]>/g)].map((cell) => {
       const classAttr = /class="([^"]*)"/.exec(cell[1]);
       const classNames = classAttr ? classAttr[1].split(/\s+/) : [];
-      const href = /href="([^"]+)"/.exec(cell[2]);
+      // <br> は改行として扱う。剥がしてしまうと前後が連結される。
+      const withBreaks = cell[2].replace(/<br\s*\/?>/gi, '\n');
+      const linked = [...cell[2].matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
+      const bare = decodeEntities(withBreaks.replace(/<[^>]+>/g, ''))
+        .split(/\s+/)
+        .filter((token) => /^https?:\/\//.test(token));
+      const urls = [...new Set([...linked, ...bare])];
 
       return {
-        text: decodeEntities(cell[2].replace(/<[^>]+>/g, ''))
+        text: decodeEntities(withBreaks.replace(/<[^>]+>/g, ''))
           .replace(ZERO_WIDTH, '')
-          .trim(),
-        url: href ? href[1] : null,
+          .split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .join('\n'),
+        url: urls[0] ?? null,
+        urls,
         strike: classNames.some((name) => strikeClasses.has(name)),
         // チェックボックスは <svg><use href="#checked-checkbox-id"> で書き出され、
         // タグを剥がすと text が空になる。真偽をここで拾っておく。
@@ -247,7 +265,10 @@ export function parseManufacturerSheet(html: string): SheetRecord[] {
       for (const [key, index] of Object.entries(COLUMNS)) {
         const cell = cells[index];
         record[key] = cell.text;
-        if (key === 'contact' || key === 'source') record[`${key}Url`] = cell.url;
+        if (key === 'contact' || key === 'source') {
+          record[`${key}Url`] = cell.url;
+          record[`${key}Urls`] = cell.urls;
+        }
       }
       return record;
     });

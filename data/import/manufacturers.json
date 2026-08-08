@@ -8,8 +8,17 @@
     "models": "4NE1 Gen 3.5, 4NE1 Mini Standard, 4NE1 Mini Pro, MiPA",
     "contact": "https://neura-robotics.com/reservations/",
     "contactUrl": "https://neura-robotics.com/reservations/",
-    "source": "https://neura-robotics.com/reservations/https://neura-robotics.com/product/4ne1-reservation/https://neura-robotics.com/product/4ne1-mini-reservation/https://neura-robotics.com/product/mipa-reservation/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://neura-robotics.com/reservations/"
+    ],
+    "source": "https://neura-robotics.com/reservations/\nhttps://neura-robotics.com/product/4ne1-reservation/\nhttps://neura-robotics.com/product/4ne1-mini-reservation/\nhttps://neura-robotics.com/product/mipa-reservation/",
+    "sourceUrl": "https://neura-robotics.com/reservations/",
+    "sourceUrls": [
+      "https://neura-robotics.com/reservations/",
+      "https://neura-robotics.com/product/4ne1-reservation/",
+      "https://neura-robotics.com/product/4ne1-mini-reservation/",
+      "https://neura-robotics.com/product/mipa-reservation/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -21,8 +30,12 @@
     "models": "Optimus",
     "contact": "",
     "contactUrl": null,
+    "contactUrls": [],
     "source": "https://ir.tesla.com/_flysystem/s3/sec/000162828026026551/tsla-20260422-gen.pdf",
     "sourceUrl": "https://ir.tesla.com/_flysystem/s3/sec/000162828026026551/tsla-20260422-gen.pdf",
+    "sourceUrls": [
+      "https://ir.tesla.com/_flysystem/s3/sec/000162828026026551/tsla-20260422-gen.pdf"
+    ],
     "checkedAt": "2026-07-30"
   },
   {
@@ -34,8 +47,14 @@
     "models": "Phoenix",
     "contact": "",
     "contactUrl": null,
-    "source": "https://sanctuary.ai/solutions/https://sanctuary.ai/contact-sanctuary-ai/https://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/",
-    "sourceUrl": null,
+    "contactUrls": [],
+    "source": "https://sanctuary.ai/solutions/\nhttps://sanctuary.ai/contact-sanctuary-ai/\nhttps://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/",
+    "sourceUrl": "https://sanctuary.ai/solutions/",
+    "sourceUrls": [
+      "https://sanctuary.ai/solutions/",
+      "https://sanctuary.ai/contact-sanctuary-ai/",
+      "https://sanctuary.ai/news/sanctuary-ai-releases-new-generation-of-ai-robots-for-high-quality-data-capture/"
+    ],
     "checkedAt": "2026-08-01"
   },
   {
@@ -47,8 +66,13 @@
     "models": "Kaleido9",
     "contact": "",
     "contactUrl": null,
-    "source": "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/https://kawasakirobotics.com/jp/blog/202511_kaleido/",
-    "sourceUrl": null,
+    "contactUrls": [],
+    "source": "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/\nhttps://kawasakirobotics.com/jp/blog/202511_kaleido/",
+    "sourceUrl": "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/",
+    "sourceUrls": [
+      "https://kawasakirobotics.com/jp/blog/20260316_kaleido9/",
+      "https://kawasakirobotics.com/jp/blog/202511_kaleido/"
+    ],
     "checkedAt": "2026-08-01"
   },
   {
@@ -60,8 +84,13 @@
     "models": "Next-Gen IRON",
     "contact": "",
     "contactUrl": null,
-    "source": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7https://www.xpeng.com/pressroom/news/019e95aed2899e8226228a028d650112",
-    "sourceUrl": null,
+    "contactUrls": [],
+    "source": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7\nhttps://www.xpeng.com/pressroom/news/019e95aed2899e8226228a028d650112",
+    "sourceUrl": "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+    "sourceUrls": [
+      "https://www.xpeng.com/pressroom/news/019a56f54fe99a2a0a8d8a0282e402b7",
+      "https://www.xpeng.com/pressroom/news/019e95aed2899e8226228a028d650112"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -73,8 +102,14 @@
     "models": "MenteeBot V3",
     "contact": "",
     "contactUrl": null,
-    "source": "https://www.menteebot.com/bot/https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-aihttps://www.mobileye.com/press-kit/mobileye-agrees-to-acquire-mentee-robotics/",
-    "sourceUrl": null,
+    "contactUrls": [],
+    "source": "https://www.menteebot.com/bot/\nhttps://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai\nhttps://www.mobileye.com/press-kit/mobileye-agrees-to-acquire-mentee-robotics/",
+    "sourceUrl": "https://www.menteebot.com/bot/",
+    "sourceUrls": [
+      "https://www.menteebot.com/bot/",
+      "https://ir.mobileye.com/news-releases/news-release-details/mobileye-acquire-mentee-robotics-accelerate-physical-ai",
+      "https://www.mobileye.com/press-kit/mobileye-agrees-to-acquire-mentee-robotics/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -86,8 +121,15 @@
     "models": "LG CLOiD",
     "contact": "https://www.lg.com/jp/support/contact-us/",
     "contactUrl": "https://www.lg.com/jp/support/contact-us/",
-    "source": "https://www.lg.com/global/newsroom/news/home-appliance-solution/lg-electronics-presents-lg-cloid-home-robot-to-demonstrate-zero-labor-home-at-ces-2026/https://www.lg.com/jp/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.lg.com/jp/support/contact-us/"
+    ],
+    "source": "https://www.lg.com/global/newsroom/news/home-appliance-solution/lg-electronics-presents-lg-cloid-home-robot-to-demonstrate-zero-labor-home-at-ces-2026/\nhttps://www.lg.com/jp/",
+    "sourceUrl": "https://www.lg.com/global/newsroom/news/home-appliance-solution/lg-electronics-presents-lg-cloid-home-robot-to-demonstrate-zero-labor-home-at-ces-2026/",
+    "sourceUrls": [
+      "https://www.lg.com/global/newsroom/news/home-appliance-solution/lg-electronics-presents-lg-cloid-home-robot-to-demonstrate-zero-labor-home-at-ces-2026/",
+      "https://www.lg.com/jp/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -99,8 +141,16 @@
     "models": "Memo",
     "contact": "https://www.sunday.ai/beta-program",
     "contactUrl": "https://www.sunday.ai/beta-program",
-    "source": "https://www.sunday.ai/https://www.sunday.ai/beta-programhttps://www.sunday.ai/journal/series-b",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.sunday.ai/beta-program"
+    ],
+    "source": "https://www.sunday.ai/\nhttps://www.sunday.ai/beta-program\nhttps://www.sunday.ai/journal/series-b",
+    "sourceUrl": "https://www.sunday.ai/",
+    "sourceUrls": [
+      "https://www.sunday.ai/",
+      "https://www.sunday.ai/beta-program",
+      "https://www.sunday.ai/journal/series-b"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -112,8 +162,14 @@
     "models": "G1, G1-Comp, H2, H2 Plus, R1, H1, H1-2",
     "contact": "https://shop.unitree.com/collections/humanoid-robot",
     "contactUrl": "https://shop.unitree.com/collections/humanoid-robot",
+    "contactUrls": [
+      "https://shop.unitree.com/collections/humanoid-robot"
+    ],
     "source": "https://shop.unitree.com/collections/humanoid-robot",
-    "sourceUrl": null,
+    "sourceUrl": "https://shop.unitree.com/collections/humanoid-robot",
+    "sourceUrls": [
+      "https://shop.unitree.com/collections/humanoid-robot"
+    ],
     "checkedAt": "2026-07-30"
   },
   {
@@ -125,8 +181,16 @@
     "models": "A2 Ultra",
     "contact": "https://jp.agibot.com/contact/168.html",
     "contactUrl": "https://jp.agibot.com/contact/168.html",
-    "source": "https://agibot.com/jp/products/A2_Ultrahttps://store.agibot.com/products/a2-ultrahttps://www.agibot.com/AGIBOT%20Website%20Privacy%20Policy.pdf",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://jp.agibot.com/contact/168.html"
+    ],
+    "source": "https://agibot.com/jp/products/A2_Ultra\nhttps://store.agibot.com/products/a2-ultra\nhttps://www.agibot.com/AGIBOT%20Website%20Privacy%20Policy.pdf",
+    "sourceUrl": "https://agibot.com/jp/products/A2_Ultra",
+    "sourceUrls": [
+      "https://agibot.com/jp/products/A2_Ultra",
+      "https://store.agibot.com/products/a2-ultra",
+      "https://www.agibot.com/AGIBOT%20Website%20Privacy%20Policy.pdf"
+    ],
     "checkedAt": "2026-07-30"
   },
   {
@@ -138,8 +202,16 @@
     "models": "Walker S2, Walker S1, Walker S, Walker S Lite, Walker C1, Walker C, Walker X, Cruzr S2, Panda Robot, Walker Tienkung TK2301（無疆）, Walker Tienkung TK2201（無界）, Walker Tienkung TK2101",
     "contact": "https://www.commercial.ubtrobot.com/jp/contact-ubtech-robotics/",
     "contactUrl": "https://www.commercial.ubtrobot.com/jp/contact-ubtech-robotics/",
-    "source": "https://www.ubtrobot.com/en/humanoid/products/walker-s2https://www.ubtrobot.com/en/ai-education/products/walker-tienkung/https://www.commercial.ubtrobot.com/jp/contact-ubtech-robotics/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.commercial.ubtrobot.com/jp/contact-ubtech-robotics/"
+    ],
+    "source": "https://www.ubtrobot.com/en/humanoid/products/walker-s2\nhttps://www.ubtrobot.com/en/ai-education/products/walker-tienkung/\nhttps://www.commercial.ubtrobot.com/jp/contact-ubtech-robotics/",
+    "sourceUrl": "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+    "sourceUrls": [
+      "https://www.ubtrobot.com/en/humanoid/products/walker-s2",
+      "https://www.ubtrobot.com/en/ai-education/products/walker-tienkung/",
+      "https://www.commercial.ubtrobot.com/jp/contact-ubtech-robotics/"
+    ],
     "checkedAt": "2026-07-30"
   },
   {
@@ -151,8 +223,18 @@
     "models": "K1 Geek, K1 Education, K1 Professional, T1 Basic, T1 Standard, T1 Customized, T2 Professional P1, T2 Professional P2, T2 Professional P3",
     "contact": "https://www.booster.tech/store/",
     "contactUrl": "https://www.booster.tech/store/",
-    "source": "https://www.booster.tech/https://www.booster.tech/store/https://www.booster.tech/booster-k1/https://www.booster.tech/booster-t1/https://www.booster.tech/booster-t2/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.booster.tech/store/"
+    ],
+    "source": "https://www.booster.tech/\nhttps://www.booster.tech/store/\nhttps://www.booster.tech/booster-k1/\nhttps://www.booster.tech/booster-t1/\nhttps://www.booster.tech/booster-t2/",
+    "sourceUrl": "https://www.booster.tech/",
+    "sourceUrls": [
+      "https://www.booster.tech/",
+      "https://www.booster.tech/store/",
+      "https://www.booster.tech/booster-k1/",
+      "https://www.booster.tech/booster-t1/",
+      "https://www.booster.tech/booster-t2/"
+    ],
     "checkedAt": "2026-08-01"
   },
   {
@@ -164,8 +246,15 @@
     "models": "Oli Lite, Oli EDU, Oli Super, TRON 2",
     "contact": "https://www.robotbank.jp/contact",
     "contactUrl": "https://www.robotbank.jp/contact",
-    "source": "https://prtimes.jp/main/html/rd/p/000000062.000097103.htmlhttps://www.robotbank.jp/product_cat/aiロボット/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.robotbank.jp/contact"
+    ],
+    "source": "https://prtimes.jp/main/html/rd/p/000000062.000097103.html\nhttps://www.robotbank.jp/product_cat/aiロボット/",
+    "sourceUrl": "https://prtimes.jp/main/html/rd/p/000000062.000097103.html",
+    "sourceUrls": [
+      "https://prtimes.jp/main/html/rd/p/000000062.000097103.html",
+      "https://www.robotbank.jp/product_cat/aiロボット/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -177,8 +266,17 @@
     "models": "PM01 Commercial, PM01 Education, T800 Basic, T800 Development（Open Source）, T800 Pro, T800 Max, SE01",
     "contact": "https://www.robotsinternational.com/Engine-AI.htm",
     "contactUrl": "https://www.robotsinternational.com/Engine-AI.htm",
-    "source": "https://www.robotsinternational.com/Engine-AI.htmhttps://www.robotsinternational.com/i-jp/catalog/product/view/id/13562/s/EngineAI-PM01/https://www.engineai.com.cn/https://www.engineai.com.cn/product-purchase.html",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.robotsinternational.com/Engine-AI.htm"
+    ],
+    "source": "https://www.robotsinternational.com/Engine-AI.htm\nhttps://www.robotsinternational.com/i-jp/catalog/product/view/id/13562/s/EngineAI-PM01/\nhttps://www.engineai.com.cn/\nhttps://www.engineai.com.cn/product-purchase.html",
+    "sourceUrl": "https://www.robotsinternational.com/Engine-AI.htm",
+    "sourceUrls": [
+      "https://www.robotsinternational.com/Engine-AI.htm",
+      "https://www.robotsinternational.com/i-jp/catalog/product/view/id/13562/s/EngineAI-PM01/",
+      "https://www.engineai.com.cn/",
+      "https://www.engineai.com.cn/product-purchase.html"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -190,8 +288,15 @@
     "models": "L7, Q5, M7",
     "contact": "https://www.robotsinternational.com/RobotEra.htm",
     "contactUrl": "https://www.robotsinternational.com/RobotEra.htm",
-    "source": "https://www.robotsinternational.com/RobotEra.htmhttps://robotera.com/en/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.robotsinternational.com/RobotEra.htm"
+    ],
+    "source": "https://www.robotsinternational.com/RobotEra.htm\nhttps://robotera.com/en/",
+    "sourceUrl": "https://www.robotsinternational.com/RobotEra.htm",
+    "sourceUrls": [
+      "https://www.robotsinternational.com/RobotEra.htm",
+      "https://robotera.com/en/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -203,8 +308,16 @@
     "models": "CASBOT W1, CASBOT 02",
     "contact": "https://www.robotsinternational.com/Casbot.htm",
     "contactUrl": "https://www.robotsinternational.com/Casbot.htm",
-    "source": "https://www.robotsinternational.com/Casbot.htmhttps://casbot.tech/casbot-w1.htmlhttps://casbot.tech/casbot-02.html",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.robotsinternational.com/Casbot.htm"
+    ],
+    "source": "https://www.robotsinternational.com/Casbot.htm\nhttps://casbot.tech/casbot-w1.html\nhttps://casbot.tech/casbot-02.html",
+    "sourceUrl": "https://www.robotsinternational.com/Casbot.htm",
+    "sourceUrls": [
+      "https://www.robotsinternational.com/Casbot.htm",
+      "https://casbot.tech/casbot-w1.html",
+      "https://casbot.tech/casbot-02.html"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -216,8 +329,16 @@
     "models": "DOBOT Atom Max, DOBOT Atom Trainer",
     "contact": "https://jp.dobot-robots.com/about/contact-us",
     "contactUrl": "https://jp.dobot-robots.com/about/contact-us",
-    "source": "https://jp.dobot-robots.com/about/contact-ushttps://jp.dobot-robots.com/products/humanoid-robots/atom.htmlhttps://www.dobot-robots.com/insights/news/dobot-debuted-global-delivery-of-humanoid-robot.html",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://jp.dobot-robots.com/about/contact-us"
+    ],
+    "source": "https://jp.dobot-robots.com/about/contact-us\nhttps://jp.dobot-robots.com/products/humanoid-robots/atom.html\nhttps://www.dobot-robots.com/insights/news/dobot-debuted-global-delivery-of-humanoid-robot.html",
+    "sourceUrl": "https://jp.dobot-robots.com/about/contact-us",
+    "sourceUrls": [
+      "https://jp.dobot-robots.com/about/contact-us",
+      "https://jp.dobot-robots.com/products/humanoid-robots/atom.html",
+      "https://www.dobot-robots.com/insights/news/dobot-debuted-global-delivery-of-humanoid-robot.html"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -229,8 +350,16 @@
     "models": "cinnamon 1",
     "contact": "https://www.donutrobotics.com/",
     "contactUrl": "https://www.donutrobotics.com/",
-    "source": "https://www.donutrobotics.com/en/blank-2https://www.donutrobotics.com/https://prtimes.jp/main/html/rd/p/000000041.000057944.html",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.donutrobotics.com/"
+    ],
+    "source": "https://www.donutrobotics.com/en/blank-2\nhttps://www.donutrobotics.com/\nhttps://prtimes.jp/main/html/rd/p/000000041.000057944.html",
+    "sourceUrl": "https://www.donutrobotics.com/en/blank-2",
+    "sourceUrls": [
+      "https://www.donutrobotics.com/en/blank-2",
+      "https://www.donutrobotics.com/",
+      "https://prtimes.jp/main/html/rd/p/000000041.000057944.html"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -242,8 +371,16 @@
     "models": "ugo Pro",
     "contact": "https://ugo.plus/contact/",
     "contactUrl": "https://ugo.plus/contact/",
-    "source": "https://ugo.plus/products/ugo-pro/https://ugo.plus/contact/https://corp.ugo.plus/news/2024/02/08/01/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://ugo.plus/contact/"
+    ],
+    "source": "https://ugo.plus/products/ugo-pro/\nhttps://ugo.plus/contact/\nhttps://corp.ugo.plus/news/2024/02/08/01/",
+    "sourceUrl": "https://ugo.plus/products/ugo-pro/",
+    "sourceUrls": [
+      "https://ugo.plus/products/ugo-pro/",
+      "https://ugo.plus/contact/",
+      "https://corp.ugo.plus/news/2024/02/08/01/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -255,8 +392,16 @@
     "models": "K2 Basic Version, K2 Bipedal Development Version, K2 Wheeled Development Version",
     "contact": "https://insol-high.com/contact-sankei",
     "contactUrl": "https://insol-high.com/contact-sankei",
-    "source": "https://prtimes.jp/main/html/rd/p/000000003.000139883.htmlhttps://insol-high.com/contact-sankeihttps://www.gotokepler.com/productDetailK2?id=2",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://insol-high.com/contact-sankei"
+    ],
+    "source": "https://prtimes.jp/main/html/rd/p/000000003.000139883.html\nhttps://insol-high.com/contact-sankei\nhttps://www.gotokepler.com/productDetailK2?id=2",
+    "sourceUrl": "https://prtimes.jp/main/html/rd/p/000000003.000139883.html",
+    "sourceUrls": [
+      "https://prtimes.jp/main/html/rd/p/000000003.000139883.html",
+      "https://insol-high.com/contact-sankei",
+      "https://www.gotokepler.com/productDetailK2?id=2"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -268,8 +413,15 @@
     "models": "DR02, DR02 Pro",
     "contact": "https://www.elsa-jp.co.jp/products/detail/deeprobotics-dr02/",
     "contactUrl": "https://www.elsa-jp.co.jp/products/detail/deeprobotics-dr02/",
-    "source": "https://www.elsa-jp.co.jp/newsrelease/deeprobotics-dr02/https://www.elsa-jp.co.jp/products/detail/deeprobotics-dr02/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.elsa-jp.co.jp/products/detail/deeprobotics-dr02/"
+    ],
+    "source": "https://www.elsa-jp.co.jp/newsrelease/deeprobotics-dr02/\nhttps://www.elsa-jp.co.jp/products/detail/deeprobotics-dr02/",
+    "sourceUrl": "https://www.elsa-jp.co.jp/newsrelease/deeprobotics-dr02/",
+    "sourceUrls": [
+      "https://www.elsa-jp.co.jp/newsrelease/deeprobotics-dr02/",
+      "https://www.elsa-jp.co.jp/products/detail/deeprobotics-dr02/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -281,8 +433,15 @@
     "models": "AI Sapiens K0",
     "contact": "https://ai.robotis.com/ai_sapiens/introduction_ai_sapiens.html",
     "contactUrl": "https://ai.robotis.com/ai_sapiens/introduction_ai_sapiens.html",
-    "source": "https://ai.robotis.com/ai_sapiens/introduction_ai_sapiens.htmlhttps://www.robotis.com/ja/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://ai.robotis.com/ai_sapiens/introduction_ai_sapiens.html"
+    ],
+    "source": "https://ai.robotis.com/ai_sapiens/introduction_ai_sapiens.html\nhttps://www.robotis.com/ja/",
+    "sourceUrl": "https://ai.robotis.com/ai_sapiens/introduction_ai_sapiens.html",
+    "sourceUrls": [
+      "https://ai.robotis.com/ai_sapiens/introduction_ai_sapiens.html",
+      "https://www.robotis.com/ja/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -294,8 +453,14 @@
     "models": "Eno",
     "contact": "https://www.genesis.ai/",
     "contactUrl": "https://www.genesis.ai/",
+    "contactUrls": [
+      "https://www.genesis.ai/"
+    ],
     "source": "https://www.genesis.ai/",
     "sourceUrl": "https://www.genesis.ai/",
+    "sourceUrls": [
+      "https://www.genesis.ai/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -307,8 +472,16 @@
     "models": "Figure 03",
     "contact": "https://www.figure.ai/",
     "contactUrl": "https://www.figure.ai/",
-    "source": "https://www.figure.ai/news/introducing-figure-03?id=Figure03https://www.figure.ai/news/figure-signs-agreement-with-catalyst-brandshttps://www.figure.ai/news/f-03-at-bmw",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.figure.ai/"
+    ],
+    "source": "https://www.figure.ai/news/introducing-figure-03?id=Figure03\nhttps://www.figure.ai/news/figure-signs-agreement-with-catalyst-brands\nhttps://www.figure.ai/news/f-03-at-bmw",
+    "sourceUrl": "https://www.figure.ai/news/introducing-figure-03?id=Figure03",
+    "sourceUrls": [
+      "https://www.figure.ai/news/introducing-figure-03?id=Figure03",
+      "https://www.figure.ai/news/figure-signs-agreement-with-catalyst-brands",
+      "https://www.figure.ai/news/f-03-at-bmw"
+    ],
     "checkedAt": "2026-07-30"
   },
   {
@@ -320,8 +493,16 @@
     "models": "Apollo 2（Biped）, Apollo 2（Wheeled）",
     "contact": "https://apptronik.com/contact",
     "contactUrl": "https://apptronik.com/contact",
-    "source": "https://apptronik.com/contacthttps://apptronik.com/apollo/apollo-2https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://apptronik.com/contact"
+    ],
+    "source": "https://apptronik.com/contact\nhttps://apptronik.com/apollo/apollo-2\nhttps://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work",
+    "sourceUrl": "https://apptronik.com/contact",
+    "sourceUrls": [
+      "https://apptronik.com/contact",
+      "https://apptronik.com/apollo/apollo-2",
+      "https://apptronik.com/news-collection/welcome-to-robot-park-where-apptroniks-apollo-goes-to-work"
+    ],
     "checkedAt": "2026-07-30"
   },
   {
@@ -333,8 +514,16 @@
     "models": "Digit",
     "contact": "https://www.agilityrobotics.com/sales",
     "contactUrl": "https://www.agilityrobotics.com/sales",
-    "source": "https://www.agilityrobotics.com/saleshttps://www.agilityrobotics.com/solutionshttps://www.agilityrobotics.com/content/agility-robotics-announces-commercial-agreement-with-toyota-motor-manufacturing-canada",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.agilityrobotics.com/sales"
+    ],
+    "source": "https://www.agilityrobotics.com/sales\nhttps://www.agilityrobotics.com/solutions\nhttps://www.agilityrobotics.com/content/agility-robotics-announces-commercial-agreement-with-toyota-motor-manufacturing-canada",
+    "sourceUrl": "https://www.agilityrobotics.com/sales",
+    "sourceUrls": [
+      "https://www.agilityrobotics.com/sales",
+      "https://www.agilityrobotics.com/solutions",
+      "https://www.agilityrobotics.com/content/agility-robotics-announces-commercial-agreement-with-toyota-motor-manufacturing-canada"
+    ],
     "checkedAt": "2026-07-30"
   },
   {
@@ -346,8 +535,16 @@
     "models": "NEO",
     "contact": "https://www.1x.tech/order",
     "contactUrl": "https://www.1x.tech/order",
-    "source": "https://www.1x.tech/orderhttps://www.1x.tech/ja_jp/discover/neo-home-robothttps://www.1x.tech/neo",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.1x.tech/order"
+    ],
+    "source": "https://www.1x.tech/order\nhttps://www.1x.tech/ja_jp/discover/neo-home-robot\nhttps://www.1x.tech/neo",
+    "sourceUrl": "https://www.1x.tech/order",
+    "sourceUrls": [
+      "https://www.1x.tech/order",
+      "https://www.1x.tech/ja_jp/discover/neo-home-robot",
+      "https://www.1x.tech/neo"
+    ],
     "checkedAt": "2026-07-30"
   },
   {
@@ -359,8 +556,17 @@
     "models": "Atlas",
     "contact": "https://bostondynamics.com/atlas-contact/",
     "contactUrl": "https://bostondynamics.com/atlas-contact/",
-    "source": "https://bostondynamics.com/atlas-contact/https://bostondynamics.com/products/atlas/https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://bostondynamics.com/atlas-contact/"
+    ],
+    "source": "https://bostondynamics.com/atlas-contact/\nhttps://bostondynamics.com/products/atlas/\nhttps://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/\nhttps://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf",
+    "sourceUrl": "https://bostondynamics.com/atlas-contact/",
+    "sourceUrls": [
+      "https://bostondynamics.com/atlas-contact/",
+      "https://bostondynamics.com/products/atlas/",
+      "https://bostondynamics.com/blog/boston-dynamics-unveils-new-atlas-robot-to-revolutionize-industry/",
+      "https://bostondynamics.com/wp-content/uploads/2026/01/atlas-spec-sheet.pdf"
+    ],
     "checkedAt": "2026-08-01"
   },
   {
@@ -372,8 +578,18 @@
     "models": "GR-3(Meow-bot), GR-3C (Cosmo), GR-3C Ultra",
     "contact": "https://www.fftai.com/contact-us",
     "contactUrl": "https://www.fftai.com/contact-us",
-    "source": "https://www.fftai.com/products-gr3serieshttps://www.fftai.com/products-gr3chttps://www.fftai.com/grx/gr3https://www.fftai.com/contact-ushttps://www.fftai.com/uploads/upload/files/20251022/425294838296d52b62b802c68128c30f.pdf",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.fftai.com/contact-us"
+    ],
+    "source": "https://www.fftai.com/products-gr3series\nhttps://www.fftai.com/products-gr3c\nhttps://www.fftai.com/grx/gr3\nhttps://www.fftai.com/contact-us\nhttps://www.fftai.com/uploads/upload/files/20251022/425294838296d52b62b802c68128c30f.pdf",
+    "sourceUrl": "https://www.fftai.com/products-gr3series",
+    "sourceUrls": [
+      "https://www.fftai.com/products-gr3series",
+      "https://www.fftai.com/products-gr3c",
+      "https://www.fftai.com/grx/gr3",
+      "https://www.fftai.com/contact-us",
+      "https://www.fftai.com/uploads/upload/files/20251022/425294838296d52b62b802c68128c30f.pdf"
+    ],
     "checkedAt": "2026-08-01"
   },
   {
@@ -385,8 +601,15 @@
     "models": "KUAVO 4PRO Standard, KUAVO 4PRO Advanced, KUAVO 4PRO MaxA, KUAVO 4PRO MaxB, KUAVO 4PRO Exhibition, KUAVO 4PRO Exhibition Compute, KUAVO 4PRO-W（輪腕）, KUAVO 5 Advanced, KUAVO 5 MaxA, KUAVO 5 MaxB, KUAVO 5 Exhibition Compute, KUAVO 5-W, KUAVO 5-W MaxA, KUAVO 5-W MaxB, ROBAN2 灵动版, ROBAN2 进阶版A, ROBAN2 进阶版B, ROBAN2 进阶版C, AELOS PRO3, AELOS LITE, AELOS PRO, AELOS SMART",
     "contact": "https://www.lejurobot.com/en/about-us/contact-us",
     "contactUrl": "https://www.lejurobot.com/en/about-us/contact-us",
-    "source": "https://www.lejurobot.com/en/https://www.lejurobot.com/en/about-us/contact-us",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.lejurobot.com/en/about-us/contact-us"
+    ],
+    "source": "https://www.lejurobot.com/en/\nhttps://www.lejurobot.com/en/about-us/contact-us",
+    "sourceUrl": "https://www.lejurobot.com/en/",
+    "sourceUrls": [
+      "https://www.lejurobot.com/en/",
+      "https://www.lejurobot.com/en/about-us/contact-us"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -398,8 +621,19 @@
     "models": "TALOS, KANGAROO, ARI, TIAGo（双腕構成）, TIAGo Pro",
     "contact": "https://pal-robotics.com/contact/",
     "contactUrl": "https://pal-robotics.com/contact/",
-    "source": "https://pal-robotics.com/contact/https://pal-robotics.com/robot/talos/https://pal-robotics.com/robot/kangaroo/https://pal-robotics.com/robot/ari/https://pal-robotics.com/robot/tiago/https://pal-robotics.com/robot/tiago-pro/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://pal-robotics.com/contact/"
+    ],
+    "source": "https://pal-robotics.com/contact/\nhttps://pal-robotics.com/robot/talos/\nhttps://pal-robotics.com/robot/kangaroo/\nhttps://pal-robotics.com/robot/ari/\nhttps://pal-robotics.com/robot/tiago/\nhttps://pal-robotics.com/robot/tiago-pro/",
+    "sourceUrl": "https://pal-robotics.com/contact/",
+    "sourceUrls": [
+      "https://pal-robotics.com/contact/",
+      "https://pal-robotics.com/robot/talos/",
+      "https://pal-robotics.com/robot/kangaroo/",
+      "https://pal-robotics.com/robot/ari/",
+      "https://pal-robotics.com/robot/tiago/",
+      "https://pal-robotics.com/robot/tiago-pro/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -411,8 +645,16 @@
     "models": "Calvin-40",
     "contact": "https://en.wandercraft.eu/calvin-40",
     "contactUrl": "https://en.wandercraft.eu/calvin-40",
-    "source": "https://en.wandercraft.eu/calvin-40https://en.wandercraft.eu/https://en.wandercraft.eu/blog/news",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://en.wandercraft.eu/calvin-40"
+    ],
+    "source": "https://en.wandercraft.eu/calvin-40\nhttps://en.wandercraft.eu/\nhttps://en.wandercraft.eu/blog/news",
+    "sourceUrl": "https://en.wandercraft.eu/calvin-40",
+    "sourceUrls": [
+      "https://en.wandercraft.eu/calvin-40",
+      "https://en.wandercraft.eu/",
+      "https://en.wandercraft.eu/blog/news"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -424,8 +666,17 @@
     "models": "ALICE4, ALICE M1",
     "contact": "https://eng.arobot4all.com/2069803258",
     "contactUrl": "https://eng.arobot4all.com/2069803258",
-    "source": "https://eng.arobot4all.com/42https://eng.arobot4all.com/2069803258https://www.arobot4all.com/ALICE_M1https://www.ces2026-humanoidmaxalliance.com/aeirobot",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://eng.arobot4all.com/2069803258"
+    ],
+    "source": "https://eng.arobot4all.com/42\nhttps://eng.arobot4all.com/2069803258\nhttps://www.arobot4all.com/ALICE_M1\nhttps://www.ces2026-humanoidmaxalliance.com/aeirobot",
+    "sourceUrl": "https://eng.arobot4all.com/42",
+    "sourceUrls": [
+      "https://eng.arobot4all.com/42",
+      "https://eng.arobot4all.com/2069803258",
+      "https://www.arobot4all.com/ALICE_M1",
+      "https://www.ces2026-humanoidmaxalliance.com/aeirobot"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -437,8 +688,14 @@
     "models": "SKYWALKER I, SKYWALKER II, AiQ",
     "contact": "",
     "contactUrl": null,
-    "source": "https://www.eir.com.cn/https://sc.news.cn/20250926/543d53349b2c4aee9429ffb86479f643/c.htmlhttps://sc.people.com.cn/n2/2026/0128/c345509-41486263.html",
-    "sourceUrl": null,
+    "contactUrls": [],
+    "source": "https://www.eir.com.cn/\nhttps://sc.news.cn/20250926/543d53349b2c4aee9429ffb86479f643/c.html\nhttps://sc.people.com.cn/n2/2026/0128/c345509-41486263.html",
+    "sourceUrl": "https://www.eir.com.cn/",
+    "sourceUrls": [
+      "https://www.eir.com.cn/",
+      "https://sc.news.cn/20250926/543d53349b2c4aee9429ffb86479f643/c.html",
+      "https://sc.people.com.cn/n2/2026/0128/c345509-41486263.html"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -450,8 +707,16 @@
     "models": "Gen1, Z1, Z1 Development",
     "contact": "https://www.magiclab.top/en/contact",
     "contactUrl": "https://www.magiclab.top/en/contact",
-    "source": "https://www.magiclab.top/en/humanhttps://www.magiclab.top/en/z1https://www.magiclab.top/en/contact",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.magiclab.top/en/contact"
+    ],
+    "source": "https://www.magiclab.top/en/human\nhttps://www.magiclab.top/en/z1\nhttps://www.magiclab.top/en/contact",
+    "sourceUrl": "https://www.magiclab.top/en/human",
+    "sourceUrls": [
+      "https://www.magiclab.top/en/human",
+      "https://www.magiclab.top/en/z1",
+      "https://www.magiclab.top/en/contact"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -463,8 +728,15 @@
     "models": "MATRIX-3",
     "contact": "https://matrixrobotics.ai/",
     "contactUrl": "https://matrixrobotics.ai/",
-    "source": "https://matrixrobotics.ai/https://apnews.com/article/7d542b5ee92caa9d79efa28de89afbbe",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://matrixrobotics.ai/"
+    ],
+    "source": "https://matrixrobotics.ai/\nhttps://apnews.com/article/7d542b5ee92caa9d79efa28de89afbbe",
+    "sourceUrl": "https://matrixrobotics.ai/",
+    "sourceUrls": [
+      "https://matrixrobotics.ai/",
+      "https://apnews.com/article/7d542b5ee92caa9d79efa28de89afbbe"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -476,8 +748,19 @@
     "models": "Bumi Pro, Bumi EDU-Pro, Bumi EDU-Max, N2, N2 EDU, E1, E1 EDU, W1",
     "contact": "https://noetixrobotics.com/en/contact-us?t=a",
     "contactUrl": "https://noetixrobotics.com/en/contact-us?t=a",
-    "source": "https://noetixrobotics.com/enhttps://noetixrobotics.com/en/contact-us?t=ahttps://noetixrobotics.com/en/product/n2/1262https://noetixrobotics.com/en/n2https://noetixrobotics.com/en/e1https://noetixrobotics.com/en/hobbs-w1",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://noetixrobotics.com/en/contact-us?t=a"
+    ],
+    "source": "https://noetixrobotics.com/en\nhttps://noetixrobotics.com/en/contact-us?t=a\nhttps://noetixrobotics.com/en/product/n2/1262\nhttps://noetixrobotics.com/en/n2\nhttps://noetixrobotics.com/en/e1\nhttps://noetixrobotics.com/en/hobbs-w1",
+    "sourceUrl": "https://noetixrobotics.com/en",
+    "sourceUrls": [
+      "https://noetixrobotics.com/en",
+      "https://noetixrobotics.com/en/contact-us?t=a",
+      "https://noetixrobotics.com/en/product/n2/1262",
+      "https://noetixrobotics.com/en/n2",
+      "https://noetixrobotics.com/en/e1",
+      "https://noetixrobotics.com/en/hobbs-w1"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -489,8 +772,15 @@
     "models": "青龍 公版機 v2.5, 青龍 Mini（RL-Boy）",
     "contact": "",
     "contactUrl": null,
-    "source": "https://www.openloong.org.cn/cn/projects/openloonghttps://www.openloong.org.cn/projects/miniloonghttps://atomgit.com/openloonghttps://github.com/loongOpen",
-    "sourceUrl": null,
+    "contactUrls": [],
+    "source": "https://www.openloong.org.cn/cn/projects/openloong\nhttps://www.openloong.org.cn/projects/miniloong\nhttps://atomgit.com/openloong\nhttps://github.com/loongOpen",
+    "sourceUrl": "https://www.openloong.org.cn/cn/projects/openloong",
+    "sourceUrls": [
+      "https://www.openloong.org.cn/cn/projects/openloong",
+      "https://www.openloong.org.cn/projects/miniloong",
+      "https://atomgit.com/openloong",
+      "https://github.com/loongOpen"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -502,8 +792,17 @@
     "models": "RoBee R, RoBee M, RoBee F",
     "contact": "https://www.oversonicrobotics.com/contacts/",
     "contactUrl": "https://www.oversonicrobotics.com/contacts/",
-    "source": "https://www.oversonicrobotics.com/robee-r/https://www.oversonicrobotics.com/robee-m/https://www.oversonicrobotics.com/robee-f/https://www.oversonicrobotics.com/contacts/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.oversonicrobotics.com/contacts/"
+    ],
+    "source": "https://www.oversonicrobotics.com/robee-r/\nhttps://www.oversonicrobotics.com/robee-m/\nhttps://www.oversonicrobotics.com/robee-f/\nhttps://www.oversonicrobotics.com/contacts/",
+    "sourceUrl": "https://www.oversonicrobotics.com/robee-r/",
+    "sourceUrls": [
+      "https://www.oversonicrobotics.com/robee-r/",
+      "https://www.oversonicrobotics.com/robee-m/",
+      "https://www.oversonicrobotics.com/robee-f/",
+      "https://www.oversonicrobotics.com/contacts/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -515,8 +814,17 @@
     "models": "PR-OMNI, PR-DUO",
     "contact": "https://www.perceptyne.com/contact",
     "contactUrl": "https://www.perceptyne.com/contact",
-    "source": "https://www.perceptyne.com/product/omnihttps://www.perceptyne.com/product/duohttps://www.perceptyne.com/contacthttps://www.perceptyne.com/terms-and-conditions",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.perceptyne.com/contact"
+    ],
+    "source": "https://www.perceptyne.com/product/omni\nhttps://www.perceptyne.com/product/duo\nhttps://www.perceptyne.com/contact\nhttps://www.perceptyne.com/terms-and-conditions",
+    "sourceUrl": "https://www.perceptyne.com/product/omni",
+    "sourceUrls": [
+      "https://www.perceptyne.com/product/omni",
+      "https://www.perceptyne.com/product/duo",
+      "https://www.perceptyne.com/contact",
+      "https://www.perceptyne.com/terms-and-conditions"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -528,8 +836,16 @@
     "models": "RB-Y1",
     "contact": "https://www.rainbow-robotics.com/en_inquiry",
     "contactUrl": "https://www.rainbow-robotics.com/en_inquiry",
-    "source": "https://www.rainbow-robotics.com/en_rby1https://www.rainbow-robotics.com/en_inquiryhttps://www.rainbow-robotics.com/en_pr/20240508",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.rainbow-robotics.com/en_inquiry"
+    ],
+    "source": "https://www.rainbow-robotics.com/en_rby1\nhttps://www.rainbow-robotics.com/en_inquiry\nhttps://www.rainbow-robotics.com/en_pr/20240508",
+    "sourceUrl": "https://www.rainbow-robotics.com/en_rby1",
+    "sourceUrls": [
+      "https://www.rainbow-robotics.com/en_rby1",
+      "https://www.rainbow-robotics.com/en_inquiry",
+      "https://www.rainbow-robotics.com/en_pr/20240508"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -541,8 +857,16 @@
     "models": "TITAN",
     "contact": "https://www.roboforce.ai/technology",
     "contactUrl": "https://www.roboforce.ai/technology",
-    "source": "https://www.roboforce.ai/technologyhttps://www.roboforce.ai/https://www.roboforce.ai/news",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.roboforce.ai/technology"
+    ],
+    "source": "https://www.roboforce.ai/technology\nhttps://www.roboforce.ai/\nhttps://www.roboforce.ai/news",
+    "sourceUrl": "https://www.roboforce.ai/technology",
+    "sourceUrls": [
+      "https://www.roboforce.ai/technology",
+      "https://www.roboforce.ai/",
+      "https://www.roboforce.ai/news"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -554,8 +878,17 @@
     "models": "具身天工3.0, 天轶2.0（Tian Yi 2.0）",
     "contact": "https://www.x-humanoid.com/bt.html",
     "contactUrl": "https://www.x-humanoid.com/bt.html",
-    "source": "https://www.x-humanoid.com/bt.htmlhttps://www.x-humanoid.com/detail/jstg.htmlhttps://www.x-humanoid.com/detail/tianyi.htmlhttps://www.x-humanoid.com/news-view-251.html",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.x-humanoid.com/bt.html"
+    ],
+    "source": "https://www.x-humanoid.com/bt.html\nhttps://www.x-humanoid.com/detail/jstg.html\nhttps://www.x-humanoid.com/detail/tianyi.html\nhttps://www.x-humanoid.com/news-view-251.html",
+    "sourceUrl": "https://www.x-humanoid.com/bt.html",
+    "sourceUrls": [
+      "https://www.x-humanoid.com/bt.html",
+      "https://www.x-humanoid.com/detail/jstg.html",
+      "https://www.x-humanoid.com/detail/tianyi.html",
+      "https://www.x-humanoid.com/news-view-251.html"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -567,8 +900,15 @@
     "models": "S1",
     "contact": "https://www.astribot.com/en/contact/",
     "contactUrl": "https://www.astribot.com/en/contact/",
-    "source": "https://www.astribot.com/en/product/https://www.astribot.com/en/contact/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.astribot.com/en/contact/"
+    ],
+    "source": "https://www.astribot.com/en/product/\nhttps://www.astribot.com/en/contact/",
+    "sourceUrl": "https://www.astribot.com/en/product/",
+    "sourceUrls": [
+      "https://www.astribot.com/en/product/",
+      "https://www.astribot.com/en/contact/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -580,8 +920,16 @@
     "models": "GALBOT G1, GALBOT S1",
     "contact": "https://galbot.com/",
     "contactUrl": "https://galbot.com/",
-    "source": "https://galbot.com/https://www.galbot.com/g1https://www.galbot.com/s1",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://galbot.com/"
+    ],
+    "source": "https://galbot.com/\nhttps://www.galbot.com/g1\nhttps://www.galbot.com/s1",
+    "sourceUrl": "https://galbot.com/",
+    "sourceUrls": [
+      "https://galbot.com/",
+      "https://www.galbot.com/g1",
+      "https://www.galbot.com/s1"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -593,8 +941,16 @@
     "models": "THEMIS V2.5, BRUCE",
     "contact": "https://www.westwoodrobotics.io/contact-alt/",
     "contactUrl": "https://www.westwoodrobotics.io/contact-alt/",
-    "source": "https://www.westwoodrobotics.io/themis/https://store.westwoodrobotics.io/product/bruce-humanoid-open-platform-16-dof-kid-size-biped-robot/https://www.westwoodrobotics.io/contact-alt/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.westwoodrobotics.io/contact-alt/"
+    ],
+    "source": "https://www.westwoodrobotics.io/themis/\nhttps://store.westwoodrobotics.io/product/bruce-humanoid-open-platform-16-dof-kid-size-biped-robot/\nhttps://www.westwoodrobotics.io/contact-alt/",
+    "sourceUrl": "https://www.westwoodrobotics.io/themis/",
+    "sourceUrls": [
+      "https://www.westwoodrobotics.io/themis/",
+      "https://store.westwoodrobotics.io/product/bruce-humanoid-open-platform-16-dof-kid-size-biped-robot/",
+      "https://www.westwoodrobotics.io/contact-alt/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -606,8 +962,16 @@
     "models": "Isaac 1, Isaac 0",
     "contact": "https://www.weaverobotics.com/",
     "contactUrl": "https://www.weaverobotics.com/",
-    "source": "https://www.weaverobotics.com/isaac-1https://www.weaverobotics.com/isaac-0https://www.weaverobotics.com/business",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.weaverobotics.com/"
+    ],
+    "source": "https://www.weaverobotics.com/isaac-1\nhttps://www.weaverobotics.com/isaac-0\nhttps://www.weaverobotics.com/business",
+    "sourceUrl": "https://www.weaverobotics.com/isaac-1",
+    "sourceUrls": [
+      "https://www.weaverobotics.com/isaac-1",
+      "https://www.weaverobotics.com/isaac-0",
+      "https://www.weaverobotics.com/business"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -619,8 +983,16 @@
     "models": "Quanta X1 Pro, Quanta X2",
     "contact": "https://x2robot.com/en/",
     "contactUrl": "https://x2robot.com/en/",
-    "source": "https://x2robot.com/en/product/quantum1https://x2robot.com/product/quantum2https://x2robot.com/en/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://x2robot.com/en/"
+    ],
+    "source": "https://x2robot.com/en/product/quantum1\nhttps://x2robot.com/product/quantum2\nhttps://x2robot.com/en/",
+    "sourceUrl": "https://x2robot.com/en/product/quantum1",
+    "sourceUrls": [
+      "https://x2robot.com/en/product/quantum1",
+      "https://x2robot.com/product/quantum2",
+      "https://x2robot.com/en/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -632,8 +1004,17 @@
     "models": "Wanda 2.0, Panther, Martian 2.0, Wanda 3.0",
     "contact": "https://www.unix-group.ai/cn/picture/187",
     "contactUrl": "https://www.unix-group.ai/cn/picture/187",
-    "source": "https://www.unix-group.ai/Wandahttps://www.unix-group.ai/Pantherhttps://www.unix-group.ai/cn/picture/187https://unix-group.ai/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.unix-group.ai/cn/picture/187"
+    ],
+    "source": "https://www.unix-group.ai/Wanda\nhttps://www.unix-group.ai/Panther\nhttps://www.unix-group.ai/cn/picture/187\nhttps://unix-group.ai/",
+    "sourceUrl": "https://www.unix-group.ai/Wanda",
+    "sourceUrls": [
+      "https://www.unix-group.ai/Wanda",
+      "https://www.unix-group.ai/Panther",
+      "https://www.unix-group.ai/cn/picture/187",
+      "https://unix-group.ai/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -645,8 +1026,16 @@
     "models": "AlphaBot 2",
     "contact": "https://ai2robotics.com/en/introduce/",
     "contactUrl": "https://ai2robotics.com/en/introduce/",
-    "source": "https://ai2robotics.com/en/introduce/https://docs.ai2robotics.com/https://docs.ai2robotics.com/alphabot2/hardware/getting-started/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://ai2robotics.com/en/introduce/"
+    ],
+    "source": "https://ai2robotics.com/en/introduce/\nhttps://docs.ai2robotics.com/\nhttps://docs.ai2robotics.com/alphabot2/hardware/getting-started/",
+    "sourceUrl": "https://ai2robotics.com/en/introduce/",
+    "sourceUrls": [
+      "https://ai2robotics.com/en/introduce/",
+      "https://docs.ai2robotics.com/",
+      "https://docs.ai2robotics.com/alphabot2/hardware/getting-started/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -658,8 +1047,14 @@
     "models": "Maker H01",
     "contact": "https://gigaai.cc/maker-h01",
     "contactUrl": "https://gigaai.cc/maker-h01",
+    "contactUrls": [
+      "https://gigaai.cc/maker-h01"
+    ],
     "source": "https://gigaai.cc/maker-h01",
     "sourceUrl": "https://gigaai.cc/maker-h01",
+    "sourceUrls": [
+      "https://gigaai.cc/maker-h01"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -671,8 +1066,16 @@
     "models": "R1 PRO, R1 Lite, Kengo",
     "contact": "https://galaxea-dynamics.com/",
     "contactUrl": "https://galaxea-dynamics.com/",
-    "source": "https://galaxea-dynamics.com/https://docs.galaxea-ai.com/https://galaxea-dynamics.com/zh/products/galaxea-s-proprietary-embodied-ai-bipedal-robot",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://galaxea-dynamics.com/"
+    ],
+    "source": "https://galaxea-dynamics.com/\nhttps://docs.galaxea-ai.com/\nhttps://galaxea-dynamics.com/zh/products/galaxea-s-proprietary-embodied-ai-bipedal-robot",
+    "sourceUrl": "https://galaxea-dynamics.com/",
+    "sourceUrls": [
+      "https://galaxea-dynamics.com/",
+      "https://docs.galaxea-ai.com/",
+      "https://galaxea-dynamics.com/zh/products/galaxea-s-proprietary-embodied-ai-bipedal-robot"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -684,8 +1087,15 @@
     "models": "Psi V1",
     "contact": "https://www.psibot.ai/products_zh/product_psibot-v1_zh/",
     "contactUrl": "https://www.psibot.ai/products_zh/product_psibot-v1_zh/",
-    "source": "https://www.psibot.ai/products_zh/product_psibot-v1_zh/https://www.psibot.ai/en/home/",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.psibot.ai/products_zh/product_psibot-v1_zh/"
+    ],
+    "source": "https://www.psibot.ai/products_zh/product_psibot-v1_zh/\nhttps://www.psibot.ai/en/home/",
+    "sourceUrl": "https://www.psibot.ai/products_zh/product_psibot-v1_zh/",
+    "sourceUrls": [
+      "https://www.psibot.ai/products_zh/product_psibot-v1_zh/",
+      "https://www.psibot.ai/en/home/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -697,8 +1107,14 @@
     "models": "K15",
     "contact": "https://anyverse.com/",
     "contactUrl": "https://anyverse.com/",
+    "contactUrls": [
+      "https://anyverse.com/"
+    ],
     "source": "https://anyverse.com/",
     "sourceUrl": "https://anyverse.com/",
+    "sourceUrls": [
+      "https://anyverse.com/"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -710,8 +1126,15 @@
     "models": "HMND 01 ALPHA (Wheeled)",
     "contact": "https://hmnd.ai/",
     "contactUrl": "https://hmnd.ai/",
-    "source": "https://hmnd.ai/https://press.siemens.com/jp/ja/pressrelease/pr-20260416",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://hmnd.ai/"
+    ],
+    "source": "https://hmnd.ai/\nhttps://press.siemens.com/jp/ja/pressrelease/pr-20260416",
+    "sourceUrl": "https://hmnd.ai/",
+    "sourceUrls": [
+      "https://hmnd.ai/",
+      "https://press.siemens.com/jp/ja/pressrelease/pr-20260416"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -723,8 +1146,14 @@
     "models": "r-noid",
     "contact": "https://www.robot.com/r-noid",
     "contactUrl": "https://www.robot.com/r-noid",
+    "contactUrls": [
+      "https://www.robot.com/r-noid"
+    ],
     "source": "https://www.robot.com/r-noid",
     "sourceUrl": "https://www.robot.com/r-noid",
+    "sourceUrls": [
+      "https://www.robot.com/r-noid"
+    ],
     "checkedAt": "2026-08-02"
   },
   {
@@ -736,8 +1165,16 @@
     "models": "Agile ONE",
     "contact": "https://www.agile-robots.com/en/lets-connect/",
     "contactUrl": "https://www.agile-robots.com/en/lets-connect/",
-    "source": "https://www.agile-robots.com/ja/solutions/agile-one/https://www.agile-robots.com/en/lets-connect/https://prtimes.jp/main/html/rd/p/000000002.000185040.html",
-    "sourceUrl": null,
+    "contactUrls": [
+      "https://www.agile-robots.com/en/lets-connect/"
+    ],
+    "source": "https://www.agile-robots.com/ja/solutions/agile-one/\nhttps://www.agile-robots.com/en/lets-connect/\nhttps://prtimes.jp/main/html/rd/p/000000002.000185040.html",
+    "sourceUrl": "https://www.agile-robots.com/ja/solutions/agile-one/",
+    "sourceUrls": [
+      "https://www.agile-robots.com/ja/solutions/agile-one/",
+      "https://www.agile-robots.com/en/lets-connect/",
+      "https://prtimes.jp/main/html/rd/p/000000002.000185040.html"
+    ],
     "checkedAt": "2026-08-02"
   }
 ]

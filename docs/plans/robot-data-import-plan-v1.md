@@ -43,7 +43,10 @@ updated: 2026-08-08
 - スペックキーは `lib/specSchema.ts`、タグは `lib/tagRegistry.ts` に登録済みの値のみ使う（G7）。**これらは Git 管理を継続する**（`content-platform-and-database-architecture-v2.md` §5.2）
 - 本番Postgresへ SQL で直接書き込まない。Payload API / MCP を通す（同 §7.3）
 - 挙動変更・構造改善・見た目変更を同じ task に混ぜない（`ai/rules/10-workflow.md`）
-- 1 task = 1 commit。**例外は Task 9 のみ** — 134件を1コミットにすると revert 単位が粗すぎるため、1メーカー1コミット（33コミット以上）にする
+- 1 task = 1 commit。**例外は Task 9** — ただし「1メーカー1 Git commit」は **DB変更の
+  revert 単位にならない**（Payload へ書いた134件は Git 差分にならない）。Task 9 は
+  **1メーカー1 transaction ＋ 1 audit artifact**（run ID・作成/更新した `stableId` の一覧・
+  before/after の件数）とし、Git には artifact だけを commit する
 - 新しい validation ゲートは、**わざと違反を仕込んで赤くなることを確認してから**採用する
 - データ変更の各 task 末尾で検証を実行し、error 0 を確認する
 
@@ -178,14 +181,20 @@ Google Sheets の取り消し線は、HTML書き出しでは `text-decoration:li
 | | robots | manufacturers | robotSeries |
 |---|---|---|---|
 | ①完了時 | 63 | 26 | 0 |
-| **Series へ移管**（Task 3） | **−7** | — | **+7** |
-| Series 新規作成（Task 3） | — | — | +21 |
+| **Series へ移管**（Task 3） | **−6** | — | **+6** |
+| Series 新規作成（Task 3） | — | — | +22 |
 | `apptronik-apollo-2` の分割（Task 7） | +1 | — | — |
 | 新規追加（Task 9） | +134 | +33 | — |
-| **本計画の完了時** | **191** | **59** | **28** |
+| **本計画の完了時** | **192** | **59** | **28** |
 
-**移管分を引き忘れない。** `63 + 134 + 1 = 198` は誤り。Task 3 で7件が `robots` から
-`robotSeries` へ移るため `63 − 7 + 1 + 134 = 191`。
+**移管分を引き忘れない。** `63 + 134 + 1 = 198` は誤り。`63 − 6 + 1 + 134 = 192`。
+
+**移管は6件で、レポートが出す「親レコード7件」とは別物。** レポートの7件には
+`ubtech-walker-tienkung` が含まれるが、これは A群（ファミリ名が機種として存在しない）に
+該当しない。逆に A群の `R1` は Galaxea Dynamics のファミリで、Unitree の
+`unitree-r1-standard` とは無関係（ファミリ名だけで突き合わせると誤マッチする）。
+**`npm run report:robot-db-diff` の「シリーズ manifest」節が正本**で、メーカー名で限定して
+移管元を確定させる。
 
 **177 は原本の行数であって最終レコード件数ではない。57 は代理店シートの行数であってメーカー件数ではない。** 混同しない。
 
@@ -194,9 +203,9 @@ Google Sheets の取り消し線は、HTML書き出しでは `text-decoration:li
 ```
 現行 published            57
  −1  onex-eve を archived（DEC-S02）
- −7  Series へ移管（Task 3。7件すべて published。移管後は robots ではなくなる）
+ −6  Series へ移管（Task 3。6件すべて published。移管後は robots ではなくなる）
 ────
-     49 件
+     50 件
 ```
 
 **Series 自体の公開状態は別途決める**（新規finding 10。Task 3 と Task 4 の間にゲートが要る）。
@@ -475,7 +484,16 @@ Expected: `robots.json` 197件 / `manufacturers.json` 57件 / `deployments.json`
 
 - [ ] **Step 2: 突合先を Payload へ切り替える**
 
-現在は `lib/data/localContentSnapshot.ts` を読んでいる。①の repository 経由へ変える。期待値16項目はそのまま使う。
+**source の差し替えだけでは済まない。** 現在の `scripts/report-robot-db-diff.mjs` は
+`lib/data/localContentSnapshot.ts` を同期で読む約280行の script。次が要る。
+
+1. repository の非同期 query への書き換え（`await` 化、接続失敗時の扱い）
+2. **期待値を Task ごとの manifest へ移す。** 現在の18項目は着手前 baseline を固定値で
+   持っており、Task 3（移管6件）と Task 7（分割1件）で**自ら失敗する**
+3. fixture 注入（テストから Payload を立てずに走らせる経路）
+4. 出力契約の更新
+
+**Step 2 は独立した実装単位として扱い、1コミットにまとめない。**
 
 - [ ] **Step 3: 検算**
 
@@ -563,9 +581,68 @@ Apollo 2 分割（Task 7）で件数が動くため、**各 Task 後の期待状
 
 - [ ] **Step 4: 既存 Robot に `seriesId` を付ける**
 
-- [ ] **Step 5: ゲートが赤くなることを確認 → コミット**
+- [ ] **Step 5: 移管対象を指す16件の参照を移行する**
+
+`npm run report:robot-db-diff` の「移管対象IDを指す参照」節が一覧を出す。
+**Robot を消す前に、16件すべての移行先を決める。**
+
+| 参照元 | 件数 | 移行先 |
+|---|---|---|
+| `useCase.candidateRobots[].robotId` | 12 | `seriesId` へ（Task 4。根拠URLはシリーズ製品ページのまま） |
+| `article.relatedRobotIds` | 4 | **要判断** — Article がシリーズを参照できるようにするか、具体的な variant へ付け替えるか |
+
+Article 4件は `china-humanoid-duopoly-agibot-june2026` / `china-humanoid-demand-gap-june2026` /
+`humanoids-summit-tokyo-may2026` / `agibot-manufacturer-guide`。
+**メーカー解説の `lineup` にも `agibot-a2` があるため、そこも確認する。**
+
+```bash
+npm run report:robot-db-diff
+```
+Expected: 「移管対象IDを指す参照」が16件。**移行後に0件になることを Task 4 の完了条件で確認する。**
+
+- [ ] **Step 6: ゲートが赤くなることを確認 → コミット**
 
 **完了条件:** `robotSeries` が28件、検証が error 0、意図的な違反で exit 1。
+
+---
+
+### Task 3.5: シリーズの公開状態を決める（§3.1 の宿題）
+
+**Files:**
+- Modify: `data/robotSeries.ts`（または Payload 上のレコード）
+- Test: `tests/content/series-publish-gate.test.ts`
+
+**Global Constraints は「新規レコードは draft」としているが、Task 4 は published な useCase から
+シリーズを参照させる。** draft のままだと公開ページで解決できず、published にするなら
+人間の承認と公開ゲートが要る。**Task 4 の前に決める。**
+
+- [ ] **Step 1: 28件の公開状態を決める**
+
+| 由来 | 件数 | 初期状態 |
+|---|---|---|
+| 既存 Robot から移管（すべて現在 published） | 6 | **published**。既に公開されていた実体なので状態を引き継ぐ |
+| A群の新規作成 | 8 | **draft**。構成が Task 9 まで入らないため |
+| B群の新規作成 | 14 | **draft**。同上 |
+
+- [ ] **Step 2: published な useCase が draft な Series を参照しないゲートを足す**
+
+```ts
+it('published な useCase は draft の series を候補にできない', () => {
+  const snapshot = structuredClone(localContentSnapshot);
+  const series = snapshot.robotSeries.find((x) => x.publishStatus === 'draft')!;
+  const useCase = snapshot.useCases.find((u) => u.publishStatus === 'published')!;
+  useCase.candidateRobots[0] = { ...useCase.candidateRobots[0], robotId: undefined, seriesId: series.id };
+
+  expect(
+    validateContentSnapshot(snapshot).errors.some((e) => e.startsWith('[candidate-series-draft]')),
+  ).toBe(true);
+});
+```
+
+- [ ] **Step 3: ゲートが赤くなることを確認 → コミット**
+
+**完了条件:** 28件の公開状態が決まり、published な useCase から draft な Series を
+参照すると exit 1 になることを確認済み。
 
 ---
 
@@ -601,7 +678,8 @@ npm run check
 
 **ビジュアル回帰のベースライン再生成が要る。** スナップショットは24枚あり、ファイル名に OS 名が入る（`-darwin` / `-linux`）。macOS では linux 分を生成できないため `.github/workflows/update-visual-baselines.yml` を手動実行する。**このジョブの push は CI を起動しない**ので、`gh workflow run ci.yml --ref <branch>` を別途叩く。
 
-**完了条件:** シリーズの詳細が構成一覧を出し、useCase の候補が「提供終了」表示にならない。`/robots` のカード数が §3.1 の計算と一致する。
+**完了条件:** シリーズの詳細が構成一覧を出し、useCase の候補が「提供終了」表示にならない。
+**`npm run report:robot-db-diff` の「移管対象IDを指す参照」が0件になる。**`/robots` のカード数が §3.1 の計算と一致する。
 
 ---
 
@@ -720,11 +798,30 @@ Expected: `deploymentStage` 列が正規化JSONに入る。
 
 - [ ] **Step 2: 冪等な importer を書く**
 
-同じJSONで2回流しても結果が変わらないこと。`id` で upsert する。
+**`id` で upsert する、では足りない。** ①は domain の `id` を Payload の `stableId`
+フィールドへ保存し、Payload 内部IDを公開参照に使わない設計。したがって importer の契約は
+**「入力JSONの `id` を `stableId` で検索し、あれば update、無ければ create」**になる。
 
-- [ ] **Step 3: メーカー単位で分割投入する**
+- 疎なJSON（一部フィールドしか持たない）で update するとき、**既存フィールドを消さない**
+- メーカー単位で transaction を張る（Step 3）
+- `--dry-run` で作成/更新される件数だけ出せる
+- 部分失敗したとき、どこまで進んだかが分かる
+- relationship（`manufacturerId` / `seriesId`）は `stableId` から Payload ID へ解決する
 
-1メーカー1コミット。Unitree 19機 / Leju 18機 / UBTECH 12機が最大。`publishStatus: 'draft'` で入れ、`seriesId` を設定する。
+同じJSONで2回流しても結果が変わらないことをテストで固定する。
+
+- [ ] **Step 3: メーカー単位で投入する**
+
+**1メーカー1 transaction。**Unitree 19機 / Leju 18機 / UBTECH 12機が最大。
+`publishStatus: 'draft'` で入れ、`seriesId` を設定する。
+
+各 run について次を artifact として残し、Git へ commit する。
+
+```
+run ID / 対象メーカー / 作成した stableId 一覧 / 更新した stableId 一覧 / before・after の件数
+```
+
+**戻すときはこの artifact から inverse operation を組む。**Git revert では戻らない。
 
 - [ ] **Step 4: Task 3 の warning を error へ上げる**
 
@@ -747,7 +844,7 @@ published 件数とバイト数を対で記録し、**1件あたりのバイト�
 
 投入後の選択ツリーは **59社 + published な Robot 件数**になる。現在は約83行。**177 は原本の行数であって Payload のレコード数ではない**ので、実測して記録する。実測して記録し、**メーカー → シリーズ → 機種 の3段カスケードを別計画として起票する**。
 
-**完了条件:** `robots` が **191件**、`robotSeries` が28件、`npm run check` が全緑（§3.1）。
+**完了条件:** `robots` が **192件**、`robotSeries` が28件、`npm run check` が全緑（§3.1）。
 
 ---
 

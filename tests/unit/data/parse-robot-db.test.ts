@@ -38,6 +38,42 @@ describe('parseSheet', () => {
     expect(parseSheet(html)[0][0].text).toBe('');
   });
 
+  it('1セルに複数のリンクがあるとき全部拾う', () => {
+    // 代理店シートの「情報源」列は 51/57 行が複数URLを持つ。
+    // 先頭1本だけ取ると残りが text へ連結され、出典として使えない文字列になる。
+    const html =
+      '<style>.a{}</style><table><tr><td class="a">' +
+      '<a href="https://x/one">one</a><a href="https://x/two">two</a>' +
+      '</td></tr></table>';
+    const cell = parseSheet(html)[0][0];
+    expect(cell.urls).toEqual(['https://x/one', 'https://x/two']);
+    expect(cell.url).toBe('https://x/one');
+  });
+
+  it('<br> 区切りの素テキストURLを分割する', () => {
+    // 代理店シートの「情報源」列は 51/57 行がこの形。<br> を剥がすと
+    // https://a/https://b/ という1本の壊れた文字列になる。
+    const html =
+      '<style>.a{}</style><table><tr><td class="a">' +
+      'https://x/one<br>https://x/two<br>https://x/three' +
+      '</td></tr></table>';
+    const cell = parseSheet(html)[0][0];
+    expect(cell.urls).toEqual(['https://x/one', 'https://x/two', 'https://x/three']);
+    expect(cell.text).toBe('https://x/one\nhttps://x/two\nhttps://x/three');
+  });
+
+  it('リンクと素テキストURLが混在しても重複させない', () => {
+    const html =
+      '<style>.a{}</style><table><tr><td class="a">' +
+      '<a href="https://x/one">https://x/one</a><br>https://x/two' +
+      '</td></tr></table>';
+    expect(parseSheet(html)[0][0].urls).toEqual(['https://x/one', 'https://x/two']);
+  });
+
+  it('リンクが無いセルの urls は空配列', () => {
+    expect(parseSheet(HTML)[0][0].urls).toEqual([]);
+  });
+
   it('line-through を含まないクラスは strike にしない', () => {
     const html =
       '<style>.u{text-decoration:underline;}</style><table><tr><td class="u">X</td></tr></table>';
