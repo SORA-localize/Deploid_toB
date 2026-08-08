@@ -10,6 +10,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 計画 | 一言 | branch | 開始日 |
 |---|---|---|---|
+| [ロボットDB同期](plans/robot-db-sync-plan-v1.md) | `~/Downloads/ロボDB/ロボDB/*.html` を原本にDBを同期。母集団177行→完了時198レコード（更新42・追加134・archived化1・variant分割1）、メーカー26→59社。**Task 1〜11は着手可能、Task 12はシートへの1列追加待ち**（`deploymentStage`はどのシートからも導出できず型必須）。あわせて「買えるか」軸の重複を解消する（`Robot.buyerReadiness` と `marketAvailability` を削除） | 未定 | 2026-08-07 |
 | [積み残し登録簿フォローアップ](plans/deferred-work-register-followup-v1.md) | 登録簿#4/#5/#6/#10の実行計画。**#4・#5・#6は解消済み**。残るのは#10のバッテリー23機（CSVのvariant名とレコードの対応を人が決める） | `main`（専用branchなし） | 2026-08-05 |
 | [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | `data/*.ts` から Payload CMS + managed PostgreSQLへ、URLと不変idを保って段階移行。実装は未着手。**2026-07-26付でPhase 3・5・6が作った層を反映していない——着手時に現行実装へ突合すること** | 未定（専用branch必須） | 2026-07-26 |
 | [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | 上位ロードマップ。**Phase番号は移行前リファクタの1〜7とは別体系**（本書のPhase 1はCMS/DB移行を指す）。移行前スコープは実装インデックス側が正本 | phaseごとに分割 | 2026-07-26 |
