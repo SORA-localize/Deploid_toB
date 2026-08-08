@@ -29,7 +29,7 @@ updated: 2026-08-08
 - 色は `lib/visualSemantics.ts` と `src/app/globals.css` のトークンを使う。色リテラルを書かない（`ai/rules/30-ui-design.md`）
 - 画像は `rights` メタデータなしに公開しない。`src: ''` は valid（`ai/rules/40-content-rights.md`）
 - 挙動変更・構造改善・見た目変更を同じ task に混ぜない（`ai/rules/10-workflow.md`）
-- 1 task = 1 commit
+- 1 task = 1 commit。**例外は Task 12 のみ** — 134件を1コミットにすると revert 単位が粗すぎるため、意図的に1メーカー1コミット（33コミット以上）にする。§9.1 のロールバックはこの粒度に依存する
 - 新しい validation ゲートは、**わざと違反を仕込んで赤くなることを確認してから**採用する
 - `npm run validate:data` はデータ変更の各 task 末尾で実行し、error 0 を確認する
 
@@ -339,7 +339,7 @@ DEC-S02 で archived にするのは「一般販売モデルではない」と�
 
 - `docs/plans/content-platform-migration-plan-v1.md` Task 5 の `scripts/import-content-to-payload.mts` は `data/*.ts` から取り込む設計なので、先に入れたデータはそのまま運ばれる
 - 同 Task 5 の parity 検証は、63件より198件（§3.0）の実データ形状で通したほうが価値が高い
-- バンドル予算は障害にならない（実測: shared floor 554,140/560,000、`/robots` 185,524/215,000）。`scripts/check-client-bundle-content.mjs` が「1チャンクに5件以上のレコードslug禁止」を敷いているとおりカタログデータはJSチャンクに乗らず、RSCペイロード側にある。増えるのは `/robots` の prerender HTML 36,770 B → 約110KB で、ページ重量の話であり移行順序とは独立
+- バンドル予算は障害にならない（実測: shared floor 554,140/560,000、`/robots` 185,524/215,000）。`scripts/check-client-bundle-content.mjs` が「1チャンクに5件以上のレコードslug禁止」を敷いているとおりカタログデータはJSチャンクに乗らず、RSCペイロード側にある。増えるのは `/robots` の prerender HTML 36,770 B → 全件昇格時で約124KB（Task 12 Step 5）で、ページ重量の話であり移行順序とは独立
 
 ### DEC-S10. 画像・ロゴはこの計画の対象外
 
@@ -412,7 +412,7 @@ Robot の公開ゲート（`data-maintenance-checklist-v1.md` §F）に対する
 | `components/ProcurementNotes.tsx` | 注記4軸の表示（Manufacturer詳細・Robot詳細で共用） |
 | `tests/unit/data/parse-robot-db.test.ts` | パーサの単体テスト |
 | `tests/unit/components/procurement-notes.test.tsx` | 注記表示の単体テスト |
-| `tests/unit/validation/archived-stage.test.ts` | DEC-S07 の validation テスト |
+| `tests/unit/validation/discontinued-publish-status.test.ts` | DEC-S07 の validation テスト |
 
 ### 変更
 
@@ -426,7 +426,7 @@ Robot の公開ゲート（`data-maintenance-checklist-v1.md` §F）に対する
 | `lib/display.ts` | 変更なし（`deploymentStageOrder` は `discontinued` を含んだまま） |
 | `lib/visualSemantics.ts` | `buyerReadinessTones` / `marketAvailabilityTones` / `getBuyerReadinessTone` 削除 |
 | `lib/catalog/search.ts` | 51行目の `buyerReadinessLabels[robot.buyerReadiness]` 削除 |
-| `lib/validation/robots.ts` | archived × 現役 `deploymentStage` の error 追加 |
+| `lib/validation/robots.ts` | **片方向**ゲート追加: `deploymentStage === 'discontinued'` ⟹ `publishStatus === 'archived'`（DEC-S07 改訂。**逆方向は検査しない** — `onex-eve` が archived × `limited-production` で反例になる） |
 | `lib/uiText.ts` | 注記4軸のラベル追加 |
 | `components/ManufacturerFactSheet.tsx` | 注記表示の呼び出し |
 | `components/RobotStickyAside.tsx` | `supportNote` 表示の呼び出し |
@@ -680,6 +680,22 @@ npm run test:e2e
 ```
 Expected: すべて成功。特に `check:bundle-content` が緑であること（注記本文が client チャンクへ漏れていない証拠）。
 
+**緑であることだけを見ない。各チャンクの最大 hit 数を before / after で記録する。**
+`scripts/check-client-bundle-content.mjs` は全コレクションの slug（draft 含む）を集めて
+チャンクごとに `source.includes('"slug"')` を掛け、**5件以上で赤**にする。
+本計画で slug の総数は 175（63+26+44+31+11）から約380へ倍増するため、
+4 → 5 に乗る直前が「緑」からは見えない。
+
+記録の取り方は2案。**どちらでもよいが、数字を残すこと。**
+
+- `scripts/check-client-bundle-content.mjs` に「最大 hit 数」を1行 `console.log` する
+  （`MAX_DISTINCT_SLUGS_PER_CHUNK` と同じスコープで既に数えているので追加コストは無い）
+- または本 task の完了報告に、赤にならなかった最大値を手で記録する
+
+`docs/decisions/ai_fullstack_development_guardrails_v1.md` が「誤検知が常態化すると
+チェック自体が無視される」として `activeSection` を grep 対象から外したのと同じ構図。
+余裕が縮んでいることに気づけるようにしておく。
+
 - [ ] **Step 7: 手動確認**
 
 `npm run dev` で `/manufacturers/unitree` と `/robots/unitree-g1` を開き、注記が出ること、390px 幅で折り返しが破綻しないこと、`dt`/`dd` がスクリーンリーダー順で読めることを確認する。
@@ -832,7 +848,7 @@ Expected: `63 <sha256>`。この2つを控える。
 - [ ] **Step 3: 分割前後で内容が同一であることを機械確認**
 
 Step 1 と同じコマンドを実行。
-Expected: 件数・JSON長が Step 1 と完全一致。**一致しなければ分割をやり直す。**
+Expected: 件数と sha256 が Step 1 と完全一致。**一致しなければ分割をやり直す。**
 
 - [ ] **Step 4: 検証**
 
@@ -846,7 +862,7 @@ npm run typecheck && npm run validate:data && npm run check:data-boundaries && n
 git commit -am "refactor(data): data/robots.ts をメーカー別ファイルへ分割"
 ```
 
-**完了条件:** 件数と JSON 長が分割前と一致。`check:data-boundaries` が緑。
+**完了条件:** 件数と `id` ソート後の sha256 が分割前と一致。`check:data-boundaries` が緑。
 
 ---
 
@@ -1107,7 +1123,7 @@ Task 11（manufacturers）… 独立 ──────────────�
 |---|---|---|
 | Task 7 の分割でレコードを落とす / 取り違える / 重複させる | データ欠損。`validate:data` は件数を見ないため気づけない | Step 1・3 で `id` ソート後の sha256 を突き合わせる（長さ比較では並び替えも取り違えも検出できない） |
 | Task 3 で検索性が落ちる | `/robots` の検索で「初期導入向け」等が引けなくなる | 意図した変更。カードに表示されていない値なので実害は小さいと判断。**ユーザーへ事前告知済み（2026-08-07）** |
-| Task 6 のゲートが空振りする | 「落ちないゲート」が増える | Step 5 でわざと違反を仕込み exit 1 を確認する（Global Constraints） |
+| Task 6 のゲートが空振りする | 「落ちないゲート」が増える | Step 6 でわざと違反を仕込み exit 1 を確認する（Global Constraints） |
 | Task 10 で世界地図の static asset が陳腐化 | Home の地図が古い拠点のまま | `check:world-map-asset` を検証に入れ、赤なら `generate:world-map` で再生成 |
 | Task 12 で `/robots` が重くなる | 全件昇格時のページ重量 36,770 B → 約124KB | Step 5 で実測。150KB 超なら別計画として起票 |
 | Task 5 で注記本文が client bundle へ漏れる | 共有フロア増加、`check:bundle-content` 違反 | Server Component 側で渡す。`tests/unit/view-models/robots.test.ts` の `supportNote` 行を残して機械的に守る |
