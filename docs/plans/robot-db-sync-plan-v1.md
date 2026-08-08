@@ -403,7 +403,7 @@ Robot の公開ゲート（`data-maintenance-checklist-v1.md` §F）に対する
 
 | Path | 責務 |
 |---|---|
-| `scripts/parse-robot-db.mjs` | HTML 5ファイル → 正規化JSON。取り消し線判定・結合セル前方補完・`<a href>` 抽出 |
+| `scripts/parse-robot-db.ts` | HTML 5ファイル → 正規化JSON。取り消し線判定・結合セル前方補完・`<a href>` 抽出。**`.mjs` ではなく `.ts`** — テストから import するため型宣言が要る（`tsconfig` は `allowJs: false`）。Node は `--experimental-strip-types` で直接実行する |
 | `scripts/report-robot-db-diff.mjs` | 正規化JSON と `data/*.ts` の突合レポート（§3 の再生成） |
 | `data/import/robots.json` | 発表済みロボット 198行の正規化結果（機種名セルの取り消し線フラグ付き） |
 | `data/import/deployments.json` | 導入事例 41行の正規化結果 |
@@ -445,19 +445,19 @@ Robot の公開ゲート（`data-maintenance-checklist-v1.md` §F）に対する
 ### Task 1: HTMLパーサ
 
 **Files:**
-- Create: `scripts/parse-robot-db.mjs`
+- Create: `scripts/parse-robot-db.ts`
 - Test: `tests/unit/data/parse-robot-db.test.ts`
 - Create: `data/import/robots.json`, `data/import/deployments.json`, `data/import/manufacturers.json`
 
 **Interfaces:**
-- Produces: `parseSheet(html: string): Cell[][]`（`Cell = { text: string; url: string | null; strike: boolean }`）
+- Produces: `parseSheet(html: string): Cell[][]`（`Cell = { text: string; url: string | null; strike: boolean; checked: boolean }`。`checked` はチェックボックス — `<svg>` で書き出されるため text からは判定できない）
 - Produces: `parseRobotSheet(html: string): RobotImportRow[]`（`{ maker, makerUrl, model, modelUrl, strike, specs: Record<string,string> }`）
 
 - [ ] **Step 1: 失敗するテストを書く**
 
 ```ts
 import { describe, expect, it } from 'vitest';
-import { parseSheet, parseRobotSheet } from '../../../scripts/parse-robot-db.mjs';
+import { parseSheet, parseRobotSheet } from '../../../scripts/parse-robot-db.ts';
 
 const HTML = `<html><head><style>
 .s1{text-decoration:line-through;}
@@ -487,7 +487,7 @@ describe('parse-robot-db', () => {
 - [ ] **Step 2: 失敗を確認**
 
 Run: `npx vitest run tests/unit/data/parse-robot-db.test.ts`
-Expected: FAIL（`Cannot find module '../../../scripts/parse-robot-db.mjs'`）
+Expected: FAIL（`Cannot find module '../../../scripts/parse-robot-db.ts'`）
 
 - [ ] **Step 3: パーサを実装**
 
@@ -500,14 +500,14 @@ Expected: PASS
 
 - [ ] **Step 5: 実データで件数を検算**
 
-Run: `node scripts/parse-robot-db.mjs --stats`
+Run: `npm run parse:robot-db`
 Expected: `発表済みロボット 198行 / 機種名セル取り消し線17 / メーカー57`、`導入事例 41行`、`代理店 57行`。§1〜§2 と一致しなければ実装を直す。
 
 - [ ] **Step 6: 正規化JSONを出力してコミット**
 
 ```bash
-node scripts/parse-robot-db.mjs --out data/import
-git add scripts/parse-robot-db.mjs tests/unit/data/parse-robot-db.test.ts data/import
+npm run parse:robot-db -- --out data/import
+git add scripts/parse-robot-db.ts tests/unit/data/parse-robot-db.test.ts data/import package.json
 git commit -m "feat(data): ロボDB原本HTMLのパーサと正規化JSONを追加"
 ```
 
@@ -1033,7 +1033,7 @@ Expected: `59`。**57 と出たら代理店シートの行数と取り違えて�
 
 - [ ] **Step 1: 原本HTMLを再書き出しし、パーサを通す**
 
-Run: `node scripts/parse-robot-db.mjs --out data/import`
+Run: `npm run parse:robot-db -- --out data/import`
 Expected: `deploymentStage` 列が正規化JSONに入る。
 
 - [ ] **Step 2: メーカー単位で分割投入する**

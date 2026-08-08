@@ -12,6 +12,7 @@
     "validate:data": "node --experimental-strip-types scripts/validate-data.mjs",
     "build:data-r01-manifest": "node --experimental-strip-types scripts/build-data-r01-manifest.mjs",
     "build:data-r02-manifest": "node --experimental-strip-types scripts/build-data-r02-manifest.mjs",
+    "parse:robot-db": "node --experimental-strip-types scripts/parse-robot-db.ts",
     "check:source-links": "node --experimental-strip-types scripts/check-source-links.mjs",
     "check:data-boundaries": "node scripts/check-data-import-boundaries.mjs",
     "check:client-imports": "node scripts/check-client-import-graph.mjs",
