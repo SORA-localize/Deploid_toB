@@ -68,7 +68,7 @@ updated: 2026-08-06
 | `docs/README.md` | ○ | 「いま動いているもの」に **`robot-data-r02-integration-plan-v1.md`が完了しておらず残taskがある**と明記（§2.2） |
 | `docs/decisions/content-platform-and-database-architecture-v2.md` | △ 部分対象 | §10移行原則を確認したが、バッテリー関連の記述は無し。「cutoverまでは`data/*.ts`が正本」という既存方針を追認しただけ |
 | `docs/plans/content-platform-migration-plan-v1.md`（970行） | **対象外** | `mAh`/`Wh`/`specSchema`でgrepしヒット無し。未着手のCMS/DB移行そのものの実装計画であり、今回の4項目（cutover前の通常保守）とは別フェーズ。全文読了はしていない — 970行を読む価値がこの計画の結論を変える可能性は低いと判断したため。着手時期が来たら別途読む |
-| `docs/plans/robot-data-r02-integration-plan-v1.md` | ○ | **`#10`と同一の作業がR02-09として既に計画済みで未完了**。新規計画を書くのではなく、この計画に接続する（§3.2） |
+| `docs/archive/robot-data-r02-integration-plan-v1.md` | ○ | **`#10`と同一の作業がR02-09として既に計画済みで未完了**。新規計画を書くのではなく、この計画に接続する（§3.2） |
 | `docs/decisions/data/research/DATA-R02-decisions.md` | ○ | R02統合の承認済み判断ログ。battery項目の明示決定は無いが、Option A（新フィールド追加をしない方針）の射程を確認した |
 | `docs/decisions/data/research/DATA-R02-master-report.md` / `DATA-R02-unresolved.md` / `DATA-R02-B01〜B10.md` | ○ | `#10`の一次証拠（§2.2） |
 
@@ -104,7 +104,7 @@ commitの時系列（`git log`で実測）:
 | 2026-07-28 | `9530937` | `batterySystem`のみ復元 |
 | 2026-07-28 | `660caad` | 上記削除の経緯を記録（`batteryCapacityWh`は未復元のまま） |
 
-**発見3: これは新規タスクではなく、`docs/plans/robot-data-r02-integration-plan-v1.md`の未完了task。**
+**発見3: これは新規タスクではなく、`docs/archive/robot-data-r02-integration-plan-v1.md`の未完了task。**
 
 同計画のtask `R02-09`（"conflict / variant / inaccessibleを個別処理する"）が、まさにこの「`needs-review`だったバッテリー行を個別に確定する」作業に相当する。`docs/README.md`の「いま動いているもの」表も「個別conflict機（pal-kangaroo等）と最終回帰監査（R02-11）が残task」と明記しており、**この計画は完了していない**。よって`#10`は独立した新規計画ではなく、既存計画のR02-09を再開する形にする（§3.2）。
 

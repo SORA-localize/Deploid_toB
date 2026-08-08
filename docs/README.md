@@ -10,13 +10,11 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 計画 | 一言 | branch | 開始日 |
 |---|---|---|---|
-| [ロボットDB同期](plans/robot-db-sync-plan-v1.md) | `~/Downloads/ロボDB/ロボDB/*.html` を原本にDBを同期。母集団177行→完了時198レコード（更新42・追加134・archived化1・variant分割1）、メーカー26→59社。**Task 1〜11は着手可能、Task 12はシートへの1列追加待ち**（`deploymentStage`はどのシートからも導出できず型必須）。あわせて「買えるか」軸の重複を解消する（`Robot.buyerReadiness` と `marketAvailability` を削除） | 未定 | 2026-08-07 |
+| [ロボットデータ投入](plans/robot-data-import-plan-v1.md) | 原本HTMLから177機・59社・28シリーズを **Payload へ**投入。**§0 の前提ゲート7項目（コンテンツ基盤移行の完了）を満たすまで着手しない**。Task 9 のみ原本への `deploymentStage` 記入134行が前提 | 未定 | 2026-08-08 |
 | [積み残し登録簿フォローアップ](plans/deferred-work-register-followup-v1.md) | 登録簿#4/#5/#6/#10の実行計画。**#4・#5・#6は解消済み**。残るのは#10のバッテリー23機（CSVのvariant名とレコードの対応を人が決める） | `main`（専用branchなし） | 2026-08-05 |
 | [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | `data/*.ts` から Payload CMS + managed PostgreSQLへ、URLと不変idを保って段階移行。実装は未着手。**2026-07-26付でPhase 3・5・6が作った層を反映していない——着手時に現行実装へ突合すること** | 未定（専用branch必須） | 2026-07-26 |
 | [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | 上位ロードマップ。**Phase番号は移行前リファクタの1〜7とは別体系**（本書のPhase 1はCMS/DB移行を指す）。移行前スコープは実装インデックス側が正本 | phaseごとに分割 | 2026-07-26 |
 | [レスポンシブ対応](plans/responsive-phase-1-static-audit-v1.md) | Phase 1のコード実装は完了。R-06（実機スクリーンショットでの最終確認）が未実施 | 専用branchなし（mainへ直接実装） | 2026-07-03 |
-| [ロボットデータ ファクトチェック反映](plans/robot-data-factcheck-impl-plan-2026-07-01.md) | Phase A/Bは完了。Phase Cは`marketAvailability`のみ実装済み、`scopeStatus`/`evidenceLevel`が未着手 | 未定（型変更のため別branch推奨のまま） | 2026-07-01 |
-| [ロボットデータ R02統合](plans/robot-data-r02-integration-plan-v1.md) | 全61機再調査（DATA-R02）の反映。低リスクbatchは反映済み、個別conflict機（pal-kangaroo等）と最終回帰監査（R02-11）が残task | `data/robot-catalog-r01-rollout-20260716`（PR #3はmerge済み、残taskは別PRで継続） | 2026-07-17 |
 | [ロボット画像・メーカーロゴ調達](plans/robot-image-sourcing-plan-v1.md) | Robot B1〜B6の読み取り専用調査は完了。台帳・許諾SSOTの実装が調査開始gateとして未着手 | 未定 | 2026-07-08 |
 
 ---
@@ -44,6 +42,8 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 | 2026-08-04 | [CMS / DB移行前リファクタリング Phase 1〜7](archive/pre-migration-refactor-implementation-index-v1.md)。実測値は [結果](reference/pre-migration-refactor-results-v1.md) |
 | 2026-08-05 | [同リファクタの全体レビュー](archive/pre-migration-refactor-full-review-plan-v1.md)。14の規定文書に照らしてR1〜R19を5層に分けて実行し、健全と結論。唯一の修正はコンポーネント3ファイルの重複除去 |
 | 2026-08-06 | 積み残し登録簿の `#4`（color-contrast 219件→0件、axe gateを`serious`へ）・`#5`（/reportsタブ到達性）・`#6`（Reports H1）・`#9`（e2e hydration race）・`#11`（Linuxベースライン自動再生成） |
+
+| 2026-08-08 | 完了・吸収済みの計画9件を `docs/archive/` へ移動。`refactor-phase-01`〜`07` と `pre-migration-refactor-safety-design` は完了済みなのに `docs/plans/` に残っていた（Phase 05 だけ移されており移し忘れ）。`robot-data-r02-integration` と `robot-data-factcheck-impl` は新しいデータ投入計画へ吸収 |
 
 残る積み残しは [登録簿](decisions/deferred-work-register-v1.md) が正本。
 

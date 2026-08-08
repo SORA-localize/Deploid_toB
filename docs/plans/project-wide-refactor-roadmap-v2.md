@@ -22,7 +22,7 @@ Deploid全体を、次の状態へ段階的に移行する。
 - 決定: `../decisions/content-platform-and-database-architecture-v2.md`
 - 実装計画: `content-platform-migration-plan-v1.md`
 
-> **2026-07-26 実行範囲**: CMS / DB移行は保留し、現行TS構成のまま実施できる安全網・依存・データ内部・性能・Client境界・UI・セキュリティを先行する。安全設計は [`pre-migration-refactor-safety-design-v1.md`](pre-migration-refactor-safety-design-v1.md)、実行順とbranch gateは [`pre-migration-refactor-implementation-index-v1.md`](../archive/pre-migration-refactor-implementation-index-v1.md) を正本とする。
+> **2026-07-26 実行範囲**: CMS / DB移行は保留し、現行TS構成のまま実施できる安全網・依存・データ内部・性能・Client境界・UI・セキュリティを先行する。安全設計は [`pre-migration-refactor-safety-design-v1.md`](../archive/pre-migration-refactor-safety-design-v1.md)、実行順とbranch gateは [`pre-migration-refactor-implementation-index-v1.md`](../archive/pre-migration-refactor-implementation-index-v1.md) を正本とする。
 >
 > **⚠️ Phase番号が2系統ある。** 本書の Phase 0〜6 と、実際に実行している移行前リファクタの
 > Phase 1〜7 は**別物**。本書の「Phase 1 コンテンツ基盤」は Payload CMS + Postgres 移行を指し、

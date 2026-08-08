@@ -127,7 +127,7 @@ static asset の制約を維持した新設計。別 plan（`refactor-phase-08-h
 
 **関連**: #3 の `motion/react` 依存はこの実装方針に影響する。
 
-出典: [`refactor-phase-04-home-performance-v1.md`](../plans/refactor-phase-04-home-performance-v1.md) の Follow-up 節
+出典: [`refactor-phase-04-home-performance-v1.md`](../archive/refactor-phase-04-home-performance-v1.md) の Follow-up 節
 
 ---
 
@@ -143,7 +143,7 @@ mAh単位で統一）と `docs/decisions/data/research/DATA-R02-*` を突合し�
 「多くの機種で mAh/Ah しか公表されておらず、電圧不明でWh換算できない」ことが判明。
 Wh 側は復元せず **mAh へ一本化**すると決定（詳細:
 [`deferred-work-register-followup-v1.md`](../plans/deferred-work-register-followup-v1.md) DEC-04）。
-`docs/plans/robot-data-r02-integration-plan-v1.md` の未完了task `R02-09` の再開として実施した。
+`docs/archive/robot-data-r02-integration-plan-v1.md` の未完了task `R02-09` の再開として実施した。
 
 **現状**（PR [#20](https://github.com/SORA-localize/Deploid_toB/pull/20)）: 20/63機に
 `batteryCapacityMah` を反映済み（Unitree 8機、AgiBot 2機、UBTECH 2機、LimX 2機、Leju 2機、
