@@ -1,6 +1,6 @@
 ---
 status: plan
-updated: 2026-07-26
+updated: 2026-08-08
 ---
 
 # Content Platform Migration Implementation Plan
@@ -13,7 +13,77 @@ updated: 2026-07-26
 
 **Tech Stack:** Next.js 16 App Router、React 19、TypeScript、Payload CMS、Postgres、Vitest、Playwright、Vercel、Vercel BlobまたはS3互換storage
 
-> **Deferred program prerequisite:** CMS / DB移行は未着手。開始前に [`pre-migration-refactor-implementation-index-v1.md`](../archive/pre-migration-refactor-implementation-index-v1.md) のPhase 1〜7を完了する。この前提で品質ツール、local snapshot、validator、view modelは既に存在するため、本計画で同じ基盤を作り直さない。
+> **Deferred program prerequisite:** Phase 1〜7 は完了済み（2026-08-04）。品質ツール、local snapshot、validator、view model は既に存在するため、本計画で同じ基盤を作り直さない。**どれが既存でどれが新規かは「2026-08-08 突合結果」§A・§B が正本。File Structure の表より優先する。**
+
+## 2026-08-08 突合結果（着手前に必ず読む）
+
+本計画は 2026-07-26 付で、pre-migration refactor の Phase 3・5・6 が作った層を反映していない。
+**着手前に実装と突き合わせた結果を以下に記録する。File Structure の表より本節が優先する。**
+
+### A. 「新規作成」に挙がっているが既に存在するもの（4件）
+
+| Path | 実態 |
+|---|---|
+| `lib/validation/crossCollection.ts` | Phase 3 が作成済み。`buildReferenceIndex` を持つ |
+| `vitest.config.ts` | Phase 1 で導入済み |
+| `playwright.config.ts` | Phase 1 で導入済み |
+| `tests/e2e/public-routes.spec.ts` | Phase 6 で作成済み |
+
+### B. 同じ役割の層が別の場所に既にあるもの（重複して作らない）
+
+| 計画の記載 | 実装の現状 | 判断 |
+|---|---|---|
+| `lib/content/contracts.ts`（source/repository境界とsnapshot型） | **`lib/data/contentSnapshot.ts`** が `ContentSnapshot` 型を提供済み | 既存を使う。`lib/content/` を新設しない |
+| `lib/content/localSource.ts`（移行期間のTS reader） | **`lib/data/localContentSnapshot.ts`** が全collectionを結合済み | 既存を使う |
+| `lib/validation/collections/*.ts`（collection単位のdomain validation） | **`lib/validation/*.ts`** に9本（`robots` / `manufacturers` / `useCases` / `articles` / `deployments` / `common` / `registry` / `types` / `validateContentSnapshot`）が既存 | 既存の平置きを使う。`collections/` サブディレクトリを作らない |
+| `lib/validation/crossCollection.ts`（collection横断） | 同名で既存 | 既存を拡張する |
+
+`lib/validate.ts` は「互換facade」で、規則の本体は `lib/validation/*.ts` にある（`lib/validate.ts:1-4` のコメント）。
+移行では facade の中身を差し替えるだけでよく、検証ロジックを書き直さない。
+
+### C. ファイル名の誤り
+
+| 計画の記載 | 実際 |
+|---|---|
+| `next.config.mjs` | **`next.config.ts`** |
+
+### D. 計画が知らないコレクション（2件・2026-08-08 決定）
+
+`docs/decisions/data-architecture-redesign-v1.md` §4-1 / §11 で2つのコレクションを新設すると決めた。
+**Task 3（全collectionと権限を定義する）にこの2つを含める。**
+
+| コレクション | 内容 | 出典 |
+|---|---|---|
+| `robotSeries` | 製品ファミリ。スペック・価格を持たない。`Robot.seriesId?` で結ぶ | `robot-data-import-plan-v1.md` DEC-S08 |
+| `distributors` | 国内の提供事業者。メーカーと多対多 | `data-architecture-redesign-v1.md` §4-1 |
+
+あわせて `Robot` から `buyerReadiness` / `marketAvailability` / `safetyNote` / `vendorRiskNote` /
+`comparison` を落とす（DEC-S05・S06）。**`collections/Robots.ts` を書くときに現行 `data/types.ts` を
+そのまま写さない。**
+
+### E. 前提条件の再確認（2026-08-08 実測）
+
+| Task 1 の確認項目 | 実測 |
+|---|---|
+| Payload / Postgres package | **0件**（未導入。計画どおり） |
+| `DATABASE_URL` / `PAYLOAD_SECRET` / `CONTENT_SOURCE` | `.env.example` に**0件**（計画どおり） |
+| `npm run check:data-boundaries` | exit 0 |
+| pre-migration refactor の完了文書 | `docs/reference/pre-migration-refactor-results-v1.md` 存在 |
+| Vercel プロジェクト | 接続済み（`.vercel/project.json`）。`vercel.json` は無く既定設定＝`main` が本番、他ブランチは Preview |
+
+### F. 制約の緩和（2026-08-08、人間の判断）
+
+Global Constraints のうち次の2つは**適用しない**。
+
+- 「`id`、`slug`、`previousSlugs`、公開URLを移行都合で変更しない」 →
+  **公開URLの維持は不要**。ただし `id` は他collectionからの参照に使うため引き続き不変とする
+- 無停止での cutover → **1週間程度の停止は許容**
+
+この2つは parity 検証と cutover のコストを大きく押し上げる制約だった。外れたことで
+Task 5（parity）と Task 9（cutover）の要件を見直す余地がある。**見直しは Task 5 / 9 の
+着手時に行い、本節では判断しない。**
+
+---
 
 ## Global Constraints
 

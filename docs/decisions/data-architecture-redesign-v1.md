@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-08-07
+updated: 2026-08-08
 ---
 
 # データアーキテクチャ再設計 v1（CMS見据え・保守性主眼）
@@ -126,7 +126,9 @@ slug ──┬── URL識別子        /robots/unitree-g1
 ```
 コアエンティティ（事実の個票）
   manufacturers   供給体制
-  robots          導入判断の個票
+  distributors    国内の提供事業者（代理店・直販窓口）★2026-08-08 新設
+  robotSeries     製品ファミリ（買える構成が複数ある製品の傘）★2026-08-08 新設
+  robots          導入判断の個票＝買える構成（SKU）
 
 編集コンテンツ（鮮度・読み物）
   articles        ニュースメディア（旧 reports を改称・拡張）★
@@ -144,7 +146,10 @@ slug ──┬── URL識別子        /robots/unitree-g1
 ### 4-2. 参照関係図（すべて id 参照）
 
 ```
+manufacturers ──< robotSeries            (manufacturer has many series)
 manufacturers ──< robots                 (manufacturer has many robots)
+robotSeries   ──< robots                 (series has many configurations)★
+distributors  >──< manufacturers          (多対多。1事業者が複数メーカーを扱う)★
 robots         ──< deployments           (robot deployed at many sites)
 useCases       >── robots (candidate)    (useCase ← candidate robots)
 useCases       <── deployments           (deployment.relatedUseCaseIds が一方向に useCase を指す。双方向対称は強制しない)
@@ -156,6 +161,9 @@ placements     >── articles
 - `deployments.relatedUseCaseIds`（任意項目）は「この導入事例がどの用途の根拠になるか」を示す。`UseCase.candidateRobots[].evidenceDeploymentIds` と組み合わせて、候補ロボットの `strong` / `adjacent-deployment` 根拠にも使う。無理な紐付けはしない（該当しない事例は空のままでよい）。
 - `UseCase.candidateRobots`は単なるid配列ではなく`{robotId, fit, basis, evidenceDeploymentIds?, evidenceSourceUrls?, reason}[]`（`fit`: strong/possible/watch）。「なぜ候補なのか」と「どの根拠でそう言えるのか」をデータ自身が持つ。`fit: 'strong'`は`evidenceDeploymentIds`で同じrobotId・同じuseCaseのpublished deploymentを明示できる場合だけ使う（量産・商用展開の事実だけでは`strong`にしない）。published UseCase の候補に残せる `basis` は `deployment` / `official-use-case` / `adjacent-deployment` のみとし、`product-capability` / `market-signal` / `editorial-watch` は draft の調査メモまたは非公開候補として扱う。`lib/data.ts`の`getRelated*()`は呼び出し側が渡した順序を保持する（関連ID配列の順序は編集上の関連優先度）。
 - `Article.relatedUseCaseIds` は用途詳細の「関連記事」の正本。記事側の編集判断で「この用途の追加理解になる」と明示した場合だけ付与する。`industryTags` / `taskTags` / `themeTags` の一致だけで用途の関連記事を自動生成しない。
+- `robotSeries` は**スペックも価格も持たない**。名前・メーカー・概要・出典・画像だけを持つ識別単位。買えるのは `robots`（構成）のほう。`Robot.seriesId?` は**任意** — 構成が1つしかない製品にはシリーズを作らない。詳細は `../plans/robot-data-import-plan-v1.md` DEC-S08。
+- `UseCase.candidateRobots[]` は `robotId` または `seriesId` のどちらか一方を持つ。**用途の根拠はシリーズ粒度にしか存在しないことが多い**（実測: 該当14件すべてが `basis: 'official-use-case'` で、根拠URLはメーカーのシリーズ製品ページ）。特定構成の実証がある場合だけ `robotId` を使う。
+- `distributors` は多対多。`Tohasen Robotics` は Unitree と Booster、`Robots International` は EngineAI・RobotEra・CASBOT を扱う（実測）。メーカーの中に埋め込むと同じ事業者が重複するため独立させる。**取扱モデルは機種単位**（代理店シートの「対応モデル」列）なので、関係の実体は `distributors ⇄ robots` にも及ぶ。
 - **逆向きは導出**（§6）。robots は自分が属する useCases を持たない。`lib/data.ts` が逆引きする。
 
 ---
@@ -398,15 +406,104 @@ previousSlugs?★新規・301用
 summary, publishStatus, updatedAt, reliability, sources, heroImage?, seo?
 ```
 
-**Manufacturer**: name, nameJa?, companyType, companyStatus, country, hqCity?, headquarters?, foundedYear?, website, logo?, contactUrl?, description, japanPresence, domesticDistributors?, *Note群, featuredRank?
+**Manufacturer**: name, nameJa?, companyType, companyStatus, country, hqCity?, headquarters?, foundedYear?, website, logo?, logos?, contactUrl?, description, japanPresence, supportNote?, procurementNote?, vendorRiskNote?, featuredRank?
+→ `domesticDistributors?`（埋め込み配列）は `distributors` コレクションへ移す。`distributorNote?` は同じ事実を自由文で持つ重複なので、移行完了後に削除する。
 
-**Robot**: name, nameJa?, **manufacturerId**, category, description, featuredRank?, deploymentStage, buyerReadiness, **specs（specSchema駆動）**, procurementModels[], priceNote?, japanAvailability, distributorJapan?, *Note群, images?, industryTags?, taskTags?, comparison
+**Distributor**（★2026-08-08 新設）: name, nameJa?, website?, providerType（`maker-direct` / `reseller` / `other`）, handledManufacturerIds[], handledRobotIds?[], acquisitionMethods[]（購入 / レンタル 等）, inquiryUrl?, note?
+
+**RobotSeries**（★2026-08-08 新設）: name, nameJa?, **manufacturerId**, description?, images?, industryTags?, taskTags?
+→ **スペック・価格・入手性を持たない。** 買えるのは構成（`Robot`）のほう。
+
+**Robot**: name, nameJa?, **manufacturerId**, **seriesId?**★, category, description, featuredRank?, deploymentStage, **specs（specSchema駆動）**, procurementModels[], priceOffers?, loadRatings?, fieldEvidence?, japanAvailability, images?, industryTags?, taskTags?
+→ 2026-08-08 に `buyerReadiness` / `marketAvailability` / `safetyNote` / `vendorRiskNote` / `comparison` を削除（`../plans/robot-data-import-plan-v1.md` DEC-S05・S06）。`buyerReadiness` は `UseCase` 側には残る。
 
 **Article（旧Report）**: title, titleJa?, **category★**, type, section, publishedAt, author?, industryTags?, regionTags?, **themeTags?[]**, whyItMatters, keyTakeaways?, body?, readingTimeMin?, featured?, **related*Ids[]**
 
-**UseCase**: title, titleJa?, subtitle?, featuredRank?, maturityLevel, buyerReadiness, environment, requiredCapabilities[], **primaryDomain, secondaryDomains?**, industryTags[], taskTags[], atAGlance, overview, whyItMatters, capabilityNotes, environmentRequirements, whyHardToday, japanDeploymentConditions, **candidateRobots[]{robotId,fit,basis,evidenceDeploymentIds?,evidenceSourceUrls?,reason}**
+**UseCase**: title, titleJa?, subtitle?, featuredRank?, maturityLevel, buyerReadiness, environment, requiredCapabilities[], **primaryDomain, secondaryDomains?**, industryTags[], taskTags[], atAGlance, overview, whyItMatters, capabilityNotes, environmentRequirements, whyHardToday, japanDeploymentConditions, **candidateRobots[]{robotId? | seriesId?, fit, basis, evidenceDeploymentIds?, evidenceSourceUrls?, reason}**★
 
 **Deployment**: **manufacturerId, robotId?**, customer, siteName?, country, location, status, startedAt?
+
+---
+
+## 11.4. ファイル分割方針（★2026-08-08 追加）
+
+1コレクション = 1ファイルの巨大配列をやめる。**編集する人が開くファイルを小さく保つ**ことが目的で、
+実行時の性能ではない（`lib/data/localContentSnapshot.ts` が結合するので読み込み側は変わらない）。
+
+### 現状（2026-08-08 実測）
+
+| ファイル | 行数 | 件数 | 1件あたり |
+|---|---|---|---|
+| `data/robots.ts` | 5,039 | 63 | 約80行 |
+| `data/useCases.ts` | 2,980 | 44 | 約68行 |
+| `data/articles.ts` | 2,732 | 34 | 約80行 |
+| `data/manufacturers.ts` | 1,946 | 26 | 約75行 |
+| `data/deployments.ts` | 332 | 11 | 約30行 |
+
+`robots` は177機になるため**約15,800行**になる。分割しないと編集も差分レビューも成立しない。
+
+### 分割の基準
+
+**「一緒に変更されるものを同じファイルに置く」**（changes-together / lives-together）。
+行数だけを基準にしない。
+
+| コレクション | 分割単位 | 理由 |
+|---|---|---|
+| `robots` | **メーカー別** `data/robots/<manufacturer-id>.ts` | 1メーカーの機体は同じ出典・同じ調査回で一緒に更新される。最大は Unitree 19機・Leju 18機 |
+| `robotSeries` | 単一ファイル `data/robotSeries.ts` | 28件・スペックを持たないため小さい |
+| `distributors` | 単一ファイル `data/distributors.ts` | 10件未満 |
+| `manufacturers` | 単一ファイル | 59社・約4,400行。分割は後で判断する |
+| `articles` | **記事種別 × 年** `data/articles/<type>/<slug>.ts` | 記事は1本ずつ書かれ、あとから触らない。既に `manufacturer-guide/` で1本1ファイルの前例がある |
+| `useCases` | **1件1ファイル** `data/useCases/<slug>.ts` | 1件68行と大きく、`candidateRobots` の更新が個別に発生する |
+| `deployments` | 単一ファイル | 41件・小さい |
+
+### 前例と制約
+
+- `data/articles.ts` は既に `data/articles/manufacturer-guide/*.ts` を3本 import している。同じ形を広げる
+- `scripts/check-data-import-boundaries.mjs` の走査対象は `components` / `lib` / `scripts` / `src` / `tests` で `data/` を含まないため、`data/` 内の相互 import は抵触しない
+- **分割は値の変更と混ぜない。** 分割前後で件数と `id` ソート後の sha256 が一致することを機械確認する
+  （長さ比較では並び替えもレコード取り違えも検出できない）
+
+### CMS移行後
+
+Payload + PostgreSQL へ移ると、この分割は消える（レコードはDBの行になる）。
+つまりファイル分割は**移行までの数か月を運用可能にするための措置**であり、
+恒久的なアーキテクチャではない。**分割方針に凝りすぎない。**
+
+---
+
+## 11.45. 出典（`Source`）の持ち方（★2026-08-08 追加）
+
+現状、`Source` は各レコードに埋め込まれた配列で、**6コレクション合計581本**ある。
+同じ製品ページURLが複数のレコードに別々にコピーされている。
+
+**当面は埋め込みのまま維持する。** 理由:
+
+- 出典は「そのレコードがいつ・何を根拠に書かれたか」を示すもので、`checkedAt` と
+  `reliability` はレコードごとに意味が違う。共有すると更新の意味が壊れる
+- `fieldEvidence`（455項目）は「どのスペックがどのURLに基づくか」をレコード内で解決している。
+  外部化すると2段参照になる
+
+**独立コレクション化を検討する条件**: 同一URLの重複が3桁に達し、URLの死活確認
+（`npm run check:source-links`）が重複ぶんだけ無駄に走るようになったとき。
+177機投入後に `check:source-links` の対象URL数を実測して判断する。
+
+---
+
+## 11.46. `articles` に形の違うものが2種類入っている（★2026-08-08 追加）
+
+記事34件のうち3件が `type: 'manufacturer-guide'` で、**これだけ構造化された本文**を持つ
+（`ManufacturerGuideContent`: 導入事例リスト・調達チャネル・ラインアップ表・FAQ・動画）。
+残る31件は `body` の文章。同じ `Article` という入れ物に形の違うものが同居している。
+
+**当面は分離しない。** 型は既に `StandardArticle | ManufacturerGuideArticle` の判別可能
+ユニオンになっており、型レベルでは区別できている。3件しかないうちにコレクションを分けると、
+`articlePlacements` や記事一覧の棚（`lib/articleShelves.ts`）の分岐が増えるだけで得がない。
+
+**分離を検討する条件**: `manufacturer-guide` が10件を超えるか、
+`ManufacturerGuideContent` に `robots` / `deployments` への構造化参照が増えて
+「記事」ではなく「メーカーの派生ビュー」になったとき。後者なら
+`manufacturers` の一部として持つほうが自然になる。
 
 ---
 
