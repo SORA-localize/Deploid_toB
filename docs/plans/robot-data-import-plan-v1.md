@@ -7,7 +7,7 @@ updated: 2026-08-08
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Google Sheets のHTML書き出しを原本として、Payload + PostgreSQL へ 177機のロボット・59社のメーカー・28シリーズ・導入事例を投入する。
+**Goal:** Google Sheets のHTML書き出しを原本として、Payload + PostgreSQL へ 177機のロボット・59社のメーカー・29シリーズ・導入事例を投入する。
 
 **Architecture:** 原本HTML → 正規化JSON（`data/import/*.json`、実装済み）→ Payload Local API。TSファイル（`data/*.ts`）を経由しない。既存63件は移行計画が Payload へ移し終えている前提で、その上に差分を当てる。
 
@@ -77,12 +77,15 @@ Expected: `Manufacturers` / `Robots` / `RobotSeries` / `Distributors` / `UseCase
 - [ ] **G-3: 既存データが Payload に入り、parity が取れている**
 
 ```bash
-shasum -a 256 docs/reference/cutover-baseline-snapshot.json
-npm run content:compare -- --baseline docs/reference/cutover-baseline-snapshot.json
+cat docs/reference/cutover-baseline-manifest.json  # artifactUrl と sha256 を確認
+npm run content:compare -- --baseline-manifest docs/reference/cutover-baseline-manifest.json
 ```
 Expected: 件数・ID集合・参照・公開状態が一致。robots 63 / manufacturers 26 / useCases 44 / articles 34 / deployments 11。
 
-**「local vs payload」ではなく「baseline vs payload」で比較する。** ①の Task 9 で
+**「local vs payload」ではなく「manifest が指す artifact vs payload」で比較する。**
+baseline 本体は object storage にあり、Git には manifest（URL・hash・件数）だけがある
+（①の Task 5 Step 7、`content-platform-and-database-architecture-v2.md` §2.1
+「Gitへ同じレコードを二重保存しない」に従う）。①の Task 9 で
 local TS を撤去すると比較元が消えるため、Task 5 Step 7 で固定した署名付き snapshot を使う。
 
 - [ ] **G-4: 削除済みフィールドが `collections/Robots.ts` に無い**
@@ -105,7 +108,10 @@ Expected: exit 0。**e2e の flaky 件数まで読む。** retries や verify=SU
 
 - [ ] **G-6: 本番と検証でDBが分かれている**
 
-Preview デプロイと本番が同じDBを見ていないことを確認する。Git はブランチで分かれるが**DBは分かれない**ため、Preview の編集が本番に出る事故が起きうる。
+`docs/reference/content-platform-resources-v1.md`（①の Task 0 が作る）に記録された
+Preview と Production の fingerprint（host / project ref / database名）を見比べ、
+**host_addr か project ref のどちらかが必ず異なる**ことを確認する。`current_database()`
+だけの一致確認では不十分（別providerで標準DB名が一致することがある）。
 
 - [ ] **G-7: 復旧手順が動く**
 
@@ -181,20 +187,23 @@ Google Sheets の取り消し線は、HTML書き出しでは `text-decoration:li
 | | robots | manufacturers | robotSeries |
 |---|---|---|---|
 | ①完了時 | 63 | 26 | 0 |
-| **Series へ移管**（Task 3） | **−6** | — | **+6** |
+| **Series へ移管**（Task 3〜9.5） | **−7** | — | **+7** |
 | Series 新規作成（Task 3） | — | — | +22 |
 | `apptronik-apollo-2` の分割（Task 7） | +1 | — | — |
 | 新規追加（Task 9） | +134 | +33 | — |
-| **本計画の完了時** | **192** | **59** | **28** |
+| **本計画の完了時** | **191** | **59** | **29** |
 
-**移管分を引き忘れない。** `63 + 134 + 1 = 198` は誤り。`63 − 6 + 1 + 134 = 192`。
+**移管分を引き忘れない。** `63 + 134 + 1 = 198` は誤り。`63 − 7 + 1 + 134 = 191`。
 
-**移管は6件で、レポートが出す「親レコード7件」とは別物。** レポートの7件には
-`ubtech-walker-tienkung` が含まれるが、これは A群（ファミリ名が機種として存在しない）に
-該当しない。逆に A群の `R1` は Galaxea Dynamics のファミリで、Unitree の
-`unitree-r1-standard` とは無関係（ファミリ名だけで突き合わせると誤マッチする）。
-**`npm run report:robot-db-diff` の「シリーズ manifest」節が正本**で、メーカー名で限定して
-移管元を確定させる。
+**移管は7件で、レポートが出す「親レコード7件」と一致する。** 当初 `ubtech-walker-tienkung`
+がA群の手動リストから漏れていた。ファミリ名の接頭辞抽出（`Walker Tienkung TK2301` のような
+末尾が既知の語＝EDU/Basic/Standard等でない構成名）は自動グルーピングに失敗するため、
+単独の走査では検出できない。**`npm run report:robot-db-diff` の「シリーズ manifest」節が
+正本**で、[メーカー, ファミリ] を手動で列挙し、現行の親レコード検出（前方一致）と
+突き合わせて確定させる（19項目すべて `✓` になることを確認済み）。
+
+A群の `R1` は **Galaxea Dynamics** のファミリで、Unitree の `unitree-r1-standard`
+（B群、家名が変わる別ファミリ）とは無関係。ファミリ名だけで突き合わせると誤マッチする。
 
 **177 は原本の行数であって最終レコード件数ではない。57 は代理店シートの行数であってメーカー件数ではない。** 混同しない。
 
@@ -203,10 +212,14 @@ Google Sheets の取り消し線は、HTML書き出しでは `text-decoration:li
 ```
 現行 published            57
  −1  onex-eve を archived（DEC-S02）
- −6  Series へ移管（Task 3。6件すべて published。移管後は robots ではなくなる）
+ −7  Series へ移管（Task 3。7件すべて published。移管後は robots ではなくなる）
 ────
-     50 件
+     49 件
 ```
+
+**Task 7 の Apollo 2 分割後も49件のまま。** Global Constraints「新規レコードは draft」に
+従い、新規 `id` の Wheeled 側は draft で作る。既存 `id` を継承する Biped 側は published を
+維持する。件数が動くのは Wheeled が昇格したときだけ。
 
 **Series 自体の公開状態は別途決める**（新規finding 10。Task 3 と Task 4 の間にゲートが要る）。
 以降、値を確認したものから昇格する。
@@ -340,11 +353,11 @@ Robot:       seriesId?: Id を追加。構成が割れるファミリのみ設�
 
 `seriesId` を任意にするのは、1構成しかない106機にまでシリーズを作ると 1:1 レコードが106件増え、そのすべてが公開ゲート（`sources` 必須・G2）の対象になるため。
 
-**対象28件は性質が2つに分かれる。**
+**対象29件は性質が2つに分かれる。**
 
 | | 件数 | 内容 | 目的 |
 |---|---|---|---|
-| **A** | 14 | ファミリ名が機種として存在しない（`T1` `K1` `T800` `PM01` `G1-D` `A2` `H2-D` `T2` `4NE1` `KUAVO 4PRO` `KUAVO 5` `Oli` `Bumi` `R1`(LimX)） | **正しさ。** いま useCase が誤表示になる |
+| **A** | 15 | ファミリ名が機種として存在しない（`T1` `K1` `T2` `T800` `PM01` `G1-D` `H2-D` `Walker Tienkung` `A2` `4NE1` `KUAVO 4PRO` `KUAVO 5` `Oli` `Bumi` `R1`(Galaxea Dynamics)） | **正しさ。** いま useCase・article が誤表示になる |
 | **B** | 14 | ファミリ名が機種としても存在する（`G1` `H2` `R1`(Unitree) `Apollo 2` `X2` `Walker S` `GR-3C` `KUAVO 5-W` `TIAGo` `DR02` `Z1` `N2` `E1` `HMND 01 ALPHA`） | **将来のUI。** 参照は今も正しく表示される |
 
 **B は正しさの問題ではない。** 3段カスケード（§11）の下地として先に置く。
@@ -489,7 +502,7 @@ Expected: `robots.json` 197件 / `manufacturers.json` 57件 / `deployments.json`
 
 1. repository の非同期 query への書き換え（`await` 化、接続失敗時の扱い）
 2. **期待値を Task ごとの manifest へ移す。** 現在の18項目は着手前 baseline を固定値で
-   持っており、Task 3（移管6件）と Task 7（分割1件）で**自ら失敗する**
+   持っており、Task 3（移管7件）と Task 7（分割1件）で**自ら失敗する**
 3. fixture 注入（テストから Payload を立てずに走らせる経路）
 4. 出力契約の更新
 
@@ -547,62 +560,65 @@ Apollo 2 分割（Task 7）で件数が動くため、**各 Task 後の期待状
 
 ---
 
-### Task 3: シリーズ28件を作る（DEC-S08）
+### Task 3: シリーズ29件を作る（DEC-S08）
 
 **Files:**
-- Create: 28件の `robotSeries` レコード
+- Create: 29件の `robotSeries` レコード
 - Modify: `collections/RobotSeries.ts`（validation）
 
 - [ ] **Step 1: レポートにシリーズ候補の検出を足す**
 
-構成が2件以上のファミリを A / B に分けて出す。**28件を手で書き写さない。** ファミリ推定は接頭辞処理なので、出力を人が確認して確定する。
+構成が2件以上のファミリを A / B に分けて出す。**29件を手で書き写さない。** ファミリ推定は接頭辞処理だけでは失敗する（`Walker Tienkung` の実例）ため、`npm run report:robot-db-diff` の manifest を正本とする。
 
 - [ ] **Step 2: 失敗するテストを書く → validation を実装**
 
 `seriesId` が `robotSeries` の実在レコードを指すこと / `slug` が `robots` と横断で一意であること / シリーズが `priceOffers` を持たないこと。**「構成を1件以上持つ」は Task 9 まで warning**（この時点では variant が未投入のため）。
 
-- [ ] **Step 3: 28件を作る**
+- [ ] **Step 3: 29件を作る**
 
-**内訳は 28 = A群14 + B群14。** A群のうち既存の Robot レコードがあるのは一部だけで、
-残りは新規作成になる。**「移管7 + 新規14 = 21」では7件足りない。**
+**内訳は 29 = A群15 + B群14。**
 
 | | 件数 | 扱い |
 |---|---|---|
-| A群のうち既存 Robot がある | 7 | **移管。** `id` と `slug` を引き継ぐ（URL が動かない） |
-| A群のうち既存 Robot が無い | 7 | 新規作成（構成がすべて新規追加分のため） |
-| B群 | 14 | 新規作成。ファミリ名が機種と衝突するため `unitree-g1-series` のような slug を新設 |
+| A群のうち既存 Robot がある（移管） | 7 | `id` と `slug` を引き継ぐ（URL が動かない） |
+| A群のうち既存 Robot が無い（新規） | 8 | 構成がすべて新規追加分のため |
+| B群（新規） | 14 | ファミリ名が機種と衝突するため `unitree-g1-series` のような slug を新設 |
 
-**A群14件の一覧と、レポートが出す「親レコード7件」は一致しない。** レポートの7件には
-`ubtech-walker-tienkung` が含まれるが、DEC-S08 の A群一覧には `Walker Tienkung` が無い。
-ファミリ推定（接頭辞処理）と親レコード検出（孤立レコードとの突合）が別の走査だったため。
-**Step 1 の manifest で両者を突き合わせ、28件を確定させる。**
+**`npm run report:robot-db-diff` の「シリーズ manifest」節が29件すべてを機械照合する
+（A群移管7・A群新規8・B群14・参照20件・完了時191件）。手で書き写さない。**
 
 公開ゲートは Manufacturer と同じ水準（`id` / `slug` / `name` / `manufacturerId` / `summary` / `sources` 非空）。`sources` はメーカーのシリーズ製品ページ。
 
-- [ ] **Step 4: 既存 Robot に `seriesId` を付ける**
+**移管7件は `robotSeries` 側に新しいレコードを作るだけで、元の `Robot` レコードはまだ消さない。**
+`id` / `slug` の引き継ぎ（同じ値を `robotSeries` 側にも設定する）は行うが、実際に
+`robots` から取り除くのは Task 9.5（variant 投入後）。**理由は §4 のとおり — variant が
+0件の状態で published な Series を晒さない。**
 
-- [ ] **Step 5: 移管対象を指す16件の参照を移行する**
+- [ ] **Step 4: 既存の姉妹 variant に `seriesId` を付ける**
 
-`npm run report:robot-db-diff` の「移管対象IDを指す参照」節が一覧を出す。
-**Robot を消す前に、16件すべての移行先を決める。**
+移管7件のうち、既に `robots` に存在する姉妹構成（例: `agibot-a2-ultra` は `A2` の姉妹）へ
+`seriesId` を設定する。**移管対象そのもの（`agibot-a2` 等）にはまだ設定しない**
+（Task 9.5 でまとめて処理する。二重管理を避ける）。
+
+- [ ] **Step 5: 参照移行の対象を確定する（実行は Task 9.5）**
+
+`npm run report:robot-db-diff` の「移管対象IDを指す参照」節が一覧を出す。**この時点では
+移行しない。** Task 9.5 が variant 投入後にまとめて行う。ここでは対象を確定して記録するだけ。
 
 | 参照元 | 件数 | 移行先 |
 |---|---|---|
-| `useCase.candidateRobots[].robotId` | 12 | `seriesId` へ（Task 4。根拠URLはシリーズ製品ページのまま） |
-| `article.relatedRobotIds` | 4 | **要判断** — Article がシリーズを参照できるようにするか、具体的な variant へ付け替えるか |
-
-Article 4件は `china-humanoid-duopoly-agibot-june2026` / `china-humanoid-demand-gap-june2026` /
-`humanoids-summit-tokyo-may2026` / `agibot-manufacturer-guide`。
-**メーカー解説の `lineup` にも `agibot-a2` があるため、そこも確認する。**
+| `useCase.candidateRobots[].robotId` | 14 | `seriesId` へ（根拠URLはシリーズ製品ページのまま） |
+| `article.relatedRobotIds` | 5 | `seriesId` へ |
+| `article.manufacturerGuideContent.lineup[].robotId` | 1 | `seriesId` へ（`agibot-manufacturer-guide`） |
 
 ```bash
 npm run report:robot-db-diff
 ```
-Expected: 「移管対象IDを指す参照」が16件。**移行後に0件になることを Task 4 の完了条件で確認する。**
+Expected: 「移管IDを指す参照」が20件。**Task 9.5 の完了条件で0件になることを確認する。**
 
 - [ ] **Step 6: ゲートが赤くなることを確認 → コミット**
 
-**完了条件:** `robotSeries` が28件、検証が error 0、意図的な違反で exit 1。
+**完了条件:** `robotSeries` が29件（すべて `draft`）、検証が error 0、意図的な違反で exit 1。
 
 ---
 
@@ -612,17 +628,21 @@ Expected: 「移管対象IDを指す参照」が16件。**移行後に0件にな
 - Modify: `data/robotSeries.ts`（または Payload 上のレコード）
 - Test: `tests/content/series-publish-gate.test.ts`
 
-**Global Constraints は「新規レコードは draft」としているが、Task 4 は published な useCase から
-シリーズを参照させる。** draft のままだと公開ページで解決できず、published にするなら
-人間の承認と公開ゲートが要る。**Task 4 の前に決める。**
+**Global Constraints は「新規レコードは draft」としている。29件すべてこれに従う。**
+`useCase` の参照切り替えは Task 9.5（variant が実在してから）まで行わない。**variant が
+0件の Series を published にして公開ページへ晒す期間を作らない。**
 
-- [ ] **Step 1: 28件の公開状態を決める**
+**cutover の順序はこれで固定する**（新規finding「Series移管後の件数と参照移行」への対応）。
 
-| 由来 | 件数 | 初期状態 |
-|---|---|---|
-| 既存 Robot から移管（すべて現在 published） | 6 | **published**。既に公開されていた実体なので状態を引き継ぐ |
-| A群の新規作成 | 8 | **draft**。構成が Task 9 まで入らないため |
-| B群の新規作成 | 14 | **draft**。同上 |
+```
+Series を draft で作成（Task 3）
+  → variant 投入（Task 9）
+  → 参照移行（Task 9.5）
+  → 親 Robot 削除（Task 9.5）
+  → 移管7件の Series を published（Task 9.5）
+```
+
+- [ ] **Step 1: 29件とも `publishStatus: 'draft'` で作成したことを確認する**
 
 - [ ] **Step 2: published な useCase が draft な Series を参照しないゲートを足す**
 
@@ -641,45 +661,52 @@ it('published な useCase は draft の series を候補にできない', () => 
 
 - [ ] **Step 3: ゲートが赤くなることを確認 → コミット**
 
-**完了条件:** 28件の公開状態が決まり、published な useCase から draft な Series を
+**完了条件:** 29件の公開状態が決まり、published な useCase から draft な Series を
 参照すると exit 1 になることを確認済み。
 
 ---
 
-### Task 4: シリーズの表示と useCase 参照の切り替え（DEC-S08）
+### Task 4: シリーズの表示を実装する（DEC-S08。UIのみ）
+
+**この Task は表示だけを作る。useCase の参照切り替えと親 Robot の削除は Task 9.5 で行う**
+（§4 の cutover 順序）。29件は全件 draft なので、ここで作る画面は「動くが、まだ誰にも
+見えていない」状態のまま Task 9.5 まで置かれる。
 
 **Files:**
 - Modify: `src/app/robots/[slug]/page.tsx`, `src/app/sitemap.ts`, `lib/searchIndex.ts`, `lib/uiText.ts`
 - Create: `components/SeriesVariantList.tsx`
-- Modify: `collections/UseCases.ts`（`seriesId` 排他 validation）
+- Modify: `collections/UseCases.ts`（`seriesId` 排他 validation。**受け付けるだけで、まだ使わない**）
 - Test: `tests/unit/components/series-variant-list.test.tsx`
 
 - [ ] **Step 1: 失敗するテストを書く → `SeriesVariantList` を実装 → PASS**
 
-構成を名前つきで並べる。構成が空なら何も描画しない。
+構成を名前つきで並べる。構成が空なら何も描画しない（draft の間はこの空状態が正しい表示）。
 
 - [ ] **Step 2: `/robots/[slug]` に series 分岐を足す**
 
 `generateStaticParams` にシリーズの slug を加える。series では `archivedNotice` を出さず構成一覧を出す。Robot 側には所属シリーズへの導線。文言は `lib/uiText.ts` に置く。
 
-- [ ] **Step 3: useCase の候補14件を `seriesId` へ付け替える**
+**draft の series は `generateStaticParams` に含めるが、通常ルートでは 404 にする**
+（他の draft レコードと同じ扱い。preview 経路でのみ見える）。
 
-根拠URLは変更しない（もともとシリーズ製品ページを指している）。
+- [ ] **Step 3: sitemap と検索の対応を作る（draft は載せない）**
 
-- [ ] **Step 4: sitemap と検索にシリーズを載せる**
+sitemap・検索とも published のみを対象にする既存ルールに従う。29件は draft なので
+**この時点では何も追加されない。** Task 9.5 で7件が published になったときに反映される
+ことをテストで確認する。
 
-- [ ] **Step 5: 検証と手動確認**
+- [ ] **Step 4: 検証と手動確認**
 
 ```bash
 npm run check
 ```
 
-`/robots` のカード数は **50件**（published 57 − onex-eve 1 − Series へ移管 7 − ... §3.1 の49に Task 7 の分割分を考慮）。**「57のまま」ではない。**実際の数は §3.1 の計算と一致することを確認する。シリーズは一覧に出ない。`/use-cases/research-development` の候補に「T1（提供終了）」が出ないこと。390px で崩れないこと。
+`/robots` のカード数は §3.1 のとおり変化しない（Robot 側はまだ何も変わっていない）。
+390px で崩れないこと。
 
 **ビジュアル回帰のベースライン再生成が要る。** スナップショットは24枚あり、ファイル名に OS 名が入る（`-darwin` / `-linux`）。macOS では linux 分を生成できないため `.github/workflows/update-visual-baselines.yml` を手動実行する。**このジョブの push は CI を起動しない**ので、`gh workflow run ci.yml --ref <branch>` を別途叩く。
 
-**完了条件:** シリーズの詳細が構成一覧を出し、useCase の候補が「提供終了」表示にならない。
-**`npm run report:robot-db-diff` の「移管対象IDを指す参照」が0件になる。**`/robots` のカード数が §3.1 の計算と一致する。
+**完了条件:** series の詳細ページと `SeriesVariantList` が動く（draft なので通常ルートでは404、preview では見える）。`useCase` / `robots` のデータはまだ何も変更していない。
 
 ---
 
@@ -742,6 +769,9 @@ Task 1 のレポートで差分が出た値のみ。`specSchema` に無い列（
 
 **波及範囲（実測）**: `useCases` の `candidateRobots[].robotId` から**7箇所**、`apptronik-apollo` の `supersededById` から1箇所。既存 `id` を Biped が継承するので**7箇所はそのまま Biped を指す。付け替えはしない**（§11）。
 
+**Wheeled 側は Global Constraints どおり `publishStatus: 'draft'` で作る。** 新規 `id` なので
+draft 開始が原則で、Biped と同じ published にする理由はない。
+
 - [ ] **Step 4: 検証 → コミット**
 
 **完了条件:** 名称3件・archived 1件・分割1件が反映され、参照切れなし。
@@ -803,6 +833,9 @@ Expected: `deploymentStage` 列が正規化JSONに入る。
 **「入力JSONの `id` を `stableId` で検索し、あれば update、無ければ create」**になる。
 
 - 疎なJSON（一部フィールドしか持たない）で update するとき、**既存フィールドを消さない**
+- 正規化JSONの `urls: string[]`（1セル複数URL、代理店シートで51/57行が該当）は、
+  Payload の `sources[]`（`title` / `url` / `checkedAt` / `reliability` の配列）へ
+  **全件**変換する。後方互換の `url`（先頭1本）だけを見て残りを捨てない
 - メーカー単位で transaction を張る（Step 3）
 - `--dry-run` で作成/更新される件数だけ出せる
 - 部分失敗したとき、どこまで進んだかが分かる
@@ -818,10 +851,20 @@ Expected: `deploymentStage` 列が正規化JSONに入る。
 各 run について次を artifact として残し、Git へ commit する。
 
 ```
-run ID / 対象メーカー / 作成した stableId 一覧 / 更新した stableId 一覧 / before・after の件数
+run ID / 対象メーカー / 作成した stableId 一覧
+/ 更新した stableId 一覧とその before-image（更新前の全フィールド値）
+/ before・after の件数
 ```
 
-**戻すときはこの artifact から inverse operation を組む。**Git revert では戻らない。
+**update した stableId は before-image を必ず残す。** create した分は「無かった」状態が
+inverse なので不要だが、update は before-image が無いと戻せない。
+
+**強制的に途中失敗させて全体がロールバックすることをテストする。** 134件中の
+どこか（例: 100件目）で意図的に失敗させ、それまでに投入した分がトランザクション境界内で
+巻き戻ることを確認する。
+
+**戻すときはこの artifact から inverse operation を組む。**create は delete、update は
+before-image への再 update。Git revert では戻らない（Payload へ書いたデータは Git 差分ではない）。
 
 - [ ] **Step 4: Task 3 の warning を error へ上げる**
 
@@ -844,7 +887,69 @@ published 件数とバイト数を対で記録し、**1件あたりのバイト�
 
 投入後の選択ツリーは **59社 + published な Robot 件数**になる。現在は約83行。**177 は原本の行数であって Payload のレコード数ではない**ので、実測して記録する。実測して記録し、**メーカー → シリーズ → 機種 の3段カスケードを別計画として起票する**。
 
-**完了条件:** `robots` が **192件**、`robotSeries` が28件、`npm run check` が全緑（§3.1）。
+**完了条件:** `robots` が **198件**（63 + 134 + Apollo分割1。移管7件はまだ Task 9.5 まで
+`robots` に残る）、`robotSeries` の全件が variant を1件以上持つ、`npm run check` が全緑。
+
+---
+
+### Task 9.5: シリーズを cutover する（DEC-S08。§4 の順序の最終段）
+
+**Files:**
+- Modify: `data/robotSeries.ts`（7件を published に）
+- Modify: `data/useCases.ts`（14箇所）、`data/articles.ts`（5箇所。`relatedRobotIds` 4 + `manufacturerGuideContent.lineup` 1）
+- Modify: `data/robots.ts`（移管7件を削除）
+
+**Interfaces:**
+- Consumes: Task 9 で投入された variant（`seriesId` 設定済み）
+
+**Task 9 で variant が実在するようになった後に、まとめて行う。** 分けて実行すると
+「published な Series が空」または「Robot と Series が同じ id/slug で衝突する」状態が生まれる。
+
+- [ ] **Step 1: 参照20件を `seriesId` へ移行する**
+
+```bash
+npm run report:robot-db-diff
+```
+Expected: 「移管IDを指す参照」が20件のまま（まだ移行前）。
+
+`useCase.candidateRobots[].robotId` 14箇所、`article.relatedRobotIds` 5箇所、
+`article.manufacturerGuideContent.lineup[].robotId` 1箇所（`agibot-manufacturer-guide`）を
+`seriesId` へ書き換える。根拠URL・`roleLabel` は変更しない（もともとシリーズ製品ページを指している）。
+
+- [ ] **Step 2: 移管7件の Robot レコードを削除する**
+
+`id` / `slug` は既に `robotSeries` 側が引き継いでいる（Task 3）。**同じ `id` を `robots` と
+`robotSeries` の両方に残さない** — Payload では collection が違えば technically 衝突しないが、
+`/robots/[slug]` のルーティングは1つの実体にしか解決できない。
+
+- [ ] **Step 3: 移管7件の Series を `published` にする**
+
+variant が実在し、参照も移行済みなので、ここで初めて公開する。
+
+- [ ] **Step 4: 検証**
+
+```bash
+npm run report:robot-db-diff
+```
+Expected: 「移管IDを指す参照」が **0件**。`robots` が191件、`robotSeries` が29件
+（うち published 7）。
+
+```bash
+npm run check
+```
+
+- [ ] **Step 5: 手動確認**
+
+`/use-cases/research-development` の候補に「T1（提供終了）」が出ないこと。
+`/robots/booster-t1` が構成一覧を表示すること。`/robots` のカード数が §3.1 と一致すること。
+
+- [ ] **Step 6: コミット**
+
+```bash
+git commit -am "feat(data): シリーズ7件を cutover（参照移行・親Robot削除・公開）"
+```
+
+**完了条件:** 「移管IDを指す参照」が0件。`robots` 191件・`robotSeries` 29件（published 7・draft 22）。
 
 ---
 
@@ -875,19 +980,24 @@ npm run check:source-links
    ↓
 Task 1（再パース・突合先切替）
    ↓
-Task 2 ─→ Task 3 ─→ Task 4        スキーマとシリーズ
-   │                   ↓
-   └─→ Task 5（UI・独立）          注記表示
+Task 2 ─→ Task 3 ─→ Task 3.5 ─→ Task 4    シリーズ（データ→公開状態→UI）
+   │
+   └─→ Task 5（UI・独立）                  注記表示
    ↓
-Task 6 ─→ Task 7                  既存データの更新
+Task 6 ─→ Task 7                          既存データの更新
    ↓
 Task 8（deployments / manufacturers・独立）
    ↓
-Task 9（§5 完了が前提）─→ Task 10
+Task 9（§5 完了が前提）─→ Task 9.5 ─→ Task 10
 ```
 
-- **Task 3 → 4 の順**。データを入れてから表示を切り替える
+- **Task 3 → 3.5 → 4 の順**。データを作り、公開状態を決めてから、表示を作る
+- **Task 4 は useCase の参照を切り替えない。** それは Task 9.5 の仕事（§4 の cutover 順序）。
+  variant が0件のまま Series を published にしないため、切り替えを investment 投入後まで遅らせる
 - **Task 3 の「シリーズは構成を1件以上」は Task 9 まで warning**。Task 3 時点では variant が0件のため、error にすると自分自身が落ちる
+- **Task 9.5 は Task 9 の直後、Task 10（回帰監査）の前**。variant が実在してから参照を移し、
+  親 Robot を消し、Series を公開する。この3つを分割実行すると
+  「published な Series が空」または「同じ id/slug が2箇所に存在する」状態が生まれる
 - **Task 8 は Task 9 より先**。新規134件の `manufacturerId` が参照整合性チェック（G5）に引っかかる
 - **Task 5 は独立**。UIのみで他のデータ変更に依存しない
 
@@ -944,7 +1054,7 @@ npm run content:compare               # §0 G-3（①が作る）
 ## 11. この計画がやらないこと
 
 - **`distributors` コレクションの実装。** 設計は `data-architecture-redesign-v1.md` §4-1 / §11 で確定済み。グローバルナビのタブとUI仕様が固まってから着手する（人間の意向、2026-08-08）。**ただし Task 8 で代理店シートを取り込むときは、後で移せる形で保持する**
-- **全機種へのシリーズ定義と3段カスケードUI。** 本計画で入れるのは `RobotSeries` 型と28シリーズだけ。**Task 9 Step 7 で起票する**
+- **全機種へのシリーズ定義と3段カスケードUI。** 本計画で入れるのは `RobotSeries` 型と29シリーズだけ。**Task 9 Step 7 で起票する**
 - **`draft` → `published` の昇格**（最大134件）。本計画はレコードを投入するところまで。**昇格しない限り `/robots` のカードは今より減る**（§3.1）。昇格基準と担当は別途決める
 - **`japanAvailability` の個別判断49機。** DEC-S03 の「入手可能 / 列挙あり」セルは一致率41%のため自動確定しない
 - **`useCases` の候補ロボットの付け替え。** `apptronik-apollo-2` の7箇所は Biped を指したまま残る

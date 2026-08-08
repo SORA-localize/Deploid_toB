@@ -131,6 +131,11 @@ section('シリーズ manifest（DEC-S08。移管元と参照を確定させる�
 
 // ファミリ名だけでは一意に決まらない。'R1' は Unitree と Galaxea の両方に存在し、
 // メーカーを付けないと unitree-r1-standard へ誤マッチする。必ず [maker, family] で持つ。
+// 「ファミリ名が機種として存在しない」の網羅は、接頭辞strip（fam()）による自動グルーピングと、
+// 現行orphanとの前方一致検出の**両方**を突き合わせて確定した（2026-08-09）。
+// 前者は末尾が既知の語（EDU/Basic/Standard等）でない構成名（例: Walker Tienkung TK2301）を
+// 別ファミリと誤認するため、単独では信頼できない。Walker Tienkung はこの理由で最初の
+// 手動リストから漏れていた実例。
 const SERIES_FAMILIES_A = [
   ['Booster Robotics', 'T1'],
   ['Booster Robotics', 'K1'],
@@ -139,6 +144,7 @@ const SERIES_FAMILIES_A = [
   ['EngineAI', 'PM01'],
   ['Unitree Robotics', 'G1-D'],
   ['Unitree Robotics', 'H2-D'],
+  ['UBTECH Robotics', 'Walker Tienkung'],
   ['AgiBot', 'A2'],
   ['NEURA Robotics', '4NE1'],
   ['Leju Robotics', 'KUAVO 4PRO'],
@@ -149,6 +155,7 @@ const SERIES_FAMILIES_A = [
 ];
 
 const seriesRows = [];
+const seriesRowsB = [];
 for (const [maker, family] of SERIES_FAMILIES_A) {
   const variants = live.filter(
     (row) =>
@@ -167,12 +174,44 @@ for (const [maker, family] of SERIES_FAMILIES_A) {
 }
 
 const transferable = seriesRows.filter((row) => row.existing);
+// B群: ファミリ名が機種としても存在する。参照は既に正しく表示されるため移管しない。
+// 3段カスケードUI（別計画）の下地として series レコードだけ作る。
+const SERIES_FAMILIES_B = [
+  ['Unitree Robotics', 'G1'],
+  ['Unitree Robotics', 'H2'],
+  ['Unitree Robotics', 'R1'],
+  ['Apptronik', 'Apollo 2'],
+  ['AgiBot', 'X2'],
+  ['UBTECH Robotics', 'Walker S'],
+  ['Fourier Intelligence', 'GR-3C'],
+  ['Leju Robotics', 'KUAVO 5-W'],
+  ['PAL Robotics', 'TIAGo'],
+  ['Deep Robotics', 'DR02'],
+  ['MagicLab', 'Z1'],
+  ['Noetix Robotics', 'N2'],
+  ['Noetix Robotics', 'E1'],
+  ['Humanoid', 'HMND 01 ALPHA'],
+];
+
+for (const [maker, family] of SERIES_FAMILIES_B) {
+  const variants = live.filter(
+    (row) =>
+      row.maker === maker &&
+      normalize(row.model).startsWith(normalize(family)) &&
+      normalize(row.model) !== normalize(family),
+  );
+  seriesRowsB.push({ family, maker, variants: variants.length });
+}
+
 for (const row of seriesRows) {
   const from = row.existing ? `移管 ← ${row.existing.id}（${row.existing.publishStatus}）` : '新規作成';
-  console.log(`  [A] ${row.maker.padEnd(20)} ${row.family.padEnd(12)} ${String(row.variants).padStart(2)}構成  ${from}`);
+  console.log(`  [A] ${row.maker.padEnd(20)} ${row.family.padEnd(16)} ${String(row.variants).padStart(2)}構成  ${from}`);
+}
+for (const row of seriesRowsB) {
+  console.log(`  [B] ${row.maker.padEnd(20)} ${row.family.padEnd(16)} ${String(row.variants).padStart(2)}構成  新規作成（参照は移さない）`);
 }
 const transferableCount = transferable.length;
-console.log(`\n  A群 ${seriesRows.length} 件 / うち移管 ${transferable.length} 件 / 新規 ${seriesRows.length - transferable.length} 件`);
+console.log(`\n  A群 ${seriesRows.length} 件（移管 ${transferable.length} / 新規 ${seriesRows.length - transferable.length}） + B群 ${seriesRowsB.length} 件（すべて新規） = シリーズ計 ${seriesRows.length + seriesRowsB.length} 件`);
 
 // 移管対象を指している他コレクションの参照。ここが0にならないと Robot を消せない。
 const transferIds = new Set(transferable.map((row) => row.existing.id));
@@ -192,6 +231,13 @@ for (const robot of robots) {
     inbound.push(`robot ${robot.id}.supersededById -> ${robot.supersededById}`);
   }
 }
+// メーカー解説記事の ManufacturerGuideContent.lineup は relatedRobotIds とは別のフィールド。
+// article.relatedRobotIds の走査だけでは見えない（agibot-manufacturer-guide で実際に漏れていた）。
+for (const article of articles) {
+  for (const row of article.manufacturerGuideContent?.lineup ?? []) {
+    if (transferIds.has(row.robotId)) inbound.push(`article ${article.slug}.manufacturerGuideContent.lineup -> ${row.robotId}`);
+  }
+}
 
 const inboundCount = inbound.length;
 console.log(`\n  移管対象IDを指す参照: ${inbound.length} 件（すべて移行先を決めるまで Robot を消せない）`);
@@ -207,9 +253,9 @@ allOk = checkExpectation('一致した Deploid レコード', matchedIds.size, 4
 allOk = checkExpectation('追加', additions.length, 134) && allOk;
 allOk = checkExpectation('Deploid 側で一致しない', orphans.length, 21) && allOk;
 // 移管分を引く。63 + 134 + 1 = 198 は誤り（Series へ移る6件を数え落とす）。
-allOk = checkExpectation('A群のうち移管', transferableCount, 6) && allOk;
-allOk = checkExpectation('移管IDを指す参照', inboundCount, 16) && allOk;
-allOk = checkExpectation('完了時のレコード数', robots.length - transferableCount + 1 + additions.length, 192) && allOk;
+allOk = checkExpectation('A群のうち移管', transferableCount, 7) && allOk;
+allOk = checkExpectation('移管IDを指す参照', inboundCount, 20) && allOk;
+allOk = checkExpectation('完了時のレコード数', robots.length - transferableCount + 1 + additions.length, 191) && allOk;
 
 // 1レコードに複数行が当たる = variant 分割が要る（§3、apptronik-apollo-2 の Biped / Wheeled）
 const rowsPerRecord = new Map();
@@ -255,6 +301,7 @@ for (const { robot, variants } of parentsWithVariants) {
 }
 console.log('');
 allOk = checkExpectation('DEC-S08 の判断が要る親レコード', needsJudgement.length, 7) && allOk;
+allOk = checkExpectation('シリーズ計（A+B）', seriesRows.length + seriesRowsB.length, 29) && allOk;
 
 // DEC-S09: mobility は単一値なので、別カテゴリが1行に同居していると1つしか入らない。
 section('複合的な移動方式（DEC-S09。hybrid として入れる）');
