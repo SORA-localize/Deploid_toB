@@ -85,9 +85,10 @@ Task 5（parity）と Task 9（cutover）の要件を見直す余地がある。
 
 ---
 
-## 2026-08-08 外部監査の指摘（着手前に解決する）
+## 2026-08-08 外部監査の指摘（**反映済み**）
 
-突合結果（上記）に続き、外部監査で見つかった未解決項目。**これらを解決するまで Task 2 へ進まない。**
+突合結果（上記）に続き、外部監査で見つかった項目。**すべて本文へ反映済み。**
+以下は「何をどう直したか」の記録であり、未解決リストではない。
 
 ### M-1. Task 3 が10コレクションを作らない（Critical）
 
@@ -243,6 +244,68 @@ find / create / update / delete で、独立した publish capability は無い�
 
 ---
 
+### Task 0: 資源を確定して払い出す（人間の作業を含む）
+
+**Files:**
+- Create: `docs/reference/content-platform-resources-v1.md`（資源表）
+- Modify: `.env.example`
+
+**Interfaces:**
+- Produces: Postgres / object storage の provider 確定、環境別の接続情報、secret の管理者
+
+`content-platform-and-database-architecture-v2.md` §11 が「実装開始時に確定する」とした
+未確定5件を、ここで閉じる。**Task 2 の前に終わらせる。**
+
+- [ ] **Step 1: provider を確定する**
+
+| 項目 | 初期値 | 決めること |
+|---|---|---|
+| Postgres | Supabase | プラン、リージョン、接続プーリング方式 |
+| object storage | Vercel Blob | Payload storage adapter、bucket、CORS |
+| Payload の置き場 | 現行 Vercel へ同居 | Payload Cloud を使わない判断の確認 |
+
+- [ ] **Step 2: 環境ごとにDBを分ける（②の G-6 の前提）**
+
+**Git はブランチで分かれるが DB は分かれない。** Preview の編集が本番に出る事故を防ぐ。
+
+| 環境 | DB | 用途 |
+|---|---|---|
+| local | ローカル or 開発用 Supabase | 開発 |
+| CI | 使い捨て（毎回作り直す） | migration の空DB適用検証（Task 3.5 Step 2） |
+| Preview | 検証用 | ブランチデプロイ |
+| Production | 本番 | |
+
+- [ ] **Step 3: 環境変数を洗い出して `.env.example` へ書く**
+
+```dotenv
+DATABASE_URL=
+PAYLOAD_SECRET=
+PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
+CONTENT_SOURCE=local
+REVALIDATION_SECRET=
+BLOB_READ_WRITE_TOKEN=
+```
+
+**`REVALIDATION_SECRET` は Task 7 が使うのに、これまで `.env.example` の更新対象に
+入っていなかった。** `BLOB_READ_WRITE_TOKEN` も Task 5 の画像 upload に要る。
+**実値はここに書かない。** Vercel の Environment Variables で設定する。
+
+- [ ] **Step 4: 接続を確認する**
+
+```bash
+psql "$DATABASE_URL" -c 'select current_database(), current_user;'
+```
+Expected: 意図した環境のDBへ繋がる。**Preview と Production で異なる `current_database()` が
+返ることを確認する**（②の G-6 が求める分離の実証）。
+
+- [ ] **Step 5: 資源表を書いてcommit**
+
+provider・環境別の接続先・secret の管理者・バックアップ方針・復旧手順の入口を1枚にまとめる。
+
+**完了条件:** 5つの未確定事項が閉じ、環境ごとにDBが分かれていることをコマンドで確認済み。
+
+---
+
 ### Task 1: 移行開始前gateを確認する
 
 **Files:**
@@ -344,7 +407,9 @@ Run: `npm run test:e2e -- tests/e2e/payload-admin.spec.ts`
 
 Expected: `/admin` のheadingが見つからずFAIL
 
-- [ ] **Step 3: PayloadとPostgres adapterを追加する**
+- [ ] **Step 3: Payload・Postgres adapter・`tsx` を追加する**
+
+`tsx` は Task 5 の import / compare / export script が使う。**transitive dependency に依存しない。**
 
 ```bash
 npm install payload @payloadcms/next @payloadcms/db-postgres @payloadcms/richtext-lexical sharp
@@ -352,18 +417,28 @@ npm install payload @payloadcms/next @payloadcms/db-postgres @payloadcms/richtex
 
 - [ ] **Step 4: Next.js configをPayloadでwrapする**
 
-```js
-import path from 'node:path';
+**現行 `next.config.ts` を置き換えない。`withPayload()` で包むだけにする。**
+
+現行の `next.config.ts:18-25` は全 route へ security headers を設定している。
+置換すると消え、`tests/unit/security-headers.test.ts` が落ちる。
+
+```ts
+// next.config.ts — 既存の import と nextConfig 本体はそのまま残す
 import { withPayload } from '@payloadcms/next/withPayload';
 
 const nextConfig = {
   cacheComponents: true,
   turbopack: { root: path.resolve('.') },
   images: { formats: ['image/avif', 'image/webp'] },
+  async headers() {
+    return [{ source: '/:path*', headers: [...securityHeaders] }];   // ← 消さない
+  },
 };
 
-export default withPayload(nextConfig);
+export default withPayload(nextConfig);   // ← 変更はこの1行だけ
 ```
+
+**ファイル名は `next.config.ts`。** `next.config.mjs` ではない（突合結果 §C）。
 
 - [ ] **Step 5: 環境変数契約を追加する**
 
@@ -425,6 +500,8 @@ git commit -m "feat: embed Payload CMS in the Next.js app"
 **Files:**
 - Create: `collections/Manufacturers.ts`
 - Create: `collections/Robots.ts`
+- Create: `collections/RobotSeries.ts`
+- Create: `collections/Distributors.ts`
 - Create: `collections/UseCases.ts`
 - Create: `collections/Deployments.ts`
 - Create: `collections/Articles.ts`
@@ -433,11 +510,36 @@ git commit -m "feat: embed Payload CMS in the Next.js app"
 - Create: `globals/SiteSettings.ts`
 - Create: `lib/payload/access.ts`
 - Modify: `payload.config.ts`
+- Modify: `data/types.ts`（削除5フィールド、`RobotSeries` / `Distributor` 型、`Robot.seriesId`、`UseCaseCandidateRobot.seriesId`）
+- Modify: `lib/catalog/search.ts`（`buyerReadinessLabels[robot.buyerReadiness]` の除去）
+- Modify: `lib/labels.ts` / `lib/visualSemantics.ts`（`marketAvailabilityLabels` / 未使用 tone の除去）
+- Modify: `scripts/build-data-r01-manifest.mjs` / `scripts/build-data-r02-manifest.mjs`
+- Modify: `tests/unit/view-models/robots.test.ts`
 - Test: `tests/content/payload-schema.test.ts`
 
 **Interfaces:**
-- Consumes: `data/types.ts` の現行field semantics
-- Produces: Payload collections、relationship fields、draft/version、role-based access
+- Consumes: `data/types.ts` の現行field semantics（**ただし §D の削除5フィールドは写さない**）
+- Produces: Payload collections 10本、relationship fields、draft/version、role-based access
+
+**`data/types.ts` をそのまま写さない。** 現行型には削除が決まっているフィールドが含まれる。
+写すと Payload schema へ再導入され、②の §0 G-4 が永久に通らなくなる。
+
+**このTaskが `Robot` から削除する5フィールド**（`robot-data-import-plan-v1.md` DEC-S05・S06）:
+
+| フィールド | 現状 | 削除にあたって一緒に消すもの |
+|---|---|---|
+| `buyerReadiness` | 型に `@deprecated`。**`lib/catalog/search.ts:51` が実行時に使用中** | `lib/catalog/search.ts` の連結。型 `BuyerReadiness` は `UseCase` が使うので残す |
+| `marketAvailability` | 参照0。`robot.marketAvailability` を読むコードが存在しない | 型 `MarketAvailability`、`lib/labels.ts` の `marketAvailabilityLabels`、`lib/visualSemantics.ts` の tone、両 manifest script |
+| `safetyNote` | 0/63件 | `tests/unit/view-models/robots.test.ts` の参照 |
+| `vendorRiskNote` | 1/63件。**`Manufacturer.vendorRiskNote` は 25/26 で残す** | 同上 |
+
+**`comparison` は削除しない。** 型に `@deprecated` が付くが `components/ComparisonRobotPanel.tsx`
+が `robot.comparison.*` を12箇所で実表示している。削除するなら `/compare` の作り替えが要るため
+別計画。`collections/Robots.ts` には含める。
+
+`RobotSeries` と `Distributors` の設計は `docs/decisions/data-architecture-redesign-v1.md`
+§4-1 / §11 が正本。**`RobotSeries` はスペックも価格も持たない**（`deploymentStage` と `specs` に
+答えが存在しないため）。
 
 - [ ] **Step 1: schema contract testを書く**
 
@@ -452,6 +554,8 @@ describe('Payload content schema', () => {
       expect.arrayContaining([
         'admins',
         'manufacturers',
+        'distributors',
+        'robot-series',
         'robots',
         'use-cases',
         'deployments',
@@ -461,6 +565,28 @@ describe('Payload content schema', () => {
       ]),
     );
   });
+
+  // ②の §0 G-4 が要求する。data/types.ts を写すと再導入されるため機械で止める。
+  it('does not carry the removed Robot fields', async () => {
+    const resolved = await config;
+    const robots = resolved.collections.find((collection) => collection.slug === 'robots')!;
+    const names = robots.fields.flatMap((field) => ('name' in field ? [field.name] : []));
+
+    for (const removed of ['buyerReadiness', 'marketAvailability', 'safetyNote', 'vendorRiskNote']) {
+      expect(names).not.toContain(removed);
+    }
+    // comparison は /compare が使用中のため残す
+    expect(names).toContain('comparison');
+  });
+
+  it('links robots to their series', async () => {
+    const resolved = await config;
+    const robots = resolved.collections.find((collection) => collection.slug === 'robots')!;
+    const seriesId = robots.fields.find((field) => 'name' in field && field.name === 'seriesId');
+
+    expect(seriesId).toBeDefined();
+    expect(seriesId).toMatchObject({ type: 'relationship', relationTo: 'robot-series', required: false });
+  });
 });
 ```
 
@@ -468,7 +594,7 @@ describe('Payload content schema', () => {
 
 Run: `npm run test -- tests/content/payload-schema.test.ts`
 
-Expected: `manufacturers` などが不足してFAIL
+Expected: `manufacturers` / `robot-series` / `distributors` が不足してFAIL
 
 - [ ] **Step 3: collectionを一つずつ追加する**
 
@@ -526,6 +652,80 @@ Expected: PASS
 git add collections globals lib/payload payload.config.ts payload-types.ts tests/content/payload-schema.test.ts
 git commit -m "feat: define Payload content collections"
 ```
+
+---
+
+### Task 3.5: Postgres migration を生成・適用・検証する
+
+**Files:**
+- Create: `migrations/*.ts`（Payload が生成）
+- Modify: `package.json`（`payload:migrate` / `payload:migrate:status` / `payload:migrate:create`）
+- Modify: `.github/workflows/ci.yml`
+- Test: `tests/content/migration.test.ts`
+
+**Interfaces:**
+- Consumes: Task 3 の collections 10本
+- Produces: Git で review 可能な migration ファイルと、CI での適用確認
+
+**Global Constraints が「schema変更はmigrationを生成してGitでreviewし、CIで適用確認する」と
+要求しているのに、Task 3 までにその手順が無かった。** Postgres では collection / field の追加ごとに
+migration が要る（`https://payloadcms.com/docs/database/migrations`）。
+
+- [ ] **Step 1: migration script を package.json へ追加する**
+
+```json
+{
+  "payload:migrate": "payload migrate",
+  "payload:migrate:create": "payload migrate:create",
+  "payload:migrate:status": "payload migrate:status"
+}
+```
+
+- [ ] **Step 2: 空DBへ適用できることを確認する**
+
+新しい空のデータベースを作り、そこへ流す。
+
+```bash
+npm run payload:migrate:create -- initial-schema
+npm run payload:migrate
+npm run payload:migrate:status
+```
+Expected: 10 collection ぶんのテーブルが作られ、status がすべて適用済みになる。
+
+- [ ] **Step 3: 既存schemaを持つDBへ適用できることを確認する**
+
+Step 2 のDBに対して、Task 3 で1フィールド足してから再生成・再適用する。
+
+Expected: 差分だけの migration が生成され、既存データが消えない。
+
+- [ ] **Step 4: 巻き戻せることを確認する**
+
+```bash
+npm run payload:migrate -- down
+npm run payload:migrate:status
+```
+Expected: 直前の migration が取り消される。**down が動かない場合は、
+`content:export` からの復元手順を Task 5 で確立するまで先へ進まない。**
+
+- [ ] **Step 5: CI へ組み込む**
+
+`.github/workflows/ci.yml` に `payload:migrate:status` を追加し、
+**未適用の migration が残っていたら赤くする**。
+
+- [ ] **Step 6: ゲートが赤くなることを確認する（Global Constraints）**
+
+`collections/Robots.ts` にフィールドを1つ足し、migration を生成せずに CI を回す。
+Expected: **exit 1**。確認できたらフィールドを戻す。
+
+- [ ] **Step 7: commit**
+
+```bash
+git add migrations package.json .github/workflows/ci.yml tests/content/migration.test.ts
+git commit -m "feat(db): Postgres migration の生成・適用・検証を追加"
+```
+
+**完了条件:** 空DB / 既存DB の両方へ適用でき、未適用 migration を CI が検出する。
+意図的な未生成で赤くなることを確認済み。
 
 ---
 
@@ -731,7 +931,13 @@ site-settings
 }
 ```
 
-`tsx` はTask 1で明示的なdevDependencyとして追加済みであることを確認する。transitive dependencyには依存しない。
+`tsx` は **Task 2 Step 3 で devDependency として追加する**（Task 1 に install step は無く、
+現 `package.json` にも無い。lockfile に transitive として存在するだけなので依存しない）。
+
+```bash
+npm ls tsx --depth=0
+```
+Expected: `devDependencies` に解決される。transitive のみなら Task 2 へ戻る。
 
 - [ ] **Step 6: 開発DBへimportして再実行する**
 
@@ -747,7 +953,23 @@ Run: `npm run content:compare`
 
 Expected: `missing=0 extra=0 changed=0 brokenReferences=0`
 
-- [ ] **Step 7: commit**
+- [ ] **Step 7: cutover baseline snapshot を固定する**
+
+**`content:compare` は Task 9 で local TS を撤去したあと実行できなくなる。**
+「local vs payload」の比較なので、比較元が消えるため。
+
+Task 9 の直前に `content:export` で**署名付きの baseline snapshot** を取り、
+`docs/reference/` へ commit する。以降の parity 検証はこの固定 snapshot と Payload を比較する。
+
+```bash
+npm run content:export -- --out docs/reference/cutover-baseline-snapshot.json
+shasum -a 256 docs/reference/cutover-baseline-snapshot.json
+```
+
+**この snapshot が `robot-data-import-plan-v1.md` の §0 G-3 の比較対象になる。**
+②側は「local vs payload」ではなく「baseline vs payload」を検証する。
+
+- [ ] **Step 8: commit**
 
 ```bash
 git add scripts/import-content-to-payload.mts scripts/compare-content-sources.mts scripts/export-content-snapshot.mts tests/fixtures/contentSnapshot.ts tests/content/import-parity.test.ts package.json package-lock.json
@@ -938,6 +1160,13 @@ git commit -m "feat: add content preview and cache revalidation"
 **Interfaces:**
 - Consumes: Payload MCP plugin、`content-draft-writer`
 - Produces: schema-aware read/create/update-draft tools、publish/delete拒否
+
+**Payload MCP に独立した publish capability は無い。** 標準は find / create / update / delete で、
+`update: true` のまま `_status: 'published'` を書ければ公開できてしまう
+（`https://payloadcms.com/docs/plugins/mcp`）。**resolver に `publish: false` を期待する設計は
+権限制御になっていない。**
+
+collection の access / hook で **draft → published の遷移そのものを拒否する**。
 
 - [ ] **Step 1: MCP権限testを書く**
 

@@ -74,9 +74,13 @@ Expected: `Manufacturers` / `Robots` / `RobotSeries` / `Distributors` / `UseCase
 - [ ] **G-3: 既存データが Payload に入り、parity が取れている**
 
 ```bash
-npm run content:compare
+shasum -a 256 docs/reference/cutover-baseline-snapshot.json
+npm run content:compare -- --baseline docs/reference/cutover-baseline-snapshot.json
 ```
 Expected: 件数・ID集合・参照・公開状態が一致。robots 63 / manufacturers 26 / useCases 44 / articles 34 / deployments 11。
+
+**「local vs payload」ではなく「baseline vs payload」で比較する。** ①の Task 9 で
+local TS を撤去すると比較元が消えるため、Task 5 Step 7 で固定した署名付き snapshot を使う。
 
 - [ ] **G-4: 削除済みフィールドが `collections/Robots.ts` に無い**
 
