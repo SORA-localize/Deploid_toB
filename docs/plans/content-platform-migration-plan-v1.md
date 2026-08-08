@@ -85,6 +85,89 @@ Task 5（parity）と Task 9（cutover）の要件を見直す余地がある。
 
 ---
 
+## 2026-08-08 外部監査の指摘（着手前に解決する）
+
+突合結果（上記）に続き、外部監査で見つかった未解決項目。**これらを解決するまで Task 2 へ進まない。**
+
+### M-1. Task 3 が10コレクションを作らない（Critical）
+
+`### Task 3` の Files と schema test は**7コレクション**しか列挙していない。突合結果 §D が
+`RobotSeries` と `Distributors` の追加を指示しているが、**本文に反映されていない**。
+test・snapshot・repository・import order・cache tag のいずれにも無い。
+
+`docs/plans/robot-data-import-plan-v1.md` の §0 G-2 は10コレクションを要求するため、
+**このままでは②が永久に着手できない。**
+
+### M-2. 削除5フィールドの実行主体がいない（Critical）
+
+②の DEC-S05・S06 は `Robot` から `buyerReadiness` / `marketAvailability` / `safetyNote` /
+`vendorRiskNote` を落とすとするが、**①のどの Task も実行しない**。Task 3 は現行 `data/types.ts` の
+semantics を写す設計なので、**削除予定のフィールドを Payload schema へ再導入してしまう。**
+
+`buyerReadiness` は `lib/catalog/search.ts` で使用中。Payload schema だけでなく domain 型・
+mapper・search・labels・visual semantics・tests・manifest scripts まで一緒に移す必要がある。
+
+**`comparison` は削除しない。** `components/ComparisonRobotPanel.tsx` が12箇所で実表示している。
+
+### M-3. Postgres migration の Task が無い（High）
+
+Global Constraints は「schema変更はmigrationを生成してGitでreviewし、CIで適用確認する」と
+要求しているが、本文に `payload migrate:create` / `migrations/` / `migrate:status` /
+production適用 / down検証が**一度も現れない**。Postgres では collection / field 追加ごとに
+migration が要る。
+
+**schema Task ごとに migration 生成と review を含め、空DBへの up・既存schemaへの up・
+down または復旧を検証する Task を追加する。**
+
+### M-4. ①と②で script 名が食い違う（High）
+
+| ①が定義 | ②が呼ぶ |
+|---|---|
+| `content:compare` | ~~`compare:content-sources`~~ → ②側を修正済み |
+| `content:export` | ~~`export:content-snapshot`~~ → ②側を修正済み |
+
+②は修正済み。**①側は cutover 後に local TS と local adapter を削除するため、
+`content:compare` の「local vs payload」比較自体が実行不能になる。**②の G-3 は
+「署名付き cutover baseline snapshot 対 Payload」の比較へ変える必要がある。
+
+### M-5. Task 2 の next config 例が security headers を消す（High）
+
+現行 `next.config.ts:18-22` は全 route に security headers を設定している。Task 2 の置換例には
+`headers()` が**無い**ため、そのまま実装すると削除される。`tests/unit/security-headers.test.ts` が
+落ちる。
+
+**現行 config を保持したまま `export default withPayload(nextConfig)` だけを加える。**
+
+なお `next.config.mjs` という記載は誤りで、実際は `next.config.ts`（突合結果 §C）。
+Task 2 の Files と commit command が未修正のまま。
+
+### M-6. `tsx` が devDependency に無い（Medium）
+
+Task 5 は「`tsx` は Task 1 で明示的な devDependency として追加済み」とするが、**Task 1 に
+install step は無く、`package.json` にも無い**（lockfile に transitive としてのみ存在）。
+
+Task 2 か 5 で `npm install -D tsx` するか、現行 scripts に合わせて Node の
+`--experimental-strip-types` へ統一する。
+
+### M-7. object storage・secret・DB分離の provisioning が未計画（High）
+
+Task 5 は画像を object storage へ upload するとするが、provider・storage adapter・bucket・
+credentials・CORS・バックアップ・失敗時処理が無い。`REVALIDATION_SECRET` も Task 7 で使うのに
+`.env.example` の更新対象に入っていない。Preview / Production の DB を別々に作る Task も無く、
+②の G-6 へ丸投げされている。
+
+**Task 2 の前に provider 確定・資源表・secret ownership を作る。**
+
+### M-8. MCP の `publish: false` は権限制御になっていない（High）
+
+Task 8 は独自 resolver に `publish: false` を期待するが、Payload MCP の標準 capability は
+find / create / update / delete で、独立した publish capability は無い。`update: true` のまま
+`_status: published` を拒否しなければ公開できてしまう。
+
+**collection access / hook で draft → published transition を拒否する統合testを作る。**
+
+---
+
 ## Global Constraints
 
 - `id`、`slug`、`previousSlugs`、公開URLを移行都合で変更しない。

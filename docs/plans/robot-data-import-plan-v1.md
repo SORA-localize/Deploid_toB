@@ -74,16 +74,20 @@ Expected: `Manufacturers` / `Robots` / `RobotSeries` / `Distributors` / `UseCase
 - [ ] **G-3: 既存データが Payload に入り、parity が取れている**
 
 ```bash
-npm run compare:content-sources
+npm run content:compare
 ```
 Expected: 件数・ID集合・参照・公開状態が一致。robots 63 / manufacturers 26 / useCases 44 / articles 34 / deployments 11。
 
 - [ ] **G-4: 削除済みフィールドが `collections/Robots.ts` に無い**
 
 ```bash
-rg -n 'buyerReadiness|marketAvailability|safetyNote|vendorRiskNote|comparison' collections/Robots.ts
+rg -n 'buyerReadiness|marketAvailability|safetyNote|vendorRiskNote' collections/Robots.ts
 ```
 Expected: **0件**（DEC-S05・S06）。`buyerReadiness` は `collections/UseCases.ts` には残る。
+
+**`comparison` は検査対象に含めない。** 型に `@deprecated` が付いているが、
+`components/ComparisonRobotPanel.tsx` が `robot.comparison.*` を12箇所で実表示しており、
+**本計画のどの DEC も削除を決めていない**。削除するなら `/compare` の作り替えが要るため別計画。
 
 - [ ] **G-5: 品質ゲートが緑**
 
@@ -99,7 +103,7 @@ Preview デプロイと本番が同じDBを見ていないことを確認する�
 - [ ] **G-7: 復旧手順が動く**
 
 ```bash
-npm run export:content-snapshot
+npm run content:export
 ```
 Expected: エクスポートが生成される。**投入前に1回取っておく。**Task 9 は134件を入れるので、戻す先が要る。
 
@@ -170,13 +174,29 @@ Google Sheets の取り消し線は、HTML書き出しでは `text-decoration:li
 | | robots | manufacturers | robotSeries |
 |---|---|---|---|
 | ①完了時 | 63 | 26 | 0 |
-| 追加 | +134 | +33 | +28 |
-| `apptronik-apollo-2` の分割 | +1 | — | — |
-| **本計画の完了時** | **198** | **59** | **28** |
+| **Series へ移管**（Task 3） | **−7** | — | **+7** |
+| Series 新規作成（Task 3） | — | — | +21 |
+| `apptronik-apollo-2` の分割（Task 7） | +1 | — | — |
+| 新規追加（Task 9） | +134 | +33 | — |
+| **本計画の完了時** | **191** | **59** | **28** |
+
+**移管分を引き忘れない。** `63 + 134 + 1 = 198` は誤り。Task 3 で7件が `robots` から
+`robotSeries` へ移るため `63 − 7 + 1 + 134 = 191`。
 
 **177 は原本の行数であって最終レコード件数ではない。57 は代理店シートの行数であってメーカー件数ではない。** 混同しない。
 
-新規134件は `draft` で投入するため、投入直後の published は 63件中の published 57件から `onex-eve` を archived にした **56件**。以降、値を確認したものから昇格する。
+新規134件は `draft` で投入するため、投入直後の published は次のとおり。
+
+```
+現行 published            57
+ −1  onex-eve を archived（DEC-S02）
+ −7  Series へ移管（Task 3。7件すべて published。移管後は robots ではなくなる）
+────
+     49 件
+```
+
+**Series 自体の公開状態は別途決める**（新規finding 10。Task 3 と Task 4 の間にゲートが要る）。
+以降、値を確認したものから昇格する。
 
 ### 3.2 メーカーの3つの母集団
 
@@ -458,7 +478,12 @@ Expected: `robots.json` 197件 / `manufacturers.json` 57件 / `deployments.json`
 ```bash
 npm run report:robot-db-diff
 ```
-Expected: exit 0、16項目すべて `✓`。母集団177 / 一致43行(42レコード) / 追加134 / 一致しない21 / 完了時198 / メーカー完了時59 / DEC-S08 の親レコード7。
+Expected: exit 0、16項目すべて `✓`。母集団177 / 一致43行(42レコード) / 追加134 / 一致しない21 / メーカー完了時59 / DEC-S08 の親レコード7。
+
+**レポートの期待値は着手前の baseline であり、Task 3 以降は自ら失敗する。** 現在の
+`scripts/report-robot-db-diff.mjs` は robots 63件を前提に値を固定している。Series 移管（Task 3）と
+Apollo 2 分割（Task 7）で件数が動くため、**各 Task 後の期待状態を manifest 化し、同じ固定値を
+使い続けない**（新規finding 9）。
 
 **数字が合わない場合、§2〜§3 を直す前に正規化規則の取りこぼしを疑う。**
 
@@ -516,7 +541,19 @@ Expected: exit 0、16項目すべて `✓`。母集団177 / 一致43行(42レコ
 
 - [ ] **Step 3: 28件を作る**
 
-**A の7件は既存の Robot レコードから移す。** `id` と `slug` を引き継ぐ。**B の14件は新規**で、ファミリ名が機種と衝突するため `unitree-g1-series` のような slug を新設する。
+**内訳は 28 = A群14 + B群14。** A群のうち既存の Robot レコードがあるのは一部だけで、
+残りは新規作成になる。**「移管7 + 新規14 = 21」では7件足りない。**
+
+| | 件数 | 扱い |
+|---|---|---|
+| A群のうち既存 Robot がある | 7 | **移管。** `id` と `slug` を引き継ぐ（URL が動かない） |
+| A群のうち既存 Robot が無い | 7 | 新規作成（構成がすべて新規追加分のため） |
+| B群 | 14 | 新規作成。ファミリ名が機種と衝突するため `unitree-g1-series` のような slug を新設 |
+
+**A群14件の一覧と、レポートが出す「親レコード7件」は一致しない。** レポートの7件には
+`ubtech-walker-tienkung` が含まれるが、DEC-S08 の A群一覧には `Walker Tienkung` が無い。
+ファミリ推定（接頭辞処理）と親レコード検出（孤立レコードとの突合）が別の走査だったため。
+**Step 1 の manifest で両者を突き合わせ、28件を確定させる。**
 
 公開ゲートは Manufacturer と同じ水準（`id` / `slug` / `name` / `manufacturerId` / `summary` / `sources` 非空）。`sources` はメーカーのシリーズ製品ページ。
 
@@ -556,11 +593,11 @@ Expected: exit 0、16項目すべて `✓`。母集団177 / 一致43行(42レコ
 npm run check
 ```
 
-`/robots` のカード数が **57のまま**であること（シリーズは一覧に出ない）。`/use-cases/research-development` の候補に「T1（提供終了）」が出ないこと。390px で崩れないこと。
+`/robots` のカード数は **50件**（published 57 − onex-eve 1 − Series へ移管 7 − ... §3.1 の49に Task 7 の分割分を考慮）。**「57のまま」ではない。**実際の数は §3.1 の計算と一致することを確認する。シリーズは一覧に出ない。`/use-cases/research-development` の候補に「T1（提供終了）」が出ないこと。390px で崩れないこと。
 
 **ビジュアル回帰のベースライン再生成が要る。** スナップショットは24枚あり、ファイル名に OS 名が入る（`-darwin` / `-linux`）。macOS では linux 分を生成できないため `.github/workflows/update-visual-baselines.yml` を手動実行する。**このジョブの push は CI を起動しない**ので、`gh workflow run ci.yml --ref <branch>` を別途叩く。
 
-**完了条件:** シリーズの詳細が構成一覧を出し、useCase の候補が「提供終了」表示にならない。`/robots` のカード数は57のまま。
+**完了条件:** シリーズの詳細が構成一覧を出し、useCase の候補が「提供終了」表示にならない。`/robots` のカード数が §3.1 の計算と一致する。
 
 ---
 
@@ -637,7 +674,12 @@ Task 1 のレポートで差分が出た値のみ。`specSchema` に無い列（
 
 - [ ] **Step 2: `deployments` を取り込む**
 
-緯度経度は `location: { lat, lng }` へ。`DeploymentSite` に無い列（`coordinatePrecision` / `deploymentType` / `endedAt` / `summary` / `nextReviewBy` / `importReady` / `exclusionReason`）は取り込まない。
+緯度経度は `location: { lat, lng }` へ。**`summary` と `nextReviewBy` は `BaseRecord` のフィールドなので取り込む**（`data/types.ts:99,105`）。
+正規化JSONには `summary` / `sources` / `publishStatus` / `reliability` / `updatedAt` / `nextReviewBy` が既にある。
+`sources` と `relatedUseCaseIds` はJSON文字列なので型付きで parse する。
+
+取り込まないのは**本当にスキーマ外の列だけ** — `coordinatePrecision` / `deploymentType` /
+`endedAt` / `importReady` / `exclusionReason`。
 
 - [ ] **Step 3: 既存26社のうち24社を更新し、新メーカー33社を追加**
 
@@ -699,9 +741,9 @@ published 件数とバイト数を対で記録し、**1件あたりのバイト�
 
 - [ ] **Step 7: `/compare` のツリー行数を実測し、別計画を起票する（DEC-S08）**
 
-投入後の選択ツリーは **57社 + 177機 = 234行**（現在は約83行）になる見込み。実測して記録し、**メーカー → シリーズ → 機種 の3段カスケードを別計画として起票する**。
+投入後の選択ツリーは **59社 + published な Robot 件数**になる。現在は約83行。**177 は原本の行数であって Payload のレコード数ではない**ので、実測して記録する。実測して記録し、**メーカー → シリーズ → 機種 の3段カスケードを別計画として起票する**。
 
-**完了条件:** `robots` が198件、`robotSeries` が28件、`npm run check` が全緑。
+**完了条件:** `robots` が **191件**、`robotSeries` が28件、`npm run check` が全緑（§3.1）。
 
 ---
 
@@ -777,14 +819,14 @@ npm run report:robot-db-diff                  # 突合（期待値16項目）
 npm run check                                 # 全ゲート
 npm run check:world-map-asset                 # Task 8
 npm run check:source-links                    # Task 10
-npm run compare:content-sources               # §0 G-3（①が作る）
+npm run content:compare               # §0 G-3（①が作る）
 ```
 
 **CI の確認は retries や verify=SUCCESS だけを見ない。** e2e の flaky 件数まで読む。
 
 ### 手動確認チェックリスト
 
-- [ ] `/robots` — カード数が published レコード数と一致する。シリーズが出ていない。フィルタの件数表示が正しい
+- [ ] `/robots` — カード数が published な Robot の件数と一致する（§3.1 の計算値）。**シリーズが出ていない。** フィルタの件数表示が正しい
 - [ ] `/robots` — 390px / 768px / 1280px で横スクロールが出ない
 - [ ] `/robots/[slug]`（Robot） — `supportNote` と所属シリーズへの導線が出る
 - [ ] `/robots/[slug]`（Series） — 構成一覧が出る。「提供終了」が出ない
