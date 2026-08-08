@@ -2150,7 +2150,7 @@
     "makerUrl": "https://www.lejurobot.com/en",
     "model": "AELOS PRO3",
     "modelUrl": "https://www.lejurobot.com/en/products/aelos-pro3",
-    "strike": false,
+    "strike": true,
     "specs": {
       "mobility": "二足",
       "dimensions": "34.6×22.4×11.8",
@@ -2174,7 +2174,7 @@
     "makerUrl": "https://www.lejurobot.com/en",
     "model": "AELOS LITE",
     "modelUrl": "https://www.lejurobot.com/en/products/aelos-kaihong",
-    "strike": false,
+    "strike": true,
     "specs": {
       "mobility": "二足",
       "dimensions": "約34.6（高・シリーズ値）",
@@ -2198,7 +2198,7 @@
     "makerUrl": "https://www.lejurobot.com/en",
     "model": "AELOS PRO",
     "modelUrl": "https://www.lejurobot.com/en/products/aelos-kaihong",
-    "strike": false,
+    "strike": true,
     "specs": {
       "mobility": "二足",
       "dimensions": "約34.6（高・シリーズ値）",
@@ -2222,7 +2222,7 @@
     "makerUrl": "https://www.lejurobot.com/en",
     "model": "AELOS SMART",
     "modelUrl": "https://www.lejurobot.com/en/products/aelos-smart",
-    "strike": false,
+    "strike": true,
     "specs": {
       "mobility": "二足",
       "dimensions": "34.6×22.4×11.8",
@@ -4316,14 +4316,6 @@
       "sdk": "ugo Platform",
       "computePlatform": "未公表"
     }
-  },
-  {
-    "maker": "Sunday Robotics",
-    "makerUrl": "https://www.sunday.ai/",
-    "model": "ACT-2",
-    "modelUrl": "https://www.sunday.ai/blog/act-2-preview",
-    "strike": true,
-    "specs": {}
   },
   {
     "maker": "Sunday Robotics",

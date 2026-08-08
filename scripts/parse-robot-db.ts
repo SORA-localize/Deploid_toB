@@ -1,5 +1,5 @@
 // ロボットDB原本（Google Sheets の HTML 書き出し）→ 正規化JSON。
-// 設計・母集団の定義: docs/plans/robot-db-sync-plan-v1.md §1〜§2
+// 設計・母集団の定義: docs/plans/robot-data-import-plan-v1.md §1〜§2
 //
 // CSV書き出しを使わないのは、セルのハイパーリンクが落ちて出典URLが消えるため（§1）。
 // HTML なら `<a href>` として残る。
@@ -33,7 +33,17 @@ export interface RobotImportRow {
 /** 列名をそのままキーにした1行。URL列はリンクが無ければ null */
 export type SheetRecord = Record<string, string | boolean | null>;
 
-const SOURCE_DIR = path.join(os.homedir(), 'Downloads', 'ロボDB', 'ロボDB');
+/**
+ * 原本の置き場。ブラウザは同名フォルダがあると「ロボDB 2」のように連番を付けるため、
+ * パスを固定しない。`--source <dir>` か環境変数 `ROBOT_DB_DIR` で上書きできる。
+ */
+const DEFAULT_SOURCE_DIR = path.join(os.homedir(), 'Downloads', 'ロボDB 2');
+
+function resolveSourceDir(): string {
+  const flag = process.argv.indexOf('--source');
+  if (flag !== -1 && process.argv[flag + 1]) return process.argv[flag + 1];
+  return process.env.ROBOT_DB_DIR ?? DEFAULT_SOURCE_DIR;
+}
 
 const SHEETS = {
   robots: '発表済みロボット.html',
@@ -246,11 +256,11 @@ export function parseManufacturerSheet(html: string): SheetRecord[] {
 // ── CLI ──────────────────────────────────────────────────────────────────────
 
 function read(sheet: keyof typeof SHEETS): string {
-  const file = path.join(SOURCE_DIR, SHEETS[sheet]);
+  const file = path.join(resolveSourceDir(), SHEETS[sheet]);
   if (!fs.existsSync(file)) {
     throw new Error(
       `原本が見つかりません: ${file}\n` +
-        'ロボDB の HTML 書き出しを ~/Downloads/ロボDB/ロボDB/ に置いてください。',
+        '`--source <dir>` か環境変数 ROBOT_DB_DIR で原本の置き場を指定してください。',
     );
   }
   return fs.readFileSync(file, 'utf8');
