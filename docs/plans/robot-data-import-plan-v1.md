@@ -62,7 +62,7 @@ test -f payload.config.ts && echo "payload.config.ts OK"
 ```
 Expected: パッケージが解決し、環境変数が `.env.example` に定義され、`payload.config.ts` が存在する。
 
-- [ ] **G-2: 8コレクションが定義されている**
+- [ ] **G-2: 10コレクションが定義されている**
 
 ```bash
 ls collections/
