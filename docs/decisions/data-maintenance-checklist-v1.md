@@ -126,7 +126,7 @@ updated: 2026-08-09
 - [ ] sources が空でない（自動：常時必須）
 - [ ] 画像が未ローカル化なら warning（推奨：ローカル化）
 
-> 2026-08-09 に `buyerReadiness` を Robot の公開ゲート必須項目から外した（[`data-architecture-redesign-v1.md`](data-architecture-redesign-v1.md) §0 / `../plans/robot-data-import-plan-v1.md` DEC-S05・S06）。`buyerReadiness` は UseCase 側の必須項目としては残る。
+> 2026-08-09 に `buyerReadiness` を Robot の公開ゲート必須項目から外した（[`data-architecture-redesign-v1.md`](data-architecture-redesign-v1.md) §11 / `../plans/robot-data-import-plan-v1.md` DEC-S05・S06）。`buyerReadiness` は UseCase 側の必須項目としては残る。
 
 **Manufacturer**
 - [ ] id / slug / name / country / companyType / japanPresence
