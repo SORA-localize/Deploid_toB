@@ -42,3 +42,6 @@ docs/planning/local-prototype-image-fill-plan-v1.md
 .worktrees/
 .plan-snippets/
 tsconfig.plan-snippets.tsbuildinfo
+
+# subagent-driven-development scratch workspace (ledgers, briefs, review packages)
+.superpowers/
