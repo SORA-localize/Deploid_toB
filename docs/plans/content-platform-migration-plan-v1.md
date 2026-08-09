@@ -1,13 +1,13 @@
 ---
 status: plan
-updated: 2026-08-08
+updated: 2026-08-09
 ---
 
 # Content Platform Migration Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** `data/*.ts` を正本とする現行構成を、URL・ID・表示内容を維持したまま Payload CMS + managed Postgres へ移行する。
+**Goal:** `data/*.ts` を正本とする現行構成を、Payload CMS + managed Postgres へ移行する。**公開URL（slug）の維持は要件外**（§F・Global Constraints）。`id`（stableId）はcollection内・collection横断の参照整合性に使うため不変。
 
 **Architecture:** GitHubはコード、Payload schema、migration、validatorを管理する。コンテンツレコードはPostgresを唯一の正本とし、Next.jsはserver-side repository経由、非エンジニアはPayload Admin、CodexはPayload MCP経由で同じデータを扱う。移行期間だけlocal/payloadのread adapterを切り替え、dual writeは行わない。
 
@@ -316,6 +316,26 @@ psql "$DATABASE_URL" -c "
 Expected: Preview と Production で **host_addr または project ref のどちらかが必ず異なる**。
 `current_database()` だけが違い、他がすべて同じ場合は誤検知の可能性があるため再確認する。
 
+**接続メタデータだけでは足りない。** `host_addr` は同じ project でも pooler 経由接続と
+direct 接続で異なる値を返すため、「pooler 経由の Preview」と「direct 接続の Production」を
+誤って“別DB”と判定する可能性があり、逆に「pooler 経由の Preview」と「pooler 経由の
+別環境」が同じ pooler host を経由して同一に見える可能性もある。**接続メタデータに加えて、
+DBの中に書き込んだ実データで確認する環境マーカーを持つ。**
+
+```sql
+create table if not exists _environment_marker (
+  environment text primary key,
+  created_at timestamptz not null default now()
+);
+insert into _environment_marker (environment) values ('preview')
+  on conflict (environment) do nothing;
+```
+
+Preview DBには `'preview'` 、Production DBには `'production'` の行だけを一度書き込み、
+以後は `select environment from _environment_marker` で読み戻して接続先を確認する。
+このテーブルは接続文字列の違いに影響されない実データであるため、pooler/direct の
+差異による誤判定を起こさない。
+
 - [ ] **Step 5: 資源表を書いてcommit**
 
 provider・環境別の接続先・secret の管理者・バックアップ方針・復旧手順の入口を1枚にまとめる。
@@ -517,10 +537,15 @@ export const Admins: CollectionConfig = {
     type: 'select',
     required: true,
     defaultValue: 'editor',
-    options: ['editor', 'publisher', 'admin'],
+    options: ['editor', 'publisher', 'admin', 'content-draft-writer'],
   }],
 };
 ```
+
+**`content-draft-writer` は Task 8 の Codex MCP 専用ロール。** `editor` とは分けて追加する
+（`editor` は人間の Admin UI 操作を想定し、`published` への昇格を admin 承認フローの外で
+できてしまうと Task 8 の「delete/publish拒否」設計と衝突するため）。Task 8 の
+`access.update` / `access.delete` はこのロールの値で分岐する。
 
 `payload.config.ts` は `buildConfig` で `postgresAdapter({ pool: { connectionString: process.env.DATABASE_URL } })`、`lexicalEditor()`、`Admins`、`secret`、`typescript.outputFile` を設定する。`DATABASE_URL` と `PAYLOAD_SECRET` が欠落した場合は、用途が分かるメッセージで起動を失敗させる。admin page / layout / REST route / import mapはPayloadの既存Next.js統合用viewとhandlerを使い、独自admin shellを作らない。
 
@@ -769,14 +794,24 @@ Expected: 直前の migration が取り消され、そのテーブル・カラ�
 drift は検出できない。**`migrate:create` を実行して新しいファイルが生成されるかどうかで
 判定する** — 生成されれば drift がある。
 
+**CIは非対話。** 変更が無いとき `migrate:create` が「変更なし、生成しますか」のような
+確認プロンプトを出す実装だと、CIの標準入力は無いのでプロンプトが応答を待ち続けて
+ジョブがtimeoutするまでハングする（drift が無いのが大多数のケースなので、これが
+毎回のCIで起きる）。**`--skip-empty`（変更が無ければファイルを作らずexit 0で終える
+フラグ。導入する Payload バージョンのCLIオプションを公式ドキュメントで確認し、
+無ければ `yes ''` 等でプロンプトへ空応答を流す代替を使う）を付けて非対話化する。**
+
 ```bash
-npm run payload:migrate:create -- __drift-check 2>&1 | tee /tmp/drift.log
+npm run payload:migrate:create -- __drift-check --skip-empty 2>&1 | tee /tmp/drift.log
 if ls migrations/*__drift-check* 2>/dev/null; then
   echo "schema drift: collections の変更に対応する migration が無い"
   rm migrations/*__drift-check*
   exit 1
 fi
 ```
+
+**`--skip-empty` を先に単体で確認する。** drift が無い状態でこのコマンドだけを実行し、
+プロンプトが出ずにexit 0で終わることを、Step 6 でCIへ組み込む前に手元で確認する。
 
 - [ ] **Step 6: CI へ組み込む**
 
@@ -1098,7 +1133,18 @@ snapshot を `docs/reference/` へ commit するとこれに反する。加え�
 チェックサムであって、真正性を証明する署名ではない（同じ場所でJSONとhashを両方書き換えられる）。
 
 Task 9 の直前に `content:export` で snapshot を取り、**object storage（Task 0 で確定した
-provider）の immutable / write-once な領域へ置く**。Git には次の3つだけを commit する。
+provider）の immutable / write-once な領域へ置く**。「immutable な領域」の中身を Task 0 の
+資源表（`docs/reference/content-platform-resources-v1.md`）へ具体的に記録する。
+
+| 項目 | 方針 |
+|---|---|
+| アクセス | private（署名付きURLでのみ読める。公開URLにしない） |
+| 上書き・バージョニング | provider がobject versioning／immutability設定を持つ場合は有効化する。持たない場合（Task 0 default の Vercel Blob は現時点でWORM/object-lockを提供しない）、**同一キーへの再uploadを禁止し、runごとに一意なキー（日時+ハッシュ）で新規オブジェクトとして置く**運用で上書きを防ぐ |
+| 削除権限 | 削除できるのは admin ロールのみ。日常運用（import/export/parity）の実行者アカウントには delete 権限を渡さない |
+| 保持期間 | cutover完了（Task 9 Step 7 のrollback window終了）から最低90日は削除しない。90日経過後の削除は手動判断とし、自動失効ルールは設定しない |
+| 復元確認 | Step 6 のexport→restore round-tripテストと同じ経路で、この artifact からの復元が動くことを Task 9 実行前に一度確認する |
+
+Git には次の3つだけを commit する。
 
 ```bash
 npm run content:export -- --upload  # object storage へ upload、URLを返す
@@ -1298,6 +1344,21 @@ export const contentTags = {
 revalidateTag(contentTags.robots, 'max');
 ```
 
+**タグを定義するだけでは効かない。** `use cache` を付けた repository 関数の内部で、
+対応する `cacheTag()` を実際に呼ぶ必要がある。
+
+```ts
+// lib/content/payloadSource.ts
+export async function getRobotById(id: string) {
+  'use cache';
+  cacheTag(contentTags.robots);
+  return payload.find({ collection: 'robots', where: { stableId: { equals: id } } });
+}
+```
+
+**10コレクション分の repository 関数すべてに漏れなく `cacheTag()` を入れる。** タグ定義（Step 3）と
+`cacheTag()` 呼び出し（本Step）が両方揃って初めて `revalidateTag` が効く。
+
 - [ ] **Step 4: draft previewを通常cacheから分離する**
 
 draft modeではdraftを含め、published modeではpublished/archived policyだけを返す。draft responseを共有cacheへ保存しない。
@@ -1305,16 +1366,23 @@ draft modeではdraftを含め、published modeではpublished/archived policy�
 - [ ] **Step 5: 更新前後の値を統合テストで確認する**
 
 HTTP status だけでは「revalidate が呼ばれたこと」しか分からず、「表示が実際に新しい値へ
-変わったこと」は確認できない。
+変わったこと」は確認できない。**`revalidateTag(tag, 'max')` の第2引数 `'max'` は
+stale-while-revalidate profile を指定するもので、呼び出し直後の1回の読み出しで
+即座に新しい値へ切り替わることを保証しない**（背後で再生成が終わるまで、その間の読み出しは
+古い値を返してよい、という契約）。呼び出し直後の1回勝負で `toBe('X')` を assert するテストは
+この契約と矛盾する。**ポーリングで「最終的に新しい値になる」ことを確認する。**
 
 ```ts
-test('publish後に古い値ではなく新しい値が返る', async () => {
+test('publish後に古い値ではなく新しい値が返る（stale-while-revalidateを考慮）', async () => {
   const before = await repository.getRobotById(id);
   await payload.update({ collection: 'robots', id, data: { name: 'X' } });
   await fetch('/api/revalidate-content', { method: 'POST', headers: signed, body: JSON.stringify({ collection: 'robots' }) });
-  const after = await repository.getRobotById(id);
-  expect(after?.name).not.toBe(before?.name);
-  expect(after?.name).toBe('X');
+
+  await vi.waitFor(async () => {
+    const after = await repository.getRobotById(id);
+    expect(after?.name).not.toBe(before?.name);
+    expect(after?.name).toBe('X');
+  }, { timeout: 5000, interval: 100 });
 });
 ```
 
@@ -1339,7 +1407,13 @@ git commit -m "feat: add content preview and cache revalidation"
 
 ### Task 8: Codex MCPと編集権限を導入する
 
+**この Task は Task 3.5（Postgres migration基盤）の後に置く。** MCP plugin 自身が
+API key 用の collection をスキーマに追加するため、その migration が Task 3.5 の
+`migrate:create` サイクルに乗る必要がある。Task 3.5 より前に導入すると、MCP plugin
+導入時点のスキーマ変更が drift 検出の対象外になってしまう。
+
 **Files:**
+- Modify: `package.json`（`@payloadcms/plugin-mcp` を追加）
 - Modify: `payload.config.ts`
 - Create: `lib/payload/mcp.ts`
 - Create: `.codex/content-workflow.md`
@@ -1347,6 +1421,17 @@ git commit -m "feat: add content preview and cache revalidation"
 - Modify: `ai/rules/21-data-maintenance-workflow.md`
 - Modify: `.env.example`
 - Test: `tests/content/mcp-access.test.ts`
+
+- [ ] **Step 0: パッケージを導入する**
+
+```bash
+npm install @payloadcms/plugin-mcp
+```
+
+`payload.config.ts` の `plugins` へ追加し、`Admins` の `content-draft-writer` ロールだけを
+MCP 経由の書き込みに許可する（他ロールはMCP経由では読み取りのみ）。導入後は
+Task 3.5 の drift 検出（`migrate:create` dry-run相当）を実行し、plugin が追加した
+API key collection のmigrationが生成されることを確認する。
 
 **Interfaces:**
 - Consumes: Payload MCP plugin、`content-draft-writer`
@@ -1375,16 +1460,31 @@ import config from '@payload-config';
 
 describe('content-draft-writer の実権限（Local API 経由）', () => {
   let payload: Awaited<ReturnType<typeof getPayload>>;
+  let unitreeId: string;
   const asDraftWriter = { user: { id: 'test-draft-writer', role: 'content-draft-writer' } };
+  const asPublisher = { user: { id: 'test-publisher', role: 'publisher' } };
 
   beforeAll(async () => {
     payload = await getPayload({ config });
+    // manufacturerId は Payload relationship なので、stableId 'unitree' から
+    // Payload 内部IDへ解決してから使う（domain の 'unitree' を relationship 値に直接渡せない）。
+    const [unitree] = (await payload.find({
+      collection: 'manufacturers', where: { stableId: { equals: 'unitree' } }, limit: 1,
+    })).docs;
+    unitreeId = unitree.id;
   });
 
   it('draft の作成に成功する', async () => {
     const doc = await payload.create({
       collection: 'robots',
-      data: { name: 'Test', manufacturerId: 'unitree', _status: 'draft' },
+      data: {
+        stableId: 'test-mcp-draft-robot',
+        slug: 'test-mcp-draft-robot',
+        name: 'Test',
+        manufacturerId: unitreeId,
+        _status: 'draft',
+      },
+      draft: true,
       overrideAccess: false,
       user: asDraftWriter.user,
     });
@@ -1392,16 +1492,16 @@ describe('content-draft-writer の実権限（Local API 経由）', () => {
   });
 
   it('draft の更新に成功する', async () => {
-    const [doc] = (await payload.find({ collection: 'robots', where: { _status: { equals: 'draft' } }, limit: 1 })).docs;
+    const [doc] = (await payload.find({ collection: 'robots', where: { stableId: { equals: 'test-mcp-draft-robot' } }, limit: 1 })).docs;
     const updated = await payload.update({
       collection: 'robots', id: doc.id, data: { name: 'Test 2' },
-      overrideAccess: false, user: asDraftWriter.user,
+      draft: true, overrideAccess: false, user: asDraftWriter.user,
     });
     expect(updated.name).toBe('Test 2');
   });
 
   it('_status: published への更新を拒否する', async () => {
-    const [doc] = (await payload.find({ collection: 'robots', where: { _status: { equals: 'draft' } }, limit: 1 })).docs;
+    const [doc] = (await payload.find({ collection: 'robots', where: { stableId: { equals: 'test-mcp-draft-robot' } }, limit: 1 })).docs;
     await expect(
       payload.update({
         collection: 'robots', id: doc.id, data: { _status: 'published' },
@@ -1411,7 +1511,7 @@ describe('content-draft-writer の実権限（Local API 経由）', () => {
   });
 
   it('delete を拒否する', async () => {
-    const [doc] = (await payload.find({ collection: 'robots', where: { _status: { equals: 'draft' } }, limit: 1 })).docs;
+    const [doc] = (await payload.find({ collection: 'robots', where: { stableId: { equals: 'test-mcp-draft-robot' } }, limit: 1 })).docs;
     await expect(
       payload.delete({ collection: 'robots', id: doc.id, overrideAccess: false, user: asDraftWriter.user }),
     ).rejects.toThrow(/Forbidden|Unauthorized/);
@@ -1422,11 +1522,29 @@ describe('content-draft-writer の実権限（Local API 経由）', () => {
       payload.find({ collection: 'admins', overrideAccess: false, user: asDraftWriter.user }),
     ).rejects.toThrow(/Forbidden|Unauthorized/);
   });
+
+  it('publisher ロールは同じ draft を published へ昇格できる（拒否対象は content-draft-writer だけと確認する）', async () => {
+    const [doc] = (await payload.find({ collection: 'robots', where: { stableId: { equals: 'test-mcp-draft-robot' } }, limit: 1 })).docs;
+    const published = await payload.update({
+      collection: 'robots', id: doc.id, data: { _status: 'published' },
+      overrideAccess: false, user: asPublisher.user,
+    });
+    expect(published._status).toBe('published');
+  });
 });
 ```
 
 **`overrideAccess: false` が要。** 省略すると Local API はデフォルトで access 制御をスキップし、
-テストが「常に成功する」誤検知になる。
+テストが「常に成功する」誤検知になる。**`draft: true` も要。** Payload Drafts は
+`data._status: 'draft'` だけでなく呼び出しオプション `draft: true` の両方が揃って初めて
+draft として保存される（`https://payloadcms.com/docs/versions/drafts`）。
+
+**このテストは Local API 経由のみで、実際の MCP エンドポイント（Codexが呼ぶ経路）は
+カバーしない。** Local API での access 制御が MCP plugin の find/create/update/delete
+呼び出しにもそのまま適用される設計だが（`access` は collection 共通のフックであり MCP
+専用の別経路を持たない）、Step 5 の Codex 経由の手動確認が実エンドポイントを通す唯一の
+検証。自動テストへ組み込む場合は MCP server を子プロセスで起動し、stdio 経由でtool呼び出しを
+行う統合テストが必要（本 Task の範囲外、`deferred-work-register-v1.md` へ積み残す）。
 
 - [ ] **Step 2: 権限をcollection access/hookへ実装する**
 
@@ -1454,7 +1572,7 @@ schema取得
 
 Run: `npm run test -- tests/content/mcp-access.test.ts`
 
-Expected: 5ケースすべて PASS（draft作成・draft更新・published拒否・delete拒否・admins拒否）。
+Expected: 6ケースすべて PASS（draft作成・draft更新・published拒否・delete拒否・admins拒否・publisherは昇格できる）。
 **実際の Payload Local API に対して実行され、fake resolver のモックではないこと。**
 
 - [ ] **Step 5: Codexからread-only接続を確認する**
@@ -1593,7 +1711,8 @@ cutover後に公開障害が起きた場合は、コードを巻き戻さず、2
 - Codex通常権限でdelete/publish/schema/adminが拒否される
 - Postgresがコンテンツ唯一の正本である
 - Gitにcontent recordの二重正本がない
-- 全stable ID、slug、previousSlugs、relationship、公開状態が維持される
+- 全stable ID、relationship、公開状態が維持される。**slug・previousSlugsの維持は要件外**（§F）——
+  移行時に値が入っていれば足り、移行前と同一である必要はない
 - `npm run check` がexit 0
 - 主要routeのdesktop/mobile E2Eが通る
 - publish後のcache revalidationが動作する

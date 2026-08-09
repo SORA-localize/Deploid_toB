@@ -1,6 +1,6 @@
 ---
 status: plan
-updated: 2026-08-08
+updated: 2026-08-09
 ---
 
 # ロボットデータ投入 実行計画 v1
@@ -172,7 +172,7 @@ Google Sheets の取り消し線は、HTML書き出しでは `text-decoration:li
 
 ## 3. 突合結果（`npm run report:robot-db-diff` で再生成できる）
 
-**件数を手で数えない。** 原本が更新されたら `npm run parse:robot-db -- --out data/import` → `npm run report:robot-db-diff` の順で回す。期待値16項目を機械照合し、1つでも外れたら exit 1。
+**件数を手で数えない。** 原本が更新されたら `npm run parse:robot-db -- --out data/import` → `npm run report:robot-db-diff -- --state pre-series` の順で回す。期待値19項目を機械照合し、1つでも外れたら exit 1。`--state` の4値と各 Task での使い分けは Task 1 Step 2 を参照。
 
 | | 件数 |
 |---|---|
@@ -454,9 +454,9 @@ Robot:       seriesId?: Id を追加。構成が割れるファミリのみ設�
 | Path | 責務 |
 |---|---|
 | `scripts/parse-robot-db.ts` | HTML → 正規化JSON。取り消し線判定・結合セル前方補完・`<a href>` 抽出 |
-| `scripts/report-robot-db-diff.mjs` | 突合レポート。期待値16項目を機械照合 |
+| `scripts/report-robot-db-diff.mjs` | 突合レポート。期待値19項目を機械照合 |
 | `data/import/robots.json` / `manufacturers.json` / `deployments.json` | 正規化結果 |
-| `tests/unit/data/parse-robot-db.test.ts` | パーサの単体テスト13件 |
+| `tests/unit/data/parse-robot-db.test.ts` | パーサの単体テスト17件 |
 
 ### 新規作成
 
@@ -501,8 +501,20 @@ Expected: `robots.json` 197件 / `manufacturers.json` 57件 / `deployments.json`
 `lib/data/localContentSnapshot.ts` を同期で読む約280行の script。次が要る。
 
 1. repository の非同期 query への書き換え（`await` 化、接続失敗時の扱い）
-2. **期待値を Task ごとの manifest へ移す。** 現在の18項目は着手前 baseline を固定値で
-   持っており、Task 3（移管7件）と Task 7（分割1件）で**自ら失敗する**
+2. **`--state` 引数で期待値セットを切り替える。** 同じコマンド・同じ期待値のままでは
+   「cutover前は参照20件が正しい」「cutover後は0件が正しい」を区別できず、Task 3〜9.5 の
+   どこかで**自ら失敗する**（新規finding 7）。4状態を CLI 引数で明示指定する（自動判定はしない
+   — 「今どの Task の後のはずか」を呼び出し側が知っているため、誤検出より明示指定が安全）。
+
+   | `--state` | 呼び出す Task | robots | robotSeries | 参照（robotId向き） |
+   |---|---|---|---|---|
+   | `pre-series` | Task 1 Step 3 | 63 | 0 | 20（robotId） |
+   | `series-created` | Task 3 Step 5 | 63 | 29（全draft） | 20（robotId・不変） |
+   | `imported` | Task 9 Step 5 | 198 | 29（全draft） | 20（robotId・不変） |
+   | `cutover` | Task 9.5 Step 3/完了確認 | 191 | 29（published 7・draft 22） | 0（全件 seriesId 化） |
+
+   各 state は独立した期待値テーブルを持つ（`EXPECTATIONS[state]`）。`--state` 未指定は
+   error で終了する（default値による誤判定を防ぐ）。
 3. fixture 注入（テストから Payload を立てずに走らせる経路）
 4. 出力契約の更新
 
@@ -511,14 +523,14 @@ Expected: `robots.json` 197件 / `manufacturers.json` 57件 / `deployments.json`
 - [ ] **Step 3: 検算**
 
 ```bash
-npm run report:robot-db-diff
+npm run report:robot-db-diff -- --state pre-series
 ```
-Expected: exit 0、16項目すべて `✓`。母集団177 / 一致43行(42レコード) / 追加134 / 一致しない21 / メーカー完了時59 / DEC-S08 の親レコード7。
+Expected: exit 0、19項目すべて `✓`。母集団177 / 一致43行(42レコード) / 追加134 / 一致しない21 / メーカー完了時59 / DEC-S08 の親レコード7。
 
-**レポートの期待値は着手前の baseline であり、Task 3 以降は自ら失敗する。** 現在の
-`scripts/report-robot-db-diff.mjs` は robots 63件を前提に値を固定している。Series 移管（Task 3）と
-Apollo 2 分割（Task 7）で件数が動くため、**各 Task 後の期待状態を manifest 化し、同じ固定値を
-使い続けない**（新規finding 9）。
+**`--state` 未対応のまま Task 3 以降へ進むと自ら失敗する。** Series 移管（Task 3）と
+Apollo 2 分割（Task 7）で件数が動くため、Task 1 Step 2 の `--state pre-series` 固定値を
+Task 3 以降でもそのまま使い続けない — 各 Task は自分の状態に対応する `--state` 値を渡す
+（Task 1 Step 2 の対応表）。
 
 **数字が合わない場合、§2〜§3 を直す前に正規化規則の取りこぼしを疑う。**
 
@@ -627,9 +639,9 @@ Task 9.5  Robot（元のid/slug）を削除
 | `article.manufacturerGuideContent.lineup[].robotId` | 1 | `seriesId` へ（`agibot-manufacturer-guide`） |
 
 ```bash
-npm run report:robot-db-diff
+npm run report:robot-db-diff -- --state series-created
 ```
-Expected: 「移管IDを指す参照」が20件。**Task 9.5 の完了条件で0件になることを確認する。**
+Expected: 「移管IDを指す参照」が20件（robotId のまま・不変）。**Task 9.5 の完了条件（`--state cutover`）で0件になることを確認する。**
 
 - [ ] **Step 6: ゲートが赤くなることを確認 → コミット**
 
@@ -866,9 +878,10 @@ Expected: `deploymentStage` 列が正規化JSONに入る。
 **「入力JSONの `id` を `stableId` で検索し、あれば update、無ければ create」**になる。
 
 - 疎なJSON（一部フィールドしか持たない）で update するとき、**既存フィールドを消さない**
-- 正規化JSONの `urls: string[]`（1セル複数URL、代理店シートで51/57行が該当）は、
+- 正規化JSONの `sourceUrls: string[]`（1セル複数URL、代理店シートで51/57行が該当。
+  parse-robot-db.ts:270 が列ごとに `${key}Urls` を生成し、「情報源」列は `sourceUrls`）は、
   Payload の `sources[]`（`title` / `url` / `checkedAt` / `reliability` の配列）へ
-  **全件**変換する。後方互換の `url`（先頭1本）だけを見て残りを捨てない
+  **全件**変換する。後方互換の `sourceUrl`（先頭1本）だけを見て残りを捨てない
 - メーカー単位で transaction を張る（Step 3）
 - `--dry-run` で作成/更新される件数だけ出せる
 - 部分失敗したとき、どこまで進んだかが分かる
@@ -878,26 +891,36 @@ Expected: `deploymentStage` 列が正規化JSONに入る。
 
 - [ ] **Step 3: メーカー単位で投入する**
 
-**1メーカー1 transaction。**Unitree 19機 / Leju 18機 / UBTECH 12機が最大。
+**1メーカー1 transaction ＋ 1 audit artifact。**Unitree 19機 / Leju 18機 / UBTECH 12機が
+最大で、134件全体を1トランザクションにはしない（メーカー59社ぶん、最大59 transaction）。
 `publishStatus: 'draft'` で入れ、`seriesId` を設定する。
 
-各 run について次を artifact として残し、Git へ commit する。
+各 run について、フルの before-image は private object storage（Task 5 §7-8 で選定したもの
+と同じ provider）へ、Git へは要約 manifest のみ commit する（Task 5 の baseline snapshot と
+同じ理由 — Git へ全レコードの二重保存をしない。`content-platform-and-database-architecture-v2.md` §2.1）。
 
 ```
+# object storage（フル）
 run ID / 対象メーカー / 作成した stableId 一覧
 / 更新した stableId 一覧とその before-image（更新前の全フィールド値）
+
+# Git（要約 manifest のみ）
+run ID / 対象メーカー / object storage の URL + sha256
+/ 作成した stableId の一覧 / 更新した stableId の一覧
 / before・after の件数
 ```
 
 **update した stableId は before-image を必ず残す。** create した分は「無かった」状態が
 inverse なので不要だが、update は before-image が無いと戻せない。
 
-**強制的に途中失敗させて全体がロールバックすることをテストする。** 134件中の
-どこか（例: 100件目）で意図的に失敗させ、それまでに投入した分がトランザクション境界内で
-巻き戻ることを確認する。
+**強制的に途中失敗させて、そのメーカー1社ぶんのトランザクションがロールバックすることを
+テストする。**最大のUnitree（19機）を対象に、投入順で15機目を意図的に失敗させ、(a) その
+transaction内で既に作成/更新した1〜14機目が巻き戻ること、(b) 他メーカーの transaction（既に
+成功しているもの）には影響しないこと、の両方を確認する。134件全体をまたぐロールバックは
+設計上存在しない（transaction境界がメーカー単位のため）。
 
 **戻すときはこの artifact から inverse operation を組む。**create は delete、update は
-before-image への再 update。Git revert では戻らない（Payload へ書いたデータは Git 差分ではない）。
+before-imageへの再update。Git revert では戻らない（Payload へ書いたデータは Git 差分ではない）。
 
 - [ ] **Step 4: Task 3 の warning を error へ上げる**
 
@@ -907,7 +930,7 @@ before-image への再 update。Git revert では戻らない（Payload へ書�
 
 ```bash
 npm run check
-npm run report:robot-db-diff
+npm run report:robot-db-diff -- --state imported
 ```
 
 - [ ] **Step 6: ページ重量を実測して記録**
@@ -979,7 +1002,8 @@ Step 1 の3（Robot削除）を意図的に失敗させ、1・2・4・5 が巻�
 - [ ] **Step 3: 本実行する**
 
 ```bash
-npm run content:compare  # 実行前の状態を確認
+npm run content:compare               # 実行前の状態を確認
+npm run report:robot-db-diff -- --state imported   # 実行前は imported のまま（参照20件）
 ```
 
 Expected: 「移管IDを指す参照」相当が20件（Payload側で同等のクエリを用意する）。
@@ -1009,7 +1033,10 @@ git commit -m "feat(data): シリーズ7件を cutover（参照移行・親Robot
 
 ```bash
 npm run check
+npm run report:robot-db-diff -- --state cutover
 ```
+Expected: exit 0。「移管IDを指す参照」相当が**0件**（Step 4 の commit 前は `imported` のまま
+20件のはずで、これが変わっていなければ Step 1 の transaction が実行されていない）。
 
 - [ ] **Step 6: 手動確認**
 
@@ -1017,8 +1044,9 @@ npm run check
 `/robots/booster-t1` が構成一覧を表示すること（一時 slug が残っていないこと）。
 `/robots` のカード数が §3.1 と一致すること。
 
-**完了条件:** 「移管対象IDを指す参照」相当が0件。`robots` 191件・`robotSeries` 29件
-（published 7・draft 22）。7件すべての `slug` が一時値ではなく最終値になっている。
+**完了条件:** `npm run report:robot-db-diff -- --state cutover` が exit 0（「移管対象IDを指す参照」
+相当が0件）。`robots` 191件・`robotSeries` 29件（published 7・draft 22）。7件すべての `slug` が
+一時値ではなく最終値になっている。
 
 ---
 
@@ -1094,9 +1122,9 @@ Task 9（§5 完了が前提）─→ Task 9.5 ─→ Task 10
 ### コマンド
 
 ```bash
-npm run parse:robot-db -- --out data/import   # 原本の再パース
-npm run report:robot-db-diff                  # 突合（期待値16項目）
-npm run check                                 # 全ゲート
+npm run parse:robot-db -- --out data/import                    # 原本の再パース
+npm run report:robot-db-diff -- --state cutover                # 突合（期待値19項目・完了後の状態）
+npm run check                                                   # 全ゲート
 npm run check:world-map-asset                 # Task 8
 npm run check:source-links                    # Task 10
 npm run content:compare               # §0 G-3（①が作る）
