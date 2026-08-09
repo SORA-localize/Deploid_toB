@@ -362,6 +362,9 @@ Article / UseCaseなどの逆方向依存も含め、統合テストで表と実
 ## 11. 未確定事項
 
 次の項目は実装開始時に、無料枠・既存Vercel契約・必要な権限を確認して確定する。アーキテクチャ判断そのものは変えない。
+外部リソースの割当先と、本書・`data-architecture-redesign-v1.md` に対する human approval の記録
+（承認者・commit SHA・承認日時）は [`content-platform-resources-v1.md`](../reference/content-platform-resources-v1.md)
+の Decision Log / External Resources に残す。
 
 - Postgres提供者の最終選択（初期値はSupabase）
 - object storage提供者（初期値はVercel Blob）
