@@ -424,7 +424,7 @@ Expected: 包括URL waiver 0件、RobotのbuyerReadiness必須要件0件、旧ro
 - Consumes: pre-migration refactorで追加済みの`npm run check`、local snapshot、validator、view model
 - Produces: Payload package導入前のclean/green baseline
 
-- [ ] **Step 1: pre-migration programの完了文書を確認する**
+- [x] **Step 1: pre-migration programの完了文書を確認する**
 
 ```bash
 test -f docs/reference/pre-migration-refactor-results-v1.md
@@ -434,7 +434,7 @@ rg -n "CMS / DB移行は未実施|Added gates|Remaining work" \
 
 Expected: results文書が存在し、local TSが正本、品質ゲート完了、CMS / DBが残作業として記録されている。
 
-- [ ] **Step 2: clean installから全gateを実行する**
+- [x] **Step 2: clean installから全gateを実行する**
 
 ```bash
 npm ci
@@ -445,7 +445,7 @@ git diff --check
 
 Expected: 全gate exit 0、critical vulnerability 0。残るhighがある場合は`docs/reference/dependency-audit-2026-07-26.md`にpackage、到達可能性、追跡先がある。
 
-- [ ] **Step 3: source境界と既存migration package不在を確認する**
+- [x] **Step 3: source境界と既存migration package不在を確認する**
 
 ```bash
 npm run check:data-boundaries
@@ -459,7 +459,7 @@ Expected:
 - Payload/Postgres packageは0件
 - migration用envは0件
 
-- [ ] **Step 4: working treeとbranchを確認する**
+- [x] **Step 4: working treeとbranchを確認する**
 
 ```bash
 git status -sb
@@ -468,7 +468,7 @@ git branch --show-current
 
 Expected: working tree clean、CMS / DB移行専用branch上。pre-migration integrationや`main`へ直接実装しない。
 
-- [ ] **Step 5: Task 1完了を記録してcommit**
+- [x] **Step 5: Task 1完了を記録してcommit**
 
 ```bash
 git add docs/plans/content-platform-migration-plan-v1.md
