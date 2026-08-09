@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-08-08
+updated: 2026-08-09
 ---
 
 # データアーキテクチャ再設計 v1（CMS見据え・保守性主眼）
@@ -29,6 +29,10 @@ updated: 2026-08-08
 | 参照の持ち方 | **不変 id と slug を分離**。参照は id、slug は可変URL |
 | 今回の成果物 | **設計ドキュメントのみ** |
 | reports の役割 | **ヒューマノイド専門ニュースメディア**（業界最新情報・取材記事・企業レポート・分析） |
+
+`slug` が可変であることと、保存先移行で自由に変更してよいことは別である。①のPayload移行では
+`slug` / `previousSlugs` / 公開URLをparity対象として維持する。②のSeries cutoverなど、旧URL・
+新URL・301または同一URL継承を計画に列挙して承認した変換だけをwaiverとする。
 
 ---
 
@@ -413,9 +417,21 @@ summary, publishStatus, updatedAt, reliability, sources, heroImage?, seo?
 
 **RobotSeries**（★2026-08-08 新設）: name, nameJa?, **manufacturerId**, description?, images?, industryTags?, taskTags?
 → **スペック・価格・入手性を持たない。** 買えるのは構成（`Robot`）のほう。
+既存RobotをSeriesへ型移行する7件は、RobotのstableIdをSeriesがそのまま継承する。移行期間だけdraft
+Seriesと元Robotに同じstableIdが共存し、単一cutover transactionで元Robotを削除してSeriesだけを残す。
+新規Series 22件だけを`robot-series-*`で発番する。
+
+**検索契約**: `/robots`・`/compare` の機体選択にはRobotだけを出す。サイト横断検索にはpublishedの
+RobotとRobotSeriesを出し、indexの一意キーを
+`{ kind: 'robot' | 'robot-series', stableId, slug }` とする。表示URLはいずれも
+`/robots/${slug}`。同じSeries内で完全一致した場合はSeriesをvariantより先にし、以降は名称一致度・
+表示名・stableIdの順で決定的に並べる。重複排除keyは `${kind}:${stableId}` とする。
 
 **Robot**: name, nameJa?, **manufacturerId**, **seriesId?**★, category, description, featuredRank?, deploymentStage, **specs（specSchema駆動）**, procurementModels[], priceOffers?, loadRatings?, fieldEvidence?, japanAvailability, images?, industryTags?, taskTags?
-→ 2026-08-08 に `buyerReadiness` / `marketAvailability` / `safetyNote` / `vendorRiskNote` / `comparison` を削除（`../plans/robot-data-import-plan-v1.md` DEC-S05・S06）。`buyerReadiness` は `UseCase` 側には残る。
+→ 2026-08-09 に `buyerReadiness` / `marketAvailability` / `safetyNote` / `vendorRiskNote` の
+4フィールドを削除（`../plans/robot-data-import-plan-v1.md` DEC-S05・S06）。`buyerReadiness` は
+`UseCase` 側には残る。`comparison` は `/compare` の実表示が依存するため削除せず、作り替えを
+決める別計画まで維持する。
 
 **Article（旧Report）**: title, titleJa?, **category★**, type, section, publishedAt, author?, industryTags?, regionTags?, **themeTags?[]**, whyItMatters, keyTakeaways?, body?, readingTimeMin?, featured?, **related*Ids[]**
 
@@ -450,7 +466,7 @@ summary, publishStatus, updatedAt, reliability, sources, heroImage?, seo?
 | コレクション | 分割単位 | 理由 |
 |---|---|---|
 | `robots` | **メーカー別** `data/robots/<manufacturer-id>.ts` | 1メーカーの機体は同じ出典・同じ調査回で一緒に更新される。最大は Unitree 19機・Leju 18機 |
-| `robotSeries` | 単一ファイル `data/robotSeries.ts` | 28件・スペックを持たないため小さい |
+| `robotSeries` | Payload `robot-series` collection | 29件・スペックを持たないため小さい |
 | `distributors` | 単一ファイル `data/distributors.ts` | 10件未満 |
 | `manufacturers` | 単一ファイル | 59社・約4,400行。分割は後で判断する |
 | `articles` | **記事種別 × 年** `data/articles/<type>/<slug>.ts` | 記事は1本ずつ書かれ、あとから触らない。既に `manufacturer-guide/` で1本1ファイルの前例がある |
@@ -518,7 +534,7 @@ Payload + PostgreSQL へ移ると、この分割は消える（レコードはDB
 | id / slug | ✅ | ✅ | ✅ | ✅ | **必須** |
 | name / manufacturerId | ✅ | ✅ | ✅ | ✅ | **必須** |
 | summary | ✅ | — | ✅ | — | **必須** |
-| category / deploymentStage / buyerReadiness | ✅ | ✅ | ✅ | — | **必須** |
+| category / deploymentStage | ✅ | ✅ | ✅ | — | **必須** |
 | japanAvailability | ✅ | ✅ | ✅ | — | **必須** |
 | specs（specSchema駆動） | 一部 | ✅ | ✅ | — | 推奨（不明は省略可） |
 | comparison | — | ✅ | ✅ | — | 推奨 |
@@ -604,7 +620,8 @@ Payload + PostgreSQL へ移ると、この分割は消える（レコードはDB
 1. 現行品質ゲートを固定し、Payload CMS を既存 Next.js アプリへ統合する。
 2. 既存の型と不変 id を保ったまま Payload collection / PostgreSQL schema を定義する。
 3. ページから直接 Payload / SQL を呼ばず、サーバー専用 repository 境界を設ける。
-4. `data/*.ts` から再実行可能な importer で投入し、件数・slug・参照・公開URLの一致を検証する。
+4. `data/*.ts` から再実行可能な importer で投入し、件数・slug・previousSlugs・参照・公開URLの
+   一致を検証する。①ではURL waiverを適用しない。
 5. collection 単位で読取先を切り替え、問題時は環境変数でローカルデータへ戻せる期間を設ける。
 6. 管理画面、Codex向けMCP、権限、draft / publish、preview、cache invalidation を整備した後に旧データを読み取り専用化する。
 
