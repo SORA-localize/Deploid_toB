@@ -29,9 +29,9 @@ architecture owner と content owner の両方が承認するまで、対応す�
 
 | Decision | Target doc / section | Approver | Commit SHA | Approval Timestamp |
 |---|---|---|---|---|
-| URL waiver scope（①は slug/previousSlugs/公開URLをparity維持、waiverはSeries cutoverの承認済み変換のみ） | `content-platform-and-database-architecture-v2.md` §10 / `data-architecture-redesign-v1.md` §0 | Hori98 | (see next commit) | 2026-08-09 |
-| Content role enum を4値（`content-reader` / `content-draft-writer` / `content-publisher` / `platform-admin`）に確定 | `content-platform-and-database-architecture-v2.md` §7.3 | Hori98 | (see next commit) | 2026-08-09 |
-| Robot の公開ゲート必須項目から `buyerReadiness` を削除（UseCase側は維持） | `data-architecture-redesign-v1.md` §11 / `data-maintenance-checklist-v1.md` §F | Hori98 | (see next commit) | 2026-08-09 |
+| URL waiver scope（①は slug/previousSlugs/公開URLをparity維持、waiverはSeries cutoverの承認済み変換のみ） | `content-platform-and-database-architecture-v2.md` §10 / `data-architecture-redesign-v1.md` §0 | Hori98 | 9a41fc5 | 2026-08-09 |
+| Content role enum を4値（`content-reader` / `content-draft-writer` / `content-publisher` / `platform-admin`）に確定 | `content-platform-and-database-architecture-v2.md` §7.3 | Hori98 | 9a41fc5 | 2026-08-09 |
+| Robot の公開ゲート必須項目から `buyerReadiness` を削除（UseCase側は維持） | `data-architecture-redesign-v1.md` §11 / `data-maintenance-checklist-v1.md` §F | Hori98 | 9a41fc5 | 2026-08-09 |
 
 未承認の間、①の Task 1 以降には進まない（`../.superpowers/sdd/content-platform-migration-plan-v1/task-0.5-brief.md` 完了条件）。
 
