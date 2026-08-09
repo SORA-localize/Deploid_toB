@@ -32,6 +32,43 @@ function normalize(value) {
     .replace(/[^a-z0-9]/g, '');
 }
 
+/**
+ * `model` が `family` の variant かどうかを、語境界つきで判定する。
+ *
+ * 境界文字は空白・括弧の開き・ハイフンのいずれか（`A2-W` のような正当なハイフン付き
+ * variant を持つため、ハイフンを境界から除外できない）。
+ */
+function hasBoundaryAfter(model, family) {
+  if (model === family) return false;
+  if (!model.startsWith(family)) return false;
+  const boundary = model.slice(family.length, family.length + 1);
+  return boundary === '' || boundary === ' ' || boundary === '　' || boundary === '(' || boundary === '（' || boundary === '-';
+}
+
+/**
+ * `model` の所属ファミリを、候補一覧から**最長一致**で1つに決める。
+ *
+ * 2つのバグを踏まえた実装（2026-08-09、再監査で発見）。
+ *
+ * 1. **`normalize()` は括弧の中身を丸ごと消す。** `Apollo 2（Biped）` を normalize すると
+ *    ファミリ名 `Apollo 2` の normalize 結果と完全一致し、「ファミリ名そのもの」として
+ *    誤って除外される。→ 判定は normalize する前の生の文字列に対して行う。
+ * 2. **境界文字にハイフンを含めると、`G1` が `G1-D Standard` にも一致してしまう**
+ *    （`H2`/`H2-D`、`KUAVO 5`/`KUAVO 5-W` も同型）。一方ハイフンを境界から外すと、
+ *    正当なハイフン付き variant（`A2-W`）まで弾かれる。
+ *    → **同じメーカーの全候補ファミリの中で、一致した文字数が最長のものを採用する。**
+ *      `G1-D Standard` は `G1`（2文字）と `G1-D`（4文字）の両方に一致しうるが、
+ *      長い方の `G1-D` を採用すれば `G1` 側には残らない。`A2-W` は `A2` にしか
+ *      一致しないので、そのまま `A2` の variant になる。
+ */
+function isVariantOf(model, family, allFamiliesSameMaker) {
+  if (!hasBoundaryAfter(model, family)) return false;
+  const longestMatch = allFamiliesSameMaker
+    .filter((candidate) => hasBoundaryAfter(model, candidate))
+    .reduce((longest, candidate) => (candidate.length > longest.length ? candidate : longest), '');
+  return longestMatch === family;
+}
+
 function section(title) {
   console.log(`\n${'─'.repeat(72)}\n${title}\n${'─'.repeat(72)}`);
 }
@@ -156,24 +193,7 @@ const SERIES_FAMILIES_A = [
 
 const seriesRows = [];
 const seriesRowsB = [];
-for (const [maker, family] of SERIES_FAMILIES_A) {
-  const variants = live.filter(
-    (row) =>
-      row.maker === maker &&
-      normalize(row.model).startsWith(normalize(family)) &&
-      normalize(row.model) !== normalize(family),
-  );
-  const owner = manufacturers.find((m) => normalize(m.name) === normalize(maker));
-  const existing = owner
-    ? robots.find(
-        (robot) => robot.manufacturerId === owner.id && normalize(robot.name) === normalize(family),
-      )
-    : undefined;
-
-  seriesRows.push({ family, maker, existing, variants: variants.length });
-}
-
-const transferable = seriesRows.filter((row) => row.existing);
+// 同じメーカーが複数ファミリを持つ場合の最長一致判定に使う（A群・B群を横断）。
 // B群: ファミリ名が機種としても存在する。参照は既に正しく表示されるため移管しない。
 // 3段カスケードUI（別計画）の下地として series レコードだけ作る。
 const SERIES_FAMILIES_B = [
@@ -193,13 +213,30 @@ const SERIES_FAMILIES_B = [
   ['Humanoid', 'HMND 01 ALPHA'],
 ];
 
+const familiesByMaker = new Map();
+for (const [maker, family] of [...SERIES_FAMILIES_A, ...SERIES_FAMILIES_B]) {
+  const list = familiesByMaker.get(maker) ?? [];
+  list.push(family);
+  familiesByMaker.set(maker, list);
+}
+
+for (const [maker, family] of SERIES_FAMILIES_A) {
+  const candidates = familiesByMaker.get(maker) ?? [family];
+  const variants = live.filter((row) => row.maker === maker && isVariantOf(row.model, family, candidates));
+  const owner = manufacturers.find((m) => normalize(m.name) === normalize(maker));
+  const existing = owner
+    ? robots.find(
+        (robot) => robot.manufacturerId === owner.id && normalize(robot.name) === normalize(family),
+      )
+    : undefined;
+
+  seriesRows.push({ family, maker, existing, variants: variants.length });
+}
+
+const transferable = seriesRows.filter((row) => row.existing);
 for (const [maker, family] of SERIES_FAMILIES_B) {
-  const variants = live.filter(
-    (row) =>
-      row.maker === maker &&
-      normalize(row.model).startsWith(normalize(family)) &&
-      normalize(row.model) !== normalize(family),
-  );
+  const candidates = familiesByMaker.get(maker) ?? [family];
+  const variants = live.filter((row) => row.maker === maker && isVariantOf(row.model, family, candidates));
   seriesRowsB.push({ family, maker, variants: variants.length });
 }
 
@@ -276,13 +313,12 @@ section("「素の名前」の親レコード（DEC-S08。variant 投入前に a
 const parentsWithVariants = orphans
   .map((robot) => ({
     robot,
-    variants: additions.filter(
-      (row) =>
-        normalize(row.maker) ===
-          normalize(manufacturers.find((m) => m.id === robot.manufacturerId)?.name ?? '') &&
-        normalize(row.model).startsWith(normalize(robot.name ?? '')) &&
-        normalize(row.model) !== normalize(robot.name ?? ''),
-    ),
+    variants: additions.filter((row) => {
+      const makerName = manufacturers.find((m) => m.id === robot.manufacturerId)?.name ?? '';
+      if (normalize(row.maker) !== normalize(makerName)) return false;
+      const candidates = familiesByMaker.get(row.maker) ?? [robot.name ?? ''];
+      return isVariantOf(row.model, robot.name ?? '', candidates);
+    }),
   }))
   .filter((entry) => entry.variants.length > 0);
 

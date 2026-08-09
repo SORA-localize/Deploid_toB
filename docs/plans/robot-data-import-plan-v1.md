@@ -580,7 +580,7 @@ Apollo 2 分割（Task 7）で件数が動くため、**各 Task 後の期待状
 
 | | 件数 | 扱い |
 |---|---|---|
-| A群のうち既存 Robot がある（移管） | 7 | `id` と `slug` を引き継ぐ（URL が動かない） |
+| A群のうち既存 Robot がある（移管） | 7 | `id` は新規発行、**`slug` は一時値**（下記） |
 | A群のうち既存 Robot が無い（新規） | 8 | 構成がすべて新規追加分のため |
 | B群（新規） | 14 | ファミリ名が機種と衝突するため `unitree-g1-series` のような slug を新設 |
 
@@ -589,10 +589,25 @@ Apollo 2 分割（Task 7）で件数が動くため、**各 Task 後の期待状
 
 公開ゲートは Manufacturer と同じ水準（`id` / `slug` / `name` / `manufacturerId` / `summary` / `sources` 非空）。`sources` はメーカーのシリーズ製品ページ。
 
-**移管7件は `robotSeries` 側に新しいレコードを作るだけで、元の `Robot` レコードはまだ消さない。**
-`id` / `slug` の引き継ぎ（同じ値を `robotSeries` 側にも設定する）は行うが、実際に
-`robots` から取り除くのは Task 9.5（variant 投入後）。**理由は §4 のとおり — variant が
-0件の状態で published な Series を晒さない。**
+**移管7件の `id` は既存 `Robot` から引き継がない。新規発行する。** `robotSeries` は
+`robots` とは別 collection なので、`id`（stableId）自体の重複は技術的には起きない。
+問題は Step 2 で入れる **`slug` の横断一意性検査**のほうで、こちらは意図的に
+`robots` と `robotSeries` をまたいで見る。移管7件の最終的な `slug` は既存 `Robot` と
+**同じ値にする計画**（URLを動かさないため）だが、その `Robot` レコード自体は
+Task 9.5（variant 投入後）まで消えない。**同じ `slug` を持つレコードが2つ同時に
+存在する期間ができるため、それまでは一時 slug を使う。**
+
+```
+Task 3    robotSeries.slug = '<元のslug>-series'   （例: booster-t1-series）
+             ↓  variant 投入（Task 9）・参照移行（Task 9.5 Step 1）
+Task 9.5  Robot（元のid/slug）を削除
+             ↓  同一トランザクション内、削除後
+          robotSeries.slug を '<元のslug>-series' → '<元のslug>' へ更新
+```
+
+**削除と slug 更新を同一トランザクションにする。** 順序を分けてコミットすると、
+「Robot は消えたが Series の slug がまだ `-series` のまま」という状態が本番に見える
+瞬間ができる。
 
 - [ ] **Step 4: 既存の姉妹 variant に `seriesId` を付ける**
 
@@ -624,8 +639,11 @@ Expected: 「移管IDを指す参照」が20件。**Task 9.5 の完了条件で0
 
 ### Task 3.5: シリーズの公開状態を決める（§3.1 の宿題）
 
+**この時点で Payload が正本。テストは Payload Local API に対して書く**
+（`localContentSnapshot` は①の Task 9 で撤去済み）。
+
 **Files:**
-- Modify: `data/robotSeries.ts`（または Payload 上のレコード）
+- Modify: `collections/RobotSeries.ts`（`beforeChange` hook）
 - Test: `tests/content/series-publish-gate.test.ts`
 
 **Global Constraints は「新規レコードは draft」としている。29件すべてこれに従う。**
@@ -637,25 +655,40 @@ Expected: 「移管IDを指す参照」が20件。**Task 9.5 の完了条件で0
 ```
 Series を draft で作成（Task 3）
   → variant 投入（Task 9）
-  → 参照移行（Task 9.5）
-  → 親 Robot 削除（Task 9.5）
-  → 移管7件の Series を published（Task 9.5）
+  → 参照移行・親Robot削除・slug確定・公開（Task 9.5、単一トランザクション）
 ```
 
 - [ ] **Step 1: 29件とも `publishStatus: 'draft'` で作成したことを確認する**
 
+```bash
+npm run content:compare -- --collection robot-series --field publishStatus
+```
+Expected: 29件すべて `draft`。
+
 - [ ] **Step 2: published な useCase が draft な Series を参照しないゲートを足す**
 
 ```ts
-it('published な useCase は draft の series を候補にできない', () => {
-  const snapshot = structuredClone(localContentSnapshot);
-  const series = snapshot.robotSeries.find((x) => x.publishStatus === 'draft')!;
-  const useCase = snapshot.useCases.find((u) => u.publishStatus === 'published')!;
-  useCase.candidateRobots[0] = { ...useCase.candidateRobots[0], robotId: undefined, seriesId: series.id };
+import { describe, expect, it, beforeAll } from 'vitest';
+import { getPayload } from 'payload';
+import config from '@payload-config';
 
-  expect(
-    validateContentSnapshot(snapshot).errors.some((e) => e.startsWith('[candidate-series-draft]')),
-  ).toBe(true);
+describe('published useCase は draft の series を候補にできない', () => {
+  let payload: Awaited<ReturnType<typeof getPayload>>;
+  beforeAll(async () => { payload = await getPayload({ config }); });
+
+  it('draft series を候補にした update を拒否する', async () => {
+    const [draftSeries] = (await payload.find({ collection: 'robot-series', where: { publishStatus: { equals: 'draft' } }, limit: 1 })).docs;
+    const [publishedUseCase] = (await payload.find({ collection: 'use-cases', where: { publishStatus: { equals: 'published' } }, limit: 1 })).docs;
+
+    await expect(
+      payload.update({
+        collection: 'use-cases',
+        id: publishedUseCase.id,
+        data: { candidateRobots: [{ seriesId: draftSeries.id }] },
+        overrideAccess: false,
+      }),
+    ).rejects.toThrow(/candidate-series-draft/);
+  });
 });
 ```
 
@@ -894,62 +927,98 @@ published 件数とバイト数を対で記録し、**1件あたりのバイト�
 
 ### Task 9.5: シリーズを cutover する（DEC-S08。§4 の順序の最終段）
 
+**この Task の時点で、①の cutover（Task 9）は完了しており Payload が唯一の正本。**
+`data/*.ts` は既に存在しない。**すべて Payload Local API または管理画面操作として書く。**
+`git commit -am` で DB の変更をコミットすることはできない — Git には audit artifact
+だけを残す（Global Constraints）。
+
 **Files:**
-- Modify: `data/robotSeries.ts`（7件を published に）
-- Modify: `data/useCases.ts`（14箇所）、`data/articles.ts`（5箇所。`relatedRobotIds` 4 + `manufacturerGuideContent.lineup` 1）
-- Modify: `data/robots.ts`（移管7件を削除）
+- Create: `scripts/cutover-migrated-series.mts`（1回限りの cutover script）
+- Create: `docs/reference/cutover-migrated-series-<日付>.json`（audit artifact）
 
 **Interfaces:**
-- Consumes: Task 9 で投入された variant（`seriesId` 設定済み）
+- Consumes: Task 9 で投入された variant（`seriesId` 設定済み）、Task 3 で作った7件の
+  一時 slug（`<元slug>-series`）
 
 **Task 9 で variant が実在するようになった後に、まとめて行う。** 分けて実行すると
-「published な Series が空」または「Robot と Series が同じ id/slug で衝突する」状態が生まれる。
+「published な Series が空」「Robot と Series が同じ slug で衝突する」
+「Robot は消えたが Series の slug がまだ一時値のまま」のいずれかの状態が本番に見える。
 
-- [ ] **Step 1: 参照20件を `seriesId` へ移行する**
+**参照移行の対象（Article側）を先に決める。** `Article` 型には `relatedRobotIds: Id[]` しか
+なく、`seriesId` の受け皿が無い（`UseCase.candidateRobots[]` とは違う）。Article 型に
+`relatedRobotSeriesIds` を新設して①へ差し戻す案もあるが、5箇所のためだけに①のTask 0.5・
+Task 3・migration・validator・repository・parity・記事UIまで連鎖させるのは過大。
+**代わりに、5箇所は移管先シリーズの中の代表 variant（具体的な Robot）へ付け替える。**
+どの variant を代表にするかは編集判断（G2 と同様、機械では決めない）。
+
+| 記事 | 現在の参照 | 付け替え先候補（人が確定） |
+|---|---|---|
+| `jal-haneda-humanoid-pilot-2026` | `ubtech-walker-tienkung` | Walker Tienkung の3構成から選ぶ |
+| `china-humanoid-duopoly-agibot-june2026` | `agibot-a2` | A2 の3構成から選ぶ |
+| `china-humanoid-demand-gap-june2026` | `agibot-a2` | 同上 |
+| `humanoids-summit-tokyo-may2026` | `booster-t1` | T1 の3構成から選ぶ |
+| `agibot-manufacturer-guide`（`relatedRobotIds` + `manufacturerGuideContent.lineup`） | `agibot-a2` | 同上（2箇所とも同じ variant にする） |
+
+- [ ] **Step 1: 単一トランザクションで cutover script を書く**
+
+7件それぞれについて、次を**すべて成功するか全部失敗するかの1トランザクション**にする
+（High「トランザクションとaudit artifactの設計」への対応）。
+
+```
+1. useCase.candidateRobots[].robotId → seriesId（14箇所）
+2. article.relatedRobotIds の robotId → 代表 variant の robotId（5箇所、上表で確定した値）
+3. Robot（移管元、元の id/slug）を削除
+4. RobotSeries.slug を '<元slug>-series' → '<元slug>' へ更新
+5. RobotSeries.publishStatus を 'published' へ
+```
+
+- [ ] **Step 2: 強制失敗させて全体がロールバックすることを確認する**
+
+Step 1 の3（Robot削除）を意図的に失敗させ、1・2・4・5 が巻き戻ることを確認する。
+
+- [ ] **Step 3: 本実行する**
 
 ```bash
-npm run report:robot-db-diff
+npm run content:compare  # 実行前の状態を確認
 ```
-Expected: 「移管IDを指す参照」が20件のまま（まだ移行前）。
 
-`useCase.candidateRobots[].robotId` 14箇所、`article.relatedRobotIds` 5箇所、
-`article.manufacturerGuideContent.lineup[].robotId` 1箇所（`agibot-manufacturer-guide`）を
-`seriesId` へ書き換える。根拠URL・`roleLabel` は変更しない（もともとシリーズ製品ページを指している）。
+Expected: 「移管IDを指す参照」相当が20件（Payload側で同等のクエリを用意する）。
 
-- [ ] **Step 2: 移管7件の Robot レコードを削除する**
+- [ ] **Step 4: audit artifact を記録して commit**
 
-`id` / `slug` は既に `robotSeries` 側が引き継いでいる（Task 3）。**同じ `id` を `robots` と
-`robotSeries` の両方に残さない** — Payload では collection が違えば technically 衝突しないが、
-`/robots/[slug]` のルーティングは1つの実体にしか解決できない。
+```json
+{
+  "runId": "...",
+  "seriesIds": ["..."],
+  "deletedRobotIds": ["booster-t1", "booster-k1", "..."],
+  "referenceMigrations": [{ "collection": "useCases", "id": "...", "field": "candidateRobots[0].robotId", "before": "booster-t1", "after": "<seriesId>" }],
+  "slugRenames": [{ "seriesId": "...", "before": "booster-t1-series", "after": "booster-t1" }]
+}
+```
 
-- [ ] **Step 3: 移管7件の Series を `published` にする**
-
-variant が実在し、参照も移行済みなので、ここで初めて公開する。
-
-- [ ] **Step 4: 検証**
+**artifact 本体（各レコードの before-image）は private object storage へ置く。** Git には
+上記のような要約（対象IDと件数）だけを commit する。全フィールドの before-image を
+Git へ置くと、baseline snapshot で避けた「Gitへの content record 二重保存」が再発する。
 
 ```bash
-npm run report:robot-db-diff
+git add docs/reference/cutover-migrated-series-<日付>.json scripts/cutover-migrated-series.mts
+git commit -m "feat(data): シリーズ7件を cutover（参照移行・親Robot削除・公開）"
 ```
-Expected: 「移管IDを指す参照」が **0件**。`robots` が191件、`robotSeries` が29件
-（うち published 7）。
+
+- [ ] **Step 5: 検証**
 
 ```bash
 npm run check
 ```
 
-- [ ] **Step 5: 手動確認**
+- [ ] **Step 6: 手動確認**
 
 `/use-cases/research-development` の候補に「T1（提供終了）」が出ないこと。
-`/robots/booster-t1` が構成一覧を表示すること。`/robots` のカード数が §3.1 と一致すること。
+`/robots/booster-t1` が構成一覧を表示すること（一時 slug が残っていないこと）。
+`/robots` のカード数が §3.1 と一致すること。
 
-- [ ] **Step 6: コミット**
-
-```bash
-git commit -am "feat(data): シリーズ7件を cutover（参照移行・親Robot削除・公開）"
-```
-
-**完了条件:** 「移管IDを指す参照」が0件。`robots` 191件・`robotSeries` 29件（published 7・draft 22）。
+**完了条件:** 「移管対象IDを指す参照」相当が0件。`robots` 191件・`robotSeries` 29件
+（published 7・draft 22）。7件すべての `slug` が一時値ではなく最終値になっている。
 
 ---
 

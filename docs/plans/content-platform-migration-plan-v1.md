@@ -560,19 +560,24 @@ git commit -m "feat: embed Payload CMS in the Next.js app"
 - Create: `globals/SiteSettings.ts`
 - Create: `lib/payload/access.ts`
 - Modify: `payload.config.ts`
-- Modify: `data/types.ts`（削除4フィールド、`RobotSeries` / `Distributor` 型、`Robot.seriesId`、`UseCaseCandidateRobot.seriesId`）
-- Modify: `lib/catalog/search.ts`（`buyerReadinessLabels[robot.buyerReadiness]` の除去）
-- Modify: `lib/labels.ts` / `lib/visualSemantics.ts`（`marketAvailabilityLabels` / 未使用 tone の除去）
-- Modify: `scripts/build-data-r01-manifest.mjs` / `scripts/build-data-r02-manifest.mjs`
-- Modify: `tests/unit/view-models/robots.test.ts`
 - Test: `tests/content/payload-schema.test.ts`
 
 **Interfaces:**
 - Consumes: `data/types.ts` の現行field semantics（**ただし §D の削除4フィールドは写さない**）
 - Produces: Payload collections 10本、relationship fields、draft/version、role-based access
 
-**`data/types.ts` をそのまま写さない。** 現行型には削除が決まっているフィールドが含まれる。
-写すと Payload schema へ再導入され、②の §0 G-4 が永久に通らなくなる。
+**`data/types.ts` はこの Task では触らない。** Payload の `collections/Robots.ts` は
+`data/types.ts` の `Robot` interface を import・変換して作るのではなく、**独立した schema
+定義として最初から4フィールド無しで書く。** `data/robots.ts` は `Robot[]` として型付けされ
+（`data/robots.ts:3`）該当4フィールドを大量に持つため、`data/types.ts` から先に削除すると
+`data/robots.ts` が余剰プロパティエラーでコンパイル不能になる。**local source（Task 4）が
+まだ `data/robots.ts` を読んでいる間は、旧型はそのまま残す。**
+
+型と実データの同時削除は **Task 9（cutover・旧TS撤去）**で行う。そこで `data/*.ts` を
+丸ごと消すため、型だけ先に消す必要が無い。`lib/catalog/search.ts` の
+`buyerReadinessLabels[robot.buyerReadiness]` など、削除4フィールドに依存する消費側コードは
+**Task 6（ページをrepositoryへ切り替える）**で直す。Task 6 の時点でページが読む形が
+Payload 由来（4フィールド無し）に変わるため、そこで消費側を合わせる。
 
 **このTaskが `Robot` から削除する4フィールド**（`robot-data-import-plan-v1.md` DEC-S05・S06）:
 
@@ -854,15 +859,24 @@ import type {
 
 export interface ContentSnapshot {
   robots: Robot[];
+  robotSeries: RobotSeries[];        // ②DEC-S08。Task 3 §D
+  distributors: Distributor[];       // architecture-v2 §4-1。Task 3 §D
   manufacturers: Manufacturer[];
   useCases: UseCase[];
-  articles: Article[];
   deployments: DeploymentSite[];
+  articles: Article[];
   articlePlacements: ArticlePlacement[];
+  articleIndexPlacementLimits: Record<ArticlePlacementSlot, number>;  // lib/data/localContentSnapshot.ts に既存
+  media: MediaAsset[];                // 新規。rights metadata を含む
   siteSettings: {
     dataAsOf: string;
   };
 }
+
+// 10コレクション全部を持つ。Task 4 §「10コレクションの契約表」と同じ集合にする。
+// robotSeries / distributors / media / articleIndexPlacementLimits は
+// 既存 lib/data/contentSnapshot.ts の型には無いため、ここで拡張する
+// （既存を re-export せず置き換えるのではなく、フィールドを足す形で拡張する）。
 
 export interface ContentSource {
   listRobots(query: RobotListQuery): Promise<Robot[]>;
@@ -988,18 +1002,23 @@ collectionごとに `stableId` を検索し、存在すればupdate、なけれ�
 
 mediaは現行レコード内の画像を `src + rights metadata` で正規化・重複排除して先に作る。ローカル画像はobject storageへuploadし、外部画像は権利確認済みのものだけ取得・保存する。取得不能または権利未確定の画像は自動公開せず、parity reportの要確認項目として残す。
 
-Import order:
+Import order（10コレクション全部。依存先を先に import する）:
 
 ```text
 media
 manufacturers
-robots
-use-cases
-deployments
-articles
-article-placements
+distributors        # manufacturers を参照するため後
+robot-series         # manufacturers を参照するため後
+robots               # robot-series / manufacturers を参照するため後
+use-cases            # robots / robot-series を参照するため後
+deployments          # robots / manufacturers を参照するため後
+articles             # robots / robot-series / manufacturers を参照するため後
+article-placements   # articles を参照するため後
 site-settings
 ```
+
+**`robotSeries` は `robots` より先。** `Robot.seriesId` が `robotSeries` を参照するため、
+先に import しないと relationship の解決先が無い。
 
 - [ ] **Step 4: parity比較を実装する**
 
@@ -1024,10 +1043,16 @@ site-settings
   "scripts": {
     "content:import": "tsx scripts/import-content-to-payload.mts",
     "content:compare": "tsx scripts/compare-content-sources.mts",
-    "content:export": "tsx scripts/export-content-snapshot.mts"
+    "content:export": "tsx scripts/export-content-snapshot.mts",
+    "content:restore": "tsx scripts/export-content-snapshot.mts --restore"
   }
 }
 ```
+
+**`content:import` は現状「local TS → Payload」の一方向しか無い。** 復旧には
+「export した snapshot → 空DBへ書き戻す」経路が要る。`content:restore` を
+`--input <snapshot>` で受け、`content:import` と同じ upsert ロジックを再利用して
+空DBへ流し込む。
 
 `tsx` は **Task 2 Step 3 で devDependency として追加する**（Task 1 に install step は無く、
 現 `package.json` にも無い。lockfile に transitive として存在するだけなので依存しない）。
@@ -1048,6 +1073,17 @@ Run: `npm run content:import`
 Expected: 重複を作らず、同じstable ID集合でexit 0
 
 Run: `npm run content:compare`
+
+- [ ] **Step 6.5: export→restore の round-trip を確認する**
+
+```bash
+npm run content:export -- --out /tmp/rt.json
+# 別の空DBを用意する
+DATABASE_URL="$RESTORE_TEST_DB_URL" npm run content:restore -- --input /tmp/rt.json
+DATABASE_URL="$RESTORE_TEST_DB_URL" npm run content:compare -- --against /tmp/rt.json
+```
+Expected: restore後のDBが export 元と一致する（parity差分0）。**この round-trip が
+G-7（復旧手順が動く）の実証になる。**
 
 Expected: `missing=0 extra=0 changed=0 brokenReferences=0`
 
@@ -1115,6 +1151,14 @@ git commit -m "feat: add idempotent content migration tooling"
 - Modify: `components/UseCasesBrowser.tsx`
 - Modify: `components/ManufacturersBrowser.tsx`
 - Modify: `components/ReportsBrowser.tsx`
+- Modify: `lib/catalog/search.ts`（`buyerReadinessLabels[robot.buyerReadiness]` の除去。DEC-S05）
+- Modify: `lib/labels.ts` / `lib/visualSemantics.ts`（`marketAvailabilityLabels` / 未使用 tone の除去）
+- Modify: `scripts/build-data-r01-manifest.mjs` / `scripts/build-data-r02-manifest.mjs`
+- Modify: `tests/unit/view-models/robots.test.ts`
+
+**ページが repository（Payload由来・4フィールド無し）を読み始めるのはこの Task から。**
+削除4フィールドに依存する消費側コードをここで直す。Task 3 では触らなかった
+（`data/robots.ts` がまだ4フィールドを持つ local source を使うため）。
 - Test: `tests/e2e/content-routes.spec.ts`
 
 **Interfaces:**
@@ -1440,6 +1484,7 @@ git commit -m "feat: add least-privilege Codex content access"
 - Delete after parity: `data/deployments.ts`
 - Delete after parity: `data/articles.ts`
 - Delete after parity: `data/articlePlacements.ts`
+- Delete after parity: `data/types.ts`（削除4フィールド・削除4フィールドを参照する型定義ごと。Task 3 で先送りした型変更をここで完結させる）
 - Delete after cutover: `lib/content/localSource.ts`
 - Modify: `lib/content/getContentRepository.ts`
 - Modify: `scripts/validate-data.mjs`
