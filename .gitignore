@@ -48,3 +48,7 @@ tsconfig.plan-snippets.tsbuildinfo
 
 # subagent-driven-development scratch workspace (ledgers, briefs, review packages)
 .superpowers/
+
+# tests/content/migration.test.ts (Task 3.5): per-run temp migration output dirs. The suite always
+# rm -rf's these itself in afterAll; this is only a safety net for an interrupted/crashed run.
+tests/fixtures/payload-migrations/.tmp-*

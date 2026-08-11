@@ -18,8 +18,7 @@
     "tw-animate-css",
     "@radix-ui/colors",
     "postcss",
-    "postcss-load-config",
-    "tsx"
+    "postcss-load-config"
   ],
   "ignore": [
     "src/app/(payload)/admin/importMap.d.ts"

@@ -2,21 +2,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
 import { Admins } from './collections/Admins';
-import { ArticlePlacements } from './collections/ArticlePlacements';
-import { Articles } from './collections/Articles';
-import { Deployments } from './collections/Deployments';
-import { Distributors } from './collections/Distributors';
-import { Manufacturers } from './collections/Manufacturers';
-import { Media } from './collections/Media';
-import { RobotSeriesCollection } from './collections/RobotSeries';
-import { Robots } from './collections/Robots';
-import { UseCases } from './collections/UseCases';
-import { SiteSettings } from './globals/SiteSettings';
-import { RouteRegistryCollection } from './lib/payload/routeRegistry';
+import { contentCollections, contentGlobals } from './lib/payload/contentSchema';
+import { createMediaStoragePlugin } from './lib/payload/mediaStoragePlugin';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -42,24 +32,6 @@ function requireEnv(name: 'DATABASE_URL' | 'PAYLOAD_SECRET'): string {
   return value;
 }
 
-/**
- * public media store（Task 0で確定、`docs/reference/content-platform-resources-v1.md` #2）。
- * `BLOB_READ_WRITE_TOKEN` はVercelが環境（Production/Preview）ごとに自動注入するclassic static
- * tokenで、private audit storeとは別物（private audit tokenをMedia adapterへ渡さない、brief）。
- * local/CIでtokenが無い場合は `token: undefined` によりplugin自体が自動でlocal storageへ
- * fallbackするが、`alwaysInsertFields: true` で環境間のfield差分を無くす（brief:
- * 「schemaへ注入されるfield差分が環境間で変わらない設定にする」）。`MEDIA_STORAGE_ENABLED=false`
- * で明示的に無効化した場合も同様にfieldは残る（adapterを無かったことにしない）。
- */
-const mediaStoragePlugin = vercelBlobStorage({
-  enabled: process.env.MEDIA_STORAGE_ENABLED !== 'false',
-  token: process.env.BLOB_READ_WRITE_TOKEN,
-  alwaysInsertFields: true,
-  collections: {
-    media: true,
-  },
-});
-
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
   admin: {
@@ -68,28 +40,29 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [
-    Admins,
-    Manufacturers,
-    Distributors,
-    RobotSeriesCollection,
-    Robots,
-    UseCases,
-    Deployments,
-    Articles,
-    ArticlePlacements,
-    Media,
-    RouteRegistryCollection,
-  ],
-  globals: [SiteSettings],
+  collections: contentCollections,
+  globals: contentGlobals,
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),
   db: postgresAdapter({
     pool: {
       connectionString: requireEnv('DATABASE_URL'),
     },
+    // Payload's default resolution (`findMigrationDir`) picks `src/migrations` whenever a `src/`
+    // directory exists (it does here, for `src/app/(payload)`), not repo-root `migrations/`.
+    // Pin it explicitly so generated migrations land where Task 3.5 commits them
+    // (`docs/reference/database-migration-runbook-v1.md`, `git add migrations`).
+    //
+    // `PAYLOAD_TEST_MIGRATION_DIR` is an escape hatch for `tests/content/migration.test.ts` only
+    // (Task 3.5 Step 2's "generate the initial migration against an empty DB" scenario, run
+    // repeatedly against throwaway databases) — it redirects generated migration *output* to a
+    // temp directory so repeated test runs never write timestamped files into the real, committed
+    // `migrations/` directory. Never set in a real deploy environment.
+    migrationDir: process.env.PAYLOAD_TEST_MIGRATION_DIR
+      ? path.resolve(process.cwd(), process.env.PAYLOAD_TEST_MIGRATION_DIR)
+      : path.resolve(dirname, 'migrations'),
   }),
-  plugins: [mediaStoragePlugin],
+  plugins: [createMediaStoragePlugin()],
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
