@@ -1,24 +1,14 @@
 import type { Access, CollectionConfig, FieldAccess, PayloadRequest } from 'payload';
+import { type AdminRole, asAdminUser, isPlatformAdmin as isPlatformAdminAccess, isPlatformAdminUser } from '../lib/payload/access';
 
 /**
  * 正式な role enum は4値だけ。旧称 `editor` / `publisher` / `admin` は表示ラベルに限り、
  * 保存値・API入力には使わない（`docs/plans/content-platform-migration-plan-v1.md` Task 2）。
+ * 正本は `lib/payload/access.ts`（9+ collectionが同じenumで分岐するため）。ここは既存の
+ * import site（`import type { AdminRole } from '../collections/Admins'`）を壊さないための
+ * re-export。
  */
-export type AdminRole = 'content-reader' | 'content-draft-writer' | 'content-publisher' | 'platform-admin';
-
-interface AuthenticatedAdminUser {
-  id: string | number;
-  role?: AdminRole;
-}
-
-function asAdminUser(user: PayloadRequest['user']): AuthenticatedAdminUser | null {
-  if (!user) return null;
-  return user as unknown as AuthenticatedAdminUser;
-}
-
-function isPlatformAdminUser(user: AuthenticatedAdminUser | null): boolean {
-  return Boolean(user && user.role === 'platform-admin');
-}
+export type { AdminRole };
 
 /** admins コレクションの現在の総件数。bootstrap判定に使う。 */
 async function countAdmins(req: PayloadRequest): Promise<number> {
@@ -77,7 +67,7 @@ export const platformAdminExceptLastPlatformAdmin: Access = async ({ req }) => {
   return true;
 };
 
-export const isPlatformAdmin: Access = ({ req }) => isPlatformAdminUser(asAdminUser(req.user));
+export const isPlatformAdmin: Access = isPlatformAdminAccess;
 
 /**
  * role の update は platform-admin だけに許可する。加えて、対象docが現在 platform-admin で、

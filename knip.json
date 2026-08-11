@@ -19,8 +19,7 @@
     "@radix-ui/colors",
     "postcss",
     "postcss-load-config",
-    "tsx",
-    "@payloadcms/storage-vercel-blob"
+    "tsx"
   ],
   "ignore": [
     "src/app/(payload)/admin/importMap.d.ts"

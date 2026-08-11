@@ -68,6 +68,16 @@ export interface Config {
   blocks: {};
   collections: {
     admins: Admin;
+    manufacturers: Manufacturer;
+    distributors: Distributor;
+    'robot-series': RobotSery;
+    robots: Robot;
+    'use-cases': UseCase;
+    deployments: Deployment;
+    articles: Article;
+    'article-placements': ArticlePlacement;
+    media: Media;
+    'content-route-registry': ContentRouteRegistry;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -76,6 +86,16 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     admins: AdminsSelect<false> | AdminsSelect<true>;
+    manufacturers: ManufacturersSelect<false> | ManufacturersSelect<true>;
+    distributors: DistributorsSelect<false> | DistributorsSelect<true>;
+    'robot-series': RobotSeriesSelect<false> | RobotSeriesSelect<true>;
+    robots: RobotsSelect<false> | RobotsSelect<true>;
+    'use-cases': UseCasesSelect<false> | UseCasesSelect<true>;
+    deployments: DeploymentsSelect<false> | DeploymentsSelect<true>;
+    articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    'article-placements': ArticlePlacementsSelect<false> | ArticlePlacementsSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    'content-route-registry': ContentRouteRegistrySelect<false> | ContentRouteRegistrySelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -85,8 +105,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -143,6 +167,776 @@ export interface Admin {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "manufacturers".
+ */
+export interface Manufacturer {
+  id: number;
+  stableId: string;
+  slug: string;
+  previousSlugs?: string[] | null;
+  lifecycleStatus: 'active' | 'archived';
+  summary?: string | null;
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  sources?:
+    | {
+        title: string;
+        url: string;
+        publisher?: string | null;
+        publishedAt?: string | null;
+        checkedAt: string;
+        reliability: 'verified' | 'official' | 'reported' | 'estimated';
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  nextReviewBy?: string | null;
+  heroImage?: {
+    src?: string | null;
+    alt?: string | null;
+    credit?: string | null;
+    sourceUrl?: string | null;
+    rights?: {
+      status?:
+        | (
+            | 'own'
+            | 'licensed'
+            | 'commercial-permitted'
+            | 'reference-attributed'
+            | 'permission-requested'
+            | 'prototype-only'
+            | 'blocked'
+          )
+        | null;
+      sourceType?:
+        ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+      checkedAt?: string | null;
+      rightsHolder?: string | null;
+      licenseUrl?: string | null;
+      permissionNote?: string | null;
+    };
+    aspectRatio?: number | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    noindex?: boolean | null;
+  };
+  name?: string | null;
+  nameJa?: string | null;
+  companyType?: ('manufacturer' | 'distributor' | 'integrator' | 'ai-os' | 'research') | null;
+  companyStatus?: ('active' | 'stealth' | 'acquired' | 'inactive') | null;
+  country?: string | null;
+  hqCity?: string | null;
+  headquarters?: {
+    lat?: number | null;
+    lng?: number | null;
+  };
+  foundedYear?: number | null;
+  website?: string | null;
+  /**
+   * ManufacturerLogos（symbol/wordmark/combined、それぞれImageAsset形）。
+   */
+  logos?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  contactUrl?: string | null;
+  description?: string | null;
+  japanPresence?: ('office' | 'distributor' | 'partner' | 'remote' | 'none' | 'unknown') | null;
+  /**
+   * 移行完了後に削除予定（data-architecture-redesign-v1.md §11: distributors collectionへ移す）。当面は表示互換のため残す。
+   */
+  domesticDistributors?:
+    | {
+        name: string;
+        website?: string | null;
+        sourceUrl?: string | null;
+        checkedAt?: string | null;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  distributorNote?: string | null;
+  supportNote?: string | null;
+  procurementNote?: string | null;
+  vendorRiskNote?: string | null;
+  featuredRank?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "distributors".
+ */
+export interface Distributor {
+  id: number;
+  stableId: string;
+  slug: string;
+  previousSlugs?: string[] | null;
+  lifecycleStatus: 'active' | 'archived';
+  summary?: string | null;
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  sources?:
+    | {
+        title: string;
+        url: string;
+        publisher?: string | null;
+        publishedAt?: string | null;
+        checkedAt: string;
+        reliability: 'verified' | 'official' | 'reported' | 'estimated';
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  nextReviewBy?: string | null;
+  heroImage?: {
+    src?: string | null;
+    alt?: string | null;
+    credit?: string | null;
+    sourceUrl?: string | null;
+    rights?: {
+      status?:
+        | (
+            | 'own'
+            | 'licensed'
+            | 'commercial-permitted'
+            | 'reference-attributed'
+            | 'permission-requested'
+            | 'prototype-only'
+            | 'blocked'
+          )
+        | null;
+      sourceType?:
+        ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+      checkedAt?: string | null;
+      rightsHolder?: string | null;
+      licenseUrl?: string | null;
+      permissionNote?: string | null;
+    };
+    aspectRatio?: number | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    noindex?: boolean | null;
+  };
+  name?: string | null;
+  nameJa?: string | null;
+  website?: string | null;
+  providerType?: ('maker-direct' | 'reseller' | 'other') | null;
+  handledManufacturerIds?: (number | Manufacturer)[] | null;
+  handledRobotIds?: (number | Robot)[] | null;
+  acquisitionMethods?: ('purchase' | 'lease' | 'raas' | 'subscription' | 'inquiry')[] | null;
+  inquiryUrl?: string | null;
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "robots".
+ */
+export interface Robot {
+  id: number;
+  stableId: string;
+  slug: string;
+  previousSlugs?: string[] | null;
+  lifecycleStatus: 'active' | 'archived';
+  summary?: string | null;
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  sources?:
+    | {
+        title: string;
+        url: string;
+        publisher?: string | null;
+        publishedAt?: string | null;
+        checkedAt: string;
+        reliability: 'verified' | 'official' | 'reported' | 'estimated';
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  nextReviewBy?: string | null;
+  heroImage?: {
+    src?: string | null;
+    alt?: string | null;
+    credit?: string | null;
+    sourceUrl?: string | null;
+    rights?: {
+      status?:
+        | (
+            | 'own'
+            | 'licensed'
+            | 'commercial-permitted'
+            | 'reference-attributed'
+            | 'permission-requested'
+            | 'prototype-only'
+            | 'blocked'
+          )
+        | null;
+      sourceType?:
+        ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+      checkedAt?: string | null;
+      rightsHolder?: string | null;
+      licenseUrl?: string | null;
+      permissionNote?: string | null;
+    };
+    aspectRatio?: number | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    noindex?: boolean | null;
+  };
+  name?: string | null;
+  nameJa?: string | null;
+  manufacturerId?: (number | null) | Manufacturer;
+  seriesId?: (number | null) | RobotSery;
+  category?: ('humanoid' | 'general-purpose-robot' | 'upper-body-humanoid' | 'mobile-manipulator' | 'other') | null;
+  description?: string | null;
+  featuredRank?: number | null;
+  deploymentStage?:
+    ('concept' | 'prototype' | 'pilot' | 'limited-production' | 'production' | 'internal-use' | 'discontinued') | null;
+  supersededById?: (number | null) | Robot;
+  /**
+   * RobotSpecs。項目定義（単位・ラベル・グループ）の正本は lib/specSchema.ts。
+   */
+  specs?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  procurementModels?:
+    ('purchase' | 'lease' | 'raas' | 'subscription' | 'partner-program' | 'not-for-sale' | 'inquiry')[] | null;
+  priceOffers?:
+    | {
+        channel: 'manufacturer-public' | 'authorized-distributor-public';
+        display: string;
+        amount?: number | null;
+        currency?: string | null;
+        taxStatus?: ('included' | 'excluded' | 'unknown') | null;
+        variant?: string | null;
+        sellerName?: string | null;
+        sourceUrl: string;
+        id?: string | null;
+      }[]
+    | null;
+  loadRatings?:
+    | {
+        scope: 'single-arm' | 'dual-arm' | 'whole-body' | 'carrier' | 'manufacturer-wording';
+        rating: 'rated' | 'maximum' | 'unspecified';
+        kg: number;
+        condition?: string | null;
+        variant?: string | null;
+        sourceUrl: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * RobotFieldEvidence。specSchemaのkey / priceOffers / loadRatings → sourceUrl[]。
+   */
+  fieldEvidence?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  usageExampleSourceUrls?: string[] | null;
+  japanAvailability?:
+    ('official-japan' | 'distributor-japan' | 'inquiry-required' | 'import-only' | 'unavailable' | 'unknown') | null;
+  distributorJapan?: string | null;
+  supportNote?: string | null;
+  /**
+   * Partial<Record<ImageRole, ImageAsset>>。
+   */
+  images?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  industryTags?: string[] | null;
+  taskTags?: string[] | null;
+  /**
+   * @deprecated。/compare の作り替えが決まるまで維持する（削除しない）。
+   */
+  comparison?: {
+    strengths?: string[] | null;
+    constraints?: string[] | null;
+    bestFit?: string[] | null;
+    notFit?: string[] | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "robot-series".
+ */
+export interface RobotSery {
+  id: number;
+  stableId: string;
+  slug: string;
+  previousSlugs?: string[] | null;
+  lifecycleStatus: 'active' | 'archived';
+  summary?: string | null;
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  sources?:
+    | {
+        title: string;
+        url: string;
+        publisher?: string | null;
+        publishedAt?: string | null;
+        checkedAt: string;
+        reliability: 'verified' | 'official' | 'reported' | 'estimated';
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  nextReviewBy?: string | null;
+  heroImage?: {
+    src?: string | null;
+    alt?: string | null;
+    credit?: string | null;
+    sourceUrl?: string | null;
+    rights?: {
+      status?:
+        | (
+            | 'own'
+            | 'licensed'
+            | 'commercial-permitted'
+            | 'reference-attributed'
+            | 'permission-requested'
+            | 'prototype-only'
+            | 'blocked'
+          )
+        | null;
+      sourceType?:
+        ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+      checkedAt?: string | null;
+      rightsHolder?: string | null;
+      licenseUrl?: string | null;
+      permissionNote?: string | null;
+    };
+    aspectRatio?: number | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    noindex?: boolean | null;
+  };
+  name?: string | null;
+  nameJa?: string | null;
+  manufacturerId?: (number | null) | Manufacturer;
+  description?: string | null;
+  /**
+   * Partial<Record<ImageRole, ImageAsset>>。
+   */
+  images?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  industryTags?: string[] | null;
+  taskTags?: string[] | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "use-cases".
+ */
+export interface UseCase {
+  id: number;
+  stableId: string;
+  slug: string;
+  previousSlugs?: string[] | null;
+  lifecycleStatus: 'active' | 'archived';
+  summary?: string | null;
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  sources?:
+    | {
+        title: string;
+        url: string;
+        publisher?: string | null;
+        publishedAt?: string | null;
+        checkedAt: string;
+        reliability: 'verified' | 'official' | 'reported' | 'estimated';
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  nextReviewBy?: string | null;
+  heroImage?: {
+    src?: string | null;
+    alt?: string | null;
+    credit?: string | null;
+    sourceUrl?: string | null;
+    rights?: {
+      status?:
+        | (
+            | 'own'
+            | 'licensed'
+            | 'commercial-permitted'
+            | 'reference-attributed'
+            | 'permission-requested'
+            | 'prototype-only'
+            | 'blocked'
+          )
+        | null;
+      sourceType?:
+        ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+      checkedAt?: string | null;
+      rightsHolder?: string | null;
+      licenseUrl?: string | null;
+      permissionNote?: string | null;
+    };
+    aspectRatio?: number | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    noindex?: boolean | null;
+  };
+  title?: string | null;
+  titleJa?: string | null;
+  subtitle?: string | null;
+  maturityLevel?: ('early-stage' | 'pilot-phase' | 'production-ready') | null;
+  /**
+   * Robotsからは削除済み（DEC-S05）。UseCaseには残す。
+   */
+  buyerReadiness?: ('initial-adoption' | 'requires-poc' | 'limited-today') | null;
+  environment?: ('indoor-controlled' | 'indoor-semi-controlled' | 'outdoor' | 'mixed' | 'hazardous') | null;
+  requiredCapabilities?:
+    | ('mobility' | 'manipulation' | 'perception' | 'autonomy' | 'communication' | 'data-capture' | 'integration')[]
+    | null;
+  primaryIndustry?: string | null;
+  industryTags?: string[] | null;
+  taskTags?: string[] | null;
+  atAGlance?: {
+    whereFits?: string | null;
+    whereDoesNotFit?: string | null;
+    mustBeTrue?: string | null;
+  };
+  overview?: string | null;
+  whyItMatters?: string | null;
+  capabilityNotes?: {
+    mobility?: string | null;
+    manipulation?: string | null;
+    perception?: string | null;
+    autonomy?: string | null;
+    communication?: string | null;
+    integration?: string | null;
+  };
+  environmentRequirements?: string | null;
+  whyHardToday?: string | null;
+  japanDeploymentConditions?: string | null;
+  /**
+   * `robotId` または `seriesId` のどちらか一方だけを持つ（DEC-S08）。両方入力しても保存を止めない（domain validatorはTask 4以降で拡張）。
+   */
+  candidateRobots?:
+    | {
+        robotId?: (number | null) | Robot;
+        seriesId?: (number | null) | RobotSery;
+        fit: 'strong' | 'possible' | 'watch';
+        basis:
+          | 'deployment'
+          | 'adjacent-deployment'
+          | 'official-use-case'
+          | 'product-capability'
+          | 'market-signal'
+          | 'editorial-watch';
+        evidenceDeploymentIds?: (number | Deployment)[] | null;
+        evidenceSourceUrls?: string[] | null;
+        reason: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deployments".
+ */
+export interface Deployment {
+  id: number;
+  stableId: string;
+  slug: string;
+  previousSlugs?: string[] | null;
+  lifecycleStatus: 'active' | 'archived';
+  summary?: string | null;
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  sources?:
+    | {
+        title: string;
+        url: string;
+        publisher?: string | null;
+        publishedAt?: string | null;
+        checkedAt: string;
+        reliability: 'verified' | 'official' | 'reported' | 'estimated';
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  nextReviewBy?: string | null;
+  heroImage?: {
+    src?: string | null;
+    alt?: string | null;
+    credit?: string | null;
+    sourceUrl?: string | null;
+    rights?: {
+      status?:
+        | (
+            | 'own'
+            | 'licensed'
+            | 'commercial-permitted'
+            | 'reference-attributed'
+            | 'permission-requested'
+            | 'prototype-only'
+            | 'blocked'
+          )
+        | null;
+      sourceType?:
+        ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+      checkedAt?: string | null;
+      rightsHolder?: string | null;
+      licenseUrl?: string | null;
+      permissionNote?: string | null;
+    };
+    aspectRatio?: number | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    noindex?: boolean | null;
+  };
+  manufacturerId?: (number | null) | Manufacturer;
+  robotId?: (number | null) | Robot;
+  customer?: string | null;
+  siteName?: string | null;
+  country?: string | null;
+  location: {
+    lat: number;
+    lng: number;
+  };
+  status?: ('announced' | 'pilot' | 'production' | 'ended' | 'unknown') | null;
+  startedAt?: string | null;
+  relatedUseCaseIds?: (number | UseCase)[] | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles".
+ */
+export interface Article {
+  id: number;
+  stableId: string;
+  slug: string;
+  previousSlugs?: string[] | null;
+  lifecycleStatus: 'active' | 'archived';
+  summary?: string | null;
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  sources?:
+    | {
+        title: string;
+        url: string;
+        publisher?: string | null;
+        publishedAt?: string | null;
+        checkedAt: string;
+        reliability: 'verified' | 'official' | 'reported' | 'estimated';
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  nextReviewBy?: string | null;
+  heroImage?: {
+    src?: string | null;
+    alt?: string | null;
+    credit?: string | null;
+    sourceUrl?: string | null;
+    rights?: {
+      status?:
+        | (
+            | 'own'
+            | 'licensed'
+            | 'commercial-permitted'
+            | 'reference-attributed'
+            | 'permission-requested'
+            | 'prototype-only'
+            | 'blocked'
+          )
+        | null;
+      sourceType?:
+        ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+      checkedAt?: string | null;
+      rightsHolder?: string | null;
+      licenseUrl?: string | null;
+      permissionNote?: string | null;
+    };
+    aspectRatio?: number | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    noindex?: boolean | null;
+  };
+  title?: string | null;
+  titleJa?: string | null;
+  category?: ('news' | 'interview' | 'company-report' | 'analysis' | 'policy') | null;
+  type?:
+    | (
+        | 'analysis'
+        | 'deployment-report'
+        | 'interview'
+        | 'event-report'
+        | 'policy-update'
+        | 'case-study'
+        | 'news-brief'
+        | 'tech-update'
+        | 'market-analysis'
+        | 'manufacturer-guide'
+        | 'robot-guide'
+        | 'basics-guide'
+      )
+    | null;
+  section?: ('digest' | 'deployment' | 'business' | 'tech' | 'policy' | 'entertainment') | null;
+  contentKind?: ('editorial' | 'sample' | 'sponsored') | null;
+  publishedAt?: string | null;
+  author?: string | null;
+  industryTags?: string[] | null;
+  regionTags?: string[] | null;
+  themeTags?: string[] | null;
+  whyItMatters?: string | null;
+  keyTakeaways?: string[] | null;
+  featured?: boolean | null;
+  relatedRobotIds?: (number | Robot)[] | null;
+  relatedManufacturerIds?: (number | Manufacturer)[] | null;
+  relatedUseCaseIds?: (number | UseCase)[] | null;
+  /**
+   * Markdown本文。type === manufacturer-guide の記事では使わない（manufacturerGuideContentを使う）。
+   */
+  body?: string | null;
+  /**
+   * ManufacturerGuideContent（companyOverview / lineup / deploymentStatus / procurementChannels / faq 等）。type === manufacturer-guide の記事だけ使う。
+   */
+  manufacturerGuideContent?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-placements".
+ */
+export interface ArticlePlacement {
+  id: number;
+  stableId: string;
+  slug: string;
+  previousSlugs?: string[] | null;
+  lifecycleStatus: 'active' | 'archived';
+  surface?: 'reports-index' | null;
+  slot?: ('hero' | 'feature') | null;
+  articleId?: (number | null) | Article;
+  order?: number | null;
+  kind?: ('editorial' | 'sample' | 'sponsored' | 'house') | null;
+  sponsor?: {
+    name?: string | null;
+    url?: string | null;
+    disclosure?: string | null;
+    campaignId?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  stableId: string;
+  alt: string;
+  rights: {
+    status:
+      | 'own'
+      | 'licensed'
+      | 'commercial-permitted'
+      | 'reference-attributed'
+      | 'permission-requested'
+      | 'prototype-only'
+      | 'blocked';
+    sourceType: 'own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown';
+    checkedAt: string;
+    rightsHolder?: string | null;
+    licenseUrl?: string | null;
+    permissionNote?: string | null;
+  };
+  credit?: string | null;
+  sourceUrl?: string | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "content-route-registry".
+ */
+export interface ContentRouteRegistry {
+  id: number;
+  namespace: string;
+  slug: string;
+  ownerCollection: 'robots' | 'robot-series';
+  ownerStableId: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -164,10 +958,51 @@ export interface PayloadKv {
  */
 export interface PayloadLockedDocument {
   id: number;
-  document?: {
-    relationTo: 'admins';
-    value: number | Admin;
-  } | null;
+  document?:
+    | ({
+        relationTo: 'admins';
+        value: number | Admin;
+      } | null)
+    | ({
+        relationTo: 'manufacturers';
+        value: number | Manufacturer;
+      } | null)
+    | ({
+        relationTo: 'distributors';
+        value: number | Distributor;
+      } | null)
+    | ({
+        relationTo: 'robot-series';
+        value: number | RobotSery;
+      } | null)
+    | ({
+        relationTo: 'robots';
+        value: number | Robot;
+      } | null)
+    | ({
+        relationTo: 'use-cases';
+        value: number | UseCase;
+      } | null)
+    | ({
+        relationTo: 'deployments';
+        value: number | Deployment;
+      } | null)
+    | ({
+        relationTo: 'articles';
+        value: number | Article;
+      } | null)
+    | ({
+        relationTo: 'article-placements';
+        value: number | ArticlePlacement;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'content-route-registry';
+        value: number | ContentRouteRegistry;
+      } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'admins';
@@ -235,6 +1070,631 @@ export interface AdminsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "manufacturers_select".
+ */
+export interface ManufacturersSelect<T extends boolean = true> {
+  stableId?: T;
+  slug?: T;
+  previousSlugs?: T;
+  lifecycleStatus?: T;
+  summary?: T;
+  reliability?: T;
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  nextReviewBy?: T;
+  heroImage?:
+    | T
+    | {
+        src?: T;
+        alt?: T;
+        credit?: T;
+        sourceUrl?: T;
+        rights?:
+          | T
+          | {
+              status?: T;
+              sourceType?: T;
+              checkedAt?: T;
+              rightsHolder?: T;
+              licenseUrl?: T;
+              permissionNote?: T;
+            };
+        aspectRatio?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        noindex?: T;
+      };
+  name?: T;
+  nameJa?: T;
+  companyType?: T;
+  companyStatus?: T;
+  country?: T;
+  hqCity?: T;
+  headquarters?:
+    | T
+    | {
+        lat?: T;
+        lng?: T;
+      };
+  foundedYear?: T;
+  website?: T;
+  logos?: T;
+  contactUrl?: T;
+  description?: T;
+  japanPresence?: T;
+  domesticDistributors?:
+    | T
+    | {
+        name?: T;
+        website?: T;
+        sourceUrl?: T;
+        checkedAt?: T;
+        note?: T;
+        id?: T;
+      };
+  distributorNote?: T;
+  supportNote?: T;
+  procurementNote?: T;
+  vendorRiskNote?: T;
+  featuredRank?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "distributors_select".
+ */
+export interface DistributorsSelect<T extends boolean = true> {
+  stableId?: T;
+  slug?: T;
+  previousSlugs?: T;
+  lifecycleStatus?: T;
+  summary?: T;
+  reliability?: T;
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  nextReviewBy?: T;
+  heroImage?:
+    | T
+    | {
+        src?: T;
+        alt?: T;
+        credit?: T;
+        sourceUrl?: T;
+        rights?:
+          | T
+          | {
+              status?: T;
+              sourceType?: T;
+              checkedAt?: T;
+              rightsHolder?: T;
+              licenseUrl?: T;
+              permissionNote?: T;
+            };
+        aspectRatio?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        noindex?: T;
+      };
+  name?: T;
+  nameJa?: T;
+  website?: T;
+  providerType?: T;
+  handledManufacturerIds?: T;
+  handledRobotIds?: T;
+  acquisitionMethods?: T;
+  inquiryUrl?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "robot-series_select".
+ */
+export interface RobotSeriesSelect<T extends boolean = true> {
+  stableId?: T;
+  slug?: T;
+  previousSlugs?: T;
+  lifecycleStatus?: T;
+  summary?: T;
+  reliability?: T;
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  nextReviewBy?: T;
+  heroImage?:
+    | T
+    | {
+        src?: T;
+        alt?: T;
+        credit?: T;
+        sourceUrl?: T;
+        rights?:
+          | T
+          | {
+              status?: T;
+              sourceType?: T;
+              checkedAt?: T;
+              rightsHolder?: T;
+              licenseUrl?: T;
+              permissionNote?: T;
+            };
+        aspectRatio?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        noindex?: T;
+      };
+  name?: T;
+  nameJa?: T;
+  manufacturerId?: T;
+  description?: T;
+  images?: T;
+  industryTags?: T;
+  taskTags?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "robots_select".
+ */
+export interface RobotsSelect<T extends boolean = true> {
+  stableId?: T;
+  slug?: T;
+  previousSlugs?: T;
+  lifecycleStatus?: T;
+  summary?: T;
+  reliability?: T;
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  nextReviewBy?: T;
+  heroImage?:
+    | T
+    | {
+        src?: T;
+        alt?: T;
+        credit?: T;
+        sourceUrl?: T;
+        rights?:
+          | T
+          | {
+              status?: T;
+              sourceType?: T;
+              checkedAt?: T;
+              rightsHolder?: T;
+              licenseUrl?: T;
+              permissionNote?: T;
+            };
+        aspectRatio?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        noindex?: T;
+      };
+  name?: T;
+  nameJa?: T;
+  manufacturerId?: T;
+  seriesId?: T;
+  category?: T;
+  description?: T;
+  featuredRank?: T;
+  deploymentStage?: T;
+  supersededById?: T;
+  specs?: T;
+  procurementModels?: T;
+  priceOffers?:
+    | T
+    | {
+        channel?: T;
+        display?: T;
+        amount?: T;
+        currency?: T;
+        taxStatus?: T;
+        variant?: T;
+        sellerName?: T;
+        sourceUrl?: T;
+        id?: T;
+      };
+  loadRatings?:
+    | T
+    | {
+        scope?: T;
+        rating?: T;
+        kg?: T;
+        condition?: T;
+        variant?: T;
+        sourceUrl?: T;
+        id?: T;
+      };
+  fieldEvidence?: T;
+  usageExampleSourceUrls?: T;
+  japanAvailability?: T;
+  distributorJapan?: T;
+  supportNote?: T;
+  images?: T;
+  industryTags?: T;
+  taskTags?: T;
+  comparison?:
+    | T
+    | {
+        strengths?: T;
+        constraints?: T;
+        bestFit?: T;
+        notFit?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "use-cases_select".
+ */
+export interface UseCasesSelect<T extends boolean = true> {
+  stableId?: T;
+  slug?: T;
+  previousSlugs?: T;
+  lifecycleStatus?: T;
+  summary?: T;
+  reliability?: T;
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  nextReviewBy?: T;
+  heroImage?:
+    | T
+    | {
+        src?: T;
+        alt?: T;
+        credit?: T;
+        sourceUrl?: T;
+        rights?:
+          | T
+          | {
+              status?: T;
+              sourceType?: T;
+              checkedAt?: T;
+              rightsHolder?: T;
+              licenseUrl?: T;
+              permissionNote?: T;
+            };
+        aspectRatio?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        noindex?: T;
+      };
+  title?: T;
+  titleJa?: T;
+  subtitle?: T;
+  maturityLevel?: T;
+  buyerReadiness?: T;
+  environment?: T;
+  requiredCapabilities?: T;
+  primaryIndustry?: T;
+  industryTags?: T;
+  taskTags?: T;
+  atAGlance?:
+    | T
+    | {
+        whereFits?: T;
+        whereDoesNotFit?: T;
+        mustBeTrue?: T;
+      };
+  overview?: T;
+  whyItMatters?: T;
+  capabilityNotes?:
+    | T
+    | {
+        mobility?: T;
+        manipulation?: T;
+        perception?: T;
+        autonomy?: T;
+        communication?: T;
+        integration?: T;
+      };
+  environmentRequirements?: T;
+  whyHardToday?: T;
+  japanDeploymentConditions?: T;
+  candidateRobots?:
+    | T
+    | {
+        robotId?: T;
+        seriesId?: T;
+        fit?: T;
+        basis?: T;
+        evidenceDeploymentIds?: T;
+        evidenceSourceUrls?: T;
+        reason?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deployments_select".
+ */
+export interface DeploymentsSelect<T extends boolean = true> {
+  stableId?: T;
+  slug?: T;
+  previousSlugs?: T;
+  lifecycleStatus?: T;
+  summary?: T;
+  reliability?: T;
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  nextReviewBy?: T;
+  heroImage?:
+    | T
+    | {
+        src?: T;
+        alt?: T;
+        credit?: T;
+        sourceUrl?: T;
+        rights?:
+          | T
+          | {
+              status?: T;
+              sourceType?: T;
+              checkedAt?: T;
+              rightsHolder?: T;
+              licenseUrl?: T;
+              permissionNote?: T;
+            };
+        aspectRatio?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        noindex?: T;
+      };
+  manufacturerId?: T;
+  robotId?: T;
+  customer?: T;
+  siteName?: T;
+  country?: T;
+  location?:
+    | T
+    | {
+        lat?: T;
+        lng?: T;
+      };
+  status?: T;
+  startedAt?: T;
+  relatedUseCaseIds?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles_select".
+ */
+export interface ArticlesSelect<T extends boolean = true> {
+  stableId?: T;
+  slug?: T;
+  previousSlugs?: T;
+  lifecycleStatus?: T;
+  summary?: T;
+  reliability?: T;
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  nextReviewBy?: T;
+  heroImage?:
+    | T
+    | {
+        src?: T;
+        alt?: T;
+        credit?: T;
+        sourceUrl?: T;
+        rights?:
+          | T
+          | {
+              status?: T;
+              sourceType?: T;
+              checkedAt?: T;
+              rightsHolder?: T;
+              licenseUrl?: T;
+              permissionNote?: T;
+            };
+        aspectRatio?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        noindex?: T;
+      };
+  title?: T;
+  titleJa?: T;
+  category?: T;
+  type?: T;
+  section?: T;
+  contentKind?: T;
+  publishedAt?: T;
+  author?: T;
+  industryTags?: T;
+  regionTags?: T;
+  themeTags?: T;
+  whyItMatters?: T;
+  keyTakeaways?: T;
+  featured?: T;
+  relatedRobotIds?: T;
+  relatedManufacturerIds?: T;
+  relatedUseCaseIds?: T;
+  body?: T;
+  manufacturerGuideContent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-placements_select".
+ */
+export interface ArticlePlacementsSelect<T extends boolean = true> {
+  stableId?: T;
+  slug?: T;
+  previousSlugs?: T;
+  lifecycleStatus?: T;
+  surface?: T;
+  slot?: T;
+  articleId?: T;
+  order?: T;
+  kind?: T;
+  sponsor?:
+    | T
+    | {
+        name?: T;
+        url?: T;
+        disclosure?: T;
+        campaignId?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  stableId?: T;
+  alt?: T;
+  rights?:
+    | T
+    | {
+        status?: T;
+        sourceType?: T;
+        checkedAt?: T;
+        rightsHolder?: T;
+        licenseUrl?: T;
+        permissionNote?: T;
+      };
+  credit?: T;
+  sourceUrl?: T;
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "content-route-registry_select".
+ */
+export interface ContentRouteRegistrySelect<T extends boolean = true> {
+  namespace?: T;
+  slug?: T;
+  ownerCollection?: T;
+  ownerStableId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -272,6 +1732,48 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  defaultSeo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  announcementBanner?: {
+    enabled?: boolean | null;
+    message?: string | null;
+    url?: string | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  defaultSeo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  announcementBanner?:
+    | T
+    | {
+        enabled?: T;
+        message?: T;
+        url?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

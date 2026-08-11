@@ -29,6 +29,9 @@ pnpm-debug.log*
 # TypeScript build cache
 tsconfig.tsbuildinfo
 
+# Payload Media local-storage fallback (no BLOB_READ_WRITE_TOKEN configured, e.g. local/CI tests)
+/media/
+
 # macOS-specific files
 .DS_Store
 
