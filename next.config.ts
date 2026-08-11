@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { NextConfig } from 'next';
+import { withPayload } from '@payloadcms/next/withPayload';
 import { securityHeaders } from './lib/securityHeaders';
 
 /**
@@ -25,4 +26,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPayload(nextConfig);

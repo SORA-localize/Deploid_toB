@@ -18,6 +18,26 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Payload CMS用のtest DB。本番/preview Supabaseには接続しない使い捨てcontainer。
+    # ローカルではCONTENT_SOURCE / DATABASE_URLごとに専用の開発DBを使う（本タスクの.env.local）。
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: payload_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/payload_test
+      # CI専用のダミー値。外部アカウントに紐づかず、この使い捨てDBの署名にのみ使う。
+      PAYLOAD_SECRET: bd7e747183c90fe80ff7b8136607362ffe54d9e6c2fbd42a
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
