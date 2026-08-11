@@ -6,7 +6,7 @@ import {
   contentCollectionAccess,
   contentVersionsConfig,
   createPublishGateHook,
-  createVersionRetentionAfterChangeHook,
+  createVersionRetentionGuardBeforeChangeHook,
 } from '../lib/payload/access';
 import { mapPayloadManufacturerToDomain } from '../lib/content/payloadMappers';
 import type { Manufacturer } from '../lib/content/domainTypes';
@@ -97,7 +97,7 @@ export const Manufacturers: CollectionConfig = {
         mapToDomain: async (candidate) => mapPayloadManufacturerToDomain(candidate as never),
         validateForPublish: (domain) => validateManufacturerForPublish(domain as Manufacturer),
       }),
+      createVersionRetentionGuardBeforeChangeHook({ collectionSlug: 'manufacturers' }),
     ],
-    afterChange: [createVersionRetentionAfterChangeHook({ collectionSlug: 'manufacturers' })],
   },
 };

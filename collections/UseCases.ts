@@ -6,7 +6,7 @@ import {
   contentCollectionAccess,
   contentVersionsConfig,
   createPublishGateHook,
-  createVersionRetentionAfterChangeHook,
+  createVersionRetentionGuardBeforeChangeHook,
 } from '../lib/payload/access';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { UseCase } from '../lib/content/domainTypes';
@@ -150,7 +150,7 @@ export const UseCases: CollectionConfig = {
         mapToDomain: async (candidate) => mapUseCaseCandidateToDomain(candidate as UseCaseCandidate),
         validateForPublish: (domain) => validateUseCaseForPublish(domain as Partial<UseCase>),
       }),
+      createVersionRetentionGuardBeforeChangeHook({ collectionSlug: 'use-cases' }),
     ],
-    afterChange: [createVersionRetentionAfterChangeHook({ collectionSlug: 'use-cases' })],
   },
 };

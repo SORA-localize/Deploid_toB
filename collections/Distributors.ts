@@ -6,7 +6,7 @@ import {
   contentCollectionAccess,
   contentVersionsConfig,
   createPublishGateHook,
-  createVersionRetentionAfterChangeHook,
+  createVersionRetentionGuardBeforeChangeHook,
 } from '../lib/payload/access';
 import { payloadStatusToDomain, resolveRelationshipsToStableIds } from '../lib/content/payloadMappers';
 import type { Distributor } from '../lib/content/domainTypes';
@@ -94,7 +94,7 @@ export const Distributors: CollectionConfig = {
         mapToDomain: (candidate, req) => mapDistributorCandidateToDomain(candidate as DistributorCandidate, req.payload),
         validateForPublish: (domain) => validateDistributorForPublish(domain as Partial<Distributor>),
       }),
+      createVersionRetentionGuardBeforeChangeHook({ collectionSlug: 'distributors' }),
     ],
-    afterChange: [createVersionRetentionAfterChangeHook({ collectionSlug: 'distributors' })],
   },
 };

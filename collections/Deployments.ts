@@ -6,7 +6,7 @@ import {
   contentCollectionAccess,
   contentVersionsConfig,
   createPublishGateHook,
-  createVersionRetentionAfterChangeHook,
+  createVersionRetentionGuardBeforeChangeHook,
 } from '../lib/payload/access';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { DeploymentSite } from '../lib/content/domainTypes';
@@ -90,7 +90,7 @@ export const Deployments: CollectionConfig = {
         mapToDomain: (candidate, req) => mapDeploymentCandidateToDomain(candidate as DeploymentCandidate, req.payload),
         validateForPublish: (domain) => validateDeploymentForPublish(domain as Partial<DeploymentSite>),
       }),
+      createVersionRetentionGuardBeforeChangeHook({ collectionSlug: 'deployments' }),
     ],
-    afterChange: [createVersionRetentionAfterChangeHook({ collectionSlug: 'deployments' })],
   },
 };

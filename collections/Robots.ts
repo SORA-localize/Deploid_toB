@@ -6,7 +6,7 @@ import {
   contentCollectionAccess,
   contentVersionsConfig,
   createPublishGateHook,
-  createVersionRetentionAfterChangeHook,
+  createVersionRetentionGuardBeforeChangeHook,
 } from '../lib/payload/access';
 import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { mapPayloadRobotToDomain } from '../lib/content/payloadMappers';
@@ -158,8 +158,9 @@ export const Robots: CollectionConfig = {
         mapToDomain: (candidate, req) => mapPayloadRobotToDomain(candidate as never, req.payload),
         validateForPublish: (domain) => validateRobotForPublish(domain as Robot),
       }),
+      createVersionRetentionGuardBeforeChangeHook({ collectionSlug: 'robots' }),
     ],
-    afterChange: [...routeRegistryHooks.afterChange, createVersionRetentionAfterChangeHook({ collectionSlug: 'robots' })],
+    afterChange: routeRegistryHooks.afterChange,
     beforeDelete: routeRegistryHooks.beforeDelete,
   },
 };

@@ -4,7 +4,7 @@ import {
   contentCollectionAccess,
   contentVersionsConfig,
   createPublishGateHook,
-  createVersionRetentionAfterChangeHook,
+  createVersionRetentionGuardBeforeChangeHook,
 } from '../lib/payload/access';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { ArticlePlacement } from '../lib/content/domainTypes';
@@ -139,7 +139,7 @@ export const ArticlePlacements: CollectionConfig = {
         mapToDomain: (candidate, req) => mapArticlePlacementCandidateToDomain(candidate as never, req.payload),
         validateForPublish: (domain) => validatePlacementForPublish(domain as Partial<ArticlePlacement>),
       }),
+      createVersionRetentionGuardBeforeChangeHook({ collectionSlug: 'article-placements' }),
     ],
-    afterChange: [createVersionRetentionAfterChangeHook({ collectionSlug: 'article-placements' })],
   },
 };

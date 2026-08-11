@@ -6,7 +6,7 @@ import {
   contentCollectionAccess,
   contentVersionsConfig,
   createPublishGateHook,
-  createVersionRetentionAfterChangeHook,
+  createVersionRetentionGuardBeforeChangeHook,
 } from '../lib/payload/access';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { Article } from '../lib/content/domainTypes';
@@ -174,7 +174,7 @@ export const Articles: CollectionConfig = {
         mapToDomain: async (candidate) => mapArticleCandidateToDomain(candidate as ArticleCandidate),
         validateForPublish: (domain) => validateArticleForPublish(domain as never),
       }),
+      createVersionRetentionGuardBeforeChangeHook({ collectionSlug: 'articles' }),
     ],
-    afterChange: [createVersionRetentionAfterChangeHook({ collectionSlug: 'articles' })],
   },
 };

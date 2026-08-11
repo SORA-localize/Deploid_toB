@@ -286,69 +286,109 @@ export function assertBaseRecordPublishable(domain: {
 }
 
 /**
- * versions maxPerDoc(50) 到達前に古いversionをprivate audit archiveへ export し、
- * 監査ログ（`payload.logger`）へ actor・件数・version IDを残す（brief Step 3）。
- * Payloadはversion pruning自体へのhook拡張点を公開していないため、これは
- * 「Payloadが次の保存でpruneする前に前倒しで退避する」ベストエフォート実装であり、
- * 実削除そのものをinterceptしてはいない。private audit blob（`PRODUCTION_AUDIT_BLOB_TOKEN_*` /
- * `PREVIEW_AUDIT_BLOB_TOKEN_*`）とKMS署名鍵（`SNAPSHOT_SIGNING_KEY`）は
- * `docs/reference/content-platform-resources-v1.md` により後続taskでruntime envへ配線される
- * 前提のため、未設定環境（local/CI）ではexportをskipし、その旨を監査ログへ記録するだけに留める。
+ * versions maxPerDoc(50) 到達で古いversionをprivate audit archiveへ export し、監査ログへ
+ * actor・件数・version IDを残す（brief Step 3）。
+ *
+ * **重要な実装上の制約（コードレビューで発覚、修正済み）**: 当初 `afterChange` hookとして実装したが、
+ * それは手遅れだった。Payloadの実削除（`enforceMaxVersions`、`node_modules/payload/dist/versions/
+ * saveVersion.js` → `enforceMaxVersions.js`）はcollectionのcustom `afterChange` hookより**前**、
+ * core `saveVersion()` の中でPayloadが自前に呼ぶため、`afterChange` の時点では既にpruneが完了して
+ * いる。Payloadはversion pruningへのhook拡張点を一切公開していない（`beforeChange` /
+ * `afterChange` のどちらでもpruneそのものをinterceptすることはできない）。
+ *
+ * そこで `beforeChange`（実書き込み・実version作成・pruneより確実に前に実行される。
+ * `node_modules/payload/dist/collections/operations/utilities/update.js` で
+ * `beforeChange` hookの実行 → 後段で `saveVersion()` 呼び出し、の順序を確認済み）で、
+ * 「このupdateで新しいversionが1件増えたら`maxPerDoc`を超えるか」を**事前に**判定し、超える場合に
+ * pruneで消える予定のversionをexportしてから書き込みを許可する形へ直した。archiveが実際に成功した
+ * 場合のみ静かに進む。**archiveが書けない場合（private audit blob store未配線。現状すべての環境で
+ * これに該当 — `docs/reference/content-platform-resources-v1.md` #4よりAWS KMS credentialは
+ * まだruntime envに存在しない）は、書き込み自体はブロックしない**（それをやると、docが50版に
+ * 達した時点でarchive credentialが後続task（Task 5/9）で配線されるまで一切編集不能になり、
+ * 通常の編集業務を止めてしまう。この二択のうち、Task 3の範囲でscopeするべきはこちらではないと
+ * 判断した）。代わりに、**info単発ログではなく `payload.logger.error` へ「DATA LOSS」を明示した
+ * 単独メッセージで残す**ことで、通常運用のログに紛れて見逃されることを防ぐ。この既知の
+ * データロスリスクは `task-3-report.md` の Concerns にも明記し、Task 5/9でarchive credentialが
+ * 配線されるまでの受容済みgapとして追跡する。
  */
-export function createVersionRetentionAfterChangeHook(options: { collectionSlug: string; archiveThreshold?: number }) {
-  const threshold = options.archiveThreshold ?? 45; // maxPerDoc(50) の手前で前倒しにする安全マージン
-  return async function archiveOldVersionsIfNeeded({
-    doc,
+export function createVersionRetentionGuardBeforeChangeHook(options: { collectionSlug: string; maxPerDoc?: number }) {
+  const max = options.maxPerDoc ?? 50;
+  return async function guardVersionRetentionBeforeChange<TDoc extends { id?: string | number }>({
+    data,
+    operation,
+    originalDoc,
     req,
   }: {
-    doc: { id: string | number };
+    data: Partial<TDoc>;
+    operation: 'create' | 'update';
+    originalDoc?: TDoc;
     req: PayloadRequest;
-  }): Promise<void> {
+  }): Promise<Partial<TDoc>> {
+    // createは常にversion 0件から始まるためpruneの対象になり得ない。autosave/unpublishは
+    // `updateLatestVersion` を使い新規versionを作らないため、そもそも `enforceMaxVersions` が
+    // 呼ばれない（`saveVersion.js` 参照）。ここで扱うのは通常のupdate（新規version+1）だけでよい。
+    const docId = originalDoc?.id;
+    if (operation !== 'update' || docId === undefined) return data;
+
     try {
-      const { totalDocs } = await req.payload.countVersions({
+      const { totalDocs: currentVersionCount } = await req.payload.countVersions({
         collection: options.collectionSlug as never,
-        where: { parent: { equals: doc.id } },
+        where: { parent: { equals: docId } },
         req,
         overrideAccess: true,
       });
 
-      if (totalDocs < threshold) return;
+      const countAfterThisWrite = currentVersionCount + 1;
+      if (countAfterThisWrite <= max) return data;
 
-      const { docs: oldest } = await req.payload.findVersions({
+      const overflow = countAfterThisWrite - max;
+      const { docs: aboutToBePruned } = await req.payload.findVersions({
         collection: options.collectionSlug as never,
-        where: { parent: { equals: doc.id } },
-        sort: 'createdAt',
-        limit: totalDocs - threshold + 1,
+        where: { parent: { equals: docId } },
+        sort: 'updatedAt', // 古い順。enforceMaxVersionsが消す対象と同じ選び方（-updatedAtの末尾側）。
+        limit: overflow,
         req,
         overrideAccess: true,
         depth: 0,
       });
 
-      const versionIds = oldest.map((version) => version.id);
+      const versionIds = aboutToBePruned.map((version) => version.id);
+      const actorId = asAdminUser(req.user)?.id ?? 'system';
       const archived = await exportVersionsToAuditArchive({
         collectionSlug: options.collectionSlug,
-        docId: doc.id,
-        versions: oldest,
+        docId,
+        versions: aboutToBePruned,
       });
 
-      req.payload.logger.info({
-        msg: 'version-retention-archive',
-        collection: options.collectionSlug,
-        docId: doc.id,
-        actorId: asAdminUser(req.user)?.id ?? 'system',
-        versionIds,
-        archived,
-      });
+      if (archived) {
+        req.payload.logger.info({
+          msg: 'version-retention-archived-before-prune',
+          collection: options.collectionSlug,
+          docId,
+          actorId,
+          versionIds,
+        });
+      } else {
+        // このログの直後、Payload内部のenforceMaxVersionsがこのversionIdsを完全に削除する。
+        // exportできなかったので、この時点でこの内容は失われる（Concern、task-3-report.md参照）。
+        req.payload.logger.error({
+          msg: 'DATA LOSS: pruning version(s) with no audit archive configured (accepted gap until Task 5/9 wires AWS KMS / private audit blob credentials)',
+          collection: options.collectionSlug,
+          docId,
+          actorId,
+          versionIds,
+        });
+      }
     } catch (error) {
-      // 監査archiveの失敗で本編集を止めない（afterChangeなので既にcommit済み）。
-      // ログにだけ残し、運用側が別途確認できるようにする。
       req.payload.logger.error({
-        msg: 'version-retention-archive-failed',
+        msg: 'version-retention-guard-failed',
         collection: options.collectionSlug,
-        docId: doc.id,
+        docId,
         error: error instanceof Error ? error.message : String(error),
       });
     }
+
+    return data;
   };
 }
 
@@ -363,7 +403,7 @@ async function exportVersionsToAuditArchive(payload: {
       : process.env.PREVIEW_AUDIT_BLOB_TOKEN_STORE_ID;
 
   if (!storeId) {
-    // local / CI: private audit blob store未配線。exportをskipした事実だけ呼び出し側でログする。
+    // local / CI / 現状の全環境: private audit blob store未配線。呼び出し側がerrorログで明示する。
     return false;
   }
 
