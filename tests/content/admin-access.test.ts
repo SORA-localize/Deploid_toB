@@ -14,6 +14,56 @@ import config from '../../payload.config';
 
 const PASSWORD = 'Str0ngPassw0rd!23';
 
+/**
+ * `beforeAll` は毎回 admins テーブルを全消去してから走る（下記）。この破壊的操作を
+ * `npm run test` 経由（＝ `npm run check` 経由）で誤って共有DBに対して実行しないための
+ * gate。このrepoではローカル開発用 `DATABASE_URL`（`.env.local`、Task 2でSupabase preview の
+ * Direct connectionを設定）と、このsuiteを実際に検証・実行するための使い捨てlocal Postgres
+ * （このtaskではHomebrewの `postgresql@15` を `127.0.0.1:5433` で起動）は別物。
+ * CIの `postgres:17` service containerも同様に `localhost` で立つ（`.github/workflows/ci.yml`）。
+ *
+ * `DATABASE_URL` のhostが `localhost` / `127.0.0.1` 系でなければ、admins全消去より前に
+ * 例外で止める。「コメントだけが保護」という状態を避ける実行時gate。
+ *
+ * ローカルでこのsuiteを走らせるには、`.env.local` の Supabase preview 用 `DATABASE_URL` を
+ * 一時的に上書きし、使い捨てのlocal Postgresを指す値を渡すこと。例:
+ *   `DATABASE_URL=postgresql://postgres:<pw>@127.0.0.1:5433/payload_test PAYLOAD_SECRET=<any> \
+ *     npx vitest run tests/content/admin-access.test.ts`
+ * `.env.local` の実DB（preview Supabase）に対して直接 `npm run test` / `npm run check` を
+ * 実行すると、この gate がすぐに例外を投げて止まる（意図した挙動）。
+ */
+const LOCAL_DATABASE_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
+
+function assertLocalThrowawayDatabase(): void {
+  const raw = process.env.DATABASE_URL;
+  if (!raw) {
+    throw new Error(
+      'DATABASE_URL is not set. tests/content/admin-access.test.ts deletes all rows in the ' +
+        'admins table before running and must only ever run against a local throwaway ' +
+        'Postgres — see the comment above this function for how to run it locally.',
+    );
+  }
+
+  let host: string;
+  try {
+    host = new URL(raw).hostname;
+  } catch {
+    throw new Error(`DATABASE_URL is not a valid connection URL: ${raw.slice(0, 20)}...`);
+  }
+
+  if (!LOCAL_DATABASE_HOSTS.has(host)) {
+    throw new Error(
+      `Refusing to run tests/content/admin-access.test.ts against DATABASE_URL host "${host}". ` +
+        'This suite unconditionally deletes every row in the admins table before running. ' +
+        `It only runs against a local throwaway Postgres (host in ${[...LOCAL_DATABASE_HOSTS].join(', ')}), ` +
+        'never against a shared/managed database such as the Supabase preview project ' +
+        'DATABASE_URL configured in .env.local for `npm run dev`. Point DATABASE_URL at a ' +
+        'local Postgres instance before running this suite — see the comment above this ' +
+        'function for an example command.',
+    );
+  }
+}
+
 async function loginAs(payload: Payload, email: string, password: string) {
   const result = await payload.login({
     collection: 'admins',
@@ -29,13 +79,16 @@ describe('Admins collection access control (real Payload Local API)', () => {
   let payload: Payload;
 
   beforeAll(async () => {
+    assertLocalThrowawayDatabase();
     payload = await getPayload({ config });
     // 毎回クリーンな状態から始める。既存のadmins docを全消去する（テスト専用DBのみを対象にする前提）。
     await payload.delete({ collection: 'admins', where: {}, overrideAccess: true });
   });
 
   afterAll(async () => {
-    await payload.destroy();
+    // beforeAll が assertLocalThrowawayDatabase() や getPayload() で失敗した場合、
+    // payload は未代入のまま。その場合は素通りする(destroy対象が無い)。
+    await payload?.destroy();
   });
 
   it('has zero admins before bootstrap', async () => {

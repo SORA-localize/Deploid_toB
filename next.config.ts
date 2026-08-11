@@ -16,6 +16,12 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
   },
+  experimental: {
+    // `(frontend)` と `(payload)` の2つの独立 root layout に分割した（Task 2）ため、どちらの
+    // layoutにも一致しないURL（typo等）に対してNext.jsが選べるroot layoutが無い。
+    // `src/app/global-not-found.tsx` を有効にして、この場合も自前のbrand付き404を返す。
+    globalNotFound: true,
+  },
   async headers() {
     return [
       {
