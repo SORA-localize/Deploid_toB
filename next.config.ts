@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { NextConfig } from 'next';
+import { withPayload } from '@payloadcms/next/withPayload';
 import { securityHeaders } from './lib/securityHeaders';
 
 /**
@@ -15,6 +16,12 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
   },
+  experimental: {
+    // `(frontend)` と `(payload)` の2つの独立 root layout に分割した（Task 2）ため、どちらの
+    // layoutにも一致しないURL（typo等）に対してNext.jsが選べるroot layoutが無い。
+    // `src/app/global-not-found.tsx` を有効にして、この場合も自前のbrand付き404を返す。
+    globalNotFound: true,
+  },
   async headers() {
     return [
       {
@@ -25,4 +32,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPayload(nextConfig);

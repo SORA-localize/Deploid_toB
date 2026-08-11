@@ -1,7 +1,13 @@
 import Link from 'next/link';
 import { siteNavItems } from '@/lib/siteNavigation';
 
-export default function NotFound() {
+/**
+ * 404本文（コピー・CTA・主要pageへの復帰grid）。`src/app/(frontend)/not-found.tsx`
+ * （route segment内で`notFound()`が呼ばれた場合）と `src/app/global-not-found.tsx`
+ * （どのrouteにも一致しないURL。layoutを経由しないため、この中身をimportして使う）の
+ * 両方から使う共通部分。ブランドのある404文言を1箇所にまとめ、二重管理を避ける。
+ */
+export function NotFoundContent() {
   return (
     <div className="site-container flex min-h-[60vh] flex-col justify-center py-16">
       <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
