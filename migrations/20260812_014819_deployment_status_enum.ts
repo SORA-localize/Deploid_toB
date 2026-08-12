@@ -40,9 +40,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
  * 復旧手順（このmigrationより前へ戻したい場合）:
  * 1. 戻す必要が本当にあるか確認する。up() は列の型を広げるだけで、既存の
  *    draft/published値も含めて安全に通る。通常このmigrationを巻き戻す理由は無い。
- * 2. どうしても巻き戻すなら、先に deployment データを退避する
- *    （`docs/reference/database-migration-runbook-v1.md` §6 のbackup手順、または
- *    Task 5以降の `export --source payload`）。
+ * 2. どうしても巻き戻すなら、先に deployment データを退避する。手順は
+ *    `docs/reference/database-migration-runbook-v1.md` §4「巻き戻し前のbackup / restore
+ *    （テーブル単位）」:
+ *      pg_dump "$DATABASE_URL" --data-only --table=deployments --table=_deployments_v > backup.sql
+ *    content levelのexport（`export --source payload` + manifest）はTask 5以降の実装で、
+ *    現時点では存在しない。versions table（`_deployments_v`）を取り忘れないこと。
  * 3. 退避後に該当行を削除する（`DELETE FROM deployments;` と `DELETE FROM _deployments_v;`。
  *    どちらも空にする必要がある）。
  * 4. `npm run payload:migrate:down` を実行する。
@@ -63,7 +66,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
     ) t;
     IF offending > 0 THEN
       RAISE EXCEPTION 'migration 20260812_014819_deployment_status_enum: down() is one-way once real deployment status values exist (% row(s) hold announced/pilot/production/ended/unknown, which the old draft/published-only enum cannot represent)', offending
-        USING HINT = 'Export deployments first (database-migration-runbook-v1.md section 6), then DELETE FROM deployments and _deployments_v, then re-run payload:migrate:down. See the comment above down() in this migration file.';
+        USING HINT = 'Back up first: pg_dump "$DATABASE_URL" --data-only --table=deployments --table=_deployments_v > backup.sql (procedure: database-migration-runbook-v1.md section 4, "巻き戻し前のbackup / restore"). Then DELETE FROM _deployments_v; DELETE FROM deployments; and re-run payload:migrate:down. See the comment above down() in this migration file.';
     END IF;
   END $$;
    ALTER TABLE "deployments" ALTER COLUMN "status" SET DATA TYPE "public"."enum_deployments_status" USING "status"::text::"public"."enum_deployments_status";

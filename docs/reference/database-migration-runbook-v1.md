@@ -115,6 +115,46 @@ npm run payload:migrate:down
 直近のbatch（同時に生成・適用されたmigration群）を巻き戻す。**batch単位**であり、個別ファイル
 単位ではない。
 
+### 巻き戻し前のbackup / restore（テーブル単位）
+
+**contentが入っているDBを巻き戻す前に、必ずデータを退避する。** Payload側のcontent export
+（`export --source payload`、manifest付き）はTask 5以降の実装予定であり、**現時点では存在しない**。
+今日使える手段は`pg_dump` / `psql`（PostgreSQLクライアント）によるテーブル単位の退避で、以下は
+実機確認済みの手順。
+
+前提: サーバのmajor versionに合わせたclientを使う（確認環境: PostgreSQL 15.14）。接続先は
+migration用のDirect connection（poolerではない。`docs/reference/content-platform-resources-v1.md` #1）。
+
+```bash
+# 1. 退避（データのみ。schemaはmigrationが正本なのでdumpしない）
+#    versions table（_<collection>_v）も必ず一緒に取る。Payloadのdraft/version行がそこにある。
+pg_dump "$DATABASE_URL" --data-only \
+  --table=deployments --table=_deployments_v > /tmp/deployments-backup.sql
+
+# 2. 巻き戻し・再適用（必要な作業）
+psql -v ON_ERROR_STOP=1 "$DATABASE_URL" -c 'DELETE FROM _deployments_v;' -c 'DELETE FROM deployments;'
+npm run payload:migrate:down
+npm run payload:migrate
+
+# 3. 復元（復元先のtableは空であること。COPYは既存行と衝突しうる）
+psql -v ON_ERROR_STOP=1 "$DATABASE_URL" -f /tmp/deployments-backup.sql
+```
+
+`--data-only`のdumpには各sequenceの現在値が`setval`として含まれるため、復元後にidを明示しない
+INSERTを行ってもPK衝突しない（実機確認: id 1・2を復元した直後のINSERTがid 3を採番）。
+
+他のcollectionを退避する場合も同じ形で、`--table=<collection>`と`--table=_<collection>_v`を
+対にして指定する。DB全体を取るなら`--table`を外す。
+
+**実機確認（Task 4、隔離DB `deploid_task4_down_test`）**: `status`が`pilot`/`production`の
+deployment行 + version行 → 上記1で退避 → 2でDELETE・`migrate:down`・`migrate` → 3で復元 →
+`pilot`/`production`がそのまま戻り、後続INSERTも成功。
+
+> **Known gap（Task 5へ）**: これはテーブル単位の物理退避であり、source kind・environment marker・
+> provider resource IDを記録するcontent levelのexport（plan Task 4 Step 7が要求する
+> `export --source local|payload|snapshot` + manifest）ではない。Task 5でexport / restoreを実装したら、
+> 本節の手順を「DB物理退避のfallback」として残しつつ、通常経路をそちらへ差し替えること。
+
 ### 既知の生成物バグ（重要 — 巻き戻す前に必ず確認する）
 
 **症状**: 新しいcollectionを追加するmigrationの`down()`で、生成されたSQLが次の順序になる:
@@ -192,7 +232,8 @@ migration reviewのチェックリストに必ず含めること。
 
 1. まず戻す必要性を再確認する。`up()`は列の型を広げるだけで既存のdraft/published値も安全に通る。
    通常このmigrationを巻き戻す理由は無い。
-2. deployment dataを退避する（§6のbackup手順、またはTask 5以降の`export --source payload`）。
+2. deployment dataを退避する（本節（§4）の「巻き戻し前のbackup / restore（テーブル単位）」の
+   `pg_dump --data-only`。content levelのexportはTask 5以降の実装であり現時点では使えない）。
 3. `DELETE FROM _deployments_v;` と `DELETE FROM deployments;`（両方空にする）。
 4. `npm run payload:migrate:down`。
 5. 再度upする場合は`npm run payload:migrate`のあと、2で退避したデータをimportし直す。
