@@ -163,6 +163,44 @@ down/up/re-upはこの問題なく成功する）。**Task 8以降、新しいco
 進まない」というgateには抵触しない。ただし**このhand-fix手順を省略すると壊れる**ため、
 migration reviewのチェックリストに必ず含めること。
 
+### 一方向migration（down()がデータ投入後は巻き戻せないもの）
+
+**enum型を「狭い旧型」から「広い新型」へ付け替えるmigrationは、実データが入った後は
+巻き戻せない。** `down()`が旧型へcastし直すため、旧型に無い値を持つ行が1行でもあると
+`invalid input value for enum ...`で失敗する。データは失われない（transaction内でrollbackされる）
+が、rollbackは完了しない。
+
+該当migration一覧（新しく作ったら必ずここへ追記する）:
+
+| migration | 内容 | 巻き戻せる条件 |
+|---|---|---|
+| `20260812_014819_deployment_status_enum` | `deployments.status` を `_status`（draft\|published）と衝突していたenum型から `enum_deployments_site_status`（announced\|pilot\|production\|ended\|unknown）へ分離（Task 4） | `deployments` / `_deployments_v` に `announced`/`pilot`/`production`/`ended`/`unknown` を持つ行が**1行も無い**とき |
+
+**なぜ「可逆なdown()」にできないか**（同種のmigrationを書くときの判断材料）:
+
+- 旧enum型へ値を`ALTER TYPE ... ADD VALUE`で足す案は不可。(1) 旧型は`_status`と共有されており
+  draft/published以外を許す＝直した欠陥の再導入、(2) Payloadのmigrationは1 transactionで走るが、
+  Postgresは同一transaction内で追加したenum値を使えない（`unsafe use of new value`）。
+- 該当行をNULL/既定値へ潰す案は、意味（`DeploymentSite.status`＝導入実績の段階）を静かに失わせる
+  ためGlobal Constraint（意味を変えない）に反する。
+
+**対処（このrepoの方針）**: 巻き戻せない条件を満たさないときは、`down()`の先頭で
+**明示的な例外**を投げて何も壊さずに止める（素のcastエラーで落とさない）。例外messageに件数、
+`HINT`に復旧手順を入れる。`20260812_014819_deployment_status_enum`はこの形で実装済み。
+
+復旧手順（このmigrationより前へ戻す必要が本当にある場合）:
+
+1. まず戻す必要性を再確認する。`up()`は列の型を広げるだけで既存のdraft/published値も安全に通る。
+   通常このmigrationを巻き戻す理由は無い。
+2. deployment dataを退避する（§6のbackup手順、またはTask 5以降の`export --source payload`）。
+3. `DELETE FROM _deployments_v;` と `DELETE FROM deployments;`（両方空にする）。
+4. `npm run payload:migrate:down`。
+5. 再度upする場合は`npm run payload:migrate`のあと、2で退避したデータをimportし直す。
+
+実機確認済み（Task 4、隔離DB `deploid_task4_down_test`）: `status='pilot'`の行がある状態で
+`migrate:down`は上記の明示的例外で停止し、schemaとデータは無傷のまま。手順3のあとは
+`migrate:down` → `migrate` のround-tripが成功し、その後に`pilot`を再投入できる。
+
 ---
 
 ## 5. Schema drift 検出

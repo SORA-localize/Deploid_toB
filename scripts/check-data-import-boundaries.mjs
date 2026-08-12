@@ -48,27 +48,44 @@ const searchViolations = searchBoundaryRoots
 // snapshot（import / export / parity / 横断validation用の全件読み出し）を持つのは
 // `createLocalContentSource()` / `createPayloadContentSource()` が返すsourceだけで、
 // `getContentRepository()` が返す `ContentRepository` はこのメソッドを型として持たない。
-// よって「src/** ・ components/** からsource factoryを直接importしない」を機械的に守れば、
-// ページ側からsnapshotへ到達する経路が構造的に存在しなくなる（規約ではなく依存方向で担保する）。
-// 管理系（Task 5以降のimporter / exporter / parity CLI）は scripts/** から直接importしてよい。
+// よって「アプリ側からsource factoryを直接importしない」を機械的に守れば、ページから
+// snapshotへ到達する経路が構造的に存在しなくなる（規約ではなく依存方向で担保する）。
+//
+// 対象に `lib/**` を含めるのが要（Task 4 review Important #1）。Task 6のview model層は
+// `lib/`（`lib/data.ts` / `lib/robotCatalog.ts` / `lib/viewModels/**`）に置かれるため、
+// `components/**` と `src/**` だけを見ていると「lib/のmoduleがsourceを直接importして
+// `readSnapshot()` の全件をページへ渡す」経路が素通りする。ページ側は狭い
+// `ContentRepository` 型しか見ないので、型検査でもこの経路は捕まらない。
+// これはGlobal Constraint「Client Componentへraw collection全件を渡さない」が
+// 防ごうとしているものそのもの。
+//
+// 例外は `lib/content/getContentRepository.ts` だけ（source factoryを選ぶのが役目のファイル）。
+// 管理系（Task 5以降のimporter / exporter / parity CLI）は `scripts/**` / `tests/**` から
+// 直接importしてよいので、この2 rootは対象に含めない。
+//
+// specifierは末尾segmentで判定する。`@/lib/content/localSource` だけでなく、`lib/` 内から
+// 自然に書かれる相対形（`./localSource` / `../content/payloadSource`）も同じ経路であり、
+// path前置きで判定すると後者を取りこぼす。型だけのimportはruntimeで `readSnapshot()` へ
+// 到達しないため対象外（既存のdata value import gateと同じ扱い）。
 const contentSourceImport =
-  /import\s+[^;]*from\s+['"](?:@\/lib\/content\/|\.{1,2}\/(?:\.\.\/)*lib\/content\/)(localSource|payloadSource)(?:\.ts)?['"]/g;
-const contentSourceBoundaryRoots = ['components', 'src'];
+  /import\s+(?!type\b)[^;]*from\s+['"][^'"]*\/(localSource|payloadSource)(?:\.ts)?['"]/g;
+const contentSourceBoundaryRoots = ['components', 'lib', 'src'];
+const contentSourceAllowed = new Set(['lib/content/getContentRepository.ts']);
 
 const contentSourceViolations = contentSourceBoundaryRoots
   .flatMap((directory) => filesUnder(path.join(root, directory)))
   .flatMap((absolute) => {
     const relative = path.relative(root, absolute);
+    if (contentSourceAllowed.has(relative)) return [];
     contentSourceImport.lastIndex = 0;
     return contentSourceImport.test(fs.readFileSync(absolute, 'utf8')) ? [relative] : [];
   });
 
 if (contentSourceViolations.length > 0) {
   console.error(
-    'components/** and src/** must reach content only through lib/content/getContentRepository.ts ' +
-      `(never lib/content/localSource.ts or payloadSource.ts, which expose readSnapshot()):\n${contentSourceViolations
-        .map((file) => `  - ${file}`)
-        .join('\n')}`,
+    'components/**, lib/**, and src/** must reach content only through ' +
+      'lib/content/getContentRepository.ts (never lib/content/localSource.ts or payloadSource.ts, ' +
+      `which expose readSnapshot()):\n${contentSourceViolations.map((file) => `  - ${file}`).join('\n')}`,
   );
   process.exitCode = 1;
 }
