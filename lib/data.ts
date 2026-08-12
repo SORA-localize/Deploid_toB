@@ -10,6 +10,13 @@ import {
 } from '@/lib/robotCatalog';
 import type { RobotPriceView } from '@/lib/robotCatalog';
 import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
+import {
+  filterPublished,
+  filterVisibleInDetail,
+  orderRecordsByIds,
+  resolveSlugInRecords,
+} from '@/lib/content/createContentRepository';
+import type { SlugResolution } from '@/lib/content/contracts';
 
 const {
   articles,
@@ -25,32 +32,19 @@ runValidationInDev();
 // 識別子の使い分け（設計: data-architecture-redesign-v1 §3）:
 // - 参照（*Id / *Ids）・お気に入り・比較は不変の id で解決する（get*ById / *For* 系）
 // - 公開URLのパス解決のみ可変の slug を使う（get*BySlug 系）
+//
+// published filter / archived detail / slug redirect / ID解決 / 関連解決の**意味づけ本体は
+// `lib/content/createContentRepository.ts` へ移した**（Task 4 Step 5）。このファイルは移行期間
+// （Task 6でページがrepositoryへ切り替わるまで）の同期API互換層として、同じpure helperを
+// local配列に適用するだけにする。2箇所に別実装を持たない。
+//
+// `published` は一覧・比較・sitemap用（published のみ）。`visibleInDetail` は詳細・関連欄用
+// （archived を「提供終了」として残す。無言で消さない。設計 §6.5-1）。
+const published = filterPublished;
+const visibleInDetail = filterVisibleInDetail;
+const resolveBySlug = resolveSlugInRecords;
 
-const published = <T extends { publishStatus: string }>(items: readonly T[]) =>
-  items.filter((item) => item.publishStatus === 'published');
-
-// archived は「提供終了」として詳細・関連欄に残す（無言で消さない。設計 §6.5-1）。
-// draft はどのサーフェスにも出さない。一覧・比較・sitemap は published のみ。
-const visibleInDetail = <T extends { publishStatus: string }>(items: readonly T[]) =>
-  items.filter(
-    (item) => item.publishStatus === 'published' || item.publishStatus === 'archived',
-  );
-
-export interface SlugResolution<T> {
-  record?: T;
-  /** previousSlugs にヒットした場合の正規slug。呼び出し側（詳細ページ）が301する（設計 §3-3） */
-  redirectTo?: string;
-}
-
-const resolveBySlug = <T extends { slug: string; previousSlugs?: string[] }>(
-  records: readonly T[],
-  slug: string,
-): SlugResolution<T> => {
-  const record = records.find((item) => item.slug === slug);
-  if (record) return { record };
-  const moved = records.find((item) => item.previousSlugs?.includes(slug));
-  return moved ? { redirectTo: moved.slug } : {};
-};
+export type { SlugResolution };
 
 export function getRobots() {
   return published(robots);
@@ -215,13 +209,9 @@ export function getManufacturerForRobot(manufacturerId: string) {
   return getManufacturerById(manufacturerId);
 }
 
-function resolveRecordsByIds<T extends { id: string }>(ids: readonly string[], records: readonly T[]) {
-  const recordById = new Map(records.map((record) => [record.id, record]));
-  // ids の並び順を保持する（呼び出し側が編集判断で並べている関連優先度）。
-  return ids
-    .map((id) => recordById.get(id))
-    .filter((record): record is NonNullable<typeof record> => record !== undefined);
-}
+// ids の並び順を保持する（呼び出し側が編集判断で並べている関連優先度）。
+const resolveRecordsByIds = <T extends { id: string }>(ids: readonly string[], records: readonly T[]) =>
+  orderRecordsByIds(ids, records);
 
 export function getRelatedRobots(ids: string[]) {
   // archived も返す（関連欄から無言脱落させない。表示側が「提供終了」を付ける。設計 §6.5-1）

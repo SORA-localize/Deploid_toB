@@ -44,6 +44,35 @@ const searchViolations = searchBoundaryRoots
     return searchModuleImport.test(fs.readFileSync(absolute, 'utf8')) ? [relative] : [];
   });
 
+// content-platform-migration Task 4: ページ処理から `readSnapshot()` へ到達させない。
+// snapshot（import / export / parity / 横断validation用の全件読み出し）を持つのは
+// `createLocalContentSource()` / `createPayloadContentSource()` が返すsourceだけで、
+// `getContentRepository()` が返す `ContentRepository` はこのメソッドを型として持たない。
+// よって「src/** ・ components/** からsource factoryを直接importしない」を機械的に守れば、
+// ページ側からsnapshotへ到達する経路が構造的に存在しなくなる（規約ではなく依存方向で担保する）。
+// 管理系（Task 5以降のimporter / exporter / parity CLI）は scripts/** から直接importしてよい。
+const contentSourceImport =
+  /import\s+[^;]*from\s+['"](?:@\/lib\/content\/|\.{1,2}\/(?:\.\.\/)*lib\/content\/)(localSource|payloadSource)(?:\.ts)?['"]/g;
+const contentSourceBoundaryRoots = ['components', 'src'];
+
+const contentSourceViolations = contentSourceBoundaryRoots
+  .flatMap((directory) => filesUnder(path.join(root, directory)))
+  .flatMap((absolute) => {
+    const relative = path.relative(root, absolute);
+    contentSourceImport.lastIndex = 0;
+    return contentSourceImport.test(fs.readFileSync(absolute, 'utf8')) ? [relative] : [];
+  });
+
+if (contentSourceViolations.length > 0) {
+  console.error(
+    'components/** and src/** must reach content only through lib/content/getContentRepository.ts ' +
+      `(never lib/content/localSource.ts or payloadSource.ts, which expose readSnapshot()):\n${contentSourceViolations
+        .map((file) => `  - ${file}`)
+        .join('\n')}`,
+  );
+  process.exitCode = 1;
+}
+
 if (violations.length > 0) {
   console.error(`Direct data value imports are not allowed:\n${violations.map((file) => `  - ${file}`).join('\n')}`);
   process.exitCode = 1;
@@ -58,6 +87,6 @@ if (searchViolations.length > 0) {
   process.exitCode = 1;
 }
 
-if (violations.length === 0 && searchViolations.length === 0) {
+if (violations.length === 0 && searchViolations.length === 0 && contentSourceViolations.length === 0) {
   console.log('[data-boundaries] OK');
 }
