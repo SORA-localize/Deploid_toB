@@ -57,4 +57,16 @@ export default buildConfig({
   }),
   plugins: [createMediaStoragePlugin(), mcpPlugin({})],
   sharp,
+  // Payload's default `typescript.outputFile` is `${process.cwd()}/payload-types.ts` — since this
+  // fixture's CLI invocations run with cwd = repo root (same as the real payload.config.ts's
+  // invocations), an *unset* outputFile here silently overwrites the real, committed
+  // `payload-types.ts` with this fixture's MCP-plugin-inclusive types on every test run
+  // (confirmed: this happened and got committed once already — the exact same class of
+  // fixture→production contamination this file's own module comment already warns about for the
+  // DB schema, recurring one layer up in the generated-types artifact). Redirect it into this
+  // run's own temp migrationDir so it never touches the real file and gets deleted by the same
+  // `fs.rmSync(TMP_ROOT, ...)` cleanup in `tests/content/migration.test.ts`'s `afterAll`.
+  typescript: {
+    outputFile: path.join(path.dirname(migrationDir), 'fixture-payload-types.ts'),
+  },
 });

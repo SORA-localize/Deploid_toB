@@ -36,6 +36,7 @@ const SEEDED_DB_NAME = `deploid_migtest_seeded_${RUN_ID}`;
 const REPO_ROOT = process.cwd();
 const REAL_MIGRATIONS_DIR = path.join(REPO_ROOT, 'migrations');
 const FIXTURE_CONFIG_PATH = path.join(REPO_ROOT, 'tests/fixtures/payload-migrations/mcp-fixture.config.ts');
+const REAL_PAYLOAD_TYPES_PATH = path.join(REPO_ROOT, 'payload-types.ts');
 const TMP_ROOT = path.join(REPO_ROOT, 'tests/fixtures/payload-migrations', `.tmp-${RUN_ID}`);
 const TMP_EMPTY_DB_MIGRATIONS_DIR = path.join(TMP_ROOT, 'empty-db-migrations');
 const TMP_SEEDED_DB_MIGRATIONS_DIR = path.join(TMP_ROOT, 'seeded-db-migrations');
@@ -70,10 +71,23 @@ function listMigrationFiles(dir: string): string[] {
 }
 
 describe('Postgres migrations (Task 3.5) — isolated throwaway databases only', () => {
+  // Regression guard for a real bug this suite caused once already: the fixture config's CLI
+  // invocations run with cwd = repo root (same as the real payload.config.ts's invocations), so
+  // an unguarded `typescript.outputFile` default (`${cwd}/payload-types.ts`) silently overwrote
+  // the real, committed `payload-types.ts` with the MCP-plugin-inclusive fixture's types — the
+  // contamination shipped in a commit before being caught. Fixed by giving the fixture its own
+  // explicit `typescript.outputFile` inside the per-run temp dir (see
+  // `tests/fixtures/payload-migrations/mcp-fixture.config.ts`); this asserts the file this suite
+  // must never touch is byte-identical before and after the whole suite runs, so a future fixture
+  // (or a future edit to this one) that reintroduces the same class of mistake fails loudly here
+  // instead of silently shipping in a commit again.
+  let payloadTypesBefore: string;
+
   beforeAll(() => {
     assertLocalThrowawayDatabase('tests/content/migration.test.ts', AMBIENT_DATABASE_URL);
     fs.mkdirSync(TMP_EMPTY_DB_MIGRATIONS_DIR, { recursive: true });
     fs.mkdirSync(TMP_SEEDED_DB_MIGRATIONS_DIR, { recursive: true });
+    payloadTypesBefore = fs.readFileSync(REAL_PAYLOAD_TYPES_PATH, 'utf8');
   });
 
   afterAll(async () => {
@@ -390,5 +404,10 @@ describe('Postgres migrations (Task 3.5) — isolated throwaway databases only',
       },
       60_000,
     );
+  });
+
+  it('never writes to the real, committed payload-types.ts (see beforeAll comment)', () => {
+    const payloadTypesAfter = fs.readFileSync(REAL_PAYLOAD_TYPES_PATH, 'utf8');
+    expect(payloadTypesAfter).toBe(payloadTypesBefore);
   });
 });
