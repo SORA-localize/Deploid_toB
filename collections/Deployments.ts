@@ -80,6 +80,15 @@ export const Deployments: CollectionConfig = {
       name: 'status',
       type: 'select',
       options: ['announced', 'pilot', 'production', 'ended', 'unknown'],
+      // `enumName` は必須（Task 4で発見したTask 3のschema欠陥の修正）。
+      // postgres adapterはenum型名を `enum_<table>_<field>` で決めるため、drafts機構の
+      // `_status`（先頭のアンダースコアが落ちて `enum_deployments_status`）と、この
+      // 独自field `status` の enum名が衝突する。衝突時は片方（draft|published）だけが
+      // 生成され、`status` 列までその型になるため、`announced` / `pilot` 等の実値が
+      // Postgresのenum制約で拒否される（`invalid input value for enum
+      // enum_deployments_status: "pilot"`）。domain・API上のfield名 `status` と
+      // `DeploymentSite.status` の意味は変えず、DB上のenum型名だけを分離する。
+      enumName: 'enum_deployments_site_status',
     },
     { name: 'startedAt', type: 'text' },
     { name: 'relatedUseCaseIds', type: 'relationship', relationTo: 'use-cases', hasMany: true },
