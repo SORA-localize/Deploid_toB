@@ -8,6 +8,7 @@ import { getContentRepository } from '@/lib/content/getContentRepository';
 import { createInMemoryContentSource, createLocalContentSource } from '@/lib/content/localSource';
 import { createPayloadContentSource } from '@/lib/content/payloadSource';
 import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
+import { privilegedPublishContext } from '@/lib/payload/publishAuthorization';
 import { siteMeta } from '@/lib/site';
 
 /**
@@ -405,6 +406,13 @@ async function seedPayloadFixture(payload: Payload, user: Parameters<typeof payl
       overrideAccess: true,
       user,
       data: data as never,
+      // 必須修正1-4/1-6: published/archived な fixture を作るのは import/restore と同じ
+      // 特権経路。通常のupdateで `_status: 'published'` を送る経路は publish gate が拒否する。
+      context: privilegedPublishContext({
+        runId: 'repository-contract-fixture',
+        actorId: String((user as { id?: string | number } | null)?.id ?? 'unknown'),
+        reason: 'repository contract test fixture seed',
+      }),
     });
     internalIds.set(stableId, (doc as { id: string | number }).id);
   };

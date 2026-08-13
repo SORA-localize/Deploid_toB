@@ -4,6 +4,7 @@ import {
   baseContentFields,
   baseRecordContentFields,
   contentCollectionAccess,
+  contentCollectionBeforeOperationHooks,
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
@@ -94,8 +95,10 @@ export const Deployments: CollectionConfig = {
     { name: 'relatedUseCaseIds', type: 'relationship', relationTo: 'use-cases', hasMany: true },
   ],
   hooks: {
+    beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
       createPublishGateHook({
+        collectionSlug: 'deployments',
         mapToDomain: (candidate, req) => mapDeploymentCandidateToDomain(candidate as DeploymentCandidate, req.payload),
         validateForPublish: (domain) => validateDeploymentForPublish(domain as Partial<DeploymentSite>),
       }),

@@ -4,6 +4,7 @@ import {
   baseContentFields,
   baseRecordContentFields,
   contentCollectionAccess,
+  contentCollectionBeforeOperationHooks,
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
@@ -92,8 +93,10 @@ export const Manufacturers: CollectionConfig = {
     { name: 'featuredRank', type: 'number' },
   ],
   hooks: {
+    beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
       createPublishGateHook({
+        collectionSlug: 'manufacturers',
         mapToDomain: async (candidate) => mapPayloadManufacturerToDomain(candidate as never),
         validateForPublish: (domain) => validateManufacturerForPublish(domain as Manufacturer),
       }),

@@ -157,6 +157,64 @@ describe('publishApprovedVersion (real Payload Local API)', () => {
     ).rejects.toThrow(/publish-hash-mismatch/);
   });
 
+  /**
+   * 必須修正1-5（remediation group 1）: 最新version確認 → approval hash確認 → 公開update を
+   * 同一transaction・同一排他制御の中で行い、「確認は通ったが、書き込む直前に別のversionが
+   * 差し込まれた」というTOCTOUを塞ぐ。`onApprovalVerified` は**このTOCTOU回帰テスト専用**の
+   * 差し込み口で、本番の呼び出し側は渡さない。
+   */
+  it('rejects a version created after the approval check but before the publish write (TOCTOU)', async () => {
+    const draft = await payload.create({
+      collection: 'manufacturers',
+      overrideAccess: false,
+      draft: true,
+      user: writerUser,
+      data: { stableId: 'approve-mfr-toctou', slug: 'approve-mfr-toctou', ...COMPLETE_MANUFACTURER_DATA },
+    });
+
+    const { docs: versions } = await payload.findVersions({
+      collection: 'manufacturers',
+      where: { parent: { equals: draft.id } },
+      sort: '-createdAt',
+      limit: 1,
+      overrideAccess: true,
+    });
+    const approvedVersionId = versions[0].id;
+    const approvalManifestHash = computeCanonicalHash(
+      (versions[0] as unknown as { version: Record<string, unknown> }).version,
+    );
+
+    let interleaved = false;
+    await expect(
+      publishApprovedVersion({
+        payload,
+        collection: 'manufacturers',
+        stableId: 'approve-mfr-toctou',
+        approvedVersionId,
+        approvalManifestHash,
+        publisherUser,
+        onApprovalVerified: async () => {
+          // 承認確認の後、公開updateの前に、別transactionから新しいdraft versionを作る。
+          await payload.update({
+            collection: 'manufacturers',
+            id: draft.id,
+            overrideAccess: false,
+            draft: true,
+            user: writerUser,
+            data: { description: 'raced in between the approval check and the publish write' },
+          });
+          interleaved = true;
+        },
+      }),
+    ).rejects.toThrow(/publish-stale-approval/);
+
+    expect(interleaved).toBe(true);
+
+    // 競合を検出した以上、公開してはいけない（transactionごとrollback）。
+    const doc = await payload.findByID({ collection: 'manufacturers', id: draft.id, overrideAccess: true });
+    expect(doc._status).toBe('draft');
+  });
+
   it('rejects when the caller is not a publisher', async () => {
     const draft = await payload.create({
       collection: 'manufacturers',

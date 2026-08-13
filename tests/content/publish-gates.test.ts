@@ -1,6 +1,8 @@
 import { getPayload, type Payload } from 'payload';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import config from '../../payload.config';
+import { computeCanonicalHash, publishApprovedVersion } from '../../lib/payload/publishApprovedVersion';
+import { privilegedPublishContext } from '../../lib/payload/publishAuthorization';
 import { assertLocalThrowawayDatabase } from './testDbGuard';
 
 /**
@@ -34,6 +36,43 @@ async function loginAs(payload: Payload, email: string) {
   const result = await payload.login({ collection: 'admins', data: { email, password: PASSWORD } });
   if (!result.user) throw new Error(`login failed for ${email}`);
   return result.user;
+}
+
+/**
+ * remediation group 1 / 必須修正1-4 以降、承認済み公開の唯一の経路は `publishApprovedVersion()`。
+ * 「publisherがLocal APIで `_status: 'published'` を送る」だけでは公開できないため、テストの
+ * 公開はこのヘルパー（= 最新versionを承認扱いにして正規経路へ流す）を通す。
+ */
+async function publishViaApproval(
+  payload: Payload,
+  stableId: string,
+  publisherUser: Parameters<typeof publishApprovedVersion>[0]['publisherUser'],
+) {
+  const { docs: found } = await payload.find({
+    collection: 'manufacturers',
+    where: { stableId: { equals: stableId } },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+    draft: true,
+  });
+  const { docs: versions } = await payload.findVersions({
+    collection: 'manufacturers',
+    where: { parent: { equals: found[0].id } },
+    sort: '-createdAt',
+    limit: 1,
+    overrideAccess: true,
+    depth: 0,
+  });
+  const latest = versions[0];
+  return publishApprovedVersion({
+    payload,
+    collection: 'manufacturers',
+    stableId,
+    approvedVersionId: latest.id,
+    approvalManifestHash: computeCanonicalHash((latest as unknown as { version: Record<string, unknown> }).version),
+    publisherUser,
+  });
 }
 
 describe('Content collection publish gate (real Payload Local API, manufacturers as representative)', () => {
@@ -134,11 +173,11 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
     ).rejects.toThrow();
   });
 
-  it('content-publisher can publish and unpublish; incomplete drafts fail the publish gate', async () => {
+  it('content-publisher can publish through the approved path and unpublish; incomplete drafts fail the publish gate', async () => {
     const writer = await loginAs(payload, 'gate-writer@example.com');
     const publisher = await loginAs(payload, 'gate-publisher@example.com');
 
-    const incomplete = await payload.create({
+    await payload.create({
       collection: 'manufacturers',
       overrideAccess: false,
       draft: true,
@@ -146,15 +185,9 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
       data: { stableId: 'gate-mfr-incomplete', slug: 'gate-mfr-incomplete', summary: 'missing required fields' },
     });
 
-    await expect(
-      payload.update({
-        collection: 'manufacturers',
-        id: incomplete.id,
-        overrideAccess: false,
-        user: publisher,
-        data: { _status: 'published' },
-      }),
-    ).rejects.toThrow();
+    await expect(publishViaApproval(payload, 'gate-mfr-incomplete', publisher)).rejects.toThrow(
+      /publish-validation-failed/,
+    );
 
     const complete = await payload.create({
       collection: 'manufacturers',
@@ -164,26 +197,12 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
       data: { stableId: 'gate-mfr-complete', slug: 'gate-mfr-complete', ...COMPLETE_MANUFACTURER_DATA },
     });
 
-    const published = await payload.update({
-      collection: 'manufacturers',
-      id: complete.id,
-      overrideAccess: false,
-      user: publisher,
-      data: { _status: 'published' },
-    });
+    await publishViaApproval(payload, 'gate-mfr-complete', publisher);
+    const published = await payload.findByID({ collection: 'manufacturers', id: complete.id, overrideAccess: true });
     expect(published._status).toBe('published');
+    expect(published.name).toBe(COMPLETE_MANUFACTURER_DATA.name);
 
-    // partial update（必須field以外）でも公開gateが完全なdocを検証することを固定する回帰テスト。
-    const partiallyUpdated = await payload.update({
-      collection: 'manufacturers',
-      id: complete.id,
-      overrideAccess: false,
-      user: publisher,
-      data: { _status: 'published', foundedYear: 2020 },
-    });
-    expect(partiallyUpdated._status).toBe('published');
-    expect(partiallyUpdated.name).toBe(COMPLETE_MANUFACTURER_DATA.name); // 既存値のまま
-
+    // unpublish（公開を止める方向）はpublisherの通常updateで引き続きできる。
     const unpublished = await payload.update({
       collection: 'manufacturers',
       id: complete.id,
@@ -205,13 +224,7 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
       user: writer,
       data: { stableId: 'gate-mfr-unpublish-guard', slug: 'gate-mfr-unpublish-guard', ...COMPLETE_MANUFACTURER_DATA },
     });
-    await payload.update({
-      collection: 'manufacturers',
-      id: draft.id,
-      overrideAccess: false,
-      user: publisher,
-      data: { _status: 'published' },
-    });
+    await publishViaApproval(payload, 'gate-mfr-unpublish-guard', publisher);
 
     await expect(
       payload.update({
@@ -221,7 +234,7 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
         user: writer,
         data: { _status: 'draft' },
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/publish-role-required/);
   });
 
   it('only platform-admin can delete; content-publisher cannot', async () => {
@@ -274,5 +287,226 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
       user: reader,
     });
     expect(seenByReader.id).toBe(draft.id);
+  });
+
+  /**
+   * remediation group 1 / 必須修正1 の回帰テスト。監査で見つかった fail-open を固定する。
+   */
+  describe('必須修正1: 公開済みdocumentへの書き込みをfail-closedにする', () => {
+    const PUBLISHED_DESCRIPTION = 'Approved description visible to anonymous readers.';
+
+    async function seedPublished(stableId: string) {
+      const writer = await loginAs(payload, 'gate-writer@example.com');
+      const publisher = await loginAs(payload, 'gate-publisher@example.com');
+      const draft = await payload.create({
+        collection: 'manufacturers',
+        overrideAccess: false,
+        draft: true,
+        user: writer,
+        data: {
+          stableId,
+          slug: stableId,
+          ...COMPLETE_MANUFACTURER_DATA,
+          description: PUBLISHED_DESCRIPTION,
+        },
+      });
+      await publishViaApproval(payload, stableId, publisher);
+      return { draft, writer, publisher };
+    }
+
+    async function readAnonymously(stableId: string) {
+      const { docs } = await payload.find({
+        collection: 'manufacturers',
+        where: { stableId: { equals: stableId } },
+        overrideAccess: false,
+        limit: 1,
+        depth: 0,
+      });
+      return docs[0];
+    }
+
+    it('rejects a content-draft-writer update of a published document and leaves the anonymous view unchanged', async () => {
+      const { draft, writer } = await seedPublished('gate-mfr-published-edit');
+
+      await expect(
+        payload.update({
+          collection: 'manufacturers',
+          id: draft.id,
+          overrideAccess: false,
+          user: writer,
+          data: { description: 'draft-writer rewrote live content' },
+        }),
+      ).rejects.toThrow(/publish-role-required|publish-approval-required/);
+
+      const anonymous = await readAnonymously('gate-mfr-published-edit');
+      expect(anonymous?.description).toBe(PUBLISHED_DESCRIPTION);
+    });
+
+    it('lets a content-draft-writer save a new draft over a published document without changing the published version', async () => {
+      const { draft, writer } = await seedPublished('gate-mfr-draft-over-published');
+
+      const saved = await payload.update({
+        collection: 'manufacturers',
+        id: draft.id,
+        overrideAccess: false,
+        draft: true,
+        user: writer,
+        data: { description: 'pending draft, not yet approved' },
+      });
+      expect(saved._status).toBe('draft');
+
+      // 公開中のmain documentは書き換わっていない。
+      const mainRow = await payload.findByID({ collection: 'manufacturers', id: draft.id, overrideAccess: true });
+      expect(mainRow._status).toBe('published');
+      expect(mainRow.description).toBe(PUBLISHED_DESCRIPTION);
+
+      const anonymous = await readAnonymously('gate-mfr-draft-over-published');
+      expect(anonymous?.description).toBe(PUBLISHED_DESCRIPTION);
+
+      // 変更は新しいdraft versionとして残っている。
+      const { docs: versions } = await payload.findVersions({
+        collection: 'manufacturers',
+        where: { parent: { equals: draft.id } },
+        sort: '-createdAt',
+        limit: 1,
+        overrideAccess: true,
+        depth: 0,
+      });
+      const latest = (versions[0] as unknown as { version: Record<string, unknown> }).version;
+      expect(latest._status).toBe('draft');
+      expect(latest.description).toBe('pending draft, not yet approved');
+    });
+
+    /**
+     * `originalDoc` はPayloadの「最新version」であって公開中のmain rowではない。pending draftが
+     * 1件でもあると `originalDoc._status` は 'draft' になり、遷移検査だけでは公開状態の変化を
+     * 見落とす。この状態でdraft-writerが通常updateすると、公開中のmain rowがdraft内容ごと
+     * 上書きされ、実質的にunpublishされてしまっていた。
+     */
+    it('rejects a content-draft-writer plain update while a pending draft exists (must not silently unpublish)', async () => {
+      const { draft, writer } = await seedPublished('gate-mfr-pending-draft');
+
+      await payload.update({
+        collection: 'manufacturers',
+        id: draft.id,
+        overrideAccess: false,
+        draft: true,
+        user: writer,
+        data: { description: 'pending draft' },
+      });
+
+      await expect(
+        payload.update({
+          collection: 'manufacturers',
+          id: draft.id,
+          overrideAccess: false,
+          user: writer,
+          data: { description: 'draft-writer promoting their own draft' },
+        }),
+      ).rejects.toThrow(/publish-role-required|publish-approval-required/);
+
+      const mainRow = await payload.findByID({ collection: 'manufacturers', id: draft.id, overrideAccess: true });
+      expect(mainRow._status).toBe('published');
+      expect(mainRow.description).toBe(PUBLISHED_DESCRIPTION);
+
+      const anonymous = await readAnonymously('gate-mfr-pending-draft');
+      expect(anonymous?.description).toBe(PUBLISHED_DESCRIPTION);
+    });
+
+    it('rejects a plain content-publisher update that sends _status: published without an approval context', async () => {
+      const writer = await loginAs(payload, 'gate-writer@example.com');
+      const publisher = await loginAs(payload, 'gate-publisher@example.com');
+
+      const draft = await payload.create({
+        collection: 'manufacturers',
+        overrideAccess: false,
+        draft: true,
+        user: writer,
+        data: {
+          stableId: 'gate-mfr-publisher-direct',
+          slug: 'gate-mfr-publisher-direct',
+          ...COMPLETE_MANUFACTURER_DATA,
+        },
+      });
+
+      await expect(
+        payload.update({
+          collection: 'manufacturers',
+          id: draft.id,
+          overrideAccess: false,
+          user: publisher,
+          data: { _status: 'published' },
+        }),
+      ).rejects.toThrow(/publish-approval-required/);
+
+      const mainRow = await payload.findByID({ collection: 'manufacturers', id: draft.id, overrideAccess: true });
+      expect(mainRow._status).toBe('draft');
+    });
+
+    it('rejects a publish attempt that only bypasses access control with overrideAccess', async () => {
+      const writer = await loginAs(payload, 'gate-writer@example.com');
+      const draft = await payload.create({
+        collection: 'manufacturers',
+        overrideAccess: false,
+        draft: true,
+        user: writer,
+        data: { stableId: 'gate-mfr-override', slug: 'gate-mfr-override', ...COMPLETE_MANUFACTURER_DATA },
+      });
+
+      await expect(
+        payload.update({
+          collection: 'manufacturers',
+          id: draft.id,
+          overrideAccess: true,
+          data: { _status: 'published' },
+        }),
+      ).rejects.toThrow(/publish-role-required|publish-approval-required/);
+    });
+  });
+
+  describe('必須修正1-3: 匿名readはpublished かつ active のみ', () => {
+    it('does not expose archived documents through the anonymous raw API', async () => {
+      const owner = await loginAs(payload, 'gate-owner@example.com');
+
+      // archived レコードは import / restore の特権経路からしか生まれない（必須修正1-6）。
+      await payload.create({
+        collection: 'manufacturers',
+        overrideAccess: false,
+        user: owner,
+        data: {
+          stableId: 'gate-mfr-archived',
+          slug: 'gate-mfr-archived',
+          ...COMPLETE_MANUFACTURER_DATA,
+          _status: 'published',
+          lifecycleStatus: 'archived',
+        },
+        context: privilegedPublishContext({
+          runId: 'test-archived-seed',
+          actorId: String(owner.id),
+          reason: 'publish-gates regression fixture',
+        }),
+      });
+
+      const { docs: anonymous } = await payload.find({
+        collection: 'manufacturers',
+        where: { stableId: { equals: 'gate-mfr-archived' } },
+        overrideAccess: false,
+        limit: 1,
+        depth: 0,
+      });
+      expect(anonymous).toHaveLength(0);
+
+      // 認証済みなら（レビュー用途で）引き続き見える。
+      const reader = await loginAs(payload, 'gate-reader@example.com');
+      const { docs: seenByReader } = await payload.find({
+        collection: 'manufacturers',
+        where: { stableId: { equals: 'gate-mfr-archived' } },
+        overrideAccess: false,
+        user: reader,
+        limit: 1,
+        depth: 0,
+      });
+      expect(seenByReader).toHaveLength(1);
+    });
   });
 });

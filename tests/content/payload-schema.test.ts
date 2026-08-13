@@ -58,14 +58,20 @@ describe('Payload content schema', () => {
     expect(resolved.globals.map((global) => global.slug)).toContain('site-settings');
   });
 
-  it('gives every content collection drafts + maxPerDoc versioning', async () => {
+  /**
+   * 必須修正3-1（remediation group 1）: 署名済みprivate audit archiveが完成するまで自動pruneは
+   * 無効（`maxPerDoc: 0` = Payloadの `saveVersion.js` の `max > 0` ガードで
+   * `enforceMaxVersions` が呼ばれない）。以前は `maxPerDoc: 50` で、archiveできないまま
+   * 51版目以降が実削除されていた。
+   */
+  it('gives every content collection drafts and keeps automatic version pruning disabled', async () => {
     const resolved = await config;
     const contentSlugs = ['manufacturers', 'distributors', 'robot-series', 'robots', 'use-cases', 'deployments', 'articles', 'article-placements'];
     for (const slug of contentSlugs) {
       const collection = resolved.collections.find((c) => c.slug === slug)!;
       expect(collection.versions).toBeTruthy();
       expect(collection.versions?.drafts).toBeTruthy();
-      expect((collection.versions as { maxPerDoc?: number })?.maxPerDoc).toBe(50);
+      expect((collection.versions as { maxPerDoc?: number })?.maxPerDoc).toBe(0);
     }
   });
 });

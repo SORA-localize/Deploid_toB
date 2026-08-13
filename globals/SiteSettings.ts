@@ -1,5 +1,5 @@
 import type { GlobalConfig } from 'payload';
-import { canWriteDraft, publishedOrAuthenticated } from '../lib/payload/access';
+import { canWriteDraft, createGlobalPublishGateHook, publishedGlobalOrAuthenticated } from '../lib/payload/access';
 
 /**
  * サイト全体設定（デフォルトSEO・お知らせバナー）。個別collectionではないため
@@ -10,8 +10,16 @@ import { canWriteDraft, publishedOrAuthenticated } from '../lib/payload/access';
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
   access: {
-    read: publishedOrAuthenticated,
+    read: publishedGlobalOrAuthenticated,
     update: canWriteDraft,
+  },
+  /**
+   * 必須修正1-2（remediation group 1）: `versions: { drafts: true }` のglobalは
+   * `_status: 'published'` を含むupdateをそのまま受け付ける。`access.update` だけでは
+   * draft-writerのpublishを止められないため、collectionと同じくbeforeChangeのgateで塞ぐ。
+   */
+  hooks: {
+    beforeChange: [createGlobalPublishGateHook({ globalSlug: 'site-settings' })],
   },
   versions: { drafts: true },
   fields: [

@@ -64,6 +64,7 @@ import {
   rememberRelationshipId,
   type RelationshipIdCache,
 } from '../lib/content/payloadMappers.ts';
+import { privilegedPublishContext } from '../lib/payload/publishAuthorization.ts';
 import { exitCli, isDirectRun, parseArgs } from './contentCliSupport.mts';
 
 // ─── media 派生（純粋関数。ネットワーク・DBに触れない） ──────────────────────
@@ -383,6 +384,13 @@ export interface ImportOptions {
    * `req.user` の role を見るため、published/archived を書くには content-publisher 以上が要る。
    */
   user: unknown;
+  /**
+   * 必須修正1-6（remediation group 1）: import / restore は通常のpublish経路とは分離した
+   * **特権経路**として扱い、run ID・actor・理由・対象collectionを監査ログへ残す。
+   * 省略時はタイムスタンプ由来のrun IDを自動採番する。
+   */
+  runId?: string;
+  reason?: string;
   mediaResolver?: MediaFileResolver;
   /** 書き込まずに create/update の内訳だけ数える。 */
   dryRun?: boolean;
@@ -407,7 +415,7 @@ async function upsertByStableId(
   collection: ImportCollectionSlug,
   stableId: string,
   data: Record<string, unknown>,
-  args: { user: unknown; draft: boolean; file?: ResolvedMediaFile },
+  args: { user: unknown; draft: boolean; file?: ResolvedMediaFile; publishContext: Record<string, unknown> },
 ): Promise<UpsertResult> {
   const existing = (await payload.find({
     collection: collection as never,
@@ -431,6 +439,7 @@ async function upsertByStableId(
       draft: args.draft,
       user: args.user,
       overrideAccess: true,
+      context: args.publishContext,
     } as unknown as Parameters<Payload['update']>[0];
     const doc = (await payload.update(updateArgs)) as unknown as { id: string | number };
     return { id: doc.id, action: 'updated' };
@@ -442,6 +451,7 @@ async function upsertByStableId(
     draft: args.draft,
     user: args.user,
     overrideAccess: true,
+    context: args.publishContext,
     ...(args.file ? { file: args.file } : {}),
   } as unknown as Parameters<Payload['create']>[0];
   const doc = (await payload.create(createArgs)) as unknown as { id: string | number };
@@ -464,6 +474,14 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
   const { payload, snapshot, user } = options;
   const log = options.log ?? (() => {});
   const dryRun = options.dryRun ?? false;
+  // 必須修正1-6: import / restore の特権publish経路。`publishApprovedVersion()` の承認経路とは
+  // 別物として publish gate に識別させ、監査ログ（`msg: 'privileged-publish'`）へ残す。
+  const runId = options.runId ?? `content-import-${new Date().toISOString()}`;
+  const publishContext = privilegedPublishContext({
+    runId,
+    actorId: String((user as { id?: string | number } | null)?.id ?? 'unknown'),
+    reason: options.reason ?? 'content:import / content:restore idempotent upsert',
+  });
   const mediaResolver = options.mediaResolver ?? createDefaultMediaFileResolver();
   const cache: RelationshipIdCache = createRelationshipIdCache();
 
@@ -500,6 +518,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
       user,
       draft: publishStatus === 'draft',
       file,
+      publishContext,
     });
     record(collection, result, stableId);
   };
@@ -633,6 +652,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
       await upsertByStableId(payload, 'distributors', distributor.id, data, {
         user,
         draft: distributor.publishStatus === 'draft',
+        publishContext,
       });
       report.deferredReferenceUpdates.distributors += 1;
     }
@@ -641,6 +661,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
       await upsertByStableId(payload, 'robots', robot.id, data as unknown as Record<string, unknown>, {
         user,
         draft: robot.publishStatus === 'draft',
+        publishContext,
       });
       report.deferredReferenceUpdates.robots += 1;
     }
@@ -649,6 +670,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
       await upsertByStableId(payload, 'use-cases', useCase.id, data, {
         user,
         draft: useCase.publishStatus === 'draft',
+        publishContext,
       });
       report.deferredReferenceUpdates['use-cases'] += 1;
     }

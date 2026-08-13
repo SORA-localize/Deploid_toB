@@ -4,6 +4,7 @@ import {
   baseContentFields,
   baseRecordContentFields,
   contentCollectionAccess,
+  contentCollectionBeforeOperationHooks,
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
@@ -89,8 +90,10 @@ export const Distributors: CollectionConfig = {
     { name: 'note', type: 'textarea' },
   ],
   hooks: {
+    beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
       createPublishGateHook({
+        collectionSlug: 'distributors',
         mapToDomain: (candidate, req) => mapDistributorCandidateToDomain(candidate as DistributorCandidate, req.payload),
         validateForPublish: (domain) => validateDistributorForPublish(domain as Partial<Distributor>),
       }),

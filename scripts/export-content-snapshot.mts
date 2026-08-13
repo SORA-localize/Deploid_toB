@@ -554,6 +554,9 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
       payload,
       snapshot,
       user,
+      // 必須修正1-6: restore は import とは別のrun ID / 理由で監査ログへ残す。
+      runId: `content-restore-${new Date().toISOString()}`,
+      reason: `content:restore from snapshot ${inputPath}`,
       mediaResolver: createDefaultMediaFileResolver(mediaResolverOptionsFromArgs(args)),
       log: (line) => process.stdout.write(`  ${line}\n`),
     });

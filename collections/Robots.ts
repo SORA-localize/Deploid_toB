@@ -4,6 +4,7 @@ import {
   baseContentFields,
   baseRecordContentFields,
   contentCollectionAccess,
+  contentCollectionBeforeOperationHooks,
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
@@ -153,8 +154,10 @@ export const Robots: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
       createPublishGateHook({
+        collectionSlug: 'robots',
         mapToDomain: (candidate, req) => mapPayloadRobotToDomain(candidate as never, req.payload),
         validateForPublish: (domain) => validateRobotForPublish(domain as Robot),
       }),

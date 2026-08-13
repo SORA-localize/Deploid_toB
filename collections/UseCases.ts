@@ -4,6 +4,7 @@ import {
   baseContentFields,
   baseRecordContentFields,
   contentCollectionAccess,
+  contentCollectionBeforeOperationHooks,
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
@@ -145,8 +146,10 @@ export const UseCases: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
       createPublishGateHook({
+        collectionSlug: 'use-cases',
         mapToDomain: async (candidate) => mapUseCaseCandidateToDomain(candidate as UseCaseCandidate),
         validateForPublish: (domain) => validateUseCaseForPublish(domain as Partial<UseCase>),
       }),

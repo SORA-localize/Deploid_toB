@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
-import type { Payload } from 'payload';
+import { sql } from '@payloadcms/db-postgres';
+import type { Payload, PayloadRequest } from 'payload';
 import { type AuthenticatedAdminUser, asAdminUser, isContentPublisherOrAboveUser } from './access';
+import { approvedPublishContext } from './publishAuthorization';
 
 /**
  * 承認済みdraftの公開を1箇所へ集約する（brief）。Task 6〜9.5は独自のpublish updateを作らず、
@@ -26,6 +28,11 @@ export interface PublishApprovedVersionArgs {
   approvalManifestHash: string;
   /** Payload Local APIの慣例（`user` + `overrideAccess`）に合わせ、req全体ではなくuserを渡す。 */
   publisherUser: AuthenticatedAdminUser | (Record<string, unknown> & { id: string | number });
+  /**
+   * **TOCTOU回帰テスト専用**の差し込み口（`tests/content/publish-approved-version.test.ts`）。
+   * 承認確認の直後・公開updateの直前で呼ばれる。本番の呼び出し側は渡さない。
+   */
+  onApprovalVerified?: () => Promise<void>;
 }
 
 export interface PublishApprovedVersionResult {
@@ -64,83 +71,146 @@ function sortKeysDeep(value: unknown): unknown {
   return value;
 }
 
+/**
+ * 同じdocumentへの publish 同士を直列化するadvisory lock。transaction終了で自動解放される
+ * （`pg_advisory_xact_lock`）ので、明示的なunlockもタイムアウトも要らない。
+ *
+ * 必須修正1-5: 「最新version確認 → approval hash確認 → 公開update」を同一transaction内で行い、
+ * さらにこのlockで同一documentのpublishを1本に絞る。lockが取れない環境（想定外のadapter）では
+ * 黙って続行せず落とす（fail-closed）。
+ */
+async function lockDocumentForPublish(payload: Payload, transactionID: string | number, lockKey: string): Promise<void> {
+  const sessions = (payload.db as unknown as { sessions?: Record<string, { db?: { execute?: (query: unknown) => Promise<unknown> } }> })
+    .sessions;
+  const session = sessions?.[String(transactionID)];
+  const execute = session?.db?.execute;
+  if (typeof execute !== 'function') {
+    throw new Error('publish-lock-unavailable: cannot acquire a per-document publish lock on this database adapter');
+  }
+  await execute.call(session!.db, sql`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`);
+}
+
 export async function publishApprovedVersion(args: PublishApprovedVersionArgs): Promise<PublishApprovedVersionResult> {
-  const { payload, collection, stableId, approvedVersionId, approvalManifestHash, publisherUser } = args;
+  const { payload, collection, stableId, approvedVersionId, approvalManifestHash, publisherUser, onApprovalVerified } = args;
 
   const user = asAdminUser(publisherUser as never);
   if (!isContentPublisherOrAboveUser(user)) {
     throw new Error('publish-role-required');
   }
 
-  const { docs: matches } = await payload.find({
-    collection,
-    where: { stableId: { equals: stableId } },
-    limit: 1,
-    depth: 0,
-    overrideAccess: true,
-    draft: true,
-  });
-  const doc = matches[0];
-  if (!doc) {
-    throw new Error(`publish-not-found: no ${collection} document with stableId "${stableId}"`);
+  const transactionID = await payload.db.beginTransaction();
+  if (transactionID === null) {
+    throw new Error('publish-transaction-unavailable: this database adapter does not support transactions');
   }
+  // Payload Local APIは `req` の部分オブジェクトを受け取り、`transactionID` を引き継ぐ。
+  const req = { transactionID } as unknown as PayloadRequest;
+  let committed = false;
 
-  const { docs: latestVersions } = await payload.findVersions({
-    collection,
-    where: { parent: { equals: doc.id } },
-    sort: '-createdAt',
-    limit: 1,
-    overrideAccess: true,
-    depth: 0,
-  });
-  const latestVersion = latestVersions[0];
-  if (!latestVersion || String(latestVersion.id) !== String(approvedVersionId)) {
-    throw new Error('publish-stale-approval: a newer draft version exists since this approval was granted');
+  try {
+    const { docs: matches } = await payload.find({
+      collection,
+      where: { stableId: { equals: stableId } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+      draft: true,
+      req,
+    });
+    const doc = matches[0];
+    if (!doc) {
+      throw new Error(`publish-not-found: no ${collection} document with stableId "${stableId}"`);
+    }
+
+    await lockDocumentForPublish(payload, transactionID, `${collection}:${doc.id}`);
+
+    const assertApprovedVersionIsStillLatest = async () => {
+      const { docs: latestVersions } = await payload.findVersions({
+        collection,
+        where: { parent: { equals: doc.id } },
+        sort: '-createdAt',
+        limit: 1,
+        overrideAccess: true,
+        depth: 0,
+        req,
+      });
+      const latestVersion = latestVersions[0];
+      if (!latestVersion || String(latestVersion.id) !== String(approvedVersionId)) {
+        throw new Error('publish-stale-approval: a newer draft version exists since this approval was granted');
+      }
+    };
+
+    await assertApprovedVersionIsStillLatest();
+
+    const approvedVersion = await payload.findVersionByID({
+      collection,
+      id: String(approvedVersionId),
+      overrideAccess: true,
+      depth: 0,
+      req,
+    });
+    const versionData = (approvedVersion as unknown as { version?: Record<string, unknown> }).version ?? {};
+
+    const actualHash = computeCanonicalHash(versionData);
+    if (actualHash !== approvalManifestHash) {
+      throw new Error('publish-hash-mismatch: approved version content does not match the approval manifest hash');
+    }
+
+    // TOCTOU回帰テスト専用の差し込み口。本番の呼び出し側は渡さない。
+    if (onApprovalVerified) await onApprovalVerified();
+
+    // 必須修正1-5: 書き込む直前に、承認したversionがまだchain headであることを**同じ
+    // transactionの中で**もう一度確かめる。PostgresのREAD COMMITTEDでは文ごとに新しい
+    // snapshotを取るので、確認と書き込みの隙間にcommitされた別versionもここで見える。
+    await assertApprovedVersionIsStillLatest();
+
+    const published = await payload.update({
+      collection,
+      id: doc.id,
+      data: { ...stripSystemFields(versionData), _status: 'published' },
+      overrideAccess: false,
+      user: publisherUser,
+      req,
+      context: approvedPublishContext({
+        collection,
+        documentId: String(doc.id),
+        approvedVersionId: String(approvedVersionId),
+        approvalManifestHash,
+        actorId: String(user?.id ?? 'unknown'),
+      }),
+    });
+
+    const { docs: chainHead } = await payload.findVersions({
+      collection,
+      where: { parent: { equals: doc.id } },
+      sort: '-createdAt',
+      limit: 1,
+      overrideAccess: true,
+      depth: 0,
+      req,
+    });
+
+    await payload.db.commitTransaction(transactionID);
+    committed = true;
+
+    payload.logger.info({
+      msg: 'publish-approved-version',
+      collection,
+      stableId,
+      documentId: doc.id,
+      approvedVersionId,
+      actorId: user?.id,
+      canonicalHash: actualHash,
+    });
+
+    return {
+      canonicalHash: computeCanonicalHash(published as unknown as Record<string, unknown>),
+      versionChainHeadId: chainHead[0]?.id ?? approvedVersionId,
+      documentId: doc.id,
+    };
+  } catch (error) {
+    // commit後（= 公開は成立済み）にログ等で落ちた場合まで rollback を呼ぶと、解決済みsessionを
+    // 二重に終了させることになる。commit前に落ちたときだけ巻き戻す。
+    if (!committed) await payload.db.rollbackTransaction(transactionID);
+    throw error;
   }
-
-  const approvedVersion = await payload.findVersionByID({
-    collection,
-    id: String(approvedVersionId),
-    overrideAccess: true,
-    depth: 0,
-  });
-  const versionData = (approvedVersion as unknown as { version?: Record<string, unknown> }).version ?? {};
-
-  const actualHash = computeCanonicalHash(versionData);
-  if (actualHash !== approvalManifestHash) {
-    throw new Error('publish-hash-mismatch: approved version content does not match the approval manifest hash');
-  }
-
-  const published = await payload.update({
-    collection,
-    id: doc.id,
-    data: { ...stripSystemFields(versionData), _status: 'published' },
-    overrideAccess: false,
-    user: publisherUser,
-  });
-
-  const { docs: chainHead } = await payload.findVersions({
-    collection,
-    where: { parent: { equals: doc.id } },
-    sort: '-createdAt',
-    limit: 1,
-    overrideAccess: true,
-    depth: 0,
-  });
-
-  payload.logger.info({
-    msg: 'publish-approved-version',
-    collection,
-    stableId,
-    documentId: doc.id,
-    approvedVersionId,
-    actorId: user?.id,
-    canonicalHash: actualHash,
-  });
-
-  return {
-    canonicalHash: computeCanonicalHash(published as unknown as Record<string, unknown>),
-    versionChainHeadId: chainHead[0]?.id ?? approvedVersionId,
-    documentId: doc.id,
-  };
 }

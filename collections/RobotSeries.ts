@@ -4,6 +4,7 @@ import {
   baseContentFields,
   baseRecordContentFields,
   contentCollectionAccess,
+  contentCollectionBeforeOperationHooks,
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
@@ -78,8 +79,10 @@ export const RobotSeriesCollection: CollectionConfig = {
     { name: 'taskTags', type: 'text', hasMany: true },
   ],
   hooks: {
+    beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
       createPublishGateHook({
+        collectionSlug: 'robot-series',
         mapToDomain: (candidate, req) => mapRobotSeriesCandidateToDomain(candidate as RobotSeriesCandidate, req.payload),
         validateForPublish: (domain) => validateRobotSeriesForPublish(domain as Partial<RobotSeries>),
       }),

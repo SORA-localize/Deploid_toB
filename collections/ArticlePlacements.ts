@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 import {
   baseContentFields,
   contentCollectionAccess,
+  contentCollectionBeforeOperationHooks,
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
@@ -133,9 +134,11 @@ export const ArticlePlacements: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
       validateUniqueness,
       createPublishGateHook({
+        collectionSlug: 'article-placements',
         mapToDomain: (candidate, req) => mapArticlePlacementCandidateToDomain(candidate as never, req.payload),
         validateForPublish: (domain) => validatePlacementForPublish(domain as Partial<ArticlePlacement>),
       }),

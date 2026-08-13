@@ -4,6 +4,7 @@ import {
   baseContentFields,
   baseRecordContentFields,
   contentCollectionAccess,
+  contentCollectionBeforeOperationHooks,
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
@@ -169,8 +170,10 @@ export const Articles: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
       createPublishGateHook({
+        collectionSlug: 'articles',
         mapToDomain: async (candidate) => mapArticleCandidateToDomain(candidate as ArticleCandidate),
         validateForPublish: (domain) => validateArticleForPublish(domain as never),
       }),
