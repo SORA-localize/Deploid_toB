@@ -120,6 +120,29 @@ adapter実装時）に確定する前提で、Task 0時点ではopen itemとし�
 
 **CI/test storage**: brief通りCIはfake / localを使うため、cloud resourceは払い出していない。
 
+#### 2.1 cutover baseline snapshot 領域（Task 5 で確定）
+
+`content:export -- --upload` が置く cutover baseline snapshot の保管方針。移行計画 Task 5 Step 7 が
+「immutable な領域の中身をここへ具体的に記録する」ことを求めているため、実運用の値をここに置く。
+**Task 5 時点では機構だけを実装・検証しており、実データの baseline 取得は Task 9 Step 2 で行う。**
+
+| 項目 | 決定値 |
+|---|---|
+| store | Production は `deploid-audit-production`（`store_vV3iFDaAGfIly5jb`）、Preview は `deploid-audit-preview`（`store_j323pw6GSN7Sm9xp`） |
+| prefix | `cutover-baseline/` |
+| object key | `cutover-baseline/<exportedAt を `:`/`.` → `-` にした ISO8601>-<sha256 先頭12桁>.json`。detached signature は同じキー + `.cosign.bundle` |
+| アクセス | private。公開URLを持たず、Vercel Function runtime が OIDC で発行する短命URLからのみ読む。**短命URLは manifest へ保存しない**（期限切れになるため、restore 時に `storage` の永続識別子から都度発行する） |
+| 上書き・バージョニング | Vercel Blob は WORM / object-lock / object versioning を持たない（実態。S3想定の言い回しをここでは使わない）。したがって **run ごとに一意なキーで新規オブジェクトとして置き、同一キーへの再uploadを禁止**する（`allowOverwrite: false`、`scripts/export-content-snapshot.mts` の `SnapshotObjectStore.put`）。manifest の `storage.versionId` は Vercel Blob では常に `null` になる |
+| 削除権限 | Vercel Blob に fine-grained IAM は無く、`soras-projects-bb254ff5` team の admin 権限保持者が実質の削除権限者（§2「Delete / restore権限（実態）」と同じ制約）。日常運用（import/export/parity）の実行者アカウントに team admin を渡さない運用で代替する |
+| 保持期間 | cutover完了（Task 9 Step 7 の rollback window 終了）から最低90日は削除しない。90日経過後の削除は手動判断とし、**自動失効ルールは設定しない** |
+| 復元確認 | Task 5 Step 6.5 の export → restore round-trip と同じ経路で、この artifact からの復元が動くことを Task 9 実行前に一度確認する |
+
+**署名**: `alias/deploid-snapshot-signing`（§4）で cosign detached signature を作る。`content:export -- --upload`
+は署名なしでは artifact を置かない（cosign 未インストールなら失敗する）。検証（`content:verify-snapshot --manifest` /
+`content:verify-conservation --manifest`）は **§4 の公開鍵だけで完結し、AWS credential を必要としない**
+（Task 5 で実証済み）。trust anchor は §4 の公開鍵であって Rekor 透明性ログではないため、検証は
+`--insecure-ignore-tlog` で行う（外部サービスの可用性を復旧経路の依存にしない）。
+
 ### 3. Payload の置き場
 
 現行 Vercel project（`deploid-to-b`）に同居。Payload Cloud は使わない。brief Step 1 の初期値通りで、
