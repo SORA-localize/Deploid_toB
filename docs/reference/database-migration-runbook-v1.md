@@ -215,6 +215,26 @@ migration reviewのチェックリストに必ず含めること。
 | migration | 内容 | 巻き戻せる条件 |
 |---|---|---|
 | `20260812_014819_deployment_status_enum` | `deployments.status` を `_status`（draft\|published）と衝突していたenum型から `enum_deployments_site_status`（announced\|pilot\|production\|ended\|unknown）へ分離（Task 4） | `deployments` / `_deployments_v` に `announced`/`pilot`/`production`/`ended`/`unknown` を持つ行が**1行も無い**とき |
+| `20260812_080919_date_only_content_fields_to_text` | 日付のみのコンテンツ日付（`sources[].publishedAt` / `sources[].checkedAt` / `nextReviewBy` / `heroImage.rights.checkedAt` / `domesticDistributors[].checkedAt` / `articles.publishedAt` / `media.rights.checkedAt`、計61列）を `timestamptz` → `varchar`（Task 5） | 対象61列に**非NULL値が1つも無い**とき |
+
+**`date_only_content_fields_to_text` は enum の場合と危険の向きが逆**（同種を書くときの注意）。
+enum は「旧型で表現できない値」が cast エラーになるだけで、**失敗が安全側**だった。こちらは:
+
+- 月精度の値（`'2025-05'`）を持つ行 → cast エラーで transaction ごと落ちる（うるさいが安全）。
+- **`'2026-07-16'` のような普通の値を持つ行 → cast に成功してしまう。** ただしその値は
+  「`migrate:down` を実行した session の timezone の0時」になる。JSTで巻き戻すと
+  `2026-07-15T15:00:00Z` として保存され、`up()` が取り除いた1日ずれが**エラーも警告も無しに
+  再導入される**。down() 自体は成功したように見える。
+
+したがって guard の条件は「変換できない行があるか」ではなく **「対象列に値があるか」**。
+1行でもあれば止める。実機確認済み（Task 5、隔離DB `deploid_task5_down`）: 実データ投入後の
+`migrate:down` は `down() is one-way once date-only content values exist (1887 row(s) ...)` で停止し、
+列型は `character varying` のまま・値も `2026-07-16` のまま無傷。空DBでは down → up の
+round-trip が成功する。
+
+> 生成された down() は `USING` 節を持たず**空DBでも実行できなかった**
+> （`column "published_at" cannot be cast automatically to type timestamp with time zone`）。
+> 下記「既知の生成物バグ」と同種のため、明示 cast を手で足してある。
 
 **なぜ「可逆なdown()」にできないか**（同種のmigrationを書くときの判断材料）:
 
