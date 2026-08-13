@@ -114,13 +114,29 @@ export function recordDraftIntent(
 }
 
 /**
- * `recordDraftIntent()` が控えた値を読む。**記録が無ければ `false`（= main rowを書く扱い）**を
- * 返す。fail-closedの中核: 観測できなかった経路は、公開状態を書き換えうる操作として
- * 厳しい側に倒す。
+ * `recordDraftIntent()` が控えた値を、**1回だけ**読む（読んだ時点で消費する）。
+ * 記録が無ければ `false`（= main rowを書く扱い）を返す。
+ *
+ * ## なぜ消費するのか（累積するmapにしない理由）
+ *
+ * `req.context` は1つのrequestの中で使い回される。hookがネストした
+ * `payload.update({ req })` を呼ぶと、`createLocalReq()` が `{...req.context, ...context}` を
+ * 作るため、ここに置いたMapの**参照がそのまま引き継がれる**。
+ *
+ * 記録が残り続ける設計だと、id指定のdraft保存が残した `true` を、後続の
+ * **`args.id` を持たない書き込み**（`where` 指定のbulk update、`restoreVersion` 等。
+ * `beforeOperation` で何も記録しない）が拾い、「main rowを書く操作」が「draft保存」と
+ * 誤認されうる。今のcallerの組み合わせでは実害のある経路が無いことを確認したが、
+ * ここはsecurity-criticalなgateなので、「危険なcallerが今は居ない」ことに正しさを
+ * 依存させない。1回の書き込み用の使い捨てトークンにすれば、記録の無い経路は
+ * **構造上必ず** `false`（fail-closed）へ落ちる。
  */
 export function readDraftIntent(req: PayloadRequest, collectionSlug: string, docId: string | number | undefined): boolean {
   if (docId === undefined) return false;
   const map = contextOf(req)[DRAFT_INTENT_KEY];
   if (!(map instanceof Map)) return false;
-  return map.get(draftIntentKey(collectionSlug, docId)) === true;
+  const key = draftIntentKey(collectionSlug, docId);
+  const intent = map.get(key);
+  map.delete(key);
+  return intent === true;
 }

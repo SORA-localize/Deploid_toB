@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto';
-import { sql } from '@payloadcms/db-postgres';
 import type { Payload, PayloadRequest } from 'payload';
 import { type AuthenticatedAdminUser, asAdminUser, isContentPublisherOrAboveUser } from './access';
 import { approvedPublishContext } from './publishAuthorization';
+import { acquireDocumentWriteLock } from './publishLock';
 
 /**
  * 承認済みdraftの公開を1箇所へ集約する（brief）。Task 6〜9.5は独自のpublish updateを作らず、
@@ -71,25 +71,6 @@ function sortKeysDeep(value: unknown): unknown {
   return value;
 }
 
-/**
- * 同じdocumentへの publish 同士を直列化するadvisory lock。transaction終了で自動解放される
- * （`pg_advisory_xact_lock`）ので、明示的なunlockもタイムアウトも要らない。
- *
- * 必須修正1-5: 「最新version確認 → approval hash確認 → 公開update」を同一transaction内で行い、
- * さらにこのlockで同一documentのpublishを1本に絞る。lockが取れない環境（想定外のadapter）では
- * 黙って続行せず落とす（fail-closed）。
- */
-async function lockDocumentForPublish(payload: Payload, transactionID: string | number, lockKey: string): Promise<void> {
-  const sessions = (payload.db as unknown as { sessions?: Record<string, { db?: { execute?: (query: unknown) => Promise<unknown> } }> })
-    .sessions;
-  const session = sessions?.[String(transactionID)];
-  const execute = session?.db?.execute;
-  if (typeof execute !== 'function') {
-    throw new Error('publish-lock-unavailable: cannot acquire a per-document publish lock on this database adapter');
-  }
-  await execute.call(session!.db, sql`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`);
-}
-
 export async function publishApprovedVersion(args: PublishApprovedVersionArgs): Promise<PublishApprovedVersionResult> {
   const { payload, collection, stableId, approvedVersionId, approvalManifestHash, publisherUser, onApprovalVerified } = args;
 
@@ -121,7 +102,9 @@ export async function publishApprovedVersion(args: PublishApprovedVersionArgs): 
       throw new Error(`publish-not-found: no ${collection} document with stableId "${stableId}"`);
     }
 
-    await lockDocumentForPublish(payload, transactionID, `${collection}:${doc.id}`);
+    // 必須修正1-5: publish と、versionを作る書き込みの両方が同じlockを取ることで初めて
+    // 「承認確認 → 公開update」の間に別versionが割り込めなくなる。
+    await acquireDocumentWriteLock({ payload, transactionID, collectionSlug: collection, docId: doc.id });
 
     const assertApprovedVersionIsStillLatest = async () => {
       const { docs: latestVersions } = await payload.findVersions({

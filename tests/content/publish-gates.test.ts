@@ -1,8 +1,8 @@
-import { getPayload, type Payload } from 'payload';
+import { getPayload, type Payload, type PayloadRequest } from 'payload';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import config from '../../payload.config';
 import { computeCanonicalHash, publishApprovedVersion } from '../../lib/payload/publishApprovedVersion';
-import { privilegedPublishContext } from '../../lib/payload/publishAuthorization';
+import { privilegedPublishContext, recordDraftIntent } from '../../lib/payload/publishAuthorization';
 import { assertLocalThrowawayDatabase } from './testDbGuard';
 
 /**
@@ -410,6 +410,68 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
       expect(mainRow.description).toBe(PUBLISHED_DESCRIPTION);
 
       const anonymous = await readAnonymously('gate-mfr-pending-draft');
+      expect(anonymous?.description).toBe(PUBLISHED_DESCRIPTION);
+    });
+
+    /**
+     * レビュー指摘 #3 の回帰テスト（end-to-end側）。
+     *
+     * `where` 指定のbulk updateは `beforeOperation` で `args.id` を持たないため draft intent を
+     * 何も記録しない。それでもgateは「main rowを書く操作」として扱い、draft-writerを弾かなければ
+     * ならない。ここでは、同じrequestに**先行するid指定draft保存のintentが残っている**状況を
+     * 作った上で、それでも拒否されることを固定する。
+     *
+     * なお、この経路のintent残留が現状そのまま悪用できるわけではない: bulk updateの
+     * `originalDoc` はmain row（published）なので、Payloadのfield beforeValidateが
+     * `data._status` を 'published' で埋め、`isDraftSave` はintentに関係なくfalseになる。
+     * つまり今日のfail-closedは**Payload側の実装詳細に助けられた偶然**でもある。
+     * その偶然に正しさを依存させないための構造的な担保（intentを使い捨てにする）は
+     * `tests/content/publish-authorization.test.ts` が直接固定している。
+     */
+    it('rejects a draft-writer bulk update of a published document even with a stale draft intent on the request', async () => {
+      const { draft, writer } = await seedPublished('gate-mfr-intent-leak');
+
+      // pending draftを作る（これで originalDoc = 最新version は draft になる）。
+      await payload.update({
+        collection: 'manufacturers',
+        id: draft.id,
+        overrideAccess: false,
+        draft: true,
+        user: writer,
+        data: { description: 'pending draft used for the intent-leak probe' },
+      });
+
+      // 同一requestを使い回すネスト操作を再現する。先行するid指定のdraft保存が
+      // draft intentを残した状態を作り、その後 `where` 指定のbulk updateを同じreqで走らせる。
+      const transactionID = await payload.db.beginTransaction();
+      if (transactionID === null) throw new Error('expected the postgres adapter to support transactions');
+      const sharedContext: Record<string, unknown> = { deploidIntentLeakProbe: true };
+      const req = { transactionID, context: sharedContext } as unknown as PayloadRequest;
+      recordDraftIntent(req, 'manufacturers', draft.id, true);
+
+      const result = (await payload.update({
+        collection: 'manufacturers',
+        where: { id: { equals: draft.id } },
+        overrideAccess: false,
+        user: writer,
+        req,
+        data: { description: 'bulk write riding a stale draft intent' },
+      })) as unknown as { docs: unknown[]; errors: unknown[] };
+
+      await payload.db.commitTransaction(transactionID);
+
+      // gateはこのbulk updateを「main rowを書く操作」として扱い、拒否しなければならない。
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect((result.errors[0] as { message?: string }).message).toMatch(
+        /publish-role-required|publish-approval-required/,
+      );
+      expect(result.docs).toHaveLength(0);
+
+      const mainRow = await payload.findByID({ collection: 'manufacturers', id: draft.id, overrideAccess: true });
+      expect(mainRow._status).toBe('published');
+      expect(mainRow.description).toBe(PUBLISHED_DESCRIPTION);
+
+      const anonymous = await readAnonymously('gate-mfr-intent-leak');
       expect(anonymous?.description).toBe(PUBLISHED_DESCRIPTION);
     });
 

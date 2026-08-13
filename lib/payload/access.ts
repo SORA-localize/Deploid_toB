@@ -6,6 +6,7 @@ import {
   readPrivilegedPublishAuthorization,
   recordDraftIntent,
 } from './publishAuthorization';
+import { acquireDocumentWriteLock } from './publishLock';
 
 /** `process.env` そのものではなくテストから差し替え可能な形で受け取るための最小型。 */
 export type EnvLike = Record<string, string | undefined>;
@@ -406,6 +407,18 @@ export function createPublishGateHook<TDoc extends PublishTransitionCandidate>(o
     const user = asAdminUser(req.user);
     const canPublish = isContentPublisherOrAboveUser(user);
     const docId = operation === 'update' ? originalDoc?.id : undefined;
+
+    // 必須修正1-5: このupdateは（draft保存であれ公開であれ）新しいversionを作る。publish側だけが
+    // lockを取る形だとdraft保存が公開処理の検証と書き込みの隙間へ割り込めるため、**versionを作る
+    // 側でも同じlockを取る**。以降のmain row読み取りもこのlockの内側で行う。
+    if (docId !== undefined) {
+      await acquireDocumentWriteLock({
+        payload: req.payload,
+        transactionID: req.transactionID,
+        collectionSlug: options.collectionSlug,
+        docId,
+      });
+    }
 
     // Payloadの `isSavingDraft` と同じ式（localizationは未使用なので `publishAllLocales` は
     // `!draftArg` に等しく、`draftArg && data._status !== 'published'` へ縮約される）。
