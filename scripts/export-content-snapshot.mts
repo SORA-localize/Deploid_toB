@@ -273,8 +273,14 @@ export interface SnapshotObjectStore {
   /** 同一キーへの再 upload は拒否する（write-once 運用。brief Step 7 の表）。 */
   put(objectKey: string, body: Buffer): Promise<{ versionId: string | null }>;
   get(objectKey: string): Promise<Buffer>;
-  /** private object の短命 URL。manifest へは保存しない（期限切れになるため、brief Step 7）。 */
-  presignedUrl(objectKey: string): Promise<string>;
+  /**
+   * 表示・ログ用の**永続識別子**。brief Step 7 は「private object の署名付きURLは manifest へ
+   * 保存しない（期限切れになるため）」としており、`@vercel/blob@2` にはそもそも期限付き署名URLを
+   * 発行する API が無い（private blob の読み出しは認証付き `get()`）。したがってここは
+   * **URL を返さない**契約にし、期限の無いリンクがログへ残ることを構造的に防ぐ。
+   * 実際の読み出しは常に `get()` を通す。
+   */
+  objectReference(objectKey: string): string;
 }
 
 /**
@@ -300,7 +306,7 @@ export function createLocalDiskObjectStore(directory: string): SnapshotObjectSto
     async get(objectKey) {
       return readFile(path.join(directory, objectKey));
     },
-    async presignedUrl(objectKey) {
+    objectReference(objectKey) {
       return `file://${path.join(directory, objectKey)}`;
     },
   };
@@ -319,7 +325,11 @@ export function createVercelBlobObjectStore(storeName: string): SnapshotObjectSt
     async put(objectKey, body) {
       const { put } = await import('@vercel/blob');
       const result = await put(objectKey, body, {
-        access: 'public',
+        // **private 必須**。`deploid-audit-*` は private store（資源表 §2 / §2.1）で、
+        // cutover baseline は全 content record を含む。`access: 'public'` で置くと
+        // 推測しにくいだけの永続URLで誰でも読める状態になり、資源表の
+        // 「private。公開URLを持たず、短命な認証付き経路からのみ読む」と正面から矛盾する。
+        access: 'private',
         addRandomSuffix: false,
         // 同一キーへの再 upload を禁止する（Vercel Blob は WORM を持たないため、
         // 「run ごとに一意なキー + 上書き禁止」で immutability を運用的に担保する）。
@@ -328,15 +338,26 @@ export function createVercelBlobObjectStore(storeName: string): SnapshotObjectSt
       return { versionId: (result as { versionId?: string }).versionId ?? null };
     },
     async get(objectKey) {
-      const { head } = await import('@vercel/blob');
-      const meta = await head(objectKey);
-      const response = await fetch(meta.url);
-      if (!response.ok) throw new Error(`blob-get-failed-${response.status}: ${objectKey}`);
-      return Buffer.from(await response.arrayBuffer());
+      // private blob の読み出しは SDK の認証付き `get()` で行う。`head()` + 素の `fetch(url)`
+      // は public store 用のアクセス経路で、private store では 401 になる。
+      const { get } = await import('@vercel/blob');
+      const result = await get(objectKey, { access: 'private' });
+      if (!result) throw new Error(`blob-object-not-found: ${objectKey}`);
+      if (result.statusCode !== 200 || !result.stream) {
+        throw new Error(`blob-get-unexpected-status-${result.statusCode}: ${objectKey}`);
+      }
+      const chunks: Uint8Array[] = [];
+      for await (const chunk of result.stream) chunks.push(chunk);
+      return Buffer.concat(chunks);
     },
-    async presignedUrl(objectKey) {
-      const { head } = await import('@vercel/blob');
-      return (await head(objectKey)).url;
+    objectReference(objectKey) {
+      // **URL を返さない。** `@vercel/blob@2` には期限付き署名URLを発行する API が無く、
+      // private blob の読み出しは「その場で token / OIDC を使う認証付き `get()`」で行う。
+      // ここで `head().url` のような永続URLを返して表示すると、期限の無いリンクを
+      // ログ・スクロールバック・チケットへ残すことになる（brief Step 7:
+      // 「private objectの署名付きURLはmanifestへ保存しない。URLは期限切れになるため」）。
+      // よって表示・記録用には**参照解決できない永続識別子**だけを返す。
+      return `vercel-blob://${storeName}/${objectKey} (private; read via @vercel/blob get({ access: 'private' }))`;
     },
   };
 }
@@ -513,7 +534,7 @@ async function runExport(args: Map<string, string | true>): Promise<void> {
   } else {
     process.stdout.write(manifestJson);
   }
-  process.stdout.write(`object: ${await store.presignedUrl(manifest.storage.objectKey)}\n`);
+  process.stdout.write(`object: ${store.objectReference(manifest.storage.objectKey)}\n`);
 }
 
 async function runRestore(args: Map<string, string | true>): Promise<void> {
