@@ -125,7 +125,7 @@ export const Articles: CollectionConfig = {
       type: 'select',
       options: ['editorial', 'sample', 'sponsored'],
     },
-    { name: 'publishedAt', type: 'date' },
+    { name: 'publishedAt', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
     { name: 'author', type: 'text' },
     { name: 'industryTags', type: 'text', hasMany: true },
     { name: 'regionTags', type: 'text', hasMany: true },

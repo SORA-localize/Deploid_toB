@@ -98,7 +98,19 @@ export function baseContentFields(): Field[] {
   ];
 }
 
-/** 全content collection共通の `Source[]`（BaseRecord）。`reliability` の意味は `data/types.ts` と不変。 */
+/**
+ * 全content collection共通の `Source[]`（BaseRecord）。`reliability` の意味は `data/types.ts` と不変。
+ *
+ * **`publishedAt` は `date` ではなく `text`**（Task 5 で発見したTask 3のschema欠陥の修正）。
+ * 現行 `data/*.ts` の出典には月精度の公開日（`'2025-05'` / `'2025-11'`、実データで3件）があり、
+ * Postgres の `timestamp with time zone` は `invalid input syntax for type timestamp with time
+ * zone: "2025-05"` で拒否する。importer 側で `'2025-05-01'` へ丸めると、出典の「公開日は
+ * 2025年5月（日は不明）」という事実主張を「2025年5月1日」に書き換えることになり、
+ * Global Constraints の「sources の意味を変えない」に反する。しかも parity 比較は
+ * `Date.parse('2025-05') === Date.parse('2025-05-01')` のため差分として出ず、**損失が
+ * 検出できない形**になる。`collections/Deployments.ts` の `startedAt`（`'2024-01'` を持つため
+ * Task 3時点で `text`）と同じ判断をここにも適用する。
+ */
 export function sourcesField(): Field {
   return {
     name: 'sources',
@@ -107,8 +119,15 @@ export function sourcesField(): Field {
       { name: 'title', type: 'text', required: true },
       { name: 'url', type: 'text', required: true },
       { name: 'publisher', type: 'text' },
-      { name: 'publishedAt', type: 'date' },
-      { name: 'checkedAt', type: 'date', required: true },
+      {
+        name: 'publishedAt',
+        type: 'text',
+        admin: {
+          description:
+            '出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。',
+        },
+      },
+      { name: 'checkedAt', type: 'text', required: true, admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
       {
         name: 'reliability',
         type: 'select',
@@ -152,7 +171,7 @@ function rightsMetaField(name: string): Field {
         type: 'select',
         options: ['own', 'manufacturer-official', 'partner-official', 'press-release', 'third-party', 'unknown'],
       },
-      { name: 'checkedAt', type: 'date' },
+      { name: 'checkedAt', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
       { name: 'rightsHolder', type: 'text' },
       { name: 'licenseUrl', type: 'text' },
       { name: 'permissionNote', type: 'textarea' },
@@ -203,7 +222,7 @@ export function baseRecordContentFields(): Field[] {
       options: ['verified', 'official', 'reported', 'estimated'],
     },
     sourcesField(),
-    { name: 'nextReviewBy', type: 'date' },
+    { name: 'nextReviewBy', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
     imageAssetField('heroImage'),
     seoField(),
   ];

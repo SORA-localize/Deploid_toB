@@ -81,7 +81,7 @@ export const Manufacturers: CollectionConfig = {
         { name: 'name', type: 'text', required: true },
         { name: 'website', type: 'text' },
         { name: 'sourceUrl', type: 'text' },
-        { name: 'checkedAt', type: 'date' },
+        { name: 'checkedAt', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
         { name: 'note', type: 'textarea' },
       ],
     },

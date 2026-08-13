@@ -50,7 +50,7 @@ export const Media: CollectionConfig = {
           required: true,
           options: ['own', 'manufacturer-official', 'partner-official', 'press-release', 'third-party', 'unknown'],
         },
-        { name: 'checkedAt', type: 'date', required: true },
+        { name: 'checkedAt', type: 'text', required: true, admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
         { name: 'rightsHolder', type: 'text' },
         { name: 'licenseUrl', type: 'text' },
         { name: 'permissionNote', type: 'textarea' },

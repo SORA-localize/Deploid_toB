@@ -847,21 +847,23 @@ describe.each(SOURCE_CASES)('ContentRepository contract against the $name source
 
 describe('local and Payload sources agree on the same fixture', () => {
   /**
-   * **既知の差異（Task 5へ申し送り）**: local `data/*.ts` の `publishedAt` / `checkedAt` /
-   * `nextReviewBy` は日付のみの文字列（`ISODate`、例 `2026-02-01`）だが、Payloadの
-   * `type: 'date'` fieldはPostgres `timestamptz` として保存し、ISO instantで返す。
-   * 書き込み側のprocess timezoneでその日の0時と解釈されるため、UTCへ正規化した文字列を
-   * 単純に `slice(0, 10)` すると、JST環境では前日にずれる（`2026-02-01` → `2026-01-31`）。
+   * **Task 4で申し送った既知の差異は、Task 5のschema変更で解消済み**。
    *
-   * ここでは「同じprocess timezoneで見た暦日」に正規化して比較する。同一processで書いて
-   * 読む限りこれは安定するが、**import時とserve時のtimezoneが違うと日付がずれる**
-   * （import: 開発者のJSTマシン / serve: VercelのUTC）。恒久対応は
-   * schema側（date-onlyのeditorial fieldを `text` にする等）で、Task 5で決める。
+   * 当初、local `data/*.ts` の `publishedAt` / `checkedAt` / `nextReviewBy` は日付のみの文字列
+   * （`ISODate`、例 `2026-02-01`）なのに、Payloadの `type: 'date'` field はPostgres `timestamptz`
+   * として保存しISO instantで返していた。書き込み側のprocess timezoneでその日の0時と解釈される
+   * ため、**import時とserve時のtimezoneが違うと暦日がずれる**（import: 開発者のJSTマシン /
+   * serve: VercelのUTC → `2026-02-01` が `2026-01-31T15:00:00.000Z` になり、UTCで読むと1月31日）。
+   * Task 4はこれを正規化して比較で回避し、恒久対応を「schema側でdate-onlyのeditorial fieldを
+   * `text` にする」としてTask 5へ申し送っていた。
+   *
+   * Task 5で実際にその変更を入れた（`lib/payload/access.ts` の `sourcesField()` /
+   * `rightsMetaField()` / `nextReviewBy`、`collections/Articles.ts` の `publishedAt`、
+   * `collections/Manufacturers.ts` / `collections/Media.ts` の `checkedAt`。migration
+   * `20260812_080919_date_only_content_fields_to_text`）。したがって今は**正規化なしで
+   * 生の文字列がそのまま一致する**。この testはその回帰ガードで、`date` へ戻すと落ちる。
    */
-  const normalizeDate = (value: string | undefined) =>
-    value === undefined ? undefined : new Date(value).toLocaleDateString('sv-SE');
-
-  it('documents the date-only vs timestamptz divergence that Task 5 parity must handle', async () => {
+  it('keeps date-only editorial fields byte-identical across both sources', async () => {
     const [payloadArticle] = await createPayloadContentSource({ payload: payloadReady }).listArticles({
       ids: ['fx-article-new'],
       sort: 'id',
@@ -873,9 +875,8 @@ describe('local and Payload sources agree on the same fixture', () => {
       publishStatuses: ['published'],
     });
     expect(localArticle.publishedAt).toBe('2026-02-01');
-    // Payload側はinstant。生の文字列同士は一致しない（一致させるのはschema側の課題）。
-    expect(payloadArticle.publishedAt).not.toBe(localArticle.publishedAt);
-    expect(normalizeDate(payloadArticle.publishedAt)).toBe(normalizeDate(localArticle.publishedAt));
+    expect(payloadArticle.publishedAt).toBe('2026-02-01');
+    expect(payloadArticle.sources[0]?.checkedAt).toBe(localArticle.sources[0]?.checkedAt);
   });
 
   it('produces the same robots (ids, publishStatus, relations, removed fields)', async () => {
@@ -908,7 +909,8 @@ describe('local and Payload sources agree on the same fixture', () => {
       return (await repository.listArticles()).map((article) => ({
         id: article.id,
         publishStatus: article.publishStatus,
-        publishedAt: normalizeDate(article.publishedAt),
+        // Task 5 で `publishedAt` を `text` にしたため、正規化なしの生の値で比較できる。
+        publishedAt: article.publishedAt,
         relatedRobotIds: article.relatedRobotIds,
         relatedManufacturerIds: article.relatedManufacturerIds,
         relatedUseCaseIds: article.relatedUseCaseIds,
