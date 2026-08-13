@@ -9,8 +9,11 @@ import type { ContentSnapshot } from '@/lib/content/contracts';
 import { createPayloadContentSource } from '@/lib/content/payloadSource';
 import { siteMeta } from '@/lib/site';
 import {
+  STRICT_DATE_FIELDS,
+  collectMediaReviewItems,
   compareSnapshots,
   countRecords,
+  formatMediaReview,
   parityReportIsClean,
 } from '@/scripts/compare-content-sources.mts';
 import { parseArgs } from '@/scripts/contentCliSupport.mts';
@@ -131,30 +134,66 @@ describe('content source parity', () => {
     ]);
   });
 
-  it('ignores updatedAt and compares content dates as instants, not as strings', () => {
+  it('ignores updatedAt', () => {
     const actual = clone(contentSnapshotFixture);
     actual.robots[0].updatedAt = '2099-12-31T23:59:59.000Z';
-    // Payload の `type: 'date'` は `'2026-01-10'` を timestamptz として読み戻す。
-    actual.robots[0].sources[0].checkedAt = '2026-01-10T00:00:00.000Z';
-    actual.articles[0].publishedAt = '2026-01-19T00:00:00.000Z';
-    actual.robots[0].nextReviewBy = '2026-07-13T00:00:00.000Z';
-
     expect(parityReportIsClean(compareSnapshots(contentSnapshotFixture, actual))).toBe(true);
   });
 
-  it('still catches a genuinely different content date', () => {
-    const actual = clone(contentSnapshotFixture);
-    actual.robots[0].sources = structuredClone(contentSnapshotFixture.robots[0].sources);
-    actual.robots[0].sources[0].checkedAt = '2026-01-11T00:00:00.000Z';
-    expect(compareSnapshots(contentSnapshotFixture, actual).changed).toEqual([
+  /**
+   * **日付は厳密な文字列一致で比べる**（instant へ正規化しない）。
+   *
+   * migration `20260812_080919_date_only_content_fields_to_text` で該当列を `text` にしたため、
+   * Payload は書いた文字列をそのまま返す。ここを instant 比較にすると
+   * `Date.parse('2025-05') === Date.parse('2025-05-01')` が成立し、**月精度の日付を日精度へ
+   * 丸める silent な損失が parity 0 差分になる**。その損失こそ migration が防ぐために
+   * 存在するので、緩めた瞬間に落ちるようこの test で固定する。
+   */
+  it('requires byte-identical content dates', () => {
+    const cases: Array<[string, (snapshot: ContentSnapshot) => void]> = [
+      [
+        'sources[0].checkedAt',
+        (snapshot) => {
+          snapshot.robots[0].sources = structuredClone(contentSnapshotFixture.robots[0].sources);
+          snapshot.robots[0].sources[0].checkedAt = '2026-01-10T00:00:00.000Z';
+        },
+      ],
+      ['publishedAt', (snapshot) => { snapshot.articles[0].publishedAt = '2026-01-19T00:00:00.000Z'; }],
+      ['nextReviewBy', (snapshot) => { snapshot.robots[0].nextReviewBy = '2026-07-13T00:00:00.000Z'; }],
+    ];
+
+    for (const [field, mutate] of cases) {
+      const actual = clone(contentSnapshotFixture);
+      mutate(actual);
+      const fields = compareSnapshots(contentSnapshotFixture, actual).changed.map((change) => change.field);
+      expect(fields, `${field} must be compared as a string, not as an instant`).toContain(field);
+    }
+  });
+
+  it('treats a month-precision date and its day-precision rounding as different values', () => {
+    // まさに importer が黙って丸めたときの形。instant 比較だと同値になってしまう組み合わせ。
+    expect(Date.parse('2025-05')).toBe(Date.parse('2025-05-01'));
+
+    const expected = clone(contentSnapshotFixture);
+    expected.robots[0].sources = structuredClone(contentSnapshotFixture.robots[0].sources);
+    expected.robots[0].sources[0].publishedAt = '2025-05';
+    const actual = clone(expected);
+    actual.robots[0].sources = structuredClone(expected.robots[0].sources);
+    actual.robots[0].sources[0].publishedAt = '2025-05-01';
+
+    expect(compareSnapshots(expected, actual).changed).toEqual([
       {
         collection: 'robots',
         id: 'fixture-robot-a',
-        field: 'sources[0].checkedAt',
-        expected: '2026-01-10',
-        actual: '2026-01-11T00:00:00.000Z',
+        field: 'sources[0].publishedAt',
+        expected: '2025-05',
+        actual: '2025-05-01',
       },
     ]);
+  });
+
+  it('names exactly the fields that must be compared strictly', () => {
+    expect([...STRICT_DATE_FIELDS].sort()).toEqual(['checkedAt', 'nextReviewBy', 'publishedAt']);
   });
 
   it('ignores storage-assigned media attributes but not media rights', () => {
@@ -234,6 +273,49 @@ describe('media derivation', () => {
     expect(forSrc).toHaveLength(2);
     expect(new Set(forSrc.map((c) => c.asset.id)).size).toBe(2);
     for (const candidate of forSrc) expect(candidate.asset.id).toMatch(/^media:\/media\/fixture-hero\.png#[0-9a-f]{8}$/);
+  });
+});
+
+describe('media review items surfaced in the parity report', () => {
+  /**
+   * brief Step 3: 「取得不能または権利未確定の画像は自動公開せず、**parity reportの
+   * 要確認項目として残す**」。フィルタで落として `content:import` の stdout にしか
+   * 出ない状態にしない（Task 9 が archive するのは compare の JSON）。
+   */
+  it('reports unconfirmed-rights external images instead of dropping them', () => {
+    const items = collectMediaReviewItems(deriveMediaFromSnapshot(contentSnapshotFixture));
+    const unhostable = items.filter((item) => item.kind === 'unhostable-image');
+
+    expect(unhostable).toHaveLength(1);
+    expect(unhostable[0]).toMatchObject({
+      src: 'https://cdn.example.com/fixture-side.jpg',
+      usedBy: ['robots/fixture-robot-a.images.side'],
+    });
+    expect(unhostable[0].detail).toContain('reference-attributed');
+    expect(formatMediaReview(items)).toContain('REVIEW REQUIRED');
+  });
+
+  it('reports the same file carrying conflicting rights metadata as duplicate uploads', () => {
+    const snapshot = clone(contentSnapshotFixture);
+    snapshot.manufacturers[1].heroImage = {
+      ...structuredClone(snapshot.manufacturers[0].heroImage!),
+      rights: { ...snapshot.manufacturers[0].heroImage!.rights, checkedAt: '2026-02-01' },
+    };
+
+    const conflicts = collectMediaReviewItems(deriveMediaFromSnapshot(snapshot)).filter(
+      (item) => item.kind === 'conflicting-image-rights',
+    );
+    expect(conflicts).toHaveLength(1);
+    expect(conflicts[0].src).toBe('/media/fixture-hero.png');
+    expect(conflicts[0].detail).toContain('uploaded 2 times');
+  });
+
+  it('says so explicitly when there is nothing to review', () => {
+    const snapshot = clone(contentSnapshotFixture);
+    // 唯一の外部画像を外すと要確認項目はゼロになる。
+    delete snapshot.robots[0].images?.side;
+    expect(collectMediaReviewItems(deriveMediaFromSnapshot(snapshot))).toEqual([]);
+    expect(formatMediaReview([])).toBe('media review items: none');
   });
 });
 

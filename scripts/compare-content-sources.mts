@@ -27,13 +27,17 @@
  * - `updatedAt`: Payload が自分で管理する行更新時刻。import すると必ず変わる。
  * - Payload 内部ID / version metadata: canonical domain 型（`lib/content/domainTypes.ts`）が
  *   そもそも持たない。mapper が stableId へ解決済みで、両 source の snapshot に現れない。
- * - **コンテンツ由来の日時（`checkedAt` / `publishedAt` / `nextReviewBy`）は除外しない。**
- *   brief が `sources ... checkedAt` を明示的に比較対象へ挙げているため。ただし Payload の
- *   `type: 'date'` field は `'2026-07-16'` を timestamptz として保存し `'2026-07-16T00:00:00.000Z'`
- *   として読み戻すので、**表記ではなく時刻として**比較する（`DATE_FIELDS`）。
+ * - **コンテンツ由来の日付（`checkedAt` / `publishedAt` / `nextReviewBy`）は除外しないどころか、
+ *   最も厳しく比較する。** brief が `sources ... checkedAt` を明示的に比較対象へ挙げており、
+ *   かつ Task 5 の migration `20260812_080919_date_only_content_fields_to_text` でこれらの列を
+ *   `text` にしたため、Payload は書いた文字列をそのまま返す。よって**厳密な文字列一致**で見る。
+ *   （以前は `type: 'date'` が `'2026-07-16'` を `'2026-07-16T00:00:00.000Z'` にして返すため
+ *   instant として比較していた。その緩さは `Date.parse('2025-05') === Date.parse('2025-05-01')` を
+ *   同値にしてしまい、**月精度の日付を日精度へ丸める silent な損失を parity 0 差分にする**。
+ *   その損失こそ migration が防ぐために存在するので、緩さは残さない。）
  */
 import type { ContentSnapshot } from '../lib/content/contracts.ts';
-import { deriveMediaFromSnapshot } from './import-content-to-payload.mts';
+import { deriveMediaFromSnapshot, type MediaCandidate as MediaDerivationCandidate } from './import-content-to-payload.mts';
 import { exitCli, isDirectRun, parseArgs } from './contentCliSupport.mts';
 
 // ─── report 型 ────────────────────────────────────────────────────────────
@@ -102,8 +106,13 @@ const RECORD_COLLECTIONS = [
   'media',
 ] as const satisfies readonly ParityCollection[];
 
-/** Payload が `type: 'date'` として保存し、表記が変わりうる field 名。時刻として比較する。 */
-const DATE_FIELDS = new Set(['checkedAt', 'publishedAt', 'nextReviewBy']);
+/**
+ * 暦日（instant ではない）として持つコンテンツ日付。migration
+ * `20260812_080919_date_only_content_fields_to_text` で `text` 列にしてあるため、
+ * **正規化も丸めもせず厳密な文字列一致で比較する**。`'2025-05'`（月精度）と `'2025-05-01'` は
+ * 別の値として差分に出る。ここを緩めると、日付を丸める regression が parity をすり抜ける。
+ */
+export const STRICT_DATE_FIELDS: ReadonlySet<string> = new Set(['checkedAt', 'publishedAt', 'nextReviewBy']);
 
 /** 行の更新時刻。両 source で一致しえないため比較しない（brief Step 4）。 */
 const EXCLUDED_TOP_LEVEL_FIELDS = new Set(['updatedAt']);
@@ -223,22 +232,11 @@ function isAbsent(value: unknown): boolean {
 }
 
 /**
- * 日時 field を「表記」ではなく「時刻」として比べる。Payload の `type: 'date'` が
- * `'2026-07-16'` を `'2026-07-16T00:00:00.000Z'` として読み戻すのを差分にしないため。
- * どちらかが日時としてparseできない場合は文字列としてそのまま比較する（雑に一致扱いしない）。
+ * 値を再帰的に比較する。**すべての leaf は厳密比較（`!==`）**で、日付だけを緩めるような
+ * 例外は持たない（`STRICT_DATE_FIELDS` の説明を参照）。
  */
-function dateValuesEqual(a: unknown, b: unknown): boolean {
-  if (typeof a !== 'string' || typeof b !== 'string') return false;
-  if (a === b) return true;
-  const left = Date.parse(a);
-  const right = Date.parse(b);
-  if (Number.isNaN(left) || Number.isNaN(right)) return false;
-  return left === right;
-}
-
 function diffValues(
   path: string,
-  fieldName: string,
   expected: unknown,
   actual: unknown,
   out: Array<{ field: string; expected: unknown; actual: unknown }>,
@@ -248,8 +246,6 @@ function diffValues(
     out.push({ field: path, expected, actual });
     return;
   }
-
-  if (DATE_FIELDS.has(fieldName) && dateValuesEqual(expected, actual)) return;
 
   if (Array.isArray(expected) || Array.isArray(actual)) {
     if (!Array.isArray(expected) || !Array.isArray(actual)) {
@@ -262,7 +258,7 @@ function diffValues(
     }
     const length = Math.max(expected.length, actual.length);
     for (let index = 0; index < length; index += 1) {
-      diffValues(`${path}[${index}]`, fieldName, expected[index], actual[index], out);
+      diffValues(`${path}[${index}]`, expected[index], actual[index], out);
     }
     return;
   }
@@ -278,7 +274,7 @@ function diffValues(
     const right = actual as Record<string, unknown>;
     const keys = [...new Set([...Object.keys(left), ...Object.keys(right)])].sort();
     for (const key of keys) {
-      diffValues(`${path}.${key}`, key, left[key], right[key], out);
+      diffValues(`${path}.${key}`, left[key], right[key], out);
     }
     return;
   }
@@ -297,7 +293,7 @@ function diffRecords(
   for (const key of keys) {
     if (EXCLUDED_TOP_LEVEL_FIELDS.has(key)) continue;
     if (collectionExcluded?.has(key)) continue;
-    diffValues(key, key, expected[key], actual[key], out);
+    diffValues(key, expected[key], actual[key], out);
   }
   return out;
 }
@@ -424,6 +420,104 @@ export function compareSnapshots(expected: ContentSnapshot, actual: ContentSnaps
   return report;
 }
 
+/**
+ * parity report に載せる「人間の確認が要る」media 項目（brief Step 3:
+ * 「取得不能または権利未確定の画像は自動公開せず、**parity reportの要確認項目として残す**」）。
+ *
+ * `compareSnapshots()` の戻り値は brief Step 1 が固定した4 key のままにし（契約を変えない）、
+ * こちらは `content:compare` が出力する envelope 側に載せる。**フィルタで消さずに必ず残す**のが
+ * 要点で、`content:import` の stdout を読んだ人にしか見えない状態にはしない
+ * （Task 9 が archive するのは compare の JSON なので、そこに痕跡が無いと後から辿れない）。
+ */
+export interface MediaReviewItem {
+  kind: 'unhostable-image' | 'conflicting-image-rights';
+  stableId: string;
+  src: string;
+  detail: string;
+  /** この画像を参照しているレコード（`robots/unitree-g1.heroImage` 形式）。 */
+  usedBy: string[];
+}
+
+/** `content:compare` が出力する全体。parity 本体と要確認項目を分けて持つ。 */
+export interface ContentCompareReport {
+  parity: ParityReport;
+  mediaReview: MediaReviewItem[];
+}
+
+/**
+ * snapshot から media の要確認項目を集める。**parity の差分ではない**（Payload 側に
+ * 無いのが正しい状態なので `missing` には出さない）が、放置してはいけないので必ず報告する。
+ */
+export function collectMediaReviewItems(candidates: readonly MediaDerivationCandidate[]): MediaReviewItem[] {
+  const items: MediaReviewItem[] = [];
+
+  for (const candidate of candidates) {
+    if (candidate.hostable) continue;
+    items.push({
+      kind: 'unhostable-image',
+      stableId: candidate.asset.id,
+      src: candidate.src,
+      detail: candidate.reason ?? 'not-hostable',
+      usedBy: candidate.usedBy,
+    });
+  }
+
+  // 同じ src に複数の rights metadata が付いていると、同一ファイルが別レコードとして
+  // 複数回 upload される（brief の「src + rights metadata で重複排除」をそのまま実装した帰結）。
+  const bySrc = new Map<string, MediaDerivationCandidate[]>();
+  for (const candidate of candidates) {
+    bySrc.set(candidate.src, [...(bySrc.get(candidate.src) ?? []), candidate]);
+  }
+  for (const [src, group] of bySrc) {
+    if (group.length < 2) continue;
+    items.push({
+      kind: 'conflicting-image-rights',
+      stableId: group.map((candidate) => candidate.asset.id).sort().join(', '),
+      src,
+      detail:
+        `the same file carries ${group.length} different rights metadata values, so it is uploaded ` +
+        `${group.length} times as separate media records. Normalise the rights (usually checkedAt) ` +
+        'or change the dedupe rule before the cutover.',
+      usedBy: [...new Set(group.flatMap((candidate) => candidate.usedBy))].sort(),
+    });
+  }
+
+  return items;
+}
+
+export function formatMediaReview(items: readonly MediaReviewItem[]): string {
+  if (items.length === 0) return 'media review items: none';
+  const lines = [`REVIEW REQUIRED — media items needing a human decision: ${items.length}`];
+  const unhostable = items.filter((item) => item.kind === 'unhostable-image');
+  const conflicting = items.filter((item) => item.kind === 'conflicting-image-rights');
+
+  if (unhostable.length > 0) {
+    lines.push(
+      '',
+      `  not imported into the media collection (rights unconfirmed or unfetchable): ${unhostable.length}`,
+      '  these images are intentionally NOT auto-published; clear the rights or drop the reference.',
+    );
+    for (const item of unhostable.slice(0, MAX_PRINTED_ENTRIES)) {
+      lines.push(`    ${item.src}: ${item.detail}${item.usedBy[0] ? ` (used by ${item.usedBy[0]})` : ''}`);
+    }
+    if (unhostable.length > MAX_PRINTED_ENTRIES) {
+      lines.push(`    ... ${unhostable.length - MAX_PRINTED_ENTRIES} more (see the JSON report)`);
+    }
+  }
+
+  if (conflicting.length > 0) {
+    lines.push('', `  same file with conflicting rights metadata (duplicate uploads): ${conflicting.length}`);
+    for (const item of conflicting.slice(0, MAX_PRINTED_ENTRIES)) {
+      lines.push(`    ${item.src} -> ${item.stableId}`);
+    }
+    if (conflicting.length > MAX_PRINTED_ENTRIES) {
+      lines.push(`    ... ${conflicting.length - MAX_PRINTED_ENTRIES} more (see the JSON report)`);
+    }
+  }
+
+  return lines.join('\n');
+}
+
 /** collection ごとの件数（manifest の `recordCounts` と CLI 表示の両方が使う）。 */
 export function countRecords(snapshot: ContentSnapshot): Record<string, number> {
   return {
@@ -529,15 +623,23 @@ async function main(): Promise<void> {
   // local `data/*.ts` は `media` 配列を持たない（`lib/data/localContentSnapshot.ts`）。
   // Payload 側の media は importer が record 内の `ImageAsset` から決定的に導出して作る。
   // 比較元にも同じ導出を当てないと、media が丸ごと `extra` として出てしまう。
+  //   - hostable な candidate は「Payload にあるはず」の集合なので比較対象にする。
+  //   - hostable でない candidate は Payload に無いのが正しいので比較対象から外すが、
+  //     **消さずに要確認項目として report へ載せる**（brief Step 3）。
+  let mediaReview: MediaReviewItem[] = [];
   if (!args.has('skip-media')) {
-    expected.media = deriveMediaFromSnapshot(expected).filter((candidate) => candidate.hostable).map((candidate) => candidate.asset);
+    const candidates = deriveMediaFromSnapshot(expected);
+    expected.media = candidates.filter((candidate) => candidate.hostable).map((candidate) => candidate.asset);
+    mediaReview = collectMediaReviewItems(candidates);
   } else {
     actual.media = [];
   }
 
-  const report = compareSnapshots(expected, actual);
+  const parity = compareSnapshots(expected, actual);
+  const report: ContentCompareReport = { parity, mediaReview };
 
-  process.stdout.write(`${formatParityReport(report)}\n`);
+  process.stdout.write(`${formatParityReport(parity)}\n`);
+  process.stdout.write(`\n${formatMediaReview(mediaReview)}\n`);
 
   const jsonPath = args.get('json');
   if (typeof jsonPath === 'string') {
@@ -546,7 +648,7 @@ async function main(): Promise<void> {
     process.stdout.write(`\nwrote JSON report: ${jsonPath}\n`);
   }
 
-  if (!parityReportIsClean(report)) {
+  if (!parityReportIsClean(parity)) {
     process.stderr.write('\ncontent:compare failed — differences found. Do not proceed to Task 9.\n');
     process.exitCode = 1;
   }

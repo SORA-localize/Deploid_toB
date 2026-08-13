@@ -137,6 +137,18 @@ adapter実装時）に確定する前提で、Task 0時点ではopen itemとし�
 | 保持期間 | cutover完了（Task 9 Step 7 の rollback window 終了）から最低90日は削除しない。90日経過後の削除は手動判断とし、**自動失効ルールは設定しない** |
 | 復元確認 | Task 5 Step 6.5 の export → restore round-trip と同じ経路で、この artifact からの復元が動くことを Task 9 実行前に一度確認する |
 
+**Task 9 の前に人間の判断が要る事項（Task 5 で検出、未解決）**:
+
+> **同一画像ファイルが rights metadata 違いで複数の Media レコードになる（実データで8ファイル）。**
+> Task 5 の importer は移行計画 Task 5 Step 3 の「`src` + rights metadata で正規化・重複排除」を
+> そのまま実装しているため、同じ `src` に異なる rights（実際の差は大半が `checkedAt`）が付いていると
+> 別レコードとして扱い、**同じ画像を2〜3回 upload する**（media 61件のうち11件ぶんが実質重複）。
+> `npm run content:compare` の出力と `--json` の `mediaReview` に
+> `conflicting-image-rights` として毎回出る。**cutover 前にどちらかを選ぶこと**:
+> (a) `data/*.ts` 側で当該画像の rights（`checkedAt`）を揃える、または
+> (b) 重複排除の規則を「`src` のみ（rights は最も厳しいものを採用）」へ変更する。
+> 放置すると重複したまま本番 blob store へ載る。
+
 **署名**: `alias/deploid-snapshot-signing`（§4）で cosign detached signature を作る。`content:export -- --upload`
 は署名なしでは artifact を置かない（cosign 未インストールなら失敗する）。検証（`content:verify-snapshot --manifest` /
 `content:verify-conservation --manifest`）は **§4 の公開鍵だけで完結し、AWS credential を必要としない**
