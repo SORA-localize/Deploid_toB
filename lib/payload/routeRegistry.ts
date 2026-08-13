@@ -78,6 +78,59 @@ export async function claimRoute({ req, namespace, slug, ownerCollection, ownerS
   });
 }
 
+interface ClaimAllRoutesArgs {
+  req: PayloadRequest;
+  namespace: string;
+  slug: string;
+  previousSlugs?: string[] | null;
+  ownerCollection: 'robots' | 'robot-series';
+  ownerStableId: string;
+}
+
+/**
+ * 必須修正2-4: `previousSlugs` 自体の整合性を明示的に検査する（remediation group 1）。
+ *
+ * `claimRoute` は「同じownerの再claim」を冪等に許すため、`previousSlugs` 内の重複も、
+ * `previousSlugs` が現行 `slug` を含む自己衝突も、claimだけでは一切errorにならず
+ * **静かに通ってしまう**。どちらもdocumentのidentityが壊れている状態（同じslugが
+ * 「現行」と「旧」の両方として登録される／旧slug listに重複がある）なので、claimの前に
+ * 明示的に弾く。
+ */
+export function assertPreviousSlugsAreConsistent(slug: string, previousSlugs: readonly string[]): void {
+  const seen = new Set<string>();
+  for (const previousSlug of previousSlugs) {
+    if (previousSlug === slug) {
+      throw new Error(`route-previous-slugs-self-collision: "${slug}" appears in both slug and previousSlugs`);
+    }
+    if (seen.has(previousSlug)) {
+      throw new Error(`route-previous-slugs-duplicate: "${previousSlug}" appears more than once in previousSlugs`);
+    }
+    seen.add(previousSlug);
+  }
+}
+
+/**
+ * 必須修正2-1: 現行slugと**全previousSlugs**を同じ呼び出し（= 同じ `req` = 同じtransaction）で
+ * claimする。以前はcreate時に `current.slug` しかclaimせず、importやAPIでpreviousSlugs付きの
+ * documentをcreateすると旧slugが未予約のまま残り、別collectionから再利用できてしまった。
+ */
+export async function claimAllRoutes({
+  req,
+  namespace,
+  slug,
+  previousSlugs,
+  ownerCollection,
+  ownerStableId,
+}: ClaimAllRoutesArgs): Promise<void> {
+  const previous = previousSlugs ?? [];
+  assertPreviousSlugsAreConsistent(slug, previous);
+
+  await claimRoute({ req, namespace, slug, ownerCollection, ownerStableId });
+  for (const previousSlug of previous) {
+    await claimRoute({ req, namespace, slug: previousSlug, ownerCollection, ownerStableId });
+  }
+}
+
 interface MoveRouteArgs {
   req: PayloadRequest;
   namespace: string;
@@ -93,23 +146,32 @@ interface MoveRouteArgs {
  * すべて予約済みとして残す。`previousSlugs` は追記のみのため、ここでは削除しない。
  */
 export async function moveRoute({ req, namespace, toSlug, previousSlugs, ownerCollection, ownerStableId }: MoveRouteArgs): Promise<void> {
-  await claimRoute({ req, namespace, slug: toSlug, ownerCollection, ownerStableId });
-  for (const previousSlug of previousSlugs ?? []) {
-    await claimRoute({ req, namespace, slug: previousSlug, ownerCollection, ownerStableId });
-  }
+  await claimAllRoutes({ req, namespace, slug: toSlug, previousSlugs, ownerCollection, ownerStableId });
 }
 
 interface ReleaseRouteArgs {
   req: PayloadRequest;
   namespace: string;
+  ownerCollection: 'robots' | 'robot-series';
   ownerStableId: string;
 }
 
-/** ownerのdelete時に、current / previous を問わずそのownerが持つ全行を解放する。 */
-export async function releaseRoute({ req, namespace, ownerStableId }: ReleaseRouteArgs): Promise<void> {
+/**
+ * ownerのdelete時に、current / previous を問わずそのownerが持つ全行を解放する。
+ *
+ * 必須修正2-2: `where` に `ownerCollection` を必ず含める。`stableId` はcollectionごとにしか
+ * uniqueでないため、RobotとRobotSeriesが同じ `stableId` 値を持つことは起こりうる。
+ * `namespace` + `ownerStableId` だけで消すと、片方の削除でもう片方のroute行まで巻き込んで
+ * 消してしまい、生きているdocumentのURLが未予約状態に戻る（＝別ownerが奪える）。
+ */
+export async function releaseRoute({ req, namespace, ownerCollection, ownerStableId }: ReleaseRouteArgs): Promise<void> {
   await req.payload.delete({
     collection: 'content-route-registry',
-    where: { namespace: { equals: namespace }, ownerStableId: { equals: ownerStableId } },
+    where: {
+      namespace: { equals: namespace },
+      ownerCollection: { equals: ownerCollection },
+      ownerStableId: { equals: ownerStableId },
+    },
     req,
     overrideAccess: true,
   });
@@ -118,18 +180,27 @@ export async function releaseRoute({ req, namespace, ownerStableId }: ReleaseRou
 /**
  * Task 9.5（シリーズcutover）向けのowner移管。既存行のownerを差し替える。移管元・移管先の
  * 統合testはTask 9.5側で書く（brief）。ここでは移管の最小プリミティブだけを提供する。
+ *
+ * 必須修正2-3: 移管元も `fromOwnerCollection` で限定する。`releaseRoute` と同じ理由で、
+ * `namespace` + `ownerStableId` だけでは同じ `stableId` を持つ別collectionの行まで移管して
+ * しまう。
  */
 export async function transferRouteOwnership(args: {
   req: PayloadRequest;
   namespace: string;
+  fromOwnerCollection: 'robots' | 'robot-series';
   fromOwnerStableId: string;
   toOwnerCollection: 'robots' | 'robot-series';
   toOwnerStableId: string;
 }): Promise<void> {
-  const { req, namespace, fromOwnerStableId, toOwnerCollection, toOwnerStableId } = args;
+  const { req, namespace, fromOwnerCollection, fromOwnerStableId, toOwnerCollection, toOwnerStableId } = args;
   await req.payload.update({
     collection: 'content-route-registry',
-    where: { namespace: { equals: namespace }, ownerStableId: { equals: fromOwnerStableId } },
+    where: {
+      namespace: { equals: namespace },
+      ownerCollection: { equals: fromOwnerCollection },
+      ownerStableId: { equals: fromOwnerStableId },
+    },
     data: { ownerCollection: toOwnerCollection, ownerStableId: toOwnerStableId },
     req,
     overrideAccess: true,
@@ -159,10 +230,12 @@ export function createRouteRegistryHooks(ownerCollection: 'robots' | 'robot-seri
         if (!current.slug || !current.stableId) return;
 
         if (operation === 'create') {
-          await claimRoute({
+          // 必須修正2-1: create時も current.slug だけでなく previousSlugs 全件をclaimする。
+          await claimAllRoutes({
             req,
             namespace: ROBOT_ROUTE_NAMESPACE,
             slug: current.slug,
+            previousSlugs: current.previousSlugs,
             ownerCollection,
             ownerStableId: current.stableId,
           });
@@ -180,17 +253,16 @@ export function createRouteRegistryHooks(ownerCollection: 'robots' | 'robot-seri
             ownerCollection,
             ownerStableId: current.stableId,
           });
-        } else if (current.previousSlugs && current.previousSlugs.length > 0) {
-          // slug自体は変わっていないが previousSlugs だけ追記された場合も予約する。
-          for (const previousSlug of current.previousSlugs) {
-            await claimRoute({
-              req,
-              namespace: ROBOT_ROUTE_NAMESPACE,
-              slug: previousSlug,
-              ownerCollection,
-              ownerStableId: current.stableId,
-            });
-          }
+        } else {
+          // slug自体は変わっていない場合も、previousSlugs の整合性検査とclaimは毎回通す。
+          await claimAllRoutes({
+            req,
+            namespace: ROBOT_ROUTE_NAMESPACE,
+            slug: current.slug,
+            previousSlugs: current.previousSlugs,
+            ownerCollection,
+            ownerStableId: current.stableId,
+          });
         }
       },
     ],
@@ -205,7 +277,7 @@ export function createRouteRegistryHooks(ownerCollection: 'robots' | 'robot-seri
         });
         const stableId = (doc as { stableId?: string } | null)?.stableId;
         if (!stableId) return;
-        await releaseRoute({ req, namespace: ROBOT_ROUTE_NAMESPACE, ownerStableId: stableId });
+        await releaseRoute({ req, namespace: ROBOT_ROUTE_NAMESPACE, ownerCollection, ownerStableId: stableId });
       },
     ],
   };
