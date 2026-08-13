@@ -100,8 +100,41 @@ export async function resolveRelationshipsToStableIds(
   return resolved.filter((value): value is string => Boolean(value));
 }
 
-export async function resolveStableIdToRelationshipId(payload: Payload, collection: string, stableId: string | undefined): Promise<string | number | undefined> {
+/**
+ * `resolveRelationshipToStableId` の逆向き（stableId → Payload内部id）のcache。
+ * Task 5 の importer は 1 record あたり複数 relationship を解決するため、cacheが無いと
+ * 同じ参照先を何度も `find` することになる。**hitだけをcacheし、missはcacheしない**
+ * （import中に後から作られる参照先を「存在しない」と覚え込まないため）。
+ * `RelationshipResolutionCache` と同じく短命（1 import / 1 export分）で、プロセス全体では保持しない。
+ */
+export interface RelationshipIdCache {
+  entries: Map<string, string | number>;
+}
+
+export function createRelationshipIdCache(): RelationshipIdCache {
+  return { entries: new Map() };
+}
+
+/** importerが `create` 直後に内部idをcacheへ入れるための入口（余分な `find` を1回省く）。 */
+export function rememberRelationshipId(
+  cache: RelationshipIdCache | undefined,
+  collection: string,
+  stableId: string,
+  internalId: string | number,
+): void {
+  cache?.entries.set(`${collection}:${stableId}`, internalId);
+}
+
+export async function resolveStableIdToRelationshipId(
+  payload: Payload,
+  collection: string,
+  stableId: string | undefined,
+  cache?: RelationshipIdCache,
+): Promise<string | number | undefined> {
   if (!stableId) return undefined;
+  const cacheKey = `${collection}:${stableId}`;
+  const cached = cache?.entries.get(cacheKey);
+  if (cached !== undefined) return cached;
   const result = (await payload.find({
     collection: collection as never,
     where: { stableId: { equals: stableId } },
@@ -109,18 +142,118 @@ export async function resolveStableIdToRelationshipId(payload: Payload, collecti
     depth: 0,
     overrideAccess: true,
   })) as unknown as { docs: Array<{ id: string | number }> };
-  return result.docs[0]?.id;
+  const id = result.docs[0]?.id;
+  if (id !== undefined) rememberRelationshipId(cache, collection, stableId, id);
+  return id;
 }
 
-export async function resolveStableIdsToRelationshipIds(payload: Payload, collection: string, stableIds: string[] | undefined): Promise<(string | number)[]> {
+export async function resolveStableIdsToRelationshipIds(
+  payload: Payload,
+  collection: string,
+  stableIds: readonly string[] | undefined,
+  cache?: RelationshipIdCache,
+): Promise<(string | number)[]> {
   if (!stableIds) return [];
-  const resolved = await Promise.all(stableIds.map((stableId) => resolveStableIdToRelationshipId(payload, collection, stableId)));
+  const resolved = await Promise.all(
+    stableIds.map((stableId) => resolveStableIdToRelationshipId(payload, collection, stableId, cache)),
+  );
   return resolved.filter((id): id is string | number => id !== undefined);
 }
 
+/**
+ * relationship解決の失敗を「値なし」へ黙って潰さないための検査。importerは参照先を必ず
+ * 先にimportしているはずなので（Task 5 Step 3のimport順）、解決できない参照は
+ * データ側の壊れた参照であって握り潰してよい欠損ではない。
+ */
+function assertResolved(
+  resolved: string | number | undefined,
+  args: { collection: string; stableId: string; field: string; target: string; targetStableId: string },
+): string | number | undefined {
+  if (resolved !== undefined) return resolved;
+  throw new Error(
+    `unresolved-relationship: ${args.collection} "${args.stableId}" field "${args.field}" ` +
+      `references ${args.target} "${args.targetStableId}", which does not exist in Payload`,
+  );
+}
+
+async function resolveRequired(
+  payload: Payload,
+  target: string,
+  stableId: string | undefined,
+  cache: RelationshipIdCache | undefined,
+  context: { collection: string; stableId: string; field: string },
+): Promise<string | number | undefined> {
+  if (!stableId) return undefined;
+  const resolved = await resolveStableIdToRelationshipId(payload, target, stableId, cache);
+  return assertResolved(resolved, { ...context, target, targetStableId: stableId });
+}
+
+async function resolveAllRequired(
+  payload: Payload,
+  target: string,
+  stableIds: readonly string[] | undefined,
+  cache: RelationshipIdCache | undefined,
+  context: { collection: string; stableId: string; field: string },
+): Promise<(string | number)[] | undefined> {
+  if (!stableIds) return undefined;
+  const resolved: (string | number)[] = [];
+  for (const stableId of stableIds) {
+    const id = await resolveRequired(payload, target, stableId, cache, context);
+    if (id !== undefined) resolved.push(id);
+  }
+  return resolved;
+}
+
+/**
+ * Payloadが返す「未設定」表現をdomain側の1つの表現（`undefined`）へ寄せる（Task 5で発見）。
+ *
+ * Payloadは未設定の leaf を `null` で返し、`group` field は**中身が全部 `null` のobject**を
+ * 返す（`seo: { metaTitle: null, metaDescription: null, noindex: null }`）。これをそのまま
+ * domain値へ通すと、local側（fieldごと省略＝`undefined`）と機械的に食い違い、Task 5の
+ * parity比較が全レコードで差分を出す（実測: `seo` 178件 / `heroImage` 124件）。
+ *
+ * 再帰的に `null` → `undefined` にし、値の残らないobjectは丸ごと `undefined` にする。
+ * **空配列は保持する**（`comparison.strengths: []` のように「空である」ことに意味がある
+ * 必須配列があるため。任意配列は呼び出し側が `optionalArray` で別途落とす）。
+ */
+function cleanPayloadValue(value: unknown): unknown {
+  if (value === null || value === undefined) return undefined;
+  if (Array.isArray(value)) return value.map(cleanPayloadValue);
+  if (typeof value === 'object') {
+    const cleaned: Record<string, unknown> = {};
+    for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+      const normalized = cleanPayloadValue(entry);
+      if (normalized !== undefined) cleaned[key] = normalized;
+    }
+    return Object.keys(cleaned).length > 0 ? cleaned : undefined;
+  }
+  return value;
+}
+
+/** `group` field（`heroImage` / `seo` / `headquarters` など）用。未設定なら `undefined`。 */
+function optionalGroup<T>(value: unknown): T | undefined {
+  return cleanPayloadValue(value) as T | undefined;
+}
+
+/**
+ * Payloadの `array` field の行は自動採番の `id` を持つが、domain型（`Source` /
+ * `DomesticDistributor` / `RobotPriceOffer` / `RobotLoadRating`）には存在しない。
+ * そのまま通すと **Payload内部IDがdomain値とexport snapshotへ漏れる**（brief Step 4:
+ * 「Payload内部ID ... は比較対象から除外する」。実測で649件の差分になった）。行から落とす。
+ */
+function mapArrayRows<T>(rows: unknown): T[] | undefined {
+  if (!Array.isArray(rows) || rows.length === 0) return undefined;
+  return rows.map((row) => {
+    if (!row || typeof row !== 'object') return cleanPayloadValue(row) as T;
+    const withoutRowId = Object.fromEntries(
+      Object.entries(row as Record<string, unknown>).filter(([key]) => key !== 'id'),
+    );
+    return (cleanPayloadValue(withoutRowId) ?? {}) as T;
+  });
+}
+
 function mapSources(sources: unknown): Source[] {
-  if (!Array.isArray(sources)) return [];
-  return sources as Source[];
+  return mapArrayRows<Source>(sources) ?? [];
 }
 
 /**
@@ -192,8 +325,8 @@ export async function mapPayloadRobotToDomain(doc: RobotPayloadDoc, payload: Pay
     reliability: doc.reliability ?? 'reported',
     sources: mapSources(doc.sources),
     nextReviewBy: doc.nextReviewBy,
-    heroImage: doc.heroImage,
-    seo: doc.seo,
+    heroImage: optionalGroup<ImageAsset>(doc.heroImage),
+    seo: optionalGroup<SeoFields>(doc.seo),
     name: doc.name ?? '',
     nameJa: doc.nameJa,
     manufacturerId,
@@ -203,19 +336,19 @@ export async function mapPayloadRobotToDomain(doc: RobotPayloadDoc, payload: Pay
     featuredRank: doc.featuredRank,
     deploymentStage: doc.deploymentStage ?? 'concept',
     supersededById,
-    specs: doc.specs ?? {},
+    specs: optionalGroup(doc.specs) ?? {},
     procurementModels: doc.procurementModels ?? [],
-    priceOffers: optionalArray(doc.priceOffers),
-    loadRatings: optionalArray(doc.loadRatings),
-    fieldEvidence: doc.fieldEvidence,
+    priceOffers: mapArrayRows(doc.priceOffers),
+    loadRatings: mapArrayRows(doc.loadRatings),
+    fieldEvidence: optionalGroup(doc.fieldEvidence),
     usageExampleSourceUrls: optionalArray(doc.usageExampleSourceUrls),
     japanAvailability: doc.japanAvailability ?? 'unknown',
     distributorJapan: doc.distributorJapan,
     supportNote: doc.supportNote,
-    images: doc.images,
+    images: optionalGroup(doc.images),
     industryTags: optionalArray(doc.industryTags),
     taskTags: optionalArray(doc.taskTags),
-    comparison: doc.comparison ?? { strengths: [], constraints: [], bestFit: [], notFit: [] },
+    comparison: optionalGroup(doc.comparison) ?? { strengths: [], constraints: [], bestFit: [], notFit: [] },
   };
 }
 
@@ -225,12 +358,27 @@ export type RobotPayloadData = Omit<RobotPayloadDoc, 'id' | 'manufacturerId' | '
   supersededById?: string | number;
 };
 
-/** stableId relationshipを内部IDへ解決し、`_status` / `lifecycleStatus` を両方書く（custom `publishStatus` fieldは作らない）。 */
-export async function mapDomainRobotToPayload(robot: Robot, payload: Payload): Promise<RobotPayloadData> {
+/**
+ * stableId relationshipを内部IDへ解決し、`_status` / `lifecycleStatus` を両方書く
+ * （custom `publishStatus` fieldは作らない）。
+ *
+ * `supersededById` は `robots` → `robots` の自己参照で、import中は参照先がまだ作られて
+ * いないことがある。`options.deferSelfReferences` を立てると `supersededById` を書かずに
+ * 返し、importerが全robot作成後の2周目でだけ書き込めるようにする（Task 5 Step 3）。
+ */
+export async function mapDomainRobotToPayload(
+  robot: Robot,
+  payload: Payload,
+  cache?: RelationshipIdCache,
+  options: { deferSelfReferences?: boolean } = {},
+): Promise<RobotPayloadData> {
+  const context = { collection: 'robots', stableId: robot.id };
   const [manufacturerId, seriesId, supersededById] = await Promise.all([
-    resolveStableIdToRelationshipId(payload, 'manufacturers', robot.manufacturerId),
-    resolveStableIdToRelationshipId(payload, 'robot-series', robot.seriesId),
-    resolveStableIdToRelationshipId(payload, 'robots', robot.supersededById),
+    resolveRequired(payload, 'manufacturers', robot.manufacturerId, cache, { ...context, field: 'manufacturerId' }),
+    resolveRequired(payload, 'robot-series', robot.seriesId, cache, { ...context, field: 'seriesId' }),
+    options.deferSelfReferences
+      ? Promise.resolve(undefined)
+      : resolveRequired(payload, 'robots', robot.supersededById, cache, { ...context, field: 'supersededById' }),
   ]);
 
   return {
@@ -294,22 +442,22 @@ export function mapPayloadManufacturerToDomain(doc: ManufacturerPayloadDoc): Man
     reliability: doc.reliability ?? 'reported',
     sources: mapSources(doc.sources),
     nextReviewBy: doc.nextReviewBy,
-    heroImage: doc.heroImage,
-    seo: doc.seo,
+    heroImage: optionalGroup<ImageAsset>(doc.heroImage),
+    seo: optionalGroup<SeoFields>(doc.seo),
     name: (doc.name as string) ?? '',
     nameJa: doc.nameJa as string | undefined,
     companyType: (doc.companyType as Manufacturer['companyType']) ?? 'manufacturer',
     companyStatus: (doc.companyStatus as Manufacturer['companyStatus']) ?? 'active',
     country: (doc.country as string) ?? '',
     hqCity: doc.hqCity as string | undefined,
-    headquarters: doc.headquarters as Manufacturer['headquarters'],
+    headquarters: optionalGroup<Manufacturer['headquarters']>(doc.headquarters),
     foundedYear: doc.foundedYear as number | undefined,
     website: (doc.website as string) ?? '',
-    logos: doc.logos as Manufacturer['logos'],
+    logos: optionalGroup<Manufacturer['logos']>(doc.logos),
     contactUrl: doc.contactUrl as string | undefined,
     description: (doc.description as string) ?? '',
     japanPresence: (doc.japanPresence as Manufacturer['japanPresence']) ?? 'unknown',
-    domesticDistributors: optionalArray(doc.domesticDistributors as Manufacturer['domesticDistributors']),
+    domesticDistributors: mapArrayRows<NonNullable<Manufacturer['domesticDistributors']>[number]>(doc.domesticDistributors),
     distributorNote: doc.distributorNote as string | undefined,
     supportNote: doc.supportNote as string | undefined,
     procurementNote: doc.procurementNote as string | undefined,
@@ -347,8 +495,8 @@ function mapBaseRecord(doc: BaseRecordPayloadDoc) {
     reliability: doc.reliability ?? ('reported' as const),
     sources: mapSources(doc.sources),
     nextReviewBy: doc.nextReviewBy,
-    heroImage: doc.heroImage,
-    seo: doc.seo,
+    heroImage: optionalGroup<ImageAsset>(doc.heroImage),
+    seo: optionalGroup<SeoFields>(doc.seo),
   };
 }
 
@@ -377,7 +525,7 @@ export async function mapPayloadRobotSeriesToDomain(
     nameJa: doc.nameJa,
     manufacturerId,
     description: doc.description,
-    images: doc.images,
+    images: optionalGroup(doc.images),
     industryTags: optionalArray(doc.industryTags),
     taskTags: optionalArray(doc.taskTags),
   };
@@ -411,7 +559,7 @@ export async function mapPayloadDistributorToDomain(
     website: doc.website,
     providerType: doc.providerType ?? 'other',
     handledManufacturerIds,
-    handledRobotIds: doc.handledRobotIds ? handledRobotIds : undefined,
+    handledRobotIds: optionalArray(handledRobotIds),
     acquisitionMethods: doc.acquisitionMethods ?? [],
     inquiryUrl: doc.inquiryUrl,
     note: doc.note,
@@ -466,8 +614,8 @@ export async function mapPayloadUseCaseToDomain(
         seriesId,
         fit: candidate.fit,
         basis: candidate.basis,
-        evidenceDeploymentIds: candidate.evidenceDeploymentIds ? evidenceDeploymentIds : undefined,
-        evidenceSourceUrls: candidate.evidenceSourceUrls,
+        evidenceDeploymentIds: optionalArray(evidenceDeploymentIds),
+        evidenceSourceUrls: optionalArray(candidate.evidenceSourceUrls),
         reason: candidate.reason,
       };
     }),
@@ -485,10 +633,10 @@ export async function mapPayloadUseCaseToDomain(
     primaryIndustry: doc.primaryIndustry as UseCase['primaryIndustry'],
     industryTags: doc.industryTags ?? [],
     taskTags: doc.taskTags ?? [],
-    atAGlance: doc.atAGlance ?? { whereFits: '', whereDoesNotFit: '', mustBeTrue: '' },
+    atAGlance: optionalGroup<UseCase['atAGlance']>(doc.atAGlance) ?? { whereFits: '', whereDoesNotFit: '', mustBeTrue: '' },
     overview: doc.overview ?? '',
     whyItMatters: doc.whyItMatters ?? '',
-    capabilityNotes: doc.capabilityNotes ?? {},
+    capabilityNotes: optionalGroup<UseCase['capabilityNotes']>(doc.capabilityNotes) ?? {},
     environmentRequirements: doc.environmentRequirements ?? '',
     whyHardToday: doc.whyHardToday ?? '',
     japanDeploymentConditions: doc.japanDeploymentConditions ?? '',
@@ -528,10 +676,10 @@ export async function mapPayloadDeploymentToDomain(
     customer: doc.customer ?? '',
     siteName: doc.siteName,
     country: doc.country ?? '',
-    location: doc.location ?? { lat: 0, lng: 0 },
+    location: optionalGroup<DeploymentSite['location']>(doc.location) ?? { lat: 0, lng: 0 },
     status: doc.status ?? 'unknown',
     startedAt: doc.startedAt,
-    relatedUseCaseIds: doc.relatedUseCaseIds ? relatedUseCaseIds : undefined,
+    relatedUseCaseIds: optionalArray(relatedUseCaseIds),
   };
 }
 
@@ -594,7 +742,7 @@ export async function mapPayloadArticleToDomain(
     if (!doc.manufacturerGuideContent) {
       throw new Error(`article-missing-guide-content: article "${doc.stableId}" is a manufacturer-guide without manufacturerGuideContent`);
     }
-    return { ...common, type: 'manufacturer-guide', manufacturerGuideContent: doc.manufacturerGuideContent };
+    return { ...common, type: 'manufacturer-guide', manufacturerGuideContent: optionalGroup<ManufacturerGuideContent>(doc.manufacturerGuideContent) as ManufacturerGuideContent };
   }
   return { ...common, type: (doc.type ?? 'analysis') as StandardArticle['type'], body: doc.body };
 }
@@ -626,7 +774,7 @@ export async function mapPayloadArticlePlacementToDomain(
     order: doc.order ?? 0,
     kind: doc.kind,
     // Payloadの `sponsor` group は未入力でも空objectで返るため、実質未設定なら落とす。
-    sponsor: doc.sponsor?.name ? doc.sponsor : undefined,
+    sponsor: doc.sponsor?.name ? optionalGroup<ArticlePlacement['sponsor']>(doc.sponsor) : undefined,
     publishStatus: payloadStatusToDomain(doc),
   };
 }
@@ -654,7 +802,301 @@ export function mapPayloadMediaToDomain(doc: MediaPayloadDoc): MediaAsset {
     filesize: doc.filesize ?? undefined,
     width: doc.width ?? undefined,
     height: doc.height ?? undefined,
-    rights: doc.rights ?? { status: 'blocked', sourceType: 'unknown', checkedAt: '' },
+    rights: optionalGroup<MediaAsset['rights']>(doc.rights) ?? { status: 'blocked', sourceType: 'unknown', checkedAt: '' },
+  };
+}
+
+// ─── Task 5: domain → Payload write shape（読み取りmapperの逆向き） ─────────────
+// 読み取り側（`mapPayload*ToDomain`）と1対1で対応させる。`publishStatus` は
+// `domainStatusToPayload` で `_status` + `lifecycleStatus` の2fieldへ落とし、Payload schemaに
+// custom `publishStatus` fieldを作らない（Task 5 Step 3）。`updatedAt` はPayloadが管理する
+// ため書かない（書いてもPayloadに上書きされる。parity比較からも除外する）。
+//
+// `undefined` の field は Payload の `update` で「変更なし」ではなく「未設定」として扱わせたい
+// （importerは常に全fieldを送る＝local側で消えた値がPayload側に残り続けない）。そのため
+// 各mapperは domain 型に存在する全fieldを、値が無ければ `undefined` のまま明示的に含める。
+
+/** 全content collection共通のbase部分（`mapBaseRecord` の逆）。 */
+function baseRecordToPayload(record: {
+  id: string;
+  slug: string;
+  previousSlugs?: string[];
+  summary: string;
+  publishStatus: PublishStatus;
+  reliability: Reliability;
+  sources: Source[];
+  nextReviewBy?: string;
+  heroImage?: ImageAsset;
+  seo?: SeoFields;
+}) {
+  return {
+    ...domainStatusToPayload(record.publishStatus),
+    stableId: record.id,
+    slug: record.slug,
+    previousSlugs: record.previousSlugs,
+    summary: record.summary,
+    reliability: record.reliability,
+    sources: record.sources,
+    nextReviewBy: record.nextReviewBy,
+    heroImage: record.heroImage,
+    seo: record.seo,
+  };
+}
+
+export function mapDomainManufacturerToPayload(manufacturer: Manufacturer): Record<string, unknown> {
+  return {
+    ...baseRecordToPayload(manufacturer),
+    name: manufacturer.name,
+    nameJa: manufacturer.nameJa,
+    companyType: manufacturer.companyType,
+    companyStatus: manufacturer.companyStatus,
+    country: manufacturer.country,
+    hqCity: manufacturer.hqCity,
+    headquarters: manufacturer.headquarters,
+    foundedYear: manufacturer.foundedYear,
+    website: manufacturer.website,
+    logos: manufacturer.logos,
+    contactUrl: manufacturer.contactUrl,
+    description: manufacturer.description,
+    japanPresence: manufacturer.japanPresence,
+    domesticDistributors: manufacturer.domesticDistributors,
+    distributorNote: manufacturer.distributorNote,
+    supportNote: manufacturer.supportNote,
+    procurementNote: manufacturer.procurementNote,
+    vendorRiskNote: manufacturer.vendorRiskNote,
+    featuredRank: manufacturer.featuredRank,
+  };
+}
+
+export async function mapDomainRobotSeriesToPayload(
+  series: RobotSeries,
+  payload: Payload,
+  cache?: RelationshipIdCache,
+): Promise<Record<string, unknown>> {
+  const manufacturerId = await resolveRequired(payload, 'manufacturers', series.manufacturerId, cache, {
+    collection: 'robot-series',
+    stableId: series.id,
+    field: 'manufacturerId',
+  });
+  return {
+    ...baseRecordToPayload(series),
+    name: series.name,
+    nameJa: series.nameJa,
+    manufacturerId,
+    description: series.description,
+    images: series.images,
+    industryTags: series.industryTags,
+    taskTags: series.taskTags,
+  };
+}
+
+/**
+ * `handledRobotIds` は `robots` を参照するが、brief Step 3 の import 順では `distributors` が
+ * `robots` より先に来る。`options.deferForwardReferences` で1周目は書かずに置き、importerが
+ * 全collection作成後の2周目で埋める。
+ */
+export async function mapDomainDistributorToPayload(
+  distributor: Distributor,
+  payload: Payload,
+  cache?: RelationshipIdCache,
+  options: { deferForwardReferences?: boolean } = {},
+): Promise<Record<string, unknown>> {
+  const context = { collection: 'distributors', stableId: distributor.id };
+  const [handledManufacturerIds, handledRobotIds] = await Promise.all([
+    resolveAllRequired(payload, 'manufacturers', distributor.handledManufacturerIds, cache, {
+      ...context,
+      field: 'handledManufacturerIds',
+    }),
+    options.deferForwardReferences
+      ? Promise.resolve(undefined)
+      : resolveAllRequired(payload, 'robots', distributor.handledRobotIds, cache, {
+          ...context,
+          field: 'handledRobotIds',
+        }),
+  ]);
+  return {
+    ...baseRecordToPayload(distributor),
+    name: distributor.name,
+    nameJa: distributor.nameJa,
+    website: distributor.website,
+    providerType: distributor.providerType,
+    handledManufacturerIds,
+    handledRobotIds,
+    acquisitionMethods: distributor.acquisitionMethods,
+    inquiryUrl: distributor.inquiryUrl,
+    note: distributor.note,
+  };
+}
+
+/**
+ * `candidateRobots[].evidenceDeploymentIds` は `deployments` を参照し、`deployments` 側は
+ * `relatedUseCaseIds` で `use-cases` を参照する（相互参照）。どちらを先に import しても
+ * 片方は必ず前方参照になるため、`options.deferForwardReferences` で1周目は evidence を
+ * 書かずに置き、importerが2周目で埋める。
+ */
+export async function mapDomainUseCaseToPayload(
+  useCase: UseCase,
+  payload: Payload,
+  cache?: RelationshipIdCache,
+  options: { deferForwardReferences?: boolean } = {},
+): Promise<Record<string, unknown>> {
+  const context = { collection: 'use-cases', stableId: useCase.id };
+  const candidateRobots = [];
+  for (const candidate of useCase.candidateRobots) {
+    const [robotId, seriesId, evidenceDeploymentIds] = await Promise.all([
+      resolveRequired(payload, 'robots', candidate.robotId, cache, { ...context, field: 'candidateRobots.robotId' }),
+      resolveRequired(payload, 'robot-series', candidate.seriesId, cache, {
+        ...context,
+        field: 'candidateRobots.seriesId',
+      }),
+      options.deferForwardReferences
+        ? Promise.resolve(undefined)
+        : resolveAllRequired(payload, 'deployments', candidate.evidenceDeploymentIds, cache, {
+            ...context,
+            field: 'candidateRobots.evidenceDeploymentIds',
+          }),
+    ]);
+    candidateRobots.push({
+      robotId,
+      seriesId,
+      fit: candidate.fit,
+      basis: candidate.basis,
+      evidenceDeploymentIds,
+      evidenceSourceUrls: candidate.evidenceSourceUrls,
+      reason: candidate.reason,
+    });
+  }
+
+  return {
+    ...baseRecordToPayload(useCase),
+    title: useCase.title,
+    titleJa: useCase.titleJa,
+    subtitle: useCase.subtitle,
+    maturityLevel: useCase.maturityLevel,
+    buyerReadiness: useCase.buyerReadiness,
+    environment: useCase.environment,
+    requiredCapabilities: useCase.requiredCapabilities,
+    primaryIndustry: useCase.primaryIndustry,
+    industryTags: useCase.industryTags,
+    taskTags: useCase.taskTags,
+    atAGlance: useCase.atAGlance,
+    overview: useCase.overview,
+    whyItMatters: useCase.whyItMatters,
+    capabilityNotes: useCase.capabilityNotes,
+    environmentRequirements: useCase.environmentRequirements,
+    whyHardToday: useCase.whyHardToday,
+    japanDeploymentConditions: useCase.japanDeploymentConditions,
+    candidateRobots,
+  };
+}
+
+export async function mapDomainDeploymentToPayload(
+  deployment: DeploymentSite,
+  payload: Payload,
+  cache?: RelationshipIdCache,
+): Promise<Record<string, unknown>> {
+  const context = { collection: 'deployments', stableId: deployment.id };
+  const [manufacturerId, robotId, relatedUseCaseIds] = await Promise.all([
+    resolveRequired(payload, 'manufacturers', deployment.manufacturerId, cache, { ...context, field: 'manufacturerId' }),
+    resolveRequired(payload, 'robots', deployment.robotId, cache, { ...context, field: 'robotId' }),
+    resolveAllRequired(payload, 'use-cases', deployment.relatedUseCaseIds, cache, {
+      ...context,
+      field: 'relatedUseCaseIds',
+    }),
+  ]);
+  return {
+    ...baseRecordToPayload(deployment),
+    manufacturerId,
+    robotId,
+    customer: deployment.customer,
+    siteName: deployment.siteName,
+    country: deployment.country,
+    location: deployment.location,
+    status: deployment.status,
+    startedAt: deployment.startedAt,
+    relatedUseCaseIds,
+  };
+}
+
+export async function mapDomainArticleToPayload(
+  article: Article,
+  payload: Payload,
+  cache?: RelationshipIdCache,
+): Promise<Record<string, unknown>> {
+  const context = { collection: 'articles', stableId: article.id };
+  const [relatedRobotIds, relatedManufacturerIds, relatedUseCaseIds] = await Promise.all([
+    resolveAllRequired(payload, 'robots', article.relatedRobotIds, cache, { ...context, field: 'relatedRobotIds' }),
+    resolveAllRequired(payload, 'manufacturers', article.relatedManufacturerIds, cache, {
+      ...context,
+      field: 'relatedManufacturerIds',
+    }),
+    resolveAllRequired(payload, 'use-cases', article.relatedUseCaseIds, cache, {
+      ...context,
+      field: 'relatedUseCaseIds',
+    }),
+  ]);
+
+  const common = {
+    ...baseRecordToPayload(article),
+    title: article.title,
+    titleJa: article.titleJa,
+    category: article.category,
+    type: article.type,
+    section: article.section,
+    contentKind: article.contentKind,
+    publishedAt: article.publishedAt,
+    author: article.author,
+    industryTags: article.industryTags,
+    regionTags: article.regionTags,
+    themeTags: article.themeTags,
+    whyItMatters: article.whyItMatters,
+    keyTakeaways: article.keyTakeaways,
+    featured: article.featured,
+    relatedRobotIds,
+    relatedManufacturerIds,
+    relatedUseCaseIds,
+  };
+
+  // `Article` は判別可能union。本文モデルは片方だけを書き、もう片方は明示的に落とす
+  // （読み取りmapperが `type` で分岐するため、両方入っていると意味が二重になる）。
+  if (article.type === 'manufacturer-guide') {
+    return { ...common, body: undefined, manufacturerGuideContent: article.manufacturerGuideContent };
+  }
+  return { ...common, body: article.body, manufacturerGuideContent: undefined };
+}
+
+export async function mapDomainArticlePlacementToPayload(
+  placement: ArticlePlacement,
+  payload: Payload,
+  cache?: RelationshipIdCache,
+): Promise<Record<string, unknown>> {
+  const articleId = await resolveRequired(payload, 'articles', placement.articleId, cache, {
+    collection: 'article-placements',
+    stableId: placement.id,
+    field: 'articleId',
+  });
+  return {
+    ...domainStatusToPayload(placement.publishStatus),
+    stableId: placement.id,
+    // `article-placements` は公開URLを持たないが、schema一貫性のため `baseContentFields()` を
+    // 共有しており `slug` が `required: true` + `unique`。`stableId` と同じ値を書く
+    // （`collections/ArticlePlacements.ts` のコメントが指定する importer 側の責務）。
+    slug: placement.id,
+    surface: placement.surface,
+    slot: placement.slot,
+    articleId,
+    order: placement.order,
+    kind: placement.kind,
+    sponsor: placement.sponsor,
+  };
+}
+
+/** `Media` はuploadの実体。ファイルbytesはimporterが別途 `file` として渡す。 */
+export function mapDomainMediaToPayload(asset: MediaAsset): Record<string, unknown> {
+  return {
+    stableId: asset.id,
+    alt: asset.alt,
+    rights: asset.rights,
   };
 }
 

@@ -65,11 +65,23 @@ import type {
 // spread（`...record`）で済ませず全フィールドを明示する。削除4フィールドの落とし漏れや、
 // legacy側にだけ存在するfield（`Manufacturer.logo`）の混入を型で検出できるようにするため。
 
+/**
+ * local `data/*.ts` は任意配列を「fieldごと省略」でも「空配列」でも書ける（実データに
+ * `industryTags: []` が存在する）。Payload側は `optionalArray`（`payloadMappers.ts`）で
+ * 空配列を `undefined` へ寄せているため、local側も同じ規則にそろえないとTask 5のparity比較が
+ * 「local `[]` vs Payload `undefined`」を差分として出す（実測9件）。「値なし」の表現を
+ * 両source同じ1つ（`undefined`）にする。domain型が必須にしている配列
+ * （`Article.relatedRobotIds` など）には使わない。
+ */
+function optionalArray<T>(value: readonly T[] | undefined): T[] | undefined {
+  return value && value.length > 0 ? [...value] : undefined;
+}
+
 function toDomainRobot(robot: LegacyRobot): Robot {
   return {
     id: robot.id,
     slug: robot.slug,
-    previousSlugs: robot.previousSlugs,
+    previousSlugs: optionalArray(robot.previousSlugs),
     summary: robot.summary,
     publishStatus: robot.publishStatus,
     updatedAt: robot.updatedAt,
@@ -90,16 +102,16 @@ function toDomainRobot(robot: LegacyRobot): Robot {
     supersededById: robot.supersededById,
     specs: robot.specs,
     procurementModels: robot.procurementModels,
-    priceOffers: robot.priceOffers,
-    loadRatings: robot.loadRatings,
+    priceOffers: optionalArray(robot.priceOffers),
+    loadRatings: optionalArray(robot.loadRatings),
     fieldEvidence: robot.fieldEvidence,
-    usageExampleSourceUrls: robot.usageExampleSourceUrls,
+    usageExampleSourceUrls: optionalArray(robot.usageExampleSourceUrls),
     japanAvailability: robot.japanAvailability,
     distributorJapan: robot.distributorJapan,
     supportNote: robot.supportNote,
     images: robot.images,
-    industryTags: robot.industryTags,
-    taskTags: robot.taskTags,
+    industryTags: optionalArray(robot.industryTags),
+    taskTags: optionalArray(robot.taskTags),
     comparison: robot.comparison,
     // `buyerReadiness` / `marketAvailability` / `safetyNote` / `vendorRiskNote` は
     // canonical `Robot` に存在しない（DEC-S05 / S06）。ここで意図的に落とす。
@@ -110,7 +122,7 @@ function toDomainManufacturer(manufacturer: LegacyManufacturer): Manufacturer {
   return {
     id: manufacturer.id,
     slug: manufacturer.slug,
-    previousSlugs: manufacturer.previousSlugs,
+    previousSlugs: optionalArray(manufacturer.previousSlugs),
     summary: manufacturer.summary,
     publishStatus: manufacturer.publishStatus,
     updatedAt: manufacturer.updatedAt,
@@ -134,7 +146,7 @@ function toDomainManufacturer(manufacturer: LegacyManufacturer): Manufacturer {
     contactUrl: manufacturer.contactUrl,
     description: manufacturer.description,
     japanPresence: manufacturer.japanPresence,
-    domesticDistributors: manufacturer.domesticDistributors,
+    domesticDistributors: optionalArray(manufacturer.domesticDistributors),
     distributorNote: manufacturer.distributorNote,
     supportNote: manufacturer.supportNote,
     procurementNote: manufacturer.procurementNote,
@@ -147,7 +159,7 @@ function toDomainUseCase(useCase: LegacyUseCase): UseCase {
   return {
     id: useCase.id,
     slug: useCase.slug,
-    previousSlugs: useCase.previousSlugs,
+    previousSlugs: optionalArray(useCase.previousSlugs),
     summary: useCase.summary,
     publishStatus: useCase.publishStatus,
     updatedAt: useCase.updatedAt,
@@ -179,8 +191,8 @@ function toDomainUseCase(useCase: LegacyUseCase): UseCase {
       seriesId: undefined,
       fit: candidate.fit,
       basis: candidate.basis,
-      evidenceDeploymentIds: candidate.evidenceDeploymentIds,
-      evidenceSourceUrls: candidate.evidenceSourceUrls,
+      evidenceDeploymentIds: optionalArray(candidate.evidenceDeploymentIds),
+      evidenceSourceUrls: optionalArray(candidate.evidenceSourceUrls),
       reason: candidate.reason,
     })),
   };
@@ -190,7 +202,7 @@ function toDomainDeployment(deployment: LegacyDeploymentSite): DeploymentSite {
   return {
     id: deployment.id,
     slug: deployment.slug,
-    previousSlugs: deployment.previousSlugs,
+    previousSlugs: optionalArray(deployment.previousSlugs),
     summary: deployment.summary,
     publishStatus: deployment.publishStatus,
     updatedAt: deployment.updatedAt,
@@ -207,7 +219,7 @@ function toDomainDeployment(deployment: LegacyDeploymentSite): DeploymentSite {
     location: deployment.location,
     status: deployment.status,
     startedAt: deployment.startedAt,
-    relatedUseCaseIds: deployment.relatedUseCaseIds,
+    relatedUseCaseIds: optionalArray(deployment.relatedUseCaseIds),
   };
 }
 
@@ -215,7 +227,7 @@ function toDomainArticle(article: LegacyArticle): Article {
   const common = {
     id: article.id,
     slug: article.slug,
-    previousSlugs: article.previousSlugs,
+    previousSlugs: optionalArray(article.previousSlugs),
     summary: article.summary,
     publishStatus: article.publishStatus,
     updatedAt: article.updatedAt,
@@ -230,11 +242,11 @@ function toDomainArticle(article: LegacyArticle): Article {
     contentKind: article.contentKind,
     publishedAt: article.publishedAt,
     author: article.author,
-    industryTags: article.industryTags,
-    regionTags: article.regionTags,
-    themeTags: article.themeTags,
+    industryTags: optionalArray(article.industryTags),
+    regionTags: optionalArray(article.regionTags),
+    themeTags: optionalArray(article.themeTags),
     whyItMatters: article.whyItMatters,
-    keyTakeaways: article.keyTakeaways,
+    keyTakeaways: optionalArray(article.keyTakeaways),
     featured: article.featured,
     section: article.section,
     relatedRobotIds: article.relatedRobotIds,
