@@ -45,6 +45,7 @@
  * 公開URL・表示は変わらない（Global Constraints）。
  */
 import { createHash } from 'node:crypto';
+import { realpathSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { Payload } from 'payload';
@@ -281,10 +282,47 @@ export interface DefaultMediaResolverOptions {
 }
 
 /**
+ * 必須修正6-6（remediation group 2）: media resolver のパスは **realpath / resolve のあとで
+ * 許可された root 配下にあること**を確認する。`..`・絶対パス・encoded traversal を拒否する。
+ *
+ * restore の入力は「外から来た JSON」なので、`media[].url` は攻撃者が選べる。
+ * `path.join(uploadDir, decodeURIComponent(...))` は `%2e%2e%2f` を `../` へ復号したうえで
+ * join するため、**`uploadDir` の外の任意ファイルを読み出して Media レコードとして
+ * DB へ取り込ませる**ことができた（`/api/media/file/..%2f..%2f.env` の形）。
+ *
+ * `path.resolve` は `..` を畳んでから絶対パスにするので、畳んだ結果が root の下にあるかを
+ * 見れば `..` も encoded traversal も同じ1つの判定で塞げる。symlink 経由の脱出も
+ * `realpath` で解決してから同じ判定にかける（存在しないパスは realpath できないので、
+ * その場合は解決前のパスで判定して「見つからない」として扱う）。
+ */
+export function resolveWithinRoot(root: string, relativePath: string): string | undefined {
+  // 絶対パスは join の左辺を無視させる古典的な経路。明示的に拒否する。
+  if (path.isAbsolute(relativePath)) return undefined;
+  const resolvedRoot = path.resolve(root);
+  const candidate = path.resolve(resolvedRoot, relativePath);
+  const withSeparator = resolvedRoot.endsWith(path.sep) ? resolvedRoot : `${resolvedRoot}${path.sep}`;
+  if (candidate !== resolvedRoot && !candidate.startsWith(withSeparator)) return undefined;
+
+  // symlink で root の外へ出ていないか。実在しない場合は realpath できないので、
+  // 上の resolve 結果（root 配下であることは確認済み）をそのまま返す。
+  try {
+    const real = realpathSync(candidate);
+    const realRoot = realpathSync(resolvedRoot);
+    const realRootWithSeparator = realRoot.endsWith(path.sep) ? realRoot : `${realRoot}${path.sep}`;
+    if (real !== realRoot && !real.startsWith(realRootWithSeparator)) return undefined;
+    return real;
+  } catch {
+    return candidate;
+  }
+}
+
+/**
  * 既定の解決順:
  * 1. `/api/media/file/<name>` — export 元 Payload の local disk upload（restore 経路）
  * 2. `/...` — repo の `public/` 配下の実ファイル
  * 3. `http(s)://` — rights が自動ホスト可、かつ `allowNetwork` のときだけ fetch
+ *
+ * 1 と 2 はどちらも `resolveWithinRoot()` を通す（必須修正6-6）。
  */
 export function createDefaultMediaFileResolver(options: DefaultMediaResolverOptions = {}): MediaFileResolver {
   const publicDir = options.publicDir ?? path.resolve(process.cwd(), 'public');
@@ -298,7 +336,8 @@ export function createDefaultMediaFileResolver(options: DefaultMediaResolverOpti
     const name = candidate.asset.filename || fileNameFromSrc(normalizeImageSrc(source));
     const mimetype = candidate.asset.mimeType ?? mimeTypeForFile(name);
 
-    const readLocal = async (filePath: string): Promise<MediaFileResolution | undefined> => {
+    const readLocal = async (filePath: string | undefined): Promise<MediaFileResolution | undefined> => {
+      if (filePath === undefined) return undefined;
       try {
         return { file: { data: await readFile(filePath), mimetype, name } };
       } catch {
@@ -307,12 +346,33 @@ export function createDefaultMediaFileResolver(options: DefaultMediaResolverOpti
     };
 
     if (source.startsWith('/api/media/file/')) {
-      const resolved = await readLocal(path.join(uploadDir, decodeURIComponent(source.slice('/api/media/file/'.length))));
+      let requested: string;
+      try {
+        requested = decodeURIComponent(source.slice('/api/media/file/'.length));
+      } catch {
+        return { skipped: `media-path-undecodable: ${source}` };
+      }
+      const within = resolveWithinRoot(uploadDir, requested);
+      if (within === undefined) return { skipped: `media-path-outside-root: ${source}` };
+      const resolved = await readLocal(within);
       return resolved ?? { skipped: `upload-file-not-found: ${source}` };
     }
 
     if (source.startsWith('/')) {
-      const resolved = (await readLocal(path.join(publicDir, source))) ?? (await readLocal(path.join(uploadDir, name)));
+      // 先頭の `/` は「site root からの相対」であって filesystem の絶対パスではない。
+      // `resolveWithinRoot` は絶対パスを拒否するので、ここで相対形へ落としてから渡す。
+      let requested: string;
+      try {
+        requested = decodeURIComponent(source).replace(/^\/+/, '');
+      } catch {
+        return { skipped: `media-path-undecodable: ${source}` };
+      }
+      const inPublic = resolveWithinRoot(publicDir, requested);
+      const inUpload = resolveWithinRoot(uploadDir, name);
+      if (inPublic === undefined && inUpload === undefined) {
+        return { skipped: `media-path-outside-root: ${source}` };
+      }
+      const resolved = (await readLocal(inPublic)) ?? (await readLocal(inUpload));
       return resolved ?? { skipped: `local-file-not-found: ${source}` };
     }
 

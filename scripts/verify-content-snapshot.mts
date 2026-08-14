@@ -32,13 +32,15 @@ import {
 } from './compare-content-sources.mts';
 import { exitCli, isDirectRun, parseArgs } from './contentCliSupport.mts';
 import {
-  assertValidManifest,
+  assertValidEnvelope,
   canonicalJson,
   sha256Hex,
   storeFromManifest,
   verifyBlobWithCosign,
+  verifyManifestSignature,
   type CutoverBaselineManifest,
 } from './export-content-snapshot.mts';
+import { parseContentSnapshotJson } from './snapshotSchema.mts';
 
 export interface SnapshotVerificationFailure {
   check: string;
@@ -130,7 +132,15 @@ export async function loadVerifiedArtifact(
     };
   }
 
-  const snapshot = JSON.parse(artifact.toString('utf8')) as ContentSnapshot;
+  // 必須修正6-4: bare cast をやめ、厳密な runtime schema 検証を通す。verify 経路も
+  // restore と同じ入口を使う（片方だけ緩いと、緩いほうが実質の入口になる）。
+  let snapshot: ContentSnapshot;
+  try {
+    snapshot = parseContentSnapshotJson(artifact.toString('utf8'));
+  } catch (error) {
+    return { failures: [{ check: 'snapshotSchema', detail: (error as Error).message }] };
+  }
+
   failures.push(...verifyRecordCounts(manifest, snapshot));
   if (failures.length > 0) return { failures };
 
@@ -163,7 +173,7 @@ export function verifyAgainstPayloadSnapshot(
 const HELP = [
   'content:verify-snapshot — 署名 snapshot と Payload DB の全 collection 完全一致を検証する。',
   '',
-  '  --manifest <path>       署名済み baseline manifest（本番経路。署名 + sha256 + counts + parity）',
+  '  --manifest <path>       署名済み baseline envelope（manifest署名 + artifact署名 + sha256 + schema + counts + parity）',
   '  --input <snapshot.json> 手元 snapshot と Payload の parity のみ（Step 6.5 の round-trip 用）',
   '  --allow-local-store     local-disk store の manifest を受け付ける（round-trip テスト用）',
   '  --json <path>           parity レポートを JSON で書き出す',
@@ -188,9 +198,25 @@ async function main(): Promise<void> {
 
   let expected: ContentSnapshot;
   if (typeof manifestPath === 'string') {
-    const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as unknown;
-    assertValidManifest(manifest);
+    // 必須修正6-10: 受け付けるのは**署名済み envelope**。bare manifest は、正規 artifact へ
+    // 別環境向けの manifest を貼り替える攻撃をそのまま通してしまうため受け付けない。
+    const envelope = JSON.parse(await readFile(manifestPath, 'utf8')) as unknown;
+    assertValidEnvelope(envelope);
+    const { manifest } = envelope;
     process.stdout.write(`manifest schema: ok (${manifest.storage.provider}:${manifest.storage.objectKey})\n`);
+
+    const manifestSignature = await verifyManifestSignature(envelope);
+    if (!manifestSignature.verified) {
+      process.stderr.write(`FAIL manifestSignature: ${manifestSignature.detail}\n`);
+      process.exitCode = 1;
+      return;
+    }
+    process.stdout.write('manifest signature: verified\n');
+    process.stdout.write(
+      `provenance: ${manifest.provenance.sourceKind} -> ${manifest.provenance.environment} ` +
+        `(${manifest.provenance.databaseResourceId}, schema ${manifest.provenance.schemaVersion}, ` +
+        `baseline ${manifest.provenance.baselineRunId})\n`,
+    );
 
     const loaded = await loadVerifiedArtifact(manifest, { allowLocalStore: args.has('allow-local-store') });
     if (!('snapshot' in loaded)) {

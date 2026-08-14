@@ -24,13 +24,13 @@
  * 新規オブジェクトとして置き、同一キーへの再 upload を禁止する（`allowOverwrite: false`）。
  */
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import type { ContentSnapshot } from '../lib/content/contracts.ts';
-import { countRecords } from './compare-content-sources.mts';
+import { compareSnapshots, countRecords, formatParityReport, parityReportIsClean } from './compare-content-sources.mts';
 import { exitCli, isDirectRun, parseArgs } from './contentCliSupport.mts';
 import {
   assertWritableDatabase,
@@ -40,6 +40,14 @@ import {
   mediaResolverOptionsFromArgs,
   resolveImportUser,
 } from './import-content-to-payload.mts';
+import {
+  assertRestoreInputModeAllowed,
+  checkImportOutcome,
+  isLocalDatabaseHost,
+  readRestoreTargetIdentity,
+  verifyBaselineBeforeRestore,
+} from './restore-preflight.mts';
+import { parseContentSnapshotJson } from './snapshotSchema.mts';
 
 // ─── snapshot の正規化と hash ──────────────────────────────────────────────
 
@@ -68,7 +76,34 @@ export function sha256Hex(data: string | Buffer): string {
 
 // ─── manifest（brief Step 7 の検証schema） ─────────────────────────────────
 
+/**
+ * 必須修正6-9（remediation group 2）: manifest（および署名済み envelope）が持つべき出所情報。
+ *
+ * 監査の指摘は「未署名・改ざん済み・**別環境向け**の JSON でも `--i-know-this-is-production`
+ * さえ付ければ managed DB へ書ける」だった。`assertWritableDatabase` は host が localhost かと
+ * flag の有無しか見ておらず、`_environment_marker` も Supabase project identity も一切見ていない。
+ * artifact が「どこで・何から作られ、どの DB へ戻すためのものか」を artifact 自身に持たせて、
+ * restore 側が対象 DB の実際の identity と突き合わせられるようにする。
+ */
+export interface BaselineProvenance {
+  /** snapshot の作成元。`local` は cutover 前の local TS、`payload` は稼働中の Payload。 */
+  sourceKind: SnapshotSourceName;
+  /** この artifact が戻る先の環境。`_environment_marker` の値と一致しなければ restore しない。 */
+  environment: 'production' | 'preview' | 'local-throwaway';
+  /** DB の資源識別子（host:port/dbname[#supabase project ref]）。**接続情報の秘密部分は含めない**。 */
+  databaseResourceId: string;
+  /** private audit blob store の ID（`docs/reference/content-platform-resources-v1.md` §4）。 */
+  auditBlobStoreId: string;
+  /** export 時点で適用済みだった最新 migration 名。schema 世代の不一致を検出する。 */
+  schemaVersion: string;
+  /** export run ごとに一意。古い正規 artifact の replay を検出するための識別子（必須修正6-10）。 */
+  baselineRunId: string;
+  /** 単調増加。世代を跨いだ巻き戻しを検出する。 */
+  baselineGeneration: number;
+}
+
 export interface CutoverBaselineManifest {
+  provenance: BaselineProvenance;
   storage: {
     /**
      * brief の union は `'vercel-blob' | 's3'`。Task 5 のテストは実 private audit store へ
@@ -159,7 +194,103 @@ export function assertValidManifest(value: unknown): asserts value is CutoverBas
   if (typeof manifest.exportedAt !== 'string' || Number.isNaN(Date.parse(manifest.exportedAt))) problems.push('exportedAt');
   if (typeof manifest.exportedBy !== 'string' || manifest.exportedBy.length === 0) problems.push('exportedBy');
 
+  // 必須修正6-9: provenance が1 field でも欠けたら manifest として無効。欠けた field は
+  // 「検証しない」ではなく「検証できない」ので、restore を許してはいけない。
+  const provenance = manifest.provenance;
+  if (!provenance || typeof provenance !== 'object') {
+    problems.push('provenance');
+  } else {
+    if (!['local', 'payload'].includes(provenance.sourceKind as string)) problems.push('provenance.sourceKind');
+    if (!['production', 'preview', 'local-throwaway'].includes(provenance.environment as string)) {
+      problems.push('provenance.environment');
+    }
+    for (const key of ['databaseResourceId', 'auditBlobStoreId', 'schemaVersion', 'baselineRunId'] as const) {
+      if (typeof provenance[key] !== 'string' || (provenance[key] as string).length === 0) {
+        problems.push(`provenance.${key}`);
+      }
+    }
+    if (typeof provenance.baselineGeneration !== 'number' || !Number.isInteger(provenance.baselineGeneration)) {
+      problems.push('provenance.baselineGeneration');
+    }
+  }
+
   if (problems.length > 0) throw new Error(`manifest-invalid: ${problems.join(', ')}`);
+}
+
+// ─── 署名済み envelope（必須修正6-10） ─────────────────────────────────────
+
+/**
+ * 必須修正6-10: **manifest 自体も署名対象へ含める**。
+ *
+ * snapshot 本体だけに署名していると、攻撃者は「過去の正規 artifact（署名は本物）」に
+ * 「今の環境向けに書き換えた manifest（署名対象外）」を組み合わせられる。sha256 も
+ * provenance も manifest 側にあるので、artifact の署名は何の防御にもならない。
+ * manifest を署名対象へ入れると、sha256 経由で artifact も、provenance 経由で
+ * 環境・DB・store・schema 世代・baseline run ID も、すべて1つの署名で覆われる。
+ */
+export interface SignedBaselineEnvelope {
+  manifest: CutoverBaselineManifest;
+  manifestSignature: {
+    algorithm: 'cosign';
+    keyId: string;
+    /** `canonicalJson(manifest)` に対する detached cosign bundle（base64）。 */
+    bundleBase64: string;
+  };
+}
+
+export function assertValidEnvelope(value: unknown): asserts value is SignedBaselineEnvelope {
+  const envelope = value as Partial<SignedBaselineEnvelope> | null;
+  if (!envelope || typeof envelope !== 'object') throw new Error('envelope-invalid: not an object');
+  if (!('manifest' in envelope) || !('manifestSignature' in envelope)) {
+    throw new Error(
+      'envelope-invalid: expected a signed baseline envelope { manifest, manifestSignature }. ' +
+        'A bare manifest is not accepted — the manifest itself must be signed so its provenance ' +
+        'cannot be swapped onto an older artifact (必須修正6-10).',
+    );
+  }
+  assertValidManifest(envelope.manifest);
+  const signature = envelope.manifestSignature;
+  const problems: string[] = [];
+  if (!signature || typeof signature !== 'object') {
+    problems.push('manifestSignature');
+  } else {
+    if (signature.algorithm !== 'cosign') problems.push('manifestSignature.algorithm');
+    if (typeof signature.keyId !== 'string' || signature.keyId.length === 0) problems.push('manifestSignature.keyId');
+    if (typeof signature.bundleBase64 !== 'string' || signature.bundleBase64.length === 0) {
+      problems.push('manifestSignature.bundleBase64');
+    }
+  }
+  if (problems.length > 0) throw new Error(`envelope-invalid: ${problems.join(', ')}`);
+}
+
+/** manifest へ cosign 署名を付けて envelope にする。 */
+export async function signManifest(
+  manifest: CutoverBaselineManifest,
+  keyArn = signingKeyArn(),
+): Promise<SignedBaselineEnvelope> {
+  const workDir = await mkdtempDir();
+  const manifestPath = path.join(workDir, 'manifest.json');
+  const bundlePath = path.join(workDir, 'manifest.cosign.bundle');
+  await writeFile(manifestPath, canonicalJson(manifest), 'utf8');
+  signBlobWithCosign(manifestPath, bundlePath, keyArn);
+  return {
+    manifest,
+    manifestSignature: {
+      algorithm: 'cosign',
+      keyId: keyArn,
+      bundleBase64: (await readFile(bundlePath)).toString('base64'),
+    },
+  };
+}
+
+/** envelope の manifest 署名を検証する。`canonicalJson(manifest)` が署名対象。 */
+export async function verifyManifestSignature(envelope: SignedBaselineEnvelope): Promise<CosignVerifyResult> {
+  const workDir = await mkdtempDir();
+  const manifestPath = path.join(workDir, 'manifest.json');
+  const bundlePath = path.join(workDir, 'manifest.cosign.bundle');
+  await writeFile(manifestPath, canonicalJson(envelope.manifest), 'utf8');
+  await writeFile(bundlePath, Buffer.from(envelope.manifestSignature.bundleBase64, 'base64'));
+  return verifyBlobWithCosign(manifestPath, bundlePath);
 }
 
 // ─── cosign 署名 ──────────────────────────────────────────────────────────
@@ -386,12 +517,16 @@ export interface BuildManifestArgs {
   snapshot: ContentSnapshot;
   store: SnapshotObjectStore;
   exportedBy: string;
+  /** 必須修正6-9: artifact の出所。restore 側が対象DBの実 identity と突き合わせる。 */
+  provenance: BaselineProvenance;
   exportedAt?: string;
   keyArn?: string;
 }
 
 export interface BuiltBaseline {
   manifest: CutoverBaselineManifest;
+  /** 必須修正6-10: manifest ごと署名した envelope。`--manifest` で渡すのはこちら。 */
+  envelope: SignedBaselineEnvelope;
   snapshotJson: string;
   signatureBundle: Buffer;
 }
@@ -421,6 +556,7 @@ export async function exportSignedBaseline(args: BuildManifestArgs): Promise<Bui
 
   const counts = countRecords(args.snapshot);
   const manifest: CutoverBaselineManifest = {
+    provenance: args.provenance,
     storage: { provider: args.store.provider, bucket: args.store.bucket, objectKey, versionId },
     sha256,
     signature: {
@@ -445,7 +581,12 @@ export async function exportSignedBaseline(args: BuildManifestArgs): Promise<Bui
   };
   assertValidManifest(manifest);
 
-  return { manifest, snapshotJson, signatureBundle };
+  // 必須修正6-10: manifest 自体にも署名する。sha256 経由で artifact も、provenance 経由で
+  // 環境・DB・store・schema世代・baseline run IDも、これ1つの署名で覆われる。
+  const envelope = await signManifest(manifest, args.keyArn);
+  assertValidEnvelope(envelope);
+
+  return { manifest, envelope, snapshotJson, signatureBundle };
 }
 
 /** manifest の `storage` からストアを復元する（短命URLはここで都度発行する）。 */
@@ -471,12 +612,17 @@ const HELP = [
   '  --store local-disk|vercel-blob  --upload 時の保存先',
   '  --store-dir <dir>             local-disk store のディレクトリ',
   '  --store-name <name>           vercel-blob store 名（例 deploid-audit-production）',
-  '  --manifest-out <path>         manifest JSON の出力先',
+  '  --manifest-out <path>         署名済み manifest envelope の出力先',
   '  --exported-by <who>           manifest の exportedBy',
+  '  --baseline-generation <n>     --upload 時必須。単調増加の世代番号（古い baseline の replay 防止）',
   '',
-  'content:restore — export した snapshot を空DBへ書き戻す（content:import と同じ upsert）。',
+  'content:restore — export した snapshot をDBへ書き戻す（content:import と同じ upsert）。',
   '',
-  '  --restore --input <snapshot>  必須',
+  '  --restore --manifest <envelope.json>  managed DB へはこれのみ。署名 + sha256 + schema +',
+  '                                        内容 + 対象DB identity をDB変更前に全部検証する。',
+  '  --restore --input <snapshot>          未署名。localhost の throwaway DB か --test-mode のみ。',
+  '  --expected-environment <env>          オペレーターが宣言する対象環境（manifest と照合）',
+  '  --expected-baseline-run-id <id>       戻す baseline を明示する（古い artifact の replay 防止）',
   '  --media-dir <dir>             media のバイト列の読み取り元（restore 元 store 相当）',
   '  --admin-email / --admin-password / --bootstrap-admin / --i-know-this-is-production',
   '',
@@ -524,31 +670,149 @@ async function runExport(args: Map<string, string | true>): Promise<void> {
   }
 
   const exportedBy = (args.get('exported-by') as string | undefined) ?? process.env.USER ?? 'unknown';
-  const { manifest } = await exportSignedBaseline({ snapshot, store, exportedBy });
+  const provenance = await resolveExportProvenance(source, args);
+  const { manifest, envelope } = await exportSignedBaseline({ snapshot, store, exportedBy, provenance });
 
   const manifestPath = args.get('manifest-out');
-  const manifestJson = `${JSON.stringify(manifest, null, 2)}\n`;
+  // **envelope を書く**（bare manifest ではない）。restore が受け付けるのは署名済み envelope だけ。
+  const envelopeJson = `${JSON.stringify(envelope, null, 2)}\n`;
   if (typeof manifestPath === 'string') {
-    await writeFile(manifestPath, manifestJson, 'utf8');
-    process.stdout.write(`wrote manifest: ${manifestPath}\n`);
+    await writeFile(manifestPath, envelopeJson, 'utf8');
+    process.stdout.write(`wrote signed manifest envelope: ${manifestPath}\n`);
   } else {
-    process.stdout.write(manifestJson);
+    process.stdout.write(envelopeJson);
   }
+  process.stdout.write(`baseline run: ${provenance.baselineRunId} (generation ${provenance.baselineGeneration})\n`);
   process.stdout.write(`object: ${store.objectReference(manifest.storage.objectKey)}\n`);
 }
 
-async function runRestore(args: Map<string, string | true>): Promise<void> {
-  const inputPath = args.get('input');
-  if (typeof inputPath !== 'string') throw new Error('content:restore requires --input <snapshot.json>.');
+/**
+ * 必須修正6-9: artifact の provenance を**推測せず**に決める。
+ *
+ * `environment` / `databaseResourceId` / `schemaVersion` / `auditBlobStoreId` は
+ * `DATABASE_URL` が指す**その DB 自身**から読む（`_environment_marker` と `payload_migrations`）。
+ * ここを CLI flag の自己申告にすると、「artifact が主張する環境」と「実際の環境」が
+ * 一致することを誰も確かめていない状態に戻ってしまう。
+ */
+async function resolveExportProvenance(
+  sourceKind: SnapshotSourceName,
+  args: Map<string, string | true>,
+): Promise<BaselineProvenance> {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is not set. --upload records the target database identity in the manifest.');
+  }
 
-  assertWritableDatabase(args, 'scripts/export-content-snapshot.mts --restore');
-
-  const snapshot = JSON.parse(await readFile(inputPath, 'utf8')) as ContentSnapshot;
+  const generationArg = args.get('baseline-generation');
+  const baselineGeneration = typeof generationArg === 'string' ? Number.parseInt(generationArg, 10) : NaN;
+  if (!Number.isInteger(baselineGeneration) || baselineGeneration < 0) {
+    throw new Error('--upload requires --baseline-generation <integer> (monotonic; guards against replaying an older baseline).');
+  }
 
   const { getPayload } = await import('payload');
   const { default: config } = await import('../payload.config.ts');
   const payload = await getPayload({ config });
   try {
+    const target = await readRestoreTargetIdentity(payload, databaseUrl);
+    if (target.auditBlobStoreId === null) {
+      throw new Error(
+        'audit-blob-store-not-configured: the manifest must record the private audit store id, and this ' +
+          'environment has none wired (PRODUCTION_AUDIT_BLOB_TOKEN_STORE_ID / PREVIEW_AUDIT_BLOB_TOKEN_STORE_ID).',
+      );
+    }
+    return {
+      sourceKind,
+      environment: target.environment ?? 'local-throwaway',
+      databaseResourceId: target.databaseResourceId,
+      auditBlobStoreId: target.auditBlobStoreId,
+      schemaVersion: target.schemaVersion,
+      baselineRunId: `baseline-${new Date().toISOString()}-${randomUUID()}`,
+      baselineGeneration,
+    };
+  } finally {
+    await payload.destroy();
+  }
+}
+
+/**
+ * 必須修正6（remediation group 2）。以前の実装は
+ *   `JSON.parse(await readFile(inputPath, 'utf8')) as ContentSnapshot`
+ * だけで managed DB への upsert を始めていた。署名も schema 検証も対象DB identity の確認も無く、
+ * `--i-know-this-is-production` を付けさえすれば未署名・改ざん済み・別環境向けのファイルが
+ * そのまま本番へ流れた。
+ *
+ * 新しい経路:
+ * - managed DB へは `--manifest`（署名済み envelope）でしか restore できない（6-1）。
+ * - raw `--input` は localhost の throwaway DB か明示的 `--test-mode` のみ（6-2）。
+ * - DB を1行も触る前に署名 → sha256 → schema → 内容 → 対象DB identity を全部通す（6-3）。
+ * - restore 後に同じ artifact との完全 parity を自動実行し、通らなければ exit 1（6-7）。
+ * - skipped media / 部分 import が1件でもあれば成功扱いにしない（6-8）。
+ */
+async function runRestore(args: Map<string, string | true>): Promise<void> {
+  const manifestPath = args.get('manifest');
+  const inputPath = args.get('input');
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) throw new Error('DATABASE_URL is not set. content:restore needs an explicit target database.');
+
+  assertRestoreInputModeAllowed({
+    hasManifest: typeof manifestPath === 'string',
+    hasRawInput: typeof inputPath === 'string',
+    isLocalHost: isLocalDatabaseHost(databaseUrl),
+    explicitTestMode: args.has('test-mode'),
+  });
+
+  assertWritableDatabase(args, 'scripts/export-content-snapshot.mts --restore');
+
+  const { getPayload } = await import('payload');
+  const { default: config } = await import('../payload.config.ts');
+  const payload = await getPayload({ config });
+
+  try {
+    let snapshot: ContentSnapshot;
+    let sourceLabel: string;
+
+    if (typeof manifestPath === 'string') {
+      const envelope = JSON.parse(await readFile(manifestPath, 'utf8')) as unknown;
+      assertValidEnvelope(envelope);
+
+      const store = storeFromManifest(envelope.manifest);
+      const artifact = await store.get(envelope.manifest.storage.objectKey);
+      const artifactSignatureBundle = await store.get(envelope.manifest.signature.detachedSignatureObjectKey);
+      const target = await readRestoreTargetIdentity(payload, databaseUrl);
+
+      const verification = await verifyBaselineBeforeRestore({
+        envelope,
+        artifact,
+        artifactSignatureBundle,
+        target,
+        expectedEnvironment: typeof args.get('expected-environment') === 'string' ? (args.get('expected-environment') as string) : undefined,
+        expectedBaselineRunId: typeof args.get('expected-baseline-run-id') === 'string' ? (args.get('expected-baseline-run-id') as string) : undefined,
+        workDir: await mkdtempDir(),
+        writeFile: async (filePath, data) => writeFile(filePath, data),
+        joinPath: (...segments) => path.join(...segments),
+      });
+
+      if (!verification.ok) {
+        for (const failure of verification.failures) process.stderr.write(`FAIL ${failure.check}: ${failure.detail}\n`);
+        process.stderr.write('content:restore: refusing to write. No database change was made.\n');
+        process.exitCode = 1;
+        return;
+      }
+
+      snapshot = verification.verified.snapshot;
+      sourceLabel = `signed baseline ${verification.verified.provenance.baselineRunId}`;
+      process.stdout.write(
+        'preflight: manifest signature, artifact signature, sha256, snapshot schema, record counts, ' +
+          'stable ids, references, environment marker, database resource, audit store, schema version — all OK\n',
+      );
+    } else {
+      // localhost の throwaway DB か明示的 test mode だけがここへ来る。それでも
+      // bare cast はしない（必須修正6-4: 厳密な runtime schema 検証は入力形式を問わず通す）。
+      snapshot = parseContentSnapshotJson(await readFile(inputPath as string, 'utf8'));
+      sourceLabel = `unsigned snapshot ${inputPath}`;
+      process.stdout.write(`preflight: strict snapshot schema OK (unsigned input, local/test target)\n`);
+    }
+
     const user = await resolveImportUser(payload, args);
     const report = await importContentSnapshot({
       payload,
@@ -556,11 +820,37 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
       user,
       // 必須修正1-6: restore は import とは別のrun ID / 理由で監査ログへ残す。
       runId: `content-restore-${new Date().toISOString()}`,
-      reason: `content:restore from snapshot ${inputPath}`,
+      reason: `content:restore from ${sourceLabel}`,
       mediaResolver: createDefaultMediaFileResolver(mediaResolverOptionsFromArgs(args)),
       log: (line) => process.stdout.write(`  ${line}\n`),
     });
     process.stdout.write(`\n${formatImportReport(report)}\n`);
+
+    // 必須修正6-8: skipped media / 部分 import があれば成功扱いにしない。
+    const outcomeFailures = checkImportOutcome(report);
+
+    // 必須修正6-7: restore 後に**同じ artifact** との完全 parity を自動実行する。
+    const { createPayloadContentSource } = await import('../lib/content/payloadSource.ts');
+    const actual = await createPayloadContentSource({ payload }).readSnapshot();
+    const parity = compareSnapshots(snapshot, actual);
+    process.stdout.write(`\n${formatParityReport(parity)}\n`);
+    if (!parityReportIsClean(parity)) {
+      outcomeFailures.push({
+        check: 'postRestoreParity',
+        detail:
+          `missing=${parity.missing.length} extra=${parity.extra.length} changed=${parity.changed.length} ` +
+          `brokenReferences=${parity.brokenReferences.length}`,
+      });
+    }
+
+    if (outcomeFailures.length > 0) {
+      for (const failure of outcomeFailures) process.stderr.write(`FAIL ${failure.check}: ${failure.detail}\n`);
+      process.stderr.write('content:restore: NOT successful — the database was modified but does not match the artifact.\n');
+      process.exitCode = 1;
+      return;
+    }
+
+    process.stdout.write('content:restore: OK — the database matches the artifact on every collection.\n');
   } finally {
     await payload.destroy();
   }

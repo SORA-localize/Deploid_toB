@@ -18,7 +18,7 @@ import { readFile } from 'node:fs/promises';
 import type { ContentSnapshot } from '../lib/content/contracts.ts';
 import type { ParityCollection } from './compare-content-sources.mts';
 import { exitCli, isDirectRun, parseArgs } from './contentCliSupport.mts';
-import { assertValidManifest } from './export-content-snapshot.mts';
+import { assertValidEnvelope, verifyManifestSignature } from './export-content-snapshot.mts';
 import { loadVerifiedArtifact } from './verify-content-snapshot.mts';
 
 const CONSERVED_COLLECTIONS = [
@@ -120,7 +120,7 @@ export function verifyStableIdConservation(
 const HELP = [
   'content:verify-conservation — 履歴 baseline の stableId 部分集合保全だけを検証する。',
   '',
-  '  --manifest <path>            署名済み baseline manifest（必須）',
+  '  --manifest <path>            署名済み baseline envelope（必須）',
   '  --stable-id-subset           このモードを明示する（必須。責務を混ぜないための明示フラグ）',
   '  --identity-transfers <path>  承認済み identity transfer の JSON 配列',
   '  --allow-local-store          local-disk store の manifest を受け付ける（テスト用）',
@@ -145,10 +145,17 @@ async function main(): Promise<void> {
     );
   }
 
-  const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as unknown;
-  assertValidManifest(manifest);
+  // 必須修正6-10: bare manifest ではなく署名済み envelope を受け付ける。
+  const envelope = JSON.parse(await readFile(manifestPath, 'utf8')) as unknown;
+  assertValidEnvelope(envelope);
+  const manifestSignature = await verifyManifestSignature(envelope);
+  if (!manifestSignature.verified) {
+    process.stderr.write(`FAIL manifestSignature: ${manifestSignature.detail}\n`);
+    process.exitCode = 1;
+    return;
+  }
 
-  const loaded = await loadVerifiedArtifact(manifest, { allowLocalStore: args.has('allow-local-store') });
+  const loaded = await loadVerifiedArtifact(envelope.manifest, { allowLocalStore: args.has('allow-local-store') });
   if (!('snapshot' in loaded)) {
     for (const failure of loaded.failures) process.stderr.write(`FAIL ${failure.check}: ${failure.detail}\n`);
     process.exitCode = 1;

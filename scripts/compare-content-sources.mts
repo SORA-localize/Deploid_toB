@@ -312,7 +312,8 @@ function indexById(records: readonly unknown[]): Map<string, Record<string, unkn
   return map;
 }
 
-function collectBrokenReferences(
+/** restore preflight（必須修正6-3）も同じ規則で broken reference を数えるため export する。 */
+export function collectBrokenReferences(
   snapshot: ContentSnapshot,
   side: 'expected' | 'actual',
 ): ParityBrokenReference[] {

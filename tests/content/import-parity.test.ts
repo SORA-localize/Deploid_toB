@@ -321,6 +321,15 @@ describe('media review items surfaced in the parity report', () => {
 
 describe('cutover baseline manifest', () => {
   const validManifest: CutoverBaselineManifest = {
+    provenance: {
+      sourceKind: 'payload',
+      environment: 'production',
+      databaseResourceId: 'db.example.supabase.co:5432/postgres#exampleref',
+      auditBlobStoreId: 'store_deploid_audit_production',
+      schemaVersion: '20260814_020026_site_settings_data_as_of_and_placement_limits',
+      baselineRunId: 'baseline-2026-08-12T00:00:00.000Z-0000',
+      baselineGeneration: 3,
+    },
     storage: { provider: 'vercel-blob', bucket: 'deploid-audit-production', objectKey: 'cutover-baseline/x.json', versionId: null },
     sha256: 'a'.repeat(64),
     signature: { algorithm: 'cosign', keyId: 'arn:aws:kms:ap-northeast-1:1:key/2', detachedSignatureObjectKey: 'cutover-baseline/x.json.cosign.bundle' },
@@ -354,6 +363,15 @@ describe('cutover baseline manifest', () => {
       (m: CutoverBaselineManifest) => delete (m.recordCounts as Partial<CutoverBaselineManifest['recordCounts']>).media,
       (m: CutoverBaselineManifest) => { m.exportedAt = 'yesterday'; },
       (m: CutoverBaselineManifest) => { m.exportedBy = ''; },
+      // 必須修正6-9: provenance が1 field でも欠けたら manifest として無効。
+      (m: CutoverBaselineManifest) => delete (m as Partial<CutoverBaselineManifest>).provenance,
+      (m: CutoverBaselineManifest) => { (m.provenance as { environment: string }).environment = 'staging'; },
+      (m: CutoverBaselineManifest) => { (m.provenance as { sourceKind: string }).sourceKind = 'somewhere-else'; },
+      (m: CutoverBaselineManifest) => { m.provenance.databaseResourceId = ''; },
+      (m: CutoverBaselineManifest) => { m.provenance.auditBlobStoreId = ''; },
+      (m: CutoverBaselineManifest) => { m.provenance.schemaVersion = ''; },
+      (m: CutoverBaselineManifest) => { m.provenance.baselineRunId = ''; },
+      (m: CutoverBaselineManifest) => { (m.provenance as { baselineGeneration: unknown }).baselineGeneration = '3'; },
     ]) {
       const candidate = structuredClone(validManifest);
       mutate(candidate);
@@ -486,6 +504,15 @@ describe.skipIf(!canSignForReal)('cosign signing against the real KMS key', () =
         snapshot: contentSnapshotFixture,
         store,
         exportedBy: 'import-parity-test',
+        provenance: {
+          sourceKind: 'payload',
+          environment: 'local-throwaway',
+          databaseResourceId: 'localhost:5432/throwaway',
+          auditBlobStoreId: 'local-throwaway-no-audit-store',
+          schemaVersion: 'test',
+          baselineRunId: 'baseline-round-trip-test',
+          baselineGeneration: 1,
+        },
       });
       assertValidManifest(manifest);
 
