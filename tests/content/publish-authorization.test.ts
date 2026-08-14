@@ -1,6 +1,6 @@
 import type { PayloadRequest } from 'payload';
 import { describe, expect, it } from 'vitest';
-import { readDraftIntent, recordDraftIntent } from '../../lib/payload/publishAuthorization';
+import { clearDraftIntents, readDraftIntent, recordDraftIntent } from '../../lib/payload/publishAuthorization';
 
 /**
  * remediation group 1 のレビュー指摘 #3 の回帰テスト（DB不要の単体テスト）。
@@ -64,6 +64,38 @@ describe('draft intent is a single-use token scoped to one write', () => {
     recordDraftIntent(req, 'manufacturers', 7, true);
 
     expect(readDraftIntent(req, 'manufacturers', undefined)).toBe(false);
+  });
+
+  /**
+   * fix round 2: `beforeOperation` は access control より前に走るので、id指定のupdateが
+   * `beforeChange` へ到達せず終わると intent が孤児になる。`createLocalReq()` は operation ごとに
+   * `req.context` を新しいobjectへ差し替える（Mapは spread で引き継がれる）ので、
+   * token側にも「どのoperationが記録したか」を持たせて突き合わせる。
+   */
+  it('ignores an intent left behind by a different operation on the same request', () => {
+    const firstOperationContext: Record<string, unknown> = { seed: 1 };
+    const req = { context: firstOperationContext } as unknown as PayloadRequest;
+
+    // operation A が記録したが、access拒否等で消費されずに終わった。
+    recordDraftIntent(req, 'manufacturers', 7, true);
+
+    // operation B が始まる: createLocalReq が context を差し替える（Mapは引き継がれる）。
+    (req as unknown as { context: Record<string, unknown> }).context = { ...firstOperationContext };
+
+    expect(readDraftIntent(req, 'manufacturers', 7)).toBe(false);
+  });
+
+  it('clears pending intents for one collection without touching another', () => {
+    const context: Record<string, unknown> = {};
+    const req = fakeReq(context);
+
+    recordDraftIntent(req, 'manufacturers', 7, true);
+    recordDraftIntent(req, 'robots', 9, true);
+
+    clearDraftIntents(req, 'manufacturers');
+
+    expect(readDraftIntent(req, 'manufacturers', 7)).toBe(false);
+    expect(readDraftIntent(req, 'robots', 9)).toBe(true);
   });
 
   it('keeps an explicitly recorded false as false', () => {

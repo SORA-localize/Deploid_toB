@@ -88,6 +88,44 @@ function draftIntentKey(collectionSlug: string, docId: string | number): string 
   return `${collectionSlug}:${docId}`;
 }
 
+interface DraftIntentEntry {
+  draft: boolean;
+  /**
+   * このtokenを記録したoperationの `req.context` object。
+   *
+   * `createLocalReq()` は operation ごとに `req.context` を**新しいobjectへ差し替える**
+   * （空なら渡された `context`、非空なら `{...req.context, ...context}`）。req object自体は
+   * 使い回されうる（`createLocalReq` は引数のreqをmutateして返す）ため、operationの同一性は
+   * reqではなく**contextのobject identity**で見る。
+   */
+  context: Record<string, unknown>;
+}
+
+function draftIntentStore(context: Record<string, unknown>): Map<string, DraftIntentEntry> | undefined {
+  const store = context[DRAFT_INTENT_KEY];
+  return store instanceof Map ? (store as Map<string, DraftIntentEntry>) : undefined;
+}
+
+/**
+ * このcollectionについて溜まっているdraft intentを捨てる。各write operationの開始時
+ * （`beforeOperation`）に必ず呼ぶ。
+ *
+ * `beforeOperation` は **access controlより前**に走る。id指定のupdateがaccess拒否や
+ * `beforeValidate` のthrowで `beforeChange` へ到達せずに終わると、そのoperationが記録した
+ * intentは誰にも消費されず**孤児**になる。孤児を残したまま同じ `req` で同じdocumentへ
+ * 別の書き込み（`where` 指定のbulk update、`restoreVersion` など、自分ではintentを記録しない
+ * 経路）が走ると、その孤児を拾って「draft保存」と誤認しかねない。
+ * write operationの入口で毎回捨てれば、tokenが次のoperationまで生き延びること自体が無くなる。
+ */
+export function clearDraftIntents(req: PayloadRequest, collectionSlug: string): void {
+  const store = draftIntentStore(contextOf(req));
+  if (!store) return;
+  const prefix = `${collectionSlug}:`;
+  for (const key of [...store.keys()]) {
+    if (key.startsWith(prefix)) store.delete(key);
+  }
+}
+
 /**
  * `beforeOperation` で観測した Local API / REST の `draft` 引数を、同じrequestの
  * `beforeChange` から読めるように控える。
@@ -107,9 +145,8 @@ export function recordDraftIntent(
   draft: boolean,
 ): void {
   const context = contextOf(req);
-  const existing = context[DRAFT_INTENT_KEY];
-  const map = existing instanceof Map ? (existing as Map<string, boolean>) : new Map<string, boolean>();
-  map.set(draftIntentKey(collectionSlug, docId), draft);
+  const map = draftIntentStore(context) ?? new Map<string, DraftIntentEntry>();
+  map.set(draftIntentKey(collectionSlug, docId), { draft, context });
   context[DRAFT_INTENT_KEY] = map;
 }
 
@@ -133,10 +170,17 @@ export function recordDraftIntent(
  */
 export function readDraftIntent(req: PayloadRequest, collectionSlug: string, docId: string | number | undefined): boolean {
   if (docId === undefined) return false;
-  const map = contextOf(req)[DRAFT_INTENT_KEY];
-  if (!(map instanceof Map)) return false;
+  const context = contextOf(req);
+  const map = draftIntentStore(context);
+  if (!map) return false;
+
   const key = draftIntentKey(collectionSlug, docId);
-  const intent = map.get(key);
+  const entry = map.get(key);
+  // 使い捨て: 読んだ時点で必ず消す（自分のものでなかった場合も、次へ持ち越させない）。
   map.delete(key);
-  return intent === true;
+
+  if (!entry) return false;
+  // 別operationが記録したtoken（= 消費されずに残った孤児）は自分のものではない。
+  if (entry.context !== context) return false;
+  return entry.draft === true;
 }

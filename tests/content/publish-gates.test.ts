@@ -475,6 +475,126 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
       expect(anonymous?.description).toBe(PUBLISHED_DESCRIPTION);
     });
 
+    /**
+     * レビュー指摘 #3（fix round 2）の回帰テスト。
+     *
+     * `beforeOperation` は**access controlより前**に走るので、id指定のupdateが
+     * `beforeChange` へ到達せず終わった場合（access拒否、beforeValidateのthrow等）、
+     * そのoperationが記録したdraft intentは**誰にも消費されず孤児になる**。
+     *
+     * その後、同じ `req` で同じdocumentへ別の書き込みが走ると、孤児tokenを拾ってしまう。
+     * ここでは `restoreVersion` を使う。`restoreVersion` は collection の `beforeChange` を
+     * 走らせる一方、`beforeOperation` の operation は 'restoreVersion' なので自分では
+     * intentを記録しない。そして `draft` 引数なしの restore は
+     * `db.updateOne` で**main rowを直接書く**（復元元がdraft versionなら `_status: 'draft'`、
+     * つまり公開停止）。
+     *
+     * 孤児tokenを拾うと gate が「draft保存だから公開状態は動かない」と誤認し、
+     * content-draft-writer が公開中documentを公開停止できてしまう。
+     */
+    /**
+     * 上のorphanテストの対照実験。孤児tokenが無ければ `restoreVersion` は元々gateに弾かれる。
+     * これがpassし、かつorphan有りのテストがfailする、という組み合わせで
+     * 「孤児tokenの持ち越しこそが原因」だと特定できる。
+     */
+    it('rejects a content-draft-writer restoring a version onto a published document (no orphaned intent)', async () => {
+      const { draft, writer } = await seedPublished('gate-mfr-restore-baseline');
+
+      await payload.update({
+        collection: 'manufacturers',
+        id: draft.id,
+        overrideAccess: false,
+        draft: true,
+        user: writer,
+        data: { description: 'pending draft for the restore baseline' },
+      });
+      const { docs: versions } = await payload.findVersions({
+        collection: 'manufacturers',
+        where: { parent: { equals: draft.id } },
+        sort: '-createdAt',
+        limit: 1,
+        overrideAccess: true,
+        depth: 0,
+      });
+
+      await expect(
+        payload.restoreVersion({
+          collection: 'manufacturers',
+          id: String(versions[0].id),
+          overrideAccess: false,
+          user: writer,
+        }),
+      ).rejects.toThrow(/publish-role-required|publish-approval-required/);
+
+      const mainRow = await payload.findByID({ collection: 'manufacturers', id: draft.id, overrideAccess: true });
+      expect(mainRow._status).toBe('published');
+      expect(mainRow.description).toBe(PUBLISHED_DESCRIPTION);
+    });
+
+    it('does not let an orphaned draft intent from an aborted operation leak into a later write on the same request', async () => {
+      const { draft, writer } = await seedPublished('gate-mfr-orphan-intent');
+      const reader = await loginAs(payload, 'gate-reader@example.com');
+
+      // 公開中documentの上にpending draftを作る（restore対象）。
+      await payload.update({
+        collection: 'manufacturers',
+        id: draft.id,
+        overrideAccess: false,
+        draft: true,
+        user: writer,
+        data: { description: 'pending draft that must not be restorable by a draft writer' },
+      });
+      const { docs: versions } = await payload.findVersions({
+        collection: 'manufacturers',
+        where: { parent: { equals: draft.id } },
+        sort: '-createdAt',
+        limit: 1,
+        overrideAccess: true,
+        depth: 0,
+      });
+      const pendingDraftVersionId = versions[0].id;
+
+      const transactionID = await payload.db.beginTransaction();
+      if (transactionID === null) throw new Error('expected the postgres adapter to support transactions');
+      const req = { transactionID, context: { deploidOrphanProbe: true } } as unknown as PayloadRequest;
+
+      // 1) id指定のdraft保存を、access拒否されるuser（content-reader）で走らせる。
+      //    `beforeOperation` は走るので intent が記録され、access controlで落ちるため
+      //    `beforeChange` は走らず、その intent は消費されないまま残る。
+      await expect(
+        payload.update({
+          collection: 'manufacturers',
+          id: draft.id,
+          overrideAccess: false,
+          draft: true,
+          user: reader,
+          req,
+          data: { description: 'aborted before beforeChange' },
+        }),
+      ).rejects.toThrow();
+
+      // 2) 同じreqで、同じdocumentへ別種の書き込み（restoreVersion）を走らせる。
+      //    孤児tokenを拾ってはならない = gateはこれを「main rowを書く操作」として拒否する。
+      await expect(
+        payload.restoreVersion({
+          collection: 'manufacturers',
+          id: String(pendingDraftVersionId),
+          overrideAccess: false,
+          user: writer,
+          req,
+        }),
+      ).rejects.toThrow(/publish-role-required|publish-approval-required/);
+
+      await payload.db.commitTransaction(transactionID);
+
+      const mainRow = await payload.findByID({ collection: 'manufacturers', id: draft.id, overrideAccess: true });
+      expect(mainRow._status).toBe('published');
+      expect(mainRow.description).toBe(PUBLISHED_DESCRIPTION);
+
+      const anonymous = await readAnonymously('gate-mfr-orphan-intent');
+      expect(anonymous?.description).toBe(PUBLISHED_DESCRIPTION);
+    });
+
     it('rejects a plain content-publisher update that sends _status: published without an approval context', async () => {
       const writer = await loginAs(payload, 'gate-writer@example.com');
       const publisher = await loginAs(payload, 'gate-publisher@example.com');

@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import type { Access, CollectionBeforeOperationHook, Field, PayloadRequest, Where } from 'payload';
 import {
+  clearDraftIntents,
   readApprovedPublishAuthorization,
   readDraftIntent,
   readPrivilegedPublishAuthorization,
@@ -339,12 +340,31 @@ interface PublishTransitionCandidate {
  * 区別できるようにする（区別できないと、draft-writerのdraft保存を一律禁止するか、
  * unpublishを一律許すかの二択になる）。詳細は `lib/payload/publishAuthorization.ts`。
  */
+/**
+ * documentへ書き込みうるhook operation（`operationToHookOperation`、
+ * `node_modules/payload/dist/collections/operations/utilities/types.js`）。
+ * この入口で必ず、そのcollectionに溜まっているdraft intentを捨てる。
+ *
+ * read系（`read` / `count` / `countVersions` 等）を含めないのは、id指定updateの
+ * `beforeOperation` → `beforeChange` の**途中**で同じcollectionのreadが走った場合に、
+ * 正当なtokenまで消してしまうのを避けるため（消えると draft保存が拒否される方向＝
+ * fail-closed ではあるが、機能としては壊れる）。read系はそもそも `beforeChange` へ
+ * 到達しないので、孤児を「拾う」側にはならない。
+ */
+const DRAFT_INTENT_CLEARING_OPERATIONS = new Set(['create', 'update', 'delete', 'restoreVersion']);
+
 export const capturePublishIntentBeforeOperation = (({ args, collection, operation, req }: {
   args: { id?: string | number; draft?: boolean };
   collection: { slug: string };
   operation: string;
   req: PayloadRequest;
 }) => {
+  if (DRAFT_INTENT_CLEARING_OPERATIONS.has(operation)) {
+    // 直前のoperationがaccess拒否等で `beforeChange` へ到達せず残した孤児tokenを、
+    // このoperationが拾えないようにする（`restoreVersion` や `where` 指定のbulk updateは
+    // 自分ではintentを記録しないため、捨てないと拾えてしまう）。
+    clearDraftIntents(req, collection.slug);
+  }
   if (operation === 'update' && args?.id !== undefined) {
     recordDraftIntent(req, collection.slug, args.id, args.draft === true);
   }
