@@ -99,13 +99,19 @@ export function runPayloadCli(args: string[], env: EnvOverride): CliResult {
   };
 }
 
-/** `tsx <scriptPath> -- <args>` を子processとして実行する。`scripts/stamp-environment.mts` 用。 */
-export function runTsxScript(scriptPath: string, args: string[], env: EnvOverride): CliResult {
+/**
+ * `tsx <scriptPath> -- <args>` を子processとして実行する。`scripts/stamp-environment.mts` や
+ * `scripts/export-content-snapshot.mts`（content:export / content:restore）用。
+ *
+ * `timeoutMs` は既定30秒。content CLIはPayloadの起動に加えcosign署名（実AWS KMS往復）や
+ * 全collectionのparityを行うため、既定では足りないことがある。呼び出し側が延ばせるようにする。
+ */
+export function runTsxScript(scriptPath: string, args: string[], env: EnvOverride, timeoutMs = 30_000): CliResult {
   const result = spawnSync(TSX_BIN, [scriptPath, '--', ...args], {
     cwd: process.cwd(),
     env: { ...process.env, ...env },
     encoding: 'utf8',
-    timeout: 30_000,
+    timeout: timeoutMs,
   });
   return {
     status: result.status ?? -1,

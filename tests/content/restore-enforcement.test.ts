@@ -34,6 +34,7 @@ import {
   assertLocalThrowawayDatabase,
   createThrowawayDatabase,
   dropThrowawayDatabase,
+  runPayloadCli,
   runTsxScript,
   withDatabaseName,
 } from './migrationTestSupport';
@@ -54,6 +55,12 @@ import {
  * - restore 途中失敗後に成功表示しない
  */
 const clone = (snapshot: ContentSnapshot): ContentSnapshot => structuredClone(snapshot);
+
+// `tests/content/import-parity.test.ts` と同じ条件分岐。cosign バイナリと KMS credential が
+// 揃っている環境でだけ実署名テストを走らせる（CI では skip される）。
+// **file 先頭で定義する**: 下の describe だけでなく、実DB統合テストの `it.skipIf` からも
+// 参照するため（module 末尾に置くと collection 時点で TDZ になる）。
+const canSignForReal = cosignAvailable() && Boolean(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY);
 
 const LOCAL_TARGET: RestoreTargetIdentity = {
   environment: 'production',
@@ -227,6 +234,229 @@ describe('content:restore never pushes schema before verification (Critical #2)'
       await dropThrowawayDatabase(ambient, dbName);
     }
   }, 180_000);
+});
+
+/**
+ * review fix round 2: **DB側の強制ポイント**を実CLI + 実throwaway Postgres で検証する。
+ *
+ * round 1 では `assertRawInputTargetAllowed()` と baseline generation ledger の配線を
+ * 手動実行でしか確認しておらず、合成した `RestoreTargetIdentity` に対する純粋関数の単体テスト
+ * しか無かった。そのため**呼び出し箇所を消してもsuite全体がgreenのまま**という状態で、
+ * これはまさに Important #1 が指摘した「署名・記録されるだけで比較されない」パターンの再発だった。
+ * この2つは壊れると **fail open**（stamp済みDBでもraw inputが通る / replayが通る）なので、
+ * 実際の配線をテストで固定する。
+ */
+const PAYLOAD_SECRET = 'x'.repeat(32);
+const ADMIN_EMAIL = 'restore-integration@example.com';
+const ADMIN_PASSWORD = 'Str0ngPassw0rd!23';
+
+/** 最小の有効な snapshot。media も content も持たないので、restore が外部ファイルに依存しない。 */
+const EMPTY_SNAPSHOT = {
+  robots: [],
+  robotSeries: [],
+  distributors: [],
+  manufacturers: [],
+  useCases: [],
+  deployments: [],
+  articles: [],
+  articlePlacements: [],
+  articleIndexPlacementLimits: { hero: 5, feature: 2 },
+  media: [],
+  siteSettings: { dataAsOf: '2026-08' },
+};
+
+async function readLedger(databaseUrl: string): Promise<{ environment: string | null; generation: number | null }> {
+  const client = new Client({ connectionString: databaseUrl });
+  await client.connect();
+  try {
+    const { rows } = await client.query(
+      'select environment, last_restored_baseline_generation from "_environment_marker"',
+    );
+    if (rows.length === 0) return { environment: null, generation: null };
+    return {
+      environment: rows[0].environment as string | null,
+      generation: rows[0].last_restored_baseline_generation === null
+        ? null
+        : Number(rows[0].last_restored_baseline_generation),
+    };
+  } finally {
+    await client.end();
+  }
+}
+
+describe('restore/export enforcement against a real throwaway database', () => {
+  const ambient = process.env.DATABASE_URL as string;
+
+  beforeAll(() => {
+    assertLocalThrowawayDatabase('tests/content/restore-enforcement.test.ts', ambient);
+  });
+
+  /**
+   * review fix round 2 / Critical #2 の残り半分。`content:export --source payload` は
+   * `readSnapshotFromSource()` 経由で `getPayload()` を呼ぶため、round 1 で
+   * `resolveExportProvenance()` の中に置いた guard では**間に合っていなかった**
+   * （接続が先、guard が後）。restore 側と同じ方法で確認する。
+   */
+  it('content:export --source payload never pushes schema to an unmigrated database', async () => {
+    const dbName = 'deploid_export_nopush_test';
+    await createThrowawayDatabase(ambient, dbName);
+    const targetUrl = withDatabaseName(ambient, dbName);
+    try {
+      const outPath = path.join(await mkdtemp(path.join(os.tmpdir(), 'deploid-export-nopush-')), 'snapshot.json');
+      const result = runTsxScript(
+        'scripts/export-content-snapshot.mts',
+        ['--source', 'payload', '--out', outPath],
+        { DATABASE_URL: targetUrl, PAYLOAD_SECRET },
+        120_000,
+      );
+      expect(result.status).not.toBe(0);
+
+      const client = new Client({ connectionString: targetUrl });
+      await client.connect();
+      try {
+        const { rows } = await client.query(
+          "select table_name from information_schema.tables where table_schema = 'public'",
+        );
+        expect(
+          rows.map((row) => row.table_name as string),
+          'content:export must not create any table',
+        ).toEqual([]);
+      } finally {
+        await client.end();
+      }
+    } finally {
+      await dropThrowawayDatabase(ambient, dbName);
+    }
+  }, 300_000);
+
+  /**
+   * review fix round 2 / Critical #1 の統合テスト。報告書に手動確認として書いていたシナリオを
+   * 自動化する: `environment:stamp` で `preview` と刻んだDBは、**localhost であっても**
+   * 未署名 raw `--input` を拒否する。`assertRawInputTargetAllowed()` の呼び出しを外すと落ちる。
+   */
+  it('refuses a raw --input restore against a database stamped preview, even on localhost', async () => {
+    const dbName = 'deploid_stamped_refusal_test';
+    await createThrowawayDatabase(ambient, dbName);
+    const targetUrl = withDatabaseName(ambient, dbName);
+    try {
+      expect(runPayloadCli(['migrate'], { DATABASE_URL: targetUrl, PAYLOAD_SECRET }).status).toBe(0);
+      const stamped = runTsxScript('scripts/stamp-environment.mts', ['--expected', 'preview'], {
+        DATABASE_URL: targetUrl,
+        PAYLOAD_SECRET,
+        DEPLOYMENT_ENV: 'preview',
+      });
+      expect(stamped.status, `${stamped.stdout}\n${stamped.stderr}`).toBe(0);
+
+      const snapshotPath = path.join(await mkdtemp(path.join(os.tmpdir(), 'deploid-stamped-')), 'snapshot.json');
+      await writeFile(snapshotPath, canonicalJson(EMPTY_SNAPSHOT), 'utf8');
+
+      const result = runTsxScript(
+        'scripts/export-content-snapshot.mts',
+        ['--restore', '--input', snapshotPath, '--bootstrap-admin', '--admin-email', ADMIN_EMAIL, '--admin-password', ADMIN_PASSWORD],
+        { DATABASE_URL: targetUrl, PAYLOAD_SECRET },
+        120_000,
+      );
+
+      expect(result.status).not.toBe(0);
+      const output = `${result.stdout}${result.stderr}`;
+      expect(output).toMatch(/restore-raw-input-refused/);
+      expect(output).toMatch(/identifies itself as "preview"/);
+    } finally {
+      await dropThrowawayDatabase(ambient, dbName);
+    }
+  }, 300_000);
+
+  /**
+   * review fix round 2 / Important #1 の統合テスト。実CLIを2回呼び、
+   * **正規に署名された古い世代の baseline** が操作者フラグ無しで拒否され、
+   * ledger が巻き戻らないことを確認する。実 AWS KMS 署名が要るので credential がある環境のみ。
+   */
+  it.skipIf(!canSignForReal)(
+    'records the restored baseline generation and refuses a signed older one afterwards',
+    async () => {
+      const dbName = 'deploid_generation_ledger_test';
+      await createThrowawayDatabase(ambient, dbName);
+      const targetUrl = withDatabaseName(ambient, dbName);
+      const storeDir = await mkdtemp(path.join(os.tmpdir(), 'deploid-gen-store-'));
+      const env = {
+        DATABASE_URL: targetUrl,
+        PAYLOAD_SECRET,
+        PREVIEW_AUDIT_BLOB_TOKEN_STORE_ID: 'store_test_preview',
+        PAYLOAD_IMPORT_ADMIN_EMAIL: ADMIN_EMAIL,
+        PAYLOAD_IMPORT_ADMIN_PASSWORD: ADMIN_PASSWORD,
+      };
+
+      try {
+        expect(runPayloadCli(['migrate'], env).status).toBe(0);
+
+        // 1. seed（まだ stamp していないので raw --input が使える）。
+        const snapshotPath = path.join(storeDir, 'seed.json');
+        await writeFile(snapshotPath, canonicalJson(EMPTY_SNAPSHOT), 'utf8');
+        const seeded = runTsxScript(
+          'scripts/export-content-snapshot.mts',
+          ['--restore', '--input', snapshotPath, '--bootstrap-admin'],
+          env,
+          180_000,
+        );
+        expect(seeded.status, `${seeded.stdout}\n${seeded.stderr}`).toBe(0);
+
+        // 2. preview として刻む（ここから ledger の強制が効く）。
+        expect(runTsxScript('scripts/stamp-environment.mts', ['--expected', 'preview'], { ...env, DEPLOYMENT_ENV: 'preview' }).status).toBe(0);
+
+        const exportBaseline = (generation: number, manifestOut: string) =>
+          runTsxScript(
+            'scripts/export-content-snapshot.mts',
+            [
+              '--source', 'payload', '--upload', '--store', 'local-disk', '--store-dir', storeDir,
+              '--manifest-out', manifestOut, '--exported-by', 'ledger-test',
+              '--baseline-generation', String(generation),
+            ],
+            env,
+            300_000,
+          );
+
+        const gen5Manifest = path.join(storeDir, 'gen5.json');
+        const exported5 = exportBaseline(5, gen5Manifest);
+        expect(exported5.status, `${exported5.stdout}\n${exported5.stderr}`).toBe(0);
+
+        // 3. generation 5 を restore → 成功し、ledger へ記録される。
+        const restored5 = runTsxScript(
+          'scripts/export-content-snapshot.mts',
+          ['--restore', '--manifest', gen5Manifest],
+          env,
+          300_000,
+        );
+        expect(restored5.status, `${restored5.stdout}\n${restored5.stderr}`).toBe(0);
+        expect(restored5.stdout).toMatch(/recorded baseline generation 5/);
+        expect(await readLedger(targetUrl)).toEqual({ environment: 'preview', generation: 5 });
+
+        // 4. **正規に署名された** generation 2 を作る（署名は本物、世代だけ古い）。
+        const gen2Manifest = path.join(storeDir, 'gen2.json');
+        const exported2 = exportBaseline(2, gen2Manifest);
+        expect(exported2.status, `${exported2.stdout}\n${exported2.stderr}`).toBe(0);
+
+        // 5. 操作者フラグを一切渡さずに restore → 世代チェックだけで拒否されなければならない。
+        const replayed = runTsxScript(
+          'scripts/export-content-snapshot.mts',
+          ['--restore', '--manifest', gen2Manifest],
+          env,
+          300_000,
+        );
+        expect(replayed.status).not.toBe(0);
+        const output = `${replayed.stdout}${replayed.stderr}`;
+        expect(output).toMatch(/FAIL baselineGeneration/);
+        expect(output).toMatch(/already restored generation 5/);
+        expect(output).toMatch(/No database change was made/);
+
+        // 6. ledger は巻き戻っていない。
+        expect(await readLedger(targetUrl)).toEqual({ environment: 'preview', generation: 5 });
+      } finally {
+        await rm(storeDir, { recursive: true, force: true });
+        await dropThrowawayDatabase(ambient, dbName);
+      }
+    },
+    900_000,
+  );
 });
 
 // ─── 必須修正6-3: 対象DB identity の照合 ──────────────────────────────────
@@ -455,10 +685,6 @@ describe('signed baseline envelope (必須修正6-10)', () => {
 });
 
 // ─── 実 cosign + 実 AWS KMS 署名でのパイプライン全体 ───────────────────────
-//
-// `tests/content/import-parity.test.ts` と同じ条件分岐。cosign バイナリと KMS credential が
-// 揃っている環境でだけ実行する（CI では skip される）。
-const canSignForReal = cosignAvailable() && Boolean(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY);
 
 describe.skipIf(!canSignForReal)('signed restore pipeline against the real KMS key', () => {
   const buildBaseline = async (dir: string, provenance = MATCHING_PROVENANCE) => {

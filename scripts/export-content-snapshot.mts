@@ -636,6 +636,16 @@ async function runExport(args: Map<string, string | true>): Promise<void> {
     throw new Error('content:export requires --source local|payload (no implicit source selection).');
   }
 
+  // review fix round 2 / Critical #2 の残り半分: **DBへ接続する前に**push を止める。
+  //
+  // round 1 では `resolveExportProvenance()` の中でこれを設定していたが、それは
+  // `readSnapshotFromSource('payload')` が `getPayload()` を呼んで**既に接続した後**だった。
+  // つまり `content:export --source payload --upload`（cutover baseline を取る本来の経路で、
+  // managed DB に対して実行される）は、修正前とまったく同じ dev schema push と
+  // 対話プロンプトのリスクに晒されたままだった。export は読み取り操作であって
+  // schema を変える権限を持たない。詳細は `runRestore` の同じ guard の docblock を参照。
+  process.env.PAYLOAD_MIGRATING = 'true';
+
   const snapshot = await readSnapshotFromSource(source);
   const counts = countRecords(snapshot);
   process.stdout.write(
