@@ -41,10 +41,12 @@ import {
   resolveImportUser,
 } from './import-content-to-payload.mts';
 import {
+  assertRawInputTargetAllowed,
   assertRestoreInputModeAllowed,
   checkImportOutcome,
   isLocalDatabaseHost,
   readRestoreTargetIdentity,
+  recordRestoredBaseline,
   verifyBaselineBeforeRestore,
 } from './restore-preflight.mts';
 import { parseContentSnapshotJson } from './snapshotSchema.mts';
@@ -709,6 +711,9 @@ async function resolveExportProvenance(
     throw new Error('--upload requires --baseline-generation <integer> (monotonic; guards against replaying an older baseline).');
   }
 
+  // Critical #2 と同じ理由: export も schema を変えてはならない（`runRestore` の docblock 参照）。
+  process.env.PAYLOAD_MIGRATING = 'true';
+
   const { getPayload } = await import('payload');
   const { default: config } = await import('../payload.config.ts');
   const payload = await getPayload({ config });
@@ -759,9 +764,25 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
     hasRawInput: typeof inputPath === 'string',
     isLocalHost: isLocalDatabaseHost(databaseUrl),
     explicitTestMode: args.has('test-mode'),
+    nodeEnv: process.env.NODE_ENV,
   });
 
   assertWritableDatabase(args, 'scripts/export-content-snapshot.mts --restore');
+
+  // review fix round 1 / Critical #2: **config を import する前に**push を止める。
+  //
+  // `getPayload()` は `NODE_ENV !== 'production'` かつ adapter が `push: false` でない限り
+  // dev-mode schema push（`@payloadcms/drizzle` の `pushDevSchema`）を走らせ、実際に DDL を
+  // 実行して `payload_migrations` へ `batch: -1` の行を INSERT する。これが検証より前に
+  // 起きていたため、後段の「refusing to write. No database change was made.」は**事実に反して
+  // いた**（改ざん envelope でも managed DB の schema が同期されてしまう）。さらに drizzle が
+  // data-loss 警告を出す場合は対話 prompt が起動し、非TTY実行では `onCancel` の
+  // `process.exit(0)` で「何もしていないのに exit 0」になり得た。
+  //
+  // `scripts/stamp-environment.mts` が同じ理由で同じ1行を使っている（そちらの docblock 参照）。
+  // restore は schema を変えてはならない操作なので、push を止めるのは制約ではなく仕様。
+  // schema が無い DB への restore は「table が無い」というエラーで正しく落ちる。
+  process.env.PAYLOAD_MIGRATING = 'true';
 
   const { getPayload } = await import('payload');
   const { default: config } = await import('../payload.config.ts');
@@ -770,6 +791,7 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
   try {
     let snapshot: ContentSnapshot;
     let sourceLabel: string;
+    let verifiedProvenance: BaselineProvenance | undefined;
 
     if (typeof manifestPath === 'string') {
       const envelope = JSON.parse(await readFile(manifestPath, 'utf8')) as unknown;
@@ -800,6 +822,7 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
       }
 
       snapshot = verification.verified.snapshot;
+      verifiedProvenance = verification.verified.provenance;
       sourceLabel = `signed baseline ${verification.verified.provenance.baselineRunId}`;
       process.stdout.write(
         'preflight: manifest signature, artifact signature, sha256, snapshot schema, record counts, ' +
@@ -808,6 +831,10 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
     } else {
       // localhost の throwaway DB か明示的 test mode だけがここへ来る。それでも
       // bare cast はしない（必須修正6-4: 厳密な runtime schema 検証は入力形式を問わず通す）。
+      // Critical #1 の後段: DB 自身の申告で production / preview を拒否する。
+      // `NODE_ENV` と違い、これは restore の呼び出し側が書き換えられない。
+      assertRawInputTargetAllowed(await readRestoreTargetIdentity(payload, databaseUrl));
+
       snapshot = parseContentSnapshotJson(await readFile(inputPath as string, 'utf8'));
       sourceLabel = `unsigned snapshot ${inputPath}`;
       process.stdout.write(`preflight: strict snapshot schema OK (unsigned input, local/test target)\n`);
@@ -848,6 +875,16 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
       process.stderr.write('content:restore: NOT successful — the database was modified but does not match the artifact.\n');
       process.exitCode = 1;
       return;
+    }
+
+    // review fix round 1 / Important #1: 成功したときだけ世代を記録する。次回以降、これより
+    // 古い世代の artifact は署名が本物でも `baselineGeneration` チェックで拒否される。
+    if (verifiedProvenance) {
+      await recordRestoredBaseline(payload, verifiedProvenance);
+      process.stdout.write(
+        `recorded baseline generation ${verifiedProvenance.baselineGeneration} ` +
+          `(run ${verifiedProvenance.baselineRunId}) on this database\n`,
+      );
     }
 
     process.stdout.write('content:restore: OK — the database matches the artifact on every collection.\n');

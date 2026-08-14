@@ -1,7 +1,7 @@
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import type { ContentSnapshot } from '@/lib/content/contracts';
 import { countRecords } from '@/scripts/compare-content-sources.mts';
 import {
@@ -18,6 +18,7 @@ import {
 } from '@/scripts/export-content-snapshot.mts';
 import { createDefaultMediaFileResolver, resolveWithinRoot } from '@/scripts/import-content-to-payload.mts';
 import {
+  assertRawInputTargetAllowed,
   assertRestoreInputModeAllowed,
   checkImportOutcome,
   checkProvenanceAgainstTarget,
@@ -28,7 +29,14 @@ import {
   type RestoreTargetIdentity,
 } from '@/scripts/restore-preflight.mts';
 import { contentSnapshotFixture } from '@/tests/fixtures/contentSnapshot';
-import { runTsxScript } from './migrationTestSupport';
+import { Client } from 'pg';
+import {
+  assertLocalThrowawayDatabase,
+  createThrowawayDatabase,
+  dropThrowawayDatabase,
+  runTsxScript,
+  withDatabaseName,
+} from './migrationTestSupport';
 
 /**
  * remediation group 2 / 必須修正6 の負テスト。
@@ -52,6 +60,7 @@ const LOCAL_TARGET: RestoreTargetIdentity = {
   databaseResourceId: 'db.example.supabase.co:5432/postgres#prodref',
   schemaVersion: '20260814_020026_site_settings_data_as_of_and_placement_limits',
   auditBlobStoreId: 'store_deploid_audit_production',
+  lastRestoredBaselineGeneration: null,
   isLocalHost: false,
 };
 
@@ -85,8 +94,44 @@ describe('restore input mode (必須修正6-1 / 6-2)', () => {
     expect(() => call({ hasRawInput: true, isLocalHost: true })).not.toThrow();
   });
 
-  it('allows an unsigned raw --input only with an explicit test mode off-localhost', () => {
-    expect(() => call({ hasRawInput: true, isLocalHost: false, explicitTestMode: true })).not.toThrow();
+  /**
+   * review fix round 1 / Critical #1: `--test-mode` は**単独では効かない**。
+   * 効いてしまうと `--input evil.json --test-mode --i-know-this-is-production` で
+   * 未署名 JSON を managed production DB へ書き込めてしまい、監査が指摘した穴と
+   * 区別が付かない抜け道になる。
+   */
+  it('refuses --test-mode on its own — the flag alone proves nothing', () => {
+    expect(() => call({ hasRawInput: true, isLocalHost: false, explicitTestMode: true })).toThrow(
+      /restore-raw-input-refused/,
+    );
+    expect(() =>
+      call({ hasRawInput: true, isLocalHost: false, explicitTestMode: true, nodeEnv: 'production' }),
+    ).toThrow(/restore-raw-input-refused/);
+  });
+
+  it('accepts --test-mode only under a real test runner (NODE_ENV=test)', () => {
+    expect(() =>
+      call({ hasRawInput: true, isLocalHost: false, explicitTestMode: true, nodeEnv: 'test' }),
+    ).not.toThrow();
+  });
+
+  it('refuses NODE_ENV=test without the explicit flag', () => {
+    expect(() => call({ hasRawInput: true, isLocalHost: false, nodeEnv: 'test' })).toThrow(
+      /restore-raw-input-refused/,
+    );
+  });
+
+  /**
+   * 二段構えの後段。`NODE_ENV` は操作者が立てられるが、`_environment_marker` は
+   * `environment:stamp` が書く DB 自身の申告で、restore 側からは偽装できない。
+   */
+  it('refuses an unsigned input whenever the database says it is production or preview', () => {
+    for (const environment of ['production', 'preview'] as const) {
+      expect(() => assertRawInputTargetAllowed({ ...LOCAL_TARGET, environment })).toThrow(
+        /restore-raw-input-refused/,
+      );
+    }
+    expect(() => assertRawInputTargetAllowed({ ...LOCAL_TARGET, environment: null })).not.toThrow();
   });
 
   it('allows --manifest against a managed database', () => {
@@ -127,6 +172,61 @@ describe('content:restore CLI refuses an unsigned input against a managed databa
     // 「接続できなかった」ではなく「入力形式で拒否した」ことを確かめる。
     expect(`${result.stdout}${result.stderr}`).not.toMatch(/ENOTFOUND|ECONNREFUSED|getaddrinfo/);
   }, 120_000);
+});
+
+/**
+ * review fix round 1 / Critical #2 の回帰テスト。
+ *
+ * `getPayload({ config })` は Payload の dev-mode schema push（`pushDevSchema`）を走らせ、
+ * **実際に DDL を実行して `payload_migrations` へ `batch: -1` の行を INSERT する**。
+ * これが検証より前に起きていたため、「refusing to write. No database change was made.」は
+ * 事実に反していた（改ざん envelope でも managed DB へ schema sync が走る）。
+ *
+ * `scripts/stamp-environment.mts` と同じく `PAYLOAD_MIGRATING = 'true'` を config import より
+ * 前に置いて push を止める。**空の（migrate していない）DB へ restore を向けて、
+ * table が1つも作られないこと**で確認する — push が走れば全 table が出来てしまうので、
+ * これは素通しできない検査になる。
+ */
+describe('content:restore never pushes schema before verification (Critical #2)', () => {
+  const ambient = process.env.DATABASE_URL as string;
+  const dbName = 'deploid_restore_nopush_test';
+
+  beforeAll(() => {
+    assertLocalThrowawayDatabase('tests/content/restore-enforcement.test.ts', ambient);
+  });
+
+  it('leaves an unmigrated target database completely untouched', async () => {
+    await createThrowawayDatabase(ambient, dbName);
+    const targetUrl = withDatabaseName(ambient, dbName);
+    try {
+      const snapshotPath = path.join(await mkdtemp(path.join(os.tmpdir(), 'deploid-nopush-')), 'snapshot.json');
+      await writeFile(snapshotPath, canonicalJson(contentSnapshotFixture), 'utf8');
+
+      const result = runTsxScript(
+        'scripts/export-content-snapshot.mts',
+        ['--restore', '--input', snapshotPath, '--bootstrap-admin', '--admin-email', 'nopush@example.com', '--admin-password', 'Str0ngPassw0rd!23'],
+        { DATABASE_URL: targetUrl, PAYLOAD_SECRET: 'x'.repeat(32) },
+      );
+      expect(result.status).not.toBe(0);
+
+      // schema push が走っていたら Payload の table が一式出来ている。
+      const client = new Client({ connectionString: targetUrl });
+      await client.connect();
+      try {
+        const { rows } = await client.query(
+          "select table_name from information_schema.tables where table_schema = 'public'",
+        );
+        expect(
+          rows.map((row) => row.table_name as string),
+          'restore must not create any table before its checks pass',
+        ).toEqual([]);
+      } finally {
+        await client.end();
+      }
+    } finally {
+      await dropThrowawayDatabase(ambient, dbName);
+    }
+  }, 180_000);
 });
 
 // ─── 必須修正6-3: 対象DB identity の照合 ──────────────────────────────────
@@ -178,6 +278,30 @@ describe('provenance vs the real restore target (必須修正6-3)', () => {
       expectedBaselineRunId: 'baseline-2026-01-01T00:00:00.000Z-old',
     });
     expect(failures.map((failure) => failure.check)).toContain('baselineRunId');
+  });
+
+  /**
+   * review fix round 1 / Important #1: 世代チェックは**無条件**。
+   * `--expected-baseline-run-id` を渡さなくても、DBが記録している「これまでに適用した最大世代」
+   * より古い artifact は拒否される。
+   */
+  it('rejects an older baseline generation than the one this database already restored', () => {
+    const target = { ...LOCAL_TARGET, lastRestoredBaselineGeneration: 9 };
+    const failures = checkProvenanceAgainstTarget(MATCHING_PROVENANCE, target);
+    expect(failures.map((failure) => failure.check)).toContain('baselineGeneration');
+    expect(failures.find((failure) => failure.check === 'baselineGeneration')?.detail).toMatch(
+      /already restored generation 9/,
+    );
+  });
+
+  it('allows re-applying the same generation (a retry is not a rollback)', () => {
+    const target = { ...LOCAL_TARGET, lastRestoredBaselineGeneration: MATCHING_PROVENANCE.baselineGeneration };
+    expect(checkProvenanceAgainstTarget(MATCHING_PROVENANCE, target)).toEqual([]);
+  });
+
+  it('allows moving forward to a newer generation', () => {
+    const target = { ...LOCAL_TARGET, lastRestoredBaselineGeneration: 1 };
+    expect(checkProvenanceAgainstTarget(MATCHING_PROVENANCE, target)).toEqual([]);
   });
 
   it('rejects an environment the operator did not expect', () => {
@@ -287,14 +411,12 @@ describe('restore outcome (必須修正6-8)', () => {
   it('does not call a restore successful when media was skipped', () => {
     const failures = checkImportOutcome({
       skippedMedia: [{ stableId: 'media:/x.png', src: '/x.png', reason: 'local-file-not-found', usedBy: [] }],
-      created: {},
-      updated: {},
     });
     expect(failures.map((failure) => failure.check)).toEqual(['skippedMedia']);
   });
 
   it('accepts a restore that skipped nothing', () => {
-    expect(checkImportOutcome({ skippedMedia: [], created: {}, updated: {} })).toEqual([]);
+    expect(checkImportOutcome({ skippedMedia: [] })).toEqual([]);
   });
 });
 

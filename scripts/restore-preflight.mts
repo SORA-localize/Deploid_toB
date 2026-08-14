@@ -40,6 +40,11 @@ export interface RestoreTargetIdentity {
   schemaVersion: string;
   /** この環境向けに配線されている private audit blob store ID（未配線なら `null`）。 */
   auditBlobStoreId: string | null;
+  /**
+   * これまでにこのDBへ適用した baseline の最大世代（`_environment_marker` の記録）。
+   * marker row が無い（= local throwaway）場合は `null`。
+   */
+  lastRestoredBaselineGeneration: number | null;
   /** host が localhost 系か。raw `--input` を許すかの判定に使う。 */
   isLocalHost: boolean;
 }
@@ -86,7 +91,13 @@ export async function readSchemaVersion(payload: Payload): Promise<string> {
   return latest ?? 'none';
 }
 
-export async function readEnvironmentMarker(payload: Payload): Promise<RestoreTargetIdentity['environment']> {
+export interface EnvironmentMarkerRow {
+  id: string | number;
+  environment: 'production' | 'preview' | null;
+  lastRestoredBaselineGeneration: number | null;
+}
+
+export async function readEnvironmentMarker(payload: Payload): Promise<EnvironmentMarkerRow | null> {
   const { docs } = await payload.find({
     collection: 'environment-marker',
     limit: 2,
@@ -100,7 +111,44 @@ export async function readEnvironmentMarker(payload: Payload): Promise<RestoreTa
         '`singleton` should make this impossible — investigate before restoring anything.',
     );
   }
-  return (docs[0] as { environment?: 'production' | 'preview' }).environment ?? null;
+  const row = docs[0] as {
+    id: string | number;
+    environment?: 'production' | 'preview';
+    lastRestoredBaselineGeneration?: number | null;
+  };
+  return {
+    id: row.id,
+    environment: row.environment ?? null,
+    lastRestoredBaselineGeneration:
+      typeof row.lastRestoredBaselineGeneration === 'number' ? row.lastRestoredBaselineGeneration : null,
+  };
+}
+
+/**
+ * review fix round 1 / Important #1: restore 成功後に「適用した世代」を記録する。
+ * 次回以降、これより古い世代の artifact は署名が本物でも拒否される。
+ *
+ * marker row が無い DB（local throwaway）では記録先が無いので何もしない。世代強制が効くのは
+ * `environment:stamp` 済みの DB、つまり preview / production——強制したい対象そのもの。
+ */
+export async function recordRestoredBaseline(
+  payload: Payload,
+  provenance: BaselineProvenance,
+): Promise<void> {
+  const marker = await readEnvironmentMarker(payload);
+  if (!marker) return;
+  const previous = marker.lastRestoredBaselineGeneration;
+  await payload.update({
+    collection: 'environment-marker',
+    id: marker.id,
+    overrideAccess: true,
+    data: {
+      // 単調にしか進めない（同一世代の retry で世代を下げない）。
+      lastRestoredBaselineGeneration: Math.max(provenance.baselineGeneration, previous ?? provenance.baselineGeneration),
+      lastRestoredBaselineRunId: provenance.baselineRunId,
+      lastRestoredAt: new Date().toISOString(),
+    } as never,
+  });
 }
 
 export async function readRestoreTargetIdentity(
@@ -108,12 +156,14 @@ export async function readRestoreTargetIdentity(
   databaseUrl: string,
   env: Record<string, string | undefined> = process.env,
 ): Promise<RestoreTargetIdentity> {
-  const environment = await readEnvironmentMarker(payload);
+  const marker = await readEnvironmentMarker(payload);
+  const environment = marker?.environment ?? null;
   return {
     environment,
     databaseResourceId: databaseResourceId(databaseUrl),
     schemaVersion: await readSchemaVersion(payload),
     auditBlobStoreId: auditBlobStoreIdFor(environment, env),
+    lastRestoredBaselineGeneration: marker?.lastRestoredBaselineGeneration ?? null,
     isLocalHost: isLocalDatabaseHost(databaseUrl),
   };
 }
@@ -131,6 +181,8 @@ export function assertRestoreInputModeAllowed(args: {
   hasRawInput: boolean;
   isLocalHost: boolean;
   explicitTestMode: boolean;
+  /** `process.env.NODE_ENV`。`--test-mode` は単独では効かない（下記 Critical #1）。 */
+  nodeEnv?: string;
 }): void {
   if (args.hasManifest && args.hasRawInput) {
     throw new Error('content:restore takes either --manifest or --input, not both.');
@@ -139,13 +191,45 @@ export function assertRestoreInputModeAllowed(args: {
     throw new Error('content:restore requires --manifest <signed-envelope.json> (or --input for a local throwaway DB).');
   }
   if (args.hasManifest) return;
+  if (args.isLocalHost) return;
 
-  if (!args.isLocalHost && !args.explicitTestMode) {
+  // review fix round 1 / Critical #1: `--test-mode` を**操作者がタイプするだけでは主張できない
+  // 事実**へ紐付ける。
+  //
+  // 修正前は `args.has('test-mode')` だけを見ていたため、
+  // `--input evil.json --test-mode --i-know-this-is-production` で未署名 JSON を managed
+  // production DB へ書き込めた。元の監査指摘（「フラグさえ付ければ書き込める」）に対して
+  // フラグが1つ増えただけで、保証は何も増えていない状態だった。
+  //
+  // ここでは `NODE_ENV === 'test'` を要求する（test runner が設定するもので、本番運用の
+  // shell では立たない）。これに加えて、接続後に `assertRawInputTargetAllowed()` が
+  // `_environment_marker` を見て production / preview を拒否する（二段構え。片方は
+  // プロセス環境、もう片方は**DB自身の申告**で、どちらも CLI 引数では偽装できない）。
+  if (!args.explicitTestMode || args.nodeEnv !== 'test') {
     throw new Error(
       'restore-raw-input-refused: --input accepts an unsigned snapshot file and is only allowed against a ' +
-        'local throwaway database (or with an explicit --test-mode). Restoring into a managed database ' +
-        'requires --manifest <signed-envelope.json> so the artifact\'s signature, checksum and provenance ' +
-        'are verified before anything is written.',
+        'local throwaway database, or under a real test runner (--test-mode together with NODE_ENV=test). ' +
+        'Restoring into a managed database requires --manifest <signed-envelope.json> so the artifact\'s ' +
+        'signature, checksum and provenance are verified before anything is written.',
+    );
+  }
+}
+
+/**
+ * review fix round 1 / Critical #1 の後段。**接続後・書き込み前**に、raw `--input` の対象が
+ * 本当に throwaway かを **DB 自身の申告**（`_environment_marker`）で確かめる。
+ *
+ * `NODE_ENV=test` はプロセス環境なので、その気になれば操作者が立てられる。`_environment_marker`
+ * は `environment:stamp` が deploy pipeline から一度だけ書き込む行で、restore の呼び出し側が
+ * 書き換えられるものではない。production / preview と申告している DB は、フラグが何であろうと
+ * 未署名入力を受け付けない。
+ */
+export function assertRawInputTargetAllowed(target: RestoreTargetIdentity): void {
+  if (target.environment === 'production' || target.environment === 'preview') {
+    throw new Error(
+      `restore-raw-input-refused: this database identifies itself as "${target.environment}" via ` +
+        '_environment_marker. An unsigned --input snapshot is never accepted there, regardless of ' +
+        '--test-mode or --i-know-this-is-production. Use --manifest <signed-envelope.json>.',
     );
   }
 }
@@ -208,11 +292,29 @@ export function checkProvenanceAgainstTarget(
   }
 
   // 必須修正6-10: 古い正規 artifact の replay を防ぐ。run ID は署名対象（manifest）の中にあるので
-  // 書き換えられない。オペレーターがどの baseline を戻すのか明示することを要求する。
+  // 書き換えられない。オペレーターがどの baseline を戻すのか明示した場合はそれと照合する。
   if (options.expectedBaselineRunId && options.expectedBaselineRunId !== provenance.baselineRunId) {
     failures.push({
       check: 'baselineRunId',
       detail: `operator expected baseline run "${options.expectedBaselineRunId}" but the artifact is run "${provenance.baselineRunId}" (generation ${provenance.baselineGeneration})`,
+    });
+  }
+
+  // review fix round 1 / Important #1: **無条件の**世代チェック。
+  //
+  // 上の `expectedBaselineRunId` は操作者が明示したときだけ効く任意フラグなので、これ単独では
+  // 「古い正規 artifact の rollback/replay を防ぐ」（6-10）を強制できていなかった。
+  // `_environment_marker` に残した「これまでに適用した最大世代」より**古い**世代の artifact は、
+  // 署名が本物でもここで拒否する。同一世代の再適用は許す（restore が途中で失敗した後の
+  // やり直しは正当な操作で、6-10 が防ぎたいのは巻き戻しだから）。
+  const applied = target.lastRestoredBaselineGeneration;
+  if (applied !== null && provenance.baselineGeneration < applied) {
+    failures.push({
+      check: 'baselineGeneration',
+      detail:
+        `artifact is baseline generation ${provenance.baselineGeneration} but this database has already ` +
+        `restored generation ${applied}. Replaying an older baseline would roll content back; if this is ` +
+        'a deliberate rollback, export a new baseline from the artifact you want and restore that instead.',
     });
   }
 
@@ -338,14 +440,26 @@ export async function verifyBaselineBeforeRestore(
 }
 
 /**
- * 必須修正6-8: restore を「成功」と呼んでよいかの判定。
- * skipped media / 未解決 relationship / 部分 import が1件でもあれば成功にしない。
+ * 必須修正6-8のうち、**import report からしか分からない部分**だけを判定する。
+ *
+ * **この関数が見るのは `skippedMedia` だけ。**欠落レコード・未解決 relationship・部分 import は
+ * ここでは検出しない — それらは `runRestore` が restore 後に走らせる完全 parity
+ * （`compareSnapshots`）が `missing` / `changed` / `brokenReferences` として捕捉する。
+ * つまり 6-8 は**この関数と post-restore parity の両方が揃って初めて**満たされる。
+ * 片方だけを残して他方を外すと fail-closed ではなくなる。
+ *
+ * review fix round 1 / Important #2: 以前の docblock は「未解決 relationship・部分 import も
+ * カバーする」と書いていたが、実装は `skippedMedia` しか見ていなかった。将来 parity の呼び出しが
+ * 誤って外されたときに「checkImportOutcome がまだ見ているはず」という誤った安心を生むため、
+ * 記述を実装の範囲へ狭めた。（`created` / `updated` は受け取っていたが一度も読んでいなかったので
+ * 引数から外した。）
+ *
+ * `mediaRightsConflicts`（同じ src に複数の rights metadata）は**ここでは失敗にしない**。
+ * artifact 側にも復元側にも同じ重複レコードが出来るため artifact は忠実に復元されており、
+ * これは restore の失敗ではなく既知のデータ品質課題（Task 5 の human 判断待ち項目）だから。
+ * 失敗に格上げすると、その課題が解決されるまで**すべての実データ restore が通らなくなる**。
  */
-export function checkImportOutcome(report: {
-  skippedMedia: readonly unknown[];
-  created: Record<string, number>;
-  updated: Record<string, number>;
-}): RestoreCheckFailure[] {
+export function checkImportOutcome(report: { skippedMedia: readonly unknown[] }): RestoreCheckFailure[] {
   const failures: RestoreCheckFailure[] = [];
   if (report.skippedMedia.length > 0) {
     failures.push({

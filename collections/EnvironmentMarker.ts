@@ -48,5 +48,39 @@ export const EnvironmentMarkerCollection: CollectionConfig = {
       unique: true,
       admin: { hidden: true, description: 'Always 1. Unique constraint caps this table at a single row.' },
     },
+    /**
+     * review fix round 1 / Important #1（remediation group 2）: 最後に適用した baseline の世代。
+     *
+     * 必須修正6-3は「baseline generation/run ID」を**無条件の**書き込み前チェックとして挙げ、
+     * 6-10の目的も「古い正規artifactへのrollback/replayを防ぐ」と明記している。しかし
+     * `--expected-baseline-run-id` は操作者が渡したときだけ照合される任意フラグで、
+     * `baselineGeneration` は記録・署名・表示されるだけで何とも比較されていなかった
+     * （＝署名でカバーする側は完成しているのに、強制する側が運用任せになっていた）。
+     *
+     * 「最後に適用した世代」をDB側に残せば、それより**古い**世代のartifactは、署名が本物でも
+     * 拒否できる。ここへ置くのは、この行が既に「このDBが何者か」を持つ唯一のsingletonであり、
+     * content collectionではないためparityにも現れないから。
+     *
+     * 同一世代の再適用は**許す**。restoreが途中で失敗した後のやり直しは正当な操作で、
+     * 6-10が防ごうとしているのは巻き戻し（古いartifactの再適用）だから。
+     */
+    {
+      name: 'lastRestoredBaselineGeneration',
+      type: 'number',
+      admin: {
+        hidden: true,
+        description: 'Highest baseline generation ever restored into this database. Older generations are refused.',
+      },
+    },
+    {
+      name: 'lastRestoredBaselineRunId',
+      type: 'text',
+      admin: { hidden: true, description: 'baselineRunId of the most recently applied restore (audit trail).' },
+    },
+    {
+      name: 'lastRestoredAt',
+      type: 'text',
+      admin: { hidden: true, description: 'ISO timestamp of the most recently applied restore.' },
+    },
   ],
 };

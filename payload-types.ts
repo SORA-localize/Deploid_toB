@@ -1041,6 +1041,18 @@ export interface EnvironmentMarker {
    * Always 1. Unique constraint caps this table at a single row.
    */
   singleton: number;
+  /**
+   * Highest baseline generation ever restored into this database. Older generations are refused.
+   */
+  lastRestoredBaselineGeneration?: number | null;
+  /**
+   * baselineRunId of the most recently applied restore (audit trail).
+   */
+  lastRestoredBaselineRunId?: string | null;
+  /**
+   * ISO timestamp of the most recently applied restore.
+   */
+  lastRestoredAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1813,6 +1825,9 @@ export interface ContentRouteRegistrySelect<T extends boolean = true> {
 export interface EnvironmentMarkerSelect<T extends boolean = true> {
   environment?: T;
   singleton?: T;
+  lastRestoredBaselineGeneration?: T;
+  lastRestoredBaselineRunId?: T;
+  lastRestoredAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
