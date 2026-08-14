@@ -18,10 +18,9 @@
  * - `--input <snapshot.json>` — 手元の snapshot ファイルと Payload の一致だけを見る
  *   （Step 6.5 の export → restore round-trip 用。署名は介在しない）。
  */
-import { readFile, writeFile } from 'node:fs/promises';
+import { chmod, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
-import { mkdir } from 'node:fs/promises';
 import type { ContentSnapshot } from '../lib/content/contracts.ts';
 import {
   compareSnapshots,
@@ -33,13 +32,16 @@ import {
 import { exitCli, isDirectRun, parseArgs } from './contentCliSupport.mts';
 import {
   assertValidEnvelope,
+  baselineCompletionMarkerKey,
   canonicalJson,
+  removeTempDir,
   sha256Hex,
   storeFromManifest,
   verifyBlobWithCosign,
   verifyManifestSignature,
   type CutoverBaselineManifest,
 } from './export-content-snapshot.mts';
+import { checkBaselineCompletion, checkMediaInventory } from './restore-preflight.mts';
 import { parseContentSnapshotJson } from './snapshotSchema.mts';
 
 export interface SnapshotVerificationFailure {
@@ -75,9 +77,13 @@ export function verifyRecordCounts(
   return failures;
 }
 
+/**
+ * 必須修正11-1: 予測可能な名前の `mkdir` をやめ、`mkdtemp` + 0700 にする。
+ * 呼び出し側は必ず `finally` で `removeTempDir()` する（11-2: 平文 snapshot を /tmp へ残さない）。
+ */
 async function tempDir(): Promise<string> {
-  const dir = path.join(os.tmpdir(), `deploid-verify-${process.pid}-${Date.now()}`);
-  await mkdir(dir, { recursive: true });
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'deploid-verify-'));
+  await chmod(dir, 0o700);
   return dir;
 }
 
@@ -113,38 +119,63 @@ export async function loadVerifiedArtifact(
   const store = storeFromManifest(manifest);
   const artifact = await store.get(manifest.storage.objectKey);
   const signatureBundle = await store.get(manifest.signature.detachedSignatureObjectKey);
+  const completionMarker = await store
+    .get(baselineCompletionMarkerKey(manifest.storage.objectKey))
+    .catch(() => null);
 
+  // 必須修正11-1/11-2: 一時ディレクトリは**どの経路を通っても** finally で消す。
+  // 以前はここが早期 return のたびに漏れ、平文 snapshot が /tmp へ残り続けていた。
   const workDir = await tempDir();
-  const artifactPath = path.join(workDir, 'snapshot.json');
-  const bundlePath = path.join(workDir, 'snapshot.cosign.bundle');
-  await writeFile(artifactPath, artifact);
-  await writeFile(bundlePath, signatureBundle);
-
-  const signature = await verifyBlobWithCosign(artifactPath, bundlePath);
-  if (!signature.verified) {
-    return { failures: [{ check: 'signature', detail: signature.detail }] };
-  }
-
-  const digest = sha256Hex(artifact);
-  if (digest !== manifest.sha256) {
-    return {
-      failures: [{ check: 'sha256', detail: `manifest says ${manifest.sha256}, artifact hashes to ${digest}` }],
-    };
-  }
-
-  // 必須修正6-4: bare cast をやめ、厳密な runtime schema 検証を通す。verify 経路も
-  // restore と同じ入口を使う（片方だけ緩いと、緩いほうが実質の入口になる）。
-  let snapshot: ContentSnapshot;
   try {
-    snapshot = parseContentSnapshotJson(artifact.toString('utf8'));
-  } catch (error) {
-    return { failures: [{ check: 'snapshotSchema', detail: (error as Error).message }] };
+    const artifactPath = path.join(workDir, 'snapshot.json');
+    const bundlePath = path.join(workDir, 'snapshot.cosign.bundle');
+    await writeFile(artifactPath, artifact);
+    await writeFile(bundlePath, signatureBundle);
+
+    const signature = await verifyBlobWithCosign(artifactPath, bundlePath);
+    if (!signature.verified) {
+      return { failures: [{ check: 'signature', detail: signature.detail }] };
+    }
+
+    const digest = sha256Hex(artifact);
+    if (digest !== manifest.sha256) {
+      return {
+        failures: [{ check: 'sha256', detail: `manifest says ${manifest.sha256}, artifact hashes to ${digest}` }],
+      };
+    }
+
+    // 必須修正7-7: verify 側でも「完了していない run」を有効な baseline として扱わない。
+    const completionFailures = checkBaselineCompletion({
+      manifest,
+      completionMarker,
+      artifactSignatureBundle: signatureBundle,
+    });
+    if (completionFailures.length > 0) return { failures: completionFailures };
+
+    // 必須修正6-4: bare cast をやめ、厳密な runtime schema 検証を通す。verify 経路も
+    // restore と同じ入口を使う（片方だけ緩いと、緩いほうが実質の入口になる）。
+    let snapshot: ContentSnapshot;
+    try {
+      snapshot = parseContentSnapshotJson(artifact.toString('utf8'));
+    } catch (error) {
+      return { failures: [{ check: 'snapshotSchema', detail: (error as Error).message }] };
+    }
+
+    failures.push(...verifyRecordCounts(manifest, snapshot));
+    // 必須修正9-5: metadata parity だけでなく **binary inventory parity** も verify 経路で見る。
+    failures.push(
+      ...(await checkMediaInventory({
+        snapshot,
+        inventory: manifest.mediaInventory,
+        fetchMediaObject: (objectKey) => store.get(objectKey),
+      })),
+    );
+    if (failures.length > 0) return { failures };
+
+    return { snapshot, failures };
+  } finally {
+    await removeTempDir(workDir);
   }
-
-  failures.push(...verifyRecordCounts(manifest, snapshot));
-  if (failures.length > 0) return { failures };
-
-  return { snapshot, failures };
 }
 
 /** snapshot と Payload DB の全 collection 完全一致（ID集合・参照集合・公開状態を含む）。 */

@@ -6,6 +6,7 @@ import type { ContentSnapshot } from '@/lib/content/contracts';
 import { countRecords } from '@/scripts/compare-content-sources.mts';
 import {
   assertValidEnvelope,
+  baselineCompletionMarkerKey,
   canonicalJson,
   cosignAvailable,
   createLocalDiskObjectStore,
@@ -55,6 +56,12 @@ import {
  * - restore 途中失敗後に成功表示しない
  */
 const clone = (snapshot: ContentSnapshot): ContentSnapshot => structuredClone(snapshot);
+
+/** fixture の画像は repo に実体を持たないので、baseline へ同梱するテスト用の 1px PNG。 */
+const ONE_PX_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+  'base64',
+);
 
 // `tests/content/import-parity.test.ts` と同じ条件分岐。cosign バイナリと KMS credential が
 // 揃っている環境でだけ実署名テストを走らせる（CI では skip される）。
@@ -655,7 +662,14 @@ describe('restore outcome (必須修正6-8)', () => {
 describe('signed baseline envelope (必須修正6-10)', () => {
   const manifest: CutoverBaselineManifest = {
     provenance: MATCHING_PROVENANCE,
-    storage: { provider: 'vercel-blob', bucket: 'deploid-audit-production', objectKey: 'k.json', versionId: null },
+    storage: {
+      provider: 'vercel-blob',
+      bucket: 'deploid-audit-production',
+      storeId: 'store_deploid_audit_production',
+      objectKey: 'k.json',
+      versionId: null,
+    },
+    mediaInventory: [],
     sha256: 'a'.repeat(64),
     signature: { algorithm: 'cosign', keyId: 'arn:aws:kms:x:1:key/2', detachedSignatureObjectKey: 'k.json.cosign.bundle' },
     recordCounts: countRecords(contentSnapshotFixture) as CutoverBaselineManifest['recordCounts'],
@@ -694,6 +708,8 @@ describe.skipIf(!canSignForReal)('signed restore pipeline against the real KMS k
       store,
       exportedBy: 'restore-enforcement-test',
       provenance,
+      // 必須修正9: fixture の画像は repo に実体が無いので、テスト用の 1px PNG を同梱する。
+      resolveMediaBytes: async () => ONE_PX_PNG,
     });
     return { store, ...built };
   };
@@ -711,6 +727,10 @@ describe.skipIf(!canSignForReal)('signed restore pipeline against the real KMS k
       envelope: args.envelope,
       artifact: await store.get(args.manifest.storage.objectKey),
       artifactSignatureBundle: await store.get(args.manifest.signature.detachedSignatureObjectKey),
+      completionMarker: await store
+        .get(baselineCompletionMarkerKey(args.manifest.storage.objectKey))
+        .catch(() => null),
+      fetchMediaObject: (objectKey) => store.get(objectKey),
       target: args.target ?? LOCAL_TARGET,
       expectedBaselineRunId: args.expectedBaselineRunId,
       workDir,
@@ -819,6 +839,8 @@ describe.skipIf(!canSignForReal)('signed restore pipeline against the real KMS k
         envelope,
         artifact: await store.get(manifest.storage.objectKey),
         artifactSignatureBundle: await store.get(manifest.signature.detachedSignatureObjectKey),
+        completionMarker: await store.get(baselineCompletionMarkerKey(manifest.storage.objectKey)).catch(() => null),
+        fetchMediaObject: (objectKey) => store.get(objectKey),
         target: LOCAL_TARGET,
         workDir,
         writeFile: async (filePath, data) => writeFile(filePath, data),
@@ -835,11 +857,16 @@ describe.skipIf(!canSignForReal)('signed restore pipeline against the real KMS k
         store: brokenStore,
         exportedBy: 'restore-enforcement-test',
         provenance: MATCHING_PROVENANCE,
+        resolveMediaBytes: async () => ONE_PX_PNG,
       });
       const brokenResult = await verifyBaselineBeforeRestore({
         envelope: brokenBuilt.envelope,
         artifact: await brokenStore.get(brokenBuilt.manifest.storage.objectKey),
         artifactSignatureBundle: await brokenStore.get(brokenBuilt.manifest.signature.detachedSignatureObjectKey),
+        completionMarker: await brokenStore
+          .get(baselineCompletionMarkerKey(brokenBuilt.manifest.storage.objectKey))
+          .catch(() => null),
+        fetchMediaObject: (objectKey) => brokenStore.get(objectKey),
         target: LOCAL_TARGET,
         workDir: await mkdtemp(path.join(os.tmpdir(), 'deploid-verify-')),
         writeFile: async (filePath, data) => writeFile(filePath, data),
@@ -856,7 +883,8 @@ describe.skipIf(!canSignForReal)('signed restore pipeline against the real KMS k
   it('signs and verifies a manifest independently of the artifact', async () => {
     const manifest: CutoverBaselineManifest = {
       provenance: MATCHING_PROVENANCE,
-      storage: { provider: 'local-disk', bucket: '/tmp', objectKey: 'k.json', versionId: null },
+      storage: { provider: 'local-disk', bucket: '/tmp', storeId: null, objectKey: 'k.json', versionId: null },
+      mediaInventory: [],
       sha256: 'b'.repeat(64),
       signature: { algorithm: 'cosign', keyId: 'k', detachedSignatureObjectKey: 'k.json.cosign.bundle' },
       recordCounts: countRecords(contentSnapshotFixture) as CutoverBaselineManifest['recordCounts'],

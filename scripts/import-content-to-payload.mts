@@ -66,7 +66,10 @@ import {
   type RelationshipIdCache,
 } from '../lib/content/payloadMappers.ts';
 import { privilegedPublishContext } from '../lib/payload/publishAuthorization.ts';
+import { collectBrokenReferences } from './compare-content-sources.mts';
 import { exitCli, isDirectRun, parseArgs } from './contentCliSupport.mts';
+import { isRestoreAuthorization, type RestoreAuthorization } from './restoreAuthorization.mts';
+import type { MediaInventoryEntry } from './snapshotObjectStore.mts';
 
 // ─── media 派生（純粋関数。ネットワーク・DBに触れない） ──────────────────────
 
@@ -442,6 +445,9 @@ export interface ImportOptions {
   /**
    * 書き込みを行う admin。`createPublishGateHook`（Task 3）は `overrideAccess` に関係なく
    * `req.user` の role を見るため、published/archived を書くには content-publisher 以上が要る。
+   *
+   * 必須修正8-3: **通常 import は `overrideAccess: false`** で走るので、この user の role が
+   * そのまま書き込み可否になる（RBAC を迂回しない）。
    */
   user: unknown;
   /**
@@ -452,9 +458,16 @@ export interface ImportOptions {
   runId?: string;
   reason?: string;
   mediaResolver?: MediaFileResolver;
-  /** 書き込まずに create/update の内訳だけ数える。 */
-  dryRun?: boolean;
   log?: (line: string) => void;
+}
+
+/**
+ * 必須修正8-3: restore だけが使う特権経路の引数。`RestoreAuthorization` は
+ * `scripts/restoreAuthorization.mts` でしか作れないため、`content:import` の経路からは
+ * この関数を呼ぶ引数を用意できない。
+ */
+export interface RestoreOptions extends ImportOptions {
+  authorization: RestoreAuthorization;
 }
 
 function emptyCounters(): Record<string, number> {
@@ -475,7 +488,14 @@ async function upsertByStableId(
   collection: ImportCollectionSlug,
   stableId: string,
   data: Record<string, unknown>,
-  args: { user: unknown; draft: boolean; file?: ResolvedMediaFile; publishContext: Record<string, unknown> },
+  args: {
+    user: unknown;
+    draft: boolean;
+    file?: ResolvedMediaFile;
+    publishContext: Record<string, unknown>;
+    /** 必須修正8-3: 通常 import は `false`。restore（特権経路）だけが `true`。 */
+    overrideAccess: boolean;
+  },
 ): Promise<UpsertResult> {
   const existing = (await payload.find({
     collection: collection as never,
@@ -483,7 +503,8 @@ async function upsertByStableId(
     limit: 1,
     page: 1,
     depth: 0,
-    overrideAccess: true,
+    overrideAccess: args.overrideAccess,
+    user: args.user as never,
   })) as unknown as { docs: Array<{ id: string | number; filename?: string | null }> };
 
   // Payload の `create`/`update` は `draft: true` のとき data を `DraftDataFromCollectionSlug`
@@ -498,7 +519,7 @@ async function upsertByStableId(
       data,
       draft: args.draft,
       user: args.user,
-      overrideAccess: true,
+      overrideAccess: args.overrideAccess,
       context: args.publishContext,
     } as unknown as Parameters<Payload['update']>[0];
     const doc = (await payload.update(updateArgs)) as unknown as { id: string | number };
@@ -510,7 +531,7 @@ async function upsertByStableId(
     data,
     draft: args.draft,
     user: args.user,
-    overrideAccess: true,
+    overrideAccess: args.overrideAccess,
     context: args.publishContext,
     ...(args.file ? { file: args.file } : {}),
   } as unknown as Parameters<Payload['create']>[0];
@@ -518,22 +539,55 @@ async function upsertByStableId(
   return { id: doc.id, action: 'created' };
 }
 
-async function stableIdExists(payload: Payload, collection: ImportCollectionSlug, stableId: string): Promise<boolean> {
+async function stableIdExists(
+  payload: Payload,
+  collection: ImportCollectionSlug,
+  stableId: string,
+  args: { user: unknown; overrideAccess: boolean },
+): Promise<boolean> {
   const result = (await payload.find({
     collection: collection as never,
     where: { stableId: { equals: stableId } },
     limit: 1,
     page: 1,
     depth: 0,
-    overrideAccess: true,
+    overrideAccess: args.overrideAccess,
+    user: args.user as never,
   })) as unknown as { docs: unknown[] };
   return result.docs.length > 0;
 }
 
+/**
+ * 通常運用の import（`content:import`）。必須修正8-3 により **`overrideAccess: false`**、
+ * つまり Payload の access control と publish gate をそのまま通る。role が足りなければ失敗する。
+ */
 export async function importContentSnapshot(options: ImportOptions): Promise<ImportReport> {
-  const { payload, snapshot, user } = options;
+  return writeContentSnapshot({ ...options, overrideAccess: false });
+}
+
+/**
+ * 災害復旧の restore（`content:restore`）だけが通る**特権経路**。access control を override する
+ * ため、`scripts/restoreAuthorization.mts` でしか作れない `RestoreAuthorization` を要求する
+ * （必須修正8-3）。`content:import` の経路にはこの引数を作る材料が無い。
+ */
+export async function restoreContentSnapshot(options: RestoreOptions): Promise<ImportReport> {
+  if (!isRestoreAuthorization(options.authorization)) {
+    throw new Error(
+      'restore-authorization-required: restoreContentSnapshot() overrides Payload access control and only ' +
+        'accepts an authorization issued by scripts/restoreAuthorization.mts (from a verified baseline, or ' +
+        'from a database that identifies itself as a local throwaway).',
+    );
+  }
+  return writeContentSnapshot({
+    ...options,
+    overrideAccess: true,
+    reason: options.reason ?? options.authorization.reason,
+  });
+}
+
+async function writeContentSnapshot(options: ImportOptions & { overrideAccess: boolean }): Promise<ImportReport> {
+  const { payload, snapshot, user, overrideAccess } = options;
   const log = options.log ?? (() => {});
-  const dryRun = options.dryRun ?? false;
   // 必須修正1-6: import / restore の特権publish経路。`publishApprovedVersion()` の承認経路とは
   // 別物として publish gate に識別させ、監査ログ（`msg: 'privileged-publish'`）へ残す。
   const runId = options.runId ?? `content-import-${new Date().toISOString()}`;
@@ -552,7 +606,10 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
     skippedMedia: [],
     mediaRightsConflicts: [],
     siteSettingsUpdated: false,
-    dryRun,
+    // 必須修正8-1/8-2: dry-run はこの関数を通らない（`planImportFromSnapshot()` が担当する）。
+    // 「書き込む関数の中の分岐」だった頃は、dry-run でも `payload.find` と admin bootstrap が
+    // 走り、空DBでは mapper の参照解決が例外になって全 collection を検証できなかった。
+    dryRun: false,
   };
 
   const record = (collection: ImportCollectionSlug, result: UpsertResult, stableId: string) => {
@@ -567,11 +624,6 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
     publishStatus: PublishStatus,
     file?: ResolvedMediaFile,
   ) => {
-    if (dryRun) {
-      const exists = await stableIdExists(payload, collection, stableId);
-      report[exists ? 'updated' : 'created'][collection] += 1;
-      return;
-    }
     // brief Step 3: draft record は `_status: 'draft'`（data 側、mapper が付ける）と
     // `draft: true`（Local API 引数）を両方指定する。
     const result = await upsertByStableId(payload, collection, stableId, data, {
@@ -579,6 +631,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
       draft: publishStatus === 'draft',
       file,
       publishContext,
+      overrideAccess,
     });
     record(collection, result, stableId);
   };
@@ -617,7 +670,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
       continue;
     }
 
-    const alreadyPresent = await stableIdExists(payload, 'media', candidate.asset.id);
+    const alreadyPresent = await stableIdExists(payload, 'media', candidate.asset.id, { user, overrideAccess });
     if (alreadyPresent) {
       // 既存 media は metadata（alt / rights）だけ更新し、ファイル実体は再 upload しない。
       await write('media', candidate.asset.id, mapDomainMediaToPayload(candidate.asset), 'published');
@@ -693,7 +746,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
   }
 
   // ── 10. 2周目: 前方参照 / 自己参照を埋める ────────────────────────────────
-  if (!dryRun) {
+  {
     const deferredDistributors = snapshot.distributors.filter((entry) => (entry.handledRobotIds?.length ?? 0) > 0);
     const deferredRobots = snapshot.robots.filter((entry) => Boolean(entry.supersededById));
     const deferredUseCases = snapshot.useCases.filter((entry) =>
@@ -713,6 +766,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
         user,
         draft: distributor.publishStatus === 'draft',
         publishContext,
+        overrideAccess,
       });
       report.deferredReferenceUpdates.distributors += 1;
     }
@@ -722,6 +776,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
         user,
         draft: robot.publishStatus === 'draft',
         publishContext,
+        overrideAccess,
       });
       report.deferredReferenceUpdates.robots += 1;
     }
@@ -731,6 +786,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
         user,
         draft: useCase.publishStatus === 'draft',
         publishContext,
+        overrideAccess,
       });
       report.deferredReferenceUpdates['use-cases'] += 1;
     }
@@ -745,7 +801,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
   // snapshot の `siteSettings.dataAsOf` と `articleIndexPlacementLimits` を**一切書いていなかった**。
   // 読み戻し側（`payloadSource.ts`）がローカル定数へfallbackしていたため parity は通ってしまい、
   // 「SiteSettingsが移行されていない」ことが誰にも見えなかった。実際に値を書く。
-  if (!dryRun) {
+  {
     await payload.updateGlobal({
       slug: 'site-settings',
       data: {
@@ -756,7 +812,7 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
         },
       } as never,
       user: user as never,
-      overrideAccess: true,
+      overrideAccess,
       context: publishContext,
     });
   }
@@ -790,6 +846,240 @@ export function formatImportReport(report: ImportReport): string {
     if (report.skippedMedia.length > 40) lines.push(`  ... ${report.skippedMedia.length - 40} more`);
   }
   return lines.join('\n');
+}
+
+// ─── dry-run（必須修正8-1 / 8-2） ──────────────────────────────────────────
+
+/**
+ * 必須修正8-1/8-2: **dry-run を「DBへ仮レコードが作られる前提」から切り離す。**
+ *
+ * 監査の指摘どおり、以前の dry-run は書き込み関数の中の `if (dryRun)` 分岐で、
+ * (a) collection ごとに `payload.find` を撃ち、
+ * (b) relationship の解決を **DB に既にあるレコード**へ依存する mapper に任せていた。
+ * その結果、空DBに対する dry-run は最初の前方参照で例外になり、「全 collection を最後まで
+ * 検証・集計する」という dry-run 本来の目的を果たせなかった。さらに CLI 経路では
+ * `resolveImportUser()` が `--bootstrap-admin` で **admin を作成**しており、
+ * 「dry-run なのに書き込みがある」状態だった。
+ *
+ * ここでは snapshot 内の stable ID だけを使った **in-memory plan** を作る。DBにも
+ * ネットワークにも触れないので、空DB・DB無しでも全 collection を最後まで検証できる。
+ */
+export interface ImportPlanCollectionSummary {
+  /** 配列の生の要素数（重複を畳む前）。必須修正8-5。 */
+  rawLength: number;
+  /** 一意な stable ID の数。`rawLength` と違えば重複がある。 */
+  uniqueStableIds: number;
+}
+
+export interface ImportPlan {
+  perCollection: Record<string, ImportPlanCollectionSummary>;
+  /** 必須修正8-4: Map 化する前に見つけた重複 stable ID。 */
+  duplicateStableIds: Array<{ collection: string; stableId: string; occurrences: number }>;
+  /** snapshot 内で解決できない参照（DBを見ずに snapshot だけで判定する）。 */
+  unresolvedReferences: Array<{ collection: string; id: string; field: string; referencedId: string }>;
+  /** import が作ろうとする media（`ContentSnapshot.media` か、レコード内画像からの派生）。 */
+  mediaCandidates: MediaCandidate[];
+  /** Media レコードにならない画像（rights 未確定など）。 */
+  skippedMedia: ImportSkippedMedia[];
+  mediaRightsConflicts: Array<{ src: string; stableIds: string[] }>;
+  /** 各 media が使う予定の filename。2回目の import で変わっていないことの検証に使う（8-9）。 */
+  mediaFilenames: Array<{ stableId: string; filename: string }>;
+}
+
+const PLAN_COLLECTIONS = [
+  'manufacturers',
+  'robotSeries',
+  'robots',
+  'distributors',
+  'useCases',
+  'deployments',
+  'articles',
+  'articlePlacements',
+  'media',
+] as const;
+
+/**
+ * DB にもネットワークにも触れずに import 計画を組み立てる（必須修正8-1）。
+ *
+ * `collectBrokenReferences()` は `compare-content-sources.mts` にある参照規則の唯一の実装なので、
+ * plan もそれを使う（規則を2箇所に持たない）。両 module は相互 import になるが、互いの参照は
+ * **関数呼び出し時**だけで module 評価中には使わないため、ESM の循環解決で問題なく動く。
+ *
+ * ここを `await import('./compare-content-sources.mts')` にすると **deadlock する**（実測）:
+ * `content:import` を直接起動すると、この module の評価は末尾の top-level `await main()` を
+ * 含む。その main() の中から compare を動的 import すると、compare の評価はこの module の
+ * 評価完了を待ち、こちらは compare の import を待つ——互いに待ち続けて Node が
+ * 「unsettled top-level await」で exit 13 になる。静的 import はこの循環を評価順で解く。
+ */
+export async function planImportFromSnapshot(snapshot: ContentSnapshot): Promise<ImportPlan> {
+  const perCollection: Record<string, ImportPlanCollectionSummary> = {};
+  const duplicateStableIds: ImportPlan['duplicateStableIds'] = [];
+
+  for (const collection of PLAN_COLLECTIONS) {
+    const records = snapshot[collection] as readonly { id: string }[];
+    const counts = new Map<string, number>();
+    for (const record of records) counts.set(record.id, (counts.get(record.id) ?? 0) + 1);
+    perCollection[collection] = { rawLength: records.length, uniqueStableIds: counts.size };
+    for (const [stableId, occurrences] of counts) {
+      if (occurrences > 1) duplicateStableIds.push({ collection, stableId, occurrences });
+    }
+  }
+
+  const unresolvedReferences = collectBrokenReferences(snapshot, 'expected').map((broken) => ({
+    collection: broken.collection as string,
+    id: broken.id,
+    field: broken.field,
+    referencedId: broken.referencedId,
+  }));
+
+  const derived = deriveMediaFromSnapshot(snapshot);
+  const mediaCandidates: MediaCandidate[] =
+    snapshot.media.length > 0
+      ? snapshot.media.map((asset) => ({ asset, src: asset.url, hostable: true, usedBy: [] }))
+      : derived;
+
+  const bySrc = new Map<string, string[]>();
+  for (const candidate of derived) {
+    bySrc.set(candidate.src, [...(bySrc.get(candidate.src) ?? []), candidate.asset.id]);
+  }
+  const mediaRightsConflicts = [...bySrc.entries()]
+    .filter(([, stableIds]) => stableIds.length > 1)
+    .map(([src, stableIds]) => ({ src, stableIds: [...stableIds].sort() }));
+
+  return {
+    perCollection,
+    duplicateStableIds,
+    unresolvedReferences,
+    mediaCandidates,
+    skippedMedia: mediaCandidates
+      .filter((candidate) => !candidate.hostable)
+      .map((candidate) => ({
+        stableId: candidate.asset.id,
+        src: candidate.src,
+        reason: candidate.reason ?? 'not-hostable',
+        usedBy: candidate.usedBy,
+      })),
+    mediaRightsConflicts,
+    mediaFilenames: mediaCandidates
+      .map((candidate) => ({ stableId: candidate.asset.id, filename: candidate.asset.filename }))
+      .sort((a, b) => (a.stableId < b.stableId ? -1 : a.stableId > b.stableId ? 1 : 0)),
+  };
+}
+
+export function formatImportPlan(plan: ImportPlan): string {
+  const lines = ['content:import (dry run — no database writes, no admin bootstrap)'];
+  for (const [collection, summary] of Object.entries(plan.perCollection)) {
+    lines.push(
+      `  ${collection.padEnd(20)} records=${summary.rawLength} uniqueStableIds=${summary.uniqueStableIds}`,
+    );
+  }
+  lines.push(`  ${'media candidates'.padEnd(20)} ${plan.mediaCandidates.length} (skipped ${plan.skippedMedia.length})`);
+
+  if (plan.duplicateStableIds.length > 0) {
+    lines.push('', `FAIL — duplicate stable ids: ${plan.duplicateStableIds.length}`);
+    for (const duplicate of plan.duplicateStableIds.slice(0, 40)) {
+      lines.push(`  ${duplicate.collection}/${duplicate.stableId} appears ${duplicate.occurrences} times`);
+    }
+  }
+  if (plan.unresolvedReferences.length > 0) {
+    lines.push('', `FAIL — references that the snapshot cannot resolve on its own: ${plan.unresolvedReferences.length}`);
+    for (const broken of plan.unresolvedReferences.slice(0, 40)) {
+      lines.push(`  ${broken.collection}/${broken.id} ${broken.field} -> ${broken.referencedId}`);
+    }
+  }
+  if (plan.skippedMedia.length > 0) {
+    lines.push('', `NEEDS REVIEW — images that would not become media records: ${plan.skippedMedia.length}`);
+    for (const skipped of plan.skippedMedia.slice(0, 40)) lines.push(`  ${skipped.src}: ${skipped.reason}`);
+  }
+  return lines.join('\n');
+}
+
+export function importPlanIsClean(plan: ImportPlan): boolean {
+  return plan.duplicateStableIds.length === 0 && plan.unresolvedReferences.length === 0;
+}
+
+// ─── media store preflight（必須修正8-8） ──────────────────────────────────
+
+/**
+ * 必須修正8-8: **空DB + 既存 media store** の組合せを検出して止める。
+ *
+ * importer の filename は「保存先にそのキーがまだ無い」前提で決定的に決まる
+ * （`fileNameFromSrc()`）。DB は空なのに store に同名ファイルが残っていると、Payload が
+ * `hero.jpg` → `hero-1.jpg` と**自動採番**し、export した filename が再現しなくなる。
+ * これは parity 差分としてしか現れないので、事前に検出して止める。
+ */
+export interface MediaStorePreflightFailure {
+  check: string;
+  detail: string;
+}
+
+export function checkMediaStorePreflight(args: {
+  /** DB に既にある media レコード数。 */
+  existingMediaRecords: number;
+  /** import が作ろうとする filename。 */
+  plannedFilenames: readonly string[];
+  /** 対象 media store に既に存在する filename。 */
+  existingStoreFilenames: readonly string[];
+}): MediaStorePreflightFailure[] {
+  if (args.existingMediaRecords > 0) return [];
+  const existing = new Set(args.existingStoreFilenames);
+  const collisions = args.plannedFilenames.filter((filename) => existing.has(filename));
+  if (collisions.length === 0) return [];
+  return [
+    {
+      check: 'emptyDatabaseWithPopulatedMediaStore',
+      detail:
+        `the database has no media records but the media store already holds ${collisions.length} of the ` +
+        `${args.plannedFilenames.length} filenames this import would write (e.g. ${collisions.slice(0, 3).join(', ')}). ` +
+        'Payload would auto-number the uploads (name.png -> name-1.png), so filenames and media object keys ' +
+        'would stop matching the snapshot. Empty the target store (or point at a fresh one) before importing.',
+    },
+  ];
+}
+
+/** local disk 上の media store に実在する filename を読む（Blob store では adapter 側が担う）。 */
+export async function readLocalMediaStoreFilenames(uploadDir: string): Promise<string[]> {
+  try {
+    const { readdir } = await import('node:fs/promises');
+    return await readdir(uploadDir);
+  } catch {
+    return [];
+  }
+}
+
+// ─── baseline 同梱 media からの復元（必須修正9-1 / 9-3） ────────────────────
+
+/**
+ * 必須修正9: **署名済み baseline に同梱された media バイト列**から復元する resolver。
+ *
+ * 既定の resolver（`createDefaultMediaFileResolver`）は public media store / repo の `public/`
+ * からファイルを探すので、「public media Blob が生きていること」を復旧の前提にしてしまう（9-2）。
+ * こちらは inventory の object key から取り出し、**書き込む直前に sha256 を再検証**する（9-3）。
+ * 取得できない・digest が合わないものは skip ではなく **throw** する（9-4: 1件でも欠ければ失敗）。
+ */
+export function createBaselineMediaFileResolver(args: {
+  inventory: readonly MediaInventoryEntry[];
+  fetchMediaObject: (objectKey: string) => Promise<Buffer>;
+}): MediaFileResolver {
+  const byStableId = new Map(args.inventory.map((entry) => [entry.stableId, entry]));
+  return async (candidate) => {
+    const entry = byStableId.get(candidate.asset.id);
+    if (!entry) {
+      throw new Error(
+        `baseline-media-missing: ${candidate.asset.id} has no bytes in the signed baseline inventory. ` +
+          'A baseline that cannot restore its own media is not a baseline (必須修正9-1).',
+      );
+    }
+    const bytes = await args.fetchMediaObject(entry.objectKey);
+    const digest = createHash('sha256').update(bytes).digest('hex');
+    if (digest !== entry.sha256) {
+      throw new Error(
+        `baseline-media-digest-mismatch: ${candidate.asset.id} (${entry.objectKey}) hashes to ${digest}, ` +
+          `the signed inventory says ${entry.sha256}.`,
+      );
+    }
+    return { file: { data: bytes, mimetype: entry.mimeType, name: entry.filename } };
+  };
 }
 
 // ─── DB / 認証まわりの共通ヘルパ（restore 側も使う） ─────────────────────────
@@ -893,9 +1183,10 @@ async function main(): Promise<void> {
       [
         'content:import — local TS (`data/*.ts`) の content を Payload へ冪等 upsert する。',
         '',
-        '  --dry-run                     書き込まず create/update の内訳だけ出す',
+        '  --dry-run                     DBへ一切触れずに snapshot だけで計画を検証・集計する',
         '  --allow-network-media         rights 確認済みの外部画像を実際に fetch する',
         '  --media-dir <dir>             media のバイト列の読み取り元（restore 元 store 相当）',
+        '  --media-store-dir <dir>       書き込み先 media store（既定 ./media）。空DB+既存storeを検出する',
         '  --public-dir <dir>            ローカル画像（/images/...）の読み取り元',
         '  --json <path>                 import report を JSON で書き出す',
         '  --admin-email / --admin-password  書き込みに使う admin（env でも可）',
@@ -909,34 +1200,79 @@ async function main(): Promise<void> {
     return;
   }
 
+  const { createLocalContentSource } = await import('../lib/content/localSource.ts');
+  const writeJsonReport = async (value: unknown) => {
+    const jsonPath = args.get('json');
+    if (typeof jsonPath !== 'string') return;
+    const { writeFile } = await import('node:fs/promises');
+    await writeFile(jsonPath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+    process.stdout.write(`\nwrote JSON report: ${jsonPath}\n`);
+  };
+
+  // 必須修正8-1/8-2: dry-run は **DB へ一切触れない**。接続すらしないので、
+  // admin bootstrap も schema push も起こりようがなく、空DBでも最後まで集計できる。
+  if (args.has('dry-run')) {
+    const plan = await planImportFromSnapshot(await createLocalContentSource().readSnapshot());
+    process.stdout.write(`${formatImportPlan(plan)}\n`);
+    await writeJsonReport(plan);
+    if (!importPlanIsClean(plan)) {
+      process.stderr.write('\ncontent:import --dry-run failed — the snapshot itself is not importable.\n');
+      process.exitCode = 1;
+    }
+    return;
+  }
+
   assertWritableDatabase(args, 'scripts/import-content-to-payload.mts');
+
+  // remediation group 3（グループ②の再レビューで見つかった引き継ぎ事項）:
+  // **config を import する前に** dev-mode schema push を止める。
+  //
+  // `getPayload()` は `NODE_ENV !== 'production'` かつ adapter が `push: false` でない限り
+  // `pushDevSchema`（`@payloadcms/drizzle`）を走らせ、実際に DDL を実行して
+  // `payload_migrations` へ `batch: -1` の行を INSERT する。`content:export` /
+  // `content:restore` は remediation group 2 の Critical #2 でこれを塞いだが、
+  // **`content:import` 本体は同じ欠陥を持ったまま**だった——つまり Task 9 の cutover 実行
+  // （managed DB に対して `--i-know-this-is-production` 付きで走らせる、まさにこのコマンド）で、
+  // 検証より前に managed DB の schema が push され得た。data-loss 警告時の対話 prompt も同じ。
+  //
+  // `scripts/stamp-environment.mts` が同じ理由で同じ1行を config import の前に置いている。
+  process.env.PAYLOAD_MIGRATING = 'true';
 
   const { getPayload } = await import('payload');
   const { default: config } = await import('../payload.config.ts');
-  const { createLocalContentSource } = await import('../lib/content/localSource.ts');
 
   const payload = await getPayload({ config });
   try {
     const user = await resolveImportUser(payload, args);
     const snapshot = await createLocalContentSource().readSnapshot();
 
+    // 必須修正8-8: 空DB + 既存 media store の組合せ（filename 自動採番）を先に止める。
+    const plan = await planImportFromSnapshot(snapshot);
+    const uploadDirArg = args.get('media-store-dir');
+    const uploadDir = typeof uploadDirArg === 'string' ? path.resolve(uploadDirArg) : path.resolve(process.cwd(), 'media');
+    const existingMedia = await payload.count({ collection: 'media', overrideAccess: true });
+    const storePreflight = checkMediaStorePreflight({
+      existingMediaRecords: existingMedia.totalDocs,
+      plannedFilenames: plan.mediaFilenames.map((entry) => entry.filename),
+      existingStoreFilenames: await readLocalMediaStoreFilenames(uploadDir),
+    });
+    if (storePreflight.length > 0) {
+      for (const failure of storePreflight) process.stderr.write(`FAIL ${failure.check}: ${failure.detail}\n`);
+      process.stderr.write('content:import: refusing to write. No database change was made.\n');
+      process.exitCode = 1;
+      return;
+    }
+
     const report = await importContentSnapshot({
       payload,
       snapshot,
       user,
-      dryRun: args.has('dry-run'),
       mediaResolver: createDefaultMediaFileResolver(mediaResolverOptionsFromArgs(args)),
       log: (line) => process.stdout.write(`  ${line}\n`),
     });
 
     process.stdout.write(`\n${formatImportReport(report)}\n`);
-
-    const jsonPath = args.get('json');
-    if (typeof jsonPath === 'string') {
-      const { writeFile } = await import('node:fs/promises');
-      await writeFile(jsonPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-      process.stdout.write(`\nwrote JSON report: ${jsonPath}\n`);
-    }
+    await writeJsonReport(report);
   } finally {
     await payload.destroy();
   }

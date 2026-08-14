@@ -330,7 +330,25 @@ describe('cutover baseline manifest', () => {
       baselineRunId: 'baseline-2026-08-12T00:00:00.000Z-0000',
       baselineGeneration: 3,
     },
-    storage: { provider: 'vercel-blob', bucket: 'deploid-audit-production', objectKey: 'cutover-baseline/x.json', versionId: null },
+    storage: {
+      provider: 'vercel-blob',
+      bucket: 'deploid-audit-production',
+      // 必須修正7-3: 接続先を決めるのは表示名ではなく store ID。
+      storeId: 'store_deploid_audit_production',
+      objectKey: 'cutover-baseline/x.json',
+      versionId: null,
+    },
+    // 必須修正9-1: media バイト列の目録も署名対象の manifest に載る。
+    mediaInventory: [
+      {
+        stableId: 'media:/media/fixture-hero.png',
+        filename: 'fixture-hero.png',
+        objectKey: 'cutover-baseline/x.json.media/' + 'c'.repeat(64),
+        sha256: 'c'.repeat(64),
+        size: 68,
+        mimeType: 'image/png',
+      },
+    ],
     sha256: 'a'.repeat(64),
     signature: { algorithm: 'cosign', keyId: 'arn:aws:kms:ap-northeast-1:1:key/2', detachedSignatureObjectKey: 'cutover-baseline/x.json.cosign.bundle' },
     recordCounts: {
@@ -372,6 +390,14 @@ describe('cutover baseline manifest', () => {
       (m: CutoverBaselineManifest) => { m.provenance.schemaVersion = ''; },
       (m: CutoverBaselineManifest) => { m.provenance.baselineRunId = ''; },
       (m: CutoverBaselineManifest) => { (m.provenance as { baselineGeneration: unknown }).baselineGeneration = '3'; },
+      // 必須修正7-3: vercel-blob なのに store ID が無い manifest は照合できないので無効。
+      (m: CutoverBaselineManifest) => { m.storage.storeId = null; },
+      (m: CutoverBaselineManifest) => { m.storage.storeId = ''; },
+      // 必須修正9-1: media inventory を持たない manifest は media を復元できない baseline。
+      (m: CutoverBaselineManifest) => delete (m as Partial<CutoverBaselineManifest>).mediaInventory,
+      (m: CutoverBaselineManifest) => { m.mediaInventory[0].sha256 = 'not-a-digest'; },
+      (m: CutoverBaselineManifest) => { (m.mediaInventory[0] as { size: unknown }).size = '68'; },
+      (m: CutoverBaselineManifest) => { m.mediaInventory[0].objectKey = ''; },
     ]) {
       const candidate = structuredClone(validManifest);
       mutate(candidate);
@@ -504,6 +530,8 @@ describe.skipIf(!canSignForReal)('cosign signing against the real KMS key', () =
         snapshot: contentSnapshotFixture,
         store,
         exportedBy: 'import-parity-test',
+        // 必須修正9-1: baseline は media バイト列も同梱する（fixture の画像は repo に実体が無い）。
+        resolveMediaBytes: async () => ONE_PX_PNG,
         provenance: {
           sourceKind: 'payload',
           environment: 'local-throwaway',

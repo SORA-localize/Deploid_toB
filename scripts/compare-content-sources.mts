@@ -312,6 +312,38 @@ function indexById(records: readonly unknown[]): Map<string, Record<string, unkn
   return map;
 }
 
+/**
+ * 必須修正8-4: **Map 化する前に**全 collection の duplicate stable ID を検出する。
+ *
+ * `indexById()` は `Map.set` なので、同じ stable ID が2回現れると**後着が黙って前を上書き**する。
+ * その結果、重複を含む snapshot は「件数は合わないのに差分ゼロ」あるいは「片方のレコードだけが
+ * 比較され、もう片方が存在しないことに誰も気付かない」状態になっていた。件数検査
+ * （`verifyCountConsistency`）と違い、これは**比較そのものの前提が壊れている**ことの検出なので、
+ * `compareSnapshots()` の内部で必ず走る。
+ *
+ * 戻り値の 4 key（`missing` / `extra` / `changed` / `brokenReferences`）は brief Step 1 が固定した
+ * 契約なので変えない。重複は `changed`（`field: 'duplicateStableId'`）として載せる——
+ * `parityReportIsClean()` が false になり、CLI は exit 1 になる。
+ */
+export function collectDuplicateStableIds(
+  snapshot: ContentSnapshot,
+  side: 'expected' | 'actual',
+): ParityChange[] {
+  const changes: ParityChange[] = [];
+  for (const collection of RECORD_COLLECTIONS) {
+    const counts = new Map<string, number>();
+    for (const record of snapshot[collection] as readonly { id: string }[]) {
+      counts.set(String(record.id), (counts.get(String(record.id)) ?? 0) + 1);
+    }
+    for (const [id, occurrences] of counts) {
+      if (occurrences < 2) continue;
+      // 「stable ID は collection 内で1回だけ現れる」という不変条件に対する差分として書く。
+      changes.push({ collection, id, field: `duplicateStableId(${side})`, expected: 1, actual: occurrences });
+    }
+  }
+  return changes;
+}
+
 /** restore preflight（必須修正6-3）も同じ規則で broken reference を数えるため export する。 */
 export function collectBrokenReferences(
   snapshot: ContentSnapshot,
@@ -355,6 +387,13 @@ export function collectBrokenReferences(
  */
 export function compareSnapshots(expected: ContentSnapshot, actual: ContentSnapshot): ParityReport {
   const report: ParityReport = { missing: [], extra: [], changed: [], brokenReferences: [] };
+
+  // 必須修正8-4: **Map 化より先に**重複 stable ID を見る。`indexById()` に渡した時点で
+  // 後着が前を上書きしてしまい、以降どの検査からも重複は見えなくなる。
+  report.changed.push(
+    ...collectDuplicateStableIds(expected, 'expected'),
+    ...collectDuplicateStableIds(actual, 'actual'),
+  );
 
   for (const collection of RECORD_COLLECTIONS) {
     const left = indexById(expected[collection] as readonly unknown[]);
@@ -519,6 +558,223 @@ export function formatMediaReview(items: readonly MediaReviewItem[]): string {
   return lines.join('\n');
 }
 
+// ─── 件数の別々の検証（必須修正8-5） ───────────────────────────────────────
+
+export interface CountConsistencyFailure {
+  check: string;
+  detail: string;
+}
+
+/**
+ * 必須修正8-5: **raw array length / unique ID count / manifest count / Payload count を
+ * 別々に**検証する。
+ *
+ * 1つの `countRecords()` だけを4箇所で使い回すと、「配列に重複があるので length は合うが
+ * 一意 ID は足りない」「manifest の件数は snapshot と合っているが Payload には入っていない」と
+ * いった食い違いが、どれも同じ1つの数字に畳まれて見えなくなる。4つを別々の名前で突き合わせる。
+ */
+export function verifyCountConsistency(args: {
+  snapshot: ContentSnapshot;
+  /** manifest の `recordCounts`（あれば）。 */
+  manifestCounts?: Record<string, number>;
+  /** Payload から読み直した snapshot（あれば）。 */
+  payloadSnapshot?: ContentSnapshot;
+}): CountConsistencyFailure[] {
+  const failures: CountConsistencyFailure[] = [];
+  const uniqueIds = (snapshot: ContentSnapshot, collection: ParityCollection) =>
+    new Set((snapshot[collection] as readonly { id: string }[]).map((record) => String(record.id))).size;
+
+  for (const collection of RECORD_COLLECTIONS) {
+    const rawLength = (args.snapshot[collection] as readonly unknown[]).length;
+    const unique = uniqueIds(args.snapshot, collection);
+    if (rawLength !== unique) {
+      failures.push({
+        check: 'uniqueStableIdCount',
+        detail: `${collection}: the array holds ${rawLength} records but only ${unique} distinct stable ids`,
+      });
+    }
+
+    if (args.manifestCounts) {
+      const declared = args.manifestCounts[collection];
+      if (declared !== undefined && declared !== rawLength) {
+        failures.push({
+          check: 'manifestCount',
+          detail: `${collection}: manifest says ${declared}, the artifact array holds ${rawLength}`,
+        });
+      }
+    }
+
+    if (args.payloadSnapshot) {
+      const payloadLength = (args.payloadSnapshot[collection] as readonly unknown[]).length;
+      const payloadUnique = uniqueIds(args.payloadSnapshot, collection);
+      if (payloadLength !== unique) {
+        failures.push({
+          check: 'payloadCount',
+          detail: `${collection}: the snapshot has ${unique} distinct stable ids, Payload returns ${payloadLength} records`,
+        });
+      }
+      if (payloadLength !== payloadUnique) {
+        failures.push({
+          check: 'payloadUniqueStableIdCount',
+          detail: `${collection}: Payload returns ${payloadLength} records but only ${payloadUnique} distinct stable ids`,
+        });
+      }
+    }
+  }
+
+  return failures;
+}
+
+// ─── media review の waiver（必須修正8-6） ─────────────────────────────────
+
+/**
+ * 必須修正8-6: **mediaReview が残っていたら既定で exit 1**。通すのは
+ * 「人間が承認した waiver がある場合だけ」で、その waiver は**署名か承認済み digest に
+ * 結び付いている**必要がある。
+ *
+ * これまでは要確認項目を report に載せるだけで exit 0 だったため、「誰も見ていない要確認項目」を
+ * 抱えたまま次工程へ進めた。waiver は `mediaReviewSha256`（要確認項目そのものの digest）を含むので、
+ * **承認したのとは別の項目**が後から増えた場合は digest が変わり、waiver は効かなくなる。
+ */
+export interface MediaReviewWaiver {
+  /** `sha256(canonicalJson(items))`。承認した内容そのものに結び付ける。 */
+  mediaReviewSha256: string;
+  waivedBy: string;
+  waivedAt: string;
+  reason: string;
+}
+
+export function assertValidMediaReviewWaiver(value: unknown): asserts value is MediaReviewWaiver {
+  const waiver = value as Partial<MediaReviewWaiver> | null;
+  if (!waiver || typeof waiver !== 'object') throw new Error('media-waiver-invalid: not an object');
+  const problems: string[] = [];
+  if (typeof waiver.mediaReviewSha256 !== 'string' || !/^[0-9a-f]{64}$/.test(waiver.mediaReviewSha256)) {
+    problems.push('mediaReviewSha256');
+  }
+  for (const key of ['waivedBy', 'reason'] as const) {
+    if (typeof waiver[key] !== 'string' || (waiver[key] as string).length === 0) problems.push(key);
+  }
+  if (typeof waiver.waivedAt !== 'string' || Number.isNaN(Date.parse(waiver.waivedAt))) problems.push('waivedAt');
+  if (problems.length > 0) throw new Error(`media-waiver-invalid: ${problems.join(', ')}`);
+}
+
+/** waiver が結び付く digest。項目の順序に依存しないよう、正規化した JSON から取る。 */
+export function mediaReviewDigest(items: readonly MediaReviewItem[], sha256: (value: string) => string): string {
+  const normalized = [...items]
+    .map((item) => ({ kind: item.kind, stableId: item.stableId, src: item.src, detail: item.detail }))
+    .sort((a, b) => (a.stableId < b.stableId ? -1 : a.stableId > b.stableId ? 1 : 0));
+  return sha256(JSON.stringify(normalized));
+}
+
+export interface MediaReviewGateResult {
+  ok: boolean;
+  failures: Array<{ check: string; detail: string }>;
+}
+
+/**
+ * 必須修正8-6 の判定本体（純粋関数）。署名検証そのものは呼び出し側（cosign が要る）が行い、
+ * その結果を `signatureVerified` として渡す。
+ */
+export function checkMediaReviewGate(args: {
+  items: readonly MediaReviewItem[];
+  waiver?: MediaReviewWaiver;
+  /** waiver の cosign 署名が検証済みか。**未検証の waiver は無いものとして扱う**。 */
+  signatureVerified?: boolean;
+  actualDigest?: string;
+}): MediaReviewGateResult {
+  if (args.items.length === 0) return { ok: true, failures: [] };
+
+  if (!args.waiver) {
+    return {
+      ok: false,
+      failures: [
+        {
+          check: 'mediaReview',
+          detail:
+            `${args.items.length} media item(s) still need a human decision. Resolve them, or pass a signed ` +
+            'waiver (--media-waiver) that a human approved for exactly these items.',
+        },
+      ],
+    };
+  }
+
+  if (args.signatureVerified !== true) {
+    return {
+      ok: false,
+      failures: [
+        {
+          check: 'mediaWaiverSignature',
+          detail: 'the media review waiver is not signed by the approval key, so it is not an approval.',
+        },
+      ],
+    };
+  }
+
+  if (args.actualDigest !== args.waiver.mediaReviewSha256) {
+    return {
+      ok: false,
+      failures: [
+        {
+          check: 'mediaWaiverDigest',
+          detail:
+            `the waiver approves media review digest ${args.waiver.mediaReviewSha256}, but the current review ` +
+            `items hash to ${args.actualDigest}. Something changed after the approval — re-approve explicitly.`,
+        },
+      ],
+    };
+  }
+
+  return { ok: true, failures: [] };
+}
+
+// ─── --skip-media の適用範囲（必須修正8-7） ────────────────────────────────
+
+/**
+ * 必須修正8-7: `--skip-media` は **local development 専用**。Task 9 / managed environment では拒否する。
+ *
+ * `--skip-media` は「Payload 側の media を比較対象から外す」ので、media が丸ごと欠けていても
+ * parity が通ってしまう。cutover の判断材料としては危険で、開発中に media hosting を後回しに
+ * したいときだけのもの。判定は**呼び出し側が偽装できない材料**を優先する:
+ * `_environment_marker`（DB 自身の申告）> DATABASE_URL の host > NODE_ENV / VERCEL_ENV。
+ */
+export function assertSkipMediaAllowed(context: {
+  databaseUrl?: string;
+  nodeEnv?: string;
+  vercelEnv?: string;
+  deploymentEnv?: string;
+  /** DB 自身の申告（読めた場合）。 */
+  environmentMarker?: 'production' | 'preview' | null;
+}): void {
+  const refuse = (why: string): never => {
+    throw new Error(
+      `skip-media-refused: --skip-media drops media from the comparison entirely, so it is only allowed ` +
+        `during local development. ${why}`,
+    );
+  };
+
+  if (context.environmentMarker === 'production' || context.environmentMarker === 'preview') {
+    refuse(`This database identifies itself as "${context.environmentMarker}" via _environment_marker.`);
+  }
+  if (context.vercelEnv || context.deploymentEnv) {
+    refuse(`This run is inside a managed deployment (VERCEL_ENV/DEPLOYMENT_ENV is set).`);
+  }
+  if (context.nodeEnv === 'production') refuse('NODE_ENV is "production".');
+  if (context.databaseUrl) {
+    let hostname: string;
+    try {
+      hostname = new URL(context.databaseUrl).hostname;
+    } catch {
+      refuse('DATABASE_URL is not a valid connection URL, so the target cannot be shown to be local.');
+      return;
+    }
+    if (!['localhost', '127.0.0.1', '::1'].includes(hostname)) {
+      refuse(`DATABASE_URL points at "${hostname}", which is not a local development database.`);
+    }
+  } else {
+    refuse('DATABASE_URL is not set, so the target cannot be shown to be a local development database.');
+  }
+}
+
 /** collection ごとの件数（manifest の `recordCounts` と CLI 表示の両方が使う）。 */
 export function countRecords(snapshot: ContentSnapshot): Record<string, number> {
   return {
@@ -602,7 +858,8 @@ async function main(): Promise<void> {
         'content:compare — ① cutover 前の「local TS vs Payload」parity 比較専用。',
         '',
         '  --json <path>        差分レポートをJSONで書き出す',
-        '  --skip-media         local 側の派生 media 比較を行わない（media hosting を後続で扱う場合）',
+        '  --skip-media         local 側の派生 media 比較を行わない（**local development 専用**）',
+        '  --media-waiver <path>  要確認 media を人間が承認した署名済み waiver（無ければ exit 1）',
         '',
         'local source を撤去したあと（Task 9）は実行できない。② は content:verify-snapshot /',
         'content:verify-conservation を使い、bare content:compare を使わない（brief Step 5）。',
@@ -610,6 +867,17 @@ async function main(): Promise<void> {
       ].join('\n'),
     );
     return;
+  }
+
+  // 必須修正8-7: `--skip-media` は local development 専用。**接続する前に**環境で判定し、
+  // 接続後に DB 自身の申告（`_environment_marker`）でもう一度確かめる。
+  if (args.has('skip-media')) {
+    assertSkipMediaAllowed({
+      databaseUrl: process.env.DATABASE_URL,
+      nodeEnv: process.env.NODE_ENV,
+      vercelEnv: process.env.VERCEL_ENV,
+      deploymentEnv: process.env.DEPLOYMENT_ENV,
+    });
   }
 
   const { createLocalContentSource } = await import('../lib/content/localSource.ts');
@@ -620,6 +888,24 @@ async function main(): Promise<void> {
 
   const expected = await localSource.readSnapshot();
   const actual = await payloadSource.readSnapshot();
+
+  if (args.has('skip-media')) {
+    const { getPayload } = await import('payload');
+    const { default: config } = await import('../payload.config.ts');
+    const { readEnvironmentMarker } = await import('./restore-preflight.mts');
+    const payload = await getPayload({ config });
+    try {
+      assertSkipMediaAllowed({
+        databaseUrl: process.env.DATABASE_URL,
+        nodeEnv: process.env.NODE_ENV,
+        vercelEnv: process.env.VERCEL_ENV,
+        deploymentEnv: process.env.DEPLOYMENT_ENV,
+        environmentMarker: (await readEnvironmentMarker(payload))?.environment ?? null,
+      });
+    } finally {
+      await payload.destroy();
+    }
+  }
 
   // local `data/*.ts` は `media` 配列を持たない（`lib/data/localContentSnapshot.ts`）。
   // Payload 側の media は importer が record 内の `ImageAsset` から決定的に導出して作る。
@@ -642,6 +928,14 @@ async function main(): Promise<void> {
   process.stdout.write(`${formatParityReport(parity)}\n`);
   process.stdout.write(`\n${formatMediaReview(mediaReview)}\n`);
 
+  // 必須修正8-5: 件数は「4つの別々の数」として突き合わせる。
+  const countFailures = verifyCountConsistency({ snapshot: expected, payloadSnapshot: actual });
+  for (const failure of countFailures) process.stderr.write(`FAIL ${failure.check}: ${failure.detail}\n`);
+
+  // 必須修正8-6: 残っている要確認 media は既定で exit 1。署名済み waiver があるときだけ通す。
+  const gate = await evaluateMediaReviewGate(mediaReview, args.get('media-waiver'));
+  for (const failure of gate.failures) process.stderr.write(`FAIL ${failure.check}: ${failure.detail}\n`);
+
   const jsonPath = args.get('json');
   if (typeof jsonPath === 'string') {
     const { writeFile } = await import('node:fs/promises');
@@ -649,10 +943,48 @@ async function main(): Promise<void> {
     process.stdout.write(`\nwrote JSON report: ${jsonPath}\n`);
   }
 
-  if (!parityReportIsClean(parity)) {
-    process.stderr.write('\ncontent:compare failed — differences found. Do not proceed to Task 9.\n');
+  if (!parityReportIsClean(parity) || countFailures.length > 0 || !gate.ok) {
+    process.stderr.write('\ncontent:compare failed — differences or unresolved review items. Do not proceed to Task 9.\n');
     process.exitCode = 1;
   }
+}
+
+/**
+ * 必須修正8-6: waiver ファイル（署名済み JSON 文書）を読み、**署名を検証してから** gate に渡す。
+ * 署名機構は `scripts/export-content-snapshot.mts` のものを再利用する（cosign + AWS KMS 鍵）。
+ */
+async function evaluateMediaReviewGate(
+  items: readonly MediaReviewItem[],
+  waiverPath: string | true | undefined,
+): Promise<MediaReviewGateResult> {
+  if (items.length === 0) return { ok: true, failures: [] };
+
+  const { parseSignedJsonDocument, sha256Hex, verifyJsonDocumentSignature } = await import(
+    './export-content-snapshot.mts'
+  );
+  const actualDigest = mediaReviewDigest(items, sha256Hex);
+
+  if (typeof waiverPath !== 'string') {
+    return checkMediaReviewGate({ items, actualDigest });
+  }
+
+  const { readFile } = await import('node:fs/promises');
+  const raw = JSON.parse(await readFile(waiverPath, 'utf8')) as unknown;
+  let signed: Awaited<ReturnType<typeof parseSignedJsonDocument>>;
+  try {
+    signed = parseSignedJsonDocument(raw);
+    assertValidMediaReviewWaiver(signed.document);
+  } catch (error) {
+    return { ok: false, failures: [{ check: 'mediaWaiverSchema', detail: (error as Error).message }] };
+  }
+
+  const signature = await verifyJsonDocumentSignature(signed);
+  return checkMediaReviewGate({
+    items,
+    waiver: signed.document as MediaReviewWaiver,
+    signatureVerified: signature.verified,
+    actualDigest,
+  });
 }
 
 if (isDirectRun(import.meta.url)) {

@@ -21,8 +21,16 @@ import {
   verifyBlobWithCosign,
   verifyManifestSignature,
   type BaselineProvenance,
+  type CutoverBaselineManifest,
   type SignedBaselineEnvelope,
 } from './export-content-snapshot.mts';
+import {
+  assertValidCompletionMarker,
+  checkBlobStoreSelection,
+  normalizeBlobStoreId,
+  type BlobCredential,
+  type MediaInventoryEntry,
+} from './snapshotObjectStore.mts';
 import { collectDuplicateStableIds, parseContentSnapshotJson } from './snapshotSchema.mts';
 
 export interface RestoreCheckFailure {
@@ -352,9 +360,215 @@ export function checkSnapshotIntegrity(
   return failures;
 }
 
+/**
+ * 必須修正7-4: **manifest が名指しする store と、runtime credential が実際に選ぶ store** を
+ * 突き合わせる。表示名（`storage.bucket`）は誰でも好きに書けるので照合対象にしない。
+ *
+ * `storage.storeId` は署名対象（manifest の一部）なので、artifact 側の主張として信用できる。
+ * 突き合わせる相手は「今この process が持っている credential」——CLI 引数でも env の自己申告でも
+ * ない、実際に接続に使われる値。
+ */
+export function checkBlobStoreAgainstCredential(
+  manifest: CutoverBaselineManifest,
+  credential: BlobCredential | null | undefined,
+): RestoreCheckFailure[] {
+  if (manifest.storage.provider !== 'vercel-blob') return [];
+
+  const failures: RestoreCheckFailure[] = [];
+  const storeId = manifest.storage.storeId ?? '';
+
+  // manifest 内の一貫性: artifact が置かれた store と、その環境の audit store は同じもののはず。
+  if (normalizeBlobStoreId(storeId) !== normalizeBlobStoreId(manifest.provenance.auditBlobStoreId)) {
+    failures.push({
+      check: 'blobStoreProvenance',
+      detail:
+        `the artifact says it lives in store "${storeId}" but its provenance names audit store ` +
+        `"${manifest.provenance.auditBlobStoreId}". A baseline never spans two stores.`,
+    });
+  }
+
+  if (!credential) {
+    failures.push({
+      check: 'blobCredential',
+      detail:
+        'no Vercel Blob credential is available, so the store this run would read from cannot be ' +
+        'identified. Refusing to treat an unidentified store as the baseline store.',
+    });
+    return failures;
+  }
+
+  failures.push(
+    ...checkBlobStoreSelection({
+      requestedStoreId: storeId,
+      credential,
+      expectedEnvironment: manifest.provenance.environment,
+    }),
+  );
+  return failures;
+}
+
+/**
+ * 必須修正7-7: **不完全な run を有効 baseline として選ばない。**
+ *
+ * export は snapshot → detached signature → media bytes を全部置き終えた**最後**に completion
+ * marker を書く。marker が無い、または marker が署名済み manifest と食い違う baseline は、
+ * 「途中で失敗した run の残骸」なので restore の入力にしない。
+ *
+ * marker 自体は trust anchor ではない（store へ書ける者は marker も書ける）。署名済み manifest の
+ * 値と一致することを要求するので、marker は**完全性**だけを足し、信頼性を弱めることはない。
+ */
+export function checkBaselineCompletion(args: {
+  manifest: CutoverBaselineManifest;
+  /** store から取り出した completion marker の生バイト列（無ければ `null`）。 */
+  completionMarker: Buffer | null;
+  /** artifact の detached signature bundle（marker の `signatureSha256` と突き合わせる）。 */
+  artifactSignatureBundle: Buffer;
+}): RestoreCheckFailure[] {
+  if (args.completionMarker === null) {
+    return [
+      {
+        check: 'baselineCompletion',
+        detail:
+          `no completion marker for ${args.manifest.storage.objectKey}. This baseline run never finished ` +
+          'uploading all of its parts (snapshot, signature, media bytes), so it is not a restorable baseline.',
+      },
+    ];
+  }
+
+  let marker: unknown;
+  try {
+    marker = JSON.parse(args.completionMarker.toString('utf8'));
+    assertValidCompletionMarker(marker);
+  } catch (error) {
+    return [{ check: 'baselineCompletion', detail: (error as Error).message }];
+  }
+
+  const failures: RestoreCheckFailure[] = [];
+  if (marker.artifactSha256 !== args.manifest.sha256) {
+    failures.push({
+      check: 'baselineCompletion',
+      detail: `completion marker records artifact ${marker.artifactSha256}, manifest says ${args.manifest.sha256}`,
+    });
+  }
+  const signatureDigest = sha256Hex(args.artifactSignatureBundle);
+  if (marker.signatureSha256 !== signatureDigest) {
+    failures.push({
+      check: 'baselineCompletion',
+      detail: `completion marker records signature ${marker.signatureSha256}, store holds ${signatureDigest}`,
+    });
+  }
+  if (marker.baselineRunId !== args.manifest.provenance.baselineRunId) {
+    failures.push({
+      check: 'baselineCompletion',
+      detail: `completion marker belongs to run ${marker.baselineRunId}, manifest is run ${args.manifest.provenance.baselineRunId}`,
+    });
+  }
+  return failures;
+}
+
+/**
+ * 必須修正9-3/9-4/9-5: **media を metadata ではなくバイト列として検証する。**
+ *
+ * 監査の指摘: 署名 snapshot は media metadata しか持たず、画像バイト列の checksum も無いため、
+ * 復旧は「public media Blob が生きていること」に依存していた。inventory（署名対象）と
+ * snapshot の `media` が1対1であることを確かめ（binary inventory parity = 9-5）、実バイト列を
+ * 取得して sha256 と size を検証する（9-3）。1件でも欠落・改ざん・取得失敗があれば失敗（9-4）。
+ */
+export async function checkMediaInventory(args: {
+  snapshot: ContentSnapshot;
+  inventory: readonly MediaInventoryEntry[];
+  fetchMediaObject: (objectKey: string) => Promise<Buffer>;
+}): Promise<RestoreCheckFailure[]> {
+  const failures: RestoreCheckFailure[] = [];
+  const byStableId = new Map<string, MediaInventoryEntry>();
+
+  for (const entry of args.inventory) {
+    if (byStableId.has(entry.stableId)) {
+      failures.push({
+        check: 'mediaInventory',
+        detail: `duplicate inventory entry for ${entry.stableId}`,
+      });
+      continue;
+    }
+    byStableId.set(entry.stableId, entry);
+  }
+
+  const snapshotIds = new Set(args.snapshot.media.map((asset) => asset.id));
+  for (const asset of args.snapshot.media) {
+    const entry = byStableId.get(asset.id);
+    if (!entry) {
+      failures.push({
+        check: 'mediaInventory',
+        detail: `${asset.id} is in the snapshot but has no bytes in the baseline inventory (not recoverable from the baseline alone)`,
+      });
+      continue;
+    }
+    if (entry.filename !== asset.filename) {
+      failures.push({
+        check: 'mediaInventory',
+        detail: `${asset.id}: inventory filename "${entry.filename}" differs from the snapshot's "${asset.filename}"`,
+      });
+    }
+  }
+  for (const entry of args.inventory) {
+    if (!snapshotIds.has(entry.stableId)) {
+      failures.push({
+        check: 'mediaInventory',
+        detail: `${entry.stableId} has bytes in the baseline inventory but no record in the snapshot`,
+      });
+    }
+  }
+
+  // バイト列そのものの検証。object key は content-addressed なので、同じ sha256 は1回だけ取得する。
+  const verified = new Map<string, RestoreCheckFailure | null>();
+  for (const entry of args.inventory) {
+    if (verified.has(entry.objectKey)) {
+      const cached = verified.get(entry.objectKey);
+      if (cached) failures.push({ check: cached.check, detail: `${entry.stableId}: ${cached.detail}` });
+      continue;
+    }
+    let bytes: Buffer;
+    try {
+      bytes = await args.fetchMediaObject(entry.objectKey);
+    } catch (error) {
+      const failure = {
+        check: 'mediaBytes',
+        detail: `could not read ${entry.objectKey}: ${(error as Error).message}`,
+      };
+      verified.set(entry.objectKey, failure);
+      failures.push({ check: failure.check, detail: `${entry.stableId}: ${failure.detail}` });
+      continue;
+    }
+    const digest = sha256Hex(bytes);
+    if (digest !== entry.sha256) {
+      const failure = {
+        check: 'mediaBytes',
+        detail: `${entry.objectKey} hashes to ${digest}, the signed inventory says ${entry.sha256}`,
+      };
+      verified.set(entry.objectKey, failure);
+      failures.push({ check: failure.check, detail: `${entry.stableId}: ${failure.detail}` });
+      continue;
+    }
+    if (bytes.byteLength !== entry.size) {
+      const failure = {
+        check: 'mediaBytes',
+        detail: `${entry.objectKey} is ${bytes.byteLength} bytes, the signed inventory says ${entry.size}`,
+      };
+      verified.set(entry.objectKey, failure);
+      failures.push({ check: failure.check, detail: `${entry.stableId}: ${failure.detail}` });
+      continue;
+    }
+    verified.set(entry.objectKey, null);
+  }
+
+  return failures;
+}
+
 export interface VerifiedBaseline {
   snapshot: ContentSnapshot;
   provenance: BaselineProvenance;
+  /** 必須修正9: 検証済み media inventory。restore はここからバイト列を取り直す。 */
+  mediaInventory: readonly MediaInventoryEntry[];
 }
 
 export interface VerifyBaselineArgs {
@@ -363,6 +577,15 @@ export interface VerifyBaselineArgs {
   artifact: Buffer;
   /** artifact の detached cosign bundle。 */
   artifactSignatureBundle: Buffer;
+  /** 必須修正7-7: completion marker の生バイト列。取得できなければ `null`。 */
+  completionMarker: Buffer | null;
+  /** 必須修正9-3: media バイト列の取得口（object key → bytes）。 */
+  fetchMediaObject: (objectKey: string) => Promise<Buffer>;
+  /**
+   * 必須修正7-4: この process が実際に持っている Vercel Blob credential。
+   * vercel-blob manifest のときは必須（無ければ store を同定できないので失敗にする）。
+   */
+  blobCredential?: BlobCredential | null;
   target: RestoreTargetIdentity;
   expectedEnvironment?: string;
   expectedBaselineRunId?: string;
@@ -381,9 +604,12 @@ export interface VerifyBaselineArgs {
  * 2. **manifest 署名**（provenance と sha256 が本物であることの根拠。ここが最初の trust anchor）
  * 3. artifact 署名
  * 4. sha256（manifest ↔ artifact の結び付き）
- * 5. snapshot の厳密 schema
- * 6. 内容（recordCounts / duplicate stable ID / broken reference）
- * 7. 対象DB identity（environment / DB resource / audit store / schema version / baseline run）
+ * 5. **baseline の完了**（必須修正7-7。途中で終わった run を入力にしない）
+ * 6. snapshot の厳密 schema
+ * 7. 内容（recordCounts / duplicate stable ID / broken reference）
+ * 8. **media のバイト列**（必須修正9-3/9-5。inventory parity + sha256 + size）
+ * 9. 対象DB identity（environment / DB resource / audit store / schema version / baseline run）
+ * 10. **store の同定**（必須修正7-4。manifest の store ID と runtime credential の store ID）
  */
 export async function verifyBaselineBeforeRestore(
   args: VerifyBaselineArgs,
@@ -420,6 +646,15 @@ export async function verifyBaselineBeforeRestore(
     };
   }
 
+  // 必須修正7-7: 完了していない run はここで止める（以降の検証を通してしまうと、
+  // 「media が途中までしか無い baseline」が restore の入力になり得る）。
+  const completionFailures = checkBaselineCompletion({
+    manifest: envelope.manifest,
+    completionMarker: args.completionMarker,
+    artifactSignatureBundle: args.artifactSignatureBundle,
+  });
+  if (completionFailures.length > 0) return { ok: false, failures: completionFailures };
+
   let snapshot: ContentSnapshot;
   try {
     snapshot = parseContentSnapshotJson(args.artifact.toString('utf8'));
@@ -429,14 +664,29 @@ export async function verifyBaselineBeforeRestore(
 
   const failures = [
     ...checkSnapshotIntegrity(snapshot, envelope.manifest.recordCounts as unknown as Record<string, number>),
+    // 必須修正9: metadata parity だけでなく binary inventory parity も検証する。
+    ...(await checkMediaInventory({
+      snapshot,
+      inventory: envelope.manifest.mediaInventory,
+      fetchMediaObject: args.fetchMediaObject,
+    })),
     ...checkProvenanceAgainstTarget(envelope.manifest.provenance, args.target, {
       expectedEnvironment: args.expectedEnvironment,
       expectedBaselineRunId: args.expectedBaselineRunId,
     }),
+    // 必須修正7-4: 表示名ではなく store ID で、artifact と runtime credential を突き合わせる。
+    ...checkBlobStoreAgainstCredential(envelope.manifest, args.blobCredential),
   ];
   if (failures.length > 0) return { ok: false, failures };
 
-  return { ok: true, verified: { snapshot, provenance: envelope.manifest.provenance } };
+  return {
+    ok: true,
+    verified: {
+      snapshot,
+      provenance: envelope.manifest.provenance,
+      mediaInventory: envelope.manifest.mediaInventory,
+    },
+  };
 }
 
 /**

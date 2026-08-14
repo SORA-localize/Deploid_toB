@@ -118,9 +118,16 @@ npm run payload:migrate:down
 ### 巻き戻し前のbackup / restore（テーブル単位）
 
 **contentが入っているDBを巻き戻す前に、必ずデータを退避する。** Payload側のcontent export
-（`export --source payload`、manifest付き）はTask 5以降の実装予定であり、**現時点では存在しない**。
-今日使える手段は`pg_dump` / `psql`（PostgreSQLクライアント）によるテーブル単位の退避で、以下は
-実機確認済みの手順。
+（`content:export --source payload --upload`、署名済みmanifest付き）は**Task 5で実装済み**
+（下の §4.1「content level のexport / restore」を正本とする）。本節の`pg_dump` / `psql`による
+テーブル単位の退避は、**schema世代を跨ぐ巻き戻しのためのDB物理退避**として引き続き有効な手順。
+
+> content level のexport（§4.1）は**同一schema世代・同一DBへ戻す**ことを前提に設計されている
+> （restoreは`schemaVersion`と`databaseResourceId`の一致を要求する）。したがって
+> **`migrate:down`を挟む作業では本節の物理退避が正しい手段**であり、§4.1はその代替ではない。
+> 用途が別なので、どちらか一方だけを行えばよいという関係にはならない。
+
+以下は実機確認済みの手順。
 
 前提: サーバのmajor versionに合わせたclientを使う（確認環境: PostgreSQL 15.14）。接続先は
 migration用のDirect connection（poolerではない。`docs/reference/content-platform-resources-v1.md` #1）。
@@ -150,10 +157,72 @@ INSERTを行ってもPK衝突しない（実機確認: id 1・2を復元した�
 deployment行 + version行 → 上記1で退避 → 2でDELETE・`migrate:down`・`migrate` → 3で復元 →
 `pilot`/`production`がそのまま戻り、後続INSERTも成功。
 
-> **Known gap（Task 5へ）**: これはテーブル単位の物理退避であり、source kind・environment marker・
+> **Known gapは解消済み（Task 5 + remediation group 2/3）**: source kind・environment marker・
 > provider resource IDを記録するcontent levelのexport（plan Task 4 Step 7が要求する
-> `export --source local|payload|snapshot` + manifest）ではない。Task 5でexport / restoreを実装したら、
-> 本節の手順を「DB物理退避のfallback」として残しつつ、通常経路をそちらへ差し替えること。
+> `export --source local|payload` + 署名済みmanifest）は実装済み。本節は「DB物理退避」として
+> 残し、通常のcontent退避・復元は次の §4.1 を使う。
+
+### 4.1 content level のexport / restore（署名済みbaseline）
+
+`content:export` / `content:restore` / `content:verify-snapshot` / `content:verify-conservation`
+の運用手順。**この節は「実装済み」「未検証」「人間判断待ち」を区別して書く**（必須修正11-5）。
+
+#### 実装済み（自動テストで固定されている）
+
+| 事項 | 内容 |
+|---|---|
+| 署名 | AWS KMS（`alias/deploid-snapshot-signing`、ECDSA_SHA_256）+ cosign。**snapshot本体とmanifestの両方**に署名する。検証のtrust anchorは`docs/reference/content-platform-resources-v1.md` §4の公開鍵で、Rekorは使わない（`--insecure-ignore-tlog`） |
+| 環境marker | restoreは`_environment_marker`（`npm run environment:stamp`が書く行）とmanifestの`provenance.environment`の一致を要求する。未署名の`--input`は、DB自身がproduction / previewと申告していれば常に拒否される |
+| provider resource ID | manifestは`storage.storeId`（**実store ID**）と`provenance.auditBlobStoreId` / `databaseResourceId` / `schemaVersion` / `baselineRunId` / `baselineGeneration`を持つ。restoreは全部を対象DB・runtime credentialと突き合わせる |
+| media | baselineは**media bytesを同梱**し、manifestの`mediaInventory`に`objectKey` / `sha256` / `size` / `mimeType`を署名付きで記録する。restoreは全mediaのsha256を検証してから書き込む（public media Blobの生存を前提にしない） |
+| 停止条件 | 下の「停止条件」表のいずれか1件でDB書き込みを開始しない（`refusing to write. No database change was made.`）か、書き込み後の完全parityで失敗を報告する（`NOT successful`） |
+
+```bash
+# export（署名 + private audit storeへupload + 署名済みmanifest envelope）
+npm run content:export -- --source payload --upload \
+  --store vercel-blob --store-id "$PRODUCTION_AUDIT_BLOB_TOKEN_STORE_ID" \
+  --store-name deploid-audit-production \
+  --manifest-out ./cutover-baseline.envelope.json \
+  --baseline-generation <前回+1>
+
+# restore（managed DBへはmanifest経由のみ）
+npm run content:restore -- --manifest ./cutover-baseline.envelope.json \
+  --expected-environment production --expected-baseline-run-id <baselineRunId> \
+  --i-know-this-is-production
+```
+
+#### 停止条件（1件でも該当すればrestoreしない）
+
+| check | 意味 |
+|---|---|
+| `envelopeSchema` / `manifestSignature` | 署名済みenvelopeでない、またはmanifestが署名後に書き換えられている |
+| `artifactSignature` / `sha256` | artifact本体が改ざんされている、manifestのdigestと一致しない |
+| `baselineCompletion` | completion markerが無い / 別runのもの。**途中で失敗したexport runの残骸**なので使わない |
+| `snapshotSchema` / `recordCounts` / `duplicateStableId` / `brokenReference` | artifactの中身が壊れている |
+| `mediaInventory` / `mediaBytes` | mediaのbytesが欠落・改ざん・取得不能、またはsnapshotとinventoryが1対1でない |
+| `environmentMarker` / `databaseResourceId` / `auditBlobStoreId` / `schemaVersion` | 別環境・別DB・別store・別schema世代向けのartifact |
+| `baselineGeneration` / `baselineRunId` | このDBが既に適用した世代より古いartifactのreplay |
+| `blobStoreId` / `blobCredentialEnvironment` / `blobCredentialStoreUnknown` | manifestのstore IDとruntime credentialのstore IDが違う、Preview / Productionのcredential交差、credentialがどのstoreを指すか特定できない |
+| `skippedMedia` / `postRestoreParity` | 書き込み後に、DBがartifactと一致していない |
+
+#### 未検証（実credentialが無いためTask 9まで確認できない）
+
+- **実private Blob store（`deploid-audit-production` / `deploid-audit-preview`）へのupload / get / head / delは未検証。**
+  これらはOIDC-federatedで、`VERCEL_OIDC_TOKEN`をBlob accessへ交換できるのはVercel Function runtimeだけ。
+  ローカル / CIからは到達できない。store ID照合・credential交差拒否・completion markerといった
+  **ロジックはunit / 統合テストで検証済み**だが、**実Blobに対するend-to-endはTask 9で行う**。
+- OIDC経路では`BLOB_STORE_ID`をenvに設定する必要がある（未設定だとcredentialがどのstoreを選ぶか
+  特定できないため、fail-closedで拒否される）。
+
+#### 人間判断待ち
+
+- 同一`src`に異なるrights metadataが付いているmedia（`mediaRightsConflicts`）。同じファイルが
+  複数のmediaレコードとしてuploadされる既知のデータ品質課題で、restoreの失敗としては扱わない。
+- `content:compare`が要確認mediaを1件でも報告した場合、既定でexit 1になる。通すには
+  **署名済みwaiver**（`--media-waiver`）が要る。waiverは要確認項目そのもののdigestに結び付くので、
+  項目が増減したら承認し直しになる。
+- identity transfer（消失stable IDの承認済み付け替え）は**署名済み文書**でしか受け付けない。
+  `approvedBy`に名前を書いたJSONは承認ではない。
 
 ### 既知の生成物バグ（重要 — 巻き戻す前に必ず確認する）
 
@@ -253,7 +322,8 @@ round-trip が成功する。
 1. まず戻す必要性を再確認する。`up()`は列の型を広げるだけで既存のdraft/published値も安全に通る。
    通常このmigrationを巻き戻す理由は無い。
 2. deployment dataを退避する（本節（§4）の「巻き戻し前のbackup / restore（テーブル単位）」の
-   `pg_dump --data-only`。content levelのexportはTask 5以降の実装であり現時点では使えない）。
+   `pg_dump --data-only`。§4.1のcontent level exportは実装済みだが、**schema世代を跨ぐ復元には
+   使えない**——restoreは`schemaVersion`の一致を要求するため、down後のDBへは戻せない）。
 3. `DELETE FROM _deployments_v;` と `DELETE FROM deployments;`（両方空にする）。
 4. `npm run payload:migrate:down`。
 5. 再度upする場合は`npm run payload:migrate`のあと、2で退避したデータをimportし直す。

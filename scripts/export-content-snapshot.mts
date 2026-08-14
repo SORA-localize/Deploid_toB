@@ -25,21 +25,29 @@
  */
 import { execFileSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { chmod, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import type { ContentSnapshot } from '../lib/content/contracts.ts';
+import type { MediaAsset } from '../lib/content/domainTypes.ts';
 import { compareSnapshots, countRecords, formatParityReport, parityReportIsClean } from './compare-content-sources.mts';
 import { exitCli, isDirectRun, parseArgs } from './contentCliSupport.mts';
 import {
   assertWritableDatabase,
+  createBaselineMediaFileResolver,
   createDefaultMediaFileResolver,
   formatImportReport,
-  importContentSnapshot,
   mediaResolverOptionsFromArgs,
   resolveImportUser,
+  resolveWithinRoot,
+  restoreContentSnapshot,
+  type MediaFileResolver,
 } from './import-content-to-payload.mts';
+import {
+  authorizeRestoreFromLocalThrowaway,
+  authorizeRestoreFromVerifiedBaseline,
+  type RestoreAuthorization,
+} from './restoreAuthorization.mts';
 import {
   assertRawInputTargetAllowed,
   assertRestoreInputModeAllowed,
@@ -49,7 +57,29 @@ import {
   recordRestoredBaseline,
   verifyBaselineBeforeRestore,
 } from './restore-preflight.mts';
+import {
+  baselineCompletionMarkerKey,
+  createLocalDiskObjectStore,
+  createVercelBlobObjectStore,
+  normalizeBlobStoreId,
+  resolveBlobCredential,
+  type BaselineCompletionMarker,
+  type BlobCredential,
+  type MediaInventoryEntry,
+  type SnapshotObjectStore,
+  type SnapshotStorageProvider,
+} from './snapshotObjectStore.mts';
 import { parseContentSnapshotJson } from './snapshotSchema.mts';
+
+// 必須修正7 で object store の実装は `scripts/snapshotObjectStore.mts` へ移した。既存の
+// import 元（テスト・他 script）を壊さないよう、名前はここからも re-export し続ける。
+export {
+  baselineCompletionMarkerKey,
+  createLocalDiskObjectStore,
+  createVercelBlobObjectStore,
+  type MediaInventoryEntry,
+  type SnapshotObjectStore,
+} from './snapshotObjectStore.mts';
 
 // ─── snapshot の正規化と hash ──────────────────────────────────────────────
 
@@ -114,11 +144,23 @@ export interface CutoverBaselineManifest {
      * `content:verify-snapshot` は `local-disk` の manifest を既定で**拒否**し、
      * `--allow-local-store` を明示したときだけ受け付ける。
      */
-    provider: 'vercel-blob' | 's3' | 'local-disk';
+    provider: SnapshotStorageProvider;
+    /** 表示用の store 名。**接続先の選択には使わない**（必須修正7-3）。 */
     bucket: string;
+    /**
+     * 必須修正7-3/7-4: artifact が実際に置かれた **store ID**。restore / verify は runtime
+     * credential から導いた store ID とこれを突き合わせ、食い違えば拒否する。表示名（`bucket`）は
+     * 誰でも好きに書けるので、照合の対象にはならない。local-disk store は `null`。
+     */
+    storeId: string | null;
     objectKey: string;
     versionId: string | null;
   };
+  /**
+   * 必須修正9-1: baseline に同梱した media バイト列の inventory。**署名対象**なので、
+   * ここに載った sha256 は artifact 署名と同じ強さで守られる。snapshot の `media` と1対1。
+   */
+  mediaInventory: MediaInventoryEntry[];
   sha256: string;
   signature: {
     algorithm: 'cosign';
@@ -169,9 +211,41 @@ export function assertValidManifest(value: unknown): asserts value is CutoverBas
     if (typeof storage.bucket !== 'string' || storage.bucket.length === 0) problems.push('storage.bucket');
     if (typeof storage.objectKey !== 'string' || storage.objectKey.length === 0) problems.push('storage.objectKey');
     if (!(storage.versionId === null || typeof storage.versionId === 'string')) problems.push('storage.versionId');
+    // 必須修正7-3: store ID は「あるかないか」ではなく provider ごとに**必ず決まる**もの。
+    // vercel-blob なのに store ID が無い manifest は、照合できない = 受け付けない。
+    if (storage.provider === 'vercel-blob') {
+      if (typeof storage.storeId !== 'string' || storage.storeId.length === 0) problems.push('storage.storeId');
+    } else if (!(storage.storeId === null || typeof storage.storeId === 'string')) {
+      problems.push('storage.storeId');
+    }
   }
 
   if (typeof manifest.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(manifest.sha256)) problems.push('sha256');
+
+  // 必須修正9-1: media inventory は「あってもなくてもよい追加情報」ではない。field が無い
+  // manifest は media を復元できない baseline なので、manifest として無効にする。
+  if (!Array.isArray(manifest.mediaInventory)) {
+    problems.push('mediaInventory');
+  } else {
+    manifest.mediaInventory.forEach((entry, index) => {
+      const row = entry as Partial<MediaInventoryEntry> | null;
+      if (!row || typeof row !== 'object') {
+        problems.push(`mediaInventory[${index}]`);
+        return;
+      }
+      for (const key of ['stableId', 'filename', 'objectKey', 'mimeType'] as const) {
+        if (typeof row[key] !== 'string' || (row[key] as string).length === 0) {
+          problems.push(`mediaInventory[${index}].${key}`);
+        }
+      }
+      if (typeof row.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(row.sha256)) {
+        problems.push(`mediaInventory[${index}].sha256`);
+      }
+      if (typeof row.size !== 'number' || !Number.isInteger(row.size) || row.size < 0) {
+        problems.push(`mediaInventory[${index}].size`);
+      }
+    });
+  }
 
   const signature = manifest.signature;
   if (!signature || typeof signature !== 'object') {
@@ -270,29 +344,95 @@ export async function signManifest(
   manifest: CutoverBaselineManifest,
   keyArn = signingKeyArn(),
 ): Promise<SignedBaselineEnvelope> {
-  const workDir = await mkdtempDir();
-  const manifestPath = path.join(workDir, 'manifest.json');
-  const bundlePath = path.join(workDir, 'manifest.cosign.bundle');
-  await writeFile(manifestPath, canonicalJson(manifest), 'utf8');
-  signBlobWithCosign(manifestPath, bundlePath, keyArn);
-  return {
-    manifest,
-    manifestSignature: {
-      algorithm: 'cosign',
-      keyId: keyArn,
-      bundleBase64: (await readFile(bundlePath)).toString('base64'),
-    },
-  };
+  const signature = await signCanonicalJson(manifest, keyArn);
+  return { manifest, manifestSignature: signature };
 }
 
 /** envelope の manifest 署名を検証する。`canonicalJson(manifest)` が署名対象。 */
 export async function verifyManifestSignature(envelope: SignedBaselineEnvelope): Promise<CosignVerifyResult> {
-  const workDir = await mkdtempDir();
-  const manifestPath = path.join(workDir, 'manifest.json');
-  const bundlePath = path.join(workDir, 'manifest.cosign.bundle');
-  await writeFile(manifestPath, canonicalJson(envelope.manifest), 'utf8');
-  await writeFile(bundlePath, Buffer.from(envelope.manifestSignature.bundleBase64, 'base64'));
-  return verifyBlobWithCosign(manifestPath, bundlePath);
+  return verifyCanonicalJson(envelope.manifest, envelope.manifestSignature.bundleBase64);
+}
+
+/**
+ * 任意の JSON 文書へ cosign 署名を付ける汎用形（必須修正8-6 の media waiver、
+ * 必須修正10-6 の identity transfer manifest が使う）。**署名対象は `canonicalJson(document)`**
+ * なので、key 順や空白の違いでは署名は変わらず、値が1文字でも変われば必ず落ちる。
+ */
+export interface JsonDocumentSignature {
+  algorithm: 'cosign';
+  keyId: string;
+  bundleBase64: string;
+}
+
+export interface SignedJsonDocument<T> {
+  document: T;
+  signature: JsonDocumentSignature;
+}
+
+async function signCanonicalJson(value: unknown, keyArn: string): Promise<JsonDocumentSignature> {
+  // 必須修正11-1/11-2: 署名対象の平文と bundle を /tmp へ残さない。
+  return withTempDir(async (workDir) => {
+    const documentPath = path.join(workDir, 'document.json');
+    const bundlePath = path.join(workDir, 'document.cosign.bundle');
+    await writeFile(documentPath, canonicalJson(value), 'utf8');
+    signBlobWithCosign(documentPath, bundlePath, keyArn);
+    return {
+      algorithm: 'cosign' as const,
+      keyId: keyArn,
+      bundleBase64: (await readFile(bundlePath)).toString('base64'),
+    };
+  });
+}
+
+async function verifyCanonicalJson(value: unknown, bundleBase64: string): Promise<CosignVerifyResult> {
+  return withTempDir(async (workDir) => {
+    const documentPath = path.join(workDir, 'document.json');
+    const bundlePath = path.join(workDir, 'document.cosign.bundle');
+    await writeFile(documentPath, canonicalJson(value), 'utf8');
+    await writeFile(bundlePath, Buffer.from(bundleBase64, 'base64'));
+    return verifyBlobWithCosign(documentPath, bundlePath);
+  });
+}
+
+export async function signJsonDocument<T>(
+  document: T,
+  keyArn = signingKeyArn(),
+): Promise<SignedJsonDocument<T>> {
+  return { document, signature: await signCanonicalJson(document, keyArn) };
+}
+
+export async function verifyJsonDocumentSignature<T>(signed: SignedJsonDocument<T>): Promise<CosignVerifyResult> {
+  return verifyCanonicalJson(signed.document, signed.signature.bundleBase64);
+}
+
+/**
+ * 署名済み JSON 文書の外形検査（非 assertion 版）。動的 import 越しに呼ぶ場合は
+ * assertion 関数が使えない（TS2775）ため、値を返すこちらを使う。
+ */
+export function parseSignedJsonDocument(value: unknown): SignedJsonDocument<unknown> {
+  assertValidSignedJsonDocument(value);
+  return value;
+}
+
+/** 署名済み JSON 文書の外形検査（署名検証の前に形が正しいことを確かめる）。 */
+export function assertValidSignedJsonDocument(value: unknown): asserts value is SignedJsonDocument<unknown> {
+  const signed = value as Partial<SignedJsonDocument<unknown>> | null;
+  if (!signed || typeof signed !== 'object') throw new Error('signed-document-invalid: not an object');
+  if (!('document' in signed) || signed.document === undefined || signed.document === null) {
+    throw new Error('signed-document-invalid: missing `document`');
+  }
+  const signature = signed.signature;
+  const problems: string[] = [];
+  if (!signature || typeof signature !== 'object') {
+    problems.push('signature');
+  } else {
+    if (signature.algorithm !== 'cosign') problems.push('signature.algorithm');
+    if (typeof signature.keyId !== 'string' || signature.keyId.length === 0) problems.push('signature.keyId');
+    if (typeof signature.bundleBase64 !== 'string' || signature.bundleBase64.length === 0) {
+      problems.push('signature.bundleBase64');
+    }
+  }
+  if (problems.length > 0) throw new Error(`signed-document-invalid: ${problems.join(', ')}`);
 }
 
 // ─── cosign 署名 ──────────────────────────────────────────────────────────
@@ -358,8 +498,10 @@ export interface CosignVerifyResult {
 
 export async function verifyBlobWithCosign(filePath: string, bundlePath: string): Promise<CosignVerifyResult> {
   const overridePath = process.env.SNAPSHOT_SIGNING_PUBLIC_KEY_PATH;
-  const keyPath =
-    overridePath ?? path.join(await mkdtempDir(), 'deploid-snapshot-signing-pubkey.pem');
+  // 必須修正11-2: 公開鍵の temp を /tmp へ残さない（秘密ではないが、放置ファイルは
+  // 「どれが正しい鍵か分からない」状態を作る）。override があるときは何も書かない。
+  const keyDir = overridePath ? undefined : await mkdtempDir();
+  const keyPath = overridePath ?? path.join(keyDir as string, 'deploid-snapshot-signing-pubkey.pem');
   if (!overridePath) await writeFile(keyPath, SNAPSHOT_SIGNING_PUBLIC_KEY_PEM, 'utf8');
 
   try {
@@ -389,110 +531,38 @@ export async function verifyBlobWithCosign(filePath: string, bundlePath: string)
       .filter((line) => line.length > 0 && !line.startsWith('WARNING:'))
       .join(' | ');
     return { verified: false, detail: detail || stderr.trim() };
+  } finally {
+    if (keyDir) await removeTempDir(keyDir);
   }
 }
 
-async function mkdtempDir(): Promise<string> {
-  const dir = path.join(os.tmpdir(), `deploid-snapshot-${process.pid}-${Date.now()}`);
-  await mkdir(dir, { recursive: true });
+/**
+ * 必須修正11-1: 一時ディレクトリは **`mkdtemp` で予測不可能な名前** + **0700** にする。
+ *
+ * 以前は `path.join(os.tmpdir(), \`deploid-snapshot-${process.pid}-${Date.now()}\`)` を
+ * `mkdir` していた。名前が pid と時刻から**予測可能**で、既定 mode（umask 次第で 0755）なので、
+ * multi-user のマシンでは平文 snapshot（全 content record）と署名 bundle が他ユーザーから
+ * 読める場所へ落ちていた。しかも一度も削除していなかった。
+ */
+export async function mkdtempDir(): Promise<string> {
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'deploid-snapshot-'));
+  await chmod(dir, 0o700);
   return dir;
 }
 
-// ─── object storage adapter ───────────────────────────────────────────────
-
-export interface SnapshotObjectStore {
-  provider: CutoverBaselineManifest['storage']['provider'];
-  bucket: string;
-  /** 同一キーへの再 upload は拒否する（write-once 運用。brief Step 7 の表）。 */
-  put(objectKey: string, body: Buffer): Promise<{ versionId: string | null }>;
-  get(objectKey: string): Promise<Buffer>;
-  /**
-   * 表示・ログ用の**永続識別子**。brief Step 7 は「private object の署名付きURLは manifest へ
-   * 保存しない（期限切れになるため）」としており、`@vercel/blob@2` にはそもそも期限付き署名URLを
-   * 発行する API が無い（private blob の読み出しは認証付き `get()`）。したがってここは
-   * **URL を返さない**契約にし、期限の無いリンクがログへ残ることを構造的に防ぐ。
-   * 実際の読み出しは常に `get()` を通す。
-   */
-  objectReference(objectKey: string): string;
+/** 必須修正11-1/11-2: 一時ディレクトリは `finally` で必ず消す。失敗しても本処理は止めない。 */
+export async function removeTempDir(dir: string): Promise<void> {
+  await rm(dir, { recursive: true, force: true }).catch(() => {});
 }
 
-/**
- * Task 5 のテストと Step 6.5 の round-trip 用。実 private audit store
- * （`deploid-audit-production` / `deploid-audit-preview`）は OIDC federated auth で
- * Vercel Function runtime からしか到達できず、ローカル/CI からは触れない。Task 3 の
- * media storage が token 未設定時に local disk へ落ちるのと同じ前例に従う。
- */
-export function createLocalDiskObjectStore(directory: string): SnapshotObjectStore {
-  return {
-    provider: 'local-disk',
-    bucket: directory,
-    async put(objectKey, body) {
-      const target = path.join(directory, objectKey);
-      // write-once: 既に同じキーがあれば拒否する（実 store の `allowOverwrite: false` と同じ挙動）。
-      if (existsSync(target)) {
-        throw new Error(`object-key-already-exists: ${objectKey} (write-once store, use a fresh key)`);
-      }
-      await mkdir(path.dirname(target), { recursive: true });
-      await writeFile(target, body);
-      return { versionId: null };
-    },
-    async get(objectKey) {
-      return readFile(path.join(directory, objectKey));
-    },
-    objectReference(objectKey) {
-      return `file://${path.join(directory, objectKey)}`;
-    },
-  };
-}
-
-/**
- * 本番（Task 9 Step 2）向け。private Vercel Blob store（`deploid-audit-*`）を対象にする。
- * **ローカル / CI からは実行できない**（static token を持たない OIDC federated store のため、
- * Vercel Function runtime だけが `VERCEL_OIDC_TOKEN` を Blob access へ交換できる）。
- * ここでは interface を本番の形に合わせて用意するにとどめ、実 upload の検証は Task 9 で行う。
- */
-export function createVercelBlobObjectStore(storeName: string): SnapshotObjectStore {
-  return {
-    provider: 'vercel-blob',
-    bucket: storeName,
-    async put(objectKey, body) {
-      const { put } = await import('@vercel/blob');
-      const result = await put(objectKey, body, {
-        // **private 必須**。`deploid-audit-*` は private store（資源表 §2 / §2.1）で、
-        // cutover baseline は全 content record を含む。`access: 'public'` で置くと
-        // 推測しにくいだけの永続URLで誰でも読める状態になり、資源表の
-        // 「private。公開URLを持たず、短命な認証付き経路からのみ読む」と正面から矛盾する。
-        access: 'private',
-        addRandomSuffix: false,
-        // 同一キーへの再 upload を禁止する（Vercel Blob は WORM を持たないため、
-        // 「run ごとに一意なキー + 上書き禁止」で immutability を運用的に担保する）。
-        allowOverwrite: false,
-      });
-      return { versionId: (result as { versionId?: string }).versionId ?? null };
-    },
-    async get(objectKey) {
-      // private blob の読み出しは SDK の認証付き `get()` で行う。`head()` + 素の `fetch(url)`
-      // は public store 用のアクセス経路で、private store では 401 になる。
-      const { get } = await import('@vercel/blob');
-      const result = await get(objectKey, { access: 'private' });
-      if (!result) throw new Error(`blob-object-not-found: ${objectKey}`);
-      if (result.statusCode !== 200 || !result.stream) {
-        throw new Error(`blob-get-unexpected-status-${result.statusCode}: ${objectKey}`);
-      }
-      const chunks: Uint8Array[] = [];
-      for await (const chunk of result.stream) chunks.push(chunk);
-      return Buffer.concat(chunks);
-    },
-    objectReference(objectKey) {
-      // **URL を返さない。** `@vercel/blob@2` には期限付き署名URLを発行する API が無く、
-      // private blob の読み出しは「その場で token / OIDC を使う認証付き `get()`」で行う。
-      // ここで `head().url` のような永続URLを返して表示すると、期限の無いリンクを
-      // ログ・スクロールバック・チケットへ残すことになる（brief Step 7:
-      // 「private objectの署名付きURLはmanifestへ保存しない。URLは期限切れになるため」）。
-      // よって表示・記録用には**参照解決できない永続識別子**だけを返す。
-      return `vercel-blob://${storeName}/${objectKey} (private; read via @vercel/blob get({ access: 'private' }))`;
-    },
-  };
+/** 一時ディレクトリを作り、使い終わったら必ず消す。 */
+export async function withTempDir<T>(fn: (dir: string) => Promise<T>): Promise<T> {
+  const dir = await mkdtempDir();
+  try {
+    return await fn(dir);
+  } finally {
+    await removeTempDir(dir);
+  }
 }
 
 // ─── snapshot の読み出し ───────────────────────────────────────────────────
@@ -521,6 +591,12 @@ export interface BuildManifestArgs {
   exportedBy: string;
   /** 必須修正6-9: artifact の出所。restore 側が対象DBの実 identity と突き合わせる。 */
   provenance: BaselineProvenance;
+  /**
+   * 必須修正9-1: media の**バイト列**の取得元。baseline 単体から media を復元できるようにするため、
+   * snapshot の各 media asset の実体を private backup store へ一緒に置く。
+   * 省略時は `createDefaultMediaByteSource()`（Payload の local upload ディレクトリ）。
+   */
+  resolveMediaBytes?: MediaByteResolver;
   exportedAt?: string;
   keyArn?: string;
 }
@@ -531,12 +607,94 @@ export interface BuiltBaseline {
   envelope: SignedBaselineEnvelope;
   snapshotJson: string;
   signatureBundle: Buffer;
+  /** 必須修正7-7: 最後に置いた completion marker の内容。 */
+  completion: BaselineCompletionMarker;
+}
+
+// ─── media バイト列の baseline 同梱（必須修正9） ────────────────────────────
+
+/**
+ * 必須修正9-1: **baseline 単体から media を復元できる**ようにする。
+ *
+ * 監査の指摘: 署名 snapshot は media の metadata しか持たず、画像バイト列の checksum も無い。
+ * つまり復旧は「public media Blob が生きていること」に依存しており、それは baseline の意味を
+ * 満たしていない（9-2）。ここでは snapshot と同じ private backup store へ media bytes を置き、
+ * **署名対象である manifest** に objectKey / sha256 / size / mimeType の inventory を持たせる。
+ * restore 側は inventory どおりに取り出して sha256 を検証する（9-3・9-4）。
+ *
+ * `MediaInventoryEntry` 自体は `scripts/snapshotObjectStore.mts` が持つ（module 循環を避けるため。
+ * 詳細はあちらの docblock）。
+ */
+export type MediaByteResolver = (asset: MediaAsset) => Promise<Buffer>;
+
+/**
+ * 既定の media バイト列取得元。export 元 Payload の local disk upload ディレクトリから読む
+ * （`/api/media/file/<filename>` 形式の URL も、素の filename も同じ場所を指す）。
+ * Vercel Blob backed の media では `url` が絶対URLになるので、そのときだけ fetch する。
+ */
+export function createDefaultMediaByteSource(options: { uploadDir?: string } = {}): MediaByteResolver {
+  const uploadDir = options.uploadDir ?? path.resolve(process.cwd(), 'media');
+  return async (asset) => {
+    if (/^https?:\/\//i.test(asset.url)) {
+      const response = await fetch(asset.url);
+      if (!response.ok) throw new Error(`media-fetch-failed-${response.status}: ${asset.url}`);
+      return Buffer.from(await response.arrayBuffer());
+    }
+    const within = resolveWithinRoot(uploadDir, asset.filename);
+    if (within === undefined) throw new Error(`media-path-outside-root: ${asset.filename}`);
+    return readFile(within);
+  };
+}
+
+/** media bytes を store へ置き、署名対象になる inventory を組み立てる。 */
+async function uploadMediaInventory(args: {
+  media: readonly MediaAsset[];
+  objectKeyPrefix: string;
+  resolveMediaBytes?: MediaByteResolver;
+  put: (objectKey: string, body: Buffer) => Promise<{ versionId: string | null }>;
+}): Promise<MediaInventoryEntry[]> {
+  const resolve = args.resolveMediaBytes ?? createDefaultMediaByteSource();
+  const inventory: MediaInventoryEntry[] = [];
+  // content-addressed なので、同じバイト列を持つ media（rights 違いで2レコードに割れた同一
+  // ファイルなど）は同じ objectKey になる。write-once store は再 put を拒否するため、
+  // この run で既に置いたキーは置き直さない（inventory には両方の stableId が載る）。
+  const uploaded = new Set<string>();
+  // stable ID 順に固定して、同じ snapshot なら同じ inventory になるようにする。
+  const assets = [...args.media].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  for (const asset of assets) {
+    let bytes: Buffer;
+    try {
+      bytes = await resolve(asset);
+    } catch (error) {
+      // 必須修正9-4 の裏側: **取得できなかった media がある baseline は作らない**。
+      // 「あとで public store から拾えばよい」を許すと、baseline 単体での復元にならない。
+      throw new Error(`media-bytes-unavailable: ${asset.id} (${asset.filename}): ${(error as Error).message}`);
+    }
+    const sha256 = sha256Hex(bytes);
+    const objectKey = `${args.objectKeyPrefix}/${sha256}`;
+    inventory.push({
+      stableId: asset.id,
+      filename: asset.filename,
+      objectKey,
+      sha256,
+      size: bytes.byteLength,
+      mimeType: asset.mimeType ?? 'application/octet-stream',
+    });
+    if (uploaded.has(objectKey)) continue;
+    await args.put(objectKey, bytes);
+    uploaded.add(objectKey);
+  }
+  return inventory;
 }
 
 /**
  * snapshot を object storage へ置き、cosign 署名を作り、manifest を組み立てる。
  * `recordCounts.media` は **snapshot 本体から数えた値**を書き、`content:verify-snapshot` が
  * snapshot 本体の件数と一致することを検証する（brief Step 7）。
+ *
+ * 必須修正7-7: **不完全な run が有効 baseline として選ばれないようにする。** 構成物を全部
+ * 置き終えた最後に completion marker を書き、途中で失敗したら**置いた分を消してから**投げ直す。
+ * marker の無い baseline は restore / verify が受け付けない。
  */
 export async function exportSignedBaseline(args: BuildManifestArgs): Promise<BuiltBaseline> {
   const exportedAt = args.exportedAt ?? new Date().toISOString();
@@ -547,19 +705,59 @@ export async function exportSignedBaseline(args: BuildManifestArgs): Promise<Bui
   const signatureObjectKey = `${objectKey}.cosign.bundle`;
 
   const workDir = await mkdtempDir();
-  const localSnapshotPath = path.join(workDir, 'snapshot.json');
-  const localBundlePath = path.join(workDir, 'snapshot.cosign.bundle');
-  await writeFile(localSnapshotPath, snapshotBuffer);
-  signBlobWithCosign(localSnapshotPath, localBundlePath, args.keyArn);
-  const signatureBundle = await readFile(localBundlePath);
+  let signatureBundle: Buffer;
+  try {
+    const localSnapshotPath = path.join(workDir, 'snapshot.json');
+    const localBundlePath = path.join(workDir, 'snapshot.cosign.bundle');
+    await writeFile(localSnapshotPath, snapshotBuffer);
+    signBlobWithCosign(localSnapshotPath, localBundlePath, args.keyArn);
+    signatureBundle = await readFile(localBundlePath);
+  } finally {
+    // 必須修正11-1/11-2: 平文 snapshot と署名 bundle を /tmp へ残さない。
+    await removeTempDir(workDir);
+  }
 
-  const { versionId } = await args.store.put(objectKey, snapshotBuffer);
-  await args.store.put(signatureObjectKey, signatureBundle);
+  // 途中で失敗したら「置いた分」を消してから投げ直す（必須修正7-7）。
+  const written: string[] = [];
+  const put = async (key: string, body: Buffer) => {
+    const result = await args.store.put(key, body);
+    written.push(key);
+    return result;
+  };
+
+  let versionId: string | null;
+  let mediaInventory: MediaInventoryEntry[];
+  try {
+    ({ versionId } = await put(objectKey, snapshotBuffer));
+    await put(signatureObjectKey, signatureBundle);
+    mediaInventory = await uploadMediaInventory({
+      media: args.snapshot.media,
+      objectKeyPrefix: `${objectKey}.media`,
+      resolveMediaBytes: args.resolveMediaBytes,
+      put,
+    });
+  } catch (error) {
+    for (const key of [...written].reverse()) {
+      await args.store.remove(key).catch(() => {});
+    }
+    throw new Error(
+      `baseline-upload-incomplete: ${(error as Error).message}. Partial objects from this run were removed; ` +
+        'no completion marker was written, so this run can never be selected as a baseline.',
+      { cause: error },
+    );
+  }
 
   const counts = countRecords(args.snapshot);
   const manifest: CutoverBaselineManifest = {
     provenance: args.provenance,
-    storage: { provider: args.store.provider, bucket: args.store.bucket, objectKey, versionId },
+    storage: {
+      provider: args.store.provider,
+      bucket: args.store.bucket,
+      storeId: args.store.storeId,
+      objectKey,
+      versionId,
+    },
+    mediaInventory,
     sha256,
     signature: {
       algorithm: 'cosign',
@@ -583,12 +781,36 @@ export async function exportSignedBaseline(args: BuildManifestArgs): Promise<Bui
   };
   assertValidManifest(manifest);
 
+  // 必須修正7-7: **最後に** completion marker を置く。ここまで来ていない run（snapshot だけ、
+  // signature だけ、media が途中まで）は marker を持たないので、restore / verify が拒否する。
+  const completion: BaselineCompletionMarker = {
+    artifactSha256: sha256,
+    signatureSha256: sha256Hex(signatureBundle),
+    mediaInventorySha256: sha256Hex(canonicalJson(mediaInventory)),
+    baselineRunId: args.provenance.baselineRunId,
+    completedAt: new Date().toISOString(),
+  };
+  await args.store.put(baselineCompletionMarkerKey(objectKey), Buffer.from(canonicalJson(completion), 'utf8'));
+
   // 必須修正6-10: manifest 自体にも署名する。sha256 経由で artifact も、provenance 経由で
   // 環境・DB・store・schema世代・baseline run IDも、これ1つの署名で覆われる。
   const envelope = await signManifest(manifest, args.keyArn);
   assertValidEnvelope(envelope);
 
-  return { manifest, envelope, snapshotJson, signatureBundle };
+  return { manifest, envelope, snapshotJson, signatureBundle, completion };
+}
+
+/**
+ * 必須修正7-4: preflight は「credential が無い」ことも失敗として報告したいので、
+ * ここでは throw せず `null` を返す（`checkBlobStoreAgainstCredential` が `blobCredential`
+ * failure として扱う）。
+ */
+function resolveBlobCredentialOrNull(): BlobCredential | null {
+  try {
+    return resolveBlobCredential();
+  } catch {
+    return null;
+  }
 }
 
 /** manifest の `storage` からストアを復元する（短命URLはここで都度発行する）。 */
@@ -597,7 +819,14 @@ export function storeFromManifest(manifest: CutoverBaselineManifest): SnapshotOb
     case 'local-disk':
       return createLocalDiskObjectStore(manifest.storage.bucket);
     case 'vercel-blob':
-      return createVercelBlobObjectStore(manifest.storage.bucket);
+      // 必須修正7-3/7-4: **表示名（bucket）ではなく store ID** で接続先を決め、runtime
+      // credential が指す store と一致しなければ store を作る時点で拒否する。
+      // `expectedEnvironment` を渡すことで Preview / Production の credential 交差も拒否される。
+      return createVercelBlobObjectStore({
+        storeId: manifest.storage.storeId ?? '',
+        displayName: manifest.storage.bucket,
+        expectedEnvironment: manifest.provenance.environment,
+      });
     case 's3':
       throw new Error('manifest-storage-provider-unsupported: s3 store adapter is not implemented (Task 0 chose Vercel Blob).');
   }
@@ -613,7 +842,9 @@ const HELP = [
   '  --upload                      object storage へ置き、cosign 署名 + manifest を作る',
   '  --store local-disk|vercel-blob  --upload 時の保存先',
   '  --store-dir <dir>             local-disk store のディレクトリ',
-  '  --store-name <name>           vercel-blob store 名（例 deploid-audit-production）',
+  '  --store-id <id>               vercel-blob の**実 store ID**（接続先の選択と credential 照合に使う）',
+  '  --store-name <name>           vercel-blob store の表示名（manifest / ログ用。選択には使わない）',
+  '  --media-dir <dir>             baseline へ同梱する media バイト列の読み取り元（既定 ./media）',
   '  --manifest-out <path>         署名済み manifest envelope の出力先',
   '  --exported-by <who>           manifest の exportedBy',
   '  --baseline-generation <n>     --upload 時必須。単調増加の世代番号（古い baseline の replay 防止）',
@@ -663,27 +894,53 @@ async function runExport(args: Map<string, string | true>): Promise<void> {
     return;
   }
 
-  const storeName = args.get('store');
-  let store: SnapshotObjectStore;
-  if (storeName === 'local-disk') {
-    const dir = args.get('store-dir');
-    if (typeof dir !== 'string') throw new Error('--store local-disk requires --store-dir <dir>.');
-    store = createLocalDiskObjectStore(path.resolve(dir));
-  } else if (storeName === 'vercel-blob') {
-    const name = args.get('store-name');
-    if (typeof name !== 'string') throw new Error('--store vercel-blob requires --store-name <store>.');
-    store = createVercelBlobObjectStore(name);
-  } else {
-    throw new Error('--upload requires --store local-disk|vercel-blob.');
-  }
-
   if (!cosignAvailable()) {
     throw new Error('cosign is not installed. Snapshot signing is mandatory (brief Step 7); install cosign and retry.');
   }
 
+  // provenance を**先に**決める。private audit store の ID も対象環境も provenance が持っており、
+  // vercel-blob store はその2つを credential と突き合わせてからでないと作れない（必須修正7-4）。
   const exportedBy = (args.get('exported-by') as string | undefined) ?? process.env.USER ?? 'unknown';
   const provenance = await resolveExportProvenance(source, args);
-  const { manifest, envelope } = await exportSignedBaseline({ snapshot, store, exportedBy, provenance });
+
+  const storeKind = args.get('store');
+  let store: SnapshotObjectStore;
+  if (storeKind === 'local-disk') {
+    const dir = args.get('store-dir');
+    if (typeof dir !== 'string') throw new Error('--store local-disk requires --store-dir <dir>.');
+    store = createLocalDiskObjectStore(path.resolve(dir));
+  } else if (storeKind === 'vercel-blob') {
+    // 必須修正7-3: 接続先を決めるのは **store ID**。`--store-name` は manifest とログの表示名で、
+    // 認証にも store 選択にも一切関与しない（それが監査で見つかった欠陥そのもの）。
+    const storeIdArg = args.get('store-id');
+    const storeId = typeof storeIdArg === 'string' ? storeIdArg : provenance.auditBlobStoreId;
+    if (normalizeBlobStoreId(storeId) !== normalizeBlobStoreId(provenance.auditBlobStoreId)) {
+      throw new Error(
+        `blob-store-id-mismatch: --store-id "${storeId}" is not the audit store wired to this environment ` +
+          `("${provenance.auditBlobStoreId}"). The baseline must live in the store this environment declares.`,
+      );
+    }
+    const displayName = args.get('store-name');
+    store = createVercelBlobObjectStore({
+      storeId,
+      ...(typeof displayName === 'string' ? { displayName } : {}),
+      expectedEnvironment: provenance.environment,
+    });
+  } else {
+    throw new Error('--upload requires --store local-disk|vercel-blob.');
+  }
+
+  const mediaDir = args.get('media-dir');
+  const { manifest, envelope } = await exportSignedBaseline({
+    snapshot,
+    store,
+    exportedBy,
+    provenance,
+    // 必須修正9-1: media のバイト列も baseline へ同梱する（既定は Payload の local upload dir）。
+    resolveMediaBytes: createDefaultMediaByteSource(
+      typeof mediaDir === 'string' ? { uploadDir: path.resolve(mediaDir) } : {},
+    ),
+  });
 
   const manifestPath = args.get('manifest-out');
   // **envelope を書く**（bare manifest ではない）。restore が受け付けるのは署名済み envelope だけ。
@@ -798,10 +1055,13 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
   const { default: config } = await import('../payload.config.ts');
   const payload = await getPayload({ config });
 
+  let restoreWorkDir: string | undefined;
   try {
     let snapshot: ContentSnapshot;
     let sourceLabel: string;
     let verifiedProvenance: BaselineProvenance | undefined;
+    let authorization: RestoreAuthorization;
+    let mediaResolver: MediaFileResolver;
 
     if (typeof manifestPath === 'string') {
       const envelope = JSON.parse(await readFile(manifestPath, 'utf8')) as unknown;
@@ -810,16 +1070,28 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
       const store = storeFromManifest(envelope.manifest);
       const artifact = await store.get(envelope.manifest.storage.objectKey);
       const artifactSignatureBundle = await store.get(envelope.manifest.signature.detachedSignatureObjectKey);
+      // 必須修正7-7: completion marker が無い（= 途中で終わった run）ことと、取得に失敗したことを
+      // 区別せず、どちらも「完了を確認できない」として扱う。
+      const completionMarker = await store
+        .get(baselineCompletionMarkerKey(envelope.manifest.storage.objectKey))
+        .catch(() => null);
       const target = await readRestoreTargetIdentity(payload, databaseUrl);
 
+      restoreWorkDir = await mkdtempDir();
       const verification = await verifyBaselineBeforeRestore({
         envelope,
         artifact,
         artifactSignatureBundle,
+        completionMarker,
+        fetchMediaObject: (objectKey) => store.get(objectKey),
+        // 必須修正7-4: vercel-blob manifest のときだけ credential を要求する（local-disk store の
+        // round-trip テストで Blob credential を持ち出さない）。
+        blobCredential:
+          envelope.manifest.storage.provider === 'vercel-blob' ? resolveBlobCredentialOrNull() : undefined,
         target,
         expectedEnvironment: typeof args.get('expected-environment') === 'string' ? (args.get('expected-environment') as string) : undefined,
         expectedBaselineRunId: typeof args.get('expected-baseline-run-id') === 'string' ? (args.get('expected-baseline-run-id') as string) : undefined,
-        workDir: await mkdtempDir(),
+        workDir: restoreWorkDir,
         writeFile: async (filePath, data) => writeFile(filePath, data),
         joinPath: (...segments) => path.join(...segments),
       });
@@ -833,32 +1105,46 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
 
       snapshot = verification.verified.snapshot;
       verifiedProvenance = verification.verified.provenance;
+      authorization = authorizeRestoreFromVerifiedBaseline(verification.verified);
+      // 必須修正9-1/9-2: media は **baseline に同梱されたバイト列**から戻す。public media store が
+      // 生きていることを復旧の前提にしない。
+      mediaResolver = createBaselineMediaFileResolver({
+        inventory: verification.verified.mediaInventory,
+        fetchMediaObject: (objectKey) => store.get(objectKey),
+      });
       sourceLabel = `signed baseline ${verification.verified.provenance.baselineRunId}`;
       process.stdout.write(
-        'preflight: manifest signature, artifact signature, sha256, snapshot schema, record counts, ' +
-          'stable ids, references, environment marker, database resource, audit store, schema version — all OK\n',
+        'preflight: manifest signature, artifact signature, sha256, baseline completion, snapshot schema, ' +
+          'record counts, stable ids, references, media inventory (bytes + sha256), environment marker, ' +
+          'database resource, audit store, schema version, blob store identity — all OK\n',
       );
     } else {
       // localhost の throwaway DB か明示的 test mode だけがここへ来る。それでも
       // bare cast はしない（必須修正6-4: 厳密な runtime schema 検証は入力形式を問わず通す）。
       // Critical #1 の後段: DB 自身の申告で production / preview を拒否する。
       // `NODE_ENV` と違い、これは restore の呼び出し側が書き換えられない。
-      assertRawInputTargetAllowed(await readRestoreTargetIdentity(payload, databaseUrl));
+      const rawTarget = await readRestoreTargetIdentity(payload, databaseUrl);
+      assertRawInputTargetAllowed(rawTarget);
+      // 必須修正8-3: override 付き書き込みの authorization は、この経路でも
+      // 「DB 自身が local throwaway だと申告している」ことからしか発行しない。
+      authorization = authorizeRestoreFromLocalThrowaway(rawTarget);
 
       snapshot = parseContentSnapshotJson(await readFile(inputPath as string, 'utf8'));
+      mediaResolver = createDefaultMediaFileResolver(mediaResolverOptionsFromArgs(args));
       sourceLabel = `unsigned snapshot ${inputPath}`;
       process.stdout.write(`preflight: strict snapshot schema OK (unsigned input, local/test target)\n`);
     }
 
     const user = await resolveImportUser(payload, args);
-    const report = await importContentSnapshot({
+    const report = await restoreContentSnapshot({
       payload,
       snapshot,
       user,
+      authorization,
       // 必須修正1-6: restore は import とは別のrun ID / 理由で監査ログへ残す。
       runId: `content-restore-${new Date().toISOString()}`,
       reason: `content:restore from ${sourceLabel}`,
-      mediaResolver: createDefaultMediaFileResolver(mediaResolverOptionsFromArgs(args)),
+      mediaResolver,
       log: (line) => process.stdout.write(`  ${line}\n`),
     });
     process.stdout.write(`\n${formatImportReport(report)}\n`);
@@ -899,6 +1185,8 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
 
     process.stdout.write('content:restore: OK — the database matches the artifact on every collection.\n');
   } finally {
+    // 必須修正11-1/11-2: cosign 検証用に書き出した平文 artifact と bundle を /tmp へ残さない。
+    if (restoreWorkDir) await removeTempDir(restoreWorkDir);
     await payload.destroy();
   }
 }
