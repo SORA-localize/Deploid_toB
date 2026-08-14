@@ -59,18 +59,18 @@ export interface ContentSnapshot {
 }
 
 /**
- * `data/articlePlacements.ts` の `articleIndexPlacementLimits` と同じ値。
+ * 必須修正4-4/4-5（remediation group 2）: ここには**既定値定数を置かない**。
  *
- * Payload側の `SiteSettings` global（Task 3）はこの値を持つfieldをまだ持たないため、
- * Payload sourceはこの定数へfallbackする。**local側の値との一致は
- * `tests/content/repository.contract.test.ts` が機械的に検証する**（片方だけ書き換えると落ちる）。
- * `SiteSettings` にfieldを足す＝schema変更＋migration追加であり、Task 3 / 3.5 の範囲のため
- * ここでは行わない（Task 4 reportで gap として申し送る）。
+ * 以前は `DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS`（`data/articlePlacements.ts` の複製）があり、
+ * Payload sourceが `SiteSettings` global に値が無いときそこへfallbackしていた。その結果
+ * 「Payloadに値が無い」状態でも `import → export → parity` が必ず通り、SiteSettingsの移行漏れを
+ * 検出できなかった。値の正本は source ごとに1つだけ:
+ *
+ * - local source  → `data/articlePlacements.ts` / `lib/site.ts`（`lib/data/localContentSnapshot.ts` 経由）
+ * - Payload source → `site-settings` global（欠落時は `site-settings-not-migrated` で失敗する）
+ *
+ * 共有既定値を復活させると、この検出可能性がそのまま失われる。
  */
-export const DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS: Record<ArticlePlacementSlot, number> = {
-  hero: 5,
-  feature: 2,
-};
 
 /** `-` 前置で降順。sortはfield裏付けのあるものだけを許す（local配列順は両sourceで再現できないため契約に含めない）。 */
 export type ContentSort<TField extends string> = TField | `-${TField}`;

@@ -679,17 +679,25 @@ export async function importContentSnapshot(options: ImportOptions): Promise<Imp
   // ── 11. site-settings（Global。stableId upsert の対象にしない） ────────────
   //
   // brief Step 3: 「`site-settings` は Global なので `updateGlobal` を使い、stableId upsert の
-  // 対象にしない」。**既知の gap**: `globals/SiteSettings.ts`（Task 3）はまだ `dataAsOf` /
-  // `articleIndexPlacementLimits` field を持たない（Task 4 report の申し送り）。schema変更は
-  // migration を伴うため Task 5 では行わず、snapshot の該当値は
-  // `lib/site.ts` / `DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS` への fallback（`payloadSource.ts`）
-  // が読み戻す。ここでは global 行そのものを確実に存在させるための書き込みだけを行う。
+  // 対象にしない」。
+  //
+  // 必須修正4-3（remediation group 2）: 以前はここが `data: {}`（= 行を作るだけ）で、
+  // snapshot の `siteSettings.dataAsOf` と `articleIndexPlacementLimits` を**一切書いていなかった**。
+  // 読み戻し側（`payloadSource.ts`）がローカル定数へfallbackしていたため parity は通ってしまい、
+  // 「SiteSettingsが移行されていない」ことが誰にも見えなかった。実際に値を書く。
   if (!dryRun) {
     await payload.updateGlobal({
       slug: 'site-settings',
-      data: {} as never,
+      data: {
+        dataAsOf: snapshot.siteSettings.dataAsOf,
+        articleIndexPlacementLimits: {
+          hero: snapshot.articleIndexPlacementLimits.hero,
+          feature: snapshot.articleIndexPlacementLimits.feature,
+        },
+      } as never,
       user: user as never,
       overrideAccess: true,
+      context: publishContext,
     });
   }
   report.siteSettingsUpdated = true;

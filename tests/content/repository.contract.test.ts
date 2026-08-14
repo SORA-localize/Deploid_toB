@@ -2,7 +2,7 @@ import { getPayload, type Payload } from 'payload';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import config from '../../payload.config';
 import { assertLocalThrowawayDatabase } from './testDbGuard';
-import { DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS, type ContentSnapshot, type FullContentSource } from '@/lib/content/contracts';
+import type { ContentSnapshot, FullContentSource } from '@/lib/content/contracts';
 import { createContentRepository } from '@/lib/content/createContentRepository';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { createInMemoryContentSource, createLocalContentSource } from '@/lib/content/localSource';
@@ -363,7 +363,7 @@ const FIXTURE: ContentSnapshot = {
       publishStatus: 'published',
     },
   ],
-  articleIndexPlacementLimits: { ...DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS },
+  articleIndexPlacementLimits: { hero: 5, feature: 2 },
   media: [
     {
       id: 'fx-media-one',
@@ -374,7 +374,9 @@ const FIXTURE: ContentSnapshot = {
       rights: { status: 'own', sourceType: 'own', checkedAt: '2026-01-01' },
     },
   ],
-  siteSettings: { dataAsOf: siteMeta.dataAsOf },
+  // 必須修正4-4: local定数と**区別できる値**にする。Payload sourceがローカル定数へfallbackすると
+  // ここが `siteMeta.dataAsOf` になって落ちる（同じ値だとfallbackを検出できない）。
+  siteSettings: { dataAsOf: 'fixture-data-as-of-2026-03' },
 };
 
 /** Payloadの `_status` / `lifecycleStatus`（`domainStatusToPayload` と同じ表）。 */
@@ -565,6 +567,24 @@ async function seedPayloadFixture(payload: Payload, user: Parameters<typeof payl
       file: { data: ONE_PX_PNG, mimetype: 'image/png', name: asset.filename, size: ONE_PX_PNG.byteLength },
     });
   }
+
+  // 必須修正4（remediation group 2）: `site-settings` global もfixtureの一部としてseedする。
+  // Payload sourceはもうローカル定数へfallbackしないので、seedしなければ
+  // `site-settings-not-migrated` で落ちる（＝この seed が無いことが検出される）。
+  await payload.updateGlobal({
+    slug: 'site-settings',
+    overrideAccess: true,
+    user,
+    data: {
+      dataAsOf: FIXTURE.siteSettings.dataAsOf,
+      articleIndexPlacementLimits: { ...FIXTURE.articleIndexPlacementLimits },
+    } as never,
+    context: privilegedPublishContext({
+      runId: 'repository-contract-fixture',
+      actorId: String((user as { id?: string | number } | null)?.id ?? 'unknown'),
+      reason: 'repository contract test fixture seed (site settings)',
+    }),
+  });
 }
 
 let resolvePayloadSource!: (payload: Payload) => void;
@@ -619,10 +639,17 @@ describe('ContentRepository contract', () => {
     expect('readSnapshot' in repository).toBe(false);
   });
 
-  it('keeps the Payload fallback placement limits in sync with the local data source', async () => {
-    // Payload側の `SiteSettings` global はまだ `articleIndexPlacementLimits` fieldを持たず、
-    // `DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS` へfallbackする。片方だけ書き換えられたら落とす。
-    expect(DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS).toEqual(localContentSnapshot.articleIndexPlacementLimits);
+  /**
+   * 必須修正4-4/4-5（remediation group 2）: 以前ここには「Payload sourceのfallback定数と
+   * localの値が一致すること」を確かめるtestがあった。そのfallback自体が欠陥
+   * （Payloadに値が無くてもparityが通ってしまう）だったので撤去し、代わりに
+   * **local sourceがlocalの値を読むこと**だけを固定する。Payload側の値はPayloadが正本で、
+   * 欠落時は `site-settings-not-migrated` で落ちる（`site-settings-migration.test.ts`）。
+   */
+  it('reads the local placement limits and dataAsOf from the local data source only', async () => {
+    const local = createLocalContentSource();
+    expect(await local.readArticleIndexPlacementLimits()).toEqual(localContentSnapshot.articleIndexPlacementLimits);
+    expect(await local.readSiteSettings()).toEqual({ dataAsOf: siteMeta.dataAsOf });
   });
 });
 
@@ -818,7 +845,7 @@ describe.each(SOURCE_CASES)('ContentRepository contract against the $name source
       ),
     ).toEqual(['fx-article-new']);
     expect((await repository.getArticlePlacementById('reports-index:feature:fx-article-old'))?.order).toBe(10);
-    expect(await repository.getArticleIndexPlacementLimits()).toEqual(DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS);
+    expect(await repository.getArticleIndexPlacementLimits()).toEqual(FIXTURE.articleIndexPlacementLimits);
   });
 
   // ── media / siteSettings ────────────────────────────────────────────────
@@ -828,7 +855,7 @@ describe.each(SOURCE_CASES)('ContentRepository contract against the $name source
     expect(media[0]?.alt).toBe('Fixture pixel');
     expect(media[0]?.rights.status).toBe('own');
     expect((await repository.getMediaById('fx-media-one'))?.filename).toContain('fx-media-one');
-    expect((await repository.getSiteSettings()).dataAsOf).toBe(siteMeta.dataAsOf);
+    expect((await repository.getSiteSettings()).dataAsOf).toBe(FIXTURE.siteSettings.dataAsOf);
   });
 
   // ── snapshot（管理処理専用） ─────────────────────────────────────────────
@@ -848,8 +875,8 @@ describe.each(SOURCE_CASES)('ContentRepository contract against the $name source
     expect(snapshot.articles).toHaveLength(3);
     expect(snapshot.articlePlacements).toHaveLength(2);
     expect(snapshot.media).toHaveLength(1);
-    expect(snapshot.articleIndexPlacementLimits).toEqual(DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS);
-    expect(snapshot.siteSettings.dataAsOf).toBe(siteMeta.dataAsOf);
+    expect(snapshot.articleIndexPlacementLimits).toEqual(FIXTURE.articleIndexPlacementLimits);
+    expect(snapshot.siteSettings.dataAsOf).toBe(FIXTURE.siteSettings.dataAsOf);
   });
 });
 

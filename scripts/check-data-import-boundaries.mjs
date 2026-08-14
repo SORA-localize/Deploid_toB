@@ -81,6 +81,30 @@ const contentSourceViolations = contentSourceBoundaryRoots
     return contentSourceImport.test(fs.readFileSync(absolute, 'utf8')) ? [relative] : [];
   });
 
+// remediation group 2 / 必須修正4-5: 「local sourceだけがlocal値を読む」。
+// `lib/content/payloadSource.ts` が `lib/site.ts` や `data/*` の定数を import できる限り、
+// SiteSettings の欠落を黙って埋める fallback をいつでも書き戻せてしまう（実際にそれが
+// 監査で見つかった欠陥そのもの: `settings.dataAsOf ?? siteMeta.dataAsOf`）。Payload source は
+// Payload だけを正本にするので、local 側の値を持つ module への import を機械的に禁止する。
+const payloadSourceLocalConstantImport =
+  /import\s+(?!type\b)[^;]*from\s+['"](?:@\/lib\/site|\.\.\/site|\.\/site|@\/data\/|\.\.\/\.\.\/data\/)/g;
+const payloadSourceFile = 'lib/content/payloadSource.ts';
+const payloadSourceViolation = (() => {
+  const absolute = path.join(root, payloadSourceFile);
+  if (!fs.existsSync(absolute)) return false;
+  payloadSourceLocalConstantImport.lastIndex = 0;
+  return payloadSourceLocalConstantImport.test(fs.readFileSync(absolute, 'utf8'));
+})();
+
+if (payloadSourceViolation) {
+  console.error(
+    `${payloadSourceFile} must not import local content constants (lib/site.ts, data/**). ` +
+      'Payload is the source of truth for the Payload source; a local fallback hides an unmigrated ' +
+      'site-settings global from parity (remediation group 2 / 必須修正4).',
+  );
+  process.exitCode = 1;
+}
+
 if (contentSourceViolations.length > 0) {
   console.error(
     'components/**, lib/**, and src/** must reach content only through ' +
@@ -104,6 +128,11 @@ if (searchViolations.length > 0) {
   process.exitCode = 1;
 }
 
-if (violations.length === 0 && searchViolations.length === 0 && contentSourceViolations.length === 0) {
+if (
+  violations.length === 0 &&
+  searchViolations.length === 0 &&
+  contentSourceViolations.length === 0 &&
+  !payloadSourceViolation
+) {
   console.log('[data-boundaries] OK');
 }

@@ -16,9 +16,7 @@
  */
 import { getPayload, type Payload, type Where } from 'payload';
 import payloadConfig from '@/payload.config';
-import { siteMeta } from '@/lib/site';
 import {
-  DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS,
   type ArticlePlacementSourceQuery,
   type ArticleSourceQuery,
   type ContentSnapshot,
@@ -70,6 +68,17 @@ const SNAPSHOT_PAGE_SIZE = 500;
 const MAX_PAGES = 200;
 
 const ALL_PUBLISH_STATUSES: readonly PublishStatus[] = ['draft', 'published', 'archived'];
+
+/** `SiteSettings.articleIndexPlacementLimits` が持つべきslot。1つでも欠けたら移行未完了として落とす。 */
+const ARTICLE_PLACEMENT_SLOTS: readonly ArticlePlacementSlot[] = ['hero', 'feature'];
+
+/**
+ * `readSnapshot()` が全読み取りを載せるtransactionの最小 `req`（必須修正5）。Payload Local APIは
+ * `req` の部分オブジェクトを受け取り `transactionID` を引き継ぐ（`publishApprovedVersion()` と同じ形）。
+ */
+interface SnapshotReadRequest {
+  transactionID: string | number;
+}
 
 type ContentCollectionSlug =
   | 'robots'
@@ -283,21 +292,59 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
   const mapMedia = (doc: never) => mapPayloadMediaToDomain(doc as DocOf<typeof mapPayloadMediaToDomain>);
 
   /**
-   * `SiteSettings` global の生doc。`globals/SiteSettings.ts`（Task 3）は
-   * `dataAsOf` / `articleIndexPlacementLimits` fieldをまだ持たない（field追加はschema変更＋
-   * migrationを伴うためTask 4の範囲外。reportのgap参照）。将来fieldが増えればそちらが優先され、
-   * 無い間だけ既定値へfallbackする。
+   * `SiteSettings` global の生doc。
+   *
+   * 必須修正4-4（remediation group 2）: **ローカル定数へfallbackしない**。以前は
+   * `settings.dataAsOf ?? siteMeta.dataAsOf` と `?? DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS` で
+   * 欠落を埋めていたが、それではPayloadに値が無いことをparityが検出できない
+   * （fallbackが常に正解を返すため、`import → export → parity` が構造的に必ず通る）。
+   * Payloadを正本にした以上、値が無いのは「移行が完了していない」状態なので、
+   * 黙って埋めずに `site-settings-not-migrated` で落とす。
    */
-  const readSiteSettingsDocument = async (): Promise<{
-    dataAsOf?: string;
-    articleIndexPlacementLimits?: Record<ArticlePlacementSlot, number>;
+  const readSiteSettingsDocument = async (req?: SnapshotReadRequest): Promise<{
+    dataAsOf?: string | null;
+    articleIndexPlacementLimits?: Partial<Record<ArticlePlacementSlot, number | null>> | null;
   }> => {
     const payload = await client();
-    const global = await payload.findGlobal({ slug: 'site-settings', depth: 0, overrideAccess: true });
+    const global = await payload.findGlobal({
+      slug: 'site-settings',
+      depth: 0,
+      overrideAccess: true,
+      ...(req ? { req: req as never } : {}),
+    });
     return global as {
-      dataAsOf?: string;
-      articleIndexPlacementLimits?: Record<ArticlePlacementSlot, number>;
+      dataAsOf?: string | null;
+      articleIndexPlacementLimits?: Partial<Record<ArticlePlacementSlot, number | null>> | null;
     };
+  };
+
+  const requireSiteSettings = async (req?: SnapshotReadRequest): Promise<ContentSnapshot['siteSettings']> => {
+    const settings = await readSiteSettingsDocument(req);
+    if (typeof settings.dataAsOf !== 'string' || settings.dataAsOf.length === 0) {
+      throw new Error(
+        'site-settings-not-migrated: the site-settings global has no dataAsOf value. ' +
+          'Payload is the source of truth for site settings — run content:import / content:restore ' +
+          'to populate it instead of relying on a local constant.',
+      );
+    }
+    return { dataAsOf: settings.dataAsOf };
+  };
+
+  const requirePlacementLimits = async (req?: SnapshotReadRequest): Promise<Record<ArticlePlacementSlot, number>> => {
+    const settings = await readSiteSettingsDocument(req);
+    const limits = settings.articleIndexPlacementLimits;
+    const missing = ARTICLE_PLACEMENT_SLOTS.filter((slot) => typeof limits?.[slot] !== 'number');
+    if (missing.length > 0) {
+      throw new Error(
+        `site-settings-not-migrated: the site-settings global has no articleIndexPlacementLimits.${missing.join(' / ')} ` +
+          'value. Payload is the source of truth for site settings — run content:import / content:restore ' +
+          'to populate it instead of relying on a local constant.',
+      );
+    }
+    return Object.fromEntries(ARTICLE_PLACEMENT_SLOTS.map((slot) => [slot, limits?.[slot] as number])) as Record<
+      ArticlePlacementSlot,
+      number
+    >;
   };
 
   const listDocs = async (
@@ -449,17 +496,8 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
     findMediaById: (id) => findOne('media', { stableId: { equals: id } }, mapMedia),
 
     // ── SiteSettings global ───────────────────────────────────────────────
-    async readArticleIndexPlacementLimits(): Promise<Record<ArticlePlacementSlot, number>> {
-      const settings = await readSiteSettingsDocument();
-      const limits = settings.articleIndexPlacementLimits;
-      return limits ? { ...limits } : { ...DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS };
-    },
-
-    /** `dataAsOf` fieldが無い間は `lib/site.ts` の `siteMeta.dataAsOf` へfallbackする。 */
-    async readSiteSettings(): Promise<ContentSnapshot['siteSettings']> {
-      const settings = await readSiteSettingsDocument();
-      return { dataAsOf: settings.dataAsOf ?? siteMeta.dataAsOf };
-    },
+    readArticleIndexPlacementLimits: () => requirePlacementLimits(),
+    readSiteSettings: () => requireSiteSettings(),
 
     // ── 管理処理専用 ───────────────────────────────────────────────────────
     /**

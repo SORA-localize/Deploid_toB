@@ -17,7 +17,7 @@
  * - robot `specs` と `fieldEvidence`
  * - article `body`（standard）と `manufacturerGuideContent`（templated）、`articlePlacements`
  */
-import { DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS, type ContentSnapshot } from '@/lib/content/contracts';
+import type { ContentSnapshot } from '@/lib/content/contracts';
 import type { ImageAsset, Source } from '@/lib/content/domainTypes';
 
 const SOURCES: Source[] = [
@@ -434,7 +434,9 @@ export const contentSnapshotFixture: ContentSnapshot = {
     },
   ],
 
-  articleIndexPlacementLimits: { ...DEFAULT_ARTICLE_INDEX_PLACEMENT_LIMITS },
+  // 共有既定値定数へは寄せない（必須修正4-4: fallbackを復活させないため `lib/content/contracts.ts`
+  // から定数を撤去した）。fixtureは自分の値を自分で持つ。
+  articleIndexPlacementLimits: { hero: 5, feature: 2 },
 
   media: [
     {

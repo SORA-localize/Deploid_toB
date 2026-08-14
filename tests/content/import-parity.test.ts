@@ -7,7 +7,6 @@ import config from '../../payload.config';
 import { assertLocalThrowawayDatabase } from './testDbGuard';
 import type { ContentSnapshot } from '@/lib/content/contracts';
 import { createPayloadContentSource } from '@/lib/content/payloadSource';
-import { siteMeta } from '@/lib/site';
 import {
   STRICT_DATE_FIELDS,
   collectMediaReviewItems,
@@ -16,6 +15,7 @@ import {
   formatMediaReview,
   parityReportIsClean,
 } from '@/scripts/compare-content-sources.mts';
+import { privilegedPublishContext } from '@/lib/payload/publishAuthorization';
 import { parseArgs } from '@/scripts/contentCliSupport.mts';
 import {
   deriveMediaFromSnapshot,
@@ -543,11 +543,15 @@ const testMediaResolver: MediaFileResolver = async (candidate) => {
   return { file: { data: ONE_PX_PNG, mimetype: 'image/png', name: candidate.asset.filename } };
 };
 
-/** Payload 側は `SiteSettings` global に `dataAsOf` field を持たず `lib/site.ts` へ fallback する。 */
-const expectedSnapshot: ContentSnapshot = {
-  ...structuredClone(contentSnapshotFixture),
-  siteSettings: { dataAsOf: siteMeta.dataAsOf },
-};
+/**
+ * 必須修正4（remediation group 2）: 以前ここは
+ * `siteSettings: { dataAsOf: siteMeta.dataAsOf }` で**期待値をローカル定数へ差し替えて**いた。
+ * Payload側に `dataAsOf` field が無く、`payloadSource` がローカル定数へfallbackしていたためで、
+ * その結果 SiteSettings の parity は「local定数 vs 同じlocal定数」を比べる tautology だった。
+ * importer が実際に global へ書き、payload source がそれを読み戻すようになったので、
+ * 期待値は fixture そのもの（fixture の `dataAsOf` は `siteMeta.dataAsOf` と別の値）でよい。
+ */
+const expectedSnapshot: ContentSnapshot = structuredClone(contentSnapshotFixture);
 
 let payload: Payload;
 let owner: unknown;
@@ -638,6 +642,56 @@ describe('importContentSnapshot against real Payload', () => {
       changed: [],
       brokenReferences: [],
     });
+  }, 180_000);
+
+  /**
+   * 必須修正4-6（remediation group 2）: SiteSettings を import → export → parity の輪に載せる。
+   *
+   * import 直後は差分ゼロで、**Payload側の値を書き換えたら parity に差分として現れる**ことまで
+   * 確認する。ローカル定数へのfallbackが残っていると、Payloadの値が読まれないので
+   * どれだけ書き換えても差分が出ない（＝この test が落ちる）。
+   */
+  it('surfaces a SiteSettings change as a parity difference', async () => {
+    const before = await createPayloadContentSource({ payload }).readSnapshot();
+    expect(before.siteSettings).toEqual(contentSnapshotFixture.siteSettings);
+    expect(before.articleIndexPlacementLimits).toEqual(contentSnapshotFixture.articleIndexPlacementLimits);
+    expect(compareSnapshots(expectedSnapshot, before).changed).toEqual([]);
+
+    const writeSettings = async (data: Record<string, unknown>) => {
+      await payload.updateGlobal({
+        slug: 'site-settings',
+        overrideAccess: true,
+        user: owner as never,
+        data: data as never,
+        context: privilegedPublishContext({
+          runId: 'import-parity-site-settings',
+          actorId: 'test',
+          reason: 'site settings parity regression test',
+        }),
+      });
+    };
+
+    await writeSettings({
+      dataAsOf: 'tampered-2099-12',
+      articleIndexPlacementLimits: { hero: 99, feature: 98 },
+    });
+
+    const after = await createPayloadContentSource({ payload }).readSnapshot();
+    const changed = compareSnapshots(expectedSnapshot, after).changed;
+    expect(
+      changed.map((change) => `${change.id}.${change.field}: ${String(change.expected)} -> ${String(change.actual)}`).sort(),
+    ).toEqual([
+      'article-index-placement-limits.feature: 2 -> 98',
+      'article-index-placement-limits.hero: 5 -> 99',
+      'site-settings.dataAsOf: 2026-01-21 -> tampered-2099-12',
+    ]);
+
+    // 後続 test / 後続 suite のために元へ戻す（restoreも同じ経路を通ることの確認になる）。
+    await writeSettings({
+      dataAsOf: contentSnapshotFixture.siteSettings.dataAsOf,
+      articleIndexPlacementLimits: { ...contentSnapshotFixture.articleIndexPlacementLimits },
+    });
+    expect(compareSnapshots(expectedSnapshot, await createPayloadContentSource({ payload }).readSnapshot()).changed).toEqual([]);
   }, 180_000);
 
   it('keeps draft, published, and archived records distinguishable after import', async () => {

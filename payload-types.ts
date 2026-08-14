@@ -1871,6 +1871,17 @@ export interface SiteSetting {
     message?: string | null;
     url?: string | null;
   };
+  /**
+   * 掲載件数が正しい時点（例: 2026年7月）。日精度とは限らないためtext。Payloadが正本で、ローカル定数へのfallbackは無い。
+   */
+  dataAsOf?: string | null;
+  /**
+   * reports index の hero / feature 掲載上限。
+   */
+  articleIndexPlacementLimits?: {
+    hero?: number | null;
+    feature?: number | null;
+  };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1892,6 +1903,13 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         enabled?: T;
         message?: T;
         url?: T;
+      };
+  dataAsOf?: T;
+  articleIndexPlacementLimits?:
+    | T
+    | {
+        hero?: T;
+        feature?: T;
       };
   _status?: T;
   updatedAt?: T;
