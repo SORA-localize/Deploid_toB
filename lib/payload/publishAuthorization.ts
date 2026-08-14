@@ -88,23 +88,32 @@ function draftIntentKey(collectionSlug: string, docId: string | number): string 
   return `${collectionSlug}:${docId}`;
 }
 
-interface DraftIntentEntry {
-  draft: boolean;
-  /**
-   * このtokenを記録したoperationの `req.context` object。
-   *
-   * `createLocalReq()` は operation ごとに `req.context` を**新しいobjectへ差し替える**
-   * （空なら渡された `context`、非空なら `{...req.context, ...context}`）。req object自体は
-   * 使い回されうる（`createLocalReq` は引数のreqをmutateして返す）ため、operationの同一性は
-   * reqではなく**contextのobject identity**で見る。
-   */
-  context: Record<string, unknown>;
+function draftIntentStore(context: Record<string, unknown>): Map<string, boolean> | undefined {
+  const store = context[DRAFT_INTENT_KEY];
+  return store instanceof Map ? (store as Map<string, boolean>) : undefined;
 }
 
-function draftIntentStore(context: Record<string, unknown>): Map<string, DraftIntentEntry> | undefined {
-  const store = context[DRAFT_INTENT_KEY];
-  return store instanceof Map ? (store as Map<string, DraftIntentEntry>) : undefined;
-}
+/**
+ * ## 「tokenを記録元operationへ紐づける」案を採らなかった理由（fix round 3）
+ *
+ * 一度は、token値に記録時の `req.context` objectを持たせ、読み取り時に同一objectのときだけ
+ * 有効とみなす実装を入れた（`createLocalReq()` が operation ごとに `req.context` を
+ * 新しいobjectへ差し替えることを利用した、operation単位の識別子）。
+ *
+ * これは**正当なdraft保存を壊す**ため撤回した。gateより前に走る `beforeChange` hookが
+ * 同じ `req` でLocal APIを呼ぶと（`collections/ArticlePlacements.ts` の `validateUniqueness` が
+ * `req.payload.find({ ..., req })` を呼ぶ）、その時点で `req.context` が差し替わり、
+ * **そのoperation自身のtokenが自分で読めなくなる**。結果、content-draft-writerによる
+ * `article-placements` の通常のdraft保存が `publish-role-required` で落ちていた
+ * （fail-closedではあるが、必須修正1-1後段「draft writerの変更は新しいdraft versionとして
+ * 保存されること」に反する機能退行）。同じ形のhookを持つcollectionが他にも増えうる以上、
+ * この方式は採らない。
+ *
+ * 孤児token対策は `clearDraftIntents()`（各write operationの入口で捨てる）だけで足りる。
+ * `beforeOperation` を発火し、かつ `beforeChange` へ到達しうるoperationは
+ * create / update / delete / restoreVersion のみで、`DRAFT_INTENT_CLEARING_OPERATIONS` が
+ * そのすべてを覆っているため。
+ */
 
 /**
  * このcollectionについて溜まっているdraft intentを捨てる。各write operationの開始時
@@ -116,6 +125,11 @@ function draftIntentStore(context: Record<string, unknown>): Map<string, DraftIn
  * 別の書き込み（`where` 指定のbulk update、`restoreVersion` など、自分ではintentを記録しない
  * 経路）が走ると、その孤児を拾って「draft保存」と誤認しかねない。
  * write operationの入口で毎回捨てれば、tokenが次のoperationまで生き延びること自体が無くなる。
+ *
+ * 制約: 消すのはcollection prefix単位で、operation単位ではない。よって**同一 `req` を共有する
+ * 2つのoperationが同時並行で走る**と互いのtokenを消し合う（現状そのような呼び出しは無い。
+ * hook経由のネストは同期的に直列化される）。消し合った場合は「記録なし」= `false` になり、
+ * main rowを書く扱いへ倒れるだけなので方向としては安全。
  */
 export function clearDraftIntents(req: PayloadRequest, collectionSlug: string): void {
   const store = draftIntentStore(contextOf(req));
@@ -145,8 +159,8 @@ export function recordDraftIntent(
   draft: boolean,
 ): void {
   const context = contextOf(req);
-  const map = draftIntentStore(context) ?? new Map<string, DraftIntentEntry>();
-  map.set(draftIntentKey(collectionSlug, docId), { draft, context });
+  const map = draftIntentStore(context) ?? new Map<string, boolean>();
+  map.set(draftIntentKey(collectionSlug, docId), draft);
   context[DRAFT_INTENT_KEY] = map;
 }
 
@@ -175,12 +189,8 @@ export function readDraftIntent(req: PayloadRequest, collectionSlug: string, doc
   if (!map) return false;
 
   const key = draftIntentKey(collectionSlug, docId);
-  const entry = map.get(key);
-  // 使い捨て: 読んだ時点で必ず消す（自分のものでなかった場合も、次へ持ち越させない）。
+  const intent = map.get(key);
+  // 使い捨て: 読んだ時点で必ず消し、次の書き込みへ持ち越させない。
   map.delete(key);
-
-  if (!entry) return false;
-  // 別operationが記録したtoken（= 消費されずに残った孤児）は自分のものではない。
-  if (entry.context !== context) return false;
-  return entry.draft === true;
+  return intent === true;
 }

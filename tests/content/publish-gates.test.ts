@@ -82,6 +82,8 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
     assertLocalThrowawayDatabase('tests/content/publish-gates.test.ts');
     payload = await getPayload({ config });
     await payload.delete({ collection: 'manufacturers', where: {}, overrideAccess: true });
+    await payload.delete({ collection: 'article-placements', where: {}, overrideAccess: true });
+    await payload.delete({ collection: 'articles', where: {}, overrideAccess: true });
     await payload.delete({ collection: 'admins', where: {}, overrideAccess: true });
 
     const owner = await payload.create({
@@ -554,9 +556,12 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
       });
       const pendingDraftVersionId = versions[0].id;
 
-      const transactionID = await payload.db.beginTransaction();
-      if (transactionID === null) throw new Error('expected the postgres adapter to support transactions');
-      const req = { transactionID, context: { deploidOrphanProbe: true } } as unknown as PayloadRequest;
+      // 2つの操作で同じ `req` objectを共有する。孤児tokenが載るのは `req.context` であって
+      // DB側ではないので、ここでtransactionを自分で張る必要はない（張っても、①のaccess拒否で
+      // Payloadの `killTransaction` がrollbackして `req.transactionID` を消すため、
+      // ②は結局自分でtransactionを張り直すことになり、比較条件が増えるだけになる）。
+      // 各operationは `initTransaction` で自前のtransactionを持つ。
+      const req = { context: { deploidOrphanProbe: true } } as unknown as PayloadRequest;
 
       // 1) id指定のdraft保存を、access拒否されるuser（content-reader）で走らせる。
       //    `beforeOperation` は走るので intent が記録され、access controlで落ちるため
@@ -573,8 +578,9 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
         }),
       ).rejects.toThrow();
 
-      // 2) 同じreqで、同じdocumentへ別種の書き込み（restoreVersion）を走らせる。
-      //    孤児tokenを拾ってはならない = gateはこれを「main rowを書く操作」として拒否する。
+      // 2) 同じ `req`（= 同じ `req.context`）で、同じdocumentへ別種の書き込み
+      //    （`restoreVersion`）を走らせる。孤児tokenを拾ってはならない
+      //    = gateはこれを「main rowを書く操作」として拒否する。
       await expect(
         payload.restoreVersion({
           collection: 'manufacturers',
@@ -584,8 +590,6 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
           req,
         }),
       ).rejects.toThrow(/publish-role-required|publish-approval-required/);
-
-      await payload.db.commitTransaction(transactionID);
 
       const mainRow = await payload.findByID({ collection: 'manufacturers', id: draft.id, overrideAccess: true });
       expect(mainRow._status).toBe('published');
@@ -643,6 +647,90 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
           data: { _status: 'published' },
         }),
       ).rejects.toThrow(/publish-role-required|publish-approval-required/);
+    });
+  });
+
+  /**
+   * `publish-gates.test.ts` の他のケースは代表collectionとして `manufacturers` を使うが、
+   * `manufacturers` は publish gate より前に走る `beforeChange` hookを持たない。
+   *
+   * `article-placements` は `validateUniqueness` を **gateより前**に置いており、その中で
+   * `req.payload.find({ ..., req })` という同一reqのLocal API呼び出しを行う。
+   * `createLocalReq()` は呼ばれるたびに `req.context` を新しいobjectへ差し替えるため、
+   * 「gateより前にLocal APIを呼ぶhookがあるcollection」では、operationが記録した
+   * draft intentがgateへ届くまでの間に別objectへ移ってしまう。
+   *
+   * このテストは、そういうcollectionでも content-draft-writer の通常のdraft保存が
+   * 成立すること（必須修正1-1後段: draft writerの変更は公開中のmain documentへ反映せず、
+   * 新しいdraft versionとして保存される）を固定する。
+   */
+  describe('必須修正1-1: gateより前にLocal APIを呼ぶhookを持つcollectionでもdraft保存が通る', () => {
+    it('lets a content-draft-writer save a draft on a published article-placements document', async () => {
+      const owner = await loginAs(payload, 'gate-owner@example.com');
+      const writer = await loginAs(payload, 'gate-writer@example.com');
+
+      const article = await payload.create({
+        collection: 'articles',
+        overrideAccess: false,
+        draft: true,
+        user: writer,
+        data: { stableId: 'gate-placement-article', slug: 'gate-placement-article', title: 'Placement fixture article' },
+      });
+
+      const placement = await payload.create({
+        collection: 'article-placements',
+        overrideAccess: false,
+        user: owner,
+        data: {
+          stableId: 'gate-placement-published',
+          slug: 'gate-placement-published',
+          surface: 'reports-index',
+          slot: 'hero',
+          articleId: article.id,
+          order: 1,
+          lifecycleStatus: 'active',
+          _status: 'published',
+        },
+        context: privilegedPublishContext({
+          runId: 'test-placement-seed',
+          actorId: String(owner.id),
+          reason: 'publish-gates regression fixture',
+        }),
+      });
+      expect(placement._status).toBe('published');
+
+      // 公開中placementの上へ、draft-writerが通常どおりdraftを保存できる。
+      const saved = await payload.update({
+        collection: 'article-placements',
+        id: placement.id,
+        overrideAccess: false,
+        draft: true,
+        user: writer,
+        data: { order: 2 },
+      });
+      expect(saved._status).toBe('draft');
+
+      // 公開中のmain rowは動いていない。
+      const mainRow = await payload.findByID({
+        collection: 'article-placements',
+        id: placement.id,
+        overrideAccess: true,
+      });
+      expect(mainRow._status).toBe('published');
+      expect(mainRow.order).toBe(1);
+
+      // 変更は新しいdraft versionとして残っている。
+      const { docs: versions } = await payload.findVersions({
+        collection: 'article-placements',
+        where: { parent: { equals: placement.id } },
+        sort: '-createdAt',
+        limit: 1,
+        overrideAccess: true,
+        depth: 0,
+      });
+      const latest = (versions[0] as unknown as { version: Record<string, unknown> }).version;
+      expect(latest._status).toBe('draft');
+      expect(latest.order).toBe(2);
     });
   });
 

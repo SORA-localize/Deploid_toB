@@ -67,24 +67,12 @@ describe('draft intent is a single-use token scoped to one write', () => {
   });
 
   /**
-   * fix round 2: `beforeOperation` は access control より前に走るので、id指定のupdateが
-   * `beforeChange` へ到達せず終わると intent が孤児になる。`createLocalReq()` は operation ごとに
-   * `req.context` を新しいobjectへ差し替える（Mapは spread で引き継がれる）ので、
-   * token側にも「どのoperationが記録したか」を持たせて突き合わせる。
+   * `beforeOperation` は access control より前に走るので、id指定のupdateが `beforeChange` へ
+   * 到達せず終わると intent が孤児になる。孤児は `clearDraftIntents()`（各write operationの
+   * 入口で呼ぶ）が捨てる。token自体を記録元operationへ紐づける案は、gateより前にLocal APIを
+   * 呼ぶhookを持つcollectionで正当なdraft保存まで壊すため採らなかった
+   * （`lib/payload/publishAuthorization.ts` の該当コメント参照）。
    */
-  it('ignores an intent left behind by a different operation on the same request', () => {
-    const firstOperationContext: Record<string, unknown> = { seed: 1 };
-    const req = { context: firstOperationContext } as unknown as PayloadRequest;
-
-    // operation A が記録したが、access拒否等で消費されずに終わった。
-    recordDraftIntent(req, 'manufacturers', 7, true);
-
-    // operation B が始まる: createLocalReq が context を差し替える（Mapは引き継がれる）。
-    (req as unknown as { context: Record<string, unknown> }).context = { ...firstOperationContext };
-
-    expect(readDraftIntent(req, 'manufacturers', 7)).toBe(false);
-  });
-
   it('clears pending intents for one collection without touching another', () => {
     const context: Record<string, unknown> = {};
     const req = fakeReq(context);
