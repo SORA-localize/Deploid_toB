@@ -76,8 +76,14 @@ const ARTICLE_PLACEMENT_SLOTS: readonly ArticlePlacementSlot[] = ['hero', 'featu
  * `readSnapshot()` が全読み取りを載せるtransactionの最小 `req`（必須修正5）。Payload Local APIは
  * `req` の部分オブジェクトを受け取り `transactionID` を引き継ぐ（`publishApprovedVersion()` と同じ形）。
  */
-interface SnapshotReadRequest {
+export interface SnapshotReadRequest {
   transactionID: string | number;
+}
+
+/** `site-settings` global の生doc（未移行なら値が欠けうるので、すべて任意 + null許容で受ける）。 */
+interface SiteSettingsDocument {
+  dataAsOf?: string | null;
+  articleIndexPlacementLimits?: Partial<Record<ArticlePlacementSlot, number | null>> | null;
 }
 
 type ContentCollectionSlug =
@@ -137,18 +143,68 @@ interface PayloadFindArgs {
   sort: string[];
   limit?: number;
   page?: number;
+  /** 指定するとこの読み取りが `req.transactionID` のtransactionへ載る（`readSnapshot()` 用）。 */
+  req?: SnapshotReadRequest;
 }
 
 interface PayloadFindResult {
   docs: unknown[];
   hasNextPage: boolean;
+  totalDocs: number;
+}
+
+/** `findDocs` がページループで得た結果。`readSnapshot()` は `totalDocs` まで検査する。 */
+interface PagedDocs {
+  docs: unknown[];
+  /** 最終ページ時点でPayloadが報告した総件数。 */
+  totalDocs: number;
+}
+
+/**
+ * 必須修正5-2（remediation group 2）: pagination の整合性検査。
+ *
+ * ページループは「`hasNextPage` が false になったら完了」としか見ていなかった。ページ跨ぎで
+ * 取りこぼしや二重取得が起きても、snapshot はそれを**正しい全件**として出してしまう
+ * （欠落は `missing`、重複は同一idの二重出現として、後段のparityやimportを黙って狂わせる）。
+ * 全件取得を名乗る以上、件数と一意性は読み取った側が確かめる。
+ *
+ * 純粋関数として切り出してあるのは、実DBでこの2つの故障を再現させるのが難しく、
+ * 「guardが存在する」ではなく「guardが実際に落とす」ことをテストで固定したいため。
+ */
+export function assertSnapshotPageIntegrity(
+  collection: string,
+  docs: readonly { stableId?: unknown }[],
+  totalDocs: number,
+): void {
+  if (docs.length !== totalDocs) {
+    throw new Error(
+      `snapshot-pagination-incomplete: ${collection} fetched ${docs.length} of ${totalDocs} document(s). ` +
+        'A page loop that disagrees with totalDocs means documents were added, removed, or skipped mid-read.',
+    );
+  }
+
+  const seen = new Set<string>();
+  for (const doc of docs) {
+    const stableId = doc?.stableId;
+    if (typeof stableId !== 'string' || stableId.length === 0) {
+      throw new Error(`snapshot-missing-stable-id: ${collection} returned a document without a stableId.`);
+    }
+    if (seen.has(stableId)) {
+      throw new Error(
+        `snapshot-duplicate-stable-id: ${collection} returned "${stableId}" more than once across pages.`,
+      );
+    }
+    seen.add(stableId);
+  }
 }
 
 /**
  * `limit` 指定時はその1ページだけ、未指定時は明示的な `page` ループで条件に合う全件を取る。
  * `limit` / `page` / `sort` / `depth` はすべて明示し、Payloadの暗黙defaultへ委ねない。
  */
-async function findDocs(payload: Payload, args: PayloadFindArgs, pageSize: number): Promise<unknown[]> {
+async function findPagedDocs(payload: Payload, args: PayloadFindArgs, pageSize: number): Promise<PagedDocs> {
+  const req = args.req ? { req: args.req as never } : {};
+
   if (args.limit !== undefined) {
     const result = (await payload.find({
       collection: args.collection,
@@ -159,8 +215,9 @@ async function findDocs(payload: Payload, args: PayloadFindArgs, pageSize: numbe
       depth: 0,
       overrideAccess: true,
       pagination: true,
+      ...req,
     })) as unknown as PayloadFindResult;
-    return result.docs;
+    return { docs: result.docs, totalDocs: result.totalDocs };
   }
 
   const docs: unknown[] = [];
@@ -174,13 +231,18 @@ async function findDocs(payload: Payload, args: PayloadFindArgs, pageSize: numbe
       depth: 0,
       overrideAccess: true,
       pagination: true,
+      ...req,
     })) as unknown as PayloadFindResult;
     docs.push(...result.docs);
-    if (!result.hasNextPage) return docs;
+    if (!result.hasNextPage) return { docs, totalDocs: result.totalDocs };
   }
   throw new Error(
     `payload-source-page-limit-exceeded: ${args.collection} returned more than ${MAX_PAGES * pageSize} documents`,
   );
+}
+
+async function findDocs(payload: Payload, args: PayloadFindArgs, pageSize: number): Promise<unknown[]> {
+  return (await findPagedDocs(payload, args, pageSize)).docs;
 }
 
 export interface PayloadContentSourceOptions {
@@ -188,7 +250,96 @@ export interface PayloadContentSourceOptions {
   payload?: Payload | Promise<Payload>;
 }
 
-export function createPayloadContentSource(options: PayloadContentSourceOptions = {}): FullContentSource {
+export interface SnapshotReadOptions {
+  /**
+   * **回帰テスト専用**の差し込み口（`tests/content/snapshot-consistency.test.ts`）。
+   * 1 collection（または global）を読み終えた直後に呼ばれる。本番の呼び出し側は渡さない。
+   * `publishApprovedVersion()` の `onApprovalVerified` と同じ用途・同じ扱い。
+   */
+  onCollectionRead?: (collection: string, req: SnapshotReadRequest) => void | Promise<void>;
+}
+
+/**
+ * Payload source は `FullContentSource` に加えて、`readSnapshot()` のテスト用差し込み口を持つ。
+ * `ContentSnapshotSource`（source非依存の契約）側は引数なしのままにする。
+ */
+export type PayloadContentSource = FullContentSource & {
+  readSnapshot(options?: SnapshotReadOptions): Promise<ContentSnapshot>;
+};
+
+/**
+ * 必須修正5-1（remediation group 2）: snapshot中の**すべての**Payload読み取りを同じ
+ * transactionへ載せるためのwrapper。
+ *
+ * `readSnapshot()` 内で `req` を渡し忘れた読み取りが1つでもあると、その読み取りだけが
+ * transactionの外（= 別のsnapshot時点）を見る。しかも症状は「たまに参照が壊れたsnapshotが
+ * 出来る」という再現しにくい形で、型検査でもテストでも捕まりにくい。
+ *
+ * mapper（`lib/content/payloadMappers.ts`）は relationship の内部id → stableId 解決のために
+ * 自前で `payload.findByID` / `payload.find` を呼ぶ。9つのmapper signatureへ `req` を通す
+ * 方式だと「新しいmapperで渡し忘れる」が静かに起こるので、**payload instance側で
+ * 構造的に強制する**。ここを通した payload を渡す限り、mapperが何回どこを読んでも
+ * 同じtransactionに載る。
+ */
+function transactionScopedPayload(payload: Payload, req: SnapshotReadRequest): Payload {
+  const READ_METHODS = new Set(['find', 'findByID', 'findGlobal', 'findVersions', 'count']);
+  return new Proxy(payload, {
+    get(target, property) {
+      const value = Reflect.get(target, property) as unknown;
+      if (typeof value !== 'function') return value;
+      const bound = (value as (...args: unknown[]) => unknown).bind(target);
+      if (typeof property !== 'string' || !READ_METHODS.has(property)) return bound;
+      return (args: Record<string, unknown>) => bound({ ...args, req });
+    },
+  }) as Payload;
+}
+
+/**
+ * 必須修正5-1: 全 collection + global を1つの **repeatable read** transactionで読む。
+ *
+ * 以前は9 collectionを `Promise.all` で独立にqueryしていた。Postgres の既定である
+ * READ COMMITTED では文ごとに新しいsnapshotを取るため、export中にcommitされた書き込みが
+ * 「あるcollectionには反映済み、別のcollectionには未反映」という形で混ざりうる。
+ * repeatable read なら transaction 内の全文が同じDB snapshotを見るので、混合状態が
+ * 構造的に起こらない（「double-read/retryで同一revisionを確認する」という代替案は、
+ * Payload Local API が transaction を素通しで扱える以上、不要）。
+ *
+ * `accessMode: 'read only'` も付ける。snapshot読み出しが書き込みを行わないことをDB側で
+ * 保証し、将来ここに書き込みが紛れ込んだら即座にエラーになるようにする。
+ *
+ * 読み取りは `Promise.all` ではなく**直列**に行う。1つのtransactionは1本のconnection上に
+ * あり、同じconnectionへ並行してqueryを流すのは pg の想定外
+ * （`Calling client.query() when the client is already executing a query`）。
+ */
+async function withSnapshotTransaction<T>(
+  payload: Payload,
+  run: (req: SnapshotReadRequest, txPayload: Payload) => Promise<T>,
+): Promise<T> {
+  const transactionID = await payload.db.beginTransaction({
+    isolationLevel: 'repeatable read',
+    accessMode: 'read only',
+  });
+  if (transactionID === null || transactionID === undefined) {
+    throw new Error(
+      'snapshot-transaction-unavailable: this database adapter does not support transactions, so ' +
+        'readSnapshot() cannot guarantee a single consistent revision across collections.',
+    );
+  }
+
+  const req: SnapshotReadRequest = { transactionID };
+  let committed = false;
+  try {
+    const result = await run(req, transactionScopedPayload(payload, req));
+    await payload.db.commitTransaction(transactionID);
+    committed = true;
+    return result;
+  } catch (error) {
+    if (!committed) await payload.db.rollbackTransaction(transactionID);
+    throw error;
+  }
+}
+
+export function createPayloadContentSource(options: PayloadContentSourceOptions = {}): PayloadContentSource {
   let instance: Promise<Payload> | undefined;
 
   const client = async (): Promise<Payload> => {
@@ -236,13 +387,17 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
   /** 各mapperが受け取るdoc型（mapper側の内部型をそのまま使い、ここで別定義しない）。 */
   type DocOf<TMapper extends (doc: never, ...rest: never[]) => unknown> = Parameters<TMapper>[0];
 
-  /** doc配列 → domain配列。relationship解決cacheは1回の読み取りの中だけで共有する。 */
+  /**
+   * doc配列 → domain配列。relationship解決cacheは1回の読み取りの中だけで共有する。
+   * `scopedPayload` を渡すと mapper の relationship 解決もその transaction へ載る（必須修正5-1）。
+   */
   const mapAll = async <TRecord>(
     docs: unknown[],
     map: (doc: never, payload: Payload, cache: RelationshipResolutionCache) => Promise<TRecord> | TRecord,
+    scopedPayload?: Payload,
   ): Promise<TRecord[]> => {
     if (docs.length === 0) return [];
-    const payload = await client();
+    const payload = scopedPayload ?? (await client());
     const cache = createRelationshipResolutionCache();
     const mapped: TRecord[] = [];
     for (const doc of docs) {
@@ -301,25 +456,13 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
    * Payloadを正本にした以上、値が無いのは「移行が完了していない」状態なので、
    * 黙って埋めずに `site-settings-not-migrated` で落とす。
    */
-  const readSiteSettingsDocument = async (req?: SnapshotReadRequest): Promise<{
-    dataAsOf?: string | null;
-    articleIndexPlacementLimits?: Partial<Record<ArticlePlacementSlot, number | null>> | null;
-  }> => {
-    const payload = await client();
-    const global = await payload.findGlobal({
-      slug: 'site-settings',
-      depth: 0,
-      overrideAccess: true,
-      ...(req ? { req: req as never } : {}),
-    });
-    return global as {
-      dataAsOf?: string | null;
-      articleIndexPlacementLimits?: Partial<Record<ArticlePlacementSlot, number | null>> | null;
-    };
+  const readSiteSettingsDocument = async (scopedPayload?: Payload): Promise<SiteSettingsDocument> => {
+    const payload = scopedPayload ?? (await client());
+    const global = await payload.findGlobal({ slug: 'site-settings', depth: 0, overrideAccess: true });
+    return global as SiteSettingsDocument;
   };
 
-  const requireSiteSettings = async (req?: SnapshotReadRequest): Promise<ContentSnapshot['siteSettings']> => {
-    const settings = await readSiteSettingsDocument(req);
+  const requireSiteSettings = (settings: SiteSettingsDocument): ContentSnapshot['siteSettings'] => {
     if (typeof settings.dataAsOf !== 'string' || settings.dataAsOf.length === 0) {
       throw new Error(
         'site-settings-not-migrated: the site-settings global has no dataAsOf value. ' +
@@ -330,8 +473,7 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
     return { dataAsOf: settings.dataAsOf };
   };
 
-  const requirePlacementLimits = async (req?: SnapshotReadRequest): Promise<Record<ArticlePlacementSlot, number>> => {
-    const settings = await readSiteSettingsDocument(req);
+  const requirePlacementLimits = (settings: SiteSettingsDocument): Record<ArticlePlacementSlot, number> => {
     const limits = settings.articleIndexPlacementLimits;
     const missing = ARTICLE_PLACEMENT_SLOTS.filter((slot) => typeof limits?.[slot] !== 'number');
     if (missing.length > 0) {
@@ -358,7 +500,7 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
     return findDocs(payload, { collection, where, sort: toPayloadSort(sort), limit, page }, RUNTIME_PAGE_SIZE);
   };
 
-  const source: FullContentSource = {
+  const source: PayloadContentSource = {
     // ── robots ────────────────────────────────────────────────────────────
     async listRobots(query: RobotSourceQuery): Promise<Robot[]> {
       const payload = await client();
@@ -496,8 +638,12 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
     findMediaById: (id) => findOne('media', { stableId: { equals: id } }, mapMedia),
 
     // ── SiteSettings global ───────────────────────────────────────────────
-    readArticleIndexPlacementLimits: () => requirePlacementLimits(),
-    readSiteSettings: () => requireSiteSettings(),
+    async readArticleIndexPlacementLimits(): Promise<Record<ArticlePlacementSlot, number>> {
+      return requirePlacementLimits(await readSiteSettingsDocument());
+    },
+    async readSiteSettings(): Promise<ContentSnapshot['siteSettings']> {
+      return requireSiteSettings(await readSiteSettingsDocument());
+    },
 
     // ── 管理処理専用 ───────────────────────────────────────────────────────
     /**
@@ -505,73 +651,55 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
      * （`ContentRepository` はこのメソッドを型として持たない）。`limit: 500` の全件取得を
      * 許すのはこの経路だけ。全 `publishStatus`（draft含む）を対象にする。
      */
-    async readSnapshot(): Promise<ContentSnapshot> {
+    async readSnapshot(snapshotOptions: SnapshotReadOptions = {}): Promise<ContentSnapshot> {
       const payload = await client();
-      const statusWhere = publishStatusWhere(ALL_PUBLISH_STATUSES);
-      const snapshotDocs = async (collection: ContentCollectionSlug, where: Where, sort: string[]) =>
-        findDocs(payload, { collection, where, sort }, SNAPSHOT_PAGE_SIZE);
 
-      const [
-        robotDocs,
-        robotSeriesDocs,
-        distributorDocs,
-        manufacturerDocs,
-        useCaseDocs,
-        deploymentDocs,
-        articleDocs,
-        placementDocs,
-        mediaDocs,
-      ] = await Promise.all([
-        snapshotDocs('robots', statusWhere, ['stableId']),
-        snapshotDocs('robot-series', statusWhere, ['stableId']),
-        snapshotDocs('distributors', statusWhere, ['stableId']),
-        snapshotDocs('manufacturers', statusWhere, ['stableId']),
-        snapshotDocs('use-cases', statusWhere, ['stableId']),
-        snapshotDocs('deployments', statusWhere, ['stableId']),
-        snapshotDocs('articles', statusWhere, ['stableId']),
-        snapshotDocs('article-placements', statusWhere, ['stableId']),
-        snapshotDocs('media', {}, ['stableId']),
-      ]);
+      return withSnapshotTransaction(payload, async (req, txPayload) => {
+        const statusWhere = publishStatusWhere(ALL_PUBLISH_STATUSES);
 
-      const [
-        robots,
-        robotSeries,
-        distributors,
-        manufacturers,
-        useCases,
-        deployments,
-        articles,
-        articlePlacements,
-        media,
-        articleIndexPlacementLimits,
-        siteSettings,
-      ] = await Promise.all([
-        mapAll<Robot>(robotDocs, mapRobot),
-        mapAll<RobotSeries>(robotSeriesDocs, mapRobotSeries),
-        mapAll<Distributor>(distributorDocs, mapDistributor),
-        mapAll<Manufacturer>(manufacturerDocs, mapManufacturer),
-        mapAll<UseCase>(useCaseDocs, mapUseCase),
-        mapAll<DeploymentSite>(deploymentDocs, mapDeployment),
-        mapAll<Article>(articleDocs, mapArticle),
-        mapAll<ArticlePlacement>(placementDocs, mapPlacement),
-        mapAll<MediaAsset>(mediaDocs, mapMedia),
-        source.readArticleIndexPlacementLimits(),
-        source.readSiteSettings(),
-      ]);
+        /**
+         * 1 collectionを全件読み、件数と stable ID の一意性を検査する（必須修正5-2）。
+         * `Promise.all` ではなく直列（同一transaction = 同一connection）。
+         */
+        const snapshotDocs = async (collection: ContentCollectionSlug, where: Where): Promise<unknown[]> => {
+          const { docs, totalDocs } = await findPagedDocs(
+            txPayload,
+            { collection, where, sort: ['stableId'], req },
+            SNAPSHOT_PAGE_SIZE,
+          );
+          assertSnapshotPageIntegrity(collection, docs as readonly { stableId?: unknown }[], totalDocs);
+          await snapshotOptions.onCollectionRead?.(collection, req);
+          return docs;
+        };
 
-      return {
-        robots,
-        robotSeries,
-        distributors,
-        manufacturers,
-        useCases,
-        deployments,
-        articles,
-        articlePlacements,
-        articleIndexPlacementLimits,
-        media,
-        siteSettings,
-      };
+        const robotDocs = await snapshotDocs('robots', statusWhere);
+        const robotSeriesDocs = await snapshotDocs('robot-series', statusWhere);
+        const distributorDocs = await snapshotDocs('distributors', statusWhere);
+        const manufacturerDocs = await snapshotDocs('manufacturers', statusWhere);
+        const useCaseDocs = await snapshotDocs('use-cases', statusWhere);
+        const deploymentDocs = await snapshotDocs('deployments', statusWhere);
+        const articleDocs = await snapshotDocs('articles', statusWhere);
+        const placementDocs = await snapshotDocs('article-placements', statusWhere);
+        // `media` は `_status` / `lifecycleStatus` を持たない（uploadの実体そのもの）。
+        const mediaDocs = await snapshotDocs('media', {});
+
+        const settingsDocument = await readSiteSettingsDocument(txPayload);
+        await snapshotOptions.onCollectionRead?.('site-settings', req);
+
+        return {
+          robots: await mapAll<Robot>(robotDocs, mapRobot, txPayload),
+          robotSeries: await mapAll<RobotSeries>(robotSeriesDocs, mapRobotSeries, txPayload),
+          distributors: await mapAll<Distributor>(distributorDocs, mapDistributor, txPayload),
+          manufacturers: await mapAll<Manufacturer>(manufacturerDocs, mapManufacturer, txPayload),
+          useCases: await mapAll<UseCase>(useCaseDocs, mapUseCase, txPayload),
+          deployments: await mapAll<DeploymentSite>(deploymentDocs, mapDeployment, txPayload),
+          articles: await mapAll<Article>(articleDocs, mapArticle, txPayload),
+          articlePlacements: await mapAll<ArticlePlacement>(placementDocs, mapPlacement, txPayload),
+          articleIndexPlacementLimits: requirePlacementLimits(settingsDocument),
+          media: await mapAll<MediaAsset>(mediaDocs, mapMedia, txPayload),
+          siteSettings: requireSiteSettings(settingsDocument),
+        };
+      });
     },
   };
 
