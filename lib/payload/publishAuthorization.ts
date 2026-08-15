@@ -21,6 +21,11 @@ const APPROVED_PUBLISH_KEY = '__deploidApprovedPublish';
 const PRIVILEGED_PUBLISH_KEY = '__deploidPrivilegedPublish';
 const DRAFT_INTENT_KEY = '__deploidDraftIntent';
 
+// Context のfield形だけではauthorizationにしない。Payloadがoperation間で行うshallow copyは
+// object identityを保つ一方、JSON/structured cloneや手書きの自己申告objectはregistryに無い。
+const issuedApprovedAuthorizations = new WeakSet<object>();
+const issuedPrivilegedAuthorizations = new WeakSet<object>();
+
 /** 承認済みversionの公開（`publishApprovedVersion()` だけが作る）。 */
 export interface ApprovedPublishAuthorization {
   collection: string;
@@ -44,11 +49,13 @@ export interface PrivilegedPublishAuthorization {
 
 /** `publishApprovedVersion()` が Local API 呼び出しへ渡す `context`。 */
 export function approvedPublishContext(auth: ApprovedPublishAuthorization): Record<string, unknown> {
+  issuedApprovedAuthorizations.add(auth);
   return { [APPROVED_PUBLISH_KEY]: auth };
 }
 
 /** import / restore が Local API 呼び出しへ渡す `context`。 */
 export function privilegedPublishContext(auth: PrivilegedPublishAuthorization): Record<string, unknown> {
+  issuedPrivilegedAuthorizations.add(auth);
   return { [PRIVILEGED_PUBLISH_KEY]: auth };
 }
 
@@ -67,7 +74,7 @@ export function readApprovedPublishAuthorization(
   documentId: string | number | undefined,
 ): ApprovedPublishAuthorization | null {
   const value = contextOf(req)[APPROVED_PUBLISH_KEY] as ApprovedPublishAuthorization | undefined;
-  if (!value) return null;
+  if (!value || !issuedApprovedAuthorizations.has(value)) return null;
   if (value.collection !== collectionSlug) return null;
   if (documentId === undefined || String(value.documentId) !== String(documentId)) return null;
   return value;
@@ -79,7 +86,7 @@ export function readPrivilegedPublishAuthorization(
   collectionSlug: string,
 ): PrivilegedPublishAuthorization | null {
   const value = contextOf(req)[PRIVILEGED_PUBLISH_KEY] as PrivilegedPublishAuthorization | undefined;
-  if (!value) return null;
+  if (!value || !issuedPrivilegedAuthorizations.has(value)) return null;
   if (value.collections && !value.collections.includes(collectionSlug)) return null;
   return value;
 }
