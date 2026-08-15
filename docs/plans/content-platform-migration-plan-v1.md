@@ -1983,10 +1983,25 @@ git commit -m "feat: add least-privilege Codex content access"
 - Delete after parity: `data/deployments.ts`
 - Delete after parity: `data/articles.ts`
 - Delete after parity: `data/articlePlacements.ts`
-- Delete after parity: `data/types.ts`（Task 6のcanonical型移行gateが0件になった場合だけ削除）
+- Delete after parity: `data/types.ts`（Task 6のcanonical型移行gateが0件になった場合だけ削除。
+  Task 6 fix round 1時点で唯一の残存依存は `lib/data/contentSnapshot.ts` — `Robot` /
+  `Manufacturer` / `UseCase` について、legacy側の必須field（`buyerReadiness`）・legacy専用field
+  （`Manufacturer.logo`、`lib/validation/manufacturers.ts` が読む）・legacyの方が厳格な必須制約
+  （`UseCaseCandidateRobot.robotId`）が、`lib/content/localSource.ts` のlegacy→domain変換関数
+  （`toDomainRobot`等）の引数型として実際に必要なため、意図的にlegacy型を保持している。
+  `data/*.ts` を削除する前に、このfileと、それが支える legacy検証パイプライン一式
+  （`lib/validate.ts` / `lib/data/localContentSnapshot.ts` / `lib/validation/*.ts` /
+  `scripts/validate-data.mjs` 経由の dev起動時チェック・`npm run validate:data`）を
+  どう扱うか（削除するか、Payload由来のsnapshotを検証する形へ作り替えるか）を
+  このTaskで決めること。下記Step 7のgateコマンドは exclusion 無しのままでよい
+  （`lib/data/contentSnapshot.ts` が実際に1件ヒットして止まるのが正しい挙動）。
+- Delete after parity（legacy検証パイプライン。上記と同時に判断する）:
+  `lib/data/contentSnapshot.ts`, `lib/data/localContentSnapshot.ts`, `lib/validate.ts`,
+  `lib/validation/*.ts`
 - Delete after cutover: `lib/content/localSource.ts`
 - Modify: `lib/content/getContentRepository.ts`
-- Modify: `scripts/validate-data.mjs`
+- Modify: `scripts/validate-data.mjs`（legacy検証パイプラインを削除する場合は、この行自体を
+  「Delete」に読み替え、`package.json` の `build` / `validate:data` scriptからも呼び出しを外す）
 - Modify: `README.md`
 - Modify: `docs/decisions/data/README.md`
 - Modify: `docs/decisions/data-maintenance-checklist-v1.md`
@@ -2070,7 +2085,11 @@ Vercel production環境へ `CONTENT_SOURCE=payload` を設定してdeployする�
 rg -n "@/data/types|\.\.?/.*data/types" src components lib scripts tests
 ```
 
-Expected: 0件。1件でも残る場合は `data/types.ts` を削除せずTask 6へ戻る。
+Expected: 0件。Task 6 fix round 1時点では `lib/data/contentSnapshot.ts` が1件ヒットする
+（意図的・上記Filesの注記を参照）。これはTask 6の未修正ではなく、legacy検証パイプライン
+（`lib/validate.ts` / `lib/data/localContentSnapshot.ts` / `lib/validation/*.ts` /
+`scripts/validate-data.mjs`）を本Taskで削除するかPayload snapshot検証へ作り替えるまで
+解消しない残存依存。それ以外の箇所で1件でも出る場合は、新たな回帰としてTask 6へ戻って調査する。
 
 - [ ] **Step 8: 最終検証を実行する**
 

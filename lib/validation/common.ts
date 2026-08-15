@@ -3,7 +3,9 @@
 // `fs`/`path` を使う画像実測validationはこのファイルだけに置く（server/node限定）。
 import fs from 'node:fs';
 import path from 'node:path';
-import type { ImageAsset, RightsStatus } from '../../data/legacyTypes.ts';
+// Task 6 fix round 1: ImageAsset/RightsStatusはlegacyとdomainで構造が完全に同一
+// （legacy側だけの余剰fieldも無い）ため、canonical domain型をそのまま使う。
+import type { ImageAsset, RightsStatus } from '../content/domainTypes.ts';
 import { isRegisteredTag, normalizeTagKey, type TagKind } from '../tagRegistry.ts';
 import type { ValidationCollector } from './types.ts';
 
