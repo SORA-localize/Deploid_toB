@@ -3,7 +3,7 @@
 // `fs`/`path` を使う画像実測validationはこのファイルだけに置く（server/node限定）。
 import fs from 'node:fs';
 import path from 'node:path';
-import type { ImageAsset, RightsStatus } from '../../data/types.ts';
+import type { ImageAsset, RightsStatus } from '../../data/legacyTypes.ts';
 import { isRegisteredTag, normalizeTagKey, type TagKind } from '../tagRegistry.ts';
 import type { ValidationCollector } from './types.ts';
 

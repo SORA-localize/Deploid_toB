@@ -43,6 +43,7 @@ import type {
   RobotSeriesSourceQuery,
   RobotSortField,
   RobotSourceQuery,
+  SourcePage,
   UseCaseSortField,
   UseCaseSourceQuery,
 } from './contracts';
@@ -343,6 +344,14 @@ function applyPaging<T>(records: T[], limit: number | undefined, page: number | 
   return records.slice(start, start + limit);
 }
 
+/**
+ * `list*Page()` 用。フィルタ済み・ソート済みの全件（`sorted`）から1ページ切り出しつつ、
+ * `totalDocs`（= フィルタ後の全件数）を返す（Task 6 Step 2の`listAllPublished*()`が使う）。
+ */
+function pageOf<T>(sorted: T[], limit: number, page: number | undefined): SourcePage<T> {
+  return { docs: applyPaging(sorted, limit, page), totalDocs: sorted.length };
+}
+
 function matchesStatus(record: { publishStatus: PublishStatus }, statuses: readonly PublishStatus[]): boolean {
   return statuses.includes(record.publishStatus);
 }
@@ -491,6 +500,16 @@ export function createInMemoryContentSource(snapshot: ContentSnapshot): FullCont
       );
       return applyPaging(sortRecords(filtered, query.sort, robotSortValue), query.limit, query.page);
     },
+    async listRobotsPage(query: RobotSourceQuery & { limit: number }): Promise<SourcePage<Robot>> {
+      const filtered = robots.filter(
+        (robot) =>
+          matchesStatus(robot, query.publishStatuses) &&
+          matchesIds(robot, query.ids) &&
+          (query.manufacturerId === undefined || robot.manufacturerId === query.manufacturerId) &&
+          (query.seriesId === undefined || robot.seriesId === query.seriesId),
+      );
+      return pageOf(sortRecords(filtered, query.sort, robotSortValue), query.limit, query.page);
+    },
     async findRobotById(id, lookup) {
       return findById(robots, id, lookup);
     },
@@ -528,6 +547,17 @@ export function createInMemoryContentSource(snapshot: ContentSnapshot): FullCont
           (query.country === undefined || manufacturer.country === query.country),
       );
       return applyPaging(sortRecords(filtered, query.sort, manufacturerSortValue), query.limit, query.page);
+    },
+    async listManufacturersPage(
+      query: ManufacturerSourceQuery & { limit: number },
+    ): Promise<SourcePage<Manufacturer>> {
+      const filtered = manufacturers.filter(
+        (manufacturer) =>
+          matchesStatus(manufacturer, query.publishStatuses) &&
+          matchesIds(manufacturer, query.ids) &&
+          (query.country === undefined || manufacturer.country === query.country),
+      );
+      return pageOf(sortRecords(filtered, query.sort, manufacturerSortValue), query.limit, query.page);
     },
     async findManufacturerById(id, lookup) {
       return findById(manufacturers, id, lookup);
@@ -573,6 +603,18 @@ export function createInMemoryContentSource(snapshot: ContentSnapshot): FullCont
       );
       return applyPaging(sortRecords(filtered, query.sort, useCaseSortValue), query.limit, query.page);
     },
+    async listUseCasesPage(query: UseCaseSourceQuery & { limit: number }): Promise<SourcePage<UseCase>> {
+      const filtered = useCases.filter(
+        (useCase) =>
+          matchesStatus(useCase, query.publishStatuses) &&
+          matchesIds(useCase, query.ids) &&
+          (query.candidateRobotId === undefined ||
+            useCase.candidateRobots.some((candidate) => candidate.robotId === query.candidateRobotId)) &&
+          (query.candidateSeriesId === undefined ||
+            useCase.candidateRobots.some((candidate) => candidate.seriesId === query.candidateSeriesId)),
+      );
+      return pageOf(sortRecords(filtered, query.sort, useCaseSortValue), query.limit, query.page);
+    },
     async findUseCaseById(id, lookup) {
       return findById(useCases, id, lookup);
     },
@@ -616,6 +658,18 @@ export function createInMemoryContentSource(snapshot: ContentSnapshot): FullCont
           (query.relatedUseCaseId === undefined || article.relatedUseCaseIds.includes(query.relatedUseCaseId)),
       );
       return applyPaging(sortRecords(filtered, query.sort, articleSortValue), query.limit, query.page);
+    },
+    async listArticlesPage(query: ArticleSourceQuery & { limit: number }): Promise<SourcePage<Article>> {
+      const filtered = articles.filter(
+        (article) =>
+          matchesStatus(article, query.publishStatuses) &&
+          matchesIds(article, query.ids) &&
+          (query.relatedRobotId === undefined || article.relatedRobotIds.includes(query.relatedRobotId)) &&
+          (query.relatedManufacturerId === undefined ||
+            article.relatedManufacturerIds.includes(query.relatedManufacturerId)) &&
+          (query.relatedUseCaseId === undefined || article.relatedUseCaseIds.includes(query.relatedUseCaseId)),
+      );
+      return pageOf(sortRecords(filtered, query.sort, articleSortValue), query.limit, query.page);
     },
     async findArticleById(id, lookup) {
       return findById(articles, id, lookup);

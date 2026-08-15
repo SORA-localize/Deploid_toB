@@ -3,13 +3,11 @@ import type {
   Capability,
   CompanyStatus,
   CompanyType,
-  ContactInquiryType,
   DeploymentStage,
   DeploymentStatus,
   ImageRole,
   JapanAvailability,
   JapanPresence,
-  MarketAvailability,
   MobilityType,
   OperatingEnvironment,
   ProcurementModel,
@@ -25,8 +23,21 @@ import type {
   RobotCategory,
   UseCaseMaturity,
   UseCaseCapabilityNotes,
-} from '@/data/types';
+} from '@/lib/content/domainTypes';
 import type { SpecGroup } from '@/lib/specSchema';
+
+/**
+ * お問い合わせフォーム専用の分類。content collection（Robot/Manufacturer/...）のいずれにも
+ * 対応しないUI限定の型のため、`lib/content/domainTypes.ts`（Payload collectionと対応する
+ * canonical型だけを置く）には置かず、唯一の消費元であるこのファイルで直接定義する
+ * （content-platform-migration-plan-v1 Task 6: legacy compatibility境界からの移行対象）。
+ */
+export type ContactInquiryType =
+  | 'data-correction'
+  | 'listing-request'
+  | 'interview-request'
+  | 'adoption-consultation'
+  | 'other';
 
 export const TBD_LABEL = '要確認';
 
@@ -132,19 +143,6 @@ export const mobilityLabels: Record<MobilityType, string> = {
   'wheel-legged': '車輪脚',
   hybrid: 'ハイブリッド',
   stationary: '据置',
-  unknown: TBD_LABEL,
-};
-
-/** 調達可能性の実態（Robot.marketAvailability）のラベル。deploymentStage（成熟段階）とは別軸。 */
-export const marketAvailabilityLabels: Record<MarketAvailability, string> = {
-  'enterprise-deployment': '企業導入あり（商用稼働）',
-  'enterprise-pilot': '企業パイロット中',
-  'developer-platform': '開発者向け販売中',
-  'research-platform': '研究機関向け提供',
-  reservation: '予約受付中',
-  'internal-use': '自社利用のみ',
-  'planned-production': '量産予定（未発売）',
-  'company-claimed-delivery': '出荷開始（自社発表のみ）',
   unknown: TBD_LABEL,
 };
 

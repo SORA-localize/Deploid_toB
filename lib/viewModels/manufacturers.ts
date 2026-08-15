@@ -1,4 +1,4 @@
-import type { Manufacturer, Robot } from '@/data/types';
+import type { Manufacturer, Robot } from '@/lib/content/domainTypes';
 import { createManufacturerCatalogSearchText } from '@/lib/catalog/search';
 import {
   getDomesticDistributorDisplay,

@@ -1,4 +1,4 @@
-import type { Robot, RobotLoadRating, RobotSpecs } from '@/data/types';
+import type { Robot, RobotLoadRating, RobotSpecs } from '@/lib/content/domainTypes';
 import {
   deploymentStageLabels,
   japanAvailabilityLabels,

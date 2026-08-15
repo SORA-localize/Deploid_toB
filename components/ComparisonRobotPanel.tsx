@@ -7,7 +7,7 @@ import { ExternalLink, GripVertical, Star, X } from 'lucide-react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import type { CompareCardDragHandleProps } from '@/components/SortableCompareCard';
 import { ComparisonSpecList } from '@/components/ComparisonSpecList';
-import type { Robot } from '@/data/types';
+import type { Robot } from '@/lib/content/domainTypes';
 import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import { EMPTY_VALUE_LABEL } from '@/lib/labels';
 import { getComparisonSpecGroups } from '@/lib/robotDisplay';

@@ -1,4 +1,4 @@
-import type { ImageAsset, ImageRole, Robot } from '@/data/types';
+import type { ImageAsset, ImageRole, Robot } from '@/lib/content/domainTypes';
 import { getDisplayableAsset } from '@/lib/media';
 
 export const ROBOT_IMAGE_ROLE_ORDER: ImageRole[] = [

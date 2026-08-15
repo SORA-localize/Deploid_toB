@@ -2,7 +2,8 @@ import { Suspense } from 'react';
 import { ListPageSkeletonShell } from '@/components/ListPageSkeletonShell';
 import { ManufacturerCardGridSkeleton } from '@/components/ManufacturerCardGridSkeleton';
 import { ManufacturersBrowser } from '@/components/ManufacturersBrowser';
-import { getManufacturers, getRobots } from '@/lib/data';
+import { getContentRepository } from '@/lib/content/getContentRepository';
+import { withMeasuredLogoAspect } from '@/lib/manufacturerLogoEnrich';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { toInitialSearch } from '@/lib/catalog/urlSearch';
 import { createPageMetadata } from '@/lib/metadata';
@@ -25,7 +26,12 @@ function ManufacturersPageSkeleton() {
 }
 
 async function ManufacturersContent({ searchParams }: { searchParams: RouteSearchParams }) {
-  const items = createManufacturerCatalogItems(getManufacturers(), getRobots());
+  const repository = await getContentRepository();
+  const [manufacturers, robots] = await Promise.all([
+    repository.listAllPublishedManufacturers(),
+    repository.listAllPublishedRobots(),
+  ]);
+  const items = createManufacturerCatalogItems(manufacturers.map(withMeasuredLogoAspect), robots);
   const params = await pickSearchParams(searchParams, ['country', 'route', 'q'] as const);
 
   return (

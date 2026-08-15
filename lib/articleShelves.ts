@@ -1,4 +1,4 @@
-import type { Article } from '@/data/types';
+import type { Article } from '@/lib/content/domainTypes';
 import { articleSectionLabels, articleTypeLabels } from '@/lib/labels';
 
 export type ArticleShelf = 'all' | 'news' | 'manufacturer-guide' | 'robot-guide' | 'basics-guide';

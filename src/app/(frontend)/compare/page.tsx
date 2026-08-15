@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { CompareClient } from '@/components/CompareClient';
-import { getManufacturers, getRobots } from '@/lib/data';
+import { getContentRepository } from '@/lib/content/getContentRepository';
 import { toInitialSearch } from '@/lib/catalog/urlSearch';
 import { createPageMetadata } from '@/lib/metadata';
 
@@ -16,8 +16,11 @@ async function CompareContent({
 }: {
   searchParams: Promise<{ compare?: string; view?: string }>;
 }) {
-  const robots = getRobots();
-  const manufacturers = getManufacturers();
+  const repository = await getContentRepository();
+  const [robots, manufacturers] = await Promise.all([
+    repository.listAllPublishedRobots(),
+    repository.listAllPublishedManufacturers(),
+  ]);
   const { compare, view } = await searchParams;
 
   return (

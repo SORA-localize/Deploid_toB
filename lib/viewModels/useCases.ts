@@ -1,4 +1,4 @@
-import type { Robot, UseCase, UseCaseMaturity } from '@/data/types';
+import type { Robot, UseCase, UseCaseMaturity } from '@/lib/content/domainTypes';
 import { createUseCaseCatalogSearchText } from '@/lib/catalog/search';
 import { maturityLabels } from '@/lib/labels';
 import { getUseCaseCardEvidenceSummary } from '@/lib/useCaseEvidence';
@@ -43,7 +43,7 @@ export function createUseCaseCatalogItems(
   return useCases.map((useCase) => {
     const robotNames = useCase.candidateRobots
       .slice(0, 2)
-      .map((candidate) => robotNameById.get(candidate.robotId))
+      .map((candidate) => (candidate.robotId ? robotNameById.get(candidate.robotId) : undefined))
       .filter((name): name is string => Boolean(name));
 
     return {

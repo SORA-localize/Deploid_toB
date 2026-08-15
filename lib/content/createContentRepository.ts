@@ -13,13 +13,16 @@
  * 実体が `readSnapshot()` を持っていてもrepository経由では到達できない（brief Step 3）。
  */
 import type {
+  Article,
   ArticlePlacementSlot,
   ArticlePlacementSurface,
   Id,
+  Manufacturer,
   PublishStatus,
   Robot,
   RobotSeries,
   Slug,
+  UseCase,
 } from './domainTypes';
 import type {
   ArticlePlacementSortField,
@@ -34,6 +37,7 @@ import type {
   RobotSeriesSortField,
   RobotSortField,
   SlugResolution,
+  SourcePage,
   UseCaseSortField,
 } from './contracts';
 
@@ -155,6 +159,82 @@ async function resolveSlug<T extends { slug: Slug }>(
   return moved ? { redirectTo: moved.slug } : {};
 }
 
+// ─── listAllPublished*(): 一覧をまるごとclient側の絞り込みUIへ渡すpageの安全な全件取得 ──
+//
+// `/robots` `/manufacturers` `/use-cases` `/reports` とHome・sitemap.tsは、published集合を
+// まるごと取得してからclientの絞り込みUI（RobotsBrowser等）やsitemap生成へ渡す（Task 6 brief
+// Step 2）。Payloadは常にページングされたAPIなので、これらのpageは「limitを付けずに全部取る」
+// のではなく、`limit: 100` の明示的なpageループで組み立てる必要がある。
+//
+// 安全条件（brief必須）:
+// - 各pageの`totalDocs`が読み取り中に変わったら、最初から最大1回だけ再取り直す。
+//   それでも変動する場合は `unstable-pagination` で失敗する（部分結果を返さない）。
+// - pageをまたいで同じstable idが二重に出たら `list-all-duplicate-id` で失敗する。
+// - 集めた件数が最終的な`totalDocs`と一致しない場合は `list-all-incomplete` で失敗する
+//   （部分結果を返さない）。
+// - 対象が安全上限（500件）を超える場合は黙ってtruncateせず `list-all-safety-limit-exceeded`
+//   で失敗する。これはserver-side pagination UIへの切り替えを要求するシグナルで、
+//   ページ側で握りつぶさず、そのままbuildを失敗させる。
+const LIST_ALL_PAGE_SIZE = 100;
+const LIST_ALL_SAFETY_LIMIT = 500;
+const LIST_ALL_MAX_RETRIES = 1;
+
+async function listAllPublished<T>(
+  label: string,
+  idOf: (record: T) => Id,
+  fetchPage: (page: number, limit: number) => Promise<SourcePage<T>>,
+): Promise<T[]> {
+  for (let attempt = 0; ; attempt += 1) {
+    const collected: T[] = [];
+    const seenIds = new Set<Id>();
+    let expectedTotal: number | undefined;
+    let drifted = false;
+
+    for (let page = 1; ; page += 1) {
+      const { docs, totalDocs } = await fetchPage(page, LIST_ALL_PAGE_SIZE);
+
+      if (expectedTotal === undefined) {
+        expectedTotal = totalDocs;
+        if (expectedTotal > LIST_ALL_SAFETY_LIMIT) {
+          throw new Error(
+            `list-all-safety-limit-exceeded: ${label} has ${expectedTotal} published record(s), over the ` +
+              `${LIST_ALL_SAFETY_LIMIT} safety limit for whole-list pages. Switch this page to server-side ` +
+              'pagination before raising the limit.',
+          );
+        }
+      } else if (totalDocs !== expectedTotal) {
+        drifted = true;
+        break;
+      }
+
+      for (const doc of docs) {
+        const id = idOf(doc);
+        if (seenIds.has(id)) {
+          throw new Error(`list-all-duplicate-id: ${label} returned "${id}" more than once while listing all pages.`);
+        }
+        seenIds.add(id);
+        collected.push(doc);
+      }
+
+      if (docs.length < LIST_ALL_PAGE_SIZE || collected.length >= expectedTotal) break;
+    }
+
+    if (!drifted) {
+      if (collected.length !== expectedTotal) {
+        throw new Error(
+          `list-all-incomplete: ${label} fetched ${collected.length} of ${expectedTotal} published record(s). ` +
+            'Refusing to return a partial list.',
+        );
+      }
+      return collected;
+    }
+
+    if (attempt >= LIST_ALL_MAX_RETRIES) {
+      throw new Error(`unstable-pagination: ${label}'s totalDocs changed while listing all pages, even after 1 retry.`);
+    }
+  }
+}
+
 export function createContentRepository(source: ContentSource) {
   /** `*Ids` 解決の共通形。sourceへは `ids` filterを渡し、並び順はrepositoryが復元する。 */
   const listByIds = async <T extends { id: Id }>(
@@ -188,6 +268,21 @@ export function createContentRepository(source: ContentSource) {
 
     listRobotsByManufacturerId: (manufacturerId: Id, query: RobotListQuery = {}) =>
       source.listRobots({ ...query, manufacturerId, sort: query.sort ?? 'id', publishStatuses: PUBLISHED_ONLY }),
+
+    /**
+     * `/robots` `/compare` とHomeの注目ロボットが使う全件published robots（安全なpagination-walk）。
+     * client向けの絞り込みUIへ丸ごと渡す一覧専用。関連欄・詳細ページは使わない。
+     */
+    listAllPublishedRobots: (): Promise<Robot[]> =>
+      listAllPublished(
+        'robots',
+        (robot) => robot.id,
+        (page, limit) => source.listRobotsPage({ sort: 'id', publishStatuses: PUBLISHED_ONLY, page, limit }),
+      ),
+
+    /** 件数だけが要る表示（例: for-manufacturers の掲載数）用の軽量count。全件は取得しない。 */
+    countPublishedRobots: async (): Promise<number> =>
+      (await source.listRobotsPage({ sort: 'id', publishStatuses: PUBLISHED_ONLY, page: 1, limit: 1 })).totalDocs,
 
     // ── robotSeries ───────────────────────────────────────────────────────
     listRobotSeries: (query: RobotSeriesListQuery = {}) =>
@@ -256,6 +351,19 @@ export function createContentRepository(source: ContentSource) {
         source.listManufacturers({ ids: resolvedIds, sort: 'id', publishStatuses: PUBLISHED_ONLY }),
       ),
 
+    /** `/manufacturers` とHomeのワールドマップが使う全件published manufacturers（安全なpagination-walk）。 */
+    listAllPublishedManufacturers: (): Promise<Manufacturer[]> =>
+      listAllPublished(
+        'manufacturers',
+        (manufacturer) => manufacturer.id,
+        (page, limit) => source.listManufacturersPage({ sort: 'id', publishStatuses: PUBLISHED_ONLY, page, limit }),
+      ),
+
+    /** 件数だけが要る表示（例: for-manufacturers の掲載数）用の軽量count。全件は取得しない。 */
+    countPublishedManufacturers: async (): Promise<number> =>
+      (await source.listManufacturersPage({ sort: 'id', publishStatuses: PUBLISHED_ONLY, page: 1, limit: 1 }))
+        .totalDocs,
+
     // ── distributors ──────────────────────────────────────────────────────
     listDistributors: (query: DistributorListQuery = {}) =>
       source.listDistributors({ ...query, sort: query.sort ?? 'id', publishStatuses: PUBLISHED_ONLY }),
@@ -321,6 +429,14 @@ export function createContentRepository(source: ContentSource) {
     listRelatedUseCases: (ids: readonly Id[]) =>
       listByIds(ids, (resolvedIds) =>
         source.listUseCases({ ids: resolvedIds, sort: 'id', publishStatuses: PUBLISHED_ONLY }),
+      ),
+
+    /** `/use-cases` とHomeの「用途から探す」が使う全件published use cases（安全なpagination-walk）。 */
+    listAllPublishedUseCases: (): Promise<UseCase[]> =>
+      listAllPublished(
+        'useCases',
+        (useCase) => useCase.id,
+        (page, limit) => source.listUseCasesPage({ sort: 'id', publishStatuses: PUBLISHED_ONLY, page, limit }),
       ),
 
     // ── deployments ───────────────────────────────────────────────────────
@@ -400,6 +516,18 @@ export function createContentRepository(source: ContentSource) {
     listRelatedArticles: (ids: readonly Id[]) =>
       listByIds(ids, (resolvedIds) =>
         source.listArticles({ ids: resolvedIds, sort: 'id', publishStatuses: PUBLISHED_ONLY }),
+      ),
+
+    /**
+     * `/reports` とHomeの注目記事、sitemap.tsが使う全件published articles（安全なpagination-walk）。
+     * 既定は公開日の新しい順（`listArticles` と同じ意味）。
+     */
+    listAllPublishedArticles: (): Promise<Article[]> =>
+      listAllPublished(
+        'articles',
+        (article) => article.id,
+        (page, limit) =>
+          source.listArticlesPage({ sort: '-publishedAt', publishStatuses: PUBLISHED_ONLY, page, limit }),
       ),
 
     // ── articlePlacements ─────────────────────────────────────────────────

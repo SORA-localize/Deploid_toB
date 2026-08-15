@@ -3,7 +3,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { ListPageSkeletonShell } from '@/components/ListPageSkeletonShell';
 import { UseCaseCardGridSkeleton } from '@/components/UseCaseCardGridSkeleton';
 import { UseCasesBrowser } from '@/components/UseCasesBrowser';
-import { getDeploymentsForUseCase, getRobots, getUseCases } from '@/lib/data';
+import { getContentRepository } from '@/lib/content/getContentRepository';
 import { createUseCaseCatalogItems } from '@/lib/viewModels/useCases';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { toInitialSearch } from '@/lib/catalog/urlSearch';
@@ -17,14 +17,25 @@ const defaultTitle = '用途から探す';
 const defaultDescription =
   '産業・現場タスクからヒューマノイドの実適用シーンを探す。実導入事例の有無を明示しています。';
 
-function buildUseCaseItems() {
-  return createUseCaseCatalogItems(getUseCases(), getRobots(), {
-    hasDeployments: (useCaseId) => getDeploymentsForUseCase(useCaseId).length > 0,
+async function buildUseCaseItems() {
+  const repository = await getContentRepository();
+  const [useCases, robots] = await Promise.all([
+    repository.listAllPublishedUseCases(),
+    repository.listAllPublishedRobots(),
+  ]);
+  const deploymentCounts = await Promise.all(
+    useCases.map((useCase) => repository.listDeploymentsForUseCaseId(useCase.id)),
+  );
+  const hasDeploymentsByUseCaseId = new Map(
+    useCases.map((useCase, index) => [useCase.id, deploymentCounts[index]!.length > 0]),
+  );
+  return createUseCaseCatalogItems(useCases, robots, {
+    hasDeployments: (useCaseId) => hasDeploymentsByUseCaseId.get(useCaseId) ?? false,
   });
 }
 
 function resolveFilters(
-  useCases: ReturnType<typeof buildUseCaseItems>,
+  useCases: Awaited<ReturnType<typeof buildUseCaseItems>>,
   params: { industry: string | null; task: string | null; q: string | null },
 ) {
   return normalizeUseCaseFilters({
@@ -54,7 +65,7 @@ function UseCasesPageSkeleton() {
 
 export async function generateMetadata({ searchParams }: { searchParams: RouteSearchParams }) {
   const params = await pickSearchParams(searchParams, ['industry', 'task', 'q'] as const);
-  const useCases = buildUseCaseItems();
+  const useCases = await buildUseCaseItems();
   const filters = resolveFilters(useCases, params);
   const matchedSlugs = searchUseCaseSlugs(createUseCaseSearchIndex(useCases), filters.query);
   const { filtered } = getUseCaseFilterResult(useCases, filters, matchedSlugs);
@@ -90,7 +101,7 @@ async function CachedUseCasesList({
 
   return (
     <UseCasesBrowser
-      useCases={buildUseCaseItems()}
+      useCases={await buildUseCaseItems()}
       initialSearch={toInitialSearch({ industry, task, q: query })}
     />
   );

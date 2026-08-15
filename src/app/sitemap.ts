@@ -1,14 +1,16 @@
 import type { MetadataRoute } from 'next';
-import {
-  getManufacturers,
-  getArticles,
-  getRobots,
-  getUseCases,
-} from '@/lib/data';
+import { getContentRepository } from '@/lib/content/getContentRepository';
 import { shouldIndexArticle, shouldIndexPublishedRecord, shouldIndexRobot } from '@/lib/indexing';
 import { siteUrl as base } from '@/lib/site';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const repository = await getContentRepository();
+  const [robots, manufacturers, useCases, articles] = await Promise.all([
+    repository.listAllPublishedRobots(),
+    repository.listAllPublishedManufacturers(),
+    repository.listAllPublishedUseCases(),
+    repository.listAllPublishedArticles(),
+  ]);
   const staticPaths = [
     '',
     '/robots',
@@ -21,25 +23,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/for-manufacturers',
     '/privacy',
   ];
-  const robotEntries: MetadataRoute.Sitemap = getRobots()
+  const robotEntries: MetadataRoute.Sitemap = robots
     .filter(shouldIndexRobot)
     .map((r) => ({
       url: `${base}/robots/${r.slug}`,
       lastModified: new Date(r.updatedAt),
     }));
-  const manufacturerEntries: MetadataRoute.Sitemap = getManufacturers()
+  const manufacturerEntries: MetadataRoute.Sitemap = manufacturers
     .filter(shouldIndexPublishedRecord)
     .map((m) => ({
       url: `${base}/manufacturers/${m.slug}`,
       lastModified: new Date(m.updatedAt),
     }));
-  const useCaseEntries: MetadataRoute.Sitemap = getUseCases()
+  const useCaseEntries: MetadataRoute.Sitemap = useCases
     .filter(shouldIndexPublishedRecord)
     .map((u) => ({
       url: `${base}/use-cases/${u.slug}`,
       lastModified: new Date(u.updatedAt),
     }));
-  const reportEntries: MetadataRoute.Sitemap = getArticles()
+  const reportEntries: MetadataRoute.Sitemap = articles
     .filter(shouldIndexArticle)
     .map((r) => ({
       url: `${base}/reports/${r.slug}`,

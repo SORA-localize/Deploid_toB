@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
 import { RobotCardRail } from '@/components/RobotCardRail';
-import type { Robot, Manufacturer } from '@/data/types';
+import type { Robot, Manufacturer } from '@/lib/content/domainTypes';
 import { getRobotPrimaryImage } from '@/lib/robotMedia';
 
 interface FeaturedRobotsGridProps {

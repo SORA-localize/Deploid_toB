@@ -1,4 +1,4 @@
-import type { Manufacturer, Robot, UseCase } from '@/data/types';
+import type { Manufacturer, Robot, UseCase } from '@/lib/content/domainTypes';
 import { createRobotCatalogSearchText } from '@/lib/catalog/search';
 import { deploymentStageLabels } from '@/lib/labels';
 import { createRobotCardViewModel } from '@/lib/robotCatalog';

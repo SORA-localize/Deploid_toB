@@ -11,35 +11,31 @@ import { RobotImageCarousel } from '@/components/RobotImageCarousel';
 import { RobotSpecExplorer } from '@/components/RobotSpecExplorer';
 import { RobotStickyAside } from '@/components/RobotStickyAside';
 import { SourceList } from '@/components/SourceList';
-import {
-  getManufacturerForRobot,
-  getManufacturers,
-  getOfficialUseCasesForRobot,
-  getRelatedRobotsForRobot,
-  getRobotById,
-  getRobots,
-  getRobotsForDetail,
-  resolveRobotDetailBySlug,
-} from '@/lib/data';
+import { getContentRepository } from '@/lib/content/getContentRepository';
 import { sortRobots } from '@/lib/display';
 import { shouldIndexRobot } from '@/lib/indexing';
 import { breadcrumbJsonLd, robotJsonLd } from '@/lib/jsonLd';
 import { createPageMetadata } from '@/lib/metadata';
 import {
   getRobotSpecGroups,
+  resolveOfficialUseCasesForRobot,
   resolveRobotUsageExamples,
+  resolveSameManufacturerRobots,
 } from '@/lib/robotCatalog';
 import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import { uiText } from '@/lib/uiText';
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
   // archived も詳細ページは残す（「提供終了」表示。一覧・比較には出ない）
-  return getRobotsForDetail().map((robot) => ({ slug: robot.slug }));
+  const repository = await getContentRepository();
+  const robots = await repository.listRobotsForDetail();
+  return robots.map((robot) => ({ slug: robot.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { record: robot } = resolveRobotDetailBySlug(slug);
+  const repository = await getContentRepository();
+  const { record: robot } = await repository.resolveRobotDetailBySlug(slug);
   const seo = robot?.seo;
   // archived（提供終了）は閲覧可能だが検索には載せない（§11.7）
   const noindex = robot ? !shouldIndexRobot(robot) : seo?.noindex;
@@ -57,19 +53,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function RobotDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { record: robot, redirectTo } = resolveRobotDetailBySlug(slug);
+  const repository = await getContentRepository();
+  const { record: robot, redirectTo } = await repository.resolveRobotDetailBySlug(slug);
   if (redirectTo) permanentRedirect(`/robots/${redirectTo}`);
   if (!robot) notFound();
 
-  const successor = robot.supersededById ? getRobotById(robot.supersededById) : undefined;
-  const manufacturer = getManufacturerForRobot(robot.manufacturerId);
-  const manufacturers = getManufacturers();
-  const intendedUses = getOfficialUseCasesForRobot(robot.id);
+  const [successor, manufacturer, manufacturers, useCases, allRobots] = await Promise.all([
+    robot.supersededById ? repository.getRobotById(robot.supersededById) : Promise.resolve(undefined),
+    repository.getManufacturerById(robot.manufacturerId),
+    repository.listAllPublishedManufacturers(),
+    repository.listAllPublishedUseCases(),
+    repository.listAllPublishedRobots(),
+  ]);
+  const intendedUses = resolveOfficialUseCasesForRobot(robot.id, useCases);
   const usageExamples = resolveRobotUsageExamples(robot);
   const specGroups = getRobotSpecGroups(robot);
-  const relatedRobots = getRelatedRobotsForRobot(robot);
+  const relatedRobots = resolveSameManufacturerRobots(robot, allRobots, manufacturers);
 
-  const all = sortRobots(getRobots(), 'featured', manufacturers);
+  const all = sortRobots(allRobots, 'featured', manufacturers);
   const index = all.findIndex((candidate) => candidate.id === robot.id);
   const previousRobot = index > 0 ? all[index - 1] : null;
   const nextRobot = index >= 0 && index < all.length - 1 ? all[index + 1] : null;
@@ -98,7 +99,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
   return (
     <div className="min-h-screen bg-background">
-      <JsonLd data={robotJsonLd(robot, manufacturer)} />
+      <JsonLd data={robotJsonLd(robot, manufacturer ?? undefined)} />
       <JsonLd
         data={breadcrumbJsonLd(
           breadcrumbItems.map((item) => ({
@@ -140,7 +141,6 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
             >
               <ManufacturerLogoName
                 name={manufacturer.name}
-                logo={manufacturer.logo}
                 logos={manufacturer.logos}
                 variant="combined"
                 targetAreaPx={20 * 96}

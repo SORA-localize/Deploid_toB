@@ -158,6 +158,21 @@ export interface MediaSourceQuery {
 }
 
 /**
+ * 1ページ分の結果 + そのクエリ時点での `totalDocs`（Task 6 Step 2: `listAllPublished*()` の
+ * 安全なpagination-walk用）。`docs.length` は必ずしも `totalDocs` と一致しない
+ * （`docs` はこのページだけ、`totalDocs` は条件に合う全件数）。
+ *
+ * repository層（`createContentRepository.ts`）はこの `totalDocs` を毎ページ比較して、
+ * 読み取り中に対象集合が変化していないかを検査する。`ContentSource.list*()`（配列だけを返す）
+ * では検査に必要な情報が失われるため、`list*Page()` を別メソッドとして持つ
+ * （既存 `list*()` の返り値型は変えない）。
+ */
+export interface SourcePage<T> {
+  docs: T[];
+  totalDocs: number;
+}
+
+/**
  * 公開runtime用のsource契約。9 collection（`admins` を除く）へ同じ粒度で
  * list / findById / findBySlug（+ slug redirect解決用の findByPreviousSlug）を定義する。
  * `publishStatus` の意味づけ（一覧はpublishedのみ / 詳細はpublished+archived）は
@@ -165,6 +180,12 @@ export interface MediaSourceQuery {
  */
 export interface ContentSource {
   listRobots(query: RobotSourceQuery): Promise<Robot[]>;
+  /**
+   * `listRobots` と同じ絞り込み・並び順で1ページ分 + `totalDocs` を返す（Task 6 Step 2）。
+   * `listAllPublishedRobots()`（repository層）の安全なpagination-walkだけが呼ぶ。
+   * `query.limit` は必須（ページサイズ）、`query.page` 省略時は1ページ目。
+   */
+  listRobotsPage(query: RobotSourceQuery & { limit: number }): Promise<SourcePage<Robot>>;
   findRobotById(id: Id, lookup: LookupQuery): Promise<Robot | null>;
   findRobotBySlug(slug: Slug, lookup: LookupQuery): Promise<Robot | null>;
   findRobotByPreviousSlug(slug: Slug, lookup: LookupQuery): Promise<Robot | null>;
@@ -175,6 +196,7 @@ export interface ContentSource {
   findRobotSeriesByPreviousSlug(slug: Slug, lookup: LookupQuery): Promise<RobotSeries | null>;
 
   listManufacturers(query: ManufacturerSourceQuery): Promise<Manufacturer[]>;
+  listManufacturersPage(query: ManufacturerSourceQuery & { limit: number }): Promise<SourcePage<Manufacturer>>;
   findManufacturerById(id: Id, lookup: LookupQuery): Promise<Manufacturer | null>;
   findManufacturerBySlug(slug: Slug, lookup: LookupQuery): Promise<Manufacturer | null>;
   findManufacturerByPreviousSlug(slug: Slug, lookup: LookupQuery): Promise<Manufacturer | null>;
@@ -185,6 +207,7 @@ export interface ContentSource {
   findDistributorByPreviousSlug(slug: Slug, lookup: LookupQuery): Promise<Distributor | null>;
 
   listUseCases(query: UseCaseSourceQuery): Promise<UseCase[]>;
+  listUseCasesPage(query: UseCaseSourceQuery & { limit: number }): Promise<SourcePage<UseCase>>;
   findUseCaseById(id: Id, lookup: LookupQuery): Promise<UseCase | null>;
   findUseCaseBySlug(slug: Slug, lookup: LookupQuery): Promise<UseCase | null>;
   findUseCaseByPreviousSlug(slug: Slug, lookup: LookupQuery): Promise<UseCase | null>;
@@ -195,6 +218,7 @@ export interface ContentSource {
   findDeploymentByPreviousSlug(slug: Slug, lookup: LookupQuery): Promise<DeploymentSite | null>;
 
   listArticles(query: ArticleSourceQuery): Promise<Article[]>;
+  listArticlesPage(query: ArticleSourceQuery & { limit: number }): Promise<SourcePage<Article>>;
   findArticleById(id: Id, lookup: LookupQuery): Promise<Article | null>;
   findArticleBySlug(slug: Slug, lookup: LookupQuery): Promise<Article | null>;
   findArticleByPreviousSlug(slug: Slug, lookup: LookupQuery): Promise<Article | null>;

@@ -35,7 +35,7 @@ import { FavoriteCard } from '@/components/FavoriteCard';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
 import { SortableCompareCard } from '@/components/SortableCompareCard';
-import type { Manufacturer, Robot } from '@/data/types';
+import type { Manufacturer, Robot } from '@/lib/content/domainTypes';
 import { getComparisonSpecGroups } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { MAX_COMPARE_ROBOTS, normalizeCompareRobotIds } from '@/lib/compareParams';
@@ -404,7 +404,6 @@ export function CompareClient({ robots, manufacturers, initialSearch }: CompareC
                           >
                             <ManufacturerLogoName
                               name={manufacturer.nameJa ?? manufacturer.name}
-                              logo={manufacturer.logo}
                               logos={manufacturer.logos}
                               variant="combined"
                               className="text-sm font-semibold text-foreground"
@@ -656,7 +655,6 @@ export function CompareClient({ robots, manufacturers, initialSearch }: CompareC
                                 key={robot.id}
                                 robot={robot}
                                 manufacturerName={manufacturer?.name ?? robot.manufacturerId}
-                                manufacturerLogo={manufacturer?.logo}
                                 manufacturerLogos={manufacturer?.logos}
                                 onRemove={toggleFavorite}
                                 onSelect={handleFavoriteSelect}

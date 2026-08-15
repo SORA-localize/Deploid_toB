@@ -28,6 +28,7 @@ import {
   type MediaSourceQuery,
   type RobotSeriesSourceQuery,
   type RobotSourceQuery,
+  type SourcePage,
   type UseCaseSourceQuery,
 } from './contracts';
 import type {
@@ -500,6 +501,28 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
     return findDocs(payload, { collection, where, sort: toPayloadSort(sort), limit, page }, RUNTIME_PAGE_SIZE);
   };
 
+  /**
+   * `listDocs` の1ページ版。`limit` を必須にして常に単一の `payload.find()` 呼び出しに固定し、
+   * その呼び出しが報告した `totalDocs` をそのまま返す（Task 6 Step 2: `listAllPublished*()` の
+   * 安全なpagination-walkが、ページをまたいで `totalDocs` の変化を検査するために使う）。
+   */
+  const listDocsPage = async <TRecord>(
+    collection: ContentCollectionSlug,
+    where: Where,
+    sort: string,
+    limit: number,
+    page: number | undefined,
+    map: (doc: never, payload: Payload, cache: RelationshipResolutionCache) => Promise<TRecord> | TRecord,
+  ): Promise<SourcePage<TRecord>> => {
+    const payload = await client();
+    const { docs, totalDocs } = await findPagedDocs(
+      payload,
+      { collection, where, sort: toPayloadSort(sort), limit, page: page ?? 1 },
+      RUNTIME_PAGE_SIZE,
+    );
+    return { docs: await mapAll(docs, map), totalDocs };
+  };
+
   const source: PayloadContentSource = {
     // ── robots ────────────────────────────────────────────────────────────
     async listRobots(query: RobotSourceQuery): Promise<Robot[]> {
@@ -512,6 +535,17 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
         ],
       );
       return mapAll(await listDocs('robots', where, query.sort, query.limit, query.page), mapRobot);
+    },
+    async listRobotsPage(query: RobotSourceQuery & { limit: number }): Promise<SourcePage<Robot>> {
+      const payload = await client();
+      const where = combineWhere(
+        [publishStatusWhere(query.publishStatuses), idsWhere(query.ids)],
+        [
+          await relationshipWhere(payload, 'manufacturers', 'manufacturerId', query.manufacturerId, 'equals'),
+          await relationshipWhere(payload, 'robot-series', 'seriesId', query.seriesId, 'equals'),
+        ],
+      );
+      return listDocsPage('robots', where, query.sort, query.limit, query.page, mapRobot);
     },
     findRobotById: (id, lookup) => findOne('robots', byIdWhere(id, lookup), mapRobot),
     findRobotBySlug: (slug, lookup) => findOne('robots', bySlugWhere(slug, lookup), mapRobot),
@@ -539,6 +573,16 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
         query.country === undefined ? undefined : { country: { equals: query.country } },
       ]);
       return mapAll(await listDocs('manufacturers', where, query.sort, query.limit, query.page), mapManufacturer);
+    },
+    async listManufacturersPage(
+      query: ManufacturerSourceQuery & { limit: number },
+    ): Promise<SourcePage<Manufacturer>> {
+      const where = andWhere([
+        publishStatusWhere(query.publishStatuses),
+        idsWhere(query.ids),
+        query.country === undefined ? undefined : { country: { equals: query.country } },
+      ]);
+      return listDocsPage('manufacturers', where, query.sort, query.limit, query.page, mapManufacturer);
     },
     findManufacturerById: (id, lookup) => findOne('manufacturers', byIdWhere(id, lookup), mapManufacturer),
     findManufacturerBySlug: (slug, lookup) => findOne('manufacturers', bySlugWhere(slug, lookup), mapManufacturer),
@@ -574,6 +618,17 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
       );
       return mapAll(await listDocs('use-cases', where, query.sort, query.limit, query.page), mapUseCase);
     },
+    async listUseCasesPage(query: UseCaseSourceQuery & { limit: number }): Promise<SourcePage<UseCase>> {
+      const payload = await client();
+      const where = combineWhere(
+        [publishStatusWhere(query.publishStatuses), idsWhere(query.ids)],
+        [
+          await relationshipWhere(payload, 'robots', 'candidateRobots.robotId', query.candidateRobotId, 'in'),
+          await relationshipWhere(payload, 'robot-series', 'candidateRobots.seriesId', query.candidateSeriesId, 'in'),
+        ],
+      );
+      return listDocsPage('use-cases', where, query.sort, query.limit, query.page, mapUseCase);
+    },
     findUseCaseById: (id, lookup) => findOne('use-cases', byIdWhere(id, lookup), mapUseCase),
     findUseCaseBySlug: (slug, lookup) => findOne('use-cases', bySlugWhere(slug, lookup), mapUseCase),
     findUseCaseByPreviousSlug: (slug, lookup) => findOne('use-cases', byPreviousSlugWhere(slug, lookup), mapUseCase),
@@ -608,6 +663,18 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
         ],
       );
       return mapAll(await listDocs('articles', where, query.sort, query.limit, query.page), mapArticle);
+    },
+    async listArticlesPage(query: ArticleSourceQuery & { limit: number }): Promise<SourcePage<Article>> {
+      const payload = await client();
+      const where = combineWhere(
+        [publishStatusWhere(query.publishStatuses), idsWhere(query.ids)],
+        [
+          await relationshipWhere(payload, 'robots', 'relatedRobotIds', query.relatedRobotId, 'in'),
+          await relationshipWhere(payload, 'manufacturers', 'relatedManufacturerIds', query.relatedManufacturerId, 'in'),
+          await relationshipWhere(payload, 'use-cases', 'relatedUseCaseIds', query.relatedUseCaseId, 'in'),
+        ],
+      );
+      return listDocsPage('articles', where, query.sort, query.limit, query.page, mapArticle);
     },
     findArticleById: (id, lookup) => findOne('articles', byIdWhere(id, lookup), mapArticle),
     findArticleBySlug: (slug, lookup) => findOne('articles', bySlugWhere(slug, lookup), mapArticle),

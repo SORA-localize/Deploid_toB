@@ -3,7 +3,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { CardGridSkeleton } from '@/components/CardGridSkeleton';
 import { ListPageSkeletonShell } from '@/components/ListPageSkeletonShell';
 import { RobotsBrowser } from '@/components/RobotsBrowser';
-import { getManufacturers, getRobots, getUseCases } from '@/lib/data';
+import { getContentRepository } from '@/lib/content/getContentRepository';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { toInitialSearch } from '@/lib/catalog/urlSearch';
 import { sortRobots } from '@/lib/display';
@@ -18,10 +18,15 @@ import { createRobotCatalogItems } from '@/lib/viewModels/robots';
 /** 一覧の並び順（'featured'）はここで一度だけ確定させ、以降（filterRobots等）は
  *  相対順序を保つだけにする。VM化でクライアント側はRobot/Manufacturerを持たないため
  *  sortRobots('featured')をここで済ませてからcreateRobotCatalogItemsへ渡す。 */
-function createFeaturedRobotCatalogItems() {
-  const manufacturers = getManufacturers();
-  const robots = sortRobots(getRobots(), 'featured', manufacturers);
-  return createRobotCatalogItems(robots, manufacturers, getUseCases());
+async function createFeaturedRobotCatalogItems() {
+  const repository = await getContentRepository();
+  const [manufacturers, robotsRaw, useCases] = await Promise.all([
+    repository.listAllPublishedManufacturers(),
+    repository.listAllPublishedRobots(),
+    repository.listAllPublishedUseCases(),
+  ]);
+  const robots = sortRobots(robotsRaw, 'featured', manufacturers);
+  return createRobotCatalogItems(robots, manufacturers, useCases);
 }
 
 export const metadata = createPageMetadata({
@@ -54,7 +59,7 @@ async function CachedRobotsList({
   cacheLife('hours');
   cacheTag('robots-list');
 
-  const items = createFeaturedRobotCatalogItems();
+  const items = await createFeaturedRobotCatalogItems();
 
   return (
     <RobotsBrowser
@@ -70,7 +75,7 @@ async function CachedRobotsList({
 }
 
 async function RobotsContent({ searchParams }: { searchParams: RouteSearchParams }) {
-  const items = createFeaturedRobotCatalogItems();
+  const items = await createFeaturedRobotCatalogItems();
   const params = await pickSearchParams(searchParams, [
     'industry',
     'manufacturer',

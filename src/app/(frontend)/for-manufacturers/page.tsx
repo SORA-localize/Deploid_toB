@@ -1,7 +1,8 @@
 import Link from 'next/link';
+import { cacheLife, cacheTag } from 'next/cache';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { DefinitionList } from '@/components/DefinitionList';
-import { getManufacturers, getRobots } from '@/lib/data';
+import { getContentRepository } from '@/lib/content/getContentRepository';
 import { createPageMetadata } from '@/lib/metadata';
 import { siteMeta } from '@/lib/site';
 
@@ -12,9 +13,22 @@ export const metadata = createPageMetadata({
   path: '/for-manufacturers',
 });
 
-export default function ForManufacturersPage() {
-  const robotCount = getRobots().length;
-  const manufacturerCount = getManufacturers().length;
+export default async function ForManufacturersPage() {
+  // ページ全体がSuspense境界を持たない静的文書のため、repository呼び出し（Payload sourceでは
+  // 実I/O）をCache Componentsの「uncached data outside Suspense」から外すために 'use cache' で
+  // ページごとcacheする（`/robots` の CachedRobotsList と同じ既存パターン）。
+  'use cache';
+  cacheLife('hours');
+  cacheTag('for-manufacturers');
+
+  const repository = await getContentRepository();
+  // 件数だけが要る表示のため、全件を安全上限つきで取得する listAllPublished* ではなく、
+  // 軽量count（1件だけ取ってtotalDocsを読む）を使う（listAllPublished*の500件安全上限には
+  // 掲載件数表示という用途上そもそも掛からない）。
+  const [robotCount, manufacturerCount] = await Promise.all([
+    repository.countPublishedRobots(),
+    repository.countPublishedManufacturers(),
+  ]);
 
   return (
     <div className="site-container py-8">

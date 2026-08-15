@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight, CameraOff } from 'lucide-react';
 import Image from 'next/image';
-import type { Robot } from '@/data/types';
+import type { Robot } from '@/lib/content/domainTypes';
 import { imageRoleLabels } from '@/lib/labels';
 import {
   getDisplayableRobotImages,

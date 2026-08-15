@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import type { Robot } from '@/data/types';
+import type { Robot } from '@/lib/content/domainTypes';
 import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import { uiText } from '@/lib/uiText';
 import { useTiltCardEffect } from '@/lib/useTiltCardEffect';

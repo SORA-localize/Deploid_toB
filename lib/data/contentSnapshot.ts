@@ -6,7 +6,7 @@ import type {
   Manufacturer,
   Robot,
   UseCase,
-} from '@/data/types';
+} from '@/data/legacyTypes';
 import type { Distributor, MediaAsset, RobotSeries } from '@/lib/content/domainTypes';
 
 /**

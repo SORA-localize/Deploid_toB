@@ -1,7 +1,7 @@
 'use client';
 
 import { Star, X } from 'lucide-react';
-import type { Robot } from '@/data/types';
+import type { Robot } from '@/lib/content/domainTypes';
 import { uiText } from '@/lib/uiText';
 import { cn } from '@/lib/utils';
 

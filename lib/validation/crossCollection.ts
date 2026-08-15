@@ -1,6 +1,6 @@
 // collection横断の同一性・表示可能性の土台。
 // 参照整合は不変 id で取る（slug は可変URLであり外部キーではない）。
-import type { DeploymentSite } from '../../data/types.ts';
+import type { DeploymentSite } from '../../data/legacyTypes.ts';
 import type { ContentSnapshot } from '../data/contentSnapshot.ts';
 import {
   articleCategoryOrder,

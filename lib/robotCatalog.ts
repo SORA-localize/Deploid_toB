@@ -1,10 +1,11 @@
 import type {
   Manufacturer,
+  ManufacturerGuideContent,
   Robot,
   RobotPriceOffer,
   Source,
   UseCase,
-} from '@/data/types';
+} from '@/lib/content/domainTypes';
 import { sortRobots, sortUseCases } from '@/lib/display';
 import {
   EMPTY_VALUE_LABEL,
@@ -285,6 +286,40 @@ export function resolveRobotUsageExamples(
     return source
       ? [{ title: source.title, url, publisher: source.publisher, publishedAt: source.publishedAt }]
       : [];
+  });
+}
+
+export interface ManufacturerGuideLineupDisplayRow {
+  name: string;
+  href: string;
+  /** カード横スクロールとの対応付けキー（Robot.slug が正本）。 */
+  robotSlug: string;
+  roleLabel: string;
+  price: RobotPriceView;
+}
+
+/**
+ * メーカー解説のラインナップ表を表示用に解決する。機体名・リンク・価格はRobotが正本、位置づけだけ記事編集。
+ * `robots` はページ側があらかじめ `repository.listRelatedRobots(lineup.map(r => r.robotId))` 等で
+ * 解決済みのものを渡す（このモジュール自身はrepositoryへ到達しない）。
+ */
+export function resolveManufacturerGuideLineup(
+  content: ManufacturerGuideContent,
+  robots: readonly Robot[],
+): ManufacturerGuideLineupDisplayRow[] {
+  const robotById = new Map(robots.map((robot) => [robot.id, robot]));
+  return content.lineup.flatMap((row) => {
+    const robot = robotById.get(row.robotId);
+    if (!robot) return []; // 存在チェックは validate 側で担保。非公開化された場合は行ごと落とす
+    return [
+      {
+        name: robot.nameJa ?? robot.name,
+        href: `/robots/${robot.slug}`,
+        robotSlug: robot.slug,
+        roleLabel: row.roleLabel,
+        price: resolveRobotPrice(robot),
+      },
+    ];
   });
 }
 

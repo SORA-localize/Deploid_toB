@@ -2,7 +2,7 @@ import { getPayload, type Payload } from 'payload';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import config from '../../payload.config';
 import { assertLocalThrowawayDatabase } from './testDbGuard';
-import type { ContentSnapshot, FullContentSource } from '@/lib/content/contracts';
+import type { ContentSnapshot, ContentSource, FullContentSource } from '@/lib/content/contracts';
 import { createContentRepository } from '@/lib/content/createContentRepository';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { createInMemoryContentSource, createLocalContentSource } from '@/lib/content/localSource';
@@ -877,6 +877,138 @@ describe.each(SOURCE_CASES)('ContentRepository contract against the $name source
     expect(snapshot.media).toHaveLength(1);
     expect(snapshot.articleIndexPlacementLimits).toEqual(FIXTURE.articleIndexPlacementLimits);
     expect(snapshot.siteSettings.dataAsOf).toBe(FIXTURE.siteSettings.dataAsOf);
+  });
+});
+
+describe('listAllPublishedRobots() safety pagination-walk (Task 6 Step 2)', () => {
+  // `RUNTIME_PAGE_SIZE` / `LIST_ALL_PAGE_SIZE` は両方とも100。テストはそれに合わせて組む。
+  function makeRobot(id: string, manufacturerId: string): ContentSnapshot['robots'][number] {
+    return {
+      id,
+      slug: id,
+      summary: `${id} fixture.`,
+      publishStatus: 'published',
+      updatedAt: '2026-01-01',
+      reliability: 'official',
+      sources: SOURCES,
+      name: id,
+      manufacturerId,
+      category: 'humanoid',
+      description: `${id} description.`,
+      deploymentStage: 'pilot',
+      specs: {},
+      procurementModels: ['inquiry'],
+      japanAvailability: 'inquiry-required',
+      comparison: { strengths: [], constraints: [], bestFit: [], notFit: [] },
+    };
+  }
+
+  function makeManufacturer(id: string): ContentSnapshot['manufacturers'][number] {
+    return {
+      id,
+      slug: id,
+      summary: `${id} fixture.`,
+      publishStatus: 'published',
+      updatedAt: '2026-01-01',
+      reliability: 'official',
+      sources: SOURCES,
+      name: id,
+      companyType: 'manufacturer',
+      companyStatus: 'active',
+      country: 'Japan',
+      website: `https://example.com/${id}`,
+      description: `${id} description.`,
+      japanPresence: 'office',
+    };
+  }
+
+  function snapshotWithRobots(count: number): ContentSnapshot {
+    const manufacturer = makeManufacturer('fx-listall-mfr');
+    const robots = Array.from({ length: count }, (_, i) =>
+      makeRobot(`fx-listall-robot-${String(i).padStart(4, '0')}`, manufacturer.id),
+    );
+    return { ...FIXTURE, manufacturers: [manufacturer], robots, robotSeries: [], distributors: [] };
+  }
+
+  it.each([101, 188])(
+    'returns all %d published robots from the local source with displayed count === totalDocs',
+    async (count) => {
+      const source = createInMemoryContentSource(snapshotWithRobots(count));
+      const repository = createContentRepository(source);
+      const all = await repository.listAllPublishedRobots();
+      expect(all).toHaveLength(count);
+      expect(new Set(all.map((robot) => robot.id)).size).toBe(count);
+      const page = await source.listRobotsPage({ sort: 'id', publishStatuses: ['published'], page: 1, limit: 1 });
+      expect(all.length).toBe(page.totalDocs);
+    },
+  );
+
+  it('returns all published robots from the Payload source (end-to-end wiring)', async () => {
+    const repository = createContentRepository(createPayloadContentSource({ payload: payloadReady }));
+    const all = await repository.listAllPublishedRobots();
+    // FIXTUREのpublished robotsは fx-robot-a / fx-robot-b の2件（archived/draftは含まれない）。
+    expect(all.map((robot) => robot.id).sort()).toEqual(['fx-robot-a', 'fx-robot-b']);
+  });
+
+  /**
+   * ここから下は、実DB側で「読み取り中にtotalDocsが変わる」「pageをまたいで重複idが出る」を
+   * 再現するのが難しい（正確なタイミング制御が要る）ため、`ContentSource` を最小限だけ実装した
+   * fakeで安全条件そのものを固定する。repository層のロジックだけを対象にした単体テスト。
+   */
+  function fakeRobotsSource(pages: readonly { docs: Array<{ id: string }>; totalDocs: number }[]): ContentSource {
+    let call = 0;
+    return {
+      listRobotsPage: async () => {
+        const page = pages[Math.min(call, pages.length - 1)];
+        call += 1;
+        return page as never;
+      },
+    } as unknown as ContentSource;
+  }
+
+  const robotDocs = (ids: string[]) => ids.map((id) => ({ id }));
+
+  it('retries once when totalDocs drifts mid-read, then succeeds if it settles', async () => {
+    const page1 = { docs: robotDocs(Array.from({ length: 100 }, (_, i) => `r${i}`)), totalDocs: 150 };
+    const page2Drift = { docs: robotDocs(Array.from({ length: 50 }, (_, i) => `r${100 + i}`)), totalDocs: 160 };
+    const retryPage1 = { docs: robotDocs(Array.from({ length: 100 }, (_, i) => `r${i}`)), totalDocs: 160 };
+    const retryPage2 = { docs: robotDocs(Array.from({ length: 60 }, (_, i) => `r${100 + i}`)), totalDocs: 160 };
+    const repository = createContentRepository(fakeRobotsSource([page1, page2Drift, retryPage1, retryPage2]));
+    const all = await repository.listAllPublishedRobots();
+    expect(all).toHaveLength(160);
+  });
+
+  it('fails with unstable-pagination when totalDocs keeps drifting after 1 retry', async () => {
+    const page1 = { docs: robotDocs(Array.from({ length: 100 }, (_, i) => `r${i}`)), totalDocs: 150 };
+    const page2DriftA = { docs: robotDocs(Array.from({ length: 50 }, (_, i) => `r${100 + i}`)), totalDocs: 160 };
+    const retryPage1 = { docs: robotDocs(Array.from({ length: 100 }, (_, i) => `r${i}`)), totalDocs: 170 };
+    const page2DriftB = { docs: robotDocs(Array.from({ length: 70 }, (_, i) => `r${100 + i}`)), totalDocs: 180 };
+    const repository = createContentRepository(
+      fakeRobotsSource([page1, page2DriftA, retryPage1, page2DriftB]),
+    );
+    await expect(repository.listAllPublishedRobots()).rejects.toThrow('unstable-pagination');
+  });
+
+  it('rejects a duplicate stable id seen across a page boundary', async () => {
+    const page1 = { docs: robotDocs(Array.from({ length: 100 }, (_, i) => `r${i}`)), totalDocs: 101 };
+    // page境界で同じidが再度出現するケース（sort不安定・並び替え中の再取得などを想定）。
+    const page2 = { docs: robotDocs(['r99']), totalDocs: 101 };
+    const repository = createContentRepository(fakeRobotsSource([page1, page2]));
+    await expect(repository.listAllPublishedRobots()).rejects.toThrow('list-all-duplicate-id');
+  });
+
+  it('refuses a partial result when the fetched count never reaches totalDocs', async () => {
+    const page1 = { docs: robotDocs(Array.from({ length: 100 }, (_, i) => `r${i}`)), totalDocs: 101 };
+    // 2ページ目が totalDocs 通りの1件を返さず、totalDocsは変わらないまま収集が止まる。
+    const page2 = { docs: [] as Array<{ id: string }>, totalDocs: 101 };
+    const repository = createContentRepository(fakeRobotsSource([page1, page2]));
+    await expect(repository.listAllPublishedRobots()).rejects.toThrow('list-all-incomplete');
+  });
+
+  it('fails fast with list-all-safety-limit-exceeded instead of silently truncating past 500', async () => {
+    const page1 = { docs: robotDocs(Array.from({ length: 100 }, (_, i) => `r${i}`)), totalDocs: 501 };
+    const repository = createContentRepository(fakeRobotsSource([page1]));
+    await expect(repository.listAllPublishedRobots()).rejects.toThrow('list-all-safety-limit-exceeded');
   });
 });
 

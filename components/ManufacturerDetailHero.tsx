@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, ExternalLink, Globe2, MessageSquare } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
-import type { Manufacturer } from '@/data/types';
+import type { Manufacturer } from '@/lib/content/domainTypes';
 import { uiText } from '@/lib/uiText';
 
 interface ManufacturerDetailHeroProps {
@@ -20,7 +20,6 @@ export function ManufacturerDetailHero({ manufacturer }: ManufacturerDetailHeroP
           <h1 className="mb-5 text-2xl font-semibold leading-tight text-foreground md:text-3xl">
             <ManufacturerLogoName
               name={name}
-              logo={manufacturer.logo}
               logos={manufacturer.logos}
               variant="combined"
               targetAreaPx={40 * 160}

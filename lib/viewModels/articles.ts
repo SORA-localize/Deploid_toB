@@ -1,4 +1,4 @@
-import type { Article } from '@/data/types';
+import type { Article } from '@/lib/content/domainTypes';
 import { getArticleCardLabel, getArticleShelf, type ArticleShelf } from '@/lib/articleShelves';
 import { createArticleCatalogSearchText } from '@/lib/catalog/search';
 import { getDisplayableAsset } from '@/lib/media';

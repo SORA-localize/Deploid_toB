@@ -1,9 +1,8 @@
 import { Suspense } from 'react';
 import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { ReportsBrowser } from '@/components/ReportsBrowser';
-import { getArticles } from '@/lib/data';
+import { getContentRepository } from '@/lib/content/getContentRepository';
 import { getArticleIndexPlacementReports } from '@/lib/articlePlacements';
-import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
 import { createArticleCatalogItems } from '@/lib/viewModels/articles';
 import { ARTICLE_PAGE_PARAM } from '@/lib/articlePagination';
 import { toInitialSearch } from '@/lib/catalog/urlSearch';
@@ -18,13 +17,19 @@ export const metadata = createPageMetadata({
 });
 
 async function ReportsContent({ searchParams }: { searchParams: RouteSearchParams }) {
-  const reports = createArticleCatalogItems(getArticles());
+  const repository = await getContentRepository();
+  const [articles, placements, limits] = await Promise.all([
+    repository.listAllPublishedArticles(),
+    repository.listArticlePlacements({ surface: 'reports-index' }),
+    repository.getArticleIndexPlacementLimits(),
+  ]);
+  const reports = createArticleCatalogItems(articles);
   const params = await pickSearchParams(searchParams, ['kind', 'q', ARTICLE_PAGE_PARAM]);
   // getArticleIndexPlacementReports は { id, publishedAt } を要求する generic なので VM をそのまま渡せる。
   const { heroReports, featureReports } = getArticleIndexPlacementReports({
     articles: reports,
-    placements: localContentSnapshot.articlePlacements,
-    limits: localContentSnapshot.articleIndexPlacementLimits,
+    placements,
+    limits,
   });
 
   return (

@@ -4,7 +4,7 @@ import type {
   Source,
   UseCase,
   UseCaseCandidateRobot,
-} from '../data/types.ts';
+} from '@/lib/content/domainTypes';
 import { uiText } from './uiText.ts';
 
 export const publicUseCaseCandidateBases = [
@@ -55,7 +55,7 @@ export function getUseCaseCandidateEvidenceViewModel(
     if (!deployment || !source) return [];
     return [{ href: source.url, label: '導入事例' }];
   });
-  const manufacturerName = resolveRobotManufacturerName?.(candidate.robotId);
+  const manufacturerName = candidate.robotId ? resolveRobotManufacturerName?.(candidate.robotId) : undefined;
   const sourceEvidenceLinks = (candidate.evidenceSourceUrls ?? []).map((url) => ({
     href: url,
     label: formatSourceEvidenceLabel(resolveSource?.(url), manufacturerName),
@@ -74,16 +74,20 @@ export function getUseCaseCandidateEvidenceByRobotId(
 ) {
   const sourceByUrl = new Map(useCase.sources.map((s) => [s.url, s]));
   const resolveSource: SourceResolver = (url) => sourceByUrl.get(url);
+  // `seriesId` 候補（robotIdを持たない）はrobotId単位のこのmapへは載らない（DEC-S08、series単位の
+  // 候補UIはこのヘルパーの対象外）。
   return Object.fromEntries(
-    useCase.candidateRobots.map((candidate) => [
-      candidate.robotId,
-      getUseCaseCandidateEvidenceViewModel(
-        candidate,
-        resolveDeployment,
-        resolveRobotManufacturerName,
-        resolveSource,
-      ),
-    ]),
+    useCase.candidateRobots
+      .filter((candidate): candidate is UseCaseCandidateRobot & { robotId: string } => candidate.robotId !== undefined)
+      .map((candidate) => [
+        candidate.robotId,
+        getUseCaseCandidateEvidenceViewModel(
+          candidate,
+          resolveDeployment,
+          resolveRobotManufacturerName,
+          resolveSource,
+        ),
+      ]),
   );
 }
 

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Star } from 'lucide-react';
-import type { Robot } from '@/data/types';
+import type { Robot } from '@/lib/content/domainTypes';
 import { getRobotRelatedTitle } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import type { UseCaseCandidateEvidenceViewModel } from '@/lib/useCaseEvidence';

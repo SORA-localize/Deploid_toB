@@ -12,15 +12,7 @@ import type { ManufacturerDetailSectionLink } from '@/components/ManufacturerDet
 import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { SidebarBlock, SidebarDivider, SidebarSection } from '@/components/SidebarSection';
 import { SourceList } from '@/components/SourceList';
-import {
-  getDeploymentById,
-  getDeploymentsForUseCase,
-  getManufacturerById,
-  getRelatedRobots,
-  getArticlesForUseCase,
-  getUseCases,
-  resolveUseCaseDetailBySlug,
-} from '@/lib/data';
+import { getContentRepository } from '@/lib/content/getContentRepository';
 import {
   deploymentStatusLabels,
   useCaseCapabilityNoteLabels,
@@ -31,13 +23,16 @@ import { createPageMetadata } from '@/lib/metadata';
 import { uiText } from '@/lib/uiText';
 import { getUseCaseCandidateEvidenceByRobotId } from '@/lib/useCaseEvidence';
 
-export function generateStaticParams() {
-  return getUseCases().map((u) => ({ slug: u.slug }));
+export async function generateStaticParams() {
+  const repository = await getContentRepository();
+  const useCases = await repository.listAllPublishedUseCases();
+  return useCases.map((u) => ({ slug: u.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { record: u } = resolveUseCaseDetailBySlug(slug);
+  const repository = await getContentRepository();
+  const { record: u } = await repository.resolveUseCaseDetailBySlug(slug);
   const seo = u?.seo;
   return createPageMetadata({
     title: seo?.metaTitle ?? (u ? (u.titleJa ?? u.title) : 'Use Case'),
@@ -49,24 +44,41 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function UseCaseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { record: useCase, redirectTo } = resolveUseCaseDetailBySlug(slug);
+  const repository = await getContentRepository();
+  const { record: useCase, redirectTo } = await repository.resolveUseCaseDetailBySlug(slug);
   if (redirectTo) permanentRedirect(`/use-cases/${redirectTo}`);
   if (!useCase) notFound();
 
-  const candidateRobots = getRelatedRobots(useCase.candidateRobots.map((c) => c.robotId));
+  // seriesId候補（DEC-S08）はrobotId単位のこのpageではまだ描画対象外。robotId持ちだけ解決する。
+  const candidateRobotIds = useCase.candidateRobots
+    .map((c) => c.robotId)
+    .filter((id): id is string => id !== undefined);
+  const [candidateRobots, reports, deployments] = await Promise.all([
+    repository.listRelatedRobots(candidateRobotIds),
+    repository.listArticlesForUseCaseId(useCase.id),
+    repository.listDeploymentsForUseCaseId(useCase.id),
+  ]);
   const candidateRobotById = new Map(candidateRobots.map((robot) => [robot.id, robot]));
+  const manufacturersById = new Map(
+    (await repository.listRelatedManufacturers(candidateRobots.map((robot) => robot.manufacturerId))).map(
+      (manufacturer) => [manufacturer.id, manufacturer],
+    ),
+  );
+  const deploymentsById = new Map((await Promise.all(
+    (useCase.candidateRobots.flatMap((c) => c.evidenceDeploymentIds ?? [])).map(
+      async (id) => [id, await repository.getDeploymentById(id)] as const,
+    ),
+  )));
   const candidateAnnotations = getUseCaseCandidateEvidenceByRobotId(
     useCase,
-    getDeploymentById,
+    (deploymentId) => deploymentsById.get(deploymentId) ?? undefined,
     (robotId) => {
       const robot = candidateRobotById.get(robotId);
       if (!robot) return undefined;
-      const manufacturer = getManufacturerById(robot.manufacturerId);
+      const manufacturer = manufacturersById.get(robot.manufacturerId);
       return manufacturer?.nameJa ?? manufacturer?.name ?? robot.manufacturerId;
     },
   );
-  const reports = getArticlesForUseCase(useCase.id);
-  const deployments = getDeploymentsForUseCase(useCase.id);
 
   const sections: ManufacturerDetailSectionLink[] = [
     { label: uiText.useCases.atAGlance, href: '#at-a-glance' },

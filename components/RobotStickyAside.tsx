@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { FactList } from '@/components/FactList';
-import type { Robot } from '@/data/types';
-import type { Manufacturer } from '@/data/types';
+import type { Robot } from '@/lib/content/domainTypes';
+import type { Manufacturer } from '@/lib/content/domainTypes';
 import { SidebarBlock, SidebarDivider, SidebarSection } from '@/components/SidebarSection';
 import { getRobotBasicFacts } from '@/lib/robotCatalog';
 import { uiText } from '@/lib/uiText';

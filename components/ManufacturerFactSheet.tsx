@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { FactList } from '@/components/FactList';
-import type { Manufacturer } from '@/data/types';
+import type { Manufacturer } from '@/lib/content/domainTypes';
 import {
   companyStatusLabels,
   companyTypeLabels,

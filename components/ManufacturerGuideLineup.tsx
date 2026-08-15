@@ -2,8 +2,8 @@
 
 import { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
-import type { Robot } from '@/data/types';
-import type { ManufacturerGuideLineupDisplayRow } from '@/lib/data';
+import type { Robot } from '@/lib/content/domainTypes';
+import type { ManufacturerGuideLineupDisplayRow } from '@/lib/robotCatalog';
 import { uiText } from '@/lib/uiText';
 import { FeaturedRobotCard } from '@/components/FeaturedRobotCard';
 import { RobotCardRail } from '@/components/RobotCardRail';

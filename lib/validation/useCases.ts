@@ -1,4 +1,4 @@
-import type { CandidateEvidenceBasis, DeploymentSite, UseCase } from '../../data/types.ts';
+import type { CandidateEvidenceBasis, DeploymentSite, UseCase } from '../../data/legacyTypes.ts';
 import type { ContentSnapshot } from '../data/contentSnapshot.ts';
 import { isPublicUseCaseCandidateBasis } from '../useCaseEvidence.ts';
 import {

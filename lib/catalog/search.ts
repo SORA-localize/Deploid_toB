@@ -1,7 +1,6 @@
-import type { Article, Manufacturer, Robot, UseCase } from '@/data/types';
+import type { Article, Manufacturer, Robot, UseCase } from '@/lib/content/domainTypes';
 import {
   articleTypeLabels,
-  buyerReadinessLabels,
   companyStatusLabels,
   companyTypeLabels,
   deploymentStageLabels,
@@ -48,7 +47,6 @@ export function createRobotCatalogSearchText(
     robot.distributorJapan,
     robotCategoryLabels[robot.category],
     deploymentStageLabels[robot.deploymentStage],
-    buyerReadinessLabels[robot.buyerReadiness],
     japanAvailabilityLabels[robot.japanAvailability],
     robot.specs.mobility ? mobilityLabels[robot.specs.mobility] : undefined,
     ...robot.procurementModels.map((model) => procurementLabels[model]),

@@ -10,14 +10,8 @@ import { ManufacturerRobotsGrid } from '@/components/ManufacturerRobotsGrid';
 import { NewsCard } from '@/components/NewsCard';
 import { createArticleCatalogItems } from '@/lib/viewModels/articles';
 import { SourceList } from '@/components/SourceList';
-import {
-  resolveManufacturerDetailBySlug,
-  getManufacturers,
-  getArticlesForManufacturer,
-  getArticles,
-  getRobotsByManufacturerId,
-  getUseCases,
-} from '@/lib/data';
+import { getContentRepository } from '@/lib/content/getContentRepository';
+import { withMeasuredLogoAspect } from '@/lib/manufacturerLogoEnrich';
 import { sortRobots } from '@/lib/display';
 import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { breadcrumbJsonLd, manufacturerJsonLd } from '@/lib/jsonLd';
@@ -25,13 +19,16 @@ import { createPageMetadata } from '@/lib/metadata';
 import { uiText } from '@/lib/uiText';
 import { createRobotCatalogItems } from '@/lib/viewModels/robots';
 
-export function generateStaticParams() {
-  return getManufacturers().map((manufacturer) => ({ slug: manufacturer.slug }));
+export async function generateStaticParams() {
+  const repository = await getContentRepository();
+  const manufacturers = await repository.listAllPublishedManufacturers();
+  return manufacturers.map((manufacturer) => ({ slug: manufacturer.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { record: manufacturer } = resolveManufacturerDetailBySlug(slug);
+  const repository = await getContentRepository();
+  const { record: manufacturer } = await repository.resolveManufacturerDetailBySlug(slug);
   const seo = manufacturer?.seo;
   const title =
     seo?.metaTitle ?? (manufacturer ? (manufacturer.nameJa ?? manufacturer.name) : 'Manufacturer');
@@ -46,14 +43,21 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ManufacturerDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { record: manufacturer, redirectTo } = resolveManufacturerDetailBySlug(slug);
+  const repository = await getContentRepository();
+  const { record: manufacturerRaw, redirectTo } = await repository.resolveManufacturerDetailBySlug(slug);
   if (redirectTo) permanentRedirect(`/manufacturers/${redirectTo}`);
-  if (!manufacturer) notFound();
+  if (!manufacturerRaw) notFound();
+  const manufacturer = withMeasuredLogoAspect(manufacturerRaw);
 
-  const robots = sortRobots(getRobotsByManufacturerId(manufacturer.id), 'name', [manufacturer]);
-  const reports = getArticlesForManufacturer(manufacturer.id);
-  const robotItems = createRobotCatalogItems(robots, [manufacturer], getUseCases());
-  const sampleReports = getArticles()
+  const [robotsRaw, reports, allArticles, useCases] = await Promise.all([
+    repository.listRobotsByManufacturerId(manufacturer.id),
+    repository.listArticlesForManufacturerId(manufacturer.id),
+    repository.listAllPublishedArticles(),
+    repository.listAllPublishedUseCases(),
+  ]);
+  const robots = sortRobots(robotsRaw, 'name', [manufacturer]);
+  const robotItems = createRobotCatalogItems(robots, [manufacturer], useCases);
+  const sampleReports = allArticles
     .filter((report) => report.contentKind === 'sample')
     .slice(0, 3);
   const displayedReports = reports.length > 0 ? reports : sampleReports;

@@ -15,8 +15,8 @@ import type {
   ManufacturerGuideProcurementChannel,
   Robot,
   Source,
-} from '@/data/types';
-import type { ManufacturerGuideLineupDisplayRow } from '@/lib/data';
+} from '@/lib/content/domainTypes';
+import type { ManufacturerGuideLineupDisplayRow } from '@/lib/robotCatalog';
 import {
   manufacturerGuideDeploymentCategoryLabels,
   manufacturerGuideProcurementChannelKindLabels,

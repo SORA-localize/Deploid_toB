@@ -1,4 +1,4 @@
-import type { Source } from '@/data/types';
+import type { Source } from '@/lib/content/domainTypes';
 import { uiText } from '@/lib/uiText';
 
 const titleVariantClassNames = {

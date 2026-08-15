@@ -17,17 +17,8 @@ import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
 import { SidebarBlock } from '@/components/SidebarSection';
 import { ActiveSectionProvider } from '@/lib/activeSectionContext';
-import {
-  getArticles,
-  getManufacturerGuideContent,
-  getManufacturerForRobot,
-  getRelatedManufacturers,
-  getRelatedRobots,
-  getRelatedUseCases,
-  getStandardArticleBody,
-  resolveArticleDetailBySlug,
-  resolveManufacturerGuideLineup,
-} from '@/lib/data';
+import { getContentRepository } from '@/lib/content/getContentRepository';
+import { resolveManufacturerGuideLineup } from '@/lib/robotCatalog';
 import { articleJsonLd, breadcrumbJsonLd, faqPageJsonLd } from '@/lib/jsonLd';
 import {
   ARTICLE_SHELF_TABS,
@@ -44,13 +35,16 @@ import { uiText } from '@/lib/uiText';
 import { getArticleTypeTone } from '@/lib/visualSemantics';
 import { ManufacturerGuideArticleBody } from '@/components/ManufacturerGuideArticleBody';
 
-export function generateStaticParams() {
-  return getArticles().map((report) => ({ slug: report.slug }));
+export async function generateStaticParams() {
+  const repository = await getContentRepository();
+  const articles = await repository.listAllPublishedArticles();
+  return articles.map((report) => ({ slug: report.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { record: report } = resolveArticleDetailBySlug(slug);
+  const repository = await getContentRepository();
+  const { record: report } = await repository.resolveArticleDetailBySlug(slug);
   const seo = report?.seo;
   // sample（UI確認用データ）は検索に載せない（§11.9）
   const noindex = report ? !shouldIndexArticle(report) : seo?.noindex;
@@ -103,26 +97,32 @@ function ReportSidebarContent() {
 
 export default async function ReportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { record: report, redirectTo } = resolveArticleDetailBySlug(slug);
+  const repository = await getContentRepository();
+  const { record: report, redirectTo } = await repository.resolveArticleDetailBySlug(slug);
   if (redirectTo) permanentRedirect(`/reports/${redirectTo}`);
   if (!report) notFound();
 
-  const robots = getRelatedRobots(report.relatedRobotIds);
-  const manufacturers = getRelatedManufacturers(report.relatedManufacturerIds);
-  const useCases = getRelatedUseCases(report.relatedUseCaseIds);
-
   // manufacturer-guide は固定テンプレート型で、見出し・目次は MANUFACTURER_GUIDE_SECTIONS を
   // 正本にする（本文markdownの見出しをパースしない）。要点(TL;DR)セクションも持たない設計。
-  const guideContent = getManufacturerGuideContent(report);
-  const standardBody = getStandardArticleBody(report);
+  const guideContent = report.type === 'manufacturer-guide' ? report.manufacturerGuideContent : null;
+  const standardBody = report.type === 'manufacturer-guide' ? undefined : report.body;
   const isManufacturerGuide = guideContent !== null;
-  // 製品ラインナップのカード横スクロール用。lineup の robotId をDB解決し、メーカー名は機体側から引く。
-  const lineupRobots = guideContent
-    ? getRelatedRobots(guideContent.lineup.map((row) => row.robotId))
-    : [];
+
+  const [robots, manufacturers, useCases, lineupRobots] = await Promise.all([
+    repository.listRelatedRobots(report.relatedRobotIds),
+    repository.listRelatedManufacturers(report.relatedManufacturerIds),
+    repository.listRelatedUseCases(report.relatedUseCaseIds),
+    // 製品ラインナップのカード横スクロール用。lineup の robotId をDB解決し、メーカー名は機体側から引く。
+    guideContent ? repository.listRelatedRobots(guideContent.lineup.map((row) => row.robotId)) : Promise.resolve([]),
+  ]);
   const lineupManufacturer = lineupRobots[0]
-    ? getManufacturerForRobot(lineupRobots[0].manufacturerId)
+    ? await repository.getManufacturerById(lineupRobots[0].manufacturerId)
     : undefined;
+  const relatedRobotManufacturerById = new Map(
+    (await repository.listRelatedManufacturers(robots.map((robot) => robot.manufacturerId))).map(
+      (manufacturer) => [manufacturer.id, manufacturer],
+    ),
+  );
   const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
   const hasBody = (standardBody ?? '').trim().length > 0;
   const bodyHeadings = hasBody ? extractH2Headings(standardBody!) : [];
@@ -313,7 +313,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                 <ManufacturerGuideArticleBody
                   content={guideContent}
                   sources={report.sources}
-                  lineupRows={resolveManufacturerGuideLineup(guideContent)}
+                  lineupRows={resolveManufacturerGuideLineup(guideContent, lineupRobots)}
                   lineupRobots={lineupRobots}
                   manufacturerName={lineupManufacturer?.name}
                 />
@@ -375,7 +375,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                       </h3>
                       <RobotCardRail ariaLabel={uiText.reports.relatedRobots}>
                         {robots.map((robot) => {
-                          const manufacturer = getManufacturerForRobot(robot.manufacturerId);
+                          const manufacturer = relatedRobotManufacturerById.get(robot.manufacturerId);
                           return (
                             <FeaturedRobotCard
                               key={robot.id}
@@ -411,7 +411,6 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
                             >
                               <ManufacturerLogoName
                                 name={name}
-                                logo={manufacturer.logo}
                                 logos={manufacturer.logos}
                                 variant="wordmark"
                                 targetAreaPx={24 * 120}

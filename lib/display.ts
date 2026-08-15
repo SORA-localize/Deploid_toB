@@ -13,7 +13,7 @@ import type {
   Robot,
   RobotCategory,
   UseCaseMaturity,
-} from '@/data/types';
+} from '@/lib/content/domainTypes';
 
 export const robotCategoryOrder: RobotCategory[] = [
   'humanoid',
