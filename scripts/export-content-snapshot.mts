@@ -601,6 +601,13 @@ export interface BuildManifestArgs {
   resolveMediaBytes?: MediaByteResolver;
   exportedAt?: string;
   keyArn?: string;
+  /** cryptographic boundary injection for deterministic failure-path tests; CLI never supplies this. */
+  signArtifact?: (snapshot: Buffer, keyArn?: string) => Promise<Buffer>;
+  /** cryptographic boundary injection for deterministic failure-path tests; CLI never supplies this. */
+  signManifestEnvelope?: (
+    manifest: CutoverBaselineManifest,
+    keyArn?: string,
+  ) => Promise<SignedBaselineEnvelope>;
 }
 
 export interface BuiltBaseline {
@@ -698,6 +705,20 @@ async function uploadMediaInventory(args: {
  * 置き終えた最後に completion marker を書き、途中で失敗したら**置いた分を消してから**投げ直す。
  * marker の無い baseline は restore / verify が受け付けない。
  */
+async function signArtifactBuffer(snapshotBuffer: Buffer, keyArn?: string): Promise<Buffer> {
+  const workDir = await mkdtempDir();
+  try {
+    const localSnapshotPath = path.join(workDir, 'snapshot.json');
+    const localBundlePath = path.join(workDir, 'snapshot.cosign.bundle');
+    await writeFile(localSnapshotPath, snapshotBuffer);
+    signBlobWithCosign(localSnapshotPath, localBundlePath, keyArn);
+    return readFile(localBundlePath);
+  } finally {
+    // 必須修正11-1/11-2: 平文 snapshot と署名 bundle を /tmp へ残さない。
+    await removeTempDir(workDir);
+  }
+}
+
 export async function exportSignedBaseline(args: BuildManifestArgs): Promise<BuiltBaseline> {
   const exportedAt = args.exportedAt ?? new Date().toISOString();
   const snapshotJson = canonicalJson(args.snapshot);
@@ -706,18 +727,7 @@ export async function exportSignedBaseline(args: BuildManifestArgs): Promise<Bui
   const objectKey = baselineObjectKey(exportedAt, sha256);
   const signatureObjectKey = `${objectKey}.cosign.bundle`;
 
-  const workDir = await mkdtempDir();
-  let signatureBundle: Buffer;
-  try {
-    const localSnapshotPath = path.join(workDir, 'snapshot.json');
-    const localBundlePath = path.join(workDir, 'snapshot.cosign.bundle');
-    await writeFile(localSnapshotPath, snapshotBuffer);
-    signBlobWithCosign(localSnapshotPath, localBundlePath, args.keyArn);
-    signatureBundle = await readFile(localBundlePath);
-  } finally {
-    // 必須修正11-1/11-2: 平文 snapshot と署名 bundle を /tmp へ残さない。
-    await removeTempDir(workDir);
-  }
+  const signatureBundle = await (args.signArtifact ?? signArtifactBuffer)(snapshotBuffer, args.keyArn);
 
   // 途中で失敗したら「置いた分」を消してから投げ直す（必須修正7-7）。
   const written: string[] = [];
@@ -727,79 +737,74 @@ export async function exportSignedBaseline(args: BuildManifestArgs): Promise<Bui
     return result;
   };
 
-  let versionId: string | null;
-  let mediaInventory: MediaInventoryEntry[];
   try {
-    ({ versionId } = await put(objectKey, snapshotBuffer));
+    const { versionId } = await put(objectKey, snapshotBuffer);
     await put(signatureObjectKey, signatureBundle);
-    mediaInventory = await uploadMediaInventory({
+    const mediaInventory = await uploadMediaInventory({
       media: args.snapshot.media,
       objectKeyPrefix: `${objectKey}.media`,
       resolveMediaBytes: args.resolveMediaBytes,
       put,
     });
+    const counts = countRecords(args.snapshot);
+    const manifest: CutoverBaselineManifest = {
+      provenance: args.provenance,
+      storage: {
+        provider: args.store.provider,
+        bucket: args.store.bucket,
+        storeId: args.store.storeId,
+        objectKey,
+        versionId,
+      },
+      mediaInventory,
+      sha256,
+      signature: {
+        algorithm: 'cosign',
+        keyId: args.keyArn ?? signingKeyArn(),
+        detachedSignatureObjectKey: signatureObjectKey,
+      },
+      recordCounts: {
+        manufacturers: counts.manufacturers,
+        robots: counts.robots,
+        robotSeries: counts.robotSeries,
+        distributors: counts.distributors,
+        useCases: counts.useCases,
+        deployments: counts.deployments,
+        articles: counts.articles,
+        articlePlacements: counts.articlePlacements,
+        media: counts.media,
+        siteSettings: counts.siteSettings,
+      },
+      exportedAt,
+      exportedBy: args.exportedBy,
+    };
+    assertValidManifest(manifest);
+
+    // manifest 署名も完了条件の一部。marker より前に作り、失敗時は上で置いた全 object を消す。
+    const envelope = await (args.signManifestEnvelope ?? signManifest)(manifest, args.keyArn);
+    assertValidEnvelope(envelope);
+
+    const completion: BaselineCompletionMarker = {
+      artifactSha256: sha256,
+      signatureSha256: sha256Hex(signatureBundle),
+      mediaInventorySha256: sha256Hex(canonicalJson(mediaInventory)),
+      baselineRunId: args.provenance.baselineRunId,
+      completedAt: new Date().toISOString(),
+    };
+    // 必須修正7-7: **全署名の成功後、最後のstore writeとして** completion marker を置く。
+    await put(baselineCompletionMarkerKey(objectKey), Buffer.from(canonicalJson(completion), 'utf8'));
+
+    return { manifest, envelope, snapshotJson, signatureBundle, completion };
   } catch (error) {
     for (const key of [...written].reverse()) {
       await args.store.remove(key).catch(() => {});
     }
     throw new Error(
       `baseline-upload-incomplete: ${(error as Error).message}. Partial objects from this run were removed; ` +
-        'no completion marker was written, so this run can never be selected as a baseline.',
+        'no completion marker was retained, so this run can never be selected as a baseline.',
       { cause: error },
     );
   }
-
-  const counts = countRecords(args.snapshot);
-  const manifest: CutoverBaselineManifest = {
-    provenance: args.provenance,
-    storage: {
-      provider: args.store.provider,
-      bucket: args.store.bucket,
-      storeId: args.store.storeId,
-      objectKey,
-      versionId,
-    },
-    mediaInventory,
-    sha256,
-    signature: {
-      algorithm: 'cosign',
-      keyId: args.keyArn ?? signingKeyArn(),
-      detachedSignatureObjectKey: signatureObjectKey,
-    },
-    recordCounts: {
-      manufacturers: counts.manufacturers,
-      robots: counts.robots,
-      robotSeries: counts.robotSeries,
-      distributors: counts.distributors,
-      useCases: counts.useCases,
-      deployments: counts.deployments,
-      articles: counts.articles,
-      articlePlacements: counts.articlePlacements,
-      media: counts.media,
-      siteSettings: counts.siteSettings,
-    },
-    exportedAt,
-    exportedBy: args.exportedBy,
-  };
-  assertValidManifest(manifest);
-
-  // 必須修正7-7: **最後に** completion marker を置く。ここまで来ていない run（snapshot だけ、
-  // signature だけ、media が途中まで）は marker を持たないので、restore / verify が拒否する。
-  const completion: BaselineCompletionMarker = {
-    artifactSha256: sha256,
-    signatureSha256: sha256Hex(signatureBundle),
-    mediaInventorySha256: sha256Hex(canonicalJson(mediaInventory)),
-    baselineRunId: args.provenance.baselineRunId,
-    completedAt: new Date().toISOString(),
-  };
-  await args.store.put(baselineCompletionMarkerKey(objectKey), Buffer.from(canonicalJson(completion), 'utf8'));
-
-  // 必須修正6-10: manifest 自体にも署名する。sha256 経由で artifact も、provenance 経由で
-  // 環境・DB・store・schema世代・baseline run IDも、これ1つの署名で覆われる。
-  const envelope = await signManifest(manifest, args.keyArn);
-  assertValidEnvelope(envelope);
-
-  return { manifest, envelope, snapshotJson, signatureBundle, completion };
 }
 
 /**

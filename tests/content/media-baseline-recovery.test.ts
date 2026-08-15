@@ -203,6 +203,34 @@ describe('baseline media resolver (必須修正9-1 / 9-3)', () => {
   });
 });
 
+describe('baseline export completion ordering', () => {
+  it('removes every written object and never leaves a completion marker when manifest signing fails', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'deploid-manifest-sign-failure-'));
+    try {
+      const snapshot = structuredClone(contentSnapshotFixture);
+      snapshot.media = [];
+      await expect(
+        exportSignedBaseline({
+          snapshot,
+          store: createLocalDiskObjectStore(dir),
+          exportedBy: 'manifest-sign-failure-test',
+          provenance: LOCAL_PROVENANCE,
+          signArtifact: async () => Buffer.from('deterministic-test-signature'),
+          signManifestEnvelope: async () => {
+            throw new Error('manifest signer unavailable');
+          },
+        }),
+      ).rejects.toThrow(/baseline-upload-incomplete: manifest signer unavailable/);
+
+      const { readdir } = await import('node:fs/promises');
+      const left = await readdir(path.join(dir, 'cutover-baseline')).catch(() => []);
+      expect(left).toEqual([]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+});
+
 // ─── 実 cosign + 実 KMS + 実 Payload/Postgres ─────────────────────────────
 
 describe.skipIf(!canSignForReal)('recovering media from the signed baseline alone', () => {
