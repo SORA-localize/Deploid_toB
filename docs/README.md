@@ -10,6 +10,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 計画 | 一言 | branch | 開始日 |
 |---|---|---|---|
+| [Cutover安全性の残存修正](plans/content-platform-cutover-safety-remediation-v1.md) | Task 3〜5再監査で残ったreplay、local-disk、署名順序、公開認可境界、件数検証、completion marker、env文書を修正 | `feature/content-platform-migration` | 2026-08-15 |
 | [ロボットデータ投入](plans/robot-data-import-plan-v1.md) | 原本HTMLから177機・59社・28シリーズを **Payload へ**投入。**§0 の前提ゲート7項目（コンテンツ基盤移行の完了）を満たすまで着手しない**。Task 9 のみ原本への `deploymentStage` 記入134行が前提 | 未定 | 2026-08-08 |
 | [積み残し登録簿フォローアップ](plans/deferred-work-register-followup-v1.md) | 登録簿#4/#5/#6/#10の実行計画。**#4・#5・#6は解消済み**。残るのは#10のバッテリー23機（CSVのvariant名とレコードの対応を人が決める） | `main`（専用branchなし） | 2026-08-05 |
 | [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | `data/*.ts` から Payload CMS + managed PostgreSQLへ、URLと不変idを保って段階移行。実装は未着手。**2026-07-26付でPhase 3・5・6が作った層を反映していない——着手時に現行実装へ突合すること** | 未定（専用branch必須） | 2026-07-26 |
