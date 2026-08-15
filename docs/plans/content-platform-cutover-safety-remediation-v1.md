@@ -34,10 +34,10 @@ updated: 2026-08-15
 - `EnvironmentMarkerRow.lastRestoredBaselineRunId: string | null`
 - `checkProvenanceAgainstTarget()` permits equal generation only when the stored and incoming run IDs match.
 
-- [ ] Add tests that a matching generation/run is accepted, a matching generation/different run is rejected, and a legacy marker with generation but no run ID fails closed.
-- [ ] Run `npx vitest run tests/content/restore-enforcement.test.ts` and confirm the new assertions fail because run IDs are not read or compared.
-- [ ] Read `lastRestoredBaselineRunId` from the environment marker and compare it in `checkProvenanceAgainstTarget()`.
-- [ ] Re-run the targeted test and confirm it passes.
+- [x] Add tests that a matching generation/run is accepted, a matching generation/different run is rejected, and a legacy marker with generation but no run ID fails closed.
+- [x] Run `npx vitest run tests/content/restore-enforcement.test.ts` and confirm the new assertions fail because run IDs are not read or compared.
+- [x] Read `lastRestoredBaselineRunId` from the environment marker and compare it in `checkProvenanceAgainstTarget()`.
+- [x] Re-run the targeted test and confirm it passes.
 
 ### Task 2: Authenticate manifests before I/O and reject managed local-disk baselines
 
@@ -52,11 +52,11 @@ updated: 2026-08-15
 - `runRestore()` verifies the manifest signature before `storeFromManifest()` or any `store.get()` call.
 - `runExport()` refuses `--store local-disk` for Production/Preview provenance.
 
-- [ ] Add tests for Production/Preview local-disk refusal and local throwaway acceptance.
-- [ ] Add an execution-order test whose store accessor must not run when the manifest signature is invalid.
-- [ ] Run the targeted tests and confirm they fail on the current permissive/order behavior.
-- [ ] Add the shared policy check and move the first manifest verification ahead of store construction/read.
-- [ ] Re-run the targeted tests and confirm they pass.
+- [x] Add tests for Production/Preview local-disk refusal and local throwaway acceptance.
+- [x] Add an execution-order test whose store accessor must not run when the manifest signature is invalid.
+- [x] Run the targeted tests and confirm they fail on the current permissive/order behavior.
+- [x] Add the shared policy check and move the first manifest verification ahead of store construction/read.
+- [x] Re-run the targeted tests and confirm they pass.
 
 ### Task 3: Enforce publish authorization module boundaries
 
@@ -71,10 +71,10 @@ updated: 2026-08-15
 - Production imports of the privileged issuer are allowed only from `scripts/import-content-to-payload.mts`.
 - Authorization objects are tracked by identity so copying context payload data is not accepted by the gate.
 
-- [ ] Add gate tests proving a structurally copied authorization is rejected while a genuinely issued authorization is accepted.
-- [ ] Add a boundary-check fixture/test or invoke the checker against controlled violating input; confirm it fails before implementation.
-- [ ] Introduce identity-backed authorization issuance/read behavior and the static production-import boundary checker.
-- [ ] Wire the checker into `npm run check` and re-run the targeted tests/check.
+- [x] Add gate tests proving a structurally copied authorization is rejected while a genuinely issued authorization is accepted.
+- [x] Add a boundary-check fixture/test or invoke the checker against controlled violating input; confirm it fails before implementation.
+- [x] Introduce identity-backed authorization issuance/read behavior and the static production-import boundary checker.
+- [x] Wire the checker into `npm run check` and re-run the targeted tests/check.
 
 ### Task 4: Report raw Payload count mismatches independently
 
@@ -86,10 +86,10 @@ updated: 2026-08-15
 - `payloadCount` compares Payload raw length with artifact raw length.
 - `payloadUniqueStableIdCount` remains a separate duplicate check.
 
-- [ ] Add the boundary test `artifact raw=4, artifact unique=3, Payload raw=3` and require both `uniqueStableIdCount` and `payloadCount`.
-- [ ] Run the targeted test and confirm `payloadCount` is missing.
-- [ ] Change the raw count comparison and diagnostic.
-- [ ] Re-run the targeted test and confirm it passes.
+- [x] Add the boundary test `artifact raw=4, artifact unique=3, Payload raw=3` and require both `uniqueStableIdCount` and `payloadCount`.
+- [x] Run the targeted test and confirm `payloadCount` is missing.
+- [x] Change the raw count comparison and diagnostic.
+- [x] Re-run the targeted test and confirm it passes.
 
 ### Task 5: Make completion marker the final successful export write
 
@@ -102,10 +102,10 @@ updated: 2026-08-15
 - Any failure before marker creation removes all objects written by that run.
 - Tests may inject deterministic signing functions at the cryptographic boundary; production defaults remain real cosign/KMS.
 
-- [ ] Add a test that injects a manifest-signing failure and asserts no completion marker or partial objects remain.
-- [ ] Run it and confirm the current code leaves a completion marker/objects.
-- [ ] Move signing before the final marker write and extend cleanup across the complete export transaction.
-- [ ] Re-run the targeted test and confirm it passes.
+- [x] Add a test that injects a manifest-signing failure and asserts no completion marker or partial objects remain.
+- [x] Run it and confirm the current code leaves a completion marker/objects.
+- [x] Move signing before the final marker write and extend cleanup across the complete export transaction.
+- [x] Re-run the targeted test and confirm it passes.
 
 ### Task 6: Align operator configuration and finish verification
 
@@ -118,14 +118,22 @@ updated: 2026-08-15
 **Interfaces:**
 - Document `BLOB_STORE_ID`, `SNAPSHOT_SIGNING_KMS_KEY_ARN`, and `SNAPSHOT_SIGNING_PUBLIC_KEY_PATH` using the exact runtime names.
 
-- [ ] Update environment documentation and the cutover runbook without changing secrets or resource IDs.
-- [ ] Run `npm run typecheck`, `npm run lint`, targeted CLI dry-run, full PostgreSQL-backed `npm test`, `npm run build`, boundary/doc/dead-code checks, and `git diff --check`.
-- [ ] Re-scan all reported call sites and requirements.
-- [ ] Move this completed plan to `docs/archive/`, remove its active row from `docs/README.md`, and commit the verified changes.
+- [x] Update environment documentation and the cutover runbook without changing secrets or resource IDs.
+- [x] Run `npm run typecheck`, `npm run lint`, targeted CLI dry-run, full PostgreSQL-backed `npm test`, `npm run build`, boundary/doc/dead-code checks, and `git diff --check`.
+- [x] Re-scan all reported call sites and requirements.
+- [x] Move this completed plan to `docs/archive/`, remove its active row from `docs/README.md`, and commit the verified changes.
+
+## Verification Evidence
+
+- PostgreSQL-backed full suite: 44 test files passed, 1 skipped; 409 tests passed, 33 credential-dependent tests skipped.
+- Production build: Next.js 16.2.12 compiled successfully and generated 158 static pages.
+- Static checks: typecheck, publish-authorization boundaries, data boundaries, client imports, docs links, plan snippets, dead code, and `git diff --check` passed.
+- CLI dry run: all local-source collections and 61 media candidates were enumerated without database writes.
+- Lint: 0 errors and the repository's existing 4 `@next/next/no-img-element` warnings.
+- Real AWS KMS signing and real Vercel Private Blob E2E remain credential-dependent and were not claimed as locally verified.
 
 ## Out of Scope
 
 - Real AWS KMS signing when credentials are unavailable.
 - Real Vercel Private Blob E2E outside an authorized Vercel runtime.
 - Unrelated UI, data, dependency, or content changes.
-
