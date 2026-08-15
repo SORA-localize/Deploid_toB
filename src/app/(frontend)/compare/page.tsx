@@ -3,7 +3,9 @@ import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { CompareClient } from '@/components/CompareClient';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { toInitialSearch } from '@/lib/catalog/urlSearch';
+import { toCompareManufacturer } from '@/lib/manufacturerDisplay';
 import { createPageMetadata } from '@/lib/metadata';
+import { toCompareRobot } from '@/lib/robotCatalog';
 
 export const metadata = createPageMetadata({
   title: '比較',
@@ -17,10 +19,12 @@ async function CompareContent({
   searchParams: Promise<{ compare?: string; view?: string }>;
 }) {
   const repository = await getContentRepository();
-  const [robots, manufacturers] = await Promise.all([
+  const [robotsRaw, manufacturersRaw] = await Promise.all([
     repository.listAllPublishedRobots(),
     repository.listAllPublishedManufacturers(),
   ]);
+  const robots = robotsRaw.map(toCompareRobot);
+  const manufacturers = manufacturersRaw.map(toCompareManufacturer);
   const { compare, view } = await searchParams;
 
   return (

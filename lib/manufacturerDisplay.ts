@@ -1,6 +1,24 @@
 import type { Manufacturer, Robot } from '@/lib/content/domainTypes';
 import { EMPTY_VALUE_LABEL } from '@/lib/labels';
 
+/**
+ * `/compare` 専用のfield trim（Task 6 fix round 2, Medium指摘への対応）。
+ * `CompareClient`が実際に読むManufacturerのfieldは`id`/`name`/`nameJa`/`logos`だけ
+ * （`sortManufacturers`が内部で使う`japanPresence`/`foundedYear`は型を保つため残す）。
+ * `sources`・`seo`・`previousSlugs`・`nextReviewBy`は比較UIのどこからも読まれないため、
+ * 型は`Manufacturer`のまま値だけ空にしてclientへ送るJSON payloadから落とす
+ * （`lib/robotCatalog.ts`の`toCompareRobot`と同じ方針・同じ理由）。
+ */
+export function toCompareManufacturer(manufacturer: Manufacturer): Manufacturer {
+  return {
+    ...manufacturer,
+    sources: [],
+    seo: undefined,
+    previousSlugs: undefined,
+    nextReviewBy: undefined,
+  };
+}
+
 export type ManufacturerConsultationRoute =
   | 'domestic-distributor'
   | 'domestic-direct'

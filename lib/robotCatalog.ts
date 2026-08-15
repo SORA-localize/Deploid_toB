@@ -323,6 +323,37 @@ export function resolveManufacturerGuideLineup(
   });
 }
 
+/**
+ * `/compare` 専用のfield trim（Task 6 fix round 2, Medium指摘への対応）。
+ *
+ * `/compare`（`CompareClient` → `ComparisonRobotPanel` / `ComparisonSpecList` /
+ * `lib/robotDisplay.ts`の`getComparisonSpecGroups`）を実際に読んで確認したところ、
+ * 一覧Browserと違い、比較UIは`specs`（詳細spec表）・`comparison`（強み/制約/適性）・
+ * `images`（カード画像）・`loadRatings`（可搬重量）・`fieldEvidence`（spec行の出典link）・
+ * `priceOffers`（`.length`で価格有無を判定）・`japanAvailability`・`deploymentStage`・
+ * `procurementModels`など、ほぼ全fieldを実際に使う（detailページに近い）。加えて`sortRobots`/
+ * `sortManufacturers`（`lib/display.ts`、他の一覧ページとも共有）が引数型として完全な`Robot[]`を
+ * 要求するため、propsの型自体を狭めるとそれらの共有utilityの型を広げる必要が生じ、
+ * 影響範囲が`/compare`以外の複数ページへ広がってしまう。
+ *
+ * 一方で、比較UIのどのコンポーネントも読んでいないことを実際に確認できたfield
+ * （`sources`本文・`usageExampleSourceUrls`・`seo`・`previousSlugs`・`nextReviewBy`）は、
+ * 型は`Robot`のまま維持しつつ値だけ空にして、実際にclientへ送られるJSON payloadから
+ * 中身を落とす。型を変えないため、`CompareClient`・`ComparisonRobotPanel`・
+ * `SortableCompareCard`・`components/compare/CompareParts.tsx`・`FavoriteCard`の
+ * どれも変更不要。
+ */
+export function toCompareRobot(robot: Robot): Robot {
+  return {
+    ...robot,
+    sources: [],
+    usageExampleSourceUrls: undefined,
+    seo: undefined,
+    previousSlugs: undefined,
+    nextReviewBy: undefined,
+  };
+}
+
 export function resolveSameManufacturerRobots(
   robot: Robot,
   robots: readonly Robot[],

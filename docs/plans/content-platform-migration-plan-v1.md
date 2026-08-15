@@ -1513,14 +1513,22 @@ const robots = await repository.listAllPublishedRobots();
 `lib/data.ts` のmodule-level array importを削除し、ページから `data/*.ts` を直接importしない。
 
 同時にruntime consumerの型importを `@/data/types` から `@/lib/content/domainTypes` へ移す。
-`data/*.ts` と `lib/content/localSource.ts` だけがlegacy型を参照してよい。機械ゲートは次で固定する。
+legacy型を参照してよいのは `data/*.ts`・`lib/content/localSource.ts`・`lib/data/contentSnapshot.ts`
+の3箇所だけに閉じる（fix round 1で判明: `lib/data/contentSnapshot.ts` の `Robot` /
+`Manufacturer` / `UseCase` field は、`lib/content/localSource.ts` のlegacy→domain変換関数
+（`toDomainRobot`等）が引数型として厳密なlegacy shapeを要求すること、`lib/validation/manufacturers.ts`
+がlegacy専用の `Manufacturer.logo` を読むことから、domain型に置き換えるとコンパイルが壊れる
+実在の構造差分がある。詳細は `lib/data/contentSnapshot.ts` 冒頭コメント参照）。機械ゲートは
+次で固定する。
 
 ```bash
 rg -n "@/data/types|\.\.?/.*data/types" src components lib tests \
-  -g '!lib/content/localSource.ts'
+  -g '!lib/content/localSource.ts' -g '!lib/data/contentSnapshot.ts'
 ```
 
-Expected: 0件。現状46ファイルあるため、Task 9で `data/types.ts` を削除する前に全件を解消する。
+Expected: 0件。現状46ファイルあるため、Task 9で `data/types.ts` を削除する前に全件を解消する
+（`lib/data/contentSnapshot.ts` の残存importは対象外。Task 9のcutoverでlegacy検証パイプライン
+（`lib/validate.ts` 一式）ごと削除・作り替えするまで残る想定で、Task 9本文にその手順がある）。
 
 - [ ] **Step 3: Client Component propsをview modelへ縮小する**
 

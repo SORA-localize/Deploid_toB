@@ -58,17 +58,25 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
   if (redirectTo) permanentRedirect(`/robots/${redirectTo}`);
   if (!robot) notFound();
 
-  const [successor, manufacturer, manufacturers, useCases, allRobots] = await Promise.all([
-    robot.supersededById ? repository.getRobotById(robot.supersededById) : Promise.resolve(undefined),
-    repository.getManufacturerById(robot.manufacturerId),
-    repository.listAllPublishedManufacturers(),
-    repository.listAllPublishedUseCases(),
-    repository.listAllPublishedRobots(),
-  ]);
-  const intendedUses = resolveOfficialUseCasesForRobot(robot.id, useCases);
+  // Task 6 fix round 2（reviewer Medium指摘への対応）: 詳細ページ1件ごとに全collectionを
+  // 走査しない。「同じ用途の候補ロボットか」「同じメーカーの関連ロボットか」はrobot単位で
+  // 絞り込めるため、既存のrepositoryの絞り込みメソッド（`listUseCasesForRobotId` /
+  // `listRobotsByManufacturerId`）へ寄せる。前後ナビゲーション用の全ロボット走査
+  // （`allRobots` → `sortRobots(..., 'featured', ...)`）は今回のスコープでは対応しない
+  // （Task 7のcache導入と合わせて再設計する。task-6-report.md参照）。
+  const [successor, manufacturer, manufacturers, useCasesForRobot, sameManufacturerRobots, allRobots] =
+    await Promise.all([
+      robot.supersededById ? repository.getRobotById(robot.supersededById) : Promise.resolve(undefined),
+      repository.getManufacturerById(robot.manufacturerId),
+      repository.listAllPublishedManufacturers(),
+      repository.listUseCasesForRobotId(robot.id),
+      repository.listRobotsByManufacturerId(robot.manufacturerId),
+      repository.listAllPublishedRobots(),
+    ]);
+  const intendedUses = resolveOfficialUseCasesForRobot(robot.id, useCasesForRobot);
   const usageExamples = resolveRobotUsageExamples(robot);
   const specGroups = getRobotSpecGroups(robot);
-  const relatedRobots = resolveSameManufacturerRobots(robot, allRobots, manufacturers);
+  const relatedRobots = resolveSameManufacturerRobots(robot, sameManufacturerRobots, manufacturers);
 
   const all = sortRobots(allRobots, 'featured', manufacturers);
   const index = all.findIndex((candidate) => candidate.id === robot.id);
