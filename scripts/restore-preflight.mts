@@ -54,6 +54,8 @@ export interface RestoreTargetIdentity {
    * marker row が無い（= local throwaway）場合は `null`。
    */
   lastRestoredBaselineGeneration: number | null;
+  /** 同一世代の正当な retry と、別 run による世代番号の再利用を区別する。 */
+  lastRestoredBaselineRunId: string | null;
   /** host が localhost 系か。raw `--input` を許すかの判定に使う。 */
   isLocalHost: boolean;
 }
@@ -104,6 +106,7 @@ export interface EnvironmentMarkerRow {
   id: string | number;
   environment: 'production' | 'preview' | null;
   lastRestoredBaselineGeneration: number | null;
+  lastRestoredBaselineRunId: string | null;
 }
 
 export async function readEnvironmentMarker(payload: Payload): Promise<EnvironmentMarkerRow | null> {
@@ -124,12 +127,17 @@ export async function readEnvironmentMarker(payload: Payload): Promise<Environme
     id: string | number;
     environment?: 'production' | 'preview';
     lastRestoredBaselineGeneration?: number | null;
+    lastRestoredBaselineRunId?: string | null;
   };
   return {
     id: row.id,
     environment: row.environment ?? null,
     lastRestoredBaselineGeneration:
       typeof row.lastRestoredBaselineGeneration === 'number' ? row.lastRestoredBaselineGeneration : null,
+    lastRestoredBaselineRunId:
+      typeof row.lastRestoredBaselineRunId === 'string' && row.lastRestoredBaselineRunId.length > 0
+        ? row.lastRestoredBaselineRunId
+        : null,
   };
 }
 
@@ -173,6 +181,7 @@ export async function readRestoreTargetIdentity(
     schemaVersion: await readSchemaVersion(payload),
     auditBlobStoreId: auditBlobStoreIdFor(environment, env),
     lastRestoredBaselineGeneration: marker?.lastRestoredBaselineGeneration ?? null,
+    lastRestoredBaselineRunId: marker?.lastRestoredBaselineRunId ?? null,
     isLocalHost: isLocalDatabaseHost(databaseUrl),
   };
 }
@@ -325,6 +334,23 @@ export function checkProvenanceAgainstTarget(
         `restored generation ${applied}. Replaying an older baseline would roll content back; if this is ` +
         'a deliberate rollback, export a new baseline from the artifact you want and restore that instead.',
     });
+  }
+  if (applied !== null && provenance.baselineGeneration === applied) {
+    if (target.lastRestoredBaselineRunId === null) {
+      failures.push({
+        check: 'baselineRunId',
+        detail:
+          `this database already records baseline generation ${applied} but does not record the run id that ` +
+          'produced it. Refusing an ambiguous same-generation retry; export and restore a newer generation.',
+      });
+    } else if (provenance.baselineRunId !== target.lastRestoredBaselineRunId) {
+      failures.push({
+        check: 'baselineRunId',
+        detail:
+          `artifact run "${provenance.baselineRunId}" reuses the same generation ${applied} as already-restored ` +
+          `run "${target.lastRestoredBaselineRunId}". Only an exact retry of the same run is allowed.`,
+      });
+    }
   }
 
   return failures;

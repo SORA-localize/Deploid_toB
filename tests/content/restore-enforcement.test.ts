@@ -81,6 +81,7 @@ const LOCAL_TARGET: RestoreTargetIdentity = {
   schemaVersion: '20260814_020026_site_settings_data_as_of_and_placement_limits',
   auditBlobStoreId: 'store_deploid_audit_production',
   lastRestoredBaselineGeneration: null,
+  lastRestoredBaselineRunId: null,
   isLocalHost: false,
 };
 
@@ -537,9 +538,35 @@ describe('provenance vs the real restore target (必須修正6-3)', () => {
     );
   });
 
-  it('allows re-applying the same generation (a retry is not a rollback)', () => {
-    const target = { ...LOCAL_TARGET, lastRestoredBaselineGeneration: MATCHING_PROVENANCE.baselineGeneration };
+  it('allows re-applying the same generation only when it is the same baseline run', () => {
+    const target = {
+      ...LOCAL_TARGET,
+      lastRestoredBaselineGeneration: MATCHING_PROVENANCE.baselineGeneration,
+      lastRestoredBaselineRunId: MATCHING_PROVENANCE.baselineRunId,
+    };
     expect(checkProvenanceAgainstTarget(MATCHING_PROVENANCE, target)).toEqual([]);
+  });
+
+  it('rejects a different baseline run that reuses the already-restored generation', () => {
+    const target = {
+      ...LOCAL_TARGET,
+      lastRestoredBaselineGeneration: MATCHING_PROVENANCE.baselineGeneration,
+      lastRestoredBaselineRunId: 'baseline-2026-08-14T00:00:00.000Z-other',
+    };
+    const failures = checkProvenanceAgainstTarget(MATCHING_PROVENANCE, target);
+    expect(failures.map((failure) => failure.check)).toContain('baselineRunId');
+    expect(failures.find((failure) => failure.check === 'baselineRunId')?.detail).toMatch(/same generation/);
+  });
+
+  it('fails closed when an applied generation has no recorded baseline run id', () => {
+    const target = {
+      ...LOCAL_TARGET,
+      lastRestoredBaselineGeneration: MATCHING_PROVENANCE.baselineGeneration,
+      lastRestoredBaselineRunId: null,
+    };
+    const failures = checkProvenanceAgainstTarget(MATCHING_PROVENANCE, target);
+    expect(failures.map((failure) => failure.check)).toContain('baselineRunId');
+    expect(failures.find((failure) => failure.check === 'baselineRunId')?.detail).toMatch(/does not record the run id/);
   });
 
   it('allows moving forward to a newer generation', () => {
@@ -939,6 +966,7 @@ describe.skipIf(!canSignForReal)('blob store identity inside the preflight chain
     schemaVersion: BLOB_PROVENANCE.schemaVersion,
     auditBlobStoreId: AUDIT_STORE_ID,
     lastRestoredBaselineGeneration: null,
+    lastRestoredBaselineRunId: null,
     isLocalHost: false,
   };
 

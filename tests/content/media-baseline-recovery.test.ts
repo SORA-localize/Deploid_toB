@@ -282,6 +282,7 @@ describe.skipIf(!canSignForReal)('recovering media from the signed baseline alon
           schemaVersion: LOCAL_PROVENANCE.schemaVersion,
           auditBlobStoreId: LOCAL_PROVENANCE.auditBlobStoreId,
           lastRestoredBaselineGeneration: null,
+          lastRestoredBaselineRunId: null,
           isLocalHost: true,
         },
         workDir,
