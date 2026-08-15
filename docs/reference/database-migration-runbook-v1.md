@@ -1,6 +1,6 @@
 ---
 status: reference
-updated: 2026-08-12
+updated: 2026-08-15
 ---
 
 # Postgres migration runbook v1
@@ -177,6 +177,14 @@ deployment行 + version行 → 上記1で退避 → 2でDELETE・`migrate:down`�
 | media | baselineは**media bytesを同梱**し、manifestの`mediaInventory`に`objectKey` / `sha256` / `size` / `mimeType`を署名付きで記録する。restoreは全mediaのsha256を検証してから書き込む（public media Blobの生存を前提にしない） |
 | 停止条件 | 下の「停止条件」表のいずれか1件でDB書き込みを開始しない（`refusing to write. No database change was made.`）か、書き込み後の完全parityで失敗を報告する（`NOT successful`） |
 
+実行前にdeployment scopeごとに次を確認する。
+
+- `BLOB_STORE_ID`は、Productionなら`PRODUCTION_AUDIT_BLOB_TOKEN_STORE_ID`、Previewなら
+  `PREVIEW_AUDIT_BLOB_TOKEN_STORE_ID`と同じstoreを指すこと。
+- `SNAPSHOT_SIGNING_KMS_KEY_ARN`はsnapshot署名KMS keyのARNであること。鍵をrotationした場合は、
+  対応する公開鍵PEMを`SNAPSHOT_SIGNING_PUBLIC_KEY_PATH`にも設定すること。
+- Production/Previewのexport/restoreでは`local-disk`を使わない。CLIもfail-closedで拒否する。
+
 ```bash
 # export（署名 + private audit storeへupload + 署名済みmanifest envelope）
 npm run content:export -- --source payload --upload \
@@ -201,7 +209,7 @@ npm run content:restore -- --manifest ./cutover-baseline.envelope.json \
 | `snapshotSchema` / `recordCounts` / `duplicateStableId` / `brokenReference` | artifactの中身が壊れている |
 | `mediaInventory` / `mediaBytes` | mediaのbytesが欠落・改ざん・取得不能、またはsnapshotとinventoryが1対1でない |
 | `environmentMarker` / `databaseResourceId` / `auditBlobStoreId` / `schemaVersion` | 別環境・別DB・別store・別schema世代向けのartifact |
-| `baselineGeneration` / `baselineRunId` | このDBが既に適用した世代より古いartifactのreplay |
+| `baselineGeneration` / `baselineRunId` | このDBが既に適用した世代より古いartifact、または同じ世代番号を再利用した別run。同世代は同じrun IDの再試行だけ許可 |
 | `blobStoreId` / `blobCredentialEnvironment` / `blobCredentialStoreUnknown` | manifestのstore IDとruntime credentialのstore IDが違う、Preview / Productionのcredential交差、credentialがどのstoreを指すか特定できない |
 | `skippedMedia` / `postRestoreParity` | 書き込み後に、DBがartifactと一致していない |
 
