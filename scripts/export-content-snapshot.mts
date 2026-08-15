@@ -52,6 +52,7 @@ import {
 import {
   assertRawInputTargetAllowed,
   assertRestoreInputModeAllowed,
+  assertSnapshotStoreAllowed,
   checkImportOutcome,
   isLocalDatabaseHost,
   readRestoreTargetIdentity,
@@ -833,6 +834,26 @@ export function storeFromManifest(manifest: CutoverBaselineManifest): SnapshotOb
   }
 }
 
+/**
+ * manifest-directed I/O の trust boundary。署名検証が成功するまでは store factory を呼ばない。
+ * dependency injection は「失敗時に factory が未呼び出し」を外部I/O無しで固定するテスト用。
+ */
+export async function openVerifiedBaselineStore(
+  envelope: SignedBaselineEnvelope,
+  dependencies: {
+    verifyManifest?: (value: SignedBaselineEnvelope) => Promise<CosignVerifyResult>;
+    beforeStore?: (manifest: CutoverBaselineManifest) => void;
+    createStore?: (manifest: CutoverBaselineManifest) => SnapshotObjectStore;
+  } = {},
+): Promise<SnapshotObjectStore> {
+  const verification = await (dependencies.verifyManifest ?? verifyManifestSignature)(envelope);
+  if (!verification.verified) {
+    throw new Error(`manifest-signature-refused: ${verification.detail}`);
+  }
+  dependencies.beforeStore?.(envelope.manifest);
+  return (dependencies.createStore ?? storeFromManifest)(envelope.manifest);
+}
+
 // ─── CLI ─────────────────────────────────────────────────────────────────
 
 const HELP = [
@@ -843,6 +864,7 @@ const HELP = [
   '  --upload                      object storage へ置き、cosign 署名 + manifest を作る',
   '  --store local-disk|vercel-blob  --upload 時の保存先',
   '  --store-dir <dir>             local-disk store のディレクトリ',
+  '  --allow-local-store           localhost + NODE_ENV=test の統合テストだけ local-disk を許可',
   '  --store-id <id>               vercel-blob の**実 store ID**（接続先の選択と credential 照合に使う）',
   '  --store-name <name>           vercel-blob store の表示名（manifest / ログ用。選択には使わない）',
   '  --media-dir <dir>             baseline へ同梱する media バイト列の読み取り元（既定 ./media）',
@@ -904,6 +926,14 @@ async function runExport(args: Map<string, string | true>): Promise<void> {
   // vercel-blob store はその2つを credential と突き合わせてからでないと作れない（必須修正7-4）。
   const exportedBy = (args.get('exported-by') as string | undefined) ?? process.env.USER ?? 'unknown';
   const provenance = await resolveExportProvenance(source, args);
+
+  assertSnapshotStoreAllowed({
+    provider: args.get('store') as SnapshotStorageProvider,
+    environment: provenance.environment,
+    isLocalHost: isLocalDatabaseHost(process.env.DATABASE_URL as string),
+    explicitTestMode: args.has('allow-local-store'),
+    nodeEnv: process.env.NODE_ENV,
+  });
 
   const storeKind = args.get('store');
   let store: SnapshotObjectStore;
@@ -1069,7 +1099,18 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
       const envelope = JSON.parse(await readFile(manifestPath, 'utf8')) as unknown;
       assertValidEnvelope(envelope);
 
-      const store = storeFromManifest(envelope.manifest);
+      // manifest が指定する provider / bucket / object key は、署名が本物だと分かるまで
+      // I/O に使わない。local-disk policy も署名検証後・store 構築前に評価する。
+      const store = await openVerifiedBaselineStore(envelope, {
+        beforeStore: (manifest) =>
+          assertSnapshotStoreAllowed({
+            provider: manifest.storage.provider,
+            environment: manifest.provenance.environment,
+            isLocalHost: isLocalDatabaseHost(databaseUrl),
+            explicitTestMode: args.has('allow-local-store'),
+            nodeEnv: process.env.NODE_ENV,
+          }),
+      });
       const artifact = await store.get(envelope.manifest.storage.objectKey);
       const artifactSignatureBundle = await store.get(envelope.manifest.signature.detachedSignatureObjectKey);
       // 必須修正7-7: completion marker が無い（= 途中で終わった run）ことと、取得に失敗したことを

@@ -11,6 +11,7 @@ import {
   cosignAvailable,
   createLocalDiskObjectStore,
   exportSignedBaseline,
+  openVerifiedBaselineStore,
   signManifest,
   verifyManifestSignature,
   type BaselineProvenance,
@@ -21,6 +22,7 @@ import { createDefaultMediaFileResolver, resolveWithinRoot } from '@/scripts/imp
 import {
   assertRawInputTargetAllowed,
   assertRestoreInputModeAllowed,
+  assertSnapshotStoreAllowed,
   checkImportOutcome,
   checkProvenanceAgainstTarget,
   checkSnapshotIntegrity,
@@ -398,6 +400,7 @@ describe('restore/export enforcement against a real throwaway database', () => {
         PREVIEW_AUDIT_BLOB_TOKEN_STORE_ID: 'store_test_preview',
         PAYLOAD_IMPORT_ADMIN_EMAIL: ADMIN_EMAIL,
         PAYLOAD_IMPORT_ADMIN_PASSWORD: ADMIN_PASSWORD,
+        NODE_ENV: 'test',
       };
 
       try {
@@ -421,7 +424,7 @@ describe('restore/export enforcement against a real throwaway database', () => {
           runTsxScript(
             'scripts/export-content-snapshot.mts',
             [
-              '--source', 'payload', '--upload', '--store', 'local-disk', '--store-dir', storeDir,
+              '--source', 'payload', '--upload', '--store', 'local-disk', '--store-dir', storeDir, '--allow-local-store',
               '--manifest-out', manifestOut, '--exported-by', 'ledger-test',
               '--baseline-generation', String(generation),
             ],
@@ -436,7 +439,7 @@ describe('restore/export enforcement against a real throwaway database', () => {
         // 3. generation 5 を restore → 成功し、ledger へ記録される。
         const restored5 = runTsxScript(
           'scripts/export-content-snapshot.mts',
-          ['--restore', '--manifest', gen5Manifest],
+          ['--restore', '--manifest', gen5Manifest, '--allow-local-store'],
           env,
           300_000,
         );
@@ -452,7 +455,7 @@ describe('restore/export enforcement against a real throwaway database', () => {
         // 5. 操作者フラグを一切渡さずに restore → 世代チェックだけで拒否されなければならない。
         const replayed = runTsxScript(
           'scripts/export-content-snapshot.mts',
-          ['--restore', '--manifest', gen2Manifest],
+          ['--restore', '--manifest', gen2Manifest, '--allow-local-store'],
           env,
           300_000,
         );
@@ -709,6 +712,58 @@ describe('signed baseline envelope (必須修正6-10)', () => {
     exportedAt: '2026-08-14T00:00:00.000Z',
     exportedBy: 'operator',
   };
+
+  it('rejects local-disk baselines for managed environments by default', () => {
+    expect(() =>
+      assertSnapshotStoreAllowed({
+        provider: 'local-disk',
+        environment: 'production',
+        isLocalHost: false,
+        explicitTestMode: false,
+        nodeEnv: 'production',
+      }),
+    ).toThrow(/managed-baseline-local-store-refused/);
+  });
+
+  it('allows local-disk only for a local throwaway or an explicit localhost test', () => {
+    expect(() =>
+      assertSnapshotStoreAllowed({
+        provider: 'local-disk',
+        environment: 'local-throwaway',
+        isLocalHost: true,
+        explicitTestMode: false,
+        nodeEnv: 'development',
+      }),
+    ).not.toThrow();
+    expect(() =>
+      assertSnapshotStoreAllowed({
+        provider: 'local-disk',
+        environment: 'preview',
+        isLocalHost: true,
+        explicitTestMode: true,
+        nodeEnv: 'test',
+      }),
+    ).not.toThrow();
+  });
+
+  it('verifies the manifest before constructing or reading its declared store', async () => {
+    const envelope: SignedBaselineEnvelope = {
+      manifest,
+      manifestSignature: { algorithm: 'cosign', keyId: 'untrusted', bundleBase64: 'AA==' },
+    };
+    let storeConstructed = false;
+
+    await expect(
+      openVerifiedBaselineStore(envelope, {
+        verifyManifest: async () => ({ verified: false, detail: 'fabricated manifest signature' }),
+        createStore: () => {
+          storeConstructed = true;
+          throw new Error('store must not be constructed');
+        },
+      }),
+    ).rejects.toThrow(/manifest-signature-refused/);
+    expect(storeConstructed).toBe(false);
+  });
 
   it('rejects a bare manifest — the manifest itself must be signed', () => {
     expect(() => assertValidEnvelope(structuredClone(manifest))).toThrow(/envelope-invalid/);

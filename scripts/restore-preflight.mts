@@ -234,6 +234,27 @@ export function assertRestoreInputModeAllowed(args: {
 }
 
 /**
+ * local-disk baseline は durable な private audit store ではないため、managed 環境の正規
+ * export / restore には使わせない。localhost 上の統合テストだけは、明示フラグと
+ * `NODE_ENV=test` の両方がある場合に限って stamped environment を再現できる。
+ */
+export function assertSnapshotStoreAllowed(args: {
+  provider: 'vercel-blob' | 's3' | 'local-disk';
+  environment: 'production' | 'preview' | 'local-throwaway';
+  isLocalHost: boolean;
+  explicitTestMode: boolean;
+  nodeEnv?: string;
+}): void {
+  if (args.provider !== 'local-disk') return;
+  if (args.environment === 'local-throwaway' && args.isLocalHost) return;
+  if (args.explicitTestMode && args.isLocalHost && args.nodeEnv === 'test') return;
+  throw new Error(
+    `managed-baseline-local-store-refused: ${args.environment} baselines must use the private audit object ` +
+      'store. local-disk is allowed only for a localhost throwaway or an explicit NODE_ENV=test integration run.',
+  );
+}
+
+/**
  * review fix round 1 / Critical #1 の後段。**接続後・書き込み前**に、raw `--input` の対象が
  * 本当に throwaway かを **DB 自身の申告**（`_environment_marker`）で確かめる。
  *
