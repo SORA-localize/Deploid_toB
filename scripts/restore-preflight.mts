@@ -31,6 +31,7 @@ import {
   type BlobCredential,
   type MediaInventoryEntry,
 } from './snapshotObjectStore.mts';
+import { registerVerifiedBaseline } from './restoreAuthorization.mts';
 import { collectDuplicateStableIds, parseContentSnapshotJson } from './snapshotSchema.mts';
 
 export interface RestoreCheckFailure {
@@ -681,11 +682,14 @@ export async function verifyBaselineBeforeRestore(
 
   return {
     ok: true,
-    verified: {
+    // review fix round 1 / Important #1: **この戻り値そのもの**を registry へ登録する。
+    // `authorizeRestoreFromVerifiedBaseline()` は object identity で照合するので、
+    // 形だけ似せた別の object では特権 restore の authorization を作れない。
+    verified: registerVerifiedBaseline({
       snapshot,
       provenance: envelope.manifest.provenance,
       mediaInventory: envelope.manifest.mediaInventory,
-    },
+    }),
   };
 }
 

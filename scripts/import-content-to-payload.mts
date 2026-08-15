@@ -1013,16 +1013,43 @@ export interface MediaStorePreflightFailure {
   detail: string;
 }
 
+/**
+ * review fix round 1 / Important #3: 「既存 store の filename 一覧」は**取れなかったことと
+ * 空だったことを区別する**。
+ *
+ * 修正前は `readdir` 失敗時に `[]` を返していたため、Vercel Blob backed の media store
+ * （まさに Task 9 で使う構成）では常に「store は空」と判定され、この preflight が
+ * **サイレントに素通り**していた。取得できない場合は fail-closed にする。
+ */
+export type MediaStoreListing =
+  | { kind: 'listed'; filenames: readonly string[] }
+  | { kind: 'unavailable'; reason: string };
+
 export function checkMediaStorePreflight(args: {
   /** DB に既にある media レコード数。 */
   existingMediaRecords: number;
-  /** import が作ろうとする filename。 */
+  /** import / restore が作ろうとする filename。 */
   plannedFilenames: readonly string[];
-  /** 対象 media store に既に存在する filename。 */
-  existingStoreFilenames: readonly string[];
+  /** 対象 media store の現状。 */
+  listing: MediaStoreListing;
 }): MediaStorePreflightFailure[] {
+  // 既に media レコードがある DB は「空DB + 既存 store」ではないので、この検査の対象外。
   if (args.existingMediaRecords > 0) return [];
-  const existing = new Set(args.existingStoreFilenames);
+  if (args.plannedFilenames.length === 0) return [];
+
+  if (args.listing.kind === 'unavailable') {
+    return [
+      {
+        check: 'mediaStoreUnverifiable',
+        detail:
+          `the database has no media records and the contents of the target media store could not be listed ` +
+          `(${args.listing.reason}). Payload auto-numbers uploads whose filename already exists, which silently ` +
+          'breaks filename and media object key parity. Refusing to write rather than assuming the store is empty.',
+      },
+    ];
+  }
+
+  const existing = new Set(args.listing.filenames);
   const collisions = args.plannedFilenames.filter((filename) => existing.has(filename));
   if (collisions.length === 0) return [];
   return [
@@ -1030,21 +1057,73 @@ export function checkMediaStorePreflight(args: {
       check: 'emptyDatabaseWithPopulatedMediaStore',
       detail:
         `the database has no media records but the media store already holds ${collisions.length} of the ` +
-        `${args.plannedFilenames.length} filenames this import would write (e.g. ${collisions.slice(0, 3).join(', ')}). ` +
+        `${args.plannedFilenames.length} filenames this run would write (e.g. ${collisions.slice(0, 3).join(', ')}). ` +
         'Payload would auto-number the uploads (name.png -> name-1.png), so filenames and media object keys ' +
-        'would stop matching the snapshot. Empty the target store (or point at a fresh one) before importing.',
+        'would stop matching the snapshot. Empty the target store (or point at a fresh one) before writing.',
     },
   ];
 }
 
-/** local disk 上の media store に実在する filename を読む（Blob store では adapter 側が担う）。 */
-export async function readLocalMediaStoreFilenames(uploadDir: string): Promise<string[]> {
+/** Payload の media storage が Vercel Blob backed か（`lib/payload/mediaStoragePlugin.ts` と同じ条件）。 */
+export function mediaStoreIsBlobBacked(env: Record<string, string | undefined> = process.env): boolean {
+  return env.MEDIA_STORAGE_ENABLED !== 'false' && Boolean(env.BLOB_READ_WRITE_TOKEN);
+}
+
+/**
+ * 対象 media store に実在する filename を読む。
+ *
+ * - Vercel Blob backed（Task 9 の構成）: public media store の token で `list()` する。
+ *   失敗したら `unavailable`（fail-closed）。
+ * - local disk: `readdir`。**ディレクトリが無い場合だけ**「空」として扱う（それは本当に空だから）。
+ *   その他のエラーは `unavailable`。
+ */
+export async function readMediaStoreListing(options: {
+  uploadDir: string;
+  env?: Record<string, string | undefined>;
+}): Promise<MediaStoreListing> {
+  const env = options.env ?? process.env;
+
+  if (mediaStoreIsBlobBacked(env)) {
+    try {
+      const { list } = await import('@vercel/blob');
+      const filenames: string[] = [];
+      let cursor: string | undefined;
+      do {
+        const page = await list({ token: env.BLOB_READ_WRITE_TOKEN, ...(cursor ? { cursor } : {}) });
+        for (const blob of page.blobs) filenames.push(path.posix.basename(blob.pathname));
+        cursor = page.hasMore ? page.cursor : undefined;
+      } while (cursor);
+      return { kind: 'listed', filenames };
+    } catch (error) {
+      return { kind: 'unavailable', reason: `vercel-blob list failed: ${(error as Error).message}` };
+    }
+  }
+
   try {
     const { readdir } = await import('node:fs/promises');
-    return await readdir(uploadDir);
-  } catch {
-    return [];
+    return { kind: 'listed', filenames: await readdir(options.uploadDir) };
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return { kind: 'listed', filenames: [] };
+    return { kind: 'unavailable', reason: `${options.uploadDir}: ${(error as Error).message}` };
   }
+}
+
+/**
+ * 空DB + 既存 media store の検査を、**書き込みを始める前に**行う共通ヘルパ。
+ * `content:import` と `content:restore` の両方がこれを通る（Important #3 の (a)）。
+ */
+export async function preflightMediaStore(args: {
+  payload: Payload;
+  plannedFilenames: readonly string[];
+  uploadDir: string;
+  env?: Record<string, string | undefined>;
+}): Promise<MediaStorePreflightFailure[]> {
+  const existing = await args.payload.count({ collection: 'media', overrideAccess: true });
+  return checkMediaStorePreflight({
+    existingMediaRecords: existing.totalDocs,
+    plannedFilenames: args.plannedFilenames,
+    listing: await readMediaStoreListing({ uploadDir: args.uploadDir, ...(args.env ? { env: args.env } : {}) }),
+  });
 }
 
 // ─── baseline 同梱 media からの復元（必須修正9-1 / 9-3） ────────────────────
@@ -1250,11 +1329,10 @@ async function main(): Promise<void> {
     const plan = await planImportFromSnapshot(snapshot);
     const uploadDirArg = args.get('media-store-dir');
     const uploadDir = typeof uploadDirArg === 'string' ? path.resolve(uploadDirArg) : path.resolve(process.cwd(), 'media');
-    const existingMedia = await payload.count({ collection: 'media', overrideAccess: true });
-    const storePreflight = checkMediaStorePreflight({
-      existingMediaRecords: existingMedia.totalDocs,
+    const storePreflight = await preflightMediaStore({
+      payload,
       plannedFilenames: plan.mediaFilenames.map((entry) => entry.filename),
-      existingStoreFilenames: await readLocalMediaStoreFilenames(uploadDir),
+      uploadDir,
     });
     if (storePreflight.length > 0) {
       for (const failure of storePreflight) process.stderr.write(`FAIL ${failure.check}: ${failure.detail}\n`);

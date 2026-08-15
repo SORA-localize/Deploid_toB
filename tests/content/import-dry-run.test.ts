@@ -19,13 +19,18 @@ import { sha256Hex } from '@/scripts/export-content-snapshot.mts';
 import {
   checkMediaStorePreflight,
   deriveMediaFromSnapshot,
+  mediaStoreIsBlobBacked,
+  readMediaStoreListing,
   importContentSnapshot,
   importPlanIsClean,
   planImportFromSnapshot,
   restoreContentSnapshot,
   type MediaFileResolver,
 } from '@/scripts/import-content-to-payload.mts';
-import { authorizeRestoreFromLocalThrowaway } from '@/scripts/restoreAuthorization.mts';
+import {
+  authorizeRestoreFromLocalThrowaway,
+  authorizeRestoreFromVerifiedBaseline,
+} from '@/scripts/restoreAuthorization.mts';
 import { contentSnapshotFixture } from '@/tests/fixtures/contentSnapshot';
 import { assertLocalThrowawayDatabase } from './testDbGuard';
 import {
@@ -256,7 +261,7 @@ describe('media store preflight (必須修正8-8)', () => {
     const failures = checkMediaStorePreflight({
       existingMediaRecords: 0,
       plannedFilenames: ['fixture-hero.png', 'other.png'],
-      existingStoreFilenames: ['fixture-hero.png'],
+      listing: { kind: 'listed', filenames: ['fixture-hero.png'] },
     });
     expect(failures.map((failure) => failure.check)).toEqual(['emptyDatabaseWithPopulatedMediaStore']);
     expect(failures[0].detail).toMatch(/auto-number/);
@@ -264,7 +269,11 @@ describe('media store preflight (必須修正8-8)', () => {
 
   it('allows an empty database with an empty store', () => {
     expect(
-      checkMediaStorePreflight({ existingMediaRecords: 0, plannedFilenames: ['a.png'], existingStoreFilenames: [] }),
+      checkMediaStorePreflight({
+        existingMediaRecords: 0,
+        plannedFilenames: ['a.png'],
+        listing: { kind: 'listed', filenames: [] },
+      }),
     ).toEqual([]);
   });
 
@@ -273,10 +282,46 @@ describe('media store preflight (必須修正8-8)', () => {
       checkMediaStorePreflight({
         existingMediaRecords: 1,
         plannedFilenames: ['fixture-hero.png'],
-        existingStoreFilenames: ['fixture-hero.png'],
+        listing: { kind: 'listed', filenames: ['fixture-hero.png'] },
       }),
     ).toEqual([]);
   });
+
+  /**
+   * review fix round 1 / Important #3: 修正前は store の一覧取得に失敗すると `[]` を返していた。
+   * Vercel Blob backed の構成（Task 9 で実際に使う構成）では毎回 `[]` になり、この preflight は
+   * **常にサイレントに素通り**していた。「確認できない」は「空」ではない。
+   */
+  it('refuses to proceed when the store contents cannot be listed at all', () => {
+    const failures = checkMediaStorePreflight({
+      existingMediaRecords: 0,
+      plannedFilenames: ['fixture-hero.png'],
+      listing: { kind: 'unavailable', reason: 'vercel-blob list failed: no token' },
+    });
+    expect(failures.map((failure) => failure.check)).toEqual(['mediaStoreUnverifiable']);
+    expect(failures[0].detail).toMatch(/Refusing to write rather than assuming the store is empty/);
+  });
+
+  it('recognises a Blob-backed media store from the same env the plugin uses', () => {
+    expect(mediaStoreIsBlobBacked({ BLOB_READ_WRITE_TOKEN: 'vercel_blob_rw_store_secret' })).toBe(true);
+    expect(mediaStoreIsBlobBacked({})).toBe(false);
+    expect(
+      mediaStoreIsBlobBacked({ BLOB_READ_WRITE_TOKEN: 'vercel_blob_rw_store_secret', MEDIA_STORAGE_ENABLED: 'false' }),
+    ).toBe(false);
+  });
+
+  /** local disk 側: ディレクトリが無いのは「本当に空」。読めない場合は unavailable。 */
+  it('treats a missing local upload directory as empty but a Blob listing failure as unavailable', async () => {
+    const missing = await readMediaStoreListing({ uploadDir: path.join(os.tmpdir(), 'deploid-no-such-dir-xyz'), env: {} });
+    expect(missing).toEqual({ kind: 'listed', filenames: [] });
+
+    const blobFailure = await readMediaStoreListing({
+      uploadDir: path.join(os.tmpdir(), 'unused'),
+      // 実 Blob へは到達できないので list は必ず失敗する。fail-closed になることを見る。
+      env: { BLOB_READ_WRITE_TOKEN: 'vercel_blob_rw_deadstore_notarealtoken' },
+    });
+    expect(blobFailure.kind).toBe('unavailable');
+  }, 60_000);
 });
 
 // ─── 必須修正8-3: restore 専用 override entrypoint ────────────────────────
@@ -300,6 +345,35 @@ describe('restore-only privileged entrypoint (必須修正8-3)', () => {
       );
     }
     expect(() => authorizeRestoreFromLocalThrowaway({ environment: null, isLocalHost: true })).not.toThrow();
+  });
+
+  /**
+   * review fix round 1 / Important #2: 一度も `environment:stamp` されていない managed database は
+   * `environment: null` を返す。marker だけを見ていると、**まだ stamp されていない本番DB**へ
+   * 特権 override authorization を発行してしまう。`isLocalHost` は引数として渡されていながら
+   * 一度も読まれていなかった（テストが全ケースで `isLocalHost: true` を渡していたため露見しなかった）。
+   */
+  it('refuses an unstamped database that is not on a local host', () => {
+    expect(() => authorizeRestoreFromLocalThrowaway({ environment: null, isLocalHost: false })).toThrow(
+      /restore-authorization-refused/,
+    );
+    expect(() => authorizeRestoreFromLocalThrowaway({ environment: null, isLocalHost: false })).toThrow(
+      /not a throwaway/,
+    );
+  });
+
+  /**
+   * review fix round 1 / Important #1: authorization は
+   * `verifyBaselineBeforeRestore()` が**実際に返したオブジェクト**を要求する。
+   * 形を似せただけの object では発行できない（正常系は
+   * `tests/content/restore-enforcement.test.ts` の実 KMS テストで確認）。
+   */
+  it('refuses a hand-made object that merely looks like a verification result', () => {
+    expect(() =>
+      authorizeRestoreFromVerifiedBaseline({
+        provenance: { baselineRunId: 'baseline-forged', environment: 'production' },
+      }),
+    ).toThrow(/not a verification result produced by verifyBaselineBeforeRestore/);
   });
 });
 
@@ -384,6 +458,76 @@ describe('content:import against real throwaway databases', () => {
         await client.end();
       }
     } finally {
+      await dropThrowawayDatabase(ambient, dbName);
+    }
+  }, 300_000);
+
+  /**
+   * review fix round 1 / Important #3(a): 必須修正8-8 の preflight は **restore にも**要る。
+   * 空DB + 既存 media store という、まさに要件が想定していた状況を `content:restore` で作り、
+   * **DB を1行も触る前に**拒否されることを確かめる。
+   *
+   * 修正前は preflight が `content:import` だけに配線されていたため、restore では filename
+   * 自動採番が書き込み**後**の parity でしか出ず、「No database change was made」という
+   * 他のチェーンの保証と食い違っていた。
+   */
+  it('refuses a restore into an empty database whose media store already holds the filenames', async () => {
+    const dbName = 'deploid_restore_mediastore_test';
+    await createThrowawayDatabase(ambient, dbName);
+    const targetUrl = withDatabaseName(ambient, dbName);
+    const workDir = await mkdtemp(path.join(os.tmpdir(), 'deploid-restore-store-'));
+    try {
+      expect(runPayloadCli(['migrate'], { DATABASE_URL: targetUrl, PAYLOAD_SECRET }).status).toBe(0);
+
+      // 空DBへ戻す snapshot（media 1件）。
+      const snapshot = {
+        robots: [],
+        robotSeries: [],
+        distributors: [],
+        manufacturers: [],
+        useCases: [],
+        deployments: [],
+        articles: [],
+        articlePlacements: [],
+        articleIndexPlacementLimits: { hero: 5, feature: 2 },
+        media: [structuredClone(contentSnapshotFixture.media[0])],
+        siteSettings: { dataAsOf: '2026-08' },
+      };
+      const snapshotPath = path.join(workDir, 'snapshot.json');
+      await writeFile(snapshotPath, JSON.stringify(snapshot), 'utf8');
+
+      // 対象 media store には既に同じ filename がある（前回 run の孤児ファイル相当）。
+      const storeDir = path.join(workDir, 'media-store');
+      await mkdir(storeDir, { recursive: true });
+      await writeFile(path.join(storeDir, contentSnapshotFixture.media[0].filename), ONE_PX_PNG);
+
+      const result = runTsxScript(
+        'scripts/export-content-snapshot.mts',
+        [
+          '--restore', '--input', snapshotPath,
+          '--media-store-dir', storeDir,
+          '--bootstrap-admin', '--admin-email', 'restore-store@example.com', '--admin-password', 'Str0ngPassw0rd!23',
+        ],
+        { DATABASE_URL: targetUrl, PAYLOAD_SECRET },
+        180_000,
+      );
+
+      expect(result.status).not.toBe(0);
+      const output = `${result.stdout}${result.stderr}`;
+      expect(output).toMatch(/emptyDatabaseWithPopulatedMediaStore/);
+      expect(output).toMatch(/No database change was made/);
+
+      // 本当に1行も書いていない。
+      const client = new Client({ connectionString: targetUrl });
+      await client.connect();
+      try {
+        const { rows } = await client.query('select count(*)::int as count from "media"');
+        expect(rows[0].count).toBe(0);
+      } finally {
+        await client.end();
+      }
+    } finally {
+      await rm(workDir, { recursive: true, force: true });
       await dropThrowawayDatabase(ambient, dbName);
     }
   }, 300_000);

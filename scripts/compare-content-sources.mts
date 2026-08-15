@@ -952,8 +952,13 @@ async function main(): Promise<void> {
 /**
  * 必須修正8-6: waiver ファイル（署名済み JSON 文書）を読み、**署名を検証してから** gate に渡す。
  * 署名機構は `scripts/export-content-snapshot.mts` のものを再利用する（cosign + AWS KMS 鍵）。
+ *
+ * review fix round 1 / Important #4: **この関数自体をテスト対象にする**ために export する。
+ * 修正前は gate のテストが `signatureVerified` を boolean リテラルで注入するだけで、
+ * 「ファイルを読んで cosign で検証する」この経路が一度も実行されていなかった——
+ * つまり偽造署名を持つ waiver ファイルが実際に拒否されることを、誰も確かめていなかった。
  */
-async function evaluateMediaReviewGate(
+export async function evaluateMediaReviewGate(
   items: readonly MediaReviewItem[],
   waiverPath: string | true | undefined,
 ): Promise<MediaReviewGateResult> {

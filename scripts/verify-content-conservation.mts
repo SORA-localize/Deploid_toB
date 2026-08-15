@@ -290,6 +290,70 @@ export function verifyStableIdConservation(
   return { ok: violations.length === 0, checkedIds, appliedTransfers, violations };
 }
 
+// ─── 承認済み transfer の読み込み（必須修正10-5 / 10-6） ────────────────────
+
+export interface IdentityTransferLoadFailure {
+  check: string;
+  detail: string;
+}
+
+/**
+ * 署名済み identity transfer 文書を読み、**cosign 署名を検証してから**中身を返す。
+ *
+ * review fix round 1 / Important #4: この経路を CLI の `main()` から切り出して export する。
+ * 修正前は「裸の配列が `parseIdentityTransferDocument` で弾かれる」ことしかテストされておらず、
+ * **形は正しいが署名が偽造/不正な文書**が実際に cosign で拒否されること、`baselineRunId` の
+ * 再利用が拒否されることを誰も確かめていなかった（`{ document: {...}, signature: { algorithm:
+ * 'cosign', keyId: 'x', bundleBase64: 'AA==' } }` は外形検査を通ってしまう）。
+ */
+export async function loadApprovedIdentityTransfers(args: {
+  path: string;
+  /** この run が検証している baseline。承認はこれに結び付いていなければならない。 */
+  baselineRunId: string;
+}): Promise<{ transfers: IdentityTransfer[] } | { failure: IdentityTransferLoadFailure }> {
+  const signed = JSON.parse(await readFile(args.path, 'utf8')) as unknown;
+
+  try {
+    assertValidSignedJsonDocument(signed);
+  } catch (error) {
+    return {
+      failure: {
+        check: 'identityTransferSignature',
+        detail:
+          `${(error as Error).message}. An identity transfer manifest must be a cosign-signed document ` +
+          '({ document: { baselineRunId, transfers }, signature }); a plain JSON array of self-attested ' +
+          'approvals is not accepted (必須修正10-5).',
+      },
+    };
+  }
+
+  const signature = await verifyJsonDocumentSignature(signed);
+  if (!signature.verified) {
+    return { failure: { check: 'identityTransferSignature', detail: signature.detail } };
+  }
+
+  let document: IdentityTransferDocument;
+  try {
+    document = parseIdentityTransferDocument(signed.document);
+  } catch (error) {
+    return { failure: { check: 'identityTransfers', detail: (error as Error).message } };
+  }
+
+  // 承認は「この baseline に対して」出されたもの。別 baseline へ流用させない。
+  if (document.baselineRunId !== args.baselineRunId) {
+    return {
+      failure: {
+        check: 'identityTransferBaseline',
+        detail:
+          `the approval is for baseline "${document.baselineRunId}" but this run verifies baseline ` +
+          `"${args.baselineRunId}".`,
+      },
+    };
+  }
+
+  return { transfers: document.transfers };
+}
+
 // ─── CLI ─────────────────────────────────────────────────────────────────
 
 const HELP = [
@@ -345,46 +409,16 @@ async function main(): Promise<void> {
   let transfers: IdentityTransfer[] = [];
   const transfersPath = args.get('identity-transfers');
   if (typeof transfersPath === 'string') {
-    const signed = JSON.parse(await readFile(transfersPath, 'utf8')) as unknown;
-    try {
-      assertValidSignedJsonDocument(signed);
-    } catch (error) {
-      process.stderr.write(
-        `FAIL identityTransferSignature: ${(error as Error).message}. An identity transfer manifest must be ` +
-          'a cosign-signed document ({ document: { baselineRunId, transfers }, signature }); a plain JSON ' +
-          'array of self-attested approvals is not accepted (必須修正10-5).\n',
-      );
+    const loadedTransfers = await loadApprovedIdentityTransfers({
+      path: transfersPath,
+      baselineRunId: envelope.manifest.provenance.baselineRunId,
+    });
+    if ('failure' in loadedTransfers) {
+      process.stderr.write(`FAIL ${loadedTransfers.failure.check}: ${loadedTransfers.failure.detail}\n`);
       process.exitCode = 1;
       return;
     }
-
-    const signature = await verifyJsonDocumentSignature(signed);
-    if (!signature.verified) {
-      process.stderr.write(`FAIL identityTransferSignature: ${signature.detail}\n`);
-      process.exitCode = 1;
-      return;
-    }
-
-    let document: IdentityTransferDocument;
-    try {
-      document = parseIdentityTransferDocument(signed.document);
-    } catch (error) {
-      process.stderr.write(`FAIL identityTransfers: ${(error as Error).message}\n`);
-      process.exitCode = 1;
-      return;
-    }
-
-    // 承認は「この baseline に対して」出されたもの。別 baseline へ流用させない。
-    if (document.baselineRunId !== envelope.manifest.provenance.baselineRunId) {
-      process.stderr.write(
-        `FAIL identityTransferBaseline: the approval is for baseline "${document.baselineRunId}" but this ` +
-          `run verifies baseline "${envelope.manifest.provenance.baselineRunId}".\n`,
-      );
-      process.exitCode = 1;
-      return;
-    }
-
-    transfers = document.transfers;
+    transfers = loadedTransfers.transfers;
     process.stdout.write(`identity transfers: ${transfers.length} approved and signed for this baseline\n`);
   }
 

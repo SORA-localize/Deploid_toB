@@ -38,6 +38,7 @@ import {
   createDefaultMediaFileResolver,
   formatImportReport,
   mediaResolverOptionsFromArgs,
+  preflightMediaStore,
   resolveImportUser,
   resolveWithinRoot,
   restoreContentSnapshot,
@@ -857,6 +858,7 @@ const HELP = [
   '  --expected-environment <env>          オペレーターが宣言する対象環境（manifest と照合）',
   '  --expected-baseline-run-id <id>       戻す baseline を明示する（古い artifact の replay 防止）',
   '  --media-dir <dir>             media のバイト列の読み取り元（restore 元 store 相当）',
+  '  --media-store-dir <dir>       書き込み先 media store（既定 ./media）。空DB+既存storeを検出する',
   '  --admin-email / --admin-password / --bootstrap-admin / --i-know-this-is-production',
   '',
 ].join('\n');
@@ -1133,6 +1135,25 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
       mediaResolver = createDefaultMediaFileResolver(mediaResolverOptionsFromArgs(args));
       sourceLabel = `unsigned snapshot ${inputPath}`;
       process.stdout.write(`preflight: strict snapshot schema OK (unsigned input, local/test target)\n`);
+    }
+
+    // review fix round 1 / Important #3: 必須修正8-8 の preflight は `content:import` だけでなく
+    // **restore にも**要る。要件が本来想定していたのは「空DB + 既存 store」への書き戻しであり、
+    // それはまさに restore の状況。ここを飛ばすと filename 自動採番が書き込み**後**の parity で
+    // しか出ず、「refusing to write. No database change was made.」という他のチェーンの保証と
+    // 食い違う（DB を触ってから失敗する）。
+    const mediaStoreDirArg = args.get('media-store-dir');
+    const storePreflight = await preflightMediaStore({
+      payload,
+      plannedFilenames: snapshot.media.map((asset) => asset.filename),
+      uploadDir:
+        typeof mediaStoreDirArg === 'string' ? path.resolve(mediaStoreDirArg) : path.resolve(process.cwd(), 'media'),
+    });
+    if (storePreflight.length > 0) {
+      for (const failure of storePreflight) process.stderr.write(`FAIL ${failure.check}: ${failure.detail}\n`);
+      process.stderr.write('content:restore: refusing to write. No database change was made.\n');
+      process.exitCode = 1;
+      return;
     }
 
     const user = await resolveImportUser(payload, args);

@@ -29,6 +29,12 @@ import {
   verifyBaselineBeforeRestore,
   type RestoreTargetIdentity,
 } from '@/scripts/restore-preflight.mts';
+import {
+  encodeUnsignedJwtForTests,
+  resolveBlobCredential,
+  type BlobCredential,
+} from '@/scripts/snapshotObjectStore.mts';
+import { authorizeRestoreFromVerifiedBaseline } from '@/scripts/restoreAuthorization.mts';
 import { contentSnapshotFixture } from '@/tests/fixtures/contentSnapshot';
 import { Client } from 'pg';
 import {
@@ -898,4 +904,176 @@ describe.skipIf(!canSignForReal)('signed restore pipeline against the real KMS k
     forged.manifest.provenance.databaseResourceId = 'db.attacker.example:5432/postgres';
     expect((await verifyManifestSignature(forged)).verified).toBe(false);
   }, 180_000);
+});
+
+// ─── 必須修正7-4 を preflight chain 全体で検証する（review fix round 1 / Important #5） ───
+
+/**
+ * レビュー指摘: `checkBlobStoreAgainstCredential()` が `tests/` から一度も参照されておらず、
+ * 7-4 / 7-8 のカバレッジは純粋関数 `checkBlobStoreSelection` に対するものだけだった。
+ * 実 KMS を使う `verifyBaselineBeforeRestore` のテストは全て `local-disk` manifest を作るため、
+ * この関数は provider 判定で即 short-circuit し、**`verifyBaselineBeforeRestore` から実際に
+ * 呼ばれていることすらテストされていなかった**（呼び出しを消してもスイートは green のまま）。
+ *
+ * ここでは `vercel-blob` の manifest を実 KMS で署名し、artifact / signature / completion marker /
+ * media bytes は local-disk store から供給して、**chain 全体**を通す。
+ */
+describe.skipIf(!canSignForReal)('blob store identity inside the preflight chain (必須修正7-4 / 7-8)', () => {
+  const AUDIT_STORE_ID = 'store_abc123prod';
+  const RW_TOKEN_MATCHING = 'vercel_blob_rw_abc123prod_deadbeefcafe';
+  const RW_TOKEN_OTHER_STORE = 'vercel_blob_rw_xyz789prev_feedfacecafe';
+
+  const BLOB_PROVENANCE: BaselineProvenance = {
+    sourceKind: 'payload',
+    environment: 'production',
+    databaseResourceId: 'db.example.supabase.co:5432/postgres#prodref',
+    auditBlobStoreId: AUDIT_STORE_ID,
+    schemaVersion: '20260814_020026_site_settings_data_as_of_and_placement_limits',
+    baselineRunId: 'baseline-2026-08-15T00:00:00.000Z-blobchain',
+    baselineGeneration: 7,
+  };
+
+  const BLOB_TARGET: RestoreTargetIdentity = {
+    environment: 'production',
+    databaseResourceId: BLOB_PROVENANCE.databaseResourceId,
+    schemaVersion: BLOB_PROVENANCE.schemaVersion,
+    auditBlobStoreId: AUDIT_STORE_ID,
+    lastRestoredBaselineGeneration: null,
+    isLocalHost: false,
+  };
+
+  /**
+   * local-disk store へ本物の baseline を作り、その manifest を「vercel-blob に置いてある」形へ
+   * 書き換えて**実 KMS で署名し直す**。bytes は local store から供給するので、store 同定以外の
+   * 検査はすべて本物どおりに通る。
+   */
+  const buildBlobBaseline = async (dir: string, overrides: Partial<CutoverBaselineManifest['storage']> = {}) => {
+    const store = createLocalDiskObjectStore(dir);
+    const built = await exportSignedBaseline({
+      snapshot: contentSnapshotFixture,
+      store,
+      exportedBy: 'blob-chain-test',
+      provenance: BLOB_PROVENANCE,
+      resolveMediaBytes: async () => ONE_PX_PNG,
+    });
+    const manifest: CutoverBaselineManifest = {
+      ...built.manifest,
+      storage: {
+        ...built.manifest.storage,
+        provider: 'vercel-blob',
+        bucket: 'deploid-audit-production',
+        storeId: AUDIT_STORE_ID,
+        ...overrides,
+      },
+    };
+    return { store, manifest, envelope: await signManifest(manifest) };
+  };
+
+  const verifyWithCredential = async (
+    dir: string,
+    manifest: CutoverBaselineManifest,
+    envelope: unknown,
+    blobCredential: BlobCredential | null,
+  ) => {
+    const store = createLocalDiskObjectStore(dir);
+    const workDir = await mkdtemp(path.join(os.tmpdir(), 'deploid-blobchain-'));
+    try {
+      return await verifyBaselineBeforeRestore({
+        envelope,
+        artifact: await store.get(manifest.storage.objectKey),
+        artifactSignatureBundle: await store.get(manifest.signature.detachedSignatureObjectKey),
+        completionMarker: await store.get(baselineCompletionMarkerKey(manifest.storage.objectKey)).catch(() => null),
+        fetchMediaObject: (objectKey) => store.get(objectKey),
+        blobCredential,
+        target: BLOB_TARGET,
+        workDir,
+        writeFile: async (filePath, data) => writeFile(filePath, data),
+        joinPath: (...segments) => path.join(...segments),
+      });
+    } finally {
+      await rm(workDir, { recursive: true, force: true });
+    }
+  };
+
+  it('accepts a vercel-blob baseline whose credential selects the same store', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'deploid-blobchain-store-'));
+    try {
+      const { manifest, envelope } = await buildBlobBaseline(dir);
+      const result = await verifyWithCredential(dir, manifest, envelope, resolveBlobCredential({
+        BLOB_READ_WRITE_TOKEN: RW_TOKEN_MATCHING,
+      }));
+      expect(result.ok, JSON.stringify('failures' in result ? result.failures : [])).toBe(true);
+
+      // review fix round 1 / Important #1 の正常系: **実際の検証結果**からは authorization が出る。
+      if (result.ok) {
+        expect(() => authorizeRestoreFromVerifiedBaseline(result.verified)).not.toThrow();
+        // 同じ内容でも別 object なら出ない（object identity で照合しているため）。
+        expect(() => authorizeRestoreFromVerifiedBaseline({ ...result.verified })).toThrow(
+          /not a verification result produced by verifyBaselineBeforeRestore/,
+        );
+      }
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 300_000);
+
+  it('refuses when this run has no blob credential to identify the store with', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'deploid-blobchain-store-'));
+    try {
+      const { manifest, envelope } = await buildBlobBaseline(dir);
+      const result = await verifyWithCredential(dir, manifest, envelope, null);
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.failures.map((failure) => failure.check)).toContain('blobCredential');
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 300_000);
+
+  it('refuses a credential bound to a different store', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'deploid-blobchain-store-'));
+    try {
+      const { manifest, envelope } = await buildBlobBaseline(dir);
+      const result = await verifyWithCredential(dir, manifest, envelope, resolveBlobCredential({
+        BLOB_READ_WRITE_TOKEN: RW_TOKEN_OTHER_STORE,
+      }));
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.failures.map((failure) => failure.check)).toContain('blobStoreId');
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 300_000);
+
+  it('refuses a manifest whose storage store id disagrees with its own provenance', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'deploid-blobchain-store-'));
+    try {
+      // artifact は store A に置かれたと主張しつつ、provenance の audit store は B。
+      const { manifest, envelope } = await buildBlobBaseline(dir, { storeId: 'store_someotherstore' });
+      const result = await verifyWithCredential(dir, manifest, envelope, resolveBlobCredential({
+        BLOB_READ_WRITE_TOKEN: 'vercel_blob_rw_someotherstore_deadbeefcafe',
+      }));
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.failures.map((failure) => failure.check)).toContain('blobStoreProvenance');
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 300_000);
+
+  /** 必須修正7-8: Preview の OIDC credential で Production の baseline を読もうとした場合。 */
+  it('refuses preview OIDC credentials against a production baseline', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'deploid-blobchain-store-'));
+    try {
+      const { manifest, envelope } = await buildBlobBaseline(dir);
+      const previewCredential = resolveBlobCredential({
+        VERCEL_OIDC_TOKEN: encodeUnsignedJwtForTests({ environment: 'preview' }),
+        BLOB_STORE_ID: AUDIT_STORE_ID,
+      });
+      const result = await verifyWithCredential(dir, manifest, envelope, previewCredential);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.failures.map((failure) => failure.check)).toContain('blobCredentialEnvironment');
+      }
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }, 300_000);
 });
