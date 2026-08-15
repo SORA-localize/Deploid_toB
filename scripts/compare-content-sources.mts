@@ -607,10 +607,10 @@ export function verifyCountConsistency(args: {
     if (args.payloadSnapshot) {
       const payloadLength = (args.payloadSnapshot[collection] as readonly unknown[]).length;
       const payloadUnique = uniqueIds(args.payloadSnapshot, collection);
-      if (payloadLength !== unique) {
+      if (payloadLength !== rawLength) {
         failures.push({
           check: 'payloadCount',
-          detail: `${collection}: the snapshot has ${unique} distinct stable ids, Payload returns ${payloadLength} records`,
+          detail: `${collection}: the artifact array holds ${rawLength} records, Payload returns ${payloadLength}`,
         });
       }
       if (payloadLength !== payloadUnique) {

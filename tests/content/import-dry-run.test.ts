@@ -156,7 +156,7 @@ describe('duplicate stable ids and count consistency (必須修正8-4 / 8-5)', (
     // 4つの数字が別々の失敗として出る（1つに畳まれない）。
     expect(byCheck.get('uniqueStableIdCount')).toMatch(/4 records but only 3 distinct/);
     expect(byCheck.get('manifestCount')).toMatch(/manifest says 3, the artifact array holds 4/);
-    expect(byCheck.get('payloadCount')).toMatch(/3 distinct stable ids, Payload returns 2/);
+    expect(byCheck.get('payloadCount')).toMatch(/artifact array holds 4 records, Payload returns 2/);
   });
 
   it('passes when all four counts agree', () => {
@@ -167,6 +167,18 @@ describe('duplicate stable ids and count consistency (必須修正8-4 / 8-5)', (
         payloadSnapshot: structuredClone(contentSnapshotFixture),
       }),
     ).toEqual([]);
+  });
+
+  it('compares Payload raw length with artifact raw length even when a duplicate makes unique counts match', () => {
+    const snapshot = clone(contentSnapshotFixture);
+    snapshot.robots.push(structuredClone(snapshot.robots[0]));
+    const failures = verifyCountConsistency({
+      snapshot,
+      payloadSnapshot: structuredClone(contentSnapshotFixture),
+    });
+    const robotFailures = failures.filter((failure) => failure.detail.startsWith('robots:'));
+    expect(robotFailures.map((failure) => failure.check)).toEqual(['uniqueStableIdCount', 'payloadCount']);
+    expect(robotFailures[1].detail).toMatch(/artifact array holds 4 records, Payload returns 3/);
   });
 });
 
