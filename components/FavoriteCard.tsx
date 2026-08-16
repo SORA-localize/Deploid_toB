@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { X } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
-import type { ManufacturerLogos, Robot } from '@/lib/content/domainTypes';
+import type { ManufacturerLogos } from '@/lib/content/domainTypes';
+import type { CompareRobotViewModel } from '@/lib/viewModels/compare';
 import { uiText } from '@/lib/uiText';
 
 interface FavoriteCardProps {
-  robot: Robot;
+  robot: CompareRobotViewModel;
   manufacturerName?: string;
   manufacturerLogos?: ManufacturerLogos;
   onRemove: (id: string) => void;

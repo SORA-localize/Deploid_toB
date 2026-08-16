@@ -9,6 +9,7 @@ import {
 } from '@/lib/labels';
 import { getSpecEntry, specSchema, type SpecKey } from '@/lib/specSchema';
 import { uiText } from '@/lib/uiText';
+import type { CompareRobotViewModel } from '@/lib/viewModels/compare';
 
 export interface DisplayRow {
   label: string;
@@ -39,7 +40,9 @@ export function formatRuntime(value: number | undefined) {
  * 比較ページ詳細データが共通で呼ぶ。値の組み立てをここ1箇所にまとめ、個別に heightCm 等を
  * 再計算する箇所を増やさない。
  */
-export function getRobotDimensionsSummary(robot: Robot): { value: string; hasData: boolean; sourceUrls?: string[] } {
+export function getRobotDimensionsSummary<T extends Pick<Robot, 'specs' | 'fieldEvidence'>>(
+  robot: T,
+): { value: string; hasData: boolean; sourceUrls?: string[] } {
   const { heightCm, widthCm, depthCm } = robot.specs;
   const parts = [heightCm, widthCm, depthCm].filter((v): v is number => v != null);
   if (parts.length === 0) {
@@ -84,9 +87,9 @@ export function getSpecRows(specs: RobotSpecs, keys?: readonly SpecKey[]): Displ
   }));
 }
 
-function formatComparisonPriceStatus(robot: Robot) {
+function formatComparisonPriceStatus(robot: Pick<CompareRobotViewModel, 'procurementModels' | 'hasPriceOffers'>) {
   if (robot.procurementModels.includes('not-for-sale')) return '一般販売なし';
-  return (robot.priceOffers?.length ?? 0) > 0 ? '公開価格あり' : '問い合わせ';
+  return robot.hasPriceOffers ? '公開価格あり' : '問い合わせ';
 }
 
 function formatLoadKg(kg: number) {
@@ -201,7 +204,7 @@ export function formatRobotLoadRatings(loads: readonly RobotLoadRating[]) {
   }).join(' / ');
 }
 
-export function getComparisonCoreRows(robot: Robot): ComparisonDisplayRow[] {
+export function getComparisonCoreRows(robot: CompareRobotViewModel): ComparisonDisplayRow[] {
   const { specs } = robot;
   const hasLoadRatings = (robot.loadRatings?.length ?? 0) > 0;
   const runtime = formatRuntime(specs.runtimeMin);
@@ -223,7 +226,7 @@ export function getComparisonCoreRows(robot: Robot): ComparisonDisplayRow[] {
   ];
 }
 
-export function getComparisonDetailRows(robot: Robot): ComparisonDisplayRow[] {
+export function getComparisonDetailRows(robot: CompareRobotViewModel): ComparisonDisplayRow[] {
   const { specs } = robot;
 
   // 寸法（身長×幅×奥行き）は detail ページ・サイドバーと同じ正本（本ファイルの getRobotDimensionsSummary）を使う
@@ -253,7 +256,7 @@ export function getComparisonDetailRows(robot: Robot): ComparisonDisplayRow[] {
   ];
 }
 
-export function getComparisonSpecGroups(robot: Robot): ComparisonSpecGroup[] {
+export function getComparisonSpecGroups(robot: CompareRobotViewModel): ComparisonSpecGroup[] {
   return [
     { heading: uiText.comparison.coreVariables, rows: getComparisonCoreRows(robot) },
     { heading: uiText.comparison.detailedData, rows: getComparisonDetailRows(robot) },

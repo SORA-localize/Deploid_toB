@@ -4,13 +4,11 @@ import type {
   DeploymentStage,
   JapanAvailability,
   JapanPresence,
-  Manufacturer,
   ArticleSection,
   ArticleCategory,
   ArticleType,
   ManufacturerGuideDeploymentCategory,
   ManufacturerGuideProcurementChannelKind,
-  Robot,
   RobotCategory,
   UseCaseMaturity,
 } from '@/lib/content/domainTypes';
@@ -157,10 +155,32 @@ function compareNames(a: string, b: string) {
   return a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
 }
 
-function compareRobotCatalogNames(
-  a: Robot,
-  b: Robot,
-  manufacturerById?: Map<string, Manufacturer>,
+/**
+ * `sortRobots` が実際に読むfieldの最小集合。`/compare`（`lib/viewModels/compare.ts`の
+ * `CompareRobotViewModel`）のように、フルの`Robot`を持たない呼び出し元でも使えるようにする
+ * （Task 6 fix round 3）。`sort`引数の値は実行時にしか決まらないため、TypeScriptはどの分岐が
+ * 実行されるかで制約を絞れない。関数シグネチャ全体が要求するfield集合をここで固定する。
+ */
+interface RobotSortFields {
+  featuredRank?: number;
+  deploymentStage: DeploymentStage;
+  japanAvailability: JapanAvailability;
+  updatedAt: string;
+  manufacturerId: string;
+  name: string;
+  slug: string;
+}
+
+/** `sortRobots` / `compareRobotCatalogNames` が manufacturer側から読む最小集合。 */
+interface ManufacturerNameFields {
+  id: string;
+  name: string;
+}
+
+function compareRobotCatalogNames<T extends RobotSortFields>(
+  a: T,
+  b: T,
+  manufacturerById?: Map<string, ManufacturerNameFields>,
 ) {
   const aManufacturer = manufacturerById?.get(a.manufacturerId)?.name ?? a.manufacturerId;
   const bManufacturer = manufacturerById?.get(b.manufacturerId)?.name ?? b.manufacturerId;
@@ -172,11 +192,11 @@ function compareRobotCatalogNames(
   return compareNames(a.slug, b.slug);
 }
 
-export function sortRobots(
-  robots: Robot[],
+export function sortRobots<T extends RobotSortFields>(
+  robots: T[],
   sort: RobotSortKey,
-  manufacturers?: readonly Manufacturer[],
-): Robot[] {
+  manufacturers?: readonly ManufacturerNameFields[],
+): T[] {
   const stageIndex = new Map(deploymentStageOrder.map((s, i) => [s, i]));
   const availIndex = new Map(japanAvailabilityOrder.map((s, i) => [s, i]));
   const manufacturerById = manufacturers
@@ -241,10 +261,17 @@ export const byArticlePublishedDesc = (
 
 export type ManufacturerSortKey = 'japan' | 'name' | 'founded';
 
-export function sortManufacturers(
-  manufacturers: Manufacturer[],
+/** `sortManufacturers` が実際に読むfieldの最小集合（Task 6 fix round 3）。 */
+interface ManufacturerSortFields {
+  japanPresence: JapanPresence;
+  foundedYear?: number;
+  name: string;
+}
+
+export function sortManufacturers<T extends ManufacturerSortFields>(
+  manufacturers: T[],
   sort: ManufacturerSortKey,
-): Manufacturer[] {
+): T[] {
   const presenceIndex = new Map(japanPresenceOrder.map((s, i) => [s, i]));
 
   return [...manufacturers].sort((a, b) => {

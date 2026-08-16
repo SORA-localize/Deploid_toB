@@ -3,9 +3,8 @@ import { PageSuspenseFallback } from '@/components/PageSuspenseFallback';
 import { CompareClient } from '@/components/CompareClient';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { toInitialSearch } from '@/lib/catalog/urlSearch';
-import { toCompareManufacturer } from '@/lib/manufacturerDisplay';
 import { createPageMetadata } from '@/lib/metadata';
-import { toCompareRobot } from '@/lib/robotCatalog';
+import { createCompareManufacturerViewModel, createCompareRobotViewModel } from '@/lib/viewModels/compare';
 
 export const metadata = createPageMetadata({
   title: '比較',
@@ -23,8 +22,8 @@ async function CompareContent({
     repository.listAllPublishedRobots(),
     repository.listAllPublishedManufacturers(),
   ]);
-  const robots = robotsRaw.map(toCompareRobot);
-  const manufacturers = manufacturersRaw.map(toCompareManufacturer);
+  const robots = robotsRaw.map(createCompareRobotViewModel);
+  const manufacturers = manufacturersRaw.map(createCompareManufacturerViewModel);
   const { compare, view } = await searchParams;
 
   return (

@@ -35,7 +35,7 @@ import { FavoriteCard } from '@/components/FavoriteCard';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
 import { SearchInput } from '@/components/SearchInput';
 import { SortableCompareCard } from '@/components/SortableCompareCard';
-import type { Manufacturer, Robot } from '@/lib/content/domainTypes';
+import type { CompareManufacturerViewModel, CompareRobotViewModel } from '@/lib/viewModels/compare';
 import { getComparisonSpecGroups } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 import { MAX_COMPARE_ROBOTS, normalizeCompareRobotIds } from '@/lib/compareParams';
@@ -48,8 +48,8 @@ import { normalizeSearchText } from '@/lib/normalizeSearchText';
 type CompareView = 'visual' | 'specs';
 
 interface CompareClientProps {
-  robots: Robot[];
-  manufacturers: Manufacturer[];
+  robots: CompareRobotViewModel[];
+  manufacturers: CompareManufacturerViewModel[];
   initialSearch: string;
 }
 
@@ -87,7 +87,7 @@ export function CompareClient({ robots, manufacturers, initialSearch }: CompareC
   // ローカル絞り込み（URLには載せない。共有すべき状態は選択と表示モードのみ）。
   const [menuQuery, setMenuQuery] = useState('');
   const normalizedMenuQuery = normalizeSearchText(menuQuery);
-  const menuRobotMatches = (robot: Robot, manufacturer: Manufacturer) => {
+  const menuRobotMatches = (robot: CompareRobotViewModel, manufacturer: CompareManufacturerViewModel) => {
     if (!normalizedMenuQuery) return true;
     return [robot.name, robot.nameJa, manufacturer.name, manufacturer.nameJa]
       .some((text) => text && normalizeSearchText(text).includes(normalizedMenuQuery));
