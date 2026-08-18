@@ -1,6 +1,6 @@
 ---
 status: reference
-updated: 2026-08-15
+updated: 2026-08-18
 ---
 
 # Postgres migration runbook v1
@@ -406,7 +406,34 @@ hostを検査し、それ以外なら例外で止める）。Production / Previe
 
 ---
 
-## 7. Global Constraints との対応
+## 7. Payload collection以外のtableを追加する場合（`afterSchemaInit`）
+
+**新規migration**: `20260818_090053_add_preview_nonces`（Task 7、`preview_nonces` — Draft Mode
+preview tokenのnonce台帳）。
+
+Payload collectionとして宣言していない生tableを`migrations/*.ts`だけで作ると、実機で次の
+落とし穴を踏む: `getPayload()` が実行するdev-mode schema auto-push（drizzle-kitの宣言的
+push — 「Payloadが知っているschema」にDBを合わせ込む）が、その生tableを「未知のtable」と
+見なして**pushのたびに削除する**。`tests/content/*.test.ts` はほぼ全て `getPayload()` を
+呼ぶため、テストを1回走らせるだけでmigrationで作ったばかりのtableが消える
+（`preview_nonces`で実機確認済み）。
+
+**対処**: 対象tableをPayloadのadapter設定（`postgresAdapter({ afterSchemaInit: [...] })`）で
+drizzleの `pgTable` として宣言し、pushの「知っている」schemaに含める
+（`lib/payload/previewNonceSchema.ts` が実装例）。`payload.config.ts` の本番設定と、
+`tests/fixtures/payload-migrations/mcp-fixture.config.ts`（Task 3.5 Step 3のfixture。
+本番の`contentCollections`/`contentGlobals`/`createMediaStoragePlugin()`を再利用する設計）の
+**両方**に同じ`afterSchemaInit`を足す必要がある——`createMediaStoragePlugin()`が既に踏んでいた
+のと同じ理由（fixtureとproductionのdeclarative schemaがずれると、無関係な
+`DROP TABLE`/`DROP COLUMN`がdrift検出へ混入する）。片方だけ足すと
+`tests/content/migration.test.ts`のdrift検出testが壊れる（実機で確認済み: fixtureへ
+足し忘れた状態では、期待した1件の差分ファイルが生成されず`generated.length`が0になった）。
+
+`migrations/*.ts`自体は通常どおり`payload migrate:create`で生成する（`afterSchemaInit`で
+宣言済みなら差分として検出される）。生SQLを手書きする必要は無い——`preview_nonces`の
+migrationファイルも生成結果をそのまま採用している。
+
+## 8. Global Constraints との対応
 
 - 「schema変更はmigrationを生成してGitでreviewし、CIで適用確認する」→ §1・§5・
   `.github/workflows/ci.yml`。

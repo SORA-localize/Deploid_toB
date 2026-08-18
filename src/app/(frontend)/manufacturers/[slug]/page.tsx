@@ -1,3 +1,4 @@
+import { cacheLife, cacheTag } from 'next/cache';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
@@ -10,6 +11,8 @@ import { ManufacturerRobotsGrid } from '@/components/ManufacturerRobotsGrid';
 import { NewsCard } from '@/components/NewsCard';
 import { createArticleCatalogItems } from '@/lib/viewModels/articles';
 import { SourceList } from '@/components/SourceList';
+import { contentTags } from '@/lib/content/cacheTags';
+import type { Manufacturer } from '@/lib/content/domainTypes';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { withMeasuredLogoAspect } from '@/lib/manufacturerLogoEnrich';
 import { sortRobots } from '@/lib/display';
@@ -17,7 +20,7 @@ import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { breadcrumbJsonLd, manufacturerJsonLd } from '@/lib/jsonLd';
 import { createPageMetadata } from '@/lib/metadata';
 import { uiText } from '@/lib/uiText';
-import { createRobotCatalogItems } from '@/lib/viewModels/robots';
+import { createRobotCatalogItems, type RobotCatalogItem } from '@/lib/viewModels/robots';
 
 export async function generateStaticParams() {
   const repository = await getContentRepository();
@@ -41,12 +44,43 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   });
 }
 
-export default async function ManufacturerDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+type ManufacturerDetailData =
+  | { kind: 'redirect'; redirectTo: string }
+  | { kind: 'not-found' }
+  | {
+      kind: 'found';
+      manufacturer: Manufacturer;
+      robotCount: number;
+      robotItems: RobotCatalogItem[];
+      displayedReportItems: ReturnType<typeof createArticleCatalogItems>;
+      sections: ManufacturerDetailSectionLink[];
+      manufacturerName: string;
+    };
+
+/**
+ * データ取得だけを`'use cache'`にする（Task 7 Step 3）。`notFound()` / `permanentRedirect()`は
+ * Next.jsのnavigation制御なので、cacheされた関数の外（呼び出し元の`ManufacturerDetailPage`）で
+ * 判断する——`/robots` の `CachedRobotsList` と同じ「データ取得はcache、制御フローは外」という
+ * 既存パターンをdynamic route detailページへ適用したもの。
+ *
+ * Manufacturer詳細の依存表（`lib/content/cacheDependencies.ts`）:
+ * manufacturers, robots, robotSeries, distributors, articles, useCases, media。
+ */
+async function getCachedManufacturerDetailData(slug: string): Promise<ManufacturerDetailData> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(contentTags.manufacturers);
+  cacheTag(contentTags.robots);
+  cacheTag(contentTags.robotSeries);
+  cacheTag(contentTags.distributors);
+  cacheTag(contentTags.articles);
+  cacheTag(contentTags.useCases);
+  cacheTag(contentTags.media);
+
   const repository = await getContentRepository();
   const { record: manufacturerRaw, redirectTo } = await repository.resolveManufacturerDetailBySlug(slug);
-  if (redirectTo) permanentRedirect(`/manufacturers/${redirectTo}`);
-  if (!manufacturerRaw) notFound();
+  if (redirectTo) return { kind: 'redirect', redirectTo };
+  if (!manufacturerRaw) return { kind: 'not-found' };
   const manufacturer = withMeasuredLogoAspect(manufacturerRaw);
 
   const [robotsRaw, reports, allArticles, useCases] = await Promise.all([
@@ -71,6 +105,24 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
     { label: uiText.common.resources, href: '#sources', count: manufacturer.sources.length },
   ];
   const manufacturerName = manufacturer.nameJa ?? manufacturer.name;
+
+  return {
+    kind: 'found',
+    manufacturer,
+    robotCount: robots.length,
+    robotItems,
+    displayedReportItems: createArticleCatalogItems(displayedReports),
+    sections,
+    manufacturerName,
+  };
+}
+
+export default async function ManufacturerDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const data = await getCachedManufacturerDetailData(slug);
+  if (data.kind === 'redirect') permanentRedirect(`/manufacturers/${data.redirectTo}`);
+  if (data.kind === 'not-found') notFound();
+  const { manufacturer, robotCount, robotItems, displayedReportItems, sections, manufacturerName } = data;
 
   return (
     <div className="min-h-screen bg-background">
@@ -97,27 +149,27 @@ export default async function ManufacturerDetailPage({ params }: { params: Promi
 
         <ManufacturerDetailHero manufacturer={manufacturer} />
 
-        <ManufacturerFactSheet manufacturer={manufacturer} robotCount={robots.length} />
+        <ManufacturerFactSheet manufacturer={manufacturer} robotCount={robotCount} />
 
         <ManufacturerDetailSection
           id="robots"
           title={uiText.manufacturers.robotsSection}
           action={
             <span className="text-xs text-muted-foreground whitespace-nowrap">
-              {uiText.manufacturers.models(robots.length)}
+              {uiText.manufacturers.models(robotCount)}
             </span>
           }
         >
           <ManufacturerRobotsGrid items={robotItems} />
         </ManufacturerDetailSection>
 
-        {displayedReports.length > 0 && (
+        {displayedReportItems.length > 0 && (
           <ManufacturerDetailSection
             id="reports"
             title={uiText.manufacturers.relatedReports}
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-              {createArticleCatalogItems(displayedReports).map((report) => (
+              {displayedReportItems.map((report) => (
                 <NewsCard key={report.id} report={report} />
               ))}
             </div>

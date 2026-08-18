@@ -9,6 +9,7 @@ import {
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
 } from '../lib/payload/access';
+import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { UseCase } from '../lib/content/domainTypes';
 
@@ -155,5 +156,7 @@ export const UseCases: CollectionConfig = {
       }),
       createVersionRetentionGuardBeforeChangeHook({ collectionSlug: 'use-cases' }),
     ],
+    // Task 7 Step 3: publish後にpublicキャッシュを無効化する通知。
+    afterChange: [createRevalidationAfterChangeHook('use-cases')],
   },
 };

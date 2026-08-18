@@ -10,6 +10,7 @@ import {
   createVersionRetentionGuardBeforeChangeHook,
 } from '../lib/payload/access';
 import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
+import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { RobotSeries } from '../lib/content/domainTypes';
 
@@ -88,7 +89,8 @@ export const RobotSeriesCollection: CollectionConfig = {
       }),
       createVersionRetentionGuardBeforeChangeHook({ collectionSlug: 'robot-series' }),
     ],
-    afterChange: routeRegistryHooks.afterChange,
+    // Task 7 Step 3: 既存のroute registry afterChangeへ、revalidation通知を追加する形で足す。
+    afterChange: [...routeRegistryHooks.afterChange, createRevalidationAfterChangeHook('robot-series')],
     beforeDelete: routeRegistryHooks.beforeDelete,
   },
 };

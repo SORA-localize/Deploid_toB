@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload';
 import { canWriteDraft, createGlobalPublishGateHook, publishedGlobalOrAuthenticated } from '../lib/payload/access';
+import { createSettingsRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 
 /**
  * サイト全体設定（デフォルトSEO・お知らせバナー）。個別collectionではないため
@@ -20,6 +21,8 @@ export const SiteSettings: GlobalConfig = {
    */
   hooks: {
     beforeChange: [createGlobalPublishGateHook({ globalSlug: 'site-settings' })],
+    // Task 7 Step 3: publish後にpublicキャッシュを無効化する通知。
+    afterChange: [createSettingsRevalidationAfterChangeHook()],
   },
   versions: { drafts: true },
   fields: [

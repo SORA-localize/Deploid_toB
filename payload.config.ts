@@ -7,6 +7,7 @@ import sharp from 'sharp';
 import { Admins } from './collections/Admins';
 import { contentCollections, contentGlobals } from './lib/payload/contentSchema';
 import { createMediaStoragePlugin } from './lib/payload/mediaStoragePlugin';
+import { withPreviewNonceSchema } from './lib/payload/previewNonceSchema';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -48,6 +49,10 @@ export default buildConfig({
     pool: {
       connectionString: requireEnv('DATABASE_URL'),
     },
+    // Draft Mode preview tokenのnonce台帳（`lib/payload/previewNonceSchema.ts`）。Payload
+    // collectionにしない生tableなので、`afterSchemaInit` で宣言に加えないとdev-mode
+    // schema auto-pushのたびに削除される（詳細はそのファイルのコメント参照）。
+    afterSchemaInit: [withPreviewNonceSchema],
     // Payload's default resolution (`findMigrationDir`) picks `src/migrations` whenever a `src/`
     // directory exists (it does here, for `src/app/(payload)`), not repo-root `migrations/`.
     // Pin it explicitly so generated migrations land where Task 3.5 commits them

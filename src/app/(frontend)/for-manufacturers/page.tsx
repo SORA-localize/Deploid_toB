@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { cacheLife, cacheTag } from 'next/cache';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { DefinitionList } from '@/components/DefinitionList';
+import { contentTags } from '@/lib/content/cacheTags';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { createPageMetadata } from '@/lib/metadata';
 import { siteMeta } from '@/lib/site';
@@ -19,7 +20,10 @@ export default async function ForManufacturersPage() {
   // ページごとcacheする（`/robots` の CachedRobotsList と同じ既存パターン）。
   'use cache';
   cacheLife('hours');
-  cacheTag('for-manufacturers');
+  // このページはbriefの依存表に無い（掲載件数の2 collection count表示のみ）。実際に読む
+  // collectionだけをtagする: robots, manufacturers。
+  cacheTag(contentTags.robots);
+  cacheTag(contentTags.manufacturers);
 
   const repository = await getContentRepository();
   // 件数だけが要る表示のため、全件を安全上限つきで取得する listAllPublished* ではなく、

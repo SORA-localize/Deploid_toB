@@ -3,6 +3,7 @@ import * as migration_20260812_014819_deployment_status_enum from './20260812_01
 import * as migration_20260812_080919_date_only_content_fields_to_text from './20260812_080919_date_only_content_fields_to_text';
 import * as migration_20260814_020026_site_settings_data_as_of_and_placement_limits from './20260814_020026_site_settings_data_as_of_and_placement_limits';
 import * as migration_20260814_122137_restore_baseline_generation_ledger from './20260814_122137_restore_baseline_generation_ledger';
+import * as migration_20260818_090053_add_preview_nonces from './20260818_090053_add_preview_nonces';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20260814_122137_restore_baseline_generation_ledger.up,
     down: migration_20260814_122137_restore_baseline_generation_ledger.down,
-    name: '20260814_122137_restore_baseline_generation_ledger'
+    name: '20260814_122137_restore_baseline_generation_ledger',
+  },
+  {
+    up: migration_20260818_090053_add_preview_nonces.up,
+    down: migration_20260818_090053_add_preview_nonces.down,
+    name: '20260818_090053_add_preview_nonces'
   },
 ];

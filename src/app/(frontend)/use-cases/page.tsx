@@ -3,6 +3,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { ListPageSkeletonShell } from '@/components/ListPageSkeletonShell';
 import { UseCaseCardGridSkeleton } from '@/components/UseCaseCardGridSkeleton';
 import { UseCasesBrowser } from '@/components/UseCasesBrowser';
+import { contentTags } from '@/lib/content/cacheTags';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { createUseCaseCatalogItems } from '@/lib/viewModels/useCases';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
@@ -97,7 +98,14 @@ async function CachedUseCasesList({
 }) {
   'use cache';
   cacheLife('hours');
-  cacheTag('use-cases-list');
+  // UseCase一覧の依存表（`lib/content/cacheDependencies.ts`）。briefの依存表は
+  // useCases/mediaのみだが、実装（`buildUseCaseItems`）はcardへrobot名（`robotNames`）と
+  // 導入実績有無（`hasDeployments`、`listDeploymentsForUseCaseId`）も埋め込んでいるため、
+  // それらのtagも足す（brief: 「各cached関数は実際に読む依存先をすべてtag付けする」）。
+  cacheTag(contentTags.useCases);
+  cacheTag(contentTags.robots);
+  cacheTag(contentTags.deployments);
+  cacheTag(contentTags.media);
 
   return (
     <UseCasesBrowser

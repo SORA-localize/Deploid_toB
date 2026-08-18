@@ -7,6 +7,7 @@ import { buildConfig } from 'payload';
 import sharp from 'sharp';
 import { contentCollections, contentGlobals } from '../../../lib/payload/contentSchema';
 import { createMediaStoragePlugin } from '../../../lib/payload/mediaStoragePlugin';
+import { withPreviewNonceSchema } from '../../../lib/payload/previewNonceSchema';
 
 /**
  * Task 3.5 Step 3（隔離DBへの「既存schemaを持つDBへ適用できる」検証）と、Task 8 が実際に採用する
@@ -54,6 +55,10 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL,
     },
     migrationDir,
+    // 本番の`payload.config.ts`と揃える（Task 7）。省略すると`preview_nonces`tableの宣言の
+    // 有無だけで本番と食い違い、無関係な差分がdrift検出へ混入する（`createMediaStoragePlugin()`
+    // と同じ理由、上のdocblock参照）。
+    afterSchemaInit: [withPreviewNonceSchema],
   }),
   plugins: [createMediaStoragePlugin(), mcpPlugin({})],
   sharp,

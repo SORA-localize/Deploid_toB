@@ -9,6 +9,7 @@ import {
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
 } from '../lib/payload/access';
+import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { Article } from '../lib/content/domainTypes';
 
@@ -179,5 +180,7 @@ export const Articles: CollectionConfig = {
       }),
       createVersionRetentionGuardBeforeChangeHook({ collectionSlug: 'articles' }),
     ],
+    // Task 7 Step 3: publish後にpublicキャッシュを無効化する通知。
+    afterChange: [createRevalidationAfterChangeHook('articles')],
   },
 };

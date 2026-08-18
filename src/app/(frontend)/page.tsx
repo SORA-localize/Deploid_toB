@@ -8,6 +8,7 @@ import { JsonLd } from '@/components/JsonLd';
 import { ManufacturerWorldMap } from '@/components/ManufacturerWorldMap';
 import { NewsFeatureCard } from '@/components/NewsFeatureCard';
 import { NewsHeroCarousel } from '@/components/NewsHeroCarousel';
+import { contentTags } from '@/lib/content/cacheTags';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import type { Robot } from '@/lib/content/domainTypes';
 import { sortRobots, sortUseCases } from '@/lib/display';
@@ -38,7 +39,16 @@ export default async function HomePage() {
   // 非cacheな非同期読み取りは「uncached data outside Suspense」としてbuildを失敗させるため。
   'use cache';
   cacheLife('hours');
-  cacheTag('home');
+  // Homeの依存表（`lib/content/cacheDependencies.ts`）: robots, manufacturers, useCases,
+  // deployments, articles, articlePlacements, media, settings。
+  cacheTag(contentTags.robots);
+  cacheTag(contentTags.manufacturers);
+  cacheTag(contentTags.useCases);
+  cacheTag(contentTags.deployments);
+  cacheTag(contentTags.articles);
+  cacheTag(contentTags.articlePlacements);
+  cacheTag(contentTags.media);
+  cacheTag(contentTags.settings);
 
   const repository = await getContentRepository();
   const [manufacturersRaw, robots, useCases, articles, placements, limits] = await Promise.all([

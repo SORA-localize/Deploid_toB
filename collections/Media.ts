@@ -1,5 +1,6 @@
 import type { Access, CollectionConfig } from 'payload';
 import { asAdminUser, isContentDraftWriterOrAboveUser, isPlatformAdmin } from '../lib/payload/access';
+import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 
 const canWriteMedia: Access = ({ req }) => isContentDraftWriterOrAboveUser(asAdminUser(req.user));
 
@@ -22,6 +23,12 @@ export const Media: CollectionConfig = {
     create: canWriteMedia,
     update: canWriteMedia,
     delete: isPlatformAdmin,
+  },
+  hooks: {
+    // Task 7 Step 3: publish gateを持たない collection（mediaはdraft/publish状態を持たない
+    // uploadの実体そのもの）だが、rights/altの変更が埋め込み表示（Robot一覧のサムネ等）に
+    // 影響するため、同じ通知を足す。
+    afterChange: [createRevalidationAfterChangeHook('media')],
   },
   fields: [
     { name: 'stableId', type: 'text', required: true, unique: true, index: true },

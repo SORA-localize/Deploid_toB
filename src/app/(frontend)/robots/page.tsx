@@ -3,6 +3,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { CardGridSkeleton } from '@/components/CardGridSkeleton';
 import { ListPageSkeletonShell } from '@/components/ListPageSkeletonShell';
 import { RobotsBrowser } from '@/components/RobotsBrowser';
+import { contentTags } from '@/lib/content/cacheTags';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { browserGridClassNames } from '@/lib/catalogLayoutClasses';
 import { toInitialSearch } from '@/lib/catalog/urlSearch';
@@ -57,7 +58,13 @@ async function CachedRobotsList({
 }) {
   'use cache';
   cacheLife('hours');
-  cacheTag('robots-list');
+  // Robot一覧・比較の依存表（`lib/content/cacheDependencies.ts`）: robots, manufacturers,
+  // robotSeries, media。埋め込み表示されるmanufacturer名・series名・画像の更新も
+  // 一覧のrevalidateに反映させるため、主collectionのtag1つだけでは足りない。
+  cacheTag(contentTags.robots);
+  cacheTag(contentTags.manufacturers);
+  cacheTag(contentTags.robotSeries);
+  cacheTag(contentTags.media);
 
   const items = await createFeaturedRobotCatalogItems();
 

@@ -7,6 +7,7 @@ import {
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
 } from '../lib/payload/access';
+import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { ArticlePlacement } from '../lib/content/domainTypes';
 
@@ -144,5 +145,7 @@ export const ArticlePlacements: CollectionConfig = {
       }),
       createVersionRetentionGuardBeforeChangeHook({ collectionSlug: 'article-placements' }),
     ],
+    // Task 7 Step 3: publish後にpublicキャッシュを無効化する通知。
+    afterChange: [createRevalidationAfterChangeHook('article-placements')],
   },
 };
