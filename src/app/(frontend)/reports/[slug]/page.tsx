@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { cacheLife, cacheTag } from 'next/cache';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import { ArticleRelatedSidebar } from '@/components/ArticleRelatedSidebar';
@@ -17,6 +18,7 @@ import { SourceList } from '@/components/SourceList';
 import { TagChip } from '@/components/TagChip';
 import { SidebarBlock } from '@/components/SidebarSection';
 import { ActiveSectionProvider } from '@/lib/activeSectionContext';
+import { contentTags } from '@/lib/content/cacheTags';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { resolveManufacturerGuideLineup } from '@/lib/robotCatalog';
 import { articleJsonLd, breadcrumbJsonLd, faqPageJsonLd } from '@/lib/jsonLd';
@@ -43,8 +45,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const repository = await getContentRepository();
-  const { record: report } = await repository.resolveArticleDetailBySlug(slug);
+  // fix round 1: 別途uncachedなrepository呼び出しをここで行うと、本体page（'use cache'）と
+  // generateMetadataでcache有無が食い違い、Cache Componentsが
+  // "generateMetadata depends on uncached data when the rest of the route does not" として
+  // build失敗させる（CONTENT_SOURCE=payload構成で実機確認済み）。同じcached関数を共有する。
+  const data = await getCachedReportDetailData(slug);
+  const report = data.kind === 'found' ? data.report : undefined;
   const seo = report?.seo;
   // sample（UI確認用データ）は検索に載せない（§11.9）
   const noindex = report ? !shouldIndexArticle(report) : seo?.noindex;
@@ -95,12 +101,27 @@ function ReportSidebarContent() {
   );
 }
 
-export default async function ReportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+/**
+ * データ取得だけを`'use cache'`にする（Task 7 Step 3）。`'use cache'`関数の戻り値は
+ * serializableである必要があるため、`Map`は使わず配列で返し、`Map`の再構築は呼び出し元
+ * （非cacheな`ReportDetailPage`）で行う。
+ *
+ * Report詳細の依存表（`lib/content/cacheDependencies.ts`）: articles, robots, manufacturers,
+ * useCases。briefの依存表は`robotSeries`/`media`も挙げるが、このpageはどちらも実際には
+ * 読まない（`KNOWN_GAPS`参照）ため含めない。
+ */
+async function getCachedReportDetailData(slug: string) {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(contentTags.articles);
+  cacheTag(contentTags.robots);
+  cacheTag(contentTags.manufacturers);
+  cacheTag(contentTags.useCases);
+
   const repository = await getContentRepository();
   const { record: report, redirectTo } = await repository.resolveArticleDetailBySlug(slug);
-  if (redirectTo) permanentRedirect(`/reports/${redirectTo}`);
-  if (!report) notFound();
+  if (redirectTo) return { kind: 'redirect' as const, redirectTo };
+  if (!report) return { kind: 'not-found' as const };
 
   // manufacturer-guide は固定テンプレート型で、見出し・目次は MANUFACTURER_GUIDE_SECTIONS を
   // 正本にする（本文markdownの見出しをパースしない）。要点(TL;DR)セクションも持たない設計。
@@ -118,10 +139,8 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
   const lineupManufacturer = lineupRobots[0]
     ? await repository.getManufacturerById(lineupRobots[0].manufacturerId)
     : undefined;
-  const relatedRobotManufacturerById = new Map(
-    (await repository.listRelatedManufacturers(robots.map((robot) => robot.manufacturerId))).map(
-      (manufacturer) => [manufacturer.id, manufacturer],
-    ),
+  const relatedRobotManufacturers = await repository.listRelatedManufacturers(
+    robots.map((robot) => robot.manufacturerId),
   );
   const hasTakeaways = (report.keyTakeaways ?? []).length > 0;
   const hasBody = (standardBody ?? '').trim().length > 0;
@@ -166,6 +185,56 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
     ...(hasRelated ? [{ label: uiText.reports.relatedInfo, href: '#related' }] : []),
   ];
   const tocIds = toc.map((item) => item.href.replace('#', ''));
+
+  return {
+    kind: 'found' as const,
+    report,
+    guideContent,
+    standardBody,
+    isManufacturerGuide,
+    robots,
+    manufacturers,
+    useCases,
+    lineupRobots,
+    lineupManufacturer,
+    relatedRobotManufacturers,
+    hasTakeaways,
+    hasBody,
+    heroImage,
+    hasRelated,
+    breadcrumbItems,
+    reportHeadingTitle,
+    toc,
+    tocIds,
+  };
+}
+
+export default async function ReportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const data = await getCachedReportDetailData(slug);
+  if (data.kind === 'redirect') permanentRedirect(`/reports/${data.redirectTo}`);
+  if (data.kind === 'not-found') notFound();
+  const {
+    report,
+    guideContent,
+    standardBody,
+    isManufacturerGuide,
+    robots,
+    manufacturers,
+    useCases,
+    lineupRobots,
+    lineupManufacturer,
+    relatedRobotManufacturers,
+    hasTakeaways,
+    hasBody,
+    heroImage,
+    hasRelated,
+    breadcrumbItems,
+    reportHeadingTitle,
+    toc,
+    tocIds,
+  } = data;
+  const relatedRobotManufacturerById = new Map(relatedRobotManufacturers.map((manufacturer) => [manufacturer.id, manufacturer]));
 
   return (
     <div className="min-h-screen bg-background">

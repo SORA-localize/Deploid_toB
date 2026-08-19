@@ -1,3 +1,4 @@
+import { cacheLife, cacheTag } from 'next/cache';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { AlertCircle, Building2, CheckCircle2, MapPin } from 'lucide-react';
 import { BudouXText } from '@/components/BudouXText';
@@ -12,6 +13,7 @@ import type { ManufacturerDetailSectionLink } from '@/components/ManufacturerDet
 import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { SidebarBlock, SidebarDivider, SidebarSection } from '@/components/SidebarSection';
 import { SourceList } from '@/components/SourceList';
+import { contentTags } from '@/lib/content/cacheTags';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import {
   deploymentStatusLabels,
@@ -31,8 +33,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const repository = await getContentRepository();
-  const { record: u } = await repository.resolveUseCaseDetailBySlug(slug);
+  // fix round 1: 別途uncachedなrepository呼び出しをここで行うと、本体page（'use cache'）と
+  // generateMetadataでcache有無が食い違い、Cache Componentsが
+  // "generateMetadata depends on uncached data when the rest of the route does not" として
+  // build失敗させる（CONTENT_SOURCE=payload構成で実機確認済み）。同じcached関数を共有する。
+  const data = await getCachedUseCaseDetailData(slug);
+  const u = data.kind === 'found' ? data.useCase : undefined;
   const seo = u?.seo;
   return createPageMetadata({
     title: seo?.metaTitle ?? (u ? (u.titleJa ?? u.title) : 'Use Case'),
@@ -42,12 +48,26 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   });
 }
 
-export default async function UseCaseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+/**
+ * データ取得だけを`'use cache'`にする（Task 7 Step 3、`/manufacturers/[slug]`と同じパターン）。
+ *
+ * UseCase詳細の依存表（`lib/content/cacheDependencies.ts`）: useCases, robots, articles,
+ * deployments, manufacturers。briefの依存表は`robotSeries`/`media`も挙げるが、このpageは
+ * どちらも実際には読まない（`KNOWN_GAPS`参照）ため含めない。
+ */
+async function getCachedUseCaseDetailData(slug: string) {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(contentTags.useCases);
+  cacheTag(contentTags.robots);
+  cacheTag(contentTags.articles);
+  cacheTag(contentTags.deployments);
+  cacheTag(contentTags.manufacturers);
+
   const repository = await getContentRepository();
   const { record: useCase, redirectTo } = await repository.resolveUseCaseDetailBySlug(slug);
-  if (redirectTo) permanentRedirect(`/use-cases/${redirectTo}`);
-  if (!useCase) notFound();
+  if (redirectTo) return { kind: 'redirect' as const, redirectTo };
+  if (!useCase) return { kind: 'not-found' as const };
 
   // seriesId候補（DEC-S08）はrobotId単位のこのpageではまだ描画対象外。robotId持ちだけ解決する。
   const candidateRobotIds = useCase.candidateRobots
@@ -90,6 +110,24 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<{ 
     { label: uiText.useCases.considerations, href: '#considerations' },
     { label: uiText.common.resources, href: '#sources', count: useCase.sources.length },
   ];
+
+  return {
+    kind: 'found' as const,
+    useCase,
+    deployments,
+    sections,
+    candidateRobots,
+    candidateAnnotations,
+    reports,
+  };
+}
+
+export default async function UseCaseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const data = await getCachedUseCaseDetailData(slug);
+  if (data.kind === 'redirect') permanentRedirect(`/use-cases/${data.redirectTo}`);
+  if (data.kind === 'not-found') notFound();
+  const { useCase, deployments, sections, candidateRobots, candidateAnnotations, reports } = data;
 
   return (
     <div className="min-h-screen bg-background">

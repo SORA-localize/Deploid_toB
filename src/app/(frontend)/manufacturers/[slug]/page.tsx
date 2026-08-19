@@ -30,8 +30,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const repository = await getContentRepository();
-  const { record: manufacturer } = await repository.resolveManufacturerDetailBySlug(slug);
+  // fix round 1: 別途uncachedなrepository呼び出しをここで行うと、本体page（'use cache'）と
+  // generateMetadataでcache有無が食い違い、Cache Componentsが
+  // "generateMetadata depends on uncached data when the rest of the route does not" として
+  // build失敗させる（CONTENT_SOURCE=payload構成で実機確認済み）。同じcached関数を共有する。
+  const data = await getCachedManufacturerDetailData(slug);
+  const manufacturer = data.kind === 'found' ? data.manufacturer : undefined;
   const seo = manufacturer?.seo;
   const title =
     seo?.metaTitle ?? (manufacturer ? (manufacturer.nameJa ?? manufacturer.name) : 'Manufacturer');
@@ -64,18 +68,26 @@ type ManufacturerDetailData =
  * 既存パターンをdynamic route detailページへ適用したもの。
  *
  * Manufacturer詳細の依存表（`lib/content/cacheDependencies.ts`）:
- * manufacturers, robots, robotSeries, distributors, articles, useCases, media。
+ * manufacturers, robots, articles, useCases。
+ *
+ * **`distributors` / `robotSeries` / `media` は含めない（fix round 1 / Critical 2）。**
+ * brief Step 3の依存表はこの3つも挙げているが、このページが実際に呼ぶrepositoryメソッド
+ * （`resolveManufacturerDetailBySlug` / `listRobotsByManufacturerId` /
+ * `listArticlesForManufacturerId` / `listAllPublishedArticles` / `listAllPublishedUseCases`）は
+ * どれもこの3 collectionを読まない——画面に出る「取扱代理店」は
+ * `Manufacturer.domesticDistributors` という別の埋め込みfieldで、`Distributor` collectionとは
+ * 無関係。以前は`cacheTag(contentTags.distributors)`のような、Step 5.5の「全collectionに
+ * 最低1 consumer」を機械的に満たすための見せかけの紐付けを足していた（reviewerのCritical指摘で
+ * 発覚、ユーザー承認済み）。`distributors` / `robotSeries` / `media` に実consumerが無いことは
+ * `lib/content/cacheDependencies.ts` の `KNOWN_GAPS` に明示的に扱う。
  */
 async function getCachedManufacturerDetailData(slug: string): Promise<ManufacturerDetailData> {
   'use cache';
   cacheLife('hours');
   cacheTag(contentTags.manufacturers);
   cacheTag(contentTags.robots);
-  cacheTag(contentTags.robotSeries);
-  cacheTag(contentTags.distributors);
   cacheTag(contentTags.articles);
   cacheTag(contentTags.useCases);
-  cacheTag(contentTags.media);
 
   const repository = await getContentRepository();
   const { record: manufacturerRaw, redirectTo } = await repository.resolveManufacturerDetailBySlug(slug);

@@ -58,13 +58,14 @@ async function CachedRobotsList({
 }) {
   'use cache';
   cacheLife('hours');
-  // Robot一覧・比較の依存表（`lib/content/cacheDependencies.ts`）: robots, manufacturers,
-  // robotSeries, media。埋め込み表示されるmanufacturer名・series名・画像の更新も
-  // 一覧のrevalidateに反映させるため、主collectionのtag1つだけでは足りない。
+  // Robot一覧・比較の依存表（`lib/content/cacheDependencies.ts`）。実装
+  // （`createFeaturedRobotCatalogItems`）が実際に読むのは robots / manufacturers / useCases
+  // （用途バッジ用）の3 collectionのみ。briefの表は`robotSeries`/`media`も挙げるが、
+  // このpageも他のどのpageも実際にはそれらのcollectionを読まない
+  // （`lib/content/cacheDependencies.ts`のKNOWN_GAPS参照——見せかけの紐付けを作らない）。
   cacheTag(contentTags.robots);
   cacheTag(contentTags.manufacturers);
-  cacheTag(contentTags.robotSeries);
-  cacheTag(contentTags.media);
+  cacheTag(contentTags.useCases);
 
   const items = await createFeaturedRobotCatalogItems();
 

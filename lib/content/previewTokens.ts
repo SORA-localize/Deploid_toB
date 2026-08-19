@@ -101,9 +101,12 @@ export function isAllowedPreviewRedirect(rawPath: string): boolean {
   if (decoded.includes('..')) return false;
   if (!decoded.startsWith('/')) return false;
   if (decoded.startsWith('//')) return false;
-  // 復号後に scheme（"javascript:" 等）が現れたら拒否する。先頭は必ず "/" である前提の上で、
-  // どこかに "scheme:" 相当のcolonが混入していないかも見ておく（多重decodeでの回避策）。
-  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(decoded)) return false;
+  // fix round 1 / Minor 7: 復号後のscheme検出（`^[a-zA-Z][a-zA-Z0-9+.-]*:`）はここでは
+  // 到達不能だったため削除した——直前の`!decoded.startsWith('/')`チェックを通過した時点で
+  // `decoded`は必ず`/`始まりであり、`/`始まりの文字列が英字始まりのscheme patternへ
+  // マッチすることはない。`javascript:`等のscheme拒否は「`/`で始まらないものを拒否する」
+  // という、この関数の先頭の条件（およびmintPreviewToken/consumePreviewTokenが受け取る値の
+  // 形自体）が既に担っている。
 
   const pathOnly = decoded.split(/[?#]/, 1)[0]!;
   return ALLOWED_PREVIEW_ROOTS.some((root) => {

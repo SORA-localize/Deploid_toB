@@ -40,14 +40,15 @@ export default async function HomePage() {
   'use cache';
   cacheLife('hours');
   // Homeの依存表（`lib/content/cacheDependencies.ts`）: robots, manufacturers, useCases,
-  // deployments, articles, articlePlacements, media, settings。
+  // deployments, articles, articlePlacements, settings。`media`は含めない——`Media`
+  // collectionはサイト上のどのpageからも読まれていない（fix round 1 / Critical 2と同じ
+  // 理由、`KNOWN_GAPS`参照）。
   cacheTag(contentTags.robots);
   cacheTag(contentTags.manufacturers);
   cacheTag(contentTags.useCases);
   cacheTag(contentTags.deployments);
   cacheTag(contentTags.articles);
   cacheTag(contentTags.articlePlacements);
-  cacheTag(contentTags.media);
   cacheTag(contentTags.settings);
 
   const repository = await getContentRepository();

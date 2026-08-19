@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { cacheLife, cacheTag } from 'next/cache';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -11,6 +12,7 @@ import { RobotImageCarousel } from '@/components/RobotImageCarousel';
 import { RobotSpecExplorer } from '@/components/RobotSpecExplorer';
 import { RobotStickyAside } from '@/components/RobotStickyAside';
 import { SourceList } from '@/components/SourceList';
+import { contentTags } from '@/lib/content/cacheTags';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { sortRobots } from '@/lib/display';
 import { shouldIndexRobot } from '@/lib/indexing';
@@ -34,8 +36,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const repository = await getContentRepository();
-  const { record: robot } = await repository.resolveRobotDetailBySlug(slug);
+  // fix round 1: 別途uncachedなrepository呼び出しをここで行うと、本体page（'use cache'）と
+  // generateMetadataでcache有無が食い違い、Cache Componentsが
+  // "generateMetadata depends on uncached data when the rest of the route does not" として
+  // build失敗させる（CONTENT_SOURCE=payload構成で実機確認済み）。同じcached関数を共有する。
+  const data = await getCachedRobotDetailData(slug);
+  const robot = data.kind === 'found' ? data.robot : undefined;
   const seo = robot?.seo;
   // archived（提供終了）は閲覧可能だが検索には載せない（§11.7）
   const noindex = robot ? !shouldIndexRobot(robot) : seo?.noindex;
@@ -51,12 +57,27 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   });
 }
 
-export default async function RobotDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+/**
+ * データ取得だけを`'use cache'`にする（Task 7 Step 3、`/manufacturers/[slug]`と同じパターン）。
+ * `notFound()` / `permanentRedirect()`はcacheされた関数の外（呼び出し元）で判断する。
+ *
+ * Robot詳細の依存表（`lib/content/cacheDependencies.ts`）: robots, manufacturers, useCases。
+ * briefの依存表は`robotSeries`/`media`も挙げるが、このpageはどちらも実際には読まない
+ * （`robot.seriesId`はrobot自身のfieldとして既に`robots`タグの範囲内。`media`は
+ * `Media` collectionをサイト上のどのpageも読まない——`KNOWN_GAPS`参照）ため含めない
+ * （Critical 2と同じ理由——実際に読まないcollectionのtagは足さない）。
+ */
+async function getCachedRobotDetailData(slug: string) {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(contentTags.robots);
+  cacheTag(contentTags.manufacturers);
+  cacheTag(contentTags.useCases);
+
   const repository = await getContentRepository();
   const { record: robot, redirectTo } = await repository.resolveRobotDetailBySlug(slug);
-  if (redirectTo) permanentRedirect(`/robots/${redirectTo}`);
-  if (!robot) notFound();
+  if (redirectTo) return { kind: 'redirect' as const, redirectTo };
+  if (!robot) return { kind: 'not-found' as const };
 
   // Task 6 fix round 2（reviewer Medium指摘への対応）: 詳細ページ1件ごとに全collectionを
   // 走査しない。「同じ用途の候補ロボットか」「同じメーカーの関連ロボットか」はrobot単位で
@@ -104,6 +125,41 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
       : []),
     { label: robot.nameJa ?? robot.name },
   ];
+
+  return {
+    kind: 'found' as const,
+    robot,
+    manufacturer,
+    successor,
+    sections,
+    breadcrumbItems,
+    previousRobot,
+    nextRobot,
+    intendedUses,
+    usageExamples,
+    relatedRobots,
+    specGroups,
+  };
+}
+
+export default async function RobotDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const data = await getCachedRobotDetailData(slug);
+  if (data.kind === 'redirect') permanentRedirect(`/robots/${data.redirectTo}`);
+  if (data.kind === 'not-found') notFound();
+  const {
+    robot,
+    manufacturer,
+    successor,
+    sections,
+    breadcrumbItems,
+    previousRobot,
+    nextRobot,
+    intendedUses,
+    usageExamples,
+    relatedRobots,
+    specGroups,
+  } = data;
 
   return (
     <div className="min-h-screen bg-background">

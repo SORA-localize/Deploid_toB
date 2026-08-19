@@ -123,6 +123,36 @@ docblock参照）。
 fail-open**——Next.jsサーバーが応答しない、`PAYLOAD_PUBLIC_SERVER_URL` 未設定、secret未設定の
 いずれでも、content書き込み自体はブロックしない（キャッシュが1回古いまま残るだけ）。
 
+### 6.1 fail-open時の残存ウィンドウ（Important 4）
+
+webhook通知が失敗する（Next.jsサーバー未応答、secret未設定・不一致、ネットワーク不通等）と、
+そのpublish/unpublishは**そのまま何もしない**——次に別の書き込みが同じcollectionへ成功で
+webhookを飛ばすまで、古い表示が残り続けるリスクがある。この残存ウィンドウの長さは、
+cache化された各view（`lib/content/cacheDependencies.ts`）が使う `cacheLife('hours')` の
+実測値（`node_modules/next/dist/server/config-shared.js` の組み込みprofile定義）で決まる:
+
+| profile値 | 秒数 | 意味 |
+|---|---|---|
+| `stale` | 300秒（5分） | クライアント（router cache）がこの間は再検証なしに使い回す |
+| `revalidate` | 3600秒（**60分**） | サーバーがこの間隔でbackground再生成を試みる（stale-while-revalidate） |
+| `expire` | 86400秒（**24時間**） | 上限。これを過ぎるとstale値を一切返さず、同期的に再生成する |
+
+**したがって、webhookが一度も届かなかった最悪ケースでも:**
+
+- 通常は次のrequestから**最大60分以内**に、Next自身のtime-basedバックグラウンド再生成
+  （tagとは無関係に`revalidate`秒数が経過したら発生する）によって新しい値へ切り替わる。
+- どれだけ運が悪くても**24時間以内**には必ず新しい値になる（`expire`はstale値を返す
+  ことを一切許さない硬い上限のため）。
+- webhookが正常に届いた場合は、上記の時間経過を待たず`revalidateTag(tag, 'max')`が
+  該当cache entryを直接無効化する（`tests/e2e/cache-revalidation.spec.ts`で実HTTPを
+  使い検証済み——次にpollした実requestで新しい値が返ることを確認している）。
+
+unpublish（掲載停止）でも同じ残存ウィンドウが適用される——**fail-open設計を選んだ以上、
+「掲載停止したはずの内容が最大24時間、実運用上は概ね60分以内に古いキャッシュとして
+公開され続ける可能性がある」ことを運用上受容している。** 緊急に停止したい場合は、
+`REVALIDATION_SECRET`を使って手動で`/api/revalidate-content`へ署名付きrequestを送るか、
+Vercelのcache purge機能を使う。
+
 ---
 
 ## 関連

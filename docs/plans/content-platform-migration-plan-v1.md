@@ -1659,6 +1659,21 @@ export async function getRobotById(id: string) {
 | Home | `robots`, `manufacturers`, `useCases`, `deployments`, `articles`, `articlePlacements`, `media`, `settings` |
 | sitemap / search index | `robots`, `robotSeries`, `manufacturers`, `useCases`, `articles`, `settings` |
 
+> **実装時の注記（Task 7 fix round 1、`task-7-report.md`参照）**:
+> - **`distributors` / `robotSeries` / `media`** は、この表の複数行で依存として挙がって
+>   いるが、実装時点でどの cached view も実際にはこの3 collectionを読まない
+>   （`distributors`: 画面に出る「取扱代理店」は `Manufacturer.domesticDistributors` という
+>   別の埋め込みfield。`robotSeries`: `robot-series` を単体で解決するpageが存在しない。
+>   `media`: `Media` collectionの読み取りメソッド自体をどのpage/componentも一度も呼ばない
+>   ——`heroImage`/`images`/`logos`はcollection自身の埋め込みfieldで、`Media`への
+>   relationshipではない）。実装では、実際に読まないcollectionへ`cacheTag()`を呼ぶ
+>   見せかけの紐付けを作らない方針を徹底し、この3つは`lib/content/cacheDependencies.ts`の
+>   `KNOWN_GAPS`として明示的に扱う。将来、これらのcollectionを実際に使うUIができた時点で
+>   解消できる。
+> - **「Series詳細」は実装時点でページ自体が存在しない**（`robot-series` は
+>   `/robots/[slug]` のnamespaceを共有する設計だが、現在のroute実装は robotsのslugしか
+>   解決しない）。この行はcache化の対象外。
+
 タグ定義（Step 3）と全依存先への `cacheTag()` 呼び出し（本Step）が揃って初めて、関連recordの
 publish後に埋め込み表示まで更新される。統合テストではRobot名の変更後にRobot詳細だけでなく、
 そのRobotを埋め込むUseCaseとArticleも最終的に新しい名前になることを確認する。

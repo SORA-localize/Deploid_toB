@@ -102,10 +102,11 @@ async function CachedUseCasesList({
   // useCases/mediaのみだが、実装（`buildUseCaseItems`）はcardへrobot名（`robotNames`）と
   // 導入実績有無（`hasDeployments`、`listDeploymentsForUseCaseId`）も埋め込んでいるため、
   // それらのtagも足す（brief: 「各cached関数は実際に読む依存先をすべてtag付けする」）。
+  // `media`は含めない——`Media` collectionはサイト上のどのpageからも読まれておらず
+  // （fix round 1 / Critical 2と同じ理由）、`KNOWN_GAPS`の既知の例外。
   cacheTag(contentTags.useCases);
   cacheTag(contentTags.robots);
   cacheTag(contentTags.deployments);
-  cacheTag(contentTags.media);
 
   return (
     <UseCasesBrowser
