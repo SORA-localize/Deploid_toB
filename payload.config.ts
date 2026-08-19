@@ -6,6 +6,7 @@ import { buildConfig } from 'payload';
 import sharp from 'sharp';
 import { Admins } from './collections/Admins';
 import { contentCollections, contentGlobals } from './lib/payload/contentSchema';
+import { createMcpPlugin } from './lib/payload/mcp';
 import { createMediaStoragePlugin } from './lib/payload/mediaStoragePlugin';
 import { withPreviewNonceSchema } from './lib/payload/previewNonceSchema';
 
@@ -67,7 +68,9 @@ export default buildConfig({
       ? path.resolve(process.cwd(), process.env.PAYLOAD_TEST_MIGRATION_DIR)
       : path.resolve(dirname, 'migrations'),
   }),
-  plugins: [createMediaStoragePlugin()],
+  // MCP pluginはcreateMediaStoragePlugin()の後ろに置く（順序自体に意味は無いが、
+  // tests/fixtures/payload-migrations/mcp-fixture.config.ts と同じ並びにして差分を読みやすくする）。
+  plugins: [createMediaStoragePlugin(), createMcpPlugin()],
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),

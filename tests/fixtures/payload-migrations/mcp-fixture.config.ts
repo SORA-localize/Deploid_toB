@@ -1,11 +1,11 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { postgresAdapter } from '@payloadcms/db-postgres';
-import { mcpPlugin } from '@payloadcms/plugin-mcp';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
 import { contentCollections, contentGlobals } from '../../../lib/payload/contentSchema';
+import { createMcpPlugin } from '../../../lib/payload/mcp';
 import { createMediaStoragePlugin } from '../../../lib/payload/mediaStoragePlugin';
 import { withPreviewNonceSchema } from '../../../lib/payload/previewNonceSchema';
 
@@ -23,9 +23,16 @@ import { withPreviewNonceSchema } from '../../../lib/payload/previewNonceSchema'
  * `alwaysInsertFields` が追加する `media.prefix` columnの有無だけで本番と食い違い、無関係な
  * `DROP COLUMN "prefix"` が混入する（実際に一度発生した）。
  *
- * `@payloadcms/plugin-mcp` は Task 3.5 時点では devDependency（このfixtureでの検証専用）。
- * Task 8 が実際にMCPサーバーを配線する際は、production dependencyへ昇格し
- * `payload.config.ts` へ組み込む（このfixtureとは別の作業）。
+ * **Task 8完了時点の更新**: Task 3.5時点ではここに直接 `mcpPlugin({})`（bare options）を
+ * 置いていたが、それは「Task 8が実際に採用するoptionsはまだ決まっていない」ためのplaceholderで、
+ * このファイル自身のdocblockが「Task 8が実際にMCPサーバーを配線する際は...このfixtureとは
+ * 別の作業」と明記していた。Task 8がoptions（`collections` / `overrideApiKeyCollection` —
+ * 後者は`payload-mcp-api-keys.user` fieldを`required: false`へ緩める、実機で見つけたNOT NULL
+ * 列とON DELETE SET NULLのFKの自己矛盾を防ぐ修正を含む、`lib/payload/mcp.ts`参照）を確定させた
+ * ので、bare `mcpPlugin({})` のままだとこのfixtureが生成するschemaが実際にcommitされた
+ * migration（`migrations/*_add_payload_mcp_api_keys.ts`）と食い違い、drift検出（Step 5a/5b）が
+ * 「実際には無い差分」を拾ってしまう。`createMcpPlugin()`（本番 `payload.config.ts` が使うのと
+ * 同じ関数）へ差し替えることで、このfixtureが実際に採用されたschemaを正しく代表するようにする。
  */
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -60,7 +67,7 @@ export default buildConfig({
     // と同じ理由、上のdocblock参照）。
     afterSchemaInit: [withPreviewNonceSchema],
   }),
-  plugins: [createMediaStoragePlugin(), mcpPlugin({})],
+  plugins: [createMediaStoragePlugin(), createMcpPlugin()],
   sharp,
   // Payload's default `typescript.outputFile` is `${process.cwd()}/payload-types.ts` — since this
   // fixture's CLI invocations run with cwd = repo root (same as the real payload.config.ts's

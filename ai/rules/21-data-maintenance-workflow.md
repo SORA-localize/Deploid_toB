@@ -24,6 +24,13 @@ files above — see the Current Work Posture note in `ai/rules/00-index.md`. Aft
 same collections through Payload (Admin UI, Local API, REST, or MCP) instead; `data/*.ts` is deleted
 per `content-platform-and-database-architecture-v2.md` §10, migration principle 8.
 
+**Codex MCP (Task 8)**: a Payload MCP server exists (`lib/payload/mcp.ts`, workflow documented in
+`.codex/content-workflow.md`) for the Payload side of the migration. It is not yet the edit
+destination for ordinary content work — `data/*.ts` still is, per the paragraph above. MCP write
+access is scoped to `content-draft-writer` (create/update draft only); publishing still requires a
+human `content-publisher` going through `publishApprovedVersion()`, and `admins` /
+`payload-mcp-api-keys` are never exposed to MCP.
+
 Purpose: let an AI agent add or update records without breaking the `id` / `slug` model, source requirements, registry usage, or image-rights rules.
 
 ## Operating Rules

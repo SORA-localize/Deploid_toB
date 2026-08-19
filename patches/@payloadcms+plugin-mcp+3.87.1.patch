@@ -1,0 +1,27 @@
+diff --git a/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js b/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js
+index 1a81ee7..08aad56 100644
+--- a/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js
++++ b/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js
+@@ -225,8 +225,21 @@ ${JSON.stringify(errors)}
+         const convertedFields = convertCollectionSchemaToZod(schema);
+         // Create a new schema that combines the converted fields with update-specific parameters
+         // Use .partial() to make all fields optional for partial updates
++        //
++        // PATCHED (Deploid Task 8, patches/@payloadcms+plugin-mcp+*.patch): convertCollectionSchemaToZod()
++        // falls back to `z.record(z.any())` when the collection's JSON-Schema-to-Zod conversion
++        // throws (its own catch block, e.g. for collections with `type: 'json'` fields such as
++        // `robots.specs`) — and `z.record(...)` has no `.partial()` method, so the original
++        // `convertedFields.partial().shape` throws `TypeError: convertedFields.partial is not a
++        // function`. That throw is swallowed as an unhandled rejection deep inside the MCP server
++        // construction, which never resolves the in-flight HTTP response — every POST to /mcp on an
++        // API key with `update` enabled for such a collection hangs forever (observed: 100% packet
++        // loss, connection never closes). Mirror what createResourceTool already does for the same
++        // fallback case (`...convertedFields.shape`, which is `undefined` on a ZodRecord and spreads
++        // to nothing) instead of unconditionally calling `.partial()`.
++        const partialFields = typeof convertedFields?.partial === 'function' ? convertedFields.partial().shape : undefined;
+         const updateResourceSchema = z.object({
+-            ...convertedFields.partial().shape,
++            ...partialFields,
+             id: z.union([
+                 z.string(),
+                 z.number()

@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     admins: AdminAuthOperations;
+    'payload-mcp-api-keys': PayloadMcpApiKeyAuthOperations;
   };
   blocks: {};
   collections: {
@@ -79,6 +80,7 @@ export interface Config {
     media: Media;
     'content-route-registry': ContentRouteRegistry;
     'environment-marker': EnvironmentMarker;
+    'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -98,6 +100,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     'content-route-registry': ContentRouteRegistrySelect<false> | ContentRouteRegistrySelect<true>;
     'environment-marker': EnvironmentMarkerSelect<false> | EnvironmentMarkerSelect<true>;
+    'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -117,13 +120,31 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: Admin;
+  user: Admin | PayloadMcpApiKey;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
 export interface AdminAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface PayloadMcpApiKeyAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -1057,6 +1078,159 @@ export interface EnvironmentMarker {
   createdAt: string;
 }
 /**
+ * API keys control which collections, resources, tools, and prompts MCP clients can access
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys".
+ */
+export interface PayloadMcpApiKey {
+  id: number;
+  /**
+   * The user that the API key is associated with.
+   */
+  user?: (number | null) | Admin;
+  /**
+   * A useful label for the API key.
+   */
+  label?: string | null;
+  /**
+   * The purpose of the API key.
+   */
+  description?: string | null;
+  manufacturers?: {
+    /**
+     * Allow clients to find manufacturers.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create manufacturers.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update manufacturers.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete manufacturers.
+     */
+    delete?: boolean | null;
+  };
+  distributors?: {
+    /**
+     * Allow clients to find distributors.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create distributors.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update distributors.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete distributors.
+     */
+    delete?: boolean | null;
+  };
+  robotSeries?: {
+    /**
+     * Allow clients to find robot-series.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create robot-series.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update robot-series.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete robot-series.
+     */
+    delete?: boolean | null;
+  };
+  robots?: {
+    /**
+     * Allow clients to find robots.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create robots.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update robots.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete robots.
+     */
+    delete?: boolean | null;
+  };
+  useCases?: {
+    /**
+     * Allow clients to find use-cases.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create use-cases.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update use-cases.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete use-cases.
+     */
+    delete?: boolean | null;
+  };
+  deployments?: {
+    /**
+     * Allow clients to find deployments.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create deployments.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update deployments.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete deployments.
+     */
+    delete?: boolean | null;
+  };
+  articles?: {
+    /**
+     * Allow clients to find articles.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create articles.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update articles.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete articles.
+     */
+    delete?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
+  collection: 'payload-mcp-api-keys';
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1127,12 +1301,21 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'environment-marker';
         value: number | EnvironmentMarker;
+      } | null)
+    | ({
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'admins';
-    value: number | Admin;
-  };
+  user:
+    | {
+        relationTo: 'admins';
+        value: number | Admin;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -1142,10 +1325,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'admins';
-    value: number | Admin;
-  };
+  user:
+    | {
+        relationTo: 'admins';
+        value: number | Admin;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
+      };
   key?: string | null;
   value?:
     | {
@@ -1830,6 +2018,76 @@ export interface EnvironmentMarkerSelect<T extends boolean = true> {
   lastRestoredAt?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys_select".
+ */
+export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
+  user?: T;
+  label?: T;
+  description?: T;
+  manufacturers?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  distributors?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  robotSeries?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  robots?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  useCases?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  deployments?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  articles?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

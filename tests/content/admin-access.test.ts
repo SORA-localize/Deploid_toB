@@ -350,4 +350,146 @@ describe('Admins collection access control (real Payload Local API)', () => {
     });
     expect(reloaded.role).toBe('platform-admin');
   });
+
+  /**
+   * Task 8 Step 1: `admins` は MCP から一切exposeしない（`lib/payload/mcp.ts` の
+   * `MCP_EDITABLE_COLLECTIONS` に `admins` を含めない）が、その前提として「admins自体の
+   * Local API access（`collections/Admins.ts` の `selfOrPlatformAdmin` 等）が実際どう
+   * 振る舞うか」を実機で確認しておく必要がある。
+   *
+   * **実機で確認した挙動（brief Step 1のコード例との相違点）**: brief Step 1のコード例は
+   * `payload.find({ collection: 'admins', ..., user: asDraftWriter.user })` が例外を
+   * throwすることを期待している。実際には Payload の document-level access は
+   * `boolean` を返すか `Where` filter objectを返すかで挙動が変わる:
+   *
+   * - `selfOrPlatformAdmin` は非platform-adminに対して `{ id: { equals: user.id } }`
+   *   という **Where filter** を返す（`false` を返さない）。`find` / `count` はこれを
+   *   通常のqueryのように**結果へ適用するだけ**で、例外は投げない——ただし返る行は
+   *   「自分自身の1件だけ」になり、他人のadmin情報（email/role等）は一切含まれない。
+   * - `findByID` で他人のdocumentを指定すると、その行がWhere filterにマッチしないため
+   *   Payloadは `404 NotFound`（`Forbidden`ではない——存在有無を漏らさない設計）を投げる。
+   * - `create` / `update` / `delete` は単一document操作で access が `false` を返す
+   *   ケースが多く、これらは引き続き例外を投げる（上のテスト群で確認済み）。
+   * - 完全に未認証（`user`無し）の場合は `selfOrPlatformAdmin` が `false`（boolean）を
+   *   返すため、`find` であっても例外を投げる。
+   *
+   * つまり「他人のadmin情報が見えない」という**安全性の実質**は満たされているが、brief
+   * Step 1のコード例が書く `.rejects.toThrow()` という**字面**は、非platform-adminによる
+   * `find`（listクエリ）には当てはまらない。ここでは実質（他人のデータが漏れないこと）を
+   * 検証し、字面通りの例外を無理に発生させる設計変更（=安全性を弱めてでも例外を投げさせる）は
+   * 行わない。
+   */
+  describe('admins Local API access — real behavior, including cases the brief code example got wrong', () => {
+    let freshReader: Awaited<ReturnType<typeof loginAs>>;
+    let freshPublisher: Awaited<ReturnType<typeof loginAs>>;
+    let anyOtherAdminId: string | number;
+
+    beforeAll(async () => {
+      // このsuite末尾時点の状態: owner@example.com は前のテストでcontent-publisherへ降格済み、
+      // second-owner@example.com が唯一のplatform-admin。reader@example.com は削除済みなので、
+      // content-reader roleのuserを新しく作る。
+      const secondOwner = await loginAs(payload, 'second-owner@example.com', PASSWORD);
+      const created = await payload.create({
+        collection: 'admins',
+        overrideAccess: false,
+        user: secondOwner,
+        data: { email: 'fresh-reader@example.com', password: PASSWORD, role: 'content-reader' },
+      });
+      freshReader = await loginAs(payload, 'fresh-reader@example.com', PASSWORD);
+      freshPublisher = await loginAs(payload, 'owner@example.com', PASSWORD); // 降格済みでcontent-publisher
+      anyOtherAdminId = created.id === secondOwner.id ? created.id : secondOwner.id;
+    });
+
+    it('rejects unauthenticated find/count (selfOrPlatformAdmin returns boolean false when there is no user)', async () => {
+      await expect(payload.find({ collection: 'admins', overrideAccess: false })).rejects.toThrow();
+      await expect(payload.count({ collection: 'admins', overrideAccess: false })).rejects.toThrow();
+    });
+
+    it('rejects unauthenticated update/delete', async () => {
+      await expect(
+        payload.update({ collection: 'admins', id: anyOtherAdminId, overrideAccess: false, data: { role: 'platform-admin' } }),
+      ).rejects.toThrow();
+      await expect(payload.delete({ collection: 'admins', id: anyOtherAdminId, overrideAccess: false })).rejects.toThrow();
+    });
+
+    it('a content-reader find() does not throw, but never returns any admin other than themself', async () => {
+      const { docs, totalDocs } = await payload.find({ collection: 'admins', overrideAccess: false, user: freshReader });
+      expect(totalDocs).toBe(1);
+      expect(docs.map((d) => d.email)).toEqual(['fresh-reader@example.com']);
+    });
+
+    it('a content-reader findByID on another admin gets 404 NotFound, not the document', async () => {
+      await expect(
+        payload.findByID({ collection: 'admins', id: anyOtherAdminId, overrideAccess: false, user: freshReader }),
+      ).rejects.toThrow();
+    });
+
+    it('rejects admin creation by a content-reader', async () => {
+      await expect(
+        payload.create({
+          collection: 'admins',
+          overrideAccess: false,
+          user: freshReader,
+          data: { email: 'reader-created-intruder@example.com', password: PASSWORD, role: 'content-reader' },
+        }),
+      ).rejects.toThrow();
+    });
+
+    it('rejects admin creation by a content-publisher', async () => {
+      await expect(
+        payload.create({
+          collection: 'admins',
+          overrideAccess: false,
+          user: freshPublisher,
+          data: { email: 'publisher-created-intruder@example.com', password: PASSWORD, role: 'content-reader' },
+        }),
+      ).rejects.toThrow();
+    });
+
+    it('rejects a content-reader updating another admin', async () => {
+      await payload
+        .update({
+          collection: 'admins',
+          id: anyOtherAdminId,
+          overrideAccess: false,
+          user: freshReader,
+          data: { role: 'content-reader' },
+        })
+        .catch(() => undefined);
+
+      const reloaded = await payload.findByID({ collection: 'admins', id: anyOtherAdminId, overrideAccess: true });
+      expect(reloaded.role).toBe('platform-admin'); // second-owner@example.com — unchanged
+    });
+
+    it('rejects a content-publisher updating another admin', async () => {
+      await payload
+        .update({
+          collection: 'admins',
+          id: anyOtherAdminId,
+          overrideAccess: false,
+          user: freshPublisher,
+          data: { role: 'content-reader' },
+        })
+        .catch(() => undefined);
+
+      const reloaded = await payload.findByID({ collection: 'admins', id: anyOtherAdminId, overrideAccess: true });
+      expect(reloaded.role).toBe('platform-admin');
+    });
+
+    it('rejects deletion by a content-reader and a content-publisher', async () => {
+      await expect(
+        payload.delete({ collection: 'admins', id: anyOtherAdminId, overrideAccess: false, user: freshReader }),
+      ).rejects.toThrow();
+      await expect(
+        payload.delete({ collection: 'admins', id: anyOtherAdminId, overrideAccess: false, user: freshPublisher }),
+      ).rejects.toThrow();
+
+      const { totalDocs } = await payload.count({
+        collection: 'admins',
+        where: { id: { equals: anyOtherAdminId } },
+        overrideAccess: true,
+      });
+      expect(totalDocs).toBe(1); // still there
+    });
+  });
 });
