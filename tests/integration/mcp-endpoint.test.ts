@@ -258,7 +258,18 @@ describe('Real MCP transport (next dev + StreamableHTTPClientTransport) enforces
     it('2. can create a draft named test-mcp-endpoint-draft', async () => {
       const result = await mcp.client.callTool({
         name: 'createRobots',
-        arguments: { stableId: 'test-mcp-endpoint-draft', slug: 'test-mcp-endpoint-draft', name: 'MCP Endpoint Test Robot', draft: true },
+        arguments: {
+          stableId: 'test-mcp-endpoint-draft',
+          slug: 'test-mcp-endpoint-draft',
+          name: 'MCP Endpoint Test Robot',
+          // `lifecycleStatus` は `lib/payload/access.ts` の `baseContentFields()` で
+          // `required: true`（`defaultValue: 'active'`はPayload create()側の既定値付与であって、
+          // MCP toolのinput schema validationはそれを見ない——upstreamの実バグ修正
+          // （`convertCollectionSchemaToZod`の"use strict"問題、patches/参照）でこのtoolの
+          // input schemaが実際にcollectionのfieldを反映するようになって初めて判明した）。
+          lifecycleStatus: 'active',
+          draft: true,
+        },
       });
       const text = textOf(result);
       expect(text).toContain('Resource created successfully');
