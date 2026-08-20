@@ -1,11 +1,11 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { postgresAdapter } from '@payloadcms/db-postgres';
+import { mcpPlugin } from '@payloadcms/plugin-mcp';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { buildConfig } from 'payload';
 import sharp from 'sharp';
 import { contentCollections, contentGlobals } from '../../../lib/payload/contentSchema';
-import { createMcpPlugin } from '../../../lib/payload/mcp';
 import { createMediaStoragePlugin } from '../../../lib/payload/mediaStoragePlugin';
 import { withPreviewNonceSchema } from '../../../lib/payload/previewNonceSchema';
 
@@ -23,16 +23,26 @@ import { withPreviewNonceSchema } from '../../../lib/payload/previewNonceSchema'
  * `alwaysInsertFields` が追加する `media.prefix` columnの有無だけで本番と食い違い、無関係な
  * `DROP COLUMN "prefix"` が混入する（実際に一度発生した）。
  *
- * **Task 8完了時点の更新**: Task 3.5時点ではここに直接 `mcpPlugin({})`（bare options）を
- * 置いていたが、それは「Task 8が実際に採用するoptionsはまだ決まっていない」ためのplaceholderで、
- * このファイル自身のdocblockが「Task 8が実際にMCPサーバーを配線する際は...このfixtureとは
- * 別の作業」と明記していた。Task 8がoptions（`collections` / `overrideApiKeyCollection` —
- * 後者は`payload-mcp-api-keys.user` fieldを`required: false`へ緩める、実機で見つけたNOT NULL
- * 列とON DELETE SET NULLのFKの自己矛盾を防ぐ修正を含む、`lib/payload/mcp.ts`参照）を確定させた
- * ので、bare `mcpPlugin({})` のままだとこのfixtureが生成するschemaが実際にcommitされた
- * migration（`migrations/*_add_payload_mcp_api_keys.ts`）と食い違い、drift検出（Step 5a/5b）が
- * 「実際には無い差分」を拾ってしまう。`createMcpPlugin()`（本番 `payload.config.ts` が使うのと
- * 同じ関数）へ差し替えることで、このfixtureが実際に採用されたschemaを正しく代表するようにする。
+ * **Task 8完了後もbare `mcpPlugin({})` のまま維持する（reviewer指摘で判明、一度
+ * `createMcpPlugin()` へ差し替えて壊した経緯がある）**: `tests/content/migration.test.ts` の
+ * Step 3/4/5は「まだcommitされていない未来のschema変更」を`migrate:create`が検出できること
+ * （drift検出）と、それをapply / down / re-upできることを検証する回帰test。Task 8が実際に
+ * `migrations/*_add_payload_mcp_api_keys.ts` を committed migrations へ追加した**後**は、
+ * その内容はもう「未来の変更」ではなく「既にcommit済みのbaseline」になる。このfixtureを
+ * 本番と同じ `createMcpPlugin()` へ差し替えると、fixtureのschemaとcommitted baselineが
+ * 完全に一致してしまい、Step 5aの `migrate:create --skip-empty` は（正しく）差分ゼロ
+ * （生成ファイル数0）を返す——ところがStep 5aは「ちょうど1ファイル生成される」ことを
+ * 前提にしており、これが `expected +0 to be 1` で落ち、Step 3(apply)・Step 4(down)・
+ * Step 4(re-up) までカスケードして壊れる（down が新規batchを持たないため直近の
+ * batch全体——初期schema含む——を巻き戻してしまい、seed行を含む全tableが消える）。
+ * 実際に`createMcpPlugin()`へ差し替えて確認済み（4/13 fail、`git worktree`でのcrean
+ * install 2回で再現）。bare `mcpPlugin({})` を維持する限り、fixtureのschemaは
+ * committed baselineに対して常に「まだ無い追加table」を持ち続けるため、drift検出の
+ * 前提が壊れない。本番が実際に採用したoptions（`collections` / `overrideApiKeyCollection`）
+ * の正しさは、production `payload.config.ts` に対する直接のdrift check
+ * （`payload:migrate:create -- __drift_check --skip-empty`、`npm run check`のCI step）と
+ * `tests/content/mcp-access.test.ts`が別途担保する——このfixtureの役割はあくまで
+ * 「migrationツール自体（generate/apply/down/up/drift検出）が正しく動く」ことの検証に限定する。
  */
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -67,7 +77,7 @@ export default buildConfig({
     // と同じ理由、上のdocblock参照）。
     afterSchemaInit: [withPreviewNonceSchema],
   }),
-  plugins: [createMediaStoragePlugin(), createMcpPlugin()],
+  plugins: [createMediaStoragePlugin(), mcpPlugin({})],
   sharp,
   // Payload's default `typescript.outputFile` is `${process.cwd()}/payload-types.ts` — since this
   // fixture's CLI invocations run with cwd = repo root (same as the real payload.config.ts's

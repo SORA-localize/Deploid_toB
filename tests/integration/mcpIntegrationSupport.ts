@@ -109,15 +109,9 @@ export async function startAppServer(options: {
   port: number;
   databaseUrl: string;
   payloadSecret: string;
-  /**
-   * 実在するMCP API keyの値。渡された場合、readiness確認の後に**認証付きの**POST
-   * `initialize` requestを1回投げてMCPのPOST dispatchコードパスを事前にコンパイルさせる
-   * （下のコメント参照）。省略時はwarm-upを行わない。
-   */
-  warmUpApiKey?: string;
   timeoutMs?: number;
 }): Promise<AppServerHandle> {
-  const { port, databaseUrl, payloadSecret, warmUpApiKey, timeoutMs = 120_000 } = options;
+  const { port, databaseUrl, payloadSecret, timeoutMs = 120_000 } = options;
   const baseUrl = `http://127.0.0.1:${port}`;
   const logs: string[] = [];
 
@@ -159,17 +153,18 @@ export async function startAppServer(options: {
   }
   console.log(`[mcpIntegrationSupport] next dev GET-ready after ${Date.now() - t0}ms`);
 
-  // 以前ここに「認証付きPOSTを1回投げてdispatchコードパスをwarm upする」処理があったが、
-  // **timeoutを持たない生の`fetch()`が280秒（testのhookTimeout上限）ハングし、テスト全体を
-  // 巻き添えにした**（実機で再現・特定済み）。GETは6〜7秒でready化しており、Next.jsは
-  // route moduleをmethodごとではなくファイル単位でコンパイルするため「POST側だけ未コンパイル」
-  // という当初の仮説はそもそも成立しない。ハングの実際の原因はwarm-up自体の実装
-  // （MCP handshakeを正しく踏んでいない生fetch、または長時間のstreaming応答を素朴に
-  // `.text()`で待ち切ろうとしたこと）にあると判断し、warm-upは撤去した。
-  // 実clientの接続（`connectMcpClient()`）はSDK自身のtimeout機構（`setTimeout`ベースで
-  // 実際のHTTP応答を待たずに発火する）を使うため、同じ種類のハングでテストプロセスごと
-  // 止まることはない——最悪でも `McpError -32001: Request timed out` で失敗するだけ。
-  void warmUpApiKey;
+  // このfunctionは以前、readiness確認の後に「認証付きPOSTを1回投げてMCPのPOST dispatch
+  // コードパスをwarm upする」処理を持っていたが、**timeoutを持たない生の`fetch()`が280秒
+  // （testのhookTimeout上限）ハングし、テスト全体を巻き添えにした**（実機で再現・特定済み）。
+  // GETは6〜7秒でready化しており、Next.jsはroute moduleをmethodごとではなくファイル単位で
+  // コンパイルするため「POST側だけ未コンパイル」という当初の仮説はそもそも成立しない。
+  // ハングの実際の原因はwarm-up自体の実装（MCP handshakeを正しく踏んでいない生fetch、
+  // または長時間のstreaming応答を素朴に`.text()`で待ち切ろうとしたこと）にあると判断し、
+  // warm-up処理と`warmUpApiKey`引数は完全に撤去した（呼び出し側に引数だけ残して何もしない、
+  // という誤誘導を避けるため）。実clientの接続（`connectMcpClient()`）はSDK自身のtimeout機構
+  // （`setTimeout`ベースで実際のHTTP応答を待たずに発火する）を使うため、同じ種類のハングで
+  // テストプロセスごと止まることはない——最悪でも `McpError -32001: Request timed out` で
+  // 失敗するだけ。
 
   return { process: child, baseUrl, logs };
 }

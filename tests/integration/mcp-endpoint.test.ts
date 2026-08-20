@@ -50,6 +50,35 @@ function textOf(result: unknown): string {
   return first?.text ?? '';
 }
 
+/**
+ * 存在しないtool名を呼んだ結果を検証するassertion。
+ *
+ * 元の実装（`.rejects.toThrow()`のみ）はreviewer指摘（Important 3）により誤りと判明した:
+ * `@modelcontextprotocol/sdk`のclientは、存在しないtool名を`tools/call`しても
+ * `client.request()`のPromiseをrejectさせず、`{ content: [...], isError: true }`という
+ * **resolveされた結果**を返すことがある（`content[0].text`に`"MCP error -32602: Tool <name>
+ * not found"`が入る）。`.rejects.toThrow()`だけでは、実際にresolveされた場合に何も検証せず
+ * 素通りしてしまう（false positive）。
+ *
+ * 一方、`node_modules/@modelcontextprotocol/sdk/dist/esm/server/mcp.js`の
+ * `CallToolRequestSchema`ハンドラは`throw new McpError(ErrorCode.InvalidParams, "Tool ... not
+ * found")`しており、これがJSON-RPCの protocol-level error responseとして返り、client側で
+ * Promiseがrejectされる経路も理論上あり得る（実装のdispatch層次第）。どちらが実際に起こるかは
+ * 呼び出し経路によって変わりうるため、**両方を許容し、どちらの経路でも「not foundとして
+ * 拒否された」ことを実際に確認する**形にする（片方だけを決め打ちで書いて、また実態と
+ * 違う書き方をする再発を避ける）。
+ */
+async function expectToolCallFailsAsNotFound(callPromise: Promise<unknown>): Promise<void> {
+  try {
+    const result = await callPromise;
+    const r = result as { isError?: boolean; content?: Array<{ type: string; text?: string }> };
+    expect(r.isError, `expected isError: true (resolved path), got ${JSON.stringify(r)}`).toBe(true);
+    expect(textOf(r)).toMatch(/not found/i);
+  } catch (error) {
+    expect(String(error)).toMatch(/not found/i);
+  }
+}
+
 describe('Real MCP transport (next dev + StreamableHTTPClientTransport) enforces Task 3 RBAC', () => {
   let dbUrl: string;
   let server: AppServerHandle | undefined;
@@ -163,8 +192,8 @@ describe('Real MCP transport (next dev + StreamableHTTPClientTransport) enforces
     mark('admins + MCP API keys bootstrapped');
 
     const port = await findFreePort();
-    server = await startAppServer({ port, databaseUrl: dbUrl, payloadSecret: PAYLOAD_SECRET, warmUpApiKey: normalKeyValue });
-    mark('next dev ready + warm-up POST complete');
+    server = await startAppServer({ port, databaseUrl: dbUrl, payloadSecret: PAYLOAD_SECRET });
+    mark('next dev ready');
   }, 280_000);
 
   afterAll(async () => {
@@ -275,12 +304,12 @@ describe('Real MCP transport (next dev + StreamableHTTPClientTransport) enforces
     });
 
     it('5. delete tool does not even exist for this credential (no deleteRobots capability enabled)', async () => {
-      await expect(mcp.client.callTool({ name: 'deleteRobots', arguments: {} })).rejects.toThrow();
+      await expectToolCallFailsAsNotFound(mcp.client.callTool({ name: 'deleteRobots', arguments: {} }));
     });
 
     it('6. admins / payload-mcp-api-keys have no MCP tools at all (excluded entirely, not just access-denied)', async () => {
-      await expect(mcp.client.callTool({ name: 'findAdmins', arguments: {} })).rejects.toThrow();
-      await expect(mcp.client.callTool({ name: 'findPayloadMcpApiKeys', arguments: {} })).rejects.toThrow();
+      await expectToolCallFailsAsNotFound(mcp.client.callTool({ name: 'findAdmins', arguments: {} }));
+      await expectToolCallFailsAsNotFound(mcp.client.callTool({ name: 'findPayloadMcpApiKeys', arguments: {} }));
     });
   });
 
@@ -347,7 +376,7 @@ describe('Real MCP transport (next dev + StreamableHTTPClientTransport) enforces
       const names = tools.map((t) => t.name);
       expect(names.some((n) => /admin/i.test(n))).toBe(false);
 
-      await expect(mcp.client.callTool({ name: 'createAdmins', arguments: {} })).rejects.toThrow();
+      await expectToolCallFailsAsNotFound(mcp.client.callTool({ name: 'createAdmins', arguments: {} }));
     });
   });
 });

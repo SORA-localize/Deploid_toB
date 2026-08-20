@@ -40,6 +40,47 @@ const REAL_PAYLOAD_TYPES_PATH = path.join(REPO_ROOT, 'payload-types.ts');
 const TMP_ROOT = path.join(REPO_ROOT, 'tests/fixtures/payload-migrations', `.tmp-${RUN_ID}`);
 const TMP_EMPTY_DB_MIGRATIONS_DIR = path.join(TMP_ROOT, 'empty-db-migrations');
 const TMP_SEEDED_DB_MIGRATIONS_DIR = path.join(TMP_ROOT, 'seeded-db-migrations');
+/**
+ * Task 8がcommitした後の "pre-Task-8 baseline" を人工的に再構成するための隔離ディレクトリ。
+ * 下の`PRE_TASK_8_EXCLUDED_MIGRATION_NAME_PATTERN`の説明を参照。
+ */
+const TMP_BASELINE_MIGRATIONS_DIR = path.join(TMP_ROOT, 'baseline-migrations');
+
+/**
+ * Step 3/4/5は「Task 8がMCP対応を足す**前**の実環境からdrift検出→apply→down→re-upが
+ * 正しく動く」ことを検証するTask 3.5由来の回帰test。この検証が意味を持つには、
+ * `mcp-fixture.config.ts`（`tests/fixtures/payload-migrations/mcp-fixture.config.ts`）が
+ * 生成しようとするmigration（`payload_mcp_api_keys`table）が、適用済みbaselineに
+ * **まだ存在しない**ことが前提になる。
+ *
+ * Task 8が実際に`migrations/*_add_payload_mcp_api_keys.ts`をcommitした後は、
+ * `REAL_MIGRATIONS_DIR`（本番committed migrations）をそのまま適用すると、
+ * この前提が崩れる——fixtureが生成しようとする内容は「もう存在するtable」になり、
+ * `migrate:create`は（正しく）差分ゼロを返すか、bareなfixture設定を使えば逆に
+ * 「既存columnを消すALTER」を生成してしまう。どちらの場合も「CREATE TABLEを
+ * 含む新規migrationが1本生成される」というStep 5a以降の前提と食い違い、
+ * Step 3(apply)・Step 4(down)・Step 4(re-up)までカスケードして壊れる
+ * （実機で確認済み: `createMcpPlugin()`へ差し替えても、bare `mcpPlugin({})`に戻しても
+ * どちらも壊れる——原因はfixtureのoptionsではなく、baseline自体に`payload_mcp_api_keys`
+ * が既に含まれてしまっていること）。
+ *
+ * 対処: このsuite専用に「Task 8のmigrationを除いたbaseline」を`TMP_BASELINE_MIGRATIONS_DIR`
+ * へ人工的に再構成し、`Step 3 setup`ではそちらへ適用する。`readMigrationFiles()`
+ * （`node_modules/payload/dist/database/migrations/readMigrationFiles.js`）は
+ * `index.ts`を読まず、対象ディレクトリの`.ts`ファイルを直接scanするため、
+ * `index.ts`を作り直す必要はない。
+ */
+const PRE_TASK_8_EXCLUDED_MIGRATION_NAME_PATTERN = /add_payload_mcp_api_keys/;
+
+function populateBaselineMigrationsDir(): void {
+  fs.mkdirSync(TMP_BASELINE_MIGRATIONS_DIR, { recursive: true });
+  for (const file of fs.readdirSync(REAL_MIGRATIONS_DIR)) {
+    if (file === 'index.ts') continue;
+    if (!file.endsWith('.ts') && !file.endsWith('.json')) continue;
+    if (PRE_TASK_8_EXCLUDED_MIGRATION_NAME_PATTERN.test(file)) continue;
+    fs.copyFileSync(path.join(REAL_MIGRATIONS_DIR, file), path.join(TMP_BASELINE_MIGRATIONS_DIR, file));
+  }
+}
 
 /**
  * Payload/drizzle-kit（このrepoのバージョン: `payload@3.87.1`）が生成する down() migrationの
@@ -247,10 +288,17 @@ describe('Postgres migrations (Task 3.5) — isolated throwaway databases only',
       async () => {
         await createThrowawayDatabase(AMBIENT_DATABASE_URL!, SEEDED_DB_NAME);
 
-        // Apply the *real* committed migrations/ (production config, production dir — no override)
-        // so this DB starts in exactly the state a real environment would be in before Task 8 adds
-        // MCP support.
-        const migrate = runPayloadCli(['migrate'], { DATABASE_URL: seededDbUrl(), PAYLOAD_SECRET });
+        // Apply the committed migrations/ *excluding* Task 8's own `add_payload_mcp_api_keys`
+        // migration (see PRE_TASK_8_EXCLUDED_MIGRATION_NAME_PATTERN docblock above), so this DB
+        // starts in exactly the state a real environment would be in before Task 8 adds MCP
+        // support — which is what the rest of this describe (Step 5a onward) needs in order to
+        // have real drift left for `mcp-fixture.config.ts` to detect.
+        populateBaselineMigrationsDir();
+        const migrate = runPayloadCli(['migrate'], {
+          DATABASE_URL: seededDbUrl(),
+          PAYLOAD_SECRET,
+          PAYLOAD_TEST_MIGRATION_DIR: TMP_BASELINE_MIGRATIONS_DIR,
+        });
         expect(migrate.status, `${migrate.stdout}\n${migrate.stderr}`).toBe(0);
 
         const client = new Client({ connectionString: seededDbUrl() });
@@ -265,13 +313,11 @@ describe('Postgres migrations (Task 3.5) — isolated throwaway databases only',
 
         // migrate:create writes into whatever migrationDir the config points at, and diffs against
         // the *last snapshot file* in that dir — not a live DB introspection (confirmed by reading
-        // @payloadcms/drizzle's buildCreateMigration.js). Seed the temp dir with the real committed
-        // migration's .ts/.json so the next migrate:create's baseline matches what's actually
-        // applied to this DB.
-        for (const file of fs.readdirSync(REAL_MIGRATIONS_DIR)) {
-          if (file.endsWith('.ts') || file.endsWith('.json')) {
-            fs.copyFileSync(path.join(REAL_MIGRATIONS_DIR, file), path.join(TMP_SEEDED_DB_MIGRATIONS_DIR, file));
-          }
+        // @payloadcms/drizzle's buildCreateMigration.js). Seed the temp dir with the *baseline*
+        // (pre-Task-8) migration's .ts/.json — not the real committed ones — so the next
+        // migrate:create's baseline matches what was actually just applied to this DB.
+        for (const file of fs.readdirSync(TMP_BASELINE_MIGRATIONS_DIR)) {
+          fs.copyFileSync(path.join(TMP_BASELINE_MIGRATIONS_DIR, file), path.join(TMP_SEEDED_DB_MIGRATIONS_DIR, file));
         }
       },
       60_000,
