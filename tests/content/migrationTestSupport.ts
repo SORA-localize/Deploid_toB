@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { Client } from 'pg';
+import { assertLocalThrowawayDatabaseUrl } from './testDbGuard';
 
 /**
  * `tests/content/migration.test.ts` の共通basement。
@@ -18,51 +19,13 @@ import { Client } from 'pg';
  *    直接つなぎ、生成・破棄する。ambient `DATABASE_URL` のhost/port/user/passwordは再利用し
  *    dbname部分だけを差し替える（CI ではpostgres:17 service、ローカルではHomebrewの
  *    postgresql@15、どちらも `postgres` maintenance dbを持つ）。
+ *
+ * throwaway DB判定（host・DB名の両方の検査）は`./testDbGuard`が唯一の正本。ここではコピーを
+ * 作らずimportするだけにする（2026-08-20のインシデント: この判定ロジックが複数箇所へ
+ * コピーされ、修正が一部にしか反映されなかった再発防止）。
  */
 
-const LOCAL_DATABASE_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
-
-/**
- * 既知の共有/永続DB名。この関数がチェックするのはambient DATABASE_URL（maintenance接続用に
- * host/port/user/passwordだけ再利用する起点）だが、`tests/content/testDbGuard.ts`と同じ
- * インシデント（host判定だけでは`deploid_dev`のようなlocalhost上の永続DBを弾けない）の
- * 再発防止として、こちらもDB名を検査する（2026-08-20発生）。
- */
-const KNOWN_NON_THROWAWAY_DATABASE_NAMES = new Set(['deploid_dev', 'postgres']);
-const THROWAWAY_DATABASE_NAME_PATTERN = /test|throwaway|e2e/i;
-
-export function assertLocalThrowawayDatabase(callerFile: string, databaseUrl: string | undefined): void {
-  if (!databaseUrl) {
-    throw new Error(`DATABASE_URL is not set. ${callerFile} creates/drops throwaway Postgres databases and must only ever run against a local Postgres server.`);
-  }
-  let url: URL;
-  try {
-    url = new URL(databaseUrl);
-  } catch {
-    throw new Error(`DATABASE_URL is not a valid connection URL: ${databaseUrl.slice(0, 20)}...`);
-  }
-  const host = url.hostname;
-  if (!LOCAL_DATABASE_HOSTS.has(host)) {
-    throw new Error(
-      `Refusing to run ${callerFile} against DATABASE_URL host "${host}". This suite creates and drops ` +
-        `whole Postgres databases and only runs against a local throwaway Postgres server (host in ` +
-        `${[...LOCAL_DATABASE_HOSTS].join(', ')}), never against a shared/managed database such as Supabase.`,
-    );
-  }
-  const databaseName = url.pathname.replace(/^\//, '');
-  if (
-    KNOWN_NON_THROWAWAY_DATABASE_NAMES.has(databaseName) ||
-    !THROWAWAY_DATABASE_NAME_PATTERN.test(databaseName)
-  ) {
-    throw new Error(
-      `Refusing to run ${callerFile} with ambient DATABASE_URL database "${databaseName}". This suite creates ` +
-        'and drops whole Postgres databases derived from this connection string and only runs when the ' +
-        'ambient database name is explicitly throwaway (must contain "test", "throwaway", or "e2e"; localhost ' +
-        `alone is not sufficient — "${databaseName}" may be a shared/persistent database such as the ` +
-        "developer's local dev DB).",
-    );
-  }
-}
+export const assertLocalThrowawayDatabase = assertLocalThrowawayDatabaseUrl;
 
 /** ambient DATABASE_URL のhost/port/user/passwordを維持したまま、dbname部分だけ差し替える。 */
 export function withDatabaseName(databaseUrl: string, dbName: string): string {

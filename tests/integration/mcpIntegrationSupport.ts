@@ -4,6 +4,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Payload } from 'payload';
 import { Client as PgClient } from 'pg';
+import { assertLocalThrowawayDatabaseUrl } from '../content/testDbGuard';
 
 /**
  * Task 8 Step 5: `tests/integration/mcp-endpoint.test.ts` 用の下回り。
@@ -12,28 +13,12 @@ import { Client as PgClient } from 'pg';
  * 「実MCP transport（実HTTP、実JSON-RPC、実API key認証）が Task 3 の権限表を実際に迂回しない」
  * ことを証明するために、`next dev` を子processとして実際に起動する。`playwright.config.ts` の
  * `webServer`（e2e専用: `next start` + 専用port）と同じ発想を、vitest側で手動実装したもの。
+ *
+ * throwaway DB判定は`tests/content/testDbGuard.ts`が唯一の正本。ここではコピーを作らず
+ * importするだけにする（2026-08-20のインシデント再発防止、詳細は同ファイル参照）。
  */
 
-const LOCAL_DATABASE_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
-
-export function assertLocalThrowawayDatabase(callerFile: string, databaseUrl: string | undefined): void {
-  if (!databaseUrl) {
-    throw new Error(`DATABASE_URL is not set. ${callerFile} creates/drops throwaway Postgres databases and must only ever run against a local Postgres server.`);
-  }
-  let host: string;
-  try {
-    host = new URL(databaseUrl).hostname;
-  } catch {
-    throw new Error(`DATABASE_URL is not a valid connection URL: ${databaseUrl.slice(0, 20)}...`);
-  }
-  if (!LOCAL_DATABASE_HOSTS.has(host)) {
-    throw new Error(
-      `Refusing to run ${callerFile} against DATABASE_URL host "${host}". This suite creates/drops a ` +
-        `whole Postgres database and only runs against a local throwaway Postgres server (host in ` +
-        `${[...LOCAL_DATABASE_HOSTS].join(', ')}), never against a shared/managed database such as Supabase.`,
-    );
-  }
-}
+export const assertLocalThrowawayDatabase = assertLocalThrowawayDatabaseUrl;
 
 export function withDatabaseName(databaseUrl: string, dbName: string): string {
   const url = new URL(databaseUrl);
