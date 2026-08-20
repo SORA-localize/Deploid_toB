@@ -30,6 +30,7 @@ import os from 'node:os';
 import path from 'node:path';
 import type { ContentSnapshot } from '../lib/content/contracts.ts';
 import type { MediaAsset } from '../lib/content/domainTypes.ts';
+import { PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG } from '../lib/content/databaseSafety.ts';
 import { compareSnapshots, countRecords, formatParityReport, parityReportIsClean } from './compare-content-sources.mts';
 import { exitCli, isDirectRun, parseArgs } from './contentCliSupport.mts';
 import {
@@ -55,6 +56,7 @@ import {
   assertSnapshotStoreAllowed,
   checkImportOutcome,
   isLocalDatabaseHost,
+  looksLikeThrowawayDatabaseName,
   readRestoreTargetIdentity,
   recordRestoredBaseline,
   verifyBaselineBeforeRestore,
@@ -887,6 +889,9 @@ const HELP = [
   '  --media-dir <dir>             media のバイト列の読み取り元（restore 元 store 相当）',
   '  --media-store-dir <dir>       書き込み先 media store（既定 ./media）。空DB+既存storeを検出する',
   '  --admin-email / --admin-password / --bootstrap-admin / --i-know-this-is-production',
+  '  --i-know-this-is-a-persistent-local-database',
+  '                                 throwaway 名でない local DATABASE_URL（例: deploid_dev）への',
+  '                                 raw --input restore / 書き込みを許可する',
   '',
 ].join('\n');
 
@@ -1067,6 +1072,8 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
     hasManifest: typeof manifestPath === 'string',
     hasRawInput: typeof inputPath === 'string',
     isLocalHost: isLocalDatabaseHost(databaseUrl),
+    looksLikeThrowawayName: looksLikeThrowawayDatabaseName(databaseUrl),
+    confirmedPersistentLocalDatabase: args.has(PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG),
     explicitTestMode: args.has('test-mode'),
     nodeEnv: process.env.NODE_ENV,
   });

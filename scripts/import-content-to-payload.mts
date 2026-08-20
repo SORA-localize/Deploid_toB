@@ -49,6 +49,12 @@ import { realpathSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { Payload } from 'payload';
+import {
+  assertWritableDatabaseUrl,
+  classifyDatabaseUrl,
+  PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG,
+  PRODUCTION_CONFIRMATION_FLAG,
+} from '../lib/content/databaseSafety.ts';
 import type { ContentSnapshot } from '../lib/content/contracts.ts';
 import type { ImageAsset, MediaAsset, PublishStatus, RightsMeta } from '../lib/content/domainTypes.ts';
 import {
@@ -1163,31 +1169,34 @@ export function createBaselineMediaFileResolver(args: {
 
 // ─── DB / 認証まわりの共通ヘルパ（restore 側も使う） ─────────────────────────
 
-const LOCAL_DATABASE_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
-
 /**
- * importer は破壊的（既存レコードを update する）。既定では local throwaway Postgres 以外を
- * 拒否し、本番（Supabase）へ流すときだけ `--i-know-this-is-production` を明示的に要求する。
- * Task 9 の cutover はこの flag を意図的に付けて実行する。
+ * importer は破壊的（既存レコードを update する）。remediation group 4（2026-08-20の外部監査）
+ * 以降、判定ロジックの実体は `lib/content/databaseSafety.ts` の `assertWritableDatabaseUrl`
+ * （3分岐: remote host は `--i-know-this-is-production` 必須／local + throwaway 名は無条件許可／
+ * local + 非throwaway 名（`deploid_dev` 等）は `--i-know-this-is-a-persistent-local-database`
+ * 必須）。以前は「local host なら無条件で許可」だったため、`.env.local` の既定 `DATABASE_URL`
+ * （`deploid_dev`）へ明示指定を忘れたまま `content:import` を実行すると確認なしに destructive な
+ * upsert が走った——これが2026-08-20のインシデントと同種の脆弱性として外部監査で指摘された。
  */
 export function assertWritableDatabase(args: Map<string, string | true>, callerFile: string): void {
   const raw = process.env.DATABASE_URL;
-  if (!raw) throw new Error(`DATABASE_URL is not set. ${callerFile} needs an explicit target database.`);
-  let host: string;
-  try {
-    host = new URL(raw).hostname;
-  } catch {
-    throw new Error('DATABASE_URL is not a valid connection URL.');
+  assertWritableDatabaseUrl({
+    raw,
+    callerFile,
+    confirmedProduction: args.has(PRODUCTION_CONFIRMATION_FLAG),
+    confirmedPersistentLocalDatabase: args.has(PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG),
+  });
+  if (raw) {
+    const classification = classifyDatabaseUrl(raw);
+    if (!classification.isLocalHost) {
+      process.stderr.write(`WARNING: writing to non-local database host "${classification.host}" (explicitly confirmed).\n`);
+    } else if (!classification.looksLikeThrowawayName) {
+      process.stderr.write(
+        `WARNING: writing to local database "${classification.databaseName}" whose name is not recognizably ` +
+          'throwaway (explicitly confirmed).\n',
+      );
+    }
   }
-  if (LOCAL_DATABASE_HOSTS.has(host)) return;
-  if (args.has('i-know-this-is-production')) {
-    process.stderr.write(`WARNING: writing to non-local database host "${host}" (explicitly confirmed).\n`);
-    return;
-  }
-  throw new Error(
-    `Refusing to write to DATABASE_URL host "${host}". ${callerFile} performs destructive upserts. ` +
-      'Pass --i-know-this-is-production to target a managed database (Task 9 cutover only).',
-  );
 }
 
 /**
@@ -1216,11 +1225,10 @@ export async function resolveImportUser(
   });
 
   if (existing.docs.length === 0) {
-    const host = new URL(process.env.DATABASE_URL as string).hostname;
     if (!args.has('bootstrap-admin')) {
       throw new Error(`No admin with email "${email}" exists. Pass --bootstrap-admin to create one (local databases only).`);
     }
-    if (!LOCAL_DATABASE_HOSTS.has(host)) {
+    if (!classifyDatabaseUrl(process.env.DATABASE_URL as string).isLocalHost) {
       throw new Error('--bootstrap-admin is only allowed against a local throwaway database.');
     }
     // 1人目の admin は Task 2 の bootstrap で platform-admin へ強制される。
@@ -1271,6 +1279,9 @@ async function main(): Promise<void> {
         '  --admin-email / --admin-password  書き込みに使う admin（env でも可）',
         '  --bootstrap-admin             admin が無い場合に作る（local DB のみ）',
         '  --i-know-this-is-production   local 以外の DATABASE_URL への書き込みを許可する',
+        '  --i-know-this-is-a-persistent-local-database',
+        '                                 throwaway 名でない local DATABASE_URL（例: deploid_dev）',
+        '                                 への書き込みを許可する',
         '',
         '空DBへ export 済み snapshot を書き戻すのは content:restore（同じ upsert を使う）。',
         '',

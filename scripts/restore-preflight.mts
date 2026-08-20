@@ -13,6 +13,7 @@
  * 書き込みは始まっていない。
  */
 import type { Payload } from 'payload';
+import { classifyDatabaseUrl, PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG } from '../lib/content/databaseSafety.ts';
 import type { ContentSnapshot } from '../lib/content/contracts.ts';
 import { collectBrokenReferences, countRecords } from './compare-content-sources.mts';
 import {
@@ -60,8 +61,6 @@ export interface RestoreTargetIdentity {
   isLocalHost: boolean;
 }
 
-const LOCAL_DATABASE_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
-
 /**
  * `DATABASE_URL` → 資源識別子。**password / secret を一切含めない**形にする
  * （manifest とログへ載るため）。Supabase の transaction pooler は host が project 間で
@@ -74,8 +73,14 @@ export function databaseResourceId(databaseUrl: string): string {
   return `${url.hostname}:${url.port || '5432'}/${database}${projectRef ? `#${projectRef}` : ''}`;
 }
 
+/** host判定は `lib/content/databaseSafety.ts` の分類ロジックを唯一の正本として使う。 */
 export function isLocalDatabaseHost(databaseUrl: string): boolean {
-  return LOCAL_DATABASE_HOSTS.has(new URL(databaseUrl).hostname);
+  return classifyDatabaseUrl(databaseUrl).isLocalHost;
+}
+
+/** DB名がthrowaway用途だと明示的に読み取れるか。同じく `lib/content/databaseSafety.ts` が正本。 */
+export function looksLikeThrowawayDatabaseName(databaseUrl: string): boolean {
+  return classifyDatabaseUrl(databaseUrl).looksLikeThrowawayName;
 }
 
 /** 環境ごとの private audit blob store ID（`lib/payload/access.ts` と同じ env var 名）。 */
@@ -193,11 +198,23 @@ export async function readRestoreTargetIdentity(
  * 以前の `assertWritableDatabase` は「localhost か、さもなくば `--i-know-this-is-production`」
  * だけを見ていた。flag は**入力の素性を一切保証しない**ので、これ単独では
  * 「未署名 JSON を production へ流す」を止められない。
+ *
+ * remediation group 4（2026-08-20の外部監査）: raw `--input` を許す local host の判定が
+ * `isLocalHost`（host だけ）だったため、`.env.local` の既定 `DATABASE_URL`（`deploid_dev`）へ
+ * 明示指定を忘れたまま `content:restore --input` を実行すると、確認なしに未署名 JSON が
+ * developer の永続devDB へ流れ得た。`lib/content/databaseSafety.ts` の分類と同じ3分岐へ直す:
+ * local + throwaway 名は無条件許可（変更なし）、local + 非throwaway 名（`deploid_dev` 等）は
+ * `--i-know-this-is-a-persistent-local-database` を要求する（新設）。remote host の扱い
+ * （`--manifest` 必須。raw `--input` は test-mode 経路のみ）は変更しない。
  */
 export function assertRestoreInputModeAllowed(args: {
   hasManifest: boolean;
   hasRawInput: boolean;
   isLocalHost: boolean;
+  /** DB名がthrowaway用途だと明示的に読み取れるか（`isLocalHost`がtrueのときだけ意味を持つ）。 */
+  looksLikeThrowawayName: boolean;
+  /** `--i-know-this-is-a-persistent-local-database` が渡されたか。 */
+  confirmedPersistentLocalDatabase: boolean;
   explicitTestMode: boolean;
   /** `process.env.NODE_ENV`。`--test-mode` は単独では効かない（下記 Critical #1）。 */
   nodeEnv?: string;
@@ -209,7 +226,17 @@ export function assertRestoreInputModeAllowed(args: {
     throw new Error('content:restore requires --manifest <signed-envelope.json> (or --input for a local throwaway DB).');
   }
   if (args.hasManifest) return;
-  if (args.isLocalHost) return;
+  if (args.isLocalHost) {
+    if (args.looksLikeThrowawayName) return;
+    if (args.confirmedPersistentLocalDatabase) return;
+    throw new Error(
+      'restore-raw-input-refused: --input accepts an unsigned snapshot file. This database is local, but its ' +
+        'name is not recognizably throwaway (does not contain "test", "throwaway", or "e2e") — it may be a known ' +
+        `persistent database such as the developer's local dev DB (deploid_dev). If restoring an unsigned ` +
+        `snapshot into it is intentional, pass --${PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG} to confirm. ` +
+        'Restoring into a managed database requires --manifest <signed-envelope.json> instead.',
+    );
+  }
 
   // review fix round 1 / Critical #1: `--test-mode` を**操作者がタイプするだけでは主張できない
   // 事実**へ紐付ける。

@@ -105,6 +105,8 @@ describe('restore input mode (必須修正6-1 / 6-2)', () => {
       hasManifest: false,
       hasRawInput: false,
       isLocalHost: false,
+      looksLikeThrowawayName: false,
+      confirmedPersistentLocalDatabase: false,
       explicitTestMode: false,
       ...overrides,
     });
@@ -114,7 +116,32 @@ describe('restore input mode (必須修正6-1 / 6-2)', () => {
   });
 
   it('allows an unsigned raw --input against a local throwaway database', () => {
-    expect(() => call({ hasRawInput: true, isLocalHost: true })).not.toThrow();
+    expect(() => call({ hasRawInput: true, isLocalHost: true, looksLikeThrowawayName: true })).not.toThrow();
+  });
+
+  /**
+   * remediation group 4（2026-08-20の外部監査）: local host であるだけでは raw `--input` を
+   * 通さない。DB名がthrowaway用途だと読み取れない（`deploid_dev`等）なら、明示的な
+   * `--i-know-this-is-a-persistent-local-database` が無い限り拒否する。
+   */
+  it('refuses an unsigned raw --input against a local database whose name is not recognizably throwaway', () => {
+    expect(() =>
+      call({ hasRawInput: true, isLocalHost: true, looksLikeThrowawayName: false }),
+    ).toThrow(/restore-raw-input-refused/);
+    expect(() =>
+      call({ hasRawInput: true, isLocalHost: true, looksLikeThrowawayName: false }),
+    ).toThrow(/i-know-this-is-a-persistent-local-database/);
+  });
+
+  it('allows an unsigned raw --input against a local persistent database once explicitly confirmed', () => {
+    expect(() =>
+      call({
+        hasRawInput: true,
+        isLocalHost: true,
+        looksLikeThrowawayName: false,
+        confirmedPersistentLocalDatabase: true,
+      }),
+    ).not.toThrow();
   });
 
   /**
@@ -377,6 +404,94 @@ describe('restore/export enforcement against a real throwaway database', () => {
       const output = `${result.stdout}${result.stderr}`;
       expect(output).toMatch(/restore-raw-input-refused/);
       expect(output).toMatch(/identifies itself as "preview"/);
+    } finally {
+      await dropThrowawayDatabase(ambient, dbName);
+    }
+  }, 300_000);
+
+  /**
+   * remediation group 4（P0, 2026-08-20の外部監査）の統合テスト。
+   *
+   * 以前の `assertRestoreInputModeAllowed()` は raw `--input` を「local host かどうか」だけで
+   * 判定していた。`.env.local` の既定 `DATABASE_URL`（`deploid_dev`。developerの永続devDB）へ
+   * 明示指定を忘れたまま `content:restore --input` を実行すると、確認なしに未署名 JSON が
+   * そのまま書き込めた——2026-08-20のtest suiteインシデントと同種の脆弱性。
+   *
+   * `deploid_dev` そのものには触れず、throwaway 名でない別のlocal DB名で同じ経路を再現する。
+   */
+  it('refuses a raw --input restore into a local database whose name is not recognizably throwaway', async () => {
+    const dbName = 'deploid_manual_probe_restore';
+    await createThrowawayDatabase(ambient, dbName);
+    const targetUrl = withDatabaseName(ambient, dbName);
+    try {
+      expect(runPayloadCli(['migrate'], { DATABASE_URL: targetUrl, PAYLOAD_SECRET }).status).toBe(0);
+
+      const snapshotPath = path.join(
+        await mkdtemp(path.join(os.tmpdir(), 'deploid-manual-probe-restore-')),
+        'snapshot.json',
+      );
+      await writeFile(snapshotPath, canonicalJson(EMPTY_SNAPSHOT), 'utf8');
+
+      const result = runTsxScript(
+        'scripts/export-content-snapshot.mts',
+        ['--restore', '--input', snapshotPath, '--bootstrap-admin', '--admin-email', ADMIN_EMAIL, '--admin-password', ADMIN_PASSWORD],
+        { DATABASE_URL: targetUrl, PAYLOAD_SECRET },
+        120_000,
+      );
+
+      expect(result.status).not.toBe(0);
+      const output = `${result.stdout}${result.stderr}`;
+      expect(output).toMatch(/restore-raw-input-refused/);
+      expect(output).toMatch(/i-know-this-is-a-persistent-local-database/);
+
+      // 本当に1行も書いていない。
+      const client = new Client({ connectionString: targetUrl });
+      await client.connect();
+      try {
+        const { rows } = await client.query('select count(*)::int as count from "admins"');
+        expect(rows[0].count, 'a refused restore must leave admins untouched').toBe(0);
+      } finally {
+        await client.end();
+      }
+    } finally {
+      await dropThrowawayDatabase(ambient, dbName);
+    }
+  }, 300_000);
+
+  it('allows the same raw --input restore once --i-know-this-is-a-persistent-local-database is passed', async () => {
+    const dbName = 'deploid_manual_probe_restore_confirmed';
+    await createThrowawayDatabase(ambient, dbName);
+    const targetUrl = withDatabaseName(ambient, dbName);
+    try {
+      expect(runPayloadCli(['migrate'], { DATABASE_URL: targetUrl, PAYLOAD_SECRET }).status).toBe(0);
+
+      const snapshotPath = path.join(
+        await mkdtemp(path.join(os.tmpdir(), 'deploid-manual-probe-restore-')),
+        'snapshot.json',
+      );
+      await writeFile(snapshotPath, canonicalJson(EMPTY_SNAPSHOT), 'utf8');
+
+      const result = runTsxScript(
+        'scripts/export-content-snapshot.mts',
+        [
+          '--restore', '--input', snapshotPath,
+          '--bootstrap-admin', '--admin-email', ADMIN_EMAIL, '--admin-password', ADMIN_PASSWORD,
+          '--i-know-this-is-a-persistent-local-database',
+        ],
+        { DATABASE_URL: targetUrl, PAYLOAD_SECRET },
+        120_000,
+      );
+
+      expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+
+      const client = new Client({ connectionString: targetUrl });
+      await client.connect();
+      try {
+        const { rows } = await client.query('select count(*)::int as count from "admins"');
+        expect(rows[0].count, 'the confirmed restore must actually bootstrap the admin').toBeGreaterThan(0);
+      } finally {
+        await client.end();
+      }
     } finally {
       await dropThrowawayDatabase(ambient, dbName);
     }

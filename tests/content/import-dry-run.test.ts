@@ -563,6 +563,91 @@ describe('content:import against real throwaway databases', () => {
     expect(output).toMatch(/skip-media-refused/);
     expect(output).not.toMatch(/ENOTFOUND|ECONNREFUSED|getaddrinfo/);
   }, 180_000);
+
+  /**
+   * remediation group 4（P0, 2026-08-20の外部監査）の統合テスト。
+   *
+   * 以前の `assertWritableDatabase()` は「local host かどうか」だけを見ていた
+   * （`if (LOCAL_DATABASE_HOSTS.has(host)) return;`）。`.env.local` の既定 `DATABASE_URL`
+   * （`deploid_dev`。developerの永続devDB）へ明示指定を忘れたまま `content:import` を実行すると、
+   * 確認なしに destructive な upsert がそのまま走った——これは2026-08-20の
+   * test suiteインシデント（throwaway DB guardのhost-only判定によりdeploid_devの実データが
+   * 失われた事故）と同種の脆弱性として外部監査で指摘された。
+   *
+   * `deploid_dev` そのものには触れず（読み取り専用の拒否確認は別途手動で行う）、throwaway 名
+   * でない別のlocal DB名（`deploid_manual_probe_*`）で同じ経路を再現する。
+   */
+  it('refuses to write to a local database whose name is not recognizably throwaway, without confirmation', async () => {
+    const dbName = 'deploid_manual_probe_import';
+    await createThrowawayDatabase(ambient, dbName);
+    const targetUrl = withDatabaseName(ambient, dbName);
+    try {
+      expect(runPayloadCli(['migrate'], { DATABASE_URL: targetUrl, PAYLOAD_SECRET }).status).toBe(0);
+
+      const result = runTsxScript(
+        'scripts/import-content-to-payload.mts',
+        ['--bootstrap-admin', '--admin-email', 'manual-probe@example.com', '--admin-password', 'Str0ngPassw0rd!23'],
+        { DATABASE_URL: targetUrl, PAYLOAD_SECRET },
+        180_000,
+      );
+      expect(result.status).not.toBe(0);
+      const output = `${result.stdout}${result.stderr}`;
+      expect(output).toMatch(/i-know-this-is-a-persistent-local-database/);
+
+      const client = new Client({ connectionString: targetUrl });
+      await client.connect();
+      try {
+        const { rows } = await client.query('select count(*)::int as count from "admins"');
+        expect(rows[0].count, 'a refused import must leave admins untouched').toBe(0);
+      } finally {
+        await client.end();
+      }
+    } finally {
+      await dropThrowawayDatabase(ambient, dbName);
+    }
+  }, 300_000);
+
+  it('writes once --i-know-this-is-a-persistent-local-database is passed', async () => {
+    const dbName = 'deploid_manual_probe_import_confirmed';
+    await createThrowawayDatabase(ambient, dbName);
+    const targetUrl = withDatabaseName(ambient, dbName);
+    // 既定の `--media-store-dir`（`./media`）は実 repo の media store で、real content の
+    // filenameを既に持っている。この test は「writable-database gate をflagで通過できるか」
+    // だけを見たいので、必須修正8-8の空DB+既存media store preflight（別のgate）と衝突しない
+    // よう、空のtemp dirを明示的に渡す。
+    const mediaStoreDir = await mkdtemp(path.join(os.tmpdir(), 'deploid-manual-probe-media-'));
+    try {
+      expect(runPayloadCli(['migrate'], { DATABASE_URL: targetUrl, PAYLOAD_SECRET }).status).toBe(0);
+
+      const result = runTsxScript(
+        'scripts/import-content-to-payload.mts',
+        [
+          '--bootstrap-admin', '--admin-email', 'manual-probe@example.com', '--admin-password', 'Str0ngPassw0rd!23',
+          '--media-store-dir', mediaStoreDir,
+          '--i-know-this-is-a-persistent-local-database',
+        ],
+        { DATABASE_URL: targetUrl, PAYLOAD_SECRET },
+        180_000,
+      );
+      const output = `${result.stdout}${result.stderr}`;
+      // gate自体を通過したことの直接証拠（gateが働いていることは上の「拒否」testで確認済み）。
+      expect(output).toMatch(/WARNING: writing to local database "deploid_manual_probe_import_confirmed"/);
+      expect(output).not.toMatch(/Refusing to write/);
+      expect(result.status, output).toBe(0);
+
+      const client = new Client({ connectionString: targetUrl });
+      await client.connect();
+      try {
+        const { rows } = await client.query('select count(*)::int as count from "admins"');
+        expect(rows[0].count, 'the confirmed import must actually write').toBeGreaterThan(0);
+      } finally {
+        await client.end();
+      }
+    } finally {
+      await rm(mediaStoreDir, { recursive: true, force: true });
+      await dropThrowawayDatabase(ambient, dbName);
+    }
+  }, 300_000);
 });
 
 // ─── 必須修正8-9: 2回流して同じ結果になること ────────────────────────────
