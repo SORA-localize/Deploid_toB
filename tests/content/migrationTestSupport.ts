@@ -22,21 +22,44 @@ import { Client } from 'pg';
 
 const LOCAL_DATABASE_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
 
+/**
+ * 既知の共有/永続DB名。この関数がチェックするのはambient DATABASE_URL（maintenance接続用に
+ * host/port/user/passwordだけ再利用する起点）だが、`tests/content/testDbGuard.ts`と同じ
+ * インシデント（host判定だけでは`deploid_dev`のようなlocalhost上の永続DBを弾けない）の
+ * 再発防止として、こちらもDB名を検査する（2026-08-20発生）。
+ */
+const KNOWN_NON_THROWAWAY_DATABASE_NAMES = new Set(['deploid_dev', 'postgres']);
+const THROWAWAY_DATABASE_NAME_PATTERN = /test|throwaway|e2e/i;
+
 export function assertLocalThrowawayDatabase(callerFile: string, databaseUrl: string | undefined): void {
   if (!databaseUrl) {
     throw new Error(`DATABASE_URL is not set. ${callerFile} creates/drops throwaway Postgres databases and must only ever run against a local Postgres server.`);
   }
-  let host: string;
+  let url: URL;
   try {
-    host = new URL(databaseUrl).hostname;
+    url = new URL(databaseUrl);
   } catch {
     throw new Error(`DATABASE_URL is not a valid connection URL: ${databaseUrl.slice(0, 20)}...`);
   }
+  const host = url.hostname;
   if (!LOCAL_DATABASE_HOSTS.has(host)) {
     throw new Error(
       `Refusing to run ${callerFile} against DATABASE_URL host "${host}". This suite creates and drops ` +
         `whole Postgres databases and only runs against a local throwaway Postgres server (host in ` +
         `${[...LOCAL_DATABASE_HOSTS].join(', ')}), never against a shared/managed database such as Supabase.`,
+    );
+  }
+  const databaseName = url.pathname.replace(/^\//, '');
+  if (
+    KNOWN_NON_THROWAWAY_DATABASE_NAMES.has(databaseName) ||
+    !THROWAWAY_DATABASE_NAME_PATTERN.test(databaseName)
+  ) {
+    throw new Error(
+      `Refusing to run ${callerFile} with ambient DATABASE_URL database "${databaseName}". This suite creates ` +
+        'and drops whole Postgres databases derived from this connection string and only runs when the ' +
+        'ambient database name is explicitly throwaway (must contain "test", "throwaway", or "e2e"; localhost ' +
+        `alone is not sufficient — "${databaseName}" may be a shared/persistent database such as the ` +
+        "developer's local dev DB).",
     );
   }
 }
