@@ -2,6 +2,7 @@ import { type ChildProcessWithoutNullStreams, spawn, spawnSync } from 'node:chil
 import { createServer } from 'node:net';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
+import type { Payload } from 'payload';
 import { Client as PgClient } from 'pg';
 
 /**
@@ -60,6 +61,54 @@ export async function createThrowawayDatabase(ambientDatabaseUrl: string, dbName
 export async function dropThrowawayDatabase(ambientDatabaseUrl: string, dbName: string): Promise<void> {
   await withMaintenanceClient(ambientDatabaseUrl, async (client) => {
     await client.query(`DROP DATABASE IF EXISTS "${dbName}" WITH (FORCE)`);
+  });
+}
+
+/**
+ * Task 8 fix round 3: `npm run test:integration` のexit codeが（アサーションは12/12 PASSなのに）
+ * 3/3回とも1になる問題の実体を修正する。
+ *
+ * 根本原因は「teardownの順序（`stopAppServer` → `destroy()` → `dropThrowawayDatabase()`）が
+ * 崩れていた」ことでも「`destroy()`のPromiseをawaitし忘れていた」ことでもなかった
+ * （どちらも既に正しく実装されていた）。実際に`payload.destroy()`のソース
+ * （`node_modules/@payloadcms/drizzle/dist/destroy.js`）を読み、`getPayload()`で取得した
+ * インスタンスに対して直接検証したところ、次の2点が判明した:
+ *
+ * 1. `payload.destroy()` は `this.pool`（`@payloadcms/db-postgres` が保持する生の `pg.Pool`）を
+ *    一切 `end()` しない。内部のschema/drizzle参照をクリアするだけで、実際のPostgres
+ *    connectionはpool内にidleなまま残り続ける（`payload.destroy()`を呼んだ直後に
+ *    `pg_stat_activity`を見ても接続数は減らないことを実機で確認済み）。
+ * 2. だからといって`payload.db.pool.end()`を明示的に呼んで待つのも解決策にならない。
+ *    `@payloadcms/db-postgres`の`connect.js`内`connectWithReconnect()`は、起動時に
+ *    `pool.connect()`したconnectionを**意図的に一度もreleaseしない**（ECONNRESET検知用の
+ *    「見張り」connectionとして保持し続ける設計）。そのため`pool.end()`は「全clientが
+ *    poolへ返却されるまで待つ」という通常のpg-pool仕様どおり、その見張りconnectionの解放を
+ *    永遠に待ち続けてhangする（実機で2分以上hangすることを確認済み——これは exit code 1 より
+ *    悪い結果になる）。
+ *
+ * 実際に起きていた事象は、node-postgres自体が公式docsで明記している既知の挙動だった:
+ * `pg.Pool`はidleなclientがfatalな切断（今回のケースでは、teardownの
+ * `dropThrowawayDatabase()`自身が発行する`DROP DATABASE ... WITH (FORCE)`がpoolに残っていた
+ * idle connectionを強制切断し、`57P01 terminating connection due to administrator command`を
+ * 引き起こす）を受け取ると、そのpoolに`error` listenerが1つも登録されていない場合、
+ * Node自体への「unhandled 'error' event」としてthrowする
+ * （https://node-postgres.com/apis/pool: "you should register a listener on the pool to catch
+ * errors... if you don't attach a listener... your program will crash"）。
+ * `@payloadcms/db-postgres`の`connect.js`は個々のclientへ`prependListener('error', ...)`を
+ * 付けてはいるが、**pool全体に対する`error` listenerは一切登録していない**——このsuiteが
+ * 使う`getPayload()`で得たインスタンスのpoolはguardなしのままだった。
+ *
+ * 修正は「poolを閉じ切るのを待つ」ではなく、node-postgresが要求する標準的な安全策——
+ * **poolへ`error` listenerを1つ登録し、teardown中に意図して発生させる切断由来の`error`
+ * イベントを、processを巻き込まずに処理する**——である。`beforeAll`で`setupPayload`を
+ * 取得した直後に呼び出すことで、テスト実行中〜teardownまでの全期間をこのguardの対象にする。
+ */
+export function guardPayloadPoolErrors(payload: Payload): void {
+  const pool = (payload as unknown as { db?: { pool?: { on: (event: 'error', listener: (err: unknown) => void) => void } } }).db?.pool;
+  if (!pool) return;
+  pool.on('error', (err: unknown) => {
+    const code = (err as { code?: string } | undefined)?.code;
+    console.log(`[mcpIntegrationSupport] swallowed expected pool 'error' event during teardown (code: ${code ?? 'unknown'})`);
   });
 }
 

@@ -7,6 +7,7 @@ import {
   createThrowawayDatabase,
   dropThrowawayDatabase,
   findFreePort,
+  guardPayloadPoolErrors,
   runPayloadMigrate,
   startAppServer,
   stopAppServer,
@@ -125,6 +126,14 @@ describe('Real MCP transport (next dev + StreamableHTTPClientTransport) enforces
     const { default: config } = await import('../../payload.config');
     setupPayload = await getPayload({ config });
     mark('setupPayload connected (dev-mode schema push complete)');
+
+    // fix round 3: `payload.destroy()` は下回りの `pg.Pool` を閉じない（destroy.jsを参照)、かつ
+    // このpoolにはPayload/db-postgres側で `error` listenerが付いていないため、teardownの
+    // `dropThrowawayDatabase()` が発行する `DROP DATABASE ... WITH (FORCE)` がpool内に残っていた
+    // idle connectionを強制切断すると、guardなしのpoolがそれをunhandled 'error' eventとして
+    // processへ投げ、アサーションは全PASSするのにexit codeだけ1になっていた（詳細は
+    // `mcpIntegrationSupport.ts` の `guardPayloadPoolErrors` docblock参照）。
+    guardPayloadPoolErrors(setupPayload);
 
     const owner = await setupPayload.create({
       collection: 'admins',
