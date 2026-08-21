@@ -17,15 +17,29 @@ Production/Previewへ向けて使わない。
 
 ## 1. 日常のコマンド
 
-`package.json` scripts（すべて `payload` CLIの薄いラッパー）:
+`package.json` scripts:
 
 | script | 中身 | 用途 |
 |---|---|---|
-| `npm run payload:migrate` | `payload migrate` | 未適用のmigrationをすべて適用する |
-| `npm run payload:migrate:create -- <name>` | `payload migrate:create <name>` | 現在のcollections/globalsの定義と、`migrations/`内の最新snapshotとの差分からmigrationを生成する |
-| `npm run payload:migrate:down` | `payload migrate:down` | 直近のbatch（複数ファイルなら複数）を一括で巻き戻す |
-| `npm run payload:migrate:status` | `payload migrate:status` | 生成済みmigrationファイルそれぞれの適用状態（Yes/No）を表示する |
+| `npm run payload:migrate` | `tsx scripts/run-payload-migration-cli.mts -- migrate` | 未適用のmigrationをすべて適用する |
+| `npm run payload:migrate:create -- <name>` | `tsx scripts/run-payload-migration-cli.mts -- migrate:create <name>` | 現在のcollections/globalsの定義と、`migrations/`内の最新snapshotとの差分からmigrationを生成する |
+| `npm run payload:migrate:down` | `tsx scripts/run-payload-migration-cli.mts -- migrate:down` | 直近のbatch（複数ファイルなら複数）を一括で巻き戻す |
+| `npm run payload:migrate:status` | `tsx scripts/run-payload-migration-cli.mts -- migrate:status` | 生成済みmigrationファイルそれぞれの適用状態（Yes/No）を表示する |
 | `npm run environment:stamp -- --expected <preview\|production>` | `tsx scripts/stamp-environment.mts` | `_environment_marker`へ環境markerを冪等に書き込む |
+
+**2026-08-21 (remediation group 6) 追記**: 上記4つの`payload:migrate*`は、以前は`payload`
+CLI（`node_modules/.bin/payload`、実体は`payload/bin.js`）の薄いラッパーだった。
+`payload/bin.js`は`payload.config.ts`のtranspileにtsxの非同期worker-thread loaderを使うが、
+Node 22.12.0上ではこれが「短時間に子processを連続起動する」負荷下（CIの共有runnerや
+連続deploy）でNodeの event-loop-idle判定と競合し、`Warning: Detected unsettled top-level
+await`（exit code 13）で失敗することがある——実際にこのrepoのGitHub Actions上で複数回
+再現した実バグ（詳細は`.superpowers/sdd/content-platform-migration-plan-v1/
+remediation-group6-report.md`）。`patches/payload+3.87.1.patch`でこの競合自体への
+upstream側の対処（silent false-successの防止）は入れたが、競合の発生自体は止まらないため、
+4つの`payload:migrate*`は`scripts/run-payload-migration-cli.mts`
+（`payload`の公開API `payload.db.migrate()`等を直接呼ぶ、同じmigration機構への薄い
+ラッパーだが、tsx loaderの起動をprocess起動の最初に前倒しで一度だけ行う`tsx <script>`
+経路を使う）経由に切り替えた。コマンド名・挙動はユーザーから見て変化しない。
 
 **`migrationDir` は repo-root の `migrations/`固定。** `payload.config.ts`で明示的に
 `migrationDir: path.resolve(dirname, 'migrations')`を指定している。Payloadの既定解決
