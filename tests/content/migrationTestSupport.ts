@@ -145,6 +145,11 @@ export function runPayloadCli(args: string[], env: EnvOverride): CliResult {
     if (!isKnownBootstrapRace) {
       break;
     }
+    if (attempt < PAYLOAD_CLI_BOOTSTRAP_RACE_MAX_ATTEMPTS) {
+      console.warn(
+        `[runPayloadCli] known payload CLI bootstrap race (exit ${UNSETTLED_TOP_LEVEL_AWAIT_EXIT_CODE}) hit on attempt ${attempt}/${PAYLOAD_CLI_BOOTSTRAP_RACE_MAX_ATTEMPTS} for "payload ${args.join(' ')}", retrying`,
+      );
+    }
   }
   return {
     status: result!.status ?? -1,
