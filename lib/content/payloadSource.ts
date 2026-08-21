@@ -146,6 +146,27 @@ interface PayloadFindArgs {
   page?: number;
   /** 指定するとこの読み取りが `req.transactionID` のtransactionへ載る（`readSnapshot()` 用）。 */
   req?: SnapshotReadRequest;
+  /**
+   * Draft Mode配線（`LookupQuery.publishStatuses`に`'draft'`が含まれるとき）。`payload.find()`へ
+   * そのまま`draft: true`として渡す。
+   *
+   * これが要る理由: `_status: {equals: 'draft'}`という`where`句だけでは、**公開中documentの上に
+   * 積まれた未承認draft更新**を拾えない。Payloadのdraft機構では、公開済みdocumentへ
+   * `draft: true`のupdateを保存しても、main table row（通常のfindが見る場所）は書き換わらず
+   * `_status: 'published'`のまま残る——新しいdraft versionは`_versions`テーブルにだけ追加される
+   * （`node_modules/payload/dist/collections/operations/updateByID.js`、`lib/payload/access.ts`
+   * の`isDraftSave`コメント参照）。`draft: true`を渡すと、Payloadは`payload.db.queryDrafts()`
+   * （`node_modules/@payloadcms/drizzle/dist/queryDrafts.js`）で`_versions`テーブル側を
+   * `latest: true`条件で検索し、documentごとの**最新version**（draftであれpublishedであれ）を
+   * 返す——これが唯一、未承認draft更新の実際の中身を読める経路。
+   *
+   * ブランド新規（一度もpublishされていない）documentは、main rowが最初から`_status: 'draft'`
+   * なので`draft: true`を付けなくても`where`だけで見つかるが、`draft: true`を付けても同じ結果に
+   * なる（`queryDrafts`は常に`latest: true`のversionを返すため、一度もpublishされていない
+   * documentの最新versionはそのdocument自身と同じ）。両方のケースを同じ経路で扱うため常に
+   * `draft: true`を渡す。
+   */
+  draft?: boolean;
 }
 
 interface PayloadFindResult {
@@ -216,6 +237,7 @@ async function findPagedDocs(payload: Payload, args: PayloadFindArgs, pageSize: 
       depth: 0,
       overrideAccess: true,
       pagination: true,
+      draft: args.draft ?? false,
       ...req,
     })) as unknown as PayloadFindResult;
     return { docs: result.docs, totalDocs: result.totalDocs };
@@ -232,6 +254,7 @@ async function findPagedDocs(payload: Payload, args: PayloadFindArgs, pageSize: 
       depth: 0,
       overrideAccess: true,
       pagination: true,
+      draft: args.draft ?? false,
       ...req,
     })) as unknown as PayloadFindResult;
     docs.push(...result.docs);
@@ -407,18 +430,26 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
     return mapped;
   };
 
-  /** ID / slug / previousSlug の単発解決に共通の形。 */
+  /** ID / slug / previousSlug の単発解決に共通の形。`draft`は`wantsDraft(lookup)`から渡す。 */
   const findOne = async <TRecord>(
     collection: ContentCollectionSlug,
     where: Where,
     map: (doc: never, payload: Payload, cache: RelationshipResolutionCache) => Promise<TRecord> | TRecord,
+    draft = false,
   ): Promise<TRecord | null> => {
     const payload = await client();
-    const docs = await findDocs(payload, { collection, where, sort: ['stableId'], limit: 1, page: 1 }, RUNTIME_PAGE_SIZE);
+    const docs = await findDocs(
+      payload,
+      { collection, where, sort: ['stableId'], limit: 1, page: 1, draft },
+      RUNTIME_PAGE_SIZE,
+    );
     if (docs.length === 0) return null;
     const [record] = await mapAll(docs, map);
     return record ?? null;
   };
+
+  /** `LookupQuery.publishStatuses`に`'draft'`が含まれるか（`PayloadFindArgs.draft`のコメント参照）。 */
+  const wantsDraft = (lookup: LookupQuery): boolean => lookup.publishStatuses.includes('draft');
 
   const bySlugWhere = (slug: Slug, lookup: LookupQuery): Where =>
     andWhere([{ slug: { equals: slug } }, publishStatusWhere(lookup.publishStatuses)]);
@@ -547,9 +578,10 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
       );
       return listDocsPage('robots', where, query.sort, query.limit, query.page, mapRobot);
     },
-    findRobotById: (id, lookup) => findOne('robots', byIdWhere(id, lookup), mapRobot),
-    findRobotBySlug: (slug, lookup) => findOne('robots', bySlugWhere(slug, lookup), mapRobot),
-    findRobotByPreviousSlug: (slug, lookup) => findOne('robots', byPreviousSlugWhere(slug, lookup), mapRobot),
+    findRobotById: (id, lookup) => findOne('robots', byIdWhere(id, lookup), mapRobot, wantsDraft(lookup)),
+    findRobotBySlug: (slug, lookup) => findOne('robots', bySlugWhere(slug, lookup), mapRobot, wantsDraft(lookup)),
+    findRobotByPreviousSlug: (slug, lookup) =>
+      findOne('robots', byPreviousSlugWhere(slug, lookup), mapRobot, wantsDraft(lookup)),
 
     // ── robotSeries ───────────────────────────────────────────────────────
     async listRobotSeries(query: RobotSeriesSourceQuery): Promise<RobotSeries[]> {
@@ -560,10 +592,11 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
       );
       return mapAll(await listDocs('robot-series', where, query.sort, query.limit, query.page), mapRobotSeries);
     },
-    findRobotSeriesById: (id, lookup) => findOne('robot-series', byIdWhere(id, lookup), mapRobotSeries),
-    findRobotSeriesBySlug: (slug, lookup) => findOne('robot-series', bySlugWhere(slug, lookup), mapRobotSeries),
+    findRobotSeriesById: (id, lookup) => findOne('robot-series', byIdWhere(id, lookup), mapRobotSeries, wantsDraft(lookup)),
+    findRobotSeriesBySlug: (slug, lookup) =>
+      findOne('robot-series', bySlugWhere(slug, lookup), mapRobotSeries, wantsDraft(lookup)),
     findRobotSeriesByPreviousSlug: (slug, lookup) =>
-      findOne('robot-series', byPreviousSlugWhere(slug, lookup), mapRobotSeries),
+      findOne('robot-series', byPreviousSlugWhere(slug, lookup), mapRobotSeries, wantsDraft(lookup)),
 
     // ── manufacturers ─────────────────────────────────────────────────────
     async listManufacturers(query: ManufacturerSourceQuery): Promise<Manufacturer[]> {
@@ -584,10 +617,12 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
       ]);
       return listDocsPage('manufacturers', where, query.sort, query.limit, query.page, mapManufacturer);
     },
-    findManufacturerById: (id, lookup) => findOne('manufacturers', byIdWhere(id, lookup), mapManufacturer),
-    findManufacturerBySlug: (slug, lookup) => findOne('manufacturers', bySlugWhere(slug, lookup), mapManufacturer),
+    findManufacturerById: (id, lookup) =>
+      findOne('manufacturers', byIdWhere(id, lookup), mapManufacturer, wantsDraft(lookup)),
+    findManufacturerBySlug: (slug, lookup) =>
+      findOne('manufacturers', bySlugWhere(slug, lookup), mapManufacturer, wantsDraft(lookup)),
     findManufacturerByPreviousSlug: (slug, lookup) =>
-      findOne('manufacturers', byPreviousSlugWhere(slug, lookup), mapManufacturer),
+      findOne('manufacturers', byPreviousSlugWhere(slug, lookup), mapManufacturer, wantsDraft(lookup)),
 
     // ── distributors ──────────────────────────────────────────────────────
     async listDistributors(query: DistributorSourceQuery): Promise<Distributor[]> {
@@ -601,10 +636,12 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
       );
       return mapAll(await listDocs('distributors', where, query.sort, query.limit, query.page), mapDistributor);
     },
-    findDistributorById: (id, lookup) => findOne('distributors', byIdWhere(id, lookup), mapDistributor),
-    findDistributorBySlug: (slug, lookup) => findOne('distributors', bySlugWhere(slug, lookup), mapDistributor),
+    findDistributorById: (id, lookup) =>
+      findOne('distributors', byIdWhere(id, lookup), mapDistributor, wantsDraft(lookup)),
+    findDistributorBySlug: (slug, lookup) =>
+      findOne('distributors', bySlugWhere(slug, lookup), mapDistributor, wantsDraft(lookup)),
     findDistributorByPreviousSlug: (slug, lookup) =>
-      findOne('distributors', byPreviousSlugWhere(slug, lookup), mapDistributor),
+      findOne('distributors', byPreviousSlugWhere(slug, lookup), mapDistributor, wantsDraft(lookup)),
 
     // ── useCases ──────────────────────────────────────────────────────────
     async listUseCases(query: UseCaseSourceQuery): Promise<UseCase[]> {
@@ -629,9 +666,10 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
       );
       return listDocsPage('use-cases', where, query.sort, query.limit, query.page, mapUseCase);
     },
-    findUseCaseById: (id, lookup) => findOne('use-cases', byIdWhere(id, lookup), mapUseCase),
-    findUseCaseBySlug: (slug, lookup) => findOne('use-cases', bySlugWhere(slug, lookup), mapUseCase),
-    findUseCaseByPreviousSlug: (slug, lookup) => findOne('use-cases', byPreviousSlugWhere(slug, lookup), mapUseCase),
+    findUseCaseById: (id, lookup) => findOne('use-cases', byIdWhere(id, lookup), mapUseCase, wantsDraft(lookup)),
+    findUseCaseBySlug: (slug, lookup) => findOne('use-cases', bySlugWhere(slug, lookup), mapUseCase, wantsDraft(lookup)),
+    findUseCaseByPreviousSlug: (slug, lookup) =>
+      findOne('use-cases', byPreviousSlugWhere(slug, lookup), mapUseCase, wantsDraft(lookup)),
 
     // ── deployments ───────────────────────────────────────────────────────
     async listDeployments(query: DeploymentSourceQuery): Promise<DeploymentSite[]> {
@@ -646,10 +684,11 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
       );
       return mapAll(await listDocs('deployments', where, query.sort, query.limit, query.page), mapDeployment);
     },
-    findDeploymentById: (id, lookup) => findOne('deployments', byIdWhere(id, lookup), mapDeployment),
-    findDeploymentBySlug: (slug, lookup) => findOne('deployments', bySlugWhere(slug, lookup), mapDeployment),
+    findDeploymentById: (id, lookup) => findOne('deployments', byIdWhere(id, lookup), mapDeployment, wantsDraft(lookup)),
+    findDeploymentBySlug: (slug, lookup) =>
+      findOne('deployments', bySlugWhere(slug, lookup), mapDeployment, wantsDraft(lookup)),
     findDeploymentByPreviousSlug: (slug, lookup) =>
-      findOne('deployments', byPreviousSlugWhere(slug, lookup), mapDeployment),
+      findOne('deployments', byPreviousSlugWhere(slug, lookup), mapDeployment, wantsDraft(lookup)),
 
     // ── articles ──────────────────────────────────────────────────────────
     async listArticles(query: ArticleSourceQuery): Promise<Article[]> {
@@ -676,9 +715,10 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
       );
       return listDocsPage('articles', where, query.sort, query.limit, query.page, mapArticle);
     },
-    findArticleById: (id, lookup) => findOne('articles', byIdWhere(id, lookup), mapArticle),
-    findArticleBySlug: (slug, lookup) => findOne('articles', bySlugWhere(slug, lookup), mapArticle),
-    findArticleByPreviousSlug: (slug, lookup) => findOne('articles', byPreviousSlugWhere(slug, lookup), mapArticle),
+    findArticleById: (id, lookup) => findOne('articles', byIdWhere(id, lookup), mapArticle, wantsDraft(lookup)),
+    findArticleBySlug: (slug, lookup) => findOne('articles', bySlugWhere(slug, lookup), mapArticle, wantsDraft(lookup)),
+    findArticleByPreviousSlug: (slug, lookup) =>
+      findOne('articles', byPreviousSlugWhere(slug, lookup), mapArticle, wantsDraft(lookup)),
 
     // ── articlePlacements ─────────────────────────────────────────────────
     async listArticlePlacements(query: ArticlePlacementSourceQuery): Promise<ArticlePlacement[]> {
@@ -694,7 +734,8 @@ export function createPayloadContentSource(options: PayloadContentSourceOptions 
       );
       return mapAll(await listDocs('article-placements', where, query.sort, query.limit, query.page), mapPlacement);
     },
-    findArticlePlacementById: (id, lookup) => findOne('article-placements', byIdWhere(id, lookup), mapPlacement),
+    findArticlePlacementById: (id, lookup) =>
+      findOne('article-placements', byIdWhere(id, lookup), mapPlacement, wantsDraft(lookup)),
 
     // ── media ─────────────────────────────────────────────────────────────
     async listMedia(query: MediaSourceQuery): Promise<MediaAsset[]> {

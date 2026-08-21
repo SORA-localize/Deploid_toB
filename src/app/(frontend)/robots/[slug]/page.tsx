@@ -13,6 +13,10 @@ import { RobotSpecExplorer } from '@/components/RobotSpecExplorer';
 import { RobotStickyAside } from '@/components/RobotStickyAside';
 import { SourceList } from '@/components/SourceList';
 import { contentTags } from '@/lib/content/cacheTags';
+import { resolveDraftAwarePageData } from '@/lib/content/draftAwarePageData';
+import type { ContentRepository } from '@/lib/content/createContentRepository';
+import type { SlugResolution } from '@/lib/content/contracts';
+import type { Robot } from '@/lib/content/domainTypes';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { sortRobots } from '@/lib/display';
 import { shouldIndexRobot } from '@/lib/indexing';
@@ -40,11 +44,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // generateMetadataでcache有無が食い違い、Cache Componentsが
   // "generateMetadata depends on uncached data when the rest of the route does not" として
   // build失敗させる（CONTENT_SOURCE=payload構成で実機確認済み）。同じcached関数を共有する。
-  const data = await getCachedRobotDetailData(slug);
+  // draft mode配線後も同様の理由で、本体pageと同じ`resolveDraftAwarePageData`を共有する
+  // （`draftMode()`はNext.jsが明示的にサポートするdynamic API——生のuncached呼び出しとは違い、
+  // `'use cache'`関数と同居してもCache Componentsのbuild検査には抵触しない）。
+  const { data, isDraftPreview } = await resolveDraftAwarePageData(slug, getCachedRobotDetailData, getDraftRobotDetailData);
   const robot = data.kind === 'found' ? data.robot : undefined;
   const seo = robot?.seo;
-  // archived（提供終了）は閲覧可能だが検索には載せない（§11.7）
-  const noindex = robot ? !shouldIndexRobot(robot) : seo?.noindex;
+  // archived（提供終了）は閲覧可能だが検索には載せない（§11.7）。draft preview中も同様にnoindex。
+  const noindex = isDraftPreview || (robot ? !shouldIndexRobot(robot) : seo?.noindex);
   const title = seo?.metaTitle ?? (robot ? (robot.nameJa ?? robot.name) : 'Robot');
   const image = robot ? getRobotPrimaryImage(robot)?.src : undefined;
 
@@ -58,24 +65,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 /**
- * データ取得だけを`'use cache'`にする（Task 7 Step 3、`/manufacturers/[slug]`と同じパターン）。
- * `notFound()` / `permanentRedirect()`はcacheされた関数の外（呼び出し元）で判断する。
- *
- * Robot詳細の依存表（`lib/content/cacheDependencies.ts`）: robots, manufacturers, useCases。
- * briefの依存表は`robotSeries`/`media`も挙げるが、このpageはどちらも実際には読まない
- * （`robot.seriesId`はrobot自身のfieldとして既に`robots`タグの範囲内。`media`は
- * `Media` collectionをサイト上のどのpageも読まない——`KNOWN_GAPS`参照）ため含めない
- * （Critical 2と同じ理由——実際に読まないcollectionのtagは足さない）。
+ * notFound/redirect判定・関連データの組み立てなど、cache有無に依存しない部分の共通ロジック
+ * （task7-draft-mode-wiring-brief.md: cached経路とdraft経路でロジックを二重化しない）。
+ * `resolution`はcached経路（`repository.resolveRobotDetailBySlug`）・draft経路
+ * （`repository.resolveRobotDraftDetailBySlug`）のどちらの結果でも受け取れる——両者は同じ
+ * `SlugResolution<Robot>`形を返す。
  */
-async function getCachedRobotDetailData(slug: string) {
-  'use cache';
-  cacheLife('hours');
-  cacheTag(contentTags.robots);
-  cacheTag(contentTags.manufacturers);
-  cacheTag(contentTags.useCases);
-
-  const repository = await getContentRepository();
-  const { record: robot, redirectTo } = await repository.resolveRobotDetailBySlug(slug);
+async function buildRobotDetailData(repository: ContentRepository, resolution: SlugResolution<Robot>) {
+  const { record: robot, redirectTo } = resolution;
   if (redirectTo) return { kind: 'redirect' as const, redirectTo };
   if (!robot) return { kind: 'not-found' as const };
 
@@ -142,9 +139,40 @@ async function getCachedRobotDetailData(slug: string) {
   };
 }
 
+/**
+ * データ取得だけを`'use cache'`にする（Task 7 Step 3、`/manufacturers/[slug]`と同じパターン）。
+ * `notFound()` / `permanentRedirect()`はcacheされた関数の外（呼び出し元）で判断する。
+ *
+ * Robot詳細の依存表（`lib/content/cacheDependencies.ts`）: robots, manufacturers, useCases。
+ * briefの依存表は`robotSeries`/`media`も挙げるが、このpageはどちらも実際には読まない
+ * （`robot.seriesId`はrobot自身のfieldとして既に`robots`タグの範囲内。`media`は
+ * `Media` collectionをサイト上のどのpageも読まない——`KNOWN_GAPS`参照）ため含めない
+ * （Critical 2と同じ理由——実際に読まないcollectionのtagは足さない）。
+ */
+async function getCachedRobotDetailData(slug: string) {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(contentTags.robots);
+  cacheTag(contentTags.manufacturers);
+  cacheTag(contentTags.useCases);
+
+  const repository = await getContentRepository();
+  return buildRobotDetailData(repository, await repository.resolveRobotDetailBySlug(slug));
+}
+
+/**
+ * Draft Mode専用のuncached経路（task7-draft-mode-wiring-brief.md）。`'use cache'`を**持たない**
+ * ——draft modeが有効かつ`getActivePreviewSession()`検証済みの場合だけ、
+ * `resolveDraftAwarePageData()`経由で呼ばれる。共有cacheへ絶対に載らない。
+ */
+async function getDraftRobotDetailData(slug: string) {
+  const repository = await getContentRepository();
+  return buildRobotDetailData(repository, await repository.resolveRobotDraftDetailBySlug(slug));
+}
+
 export default async function RobotDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const data = await getCachedRobotDetailData(slug);
+  const { data } = await resolveDraftAwarePageData(slug, getCachedRobotDetailData, getDraftRobotDetailData);
   if (data.kind === 'redirect') permanentRedirect(`/robots/${data.redirectTo}`);
   if (data.kind === 'not-found') notFound();
   const {

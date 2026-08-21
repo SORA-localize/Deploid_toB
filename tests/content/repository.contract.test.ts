@@ -262,6 +262,31 @@ const FIXTURE: ContentSnapshot = {
       japanDeploymentConditions: 'Conditions.',
       candidateRobots: [],
     },
+    {
+      id: 'fx-usecase-draft',
+      slug: 'fx-usecase-draft',
+      summary: 'Draft use case fixture.',
+      publishStatus: 'draft',
+      updatedAt: '2026-01-13',
+      reliability: 'estimated',
+      sources: SOURCES,
+      title: 'Draft use case',
+      maturityLevel: 'early-stage',
+      buyerReadiness: 'limited-today',
+      environment: 'outdoor',
+      requiredCapabilities: ['mobility'],
+      primaryIndustry: 'construction',
+      industryTags: ['construction'],
+      taskTags: ['inspection'],
+      atAGlance: { whereFits: 'A', whereDoesNotFit: 'B', mustBeTrue: 'C' },
+      overview: 'Draft overview.',
+      whyItMatters: 'Draft why it matters.',
+      capabilityNotes: {},
+      environmentRequirements: 'Draft requirements.',
+      whyHardToday: 'Draft hard today.',
+      japanDeploymentConditions: 'Draft conditions.',
+      candidateRobots: [],
+    },
   ],
   deployments: [
     {
@@ -690,6 +715,23 @@ describe.each(SOURCE_CASES)('ContentRepository contract against the $name source
     expect(await repository.resolveRobotDetailBySlug('fx-robot-nonexistent')).toEqual({});
   });
 
+  /**
+   * task7-draft-mode-wiring-brief.md: Draft Mode配線の要——`resolveRobotDetailBySlug`
+   * （通常経路）は`'draft'`を一切見せない一方、`resolveRobotDraftDetailBySlug`
+   * （draft mode有効 + session検証済みの場合だけpageのuncached経路から呼ぶ）は見せる。
+   * どちらもpublished/archivedの可視性は変えない。
+   */
+  it('resolves draft-only robots only through resolveRobotDraftDetailBySlug, never through the normal detail resolver', async () => {
+    expect(await repository.resolveRobotDetailBySlug('fx-robot-draft')).toEqual({});
+
+    expect((await repository.resolveRobotDraftDetailBySlug('fx-robot-draft')).record?.id).toBe('fx-robot-draft');
+    // draft-aware経路もpublished/archivedはそのまま解決する（draftだけに限定されるわけではない）。
+    expect((await repository.resolveRobotDraftDetailBySlug('fx-robot-a')).record?.id).toBe('fx-robot-a');
+    expect((await repository.resolveRobotDraftDetailBySlug('fx-robot-archived')).record?.id).toBe('fx-robot-archived');
+    expect((await repository.resolveRobotDraftDetailBySlug('fx-robot-a-old')).redirectTo).toBe('fx-robot-a');
+    expect(await repository.resolveRobotDraftDetailBySlug('fx-robot-nonexistent')).toEqual({});
+  });
+
   it('applies explicit limit / page / sort to robot lists', async () => {
     expect((await repository.listRobots({ limit: 1, page: 1, sort: 'name' })).map((robot) => robot.id)).toEqual([
       'fx-robot-a',
@@ -746,6 +788,15 @@ describe.each(SOURCE_CASES)('ContentRepository contract against the $name source
     expect(await repository.resolveRobotNamespaceBySlug('fx-nothing')).toEqual({ kind: 'not-found' });
   });
 
+  it('resolves the shared /robots/[slug] namespace for draft-only robots only through resolveRobotNamespaceDraftBySlug', async () => {
+    expect(await repository.resolveRobotNamespaceBySlug('fx-robot-draft')).toEqual({ kind: 'not-found' });
+    expect(await repository.resolveRobotNamespaceDraftBySlug('fx-robot-draft')).toMatchObject({ kind: 'robot' });
+    // published robots / series still resolve through the draft-aware namespace method.
+    expect(await repository.resolveRobotNamespaceDraftBySlug('fx-robot-a')).toMatchObject({ kind: 'robot' });
+    expect(await repository.resolveRobotNamespaceDraftBySlug('fx-series-one')).toMatchObject({ kind: 'robot-series' });
+    expect(await repository.resolveRobotNamespaceDraftBySlug('fx-nothing')).toEqual({ kind: 'not-found' });
+  });
+
   // ── manufacturers ───────────────────────────────────────────────────────
   it('lists published manufacturers and resolves slugs and related ids', async () => {
     expect((await repository.listManufacturers()).map((manufacturer) => manufacturer.id)).toEqual([
@@ -758,6 +809,13 @@ describe.each(SOURCE_CASES)('ContentRepository contract against the $name source
     expect(
       (await repository.listRelatedManufacturers(['fx-mfr-beta', 'fx-mfr-alpha'])).map((manufacturer) => manufacturer.id),
     ).toEqual(['fx-mfr-beta', 'fx-mfr-alpha']);
+  });
+
+  it('resolves a draft-only manufacturer only through resolveManufacturerDraftDetailBySlug', async () => {
+    expect(await repository.resolveManufacturerDetailBySlug('fx-mfr-draft')).toEqual({});
+    expect((await repository.resolveManufacturerDraftDetailBySlug('fx-mfr-draft')).record?.id).toBe('fx-mfr-draft');
+    expect((await repository.resolveManufacturerDraftDetailBySlug('fx-mfr-alpha')).record?.id).toBe('fx-mfr-alpha');
+    expect(await repository.resolveManufacturerDraftDetailBySlug('fx-mfr-nonexistent')).toEqual({});
   });
 
   // ── distributors ────────────────────────────────────────────────────────
@@ -790,6 +848,15 @@ describe.each(SOURCE_CASES)('ContentRepository contract against the $name source
       'fx-usecase-two',
       'fx-usecase-one',
     ]);
+  });
+
+  it('resolves a draft-only use case only through resolveUseCaseDraftDetailBySlug', async () => {
+    expect(await repository.resolveUseCaseDetailBySlug('fx-usecase-draft')).toEqual({});
+    expect((await repository.resolveUseCaseDraftDetailBySlug('fx-usecase-draft')).record?.id).toBe(
+      'fx-usecase-draft',
+    );
+    expect((await repository.resolveUseCaseDraftDetailBySlug('fx-usecase-one')).record?.id).toBe('fx-usecase-one');
+    expect(await repository.resolveUseCaseDraftDetailBySlug('fx-usecase-nonexistent')).toEqual({});
   });
 
   it('keeps candidateRobots evidence semantics (robotId / seriesId are stable ids)', async () => {
@@ -833,6 +900,15 @@ describe.each(SOURCE_CASES)('ContentRepository contract against the $name source
     ]);
   });
 
+  it('resolves a draft-only article only through resolveArticleDraftDetailBySlug', async () => {
+    expect(await repository.resolveArticleDetailBySlug('fx-article-draft')).toEqual({});
+    expect((await repository.resolveArticleDraftDetailBySlug('fx-article-draft')).record?.id).toBe(
+      'fx-article-draft',
+    );
+    expect((await repository.resolveArticleDraftDetailBySlug('fx-article-new')).record?.id).toBe('fx-article-new');
+    expect(await repository.resolveArticleDraftDetailBySlug('fx-article-nonexistent')).toEqual({});
+  });
+
   // ── articlePlacements ───────────────────────────────────────────────────
   it('lists article placements by surface and slot, ordered by order', async () => {
     expect((await repository.listArticlePlacements()).map((placement) => placement.id)).toEqual([
@@ -870,13 +946,92 @@ describe.each(SOURCE_CASES)('ContentRepository contract against the $name source
     expect(snapshot.manufacturers).toHaveLength(3);
     expect(snapshot.robotSeries).toHaveLength(1);
     expect(snapshot.distributors).toHaveLength(1);
-    expect(snapshot.useCases).toHaveLength(2);
+    expect(snapshot.useCases).toHaveLength(3);
     expect(snapshot.deployments).toHaveLength(1);
     expect(snapshot.articles).toHaveLength(3);
     expect(snapshot.articlePlacements).toHaveLength(2);
     expect(snapshot.media).toHaveLength(1);
     expect(snapshot.articleIndexPlacementLimits).toEqual(FIXTURE.articleIndexPlacementLimits);
     expect(snapshot.siteSettings.dataAsOf).toBe(FIXTURE.siteSettings.dataAsOf);
+  });
+});
+
+/**
+ * task7-draft-mode-wiring-brief.md 検証項目: 「既存publishedへの未承認draft更新」
+ * （brief必須修正1で明記された2つのdraftシナリオのうち、まだcoverしていなかった方）。
+ *
+ * Payloadのdraft機構では、公開中documentへ`draft: true`のupdateを保存しても main table row
+ * （通常のfindが見る場所）は書き換わらず、新しいdraft versionは`_versions`テーブルにだけ
+ * 追加される（`lib/payload/access.ts`の`isDraftSave`コメント、`payloadSource.ts`の
+ * `PayloadFindArgs.draft`コメント参照）。このシナリオは「一度もpublishされていない新規
+ * document」（`fx-robot-draft`等、`describe.each(SOURCE_CASES)`内でcover済み）とは別物で、
+ * `draft: true`を渡さない通常の`where`句だけでは検出できない——実際にPayloadへ
+ * `payload.update({..., draft: true})`を発行して確かめない限り、テストとして無意味になる
+ * （fixtureのJSON定義だけでは再現できない）。
+ *
+ * localには「公開中documentの上に積まれた未承認draft」というversionの概念自体が無いため、
+ * このシナリオはPayload sourceでのみ意味を持つ（`describe.each(SOURCE_CASES)`には含めない）。
+ */
+describe('draft-aware resolution over a pending (unapproved) draft update on top of a published document (Payload only)', () => {
+  const PUBLISHED_NAME = 'Alpha One'; // FIXTURE.robots[0]（fx-robot-a）のpublished名。
+  const PENDING_DRAFT_NAME = 'Pending Draft Name (unapproved)';
+  let internalRobotId: string | number;
+
+  beforeAll(async () => {
+    const { docs } = await payload.find({
+      collection: 'robots',
+      where: { stableId: { equals: 'fx-robot-a' } },
+      overrideAccess: true,
+      limit: 1,
+      depth: 0,
+    });
+    const doc = docs[0] as { id: string | number } | undefined;
+    if (!doc) throw new Error('fx-robot-a fixture not found — did seedPayloadFixture run in the outer beforeAll?');
+    internalRobotId = doc.id;
+
+    // `draft: true`かつ`_status: 'published'`を送らない = isDraftSave。publish gate
+    // （`createPublishGateHook`）はcontent-publisher以上のroleもapproval contextも要求しない
+    // ——通常のdraft-writerによるdraft保存と同じ形（`lib/payload/access.ts`参照）。
+    await payload.update({
+      collection: 'robots',
+      id: internalRobotId,
+      draft: true,
+      overrideAccess: true,
+      data: { name: PENDING_DRAFT_NAME },
+    });
+  });
+
+  it('keeps the normal (non-draft) detail resolver showing the published content, unaffected by the pending draft', async () => {
+    const repository = createContentRepository(createPayloadContentSource({ payload: payloadReady }));
+    const resolved = await repository.resolveRobotDetailBySlug('fx-robot-a');
+    expect(resolved.record?.name).toBe(PUBLISHED_NAME);
+    expect(resolved.record?.name).not.toBe(PENDING_DRAFT_NAME);
+  });
+
+  it('shows the pending draft content only through resolveRobotDraftDetailBySlug', async () => {
+    const repository = createContentRepository(createPayloadContentSource({ payload: payloadReady }));
+    const resolved = await repository.resolveRobotDraftDetailBySlug('fx-robot-a');
+    expect(resolved.record?.name).toBe(PENDING_DRAFT_NAME);
+  });
+
+  it('does not leak the pending draft into getRobotById / getRobotDetailById (published/detail-only accessors)', async () => {
+    const repository = createContentRepository(createPayloadContentSource({ payload: payloadReady }));
+    expect((await repository.getRobotById('fx-robot-a'))?.name).toBe(PUBLISHED_NAME);
+    expect((await repository.getRobotDetailById('fx-robot-a'))?.name).toBe(PUBLISHED_NAME);
+  });
+
+  it('does not leak the pending draft into resolveRobotNamespaceBySlug (non-draft namespace resolver)', async () => {
+    const repository = createContentRepository(createPayloadContentSource({ payload: payloadReady }));
+    const resolved = await repository.resolveRobotNamespaceBySlug('fx-robot-a');
+    expect(resolved).toMatchObject({ kind: 'robot' });
+    if (resolved.kind === 'robot') expect(resolved.robot.name).toBe(PUBLISHED_NAME);
+  });
+
+  it('shows the pending draft through resolveRobotNamespaceDraftBySlug', async () => {
+    const repository = createContentRepository(createPayloadContentSource({ payload: payloadReady }));
+    const resolved = await repository.resolveRobotNamespaceDraftBySlug('fx-robot-a');
+    expect(resolved).toMatchObject({ kind: 'robot' });
+    if (resolved.kind === 'robot') expect(resolved.robot.name).toBe(PENDING_DRAFT_NAME);
   });
 });
 

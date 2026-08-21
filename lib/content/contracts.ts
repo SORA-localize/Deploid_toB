@@ -101,7 +101,24 @@ export interface BaseSourceQuery<TSortField extends string> {
   ids?: readonly Id[];
 }
 
-/** ID / slug 単発解決の絞り込み。listと同じ `publishStatuses` の意味を持つ。 */
+/**
+ * ID / slug 単発解決の絞り込み。listと同じ `publishStatuses` の意味を持つ。
+ *
+ * `publishStatuses` に `'draft'` を含めることもできる（Draft Mode配線、`task7-draft-mode-wiring
+ * -brief.md`）。これは`createContentRepository.ts`の`resolve*DraftDetailBySlug`系メソッド専用の
+ * 意味で、通常の`resolve*DetailBySlug`（published(+archived))は`'draft'`を一切含めない
+ * ——draft mode無効時のPublishStatusの意味は変えないという制約はここで担保される。
+ *
+ * `ContentSource`実装はこれを次のように解釈する:
+ * - Payload source: `lookup.publishStatuses.includes('draft')` なら`payload.find()`/
+ *   `findByID()`へ`draft: true`を渡す（Payloadの`queryDrafts`機構——公開中documentの上に
+ *   積まれた未承認draft versionも含めて「最新version」を返す。main rowの`_status`だけを見る
+ *   `where`句では、公開中documentへの未承認draft更新を拾えない——`payloadSource.ts`冒頭の
+ *   `wantsDraft`のコメント参照）。
+ * - Local source: `data/*.ts`は元々`publishStatus: 'draft'`のfixtureを含んでおり
+ *   （`PublishStatus`型自体がdraftを含む）、既存の`matchesStatus`フィルタが素通しで対応する。
+ *   追加の分岐は不要。
+ */
 export interface LookupQuery {
   publishStatuses: readonly PublishStatus[];
 }

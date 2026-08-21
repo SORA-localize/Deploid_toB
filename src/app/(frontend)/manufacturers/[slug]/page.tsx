@@ -12,6 +12,9 @@ import { NewsCard } from '@/components/NewsCard';
 import { createArticleCatalogItems } from '@/lib/viewModels/articles';
 import { SourceList } from '@/components/SourceList';
 import { contentTags } from '@/lib/content/cacheTags';
+import type { SlugResolution } from '@/lib/content/contracts';
+import type { ContentRepository } from '@/lib/content/createContentRepository';
+import { resolveDraftAwarePageData } from '@/lib/content/draftAwarePageData';
 import type { Manufacturer } from '@/lib/content/domainTypes';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { withMeasuredLogoAspect } from '@/lib/manufacturerLogoEnrich';
@@ -34,7 +37,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // generateMetadataでcache有無が食い違い、Cache Componentsが
   // "generateMetadata depends on uncached data when the rest of the route does not" として
   // build失敗させる（CONTENT_SOURCE=payload構成で実機確認済み）。同じcached関数を共有する。
-  const data = await getCachedManufacturerDetailData(slug);
+  const { data, isDraftPreview } = await resolveDraftAwarePageData(
+    slug,
+    getCachedManufacturerDetailData,
+    getDraftManufacturerDetailData,
+  );
   const manufacturer = data.kind === 'found' ? data.manufacturer : undefined;
   const seo = manufacturer?.seo;
   const title =
@@ -44,7 +51,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title,
     description: seo?.metaDescription ?? manufacturer?.description,
     path: manufacturer ? `/manufacturers/${manufacturer.slug}` : undefined,
-    noindex: manufacturer ? !shouldIndexPublishedRecord(manufacturer) : seo?.noindex,
+    noindex: isDraftPreview || (manufacturer ? !shouldIndexPublishedRecord(manufacturer) : seo?.noindex),
   });
 }
 
@@ -90,7 +97,28 @@ async function getCachedManufacturerDetailData(slug: string): Promise<Manufactur
   cacheTag(contentTags.useCases);
 
   const repository = await getContentRepository();
-  const { record: manufacturerRaw, redirectTo } = await repository.resolveManufacturerDetailBySlug(slug);
+  return buildManufacturerDetailData(repository, await repository.resolveManufacturerDetailBySlug(slug));
+}
+
+/**
+ * Draft Mode専用のuncached経路（task7-draft-mode-wiring-brief.md）。`'use cache'`を**持たない**
+ * ——draft modeが有効かつ`getActivePreviewSession()`検証済みの場合だけ、
+ * `resolveDraftAwarePageData()`経由で呼ばれる。共有cacheへ絶対に載らない。
+ */
+async function getDraftManufacturerDetailData(slug: string): Promise<ManufacturerDetailData> {
+  const repository = await getContentRepository();
+  return buildManufacturerDetailData(repository, await repository.resolveManufacturerDraftDetailBySlug(slug));
+}
+
+/**
+ * notFound/redirect判定・関連データの組み立てなど、cache有無に依存しない部分の共通ロジック
+ * （task7-draft-mode-wiring-brief.md: cached経路とdraft経路でロジックを二重化しない）。
+ */
+async function buildManufacturerDetailData(
+  repository: ContentRepository,
+  resolution: SlugResolution<Manufacturer>,
+): Promise<ManufacturerDetailData> {
+  const { record: manufacturerRaw, redirectTo } = resolution;
   if (redirectTo) return { kind: 'redirect', redirectTo };
   if (!manufacturerRaw) return { kind: 'not-found' };
   const manufacturer = withMeasuredLogoAspect(manufacturerRaw);
@@ -131,7 +159,7 @@ async function getCachedManufacturerDetailData(slug: string): Promise<Manufactur
 
 export default async function ManufacturerDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const data = await getCachedManufacturerDetailData(slug);
+  const { data } = await resolveDraftAwarePageData(slug, getCachedManufacturerDetailData, getDraftManufacturerDetailData);
   if (data.kind === 'redirect') permanentRedirect(`/manufacturers/${data.redirectTo}`);
   if (data.kind === 'not-found') notFound();
   const { manufacturer, robotCount, robotItems, displayedReportItems, sections, manufacturerName } = data;

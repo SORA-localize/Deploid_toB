@@ -14,6 +14,10 @@ import { RelatedLinkList } from '@/components/RelatedLinkList';
 import { SidebarBlock, SidebarDivider, SidebarSection } from '@/components/SidebarSection';
 import { SourceList } from '@/components/SourceList';
 import { contentTags } from '@/lib/content/cacheTags';
+import type { SlugResolution } from '@/lib/content/contracts';
+import type { ContentRepository } from '@/lib/content/createContentRepository';
+import type { UseCase } from '@/lib/content/domainTypes';
+import { resolveDraftAwarePageData } from '@/lib/content/draftAwarePageData';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import {
   deploymentStatusLabels,
@@ -37,14 +41,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // generateMetadataでcache有無が食い違い、Cache Componentsが
   // "generateMetadata depends on uncached data when the rest of the route does not" として
   // build失敗させる（CONTENT_SOURCE=payload構成で実機確認済み）。同じcached関数を共有する。
-  const data = await getCachedUseCaseDetailData(slug);
+  const { data, isDraftPreview } = await resolveDraftAwarePageData(
+    slug,
+    getCachedUseCaseDetailData,
+    getDraftUseCaseDetailData,
+  );
   const u = data.kind === 'found' ? data.useCase : undefined;
   const seo = u?.seo;
   return createPageMetadata({
     title: seo?.metaTitle ?? (u ? (u.titleJa ?? u.title) : 'Use Case'),
     description: seo?.metaDescription ?? u?.subtitle ?? u?.summary,
     path: u ? `/use-cases/${u.slug}` : undefined,
-    noindex: u ? !shouldIndexPublishedRecord(u) : seo?.noindex,
+    noindex: isDraftPreview || (u ? !shouldIndexPublishedRecord(u) : seo?.noindex),
   });
 }
 
@@ -65,7 +73,25 @@ async function getCachedUseCaseDetailData(slug: string) {
   cacheTag(contentTags.manufacturers);
 
   const repository = await getContentRepository();
-  const { record: useCase, redirectTo } = await repository.resolveUseCaseDetailBySlug(slug);
+  return buildUseCaseDetailData(repository, await repository.resolveUseCaseDetailBySlug(slug));
+}
+
+/**
+ * Draft Mode専用のuncached経路（task7-draft-mode-wiring-brief.md）。`'use cache'`を**持たない**
+ * ——draft modeが有効かつ`getActivePreviewSession()`検証済みの場合だけ、
+ * `resolveDraftAwarePageData()`経由で呼ばれる。共有cacheへ絶対に載らない。
+ */
+async function getDraftUseCaseDetailData(slug: string) {
+  const repository = await getContentRepository();
+  return buildUseCaseDetailData(repository, await repository.resolveUseCaseDraftDetailBySlug(slug));
+}
+
+/**
+ * notFound/redirect判定・関連データの組み立てなど、cache有無に依存しない部分の共通ロジック
+ * （task7-draft-mode-wiring-brief.md: cached経路とdraft経路でロジックを二重化しない）。
+ */
+async function buildUseCaseDetailData(repository: ContentRepository, resolution: SlugResolution<UseCase>) {
+  const { record: useCase, redirectTo } = resolution;
   if (redirectTo) return { kind: 'redirect' as const, redirectTo };
   if (!useCase) return { kind: 'not-found' as const };
 
@@ -124,7 +150,7 @@ async function getCachedUseCaseDetailData(slug: string) {
 
 export default async function UseCaseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const data = await getCachedUseCaseDetailData(slug);
+  const { data } = await resolveDraftAwarePageData(slug, getCachedUseCaseDetailData, getDraftUseCaseDetailData);
   if (data.kind === 'redirect') permanentRedirect(`/use-cases/${data.redirectTo}`);
   if (data.kind === 'not-found') notFound();
   const { useCase, deployments, sections, candidateRobots, candidateAnnotations, reports } = data;

@@ -49,6 +49,29 @@ const DETAIL_VISIBLE: readonly PublishStatus[] = ['published', 'archived'];
 const publishedLookup: LookupQuery = { publishStatuses: PUBLISHED_ONLY };
 const detailLookup: LookupQuery = { publishStatuses: DETAIL_VISIBLE };
 
+// ─── Draft Mode配線（task7-draft-mode-wiring-brief.md）────────────────────────
+//
+// draft modeが有効 + `getActivePreviewSession()`が検証済みsessionを返した場合だけ、ページは
+// ここの`resolve*DraftDetailBySlug`/`resolveRobotNamespaceDraftBySlug`を呼ぶ（`'use cache'`
+// でラップされたcached経路とは完全に別のuncachedな経路——最重要制約: draft responseを共有
+// cacheへ絶対に漏らさない）。
+//
+// 各entityの「通常のdetail可視範囲 + draft」を保つ2つの集合に分ける（1つの`draftLookup`へ
+// まとめない）。理由: robotのdetailは`DETAIL_VISIBLE`(published+archived)だが、
+// manufacturer/useCase/articleのdetailは`publishedLookup`(publishedのみ、archivedは含まない
+// ——現状archived UIが無いため)。単一の`['draft','published','archived']`をどのentityにも
+// 一律適用すると、manufacturer/useCase/articleのdraft経路だけarchivedを新たに見せてしまい、
+// 「draft mode有効時のみdraftが見えるようになる」を超えて意図しない可視範囲の拡大になる
+// （brief Global Constraints: 「draft mode有効時のみ、検証済みsessionという条件下でdraftも
+// 見えるようにする」——archivedの可視範囲そのものは変えない）。
+const DETAIL_VISIBLE_WITH_DRAFT: readonly PublishStatus[] = ['draft', 'published', 'archived'];
+const PUBLISHED_WITH_DRAFT: readonly PublishStatus[] = ['draft', 'published'];
+
+/** robot detail用（`detailLookup` + draft）。 */
+const draftDetailLookup: LookupQuery = { publishStatuses: DETAIL_VISIBLE_WITH_DRAFT };
+/** manufacturer/useCase/article detail用（`publishedLookup` + draft）。 */
+const draftPublishedLookup: LookupQuery = { publishStatuses: PUBLISHED_WITH_DRAFT };
+
 // ─── 現行 `lib/data.ts` と共有するpure helper ────────────────────────────
 // `lib/data.ts`（移行期間中はページが直接使い続ける）とrepositoryが同じ述語を使うようにして、
 // 「published filter の意味」が2箇所で分岐しないようにする。
@@ -261,6 +284,19 @@ export function createContentRepository(source: ContentSource) {
     resolveRobotDetailBySlug: (slug: Slug) =>
       resolveSlug(slug, detailLookup, source.findRobotBySlug.bind(source), source.findRobotByPreviousSlug.bind(source)),
 
+    /**
+     * Draft Mode専用: `resolveRobotDetailBySlug`のdraft込み版。draft modeが有効かつ
+     * `getActivePreviewSession()`検証済みsessionの下でだけ、pageのuncached経路から呼ぶ
+     * （`'use cache'`関数の中では絶対に呼ばない——最重要制約）。
+     */
+    resolveRobotDraftDetailBySlug: (slug: Slug) =>
+      resolveSlug(
+        slug,
+        draftDetailLookup,
+        source.findRobotBySlug.bind(source),
+        source.findRobotByPreviousSlug.bind(source),
+      ),
+
     listRelatedRobots: (ids: readonly Id[]) =>
       listByIds(ids, (resolvedIds) =>
         source.listRobots({ ids: resolvedIds, sort: 'id', publishStatuses: DETAIL_VISIBLE }),
@@ -331,6 +367,22 @@ export function createContentRepository(source: ContentSource) {
       return { kind: 'not-found' };
     },
 
+    /**
+     * Draft Mode専用: `resolveRobotNamespaceBySlug`のdraft込み版。ロジックは同一で、
+     * `detailLookup`の代わりに`draftDetailLookup`を使うだけ。
+     */
+    async resolveRobotNamespaceDraftBySlug(slug: Slug): Promise<RobotNamespaceResolution> {
+      const robot = await source.findRobotBySlug(slug, draftDetailLookup);
+      if (robot) return { kind: 'robot', robot };
+      const series = await source.findRobotSeriesBySlug(slug, draftDetailLookup);
+      if (series) return { kind: 'robot-series', series };
+      const movedRobot = await source.findRobotByPreviousSlug(slug, draftDetailLookup);
+      if (movedRobot) return { kind: 'redirect', redirectTo: movedRobot.slug, target: 'robot' };
+      const movedSeries = await source.findRobotSeriesByPreviousSlug(slug, draftDetailLookup);
+      if (movedSeries) return { kind: 'redirect', redirectTo: movedSeries.slug, target: 'robot-series' };
+      return { kind: 'not-found' };
+    },
+
     // ── manufacturers ─────────────────────────────────────────────────────
     listManufacturers: (query: ManufacturerListQuery = {}) =>
       source.listManufacturers({ ...query, sort: query.sort ?? 'id', publishStatuses: PUBLISHED_ONLY }),
@@ -342,6 +394,15 @@ export function createContentRepository(source: ContentSource) {
       resolveSlug(
         slug,
         publishedLookup,
+        source.findManufacturerBySlug.bind(source),
+        source.findManufacturerByPreviousSlug.bind(source),
+      ),
+
+    /** Draft Mode専用: `resolveManufacturerDetailBySlug`のdraft込み版。 */
+    resolveManufacturerDraftDetailBySlug: (slug: Slug) =>
+      resolveSlug(
+        slug,
+        draftPublishedLookup,
         source.findManufacturerBySlug.bind(source),
         source.findManufacturerByPreviousSlug.bind(source),
       ),
@@ -406,6 +467,15 @@ export function createContentRepository(source: ContentSource) {
       resolveSlug(
         slug,
         publishedLookup,
+        source.findUseCaseBySlug.bind(source),
+        source.findUseCaseByPreviousSlug.bind(source),
+      ),
+
+    /** Draft Mode専用: `resolveUseCaseDetailBySlug`のdraft込み版。 */
+    resolveUseCaseDraftDetailBySlug: (slug: Slug) =>
+      resolveSlug(
+        slug,
+        draftPublishedLookup,
         source.findUseCaseBySlug.bind(source),
         source.findUseCaseByPreviousSlug.bind(source),
       ),
@@ -485,6 +555,15 @@ export function createContentRepository(source: ContentSource) {
       resolveSlug(
         slug,
         publishedLookup,
+        source.findArticleBySlug.bind(source),
+        source.findArticleByPreviousSlug.bind(source),
+      ),
+
+    /** Draft Mode専用: `resolveArticleDetailBySlug`のdraft込み版。 */
+    resolveArticleDraftDetailBySlug: (slug: Slug) =>
+      resolveSlug(
+        slug,
+        draftPublishedLookup,
         source.findArticleBySlug.bind(source),
         source.findArticleByPreviousSlug.bind(source),
       ),

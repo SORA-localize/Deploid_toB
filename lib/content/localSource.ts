@@ -352,6 +352,17 @@ function pageOf<T>(sorted: T[], limit: number, page: number | undefined): Source
   return { docs: applyPaging(sorted, limit, page), totalDocs: sorted.length };
 }
 
+/**
+ * Draft Mode配線（task7-draft-mode-wiring-brief.md）: `createContentRepository.ts`の
+ * `resolve*DraftDetailBySlug`系は`statuses`に`'draft'`を含む`LookupQuery`（`draftDetailLookup`/
+ * `draftPublishedLookup`）を渡してくる。local sourceは特別扱いを一切していない——
+ * `data/*.ts`は元々`publishStatus: 'draft'`のfixtureを実際に持っており（`PublishStatus`型自体が
+ * `'draft'`を含む。例: `data/robots.ts`のconcept段階ロボット）、この関数がそのまま
+ * `record.publishStatus === 'draft'`のレコードを拾う。`CONTENT_SOURCE=local`でも
+ * draft-aware解決は動作する（Payloadの「公開中documentの上へ積まれた未承認draft更新」という
+ * versionの概念は無いが、「まだpublishされていない別レコード」という形のdraftはlocalにも
+ * 実在する）。
+ */
 function matchesStatus(record: { publishStatus: PublishStatus }, statuses: readonly PublishStatus[]): boolean {
   return statuses.includes(record.publishStatus);
 }

@@ -19,6 +19,10 @@ import { TagChip } from '@/components/TagChip';
 import { SidebarBlock } from '@/components/SidebarSection';
 import { ActiveSectionProvider } from '@/lib/activeSectionContext';
 import { contentTags } from '@/lib/content/cacheTags';
+import type { SlugResolution } from '@/lib/content/contracts';
+import type { ContentRepository } from '@/lib/content/createContentRepository';
+import type { Article } from '@/lib/content/domainTypes';
+import { resolveDraftAwarePageData } from '@/lib/content/draftAwarePageData';
 import { getContentRepository } from '@/lib/content/getContentRepository';
 import { resolveManufacturerGuideLineup } from '@/lib/robotCatalog';
 import { articleJsonLd, breadcrumbJsonLd, faqPageJsonLd } from '@/lib/jsonLd';
@@ -49,11 +53,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // generateMetadataでcache有無が食い違い、Cache Componentsが
   // "generateMetadata depends on uncached data when the rest of the route does not" として
   // build失敗させる（CONTENT_SOURCE=payload構成で実機確認済み）。同じcached関数を共有する。
-  const data = await getCachedReportDetailData(slug);
+  const { data, isDraftPreview } = await resolveDraftAwarePageData(
+    slug,
+    getCachedReportDetailData,
+    getDraftReportDetailData,
+  );
   const report = data.kind === 'found' ? data.report : undefined;
   const seo = report?.seo;
-  // sample（UI確認用データ）は検索に載せない（§11.9）
-  const noindex = report ? !shouldIndexArticle(report) : seo?.noindex;
+  // sample（UI確認用データ）は検索に載せない（§11.9）。draft preview中も同様にnoindex。
+  const noindex = isDraftPreview || (report ? !shouldIndexArticle(report) : seo?.noindex);
   const title = seo?.metaTitle ?? (report ? (report.titleJa ?? report.title) : 'Article');
 
   return createPageMetadata({
@@ -119,7 +127,25 @@ async function getCachedReportDetailData(slug: string) {
   cacheTag(contentTags.useCases);
 
   const repository = await getContentRepository();
-  const { record: report, redirectTo } = await repository.resolveArticleDetailBySlug(slug);
+  return buildReportDetailData(repository, await repository.resolveArticleDetailBySlug(slug));
+}
+
+/**
+ * Draft Mode専用のuncached経路（task7-draft-mode-wiring-brief.md）。`'use cache'`を**持たない**
+ * ——draft modeが有効かつ`getActivePreviewSession()`検証済みの場合だけ、
+ * `resolveDraftAwarePageData()`経由で呼ばれる。共有cacheへ絶対に載らない。
+ */
+async function getDraftReportDetailData(slug: string) {
+  const repository = await getContentRepository();
+  return buildReportDetailData(repository, await repository.resolveArticleDraftDetailBySlug(slug));
+}
+
+/**
+ * notFound/redirect判定・関連データの組み立てなど、cache有無に依存しない部分の共通ロジック
+ * （task7-draft-mode-wiring-brief.md: cached経路とdraft経路でロジックを二重化しない）。
+ */
+async function buildReportDetailData(repository: ContentRepository, resolution: SlugResolution<Article>) {
+  const { record: report, redirectTo } = resolution;
   if (redirectTo) return { kind: 'redirect' as const, redirectTo };
   if (!report) return { kind: 'not-found' as const };
 
@@ -211,7 +237,7 @@ async function getCachedReportDetailData(slug: string) {
 
 export default async function ReportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const data = await getCachedReportDetailData(slug);
+  const { data } = await resolveDraftAwarePageData(slug, getCachedReportDetailData, getDraftReportDetailData);
   if (data.kind === 'redirect') permanentRedirect(`/reports/${data.redirectTo}`);
   if (data.kind === 'not-found') notFound();
   const {
