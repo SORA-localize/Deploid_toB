@@ -433,7 +433,19 @@ drizzleの `pgTable` として宣言し、pushの「知っている」schemaに�
 宣言済みなら差分として検出される）。生SQLを手書きする必要は無い——`preview_nonces`の
 migrationファイルも生成結果をそのまま採用している。
 
-## 8. Global Constraints との対応
+## 8. Payload 3.87.1の既知バグ: draft内nested group更新
+
+Payload 3.87.1では、`draft: true` かつ既に`_status: 'draft'`のcollection documentに対し、
+`heroImage.rights`のような二重groupを更新すると、`update()`の戻り値には新値が入る一方、
+直後のfresh readでは旧値が残ることがある。単独のgroup fieldや`heroImage.src`など同階層の値では
+再現せず、nested groupのdraft更新に限定して実機再現した。
+
+このため、署名済みexport / cutover baseline / parityの読み取りは未承認draftを意図的に除外する
+（`readSnapshot()`に`draft: true`を追加してはならない）。draft記事の権利メタデータを補正する
+必要がある場合は、対象stable IDと旧値を`WHERE`条件に含めたローカルDB限定の補正を行い、fresh
+readと`content:compare`で確認する。本番DBへの直接SQLは禁止する。
+
+## 9. Global Constraints との対応
 
 - 「schema変更はmigrationを生成してGitでreviewし、CIで適用確認する」→ §1・§5・
   `.github/workflows/ci.yml`。
