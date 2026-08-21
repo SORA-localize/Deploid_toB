@@ -1,0 +1,30 @@
+diff --git a/node_modules/payload/bin.js b/node_modules/payload/bin.js
+index d1cfb26..697b2b1 100755
+--- a/node_modules/payload/bin.js
++++ b/node_modules/payload/bin.js
+@@ -15,7 +15,7 @@ if (disableTranspile) {
+     await bin()
+   }
+ 
+-  void start()
++  await start()
+ } else {
+   const filename = fileURLToPath(import.meta.url)
+   const dirname = path.dirname(filename)
+@@ -41,7 +41,7 @@ if (disableTranspile) {
+       await bin()
+     }
+ 
+-    void start()
++    await start()
+   } else if (useSwc) {
+     const { register } = await import('node:module')
+     // Remove --use-swc from arguments
+@@ -60,6 +60,6 @@ if (disableTranspile) {
+       await bin()
+     }
+ 
+-    void start()
++    await start()
+   }
+ }
