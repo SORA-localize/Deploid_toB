@@ -67,74 +67,77 @@ export interface CliResult {
  * `NODE_ENV` 必須のためoverride用のplain objectには不向き）。 */
 export type EnvOverride = Record<string, string | undefined>;
 
-const PAYLOAD_BIN = path.resolve(process.cwd(), 'node_modules/.bin/payload');
 const TSX_BIN = path.resolve(process.cwd(), 'node_modules/.bin/tsx');
+const MIGRATION_CLI_SCRIPT = path.resolve(process.cwd(), 'scripts/run-payload-migration-cli.mts');
 
 /**
- * Remediation group 6 (2026-08-21, PR #34's first real GitHub Actions run): `payload <cmd>`
- * (`node_modules/.bin/payload`, a symlink to `node_modules/payload/bin.js`) boots by calling
- * `tsx/esm/api`'s `tsImport()` to dynamically load `dist/bin/index.js`, so it can transpile our
- * TypeScript `payload.config.ts` on the fly. That `tsImport()` call sets up tsx's ESM loader via
- * Node's *asynchronous* `module.register()` worker-thread path (`payload`'s own `bin.js` disables
- * the newer synchronous `registerHooks` API to work around a separate, unrelated tsx bug — see the
- * comment in `node_modules/payload/bin.js` referencing payloadcms/payload#16949 — which leaves the
- * async worker path as the only one available on Node 22.12.0, the exact version this repo's CI
- * pins).
+ * Remediation group 6 (2026-08-21, PR #34's first real GitHub Actions run, revised after a second
+ * real CI run — see below): `payload <cmd>` (`node_modules/.bin/payload`, a symlink to
+ * `node_modules/payload/bin.js`) boots by calling `tsx/esm/api`'s `tsImport()` to dynamically load
+ * `dist/bin/index.js`, so it can transpile our TypeScript `payload.config.ts` on the fly. That
+ * `tsImport()` call sets up tsx's ESM loader via Node's *asynchronous* `module.register()`
+ * worker-thread path (`payload`'s own `bin.js` disables the newer synchronous `registerHooks` API
+ * to work around a separate, unrelated tsx bug — see the comment in `node_modules/payload/bin.js`
+ * referencing payloadcms/payload#16949 — which leaves the async worker path as the only one
+ * available on Node 22.12.0, the exact version this repo's CI pins).
  *
  * Confirmed root cause (not a guess): under process-spawn load (many short-lived `payload`/`tsx`
  * child processes started back-to-back, as this suite and CI both do), that worker-thread loader
  * setup can lose its race against Node's own "is the event loop actually idle" check. Node then
- * either (upstream `payload@3.87.1`'s actual shipped code, before this project's patch below)
- * silently exits 0 having done *nothing* — no `payload.init()` log line, no migration applied, no
- * migration file written — because `bin.js` starts its whole bootstrap with a bare, unawaited
- * `void start()`; or (after patching `void start()` to `await start()`, see
- * `patches/payload+3.87.1.patch`) Node's top-level-await machinery honestly detects the stuck
- * promise and exits with code 13 and `Warning: Detected unsettled top-level await`. Verified with
- * an instrumented standalone reproduction (30+ isolated runs against real Postgres 17, outside
- * vitest) hitting the *first* failure mode in ~30-50% of individual `payload` invocations when run
- * back-to-back under `nvm use v22.12.0 && npm ci`; the compiled migration logic itself
- * (`@payloadcms/drizzle`'s `migrate.js` / `buildCreateMigration.js`) uses only synchronous
- * `fs.writeFileSync` and fully-awaited `commitTransaction()` — there is no evidence of any bug in
- * the migration mechanism itself, only in the CLI's own process bootstrap. Ruling out alternatives
- * from the brief: (a) confirmed *not* a `spawnSync` stdout/stderr truncation issue — `spawnSync`
- * blocks until the child fully exits and every failing case here also has zero bytes on both
- * streams, i.e. nothing was ever written, not something written-then-lost; (b) confirmed *not*
- * specific to `payload`'s `tsImport()` code path specifically — forcing the alternate
- * `--disable-transpile` + pre-registered `NODE_OPTIONS=--import=tsx/esm` route hits the exact same
- * "unsettled top-level await" signature at a similar rate, because that route still goes through
- * tsx's same async worker-thread loader, just registered a few lines earlier; (c) confirmed *not*
- * a Postgres-side timing issue in `createThrowawayDatabase`/`dropThrowawayDatabase` — the plain
- * `tsx <script>` CLI path used by `runTsxScript` below (a *different*, non-`payload`-bin.js
- * bootstrap that front-loads its loader registration before any application code runs) never
- * produced this signature in 20 back-to-back runs under the same load.
+ * either (upstream `payload@3.87.1`'s actual shipped code) silently exits 0 having done *nothing*
+ * — no `payload.init()` log line, no migration applied — because `bin.js` starts its whole
+ * bootstrap with a bare, unawaited `void start()`; or (after patching `void start()` to
+ * `await start()`, see `patches/payload+3.87.1.patch`) Node's top-level-await machinery honestly
+ * detects the stuck promise and exits with code 13 and `Warning: Detected unsettled top-level
+ * await`.
  *
- * Fix, two parts:
- * 1. `patches/payload+3.87.1.patch` changes `payload/bin.js`'s three `void start()` call sites to
- *    `await start()`. This alone does not eliminate the race, but it eliminates upstream's silent
- *    false-success (a real correctness bug: `npm run payload:migrate` in `ci.yml` and any real
- *    deploy could otherwise report success while silently applying nothing) and gives every
- *    failure the one exact, honest, machine-detectable signature below.
- * 2. This function retries — *only* on that exact signature, up to twice more (3 attempts total).
- *    This is a bounded retry of a proven-transient *process bootstrap* failure, not a retry that
- *    papers over a real migration-logic failure: empirically, re-running the identical `payload`
- *    invocation after this signature always either succeeds or hits the same signature again
- *    (confirmed: some reproduction runs needed a 2nd retry before succeeding), and a stress test of
- *    30 consecutive full end-to-end runs (empty-db migrate, environment:stamp, seeded-db migrate)
- *    with this retry in place had zero failures. Any *other* failure (wrong SQL, a real assertion
- *    failure inside a migration, a non-zero exit for an actual reason) does not match this
- *    signature and is returned immediately on the first attempt, unretried — this suite's
- *    assertions are exactly as strict as before this change.
+ * First attempt (superseded): patch `void start()` -> `await start()` (kept — it is a real
+ * upstream correctness fix, see the patch file) plus a bounded 3-attempt retry in this function
+ * scoped to that exact exit-13 signature. Locally (quiet Homebrew Postgres, back-to-back child
+ * process spawns) this reliably passed 12/12 and then 30/30 stress runs. It did **not** hold on
+ * GitHub Actions' actual shared runner: PR #34's second real CI run hit the race on
+ * `migrate:create driftcheck1 --skip-empty` on attempt 1/3 *and* attempt 2/3 back-to-back,
+ * exhausting the retry and failing for real. Reproduced locally too, once contention was made
+ * *real* instead of just "many processes on an otherwise-idle 10-core machine": running
+ * `stress-ng --cpu 16 --cpu-load 95` in the background (saturating this machine the way a small
+ * shared CI runner is saturated by the rest of `npm run check` running concurrently) made
+ * `tests/content/migration.test.ts` fail 3 out of 5 consecutive full-file runs with the retry
+ * exhausted, matching the CI failure shape exactly. So 3 retries of the *same racy bootstrap* is
+ * not a reliable mitigation under real contention — the race can be persistent enough within a
+ * short burst that back-to-back retries land in the same bad window.
+ *
+ * Real fix (this version): stop invoking `payload/bin.js` for `migrate`/`migrate:create`/
+ * `migrate:down`/`migrate:status` entirely. `scripts/run-payload-migration-cli.mts` calls the
+ * exact same public `payload.db.migrate()` / `.createMigration()` / `.migrateDown()` /
+ * `.migrateStatus()` functions that `payload/dist/bin/migrate.js` itself calls (same migration
+ * mechanism under test, unchanged), but that script is invoked via `tsx <script>` — the same
+ * bootstrap `runTsxScript()` below already uses for `stamp-environment.mts`, which registers tsx's
+ * ESM loader once, up front, before any application code runs (closer to Node's own `--import`
+ * flag than to a mid-execution `tsImport()` call). This is not a guess: in the *same* PR #34 CI
+ * run where `payload/bin.js`-based calls raced repeatedly, all 4 `runTsxScript()`-based
+ * `stamp-environment.mts` invocations in that run succeeded cleanly with zero races — direct
+ * evidence, from the real failing CI run, not just a local guess. Confirmed again locally under
+ * the same `stress-ng --cpu 16 --cpu-load 95` load that reproduced the CI failure: the plain
+ * `tsx <script>` bootstrap hit zero "unsettled top-level await" occurrences across the stress
+ * testing done for this fix (see the report for exact run counts), while the old `payload/bin.js`
+ * path failed 3/5 full-suite runs under identical load.
+ *
+ * The retry loop below is kept as a defense-in-depth safety net, not the primary mitigation —
+ * it now guards a code path (tsx CLI's own loader bootstrap) with no direct evidence of ever
+ * racing, rather than the one now known to race persistently under contention.
  */
 const UNSETTLED_TOP_LEVEL_AWAIT_RE = /Detected unsettled top-level await/;
 const UNSETTLED_TOP_LEVEL_AWAIT_EXIT_CODE = 13;
-const PAYLOAD_CLI_BOOTSTRAP_RACE_MAX_ATTEMPTS = 3;
+const MIGRATION_CLI_BOOTSTRAP_RACE_MAX_ATTEMPTS = 3;
 
-/** `payload <args>` を子processとして実行する。migrate / migrate:create / migrate:down / migrate:status 用。
- * `payload`起動時の既知のbootstrap race（上のdocblock参照）に限定して、最大2回まで再試行する。 */
+/** `payload <args>` の等価物を、`payload/bin.js`ではなく`scripts/run-payload-migration-cli.mts`
+ * （`tsx`経由、上のdocblock参照）を通して実行する。migrate / migrate:create / migrate:down /
+ * migrate:status 用。defense-in-depthとして、既知のbootstrap raceシグネチャに限定した
+ * 再試行（最大2回まで）も残す。 */
 export function runPayloadCli(args: string[], env: EnvOverride): CliResult {
   let result: SpawnSyncReturns<string>;
-  for (let attempt = 1; attempt <= PAYLOAD_CLI_BOOTSTRAP_RACE_MAX_ATTEMPTS; attempt++) {
-    result = spawnSync(PAYLOAD_BIN, args, {
+  for (let attempt = 1; attempt <= MIGRATION_CLI_BOOTSTRAP_RACE_MAX_ATTEMPTS; attempt++) {
+    result = spawnSync(TSX_BIN, [MIGRATION_CLI_SCRIPT, '--', ...args], {
       cwd: process.cwd(),
       env: { ...process.env, ...env },
       encoding: 'utf8',
@@ -145,9 +148,9 @@ export function runPayloadCli(args: string[], env: EnvOverride): CliResult {
     if (!isKnownBootstrapRace) {
       break;
     }
-    if (attempt < PAYLOAD_CLI_BOOTSTRAP_RACE_MAX_ATTEMPTS) {
+    if (attempt < MIGRATION_CLI_BOOTSTRAP_RACE_MAX_ATTEMPTS) {
       console.warn(
-        `[runPayloadCli] known payload CLI bootstrap race (exit ${UNSETTLED_TOP_LEVEL_AWAIT_EXIT_CODE}) hit on attempt ${attempt}/${PAYLOAD_CLI_BOOTSTRAP_RACE_MAX_ATTEMPTS} for "payload ${args.join(' ')}", retrying`,
+        `[runPayloadCli] known migration CLI bootstrap race (exit ${UNSETTLED_TOP_LEVEL_AWAIT_EXIT_CODE}) hit on attempt ${attempt}/${MIGRATION_CLI_BOOTSTRAP_RACE_MAX_ATTEMPTS} for "${args.join(' ')}", retrying`,
       );
     }
   }
