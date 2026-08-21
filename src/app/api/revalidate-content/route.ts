@@ -52,5 +52,12 @@ export async function POST(request: Request): Promise<Response> {
   const tag = contentTags[tagKey];
   revalidateTag(tag, 'max');
 
+  // 必須修正1（remediation group 5）: revalidateTag()を実際に呼んだ後、成功レスポンスを
+  // 返す前に構造化ログを出す。Vercel Function logsへ出る形（console.log）にし、
+  // `msg`・`collection`・`tagKey`・`tag`で検索できるようにする——「webhookは届いたが、
+  // 実際にrevalidateTag()まで到達したか」をここで確認できるようにするため
+  // （lib/payload/revalidationHook.tsの成功ログは「webhookを呼んだ」ことしか示さない）。
+  console.log(JSON.stringify({ msg: 'revalidate-content-tag-invalidated', collection, tagKey, tag }));
+
   return jsonResponse(200, { ok: true, collection, tag });
 }

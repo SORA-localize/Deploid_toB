@@ -1,0 +1,174 @@
+# .github/workflows/content-e2e.yml
+#
+# Remediation group 5（`.superpowers/sdd/content-platform-migration-plan-v1/
+# remediation-group5-brief.md`必須修正2）。`npm run test:integration`
+# （Task 8のMCP transport e2e）と、`tests/e2e/cache-revalidation.spec.ts` /
+# `tests/e2e/draft-mode-wiring.spec.ts`（Task 7、実`next build && next start` + 実throwaway
+# Postgres + 実content importを要する）は、現状 手動実行でしか回帰を検出できない。このworkflowが
+# それをCIへ組み込む。
+#
+# ## `.github/workflows/ci.yml`とは別fileにした理由
+#
+# - `ci.yml`の`verify` job（`pull_request` trigger、実質的なrequired check）を一切変更しないため
+#   （brief制約）。同じfile内にjobを足す方法も検討したが、別fileにすることで「このworkflowは
+#   `verify`と無関係」がfile構成レベルで自明になり、将来誤って`pull_request` triggerを足したり
+#   branch protectionのrequired checksへ登録してしまう事故を、diffを見た瞬間に気づきやすくする
+#   （同一file内のjob追加だと、既存`on:`ブロックの`pull_request`が両jobへ及ぶこと自体を見落として
+#   「このjobにだけPRをブロックさせない」設定を個別に足し忘れるリスクがある）。
+# - この2つのtest群（実`next build`/`next start`、実`next dev`子process、実Postgres migrate +
+#   content import）は`verify` jobの`npm run check`より実行時間・不安定性のリスクが高い
+#   （brief記載）。別fileにすることで、GitHub Actions UI上でも「PRの必須チェック」と
+#   「push/手動実行専用の重いe2e回帰」が別workflowとして視覚的に分離される。
+#
+# ## non-blocking化の設計
+#
+# 1. `on:`に`pull_request`を含めない。`push`（`main`のみ）と`workflow_dispatch`だけ。
+#    これだけで通常のPR開発フローには一切登場しない。
+# 2. branch protectionのrequired status checksにもこのworkflow/jobを登録しない
+#    （registrationはrepository設定側の話であり、このfileには対応する記述が無い——
+#    「登録しないこと」自体が対応)。
+# 3. jobの中身は「失敗したstepがあっても後続stepを止めない」ように、各testのstepへ個別に
+#    `continue-on-error: true`を付ける（`playwright test` stepが失敗しても、続けて
+#    `test:integration` stepを実行し、両方のartifactを回収できるようにするため）。最後に
+#    「どちらかのtest stepが実際に落ちていたら明示的にjobをfailureにする」stepを置く
+#    （brief 5の「失敗時はartifactをuploadする」を満たしつつ、push/workflow_dispatch実行結果の
+#    緑/赤がそのまま実態を表すようにする——`continue-on-error`だけに頼って常に緑にすると、
+#    「実は退行しているのに誰も気づかない」という、このworkflowを作る動機そのものを損なう)。
+#    このjob-level/step-levelの赤は、`pull_request` triggerに乗っておらずrequired checksにも
+#    登録していないため、通常のPR開発フローを一切妨げない。
+name: Content platform E2E (non-blocking)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  content-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Postgres 17 service container。`ci.yml`の`verify` jobと同じ構成
+    # （本番/preview Supabaseには接続しない使い捨てcontainer）。
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: content_e2e_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      # DB名に"test"を含めることが必須（`lib/content/databaseSafety.ts`のthrowaway判定、
+      # `content:import`のwritability gateもこれを見る）。
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/content_e2e_test
+      # 以下はすべてCI専用のダミー値。外部アカウントに紐づかず、このjob内の使い捨てDB・
+      # 使い捨てサーバーの署名にのみ使う（本番/preview環境の値とは無関係）。
+      PAYLOAD_SECRET: ce2e7f3a9d1b6480fce2f8b7a0d5c9e1b3f7a2d4c6e8b0a2d4f6b8c0e2a4c6e8
+      REVALIDATION_SECRET: ce2e-revalidation-secret-ci-only-do-not-reuse-000000
+      PREVIEW_TOKEN_SECRET: ce2e-preview-token-secret-ci-only-do-not-reuse-000000
+      # `tests/e2e/*.spec.ts`のdocblockが要求する自己参照URL（afterChangeフックが自分自身の
+      # `/api/revalidate-content`へ通知できるようにするため）。`playwright.config.ts`の
+      # `webServer`と同じport（3399）。
+      PAYLOAD_PUBLIC_SERVER_URL: http://127.0.0.1:3399
+      # e2e2本(`cache-revalidation.spec.ts`・`draft-mode-wiring.spec.ts`)は
+      # `CONTENT_SOURCE !== 'payload'`だと丸ごとskipする設計（`test.skip(...)`）。
+      # `verify` jobがこれらをskipするのはこの変数を設定していないため——このjobはここを
+      # 明示的に'payload'にすることで初めて実体を実行する。
+      CONTENT_SOURCE: payload
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.12.0
+          cache: npm
+      - run: npm ci
+
+      - run: npm run payload:migrate
+
+      # throwaway DB向けのcontent import。実credentialは使わない
+      # （`--admin-email`/`--admin-password`はこのjob内だけの使い捨てadmin）。
+      # `--bootstrap-admin`は「local throwaway DBのみ」というguardを`resolveImportUser()`
+      # （`scripts/import-content-to-payload.mts`）が持つ——上のDATABASE_URLはlocalhost + DB名に
+      # "test"を含むため通る。
+      - name: Import content into throwaway Postgres
+        run: |
+          npx tsx scripts/import-content-to-payload.mts \
+            --bootstrap-admin \
+            --admin-email content-e2e-ci@example.com \
+            --admin-password 'Str0ngPassw0rd!23-CI-only'
+
+      - run: CONTENT_SOURCE=payload npm run build
+
+      - run: npx playwright install --with-deps chromium
+
+      # 実機検証で確認した注意点: この2 specファイルを`--workers`未指定（`playwright.config.ts`の
+      # 既定`workers: 2`）でまとめて渡すと、両ファイルとも同じfixture robot（`unitree-g1`）を
+      # 書き換えるため、**ファイルをまたいだ並列実行**でrace conditionが起きる
+      # （各specファイル内は`test.describe.configure({ mode: 'serial' })`で直列化されているが、
+      # これはファイル単体の話で、別ファイルの直列groupとは互いに独立して並列実行されうる）。
+      # ローカル再現でも実際に`draft-mode-wiring.spec.ts`が古い値を拾って1件failし、
+      # `--workers=1`で2ファイルまとめて渡すと安定して4/4 passすることを確認した。
+      # `playwright.config.ts`自体は変更しない（既存`test:e2e`は単一fileずつ実行される用途が
+      # 中心で、このworkflowだけの制約のため、ここでCLI引数として上書きする）。
+      - name: Run cache-revalidation / draft-mode-wiring e2e specs
+        id: e2e_specs
+        continue-on-error: true
+        run: |
+          npx playwright test \
+            tests/e2e/cache-revalidation.spec.ts \
+            tests/e2e/draft-mode-wiring.spec.ts \
+            --workers=1
+
+      # Task 8のMCP transport e2e。`vitest.integration.config.ts`経由で実`next dev`を子processと
+      # して起動する（`tests/integration/mcpIntegrationSupport.ts`の`startAppServer()`）。
+      # 上のplaywright stepとのport衝突は無い —— 双方とも「自分専用のportを見つけて自分で
+      # server起動・終了まで面倒を見る」既存の設計（`playwright.config.ts`の`webServer`と、
+      # `mcpIntegrationSupport.ts`の`findFreePort()`）にそれぞれ任せているため、事前に手動で
+      # `npm run start`をバックグラウンド起動して待ち受けるstepは置いていない
+      # （むしろ手動で3399番portへ`npm run start`しておくと、直前のplaywright stepが自分自身の
+      # `webServer`を同じportへ起動しようとして`reuseExistingServer: false`により失敗することを
+      # 実機で確認した——このjobは意図してその手動起動stepを省いている）。このstepが使う
+      # throwaway DBも、上のcontent importが使ったDATABASE_URLとは別の使い捨てDB
+      # （`deploid_mcp_endpoint_test_<runId>`、`mcpIntegrationSupport.ts`が実行のたびに作成・
+      # 破棄する）であり、content importで投入したdataとは独立している。
+      - name: Run MCP transport integration tests
+        id: integration_tests
+        continue-on-error: true
+        run: npm run test:integration 2>&1 | tee /tmp/test-integration.log
+
+      - name: Upload Playwright report (on failure)
+        if: steps.e2e_specs.outcome == 'failure'
+        uses: actions/upload-artifact@v7
+        with:
+          name: content-e2e-playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test:integration log (on failure)
+        if: steps.integration_tests.outcome == 'failure'
+        uses: actions/upload-artifact@v7
+        with:
+          name: content-e2e-test-integration-log
+          path: /tmp/test-integration.log
+          retention-days: 7
+
+      # `continue-on-error: true`はstep単位。ここで実際の失敗有無を見て明示的にjobをfailureに
+      # する——「両stepの結果を集めてartifactをuploadする」ためにcontinue-on-errorで後続stepを
+      # 止めない設計にした副作用として、何もしなければjob自体は常にsuccess扱いになってしまう
+      # （それでは退行を見逃す、このworkflowを作る目的そのものに反する）。push/workflow_dispatch
+      # 実行結果の緑/赤が実態を表すようにするための最終gate。
+      - name: Fail the job if either test step failed
+        if: steps.e2e_specs.outcome == 'failure' || steps.integration_tests.outcome == 'failure'
+        run: |
+          echo "e2e_specs outcome: ${{ steps.e2e_specs.outcome }}"
+          echo "integration_tests outcome: ${{ steps.integration_tests.outcome }}"
+          exit 1

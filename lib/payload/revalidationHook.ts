@@ -48,6 +48,15 @@ async function notifyRevalidation(collectionSlug: RevalidatableCollectionSlug, r
         collection: collectionSlug,
         status: response.status,
       });
+    } else {
+      // 成功パスのログ。必須修正1（remediation group 5）: 失敗時のwarnしか無いと、
+      // 「revalidationが正常に動いているのか、そもそも一度も呼ばれていないのか」を
+      // ログだけから区別できない。fail-open設計自体は変えず、可観測性だけを上げる。
+      req.payload.logger.info({
+        msg: 'revalidation-webhook-notified',
+        collection: collectionSlug,
+        status: response.status,
+      });
     }
   } catch (error) {
     req.payload.logger.warn({

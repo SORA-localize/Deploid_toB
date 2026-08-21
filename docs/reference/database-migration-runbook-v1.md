@@ -1,6 +1,6 @@
 ---
 status: reference
-updated: 2026-08-18
+updated: 2026-08-21
 ---
 
 # Postgres migration runbook v1
@@ -445,7 +445,81 @@ Payload 3.87.1では、`draft: true` かつ既に`_status: 'draft'`のcollection
 必要がある場合は、対象stable IDと旧値を`WHERE`条件に含めたローカルDB限定の補正を行い、fresh
 readと`content:compare`で確認する。本番DBへの直接SQLは禁止する。
 
-## 9. Global Constraints との対応
+## 10. publish後にrevalidationが実際に成功したことを確認する運用手順
+
+remediation group 5（`.superpowers/sdd/content-platform-migration-plan-v1/remediation-group5-brief.md`
+必須修正1）。§6の`/api/revalidate-content`はfail-open設計（§6.1「fail-open時の残存ウィンドウ」）
+であり、**失敗しても書き込み自体は成功する**——そのため、失敗時のwarnログだけでは
+「revalidationが正常に動いているのか、そもそも一度も呼ばれていないのか」をログだけから
+区別できなかった。以下の成功ログを追加済み。
+
+### 10.1 検索対象のログメッセージ
+
+| 場所 | `msg` | level | 意味 |
+|---|---|---|---|
+| `lib/payload/revalidationHook.ts`（`notifyRevalidation()`） | `revalidation-webhook-notified` | info | 各collection/globalの`afterChange`から`/api/revalidate-content`へのHTTP通知が`response.ok`で成功した |
+| `lib/payload/revalidationHook.ts`（同上、既存） | `revalidation-webhook-non-ok-response` | warn | HTTP通知はできたがnon-2xxが返った |
+| `lib/payload/revalidationHook.ts`（同上、既存） | `revalidation-webhook-unreachable` | warn | HTTP通知自体が失敗した（fetch例外・timeout） |
+| `src/app/api/revalidate-content/route.ts`（`POST()`） | `revalidate-content-tag-invalidated` | (console.log、JSON文字列1行) | 署名検証・allowlist検証を通過し、`revalidateTag(tag, 'max')`を実際に呼び終えた |
+
+`route.ts`側のログは`req.payload.logger`が無い（Payloadの`req`を経由しないNext.js route
+handlerのため）ので`console.log(JSON.stringify({...}))`で出す。両方とも`collection`
+（`revalidationHook.ts`側）または`collection`・`tagKey`・`tag`（`route.ts`側）を含む。
+
+### 10.2 Vercel Function logsでの検索
+
+Vercel dashboard の Project → Logs、または CLI:
+
+```bash
+# 直近のfunction logsをJSON行として見る
+vercel logs <deployment-url-or-name> --json | grep 'revalidation-webhook-notified'
+vercel logs <deployment-url-or-name> --json | grep 'revalidate-content-tag-invalidated'
+```
+
+publishした直後に両方のmsgが（`collection`が一致する形で）**両方とも**出ていれば、
+「afterChangeフックからのHTTP通知」と「実際の`revalidateTag()`呼び出し」の両方が成功している。
+`revalidation-webhook-notified`だけ出て`revalidate-content-tag-invalidated`が出ない場合は、
+署名検証か`revalidateTag()`自体で問題が起きている可能性がある（`route.ts`のfail-closed分岐
+——401/400——のログも合わせて確認する。ただしこの2つの401/400はcollection名を含まないため、
+`route.ts`側の`unauthorized`/`unknown-collection`エラーレスポンス自体を見る必要がある）。
+
+`revalidation-webhook-notified`が一度も出ない場合は、そもそもafterChangeフックが
+`REVALIDATION_SECRET`未設定などでHTTP通知自体を試みていない（§6参照、`notifyRevalidation()`は
+secret/`PAYLOAD_PUBLIC_SERVER_URL`未設定時は早期returnしログすら出さない）。§10.3の
+troubleshooting手順を参照。
+
+### 10.3 fail-openの結果、revalidation自体が失敗した場合の最大stale時間
+
+`docs/reference/content-preview-runbook-v1.md` §6.1（Task 7 fix round 2で実測済み）の値を転記する:
+
+| profile値 | 秒数 | 意味 |
+|---|---|---|
+| `stale` | 300秒（5分） | クライアント（router cache）がこの間は再検証なしに使い回す |
+| `revalidate` | 3600秒（**60分**） | サーバーがこの間隔でbackground再生成を試みる（stale-while-revalidate） |
+| `expire` | 86400秒（**24時間**） | 上限。これを過ぎるとstale値を一切返さず、同期的に再生成する |
+
+webhook通知が一度も届かなかった最悪ケースでも、通常は**最大60分以内**に、どれだけ運が悪くても
+**24時間以内**には必ず新しい値へ切り替わる（詳細・根拠は content-preview-runbook-v1.md §6.1）。
+
+### 10.4 「publishしたのに反映が確認できない」場合のtroubleshooting
+
+次の順序で確認する（早い段階の項目ほど「そもそも通知が一度も飛んでいない」可能性が高い原因）。
+
+1. **secret未設定**: `REVALIDATION_SECRET`がPayload側（Vercel Functionのenv）に設定されているか。
+   未設定だと`notifyRevalidation()`が早期returnし、§10.1のログが一切出ない
+   （§6「secret未設定・署名欠落・不一致…は401/400で拒否する」と対になる、送信側の早期return）。
+2. **`PAYLOAD_PUBLIC_SERVER_URL`未設定**: これも未設定だと`notifyRevalidation()`が同様に早期
+   returnする。Production/Previewそれぞれの実URLが正しく設定されているか確認する
+   （プレビューdeploymentごとにURLが変わる構成の場合、固定値のままになっていないか）。
+3. **Next.js側のネットワーク到達性**: 1・2が両方設定済みなのに`revalidation-webhook-unreachable`
+   （fetch例外）や`revalidation-webhook-non-ok-response`（non-2xx）が出ている場合、Payloadを
+   実行しているruntimeから`PAYLOAD_PUBLIC_SERVER_URL`（Next.js自身）への到達性の問題
+   （VercelのFunction間ネットワーク制約、`NOTIFY_TIMEOUT_MS`＝5秒のtimeoutに収まらない遅延、
+   等）を疑う。この場合は§10.3の最大stale時間内に自然回復するのを待つか、
+   `REVALIDATION_SECRET`を使って`/api/revalidate-content`へ手動で署名付きrequestを送るか、
+   Vercelのcache purge機能を使う（content-preview-runbook-v1.md §6.1と同じ緊急手段）。
+
+## 11. Global Constraints との対応
 
 - 「schema変更はmigrationを生成してGitでreviewし、CIで適用確認する」→ §1・§5・
   `.github/workflows/ci.yml`。
