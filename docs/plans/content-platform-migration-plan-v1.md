@@ -1999,6 +1999,33 @@ git commit -m "feat: add least-privilege Codex content access"
 
 ### Task 9: 本番cutoverと旧TS撤去
 
+**Task 9着手前の外部監査で見つかった、対応済み事項（Remediation Group 1〜5）**: fail-closed
+publish gate/RBAC/route registry/version保持、SiteSettings本移行/snapshot一貫性/signed restore
+強制、Blob・OIDC/import・parity/media復元/identity transfer、import/restore全経路のDB書き込み
+安全ガード統一（2026-08-20の`deploid_dev`誤削除インシデント再発防止）、revalidation失敗の
+可観測性向上とintegration/e2e testのnon-blocking CI組み込み。詳細は
+`.superpowers/sdd/content-platform-migration-plan-v1/progress.md`（git管理外の作業ログ）。
+
+**Task 9着手前の判断（2026-08-21、ユーザー確認済み）**:
+- **source linkの403/410エラー修正は本Taskのscopeに含めない。** 外部監査でBMW公式・JAL公式
+  （403）・MEXC（410）・GlobeNewswire・GMO Air・METI（403）等、複数の実リンク失敗が見つかった。
+  `npm run check:source-links`はこれらを検出するが、**`npm run check`の構成scriptには含まれて
+  いない**（`package.json`の`check` scriptを参照。Step 8の`npm run check`ではこの問題は
+  ブロッカーにならない）。CMS移行のエンジニアリング作業とは性質が異なるコンテンツメンテナンス
+  作業のため、別途後回しにする。403がbot拒否によるものかリンク自体の不備かの分類、410・恒久
+  失敗URLの差し替えは、別taskとして起票すること。
+- **version audit archive（KMS署名付きprivate blob store）は本Taskで構築しない。** 現状は
+  archive先が無いためfail-closedでversion pruningが一切行われず、無期限にversionが増え続ける
+  （データ消失リスクは無い）。Task 9の受け入れ条件は「Version pruning is disabled because the
+  private audit archive is not yet configured. No version is automatically deleted.」を明記する
+  形とする。archive構築（容量監視・保持期間・KMS鍵管理・private blob store・復元テスト設計）は
+  将来の別remediation taskとして扱う。
+- **Payload CMS 3.87.1自体の既知バグ**（`draft: true`で二重にネストしたgroup field
+  （`heroImage.rights`等）を更新すると、`update()`の戻り値には新値が入るが実際のDBには永続化
+  されない）が実機で見つかっている。詳細・回避策は
+  `docs/reference/database-migration-runbook-v1.md`§8参照。恒久修正（patch-package化等）は
+  影響範囲の精査が必要なため本Taskに含めず、別remediationとして切り出す。
+
 **Files:**
 - Delete after parity: `data/robots.ts`
 - Delete after parity: `data/manufacturers.ts`
