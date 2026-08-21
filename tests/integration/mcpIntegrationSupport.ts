@@ -1,9 +1,10 @@
-import { type ChildProcessWithoutNullStreams, spawn, spawnSync } from 'node:child_process';
+import { type ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
 import { createServer } from 'node:net';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Payload } from 'payload';
 import { Client as PgClient } from 'pg';
+import { runPayloadCli } from '../content/migrationTestSupport';
 import { assertLocalThrowawayDatabaseUrl } from '../content/testDbGuard';
 
 /**
@@ -97,17 +98,18 @@ export function guardPayloadPoolErrors(payload: Payload): void {
   });
 }
 
-const PAYLOAD_BIN = 'node_modules/.bin/payload';
-
-/** `payload migrate` を子processとして、committedされたmigrations/を対象DBへ適用する。 */
+/**
+ * `payload migrate` を子processとして、committedされたmigrations/を対象DBへ適用する。
+ *
+ * Remediation group 6のreview（2026-08-22）で見つかったgap: 以前はここだけ独自に
+ * `node_modules/.bin/payload`（実体は`payload/bin.js`）を直接起動しており、
+ * `tests/content/migrationTestSupport.ts`の`runPayloadCli()`が塞いだのと全く同じ
+ * bootstrap race（`patches/payload+3.87.1.patch`のdocblock参照）をそのまま踏む経路が
+ * 残っていた。独自実装を持たず、既にreview済みの`runPayloadCli()`をそのまま再利用する
+ * （`tests/content/testDbGuard.ts`の再利用と同じ方針——判定・実行ロジックのコピーを作らない）。
+ */
 export function runPayloadMigrate(databaseUrl: string, payloadSecret: string): { status: number; stdout: string; stderr: string } {
-  const result = spawnSync(PAYLOAD_BIN, ['migrate'], {
-    cwd: process.cwd(),
-    env: { ...process.env, DATABASE_URL: databaseUrl, PAYLOAD_SECRET: payloadSecret },
-    encoding: 'utf8',
-    timeout: 60_000,
-  });
-  return { status: result.status ?? -1, stdout: result.stdout ?? '', stderr: result.stderr ?? '' };
+  return runPayloadCli(['migrate'], { DATABASE_URL: databaseUrl, PAYLOAD_SECRET: payloadSecret });
 }
 
 /** 空いているTCP portを1つ確保する。 */
