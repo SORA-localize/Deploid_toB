@@ -89,6 +89,12 @@ async function main(): Promise<void> {
   };
   const config = imported.default !== undefined ? await imported.default : imported;
 
+  // `payload/dist/bin/migrate.js`は`...prettySyncLogger`（`loggerDestination`/`loggerOptions`）を
+  // ここに追加で渡しているが、実際に確認したところ`payload@3.87.1`の`payload.init()`実装は
+  // この2つのkeyをどこでも参照していない（dead option、おそらく旧versionの名残）。かつ
+  // `prettySyncLoggerDestination`自体は`payload`パッケージの`exports`に含まれない内部pathの
+  // ため、真似して`import`しようとすると`ERR_PACKAGE_PATH_NOT_EXPORTED`で即死する
+  // （実機確認済み）。実質的な差は無いため、意図的に省略している。
   await payload.init({
     config: config as Parameters<typeof payload.init>[0]['config'],
     disableDBConnect: command === 'migrate:create',
@@ -127,9 +133,11 @@ async function main(): Promise<void> {
   }
 
   payload.logger.info('Done.');
-  // `payload/bin.js`と同じ理由（migrate系commandはpayload.destroy()を呼ばない設計）で
-  // poolを明示close。ここでの`await`は、tsxのloader起動のような外部process/worker-thread
-  // 起動を一切伴わない、通常のDB接続closeであり、bin.jsが踏んでいたレースとは無関係。
+  // `payload/bin.js`はmigrate系commandで`payload.destroy()`を呼ばず、プロセス終了に
+  // 接続closeを委ねている。このscriptは明示的にcloseする——`main()`のみを実行して即終了する
+  // 単発scriptなので、意図しない接続リークを残さないほうが安全なため、あえてbin.jsとは
+  // 違う選択をしている。ここでの`await`は通常のDB接続closeであり、tsxのloader起動のような
+  // 外部process/worker-thread起動を伴わないため、bin.jsが踏んでいたレースとは無関係。
   await payload.destroy();
 }
 
