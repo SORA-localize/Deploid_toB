@@ -32,7 +32,7 @@ export const articles: Article[] = [
         rightsHolder: 'Vitaly Gariev',
         licenseUrl: 'https://unsplash.com/license',
         checkedAt: '2026-07-12',
-        permissionNote: 'Unsplash Licenseの汎用イメージ。Surgie実機ではなく、遠隔操作というテーマを示す代替画像として使用。UC San Diego公式画像は転載条件が未確認のため使用していない。',
+        permissionNote: 'Unsplash Licenseの汎用イメージ。特定のロボット実機・公式写真ではなく、遠隔操作テーマの代替画像として使用。',
       },
     },
     whyItMatters: '今回動いた変数は運動性能そのものではなく、既存施設への設置性、遠隔操作による責任分界、専用設備とのコスト構造、複数作業への転用可能性である。医療に限らず、人間用設備を大規模改修せずにロボットを導入する構想を評価する材料になる。',
@@ -120,7 +120,7 @@ Surgieは商用製品ではなく、今回の発表も医療機関への導入�
         rightsHolder: 'Simon Kadula',
         licenseUrl: 'https://unsplash.com/license',
         checkedAt: '2026-07-10',
-        permissionNote: 'Unsplash Licenseの汎用工場イメージ。Highlanders N実機ではなく、量産・工場運用のテーマを示す代替画像として使用。',
+        permissionNote: 'Unsplash Licenseの汎用工場イメージ。特定のロボット実機・公式写真ではなく、量産・工場運用テーマの代替画像として使用。',
       },
     },
     whyItMatters: '国内自動車メーカーの量産設計・品質保証・工場運営をヒューマノイド供給へ転用する計画が、工場名と開始目標を伴って示された。調達側にとっては、輸入機以外の国内供給・保守候補が現実的な比較対象になり始めた。',
@@ -248,9 +248,9 @@ Figure はまだ外部企業への販売条件・価格・調達経路を公表�
         sourceType: 'third-party',
         rightsHolder: 'Bernd Dittrich',
         licenseUrl: 'https://unsplash.com/license',
-        checkedAt: '2026-06-25',
+        checkedAt: '2026-07-08',
         permissionNote:
-          'Agility Robotics公式画像はTerms of Use上ブロック済み（"personal, non-commercial use only"等の制限）。代わりにUnsplash Licenseの汎用倉庫イメージを使用。Digit実機ではない。',
+          'Unsplash Licenseの汎用倉庫イメージ。特定企業・ロボットの公式写真ではなく、物流倉庫テーマの代替画像として使用。',
       },
     },
     whyItMatters:
@@ -1384,9 +1384,9 @@ NEO の安全設計は家庭利用前提だ。産業現場での利用には安�
         sourceType: 'third-party',
         rightsHolder: 'Simon Kadula',
         licenseUrl: 'https://unsplash.com/license',
-        checkedAt: '2026-06-25',
+        checkedAt: '2026-07-10',
         permissionNote:
-          'Tesla公式のOptimus画像は許諾未確認のため使用しない。Unsplash Licenseの汎用工場イメージで代替。Optimus実機ではない。',
+          'Unsplash Licenseの汎用工場イメージ。特定のロボット実機・公式写真ではなく、量産・工場運用テーマの代替画像として使用。',
       },
     },
     whyItMatters:
@@ -1490,7 +1490,7 @@ Model SとModel Xは2012年・2015年以来Teslaの旗艦製品として君臨�
         rightsHolder: 'Agustina Perretta',
         licenseUrl: 'https://unsplash.com/license',
         checkedAt: '2026-06-25',
-        permissionNote: 'Unsplash Licenseの汎用イメージ。日本の政策テーマを示す代替画像として使用。',
+        permissionNote: 'Unsplash Licenseの汎用イメージ。特定機関の公式写真ではなく、日本の政策・労働市場テーマの代替画像として使用。',
       },
     },
     whyItMatters:
@@ -1592,7 +1592,7 @@ TechCrunchが2026年4月5日に報じた記事のタイトルは示唆的だ—�
         rightsHolder: 'Carlos Gil',
         licenseUrl: 'https://unsplash.com/license',
         checkedAt: '2026-06-25',
-        permissionNote: 'Unsplash Licenseの汎用イメージ。Humanoids Summit Tokyo公式写真ではなく、カンファレンスのテーマを示す代替画像として使用。',
+        permissionNote: 'Unsplash Licenseの汎用カンファレンスイメージ。特定イベント・製品の公式写真ではなく、カンファレンステーマの代替画像として使用。',
       },
     },
     whyItMatters:
@@ -1914,7 +1914,7 @@ Google DeepMindが複数の競合するハードウェアメーカー（Boston D
         rightsHolder: 'Agustina Perretta',
         licenseUrl: 'https://unsplash.com/license',
         checkedAt: '2026-06-25',
-        permissionNote: 'Unsplash Licenseの汎用イメージ。日本の労働市場・政策テーマを示す代替画像として使用。',
+        permissionNote: 'Unsplash Licenseの汎用イメージ。特定機関の公式写真ではなく、日本の政策・労働市場テーマの代替画像として使用。',
       },
     },
     whyItMatters:
@@ -2115,7 +2115,7 @@ R1自体は重量物ハンドリングを想定した機体ではなく、Unitre
         rightsHolder: 'Carlos Gil',
         licenseUrl: 'https://unsplash.com/license',
         checkedAt: '2026-06-25',
-        permissionNote: 'DOBOT公式のATOM Max画像は許諾未確認のため使用しない。Unsplash Licenseの汎用カンファレンスイメージで代替。',
+        permissionNote: 'Unsplash Licenseの汎用カンファレンスイメージ。特定イベント・製品の公式写真ではなく、カンファレンステーマの代替画像として使用。',
       },
     },
     whyItMatters:
@@ -2514,8 +2514,8 @@ Halos for Roboticsの特徴は、ロボット本体の制御だけで完結し�
         sourceType: 'third-party',
         rightsHolder: 'Bernd Dittrich',
         licenseUrl: 'https://unsplash.com/license',
-        checkedAt: '2026-06-25',
-        permissionNote: 'Robot.com公式のR-noid画像は許諾未確認のため使用しない。Unsplash Licenseの汎用倉庫イメージで代替。',
+        checkedAt: '2026-07-08',
+        permissionNote: 'Unsplash Licenseの汎用倉庫イメージ。特定企業・ロボットの公式写真ではなく、物流倉庫テーマの代替画像として使用。',
       },
     },
     whyItMatters:
@@ -2591,8 +2591,8 @@ R-noidは、ヒューマノイド市場が単一の形に収束していない�
         sourceType: 'third-party',
         rightsHolder: 'Vitaly Gariev',
         licenseUrl: 'https://unsplash.com/license',
-        checkedAt: '2026-06-25',
-        permissionNote: 'Unsplash Licenseの汎用イメージ。IO-AI実機ではなく、身体動作による遠隔操作のテーマを示す代替画像として使用。',
+        checkedAt: '2026-07-12',
+        permissionNote: 'Unsplash Licenseの汎用イメージ。特定のロボット実機・公式写真ではなく、遠隔操作テーマの代替画像として使用。',
       },
     },
     whyItMatters:
@@ -2670,9 +2670,9 @@ IO-AIの事例から、PoC前のチェック項目は明確になる。第一に
         sourceType: 'third-party',
         rightsHolder: 'Simon Kadula',
         licenseUrl: 'https://unsplash.com/license',
-        checkedAt: '2026-06-25',
+        checkedAt: '2026-07-10',
         permissionNote:
-          'Unsplash Licenseの汎用イメージ。PUDU D7実機ではなく、産業用ロボットの現場イメージとして使用。',
+          'Unsplash Licenseの汎用工場イメージ。特定のロボット実機・公式写真ではなく、量産・工場運用テーマの代替画像として使用。',
       },
     },
     whyItMatters:

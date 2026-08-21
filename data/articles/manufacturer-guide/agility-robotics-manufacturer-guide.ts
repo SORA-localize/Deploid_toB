@@ -34,7 +34,7 @@ export const agilityRoboticsManufacturerGuide: ManufacturerGuideArticle = {
       licenseUrl: 'https://unsplash.com/license',
       checkedAt: '2026-07-08',
       permissionNote:
-        'Agility Robotics公式画像はTerms of Use上、利用条件が限定されるため使用しない。代わりにUnsplash Licenseの汎用倉庫イメージを使用。Digit実機ではない。',
+        'Unsplash Licenseの汎用倉庫イメージ。特定企業・ロボットの公式写真ではなく、物流倉庫テーマの代替画像として使用。',
     },
   },
   relatedRobotIds: ['agility-digit'],
