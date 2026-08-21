@@ -38,6 +38,11 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/payload_test
       # CI専用のダミー値。外部アカウントに紐づかず、この使い捨てDBの署名にのみ使う。
       PAYLOAD_SECRET: bd7e747183c90fe80ff7b8136607362ffe54d9e6c2fbd42a
+      # `.env.example`のローカル既定値と同じ。`npm run check`内の`npm run build`が
+      # `getContentRepository()`（`lib/content/getContentRepository.ts`）経由でこれを要求する
+      # （未設定だとthrow）。このjobはcontent:importを実行しないため、Postgres側の実contentに
+      # 依存しない`local`（`data/*.ts`）を使う。
+      CONTENT_SOURCE: local
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
