@@ -34,9 +34,13 @@ Production（project ref `xtklkavbirorelqdyqjj`）に対して実行する前の
 
 1. **Production Vercel環境変数が現状ほぼ未設定**（下記「Production環境変数の現状」参照）。
    Preview は本セッション中に個別に埋めたが、その作業は**Production環境変数には一切適用していない**。
-2. **Step 2（OIDC-federated audit Blob store疎通）が Preview でも未実施のまま**。
-   `deploid-audit-production`も同じ制約（実Vercel Function runtimeからしか到達できない）を持つため、
-   Production cutover当日に**初めて**疎通確認することになる想定は避けたい。
+2. **（確認済み・重大）OIDC-federated audit Blob store疎通をPreviewで実際に試したところ、
+   `VERCEL_OIDC_TOKEN`が実Vercel Function runtimeに一切注入されていないことが判明した。**
+   詳細は`task9-preview-rehearsal-preflight-v1.md`「Step 2追試」参照。Vercel projectの
+   「OIDC Federation」がdashboard上で有効化されていない可能性が高く（CLIでは確認・変更不可）、
+   有効化されるまで`deploid-audit-preview`/`deploid-audit-production`はどちらも一切機能しない。
+   これは「未検証」ではなく**現状のままではProduction cutoverが構造的に失敗する**という意味で、
+   Production着手前に必ず解消が要る。
 3. **cosignによる実署名（KMSを使った実際のexport --upload）を、このセッションでは一度も実行していない。**
    Preview/Productionどちらの環境でも、`content:export -- --upload`の実行経路（署名 → private
    Blob storeへの書き込み → 検証）を通しで検証したことがない。Task 5で機構は実装・単体検証済みだが、
@@ -102,9 +106,12 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 - [ ] `BLOB_STORE_ID`がPayload/exportの実行パスで実際に読まれているか
       （`scripts/snapshotObjectStore.mts`のOIDC経路が実際に踏まれる条件）を確認し、Production側で
       設定が要るかどうかを確定する。
-- [ ] Step 2相当（OIDC-federated audit Blob store疎通）を、**まずPreviewで**実Vercel Function経由
-      （一時的な管理用API routeか、`vercel dev`のOIDC federation）で確認しておく。Production当日に
-      これを初めて試す状態を避ける。
+- [x] ~~Step 2相当（OIDC-federated audit Blob store疎通）を、まずPreviewで実Vercel Function経由で
+      確認しておく。~~ **実施済み（2026-08-22）: `VERCEL_OIDC_TOKEN`が実Vercel Functionに
+      注入されていないことを確認。**
+- [ ] **（新規・最優先）Vercel projectの「OIDC Federation」をdashboardで有効化する。** これが
+      プロジェクトオーナーの操作が必要な唯一の項目（CLIでは不可）。有効化後、上記の確認を
+      もう一度Previewで再実行し、`list()`が実際に成功することを確かめる。
 - [ ] Production Vercel環境変数を、Preview作業と同じ手順（値は都度その場で払い出し・確認、
       Previewの値を転用しない、`~/secrets/deploid-supabase-connections.txt`のproduction sectionから
       DATABASE_URLを読む）で埋める。この作業自体はTask 9計画のStepではなく、Step 1着手前の準備。
@@ -149,13 +156,17 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 3. 戻せない場合の、Payload `postgresAdapter`側`pool.max`調整とVercel同時実行数設計
 4. 負荷下（複数route・複数同時アクセス）で500が出ないことの検証
 
-優先順位（2026-08-22、プロジェクトオーナー確認済み）:
+優先順位（2026-08-22、プロジェクトオーナー確認済み。1.は完了、2.は原因判明・要対応で更新）:
 
-1. 上記4点の解消（DB接続問題）
-2. OIDC-federated audit Blob store疎通確認（DB接続問題とは独立して並行可。**Preview環境の実Vercel
-   Function経由でのみ実行し、Production store（`deploid-audit-production`）には一切触れない**）
+1. ~~上記4点の解消（DB接続問題）~~ → 未解消のまま残っている（pooler modeの確認自体が未完了）
+2. ~~OIDC-federated audit Blob store疎通確認~~ → **実施済み。`VERCEL_OIDC_TOKEN`が実Functionに
+   注入されていないことを確認した。Vercel projectの「OIDC Federation」をdashboardで有効化する
+   必要がある（プロジェクトオーナーの操作待ち）。有効化後、Previewで再確認する。**
 3. 1・2が解消してから、Production環境変数の設定設計
 4. 最後にTask 9計画Step 1（変更凍結宣言）
+
+**現時点でProduction cutoverへ進める状態ではない。** DB接続数上限の解消とOIDC Federation有効化の
+両方が未解決のまま残っている。
 
 **Production DBへの書き込み・Production Vercel環境変数の追加は、いずれも個別に明示承認を得てから
 実行する。**

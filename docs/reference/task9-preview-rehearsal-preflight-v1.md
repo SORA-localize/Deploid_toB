@@ -290,14 +290,33 @@ Vercel Preview環境の実際の`DATABASE_URL`がtransaction pooler（6543）と
 プログラム的に取り出せなかった——値を一切表示しない运用は徹底されている）。**この点は
 Production cutover着手前に必ず確認すべき事項として、下記チェックリストへ追加する。**
 
+### Step 2追試: OIDC audit Blob store疎通確認（2026-08-22、実施・重大な問題を発見）
+
+一時的なdebug API route（`src/app/api/debug-oidc-check/route.ts`、確認後commit `b1014d3`で削除済み、
+Preview storeへの書き込みは一切行っていない）を実Preview deploymentへ配置し、`vercel curl`
+（deployment protection bypassを自動発行する機能）経由で実行した。
+
+**結果: `VERCEL_OIDC_TOKEN`が実Preview Vercel Functionのruntimeに一切注入されていない。**
+`process.env`のkey一覧を確認したが`VERCEL_OIDC_TOKEN`は存在せず（`VERCEL_ENV=preview`・
+`VERCEL_TARGET_ENV=preview`は正しく確認でき、正しい環境で実行されていることは確認済み）、
+`PREVIEW_AUDIT_BLOB_TOKEN_STORE_ID`は正しく読めていた。ローカル`vercel dev`では実際に
+`VERCEL_OIDC_TOKEN`が取得できた（が"development"環境scope扱いで、Vercel Blob側のOIDC trustは
+"development"を信頼しないため`list()`は失敗した）ことと対照的に、**実deploymentでは
+そもそもtokenが存在しない**。
+
+これは「未検証」ではなく**現状壊れている（未設定）**という結論になる。Vercel projectの
+「OIDC Federation」設定（dashboard専用、CLIには対応するsubcommandが無いことを確認済み——
+`vercel project update --help`・`vercel project --help`のどちらにも該当項目なし）が、
+このprojectでは有効化されていない可能性が高い。**この設定はプロジェクトオーナーがVercel
+dashboardから確認・有効化する必要がある。** 有効化されない限り、`deploid-audit-preview` /
+`deploid-audit-production`のどちらもPayload・exportスクリプトから一切書き込めない
+（cutover baseline snapshot、Task 9計画Step 2が機能しない）。
+
 ### 未実施・未検証事項（Production cutover着手前に埋める必要がある）
 
-- **Step 2（OIDC-federated audit Blob store疎通）が未実施のまま。** `deploid-audit-preview` /
-  `deploid-audit-production`はどちらも実Vercel Function runtimeからしか到達できない設計のため、
-  ローカル端末からの`tsx`直接実行では検証できていない。cutover baseline snapshot
-  （Task 9計画Step 2、`content:export -- --upload`）は実際にこのstoreへ書き込む必要があるため、
-  Production cutover本番実行の前に、実Vercel環境（Preview deploymentで可）からの1回限りの
-  smoke testで疎通を確認しておくべき。
+- **（最優先・新規）Vercel projectの「OIDC Federation」をdashboardで確認・有効化する必要がある。**
+  上記の追試で判明。有効化されていない場合、audit Blob store（署名済みcutover baseline
+  snapshotの保存先）が実質的に一切機能しない。CLIでは確認・変更できない（dashboard専用）。
 - **Vercel Preview（および将来Production）のDATABASE_URLが実際にどのpooler modeを指しているか
   未確認。** session pooler（15接続上限）のままだと、実際の同時アクセスや今後のPayload
   admin/MCP同時利用で同じ`EMAXCONNSESSION`が本番相当のPreview deploymentでも起き得る。
