@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   const hasOidc = Boolean(process.env.VERCEL_OIDC_TOKEN);
   const storeId = process.env.PREVIEW_AUDIT_BLOB_TOKEN_STORE_ID;
+  const oidcRelatedKeys = Object.keys(process.env).filter((k) => k.includes('OIDC') || k === 'VERCEL_ENV' || k === 'VERCEL_TARGET_ENV');
   let listResult: unknown = null;
   let listError: string | null = null;
   if (hasOidc && storeId) {
@@ -21,6 +22,9 @@ export async function GET() {
   return NextResponse.json({
     hasOidcToken: hasOidc,
     hasStoreId: Boolean(storeId),
+    oidcRelatedKeys,
+    vercelEnv: process.env.VERCEL_ENV ?? null,
+    vercelTargetEnv: process.env.VERCEL_TARGET_ENV ?? null,
     listResult,
     listError,
   });
