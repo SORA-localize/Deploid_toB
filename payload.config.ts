@@ -9,6 +9,7 @@ import { contentCollections, contentGlobals } from './lib/payload/contentSchema'
 import { createMcpPlugin } from './lib/payload/mcp';
 import { createMediaStoragePlugin } from './lib/payload/mediaStoragePlugin';
 import { withPreviewNonceSchema } from './lib/payload/previewNonceSchema';
+import { resolvePublicServerUrl } from './lib/payload/resolvePublicServerUrl';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -35,7 +36,7 @@ function requireEnv(name: 'DATABASE_URL' | 'PAYLOAD_SECRET'): string {
 }
 
 export default buildConfig({
-  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
+  serverURL: resolvePublicServerUrl(),
   admin: {
     user: Admins.slug,
     importMap: {

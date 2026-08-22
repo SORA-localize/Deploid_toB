@@ -446,8 +446,17 @@ export function assertValidSignedJsonDocument(value: unknown): asserts value is 
  * **secret ではない**。verify を外部ファイル無しで完結させるために埋め込む
  * （復旧時に「鍵ファイルがどこにあるか分からない」状態を作らない）。
  * `SNAPSHOT_SIGNING_PUBLIC_KEY_PATH` で上書きできる（鍵の手動 rotation 後の経路）。
+ *
+ * 2026-08-22（remediation group 6の副産物）: この鍵は元々Production/Preview共通の
+ * 単一defaultだった——`SNAPSHOT_SIGNING_KMS_KEY_ARN`をどちらの環境も明示設定していなかった
+ * ため、Preview上で明示override無しに署名すると、気付かないままProductionの実KMS鍵で
+ * 署名してしまう設計になっていた。Postgres・Vercel Blobは既に環境ごとに別resourceだったのに
+ * この鍵だけ分離されていなかった（`content-platform-resources-v1.md` §4参照）。
+ * `lib/payload/access.ts`の`isAuditArchiveFullyConfigured()`と同じ
+ * `VERCEL_ENV === 'production' ? PRODUCTION : PREVIEW`パターンで、defaultそのものを
+ * 環境認識にした。env var overrideは引き続き最優先。
  */
-export const SNAPSHOT_SIGNING_PUBLIC_KEY_PEM = [
+export const PRODUCTION_SIGNING_PUBLIC_KEY_PEM = [
   '-----BEGIN PUBLIC KEY-----',
   'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/cHZmiiXZKXcUVZefKLtKVwLBdxS',
   'oHcOefwBg14WSe08xdJE0yM9cnVgLZYINtulE2S/ZTStYMBNoK3vOhnq6Q==',
@@ -455,11 +464,24 @@ export const SNAPSHOT_SIGNING_PUBLIC_KEY_PEM = [
   '',
 ].join('\n');
 
-export const DEFAULT_SIGNING_KEY_ARN =
-  'arn:aws:kms:ap-northeast-1:866731631468:key/a9c59d6b-b769-47bb-bc65-8ac6ff4782f5';
+export const PREVIEW_SIGNING_PUBLIC_KEY_PEM = [
+  '-----BEGIN PUBLIC KEY-----',
+  'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElua4jHrbBrGa1plUQh/jbrxC0P3x',
+  'VC40bVQtTAw2PuZdhdOsVCzFZcLwd63rGn7ccgw9hROFUOKBEkiOWW48UA==',
+  '-----END PUBLIC KEY-----',
+  '',
+].join('\n');
+
+export function defaultSigningPublicKeyPem(): string {
+  return process.env.VERCEL_ENV === 'production' ? PRODUCTION_SIGNING_PUBLIC_KEY_PEM : PREVIEW_SIGNING_PUBLIC_KEY_PEM;
+}
+
+export const PRODUCTION_SIGNING_KEY_ARN = 'arn:aws:kms:ap-northeast-1:866731631468:key/a9c59d6b-b769-47bb-bc65-8ac6ff4782f5';
+export const PREVIEW_SIGNING_KEY_ARN = 'arn:aws:kms:ap-northeast-1:866731631468:key/2f56ded3-fd2f-40c9-bf44-00c63bf59aba';
 
 export function signingKeyArn(): string {
-  return process.env.SNAPSHOT_SIGNING_KMS_KEY_ARN ?? DEFAULT_SIGNING_KEY_ARN;
+  if (process.env.SNAPSHOT_SIGNING_KMS_KEY_ARN) return process.env.SNAPSHOT_SIGNING_KMS_KEY_ARN;
+  return process.env.VERCEL_ENV === 'production' ? PRODUCTION_SIGNING_KEY_ARN : PREVIEW_SIGNING_KEY_ARN;
 }
 
 export function cosignAvailable(): boolean {
@@ -506,7 +528,7 @@ export async function verifyBlobWithCosign(filePath: string, bundlePath: string)
   // 「どれが正しい鍵か分からない」状態を作る）。override があるときは何も書かない。
   const keyDir = overridePath ? undefined : await mkdtempDir();
   const keyPath = overridePath ?? path.join(keyDir as string, 'deploid-snapshot-signing-pubkey.pem');
-  if (!overridePath) await writeFile(keyPath, SNAPSHOT_SIGNING_PUBLIC_KEY_PEM, 'utf8');
+  if (!overridePath) await writeFile(keyPath, defaultSigningPublicKeyPem(), 'utf8');
 
   try {
     execFileSync(

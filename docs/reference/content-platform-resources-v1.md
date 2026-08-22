@@ -171,6 +171,14 @@ encrypted secretsのみ」という最小構成の代替案を検討した上で
 
 **署名鍵**（cosign snapshot署名用、Task 5 / Task 9で使用）:
 
+**2026-08-22追記**: 当初、この署名鍵は環境を分けずに1本だけ存在していた（PostgresやVercel
+Blobは環境ごとに別resourceだったのに、この鍵だけ分離されていなかった）。Preview環境変数への
+値設定作業中に気づき、Preview専用鍵を新規作成して分離した。ProductionとPreviewを同じ鍵で
+署名すると、Preview上のテストデータに対する署名とProductionの実データに対する署名が
+区別不能になり、鍵の信頼境界が環境境界と一致しなくなる。
+
+Production:
+
 | 項目 | 値 |
 |---|---|
 | alias | `alias/deploid-snapshot-signing` |
@@ -181,14 +189,41 @@ encrypted secretsのみ」という最小構成の代替案を検討した上で
 | SigningAlgorithm | `ECDSA_SHA_256` |
 | 自動rotation | 非対応（AWS KMSはasymmetric keyの自動rotationをサポートしない。AWS platformの制約であり選択ではない） |
 
+Preview:
+
+| 項目 | 値 |
+|---|---|
+| alias | `alias/deploid-snapshot-signing-preview` |
+| KeyId | `2f56ded3-fd2f-40c9-bf44-00c63bf59aba` |
+| ARN | `arn:aws:kms:ap-northeast-1:866731631468:key/2f56ded3-fd2f-40c9-bf44-00c63bf59aba` |
+| KeySpec | `ECC_NIST_P256` |
+| KeyUsage | `SIGN_VERIFY` |
+| SigningAlgorithm | `ECDSA_SHA_256` |
+| 自動rotation | 非対応（同上） |
+| 作成日 | 2026-08-22 |
+
 rotationが必要になった場合は手動（新しいkeyとaliasを作成し、以降の署名を作り直す）で対応する。
+`deploid-kms` IAM userのpolicyが`Resource: "*"`へ`kms:*`を許可しているため、新規keyの
+default key policyのままで既存の`deploid-kms` credentialから使用できる（追加のkey policy
+設定は不要、実際に作成後すぐ使えることを確認済み）。
 
 検証用公開鍵（secretではない。公開して問題ない値としてそのまま掲載する）:
+
+Production:
 
 ```
 -----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/cHZmiiXZKXcUVZefKLtKVwLBdxS
 oHcOefwBg14WSe08xdJE0yM9cnVgLZYINtulE2S/ZTStYMBNoK3vOhnq6Q==
+-----END PUBLIC KEY-----
+```
+
+Preview:
+
+```
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElua4jHrbBrGa1plUQh/jbrxC0P3x
+VC40bVQtTAw2PuZdhdOsVCzFZcLwd63rGn7ccgw9hROFUOKBEkiOWW48UA==
 -----END PUBLIC KEY-----
 ```
 

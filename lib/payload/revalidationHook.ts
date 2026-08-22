@@ -17,6 +17,7 @@
  */
 import type { CollectionAfterChangeHook, GlobalAfterChangeHook, PayloadRequest } from 'payload';
 import { computeRevalidationSignature, REVALIDATE_SIGNATURE_HEADER, type RevalidatableCollectionSlug } from '../content/cacheTags';
+import { resolvePublicServerUrl } from './resolvePublicServerUrl';
 
 const NOTIFY_TIMEOUT_MS = 5000;
 
@@ -29,7 +30,7 @@ async function notifyRevalidation(collectionSlug: RevalidatableCollectionSlug, r
     return;
   }
 
-  const baseUrl = process.env.PAYLOAD_PUBLIC_SERVER_URL;
+  const baseUrl = resolvePublicServerUrl();
   if (!baseUrl) return;
 
   const body = JSON.stringify({ collection: collectionSlug });
