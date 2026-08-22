@@ -96,6 +96,7 @@ describe('assertWritableDatabaseUrl (CLIスクリプト向け: 3分岐、明示f
       raw: 'postgresql://u@localhost:5432/deploid_task9_test',
       callerFile: 'scripts/some-script.mts',
       confirmedProduction: false,
+      confirmedPreview: false,
       confirmedPersistentLocalDatabase: false,
       ...overrides,
     });
@@ -104,14 +105,20 @@ describe('assertWritableDatabaseUrl (CLIスクリプト向け: 3分岐、明示f
     expect(() => call({ raw: undefined })).toThrow(/DATABASE_URL is not set/);
   });
 
-  // ─── remote host branch (変更しない) ────────────────────────────────────
-  it('refuses a remote host without --i-know-this-is-production', () => {
+  // ─── remote host branch（2026-08-22: --i-know-this-is-preview を対称に追加） ──
+  it('refuses a remote host without --i-know-this-is-production or --i-know-this-is-preview', () => {
     expect(() => call({ raw: 'postgresql://u@db.abcdef.supabase.co:5432/postgres' })).toThrow(/Refusing to write/);
   });
 
   it('allows a remote host with --i-know-this-is-production', () => {
     expect(() =>
       call({ raw: 'postgresql://u@db.abcdef.supabase.co:5432/postgres', confirmedProduction: true }),
+    ).not.toThrow();
+  });
+
+  it('allows a remote host with --i-know-this-is-preview (does not require --i-know-this-is-production too)', () => {
+    expect(() =>
+      call({ raw: 'postgresql://u@db.abcdef.supabase.co:5432/postgres', confirmedPreview: true }),
     ).not.toThrow();
   });
 

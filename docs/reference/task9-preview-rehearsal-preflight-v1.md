@@ -86,11 +86,40 @@ brief記載の通りDB接続自体をしない設計）ため、Preview DATABASE
 
 ## Step 4: Preview DBへ実際にimportする
 
+**2026-08-22更新**: 当初案（`--bootstrap-admin --admin-email --admin-password`をPreviewへ
+そのまま使う）は、実装側の安全guardと矛盾していたため実行不能だった（`--bootstrap-admin`は
+元々local throwaway DB専用に無条件拒否していた）。Preview専用のadmin bootstrap経路
+（`scripts/import-content-to-payload.mts`の`bootstrapAdminIfAllowed()`）を新設し、
+write gate自体（`lib/content/databaseSafety.ts`）にも`--i-know-this-is-preview`を
+`--i-know-this-is-production`と対称な独立flagとして追加した——Preview操作で
+「productionだと分かっている」という矛盾したflagを使わずに済む。
+
+`DATABASE_URL`は"Preview direct connection"ではなく**session pooler**（port 5432、
+`aws-0-ap-northeast-1.pooler.supabase.com`）を使う——direct connection（`db.<ref>.supabase.co`）
+はDNS解決不能（Supabase側の仕様変更と見られる、2026-08-22に実機確認済み）。SSL接続には
+`?sslmode=require&uselibpqcompat=true`が必須（`pg-connection-string`の新しいdefault挙動が
+`sslmode=require`を`verify-full`の別名にしており、Supabaseの証明書chainがNodeの既定trust
+storeに無いため、そのままでは`self-signed certificate in certificate chain`で失敗する）。
+
+対象DBの`_environment_marker`が既に`"preview"`とstamp済みであることが前提
+（このrehearsalのStep 1で既に完了済み）。
+
 ```bash
-DATABASE_URL="<Preview direct connection>" PAYLOAD_PUBLIC_SERVER_URL="<Preview deploy URL>" \
-  npx tsx scripts/import-content-to-payload.mts --bootstrap-admin \
-  --admin-email <human提供> --admin-password <human提供>
+DATABASE_URL="<Preview session pooler connection>?sslmode=require&uselibpqcompat=true" \
+  PAYLOAD_IMPORT_ADMIN_EMAIL=<human提供> PAYLOAD_IMPORT_ADMIN_PASSWORD=<human提供> \
+  npx tsx scripts/import-content-to-payload.mts \
+  --bootstrap-admin --i-know-this-is-preview
 ```
+
+`--admin-email` / `--admin-password`（CLI引数）は`--i-know-this-is-preview`と併用不可
+（shell履歴・process listへのpassword露出を避けるため、`PAYLOAD_IMPORT_ADMIN_EMAIL` /
+`PAYLOAD_IMPORT_ADMIN_PASSWORD`という環境変数だけを使う）。
+
+`PAYLOAD_PUBLIC_SERVER_URL`は明示設定不要（`lib/payload/resolvePublicServerUrl()`が
+Vercelの`VERCEL_BRANCH_URL`/`VERCEL_URL`へ自動fallbackする実装へ変更済み）。ただし
+この手順のようにローカル端末から`tsx`で直接実行する場合は`VERCEL_URL`等も存在しないため、
+`PAYLOAD_PUBLIC_SERVER_URL`は未設定のまま解決され、revalidation webhook通知は
+（fail-open設計により）黙ってskipされる——importそのものの成否には影響しない。
 
 Expected: exit 0、`content:import`の実行結果が正本件数（robots=63, manufacturers=26,
 use-cases=44, deployments=11, articles=34, article-placements=7, media=51,

@@ -109,6 +109,16 @@ export function assertStrictThrowawayDatabaseUrl(callerFile: string, raw: string
 /** 既定の確認flag名。`--i-know-this-is-production`と紛らわしくない、独立した名前にしてある。 */
 export const PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG = 'i-know-this-is-a-persistent-local-database';
 export const PRODUCTION_CONFIRMATION_FLAG = 'i-know-this-is-production';
+/**
+ * 2026-08-22（Preview rehearsal中の外部レビュー指摘）: remote host全般への書き込みには
+ * 元々`--i-know-this-is-production`しか無かった。Previewへ書き込む場合でもこの
+ * flagを渡す必要があり、名前が実際の対象と矛盾する（「これはproductionだと分かっている」と
+ * 明示的に主張することになる）——将来の誤操作（本当にPreviewのつもりでこのflagへ慣れてしまい、
+ * 実際にproductionを指している時にも機械的に付ける)を誘発しかねない。remote hostの許可を
+ * `--i-know-this-is-production`と`--i-know-this-is-preview`の2つへ分け、Previewの操作では
+ * 後者だけで完結するようにする。
+ */
+export const PREVIEW_CONFIRMATION_FLAG = 'i-know-this-is-preview';
 
 export interface AssertWritableDatabaseUrlArgs {
   raw: string | undefined;
@@ -116,6 +126,12 @@ export interface AssertWritableDatabaseUrlArgs {
   callerFile: string;
   /** `--i-know-this-is-production` が渡されたか。remote hostの書き込みを明示的に許可する。 */
   confirmedProduction: boolean;
+  /**
+   * `--i-know-this-is-preview` が渡されたか。remote hostの書き込みを明示的に許可する
+   * （`confirmedProduction`と同格の代替——「productionだと申告する」flagを、実際には
+   * Previewに対して使わせないための分離）。
+   */
+  confirmedPreview: boolean;
   /**
    * `--i-know-this-is-a-persistent-local-database` が渡されたか。throwaway用途だと
    * 読み取れないlocal DB（`deploid_dev`等）への書き込みを明示的に許可する。
@@ -127,8 +143,10 @@ export interface AssertWritableDatabaseUrlArgs {
  * CLIスクリプト（`content:import` / `content:restore`）向けの緩和版。destructiveな
  * upsertを行う前のwritability gate。3分岐:
  *
- * 1. remote host: `confirmedProduction`（`--i-know-this-is-production`）が無ければ拒否する。
- *    （変更しない。Task 9 cutoverの既存挙動。）
+ * 1. remote host: `confirmedProduction`（`--i-know-this-is-production`）または
+ *    `confirmedPreview`（`--i-know-this-is-preview`）のどちらかが無ければ拒否する。
+ *    （remote host全般の許可という役割自体は変更しない。Task 9 cutoverの既存挙動＋
+ *    Preview向けの対称な追加。）
  * 2. local host + throwaway名: 無条件で許可する。（変更しない。CI・使い捨てDBでの通常運用。）
  * 3. local host + 非throwaway名（`deploid_dev`等）: `confirmedPersistentLocalDatabase`
  *    （`--i-know-this-is-a-persistent-local-database`）が無ければ拒否する。
@@ -138,16 +156,17 @@ export interface AssertWritableDatabaseUrlArgs {
  *    destructiveなupsertが走った。
  */
 export function assertWritableDatabaseUrl(args: AssertWritableDatabaseUrlArgs): void {
-  const { raw, callerFile, confirmedProduction, confirmedPersistentLocalDatabase } = args;
+  const { raw, callerFile, confirmedProduction, confirmedPreview, confirmedPersistentLocalDatabase } = args;
   if (!raw) throw new Error(`DATABASE_URL is not set. ${callerFile} needs an explicit target database.`);
 
   const { host, databaseName, isLocalHost, looksLikeThrowawayName } = classifyDatabaseUrl(raw);
 
   if (!isLocalHost) {
-    if (confirmedProduction) return;
+    if (confirmedProduction || confirmedPreview) return;
     throw new Error(
       `Refusing to write to DATABASE_URL host "${host}". ${callerFile} performs destructive upserts. ` +
-        `Pass --${PRODUCTION_CONFIRMATION_FLAG} to target a managed database (Task 9 cutover only).`,
+        `Pass --${PRODUCTION_CONFIRMATION_FLAG} to target Production (Task 9 cutover only), or ` +
+        `--${PREVIEW_CONFIRMATION_FLAG} to target Preview.`,
     );
   }
 

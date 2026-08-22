@@ -53,6 +53,7 @@ import {
   assertWritableDatabaseUrl,
   classifyDatabaseUrl,
   PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG,
+  PREVIEW_CONFIRMATION_FLAG,
   PRODUCTION_CONFIRMATION_FLAG,
 } from '../lib/content/databaseSafety.ts';
 import type { ContentSnapshot } from '../lib/content/contracts.ts';
@@ -1185,6 +1186,7 @@ export function assertWritableDatabase(args: Map<string, string | true>, callerF
     raw,
     callerFile,
     confirmedProduction: args.has(PRODUCTION_CONFIRMATION_FLAG),
+    confirmedPreview: args.has(PREVIEW_CONFIRMATION_FLAG),
     confirmedPersistentLocalDatabase: args.has(PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG),
   });
   if (raw) {
@@ -1200,8 +1202,6 @@ export function assertWritableDatabase(args: Map<string, string | true>, callerF
   }
 }
 
-const PREVIEW_ADMIN_BOOTSTRAP_FLAG = 'i-know-this-is-preview';
-
 /**
  * `--bootstrap-admin` が実際に admin を作ってよい対象かどうかを判定して作る。
  *
@@ -1211,11 +1211,14 @@ const PREVIEW_ADMIN_BOOTSTRAP_FLAG = 'i-know-this-is-preview';
  * `--bootstrap-admin`をPreviewでも使う前提で書かれていたが、このコード側のguardと
  * 矛盾していた）。
  *
- * `--i-know-this-is-production`（`assertWritableDatabase`が要求する、remote host全般への
- * 書き込み許可フラグ）だけでこの関数の対象を広げてはいけない——そのflagは名前に反して
- * 「production」を意味しない（remote全般で要求される）ため、それだけを根拠にすると
- * 「書き込みが許可されている＝admin bootstrapも許可される」という誤った推論を許してしまう。
- * 代わりに、`--${PREVIEW_ADMIN_BOOTSTRAP_FLAG}`という別の明示flagと、**DB自身の申告**
+ * `--i-know-this-is-production`（`assertWritableDatabase`が要求していた、remote host全般への
+ * 書き込み許可フラグ）だけでこの関数の対象を広げてはいけない——「書き込みが許可されている＝
+ * admin bootstrapも許可される」という誤った推論を許してしまう。この誤りを構造的に防ぐため、
+ * `assertWritableDatabaseUrl()`（`lib/content/databaseSafety.ts`）自体にも同時に
+ * `--${PREVIEW_CONFIRMATION_FLAG}`を`--i-know-this-is-production`と対称な独立flagとして
+ * 追加した——Previewへの書き込みで「productionだと分かっている」という矛盾したflagを
+ * 渡す必要が無くなった。このadmin bootstrap関数は、その`--${PREVIEW_CONFIRMATION_FLAG}`と、
+ * **DB自身の申告**
  * （`_environment_marker`、`scripts/restoreAuthorization.mts`の
  * `authorizeRestoreFromLocalThrowaway`と同じ設計方針）の両方を要求する。marker が
  * 存在しない（一度も`environment:stamp`されていない）場合は「これはpreviewだ」という
@@ -1224,7 +1227,7 @@ const PREVIEW_ADMIN_BOOTSTRAP_FLAG = 'i-know-this-is-preview';
  * 指摘する既知の穴と同じ形）。
  *
  * production databaseでは絶対に許可しない（marker.environmentが'production'なら拒否、
- * `--${PREVIEW_ADMIN_BOOTSTRAP_FLAG}`をどれだけ渡しても通らない）。
+ * `--${PREVIEW_CONFIRMATION_FLAG}`をどれだけ渡しても通らない）。
  */
 export async function bootstrapAdminIfAllowed(
   payload: Payload,
@@ -1238,22 +1241,22 @@ export async function bootstrapAdminIfAllowed(
   isLocal: boolean,
 ): Promise<void> {
   if (!isLocal) {
-    if (!args.has(PREVIEW_ADMIN_BOOTSTRAP_FLAG)) {
+    if (!args.has(PREVIEW_CONFIRMATION_FLAG)) {
       throw new Error(
         `--bootstrap-admin is only allowed against a local throwaway database, or a database confirmed as ` +
-          `Preview via --${PREVIEW_ADMIN_BOOTSTRAP_FLAG}.`,
+          `Preview via --${PREVIEW_CONFIRMATION_FLAG}.`,
       );
     }
     if (args.has('admin-password')) {
       throw new Error(
-        `--admin-password is not allowed together with --${PREVIEW_ADMIN_BOOTSTRAP_FLAG} (avoids the password ` +
+        `--admin-password is not allowed together with --${PREVIEW_CONFIRMATION_FLAG} (avoids the password ` +
           'appearing in shell history or the process list on a real environment). Set PAYLOAD_IMPORT_ADMIN_PASSWORD instead.',
       );
     }
     const marker = await readEnvironmentMarker(payload);
     if (marker?.environment !== 'preview') {
       throw new Error(
-        `--${PREVIEW_ADMIN_BOOTSTRAP_FLAG} refused: this database's _environment_marker reports ` +
+        `--${PREVIEW_CONFIRMATION_FLAG} refused: this database's _environment_marker reports ` +
           `"${marker?.environment ?? 'none (never stamped)'}", not "preview". Run ` +
           '`npm run environment:stamp -- --expected preview` against this database first if it really is Preview, ' +
           'or double-check DATABASE_URL — this refusal is fail-closed on purpose (an unstamped managed database ' +
@@ -1301,7 +1304,7 @@ export async function resolveImportUser(
     if (!args.has('bootstrap-admin')) {
       throw new Error(
         `No admin with email "${email}" exists. Pass --bootstrap-admin to create one (local throwaway databases), ` +
-          `or --${PREVIEW_ADMIN_BOOTSTRAP_FLAG} against a database whose _environment_marker is already stamped "preview".`,
+          `or --${PREVIEW_CONFIRMATION_FLAG} against a database whose _environment_marker is already stamped "preview".`,
       );
     }
     await bootstrapAdminIfAllowed(payload, args, email, password, classifyDatabaseUrl(process.env.DATABASE_URL as string).isLocalHost);
@@ -1347,11 +1350,15 @@ async function main(): Promise<void> {
         '  --admin-email / --admin-password  書き込みに使う admin（env でも可）',
         '  --bootstrap-admin             admin が無い場合に作る（local throwaway DB、または',
         '                                 --i-know-this-is-preview 指定時の stamped Preview DB）',
-        '  --i-know-this-is-preview      _environment_marker が "preview" と申告している DB に対し、',
-        '                                 --bootstrap-admin での admin 作成を許可する（production は',
+        '  --i-know-this-is-preview      remote（非local）の DATABASE_URL が Preview であることを明示し、',
+        '                                 書き込みを許可する（--i-know-this-is-production の対になる',
+        '                                 独立 flag。Preview 操作で production 用 flag を使わずに済む）。',
+        '                                 --bootstrap-admin と併用時はさらに、_environment_marker が',
+        '                                 実際に "preview" と申告していることを要求する（production は',
         '                                 marker の申告に関わらず常に拒否）。--admin-password とは',
         '                                 併用不可（PAYLOAD_IMPORT_ADMIN_PASSWORD を使うこと）',
-        '  --i-know-this-is-production   local 以外の DATABASE_URL への書き込みを許可する',
+        '  --i-know-this-is-production   remote（非local）の DATABASE_URL が Production であることを',
+        '                                 明示し、書き込みを許可する（Task 9 cutover 用）',
         '  --i-know-this-is-a-persistent-local-database',
         '                                 throwaway 名でない local DATABASE_URL（例: deploid_dev）',
         '                                 への書き込みを許可する',
