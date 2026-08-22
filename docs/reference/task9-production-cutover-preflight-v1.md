@@ -27,7 +27,8 @@ Production（project ref `xtklkavbirorelqdyqjj`）に対して実行する前の
 - admin bootstrap（`bootstrapAdminIfAllowed()`のfail-closed設計）
 - content importの正当性（件数・parity 0差分）
 - **media/Blob upload の context object共有バグ**（commit `04c34d1`で修正、51/51件で実証済み）
-- `npm run build`が実データで成功する
+- `CONTENT_SOURCE=payload`で実Preview deploymentが正しくレンダリングする（Step 6、既知content
+  文字列・画像・横スクロール無しを確認済み）
 
 **Preview rehearsalでは確認できていない、Production固有の未検証事項**:
 
@@ -42,6 +43,16 @@ Production（project ref `xtklkavbirorelqdyqjj`）に対して実行する前の
    実resourceに対するend-to-end実行は未実施。
 4. Production Postgresは **table数0**（本セッションで読み取り専用確認済み、2026-08-22）。
    これはTask 0記録時点と変わっていない——Production は一度もmigrationを適用されていない。
+5. **Supabase session poolerの同時接続数上限（15）が、Preview Step 6実行中に実際に踏まれた。**
+   （`task9-preview-rehearsal-preflight-v1.md`「新たに発見した懸念」参照）`content-platform-resources-v1.md`
+   が本来意図していた設計は「アプリ実行時はtransaction pooler（6543）、migrationだけがdirect
+   connection」だが、direct connectionのDNS解決不能を受けてsession poolerへ切り替えた際、
+   migration専用のはずだった低concurrency前提の接続方式を、実質的にアプリ実行時の検証にも
+   使ってしまっていた可能性がある。Vercel Preview/Productionの実際の`DATABASE_URL`がどちらの
+   pooler modeを指すかは、値を表示しない制約の中では確認できなかった（ポート番号すら
+   プログラム的に取り出せなかった）。Production は Preview よりトラフィックが多くなる前提の
+   環境であるため、**この接続数上限の設計が未解決のままProduction cutoverへ進むと、実運用で
+   同じ`EMAXCONNSESSION`がユーザ向け500エラーとして表面化するリスクがある**。
 
 ## Production環境変数の現状（2026-08-22、読み取り専用確認・名前のみ）
 
@@ -81,6 +92,11 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 
 ## Production着手前チェックリスト（すべて読み取り専用または準備作業。DB/contentへの書き込みは含まない）
 
+- [ ] **（優先度高）** Vercel Preview/ProductionのDATABASE_URLがtransaction pooler（6543）か
+      session pooler（5432、15接続上限）かを確認する。session poolerのままなら、transaction
+      poolerへ戻せないか（direct connection同様DNS影響を受けていないか）を先に調べ、戻せない
+      場合はPayloadの`postgresAdapter`側の`pool.max`調整、または想定同時アクセス数の見積もりを
+      Production cutover設計に組み込む。
 - [ ] `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_REGION`（または同等の認証手段）が
       Vercel Function runtimeでcosign署名にどう渡る設計かを確認する。未設計なら先に設計する。
 - [ ] `BLOB_STORE_ID`がPayload/exportの実行パスで実際に読まれているか
@@ -107,8 +123,8 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 | 1 | 変更凍結・rollback window宣言 | — （運用上の合意事項、技術的検証対象外） | Production公開中サイトへの影響があるため、実施タイミングを事前に合意する |
 | 2 | cutover直前export（署名付きartifactをaudit storeへ） | 未実施（上記チェックリスト参照） | end-to-end未検証。Production当日が初回実行にならないようにする |
 | 3 | production import・parity | 同じ`content:import`/`content:compare`をPreviewで実証済み（51/51 media含む） | Production DATABASE_URL・env varが揃っていることが前提 |
-| 4 | Vercel Previewで`CONTENT_SOURCE=payload`有効化・`npm run check`・E2E | Preview rehearsalのStep 6として未実施のまま残っている | Step 4自体はPreview環境が対象なので、本番着手前にここで一度潰しておける |
-| 5 | 主要画面目視確認 | 未実施 | Step 4と同時にPreviewで先に済ませられる |
+| 4 | Vercel Previewで`CONTENT_SOURCE=payload`有効化・`npm run check`・E2E | **Preview deployment切替: 完了**（Step 6として実施済み）。**手動でのroute/content/image確認: 完了**（既知content文字列・実Blob画像・横スクロール無しを確認済み）。**自動E2E（`npm run test:e2e`）: 未実施** — session pooler接続数上限（15）によりローカルbuildが安定しないため | 自動E2Eが未実施な根本原因（pooler mode）を解決してから、Production着手前にPreviewで自動E2Eも完了させる |
+| 5 | 主要画面目視確認 | **完了**（Step 6の一部として、desktop 1440px / mobile 390pxのscreenshotで確認済み） | — |
 | 6 | Production切替 | — | 上記すべてが揃って初めて着手する |
 | 7 | rollback window終了後の旧TS削除 | — | Production公開後24時間の安定運用確認が前提 |
 | 8 | 最終検証（`npm run check`・`npm audit`・`git diff --check`） | 個別のcheck/testは今回のセッションでも実行済み（609 passed） | Step 7完了後にフルセットを再実行する |
@@ -123,7 +139,23 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 
 ## 次のアクション
 
-上記チェックリストを埋める作業(特にAWS credential/OIDC疎通の設計確認)を先に行うか、
-Task 9計画のStep 1(変更凍結宣言)から着手するか、方針をあなたに確認してから進める。
+**`EMAXCONNSESSION`（session pooler同時接続数上限15）は、Preview rehearsalで実際に短時間アクセス
+だけで500を発生させたことが確認されている以上、Production cutoverのblockerとして扱う。**
+これが解消されるまで、Task 9計画のStep 1（変更凍結宣言）にも着手しない。解消のために確定すべき
+事項（2026-08-22時点、プロジェクトオーナー確認済み）:
+
+1. Preview/Productionの実際のpooler mode（transaction pooler 6543 か session pooler 5432 か）
+2. transaction poolerへ戻せるか（direct connectionと同じDNS影響を受けていないか）
+3. 戻せない場合の、Payload `postgresAdapter`側`pool.max`調整とVercel同時実行数設計
+4. 負荷下（複数route・複数同時アクセス）で500が出ないことの検証
+
+優先順位（2026-08-22、プロジェクトオーナー確認済み）:
+
+1. 上記4点の解消（DB接続問題）
+2. OIDC-federated audit Blob store疎通確認（DB接続問題とは独立して並行可。**Preview環境の実Vercel
+   Function経由でのみ実行し、Production store（`deploid-audit-production`）には一切触れない**）
+3. 1・2が解消してから、Production環境変数の設定設計
+4. 最後にTask 9計画Step 1（変更凍結宣言）
+
 **Production DBへの書き込み・Production Vercel環境変数の追加は、いずれも個別に明示承認を得てから
 実行する。**

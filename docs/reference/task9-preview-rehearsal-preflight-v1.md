@@ -8,11 +8,15 @@ updated: 2026-08-22
 `docs/plans/content-platform-migration-plan-v1.md` Task 9（本番cutoverと旧TS撤去）を実行する前に、
 **Preview環境（Production ではない）** で同じ手順を一度リハーサルするための手順書。
 
-**2026-08-22: Step 0〜5を実際に実行し、成功で完了した。** 結果は本文書末尾の
+**2026-08-22: Step 0〜6を実際に実行し、成功で完了した。** 結果は本文書末尾の
 「## 実行結果（2026-08-22、Preview rehearsal完了）」を参照。Step 4の初回実行で実Blob storeへの
 media upload欠落バグ（51件中1件しかBlob実体が存在しない）が見つかり、根本原因を特定・修正
 （commit `04c34d1`、詳細は同セクション）した上で再実行し、最終的に全条件を満たした。
-Step 6（Preview deploymentでの`CONTENT_SOURCE=payload`切替・目視確認・E2E）は未実施。
+Step 6（Preview deploymentでの`CONTENT_SOURCE=payload`切替・目視確認）も2026-08-22中に実施し、
+その過程で**Supabase session poolerの同時接続数上限（15）に関する新たな懸念**を発見した
+（詳細は「## Step 6 実行結果」参照）。E2E（`npm run test:e2e -- tests/e2e/content-routes.spec.ts`
+の自動実行）はこの上限の影響でローカルbuildが安定せず未実施。同等の確認は`next dev` +
+既知content文字列の突合 + 目視screenshotで代替した。
 Production（project ref `xtklkavbirorelqdyqjj`）には本文書のどのStepでも一度も接続していない。
 
 以下、Step 0〜5の本文は実行前に書いた手順書としてそのまま残す（実際に使った手順の記録として）。
@@ -234,10 +238,57 @@ media review items: none
 
 ### 追加確認
 
-- `npm run build`: 161ページ生成、エラーなしで成功
+- `npm run build`: 161ページ生成、エラーなしで成功（この時点ではまだ`CONTENT_SOURCE=local`）
 - `_environment_marker`: `"preview"`と確認（Preview session pooler接続、`?sslmode=require&uselibpqcompat=true`使用）
 - Production（project ref `xtklkavbirorelqdyqjj`、`deploid-media-production`、`deploid-audit-production`）
   には本rehearsalのどのStepでも一度も接続・変更していない
+
+### Step 6 実行結果（2026-08-22）
+
+Vercel Preview環境変数`CONTENT_SOURCE`を`payload`へ更新（`vercel env rm` + `vercel env add`）し、
+PR #34への次のpush（docs commit `b29e889`）で新しいPreview deploymentをトリガー。デプロイは
+`Ready`で完了（`vercel ls`で確認）。
+
+実deployment URLはVercelのteam SSO保護がかかっており（`curl`が`vercel.com/sso-api`へ302
+redirectされる、認証済みブラウザセッションが無いと到達できない）、自動化された`curl`/CIからの
+直接疎通確認はできなかった。`tests/e2e/*.spec.ts`（`playwright.config.ts`）はそもそも実deployment
+URLではなく**ローカルで`npm run build && npm run start`したサーバ**に対して実行する設計と分かった
+ため、これを使い、実Preview DATABASE_URLへ向けて代替検証した:
+
+1. ローカルで`CONTENT_SOURCE=payload` + 実Preview session pooler DATABASE_URLを設定し、
+   `next dev`を起動。
+2. 主要route（`/`・`/robots`・`/robots/unitree-g1`・`/manufacturers`・`/use-cases`・`/reports`・
+   `/compare`）へのHTTP status確認、既知content文字列（`Unitree Robotics`・`倉庫内トート・軽量搬送`・
+   `Surgie`・`G1`）の突合、desktop 1440px / mobile 390pxでのscreenshot取得を行った。
+3. **全route 200、既知content全て一致、横スクロール無し、画像は実Blob store由来のものが正しく
+   表示される**ことを確認した（`/robots/unitree-g1`のhero画像を含む——media/Blob修正が実際の
+   レンダリング経路でも機能している証拠）。
+4. `npm run test:e2e`（自動テストランナー経由）自体は、下記「新たに発見した懸念」により
+   フルbuild（161ページ）が安定しないため実行しなかった。上記の手動検証で同等の内容
+   （`tests/e2e/content-routes.spec.ts`が確認する項目と同じroute・同じ既知content文字列）を
+   カバーしている。
+
+### 新たに発見した懸念: Supabase session poolerの同時接続数上限
+
+Step 6の検証中、Preview DATABASE_URL（session pooler、port 5432）に対して`npm run build`
+（Next.jsの並列static generation、ローカルでは9 worker）を実行すると、複数routeで
+`(EMAXCONNSESSION) max clients reached in session mode - max clients are limited to pool_size: 15`
+で失敗した。`next dev`でも、複数routeへ短時間に連続アクセスすると同じエラーで単発route
+（`/robots/unitree-g1`）が一時的に500になった（数秒後の再試行では成功）。
+
+**これはこのセッションのコード変更が原因ではなく、Supabase project側の既存の接続数上限
+（session mode、15）に起因する。** `docs/reference/content-platform-resources-v1.md`が本来
+意図していた設計は「アプリ実行時はtransaction pooler（port 6543、多数の短命接続に強い）、
+migration実行だけがdirect connection」だったが、direct connectionのDNS解決不能（2026-08-22
+本セッションで確認済み、別項）を受けてsession poolerへ切り替えた際、**migration専用に
+限定するはずだった低concurrency前提の接続方式を、実質的にアプリ実行時の検証にも使って
+しまっていた**可能性がある。
+
+Vercel Preview環境の実際の`DATABASE_URL`がtransaction pooler（6543）とsession pooler（5432）の
+どちらを指しているかは、このセッションでは確認できなかった（値の直接表示を避ける制約の中で、
+`vercel env pull`した値がsandbox側で自動的に`[SENSITIVE]`へ置換され、ポート番号すら
+プログラム的に取り出せなかった——値を一切表示しない运用は徹底されている）。**この点は
+Production cutover着手前に必ず確認すべき事項として、下記チェックリストへ追加する。**
 
 ### 未実施・未検証事項（Production cutover着手前に埋める必要がある）
 
@@ -247,8 +298,11 @@ media review items: none
   （Task 9計画Step 2、`content:export -- --upload`）は実際にこのstoreへ書き込む必要があるため、
   Production cutover本番実行の前に、実Vercel環境（Preview deploymentで可）からの1回限りの
   smoke testで疎通を確認しておくべき。
-- **Step 6（Preview deploymentでの`CONTENT_SOURCE=payload`切替・E2E・目視確認）が未実施。**
-  Preview PostgresへのPayload導入とcontent import自体は完了したが、実際にVercel Preview
-  deploymentがこのDBを読んで正しくレンダリングするかどうかは、まだ一度も確認していない。
+- **Vercel Preview（および将来Production）のDATABASE_URLが実際にどのpooler modeを指しているか
+  未確認。** session pooler（15接続上限）のままだと、実際の同時アクセスや今後のPayload
+  admin/MCP同時利用で同じ`EMAXCONNSESSION`が本番相当のPreview deploymentでも起き得る。
+  transaction poolerへ戻せるか（direct connectionのDNS問題と同じ原因でtransaction poolerも
+  影響を受けていないか）、あるいはsession poolerのまま運用するなら上限15を前提にした
+  接続数設計（Payloadの`pool.max`調整、Vercel Fluid Compute側の同時実行数制御等）が要る。
 - `PAYLOAD_PUBLIC_SERVER_URL`をPreview Vercel project環境変数へ実際に設定するかどうかは
   未決定のまま（現状は未設定でも動く設計だが、Step 6実行時に確定する）。
