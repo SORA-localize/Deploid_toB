@@ -1,6 +1,6 @@
 ---
 status: reference
-updated: 2026-08-21
+updated: 2026-08-22
 ---
 
 # Task 9 Preview rehearsal preflight v1
@@ -8,10 +8,15 @@ updated: 2026-08-21
 `docs/plans/content-platform-migration-plan-v1.md` Task 9（本番cutoverと旧TS撤去）を実行する前に、
 **Preview環境（Production ではない）** で同じ手順を一度リハーサルするための手順書。
 
-**この文書は手順の設計のみで、実行はまだしていない。** 2026-08-21時点でこのセッションが行った
-検証は全てローカルの使い捨てPostgres限定であり、Preview/Production Supabase・実Vercel Blobには
-一度も接続していない。各Stepを実行するには、その都度あなた（プロジェクトオーナー）の明示的な許可を
-得ること。特にStep 6以降（Preview DBへの実際の書き込み）は、実行直前にもう一度確認を取ること。
+**2026-08-22: Step 0〜5を実際に実行し、成功で完了した。** 結果は本文書末尾の
+「## 実行結果（2026-08-22、Preview rehearsal完了）」を参照。Step 4の初回実行で実Blob storeへの
+media upload欠落バグ（51件中1件しかBlob実体が存在しない）が見つかり、根本原因を特定・修正
+（commit `04c34d1`、詳細は同セクション）した上で再実行し、最終的に全条件を満たした。
+Step 6（Preview deploymentでの`CONTENT_SOURCE=payload`切替・目視確認・E2E）は未実施。
+Production（project ref `xtklkavbirorelqdyqjj`）には本文書のどのStepでも一度も接続していない。
+
+以下、Step 0〜5の本文は実行前に書いた手順書としてそのまま残す（実際に使った手順の記録として）。
+各Stepを再実行する場合も、その都度あなた（プロジェクトオーナー）の明示的な許可を得ること。
 
 ## 前提
 
@@ -162,7 +167,88 @@ rehearsal結果を踏まえて、あらためて明示的な承認を得てか�
 
 ## 未解決・要検討事項（この文書を実際に使う前に埋めること）
 
-- Step 2のOIDC-federated Blob store疎通確認方法が未確定（上記参照）。
+- Step 2のOIDC-federated Blob store疎通確認方法が未確定（上記参照）。**2026-08-22時点で未実施のまま。**
+  Production cutoverへ進む前に埋める必要がある（下記「実行結果」§未実施・未検証事項を参照）。
 - Preview環境のデプロイURL（`PAYLOAD_PUBLIC_SERVER_URL`に使う値）をVercel dashboardから
-  確認する必要がある（このセッションでは未確認）。
-- `--admin-email` / `--admin-password`は人間が用意する（このセッションでは生成・保持しない）。
+  確認する必要がある（このセッションでは未確認）。**Step 4実行では未設定のまま進めた
+  （`resolvePublicServerUrl()`のfallback設計により、ローカル端末からの`tsx`直接実行では
+  未設定として解決され、revalidation webhook通知だけがfail-openでskipされた。importそのものの
+  成否には影響しなかった）。**
+- `--admin-email` / `--admin-password`は人間が用意する。**2026-08-22実行分はプロジェクトオーナーが
+  チャットで直接提供した値（`sohei@deploid.net` / 提供されたpassword）を使用した。**
+
+---
+
+## 実行結果（2026-08-22、Preview rehearsal完了）
+
+### Step 0〜3
+
+読み取り専用確認・migration適用・drift check・dry-run、いずれも想定通り。詳細ログはこのセッションの
+会話記録にのみ残る（本文書には転記しない）。
+
+### Step 4: 実import — 1回目（失敗、根本原因調査のきっかけ）
+
+初回実行は exit 0、`content:import`の集計も正本件数と一致して見えたが、実Vercel Blob store
+（`deploid-media-preview`）を`vercel blob list`で直接確認したところ、**51件中1件しか実ファイルが
+存在しなかった**。DB上の`media`レコード自体は51件正しく作られており、import自体はエラーを
+一切出さずに「成功」した。
+
+**根本原因**: `writeContentSnapshot()`（`scripts/import-content-to-payload.mts`）が
+`privilegedPublishContext()`で作った1個のcontext objectを、snapshot全体の全`write()`呼び出し
+（全collection、`upsertByStableId()`のcreate/update両方、`updateGlobal`）へ**同じreference**で
+渡していた。Payload Local APIはこれをそのまま`req.context`に設定するため、
+`@payloadcms/plugin-cloud-storage`のafterChange hookがupload成功後に立てる
+`req.context.skipCloudStorage = true`（内部の`payload.update()`再帰防止用、`finally`でdelete）が、
+**hookが見ているreq.contextからしか消えず、呼び出し元が握っている同じreferenceからは消えない**まま
+残り続けた。結果、1件目のmedia upload成功後、2件目以降は毎回hook先頭の
+`if (req.context?.skipCloudStorage) return doc;`に引っかかり、以降のuploadが全て無音でskipされた。
+
+実Preview Blob store（`put()`単体連続呼び出し、`payload.create()`単体連続呼び出し、importerと同じ
+shared context object使用、の3段階）で切り分け、3段階目で確実に再現・確定した。ローカルthrowaway
+DB + 実Preview Blobトークンでの安全な再現であり、Preview Postgresへの追加書き込みは一切していない。
+
+**修正**: `upsertByStableId()`のcreate/update両分岐、および`updateGlobal`呼び出しで、
+`context: args.publishContext`を`context: { ...args.publishContext }`（呼び出しごとのshallow copy）
+に変更。コミット `04c34d1`。回帰テスト（`tests/content/import-dry-run.test.ts`、
+`payload.create`/`update`へ渡るcontext引数のobject identityを検証）を追加し、修正を一時的に
+revertしてテストが正しく落ちること・戻して通ることを確認済み。全テストスイート609 passed / 33
+skipped、typecheck/lintエラー0。CI green確認済み。
+
+### Step 4: 実import — 2回目（成功）
+
+修正版コミット後、Preview DBの全collection（media含む）をPayload API経由でclearし、
+`environment:stamp --expected preview`でmarkerを再スタンプしてから、修正版importerで再実行した。
+
+- exit 0、`content:import`集計が正本件数と完全一致
+  （media=51, manufacturers=26, robots=63, use-cases=44, deployments=11, articles=34,
+  article-placements=7, site-settings updated=1）
+- `vercel blob list`で実Blob store確認: **51件全て実在**
+- DB上の51件の`filename`と、Blob store実在51件のファイル名を突合: **完全一致（過不足0）**
+
+### Step 5: parity確認
+
+```
+missing=0 extra=0 changed=0 brokenReferences=0
+media review items: none
+```
+
+### 追加確認
+
+- `npm run build`: 161ページ生成、エラーなしで成功
+- `_environment_marker`: `"preview"`と確認（Preview session pooler接続、`?sslmode=require&uselibpqcompat=true`使用）
+- Production（project ref `xtklkavbirorelqdyqjj`、`deploid-media-production`、`deploid-audit-production`）
+  には本rehearsalのどのStepでも一度も接続・変更していない
+
+### 未実施・未検証事項（Production cutover着手前に埋める必要がある）
+
+- **Step 2（OIDC-federated audit Blob store疎通）が未実施のまま。** `deploid-audit-preview` /
+  `deploid-audit-production`はどちらも実Vercel Function runtimeからしか到達できない設計のため、
+  ローカル端末からの`tsx`直接実行では検証できていない。cutover baseline snapshot
+  （Task 9計画Step 2、`content:export -- --upload`）は実際にこのstoreへ書き込む必要があるため、
+  Production cutover本番実行の前に、実Vercel環境（Preview deploymentで可）からの1回限りの
+  smoke testで疎通を確認しておくべき。
+- **Step 6（Preview deploymentでの`CONTENT_SOURCE=payload`切替・E2E・目視確認）が未実施。**
+  Preview PostgresへのPayload導入とcontent import自体は完了したが、実際にVercel Preview
+  deploymentがこのDBを読んで正しくレンダリングするかどうかは、まだ一度も確認していない。
+- `PAYLOAD_PUBLIC_SERVER_URL`をPreview Vercel project環境変数へ実際に設定するかどうかは
+  未決定のまま（現状は未設定でも動く設計だが、Step 6実行時に確定する）。
