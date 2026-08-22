@@ -74,6 +74,7 @@ import {
 import { privilegedPublishContext } from '../lib/payload/publishAuthorization.ts';
 import { collectBrokenReferences } from './compare-content-sources.mts';
 import { exitCli, isDirectRun, parseArgs } from './contentCliSupport.mts';
+import { readEnvironmentMarker } from './restore-preflight.mts';
 import { isRestoreAuthorization, type RestoreAuthorization } from './restoreAuthorization.mts';
 import type { MediaInventoryEntry } from './snapshotObjectStore.mts';
 
@@ -1199,6 +1200,78 @@ export function assertWritableDatabase(args: Map<string, string | true>, callerF
   }
 }
 
+const PREVIEW_ADMIN_BOOTSTRAP_FLAG = 'i-know-this-is-preview';
+
+/**
+ * `--bootstrap-admin` が実際に admin を作ってよい対象かどうかを判定して作る。
+ *
+ * 2026-08-22（Preview rehearsal中に発見したgap）: 元々は`isLocalHost`だけを見ており、
+ * local throwaway DB以外では常に拒否していた——安全だが、実Preview環境に対する
+ * rehearsalの初回admin作成が構造的に不可能だった（Task9 preflight docのStep 4は
+ * `--bootstrap-admin`をPreviewでも使う前提で書かれていたが、このコード側のguardと
+ * 矛盾していた）。
+ *
+ * `--i-know-this-is-production`（`assertWritableDatabase`が要求する、remote host全般への
+ * 書き込み許可フラグ）だけでこの関数の対象を広げてはいけない——そのflagは名前に反して
+ * 「production」を意味しない（remote全般で要求される）ため、それだけを根拠にすると
+ * 「書き込みが許可されている＝admin bootstrapも許可される」という誤った推論を許してしまう。
+ * 代わりに、`--${PREVIEW_ADMIN_BOOTSTRAP_FLAG}`という別の明示flagと、**DB自身の申告**
+ * （`_environment_marker`、`scripts/restoreAuthorization.mts`の
+ * `authorizeRestoreFromLocalThrowaway`と同じ設計方針）の両方を要求する。marker が
+ * 存在しない（一度も`environment:stamp`されていない）場合は「これはpreviewだ」という
+ * 未検証の申告を信用せずfail-closedで拒否する——未stampの実production DBを誤ってpreview
+ * だと申告してしまうケースを防ぐ（`authorizeRestoreFromLocalThrowaway`のdocblockが
+ * 指摘する既知の穴と同じ形）。
+ *
+ * production databaseでは絶対に許可しない（marker.environmentが'production'なら拒否、
+ * `--${PREVIEW_ADMIN_BOOTSTRAP_FLAG}`をどれだけ渡しても通らない）。
+ */
+export async function bootstrapAdminIfAllowed(
+  payload: Payload,
+  args: Map<string, string | true>,
+  email: string,
+  password: string,
+  // 呼び出し側（resolveImportUser）は実際の`classifyDatabaseUrl(process.env.DATABASE_URL).isLocalHost`を
+  // 渡す。引数として受け取る形にしているのは、testが実Postgres + 実Payloadを使いながら
+  // 「non-localと判定された場合」の分岐を、`process.env.DATABASE_URL`の値を偽装することなく
+  // 個別に再現できるようにするため（mockを使わずに実environment-marker行に対して検証する）。
+  isLocal: boolean,
+): Promise<void> {
+  if (!isLocal) {
+    if (!args.has(PREVIEW_ADMIN_BOOTSTRAP_FLAG)) {
+      throw new Error(
+        `--bootstrap-admin is only allowed against a local throwaway database, or a database confirmed as ` +
+          `Preview via --${PREVIEW_ADMIN_BOOTSTRAP_FLAG}.`,
+      );
+    }
+    if (args.has('admin-password')) {
+      throw new Error(
+        `--admin-password is not allowed together with --${PREVIEW_ADMIN_BOOTSTRAP_FLAG} (avoids the password ` +
+          'appearing in shell history or the process list on a real environment). Set PAYLOAD_IMPORT_ADMIN_PASSWORD instead.',
+      );
+    }
+    const marker = await readEnvironmentMarker(payload);
+    if (marker?.environment !== 'preview') {
+      throw new Error(
+        `--${PREVIEW_ADMIN_BOOTSTRAP_FLAG} refused: this database's _environment_marker reports ` +
+          `"${marker?.environment ?? 'none (never stamped)'}", not "preview". Run ` +
+          '`npm run environment:stamp -- --expected preview` against this database first if it really is Preview, ' +
+          'or double-check DATABASE_URL — this refusal is fail-closed on purpose (an unstamped managed database ' +
+          'could just as easily be production).',
+      );
+    }
+  }
+
+  // 1人目の admin は Task 2 の bootstrap（Admins.hooks.beforeValidate）で platform-admin へ
+  // 強制される。local / preview どちらの経路でも同じ create を使う——役割の違いは
+  // 「書き込み対象DBがlocal throwawayかどうか」の判定だけで、admin作成自体の形は環境非依存。
+  await payload.create({
+    collection: 'admins',
+    overrideAccess: false,
+    data: { email, password, role: 'content-reader' } as never,
+  });
+}
+
 /**
  * 書き込み用の admin を用意する。publish gate（Task 3）が content-publisher 以上を要求するため、
  * anonymous では published レコードを書けない。
@@ -1226,17 +1299,12 @@ export async function resolveImportUser(
 
   if (existing.docs.length === 0) {
     if (!args.has('bootstrap-admin')) {
-      throw new Error(`No admin with email "${email}" exists. Pass --bootstrap-admin to create one (local databases only).`);
+      throw new Error(
+        `No admin with email "${email}" exists. Pass --bootstrap-admin to create one (local throwaway databases), ` +
+          `or --${PREVIEW_ADMIN_BOOTSTRAP_FLAG} against a database whose _environment_marker is already stamped "preview".`,
+      );
     }
-    if (!classifyDatabaseUrl(process.env.DATABASE_URL as string).isLocalHost) {
-      throw new Error('--bootstrap-admin is only allowed against a local throwaway database.');
-    }
-    // 1人目の admin は Task 2 の bootstrap で platform-admin へ強制される。
-    await payload.create({
-      collection: 'admins',
-      overrideAccess: false,
-      data: { email, password, role: 'content-reader' } as never,
-    });
+    await bootstrapAdminIfAllowed(payload, args, email, password, classifyDatabaseUrl(process.env.DATABASE_URL as string).isLocalHost);
   }
 
   const { user } = await payload.login({ collection: 'admins', data: { email, password } });
@@ -1277,7 +1345,12 @@ async function main(): Promise<void> {
         '  --public-dir <dir>            ローカル画像（/images/...）の読み取り元',
         '  --json <path>                 import report を JSON で書き出す',
         '  --admin-email / --admin-password  書き込みに使う admin（env でも可）',
-        '  --bootstrap-admin             admin が無い場合に作る（local DB のみ）',
+        '  --bootstrap-admin             admin が無い場合に作る（local throwaway DB、または',
+        '                                 --i-know-this-is-preview 指定時の stamped Preview DB）',
+        '  --i-know-this-is-preview      _environment_marker が "preview" と申告している DB に対し、',
+        '                                 --bootstrap-admin での admin 作成を許可する（production は',
+        '                                 marker の申告に関わらず常に拒否）。--admin-password とは',
+        '                                 併用不可（PAYLOAD_IMPORT_ADMIN_PASSWORD を使うこと）',
         '  --i-know-this-is-production   local 以外の DATABASE_URL への書き込みを許可する',
         '  --i-know-this-is-a-persistent-local-database',
         '                                 throwaway 名でない local DATABASE_URL（例: deploid_dev）',
