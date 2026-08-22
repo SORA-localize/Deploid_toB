@@ -528,7 +528,19 @@ async function upsertByStableId(
       draft: args.draft,
       user: args.user,
       overrideAccess: args.overrideAccess,
-      context: args.publishContext,
+      // `args.publishContext` を素通しせず shallow copy する理由: 呼び出し元
+      // (`writeContentSnapshot()`)はこの object を1個だけ作って全 write() 呼び出しで
+      // 使い回す。Payload の Local API はここへ渡した object をそのまま `req.context` に
+      // 設定するため、同じ reference を渡すと呼び出しを跨いで汚染が残る。実際に
+      // `@payloadcms/plugin-cloud-storage` の afterChange hook が upload 成功後
+      // `req.context.skipCloudStorage = true` を立てて `finally` で delete するが、
+      // その delete は「そのhookが見ている req.context」に対してだけ効き、外側で
+      // 保持している同じ reference からは消えない(実機で確認済み)。結果、1件目の
+      // media upload成功後、2件目以降は hook 先頭の `if (req.context?.skipCloudStorage)
+      // return doc;` に毎回引っかかり、以降の upload が全て無音でskipされる
+      // (DB row自体は作られるので import 自体はerror無しで成功して見える)。
+      // 呼び出しごとに新しい object を渡せば、この汚染は次の呼び出しへ伝播しない。
+      context: { ...args.publishContext },
     } as unknown as Parameters<Payload['update']>[0];
     const doc = (await payload.update(updateArgs)) as unknown as { id: string | number };
     return { id: doc.id, action: 'updated' };
@@ -540,7 +552,8 @@ async function upsertByStableId(
     draft: args.draft,
     user: args.user,
     overrideAccess: args.overrideAccess,
-    context: args.publishContext,
+    // 上の update 分岐と同じ理由(shared context object 汚染対策)。
+    context: { ...args.publishContext },
     ...(args.file ? { file: args.file } : {}),
   } as unknown as Parameters<Payload['create']>[0];
   const doc = (await payload.create(createArgs)) as unknown as { id: string | number };
@@ -821,7 +834,10 @@ async function writeContentSnapshot(options: ImportOptions & { overrideAccess: b
       } as never,
       user: user as never,
       overrideAccess,
-      context: publishContext,
+      // upsertByStableId() と同じ理由(shared context object 汚染対策)。ここは1回しか
+      // 呼ばれないので今回のbugの発生源ではないが、`publishContext` を素通しする箇所を
+      // 1つも残さない方が将来の事故を防げる。
+      context: { ...publishContext },
     });
   }
   report.siteSettingsUpdated = true;

@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { Client } from 'pg';
 import { getPayload, type Payload } from 'payload';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import config from '../../payload.config';
 import type { ContentSnapshot } from '@/lib/content/contracts';
 import { createPayloadContentSource } from '@/lib/content/payloadSource';
@@ -759,6 +759,57 @@ describe('importing twice keeps stable ids, filenames and media object keys (必
         mediaResolver: testMediaResolver,
       }),
     ).rejects.toThrow();
+  }, 180_000);
+
+  /**
+   * 実 Preview環境で確認した回帰(2026-08-22): `writeContentSnapshot()` は
+   * `privilegedPublishContext()` で作った1個の object を `publishContext` として、snapshot
+   * 全体の全 write() 呼び出し(全 collection、`upsertByStableId()` の create/update 両方)へ
+   * **同じ reference** で渡していた。Payload の Local API はこれをそのまま `req.context` に
+   * 設定するため、`@payloadcms/plugin-cloud-storage` の afterChange hook が upload 成功後に
+   * `req.context.skipCloudStorage = true` を立てて `finally` で delete しても、その delete は
+   * hookが見ている req.context に対してだけ効き、呼び出し元が握っている同じ reference からは
+   * 消えなかった。結果、1件目の media upload成功後、2件目以降は hook 先頭の
+   * `if (req.context?.skipCloudStorage) return doc;` に毎回引っかかり、以降の upload が
+   * 全て無音でskipされる(DB row自体は作られるので import 自体は error 無しで成功して見える)。
+   * 実 Vercel Blob store で確認済み: 51件中1件しか実体がuploadされなかった。
+   *
+   * この collection の cloud storage adapter は local/CI では `BLOB_READ_WRITE_TOKEN` 未設定で
+   * local disk fallback になる(`media-storage.test.ts` 参照)ため、ここでは実 upload 経路を
+   * 経由せずに直接原因を検証する: `payload.create`/`payload.update` へ渡る `context` 引数を
+   * spy で捕まえ、呼び出しごとに別の object であることを確認する。`upsertByStableId()` が
+   * `context: args.publishContext` に戻れば、このテストは全 context が同一 reference になり
+   * 落ちる。
+   */
+  it('passes a fresh context object to every write() call, not one shared reference (2026-08-22 regression)', async () => {
+    const createSpy = vi.spyOn(payload, 'create');
+    const updateSpy = vi.spyOn(payload, 'update');
+    try {
+      await importContentSnapshot({
+        payload,
+        snapshot: structuredClone(contentSnapshotFixture),
+        user: owner,
+        mediaResolver: testMediaResolver,
+        runId: `context-isolation-test-${Date.now()}`,
+      });
+
+      const contexts = [...createSpy.mock.calls, ...updateSpy.mock.calls]
+        .map(([args]) => (args as { context?: Record<string, unknown> }).context)
+        .filter((context): context is Record<string, unknown> => context != null);
+
+      // fixture には manufacturers/robots/useCases/deployments/articles/articlePlacements/media の
+      // 複数 record があるので、write() は複数回呼ばれる(1回だけならこの回帰は検出できない)。
+      expect(contexts.length).toBeGreaterThan(1);
+
+      for (let i = 0; i < contexts.length; i += 1) {
+        for (let j = i + 1; j < contexts.length; j += 1) {
+          expect(contexts[i]).not.toBe(contexts[j]);
+        }
+      }
+    } finally {
+      createSpy.mockRestore();
+      updateSpy.mockRestore();
+    }
   }, 180_000);
 });
 
