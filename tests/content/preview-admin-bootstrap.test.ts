@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { getPayload, type Payload } from 'payload';
 import config from '../../payload.config';
-import { bootstrapAdminIfAllowed } from '@/scripts/import-content-to-payload.mts';
+import { assertPreviewWriteConfirmedByMarker, bootstrapAdminIfAllowed } from '@/scripts/import-content-to-payload.mts';
 import { assertLocalThrowawayDatabase } from './testDbGuard';
 
 /**
@@ -123,5 +123,85 @@ describe('bootstrapAdminIfAllowed (Preview admin bootstrap safety guard)', () =>
     const { docs } = await payload.find({ collection: 'admins', where: { email: { equals: EMAIL } }, overrideAccess: true });
     expect(docs).toHaveLength(1);
     expect((docs[0] as { role?: string }).role).toBe('platform-admin');
+  });
+});
+
+/**
+ * `assertPreviewWriteConfirmedByMarker()`（remediation: 2026-08-22、外部レビューが発見した
+ * 二次的なgap）の検証。
+ *
+ * 発見された穴: `assertWritableDatabaseUrl()`の`confirmedPreview`分岐（接続前の同期的な
+ * URL判定）は、`--i-know-this-is-preview`を渡すだけで書き込みを許可していた——DBの中身
+ * （`_environment_marker`）を一切見ていなかった。`bootstrapAdminIfAllowed()`のmarker検証は
+ * 「adminがまだ無い」場合にしか呼ばれないため、既にadminが存在する対象（実運用中の
+ * Productionはまさにこれに該当する）には一度も適用されない。結果、
+ * `DATABASE_URL=<production> --i-know-this-is-preview`（既存adminあり）という組み合わせが、
+ * 何の検証もなくcontent upsertまで到達できてしまっていた。
+ *
+ * この関数は`getPayload()`接続後・実際の書き込みを行う前に必ず呼ばれ、DB自身の申告を検証する。
+ */
+describe('assertPreviewWriteConfirmedByMarker (Preview write gate — DB self-report verification)', () => {
+  let payload: Payload;
+
+  beforeAll(async () => {
+    assertLocalThrowawayDatabase('tests/content/preview-admin-bootstrap.test.ts');
+    payload = await getPayload({ config });
+  });
+
+  afterEach(async () => {
+    await payload.delete({ collection: 'environment-marker', where: {}, overrideAccess: true });
+  });
+
+  afterAll(async () => {
+    await payload.delete({ collection: 'environment-marker', where: {}, overrideAccess: true }).catch(() => undefined);
+  });
+
+  it('allows when the marker says "preview" and only --i-know-this-is-preview is passed', async () => {
+    await payload.create({
+      collection: 'environment-marker',
+      overrideAccess: true,
+      data: { environment: 'preview', singleton: 1 } as never,
+    });
+
+    const args = new Map<string, string | true>([['i-know-this-is-preview', true]]);
+    await expect(assertPreviewWriteConfirmedByMarker(payload, args, false)).resolves.toBeUndefined();
+  });
+
+  it('refuses when the marker says "production", even with --i-know-this-is-preview', async () => {
+    await payload.create({
+      collection: 'environment-marker',
+      overrideAccess: true,
+      data: { environment: 'production', singleton: 1 } as never,
+    });
+
+    const args = new Map<string, string | true>([['i-know-this-is-preview', true]]);
+    await expect(assertPreviewWriteConfirmedByMarker(payload, args, false)).rejects.toThrow(
+      /reports "production", not "preview"/,
+    );
+  });
+
+  it('refuses when there is no marker row at all (never stamped), even with --i-know-this-is-preview (fail-closed)', async () => {
+    const args = new Map<string, string | true>([['i-know-this-is-preview', true]]);
+    await expect(assertPreviewWriteConfirmedByMarker(payload, args, false)).rejects.toThrow(/never stamped/);
+  });
+
+  it('does not check the marker at all when --i-know-this-is-production is also passed (existing production-flag behavior unchanged)', async () => {
+    // No marker row exists at all here — if this function checked the marker for the
+    // production-flag path, this would throw. It must not: assertWritableDatabaseUrl()'s
+    // existing --i-know-this-is-production path is explicitly out of scope for this change.
+    const args = new Map<string, string | true>([
+      ['i-know-this-is-preview', true],
+      ['i-know-this-is-production', true],
+    ]);
+    await expect(assertPreviewWriteConfirmedByMarker(payload, args, false)).resolves.toBeUndefined();
+  });
+
+  it('does not check the marker at all when isLocal is true, regardless of flags', async () => {
+    const args = new Map<string, string | true>([['i-know-this-is-preview', true]]);
+    await expect(assertPreviewWriteConfirmedByMarker(payload, args, true)).resolves.toBeUndefined();
+  });
+
+  it('is a no-op when --i-know-this-is-preview was never passed (authorized via --i-know-this-is-production alone, or local+throwaway)', async () => {
+    await expect(assertPreviewWriteConfirmedByMarker(payload, new Map(), false)).resolves.toBeUndefined();
   });
 });

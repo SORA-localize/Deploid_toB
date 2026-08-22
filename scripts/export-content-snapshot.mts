@@ -34,6 +34,7 @@ import { PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG } from '../lib/content/data
 import { compareSnapshots, countRecords, formatParityReport, parityReportIsClean } from './compare-content-sources.mts';
 import { exitCli, isDirectRun, parseArgs } from './contentCliSupport.mts';
 import {
+  assertPreviewWriteConfirmedByMarker,
   assertWritableDatabase,
   createBaselineMediaFileResolver,
   createDefaultMediaFileResolver,
@@ -1123,6 +1124,12 @@ async function runRestore(args: Map<string, string | true>): Promise<void> {
 
   let restoreWorkDir: string | undefined;
   try {
+    // `content:import`と同じ穴（2026-08-22の外部レビュー指摘）: `--manifest`の署名検証は
+    // content**そのもの**の改ざんを検出するが、`--i-know-this-is-preview`が実際には
+    // Productionを指すDATABASE_URLへの書き込みを許してしまう問題とは別物——署名済み
+    // manifestの中身が正しくても、書き込み先DBが間違っていれば意味が無い。
+    await assertPreviewWriteConfirmedByMarker(payload, args, isLocalDatabaseHost(databaseUrl));
+
     let snapshot: ContentSnapshot;
     let sourceLabel: string;
     let verifiedProvenance: BaselineProvenance | undefined;

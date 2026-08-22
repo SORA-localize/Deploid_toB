@@ -1203,6 +1203,49 @@ export function assertWritableDatabase(args: Map<string, string | true>, callerF
 }
 
 /**
+ * 2026-08-22（外部レビューで発見された穴）: `assertWritableDatabaseUrl()`の`confirmedPreview`
+ * 分岐は、接続前の同期的なURL文字列判定だけで動く（DBへまだ繋がっていないため中身を見られない）。
+ * そのため`--i-know-this-is-preview`は、それ単体で「本当にPreviewかどうか」を一切検証せず
+ * 書き込みを通していた——`bootstrapAdminIfAllowed()`のmarker検証は、対象DBにadminが
+ * **まだ無い**（bootstrap）場合にしか呼ばれないため、既にadminが存在する対象（実運用中の
+ * Productionはまさにこれに該当する）では一度も経由しない。結果、
+ * `DATABASE_URL=<production> --i-know-this-is-preview`（既存adminあり）という組み合わせが、
+ * 何の検証もなくcontent upsertまで到達できてしまっていた。
+ *
+ * `getPayload()`接続後・実際の書き込み（admin解決・content upsert）を行う前に、必ずここで
+ * DB自身の`_environment_marker`を検証する。`--i-know-this-is-production`が同時に渡されている
+ * 場合はチェックしない（Task 9 cutoverの既存経路・既存挙動を変えない——今回のreviewでも
+ * 「production flagの既存動作は維持」と明示されている）。marker が存在しない
+ * （一度も`environment:stamp`されていない）場合も、production markerの場合も、どちらも拒否
+ * する（fail-closed。`scripts/restoreAuthorization.mts`の`authorizeRestoreFromLocalThrowaway`
+ * ・`bootstrapAdminIfAllowed()`と同じ設計方針——未stampの管理DBを「preview だろう」と
+ * 楽観的に扱わない）。
+ */
+export async function assertPreviewWriteConfirmedByMarker(
+  payload: Payload,
+  args: Map<string, string | true>,
+  // `bootstrapAdminIfAllowed()`と同じ理由（そちらのコメント参照）で明示引数にする——
+  // testが実Postgres + 実Payloadを使いながら「non-localと判定された場合」の分岐を、
+  // `process.env.DATABASE_URL`の値を偽装することなく再現できるようにするため。
+  isLocal: boolean,
+): Promise<void> {
+  if (isLocal) return;
+  if (!args.has(PREVIEW_CONFIRMATION_FLAG)) return;
+  if (args.has(PRODUCTION_CONFIRMATION_FLAG)) return;
+
+  const marker = await readEnvironmentMarker(payload);
+  if (marker?.environment !== 'preview') {
+    throw new Error(
+      `--${PREVIEW_CONFIRMATION_FLAG} refused: this database's _environment_marker reports ` +
+        `"${marker?.environment ?? 'none (never stamped)'}", not "preview". A write authorized only by ` +
+        `--${PREVIEW_CONFIRMATION_FLAG} (not --${PRODUCTION_CONFIRMATION_FLAG}) must target a database that has ` +
+        'genuinely been stamped Preview (`npm run environment:stamp -- --expected preview`). This refusal is ' +
+        'fail-closed on purpose — an unstamped or production-stamped managed database is never treated as Preview.',
+    );
+  }
+}
+
+/**
  * `--bootstrap-admin` が実際に admin を作ってよい対象かどうかを判定して作る。
  *
  * 2026-08-22（Preview rehearsal中に発見したgap）: 元々は`isLocalHost`だけを見ており、
@@ -1413,6 +1456,7 @@ async function main(): Promise<void> {
 
   const payload = await getPayload({ config });
   try {
+    await assertPreviewWriteConfirmedByMarker(payload, args, classifyDatabaseUrl(process.env.DATABASE_URL as string).isLocalHost);
     const user = await resolveImportUser(payload, args);
     const snapshot = await createLocalContentSource().readSnapshot();
 
