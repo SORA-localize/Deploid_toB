@@ -49,16 +49,12 @@ Production（project ref `xtklkavbirorelqdyqjj`）に対して実行する前の
    実resourceに対するend-to-end実行は未実施。
 4. Production Postgresは **table数0**（本セッションで読み取り専用確認済み、2026-08-22）。
    これはTask 0記録時点と変わっていない——Production は一度もmigrationを適用されていない。
-5. **Supabase session poolerの同時接続数上限（15）が、Preview Step 6実行中に実際に踏まれた。**
-   （`task9-preview-rehearsal-preflight-v1.md`「新たに発見した懸念」参照）`content-platform-resources-v1.md`
-   が本来意図していた設計は「アプリ実行時はtransaction pooler（6543）、migrationだけがdirect
-   connection」だが、direct connectionのDNS解決不能を受けてsession poolerへ切り替えた際、
-   migration専用のはずだった低concurrency前提の接続方式を、実質的にアプリ実行時の検証にも
-   使ってしまっていた可能性がある。Vercel Preview/Productionの実際の`DATABASE_URL`がどちらの
-   pooler modeを指すかは、値を表示しない制約の中では確認できなかった（ポート番号すら
-   プログラム的に取り出せなかった）。Production は Preview よりトラフィックが多くなる前提の
-   環境であるため、**この接続数上限の設計が未解決のままProduction cutoverへ進むと、実運用で
-   同じ`EMAXCONNSESSION`がユーザ向け500エラーとして表面化するリスクがある**。
+5. **（解決済み・2026-08-23）Supabase session poolerの同時接続数上限（15）が、Preview Step 6
+   実行中に実際に踏まれた。** 調査の結果、PreviewのDATABASE_URLは確かにsession pooler
+   （port 5432）を使っていたこと、同じpooler hostnameのport切替だけでtransaction pooler
+   （6543、DNS問題とは無関係）へ戻せること、実クエリ・24並列リクエストでエラー無しを確認済み。
+   詳細は`task9-preview-rehearsal-preflight-v1.md`「pooler mode調査・解決」参照。
+   **残っているのは実際のVercel環境変数更新のみ**（Preview→将来Productionの順、別途承認後）。
 
 ## Production環境変数の現状（2026-08-22、読み取り専用確認・名前のみ）
 
@@ -152,22 +148,35 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 これが解消されるまで、Task 9計画のStep 1（変更凍結宣言）にも着手しない。解消のために確定すべき
 事項（2026-08-22時点、プロジェクトオーナー確認済み）:
 
-1. Preview/Productionの実際のpooler mode（transaction pooler 6543 か session pooler 5432 か）
-2. transaction poolerへ戻せるか（direct connectionと同じDNS影響を受けていないか）
-3. 戻せない場合の、Payload `postgresAdapter`側`pool.max`調整とVercel同時実行数設計
-4. 負荷下（複数route・複数同時アクセス）で500が出ないことの検証
+1. ~~Preview/Productionの実際のpooler mode（transaction pooler 6543 か session pooler 5432 か）~~
+   **解決済み（2026-08-23）: Previewはsession pooler（5432）を使用していた。**
+2. ~~transaction poolerへ戻せるか（direct connectionと同じDNS影響を受けていないか）~~
+   **解決済み: 戻せる。pooler hostnameは最初からDNS解決できており、direct connectionの
+   DNS問題とは無関係だった。同じhostのport切替のみでtransaction pooler（6543）へ接続でき、
+   実Payloadクエリ・24並列リクエストでもエラー無しを確認済み。**
+3. ~~戻せない場合の、Payload `postgresAdapter`側`pool.max`調整とVercel同時実行数設計~~
+   **不要と判明（2.が「戻せる」で解決したため）。**
+4. 負荷下（複数route・複数同時アクセス）で500が出ないことの検証 → **transaction poolerで
+   確認済み（12並列×2セット、エラー無し）。**
 
-優先順位（2026-08-23更新。1.は未解消、2.は根本原因判明・POC成功・route本体実装待ち）:
+詳細は`task9-preview-rehearsal-preflight-v1.md`「pooler mode調査・解決」参照。
+**残作業はVercel環境変数の実際の更新のみ**（session pooler→transaction poolerの値へ、
+Preview→将来Productionの順）。まだ実施していない——書き込み系操作は別途承認を得てから。
 
-1. 上記4点の解消（DB接続問題） → **未解消のまま残っている**（pooler modeの確認自体が未完了）
+優先順位（2026-08-23更新。1.は根本原因判明・対処方針確定・環境変数更新待ち、2.は根本原因判明・
+POC成功・route本体実装待ち）:
+
+1. DB接続問題 → **調査完了。Preview DATABASE_URLをtransaction pooler（6543）へ更新するだけで
+   解決する見込み。実際の環境変数更新は未実施（別途承認後）。**
 2. OIDC-federated audit Blob store疎通確認 → **根本原因判明（headerで渡る、dashboard操作は
    不要）・POC成功（`task9-audit-upload-endpoint-design-v1.md`参照）。3段階session route本体の
    実装がまだ残っている（着手には別途承認が要る）。**
 3. 1・2が解消してから、Production環境変数の設定設計
 4. 最後にTask 9計画Step 1（変更凍結宣言）
 
-**現時点でProduction cutoverへ進める状態ではない。** DB接続数上限の解消（1.）と、audit Blob
-upload routeの本実装（2.）の両方が未完了のまま残っている。
+**現時点でProduction cutoverへ進める状態ではない。** 両ブロッカーとも根本原因・解決方針は
+確定したが、(1)Preview DATABASE_URLの実際の更新、(2)audit Blob upload routeの本実装、
+どちらも未実施のまま残っている。
 
 **Production DBへの書き込み・Production Vercel環境変数の追加は、いずれも個別に明示承認を得てから
 実行する。**

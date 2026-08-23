@@ -284,11 +284,42 @@ migration実行だけがdirect connection」だったが、direct connectionのD
 限定するはずだった低concurrency前提の接続方式を、実質的にアプリ実行時の検証にも使って
 しまっていた**可能性がある。
 
-Vercel Preview環境の実際の`DATABASE_URL`がtransaction pooler（6543）とsession pooler（5432）の
-どちらを指しているかは、このセッションでは確認できなかった（値の直接表示を避ける制約の中で、
-`vercel env pull`した値がsandbox側で自動的に`[SENSITIVE]`へ置換され、ポート番号すら
-プログラム的に取り出せなかった——値を一切表示しない运用は徹底されている）。**この点は
-Production cutover着手前に必ず確認すべき事項として、下記チェックリストへ追加する。**
+### pooler mode調査・解決（2026-08-23）
+
+**Step 1: どちらのpooler modeか確認。** `vercel env pull`は`DATABASE_URL`が Vercel上で
+"Sensitive"型に設定されているため値を返さない（sandbox側の制約ではなく、Vercel自体が
+Sensitive型変数をAPI/CLI経由で読み出し不能にする仕様——`[SENSITIVE]`はVercelのAPI応答その
+ものだった）。フルの接続文字列を一切露出しない一時debug route（`x-vercel-oidc-token`確認の
+POCと同じ手法）で、`process.env.DATABASE_URL`をFunction内でparseし**ポート番号とhost種別だけ**
+を返す形で確認した。結果:
+
+```json
+{"hasDatabaseUrl":true,"port":"5432","hostKind":"pooler","poolerMode":"session","vercelEnv":"preview"}
+```
+
+**Preview実runtimeは確かにsession pooler（port 5432）を使っていた。**
+
+**Step 2: transaction poolerへ戻せるか確認。** direct connection（`db.<ref>.supabase.co`）の
+DNS解決不能は、pooler hostname（`aws-0-ap-northeast-1.pooler.supabase.com`）とは**別ホスト名**
+の問題であり、pooler hostname自体は最初から解決できていた（session pooler側で終始使い続けて
+きた実績がその証拠）。したがって、同じpooler hostnameのport だけを5432→6543に変えれば
+transaction poolerへ切り替えられ、direct connectionのDNS問題とは無関係——実際に確認した。
+
+- `psql`での単純接続（`select 1`）: 成功。
+- ローカル`next dev`をtransaction pooler DATABASE_URLへ向け、実Payloadクエリ（`/robots`・
+  `/robots/unitree-g1`・`/manufacturers`・`/use-cases`・`/reports`・`/compare`）を複数回実行:
+  全て200、prepared statement関連のエラーなし。
+- 同じrouteへ**12並列 × 2セット（計24リクエスト）**を同時発行: 全て200、
+  `EMAXCONNSESSION`等のエラー無し（session poolerでは同等の負荷で即座に破綻していたのと対照的）。
+
+**結論: transaction poolerへ戻すことに支障は無いと確認できた。** Step 3（`pool.max`調整・
+Vercel同時実行数設計）は不要——`content-platform-resources-v1.md`が本来意図していた設計
+（アプリ実行時はtransaction pooler、migrationはdirect connectionの代わりにsession poolerを
+使う）へ戻すだけで解決する。
+
+**残作業**: Vercel Preview（将来はProductionも）の`DATABASE_URL`環境変数を、session poolerから
+transaction poolerの値へ実際に更新する。これはまだ実施していない（読み取り専用の調査までで、
+書き込み・環境変数変更は別途承認を得てから行う）。
 
 ### Step 2追試: OIDC audit Blob store疎通確認（2026-08-22、実施・重大な問題を発見）
 
