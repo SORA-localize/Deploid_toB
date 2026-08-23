@@ -913,6 +913,15 @@ export interface ExportSignedBaselineViaUploadSessionArgs
   fetchImpl?: typeof fetch;
   /** テスト用の差し替え点。省略時は `process.env`（`assertAuditUploadEndpointAllowed`が読む）。 */
   env?: Record<string, string | undefined>;
+  /**
+   * Vercelの"Protection Bypass for Automation"（project設定のsecret、Vercel自身が
+   * `x-vercel-protection-bypass` headerとして受け付ける）。Preview（Vercel生成ドメイン）は
+   * デフォルトでSSO保護がかかるため、CLIのような非ブラウザ呼び出しはこれが無いと401になる。
+   * `deploid.net`のような独自ドメイン（= Production想定経路）は元々SSO保護の対象外
+   * （project設定`ssoProtection.deploymentType: "all_except_custom_domains"`）なので、
+   * Production向け呼び出しでは不要・未設定でよい。
+   */
+  protectionBypassSecret?: string;
 }
 
 /**
@@ -1045,6 +1054,7 @@ export async function exportSignedBaselineViaUploadSession(
     Authorization: `JWT ${args.credentials.jwt}`,
     'x-audit-upload-scope': args.credentials.sharedSecret,
     'x-audit-upload-request-id': requestId,
+    ...(args.protectionBypassSecret ? { 'x-vercel-protection-bypass': args.protectionBypassSecret } : {}),
   };
 
   let sessionId: string | undefined;
@@ -1264,7 +1274,13 @@ export async function mintAuditUploadJwt(args: Map<string, string | true>): Prom
 
   const { getPayload } = await import('payload');
   const { default: config } = await import('../payload.config.ts');
-  const payload = await getPayload({ config });
+  // `getPayload()`はconfigではなく`options.key`（省略時 'default'）単位でprocess全体
+  // キャッシュする（`node_modules/payload/dist/index.js`の`_cached`）。`runExport()`内で
+  // 先に呼ばれる`resolveExportProvenance()`が既に'default'キーのpayloadインスタンスを
+  // 作って`destroy()`済みのため、ここで同じ既定keyを使うと**破棄済みインスタンス**を
+  // 掴んでしまい、`adapter.tables`が壊れた状態で`payload.login()`が失敗する（実機で確認済み）。
+  // 独立したkeyを与えて、常に自前の新しいインスタンスを持つ。
+  const payload = await getPayload({ config, key: 'audit-upload-jwt' });
   try {
     const { user, token } = await payload.login({ collection: 'admins', data: { email, password } });
     if (!user || !token) throw new Error(`Failed to log in as "${email}".`);
@@ -1308,6 +1324,10 @@ const HELP = [
   '                                 process listに残るため）。環境変数 AUDIT_UPLOAD_ADMIN_PASSWORD、',
   '                                 または対話プロンプト（TTY、非echo）のみ',
   '                                 (環境変数 AUDIT_UPLOAD_SHARED_SECRET も必須。x-audit-upload-scope)',
+  '                                 Preview（Vercel生成ドメイン）はVercel自身のSSO保護対象なので',
+  '                                 環境変数 VERCEL_AUTOMATION_BYPASS_SECRET（project設定の',
+  '                                 "Protection Bypass for Automation"）も必要。独自ドメイン',
+  '                                 （Production想定）は対象外なので不要。',
   '  --media-dir <dir>             baseline へ同梱する media バイト列の読み取り元（既定 ./media）',
   '  --manifest-out <path>         署名済み manifest envelope の出力先',
   '  --exported-by <who>           manifest の exportedBy',
@@ -1436,6 +1456,10 @@ async function runExport(args: Map<string, string | true>): Promise<void> {
       resolveMediaBytes,
       endpointBaseUrl: endpointBaseUrl.replace(/\/$/, ''),
       credentials: { jwt, sharedSecret },
+      // Preview（Vercel生成ドメイン）はVercel自身のSSO保護がかかるため、非ブラウザ呼び出しは
+      // "Protection Bypass for Automation" secretが要る。Vercel自身の慣例に合わせた env var 名。
+      // 独自ドメイン（Production想定経路）はそもそも対象外なので未設定で構わない。
+      protectionBypassSecret: process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
     });
     manifest = built.manifest;
     envelope = built.envelope;

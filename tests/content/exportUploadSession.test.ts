@@ -168,6 +168,45 @@ describe('exportSignedBaselineViaUploadSession', () => {
     expect(completeBody).toEqual({ baselineRunId: PROVENANCE.baselineRunId });
   });
 
+  it('sends x-vercel-protection-bypass on every request when configured, and omits it when not', async () => {
+    const withBypass = createFakeAuditUploadServer();
+    await exportSignedBaselineViaUploadSession({
+      snapshot: snapshotWithMedia([]),
+      store: STORE,
+      exportedBy: 'upload-session-test',
+      provenance: PROVENANCE,
+      resolveMediaBytes: async () => ONE_PX_PNG,
+      endpointBaseUrl: ENDPOINT,
+      credentials: CREDENTIALS,
+      fetchImpl: withBypass.fetchImpl,
+      env: TEST_ENV,
+      protectionBypassSecret: 'fake-vercel-bypass-secret',
+      ...fakeSigners(),
+    });
+    expect(withBypass.calls.length).toBeGreaterThan(0);
+    for (const call of withBypass.calls) {
+      expect(call.headers['x-vercel-protection-bypass']).toBe('fake-vercel-bypass-secret');
+    }
+
+    const withoutBypass = createFakeAuditUploadServer();
+    await exportSignedBaselineViaUploadSession({
+      snapshot: snapshotWithMedia([]),
+      store: STORE,
+      exportedBy: 'upload-session-test',
+      provenance: PROVENANCE,
+      resolveMediaBytes: async () => ONE_PX_PNG,
+      endpointBaseUrl: ENDPOINT,
+      credentials: CREDENTIALS,
+      fetchImpl: withoutBypass.fetchImpl,
+      env: TEST_ENV,
+      ...fakeSigners(),
+    });
+    expect(withoutBypass.calls.length).toBeGreaterThan(0);
+    for (const call of withoutBypass.calls) {
+      expect(call.headers['x-vercel-protection-bypass']).toBeUndefined();
+    }
+  });
+
   it('uploads a content-addressed duplicate media object only once', async () => {
     const server = createFakeAuditUploadServer();
     // 2つのstableIdが同じバイト列を指す(rights違いで2レコードに割れた同一ファイルのケース)。
