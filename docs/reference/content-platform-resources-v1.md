@@ -62,11 +62,20 @@ Preview / Production を別 Supabase project として分離。
 | 用途 | モード | Port | Host | User |
 |---|---|---|---|---|
 | アプリ実行時 `DATABASE_URL`（Vercel serverless） | Transaction pooler（Supavisor） | 6543 | `aws-0-ap-northeast-1.pooler.supabase.com` | `postgres.<project-ref>` |
-| 単発 / migration実行（`payload migrate`） | Direct connection | 5432 | `db.<project-ref>.supabase.co` | `postgres` |
+| 単発 / migration実行（`payload migrate`） | Session pooler（Supavisor） | 5432 | `aws-0-ap-northeast-1.pooler.supabase.com` | `postgres.<project-ref>` |
 
 理由: transaction-modeのpoolerはVercel serverless functionが作る多数の短命接続と相性が良い一方、
 migration toolingはpooled transaction modeでは保証されないsession-levelの前提を必要とするため、
-migration実行だけはdirect connectionを使う。
+migration実行だけはsession poolerを使う。
+
+**2026-08-22/23訂正**: 当初はmigration実行にDirect connection（`db.<project-ref>.supabase.co`、
+5432）を使う設計だったが、Supabase platform側の変更と見られる理由でこのhostnameがDNS解決不能に
+なっていることを実機確認した（Preview/Production両方）。pooler hostname
+（`aws-0-ap-northeast-1.pooler.supabase.com`）自体は最初から解決できているため、direct
+connectionの代わりに**同じpooler hostnameのsession pooler（port 5432）**をmigration用として
+使う（`docs/reference/database-migration-runbook-v1.md` §2参照）。`?sslmode=require&uselibpqcompat=true`
+のquery parameterが必須（新しい`pg-connection-string`の既定挙動が`sslmode=require`を
+`verify-full`の別名にしており、Supabaseの証明書chainがNodeの既定trust storeに無いため）。
 
 **Credential owner**: プロジェクトオーナー。各Supabase projectのpasswordはproject dashboard
 （Settings → Database → reset password）から人間が個別に設定した値で、AIエージェントが生成・

@@ -57,21 +57,40 @@ upstream側の対処（silent false-successの防止）は入れたが、競合�
 migrationはschema変更であり、新しいアプリコードがそのschemaを前提にする前に適用されている
 必要がある。deploy pipelineのstep順序:
 
+**2026-08-23訂正（重要）: 「migration用のDirect connection」は現在使えない。** Preview/Production
+どちらもdirect connection（`db.<project-ref>.supabase.co`）がDNS解決不能（Supabase platform側の
+変更と見られる、2026-08-22実機確認済み）。migration実行にはpooler hostname
+（`aws-0-ap-northeast-1.pooler.supabase.com`）の**session pooler（port 5432）**を明示的に使う。
+
+**さらに重要: migration用のDATABASE_URLと、Vercelアプリruntime用のDATABASE_URLは別物として
+明示的に使い分ける。** Vercel Preview/Production環境変数の`DATABASE_URL`は
+**transaction pooler（port 6543）**に設定されている（2026-08-23、Preview側で確認・変更済み。
+`task9-preview-rehearsal-preflight-v1.md`「pooler mode調査・解決」参照）——これはアプリ
+runtimeの多数の短命接続向けで、migrationのようなsession-level guaranteeを要る操作には
+使わない（使うと`payload migrate`自体が transaction pooler固有の制約でおかしな挙動をする
+リスクがある。実際に試して確認したことはまだ無い——「使わない」運用で回避している）。
+**migrationを実行するときは、Vercelの環境変数を読みにいかず、その場でsession pooler URLを
+明示的に`DATABASE_URL`としてexportしてから`npm run payload:migrate*`を実行する。**
+（`~/secrets/deploid-supabase-connections.txt`の`pooler`行、port 5432、
+`?sslmode=require&uselibpqcompat=true`必須。詳細は`task9-preview-rehearsal-preflight-v1.md`
+Step 4参照）
+
 ```bash
 # 1. 依存関係をインストール
 npm ci
 
-# 2. migrationを適用する。DATABASE_URLは対象環境のDirect connection
-#    （docs/reference/content-platform-resources-v1.md #1 の「migration実行」用、pooler不可）。
+# 2. migrationを適用する。DATABASE_URLはこのコマンド専用に明示export した
+#    session pooler URL（Vercelの環境変数のDATABASE_URLとは別物、上記参照）。
 #    非ゼロ終了したらここでpipelineを止める。
-npm run payload:migrate
+DATABASE_URL="<session pooler URL、port 5432>" npm run payload:migrate
 
-# 3. 環境markerをstampする。preview環境なら --expected preview、production環境なら
-#    --expected production。DEPLOYMENT_ENVはpipeline側で環境ごとに設定する
+# 3. 環境markerをstampする。DATABASE_URLは同じsession pooler URLを使う。
+#    preview環境なら --expected preview、production環境なら --expected production。
+#    DEPLOYMENT_ENVはpipeline側で環境ごとに設定する
 #    （--expectedと一致しなければ何も書かず exit 1 する、Step 3参照）。
-npm run environment:stamp -- --expected "$DEPLOYMENT_ENV"
+DATABASE_URL="<session pooler URL、port 5432>" npm run environment:stamp -- --expected "$DEPLOYMENT_ENV"
 
-# 4. ここまで成功して初めてbuildする
+# 4. ここまで成功して初めてbuildする。build自体はVercelの環境変数（transaction pooler）を使う。
 npm run build
 ```
 
@@ -144,7 +163,8 @@ npm run payload:migrate:down
 以下は実機確認済みの手順。
 
 前提: サーバのmajor versionに合わせたclientを使う（確認環境: PostgreSQL 15.14）。接続先は
-migration用のDirect connection（poolerではない。`docs/reference/content-platform-resources-v1.md` #1）。
+**session pooler（port 5432、上記「## 2」の訂正参照）を明示的にexportしたDATABASE_URL**。
+Vercelアプリruntime用のDATABASE_URL（transaction pooler）を使い回さない。
 
 ```bash
 # 1. 退避（データのみ。schemaはmigrationが正本なのでdumpしない）
