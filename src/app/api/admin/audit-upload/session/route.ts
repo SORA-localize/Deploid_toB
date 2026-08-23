@@ -9,10 +9,11 @@ import payloadConfig from '@/payload.config';
 import { createAuditUploadSession } from '@/lib/payload/auditUploadSession';
 import { auditUploadPreflight, jsonResponse } from '@/lib/payload/auditUploadRouteHelpers';
 
-// cosign（`ensureCosignOnPath` / `execFileSync`）とBuffer/fsを使うため、edge runtimeでは動かない。
-// Next.jsの既定はApp Router route handlerでnodejsだが、将来の設定変更で意図せずedgeへ倒れないよう
-// 明示する。
-export const runtime = 'nodejs';
+// cosign（`ensureCosignOnPath` / `execFileSync`）とBuffer/fsを使うためedge runtimeでは動かないが、
+// `next.config.ts`の`cacheComponents: true`とroute segment configの明示的な`runtime`指定は
+// 非互換（`next build`が"Route segment config "runtime" is not compatible with
+// nextConfig.cacheComponents"でエラーになることを確認済み）。Next.jsの既定（App Router route
+// handlerはnodejs）に委ねる。
 
 const FAILURE_STATUS: Record<string, number> = {
   'malformed-envelope': 400,
