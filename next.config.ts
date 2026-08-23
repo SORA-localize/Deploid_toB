@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve('.'),
   },
+  // POC専用（docs/reference/task9-audit-upload-endpoint-design-v1.md）。確認が終わったら
+  // このentryごと削除する。`poc-cosign/fetch-cosign.mjs`がbuild時に取得するLinux cosign
+  // binaryを、debug routeのVercel Function bundleへ明示的に含める。
+  outputFileTracingIncludes: {
+    '/api/debug-cosign-poc': ['./.cosign-bin/cosign'],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
   },
