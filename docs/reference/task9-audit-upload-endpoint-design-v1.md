@@ -5,18 +5,18 @@ updated: 2026-08-23
 
 # Audit Blob store upload endpoint — 設計書 v1
 
-**この文書は設計のみで、実装はまだ一切していない。** 実装に着手する前に、特に「## 未決事項」の
-解決（プロジェクトオーナーの判断が要る）を先に済ませること。
+**この文書は設計のみで、route本体の実装はまだしていない。** POC（実Preview検証）は完了した
+（「## POC結果」参照）。3段階session route本体の実装は、この設計書と「## session実装時の
+追加必須事項」を踏まえたうえで、別途明示承認を得てから着手する。Production環境変数設定・
+Production側の疎通確認はさらに別途。
 
-**2026-08-23、プロジェクトオーナー確認済みの実行順序**:
+**2026-08-23、プロジェクトオーナー確認済みの実行順序（更新: 2はPOC完了で終了）**:
 
-1. この設計書自体はcommitしてよい。
-2. **実装前に最小POCを作る**（詳細下記「## POC計画」）。(a) cosignバイナリ同梱を本実装として
-   確定する前に、実際にVercel Node Functionで動くかを検証する。
-3. POCがPreviewで通った場合のみ、3段階session route本体の実装へ進む。
-4. **POCが失敗した場合は、pure-JS再実装ではなく、Option C（外部で検証済みであることを別の署名で
-   routeへ委譲する設計）を改めて設計し直す。** 「## 未決事項」の(b)は採用しない。
-5. **POC未確認のままroute本体やProduction環境変数設定へ進まない。**
+1. ~~この設計書自体はcommitしてよい。~~ 完了。
+2. ~~実装前に最小POCを作る。~~ **完了・成功。** 詳細「## POC結果」「## POC計画」参照。
+3. → 次: POCがPreviewで通ったので、3段階session route本体の実装へ進める（着手は別途承認後）。
+4. （不要になった）POC失敗時のOption Cフォールバックは使わない。
+5. Production環境変数設定・Production側の疎通確認はroute本体実装後、さらに別途承認を得てから。
 
 session flow自体は下記の内容で良いが、実装時に必須の追加事項がある（「## session実装時の
 追加必須事項」参照）。
@@ -46,7 +46,35 @@ runtimeでは `VERCEL_OIDC_TOKEN` が `process.env` ではなく **`x-vercel-oid
 全部Function化（cosignごとVercel Function内で実行）・cosignバイナリをFunctionへ同梱、の2案は
 下記「## 未決事項」の理由により今回は採用しない方向で設計している。
 
-## 未決事項（実装着手前に解決必須）
+## POC結果（2026-08-23、解決済み）
+
+下記「## POC計画」を実施し、**(a)を実Preview deploymentで4項目すべて確認できた**。
+
+```json
+{"cosignPath":"/var/task/.cosign-bin/cosign","cosignVersionOk":true,
+ "cosignVersionExcerpt":"GitVersion:    v3.1.3","verifyBlobOk":true,
+ "verifyBlobOutput":"","hasOidcHeader":true,"hasStoreId":true,
+ "blobListOk":true,"blobCount":0}
+```
+
+- cosign v3.1.3（Linux amd64、公式releaseのsha256で検証済み）をVercel Node Functionへ同梱でき、
+  `execFileSync`で実行できた。
+- 実Preview KMS鍵（`alias/deploid-snapshot-signing-preview`）で実際に署名したtest artifactに対し、
+  Function内で`cosign verify-blob --insecure-ignore-tlog=true`が成功した。
+- `x-vercel-oidc-token` headerが実際にRequestに存在することを確認した（`vercel curl`経由。
+  前回のdebug-oidc-checkが`hasOidcToken:false`だったのは`process.env`しか見ていなかったのが
+  原因で、OIDC Federation自体は最初から有効だった——`task9-preview-rehearsal-preflight-v1.md`
+  の「OIDC Federation未有効化」という記述はこの文書内で訂正済み）。
+- そのheader値を`oidcToken`として明示的に`@vercel/blob`の`list()`へ渡し、
+  `deploid-audit-preview`への読み取りが成功した（0件、空storeとして想定通り）。
+
+**結論: 「## 未決事項」は(a)で解決した。(b)（pure-JS再実装）・(c)（検証委譲）は不要。**
+POC用コード（`poc-cosign/`・`src/app/api/debug-cosign-poc/`・`next.config.ts`の
+`outputFileTracingIncludes`・`package.json`の`vercel-build`）はcommit `3b084e2`で全て削除済み。
+実装時は同じ構成（`outputFileTracingIncludes`でcosign binaryをroute専用に同梱、`vercel-build`で
+build時取得）を本実装のrouteに対して再度行う。
+
+## 未決事項（解決済み・記録として残す）
 
 ### 最優先: route内での署名検証は技術的に可能か
 

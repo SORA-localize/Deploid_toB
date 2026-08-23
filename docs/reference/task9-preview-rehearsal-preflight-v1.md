@@ -304,19 +304,20 @@ Preview storeへの書き込みは一切行っていない）を実Preview deplo
 "development"を信頼しないため`list()`は失敗した）ことと対照的に、**実deploymentでは
 そもそもtokenが存在しない**。
 
-これは「未検証」ではなく**現状壊れている（未設定）**という結論になる。Vercel projectの
-「OIDC Federation」設定（dashboard専用、CLIには対応するsubcommandが無いことを確認済み——
-`vercel project update --help`・`vercel project --help`のどちらにも該当項目なし）が、
-このprojectでは有効化されていない可能性が高い。**この設定はプロジェクトオーナーがVercel
-dashboardから確認・有効化する必要がある。** 有効化されない限り、`deploid-audit-preview` /
-`deploid-audit-production`のどちらもPayload・exportスクリプトから一切書き込めない
-（cutover baseline snapshot、Task 9計画Step 2が機能しない）。
+**2026-08-23訂正: 「OIDC Federation未有効化」という上記の結論は誤りだった。** プロジェクトオーナーの
+指摘により、[Vercel公式docs](https://vercel.com/docs/oidc)を確認したところ、**Vercel Functionの
+runtimeではOIDC tokenは`process.env`ではなく`x-vercel-oidc-token` request headerで渡される**
+（buildと"development" local devの場合だけ`process.env.VERCEL_OIDC_TOKEN`）。このdebug routeは
+`process.env`しか見ておらず、header読み取りロジックが元々存在しなかっただけで、OIDC Federation
+自体は最初から有効だった。詳細な訂正・実機確認結果（`docs/reference/task9-audit-upload-endpoint-design-v1.md`
+のPOCで、実際に`x-vercel-oidc-token` headerが存在し、それを使ったBlob accessが成功することを
+2026-08-23に確認済み）はそちらを参照。**dashboard操作は不要だった。**
 
 ### 未実施・未検証事項（Production cutover着手前に埋める必要がある）
 
-- **（最優先・新規）Vercel projectの「OIDC Federation」をdashboardで確認・有効化する必要がある。**
-  上記の追試で判明。有効化されていない場合、audit Blob store（署名済みcutover baseline
-  snapshotの保存先）が実質的に一切機能しない。CLIでは確認・変更できない（dashboard専用）。
+- ~~Vercel projectの「OIDC Federation」をdashboardで確認・有効化する必要がある。~~ **誤りだった
+  （上記訂正参照）。実際に必要なのは、header経由でtokenを受け取れるVercel Function側の実装
+  （`docs/reference/task9-audit-upload-endpoint-design-v1.md`）であり、dashboard操作ではない。
 - **Vercel Preview（および将来Production）のDATABASE_URLが実際にどのpooler modeを指しているか
   未確認。** session pooler（15接続上限）のままだと、実際の同時アクセスや今後のPayload
   admin/MCP同時利用で同じ`EMAXCONNSESSION`が本番相当のPreview deploymentでも起き得る。
