@@ -9,7 +9,6 @@
     "postinstall": "patch-package",
     "dev": "next dev",
     "build": "node --experimental-strip-types scripts/validate-data.mjs && next build",
-    "vercel-build": "node poc-cosign/fetch-cosign.mjs && node --experimental-strip-types scripts/validate-data.mjs && next build",
     "start": "next start",
     "validate:data": "node --experimental-strip-types scripts/validate-data.mjs",
     "build:data-r01-manifest": "node --experimental-strip-types scripts/build-data-r01-manifest.mjs",

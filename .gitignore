@@ -2,10 +2,6 @@
 dist/
 .next/
 
-# POC専用（docs/reference/task9-audit-upload-endpoint-design-v1.md）: build時に
-# poc-cosign/fetch-cosign.mjs が取得するbinary。コミットしない。
-.cosign-bin/
-
 # Playwright artifacts
 test-results/
 playwright-report/
