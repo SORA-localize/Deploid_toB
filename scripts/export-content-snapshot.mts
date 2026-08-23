@@ -680,45 +680,159 @@ export function createDefaultMediaByteSource(options: { uploadDir?: string } = {
   };
 }
 
-/** media bytes を store へ置き、署名対象になる inventory を組み立てる。 */
-async function uploadMediaInventory(args: {
+/** media 1件ぶんの読み取り済みバイト列と、署名対象 inventory の1行。 */
+interface ResolvedMediaObject {
+  entry: MediaInventoryEntry;
+  /** content-addressed objectKey が同じ media が複数レコードにまたがる場合、書き込みは1回だけ。 */
+  isFirstOccurrenceOfObjectKey: boolean;
+  bytes: Buffer;
+}
+
+/**
+ * media バイト列を**読むだけ**（store へは一切書かない）。署名対象になる inventory と、
+ * 書き込み側（`exportSignedBaseline` の直接 store 書き込み、または
+ * `exportSignedBaselineViaUploadSession` の session 経由アップロード）が使う実バイト列を
+ * 両方まとめて返す——「manifest を完成させて署名した後にしか書き込みを始めない」という
+ * 順序（Task 9 audit-upload session の必須条件）を、書き込み方法によらず共通化するため。
+ */
+function resolveMediaInventory(args: {
   media: readonly MediaAsset[];
   objectKeyPrefix: string;
   resolveMediaBytes?: MediaByteResolver;
-  put: (objectKey: string, body: Buffer) => Promise<{ versionId: string | null }>;
-}): Promise<MediaInventoryEntry[]> {
-  const resolve = args.resolveMediaBytes ?? createDefaultMediaByteSource();
-  const inventory: MediaInventoryEntry[] = [];
-  // content-addressed なので、同じバイト列を持つ media（rights 違いで2レコードに割れた同一
-  // ファイルなど）は同じ objectKey になる。write-once store は再 put を拒否するため、
-  // この run で既に置いたキーは置き直さない（inventory には両方の stableId が載る）。
-  const uploaded = new Set<string>();
-  // stable ID 順に固定して、同じ snapshot なら同じ inventory になるようにする。
-  const assets = [...args.media].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-  for (const asset of assets) {
-    let bytes: Buffer;
-    try {
-      bytes = await resolve(asset);
-    } catch (error) {
-      // 必須修正9-4 の裏側: **取得できなかった media がある baseline は作らない**。
-      // 「あとで public store から拾えばよい」を許すと、baseline 単体での復元にならない。
-      throw new Error(`media-bytes-unavailable: ${asset.id} (${asset.filename}): ${(error as Error).message}`);
+}): { resolve: () => Promise<ResolvedMediaObject[]> } {
+  const resolve = async (): Promise<ResolvedMediaObject[]> => {
+    const resolveBytes = args.resolveMediaBytes ?? createDefaultMediaByteSource();
+    const results: ResolvedMediaObject[] = [];
+    // content-addressed なので、同じバイト列を持つ media（rights 違いで2レコードに割れた同一
+    // ファイルなど）は同じ objectKey になる。write-once store は再 put を拒否するため、
+    // この run で既に見た objectKey は2回目以降 `isFirstOccurrenceOfObjectKey: false` にする
+    // （inventory には両方の stableId が載るが、書き込みは1回だけ）。
+    const seen = new Set<string>();
+    // stable ID 順に固定して、同じ snapshot なら同じ inventory になるようにする。
+    const assets = [...args.media].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    for (const asset of assets) {
+      let bytes: Buffer;
+      try {
+        bytes = await resolveBytes(asset);
+      } catch (error) {
+        // 必須修正9-4 の裏側: **取得できなかった media がある baseline は作らない**。
+        // 「あとで public store から拾えばよい」を許すと、baseline 単体での復元にならない。
+        throw new Error(`media-bytes-unavailable: ${asset.id} (${asset.filename}): ${(error as Error).message}`);
+      }
+      const sha256 = sha256Hex(bytes);
+      const objectKey = `${args.objectKeyPrefix}/${sha256}`;
+      const isFirstOccurrenceOfObjectKey = !seen.has(objectKey);
+      seen.add(objectKey);
+      results.push({
+        entry: {
+          stableId: asset.id,
+          filename: asset.filename,
+          objectKey,
+          sha256,
+          size: bytes.byteLength,
+          mimeType: asset.mimeType ?? 'application/octet-stream',
+        },
+        isFirstOccurrenceOfObjectKey,
+        bytes,
+      });
     }
-    const sha256 = sha256Hex(bytes);
-    const objectKey = `${args.objectKeyPrefix}/${sha256}`;
-    inventory.push({
-      stableId: asset.id,
-      filename: asset.filename,
+    return results;
+  };
+  return { resolve };
+}
+
+function signArtifactBuffer(snapshotBuffer: Buffer, keyArn?: string): Promise<Buffer> {
+  return withTempDir(async (workDir) => {
+    const localSnapshotPath = path.join(workDir, 'snapshot.json');
+    const localBundlePath = path.join(workDir, 'snapshot.cosign.bundle');
+    await writeFile(localSnapshotPath, snapshotBuffer);
+    signBlobWithCosign(localSnapshotPath, localBundlePath, keyArn);
+    return readFile(localBundlePath);
+  });
+}
+
+/**
+ * store 種別によらない部分: snapshot に cosign 署名を付け、media を読んで inventory を作り、
+ * manifest を組み立てて署名するところまで——**store へは一切書き込まない**。
+ *
+ * Task 9 audit-upload session（`docs/reference/task9-audit-upload-endpoint-design-v1.md`）の
+ * Step 1 は「署名検証済み manifest からしか許可 object 一覧を作らない」ため、session を開く前に
+ * 完成した署名済み envelope が要る。従来の `exportSignedBaseline` は逆順（先に書き込み、最後に
+ * manifest を組み立てて署名）だったため、この関数として順序を反転させて共通化した。
+ * `exportSignedBaseline`（直接 store 書き込み）・`exportSignedBaselineViaUploadSession`
+ * （session 経由アップロード）はどちらもこれを呼んでから、書き込み方法だけを分岐する。
+ */
+async function buildSignedBaselineArtifacts(
+  args: Omit<BuildManifestArgs, 'store'> & { store: Pick<SnapshotObjectStore, 'provider' | 'bucket' | 'storeId'> },
+): Promise<{
+  manifest: CutoverBaselineManifest;
+  envelope: SignedBaselineEnvelope;
+  snapshotJson: string;
+  objectKey: string;
+  signatureObjectKey: string;
+  snapshotBuffer: Buffer;
+  signatureBundle: Buffer;
+  mediaObjects: ResolvedMediaObject[];
+  mediaInventory: MediaInventoryEntry[];
+}> {
+  const exportedAt = args.exportedAt ?? new Date().toISOString();
+  const snapshotJson = canonicalJson(args.snapshot);
+  const snapshotBuffer = Buffer.from(snapshotJson, 'utf8');
+  const sha256 = sha256Hex(snapshotBuffer);
+  const objectKey = baselineObjectKey(exportedAt, sha256);
+  const signatureObjectKey = `${objectKey}.cosign.bundle`;
+
+  const signatureBundle = await (args.signArtifact ?? signArtifactBuffer)(snapshotBuffer, args.keyArn);
+
+  const mediaObjects = await resolveMediaInventory({
+    media: args.snapshot.media,
+    objectKeyPrefix: `${objectKey}.media`,
+    resolveMediaBytes: args.resolveMediaBytes,
+  }).resolve();
+  const mediaInventory = mediaObjects.map((object) => object.entry);
+
+  const counts = countRecords(args.snapshot);
+  const manifest: CutoverBaselineManifest = {
+    provenance: args.provenance,
+    storage: {
+      provider: args.store.provider,
+      bucket: args.store.bucket,
+      storeId: args.store.storeId,
       objectKey,
-      sha256,
-      size: bytes.byteLength,
-      mimeType: asset.mimeType ?? 'application/octet-stream',
-    });
-    if (uploaded.has(objectKey)) continue;
-    await args.put(objectKey, bytes);
-    uploaded.add(objectKey);
-  }
-  return inventory;
+      // manifest は書き込みより**前**に完成させて署名する（session 経由アップロードの必須
+      // 条件）。署名後に`storage`を書き換えると署名対象バイト列と食い違うため、put() が返す
+      // 実 versionId を後から書き戻すことはしない——`versionId`はどこの検証コードからも
+      // 参照されない表示専用の値（`assertValidManifest`はnull/stringの形しか見ない）。
+      versionId: null,
+    },
+    mediaInventory,
+    sha256,
+    signature: {
+      algorithm: 'cosign',
+      keyId: args.keyArn ?? signingKeyArn(),
+      detachedSignatureObjectKey: signatureObjectKey,
+    },
+    recordCounts: {
+      manufacturers: counts.manufacturers,
+      robots: counts.robots,
+      robotSeries: counts.robotSeries,
+      distributors: counts.distributors,
+      useCases: counts.useCases,
+      deployments: counts.deployments,
+      articles: counts.articles,
+      articlePlacements: counts.articlePlacements,
+      media: counts.media,
+      siteSettings: counts.siteSettings,
+    },
+    exportedAt,
+    exportedBy: args.exportedBy,
+  };
+  assertValidManifest(manifest);
+
+  const envelope = await (args.signManifestEnvelope ?? signManifest)(manifest, args.keyArn);
+  assertValidEnvelope(envelope);
+
+  return { manifest, envelope, snapshotJson, objectKey, signatureObjectKey, snapshotBuffer, signatureBundle, mediaObjects, mediaInventory };
 }
 
 /**
@@ -729,32 +843,18 @@ async function uploadMediaInventory(args: {
  * 必須修正7-7: **不完全な run が有効 baseline として選ばれないようにする。** 構成物を全部
  * 置き終えた最後に completion marker を書き、途中で失敗したら**置いた分を消してから**投げ直す。
  * marker の無い baseline は restore / verify が受け付けない。
+ *
+ * `local-disk` / 実 Blob 双方の `SnapshotObjectStore` へ**直接**書き込む経路。`vercel-blob` の
+ * private audit store は Vercel Function runtime からしか到達できない（`scripts/
+ * snapshotObjectStore.mts` 冒頭コメント）ため、CLI から実 audit store を使う本番経路は
+ * `exportSignedBaselineViaUploadSession` を使う。この関数自体はテスト（`createLocalDiskObjectStore`
+ * / fake store）向けとして変更しない。
  */
-async function signArtifactBuffer(snapshotBuffer: Buffer, keyArn?: string): Promise<Buffer> {
-  const workDir = await mkdtempDir();
-  try {
-    const localSnapshotPath = path.join(workDir, 'snapshot.json');
-    const localBundlePath = path.join(workDir, 'snapshot.cosign.bundle');
-    await writeFile(localSnapshotPath, snapshotBuffer);
-    signBlobWithCosign(localSnapshotPath, localBundlePath, keyArn);
-    return readFile(localBundlePath);
-  } finally {
-    // 必須修正11-1/11-2: 平文 snapshot と署名 bundle を /tmp へ残さない。
-    await removeTempDir(workDir);
-  }
-}
-
 export async function exportSignedBaseline(args: BuildManifestArgs): Promise<BuiltBaseline> {
-  const exportedAt = args.exportedAt ?? new Date().toISOString();
-  const snapshotJson = canonicalJson(args.snapshot);
-  const snapshotBuffer = Buffer.from(snapshotJson, 'utf8');
-  const sha256 = sha256Hex(snapshotBuffer);
-  const objectKey = baselineObjectKey(exportedAt, sha256);
-  const signatureObjectKey = `${objectKey}.cosign.bundle`;
-
-  const signatureBundle = await (args.signArtifact ?? signArtifactBuffer)(snapshotBuffer, args.keyArn);
-
-  // 途中で失敗したら「置いた分」を消してから投げ直す（必須修正7-7）。
+  // 途中で失敗したら「置いた分」を消してから投げ直す（必須修正7-7）。build段階（署名失敗・
+  // media読み取り失敗）はまだ何も置いていないので、rollback loopはno-opになるだけで
+  // 同じtry/catchに含めてよい——`baseline-upload-incomplete:`prefixは書き込み前の失敗にも
+  // 一貫して付ける（既存のtest期待値）。
   const written: string[] = [];
   const put = async (key: string, body: Buffer) => {
     const result = await args.store.put(key, body);
@@ -763,63 +863,25 @@ export async function exportSignedBaseline(args: BuildManifestArgs): Promise<Bui
   };
 
   try {
-    const { versionId } = await put(objectKey, snapshotBuffer);
-    await put(signatureObjectKey, signatureBundle);
-    const mediaInventory = await uploadMediaInventory({
-      media: args.snapshot.media,
-      objectKeyPrefix: `${objectKey}.media`,
-      resolveMediaBytes: args.resolveMediaBytes,
-      put,
-    });
-    const counts = countRecords(args.snapshot);
-    const manifest: CutoverBaselineManifest = {
-      provenance: args.provenance,
-      storage: {
-        provider: args.store.provider,
-        bucket: args.store.bucket,
-        storeId: args.store.storeId,
-        objectKey,
-        versionId,
-      },
-      mediaInventory,
-      sha256,
-      signature: {
-        algorithm: 'cosign',
-        keyId: args.keyArn ?? signingKeyArn(),
-        detachedSignatureObjectKey: signatureObjectKey,
-      },
-      recordCounts: {
-        manufacturers: counts.manufacturers,
-        robots: counts.robots,
-        robotSeries: counts.robotSeries,
-        distributors: counts.distributors,
-        useCases: counts.useCases,
-        deployments: counts.deployments,
-        articles: counts.articles,
-        articlePlacements: counts.articlePlacements,
-        media: counts.media,
-        siteSettings: counts.siteSettings,
-      },
-      exportedAt,
-      exportedBy: args.exportedBy,
-    };
-    assertValidManifest(manifest);
-
-    // manifest 署名も完了条件の一部。marker より前に作り、失敗時は上で置いた全 object を消す。
-    const envelope = await (args.signManifestEnvelope ?? signManifest)(manifest, args.keyArn);
-    assertValidEnvelope(envelope);
+    const built = await buildSignedBaselineArtifacts({ ...args, store: args.store });
+    await put(built.objectKey, built.snapshotBuffer);
+    await put(built.signatureObjectKey, built.signatureBundle);
+    for (const object of built.mediaObjects) {
+      if (!object.isFirstOccurrenceOfObjectKey) continue;
+      await put(object.entry.objectKey, object.bytes);
+    }
 
     const completion: BaselineCompletionMarker = {
-      artifactSha256: sha256,
-      signatureSha256: sha256Hex(signatureBundle),
-      mediaInventorySha256: sha256Hex(canonicalJson(mediaInventory)),
+      artifactSha256: built.manifest.sha256,
+      signatureSha256: sha256Hex(built.signatureBundle),
+      mediaInventorySha256: sha256Hex(canonicalJson(built.mediaInventory)),
       baselineRunId: args.provenance.baselineRunId,
       completedAt: new Date().toISOString(),
     };
     // 必須修正7-7: **全署名の成功後、最後のstore writeとして** completion marker を置く。
-    await put(baselineCompletionMarkerKey(objectKey), Buffer.from(canonicalJson(completion), 'utf8'));
+    await put(baselineCompletionMarkerKey(built.objectKey), Buffer.from(canonicalJson(completion), 'utf8'));
 
-    return { manifest, envelope, snapshotJson, signatureBundle, completion };
+    return { manifest: built.manifest, envelope: built.envelope, snapshotJson: built.snapshotJson, signatureBundle: built.signatureBundle, completion };
   } catch (error) {
     for (const key of [...written].reverse()) {
       await args.store.remove(key).catch(() => {});
@@ -827,6 +889,149 @@ export async function exportSignedBaseline(args: BuildManifestArgs): Promise<Bui
     throw new Error(
       `baseline-upload-incomplete: ${(error as Error).message}. Partial objects from this run were removed; ` +
         'no completion marker was retained, so this run can never be selected as a baseline.',
+      { cause: error },
+    );
+  }
+}
+
+/** Task 9 audit-upload session（`docs/reference/task9-audit-upload-endpoint-design-v1.md`）呼び出しに要る資格情報。 */
+export interface AuditUploadSessionCredentials {
+  /** `payload.login()` が返す JWT。`Authorization: JWT <token>` として送る（Bearerではない）。 */
+  jwt: string;
+  /** `AUDIT_UPLOAD_SHARED_SECRET`。`x-audit-upload-scope` headerとして送る。 */
+  sharedSecret: string;
+}
+
+export interface ExportSignedBaselineViaUploadSessionArgs
+  extends Omit<BuildManifestArgs, 'store'> {
+  /** 実 store へは触れない（session route が実際に書く）ため、manifest表示用の識別情報だけでよい。 */
+  store: { provider: 'vercel-blob'; bucket: string; storeId: string };
+  /** 例: `https://deploid-to-b-preview.vercel.app`。末尾スラッシュなし。 */
+  endpointBaseUrl: string;
+  credentials: AuditUploadSessionCredentials;
+  /** テスト用の差し替え点。省略時はグローバル `fetch`。 */
+  fetchImpl?: typeof fetch;
+}
+
+export interface BuiltBaselineViaUploadSession {
+  manifest: CutoverBaselineManifest;
+  envelope: SignedBaselineEnvelope;
+  snapshotJson: string;
+  signatureBundle: Buffer;
+  sessionId: string;
+}
+
+async function auditUploadFetchOk(
+  fetchImpl: typeof fetch,
+  url: string,
+  init: RequestInit,
+  failureLabel: string,
+): Promise<Response> {
+  const response = await fetchImpl(url, init);
+  if (!response.ok) {
+    const bodyText = await response.text().catch(() => '');
+    throw new Error(`${failureLabel}: HTTP ${response.status} ${bodyText}`.trim());
+  }
+  return response;
+}
+
+/**
+ * `exportSignedBaseline` の分割パイプライン版（`docs/reference/
+ * task9-audit-upload-endpoint-design-v1.md`「方針: 分割パイプライン（Option A）」）。
+ *
+ * 署名（cosign + AWS KMS）は従来通り**このCLIプロセス内**で行う——ここは変更しない。
+ * 実際に private audit store（`deploid-audit-*`）へバイト列を書くのは、この関数ではなく
+ * **デプロイ済みVercel Functionの3段階session route**（`src/app/api/admin/audit-upload/
+ * session/**`）。`deploid-audit-*`はOIDC-federatedで、Vercel Function runtimeからしか
+ * 到達できない（`scripts/snapshotObjectStore.mts`冒頭コメント）ため、CLIプロセス自身が
+ * `createVercelBlobObjectStore()`で直接書き込むことは構造的にできない。
+ *
+ * 呼び出し順序: `buildSignedBaselineArtifacts`で**署名済み envelope を書き込み前に完成**させ
+ * （session Step 1がこれを要求する）、Step 1でsessionを開き、Step 2で各objectを送り、
+ * Step 3でcompleteする。途中で失敗したら`DELETE .../session/:id`でcleanupしてから投げ直す
+ * （`exportSignedBaseline`の逆順rollbackと同じ考え方）。
+ */
+export async function exportSignedBaselineViaUploadSession(
+  args: ExportSignedBaselineViaUploadSessionArgs,
+): Promise<BuiltBaselineViaUploadSession> {
+  const fetchImpl = args.fetchImpl ?? fetch;
+  const requestId = randomUUID();
+  const authHeaders: Record<string, string> = {
+    Authorization: `JWT ${args.credentials.jwt}`,
+    'x-audit-upload-scope': args.credentials.sharedSecret,
+    'x-audit-upload-request-id': requestId,
+  };
+
+  let sessionId: string | undefined;
+  try {
+    const built = await buildSignedBaselineArtifacts({ ...args, store: args.store });
+
+    const sessionResponse = await auditUploadFetchOk(
+      fetchImpl,
+      `${args.endpointBaseUrl}/api/admin/audit-upload/session`,
+      {
+        method: 'POST',
+        headers: { ...authHeaders, 'content-type': 'application/json' },
+        body: JSON.stringify(built.envelope),
+      },
+      'audit-upload-session-create-failed',
+    );
+    const sessionBody = (await sessionResponse.json()) as { sessionId: string };
+    sessionId = sessionBody.sessionId;
+
+    const uploadObject = async (objectKey: string, bytes: Buffer): Promise<void> => {
+      await auditUploadFetchOk(
+        fetchImpl,
+        `${args.endpointBaseUrl}/api/admin/audit-upload/session/${sessionId}/object`,
+        {
+          method: 'POST',
+          headers: { ...authHeaders, 'content-type': 'application/octet-stream' },
+          body: new Uint8Array(bytes),
+        },
+        `audit-upload-object-failed: ${objectKey}`,
+      );
+    };
+
+    await uploadObject(built.objectKey, built.snapshotBuffer);
+    await uploadObject(built.signatureObjectKey, built.signatureBundle);
+    for (const object of built.mediaObjects) {
+      // route 側もsha256一致で許可objectを特定するため、同じobjectKeyを二重送信すると
+      // 「すでにuploaded」で拒否される（`exportSignedBaseline`のdedupと同じ理由）。
+      if (!object.isFirstOccurrenceOfObjectKey) continue;
+      await uploadObject(object.entry.objectKey, object.bytes);
+    }
+
+    await auditUploadFetchOk(
+      fetchImpl,
+      `${args.endpointBaseUrl}/api/admin/audit-upload/session/${sessionId}/complete`,
+      {
+        method: 'POST',
+        headers: { ...authHeaders, 'content-type': 'application/json' },
+        body: JSON.stringify({ baselineRunId: args.provenance.baselineRunId }),
+      },
+      'audit-upload-session-complete-failed',
+    );
+
+    return {
+      manifest: built.manifest,
+      envelope: built.envelope,
+      snapshotJson: built.snapshotJson,
+      signatureBundle: built.signatureBundle,
+      sessionId,
+    };
+  } catch (error) {
+    if (sessionId) {
+      await fetchImpl(`${args.endpointBaseUrl}/api/admin/audit-upload/session/${sessionId}`, {
+        method: 'DELETE',
+        headers: authHeaders,
+      }).catch(() => {});
+    }
+    throw new Error(
+      `baseline-upload-incomplete: ${(error as Error).message}. ` +
+        (sessionId
+          ? 'Requested cleanup of any objects uploaded this run; no completion marker was written, so this run ' +
+            'can never be selected as a baseline.'
+          : 'No session was created; nothing was written.'),
       { cause: error },
     );
   }
@@ -884,6 +1089,48 @@ export async function openVerifiedBaselineStore(
   return (dependencies.createStore ?? storeFromManifest)(envelope.manifest);
 }
 
+/**
+ * `exportSignedBaselineViaUploadSession`がデプロイ済みroute（`src/app/api/admin/audit-upload/
+ * session/**`）を呼ぶための`Authorization: JWT <token>`を用意する。
+ *
+ * このCLIは既に`DATABASE_URL`（+ `PAYLOAD_SECRET`）でLocal API接続を持っている
+ * （`resolveExportProvenance`）。対象環境（Preview/Production）の`PAYLOAD_SECRET`と同じ値が
+ * このプロセスにも設定されている前提のもと、`payload.login()`を**ローカルで**呼んで正規の
+ * JWTを発行し、それをそのままHTTP経由でデプロイ済みrouteへ送る——route側の`payload.auth()`は
+ * 同じ`PAYLOAD_SECRET`で署名検証するので、別途HTTPログインのroundtripを新設する必要がない。
+ * route側は`isPlatformAdminUser()`を要求するため、ここでも同じ判定でfail-fastする
+ * （route到達後の401より、CLI側で早く・分かりやすく落とす）。
+ */
+async function mintAuditUploadJwt(args: Map<string, string | true>): Promise<string> {
+  const email = (args.get('admin-email') as string | undefined) ?? process.env.AUDIT_UPLOAD_ADMIN_EMAIL;
+  const password = (args.get('admin-password') as string | undefined) ?? process.env.AUDIT_UPLOAD_ADMIN_PASSWORD;
+  if (!email || !password) {
+    throw new Error(
+      'Set AUDIT_UPLOAD_ADMIN_EMAIL and AUDIT_UPLOAD_ADMIN_PASSWORD (or --admin-email / --admin-password). ' +
+        'The audit-upload session route requires a platform-admin login (JWT), minted locally against the ' +
+        'same DATABASE_URL / PAYLOAD_SECRET as the target environment.',
+    );
+  }
+
+  const { getPayload } = await import('payload');
+  const { default: config } = await import('../payload.config.ts');
+  const payload = await getPayload({ config });
+  try {
+    const { user, token } = await payload.login({ collection: 'admins', data: { email, password } });
+    if (!user || !token) throw new Error(`Failed to log in as "${email}".`);
+    const role = (user as { role?: string }).role;
+    if (role !== 'platform-admin') {
+      throw new Error(
+        `"${email}" has role "${role ?? 'unknown'}", not platform-admin. The audit-upload session route ` +
+          'requires platform-admin (docs/reference/task9-audit-upload-endpoint-design-v1.md "認証設計").',
+      );
+    }
+    return token;
+  } finally {
+    await payload.destroy();
+  }
+}
+
 // ─── CLI ─────────────────────────────────────────────────────────────────
 
 const HELP = [
@@ -897,6 +1144,14 @@ const HELP = [
   '  --allow-local-store           localhost + NODE_ENV=test の統合テストだけ local-disk を許可',
   '  --store-id <id>               vercel-blob の**実 store ID**（接続先の選択と credential 照合に使う）',
   '  --store-name <name>           vercel-blob store の表示名（manifest / ログ用。選択には使わない）',
+  '  --audit-upload-endpoint <url> --store vercel-blob 時必須。デプロイ済みaudit-upload session',
+  '                                 routeのorigin（実際のBlob書き込みはこのroute自身が行う。',
+  '                                 `deploid-audit-*`はVercel Function runtimeからしか到達できない',
+  '                                 ためCLIプロセス自身は直接書き込まない）',
+  '  --admin-email / --admin-password  --store vercel-blob 時、session routeへのJWT発行に使う',
+  '                                 platform-adminのログイン（環境変数 AUDIT_UPLOAD_ADMIN_EMAIL /',
+  '                                 AUDIT_UPLOAD_ADMIN_PASSWORD でも可）',
+  '                                 (環境変数 AUDIT_UPLOAD_SHARED_SECRET も必須。x-audit-upload-scope)',
   '  --media-dir <dir>             baseline へ同梱する media バイト列の読み取り元（既定 ./media）',
   '  --manifest-out <path>         署名済み manifest envelope の出力先',
   '  --exported-by <who>           manifest の exportedBy',
@@ -969,11 +1224,23 @@ async function runExport(args: Map<string, string | true>): Promise<void> {
   });
 
   const storeKind = args.get('store');
-  let store: SnapshotObjectStore;
+  const mediaDir = args.get('media-dir');
+  const resolveMediaBytes = createDefaultMediaByteSource(
+    typeof mediaDir === 'string' ? { uploadDir: path.resolve(mediaDir) } : {},
+  );
+
+  let manifest: CutoverBaselineManifest;
+  let envelope: SignedBaselineEnvelope;
+  let objectReference: string;
+
   if (storeKind === 'local-disk') {
     const dir = args.get('store-dir');
     if (typeof dir !== 'string') throw new Error('--store local-disk requires --store-dir <dir>.');
-    store = createLocalDiskObjectStore(path.resolve(dir));
+    const store = createLocalDiskObjectStore(path.resolve(dir));
+    const built = await exportSignedBaseline({ snapshot, store, exportedBy, provenance, resolveMediaBytes });
+    manifest = built.manifest;
+    envelope = built.envelope;
+    objectReference = store.objectReference(manifest.storage.objectKey);
   } else if (storeKind === 'vercel-blob') {
     // 必須修正7-3: 接続先を決めるのは **store ID**。`--store-name` は manifest とログの表示名で、
     // 認証にも store 選択にも一切関与しない（それが監査で見つかった欠陥そのもの）。
@@ -986,26 +1253,42 @@ async function runExport(args: Map<string, string | true>): Promise<void> {
       );
     }
     const displayName = args.get('store-name');
-    store = createVercelBlobObjectStore({
-      storeId,
-      ...(typeof displayName === 'string' ? { displayName } : {}),
-      expectedEnvironment: provenance.environment,
+    const bucket = typeof displayName === 'string' ? displayName : `store_${normalizeBlobStoreId(storeId)}`;
+
+    // `deploid-audit-*`はOIDC-federatedでVercel Function runtimeからしか到達できないため、この
+    // CLIプロセス自身は`createVercelBlobObjectStore()`を呼ばない（呼べても構造的に書き込めない
+    // ——`scripts/snapshotObjectStore.mts`冒頭コメント）。実際の書き込みはTask 9 audit-upload
+    // session route（デプロイ済みVercel Function）が行う。
+    const endpointBaseUrl = args.get('audit-upload-endpoint');
+    if (typeof endpointBaseUrl !== 'string' || endpointBaseUrl.length === 0) {
+      throw new Error(
+        '--store vercel-blob requires --audit-upload-endpoint <base-url> (the deployed app origin whose ' +
+          'audit-upload session route will perform the actual Blob write).',
+      );
+    }
+    const sharedSecret = process.env.AUDIT_UPLOAD_SHARED_SECRET;
+    if (!sharedSecret) {
+      throw new Error('AUDIT_UPLOAD_SHARED_SECRET is not set. --store vercel-blob requires it (x-audit-upload-scope).');
+    }
+
+    const jwt = await mintAuditUploadJwt(args);
+    const built = await exportSignedBaselineViaUploadSession({
+      snapshot,
+      store: { provider: 'vercel-blob', bucket, storeId: normalizeBlobStoreId(storeId) },
+      exportedBy,
+      provenance,
+      resolveMediaBytes,
+      endpointBaseUrl: endpointBaseUrl.replace(/\/$/, ''),
+      credentials: { jwt, sharedSecret },
     });
+    manifest = built.manifest;
+    envelope = built.envelope;
+    objectReference =
+      `vercel-blob://${bucket}[store ${normalizeBlobStoreId(storeId)}]/${manifest.storage.objectKey} ` +
+      `(private; uploaded via audit-upload session ${built.sessionId})`;
   } else {
     throw new Error('--upload requires --store local-disk|vercel-blob.');
   }
-
-  const mediaDir = args.get('media-dir');
-  const { manifest, envelope } = await exportSignedBaseline({
-    snapshot,
-    store,
-    exportedBy,
-    provenance,
-    // 必須修正9-1: media のバイト列も baseline へ同梱する（既定は Payload の local upload dir）。
-    resolveMediaBytes: createDefaultMediaByteSource(
-      typeof mediaDir === 'string' ? { uploadDir: path.resolve(mediaDir) } : {},
-    ),
-  });
 
   const manifestPath = args.get('manifest-out');
   // **envelope を書く**（bare manifest ではない）。restore が受け付けるのは署名済み envelope だけ。
@@ -1017,7 +1300,7 @@ async function runExport(args: Map<string, string | true>): Promise<void> {
     process.stdout.write(envelopeJson);
   }
   process.stdout.write(`baseline run: ${provenance.baselineRunId} (generation ${provenance.baselineGeneration})\n`);
-  process.stdout.write(`object: ${store.objectReference(manifest.storage.objectKey)}\n`);
+  process.stdout.write(`object: ${objectReference}\n`);
 }
 
 /**
