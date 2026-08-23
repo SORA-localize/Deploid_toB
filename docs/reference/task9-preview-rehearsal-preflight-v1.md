@@ -317,9 +317,31 @@ Vercel同時実行数設計）は不要——`content-platform-resources-v1.md`�
 （アプリ実行時はtransaction pooler、migrationはdirect connectionの代わりにsession poolerを
 使う）へ戻すだけで解決する。
 
-**残作業**: Vercel Preview（将来はProductionも）の`DATABASE_URL`環境変数を、session poolerから
-transaction poolerの値へ実際に更新する。これはまだ実施していない（読み取り専用の調査までで、
-書き込み・環境変数変更は別途承認を得てから行う）。
+### pooler mode切替の実施・実機検証（2026-08-23、完了）
+
+プロジェクトオーナーの承認を得て、Preview（Productionは変更していない）の`DATABASE_URL`
+Vercel環境変数をsession poolerからtransaction pooler（6543）へ更新した（`vercel env rm` +
+`vercel env add`、値は一切表示・ログ出力していない）。空commitでredeployをtriggerし、新しい
+Preview deployment（`Ready`確認済み）に対して以下を確認した。
+
+- **主要route確認**（`CONTENT_SOURCE=payload`、実deployment、`vercel curl`のprotection
+  bypassで疎通）: `/`・`/robots`・`/robots/unitree-g1`・`/manufacturers`・`/use-cases`・
+  `/reports`・`/compare` 全て200。
+- **24並列相当の負荷再検証**（実deployment、`/robots/unitree-g1`と`/manufacturers`それぞれ
+  12並列 × 2セット）: **全24リクエスト200、`EMAXCONNSESSION`・500ともに発生せず。**
+- **ローカルでの`npm run build`（161ページ、9 worker、transaction pooler DATABASE_URL）**:
+  クリーンに成功。session poolerでは同じ条件で確実に失敗していたのと対照的。
+- **自動E2E（`npx playwright test tests/e2e/content-routes.spec.ts`、transaction pooler
+  DATABASE_URL + 実Preview DB）**: 7 passed、失敗0。
+
+**migration用DATABASE_URLとVercel runtime用DATABASE_URLの役割分離**は
+`docs/reference/database-migration-runbook-v1.md` §2・`docs/reference/content-platform-resources-v1.md`
+に明文化した（commit `fb3f2c1`）: migration/environment:stampはこのコマンド専用に明示export
+したsession pooler URLを使い、Vercelのapp runtime環境変数（transaction pooler）を絶対に
+使い回さない。
+
+**Supabase poolerに関する未解決事項はこれで無い。** Production側の`DATABASE_URL`はまだ設定
+されていない（別途、Production環境変数の設定設計の一部として決める）。
 
 ### Step 2追試: OIDC audit Blob store疎通確認（2026-08-22、実施・重大な問題を発見）
 

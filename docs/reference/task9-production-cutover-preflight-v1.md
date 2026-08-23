@@ -49,12 +49,13 @@ Production（project ref `xtklkavbirorelqdyqjj`）に対して実行する前の
    実resourceに対するend-to-end実行は未実施。
 4. Production Postgresは **table数0**（本セッションで読み取り専用確認済み、2026-08-22）。
    これはTask 0記録時点と変わっていない——Production は一度もmigrationを適用されていない。
-5. **（解決済み・2026-08-23）Supabase session poolerの同時接続数上限（15）が、Preview Step 6
-   実行中に実際に踏まれた。** 調査の結果、PreviewのDATABASE_URLは確かにsession pooler
-   （port 5432）を使っていたこと、同じpooler hostnameのport切替だけでtransaction pooler
-   （6543、DNS問題とは無関係）へ戻せること、実クエリ・24並列リクエストでエラー無しを確認済み。
-   詳細は`task9-preview-rehearsal-preflight-v1.md`「pooler mode調査・解決」参照。
-   **残っているのは実際のVercel環境変数更新のみ**（Preview→将来Productionの順、別途承認後）。
+5. **（完全解決・2026-08-23）Supabase session poolerの同時接続数上限（15）問題。** PreviewのDATABASE_URL
+   をtransaction pooler（6543）へ実際に更新・redeploy・実機検証まで完了した:
+   実deployment上での主要route確認（全200）、24並列リクエスト（全200、エラー無し）、
+   ローカル`npm run build`（161ページ、9 worker、成功）、自動E2E（7 passed）。
+   詳細は`task9-preview-rehearsal-preflight-v1.md`「pooler mode切替の実施・実機検証」参照。
+   **残るのはProduction側のDATABASE_URL設定のみ**（Production環境変数の設定設計の一部として、
+   最初からtransaction poolerで設定する）。
 
 ## Production環境変数の現状（2026-08-22、読み取り専用確認・名前のみ）
 
@@ -159,24 +160,25 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 4. 負荷下（複数route・複数同時アクセス）で500が出ないことの検証 → **transaction poolerで
    確認済み（12並列×2セット、エラー無し）。**
 
-詳細は`task9-preview-rehearsal-preflight-v1.md`「pooler mode調査・解決」参照。
-**残作業はVercel環境変数の実際の更新のみ**（session pooler→transaction poolerの値へ、
-Preview→将来Productionの順）。まだ実施していない——書き込み系操作は別途承認を得てから。
+詳細は`task9-preview-rehearsal-preflight-v1.md`「pooler mode切替の実施・実機検証」参照。
+**Preview側は完全に完了した**（環境変数更新・redeploy・実route確認・24並列負荷確認・
+`npm run build`・自動E2E、全て2026-08-23実施・成功）。migration用DATABASE_URLとVercel
+runtime用DATABASE_URLの役割分離も`database-migration-runbook-v1.md`に明文化済み（commit `fb3f2c1`）。
 
-優先順位（2026-08-23更新。1.は根本原因判明・対処方針確定・環境変数更新待ち、2.は根本原因判明・
+優先順位（2026-08-23更新。1.はPreview側完全解決・Production側のみ残、2.は根本原因判明・
 POC成功・route本体実装待ち）:
 
-1. DB接続問題 → **調査完了。Preview DATABASE_URLをtransaction pooler（6543）へ更新するだけで
-   解決する見込み。実際の環境変数更新は未実施（別途承認後）。**
+1. DB接続問題 → **Preview側は解決・実機検証済み。残るのはProduction側のDATABASE_URL設定
+   （最初からtransaction poolerで設定する、Production環境変数の設定設計の一部）のみ。**
 2. OIDC-federated audit Blob store疎通確認 → **根本原因判明（headerで渡る、dashboard操作は
    不要）・POC成功（`task9-audit-upload-endpoint-design-v1.md`参照）。3段階session route本体の
    実装がまだ残っている（着手には別途承認が要る）。**
 3. 1・2が解消してから、Production環境変数の設定設計
 4. 最後にTask 9計画Step 1（変更凍結宣言）
 
-**現時点でProduction cutoverへ進める状態ではない。** 両ブロッカーとも根本原因・解決方針は
-確定したが、(1)Preview DATABASE_URLの実際の更新、(2)audit Blob upload routeの本実装、
-どちらも未実施のまま残っている。
+**現時点でProduction cutoverへ進める状態ではない。** DB接続問題はPreview側で解決・実機検証済み
+だが、Production側のDATABASE_URL設定はまだ行っていない。audit Blob upload routeの本実装も
+未着手のまま残っている。
 
 **Production DBへの書き込み・Production Vercel環境変数の追加は、いずれも個別に明示承認を得てから
 実行する。**
