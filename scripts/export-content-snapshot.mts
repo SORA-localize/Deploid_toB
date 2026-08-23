@@ -911,6 +911,85 @@ export interface ExportSignedBaselineViaUploadSessionArgs
   credentials: AuditUploadSessionCredentials;
   /** テスト用の差し替え点。省略時はグローバル `fetch`。 */
   fetchImpl?: typeof fetch;
+  /** テスト用の差し替え点。省略時は `process.env`（`assertAuditUploadEndpointAllowed`が読む）。 */
+  env?: Record<string, string | undefined>;
+}
+
+/**
+ * `--audit-upload-endpoint`（あるいはこの関数の呼び出し側全般）が、任意のURLへ
+ * JWT・`AUDIT_UPLOAD_SHARED_SECRET`を送ってしまわないようにする。
+ *
+ * レビュー指摘: 誤入力や悪意あるURLへ資格情報が漏れうる。以下を機械的に強制する。
+ * - https必須
+ * - userinfo（user:pass@）禁止
+ * - query / hash禁止（bare originのみ——このCLIが自分でpathを組み立てる）
+ * - `provenance.environment`ごとに明示allowlistされたhostのみ許可
+ *   （Preview URLはdeploymentごとに変わる——`lib/payload/resolvePublicServerUrl.ts`と同じ理由
+ *   ——ため、Productionは完全一致、Previewはsuffix一致で判定する）
+ *
+ * redirect禁止（`redirect: 'error'`）は`fetch()`呼び出し側で強制する（ここでは検証しない）。
+ */
+export function assertAuditUploadEndpointAllowed(
+  endpointBaseUrl: string,
+  environment: BaselineProvenance['environment'],
+  env: Record<string, string | undefined> = process.env,
+): void {
+  let parsed: URL;
+  try {
+    parsed = new URL(endpointBaseUrl);
+  } catch {
+    throw new Error(`audit-upload-endpoint-invalid: "${endpointBaseUrl}" is not a valid URL.`);
+  }
+  if (parsed.protocol !== 'https:') {
+    throw new Error(`audit-upload-endpoint-invalid: must be https, got "${parsed.protocol}".`);
+  }
+  if (parsed.username || parsed.password) {
+    throw new Error('audit-upload-endpoint-invalid: userinfo (user:pass@host) is not allowed.');
+  }
+  if (parsed.search || parsed.hash) {
+    throw new Error('audit-upload-endpoint-invalid: query string / fragment is not allowed (bare origin only).');
+  }
+  if (parsed.pathname !== '/' && parsed.pathname !== '') {
+    throw new Error('audit-upload-endpoint-invalid: must be a bare origin with no path.');
+  }
+
+  if (environment === 'production') {
+    const expected = env.AUDIT_UPLOAD_ALLOWED_PRODUCTION_HOST?.trim();
+    if (!expected) {
+      throw new Error(
+        'AUDIT_UPLOAD_ALLOWED_PRODUCTION_HOST is not set. --store vercel-blob against a production baseline ' +
+          'requires an explicit allowed host (fail-closed — no default is assumed).',
+      );
+    }
+    if (parsed.host !== expected) {
+      throw new Error(
+        `audit-upload-endpoint-refused: host "${parsed.host}" is not the allowed production host "${expected}".`,
+      );
+    }
+    return;
+  }
+
+  if (environment === 'preview') {
+    const suffix = env.AUDIT_UPLOAD_ALLOWED_PREVIEW_HOST_SUFFIX?.trim();
+    if (!suffix) {
+      throw new Error(
+        'AUDIT_UPLOAD_ALLOWED_PREVIEW_HOST_SUFFIX is not set. --store vercel-blob against a preview baseline ' +
+          'requires an explicit allowed host suffix (fail-closed — no default is assumed). Preview deployment ' +
+          'hostnames change per-deployment (docs/reference/task9-...), so this is a suffix match, not exact.',
+      );
+    }
+    if (!parsed.host.endsWith(suffix)) {
+      throw new Error(
+        `audit-upload-endpoint-refused: host "${parsed.host}" does not end with the allowed preview host suffix "${suffix}".`,
+      );
+    }
+    return;
+  }
+
+  throw new Error(
+    `audit-upload-endpoint-refused: environment "${environment}" has no allowed audit-upload endpoint configured ` +
+      '(only preview/production are wired — local-throwaway never uses the real audit store).',
+  );
 }
 
 export interface BuiltBaselineViaUploadSession {
@@ -927,7 +1006,9 @@ async function auditUploadFetchOk(
   init: RequestInit,
   failureLabel: string,
 ): Promise<Response> {
-  const response = await fetchImpl(url, init);
+  // レビュー指摘: 資格情報（JWT・shared secret）を積んだrequestが、想定外のhostへ黙って
+  // redirectされないようにする。redirectを受け取った時点でthrowする（従う・無視するのではなく）。
+  const response = await fetchImpl(url, { ...init, redirect: 'error' });
   if (!response.ok) {
     const bodyText = await response.text().catch(() => '');
     throw new Error(`${failureLabel}: HTTP ${response.status} ${bodyText}`.trim());
@@ -954,6 +1035,10 @@ async function auditUploadFetchOk(
 export async function exportSignedBaselineViaUploadSession(
   args: ExportSignedBaselineViaUploadSessionArgs,
 ): Promise<BuiltBaselineViaUploadSession> {
+  // 資格情報を送る前に、送信先そのものを検証する（署名やHTTP呼び出しより前——検証NGなら
+  // 何も送らない）。
+  assertAuditUploadEndpointAllowed(args.endpointBaseUrl, args.provenance.environment, args.env);
+
   const fetchImpl = args.fetchImpl ?? fetch;
   const requestId = randomUUID();
   const authHeaders: Record<string, string> = {
@@ -1024,6 +1109,7 @@ export async function exportSignedBaselineViaUploadSession(
       await fetchImpl(`${args.endpointBaseUrl}/api/admin/audit-upload/session/${sessionId}`, {
         method: 'DELETE',
         headers: authHeaders,
+        redirect: 'error',
       }).catch(() => {});
     }
     throw new Error(
@@ -1090,6 +1176,53 @@ export async function openVerifiedBaselineStore(
 }
 
 /**
+ * TTYへechoせずに1行読む（パスワード入力用）。raw modeでbyteを直接読み、改行まで蓄積する。
+ * 追加依存を避けるため`node:readline`のecho抑制ではなく`process.stdin`を直接扱う——
+ * `readline`の`terminal: false`はhistory/editingを失う副作用があり、rawモード直読みの方が
+ * 挙動が単純で監査しやすい。
+ */
+function promptHiddenLine(promptText: string): Promise<string> {
+  const EOF = String.fromCharCode(4);
+  const ETX = String.fromCharCode(3);
+  const DEL = String.fromCharCode(127);
+  return new Promise((resolve, reject) => {
+    const stdin = process.stdin;
+    process.stdout.write(promptText);
+    const wasRaw = stdin.isRaw;
+    stdin.resume();
+    stdin.setEncoding('utf8');
+    stdin.setRawMode?.(true);
+    let input = '';
+    const cleanup = () => {
+      stdin.setRawMode?.(wasRaw ?? false);
+      stdin.pause();
+      stdin.removeListener('data', onData);
+    };
+    const onData = (chunk: string) => {
+      for (const char of chunk) {
+        if (char === '\n' || char === '\r' || char === EOF) {
+          cleanup();
+          process.stdout.write('\n');
+          resolve(input);
+          return;
+        }
+        if (char === ETX) {
+          cleanup();
+          process.stdout.write('\n');
+          reject(new Error('aborted (Ctrl-C)'));
+          return;
+        }
+        if (char === DEL || char === '\b') {
+          input = input.slice(0, -1);
+          continue;
+        }
+        input += char;
+      }
+    };
+    stdin.on('data', onData);
+  });
+}
+/**
  * `exportSignedBaselineViaUploadSession`がデプロイ済みroute（`src/app/api/admin/audit-upload/
  * session/**`）を呼ぶための`Authorization: JWT <token>`を用意する。
  *
@@ -1100,15 +1233,32 @@ export async function openVerifiedBaselineStore(
  * 同じ`PAYLOAD_SECRET`で署名検証するので、別途HTTPログインのroundtripを新設する必要がない。
  * route側は`isPlatformAdminUser()`を要求するため、ここでも同じ判定でfail-fastする
  * （route到達後の401より、CLI側で早く・分かりやすく落とす）。
+ *
+ * レビュー指摘: パスワードをCLI引数として受け取らない。shell historyとprocess list
+ * （`ps`）の両方に残るため——既存の`bootstrapAdminIfAllowed`が`--i-know-this-is-preview`との
+ * 組み合わせで`--admin-password`を拒否している方針と同じ理由を、この経路では常に適用する。
+ * 環境変数 `AUDIT_UPLOAD_ADMIN_PASSWORD`、またはTTYでの対話入力（非echo）のみを受け付ける。
  */
-async function mintAuditUploadJwt(args: Map<string, string | true>): Promise<string> {
-  const email = (args.get('admin-email') as string | undefined) ?? process.env.AUDIT_UPLOAD_ADMIN_EMAIL;
-  const password = (args.get('admin-password') as string | undefined) ?? process.env.AUDIT_UPLOAD_ADMIN_PASSWORD;
-  if (!email || !password) {
+export async function mintAuditUploadJwt(args: Map<string, string | true>): Promise<string> {
+  if (args.has('admin-password')) {
     throw new Error(
-      'Set AUDIT_UPLOAD_ADMIN_EMAIL and AUDIT_UPLOAD_ADMIN_PASSWORD (or --admin-email / --admin-password). ' +
-        'The audit-upload session route requires a platform-admin login (JWT), minted locally against the ' +
-        'same DATABASE_URL / PAYLOAD_SECRET as the target environment.',
+      '--admin-password is not accepted here (it would persist in shell history and the process list). ' +
+        'Set AUDIT_UPLOAD_ADMIN_PASSWORD, or omit it and enter the password at the interactive prompt.',
+    );
+  }
+  const email = (args.get('admin-email') as string | undefined) ?? process.env.AUDIT_UPLOAD_ADMIN_EMAIL;
+  if (!email) {
+    throw new Error('Set AUDIT_UPLOAD_ADMIN_EMAIL (or pass --admin-email) for the audit-upload session login.');
+  }
+  const password =
+    process.env.AUDIT_UPLOAD_ADMIN_PASSWORD ??
+    (process.stdin.isTTY
+      ? await promptHiddenLine(`Password for ${email} (audit-upload session login): `)
+      : undefined);
+  if (!password) {
+    throw new Error(
+      'AUDIT_UPLOAD_ADMIN_PASSWORD is not set and stdin is not an interactive TTY, so there is no way to obtain ' +
+        'the password securely. Set AUDIT_UPLOAD_ADMIN_PASSWORD, or run this command from an interactive terminal.',
     );
   }
 
@@ -1147,10 +1297,16 @@ const HELP = [
   '  --audit-upload-endpoint <url> --store vercel-blob 時必須。デプロイ済みaudit-upload session',
   '                                 routeのorigin（実際のBlob書き込みはこのroute自身が行う。',
   '                                 `deploid-audit-*`はVercel Function runtimeからしか到達できない',
-  '                                 ためCLIプロセス自身は直接書き込まない）',
-  '  --admin-email / --admin-password  --store vercel-blob 時、session routeへのJWT発行に使う',
-  '                                 platform-adminのログイン（環境変数 AUDIT_UPLOAD_ADMIN_EMAIL /',
-  '                                 AUDIT_UPLOAD_ADMIN_PASSWORD でも可）',
+  '                                 ためCLIプロセス自身は直接書き込まない）。https必須・bare origin',
+  '                                 のみ（query/hash/userinfo拒否）・環境変数',
+  '                                 AUDIT_UPLOAD_ALLOWED_PRODUCTION_HOST（完全一致）/',
+  '                                 AUDIT_UPLOAD_ALLOWED_PREVIEW_HOST_SUFFIX（suffix一致）で',
+  '                                 明示allowlistされたhost以外は拒否する',
+  '  --admin-email                 --store vercel-blob 時、session routeへのJWT発行に使う',
+  '                                 platform-adminのログイン（環境変数 AUDIT_UPLOAD_ADMIN_EMAIL でも可）',
+  '                                 パスワードは --admin-password では受け取らない（shell history /',
+  '                                 process listに残るため）。環境変数 AUDIT_UPLOAD_ADMIN_PASSWORD、',
+  '                                 または対話プロンプト（TTY、非echo）のみ',
   '                                 (環境変数 AUDIT_UPLOAD_SHARED_SECRET も必須。x-audit-upload-scope)',
   '  --media-dir <dir>             baseline へ同梱する media バイト列の読み取り元（既定 ./media）',
   '  --manifest-out <path>         署名済み manifest envelope の出力先',
