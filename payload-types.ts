@@ -80,6 +80,7 @@ export interface Config {
     media: Media;
     'content-route-registry': ContentRouteRegistry;
     'environment-marker': EnvironmentMarker;
+    'audit-upload-sessions': AuditUploadSession;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -100,6 +101,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     'content-route-registry': ContentRouteRegistrySelect<false> | ContentRouteRegistrySelect<true>;
     'environment-marker': EnvironmentMarkerSelect<false> | EnvironmentMarkerSelect<true>;
+    'audit-upload-sessions': AuditUploadSessionsSelect<false> | AuditUploadSessionsSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -1078,6 +1080,72 @@ export interface EnvironmentMarker {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-upload-sessions".
+ */
+export interface AuditUploadSession {
+  id: number;
+  /**
+   * crypto.randomBytes由来の推測不能な値。Payloadの自動採番idは連番で推測可能なため、これをURL path paramとして使う（自動採番idは使わない）。
+   */
+  sessionId: string;
+  /**
+   * CLI側が生成したcorrelation ID。Step 2/3/DELETEで一致を要求する。
+   */
+  requestId: string;
+  /**
+   * canonicalJson(manifest)のsha256。session全体がどのmanifestに紐づくかの記録。
+   */
+  manifestSha256: string;
+  /**
+   * manifest.storage.objectKey。許可prefix判定の基準値。
+   */
+  baselineObjectKey: string;
+  /**
+   * manifest.provenance.baselineRunId。completion markerへ書く値はここに保存した値を使う（Step 3のrequest bodyの値をそのまま信用しない——一致しなければ拒否する）。
+   */
+  baselineRunId: string;
+  environment: 'preview' | 'production';
+  /**
+   * 署名検証済みmanifestから導出した許可object一覧（client申告値ではない）。
+   */
+  allowedObjects: {
+    objectKey: string;
+    /**
+     * signature bundle entryだけnull（manifestに事前宣言されたsha256が無いため。`lib/payload/auditUploadSession.ts`のコメント参照）。それ以外は必ず設定される。
+     */
+    sha256?: string | null;
+    /**
+     * manifestが値を持つ場合（media）だけ設定する。snapshot本体・signature bundleはmanifestにsize欄が無いためnull——sha256一致だけがそれらの正当性の根拠になる（sha256が実質的に長さも含めて内容を一意に決める）。
+     */
+    size?: number | null;
+    uploaded: boolean;
+    /**
+     * media entryだけ設定する（`MediaInventoryEntry.stableId`）。Step 3で`manifest.mediaInventory`と同じ形を再構築し、既存exporterと同じ`sha256Hex(canonicalJson(mediaInventory))`でmediaInventorySha256を計算するために必要。
+     */
+    stableId?: string | null;
+    /**
+     * media entryだけ設定する。
+     */
+    filename?: string | null;
+    /**
+     * media entryだけ設定する。
+     */
+    mimeType?: string | null;
+    id?: string | null;
+  }[];
+  /**
+   * completedになったsessionはStep 2/3を二度と受け付けない（replay防止）。期限切れ判定は`expiresAt`との比較で別途行う（statusをexpiredへ書き換える専用処理は持たない）。
+   */
+  status: 'pending' | 'completed';
+  /**
+   * ISO date。この時刻を過ぎたpending sessionはStep 2/3を拒否し、cleanup対象になる。
+   */
+  expiresAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * API keys control which collections, resources, tools, and prompts MCP clients can access
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1301,6 +1369,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'environment-marker';
         value: number | EnvironmentMarker;
+      } | null)
+    | ({
+        relationTo: 'audit-upload-sessions';
+        value: number | AuditUploadSession;
       } | null)
     | ({
         relationTo: 'payload-mcp-api-keys';
@@ -2016,6 +2088,34 @@ export interface EnvironmentMarkerSelect<T extends boolean = true> {
   lastRestoredBaselineGeneration?: T;
   lastRestoredBaselineRunId?: T;
   lastRestoredAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-upload-sessions_select".
+ */
+export interface AuditUploadSessionsSelect<T extends boolean = true> {
+  sessionId?: T;
+  requestId?: T;
+  manifestSha256?: T;
+  baselineObjectKey?: T;
+  baselineRunId?: T;
+  environment?: T;
+  allowedObjects?:
+    | T
+    | {
+        objectKey?: T;
+        sha256?: T;
+        size?: T;
+        uploaded?: T;
+        stableId?: T;
+        filename?: T;
+        mimeType?: T;
+        id?: T;
+      };
+  status?: T;
+  expiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

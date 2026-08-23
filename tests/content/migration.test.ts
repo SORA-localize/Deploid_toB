@@ -69,15 +69,39 @@ const TMP_BASELINE_MIGRATIONS_DIR = path.join(TMP_ROOT, 'baseline-migrations');
  * （`node_modules/payload/dist/database/migrations/readMigrationFiles.js`）は
  * `index.ts`を読まず、対象ディレクトリの`.ts`ファイルを直接scanするため、
  * `index.ts`を作り直す必要はない。
+ *
+ * **2026-08-23追記（新しいcollectionを追加するmigrationを足した際に発覚）**: 「`add_payload_mcp_api_keys`
+ * という名前のfileだけ除外する」だけでは不十分だった。`migrate:create`が生成する`.json`
+ * snapshotは差分ではなく**その時点の全schemaの完全なsnapshot**であり、Task 8以降に追加される
+ * どの新しいmigrationも、生成時点で`payload_mcp_api_keys`が既にDBに存在していれば、その
+ * snapshotへ`payload_mcp_api_keys`のschemaを一緒に取り込んでしまう。この状態のsnapshotを
+ * 「Task 8のmigrationを除いたbaseline」の一部として使うと、drizzle-kitは
+ * 「`payload_mcp_api_keys`は既に存在する（自分のsnapshotにそう書いてある）」と
+ * 「fixtureのschemaにも`payload_mcp_api_keys`がある」の両方を見て**ALTER**を生成しようとし、
+ * 実際のDBには存在しない（baselineが除外した）tableへ`ALTER TABLE`を投げてエラーになる
+ * （`relation "payload_mcp_api_keys" does not exist`、実機で再現・確認済み）。
+ *
+ * このsuiteの目的は「Task 8がmigrationを足す**前**の世界」を再現することなので、
+ * `add_payload_mcp_api_keys`より**時系列で後**のmigration（ファイル名のtimestamp prefixで
+ * 判定できる）は、名前に関係なく全部このbaselineから除外する。
  */
 const PRE_TASK_8_EXCLUDED_MIGRATION_NAME_PATTERN = /add_payload_mcp_api_keys/;
 
 function populateBaselineMigrationsDir(): void {
   fs.mkdirSync(TMP_BASELINE_MIGRATIONS_DIR, { recursive: true });
-  for (const file of fs.readdirSync(REAL_MIGRATIONS_DIR)) {
-    if (file === 'index.ts') continue;
-    if (!file.endsWith('.ts') && !file.endsWith('.json')) continue;
-    if (PRE_TASK_8_EXCLUDED_MIGRATION_NAME_PATTERN.test(file)) continue;
+  const allFiles = fs
+    .readdirSync(REAL_MIGRATIONS_DIR)
+    .filter((file) => file !== 'index.ts' && (file.endsWith('.ts') || file.endsWith('.json')))
+    .sort();
+  const mcpMigrationFile = allFiles.find((file) => PRE_TASK_8_EXCLUDED_MIGRATION_NAME_PATTERN.test(file));
+  if (!mcpMigrationFile) {
+    throw new Error('populateBaselineMigrationsDir: no migration file matches PRE_TASK_8_EXCLUDED_MIGRATION_NAME_PATTERN.');
+  }
+  // ファイル名はtimestamp prefixなので文字列比較 = 時系列比較で正しい。
+  const mcpMigrationBasename = mcpMigrationFile.replace(/\.(ts|json)$/, '');
+  for (const file of allFiles) {
+    const basename = file.replace(/\.(ts|json)$/, '');
+    if (basename >= mcpMigrationBasename) continue;
     fs.copyFileSync(path.join(REAL_MIGRATIONS_DIR, file), path.join(TMP_BASELINE_MIGRATIONS_DIR, file));
   }
 }
@@ -95,10 +119,19 @@ function populateBaselineMigrationsDir(): void {
  * 対処: 2の行（`<new_table>` を参照するconstraint dropだけ）を取り除く。CASCADEが既に
  * やっているので取り除いても安全 — 後続の DROP INDEX / DROP COLUMN 行は constraint の有無に
  * 依存しないためそのまま残す。
+ *
+ * `newTableNames` は複数渡せる: このfixtureは `payload_mcp_api_keys`（MCP plugin）に加えて、
+ * `populateBaselineMigrationsDir()`がbaselineから除外する「MCP以降のchronologically-later
+ * migration」（例: `add_audit_upload_sessions`）も同じ1本のdrift-check migrationへ一緒に
+ * 検出されるため、同種の冗長 DROP CONSTRAINT が複数table分同時に出現しうる。
+ * 各table名はDB上のtable名（例: `_audit_upload_sessions`）ではなく、Payloadが生成する
+ * constraint名の接尾辞（先頭の `_` を含まない、例: `audit_upload_sessions`）で渡すこと。
  */
-function stripCascadeRedundantDropConstraints(migrationSource: string, newTableName: string): string {
-  const pattern = new RegExp(`\\n\\s*ALTER TABLE "[^"]+" DROP CONSTRAINT "[^"]*_${newTableName}_fk";\\n?`, 'g');
-  return migrationSource.replace(pattern, '\n');
+function stripCascadeRedundantDropConstraints(migrationSource: string, newTableNames: string[]): string {
+  return newTableNames.reduce((source, newTableName) => {
+    const pattern = new RegExp(`\\n\\s*ALTER TABLE "[^"]+" DROP CONSTRAINT "[^"]*_${newTableName}_fk";\\n?`, 'g');
+    return source.replace(pattern, '\n');
+  }, migrationSource);
 }
 
 /**
@@ -341,8 +374,21 @@ describe('Postgres migrations (Task 3.5) — isolated throwaway databases only',
         // Real, minimal diff: only the plugin's own new table + its FK columns on Payload's
         // polymorphic relationship tables. No unrelated collection should be touched (this is what
         // makes it a legitimate "actually adopted schema" fixture rather than an arbitrary field).
+        //
+        // `populateBaselineMigrationsDir()` excludes the MCP migration *and* everything
+        // chronologically after it from the seeded baseline (see that function's docblock), so any
+        // real committed migration added after Task 8 (e.g. Task 9's `add_audit_upload_sessions`)
+        // is *also* genuinely absent from this baseline and gets swept into this same single
+        // generated drift-check migration alongside `payload_mcp_api_keys`. The allowlist below
+        // must be kept in sync with `migrations/` — a name outside it means an unrelated existing
+        // collection was touched, which is the real regression this assertion guards against.
+        const expectedNewTables = [NEW_TABLE_NAME, '_audit_upload_sessions', '_audit_upload_sessions_allowed_objects'];
         expect(contents).toContain(`CREATE TABLE "${NEW_TABLE_NAME}"`);
-        expect(contents).not.toMatch(/DROP TABLE "(?!payload_mcp_api_keys")/);
+        const dropTableMatches = contents.match(/DROP TABLE "([^"]+)"/g) ?? [];
+        for (const match of dropTableMatches) {
+          const tableName = match.replace(/^DROP TABLE "/, '').replace(/"$/, '');
+          expect(expectedNewTables, `unexpected DROP TABLE for "${tableName}" in:\n${contents}`).toContain(tableName);
+        }
         expect(contents).not.toContain('media" DROP COLUMN "prefix"');
       },
       30_000,
@@ -367,7 +413,10 @@ describe('Postgres migrations (Task 3.5) — isolated throwaway databases only',
         // this fixture's generated file, not a change to any committed production migration.
         const migrationPath = path.join(TMP_SEEDED_DB_MIGRATIONS_DIR, generatedMigrationBasename);
         const original = fs.readFileSync(migrationPath, 'utf8');
-        const fixed = stripCascadeRedundantDropConstraints(original, NEW_TABLE_NAME);
+        // Constraint-name suffixes drop the new table's leading `_` (e.g. table
+        // `_audit_upload_sessions` → constraint suffix `audit_upload_sessions_fk`) — pass the
+        // suffix form, not the DB table name, or the pattern silently matches nothing.
+        const fixed = stripCascadeRedundantDropConstraints(original, [NEW_TABLE_NAME, 'audit_upload_sessions']);
         expect(fixed).not.toBe(original); // sanity: the known-bad pattern was actually present and stripped
         fs.writeFileSync(migrationPath, fixed);
 

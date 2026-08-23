@@ -2,6 +2,7 @@ import type { CollectionConfig, GlobalConfig } from 'payload';
 import { Admins } from '../../collections/Admins';
 import { ArticlePlacements } from '../../collections/ArticlePlacements';
 import { Articles } from '../../collections/Articles';
+import { AuditUploadSessionsCollection } from '../../collections/AuditUploadSessions';
 import { Deployments } from '../../collections/Deployments';
 import { Distributors } from '../../collections/Distributors';
 import { EnvironmentMarkerCollection } from '../../collections/EnvironmentMarker';
@@ -37,6 +38,7 @@ export const contentCollections: CollectionConfig[] = [
   Media,
   RouteRegistryCollection,
   EnvironmentMarkerCollection,
+  AuditUploadSessionsCollection,
 ];
 
 export const contentGlobals: GlobalConfig[] = [SiteSettings];

@@ -132,9 +132,15 @@ export function encodeUnsignedJwtForTests(claims: Record<string, unknown>): stri
  * この repository では `BLOB_READ_WRITE_TOKEN` は public media store の token なので、
  * private audit store の操作でそれを暗黙に掴むのは事故そのもの。OIDC がある環境（= Vercel
  * Function runtime）では必ず OIDC 側を使い、cross-check で store 違いを弾く。
+ *
+ * `oidcTokenOverride`（`docs/reference/task9-audit-upload-endpoint-design-v1.md`「oidcTokenOverride」）:
+ * Vercel FunctionのruntimeではOIDC tokenは`process.env.VERCEL_OIDC_TOKEN`ではなく
+ * `x-vercel-oidc-token` request headerで渡る（`VERCEL_OIDC_TOKEN`はbuildとlocal devだけ）。
+ * audit-upload routeはこの引数へheader値を明示的に渡す。**`env`経路より優先**し、
+ * `process.env`へ書き込まない・呼び出し元へ返さない・ログしない——呼び出し側の責務。
  */
-export function resolveBlobCredential(env: EnvLike = process.env): BlobCredential {
-  const oidcToken = env.VERCEL_OIDC_TOKEN?.trim();
+export function resolveBlobCredential(env: EnvLike = process.env, oidcTokenOverride?: string): BlobCredential {
+  const oidcToken = oidcTokenOverride?.trim() || env.VERCEL_OIDC_TOKEN?.trim();
   if (oidcToken) {
     const configuredStoreId = env.BLOB_STORE_ID?.trim();
     return {
@@ -268,6 +274,8 @@ export interface VercelBlobStoreOptions {
   /** artifact が宣言する環境。OIDC claim との交差を検出する。 */
   expectedEnvironment?: 'production' | 'preview' | 'local-throwaway';
   env?: EnvLike;
+  /** `resolveBlobCredential()`と同じ。Vercel Function routeが`x-vercel-oidc-token`を渡す用。 */
+  oidcTokenOverride?: string;
 }
 
 /**
@@ -279,7 +287,7 @@ export interface VercelBlobStoreOptions {
  */
 export function createVercelBlobObjectStore(options: VercelBlobStoreOptions): SnapshotObjectStore {
   const env = options.env ?? process.env;
-  const credential = resolveBlobCredential(env);
+  const credential = resolveBlobCredential(env, options.oidcTokenOverride);
   const failures = checkBlobStoreSelection({
     requestedStoreId: options.storeId,
     credential,
@@ -409,4 +417,43 @@ export function assertValidCompletionMarker(value: unknown): asserts value is Ba
   if (typeof marker.baselineRunId !== 'string' || marker.baselineRunId.length === 0) problems.push('baselineRunId');
   if (typeof marker.completedAt !== 'string' || Number.isNaN(Date.parse(marker.completedAt))) problems.push('completedAt');
   if (problems.length > 0) throw new Error(`completion-marker-invalid: ${problems.join(', ')}`);
+}
+
+// ─── audit-upload endpoint 用: object key の形状検証 ─────────────────────────
+
+/**
+ * `docs/reference/task9-audit-upload-endpoint-design-v1.md`「Step 2」の防御その2。
+ *
+ * audit-upload routeは、client がアップロードしたバイト列の sha256 を、署名検証済み
+ * manifest から導いた許可一覧と突き合わせて object を特定する（object key を client が
+ * 自己申告する経路は無い）。この関数はそれとは**独立**の、object key の**形状**そのものの
+ * 検証——sha256突き合わせのロジックにバグがあっても、想定外の prefix・`..`・絶対パスへは
+ * 書けないようにする最後の防波堤（defense in depth）。
+ *
+ * 許可する形は、`baselineObjectKey()`（`export-content-snapshot.mts`）・
+ * `${objectKey}.cosign.bundle`・`${objectKey}.media/<sha256>`（`export-content-snapshot.mts`の
+ * media upload loop）の3種だけ。`baselineCompletionMarkerKey()`（`${objectKey}.complete.json`）
+ * はroute自身が最後に書く値であり、client からの Step 2 アップロード対象には含めない
+ * （complete markerをclientが直接アップロードできてしまうと、Step 3のTOCTOU再検証が
+ * 意味を持たなくなる）。
+ */
+export function isAllowedAuditBaselineObjectKey(candidateKey: string, baselineObjectKey: string): boolean {
+  if (candidateKey.length === 0 || baselineObjectKey.length === 0) return false;
+  if (candidateKey.startsWith('/') || candidateKey.includes('..') || candidateKey.includes('\\')) return false;
+  if (!baselineObjectKey.startsWith('cutover-baseline/')) return false;
+  if (baselineObjectKey.startsWith('/') || baselineObjectKey.includes('..') || baselineObjectKey.includes('\\')) {
+    return false;
+  }
+
+  if (candidateKey === baselineObjectKey) return true;
+  if (candidateKey === `${baselineObjectKey}.cosign.bundle`) return true;
+
+  const mediaPrefix = `${baselineObjectKey}.media/`;
+  if (candidateKey.startsWith(mediaPrefix)) {
+    const suffix = candidateKey.slice(mediaPrefix.length);
+    // media key の末尾は sha256Hex 1個だけ（`/` を含まない = さらに深い階層を作らせない）。
+    return suffix.length > 0 && !suffix.includes('/');
+  }
+
+  return false;
 }

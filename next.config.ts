@@ -13,6 +13,15 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve('.'),
   },
+  // audit-upload route（`docs/reference/task9-audit-upload-endpoint-design-v1.md`）専用。
+  // `scripts/fetch-cosign-binary.mjs`がbuild時（`vercel-build`）に取得したcosign binaryを、
+  // 署名検証を実際に行う2つのrouteのVercel Function bundleへ明示的に含める。他のrouteは
+  // cosignを使わないため対象に含めない（bundle sizeを不要に増やさない）。POCで実Preview
+  // deploymentにて動作確認済みの構成（`task9-audit-upload-endpoint-design-v1.md`「POC結果」）。
+  outputFileTracingIncludes: {
+    '/api/admin/audit-upload/session': ['./.cosign-bin/cosign'],
+    '/api/admin/audit-upload/session/[sessionId]/complete': ['./.cosign-bin/cosign'],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
   },

@@ -2,6 +2,9 @@
 dist/
 .next/
 
+# scripts/fetch-cosign-binary.mjs が build時に取得する binary。コミットしない。
+.cosign-bin/
+
 # Playwright artifacts
 test-results/
 playwright-report/
