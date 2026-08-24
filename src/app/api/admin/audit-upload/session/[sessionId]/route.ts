@@ -6,7 +6,7 @@
  */
 import { getPayload } from 'payload';
 import payloadConfig from '@/payload.config';
-import { cleanupAuditUploadSession } from '@/lib/payload/auditUploadSession';
+import { cleanupAuditUploadSession } from '@/lib/payload/auditUploadCleanup';
 import { auditUploadPreflight, jsonResponse } from '@/lib/payload/auditUploadRouteHelpers';
 
 // Blob storeクライアントを使うためedge runtimeでは動かないが、`next.config.ts`の

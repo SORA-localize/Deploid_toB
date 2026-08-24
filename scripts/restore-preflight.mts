@@ -13,6 +13,7 @@
  * 書き込みは始まっていない。
  */
 import type { Payload } from 'payload';
+import { auditBlobStoreIdFor as resolveAuditBlobStoreIdFor } from '../lib/content/auditBlobStore.ts';
 import { classifyDatabaseUrl, PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG } from '../lib/content/databaseSafety.ts';
 import type { ContentSnapshot } from '../lib/content/contracts.ts';
 import { collectBrokenReferences, countRecords } from './compare-content-sources.mts';
@@ -84,14 +85,7 @@ export function looksLikeThrowawayDatabaseName(databaseUrl: string): boolean {
 }
 
 /** 環境ごとの private audit blob store ID（`lib/payload/access.ts` と同じ env var 名）。 */
-export function auditBlobStoreIdFor(
-  environment: RestoreTargetIdentity['environment'],
-  env: Record<string, string | undefined> = process.env,
-): string | null {
-  if (environment === 'production') return env.PRODUCTION_AUDIT_BLOB_TOKEN_STORE_ID ?? null;
-  if (environment === 'preview') return env.PREVIEW_AUDIT_BLOB_TOKEN_STORE_ID ?? null;
-  return env.LOCAL_AUDIT_BLOB_TOKEN_STORE_ID ?? 'local-throwaway-no-audit-store';
-}
+export const auditBlobStoreIdFor = resolveAuditBlobStoreIdFor;
 
 /** 適用済み migration のうち最後のもの。`dev`（schema push 由来）は世代として数えない。 */
 export async function readSchemaVersion(payload: Payload): Promise<string> {

@@ -1,7 +1,6 @@
 import { randomBytes, createHash } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { sql } from '@payloadcms/db-postgres';
 import type { Payload } from 'payload';
 import {
   assertValidEnvelope,
@@ -176,7 +175,8 @@ export async function createAuditUploadSession(args: {
   // 署名の「参照」であって、bundleバイト列自身のdigestではない）。bundleの正当性はStep 3で
   // `verifyManifestSignature`が既に確認した「bundleがsnapshotに対して有効な署名である」ことに
   // 拠るため、Step 2ではobjectKeyの形状チェック（`isAllowedAuditBaselineObjectKey`）だけで受け付け、
-  // sha256突き合わせは行わない特別扱いにする（下記`recordAuditUploadObject`参照）。
+  // sha256突き合わせは行わない特別扱いにする（`lib/payload/auditUploadObject.ts`の
+  // `recordAuditUploadObject`参照）。
 
   for (const obj of allowedObjects) {
     if (!isAllowedAuditBaselineObjectKey(obj.objectKey, manifest.storage.objectKey)) {
@@ -242,93 +242,6 @@ function isSessionUsable(session: LoadedSession, requestId: string): { ok: true 
   if (session.status !== 'pending') return { ok: false, reason: 'session-already-completed' };
   if (Date.parse(session.expiresAt) <= Date.now()) return { ok: false, reason: 'session-expired' };
   if (session.requestId !== requestId) return { ok: false, reason: 'request-id-mismatch' };
-  return { ok: true };
-}
-
-export type RecordObjectResult =
-  | { ok: true }
-  | { ok: false; reason: 'session-not-found' | 'session-not-usable' | 'object-not-recognized' | 'store-error'; detail: string };
-
-/**
- * Step 2。**objectKeyはclientに自己申告させない**——アップロードされたバイト列のsha256を計算し、
- * sessionの許可一覧の中から一致するものを探す。見つからなければ拒否する。
- */
-export async function recordAuditUploadObject(args: {
-  payload: Payload;
-  sessionId: string;
-  requestId: string;
-  body: Buffer;
-  oidcToken: string;
-  env?: Record<string, string | undefined>;
-  storeFactory?: BlobStoreFactory;
-}): Promise<RecordObjectResult> {
-  const env = args.env ?? process.env;
-  const session = await loadSession(args.payload, args.sessionId);
-  if (!session) return { ok: false, reason: 'session-not-found', detail: args.sessionId };
-
-  const usable = isSessionUsable(session, args.requestId);
-  if (!usable.ok) return { ok: false, reason: 'session-not-usable', detail: usable.reason };
-
-  const bodySha256 = createHash('sha256').update(args.body).digest('hex');
-  const bodySize = args.body.byteLength;
-
-  // signature bundleは仕様上sha256を持たない特別扱い（`createAuditUploadSession`のコメント参照）。
-  // そちらはobjectKey完全一致で特定する。それ以外（snapshot本体・media）はsha256一致で特定する。
-  //
-  // 順序が重要（実装中に見つけたbug）: signature slotは「アップロードされたバイト列が何か」を
-  // 一切確認せず「まだuploadedでなければ何でも受け付ける」ため、sha256一致による判定より**先に**
-  // 試すと、本来は特定のsnapshot/media entryにsha256一致するはずのバイト列まで、配列の
-  // 並び順で先に出てくるsignature slotへ誤って吸われてしまう（実際にsnapshotの2回目・
-  // mediaの2回目のuploadがこれで誤判定された）。**sha256一致の判定を必ず先に行い**、
-  // どのentryにも一致しなかった場合の最後の手段としてだけsignature slotを試す。
-  const signatureKey = `${session.baselineObjectKey}.cosign.bundle`;
-  const sha256Match = session.allowedObjects.find((obj) => {
-    if (obj.uploaded) return false;
-    if (obj.objectKey === signatureKey) return false;
-    if (obj.sha256 !== bodySha256) return false;
-    if (obj.size !== null && obj.size !== bodySize) return false;
-    return true;
-  });
-  const match =
-    sha256Match ?? session.allowedObjects.find((obj) => !obj.uploaded && obj.objectKey === signatureKey);
-  if (!match) {
-    return { ok: false, reason: 'object-not-recognized', detail: 'no allowed object matches this upload' };
-  }
-  if (!isAllowedAuditBaselineObjectKey(match.objectKey, session.baselineObjectKey)) {
-    // createAuditUploadSession側で既に検証済みのはずだが、二重に確認する（defense in depth）。
-    return { ok: false, reason: 'object-not-recognized', detail: 'object key outside allowed prefix' };
-  }
-
-  const storeId = auditBlobStoreIdFor(session.environment, env);
-  if (!storeId) return { ok: false, reason: 'store-error', detail: 'no audit blob store id configured' };
-
-  const makeStore = args.storeFactory ?? createVercelBlobObjectStore;
-  try {
-    const store = makeStore({
-      storeId,
-      displayName: `deploid-audit-${session.environment}`,
-      expectedEnvironment: session.environment,
-      env,
-      oidcTokenOverride: args.oidcToken,
-    });
-    await store.put(match.objectKey, args.body);
-  } catch (e) {
-    return { ok: false, reason: 'store-error', detail: e instanceof Error ? e.message : String(e) };
-  }
-
-  // レビュー指摘3: session全体を読んで配列を書き換えてPayloadの`update()`で丸ごと置き換えると、
-  // 2件のuploadが同時に走ったとき一方の`uploaded: true`がもう一方の更新で消える
-  // （read-modify-writeのlost update）。子table（`_audit_upload_sessions_allowed_objects`）の
-  // 該当1行だけをWHERE句付きでatomicにUPDATEする（`lib/content/previewTokens.ts`の
-  // `consumePreviewToken()`と同じ、このrepoで確立済みのpattern）。
-  await args.payload.db.drizzle.execute(sql`
-    UPDATE "_audit_upload_sessions_allowed_objects"
-    SET "uploaded" = true
-    WHERE "_parent_id" = ${session.id} AND "object_key" = ${match.objectKey} AND "uploaded" = false
-  `);
-  // 0行更新（既に別requestがこのobjectを先にuploaded済みにしていた）でも、最終状態としては
-  // 正しい（そのobjectは実際にuploaded済み）ので、ここではエラー扱いにしない——冪等に成功を返す。
-
   return { ok: true };
 }
 
@@ -521,53 +434,4 @@ export async function completeAuditUploadSession(args: {
   });
 
   return { ok: true };
-}
-
-export type CleanupSessionResult = { ok: true; removedObjectCount: number } | { ok: false; reason: string; detail: string };
-
-/**
- * session有効期限切れ、またはCLI異常終了時の明示cleanup。既にStep 2でアップロード済みの
- * objectを全部削除する（既存CLIの逆順rollbackと同じ考え方）。completed済みsessionは
- * 対象外（completion markerを書き終えた正当なbaselineを誤って壊さない）。
- */
-export async function cleanupAuditUploadSession(args: {
-  payload: Payload;
-  sessionId: string;
-  requestId: string;
-  oidcToken: string;
-  env?: Record<string, string | undefined>;
-  storeFactory?: BlobStoreFactory;
-}): Promise<CleanupSessionResult> {
-  const env = args.env ?? process.env;
-  const session = await loadSession(args.payload, args.sessionId);
-  if (!session) return { ok: false, reason: 'session-not-found', detail: args.sessionId };
-  if (session.requestId !== args.requestId) {
-    return { ok: false, reason: 'request-id-mismatch', detail: 'requestId does not match session' };
-  }
-  if (session.status === 'completed') {
-    return { ok: false, reason: 'session-already-completed', detail: 'refusing to clean up a completed baseline' };
-  }
-
-  const storeId = auditBlobStoreIdFor(session.environment, env);
-  if (!storeId) return { ok: false, reason: 'store-error', detail: 'no audit blob store id configured' };
-
-  const makeStore = args.storeFactory ?? createVercelBlobObjectStore;
-  const store = makeStore({
-    storeId,
-    displayName: `deploid-audit-${session.environment}`,
-    expectedEnvironment: session.environment,
-    env,
-    oidcTokenOverride: args.oidcToken,
-  });
-
-  let removedObjectCount = 0;
-  for (const obj of session.allowedObjects) {
-    if (!obj.uploaded) continue;
-    await store.remove(obj.objectKey);
-    removedObjectCount += 1;
-  }
-
-  await args.payload.delete({ collection: 'audit-upload-sessions', id: session.id, overrideAccess: true });
-
-  return { ok: true, removedObjectCount };
 }

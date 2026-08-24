@@ -10,6 +10,16 @@ import { securityHeaders } from './lib/securityHeaders';
  */
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  // Payload config imports sharp for Media processing. Keep the native module
+  // outside the Turbopack bundle so the runtime resolves the platform-specific
+  // @img/sharp-* optional dependency installed by Vercel.
+  serverExternalPackages: ['sharp'],
+  outputFileTracingIncludes: {
+    // `contains: true` is used by Next's route matcher. `!(/**)` is therefore
+    // intentional: it matches the static session route but not its children.
+    '/api/admin/audit-upload/session!(/**)': ['./.cosign-bin/cosign'],
+    '/api/admin/audit-upload/session/\\[sessionId\\]/complete': ['./.cosign-bin/cosign'],
+  },
   turbopack: {
     root: path.resolve('.'),
   },
@@ -18,10 +28,6 @@ const nextConfig: NextConfig = {
   // 署名検証を実際に行う2つのrouteのVercel Function bundleへ明示的に含める。他のrouteは
   // cosignを使わないため対象に含めない（bundle sizeを不要に増やさない）。POCで実Preview
   // deploymentにて動作確認済みの構成（`task9-audit-upload-endpoint-design-v1.md`「POC結果」）。
-  outputFileTracingIncludes: {
-    '/api/admin/audit-upload/session': ['./.cosign-bin/cosign'],
-    '/api/admin/audit-upload/session/[sessionId]/complete': ['./.cosign-bin/cosign'],
-  },
   images: {
     formats: ['image/avif', 'image/webp'],
   },

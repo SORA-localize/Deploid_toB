@@ -6,7 +6,7 @@
  */
 import { getPayload } from 'payload';
 import payloadConfig from '@/payload.config';
-import { recordAuditUploadObject } from '@/lib/payload/auditUploadSession';
+import { recordAuditUploadObject } from '@/lib/payload/auditUploadObject';
 import { auditUploadPreflight, jsonResponse } from '@/lib/payload/auditUploadRouteHelpers';
 
 // Buffer/fsとBlob storeクライアントを使うためedge runtimeでは動かないが、`next.config.ts`の
