@@ -3,7 +3,6 @@ import { fileURLToPath } from 'node:url';
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { buildConfig } from 'payload';
-import sharp from 'sharp';
 import { Admins } from './collections/Admins';
 import { contentCollections, contentGlobals } from './lib/payload/contentSchema';
 import { createMcpPlugin } from './lib/payload/mcp';
@@ -72,7 +71,9 @@ export default buildConfig({
   // MCP pluginはcreateMediaStoragePlugin()の後ろに置く（順序自体に意味は無いが、
   // tests/fixtures/payload-migrations/mcp-fixture.config.ts と同じ並びにして差分を読みやすくする）。
   plugins: [createMediaStoragePlugin(), createMcpPlugin()],
-  sharp,
+  // Media has no imageSizes/resizeOptions/formatOptions, so Payload's optional Sharp
+  // integration is intentionally disabled. Next.js image optimization remains a separate
+  // concern and still owns the project's Sharp dependency.
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
