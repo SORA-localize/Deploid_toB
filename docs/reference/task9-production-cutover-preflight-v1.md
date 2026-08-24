@@ -1,6 +1,6 @@
 ---
 status: reference
-updated: 2026-08-22
+updated: 2026-08-25
 ---
 
 # Task 9 Production cutover preflight v1
@@ -34,7 +34,7 @@ Production（project ref `xtklkavbirorelqdyqjj`）に対して実行する前の
 
 1. **Production Vercel環境変数が現状ほぼ未設定**（下記「Production環境変数の現状」参照）。
    Preview は本セッション中に個別に埋めたが、その作業は**Production環境変数には一切適用していない**。
-2. **（解決済み）OIDC-federated audit Blob store疎通の根本原因が判明・POCで解決を確認した。**
+2. **（解決済み）OIDC-federated audit Blob store疎通の根本原因が判明・実装・Preview実機検証まで完了した。**
    `content:export -- --upload`がCLIスクリプトのまま`process.env.VERCEL_OIDC_TOKEN`を読もうと
    していたのが原因で、Vercel Functionのruntimeでは実際は`x-vercel-oidc-token` request headerで
    tokenが渡される（[Vercel公式docs](https://vercel.com/docs/oidc)で確認）。**「OIDC Federation
@@ -42,11 +42,11 @@ Production（project ref `xtklkavbirorelqdyqjj`）に対して実行する前の
    CLIで行い、audit Blob storeへのuploadだけをheader経由でtokenを受け取れる専用Vercel Function
    route（3段階session方式）へ分離すること。設計は`task9-audit-upload-endpoint-design-v1.md`、
    POC（cosignバイナリのFunction同梱・実署名の検証・OIDC token経由のBlob access、全て実Preview
-   deploymentで成功確認済み）も同文書参照。**route本体の実装はまだ未着手**（別途承認後に着手）。
-3. **cosignによる実署名（KMSを使った実際のexport --upload）を、このセッションでは一度も実行していない。**
-   Preview/Productionどちらの環境でも、`content:export -- --upload`の実行経路（署名 → private
-   Blob storeへの書き込み → 検証）を通しで検証したことがない。Task 5で機構は実装・単体検証済みだが、
-   実resourceに対するend-to-end実行は未実施。
+   deploymentで成功確認済み）も同文書参照。**route本体は実装済み（commit `3a7b211`）で、CLI配線・
+   認証強化・Preview実機検証まで完了している。**
+3. **Production resourceに対するcosign実署名付き`content:export -- --upload`は未実施。**
+   Previewではsession→object→completeのroute経路を実Blob・実KMSで検証済みだが、Production用の
+   環境変数・DB・audit storeを使った実行は、Production設定と明示承認が必要。
 4. Production Postgresは **table数0**（本セッションで読み取り専用確認済み、2026-08-22）。
    これはTask 0記録時点と変わっていない——Production は一度もmigrationを適用されていない。
 5. **（完全解決・2026-08-23）Supabase session poolerの同時接続数上限（15）問題。** PreviewのDATABASE_URL
@@ -95,11 +95,10 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 
 ## Production着手前チェックリスト（すべて読み取り専用または準備作業。DB/contentへの書き込みは含まない）
 
-- [ ] **（優先度高）** Vercel Preview/ProductionのDATABASE_URLがtransaction pooler（6543）か
-      session pooler（5432、15接続上限）かを確認する。session poolerのままなら、transaction
-      poolerへ戻せないか（direct connection同様DNS影響を受けていないか）を先に調べ、戻せない
-      場合はPayloadの`postgresAdapter`側の`pool.max`調整、または想定同時アクセス数の見積もりを
-      Production cutover設計に組み込む。
+- [x] **（解決済み）** PreviewのDATABASE_URLをtransaction pooler（6543）へ切替・負荷検証済み。
+      Productionは未設定のため、同じ方式で設定する。
+- [ ] **（Production設定前）** Vercel ProductionのDATABASE_URLをtransaction pooler（6543）で設定し、
+      session pooler（5432、15接続上限）をアプリruntimeに使わないことを確認する。
 - [ ] `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_REGION`（または同等の認証手段）が
       Vercel Function runtimeでcosign署名にどう渡る設計かを確認する。未設計なら先に設計する。
 - [ ] `BLOB_STORE_ID`がPayload/exportの実行パスで実際に読まれているか
@@ -108,8 +107,8 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 - [x] ~~Step 2相当（OIDC-federated audit Blob store疎通）を、まずPreviewで実Vercel Function経由で
       確認しておく。~~ **実施済み（2026-08-22〜23）: 根本原因（`process.env`ではなくrequest
       headerでtokenが渡る）を特定し、POCで解決を確認済み。dashboard操作は不要と判明。**
-- [ ] **（次のステップ）`task9-audit-upload-endpoint-design-v1.md`の3段階session route本体を
-      実装する。** 設計・POCは完了、実装は未着手。着手には別途明示承認が要る。
+- [x] 3段階session routeを実装し、CLIの`content:export -- --upload`から呼び出せるようにした。
+      Preview実機でsession→object→complete、Blob digest突合、completion markerまで確認済み。
 - [ ] Production Vercel環境変数を、Preview作業と同じ手順（値は都度その場で払い出し・確認、
       Previewの値を転用しない、`~/secrets/deploid-supabase-connections.txt`のproduction sectionから
       DATABASE_URLを読む）で埋める。この作業自体はTask 9計画のStepではなく、Step 1着手前の準備。
@@ -126,9 +125,9 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 | Step | 内容 | Preview rehearsalでの裏付け | Production固有の残作業 |
 |---|---|---|---|
 | 1 | 変更凍結・rollback window宣言 | — （運用上の合意事項、技術的検証対象外） | Production公開中サイトへの影響があるため、実施タイミングを事前に合意する |
-| 2 | cutover直前export（署名付きartifactをaudit storeへ） | 未実施（上記チェックリスト参照） | end-to-end未検証。Production当日が初回実行にならないようにする |
+| 2 | cutover直前export（署名付きartifactをaudit storeへ） | **route経路はPreview実機検証済み** | Production用env/resourceでのend-to-end確認が必要 |
 | 3 | production import・parity | 同じ`content:import`/`content:compare`をPreviewで実証済み（51/51 media含む） | Production DATABASE_URL・env varが揃っていることが前提 |
-| 4 | Vercel Previewで`CONTENT_SOURCE=payload`有効化・`npm run check`・E2E | **Preview deployment切替: 完了**（Step 6として実施済み）。**手動でのroute/content/image確認: 完了**（既知content文字列・実Blob画像・横スクロール無しを確認済み）。**自動E2E（`npm run test:e2e`）: 未実施** — session pooler接続数上限（15）によりローカルbuildが安定しないため | 自動E2Eが未実施な根本原因（pooler mode）を解決してから、Production着手前にPreviewで自動E2Eも完了させる |
+| 4 | Vercel Previewで`CONTENT_SOURCE=payload`有効化・`npm run check`・E2E | **完了**（transaction pooler切替後、実deployment・自動E2Eを確認済み） | — |
 | 5 | 主要画面目視確認 | **完了**（Step 6の一部として、desktop 1440px / mobile 390pxのscreenshotで確認済み） | — |
 | 6 | Production切替 | — | 上記すべてが揃って初めて着手する |
 | 7 | rollback window終了後の旧TS削除 | — | Production公開後24時間の安定運用確認が前提 |
@@ -176,9 +175,8 @@ POC成功・route本体実装待ち）:
 3. 1・2が解消してから、Production環境変数の設定設計
 4. 最後にTask 9計画Step 1（変更凍結宣言）
 
-**現時点でProduction cutoverへ進める状態ではない。** DB接続問題はPreview側で解決・実機検証済み
-だが、Production側のDATABASE_URL設定はまだ行っていない。audit Blob upload routeの本実装も
-未着手のまま残っている。
+**現時点でProduction cutoverへはまだ進めない。** Preview側の実装・検証は完了したが、Production側の
+DATABASE_URL・secret・KMS・audit store設定、Production resourceを使った最終export検証が未完了である。
 
 **Production DBへの書き込み・Production Vercel環境変数の追加は、いずれも個別に明示承認を得てから
 実行する。**
