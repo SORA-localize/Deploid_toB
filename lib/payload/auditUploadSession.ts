@@ -2,17 +2,11 @@ import { randomBytes, createHash } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { Payload } from 'payload';
-import {
-  assertValidEnvelope,
-  canonicalJson,
-  sha256Hex,
-  verifyBlobWithCosign,
-  verifyManifestSignature,
-  withTempDir,
-  type SignedBaselineEnvelope,
-} from '../../scripts/export-content-snapshot.mts';
+import { assertValidEnvelope, canonicalJson, sha256Hex, type SignedBaselineEnvelope } from '../content/snapshotEnvelope';
+import { ensureCosignOnPath, verifyBlobWithCosign, withTempDir } from '../content/cosignVerification';
+import type { CosignVerifyResult } from '../content/cosignVerification';
 import type { MediaInventoryEntry, SnapshotObjectStore, VercelBlobStoreOptions } from '../../scripts/snapshotObjectStore.mts';
-import { auditBlobStoreIdFor } from '../../scripts/restore-preflight.mts';
+import { auditBlobStoreIdFor } from '../content/auditBlobStore';
 import {
   baselineCompletionMarkerKey,
   checkBlobStoreSelection,
@@ -39,22 +33,6 @@ const SESSION_TTL_MINUTES = 30;
  */
 export type BlobStoreFactory = (options: VercelBlobStoreOptions) => SnapshotObjectStore;
 
-/**
- * `verifyManifestSignature()`（`export-content-snapshot.mts`、無変更）は`execFileSync('cosign', ...)`
- * を**bare command nameで**呼ぶ。Vercel Function runtimeにはcosignがPATH上に無いので、
- * build時に取得・同梱したbinary（`.cosign-bin/cosign`、`outputFileTracingIncludes`で
- * このrouteのFunctionへ含める）のディレクトリをPATHへ追加する。`execFileSync`はcommand名に
- * path区切りが無い場合PATHを検索する（Node/OSの標準挙動）ため、**署名検証コード自体は
- * 一切変更しない**——呼び出し環境のPATHだけを整える。
- */
-let cosignPathEnsured = false;
-export function ensureCosignOnPath(): void {
-  if (cosignPathEnsured) return;
-  const cosignBinDir = path.join(process.cwd(), '.cosign-bin');
-  process.env.PATH = process.env.PATH ? `${cosignBinDir}:${process.env.PATH}` : cosignBinDir;
-  cosignPathEnsured = true;
-}
-
 export interface AllowedObjectRecord {
   objectKey: string;
   /** signature bundle entryだけnull（manifestに事前宣言されたsha256が無いため）。 */
@@ -76,6 +54,16 @@ export type AuditUploadSessionFailureReason =
 export type CreateSessionResult =
   | { ok: true; sessionId: string; expiresAt: string; environment: 'preview' | 'production' }
   | { ok: false; reason: AuditUploadSessionFailureReason; detail: string };
+
+async function verifyManifestSignature(envelope: SignedBaselineEnvelope): Promise<CosignVerifyResult> {
+  return withTempDir(async (dir) => {
+    const manifestPath = path.join(dir, 'manifest.json');
+    const bundlePath = path.join(dir, 'manifest.cosign.bundle');
+    await writeFile(manifestPath, canonicalJson(envelope.manifest), 'utf8');
+    await writeFile(bundlePath, Buffer.from(envelope.manifestSignature.bundleBase64, 'base64'));
+    return verifyBlobWithCosign(manifestPath, bundlePath);
+  });
+}
 
 /**
  * Step 1。**署名検証に成功した場合にしか行を作らない**（実装時の追加必須事項）。

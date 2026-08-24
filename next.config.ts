@@ -20,6 +20,17 @@ const nextConfig: NextConfig = {
     '/api/admin/audit-upload/session!(/**)': ['./.cosign-bin/cosign'],
     '/api/admin/audit-upload/session/\\[sessionId\\]/complete': ['./.cosign-bin/cosign'],
   },
+  outputFileTracingExcludes: {
+    '/api/admin/audit-upload/**': [
+      'tests/**',
+      'docs/**',
+      'media/**',
+      'public/**',
+      'migrations/**',
+      'package-lock.json',
+      'tsconfig.tsbuildinfo',
+    ],
+  },
   turbopack: {
     root: path.resolve('.'),
   },

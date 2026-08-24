@@ -17,10 +17,17 @@ const hasCosign = (relativeTraceFile) => {
 };
 
 const expected = { session: true, complete: true, object: false, cleanup: false };
+const MAX_TRACE_BYTES = 220 * 1024 * 1024;
 for (const [name, trace] of Object.entries(routes)) {
+  const tracePath = path.join(root, '.next', trace);
+  const payload = JSON.parse(fs.readFileSync(tracePath, 'utf8'));
+  const bytes = payload.files.reduce((sum, file) => {
+    try { return sum + fs.statSync(path.resolve(path.dirname(tracePath), file)).size; } catch { return sum; }
+  }, 0);
+  if (bytes > MAX_TRACE_BYTES) throw new Error(`audit-upload trace too large for ${name}: ${(bytes / 1048576).toFixed(1)} MiB`);
   const actual = hasCosign(trace);
   if (actual !== expected[name]) {
     throw new Error(`audit-upload trace invariant failed for ${name}: expected cosign=${expected[name]}, got ${actual}`);
   }
 }
-console.log('[audit-upload-traces] OK: cosign is present only in session and complete routes');
+console.log(`[audit-upload-traces] OK: cosign scope and ${MAX_TRACE_BYTES / 1048576} MiB trace budget`);
