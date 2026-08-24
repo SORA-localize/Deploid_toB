@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve('.'),
   },
+  // `payload.config.ts`がトップレベルで`sharp`をimportしており、全routeがそれを静的import
+  // する。audit-upload routeのみでVercel Turbopackビルドが`sharp`のLinuxネイティブbinary
+  // （`libvips-cpp.so`）をbundleへ含められず`ERR_DLOPEN_FAILED`になる実機不具合を確認
+  // （2026-08-24、Preview実機検証）。`sharp`をserver external package扱いにして、bundleへ
+  // 埋め込まず通常のnode_modules解決に任せる（Next.js公式ドキュメント推奨のnative依存対応）。
+  serverExternalPackages: ['sharp'],
   // audit-upload route（`docs/reference/task9-audit-upload-endpoint-design-v1.md`）専用。
   // `scripts/fetch-cosign-binary.mjs`がbuild時（`vercel-build`）に取得したcosign binaryを、
   // 署名検証を実際に行う2つのrouteのVercel Function bundleへ明示的に含める。他のrouteは
