@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { NextConfig } from 'next';
+import { withPayload } from '@payloadcms/next/withPayload';
 import { securityHeaders } from './lib/securityHeaders';
 
 /**
@@ -9,11 +10,43 @@ import { securityHeaders } from './lib/securityHeaders';
  */
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  // Next.js image optimization uses Sharp. Keep the native module outside the
+  // Turbopack bundle so the runtime resolves the platform-specific @img/sharp-*
+  // optional dependency installed by Vercel.
+  serverExternalPackages: ['sharp'],
+  outputFileTracingIncludes: {
+    // `contains: true` is used by Next's route matcher. `!(/**)` is therefore
+    // intentional: it matches the static session route but not its children.
+    '/api/admin/audit-upload/session!(/**)': ['./.cosign-bin/cosign'],
+    '/api/admin/audit-upload/session/\\[sessionId\\]/complete': ['./.cosign-bin/cosign'],
+  },
+  outputFileTracingExcludes: {
+    '/api/admin/audit-upload/**': [
+      'tests/**',
+      'docs/**',
+      'media/**',
+      'public/**',
+      'migrations/**',
+      'package-lock.json',
+      'tsconfig.tsbuildinfo',
+    ],
+  },
   turbopack: {
     root: path.resolve('.'),
   },
+  // audit-upload route（`docs/reference/task9-audit-upload-endpoint-design-v1.md`）専用。
+  // `scripts/fetch-cosign-binary.mjs`がbuild時（`vercel-build`）に取得したcosign binaryを、
+  // 署名検証を実際に行う2つのrouteのVercel Function bundleへ明示的に含める。他のrouteは
+  // cosignを使わないため対象に含めない（bundle sizeを不要に増やさない）。POCで実Preview
+  // deploymentにて動作確認済みの構成（`task9-audit-upload-endpoint-design-v1.md`「POC結果」）。
   images: {
     formats: ['image/avif', 'image/webp'],
+  },
+  experimental: {
+    // `(frontend)` と `(payload)` の2つの独立 root layout に分割した（Task 2）ため、どちらの
+    // layoutにも一致しないURL（typo等）に対してNext.jsが選べるroot layoutが無い。
+    // `src/app/global-not-found.tsx` を有効にして、この場合も自前のbrand付き404を返す。
+    globalNotFound: true,
   },
   async headers() {
     return [
@@ -25,4 +58,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPayload(nextConfig);

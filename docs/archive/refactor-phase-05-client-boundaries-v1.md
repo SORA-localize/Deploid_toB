@@ -1552,25 +1552,33 @@ raw文字列比較（`expect(JSON.stringify(vm)).not.toContain(rawText)`）は**
 
 ```ts
 // tests/unit/view-models/robots.test.ts
-// @plan-check-skip: Task 5 で作る @/lib/normalizeSearchText を参照する。Task 6 でこのmarkerを外しbaselineを減らす
+//
+// Task 6でこのfixtureの作り方が変わった: `lib/data.ts`は削除され、ページはrepository経由で
+// domain型（`lib/content/domainTypes.ts`）のcontentを読む。domain `Robot`はDEC-S05/S06で
+// `safetyNote`/`vendorRiskNote`（および`buyerReadiness`/`marketAvailability`）を持たない。
 import { describe, expect, it } from 'vitest';
-import { getManufacturers, getRobots, getUseCases } from '@/lib/data';
+import { filterPublished } from '@/lib/content/createContentRepository';
+import { toDomainContentSnapshot } from '@/lib/content/localSource';
+import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
 import { normalizeSearchText } from '@/lib/normalizeSearchText';
 import { createRobotCatalogItems } from '@/lib/viewModels/robots';
 
+const snapshot = toDomainContentSnapshot(localContentSnapshot);
+const robots = filterPublished(snapshot.robots);
+const manufacturers = filterPublished(snapshot.manufacturers);
+const useCases = filterPublished(snapshot.useCases);
+
 describe('robot catalog search text', () => {
-  const items = createRobotCatalogItems(getRobots(), getManufacturers(), getUseCases());
+  const items = createRobotCatalogItems(robots, manufacturers, useCases);
 
   it('excludes body text values, not just their keys', () => {
     const haystack = normalizeSearchText(items.map((item) => item.filter.searchText).join(' '));
 
-    for (const robot of getRobots()) {
+    for (const robot of robots) {
       const bodyValues = [
         robot.description,
         robot.summary,
         robot.supportNote,
-        robot.safetyNote,
-        robot.vendorRiskNote,
         ...robot.comparison.strengths,
         ...robot.comparison.constraints,
         ...robot.comparison.bestFit,
@@ -1737,28 +1745,34 @@ Step 6のbudget testはこの時点でも実行できる（`@/lib/viewModels/{ro
 
 ```ts
 // tests/unit/view-models/catalog-payload.test.ts
+//
+// Task 6でこのfixtureの作り方が変わった: `lib/data.ts`は削除され、ページはrepository経由で
+// domain型（`lib/content/domainTypes.ts`）のcontentを読む。VM関数群は純粋関数なので
+// repository/DBは不要で、`lib/content/localSource.ts`と同じlegacy→domain変換
+// （`toDomainContentSnapshot`）を通したfixtureをそのまま使う。
 import { describe, expect, it } from 'vitest';
-import { getManufacturers, getRobots, getUseCases } from '@/lib/data';
+import { filterPublished } from '@/lib/content/createContentRepository';
+import { toDomainContentSnapshot } from '@/lib/content/localSource';
+import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
 import { createManufacturerCatalogItems } from '@/lib/viewModels/manufacturers';
 import { createRobotCatalogItems } from '@/lib/viewModels/robots';
+
+const snapshot = toDomainContentSnapshot(localContentSnapshot);
+const robots = filterPublished(snapshot.robots);
+const manufacturers = filterPublished(snapshot.manufacturers);
+const useCases = filterPublished(snapshot.useCases);
 
 // maxBytes は Task 6 Step 5 の実測値 * 1.15。Task 7・8 で use-case / article を追加する。
 const budgets = [
   {
     name: 'robots',
     maxBytes: 0,
-    bytes: () =>
-      Buffer.byteLength(
-        JSON.stringify(createRobotCatalogItems(getRobots(), getManufacturers(), getUseCases())),
-      ),
+    bytes: () => Buffer.byteLength(JSON.stringify(createRobotCatalogItems(robots, manufacturers, useCases))),
   },
   {
     name: 'manufacturers',
     maxBytes: 0,
-    bytes: () =>
-      Buffer.byteLength(
-        JSON.stringify(createManufacturerCatalogItems(getManufacturers(), getRobots())),
-      ),
+    bytes: () => Buffer.byteLength(JSON.stringify(createManufacturerCatalogItems(manufacturers, robots))),
   },
 ];
 

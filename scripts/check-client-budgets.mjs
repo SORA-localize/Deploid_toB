@@ -3,16 +3,32 @@ import fs from 'node:fs';
 const stats = JSON.parse(fs.readFileSync('.next/diagnostics/route-bundle-stats.json', 'utf8'));
 
 /**
- * 共有フロア = **全 route に共通して現れる chunk** の集合。
+ * 共有フロア = **フロア算出対象の route に共通して現れる chunk** の集合。
  *
  * Phase 5 は `/privacy` の chunk 集合をフロアと定義していた。今日の実測では交差集合と完全に
  * 一致する（588,660 / 9 chunks、差 0）が、`/privacy` に route 固有の client code が1つでも
  * 入った瞬間、それが全 route から差し引かれて他 route の「固有」を過小評価する。
  * 基準を1 route の内容に依存させない。
+ *
+ * **フロア算出対象からは `/_not-found` と `/admin/**` を除く（Task 2、Payload統合）。**
+ * `src/app` を `(frontend)` と `(payload)` の2つの独立 root layout へ分けた結果、両者は
+ * chunkを一切共有しない別系統になった。Next.js が生成する汎用 `/_not-found`（どの route にも
+ * 一致しない URL 用の fallback）も、単一 root layout が無くなったことで `(frontend)` の
+ * layout chunk（Header/Footer/ThemeProviderなど、約35KB）を含まなくなった。
+ *
+ * この2つを交差集合の計算対象に含めたままにすると、frontend 14 route が実際には全員で
+ * 共有している約35KBのchunkが「全routeには無い」という理由だけでフロアから落ち、frontend
+ * 各routeの「route固有」サイズに一律で足されて二重計上される（実バイト数は変わらないのに
+ * 帰属だけがズレる）。`/_not-found` と `/admin/**` はそれぞれ個別の budget row で従来通り
+ * 検査される。フロアの「定義」から外すだけで、検査対象からは外さない。
  */
+const FLOOR_BASIS_EXCLUDE_ROUTES = new Set(['/_not-found']);
+const isFloorBasisRoute = (route) =>
+  !FLOOR_BASIS_EXCLUDE_ROUTES.has(route) && !route.startsWith('/admin');
+
 function sharedFloorChunks(entries) {
   let intersection = null;
-  for (const entry of entries) {
+  for (const entry of entries.filter((entry) => isFloorBasisRoute(entry.route))) {
     const chunks = new Set(entry.firstLoadChunkPaths);
     intersection =
       intersection === null
@@ -65,6 +81,11 @@ const MAX_SHARED_FLOOR_BYTES = 560_000;
  * `/compare` は Phase 7 Task 3 で 248,436 -> 282,765 へ増えた。これは劣化ではなく、
  * 全 route が負担していた sonner を toast を使う唯一の route へ移した結果で、フロアが
  * 同時に 34,520 減っている（サイト全体では純減）。実測 * 1.15 で 325,000 とする。
+ *
+ * `/admin/[[...segments]]` は Task 2（Payload統合）で新規追加。Payload純正の管理画面
+ * バンドル（lexical richtext editor 含む）で、frontend側の budget とは無関係の別系統。
+ * 実測 1,729,098 * 1.15 = 1,988,463 を 1,990,000 に切り上げ。frontend側のフロア・budgetは
+ * この route が増減しても変わらない（上の `isFloorBasisRoute` でフロア計算から除外している）。
  */
 const ROUTE_SPECIFIC_BUDGETS = {
   '/': 295_000,
@@ -82,6 +103,7 @@ const ROUTE_SPECIFIC_BUDGETS = {
   '/about': 20_000,
   '/for-manufacturers': 20_000,
   '/privacy': 20_000,
+  '/admin/[[...segments]]': 1_990_000,
 };
 
 let failed = false;

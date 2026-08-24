@@ -1,0 +1,59 @@
+diff --git a/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js b/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js
+index 1a81ee7..08aad56 100644
+--- a/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js
++++ b/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js
+@@ -225,8 +225,21 @@ ${JSON.stringify(errors)}
+         const convertedFields = convertCollectionSchemaToZod(schema);
+         // Create a new schema that combines the converted fields with update-specific parameters
+         // Use .partial() to make all fields optional for partial updates
++        //
++        // PATCHED (Deploid Task 8, patches/@payloadcms+plugin-mcp+*.patch): convertCollectionSchemaToZod()
++        // falls back to `z.record(z.any())` when the collection's JSON-Schema-to-Zod conversion
++        // throws (its own catch block, e.g. for collections with `type: 'json'` fields such as
++        // `robots.specs`) — and `z.record(...)` has no `.partial()` method, so the original
++        // `convertedFields.partial().shape` throws `TypeError: convertedFields.partial is not a
++        // function`. That throw is swallowed as an unhandled rejection deep inside the MCP server
++        // construction, which never resolves the in-flight HTTP response — every POST to /mcp on an
++        // API key with `update` enabled for such a collection hangs forever (observed: 100% packet
++        // loss, connection never closes). Mirror what createResourceTool already does for the same
++        // fallback case (`...convertedFields.shape`, which is `undefined` on a ZodRecord and spreads
++        // to nothing) instead of unconditionally calling `.partial()`.
++        const partialFields = typeof convertedFields?.partial === 'function' ? convertedFields.partial().shape : undefined;
+         const updateResourceSchema = z.object({
+-            ...convertedFields.partial().shape,
++            ...partialFields,
+             id: z.union([
+                 z.string(),
+                 z.number()
+diff --git a/node_modules/@payloadcms/plugin-mcp/dist/utils/schemaConversion/convertCollectionSchemaToZod.js b/node_modules/@payloadcms/plugin-mcp/dist/utils/schemaConversion/convertCollectionSchemaToZod.js
+index 07a2628..97b08e6 100644
+--- a/node_modules/@payloadcms/plugin-mcp/dist/utils/schemaConversion/convertCollectionSchemaToZod.js
++++ b/node_modules/@payloadcms/plugin-mcp/dist/utils/schemaConversion/convertCollectionSchemaToZod.js
+@@ -28,7 +28,26 @@ export const convertCollectionSchemaToZod = (schema)=>{
+      * 4. The resulting Zod schema is used only for parameter validation in MCP tools, not for data processing
+      * 5. No user input or external data is involved in the schema generation process
+      */ // eslint-disable-next-line @typescript-eslint/no-implied-eval
+-        return new Function('z', `return ${transpileResult.outputText}`)(z);
++        // PATCHED (Deploid Task 8, patches/@payloadcms+plugin-mcp+*.patch): `ts.transpileModule()`
++        // with `module: CommonJS` always emits a `"use strict";` directive prologue before the
++        // actual expression, for every collection (confirmed: reproduced for both a simple
++        // collection and a complex one, byte-for-byte identical prologue). Naively prepending
++        // `return ` to that whole multi-statement string makes the function return the *string*
++        // `"use strict"` and never reach the real `z.object({...})` expression at all — the real
++        // Zod schema is silently discarded. Every downstream `.shape`, `.partial()`, etc. call
++        // then operates on a JS string, not a Zod schema. For create/update MCP tools
++        // (`resource/create.js`, `resource/update.js`) this means the *tool's own input schema*
++        // ends up with none of the collection's fields — any arguments an MCP client sends for
++        // fields like `stableId`/`slug`/`name` get silently stripped during the SDK's zod
++        // `safeParseAsync()` step (`z.object()` drops unrecognized keys by default) before the
++        // tool handler ever sees them, so `createRobots`/`updateRobots` etc. report success while
++        // writing an almost-empty document. Confirmed via `curl`: created robot came back with
++        // `stableId: null, slug: null, name: null` despite those exact values being sent.
++        // Fix: strip the leading `"use strict";` directive (and any surrounding whitespace)
++        // before evaluating, so the remaining code is the single expression statement the
++        // original comment already assumed it would be.
++        const evaluableOutput = transpileResult.outputText.replace(/^\s*"use strict";\s*/, '');
++        return new Function('z', `return ${evaluableOutput}`)(z);
+     } catch (error) {
+         // If schema conversion fails (e.g., due to Zod v4 toJSONSchema null-check bug
+         // with record schemas that have undefined valueType, or bundler transforms

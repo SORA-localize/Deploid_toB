@@ -7,14 +7,14 @@ import { ExternalLink, GripVertical, Star, X } from 'lucide-react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import type { CompareCardDragHandleProps } from '@/components/SortableCompareCard';
 import { ComparisonSpecList } from '@/components/ComparisonSpecList';
-import type { Robot } from '@/data/types';
+import type { CompareRobotViewModel } from '@/lib/viewModels/compare';
 import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import { EMPTY_VALUE_LABEL } from '@/lib/labels';
 import { getComparisonSpecGroups } from '@/lib/robotDisplay';
 import { uiText } from '@/lib/uiText';
 
 interface ComparisonRobotPanelProps {
-  robot: Robot;
+  robot: CompareRobotViewModel;
   manufacturerName?: string;
   isFavorite: boolean;
   onFavoriteToggle: (id: string) => void;

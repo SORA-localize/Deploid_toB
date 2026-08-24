@@ -1,4 +1,4 @@
-import type { Robot } from '@/data/types';
+import type { Robot } from '@/lib/content/domainTypes';
 
 export const MAX_COMPARE_ROBOTS = 20;
 

@@ -1,4 +1,4 @@
-import type { Article, Robot, UseCase } from '@/data/types';
+import type { Article, Robot, UseCase } from '@/lib/content/domainTypes';
 import {
   getAnyRegisteredTag,
   getRegisteredTag,

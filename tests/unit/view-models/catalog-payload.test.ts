@@ -1,9 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { getArticles, getManufacturers, getRobots, getUseCases } from '@/lib/data';
+import { filterPublished } from '@/lib/content/createContentRepository';
+import { toDomainContentSnapshot } from '@/lib/content/localSource';
+import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
 import { createArticleCatalogItems } from '@/lib/viewModels/articles';
 import { createManufacturerCatalogItems } from '@/lib/viewModels/manufacturers';
 import { createRobotCatalogItems } from '@/lib/viewModels/robots';
 import { createUseCaseCatalogItems } from '@/lib/viewModels/useCases';
+
+// Task 6: `@/lib/data`（削除済み）の代わりに、localSource.tsと同じlegacy→domain変換を通した
+// fixtureを使う（VM関数群は純粋関数のためrepository/DBは不要）。
+const snapshot = toDomainContentSnapshot(localContentSnapshot);
+const robots = filterPublished(snapshot.robots);
+const manufacturers = filterPublished(snapshot.manufacturers);
+const useCases = filterPublished(snapshot.useCases);
+const articles = filterPublished(snapshot.articles);
 
 /**
  * catalog view model の JSON バイト数の上限。
@@ -25,29 +35,22 @@ const budgets = [
   {
     name: 'robots',
     maxBytes: 63_000,
-    bytes: () =>
-      Buffer.byteLength(
-        JSON.stringify(createRobotCatalogItems(getRobots(), getManufacturers(), getUseCases())),
-      ),
+    bytes: () => Buffer.byteLength(JSON.stringify(createRobotCatalogItems(robots, manufacturers, useCases))),
   },
   {
     name: 'useCases',
     maxBytes: 19_000,
-    bytes: () =>
-      Buffer.byteLength(JSON.stringify(createUseCaseCatalogItems(getUseCases(), getRobots()))),
+    bytes: () => Buffer.byteLength(JSON.stringify(createUseCaseCatalogItems(useCases, robots))),
   },
   {
     name: 'articles',
     maxBytes: 65_000,
-    bytes: () => Buffer.byteLength(JSON.stringify(createArticleCatalogItems(getArticles()))),
+    bytes: () => Buffer.byteLength(JSON.stringify(createArticleCatalogItems(articles))),
   },
   {
     name: 'manufacturers',
     maxBytes: 18_000,
-    bytes: () =>
-      Buffer.byteLength(
-        JSON.stringify(createManufacturerCatalogItems(getManufacturers(), getRobots())),
-      ),
+    bytes: () => Buffer.byteLength(JSON.stringify(createManufacturerCatalogItems(manufacturers, robots))),
   },
 ];
 

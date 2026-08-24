@@ -1,17 +1,15 @@
 import type {
-  BuyerReadiness,
   CompanyStatus,
   DeploymentStage,
   DeploymentStatus,
   JapanAvailability,
   JapanPresence,
-  MarketAvailability,
   PublishStatus,
   Reliability,
   ArticleType,
   RightsStatus,
   UseCaseMaturity,
-} from '@/data/types';
+} from '@/lib/content/domainTypes';
 import type { TagKind } from '@/lib/tagRegistry';
 
 export type VisualTone =
@@ -102,12 +100,6 @@ export const deploymentStageTones = {
   discontinued: 'danger',
 } as const satisfies Record<DeploymentStage, VisualTone>;
 
-export const buyerReadinessTones = {
-  'initial-adoption': 'info',
-  'requires-poc': 'warning',
-  'limited-today': 'unknown',
-} as const satisfies Record<BuyerReadiness, VisualTone>;
-
 export const japanAvailabilityTones = {
   'official-japan': 'success',
   'distributor-japan': 'success',
@@ -148,18 +140,6 @@ export const articleTypeTones = {
   'basics-guide': 'info',
 } as const satisfies Record<ArticleType, VisualTone>;
 
-export const marketAvailabilityTones = {
-  'enterprise-deployment': 'success',
-  'enterprise-pilot': 'warning',
-  'developer-platform': 'info',
-  'research-platform': 'info',
-  reservation: 'info',
-  'internal-use': 'unknown',
-  'planned-production': 'unknown',
-  'company-claimed-delivery': 'warning',
-  unknown: 'unknown',
-} as const satisfies Record<MarketAvailability, VisualTone>;
-
 export const useCaseMaturityTones = {
   'early-stage': 'unknown',
   'pilot-phase': 'warning',
@@ -185,7 +165,6 @@ export const getPublishStatusTone = (status: PublishStatus) => publishStatusTone
 export const getReliabilityTone = (reliability: Reliability) => reliabilityTones[reliability];
 export const getRightsStatusTone = (status: RightsStatus) => rightsStatusTones[status];
 export const getDeploymentStageTone = (stage: DeploymentStage) => deploymentStageTones[stage];
-export const getBuyerReadinessTone = (readiness: BuyerReadiness) => buyerReadinessTones[readiness];
 export const getJapanAvailabilityTone = (availability: JapanAvailability) =>
   japanAvailabilityTones[availability];
 export const getCompanyStatusTone = (status: CompanyStatus) => companyStatusTones[status];

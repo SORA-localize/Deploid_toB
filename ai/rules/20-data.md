@@ -4,6 +4,8 @@ Use this file for data additions, data updates, article records, tags, specs, so
 
 Migration note: Payload CMS + managed PostgreSQL is the approved target, but it is not live yet. Until the cutover criteria in `docs/plans/content-platform-migration-plan-v1.md` are complete, use the current `data/*.ts` workflow below. For migration work, also read `docs/decisions/content-platform-and-database-architecture-v2.md`.
 
+Codex MCP note: a Payload MCP server (`lib/payload/mcp.ts`) and its editorial workflow (`.codex/content-workflow.md`) exist for the Payload side of the migration (schema/testing work), but they do not change the standing rule above — `data/*.ts` remains the operational source of truth for ordinary content edits until cutover. Do not use MCP tools to write records that are supposed to live in `data/*.ts` today.
+
 ## Must Read
 
 - `ai/rules/21-data-maintenance-workflow.md` - pre-edit gate for `data/*.ts`

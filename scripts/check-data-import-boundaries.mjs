@@ -44,6 +44,76 @@ const searchViolations = searchBoundaryRoots
     return searchModuleImport.test(fs.readFileSync(absolute, 'utf8')) ? [relative] : [];
   });
 
+// content-platform-migration Task 4: ページ処理から `readSnapshot()` へ到達させない。
+// snapshot（import / export / parity / 横断validation用の全件読み出し）を持つのは
+// `createLocalContentSource()` / `createPayloadContentSource()` が返すsourceだけで、
+// `getContentRepository()` が返す `ContentRepository` はこのメソッドを型として持たない。
+// よって「アプリ側からsource factoryを直接importしない」を機械的に守れば、ページから
+// snapshotへ到達する経路が構造的に存在しなくなる（規約ではなく依存方向で担保する）。
+//
+// 対象に `lib/**` を含めるのが要（Task 4 review Important #1）。Task 6のview model層は
+// `lib/`（`lib/data.ts` / `lib/robotCatalog.ts` / `lib/viewModels/**`）に置かれるため、
+// `components/**` と `src/**` だけを見ていると「lib/のmoduleがsourceを直接importして
+// `readSnapshot()` の全件をページへ渡す」経路が素通りする。ページ側は狭い
+// `ContentRepository` 型しか見ないので、型検査でもこの経路は捕まらない。
+// これはGlobal Constraint「Client Componentへraw collection全件を渡さない」が
+// 防ごうとしているものそのもの。
+//
+// 例外は `lib/content/getContentRepository.ts` だけ（source factoryを選ぶのが役目のファイル）。
+// 管理系（Task 5以降のimporter / exporter / parity CLI）は `scripts/**` / `tests/**` から
+// 直接importしてよいので、この2 rootは対象に含めない。
+//
+// specifierは末尾segmentで判定する。`@/lib/content/localSource` だけでなく、`lib/` 内から
+// 自然に書かれる相対形（`./localSource` / `../content/payloadSource`）も同じ経路であり、
+// path前置きで判定すると後者を取りこぼす。型だけのimportはruntimeで `readSnapshot()` へ
+// 到達しないため対象外（既存のdata value import gateと同じ扱い）。
+const contentSourceImport =
+  /import\s+(?!type\b)[^;]*from\s+['"][^'"]*\/(localSource|payloadSource)(?:\.ts)?['"]/g;
+const contentSourceBoundaryRoots = ['components', 'lib', 'src'];
+const contentSourceAllowed = new Set(['lib/content/getContentRepository.ts']);
+
+const contentSourceViolations = contentSourceBoundaryRoots
+  .flatMap((directory) => filesUnder(path.join(root, directory)))
+  .flatMap((absolute) => {
+    const relative = path.relative(root, absolute);
+    if (contentSourceAllowed.has(relative)) return [];
+    contentSourceImport.lastIndex = 0;
+    return contentSourceImport.test(fs.readFileSync(absolute, 'utf8')) ? [relative] : [];
+  });
+
+// remediation group 2 / 必須修正4-5: 「local sourceだけがlocal値を読む」。
+// `lib/content/payloadSource.ts` が `lib/site.ts` や `data/*` の定数を import できる限り、
+// SiteSettings の欠落を黙って埋める fallback をいつでも書き戻せてしまう（実際にそれが
+// 監査で見つかった欠陥そのもの: `settings.dataAsOf ?? siteMeta.dataAsOf`）。Payload source は
+// Payload だけを正本にするので、local 側の値を持つ module への import を機械的に禁止する。
+const payloadSourceLocalConstantImport =
+  /import\s+(?!type\b)[^;]*from\s+['"](?:@\/lib\/site|\.\.\/site|\.\/site|@\/data\/|\.\.\/\.\.\/data\/)/g;
+const payloadSourceFile = 'lib/content/payloadSource.ts';
+const payloadSourceViolation = (() => {
+  const absolute = path.join(root, payloadSourceFile);
+  if (!fs.existsSync(absolute)) return false;
+  payloadSourceLocalConstantImport.lastIndex = 0;
+  return payloadSourceLocalConstantImport.test(fs.readFileSync(absolute, 'utf8'));
+})();
+
+if (payloadSourceViolation) {
+  console.error(
+    `${payloadSourceFile} must not import local content constants (lib/site.ts, data/**). ` +
+      'Payload is the source of truth for the Payload source; a local fallback hides an unmigrated ' +
+      'site-settings global from parity (remediation group 2 / 必須修正4).',
+  );
+  process.exitCode = 1;
+}
+
+if (contentSourceViolations.length > 0) {
+  console.error(
+    'components/**, lib/**, and src/** must reach content only through ' +
+      'lib/content/getContentRepository.ts (never lib/content/localSource.ts or payloadSource.ts, ' +
+      `which expose readSnapshot()):\n${contentSourceViolations.map((file) => `  - ${file}`).join('\n')}`,
+  );
+  process.exitCode = 1;
+}
+
 if (violations.length > 0) {
   console.error(`Direct data value imports are not allowed:\n${violations.map((file) => `  - ${file}`).join('\n')}`);
   process.exitCode = 1;
@@ -58,6 +128,11 @@ if (searchViolations.length > 0) {
   process.exitCode = 1;
 }
 
-if (violations.length === 0 && searchViolations.length === 0) {
+if (
+  violations.length === 0 &&
+  searchViolations.length === 0 &&
+  contentSourceViolations.length === 0 &&
+  !payloadSourceViolation
+) {
   console.log('[data-boundaries] OK');
 }

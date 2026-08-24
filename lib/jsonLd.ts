@@ -1,7 +1,7 @@
 // 構造化データ（JSON-LD）のビルダー（設計: data-architecture-redesign-v1 §11.7）。
 // Robot=Product / Manufacturer=Organization / Article=NewsArticle。
 // 値はすべてレコードから導出する（直書きしない）。
-import type { Article, ManufacturerGuideFaqItem, Manufacturer, Robot, UseCase } from '@/data/types';
+import type { Article, ManufacturerGuideFaqItem, Manufacturer, Robot, UseCase } from '@/lib/content/domainTypes';
 import { resolveManufacturerLogo } from './manufacturerLogo';
 import { getDisplayableAsset } from './media';
 import { getRobotPrimaryImage } from './robotMedia';

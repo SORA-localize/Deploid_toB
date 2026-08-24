@@ -2,6 +2,9 @@
 dist/
 .next/
 
+# scripts/fetch-cosign-binary.mjs が build時に取得する binary。コミットしない。
+.cosign-bin/
+
 # Playwright artifacts
 test-results/
 playwright-report/
@@ -29,6 +32,9 @@ pnpm-debug.log*
 # TypeScript build cache
 tsconfig.tsbuildinfo
 
+# Payload Media local-storage fallback (no BLOB_READ_WRITE_TOKEN configured, e.g. local/CI tests)
+/media/
+
 # macOS-specific files
 .DS_Store
 
@@ -42,3 +48,10 @@ docs/planning/local-prototype-image-fill-plan-v1.md
 .worktrees/
 .plan-snippets/
 tsconfig.plan-snippets.tsbuildinfo
+
+# subagent-driven-development scratch workspace (ledgers, briefs, review packages)
+.superpowers/
+
+# tests/content/migration.test.ts (Task 3.5): per-run temp migration output dirs. The suite always
+# rm -rf's these itself in afterAll; this is only a safety net for an interrupted/crashed run.
+tests/fixtures/payload-migrations/.tmp-*

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Play } from 'lucide-react';
-import type { ManufacturerGuideVideo } from '@/data/types';
+import type { ManufacturerGuideVideo } from '@/lib/content/domainTypes';
 
 /**
  * YouTube埋め込みのfacadeパターン。サムネイル＋再生ボタンのみを初期表示し、

@@ -161,8 +161,8 @@ const orphans = robots.filter((robot) => !matchedIds.has(robot.id));
 
 // ── シリーズ manifest（DEC-S08）────────────────────────────────────────────────
 //
-// 「A群14件」と「素の名前の親レコード7件」は別の走査で作られており一致しない。
-// 件数（191 か 192 か）と参照移行はこの manifest が確定するまで決められない。
+// 「A群15件」と「素の名前の親レコード7件」は別の走査で作られており一致しない。
+// 件数（Task 7の改名吸収3件を含む188）と参照移行はこの manifest が確定するまで決められない。
 // 手で数えずここで出す。
 section('シリーズ manifest（DEC-S08。移管元と参照を確定させる）');
 
@@ -230,14 +230,14 @@ for (const [maker, family] of SERIES_FAMILIES_A) {
       )
     : undefined;
 
-  seriesRows.push({ family, maker, existing, variants: variants.length });
+  seriesRows.push({ family, maker, existing, variants: variants.length, variantRows: variants });
 }
 
 const transferable = seriesRows.filter((row) => row.existing);
 for (const [maker, family] of SERIES_FAMILIES_B) {
   const candidates = familiesByMaker.get(maker) ?? [family];
   const variants = live.filter((row) => row.maker === maker && isVariantOf(row.model, family, candidates));
-  seriesRowsB.push({ family, maker, variants: variants.length });
+  seriesRowsB.push({ family, maker, variants: variants.length, variantRows: variants });
 }
 
 for (const row of seriesRows) {
@@ -249,6 +249,73 @@ for (const row of seriesRowsB) {
 }
 const transferableCount = transferable.length;
 console.log(`\n  A群 ${seriesRows.length} 件（移管 ${transferable.length} / 新規 ${seriesRows.length - transferable.length}） + B群 ${seriesRowsB.length} 件（すべて新規） = シリーズ計 ${seriesRows.length + seriesRowsB.length} 件`);
+
+// 総数29だけでは、あるSeriesの構成を別Seriesへ誤所属させても検知できない。
+// maker + familyごとの実測件数と、同じ行の重複所属が無いことも固定する。
+const EXPECTED_SERIES_VARIANT_COUNTS = new Map([
+  ['Booster Robotics\u0000T1', 3],
+  ['Booster Robotics\u0000K1', 3],
+  ['Booster Robotics\u0000T2', 3],
+  ['EngineAI\u0000T800', 4],
+  ['EngineAI\u0000PM01', 2],
+  ['Unitree Robotics\u0000G1-D', 2],
+  ['Unitree Robotics\u0000H2-D', 2],
+  ['UBTECH Robotics\u0000Walker Tienkung', 3],
+  ['AgiBot\u0000A2', 3],
+  ['NEURA Robotics\u00004NE1', 3],
+  ['Leju Robotics\u0000KUAVO 4PRO', 7],
+  ['Leju Robotics\u0000KUAVO 5', 5],
+  ['LimX Dynamics\u0000Oli', 3],
+  ['Noetix Robotics\u0000Bumi', 3],
+  ['Galaxea Dynamics\u0000R1', 2],
+  ['Unitree Robotics\u0000G1', 2],
+  ['Unitree Robotics\u0000H2', 2],
+  ['Unitree Robotics\u0000R1', 6],
+  ['Apptronik\u0000Apollo 2', 2],
+  ['AgiBot\u0000X2', 1],
+  ['UBTECH Robotics\u0000Walker S', 1],
+  ['Fourier Intelligence\u0000GR-3C', 2],
+  ['Leju Robotics\u0000KUAVO 5-W', 2],
+  ['PAL Robotics\u0000TIAGo', 2],
+  ['Deep Robotics\u0000DR02', 1],
+  ['MagicLab\u0000Z1', 1],
+  ['Noetix Robotics\u0000N2', 1],
+  ['Noetix Robotics\u0000E1', 1],
+  ['Humanoid\u0000HMND 01 ALPHA', 2],
+]);
+const allSeriesRows = [...seriesRows, ...seriesRowsB];
+const seriesCountMismatches = allSeriesRows.filter(
+  (row) => EXPECTED_SERIES_VARIANT_COUNTS.get(`${row.maker}\u0000${row.family}`) !== row.variants,
+);
+const membershipsByInputRow = new Map();
+for (const series of allSeriesRows) {
+  for (const variant of series.variantRows) {
+    const key = `${variant.maker}\u0000${variant.model}`;
+    const memberships = membershipsByInputRow.get(key) ?? [];
+    memberships.push(`${series.maker}/${series.family}`);
+    membershipsByInputRow.set(key, memberships);
+  }
+}
+const duplicateSeriesMemberships = [...membershipsByInputRow.values()].filter((memberships) => memberships.length > 1);
+
+// この3件は Task 7 が既存recordの改名で吸収するため、Task 9のcreate件数から引く。
+// family境界推定へ混ぜると Kaleido→Kaleido9 の数字境界や 4NE1/4NE1 Mini の最長一致で
+// 消えるため、期待する後継名を明示する。
+const RENAMED_BY_TASK_7 = new Map([
+  ['mentee-menteebotv3', 'MenteeBot V3'],
+  ['kawasaki-kaleido', 'Kaleido9'],
+  ['neura-4ne-1', '4NE1 Gen 3.5'],
+]);
+const renamedParents = orphans.flatMap((robot) => {
+  const expectedModel = RENAMED_BY_TASK_7.get(robot.id);
+  if (!expectedModel) return [];
+  const makerName = manufacturers.find((m) => m.id === robot.manufacturerId)?.name ?? '';
+  const variant = additions.find(
+    (row) => normalize(row.maker) === normalize(makerName) && normalize(row.model) === normalize(expectedModel),
+  );
+  return variant ? [{ robot, variants: [variant] }] : [];
+});
+const task9CreateCount = additions.length - renamedParents.length;
 
 // 移管対象を指している他コレクションの参照。ここが0にならないと Robot を消せない。
 const transferIds = new Set(transferable.map((row) => row.existing.id));
@@ -280,7 +347,7 @@ const inboundCount = inbound.length;
 console.log(`\n  移管対象IDを指す参照: ${inbound.length} 件（すべて移行先を決めるまで Robot を消せない）`);
 for (const line of inbound) console.log(`     ${line}`);
 
-console.log(`\n  完了時 robots = ${robots.length} − 移管${transferable.length} + 分割1 + 追加${additions.length} = ${robots.length - transferable.length + 1 + additions.length}`);
+console.log(`\n  完了時 robots = ${robots.length} − 移管${transferable.length} + 分割1 + Task 9 create(${additions.length}−改名吸収${renamedParents.length}) = ${robots.length - transferable.length + 1 + task9CreateCount}`);
 
 
 section('ロボット（計画 §3）');
@@ -289,10 +356,13 @@ allOk = checkExpectation('一致した行', matchedRows.length, 43) && allOk;
 allOk = checkExpectation('一致した Deploid レコード', matchedIds.size, 42) && allOk;
 allOk = checkExpectation('追加', additions.length, 134) && allOk;
 allOk = checkExpectation('Deploid 側で一致しない', orphans.length, 21) && allOk;
-// 移管分を引く。63 + 134 + 1 = 198 は誤り（Series へ移る6件を数え落とす）。
+// baseline追加候補134のうち3件はTask 7の既存record改名で吸収し、Task 9のcreateは131件。
 allOk = checkExpectation('A群のうち移管', transferableCount, 7) && allOk;
 allOk = checkExpectation('移管IDを指す参照', inboundCount, 20) && allOk;
-allOk = checkExpectation('完了時のレコード数', robots.length - transferableCount + 1 + additions.length, 191) && allOk;
+allOk = checkExpectation('完了時のレコード数', robots.length - transferableCount + 1 + task9CreateCount, 188) && allOk;
+allOk = checkExpectation('Seriesごとの構成件数不一致', seriesCountMismatches.length, 0) && allOk;
+allOk = checkExpectation('Series構成の重複所属', duplicateSeriesMemberships.length, 0) && allOk;
+allOk = checkExpectation('Seriesへ所属する原本行', membershipsByInputRow.size, 74) && allOk;
 
 // 1レコードに複数行が当たる = variant 分割が要る（§3、apptronik-apollo-2 の Biped / Wheeled）
 const rowsPerRecord = new Map();
@@ -310,26 +380,15 @@ if (needsSplit.length > 0) {
 // DEC-S08: シートに variant 行しか無いのに Deploid 側に素の名前の親レコードが残っていると、
 // 投入後に親と子が並存する（/robots に「T1」と「T1 Basic」…が並ぶ）。投入前に判断が要る。
 section("「素の名前」の親レコード（DEC-S08。variant 投入前に archived にする）");
-const parentsWithVariants = orphans
-  .map((robot) => ({
-    robot,
-    variants: additions.filter((row) => {
-      const makerName = manufacturers.find((m) => m.id === robot.manufacturerId)?.name ?? '';
-      if (normalize(row.maker) !== normalize(makerName)) return false;
-      const candidates = familiesByMaker.get(row.maker) ?? [robot.name ?? ''];
-      return isVariantOf(row.model, robot.name ?? '', candidates);
-    }),
-  }))
-  .filter((entry) => entry.variants.length > 0);
+const needsJudgement = transferable.map((series) => ({
+  robot: series.existing,
+  variants: series.variantRows,
+}));
 
-// この3件は Task 9 が「改名」で解決する（計画 §3.2 の「名前ずれ＝更新」「世代更新」）。
-// 素の名前が1つの後継名を指しているだけなので、DEC-S08 の3分岐にはかけない。
-const RENAMED_BY_TASK_9 = new Set(['mentee-menteebotv3', 'kawasaki-kaleido', 'neura-4ne-1']);
-
-const needsJudgement = parentsWithVariants.filter(({ robot }) => !RENAMED_BY_TASK_9.has(robot.id));
+const parentsWithVariants = [...needsJudgement, ...renamedParents];
 
 for (const { robot, variants } of parentsWithVariants) {
-  const tag = RENAMED_BY_TASK_9.has(robot.id) ? '  ← Task 9 で改名（DEC-S08 の対象外）' : '';
+  const tag = RENAMED_BY_TASK_7.has(robot.id) ? '  ← Task 7 で改名（DEC-S08 の対象外）' : '';
   console.log(`  ${robot.id}「${robot.name}」 ${robot.publishStatus}${tag}`);
   for (const variant of variants) {
     console.log(`     + ${variant.model.padEnd(34)} ${variant.specs.mobility ?? '-'}`);
@@ -337,6 +396,7 @@ for (const { robot, variants } of parentsWithVariants) {
 }
 console.log('');
 allOk = checkExpectation('DEC-S08 の判断が要る親レコード', needsJudgement.length, 7) && allOk;
+allOk = checkExpectation('Task 7 で改名する親レコード', renamedParents.length, 3) && allOk;
 allOk = checkExpectation('シリーズ計（A+B）', seriesRows.length + seriesRowsB.length, 29) && allOk;
 
 // DEC-S09: mobility は単一値なので、別カテゴリが1行に同居していると1つしか入らない。

@@ -1,4 +1,4 @@
-import type { Manufacturer } from '@/data/types';
+import type { Manufacturer } from '@/lib/content/domainTypes';
 import {
   resolveManufacturerLogo,
   type ManufacturerLogoVariant,

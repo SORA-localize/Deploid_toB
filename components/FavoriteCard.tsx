@@ -3,13 +3,13 @@
 import Link from 'next/link';
 import { X } from 'lucide-react';
 import { ManufacturerLogoName } from '@/components/ManufacturerLogoName';
-import type { ImageAsset, ManufacturerLogos, Robot } from '@/data/types';
+import type { ManufacturerLogos } from '@/lib/content/domainTypes';
+import type { CompareRobotViewModel } from '@/lib/viewModels/compare';
 import { uiText } from '@/lib/uiText';
 
 interface FavoriteCardProps {
-  robot: Robot;
+  robot: CompareRobotViewModel;
   manufacturerName?: string;
-  manufacturerLogo?: ImageAsset;
   manufacturerLogos?: ManufacturerLogos;
   onRemove: (id: string) => void;
   onSelect?: (id: string) => void;
@@ -18,7 +18,6 @@ interface FavoriteCardProps {
 export function FavoriteCard({
   robot,
   manufacturerName,
-  manufacturerLogo,
   manufacturerLogos,
   onRemove,
   onSelect,
@@ -50,7 +49,6 @@ export function FavoriteCard({
         </div>
         <ManufacturerLogoName
           name={manufacturerName ?? robot.manufacturerId}
-          logo={manufacturerLogo}
           logos={manufacturerLogos}
           variant="combined"
           className="text-xs text-muted-foreground"

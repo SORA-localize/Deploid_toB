@@ -1,15 +1,12 @@
 import Image from 'next/image';
 import { CameraOff } from 'lucide-react';
-import type { ImageAsset, ManufacturerLogos } from '@/data/types';
+import type { ManufacturerLogos } from '@/lib/content/domainTypes';
 import { getLogoBoxSize } from '@/lib/manufacturerLogoAspect';
 import { resolveManufacturerLogo, type ManufacturerLogoVariant } from '@/lib/manufacturerLogo';
 import type { CatalogLogo } from '@/lib/viewModels/shared';
 
 interface ManufacturerLogoNameProps {
   name: string;
-  /** @deprecated logos を渡すこと。単発の logo だけ渡された場合は combined 相当として扱う。
-   *  detail page（メーカー詳細・ロボット詳細等）はこちらを使い続ける。 */
-  logo?: ImageAsset;
   logos?: ManufacturerLogos;
   /** サーバー側で解決済みのロゴ。指定時は resolveManufacturerLogo を再実行せず
    *  このasset/resolvedVariantをそのまま描画する（catalog一覧カード向け）。 */
@@ -34,7 +31,6 @@ interface ManufacturerLogoNameProps {
 
 export function ManufacturerLogoName({
   name,
-  logo,
   logos,
   resolvedLogo,
   variant = 'combined',
@@ -49,7 +45,7 @@ export function ManufacturerLogoName({
 }: ManufacturerLogoNameProps) {
   const { asset: displayLogo, resolvedVariant } = resolvedLogo
     ? { asset: resolvedLogo.asset, resolvedVariant: resolvedLogo.resolvedVariant }
-    : resolveManufacturerLogo({ logo, logos }, variant);
+    : resolveManufacturerLogo({ logos }, variant);
   const { heightPx, widthPx } = getLogoBoxSize(displayLogo?.aspectRatio, targetAreaPx, {
     minHeightPx,
     maxHeightPx,

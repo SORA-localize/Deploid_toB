@@ -1,12 +1,12 @@
 'use client';
 
 import { Star, X } from 'lucide-react';
-import type { Robot } from '@/data/types';
+import type { CompareRobotViewModel } from '@/lib/viewModels/compare';
 import { uiText } from '@/lib/uiText';
 import { cn } from '@/lib/utils';
 
 interface MenuRobotButtonProps {
-  robot: Robot;
+  robot: CompareRobotViewModel;
   isSelected: boolean;
   isDisabled: boolean;
   /** お気に入り登録済み表示（表示のみ。誤タップ防止のため、この行から★の操作はさせない） */

@@ -1,4 +1,4 @@
-import type { ArticlePlacement, ArticlePlacementSlot } from '@/data/types';
+import type { ArticlePlacement, ArticlePlacementSlot } from '@/lib/content/domainTypes';
 import { byArticlePublishedDesc } from '@/lib/display';
 
 const reportsIndexSurface = 'reports-index';

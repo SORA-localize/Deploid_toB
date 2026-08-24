@@ -1,4 +1,9 @@
-import type { CandidateEvidenceBasis, DeploymentSite, UseCase } from '../../data/types.ts';
+// Task 6 fix round 1: CandidateEvidenceBasis/DeploymentSiteはlegacyとdomainで構造が完全に同一。
+// `UseCase.candidateRobots[].robotId` はdomain側でのみ optional（DEC-S08のseriesId候補向け）。
+// legacy `data/useCases.ts` は常に robotId を持つ実データしか作らないため、このファイルは
+// robotId が無い候補（seriesId候補）を「まだ検証対象外」として明示的にスキップする
+// （型を偽って必須扱いにはしない）。
+import type { CandidateEvidenceBasis, DeploymentSite, UseCase } from '../content/domainTypes.ts';
 import type { ContentSnapshot } from '../data/contentSnapshot.ts';
 import { isPublicUseCaseCandidateBasis } from '../useCaseEvidence.ts';
 import {
@@ -182,7 +187,7 @@ export function validateUseCases(snapshot: ContentSnapshot, collector: Validatio
       'useCase',
       u.slug,
       'candidateRobots.robotId',
-      u.candidateRobots.map((c) => c.robotId),
+      u.candidateRobots.map((c) => c.robotId).filter((robotId): robotId is string => robotId !== undefined),
     );
     if (u.publishStatus === 'published' && u.candidateRobots.length === 0) {
       collector.error(`[candidate-empty] useCase "${u.slug}".candidateRobots が空です`);
@@ -194,6 +199,17 @@ export function validateUseCases(snapshot: ContentSnapshot, collector: Validatio
       collector.error(`[candidate-public-empty] useCase "${u.slug}" に公開候補として使える candidateRobots がありません`);
     }
     u.candidateRobots.forEach((c, index) => {
+      if (c.robotId === undefined) {
+        // seriesId候補（DEC-S08）。legacy `data/useCases.ts` はまだこの形を作らないため
+        // 実データには現れないが、型としては起こりうる。robotId向けの参照チェックは
+        // 対象外にして、根拠チェック（basis/fit/evidence）だけ引き続き行う。
+        collector.error(
+          `[candidate-series-unsupported] useCase "${u.slug}".candidateRobots[${index}] は seriesId候補ですが、` +
+            'このvalidatorはlocal data向けでrobotId候補のみ対応しています',
+        );
+        checkUseCaseCandidateEvidence(collector, deploymentById, u, c, index);
+        return;
+      }
       checkReference({
         collector,
         kind: 'useCase',

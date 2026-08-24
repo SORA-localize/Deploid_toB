@@ -18,6 +18,31 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Payload CMS用のtest DB。本番/preview Supabaseには接続しない使い捨てcontainer。
+    # ローカルではCONTENT_SOURCE / DATABASE_URLごとに専用の開発DBを使う（本タスクの.env.local）。
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: payload_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/payload_test
+      # CI専用のダミー値。外部アカウントに紐づかず、この使い捨てDBの署名にのみ使う。
+      PAYLOAD_SECRET: bd7e747183c90fe80ff7b8136607362ffe54d9e6c2fbd42a
+      # `.env.example`のローカル既定値と同じ。`npm run check`内の`npm run build`が
+      # `getContentRepository()`（`lib/content/getContentRepository.ts`）経由でこれを要求する
+      # （未設定だとthrow）。このjobはcontent:importを実行しないため、Postgres側の実contentに
+      # 依存しない`local`（`data/*.ts`）を使う。
+      CONTENT_SOURCE: local
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -25,6 +50,37 @@ jobs:
           node-version: 22.12.0
           cache: npm
       - run: npm ci
+      # Task 3.5: schema drift check. Detects "a collections/*.ts (or globals/, or
+      # lib/payload/*.ts) change landed without a matching committed migration" — the failure
+      # mode `payload:migrate:status` below cannot see, since status only reads the already-
+      # generated migration files' applied/unapplied state, not whether the current schema config
+      # still matches the last generated migration. `--skip-empty` makes migrate:create exit 0
+      # with no file when there's no diff, instead of blocking on an interactive
+      # "create a blank migration?" prompt CI has no stdin to answer (confirmed by reading
+      # @payloadcms/drizzle's buildCreateMigration.js: `if (skipEmpty) { process.exit(0) }`).
+      - name: Schema drift check (migrate:create --skip-empty)
+        run: |
+          npm run payload:migrate:create -- __drift_check --skip-empty 2>&1 | tee /tmp/drift.log
+          if ls migrations/*__drift_check* >/dev/null 2>&1; then
+            echo "schema drift: a collections/globals/lib change has no matching committed migration"
+            rm -f migrations/*__drift_check*
+            exit 1
+          fi
+      # Apply committed migrations to this job's fresh Postgres service container *before*
+      # anything that reads/writes content data. `npm run check` (below) runs `npm run test`,
+      # which calls `getPayload()` — without a migrated schema first, Payload's dev-mode schema
+      # auto-push would create it instead, defeating the point of committed migrations
+      # (`vitest.config.ts` documents this same dependency). This mirrors the production deploy
+      # sequence (`docs/reference/database-migration-runbook-v1.md`): migrate before anything else.
+      - run: npm run payload:migrate
+      # Detects "a migration was committed but never applied" as a distinct failure mode from the
+      # drift check above (which only looks at whether a migration *file* exists for the current
+      # schema, not whether it ran). In this job the preceding `payload:migrate` step already
+      # applies every committed migration unconditionally, so this step is primarily a readable
+      # log of the applied migration state and a safety net against a future reordering of these
+      # steps — its stronger gate is `payload:migrate` itself exiting non-zero on any failed
+      # migration (Payload does not catch that error, so the process exits non-zero).
+      - run: npm run payload:migrate:status
       - run: npx playwright install --with-deps chromium
       - run: npm run check
       - uses: actions/upload-artifact@v7

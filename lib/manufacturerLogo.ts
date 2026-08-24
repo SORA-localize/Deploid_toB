@@ -1,4 +1,4 @@
-import type { ImageAsset, ManufacturerLogos } from '@/data/types';
+import type { ImageAsset, ManufacturerLogos } from '@/lib/content/domainTypes';
 import { canDisplayAsset } from '@/lib/media';
 
 export type ManufacturerLogoVariant = 'symbol' | 'wordmark' | 'combined';

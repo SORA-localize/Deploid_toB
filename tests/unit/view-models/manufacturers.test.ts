@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { getManufacturers, getRobots } from '@/lib/data';
+import { filterPublished } from '@/lib/content/createContentRepository';
+import { toDomainContentSnapshot } from '@/lib/content/localSource';
+import { localContentSnapshot } from '@/lib/data/localContentSnapshot';
 import { normalizeSearchText } from '@/lib/normalizeSearchText';
 import { createManufacturerCatalogItems } from '@/lib/viewModels/manufacturers';
 
+// Task 6: `@/lib/data`（削除済み）の代わりに、localSource.tsと同じlegacy→domain変換を通した
+// fixtureを使う（createManufacturerCatalogItemsは純粋関数のためrepository/DBは不要）。
+const snapshot = toDomainContentSnapshot(localContentSnapshot);
+const manufacturers = filterPublished(snapshot.manufacturers);
+const robots = filterPublished(snapshot.robots);
+
 describe('manufacturer catalog view models', () => {
   it('exclude editorial evidence and full domain records', () => {
-    const json = JSON.stringify(createManufacturerCatalogItems(getManufacturers(), getRobots()));
+    const json = JSON.stringify(createManufacturerCatalogItems(manufacturers, robots));
     expect(json).not.toContain('"sources"');
     expect(json).not.toContain('"headquarters"');
     expect(json).not.toContain('"description"');
@@ -15,10 +23,10 @@ describe('manufacturer catalog view models', () => {
   });
 
   it('excludes body text values, not just their keys', () => {
-    const items = createManufacturerCatalogItems(getManufacturers(), getRobots());
+    const items = createManufacturerCatalogItems(manufacturers, robots);
     const haystack = normalizeSearchText(items.map((item) => item.filter.searchText).join(' '));
 
-    for (const manufacturer of getManufacturers()) {
+    for (const manufacturer of manufacturers) {
       const bodyValues = [
         manufacturer.description,
         manufacturer.distributorNote,

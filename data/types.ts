@@ -1,6 +1,16 @@
 /**
  * Deploid data model.
  * `data/*.ts`, validation, and future CMS schemas derive from these types.
+ *
+ * **Compatibility boundary (content-platform-migration-plan-v1 Task 3):** this file is the
+ * legacy type surface for the local `data/*.ts` content source only. It still carries fields
+ * that Payload's canonical schema no longer has (e.g. `Robot.buyerReadiness` /
+ * `marketAvailability` / `safetyNote` / `vendorRiskNote`, removed in `collections/Robots.ts` per
+ * `robot-data-import-plan-v1.md` DEC-S05/S06). The permanent, cutover-era contract is
+ * `lib/content/domainTypes.ts`; that file does not import from here on purpose, so it keeps
+ * working once this file is retired at the end of the migration. Do not add new consumers that
+ * depend on the 4 removed fields — `lib/catalog/search.ts`'s existing use of `buyerReadiness` is
+ * fixed in Task 6 when pages switch to the repository/domain layer, not here.
  */
 import type { RobotSpecsFromSchema, SpecKey } from '@/lib/specSchema';
 import type { TagValue } from '@/lib/tagRegistry';

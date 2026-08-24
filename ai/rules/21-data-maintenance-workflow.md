@@ -1,15 +1,35 @@
 # Data Maintenance Workflow
 
-Use this file after `20-data.md` when adding or updating records in `data/*.ts`.
+Use this file after `20-data.md` when adding or updating content records.
 
-This gate is specific to Deploid's data layer:
+This gate covers Deploid's 9 editable content collections plus the `site-settings` global, as defined in
+[`../../docs/decisions/content-platform-and-database-architecture-v2.md`](../../docs/decisions/content-platform-and-database-architecture-v2.md) §5.1:
 
-- `data/robots.ts`
-- `data/manufacturers.ts`
-- `data/articles.ts`
-- `data/useCases.ts`
-- `data/deployments.ts`
-- `data/articlePlacements.ts`
+- `manufacturers` — today: `data/manufacturers.ts`
+- `distributors` — new in Payload; no `data/*.ts` predecessor
+- `robot-series` — new in Payload; no `data/*.ts` predecessor
+- `robots` — today: `data/robots.ts`
+- `use-cases` — today: `data/useCases.ts`
+- `deployments` — today: `data/deployments.ts`
+- `articles` — today: `data/articles.ts`
+- `article-placements` — today: `data/articlePlacements.ts`
+- `media` — new in Payload; today, image metadata lives inline on the owning record
+- `site-settings` (global, not a collection) — new in Payload; today, values such as `dataAsOf` live in `lib/site.ts`
+
+`admins` (Payload Admin user accounts, §7.3 role enum) is out of scope for this gate — it is an
+authentication/authorization concern, not a content-editing workflow.
+
+**Edit destination**: until the Payload CMS / managed Postgres cutover completes, edit the `data/*.ts`
+files above — see the Current Work Posture note in `ai/rules/00-index.md`. After cutover, edit the
+same collections through Payload (Admin UI, Local API, REST, or MCP) instead; `data/*.ts` is deleted
+per `content-platform-and-database-architecture-v2.md` §10, migration principle 8.
+
+**Codex MCP (Task 8)**: a Payload MCP server exists (`lib/payload/mcp.ts`, workflow documented in
+`.codex/content-workflow.md`) for the Payload side of the migration. It is not yet the edit
+destination for ordinary content work — `data/*.ts` still is, per the paragraph above. MCP write
+access is scoped to `content-draft-writer` (create/update draft only); publishing still requires a
+human `content-publisher` going through `publishApprovedVersion()`, and `admins` /
+`payload-mcp-api-keys` are never exposed to MCP.
 
 Purpose: let an AI agent add or update records without breaking the `id` / `slug` model, source requirements, registry usage, or image-rights rules.
 

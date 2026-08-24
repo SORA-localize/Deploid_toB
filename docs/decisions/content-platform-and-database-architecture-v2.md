@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-07-26
+updated: 2026-08-09
 ---
 
 # コンテンツ基盤・DBアーキテクチャ v2
@@ -12,7 +12,8 @@ Deploid のコンテンツ基盤は、現在の `data/*.ts` を正本とする G
 - **CMS**: Payload CMS
 - **データベース**: マネージド Postgres
 - **初期DB候補**: Supabase Postgres
-- **画像・バイナリ**: Vercel Blob または S3 互換オブジェクトストレージ
+- **画像・バイナリ**: Vercel Blob または S3 互換オブジェクトストレージ。公開Mediaと
+  非公開の監査・バックアップはstoreを分離し、PreviewとProductionでも資格情報を共有しない
 - **公開アプリ**: 現行 Next.js App Router
 - **開発・変更管理**: GitHub
 - **AI操作**: Payload MCP / Payload API を経由した Codex
@@ -26,6 +27,8 @@ Deploid のコンテンツ基盤は、現在の `data/*.ts` を正本とする G
 - `architecture_future_considerations_v1.md` の「CMS/DB移行は将来条件を満たしてから検討する」という判断
 
 旧文書の id/slug 分離、参照ID、出典、権利、公開状態、検証に関するデータモデル判断は引き続き有効である。
+ただし移行時のURL契約は本書 §10 を優先する。①の保存先変更は `slug` / `previousSlugs` / 公開URLを
+維持し、waiverは②で明示したSeries cutover等の承認済み変換だけに限定する。
 
 ---
 
@@ -83,6 +86,8 @@ Next.js + Payload CMS
           ▼
 Managed Postgres
 ├─ manufacturers
+├─ distributors
+├─ robot_series
 ├─ robots
 ├─ use_cases
 ├─ deployments
@@ -93,7 +98,11 @@ Managed Postgres
 └─ 将来の app_* テーブル
 
 Object Storage
-└─ 画像・ロゴ・添付ファイル
+├─ Production public media store
+├─ Production private audit / backup store
+├─ Preview public media store
+├─ Preview private audit / backup store
+└─ CI / test fake or local store
 ```
 
 ### 2.1. 単一の正本
@@ -107,6 +116,8 @@ Object Storage
 | タグ・状態の意味 | 原則GitHub | プログラム分岐に使うenumはコード管理 |
 | 編集者が追加する分類 | Postgres | UIから増やす必要がある分類のみcollection化 |
 | 画像メタデータ・権利 | Postgres | バイナリ本体はobject storage |
+| cutover snapshot・DB変更before-image | private object storage | Gitには署名・hash・object key・件数の要約だけを置く |
+| import用raw/正規化成果物 | private archiveまたはアクセス制限されたGit archive | Postgres移行後の運用SoTにはせず、provenance・入力hash・保持期限を付ける |
 | UI token・コンポーネント文言 | GitHub | 編集コンテンツとは分離 |
 | 調査raw成果物 | GitHub | `docs/decisions/data/research/` を継続 |
 | 将来のユーザー状態 | Postgres | CMSコンテンツとはテーブル責務を分ける |
@@ -164,6 +175,8 @@ SupabaseはDB基盤として使うが、Table Editorをコンテンツ編集UI�
 | Collection / Global | 主な内容 |
 |---|---|
 | `manufacturers` | メーカー、供給体制、国内窓口、ロゴ |
+| `distributors` | 国内提供事業者。メーカー・取扱機種との多対多関係 |
+| `robot-series` | 製品ファミリ。スペック・価格を持たず、買える構成は`robots`が保持 |
 | `robots` | 機体、スペック、価格、荷重、画像、比較材料 |
 | `use-cases` | 用途、必要能力、候補機体、evidence |
 | `deployments` | 実在導入事例、顧客、場所、関連用途 |
@@ -171,7 +184,16 @@ SupabaseはDB基盤として使うが、Table Editorをコンテンツ編集UI�
 | `article-placements` | reports/homeの掲載枠 |
 | `media` | 画像、ロゴ、権利情報、出典 |
 | `site-settings` | `dataAsOf` など、コレクションに属さない編集対象の運用設定 |
-| `admins` | 管理画面ユーザー、editor/adminロール |
+| `admins` | 管理画面ユーザー、§7.3の正式role enum |
+
+`robots`と`robot-series`が共有する`/robots/:slug`は、Git管理migrationで作る
+`content_route_registry(namespace, slug, owner_collection, owner_stable_id)`を正本にし、
+`UNIQUE(namespace, slug)`で一意性を保証する。両collectionのcreate / slug変更 / delete hookは
+同じDB transaction内でclaim / move / releaseし、collection横断の事前検索だけに依存しない。
+
+Payload Draftsの`_status`は`draft|published`だけなので、domainの`draft|published|archived`は
+`_status`と`lifecycleStatus: active|archived`の組で表す。archivedは`published + archived`として
+旧URLの詳細表示を許し、一覧・検索からrepositoryが除外する。custom `publishStatus` fieldは作らない。
 
 ### 5.2. Git管理を継続するもの
 
@@ -234,8 +256,8 @@ Client Componentへは、レコード全体ではなく画面に必要なview mo
 2. 既存レコードを編集またはdraftを作成
 3. フィールド検証と関連参照を確認
 4. previewで公開表示を確認
-5. editorがレビュー依頼
-6. publisher/adminが公開
+5. `content-draft-writer` がレビュー依頼
+6. `content-publisher` または `platform-admin` が公開
 
 ### 7.2. Codex
 
@@ -248,14 +270,35 @@ Client Componentへは、レコード全体ではなく画面に必要なview mo
 
 ### 7.3. 権限
 
+正式なrole enumは次の4値だけとする。
+
+```ts
+type ContentRole =
+  | 'content-reader'
+  | 'content-draft-writer'
+  | 'content-publisher'
+  | 'platform-admin';
+```
+
+旧文書・UI文言の `editor` / `publisher` / `admin` はそれぞれ
+`content-draft-writer` / `content-publisher` / `platform-admin` の表示上の旧称であり、DB値・API入力・
+MCP API keyには保存しない。
+
 | Profile | 許可 | 禁止 |
 |---|---|---|
 | `content-reader` | find/read | create/update/delete/publish |
 | `content-draft-writer` | find/create/update draft | delete/publish/schema/admin |
-| `content-publisher` | draft review/publish | schema/admin |
+| `content-publisher` | find/create/update draft、publish、unpublish | delete/schema/admin |
 | `platform-admin` | 全CMS操作 | 本番SQL直接操作は通常運用で使わない |
 
 通常のCodexセッションは `content-draft-writer` を使用する。
+Admin UI、Local API、REST、MCPのどの入口でも同じcollection accessと`beforeChange`を通す。
+特に `content-draft-writer` が `_status: 'published'` を送る操作は、update権限があってもhookで拒否する。
+Local APIは原則 `overrideAccess: false` と認証済み`user`を指定する。
+
+Draft Modeは、Payloadへログイン済みの上記role、または短寿命・単回使用・署名付きtokenでのみ有効化する。
+tokenは期限、nonce、改ざんを検証し、redirectは同一originのallowlistに制限する。draftの取得側でも
+閲覧権限を再検査し、Draft Mode cookieだけを認可根拠にしない。
 
 ---
 
@@ -285,13 +328,19 @@ Client Componentへは、レコード全体ではなく画面に必要なview mo
 - 件数増加後はPayload/Postgres側で検索・ページングする
 
 検索文字列ごとの無制限cache entryは作らない。
+各view modelが読むcollection集合をGit上のdependency tableで管理し、publish hookの無効化先と
+同じ表から導出する。主collectionだけでなく、Robot詳細が読むUseCase、Manufacturer詳細が読む
+Article / UseCaseなどの逆方向依存も含め、統合テストで表と実装の差分を検出する。
 
 ---
 
 ## 10. 移行原則
 
-1. `id` と `slug` を変更しない
-2. 公開URLを変更しない
+1. `id`は変更しない。RobotをRobotSeriesへ型移行する場合も同じstableIdを移管先が継承し、
+   新IDへの対応付けで代替しない
+2. ①の保存先移行では `slug` / `previousSlugs` / 公開URLを変更せずparity対象にする。②のSeries
+   cutover等、計画内で旧URL・新URL・301または同一URL継承を列挙し、人間が承認した変換だけを
+   URL waiverとして許す。包括的な「URL維持不要」というwaiverは認めない
 3. 旧TSとDBを恒久的に二重更新しない
 4. 移行期間はlocal/payloadを切り替えられるが、書き込み元は常に一方だけにする
 5. importerは再実行可能にする
@@ -300,6 +349,11 @@ Client Componentへは、レコード全体ではなく画面に必要なview mo
 8. 切替後は `data/*.ts` を削除し、rollback用exportは一時artifactとして保管する
 9. schema変更はmigrationをGitレビューしてから適用する
 10. 本番データ変更は監査履歴を残す
+11. `_environment_marker` を含む全DB schemaはGit管理migrationで作り、手動DDLを正本にしない
+12. public mediaとprivate audit/backupはstoreを分け、Preview資格情報からProduction storeへ
+    read/write/delete/restoreできないことを機械検証する
+13. transactional outboxのbefore-imageは署名鍵と別のKMS keyでenvelope encryptionし、暗号文・nonce・
+    auth tag・encrypted data key・key versionだけをDBへ置く。rotation後も保持期間内の旧artifactを復号する
 
 実装手順は `../plans/content-platform-migration-plan-v1.md` を正本とする。
 
@@ -308,9 +362,13 @@ Client Componentへは、レコード全体ではなく画面に必要なview mo
 ## 11. 未確定事項
 
 次の項目は実装開始時に、無料枠・既存Vercel契約・必要な権限を確認して確定する。アーキテクチャ判断そのものは変えない。
+外部リソースの割当先と、本書・`data-architecture-redesign-v1.md` に対する human approval の記録
+（承認者・commit SHA・承認日時）は [`content-platform-resources-v1.md`](../reference/content-platform-resources-v1.md)
+の Decision Log / External Resources に残す。
 
 - Postgres提供者の最終選択（初期値はSupabase）
 - object storage提供者（初期値はVercel Blob）
+- Production / Previewごとのpublic media store・private audit/backup storeの契約、費用、責任者
 - Payload Cloudを利用するか、現行Vercelへ同居させるか
 - preview URLと承認ロールの詳細
 - 将来の公開ユーザー認証方式

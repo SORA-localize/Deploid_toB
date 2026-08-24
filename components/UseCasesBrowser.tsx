@@ -9,7 +9,7 @@ import { PageListHeader } from '@/components/PageListHeader';
 import { EmptyState } from '@/components/EmptyState';
 import { UseCaseCard } from '@/components/UseCaseCard';
 import { UseCasesHeader } from '@/components/UseCasesHeader';
-import type { UseCaseMaturity } from '@/data/types';
+import type { UseCaseMaturity } from '@/lib/content/domainTypes';
 import { createUseCaseSearchIndex, searchUseCaseSlugs } from '@/lib/searchIndex';
 import { maturityLabels } from '@/lib/labels';
 import { SearchInput } from '@/components/SearchInput';

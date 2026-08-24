@@ -1,4 +1,4 @@
-import type { DeploymentStage } from '@/data/types';
+import type { DeploymentStage } from '@/lib/content/domainTypes';
 import { isPreReleaseDeploymentStage, japanAvailabilityOrder, sortByDisplayOrder } from '@/lib/display';
 import { matchesTag, normalizeTagKey, toTagOptions } from '@/lib/tags';
 import { isOneOf } from '@/lib/typeGuards';

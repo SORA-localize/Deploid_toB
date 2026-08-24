@@ -1,6 +1,7 @@
 // collection横断の同一性・表示可能性の土台。
 // 参照整合は不変 id で取る（slug は可変URLであり外部キーではない）。
-import type { DeploymentSite } from '../../data/types.ts';
+// Task 6 fix round 1: DeploymentSiteはlegacyとdomainで構造が完全に同一。
+import type { DeploymentSite } from '../content/domainTypes.ts';
 import type { ContentSnapshot } from '../data/contentSnapshot.ts';
 import {
   articleCategoryOrder,

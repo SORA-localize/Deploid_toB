@@ -1,4 +1,4 @@
-import type { ImageAsset, RightsStatus } from '@/data/types';
+import type { ImageAsset, RightsStatus } from '@/lib/content/domainTypes';
 
 export type MediaUsagePolicy = 'commercial-strict' | 'reference-attributed' | 'prototype';
 

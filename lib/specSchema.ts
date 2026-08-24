@@ -4,7 +4,7 @@
 //
 // 注意: lib/validate.ts 経由で Node が直接実行するため erasable syntax のみ
 // （enum / namespace 禁止。runtime import は相対 .ts パスのみ）。
-import type { MobilityType } from '../data/types.ts';
+import type { MobilityType } from '@/lib/content/domainTypes';
 
 /** 詳細ページのスペック表のセクション分類（設計 §8-2） */
 export type SpecGroup =
@@ -51,7 +51,7 @@ export const specSchema = [
 
 export type SpecKey = (typeof specSchema)[number]['key'];
 
-/** kind → 値の型。RobotSpecs（data/types.ts）はここから導出される */
+/** kind → 値の型。RobotSpecs（lib/content/domainTypes.ts）はここから導出される */
 interface SpecValueByKind {
   number: number;
   runtime: number;
