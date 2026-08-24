@@ -10,9 +10,9 @@ import { securityHeaders } from './lib/securityHeaders';
  */
 const nextConfig: NextConfig = {
   cacheComponents: true,
-  // Payload config imports sharp for Media processing. Keep the native module
-  // outside the Turbopack bundle so the runtime resolves the platform-specific
-  // @img/sharp-* optional dependency installed by Vercel.
+  // Next.js image optimization uses Sharp. Keep the native module outside the
+  // Turbopack bundle so the runtime resolves the platform-specific @img/sharp-*
+  // optional dependency installed by Vercel.
   serverExternalPackages: ['sharp'],
   outputFileTracingIncludes: {
     // `contains: true` is used by Next's route matcher. `!(/**)` is therefore
