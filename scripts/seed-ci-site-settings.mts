@@ -29,6 +29,8 @@ async function main(): Promise<void> {
   } finally {
     await payload.destroy();
   }
+  // Keep this one-shot CI helper from leaving a driver/socket handle alive.
+  process.exit(0);
 }
 
 await main();
