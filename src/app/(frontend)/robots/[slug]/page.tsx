@@ -35,7 +35,8 @@ export async function generateStaticParams() {
   // archived も詳細ページは残す（「提供終了」表示。一覧・比較には出ない）
   const repository = await getContentRepository();
   const robots = await repository.listRobotsForDetail();
-  return robots.map((robot) => ({ slug: robot.slug }));
+  const params = robots.map((robot) => ({ slug: robot.slug }));
+  return params.length > 0 || process.env.CI !== 'true' ? params : [{ slug: '__ci_empty__' }];
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {

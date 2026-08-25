@@ -28,7 +28,8 @@ import { createRobotCatalogItems, type RobotCatalogItem } from '@/lib/viewModels
 export async function generateStaticParams() {
   const repository = await getContentRepository();
   const manufacturers = await repository.listAllPublishedManufacturers();
-  return manufacturers.map((manufacturer) => ({ slug: manufacturer.slug }));
+  const params = manufacturers.map((manufacturer) => ({ slug: manufacturer.slug }));
+  return params.length > 0 || process.env.CI !== 'true' ? params : [{ slug: '__ci_empty__' }];
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {

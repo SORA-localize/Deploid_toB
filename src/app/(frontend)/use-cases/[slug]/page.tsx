@@ -32,7 +32,8 @@ import { getUseCaseCandidateEvidenceByRobotId } from '@/lib/useCaseEvidence';
 export async function generateStaticParams() {
   const repository = await getContentRepository();
   const useCases = await repository.listAllPublishedUseCases();
-  return useCases.map((u) => ({ slug: u.slug }));
+  const params = useCases.map((u) => ({ slug: u.slug }));
+  return params.length > 0 || process.env.CI !== 'true' ? params : [{ slug: '__ci_empty__' }];
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
