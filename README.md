@@ -4,8 +4,8 @@
 
 - **スタック**: Next.js 16 (App Router) / React 19 / TypeScript / Tailwind CSS v4
 - **デプロイ**: Vercel
-- **データ（現在）**: ローカル TS データ（`data/*.ts`）。Payload CMS + managed PostgreSQLへの移行前
-- **移行後の構成**: Payload管理画面 / PostgreSQL / オブジェクトストレージ / 制限付きCodex MCP
+- **データ（現在）**: Payload CMS / managed PostgreSQL（Task 9 cutover完了）
+- **構成**: Payload管理画面 / PostgreSQL / オブジェクトストレージ / 制限付きCodex MCP
 - **AI作業ルール**: `AGENTS.md` → `ai/rules/00-index.md`
 - **設計ドキュメント**: `docs/`（まず `docs/README.md`）
 - **CMS / DB判断**: `docs/decisions/content-platform-and-database-architecture-v2.md`
@@ -22,7 +22,6 @@
 | `npm run dev` | `localhost:3000` で開発サーバ |
 | `npm run build` | 本番ビルド（SSG） |
 | `npm run start` | ビルド結果をローカル起動 |
-| `npm run validate:data` | データ整合チェックのみ実行 |
 | `npm run check` | 全ゲートを通す（CIと同じ） |
 | `npm run check:dead-code` | 未使用ファイル・依存の検査（knip） |
 | `npm run check:docs` | Markdown のローカルリンク切れ検査 |
@@ -66,7 +65,7 @@ ignore が溜まると、この gate は「何も見つけない gate」にな�
 - `fix/<issue>`: 表示崩れ、検証エラー、SEO設定などの小さな修正用
 - `experiment/<name>`: UI、導線、広告枠などの検証用。採用しない前提でいつでも捨てられるようにする
 
-CMS / DBのcutover完了までは、通常のデータ・記事更新を `content/data-maintenance` で行い、`npm run validate:data` と必要に応じて `npm run build` を通してから `main` に戻す。
+通常のデータ・記事更新はPayload管理画面または認証済みPayload API/MCP経路で行い、必要に応じてsnapshot integrity checkと`npm run build`を通してから`main`へ反映する。
 大きめの変更は `content/<topic>` や `fix/<issue>` を `main` から切り、完了後に `main` へmergeする。
 
 ## 環境変数

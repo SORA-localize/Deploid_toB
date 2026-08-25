@@ -32,17 +32,16 @@ The current source-of-truth map is `docs/README.md`. Treat `docs/decisions/` as 
 ## Current Work Posture / 現在の作業方針
 
 - The Next.js migration and major UI refactor are complete.
-- A project-wide refactor and a Payload CMS + managed PostgreSQL migration are planned but not implemented. Read `docs/decisions/content-platform-and-database-architecture-v2.md`, `docs/plans/content-platform-migration-plan-v1.md`, and `docs/plans/project-wide-refactor-roadmap-v2.md` before starting that work.
-- Until the CMS / DB cutover is complete, `data/*.ts`, `data/types.ts`, and `lib/data.ts` remain the operational source of truth. Do not write the same records to both Git and PostgreSQL as co-equal sources of truth.
-- For ordinary maintenance before cutover, prefer minimal changes that follow the existing `data/`, `lib/`, and component responsibilities.
+- The Payload CMS + managed PostgreSQL cutover is complete. Payload/PostgreSQL is the sole operational content source; the former `data/*.ts` and local adapter were removed in Task 9.
+- Content changes must use the Payload editorial/API workflow. Do not recreate or maintain a second Git-backed content source.
 - Treat use cases cautiously while first-party evidence is thin; do not mass-produce thin pages. / use-cases は一次情報が薄い間は慎重に扱い、薄いページを量産しない。（guides タイプは撤去済み: `docs/archive/guides-retirement-v1.md`）
 - Confirm with the user before changing scope, product direction, or standing policy. / スコープや方針を変える前に必ずユーザーに確認する。
 
 Code-level truth wins over prose when the two differ:
 
-- Data types: `data/types.ts`
-- Data access and related-record resolution: `lib/data.ts`
-- Data validation: `lib/validate.ts` and `scripts/validate-data.mjs`
+- Data types and mapping: `lib/content/domainTypes.ts`, `lib/content/payloadMappers.ts`
+- Data access and related-record resolution: `lib/content/payloadSource.ts`, `lib/content/createContentRepository.ts`
+- Data validation: Payload schema, migrations, and `scripts/verify-content-snapshot.mts`
 - Tags: `lib/tagRegistry.ts`
 - Spec keys: `lib/specSchema.ts`
 - Labels and display order: `lib/labels.ts`, `lib/display.ts`
