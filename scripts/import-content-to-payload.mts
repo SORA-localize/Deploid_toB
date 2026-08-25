@@ -1407,7 +1407,7 @@ async function main(): Promise<void> {
   if (args.has('help')) {
     process.stdout.write(
       [
-        'content:import — local TS (`data/*.ts`) の content を Payload へ冪等 upsert する。',
+        'content:import — retired after the Production cutover. Use content:restore with a signed snapshot.',
         '',
         '  --dry-run                     DBへ一切触れずに snapshot だけで計画を検証・集計する',
         '  --allow-network-media         rights 確認済みの外部画像を実際に fetch する',
