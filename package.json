@@ -20,7 +20,7 @@
     "check:home-payload": "node scripts/check-home-payload.mjs",
     "check:bundle-content": "node --experimental-strip-types scripts/check-client-bundle-content.mjs",
     "check:plan-snippets": "node scripts/check-plan-snippets.mjs",
-    "check:dead-code": "knip",
+    "check:dead-code": "node scripts/run-knip-retry.mjs",
     "check:docs": "node scripts/check-doc-links.mjs",
     "write:refactor-results": "node scripts/write-refactor-results.mjs",
     "check:client-budgets": "node scripts/check-client-budgets.mjs",
