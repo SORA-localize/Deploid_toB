@@ -8,10 +8,9 @@
   "scripts": {
     "postinstall": "patch-package",
     "dev": "next dev",
-    "build": "node --experimental-strip-types scripts/validate-data.mjs && next build",
-    "vercel-build": "node scripts/fetch-cosign-binary.mjs && node --experimental-strip-types scripts/validate-data.mjs && next build && npm run check:audit-upload-traces",
+    "build": "next build",
+    "vercel-build": "node scripts/fetch-cosign-binary.mjs && next build && npm run check:audit-upload-traces",
     "start": "next start",
-    "validate:data": "node --experimental-strip-types scripts/validate-data.mjs",
     "build:data-r01-manifest": "node --experimental-strip-types scripts/build-data-r01-manifest.mjs",
     "build:data-r02-manifest": "node --experimental-strip-types scripts/build-data-r02-manifest.mjs",
     "parse:robot-db": "node --experimental-strip-types scripts/parse-robot-db.ts",
@@ -47,7 +46,7 @@
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:e2e": "playwright test",
-    "check": "npm run validate:data && npm run check:data-boundaries && npm run check:publish-authorization-boundaries && npm run check:client-imports && npm run check:world-map-asset && npm run typecheck && npm run lint && npm run check:plan-snippets && npm run check:dead-code && npm run check:docs && npm run test && npm run build && npm run check:home-payload && npm run check:bundle-content && npm run check:client-budgets && npm run test:e2e"
+    "check": "npm run check:data-boundaries && npm run check:publish-authorization-boundaries && npm run check:client-imports && npm run check:world-map-asset && npm run typecheck && npm run lint && npm run check:plan-snippets && npm run check:dead-code && npm run check:docs && npm run test && npm run build && npm run check:home-payload && npm run check:bundle-content && npm run check:client-budgets && npm run test:e2e"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

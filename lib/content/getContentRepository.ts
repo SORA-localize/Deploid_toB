@@ -12,25 +12,14 @@
  * （Task 5以降）。
  */
 import { createContentRepository, type ContentRepository } from './createContentRepository';
-import { createLocalContentSource } from './localSource';
 import { createPayloadContentSource } from './payloadSource';
 
 export async function getContentRepository() {
   const sourceName = process.env.CONTENT_SOURCE;
-  if (sourceName !== 'local' && sourceName !== 'payload') {
-    throw new Error(`CONTENT_SOURCE must be local or payload; received ${String(sourceName)}`);
+  if (sourceName !== 'payload') {
+    throw new Error(`CONTENT_SOURCE must be payload after the Production cutover; received ${String(sourceName)}`);
   }
-  if (
-    process.env.VERCEL_ENV === 'production' &&
-    sourceName === 'local' &&
-    process.env.ALLOW_LOCAL_CONTENT_ROLLBACK !== 'true'
-  ) {
-    throw new Error('local content is disabled in production outside the approved rollback window');
-  }
-  const source = sourceName === 'payload'
-    ? createPayloadContentSource()
-    : createLocalContentSource();
-  return createContentRepository(source);
+  return createContentRepository(createPayloadContentSource());
 }
 
 export type { ContentRepository };

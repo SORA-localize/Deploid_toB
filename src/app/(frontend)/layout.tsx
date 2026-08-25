@@ -12,15 +12,7 @@ import {
   defaultSocialDescription,
 } from '@/lib/metadata';
 import { siteUrl } from '@/lib/site';
-import { runValidationInDev } from '@/lib/validate';
 import './globals.css';
-
-// dev時のみ：local data（data/*.ts）の参照整合（存在しないid参照・双方向のズレ・id/slug重複）を
-// consoleで通知する。以前は `lib/data.ts` がページから毎回importされることで暗黙に1回だけ
-// 呼ばれていたが、Task 6でページがrepository経由に切り替わり `lib/data.ts` を削除したため、
-// 全ページ共通の入口であるroot layoutへ移した（CONTENT_SOURCEに関わらず、gitの`data/*.ts`が
-// 壊れていないかを見るdevツールのため、sourceの選択とは独立）。
-runValidationInDev();
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
