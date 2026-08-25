@@ -45,8 +45,9 @@ Production（project ref `xtklkavbirorelqdyqjj`）に対して実行する前の
    deploymentで成功確認済み）も同文書参照。**route本体は実装済み（commit `3a7b211`）で、CLI配線・
    認証強化・Preview実機検証まで完了している。**
 3. **Production resourceに対するcosign実署名付き`content:export -- --upload`は未実施。**
-   Previewではsession→object→completeのroute経路を実Blob・実KMSで検証済みだが、Production用の
-   環境変数・DB・audit storeを使った実行は、Production設定と明示承認が必要。
+   ただしPreviewでは2026-08-25にCLI経由の実行も完了した（正本件数、実KMS署名、53 objects、
+   session/object/complete、completion marker、DB上のstatus=completed・allowed_count=53を確認）。
+   Production用の環境変数・DB・audit storeを使った実行は、Production設定と明示承認が必要。
 4. Production Postgresは **table数0**（本セッションで読み取り専用確認済み、2026-08-22）。
    これはTask 0記録時点と変わっていない——Production は一度もmigrationを適用されていない。
 5. **（完全解決・2026-08-23）Supabase session poolerの同時接続数上限（15）問題。** PreviewのDATABASE_URL
@@ -112,10 +113,8 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 - [ ] Production Vercel環境変数を、Preview作業と同じ手順（値は都度その場で払い出し・確認、
       Previewの値を転用しない、`~/secrets/deploid-supabase-connections.txt`のproduction sectionから
       DATABASE_URLを読む）で埋める。この作業自体はTask 9計画のStepではなく、Step 1着手前の準備。
-- [ ] `content:export -- --upload`を、実resource（Production Postgres・Production audit Blob
-      store・Production KMS鍵）に対して**一度もend-to-endで実行したことがない**ため、Task 9 Step 2
-      （cutover直前export）が計画通りに動くことを、Production本番実行の前に一度どこか
-      （理想はPreview環境の同経路）で確認しておきたい。
+- [x] Preview resourceに対する`content:export -- --upload`を実行済み（2026-08-25）。
+      Production resourceに対する同じ実行は、Production環境変数設定後かつ本番Step 2の承認後に行う。
 
 ## Task 9計画 Step 1〜9 との対応
 
@@ -125,7 +124,7 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 | Step | 内容 | Preview rehearsalでの裏付け | Production固有の残作業 |
 |---|---|---|---|
 | 1 | 変更凍結・rollback window宣言 | — （運用上の合意事項、技術的検証対象外） | Production公開中サイトへの影響があるため、実施タイミングを事前に合意する |
-| 2 | cutover直前export（署名付きartifactをaudit storeへ） | **route経路はPreview実機検証済み** | Production用env/resourceでのend-to-end確認が必要 |
+| 2 | cutover直前export（署名付きartifactをaudit storeへ） | **CLI経由を含めPreview実機検証済み** | Production用env/resourceでのend-to-end確認が必要 |
 | 3 | production import・parity | 同じ`content:import`/`content:compare`をPreviewで実証済み（51/51 media含む） | Production DATABASE_URL・env varが揃っていることが前提 |
 | 4 | Vercel Previewで`CONTENT_SOURCE=payload`有効化・`npm run check`・E2E | **完了**（transaction pooler切替後、実deployment・自動E2Eを確認済み） | — |
 | 5 | 主要画面目視確認 | **完了**（Step 6の一部として、desktop 1440px / mobile 390pxのscreenshotで確認済み） | — |
@@ -143,10 +142,9 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 
 ## 次のアクション
 
-**`EMAXCONNSESSION`（session pooler同時接続数上限15）は、Preview rehearsalで実際に短時間アクセス
-だけで500を発生させたことが確認されている以上、Production cutoverのblockerとして扱う。**
-これが解消されるまで、Task 9計画のStep 1（変更凍結宣言）にも着手しない。解消のために確定すべき
-事項（2026-08-22時点、プロジェクトオーナー確認済み）:
+**Previewの`EMAXCONNSESSION`問題はtransaction pooler切替で解消済み。** Production cutoverの残る
+blockerは、Production環境の設定とProduction resourceを使った最終検証である。
+確認済み事項（2026-08-25時点）:
 
 1. ~~Preview/Productionの実際のpooler mode（transaction pooler 6543 か session pooler 5432 か）~~
    **解決済み（2026-08-23）: Previewはsession pooler（5432）を使用していた。**
@@ -164,16 +162,15 @@ Previewの値と同じ値をそのまま流用してはならない——環境�
 `npm run build`・自動E2E、全て2026-08-23実施・成功）。migration用DATABASE_URLとVercel
 runtime用DATABASE_URLの役割分離も`database-migration-runbook-v1.md`に明文化済み（commit `fb3f2c1`）。
 
-優先順位（2026-08-23更新。1.はPreview側完全解決・Production側のみ残、2.は根本原因判明・
-POC成功・route本体実装待ち）:
+優先順位（2026-08-25更新）:
 
 1. DB接続問題 → **Preview側は解決・実機検証済み。残るのはProduction側のDATABASE_URL設定
    （最初からtransaction poolerで設定する、Production環境変数の設定設計の一部）のみ。**
-2. OIDC-federated audit Blob store疎通確認 → **根本原因判明（headerで渡る、dashboard操作は
-   不要）・POC成功（`task9-audit-upload-endpoint-design-v1.md`参照）。3段階session route本体の
-   実装がまだ残っている（着手には別途承認が要る）。**
-3. 1・2が解消してから、Production環境変数の設定設計
-4. 最後にTask 9計画Step 1（変更凍結宣言）
+2. OIDC-federated audit Blob store疎通確認 → **根本原因判明・route実装・Preview CLI end-to-end
+   検証まで完了。残るのはProduction環境での設定・実行のみ。**
+3. Production環境変数の設定設計と値のread-only突合
+4. Production側の設定・migration・import・parity・exportを、各段階で明示承認を得て実行
+5. 最後にTask 9計画Step 1（変更凍結宣言）
 
 **現時点でProduction cutoverへはまだ進めない。** Preview側の実装・検証は完了したが、Production側の
 DATABASE_URL・secret・KMS・audit store設定、Production resourceを使った最終export検証が未完了である。
