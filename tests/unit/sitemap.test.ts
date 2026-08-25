@@ -1,4 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/lib/content/getContentRepository', () => ({
+  getContentRepository: vi.fn(async () => ({
+    listAllPublishedRobots: async () => [],
+    listAllPublishedManufacturers: async () => [],
+    listAllPublishedUseCases: async () => [],
+    listAllPublishedArticles: async () => [],
+  })),
+}));
+
 import { buildSitemapEntries } from '@/src/app/sitemap';
 
 // Sitemapはcutover後のPayload repository経由で検証する。
