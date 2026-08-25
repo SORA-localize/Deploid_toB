@@ -1305,11 +1305,20 @@ export async function bootstrapAdminIfAllowed(
     if (!isProduction && !isPreview) {
       throw new Error(
         `--bootstrap-admin is only allowed against a local throwaway database, or a database explicitly ` +
-          `confirmed as Preview/Production with the corresponding confirmation flag.`,
+          `confirmed as Preview/Production with --${PREVIEW_CONFIRMATION_FLAG} or --${PRODUCTION_CONFIRMATION_FLAG}.`,
       );
     }
     if (args.has('admin-password')) {
-      throw new Error(`--admin-password is not allowed for managed database bootstrap. Set PAYLOAD_IMPORT_ADMIN_PASSWORD instead.`);
+      if (isPreview && !isProduction) {
+        throw new Error(
+          `--admin-password is not allowed together with --${PREVIEW_CONFIRMATION_FLAG} (avoids the password ` +
+            'appearing in shell history or the process list on a real environment). Set PAYLOAD_IMPORT_ADMIN_PASSWORD instead.',
+        );
+      }
+      throw new Error(
+        `--admin-password is not allowed together with --${PRODUCTION_CONFIRMATION_FLAG} (avoids the password ` +
+          'appearing in shell history or the process list on a real environment). Set PAYLOAD_IMPORT_ADMIN_PASSWORD instead.',
+      );
     }
     const marker = await readEnvironmentMarker(payload);
     const expectedEnvironment = isProduction ? 'production' : 'preview';
