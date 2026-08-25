@@ -191,5 +191,8 @@ Production側のDATABASE_URL・secret・KMS・audit store設定、Production res
 したがって、**Productionデータ移行と公開切替は完了**している。ただし旧`data/*.ts`の削除は、rollback window
 終了と最終検証（Step 7〜9）完了後に行う。baseline envelopeはローカルの管理対象外領域に保管し、gitへは追加しない。
 
+なお、同日PR Previewの再デプロイで、Supabaseパスワード更新後に残っていたPreview側`DATABASE_URL`の旧値を検出した。
+Preview環境変数を最新のtransaction-pooler接続文字列へ更新し、再デプロイを開始済みである。Productionの接続設定には影響しない。
+
 **Production DBへの書き込み・Production Vercel環境変数の追加は、上記実施前には個別に明示承認を得てから
 実行する運用としていた。**
