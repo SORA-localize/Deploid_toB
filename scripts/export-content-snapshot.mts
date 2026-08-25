@@ -594,14 +594,11 @@ export async function withTempDir<T>(fn: (dir: string) => Promise<T>): Promise<T
 
 // ─── snapshot の読み出し ───────────────────────────────────────────────────
 
-export type SnapshotSourceName = 'local' | 'payload';
+export type SnapshotSourceName = 'payload';
 
 /** `--source` は必須。暗黙の source 選択をしない（brief Step 5）。 */
 export async function readSnapshotFromSource(source: SnapshotSourceName): Promise<ContentSnapshot> {
-  if (source === 'local') {
-    const { createLocalContentSource } = await import('../lib/content/localSource.ts');
-    return createLocalContentSource().readSnapshot();
-  }
+  if (source !== 'payload') throw new Error('content:export only supports --source payload after the Production cutover.');
   const { createPayloadContentSource } = await import('../lib/content/payloadSource.ts');
   return createPayloadContentSource().readSnapshot();
 }
@@ -1302,7 +1299,7 @@ export async function mintAuditUploadJwt(args: Map<string, string | true>): Prom
 const HELP = [
   'content:export — snapshot を JSON へ書き出す / 署名つきで object storage へ置く。',
   '',
-  '  --source local|payload        必須。暗黙の source 選択をしない。',
+  '  --source payload              必須。暗黙の source 選択をしない。',
   '  --out <path>                  snapshot JSON の出力先',
   '  --upload                      object storage へ置き、cosign 署名 + manifest を作る',
   '  --store local-disk|vercel-blob  --upload 時の保存先',
@@ -1351,8 +1348,8 @@ const HELP = [
 
 async function runExport(args: Map<string, string | true>): Promise<void> {
   const source = args.get('source');
-  if (source !== 'local' && source !== 'payload') {
-    throw new Error('content:export requires --source local|payload (no implicit source selection).');
+  if (source !== 'payload') {
+    throw new Error('content:export requires --source payload after the Production cutover.');
   }
 
   // review fix round 2 / Critical #2 の残り半分: **DBへ接続する前に**push を止める。
@@ -1365,7 +1362,7 @@ async function runExport(args: Map<string, string | true>): Promise<void> {
   // schema を変える権限を持たない。詳細は `runRestore` の同じ guard の docblock を参照。
   process.env.PAYLOAD_MIGRATING = 'true';
 
-  const snapshot = await readSnapshotFromSource(source);
+  const snapshot = await readSnapshotFromSource('payload');
   const counts = countRecords(snapshot);
   process.stdout.write(
     `exported from ${source}: ${Object.entries(counts).map(([key, value]) => `${key}=${value}`).join(' ')}\n`,
@@ -1389,7 +1386,7 @@ async function runExport(args: Map<string, string | true>): Promise<void> {
   // provenance を**先に**決める。private audit store の ID も対象環境も provenance が持っており、
   // vercel-blob store はその2つを credential と突き合わせてからでないと作れない（必須修正7-4）。
   const exportedBy = (args.get('exported-by') as string | undefined) ?? process.env.USER ?? 'unknown';
-  const provenance = await resolveExportProvenance(source, args);
+  const provenance = await resolveExportProvenance('payload', args);
 
   assertSnapshotStoreAllowed({
     provider: args.get('store') as SnapshotStorageProvider,

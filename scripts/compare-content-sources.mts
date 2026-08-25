@@ -880,7 +880,11 @@ async function main(): Promise<void> {
     });
   }
 
-  const { createLocalContentSource } = await import('../lib/content/localSource.ts');
+  const createLocalContentSource = (): { readSnapshot: () => Promise<ContentSnapshot> } => ({
+    readSnapshot: async () => {
+      throw new Error('content:compare local TS source was retired after the Production cutover; use content:verify-snapshot.');
+    },
+  });
   const { createPayloadContentSource } = await import('../lib/content/payloadSource.ts');
 
   const localSource = createLocalContentSource();
