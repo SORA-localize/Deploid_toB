@@ -1300,26 +1300,35 @@ export async function bootstrapAdminIfAllowed(
   isLocal: boolean,
 ): Promise<void> {
   if (!isLocal) {
-    if (!args.has(PREVIEW_CONFIRMATION_FLAG)) {
+    const isProduction = args.has(PRODUCTION_CONFIRMATION_FLAG);
+    const isPreview = args.has(PREVIEW_CONFIRMATION_FLAG);
+    if (!isProduction && !isPreview) {
       throw new Error(
-        `--bootstrap-admin is only allowed against a local throwaway database, or a database confirmed as ` +
-          `Preview via --${PREVIEW_CONFIRMATION_FLAG}.`,
+        `--bootstrap-admin is only allowed against a local throwaway database, or a database explicitly ` +
+          `confirmed as Preview/Production with --${PREVIEW_CONFIRMATION_FLAG} or --${PRODUCTION_CONFIRMATION_FLAG}.`,
       );
     }
     if (args.has('admin-password')) {
+      if (isPreview && !isProduction) {
+        throw new Error(
+          `--admin-password is not allowed together with --${PREVIEW_CONFIRMATION_FLAG} (avoids the password ` +
+            'appearing in shell history or the process list on a real environment). Set PAYLOAD_IMPORT_ADMIN_PASSWORD instead.',
+        );
+      }
       throw new Error(
-        `--admin-password is not allowed together with --${PREVIEW_CONFIRMATION_FLAG} (avoids the password ` +
+        `--admin-password is not allowed together with --${PRODUCTION_CONFIRMATION_FLAG} (avoids the password ` +
           'appearing in shell history or the process list on a real environment). Set PAYLOAD_IMPORT_ADMIN_PASSWORD instead.',
       );
     }
     const marker = await readEnvironmentMarker(payload);
-    if (marker?.environment !== 'preview') {
+    const expectedEnvironment = isProduction ? 'production' : 'preview';
+    if (marker?.environment !== expectedEnvironment) {
       throw new Error(
-        `--${PREVIEW_CONFIRMATION_FLAG} refused: this database's _environment_marker reports ` +
-          `"${marker?.environment ?? 'none (never stamped)'}", not "preview". Run ` +
-          '`npm run environment:stamp -- --expected preview` against this database first if it really is Preview, ' +
+        `managed bootstrap refused: this database's _environment_marker reports ` +
+          `"${marker?.environment ?? 'none (never stamped)'}", not "${expectedEnvironment}". Run ` +
+          '`npm run environment:stamp -- --expected ' + expectedEnvironment + '` against this database first, ' +
           'or double-check DATABASE_URL — this refusal is fail-closed on purpose (an unstamped managed database ' +
-          'could just as easily be production).',
+          'could just as easily be the other environment).',
       );
     }
   }
@@ -1408,7 +1417,7 @@ async function main(): Promise<void> {
         '  --json <path>                 import report を JSON で書き出す',
         '  --admin-email / --admin-password  書き込みに使う admin（env でも可）',
         '  --bootstrap-admin             admin が無い場合に作る（local throwaway DB、または',
-        '                                 --i-know-this-is-preview 指定時の stamped Preview DB）',
+        '                                 対応するconfirmation flagでstampedされたPreview/Production DB）',
         '  --i-know-this-is-preview      remote（非local）の DATABASE_URL が Preview であることを明示し、',
         '                                 書き込みを許可する（--i-know-this-is-production の対になる',
         '                                 独立 flag。Preview 操作で production 用 flag を使わずに済む）。',
