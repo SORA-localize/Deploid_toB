@@ -172,8 +172,24 @@ runtime用DATABASE_URLの役割分離も`database-migration-runbook-v1.md`に明
 4. Production側の設定・migration・import・parity・exportを、各段階で明示承認を得て実行
 5. 最後にTask 9計画Step 1（変更凍結宣言）
 
-**現時点でProduction cutoverへはまだ進めない。** Preview側の実装・検証は完了したが、Production側の
-DATABASE_URL・secret・KMS・audit store設定、Production resourceを使った最終export検証が未完了である。
+**2026-08-25の実施前時点ではProduction cutoverへ進めない状態だった。** Preview側の実装・検証は完了したが、
+Production側のDATABASE_URL・secret・KMS・audit store設定、Production resourceを使った最終export検証が未完了だった。
 
-**Production DBへの書き込み・Production Vercel環境変数の追加は、いずれも個別に明示承認を得てから
-実行する。**
+## Production実施記録（2026-08-25）
+
+上記の未完了項目は、以下の順で実施・確認済みである。
+
+- Production Postgresへmigrationを適用し、`_environment_marker=production`を確認。
+- 正本データをimportし、件数を確認（manufacturers 26 / robots 63 / useCases 44 / deployments 11 /
+  articles 34 / articlePlacements 7 / media 51 / siteSettings 1）。
+- Production Blobのmedia 51件をDBレコードと突合し、過不足なしを確認。
+- `content:compare`で `missing=0 extra=0 changed=0 brokenReferences=0`、media review itemsなし。
+- `CONTENT_SOURCE=payload` のProductionデプロイをReady化し、主要6ルートでHTTP 200を確認。
+- Production KMS鍵で署名したbaseline generation 1を、audit-upload session経由でProduction audit Blobへ保存。
+  session/object/completeおよびcompletion marker完了、署名済みenvelopeをローカルに固定した。
+
+したがって、**Productionデータ移行と公開切替は完了**している。ただし旧`data/*.ts`の削除は、rollback window
+終了と最終検証（Step 7〜9）完了後に行う。baseline envelopeはローカルの管理対象外領域に保管し、gitへは追加しない。
+
+**Production DBへの書き込み・Production Vercel環境変数の追加は、上記実施前には個別に明示承認を得てから
+実行する運用としていた。**
