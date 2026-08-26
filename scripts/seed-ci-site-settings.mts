@@ -26,6 +26,28 @@ async function main(): Promise<void> {
 
   const payload = await getPayload({ config });
   try {
+    // The cache/draft E2E helpers perform a real Payload write and therefore
+    // need a platform-admin user for the publish gate. Admins are intentionally
+    // excluded from ContentSnapshot, so create a disposable CI-only account
+    // here instead of relying on the retired --bootstrap-admin import path.
+    const { docs: existingAdmins } = await payload.find({
+      collection: 'admins',
+      limit: 1,
+      overrideAccess: true,
+      depth: 0,
+    });
+    if (existingAdmins.length === 0) {
+      const password = `ci-${crypto.randomUUID()}-Disposable!`;
+      await payload.create({
+        collection: 'admins',
+        overrideAccess: true,
+        data: {
+          email: 'ci-fixture-admin@example.invalid',
+          password,
+          role: 'platform-admin',
+        } as never,
+      });
+    }
     await restoreContentSnapshot({
       payload,
       snapshot: contentSnapshotFixture,
