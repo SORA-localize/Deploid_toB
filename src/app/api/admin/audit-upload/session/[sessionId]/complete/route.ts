@@ -28,6 +28,8 @@ interface CompleteRequestBody {
   baselineRunId?: unknown;
 }
 
+const MAX_COMPLETE_BODY_BYTES = 1024 * 1024;
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ sessionId: string }> },
@@ -38,9 +40,21 @@ export async function POST(
   const preflight = await auditUploadPreflight(request, payload);
   if (!preflight.ok) return preflight.response;
 
+  const contentLengthHeader = request.headers.get('content-length');
+  if (contentLengthHeader) {
+    const declaredLength = Number.parseInt(contentLengthHeader, 10);
+    if (Number.isFinite(declaredLength) && declaredLength > MAX_COMPLETE_BODY_BYTES) {
+      return jsonResponse(413, { error: 'body-too-large', detail: `Content-Length exceeds ${MAX_COMPLETE_BODY_BYTES} bytes` });
+    }
+  }
+
   let body: CompleteRequestBody;
   try {
-    body = (await request.json()) as CompleteRequestBody;
+    const bytes = await request.arrayBuffer();
+    if (bytes.byteLength > MAX_COMPLETE_BODY_BYTES) {
+      return jsonResponse(413, { error: 'body-too-large', detail: `body exceeds ${MAX_COMPLETE_BODY_BYTES} bytes` });
+    }
+    body = JSON.parse(Buffer.from(bytes).toString('utf8')) as CompleteRequestBody;
   } catch {
     return jsonResponse(400, { error: 'invalid-json-body' });
   }

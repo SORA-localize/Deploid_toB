@@ -7,11 +7,17 @@
  */
 process.env.PAYLOAD_MIGRATING = 'true';
 
+import { assertCiThrowawayDatabaseUrl } from '../lib/content/databaseSafety';
+
 async function main(): Promise<void> {
   if (process.env.CI !== 'true') {
     console.log('[ci-fixture] skipped outside CI=true');
     return;
   }
+
+  // CI=true is not a database identity check. Refuse before importing Payload so a
+  // misconfigured runner cannot create an admin or overwrite fixture content remotely.
+  assertCiThrowawayDatabaseUrl('scripts/seed-ci-site-settings.mts', process.env.DATABASE_URL);
 
   // Keep these imports after the migration guard is set. Static ESM imports are
   // evaluated before this module body and could initialize Payload too early.

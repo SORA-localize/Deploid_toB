@@ -1,10 +1,16 @@
 import type { Payload } from 'payload';
 import { auditBlobStoreIdFor } from '../content/auditBlobStore';
-import { createVercelBlobObjectStore, type SnapshotObjectStore, type VercelBlobStoreOptions } from '../../scripts/snapshotObjectStore.mts';
+import {
+  baselineCompletionMarkerKey,
+  createVercelBlobObjectStore,
+  type SnapshotObjectStore,
+  type VercelBlobStoreOptions,
+} from '../../scripts/snapshotObjectStore.mts';
 
 interface AllowedObjectRecord { objectKey: string; uploaded: boolean }
 interface LoadedSession {
   id: string | number; requestId: string; environment: 'preview' | 'production';
+  baselineObjectKey: string;
   allowedObjects: AllowedObjectRecord[]; status: 'pending' | 'completed';
 }
 export type BlobStoreFactory = (options: VercelBlobStoreOptions) => SnapshotObjectStore;
@@ -33,10 +39,15 @@ export async function cleanupAuditUploadSession(args: {
   });
   let removedObjectCount = 0;
   for (const obj of session.allowedObjects) {
-    if (!obj.uploaded) continue;
+    // Remove both recorded and unrecorded objects. A Blob write can succeed
+    // immediately before the DB flag update fails, leaving uploaded=false.
+    // Object keys are session-derived manifest keys, so deleting the complete
+    // allowlist is safe for this pending session and closes that orphan window.
     await store.remove(obj.objectKey);
-    removedObjectCount += 1;
+    if (obj.uploaded) removedObjectCount += 1;
   }
+  const markerKey = baselineCompletionMarkerKey(session.baselineObjectKey);
+  if (await store.exists(markerKey)) await store.remove(markerKey);
   await args.payload.delete({ collection: 'audit-upload-sessions', id: session.id, overrideAccess: true });
   return { ok: true, removedObjectCount };
 }

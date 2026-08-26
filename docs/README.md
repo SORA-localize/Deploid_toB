@@ -12,7 +12,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 |---|---|---|---|
 | [ロボットデータ投入](plans/robot-data-import-plan-v1.md) | 原本HTMLから177機・59社・28シリーズを **Payload へ**投入。**§0 の前提ゲート7項目（コンテンツ基盤移行の完了）を満たすまで着手しない**。Task 9 のみ原本への `deploymentStage` 記入134行が前提 | 未定 | 2026-08-08 |
 | [積み残し登録簿フォローアップ](plans/deferred-work-register-followup-v1.md) | 登録簿#4/#5/#6/#10の実行計画。**#4・#5・#6は解消済み**。残るのは#10のバッテリー23機（CSVのvariant名とレコードの対応を人が決める） | `main`（専用branchなし） | 2026-08-05 |
-| [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | `data/*.ts` から Payload CMS + managed PostgreSQLへ、URLと不変idを保って段階移行。実装は未着手。**2026-07-26付でPhase 3・5・6が作った層を反映していない——着手時に現行実装へ突合すること** | 未定（専用branch必須） | 2026-07-26 |
+| [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | Payload CMS + managed PostgreSQLへの移行後監査・是正。現在は安全ゲート是正ブランチで実装中 | `remediation/task9-safety-gates` | 2026-08-26 |
 | [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | 上位ロードマップ。**Phase番号は移行前リファクタの1〜7とは別体系**（本書のPhase 1はCMS/DB移行を指す）。移行前スコープは実装インデックス側が正本 | phaseごとに分割 | 2026-07-26 |
 | [レスポンシブ対応](plans/responsive-phase-1-static-audit-v1.md) | Phase 1のコード実装は完了。R-06（実機スクリーンショットでの最終確認）が未実施 | 専用branchなし（mainへ直接実装） | 2026-07-03 |
 | [ロボット画像・メーカーロゴ調達](plans/robot-image-sourcing-plan-v1.md) | Robot B1〜B6の読み取り専用調査は完了。台帳・許諾SSOTの実装が調査開始gateとして未着手 | 未定 | 2026-07-08 |
@@ -29,7 +29,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 | 2026-07-26 | [データアーキテクチャ再設計](decisions/data-architecture-redesign-v1.md) | id / slug設計は維持し、旧Git型CMS移行案を新しいPayload移行計画へ置換 |
 | 2026-07-26 | [技術スタック](decisions/humanoid_platform_tech_stack_v1.md) | CMS候補とDB不要判断を、Payload + PostgreSQLの確定構成へ更新 |
 | 2026-07-26 | [アーキテクチャ将来対応リスト](decisions/architecture_future_considerations_v1.md) | コンテンツ基盤移行の確定判断と移行後の見直し条件を追加 |
-| 2026-07-26 | [Deploid Data Work Guide](decisions/data/README.md) | cutoverまでは現行TS運用を継続する移行期間ルールを追加 |
+| 2026-07-26 | [Deploid Data Work Guide](decisions/data/README.md) | Payload移行後のデータ保守と出典・権利ゲート |
 
 ---
 
@@ -84,11 +84,11 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 ### 現行の正本（コード側）
 
-以下はCMS / DBのcutover完了まで有効。移行後の正本分担は [`content-platform-and-database-architecture-v2.md`](decisions/content-platform-and-database-architecture-v2.md) に従い、この一覧も同時に更新する。
+現在の対象ブランチではPayload CMS + PostgreSQLがコンテンツの正本である。移行後の正本分担は [`content-platform-and-database-architecture-v2.md`](decisions/content-platform-and-database-architecture-v2.md) に従う。
 
-- データ型: `../data/types.ts`
-- データ取得/関連解決: `../lib/data.ts`
-- データ検証: `../lib/validate.ts` と `../scripts/validate-data.mjs`
+- データ型・スキーマ: `../collections/` と `../lib/content/contracts.ts`
+- データ取得/関連解決: `../lib/content/getContentRepository.ts`
+- データ検証・snapshot: `../scripts/` の content verify/restore preflight
 - タグ正本: `../lib/tagRegistry.ts`
 - スペック項目正本: `../lib/specSchema.ts`
 - enumラベル/表示順: `../lib/labels.ts` と `../lib/display.ts`
@@ -96,7 +96,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 - 色・テーマtoken: `../src/app/globals.css`
 - semantic tone: `../lib/visualSemantics.ts`
 
-ページ実装から `data/*.ts` を直接検索せず、取得や関連解決は `lib/data.ts` 経由にする。移行後もページから直接SQL / Payload SDKを呼ばず、サーバー専用repository境界を経由する。
+ページ実装から `data/*.ts` を参照せず、取得や関連解決は server-only repository 境界を経由する。ページから直接SQL / Payload SDKを呼ばない。
 
 ---
 

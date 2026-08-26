@@ -414,12 +414,25 @@ export async function completeAuditUploadSession(args: {
     return { ok: false, reason: 'store-error', detail: e instanceof Error ? e.message : String(e) };
   }
 
-  await args.payload.update({
-    collection: 'audit-upload-sessions',
-    id: session.id,
-    overrideAccess: true,
-    data: { status: 'completed' } as never,
-  });
+  try {
+    await args.payload.update({
+      collection: 'audit-upload-sessions',
+      id: session.id,
+      overrideAccess: true,
+      data: { status: 'completed' } as never,
+    });
+  } catch (error) {
+    // The marker must not outlive a pending session: a later retry would be
+    // rejected by the write-once Blob store while the DB still says pending.
+    // Best-effort removal leaves cleanup able to retry if the store is down.
+    try {
+      await store.remove(baselineCompletionMarkerKey(session.baselineObjectKey));
+    } catch {
+      // Preserve the DB failure as the primary error; orphan detection/cleanup
+      // handles a store outage on the next maintenance pass.
+    }
+    return { ok: false, reason: 'store-error', detail: error instanceof Error ? error.message : String(error) };
+  }
 
   return { ok: true };
 }

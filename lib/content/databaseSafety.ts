@@ -106,6 +106,26 @@ export function assertStrictThrowawayDatabaseUrl(callerFile: string, raw: string
   }
 }
 
+/**
+ * CI fixture/migration向けの最厳格な書き込みゲート。CIフラグや呼び出し元の意図だけでは
+ * 対象DBを安全とはみなさず、local hostかつthrowaway名のDBだけを許可する。
+ */
+export function assertCiThrowawayDatabaseUrl(callerFile: string, raw: string | undefined): void {
+  if (!raw) {
+    throw new Error(
+      `DATABASE_URL is not set. ${callerFile} performs CI fixture writes and must only ever run against a local throwaway Postgres.`,
+    );
+  }
+
+  const { host, databaseName, isLocalHost, looksLikeThrowawayName } = classifyDatabaseUrl(raw);
+  if (!isLocalHost || !looksLikeThrowawayName) {
+    throw new Error(
+      `Refusing to run ${callerFile} against DATABASE_URL host "${host}" database "${databaseName}". ` +
+        'CI fixture writes are restricted to a local throwaway Postgres (local host and database name containing test, throwaway, or e2e).',
+    );
+  }
+}
+
 /** 既定の確認flag名。`--i-know-this-is-production`と紛らわしくない、独立した名前にしてある。 */
 export const PERSISTENT_LOCAL_DATABASE_CONFIRMATION_FLAG = 'i-know-this-is-a-persistent-local-database';
 export const PRODUCTION_CONFIRMATION_FLAG = 'i-know-this-is-production';

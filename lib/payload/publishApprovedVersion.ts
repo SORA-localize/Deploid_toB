@@ -3,6 +3,7 @@ import type { Payload, PayloadRequest } from 'payload';
 import { type AuthenticatedAdminUser, asAdminUser, isContentPublisherOrAboveUser } from './access';
 import { approvedPublishContext } from './publishAuthorization';
 import { acquireDocumentWriteLock } from './publishLock';
+import { notifyRevalidationAfterCommit } from './revalidationHook';
 
 /**
  * 承認済みdraftの公開を1箇所へ集約する（brief）。Task 6〜9.5は独自のpublish updateを作らず、
@@ -153,13 +154,16 @@ export async function publishApprovedVersion(args: PublishApprovedVersionArgs): 
       overrideAccess: false,
       user: publisherUser,
       req,
-      context: approvedPublishContext({
-        collection,
-        documentId: String(doc.id),
-        approvedVersionId: String(approvedVersionId),
-        approvalManifestHash,
-        actorId: String(user?.id ?? 'unknown'),
-      }),
+      context: {
+        ...approvedPublishContext({
+          collection,
+          documentId: String(doc.id),
+          approvedVersionId: String(approvedVersionId),
+          approvalManifestHash,
+          actorId: String(user?.id ?? 'unknown'),
+        }),
+        deferRevalidationUntilCommit: true,
+      },
     });
 
     const { docs: chainHead } = await payload.findVersions({
@@ -174,6 +178,8 @@ export async function publishApprovedVersion(args: PublishApprovedVersionArgs): 
 
     await payload.db.commitTransaction(transactionID);
     committed = true;
+
+    await notifyRevalidationAfterCommit(collection, payload);
 
     payload.logger.info({
       msg: 'publish-approved-version',

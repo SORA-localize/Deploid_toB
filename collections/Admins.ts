@@ -1,4 +1,5 @@
 import type { Access, CollectionConfig, FieldAccess, PayloadRequest } from 'payload';
+import { sql } from '@payloadcms/db-postgres';
 import { type AdminRole, asAdminUser, isPlatformAdmin as isPlatformAdminAccess, isPlatformAdminUser } from '../lib/payload/access';
 
 /**
@@ -17,6 +18,12 @@ async function countAdmins(req: PayloadRequest): Promise<number> {
     overrideAccess: true,
   });
   return result.totalDocs;
+}
+
+/** Membership checks must serialize with delete/demotion when a transaction is available. */
+async function lockAdminMembership(req: PayloadRequest): Promise<void> {
+  if (!req.transactionID) return;
+  await req.payload.db.drizzle.execute(sql`SELECT pg_advisory_xact_lock(hashtext('deploid-admin-membership'))`);
 }
 
 /**
@@ -48,6 +55,8 @@ export const selfOrPlatformAdmin: Access = ({ req }) => {
 export const platformAdminExceptLastPlatformAdmin: Access = async ({ req }) => {
   const user = asAdminUser(req.user);
   if (!isPlatformAdminUser(user)) return false;
+
+  await lockAdminMembership(req);
 
   const { docs } = await req.payload.find({
     collection: 'admins',
@@ -85,6 +94,8 @@ export const canUpdateRoleUnlessLastPlatformAdmin: FieldAccess = async ({ req, d
     currentRole === 'platform-admin' && incomingRole !== undefined && incomingRole !== 'platform-admin';
 
   if (!isDemotingFromPlatformAdmin) return true;
+
+  await lockAdminMembership(req);
 
   const { totalDocs } = await req.payload.count({
     collection: 'admins',

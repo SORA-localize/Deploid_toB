@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { Access, CollectionBeforeOperationHook, Field, PayloadRequest, Where } from 'payload';
+import type { Access, CollectionBeforeOperationHook, Field, FieldAccess, PayloadRequest, Where } from 'payload';
 import {
   clearDraftIntents,
   readApprovedPublishAuthorization,
@@ -178,7 +178,14 @@ export const contentVersionsConfig: { drafts: true; maxPerDoc: number } = {
  */
 export function baseContentFields(): Field[] {
   return [
-    { name: 'stableId', type: 'text', required: true, unique: true, index: true },
+    {
+      name: 'stableId',
+      type: 'text',
+      required: true,
+      unique: true,
+      index: true,
+      access: { update: immutableStableId },
+    },
     { name: 'slug', type: 'text', required: true, unique: true, index: true },
     { name: 'previousSlugs', type: 'text', hasMany: true },
     {
@@ -193,6 +200,15 @@ export function baseContentFields(): Field[] {
     },
   ];
 }
+
+/** Public identity is immutable once a record exists; changing it would orphan
+ * relationships and route-registry history. */
+export const immutableStableId: FieldAccess = ({ data, doc }) => {
+  const incoming = (data as { stableId?: unknown } | undefined)?.stableId;
+  const current = (doc as { stableId?: unknown } | undefined)?.stableId;
+  if (current !== undefined && incoming !== undefined && incoming !== current) return false;
+  return true;
+};
 
 /**
  * 全content collection共通の `Source[]`（BaseRecord）。`reliability` の意味は `data/types.ts` と不変。
@@ -490,6 +506,9 @@ export function createPublishGateHook<TDoc extends PublishTransitionCandidate>(o
     }
 
     if (!isDraftSave && candidate?._status === 'published') {
+      if (req.context?.skipPublishValidation === true && readPrivilegedPublishAuthorization(req, options.collectionSlug)) {
+        return data;
+      }
       const domain = await options.mapToDomain(candidate, req);
       options.validateForPublish(domain);
     }

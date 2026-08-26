@@ -101,8 +101,8 @@ src/app/        # App Router ページ（/, /robots, /manufacturers, /compare,
                 #   /use-cases, /reports, /about, /contact ＋各 [slug]）
 ai/rules/       # AIエージェント向けの入口・作業別ルール
 components/     # UI コンポーネント、カード、フィルター、共通レイアウト
-data/           # 現行の配列データ + types.ts（CMS / DB cutoverまでのデータ正本）
-lib/            # data.ts（現行取得境界）, labels.ts（enum→日本語）
+data/           # retired/import fixtures only; Payload is the content source of truth
+lib/            # content repository and domain services, labels.ts（enum→日本語）
 docs/           # 設計・意思決定ドキュメント（README.md がダッシュボード）
 docs/decisions/ # 恒久方針・現行仕様・運用チェックリスト
 docs/plans/     # 進行中の作業計画
