@@ -5,32 +5,21 @@
  * `readSnapshot()` を持たないため、ページ処理からimport / export / parity用の全件読み出しへは
  * 到達できない（brief Step 3の依存方向）。
  *
- * 未設定・typoを `local` へ倒さない。local開発・CI・Previewも `CONTENT_SOURCE` を明示する。
+ * 未設定・typoを別sourceへ倒さない。全環境で `CONTENT_SOURCE=payload` を明示する。
  * Productionで `local` を許すのはTask 9の24時間rollback windowだけで、その間だけ
  * `ALLOW_LOCAL_CONTENT_ROLLBACK=true` を設定し、終了時に変数自体を削除する。
- * export / restoreはruntime envを暗黙利用せず `--source local|payload|snapshot` を必須にする
+ * export / restoreはruntime envを暗黙利用せず、署名済みsnapshot経路を明示する。
  * （Task 5以降）。
  */
 import { createContentRepository, type ContentRepository } from './createContentRepository';
-import { createLocalContentSource } from './localSource';
 import { createPayloadContentSource } from './payloadSource';
 
 export async function getContentRepository() {
   const sourceName = process.env.CONTENT_SOURCE;
-  if (sourceName !== 'local' && sourceName !== 'payload') {
-    throw new Error(`CONTENT_SOURCE must be local or payload; received ${String(sourceName)}`);
+  if (sourceName !== 'payload') {
+    throw new Error(`CONTENT_SOURCE must be payload after the Production cutover; received ${String(sourceName)}`);
   }
-  if (
-    process.env.VERCEL_ENV === 'production' &&
-    sourceName === 'local' &&
-    process.env.ALLOW_LOCAL_CONTENT_ROLLBACK !== 'true'
-  ) {
-    throw new Error('local content is disabled in production outside the approved rollback window');
-  }
-  const source = sourceName === 'payload'
-    ? createPayloadContentSource()
-    : createLocalContentSource();
-  return createContentRepository(source);
+  return createContentRepository(createPayloadContentSource());
 }
 
 export type { ContentRepository };

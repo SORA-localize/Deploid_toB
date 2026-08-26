@@ -12,7 +12,7 @@ interface PlacementInput<T> {
 /**
  * 配置指定を先に埋め、残りを公開日の新しい順で補う。
  * データを直接読まず引数で受けるのは、client componentからこの関数へ到達しても
- * `localContentSnapshot`（= `data/*.ts` 全体）がbundleへ入らないようにするため。
+ * 全件snapshotがbundleへ入らないようにするため。
  */
 export function getArticleIndexPlacementReports<T extends { id: string; publishedAt: string }>({
   articles,

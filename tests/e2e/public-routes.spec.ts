@@ -7,7 +7,7 @@ const NOT_FOUND_TEXT = 'ページが見つかりません';
 const routes = [
   { path: '/', expectedH1: 'ヒューマノイド' },
   { path: '/robots', expectedH1: 'ロボット' },
-  { path: '/robots/unitree-g1', expectedH1: 'G1', canonical: '/robots/unitree-g1' },
+  { path: '/robots/fixture-robot-a', expectedH1: 'Alpha One', canonical: '/robots/fixture-robot-a' },
   { path: '/manufacturers', expectedH1: 'メーカー' },
   { path: '/use-cases', expectedH1: '用途から探す' },
   { path: '/reports', expectedH1: '記事' },

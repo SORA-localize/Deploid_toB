@@ -158,7 +158,7 @@ export async function startAppServer(options: {
       DATABASE_URL: databaseUrl,
       PAYLOAD_SECRET: payloadSecret,
       PAYLOAD_PUBLIC_SERVER_URL: baseUrl,
-      CONTENT_SOURCE: 'local',
+      CONTENT_SOURCE: 'payload',
       NODE_ENV: 'development',
     },
   });

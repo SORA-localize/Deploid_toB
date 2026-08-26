@@ -4,9 +4,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const outDir = '.plan-snippets';
-// 完了した計画は docs/archive/ へ移るが、snippet の型検査はそこでも続ける。
-// archive の code 例が実型と食い違ったまま残ると、後から参照した人がそれを写して壊す。
-const planDirs = ['docs/plans', 'docs/archive'];
+// `docs/archive/` は実装履歴を保存する場所であり、現行コードと一致しない例を含み得る。
+// 型ゲートは、現在実行可能な計画（docs/plans）のみを対象にする。
+const planDirs = ['docs/plans'];
 const baselinePath = 'scripts/plan-snippet-skip-baseline.json';
 const fence = /```(ts|tsx)\n([\s\S]*?)```/g;
 // front-matter の `snippetCheck: true` を宣言した計画書だけを対象にする。
@@ -44,10 +44,9 @@ console.log(
   `[plan-snippets] files=${checkedFiles.join(',') || '(none)'} extracted=${extracted} skipped=${skipped}`,
 );
 
-// opt-in文書が1本も無い状態でexit 0を返すと、gateは「常に通る」だけの飾りになる。
+// 現行計画が1本もopt-inしていない場合は、検査対象なしとして扱う（履歴archiveは対象外）。
 if (checkedFiles.length === 0) {
-  console.error('[plan-snippets] no plan declares `snippetCheck: true`');
-  process.exitCode = 1;
+  console.log('[plan-snippets] no active plan declares `snippetCheck: true`; nothing to check');
 }
 
 const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));

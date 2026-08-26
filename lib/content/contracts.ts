@@ -66,7 +66,7 @@ export interface ContentSnapshot {
  * 「Payloadに値が無い」状態でも `import → export → parity` が必ず通り、SiteSettingsの移行漏れを
  * 検出できなかった。値の正本は source ごとに1つだけ:
  *
- * - local source  → `data/articlePlacements.ts` / `lib/site.ts`（`lib/data/localContentSnapshot.ts` 経由）
+ * - Payload source → PayloadのSiteSettings global / article-placements collection
  * - Payload source → `site-settings` global（欠落時は `site-settings-not-migrated` で失敗する）
  *
  * 共有既定値を復活させると、この検出可能性がそのまま失われる。

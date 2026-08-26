@@ -1407,7 +1407,7 @@ async function main(): Promise<void> {
   if (args.has('help')) {
     process.stdout.write(
       [
-        'content:import — local TS (`data/*.ts`) の content を Payload へ冪等 upsert する。',
+        'content:import — retired after the Production cutover. Use content:restore with a signed snapshot.',
         '',
         '  --dry-run                     DBへ一切触れずに snapshot だけで計画を検証・集計する',
         '  --allow-network-media         rights 確認済みの外部画像を実際に fetch する',
@@ -1438,7 +1438,9 @@ async function main(): Promise<void> {
     return;
   }
 
-  const { createLocalContentSource } = await import('../lib/content/localSource.ts');
+  const readCutoverSnapshot = async (): Promise<ContentSnapshot> => {
+    throw new Error('content:import from local TS data was retired after the Production cutover; use content:restore with a signed snapshot.');
+  };
   const writeJsonReport = async (value: unknown) => {
     const jsonPath = args.get('json');
     if (typeof jsonPath !== 'string') return;
@@ -1450,7 +1452,7 @@ async function main(): Promise<void> {
   // 必須修正8-1/8-2: dry-run は **DB へ一切触れない**。接続すらしないので、
   // admin bootstrap も schema push も起こりようがなく、空DBでも最後まで集計できる。
   if (args.has('dry-run')) {
-    const plan = await planImportFromSnapshot(await createLocalContentSource().readSnapshot());
+    const plan = await planImportFromSnapshot(await readCutoverSnapshot());
     process.stdout.write(`${formatImportPlan(plan)}\n`);
     await writeJsonReport(plan);
     if (!importPlanIsClean(plan)) {
@@ -1483,7 +1485,7 @@ async function main(): Promise<void> {
   try {
     await assertPreviewWriteConfirmedByMarker(payload, args, classifyDatabaseUrl(process.env.DATABASE_URL as string).isLocalHost);
     const user = await resolveImportUser(payload, args);
-    const snapshot = await createLocalContentSource().readSnapshot();
+    const snapshot = await readCutoverSnapshot();
 
     // 必須修正8-8: 空DB + 既存 media store の組合せ（filename 自動採番）を先に止める。
     const plan = await planImportFromSnapshot(snapshot);

@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const allowed = new Set(['lib/data/localContentSnapshot.ts']);
+const allowed = new Set();
 const roots = ['components', 'lib', 'scripts', 'src', 'tests'];
 const extensions = new Set(['.ts', '.tsx', '.js', '.mjs']);
 const valueImport =

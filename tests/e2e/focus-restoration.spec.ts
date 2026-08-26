@@ -61,7 +61,7 @@ test.describe('mobile menu', () => {
 
 test.describe('compare detail dialog', () => {
   test('restores focus to the card that opened it', async ({ page }) => {
-    await page.goto('/compare?compare=unitree-g1');
+    await page.goto('/compare?compare=fixture-robot-a');
     const trigger = page.getByRole('button', { name: /の詳細を見る|詳細/ }).first();
     await trigger.click();
 

@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 const redirects = [
-  ['/robots/unitree-r1', /\/robots\/unitree-r1-air$/],
-  ['/use-cases/warehouse-picking', /\/use-cases\/warehouse-tote-material-handling$/],
+  ['/robots/fixture-robot-a-old', /\/robots\/fixture-robot-a$/],
+  ['/use-cases/fixture-usecase-one-old', /\/use-cases\/fixture-usecase-one$/],
 ] as const;
 
 for (const [from, destination] of redirects) {

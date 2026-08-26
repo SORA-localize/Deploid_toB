@@ -38,11 +38,9 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/payload_test
       # CI専用のダミー値。外部アカウントに紐づかず、この使い捨てDBの署名にのみ使う。
       PAYLOAD_SECRET: bd7e747183c90fe80ff7b8136607362ffe54d9e6c2fbd42a
-      # `.env.example`のローカル既定値と同じ。`npm run check`内の`npm run build`が
-      # `getContentRepository()`（`lib/content/getContentRepository.ts`）経由でこれを要求する
-      # （未設定だとthrow）。このjobはcontent:importを実行しないため、Postgres側の実contentに
-      # 依存しない`local`（`data/*.ts`）を使う。
-      CONTENT_SOURCE: local
+      # `npm run check`内の`npm run build`が`getContentRepository()`経由でこれを要求する。
+      # CIは使い捨てPostgresへmigrationを適用したPayload経路を検証する。
+      CONTENT_SOURCE: payload
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -81,6 +79,10 @@ jobs:
       # steps — its stronger gate is `payload:migrate` itself exiting non-zero on any failed
       # migration (Payload does not catch that error, so the process exits non-zero).
       - run: npm run payload:migrate:status
+      # The disposable CI DB is intentionally empty. Seed only the required global
+      # so the Payload-only static build can exercise its real source-of-truth path.
+      # This script is CI=true guarded and never runs against Preview/Production.
+      - run: npm run seed:ci-site-settings
       - run: npx playwright install --with-deps chromium
       - run: npm run check
       - uses: actions/upload-artifact@v7

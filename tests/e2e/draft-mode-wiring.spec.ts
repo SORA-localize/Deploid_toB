@@ -42,8 +42,8 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
  * ```
  */
 
-const ROBOT_STABLE_ID = 'unitree-g1';
-const ROBOT_SLUG = 'unitree-g1';
+const ROBOT_STABLE_ID = 'fixture-robot-a';
+const ROBOT_SLUG = 'fixture-robot-a';
 /** `lib/content/previewTokens.ts`の`PREVIEW_SESSION_COOKIE_NAME`と同じ値。 */
 const PREVIEW_SESSION_COOKIE_NAME = 'deploid-preview-session';
 

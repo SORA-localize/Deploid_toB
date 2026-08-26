@@ -2,19 +2,19 @@
 
 Use this file for data additions, data updates, article records, tags, specs, sources, and media metadata.
 
-Migration note: Payload CMS + managed PostgreSQL is the approved target, but it is not live yet. Until the cutover criteria in `docs/plans/content-platform-migration-plan-v1.md` are complete, use the current `data/*.ts` workflow below. For migration work, also read `docs/decisions/content-platform-and-database-architecture-v2.md`.
+Payload CMS + managed PostgreSQL is now live and is the sole content source after Task 9. Use the Payload editorial/API workflow; the former `data/*.ts` workflow has been retired.
 
-Codex MCP note: a Payload MCP server (`lib/payload/mcp.ts`) and its editorial workflow (`.codex/content-workflow.md`) exist for the Payload side of the migration (schema/testing work), but they do not change the standing rule above — `data/*.ts` remains the operational source of truth for ordinary content edits until cutover. Do not use MCP tools to write records that are supposed to live in `data/*.ts` today.
+Codex MCP note: a Payload MCP server (`lib/payload/mcp.ts`) and its editorial workflow (`.codex/content-workflow.md`) are available for controlled draft/edit workflows. Production publication remains subject to the Payload authorization gates.
 
 ## Must Read
 
-- `ai/rules/21-data-maintenance-workflow.md` - pre-edit gate for `data/*.ts`
+- `ai/rules/21-data-maintenance-workflow.md` - evidence and rights gate for Payload content edits
 - `docs/decisions/data/README.md` - data work entrypoint
 - `docs/decisions/data-maintenance-checklist-v1.md` - collection-specific checklists and publish gates
 - `docs/decisions/data-architecture-redesign-v1.md` - id/slug model and source-of-truth design
 - `docs/decisions/copyright_and_media_rights_policy_v1.md` - images, logos, quotes, rights
-- `data/types.ts` - type-level source of truth
-- `lib/validate.ts` - machine-enforced rules
+- `lib/content/domainTypes.ts` - canonical domain types
+- Payload collections/migrations and `scripts/verify-content-snapshot.mts` - schema and integrity gates
 
 For articles, also read:
 
@@ -38,9 +38,9 @@ For tags and specs, inspect the code source of truth before editing:
 - Unknown optional facts should be omitted or marked as confirmation-needed according to the existing data model.
 - Use only registered tag values and spec keys. Add new registry entries first when needed.
 - Tags are split by axis (`industry` / `region` / `theme` / `task` / `use-case-domain`); keep each field to its own axis. Companies and robots are relations, not tags. See the header of `lib/tagRegistry.ts`.
-- Pages should use `lib/data.ts`, not direct searches through `data/*.ts`.
-- Run `npm run validate:data` after data changes. Run `npm run build` when UI/rendering can be affected.
+- Pages should use the content repository, not direct collection access.
+- Run the Payload integrity checks and `npm run build` when content/UI behavior can be affected.
 
 ## Data Work Gate
 
-Before editing `data/*.ts`, follow `21-data-maintenance-workflow.md`. If any gate cannot be passed, stop and either research the source or ask the user.
+Before editing content, follow `21-data-maintenance-workflow.md`. If any evidence or rights gate cannot be passed, stop and either research the source or ask the user.

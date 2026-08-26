@@ -8,7 +8,7 @@ import { expect, test } from '@playwright/test';
  * 固定しておく。
  */
 test('shows a toast when the spec view is toggled', async ({ page }) => {
-  await page.goto('/compare?compare=unitree-g1');
+  await page.goto('/compare?compare=fixture-robot-a');
 
   const toggle = page.getByRole('switch', { name: 'スペック表示の切替' });
   await expect(toggle).toBeVisible();

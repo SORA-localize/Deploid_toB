@@ -111,6 +111,6 @@ test('the catalog search field is reachable from the page heading', async ({ pag
 
   const search = page.getByRole('searchbox').first();
   await search.focus();
-  await search.fill('Unitree');
-  await expect(page).toHaveURL(/q=Unitree/);
+  await search.fill('Alpha');
+  await expect(page).toHaveURL(/q=Alpha/);
 });

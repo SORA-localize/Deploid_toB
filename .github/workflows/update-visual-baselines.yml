@@ -55,7 +55,7 @@ jobs:
       PAYLOAD_SECRET: bd7e747183c90fe80ff7b8136607362ffe54d9e6c2fbd42a
       # このjobはcontent:importを実行しないため、`data/*.ts`（local）でbuildする。
       # `ci.yml`の`verify` jobと同じ既定値（`.env.example`のローカル既定値）。
-      CONTENT_SOURCE: local
+      CONTENT_SOURCE: payload
     steps:
       - uses: actions/checkout@v7
         with:

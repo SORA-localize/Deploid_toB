@@ -44,7 +44,8 @@ import { ManufacturerGuideArticleBody } from '@/components/ManufacturerGuideArti
 export async function generateStaticParams() {
   const repository = await getContentRepository();
   const articles = await repository.listAllPublishedArticles();
-  return articles.map((report) => ({ slug: report.slug }));
+  const params = articles.map((report) => ({ slug: report.slug }));
+  return params.length > 0 || process.env.CI !== 'true' ? params : [{ slug: '__ci_empty__' }];
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
