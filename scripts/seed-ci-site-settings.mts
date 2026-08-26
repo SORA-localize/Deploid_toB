@@ -28,6 +28,16 @@ async function main(): Promise<void> {
       runId: 'ci-e2e-fixture',
       reason: 'disposable CI E2E fixture',
     });
+    // Keep the required global explicit: restore may legitimately skip a global
+    // when a fixture omits it, while the static build requires these fields.
+    await payload.updateGlobal({
+      slug: 'site-settings',
+      overrideAccess: true,
+      data: {
+        dataAsOf: 'ci-fixture',
+        articleIndexPlacementLimits: { hero: 5, feature: 2 },
+      },
+    });
     console.log('[ci-fixture] seeded Payload E2E fixture');
   } finally {
     await payload.destroy();
