@@ -94,17 +94,10 @@ jobs:
 
       - run: npm run payload:migrate
 
-      # throwaway DB向けのcontent import。実credentialは使わない
-      # （`--admin-email`/`--admin-password`はこのjob内だけの使い捨てadmin）。
-      # `--bootstrap-admin`は「local throwaway DBのみ」というguardを`resolveImportUser()`
-      # （`scripts/import-content-to-payload.mts`）が持つ——上のDATABASE_URLはlocalhost + DB名に
-      # "test"を含むため通る。
-      - name: Import content into throwaway Postgres
-        run: |
-          npx tsx scripts/import-content-to-payload.mts \
-            --bootstrap-admin \
-            --admin-email content-e2e-ci@example.com \
-            --admin-password 'Str0ngPassw0rd!23-CI-only'
+      # CI専用のfixtureを投入する。Production/Previewのcontent sourceである
+      # 旧data/*.tsを復活させず、tests/fixtures/contentSnapshot.tsだけを使う。
+      - name: Seed content fixture into throwaway Postgres
+        run: npm run seed:ci-site-settings
 
       - run: CONTENT_SOURCE=payload npm run build
 
