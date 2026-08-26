@@ -15,7 +15,8 @@ import { authorizeRestoreFromLocalThrowaway } from './restoreAuthorization.mts';
 
 async function main(): Promise<void> {
   if (process.env.CI !== 'true') {
-    throw new Error('seed-ci-site-settings is CI-only; refusing outside CI=true');
+    console.log('[ci-fixture] skipped outside CI=true');
+    return;
   }
 
   const payload = await getPayload({ config });
