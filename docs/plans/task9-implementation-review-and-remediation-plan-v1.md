@@ -22,7 +22,7 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - Production/Preview/Vercel/外部 DB/Blob への接続・書き込みは行っていない
 - `.env.local` は読み込んでいない。秘密値・接続文字列・トークンは本書に記載しない
 - 承認済みの一時 PostgreSQL（127.0.0.1:55440、throwaway DB）で migration/status/CI seed、restore enforcement、integration、build、CI対象E2Eを実行した。Production/Preview DB では実行していない
-- GitHub の branch protection、ruleset、required checks は CLI 認証不備のため未確認
+- GitHub の branch protection、ruleset、required checks は API接続失敗（`api.github.com`へ接続不可）のため未確認。認証状態自体は `gh auth status` で有効を確認した
 
 ## 3. 参照したルール・判断基準
 
