@@ -58,9 +58,12 @@ async function main(): Promise<void> {
     await payload.update({
       collection: collection as never,
       id: doc.id,
+      draft: false,
       overrideAccess: true,
       user: owner as never,
-      data: { [field]: value } as never,
+      // 公開ページの日本語表示は `nameJa` を優先する。CI fixture の検証値を
+      // 実際の見出しへ反映するため、name の更新時は表示用フィールドも同じ値にする。
+      data: (field === 'name' ? { name: value, nameJa: value } : { [field]: value }) as never,
       // 既にpublished状態のdocumentを書き換えるだけ（状態遷移なし）だが、publish gateは
       // published main rowを書くwrite全てにcontent-publisher以上のroleを要求するため、
       // fixture更新と同じ特権経路を使う（`tests/content/repository.contract.test.ts`と同じ）。
