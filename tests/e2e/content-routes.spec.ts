@@ -35,12 +35,12 @@ const ROUTE_CHECKS: RouteCheck[] = [
   // Home: featured robots / use cases / reports の各セクションが実データから描画されている
   // ことを、rankingに依存しない形（link件数）で確認する。
   { route: '/', linkPrefixes: ['/robots/', '/use-cases/', '/reports/'] },
-  { route: '/robots', linkPrefixes: ['/robots/'], contains: ['Unitree'] },
-  { route: '/manufacturers', linkPrefixes: ['/manufacturers/'], contains: ['Unitree Robotics'] },
-  { route: '/use-cases', linkPrefixes: ['/use-cases/'], contains: ['倉庫内トート・軽量搬送'] },
-  { route: '/reports', linkPrefixes: ['/reports/'], contains: ['Surgie'] },
-  { route: '/compare', contains: ['Unitree'] },
-  { route: '/robots/unitree-g1', contains: ['G1', 'Unitree Robotics'] },
+  { route: '/robots', linkPrefixes: ['/robots/'], contains: ['Alpha One'] },
+  { route: '/manufacturers', linkPrefixes: ['/manufacturers/'], contains: ['Alpha Robotics'] },
+  { route: '/use-cases', linkPrefixes: ['/use-cases/'], contains: ['倉庫内トート搬送'] },
+  { route: '/reports', linkPrefixes: ['/reports/'], contains: ['フィクスチャ分析記事'] },
+  { route: '/compare', contains: ['Alpha One'] },
+  { route: '/robots/fixture-robot-a', contains: ['Alpha One', 'Alpha Robotics'] },
 ];
 
 for (const { route, linkPrefixes, contains } of ROUTE_CHECKS) {

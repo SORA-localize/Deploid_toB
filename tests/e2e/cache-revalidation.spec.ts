@@ -43,8 +43,8 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
  * `deploid_task7_e2e`という完全に別のDBを使うことで回避した）。
  */
 
-const ROBOT_STABLE_ID = 'unitree-g1';
-const ROBOT_SLUG = 'unitree-g1';
+const ROBOT_STABLE_ID = 'fixture-robot-a';
+const ROBOT_SLUG = 'fixture-robot-a';
 
 /** `payload.config.ts`を読み込むため、必ずrepo rootをcwdにして実行する。 */
 function updateRobotName(newName: string): void {

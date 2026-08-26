@@ -25,7 +25,7 @@ test('serves CSP as report-only and never enforced', async ({ request }) => {
 
 test('applies the headers to every route, not just the home page', async ({ request }) => {
   // `source: '/:path*'` の取りこぼしを捕まえる。静的 route と動的 route の両方を見る。
-  for (const route of ['/privacy', '/robots', '/robots/unitree-g1', '/sitemap.xml']) {
+  for (const route of ['/privacy', '/robots', '/robots/fixture-robot-a', '/sitemap.xml']) {
     const headers = (await request.get(route)).headers();
     expect(headers['x-content-type-options'], `missing on ${route}`).toBe('nosniff');
   }

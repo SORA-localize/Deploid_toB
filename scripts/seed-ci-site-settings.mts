@@ -9,6 +9,9 @@ process.env.PAYLOAD_MIGRATING = 'true';
 
 import { getPayload } from 'payload';
 import config from '../payload.config';
+import { contentSnapshotFixture } from '../tests/fixtures/contentSnapshot';
+import { restoreContentSnapshot } from './import-content-to-payload.mts';
+import { authorizeRestoreFromLocalThrowaway } from './restoreAuthorization.mts';
 
 async function main(): Promise<void> {
   if (process.env.CI !== 'true') {
@@ -17,15 +20,15 @@ async function main(): Promise<void> {
 
   const payload = await getPayload({ config });
   try {
-    await payload.updateGlobal({
-      slug: 'site-settings',
-      overrideAccess: true,
-      data: {
-        dataAsOf: 'ci-fixture',
-        articleIndexPlacementLimits: { hero: 5, feature: 2 },
-      },
+    await restoreContentSnapshot({
+      payload,
+      snapshot: contentSnapshotFixture,
+      user: { id: 'ci-fixture-admin', role: 'platform-admin' },
+      authorization: authorizeRestoreFromLocalThrowaway({ environment: null, isLocalHost: true }),
+      runId: 'ci-e2e-fixture',
+      reason: 'disposable CI E2E fixture',
     });
-    console.log('[ci-fixture] seeded required site-settings global');
+    console.log('[ci-fixture] seeded Payload E2E fixture');
   } finally {
     await payload.destroy();
   }

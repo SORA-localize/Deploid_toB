@@ -6,11 +6,11 @@ import { expect, test } from '@playwright/test';
 const routes = [
   '/',
   '/robots',
-  '/robots/unitree-g1',
+  '/robots/fixture-robot-a',
   '/manufacturers',
-  '/manufacturers/unitree',
+  '/manufacturers/fixture-mfr-alpha',
   '/use-cases',
-  '/use-cases/research-development',
+  '/use-cases/fixture-usecase-one',
   '/reports',
   '/compare',
 ] as const;
