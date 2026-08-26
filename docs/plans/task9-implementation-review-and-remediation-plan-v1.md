@@ -20,7 +20,7 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - 実施コミット: `46e10a7`（起点 `e7427f7` の是正コミットを含む）
 - 監査対象: Payload 設定、DB safety、migration/import/restore、監査アップロード、認証・公開、draft/revalidation/cache、Blob/KMS、CI/CD、ドキュメント
 - Production/Preview/Vercel/外部 DB/Blob への接続・書き込みは行っていない
-- `.env.local` は読み込んでいない。秘密値・接続文字列・トークンは本書に記載しない
+- `.env.local` の内容は読み取らず、明示的にsourceもしなかった。Next.js buildはファイルの存在を自動検出するため、buildログには `.env.local` と表示されたが、検証用の `DATABASE_URL`/`PAYLOAD_SECRET` をプロセス環境で明示した。秘密値・接続文字列・トークンは本書に記載しない
 - 承認済みの一時 PostgreSQL（127.0.0.1:55440、throwaway DB）で migration/status/CI seed、restore enforcement、integration、build、CI対象E2Eを実行した。Production/Preview DB では実行していない
 - GitHub の branch protection、ruleset、required checks は API接続失敗（`api.github.com`へ接続不可）のため未確認。認証状態自体は `gh auth status` で有効を確認した
 
