@@ -22,7 +22,7 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - Production/Preview/Vercel/外部 DB/Blob への接続・書き込みは行っていない
 - `.env.local` の内容は読み取らず、明示的にsourceもしなかった。Next.js buildはファイルの存在を自動検出するため、buildログには `.env.local` と表示されたが、検証用の `DATABASE_URL`/`PAYLOAD_SECRET` をプロセス環境で明示した。秘密値・接続文字列・トークンは本書に記載しない
 - 承認済みの一時 PostgreSQL（127.0.0.1:55440、throwaway DB）で migration/status/CI seed、restore enforcement、integration、build、CI対象E2Eを実行した。Production/Preview DB では実行していない
-- GitHub の branch protection、ruleset、required checks は API接続失敗（`api.github.com`へ接続不可）のため未確認。認証状態自体は `gh auth status` で有効を確認した
+- GitHub APIは通常sandboxでは接続不可だが、権限付き読み取りで確認できた。`main` は branch protectionなし、repository rulesetsは空配列で、required checksの強制設定は確認できなかった。`gh auth status`の認証は有効
 
 ## 3. 参照したルール・判断基準
 
@@ -180,5 +180,6 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - CI対象の `cache-revalidation.spec.ts` と `draft-mode-wiring.spec.ts` は4/4 pass（workers=1）
 - `npm run test:integration` は12/12 pass、全Vitestは504 pass / 37 skip
 - 全UI E2E 94本は61 pass / 32 fail / 1 did not run。失敗は最小Payload fixtureと既存UI英語fixture・visual baselineの前提不一致（または既存UI挙動）で、CIのcontent-e2e対象外。残課題として記録する
+- GitHub最新run（main, run `32922238607`）は通常CI成功、Content platform E2E失敗。失敗は修正前のremote commitでcache/draft各specがfixture表示値に追随しなかったもの。対象ブランチではE2E helper修正後に4/4 passを再現済みだが、branch未pushのためGitHub上の再実行結果は未取得
 
 DB側restore transaction、Blob/DB更新失敗時の補償、publish revalidationのcommit順序、admin同時実行保護は実装済み。throwaway DBでmigration/status/seed/restore enforcement、integration、production build、CI対象E2Eを検証済み。BlobとDBを跨ぐ完全な原子性、全UI E2Eの既存baseline整合、Preview/Production/GitHub required checksの外部検証は未完了であり、Task 9の本番承認条件はまだ満たしていない。
