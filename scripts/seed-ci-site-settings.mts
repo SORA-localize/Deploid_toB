@@ -34,6 +34,7 @@ async function main(): Promise<void> {
     await payload.updateGlobal({
       slug: 'site-settings',
       overrideAccess: true,
+      user: { id: 'ci-fixture-admin', role: 'platform-admin' },
       data: {
         dataAsOf: 'ci-fixture',
         articleIndexPlacementLimits: { hero: 5, feature: 2 },
