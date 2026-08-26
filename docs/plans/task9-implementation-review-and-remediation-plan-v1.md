@@ -21,7 +21,7 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - 監査対象: Payload 設定、DB safety、migration/import/restore、監査アップロード、認証・公開、draft/revalidation/cache、Blob/KMS、CI/CD、ドキュメント
 - Production/Preview/Vercel/外部 DB/Blob への接続・書き込みは行っていない
 - `.env.local` は読み込んでいない。秘密値・接続文字列・トークンは本書に記載しない
-- 承認済みの一時 PostgreSQL（127.0.0.1:55439、throwaway DB）で migration/status/CI seed と restore enforcement を実行した。Production/Preview DB では実行していない
+- 承認済みの一時 PostgreSQL（127.0.0.1:55440、throwaway DB）で migration/status/CI seed、restore enforcement、integration、build、CI対象E2Eを実行した。Production/Preview DB では実行していない
 - GitHub の branch protection、ruleset、required checks は CLI 認証不備のため未確認
 
 ## 3. 参照したルール・判断基準
@@ -181,4 +181,4 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - `npm run test:integration` は12/12 pass、全Vitestは504 pass / 37 skip
 - 全UI E2E 94本は61 pass / 32 fail / 1 did not run。失敗は最小Payload fixtureと既存UI英語fixture・visual baselineの前提不一致（または既存UI挙動）で、CIのcontent-e2e対象外。残課題として記録する
 
-DB側restore transaction、Blob/DB更新失敗時の補償、publish revalidationのcommit順序、admin同時実行保護は実装済み。throwaway DB で migration/status/seed/restore enforcement を検証済み。BlobとDBを跨ぐ完全な原子性、全 integration/E2E・production build、Preview/Production/GitHub required checks の外部検証は未完了であり、Task 9の本番承認条件はまだ満たしていない。
+DB側restore transaction、Blob/DB更新失敗時の補償、publish revalidationのcommit順序、admin同時実行保護は実装済み。throwaway DBでmigration/status/seed/restore enforcement、integration、production build、CI対象E2Eを検証済み。BlobとDBを跨ぐ完全な原子性、全UI E2Eの既存baseline整合、Preview/Production/GitHub required checksの外部検証は未完了であり、Task 9の本番承認条件はまだ満たしていない。
