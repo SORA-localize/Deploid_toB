@@ -7,17 +7,22 @@
  */
 process.env.PAYLOAD_MIGRATING = 'true';
 
-import { getPayload } from 'payload';
-import config from '../payload.config';
-import { contentSnapshotFixture } from '../tests/fixtures/contentSnapshot';
-import { restoreContentSnapshot } from './import-content-to-payload.mts';
-import { authorizeRestoreFromLocalThrowaway } from './restoreAuthorization.mts';
-
 async function main(): Promise<void> {
   if (process.env.CI !== 'true') {
     console.log('[ci-fixture] skipped outside CI=true');
     return;
   }
+
+  // Keep these imports after the migration guard is set. Static ESM imports are
+  // evaluated before this module body and could initialize Payload too early.
+  const [{ getPayload }, { default: config }, { contentSnapshotFixture }, { restoreContentSnapshot }, { authorizeRestoreFromLocalThrowaway }] =
+    await Promise.all([
+      import('payload'),
+      import('../payload.config'),
+      import('../tests/fixtures/contentSnapshot'),
+      import('./import-content-to-payload.mts'),
+      import('./restoreAuthorization.mts'),
+    ]);
 
   const payload = await getPayload({ config });
   try {
@@ -40,12 +45,20 @@ async function main(): Promise<void> {
         articleIndexPlacementLimits: { hero: 5, feature: 2 },
       },
     });
+    const published = await payload.findGlobal({ slug: 'site-settings', draft: false, depth: 0, overrideAccess: true });
+    const limits = published.articleIndexPlacementLimits;
+    if (limits?.hero !== 5 || limits?.feature !== 2) {
+      throw new Error('[ci-fixture] site-settings publish verification failed');
+    }
     console.log('[ci-fixture] seeded Payload E2E fixture');
   } finally {
     await payload.destroy();
   }
-  // Keep this one-shot CI helper from leaving a driver/socket handle alive.
-  process.exit(0);
 }
 
-await main();
+main()
+  .then(() => process.exit(process.exitCode ?? 0))
+  .catch((error: unknown) => {
+    console.error(error);
+    process.exit(1);
+  });
