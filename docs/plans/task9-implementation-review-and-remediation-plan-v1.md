@@ -181,5 +181,8 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - `npm run test:integration` は12/12 pass、全Vitestは504 pass / 37 skip
 - 全UI E2E 94本は61 pass / 32 fail / 1 did not run。失敗は最小Payload fixtureと既存UI英語fixture・visual baselineの前提不一致（または既存UI挙動）で、CIのcontent-e2e対象外。残課題として記録する
 - GitHub最新run（main, run `32922238607`）は通常CI成功、Content platform E2E失敗。失敗は修正前のremote commitでcache/draft各specがfixture表示値に追随しなかったもの。対象ブランチではE2E helper修正後に4/4 passを再現済みだが、branch未pushのためGitHub上の再実行結果は未取得
+- `npm run test` の実行コマンドは `vitest run`（`vitest.config.ts`）。`tests/integration/**` は既定設定で除外されるため、throwaway DB上の完全JSONレポート `/tmp/task9-vitest-full.json` で 541 tests = 504 passed / 37 skipped / 0 failed（63 test files）を確認した。integration は別コマンドで 12/12 pass。
+- 全UI E2E 32 failures は、cache/draftの旧fixture表示値（2）、日本語fixtureと英語期待値の不一致（6）、最小fixtureの件数・比較・フォーカス前提不一致（10）、visual baseline/fixture画像不一致（14）に分類した。いずれもTask 9のCI対象外だが、アプリ退行でないことをリポジトリ全体で証明したわけではないためrelease gate判断を保留する。
+- `cleanupExpiredAuditUploadSessions` を追加し、pendingかつ `expiresAt < now` のsessionを最大100件ずつ再試行可能に回収する設計にした。allowlist全件（`uploaded=false`を含む）とcompletion markerを削除してからsession行を削除し、失敗行は結果に残す。孤児Blob（DB flagがfalseのままBlobだけ存在）の回収と期限切れbatchをthrowaway DBテストで追加し、audit uploadテストは33 pass / 4 skip。
 
-DB側restore transaction、Blob/DB更新失敗時の補償、publish revalidationのcommit順序、admin同時実行保護は実装済み。throwaway DBでmigration/status/seed/restore enforcement、integration、production build、CI対象E2Eを検証済み。BlobとDBを跨ぐ完全な原子性、全UI E2Eの既存baseline整合、Preview/Production/GitHub required checksの外部検証は未完了であり、Task 9の本番承認条件はまだ満たしていない。
+DB側restore transaction、Blob/DB更新失敗時の補償、publish revalidationのcommit順序、admin同時実行保護は実装済み。throwaway DBでmigration/status/seed/restore enforcement、integration、production build、CI対象E2Eを検証済み。BlobとDBを跨ぐ完全な原子性、scheduler実装の外部登録、全UI E2Eの既存baseline整合、Preview/Production/GitHub required checksの外部検証は未完了であり、Task 9の本番承認条件はまだ満たしていない。

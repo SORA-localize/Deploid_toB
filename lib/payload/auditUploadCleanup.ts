@@ -22,6 +22,12 @@ async function loadSession(payload: Payload, sessionId: string): Promise<LoadedS
 
 export type CleanupSessionResult = { ok: true; removedObjectCount: number } | { ok: false; reason: string; detail: string };
 
+export type ExpiredAuditUploadCleanupResult = {
+  scanned: number;
+  cleaned: number;
+  failed: Array<{ sessionId: string; detail: string }>;
+};
+
 export async function cleanupAuditUploadSession(args: {
   payload: Payload; sessionId: string; requestId: string; oidcToken: string;
   env?: Record<string, string | undefined>; storeFactory?: BlobStoreFactory;
@@ -50,4 +56,32 @@ export async function cleanupAuditUploadSession(args: {
   if (await store.exists(markerKey)) await store.remove(markerKey);
   await args.payload.delete({ collection: 'audit-upload-sessions', id: session.id, overrideAccess: true });
   return { ok: true, removedObjectCount };
+}
+
+/** Reclaims expired pending sessions; failed rows remain retryable. */
+export async function cleanupExpiredAuditUploadSessions(args: {
+  payload: Payload; oidcToken: string; now?: Date;
+  env?: Record<string, string | undefined>; storeFactory?: BlobStoreFactory; limit?: number;
+}): Promise<ExpiredAuditUploadCleanupResult> {
+  const now = args.now ?? new Date();
+  const { docs } = await args.payload.find({
+    collection: 'audit-upload-sessions',
+    where: { status: { equals: 'pending' }, expiresAt: { less_than: now.toISOString() } },
+    overrideAccess: true, limit: args.limit ?? 100,
+  });
+  const result: ExpiredAuditUploadCleanupResult = { scanned: docs.length, cleaned: 0, failed: [] };
+  for (const doc of docs) {
+    const session = doc as unknown as { sessionId: string; requestId: string };
+    try {
+      const cleanup = await cleanupAuditUploadSession({
+        payload: args.payload, sessionId: session.sessionId, requestId: session.requestId,
+        oidcToken: args.oidcToken, env: args.env, storeFactory: args.storeFactory,
+      });
+      if (cleanup.ok) result.cleaned += 1;
+      else result.failed.push({ sessionId: session.sessionId, detail: `${cleanup.reason}: ${cleanup.detail}` });
+    } catch (error) {
+      result.failed.push({ sessionId: session.sessionId, detail: error instanceof Error ? error.message : String(error) });
+    }
+  }
+  return result;
 }

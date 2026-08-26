@@ -6,7 +6,7 @@ import {
   authenticateAuditUploadOperator,
   type AuditUploadAuthResult,
 } from '@/lib/payload/auditUploadAuth';
-import { cleanupAuditUploadSession } from '@/lib/payload/auditUploadCleanup';
+import { cleanupAuditUploadSession, cleanupExpiredAuditUploadSessions } from '@/lib/payload/auditUploadCleanup';
 import { recordAuditUploadObject, type BlobStoreFactory } from '@/lib/payload/auditUploadObject';
 import {
   completeAuditUploadSession,
@@ -893,6 +893,36 @@ describe('cleanupAuditUploadSession (失敗時cleanup)', () => {
     expect(result).toMatchObject({ ok: true, removedObjectCount: 1 });
     expect(store.data.size).toBe(0);
 
+    const { totalDocs } = await payload.count({ collection: 'audit-upload-sessions', where: { sessionId: { equals: sessionId } }, overrideAccess: true });
+    expect(totalDocs).toBe(0);
+  });
+
+  it('removes an orphan Blob even when its DB uploaded flag stayed false', async () => {
+    const { sessionId, manifest } = await createRawSession(payload);
+    const store = createFakeBlobStore();
+    // Simulate Blob PUT succeeding immediately before the DB transaction/update
+    // rolls back: the allowlisted object exists, but uploaded remains false.
+    store.data.set(manifest.storage.objectKey, Buffer.from('orphan snapshot'));
+    const result = await cleanupAuditUploadSession({
+      payload, sessionId, requestId: 'req-raw-1', oidcToken: previewOidcToken(),
+      env: testEnv(), storeFactory: makeStoreFactory(store),
+    });
+    expect(result).toMatchObject({ ok: true, removedObjectCount: 0 });
+    expect(store.data.size).toBe(0);
+  });
+
+  it('batch-cleans expired pending sessions and leaves completed sessions untouched', async () => {
+    const { sessionId, manifest } = await createRawSession(payload, { expiresAt: new Date(Date.now() - 1000).toISOString() });
+    await createRawSession(payload, { status: 'completed', expiresAt: new Date(Date.now() - 1000).toISOString() });
+    const store = createFakeBlobStore();
+    store.data.set(manifest.storage.objectKey, Buffer.from('expired orphan'));
+    const result = await cleanupExpiredAuditUploadSessions({
+      payload, oidcToken: previewOidcToken(), env: testEnv(), storeFactory: makeStoreFactory(store), limit: 10,
+    });
+    expect(result.scanned).toBe(1);
+    expect(result.cleaned).toBe(1);
+    expect(result.failed).toEqual([]);
+    expect(store.data.size).toBe(0);
     const { totalDocs } = await payload.count({ collection: 'audit-upload-sessions', where: { sessionId: { equals: sessionId } }, overrideAccess: true });
     expect(totalDocs).toBe(0);
   });
