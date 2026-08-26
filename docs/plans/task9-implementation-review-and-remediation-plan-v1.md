@@ -9,14 +9,15 @@ scope: content-platform-migration
 
 ## 1. 目的と結論
 
-Task 1〜9 の実装について、コード、設定、履歴、CI、テスト、データ移行・復元経路を対象に、実装レビューと安全性監査を行った。本書はその結果と、承認後に実施する是正作業をまとめたものである。
+Task 1〜9 の実装について、コード、設定、履歴、CI、テスト、データ移行・復元経路を対象に、実装レビューと安全性監査を行った。本書は監査結果、対象ブランチで実施した是正、検証結果、残る運用確認事項を記録する。
 
-現時点では Task 9 の本番カットオーバーを承認できない。主な理由は、CI 用 seed スクリプトと移行 CLI にスクリプト単体の DB 安全ゲートがなく、誤った `DATABASE_URL` に対して書き込みを実行できること、復元処理が単一トランザクションではないこと、監査アップロードの Blob/DB 整合性に孤児が残る失敗窓があること、公開 CI で E2E・integration・branch protection を確認できていないことである。
+対象ブランチでは上記のCritical/High是正を実装し、throwaway DB・build・CI対象E2E・integrationで検証した。ただし、Production/Previewの同一性、GitHub required checks/branch protection、実Blob/KMS、全UI向けE2Eの合否は外部環境または別fixtureが必要なため、本番カットオーバーはまだ承認しない。
 
 ## 2. 監査範囲と前提
 
-- 対象ブランチ: `fix-ci-e2e-admin-seed`
-- 対象コミット: `e7427f7dd0995b0f6568ef484c9ea0a81398d0bf`
+- 監査起点ブランチ: `fix-ci-e2e-admin-seed`
+- 実施ブランチ: `remediation/task9-safety-gates`
+- 実施コミット: `46e10a7`（起点 `e7427f7` の是正コミットを含む）
 - 監査対象: Payload 設定、DB safety、migration/import/restore、監査アップロード、認証・公開、draft/revalidation/cache、Blob/KMS、CI/CD、ドキュメント
 - Production/Preview/Vercel/外部 DB/Blob への接続・書き込みは行っていない
 - `.env.local` は読み込んでいない。秘密値・接続文字列・トークンは本書に記載しない
@@ -81,7 +82,7 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - 静的境界検査、typecheck、lint、dead-code、docs 検査は通過した。関連非 DB テストは 161 pass / 12 skip（実 KMS 条件付きテスト）だった。throwaway DB では migration 9件、status 全件 Yes、CI seed、restore enforcement 44 pass / 13 skip を確認した。
 - 依存監査では Critical/High は 0 件だった（Moderate 6、Low 1）。
 
-## 5. 是正計画（承認後に実施）
+## 5. 是正計画と実施結果
 
 ### Phase A: DB 書き込み安全ゲート（最優先）
 
@@ -133,15 +134,15 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - KMS、OIDC、Blob の実 credential または秘密値
 - UI/デザイン実装（本計画では運用ドキュメント整合性のみ扱う）
 
-## 7. 実装前の承認事項
+## 7. 承認事項と実施範囲
 
-実装を開始するには、次を明示承認する。
+ユーザー指示により、次の範囲を対象ブランチで実施した。
 
-1. Phase A〜D のうち実施する phase と対象ファイル
-2. DB 検証に使う throwaway DB の host/name と、破棄権限（秘密値は共有しない）
-3. CI workflow・GitHub settings を変更するかどうか
-4. Preview/Production での読み取り専用確認を許可するかどうか
-5. 既存 partial session/Blob の掃除を実施するかどうか
+1. Phase A〜Dを対象ブランチで実施
+2. ローカル一時PostgreSQLでmigration/seed/restore/integration/build/E2Eを検証
+3. CI workflowは外部設定を変更せず、既存定義を読み取り・対象E2Eを再現
+4. Preview/Production/GitHub settingsへの接続・書き込みは実施しない
+5. 既存Productionのpartial session/Blob掃除は実施しない
 
 ## 8. 検証マトリクス
 
@@ -159,7 +160,7 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 
 是正後は、変更差分を再読し、上記 ID を一件ずつ再判定する。Critical/High が残る、throwaway DB での検証ができない、Preview/Production の対象同一性が確認できない、または required checks が未確認の場合は「実装済み」までに留め、「本番安全」「カットオーバー承認済み」とは報告しない。
 
-本書自体は計画段階の成果物であり、コード変更・DB操作・デプロイを完了したことを意味しない。
+本書は対象ブランチの実装・検証結果を含む。Production/Previewへのデプロイや外部設定変更を完了したことを意味しない。
 
 ## 10. 実装進捗
 
@@ -175,5 +176,9 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - admin削除・最後のplatform-admin降格判定にtransaction advisory lockを追加
 - 削除済み script を呼ぶ `source-links.yml` を削除
 - typecheck、lint、関連非DBテストを再実行済み
+- CI=true・fixture入りthrowaway DBで `npm run build` 成功
+- CI対象の `cache-revalidation.spec.ts` と `draft-mode-wiring.spec.ts` は4/4 pass（workers=1）
+- `npm run test:integration` は12/12 pass、全Vitestは504 pass / 37 skip
+- 全UI E2E 94本は61 pass / 32 fail / 1 did not run。失敗は最小Payload fixtureと既存UI英語fixture・visual baselineの前提不一致（または既存UI挙動）で、CIのcontent-e2e対象外。残課題として記録する
 
 DB側restore transaction、Blob/DB更新失敗時の補償、publish revalidationのcommit順序、admin同時実行保護は実装済み。throwaway DB で migration/status/seed/restore enforcement を検証済み。BlobとDBを跨ぐ完全な原子性、全 integration/E2E・production build、Preview/Production/GitHub required checks の外部検証は未完了であり、Task 9の本番承認条件はまだ満たしていない。
