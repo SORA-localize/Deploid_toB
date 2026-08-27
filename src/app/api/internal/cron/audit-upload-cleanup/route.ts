@@ -2,8 +2,6 @@ import { getPayload } from 'payload';
 import config from '@/payload.config';
 import { cleanupExpiredAuditUploadSessions } from '@/lib/payload/auditUploadCleanup';
 
-export const dynamic = 'force-dynamic';
-
 /** Vercel Cron entrypoint. It is inert unless both secrets are configured. */
 export async function GET(request: Request): Promise<Response> {
   const expected = process.env.CRON_SECRET;
