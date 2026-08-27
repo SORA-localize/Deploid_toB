@@ -20,13 +20,10 @@
 #   （brief記載）。別fileにすることで、GitHub Actions UI上でも「PRの必須チェック」と
 #   「push/手動実行専用の重いe2e回帰」が別workflowとして視覚的に分離される。
 #
-# ## non-blocking化の設計
+# ## PR release-gate化の設計
 #
-# 1. `on:`に`pull_request`を含めない。`push`（`main`のみ）と`workflow_dispatch`だけ。
-#    これだけで通常のPR開発フローには一切登場しない。
-# 2. branch protectionのrequired status checksにもこのworkflow/jobを登録しない
-#    （registrationはrepository設定側の話であり、このfileには対応する記述が無い——
-#    「登録しないこと」自体が対応)。
+# 1. `pull_request`（main向け）、`push`（main）、`workflow_dispatch`で実行する。
+# 2. branch protectionのrequired status checksにこのworkflow/jobを登録し、PRで実態を検証する。
 # 3. jobの中身は「失敗したstepがあっても後続stepを止めない」ように、各testのstepへ個別に
 #    `continue-on-error: true`を付ける（`playwright test` stepが失敗しても、続けて
 #    `test:integration` stepを実行し、両方のartifactを回収できるようにするため）。最後に
@@ -34,11 +31,12 @@
 #    （brief 5の「失敗時はartifactをuploadする」を満たしつつ、push/workflow_dispatch実行結果の
 #    緑/赤がそのまま実態を表すようにする——`continue-on-error`だけに頼って常に緑にすると、
 #    「実は退行しているのに誰も気づかない」という、このworkflowを作る動機そのものを損なう)。
-#    このjob-level/step-levelの赤は、`pull_request` triggerに乗っておらずrequired checksにも
-#    登録していないため、通常のPR開発フローを一切妨げない。
-name: Content platform E2E (non-blocking)
+#    最後のgateでjobをfailureにし、PRのrequired checkとして失敗をブロックする。
+name: Content platform E2E
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
   workflow_dispatch:
