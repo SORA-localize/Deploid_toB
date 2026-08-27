@@ -186,5 +186,7 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - `cleanupExpiredAuditUploadSessions` を追加し、pendingかつ `expiresAt < now` のsessionを最大100件ずつ再試行可能に回収する設計にした。allowlist全件（`uploaded=false`を含む）とcompletion markerを削除してからsession行を削除し、失敗行は結果に残す。孤児Blob（DB flagがfalseのままBlobだけ存在）の回収と期限切れbatchをthrowaway DBテストで追加し、audit uploadテストは33 pass / 4 skip。
 - restoreの失敗注入テストを追加し、write経路が例外になった場合にcommitせず `rollbackTransaction` を呼ぶことを確認した（`tests/content/restore-enforcement.test.ts`）。ただし、実Payloadの複数collection書き込みを途中で失敗させ、前半行がDBに残らないことを確認する統合テストは未完了である。
 - 期限切れcleanup関数は実装済みだが、cron/Vercel Cron/GitHub Actions/手動ジョブへの登録はまだ行っていない。scheduler登録は外部運用設計・設定変更として別承認が必要。
+- GitHub実測（2026-08-27）ではPR #39（`remediation/task9-safety-gates` → `main`）が作成済みで、最新 `c7e2ff0` までpush済み。`task9-main-protection` rulesetはActiveで、main対象・PR必須・`verify`/`content-e2e` required・force push/削除禁止・linear history・bypassなしを確認した。
+- PR #39の`verify`は成功し、Vercel deploymentも成功した。一方、現行workflowはPRイベントで`content-e2e`を起動しないため、PR上の`content-e2e`結果は未実行。レビュー承認も未取得で、PRのmerge状態は`BLOCKED`。requiredに設定した`content-e2e`を実際にPRで実行するworkflow変更が次のCI課題である。
 
 DB側restore transaction、Blob/DB更新失敗時の補償、publish revalidationのcommit順序、admin同時実行保護は実装済み。throwaway DBでmigration/status/seed/restore enforcement、integration、production build、CI対象E2Eを検証済み。BlobとDBを跨ぐ完全な原子性、scheduler実装の外部登録、全UI E2Eの既存baseline整合、Preview/Production/GitHub required checksの外部検証は未完了であり、Task 9の本番承認条件はまだ満たしていない。
