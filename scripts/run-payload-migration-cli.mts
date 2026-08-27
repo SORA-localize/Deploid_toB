@@ -55,6 +55,7 @@
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import payload from 'payload';
+import { assertWritableDatabaseUrl } from '../lib/content/databaseSafety';
 
 async function main(): Promise<void> {
   // `runPayloadCli()`は`spawnSync(TSX_BIN, [scriptPath, '--', ...args], ...)`という、
@@ -71,6 +72,21 @@ async function main(): Promise<void> {
     process.exitCode = 1;
     return;
   }
+
+  // Guard before loading the Payload config or opening a connection. Local throwaway
+  // databases are allowed for CI; persistent local and managed targets require their
+  // explicit, target-specific confirmation flag.
+  assertWritableDatabaseUrl({
+    raw: process.env.DATABASE_URL,
+    callerFile: 'scripts/run-payload-migration-cli.mts',
+    confirmedProduction: args.includes('--i-know-this-is-production'),
+    confirmedPreview: args.includes('--i-know-this-is-preview'),
+    // Vitest creates named disposable databases that intentionally do not carry
+    // a test/e2e suffix in a few legacy enforcement cases. Keep that harness
+    // compatible while production/CI processes still require the explicit flag.
+    confirmedPersistentLocalDatabase:
+      args.includes('--i-know-this-is-a-persistent-local-database') || process.env.NODE_ENV === 'test',
+  });
 
   // `payload migrate` CLI自身が`payload.init()`より前に立てるのと同じフラグ。dev-modeの
   // schema auto-pushを止め、`payload.config.ts`が`PAYLOAD_TEST_MIGRATION_DIR`を

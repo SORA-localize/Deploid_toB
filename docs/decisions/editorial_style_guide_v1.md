@@ -7,8 +7,8 @@ updated: 2026-07-01
 
 Last reviewed: 2026-07-01
 
-> このガイドは、Deploid に掲載する記事（`data/articles.ts`）の執筆・編集方針を定める。
-> データフィールドの仕様は `data/types.ts`、公開前チェックは `data-maintenance-checklist-v1.md` C項を参照。
+> このガイドは、Deploid に掲載する記事（Payload articles collection）の執筆・編集方針を定める。
+> データフィールドの仕様は Payload collection schema/content contract、公開前チェックは `data-maintenance-checklist-v1.md` C項を参照。
 
 ---
 
@@ -450,7 +450,7 @@ heroは「最新」だけで選ばない。以下を満たすものだけ載せ�
 
 **見出しは固定テンプレートを使う**
 
-メーカー解説は同じ観点で複数社を比較できることが価値なので、§4の「見出しラベルをそのまま使わない」という一般則の例外として、次の6本の見出しをどのメーカーでも同じ順・同じ語で使う：**会社概要 → 製品ラインナップ → 沿革 → 導入実績 → 日本からの調達 → よくある質問**。見出し文字列と順序の正本はコード側（`lib/manufacturerGuideTemplate.ts`）で、本文データはセクション別の固定テンプレート型（`data/types.ts` の `ManufacturerGuideContent`）に入れる。
+メーカー解説は同じ観点で複数社を比較できることが価値なので、§4の「見出しラベルをそのまま使わない」という一般則の例外として、次の6本の見出しをどのメーカーでも同じ順・同じ語で使う：**会社概要 → 製品ラインナップ → 沿革 → 導入実績 → 日本からの調達 → よくある質問**。見出し文字列と順序の正本はコード側（`lib/manufacturerGuideTemplate.ts`）で、本文データはPayload articles schemaの固定テンプレートへ保存する。
 
 見出しを揃えるだけでは記事は揃わない。**各セクションは、順序固定の役割（骨格）に分解してある**。執筆は「骨格の各枠に、出典で確認できた情報を書き込む → 枠の順序のまま自然な日本語で接続する」の2段階で行う。役割名・枠の番号は本文に出さない。骨格に対応する情報が確認できない枠は、推測で埋めず「確認できる公開情報はない」と地の文で明記する。
 
@@ -655,4 +655,4 @@ FAQは本文の再掲欄ではない。次の3条件のどれかに該当する�
 
 - **コードを書く前に参照**：記事データを追加・編集する前にこのガイドを確認する
 - **AI生成本文の禁止**：本文（`body`）を AIに一発生成させてそのまま載せない。調査・構造・出典確認を人が行い、NG表現を除去した上で掲載する
-- **スキーマとの整合**：`data/types.ts` の `ArticleType` / `ArticleSection` / `ArticleCategory` と本ガイドのセクション分類は対応している。型を間違えると validate が落ちる
+- **スキーマとの整合**：Payload articles schema/content contractの `ArticleType` / `ArticleSection` / `ArticleCategory` と本ガイドのセクション分類は対応している。値を間違えるとcontent verificationが落ちる

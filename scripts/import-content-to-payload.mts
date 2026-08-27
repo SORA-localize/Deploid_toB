@@ -467,6 +467,8 @@ export interface ImportOptions {
   reason?: string;
   mediaResolver?: MediaFileResolver;
   log?: (line: string) => void;
+  /** restore時に全Payload Local API操作へ引き継ぐDB transaction。 */
+  transactionID?: string | number;
 }
 
 /**
@@ -503,6 +505,7 @@ async function upsertByStableId(
     publishContext: Record<string, unknown>;
     /** 必須修正8-3: 通常 import は `false`。restore（特権経路）だけが `true`。 */
     overrideAccess: boolean;
+    transactionID?: string | number;
   },
 ): Promise<UpsertResult> {
   const existing = (await payload.find({
@@ -513,6 +516,7 @@ async function upsertByStableId(
     depth: 0,
     overrideAccess: args.overrideAccess,
     user: args.user as never,
+    ...(args.transactionID !== undefined ? { req: { transactionID: args.transactionID } } : {}),
   })) as unknown as { docs: Array<{ id: string | number; filename?: string | null }> };
 
   // Payload の `create`/`update` は `draft: true` のとき data を `DraftDataFromCollectionSlug`
@@ -541,6 +545,7 @@ async function upsertByStableId(
       // (DB row自体は作られるので import 自体はerror無しで成功して見える)。
       // 呼び出しごとに新しい object を渡せば、この汚染は次の呼び出しへ伝播しない。
       context: { ...args.publishContext },
+      ...(args.transactionID !== undefined ? { req: { transactionID: args.transactionID } } : {}),
     } as unknown as Parameters<Payload['update']>[0];
     const doc = (await payload.update(updateArgs)) as unknown as { id: string | number };
     return { id: doc.id, action: 'updated' };
@@ -555,6 +560,7 @@ async function upsertByStableId(
     // 上の update 分岐と同じ理由(shared context object 汚染対策)。
     context: { ...args.publishContext },
     ...(args.file ? { file: args.file } : {}),
+    ...(args.transactionID !== undefined ? { req: { transactionID: args.transactionID } } : {}),
   } as unknown as Parameters<Payload['create']>[0];
   const doc = (await payload.create(createArgs)) as unknown as { id: string | number };
   return { id: doc.id, action: 'created' };
@@ -564,7 +570,7 @@ async function stableIdExists(
   payload: Payload,
   collection: ImportCollectionSlug,
   stableId: string,
-  args: { user: unknown; overrideAccess: boolean },
+  args: { user: unknown; overrideAccess: boolean; transactionID?: string | number },
 ): Promise<boolean> {
   const result = (await payload.find({
     collection: collection as never,
@@ -574,6 +580,7 @@ async function stableIdExists(
     depth: 0,
     overrideAccess: args.overrideAccess,
     user: args.user as never,
+    ...(args.transactionID !== undefined ? { req: { transactionID: args.transactionID } } : {}),
   })) as unknown as { docs: unknown[] };
   return result.docs.length > 0;
 }
@@ -599,11 +606,25 @@ export async function restoreContentSnapshot(options: RestoreOptions): Promise<I
         'from a database that identifies itself as a local throwaway).',
     );
   }
-  return writeContentSnapshot({
-    ...options,
-    overrideAccess: true,
-    reason: options.reason ?? options.authorization.reason,
-  });
+  const transactionID = await options.payload.db.beginTransaction();
+  if (transactionID === null) {
+    throw new Error('restore-transaction-unavailable: database adapter does not support transactions');
+  }
+  let committed = false;
+  try {
+    const report = await writeContentSnapshot({
+      ...options,
+      overrideAccess: true,
+      reason: options.reason ?? options.authorization.reason,
+      transactionID,
+    });
+    await options.payload.db.commitTransaction(transactionID);
+    committed = true;
+    return report;
+  } catch (error) {
+    if (!committed) await options.payload.db.rollbackTransaction(transactionID);
+    throw error;
+  }
 }
 
 async function writeContentSnapshot(options: ImportOptions & { overrideAccess: boolean }): Promise<ImportReport> {
@@ -617,6 +638,9 @@ async function writeContentSnapshot(options: ImportOptions & { overrideAccess: b
     actorId: String((user as { id?: string | number } | null)?.id ?? 'unknown'),
     reason: options.reason ?? 'content:import / content:restore idempotent upsert',
   });
+  if (options.transactionID !== undefined) {
+    (publishContext as Record<string, unknown>).skipPublishValidation = true;
+  }
   const mediaResolver = options.mediaResolver ?? createDefaultMediaFileResolver();
   const cache: RelationshipIdCache = createRelationshipIdCache();
 
@@ -653,6 +677,7 @@ async function writeContentSnapshot(options: ImportOptions & { overrideAccess: b
       file,
       publishContext,
       overrideAccess,
+      transactionID: options.transactionID,
     });
     record(collection, result, stableId);
   };
@@ -691,7 +716,11 @@ async function writeContentSnapshot(options: ImportOptions & { overrideAccess: b
       continue;
     }
 
-    const alreadyPresent = await stableIdExists(payload, 'media', candidate.asset.id, { user, overrideAccess });
+    const alreadyPresent = await stableIdExists(payload, 'media', candidate.asset.id, {
+      user,
+      overrideAccess,
+      transactionID: options.transactionID,
+    });
     if (alreadyPresent) {
       // 既存 media は metadata（alt / rights）だけ更新し、ファイル実体は再 upload しない。
       await write('media', candidate.asset.id, mapDomainMediaToPayload(candidate.asset), 'published');
@@ -788,6 +817,7 @@ async function writeContentSnapshot(options: ImportOptions & { overrideAccess: b
         draft: distributor.publishStatus === 'draft',
         publishContext,
         overrideAccess,
+        transactionID: options.transactionID,
       });
       report.deferredReferenceUpdates.distributors += 1;
     }
@@ -798,6 +828,7 @@ async function writeContentSnapshot(options: ImportOptions & { overrideAccess: b
         draft: robot.publishStatus === 'draft',
         publishContext,
         overrideAccess,
+        transactionID: options.transactionID,
       });
       report.deferredReferenceUpdates.robots += 1;
     }
@@ -808,6 +839,7 @@ async function writeContentSnapshot(options: ImportOptions & { overrideAccess: b
         draft: useCase.publishStatus === 'draft',
         publishContext,
         overrideAccess,
+        transactionID: options.transactionID,
       });
       report.deferredReferenceUpdates['use-cases'] += 1;
     }
@@ -838,6 +870,7 @@ async function writeContentSnapshot(options: ImportOptions & { overrideAccess: b
       // 呼ばれないので今回のbugの発生源ではないが、`publishContext` を素通しする箇所を
       // 1つも残さない方が将来の事故を防げる。
       context: { ...publishContext },
+      ...(options.transactionID !== undefined ? { req: { transactionID: options.transactionID } } : {}),
     });
   }
   report.siteSettingsUpdated = true;
@@ -1484,8 +1517,11 @@ async function main(): Promise<void> {
   const payload = await getPayload({ config });
   try {
     await assertPreviewWriteConfirmedByMarker(payload, args, classifyDatabaseUrl(process.env.DATABASE_URL as string).isLocalHost);
-    const user = await resolveImportUser(payload, args);
+    // Read the retired cutover source before resolving/bootstrapping an admin. The
+    // command must fail without any account side effect, even when --bootstrap-admin
+    // is supplied accidentally.
     const snapshot = await readCutoverSnapshot();
+    const user = await resolveImportUser(payload, args);
 
     // 必須修正8-8: 空DB + 既存 media store の組合せ（filename 自動採番）を先に止める。
     const plan = await planImportFromSnapshot(snapshot);

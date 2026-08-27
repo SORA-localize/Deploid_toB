@@ -71,8 +71,9 @@ export async function recordAuditUploadObject(args: {
   }
   const storeId = auditBlobStoreIdFor(session.environment, env);
   if (!storeId) return { ok: false, reason: 'store-error', detail: 'no audit blob store id configured' };
+  let store: SnapshotObjectStore;
   try {
-    const store = (args.storeFactory ?? createVercelBlobObjectStore)({
+    store = (args.storeFactory ?? createVercelBlobObjectStore)({
       storeId, displayName: `deploid-audit-${session.environment}`, expectedEnvironment: session.environment,
       env, oidcTokenOverride: args.oidcToken,
     });
@@ -80,10 +81,22 @@ export async function recordAuditUploadObject(args: {
   } catch (e) {
     return { ok: false, reason: 'store-error', detail: e instanceof Error ? e.message : String(e) };
   }
-  await args.payload.db.drizzle.execute(sql`
-    UPDATE "_audit_upload_sessions_allowed_objects"
-    SET "uploaded" = true
-    WHERE "_parent_id" = ${session.id} AND "object_key" = ${match.objectKey} AND "uploaded" = false
-  `);
+  try {
+    await args.payload.db.drizzle.execute(sql`
+      UPDATE "_audit_upload_sessions_allowed_objects"
+      SET "uploaded" = true
+      WHERE "_parent_id" = ${session.id} AND "object_key" = ${match.objectKey} AND "uploaded" = false
+    `);
+  } catch (error) {
+    // Do not leave a Blob that the session cannot account for. Best-effort
+    // compensation is safe because this object was just written by this call;
+    // preserve the DB error as the primary failure for retry/observability.
+    try {
+      await store.remove(match.objectKey);
+    } catch {
+      // The cleanup job can remove any remaining unaccounted object later.
+    }
+    return { ok: false, reason: 'store-error', detail: error instanceof Error ? error.message : String(error) };
+  }
   return { ok: true };
 }

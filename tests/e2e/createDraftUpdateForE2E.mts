@@ -40,7 +40,9 @@ async function main(): Promise<void> {
       id: doc.id,
       draft: true,
       overrideAccess: true,
-      data: { [field]: value } as never,
+      // 公開ページの日本語表示は `nameJa` を優先するため、draft 検証でも
+      // name/nameJa を同時に更新して、画面に出る値を明示的に固定する。
+      data: (field === 'name' ? { name: value, nameJa: value } : { [field]: value }) as never,
     });
 
     console.log(`OK: created a pending draft update on ${collection}/${stableId}.${field} (main row untouched)`);

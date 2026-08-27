@@ -15,7 +15,7 @@
  * データの正しさや認可には影響しない。認可（`createPublishGateHook`）や監査（version retention
  * guard）のfail-closedとは性質が異なる判断であることを明示するため、ここだけ別扱いにしている。
  */
-import type { CollectionAfterChangeHook, GlobalAfterChangeHook, PayloadRequest } from 'payload';
+import type { CollectionAfterChangeHook, GlobalAfterChangeHook, Payload, PayloadRequest } from 'payload';
 import { computeRevalidationSignature, REVALIDATE_SIGNATURE_HEADER, type RevalidatableCollectionSlug } from '../content/cacheTags';
 import { resolvePublicServerUrl } from './resolvePublicServerUrl';
 
@@ -68,9 +68,19 @@ async function notifyRevalidation(collectionSlug: RevalidatableCollectionSlug, r
   }
 }
 
+/** Publish transaction向け。DB commit後にだけ呼び出し、通知が未commit状態を
+ * キャッシュへ反映しないようにする。 */
+export async function notifyRevalidationAfterCommit(
+  collectionSlug: RevalidatableCollectionSlug,
+  payload: Payload,
+): Promise<void> {
+  await notifyRevalidation(collectionSlug, { payload } as unknown as PayloadRequest);
+}
+
 /** 各content collectionの既存 `hooks.afterChange` 配列へ追加する1エントリ。 */
 export function createRevalidationAfterChangeHook(collectionSlug: RevalidatableCollectionSlug): CollectionAfterChangeHook {
   return async ({ doc, req }) => {
+    if (req.context?.deferRevalidationUntilCommit) return doc;
     await notifyRevalidation(collectionSlug, req);
     return doc;
   };
@@ -79,6 +89,7 @@ export function createRevalidationAfterChangeHook(collectionSlug: RevalidatableC
 /** `globals/SiteSettings.ts` の `hooks.afterChange` へ追加する1エントリ。 */
 export function createSettingsRevalidationAfterChangeHook(): GlobalAfterChangeHook {
   return async ({ doc, req }) => {
+    if (req.context?.deferRevalidationUntilCommit) return doc;
     await notifyRevalidation('site-settings', req);
     return doc;
   };

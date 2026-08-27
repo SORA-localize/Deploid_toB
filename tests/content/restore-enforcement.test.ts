@@ -18,7 +18,7 @@ import {
   type CutoverBaselineManifest,
   type SignedBaselineEnvelope,
 } from '@/scripts/export-content-snapshot.mts';
-import { createDefaultMediaFileResolver, resolveWithinRoot } from '@/scripts/import-content-to-payload.mts';
+import { createDefaultMediaFileResolver, resolveWithinRoot, restoreContentSnapshot } from '@/scripts/import-content-to-payload.mts';
 import {
   assertRawInputTargetAllowed,
   assertRestoreInputModeAllowed,
@@ -36,7 +36,7 @@ import {
   resolveBlobCredential,
   type BlobCredential,
 } from '@/scripts/snapshotObjectStore.mts';
-import { authorizeRestoreFromVerifiedBaseline } from '@/scripts/restoreAuthorization.mts';
+import { authorizeRestoreFromLocalThrowaway, authorizeRestoreFromVerifiedBaseline } from '@/scripts/restoreAuthorization.mts';
 import { contentSnapshotFixture } from '@/tests/fixtures/contentSnapshot';
 import { Client } from 'pg';
 import {
@@ -307,6 +307,33 @@ const EMPTY_SNAPSHOT = {
   media: [],
   siteSettings: { dataAsOf: '2026-08' },
 };
+
+describe('restore transaction rollback', () => {
+  it('rolls back when a later write fails and leaves no committed prefix', async () => {
+    const calls: string[] = [];
+    const transactionalWrites: string[] = [];
+    const payload = {
+      db: {
+        beginTransaction: async () => 'tx-test',
+        commitTransaction: async () => { calls.push('commit'); },
+        rollbackTransaction: async () => { calls.push('rollback'); transactionalWrites.length = 0; },
+      },
+      find: async () => ({ docs: [] }),
+      create: async ({ collection }: { collection: string }) => { transactionalWrites.push(collection); return { id: 'created-1' }; },
+      updateGlobal: async () => { calls.push('updateGlobal'); throw new Error('injected-restore-failure'); },
+    } as never;
+    const authorization = authorizeRestoreFromLocalThrowaway({ environment: null, isLocalHost: true });
+    await expect(restoreContentSnapshot({
+      payload,
+      snapshot: { ...EMPTY_SNAPSHOT, manufacturers: [contentSnapshotFixture.manufacturers[0]] } as unknown as ContentSnapshot,
+      user: { id: 'test-admin' },
+      authorization,
+    })).rejects.toThrow('injected-restore-failure');
+    expect(calls).toEqual(['updateGlobal', 'rollback']);
+    expect(calls).not.toContain('commit');
+    expect(transactionalWrites).toEqual([]);
+  });
+});
 
 async function readLedger(databaseUrl: string): Promise<{ environment: string | null; generation: number | null }> {
   const client = new Client({ connectionString: databaseUrl });

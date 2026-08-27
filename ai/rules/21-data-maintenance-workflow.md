@@ -5,28 +5,26 @@ Use this file after `20-data.md` when adding or updating content records.
 This gate covers Deploid's 9 editable content collections plus the `site-settings` global, as defined in
 [`../../docs/decisions/content-platform-and-database-architecture-v2.md`](../../docs/decisions/content-platform-and-database-architecture-v2.md) §5.1:
 
-- `manufacturers` — today: `data/manufacturers.ts`
-- `distributors` — new in Payload; no `data/*.ts` predecessor
-- `robot-series` — new in Payload; no `data/*.ts` predecessor
-- `robots` — today: `data/robots.ts`
-- `use-cases` — today: `data/useCases.ts`
-- `deployments` — today: `data/deployments.ts`
-- `articles` — today: `data/articles.ts`
-- `article-placements` — today: `data/articlePlacements.ts`
-- `media` — new in Payload; today, image metadata lives inline on the owning record
-- `site-settings` (global, not a collection) — new in Payload; today, values such as `dataAsOf` live in `lib/site.ts`
+- `manufacturers` — Payload collection
+- `distributors` — Payload collection
+- `robot-series` — Payload collection
+- `robots` — Payload collection
+- `use-cases` — Payload collection
+- `deployments` — Payload collection
+- `articles` — Payload collection
+- `article-placements` — Payload collection
+- `media` — Payload collection
+- `site-settings` (global, not a collection) — Payload global
 
 `admins` (Payload Admin user accounts, §7.3 role enum) is out of scope for this gate — it is an
 authentication/authorization concern, not a content-editing workflow.
 
-**Edit destination**: until the Payload CMS / managed Postgres cutover completes, edit the `data/*.ts`
-files above — see the Current Work Posture note in `ai/rules/00-index.md`. After cutover, edit the
-same collections through Payload (Admin UI, Local API, REST, or MCP) instead; `data/*.ts` is deleted
-per `content-platform-and-database-architecture-v2.md` §10, migration principle 8.
+**Edit destination**: the cutover is complete on the target branch. Edit these collections through
+Payload (Admin UI, Local API, REST, or MCP) and use the repository/approval gates below. Do not edit
+the retired data/*.ts files.
 
 **Codex MCP (Task 8)**: a Payload MCP server exists (`lib/payload/mcp.ts`, workflow documented in
-`.codex/content-workflow.md`) for the Payload side of the migration. It is not yet the edit
-destination for ordinary content work — `data/*.ts` still is, per the paragraph above. MCP write
+`.codex/content-workflow.md`) and is an allowed draft-edit destination. MCP write
 access is scoped to `content-draft-writer` (create/update draft only); publishing still requires a
 human `content-publisher` going through `publishApprovedVersion()`, and `admins` /
 `payload-mcp-api-keys` are never exposed to MCP.
@@ -59,32 +57,32 @@ Purpose: let an AI agent add or update records without breaking the `id` / `slug
 
 - For new records, choose a lowercase hyphenated alphanumeric `id`, and treat it as immutable.
 - For new records, normally start with `id === slug`.
-- Check for collisions in the relevant `data/*.ts` file.
+  - Check for collisions through the Payload collection/repository boundary.
 - Do not duplicate the manufacturer name in robot `name` / `title` fields when `manufacturerId` already provides it.
 - For slug changes, do not touch `id` or any `*Id` / `*Ids` references. Add the old slug to `previousSlugs`.
 - References: `docs/decisions/data-architecture-redesign-v1.md`, `docs/decisions/data-maintenance-checklist-v1.md`.
 
 ## G4. Required Fields And Publish Gate
 
-- Inspect `data/types.ts` for required fields on the target collection.
+  - Inspect the Payload collection schema and snapshot contract for required fields.
 - Check the relevant publish gate in `docs/decisions/data-maintenance-checklist-v1.md`.
 - If publish requirements cannot be met, keep or set `publishStatus: 'draft'`.
-- References: `data/types.ts`, `docs/decisions/data-maintenance-checklist-v1.md`.
+  - References: `collections/`, `lib/content/contracts.ts`, `docs/decisions/data-maintenance-checklist-v1.md`.
 
 ## G5. Reference Integrity
 
 - All `manufacturerId`, `relatedRobotIds`, `candidateRobots[].robotId`, `supersededById`, and similar `*Id` / `*Ids` fields must point to existing immutable `id` values, not slugs.
-- Confirm referenced records exist. `npm run validate:data` should catch misses, but do not rely on it as the first check.
+- Confirm referenced records exist through the Payload repository and snapshot verification; do not rely on a batch check as the first check.
 - If the current data model has any symmetric (two-way) relationship, update both sides. Most relationships are one-way and derived; do not invent two-way links.
 - References: `docs/decisions/data-architecture-redesign-v1.md`, `docs/decisions/data/README.md`.
 
 ## G6. Sources, Reliability, And Freshness
 
 - Do not leave `sources` empty when the collection requires sources.
-- Each `sources[]` entry should include `title`, `url`, `checkedAt`, and `reliability` according to `data/types.ts`.
+- Each `sources[]` entry should include `title`, `url`, `checkedAt`, and `reliability` according to the Payload schema/content contract.
 - Update record-level `reliability` and `updatedAt` to match the current edit.
 - For volatile values such as price, distributor, and availability, set a shorter `nextReviewBy` when the model supports it.
-- References: `data/types.ts`, `docs/decisions/data-maintenance-checklist-v1.md`.
+- References: Payload collections, `lib/content/contracts.ts`, `docs/decisions/data-maintenance-checklist-v1.md`.
 
 ## G7. Specs, Tags, And Enums
 
@@ -99,7 +97,7 @@ Purpose: let an AI agent add or update records without breaking the `id` / `slug
 
 ## G8. Images And Rights
 
-- Every `ImageAsset` must include rights metadata required by `data/types.ts`.
+- Every media record must include the rights metadata required by the Payload schema.
 - Do not publish images with unclear rights. Keep `src: ''` or leave the record in draft according to current conventions.
 - Prefer local assets in `public/images/<collection>/...`; do not hotlink when a local asset should be used.
 - References: `docs/decisions/copyright_and_media_rights_policy_v1.md`, `docs/decisions/data/README.md`, `public/images/robots/README.md`.
@@ -113,7 +111,7 @@ Purpose: let an AI agent add or update records without breaking the `id` / `slug
 
 ## G10. Verification
 
-- Run `npm run validate:data` after data changes and confirm zero errors.
+- Run the applicable Payload content verification after data changes and confirm zero errors.
 - Run `npm run build` when UI, rendering, generated routes, or public output can be affected.
 - Do not report "問題なし" unless the stated verification actually ran.
 - References: `README.md`, `docs/decisions/data/README.md`.
@@ -131,7 +129,7 @@ Report the following to the user:
 ## Copy Checklist
 
 ```text
-Before editing data/*.ts, verify each gate:
+Before editing a Payload record, verify each gate:
 
 G1 Collection/work type:
 - One target collection is selected.
@@ -148,7 +146,7 @@ G3 ID/slug:
 - Slug changes keep id and references stable and add previousSlugs.
 
 G4 Required fields:
-- data/types.ts required fields were checked.
+- Payload collection/content-contract required fields were checked.
 - Publish gates in data-maintenance-checklist-v1.md were checked.
 
 G5 References:
@@ -166,7 +164,7 @@ G7 Specs/tags/enums:
 - New enum values update types, labels, and display order.
 
 G8 Images/rights:
-- ImageAsset.rights is present where images are used.
+- Media rights fields are present where images are used.
 - Unclear-rights images are not published.
 - Local image placement follows docs/decisions/data/README.md.
 
@@ -175,7 +173,7 @@ G9 publishStatus:
 - Discontinued records are archived rather than deleted.
 
 G10 Verification:
-- npm run validate:data was run with zero errors.
+- The applicable Payload content verification was run with zero errors.
 - npm run build was run when UI/rendering can be affected.
 
 G11 Report:

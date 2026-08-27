@@ -1,9 +1,30 @@
 import { describe, expect, it } from 'vitest';
 import {
+  assertCiThrowawayDatabaseUrl,
   assertStrictThrowawayDatabaseUrl,
   assertWritableDatabaseUrl,
   classifyDatabaseUrl,
 } from '@/lib/content/databaseSafety';
+
+describe('assertCiThrowawayDatabaseUrl', () => {
+  it('rejects a CI seed target that is not a local throwaway database', () => {
+    expect(() =>
+      assertCiThrowawayDatabaseUrl(
+        'scripts/seed-ci-site-settings.mts',
+        'postgresql://u@db.example.supabase.co:5432/postgres',
+      ),
+    ).toThrow(/local throwaway Postgres/);
+  });
+
+  it('allows a local throwaway database', () => {
+    expect(() =>
+      assertCiThrowawayDatabaseUrl(
+        'scripts/seed-ci-site-settings.mts',
+        'postgresql://u@localhost:5432/deploid_ci_e2e_test',
+      ),
+    ).not.toThrow();
+  });
+});
 
 /**
  * remediation group 4 (P0) の回帰テスト。

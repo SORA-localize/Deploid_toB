@@ -1,11 +1,11 @@
 ---
 status: current
-updated: 2026-08-09
+updated: 2026-08-26
 ---
 
 # データ保守運用チェックリスト v1
 
-> **移行期間の扱い（2026-07-26）**: Payload CMS + managed PostgreSQL への移行方針は確定したが、まだ実装されていない。移行計画のcutover完了までは本書と `data/*.ts` が日常運用の正本。cutover後はPayload管理画面 / MCP用の手順へ本書を更新し、旧TS編集手順をarchiveへ移す。判断は [`content-platform-and-database-architecture-v2.md`](content-platform-and-database-architecture-v2.md)、手順は [`../plans/content-platform-migration-plan-v1.md`](../plans/content-platform-migration-plan-v1.md) を参照。
+> **移行後の扱い（2026-08-26）**: 対象ブランチではPayload CMS + managed PostgreSQLが日常運用の正本である。Payload管理画面 / MCP / repository経由で編集し、旧 `data/*.ts` は編集しない。移行後の責務は [`content-platform-and-database-architecture-v2.md`](content-platform-and-database-architecture-v2.md)、是正状況は [`../plans/task9-implementation-review-and-remediation-plan-v1.md`](../plans/task9-implementation-review-and-remediation-plan-v1.md) を参照。
 
 > **2026-06-28 撤去注記（Guide）**: `Guide` / `/guides` は撤去済み。本書からは Guide 追加手順（旧 §L）・publish gate の Guide 項・useCase⇄guide 双方向チェック・`relatedGuideIds` を**削除済み**。経緯と復活は [`../archive/guides-retirement-v1.md`](../archive/guides-retirement-v1.md) / [`../archive/guides-retirement-plan-v1.md`](../archive/guides-retirement-plan-v1.md)。
 
@@ -103,7 +103,7 @@ updated: 2026-08-09
 4. [ ] 価格・国内入手性・代理店・導入状況は出典を再確認し、`sources.checkedAt` / `nextReviewBy` を更新
 5. [ ] 画像差し替えは既存 `id` ベースのパスへ配置し、古い画像が不要なら参照が残っていないか確認
 6. [ ] 関連記事・用途・導入事例を追加する場合は `slug` ではなく `id` で結ぶ
-7. [ ] `npm run validate:data` を実行する
+7. [ ] Payload content verification / snapshot parity check を実行する
 
 ## E. レコードの提供終了 / 後継機（archive）
 
@@ -245,7 +245,7 @@ AI側の実装手順:
 3. [ ] 該当レコードの `ImageAsset` を更新する
 4. [ ] メーカーロゴは variant を人が判定して `Manufacturer.logos` に登録し、legacy `logo` は増やさない
 5. [ ] `getDisplayableAsset()` の表示ポリシーに通る rights か確認する
-6. [ ] `npm run validate:data` と、表示に関わる場合は `npm run build` を実行する
+6. [ ] Payload content verification と、表示に関わる場合は `npm run build` を実行する
 
 ---
 
@@ -303,4 +303,4 @@ AI側の実装手順:
 - CMS / DBの判断: `content-platform-and-database-architecture-v2.md`
 - CMS / DB移行計画: `../plans/content-platform-migration-plan-v1.md`
 - データ運用の旧ガイド（参照用）: `../reference/humanoid_data_management_guide_v1.md`（背景・経緯の参照。整合更新はしない。運用の正本は本書と `data/README.md`）
-- 型の真実源: `nextjs_data_types_v1.ts` → `data/types.ts`
+- 型・スキーマの真実源: `collections/` と `lib/content/contracts.ts`

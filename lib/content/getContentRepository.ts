@@ -6,8 +6,7 @@
  * 到達できない（brief Step 3の依存方向）。
  *
  * 未設定・typoを別sourceへ倒さない。全環境で `CONTENT_SOURCE=payload` を明示する。
- * Productionで `local` を許すのはTask 9の24時間rollback windowだけで、その間だけ
- * `ALLOW_LOCAL_CONTENT_ROLLBACK=true` を設定し、終了時に変数自体を削除する。
+ * 旧local sourceおよびrollback windowは廃止済みで、ここから到達できない。
  * export / restoreはruntime envを暗黙利用せず、署名済みsnapshot経路を明示する。
  * （Task 5以降）。
  */

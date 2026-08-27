@@ -23,6 +23,7 @@
  * this script's module resolution consistent with the Payload CLI it complements.
  */
 import { getPayload } from 'payload';
+import { assertWritableDatabaseUrl } from '../lib/content/databaseSafety';
 
 /**
  * `getPayload()` normally runs Payload's dev-mode schema auto-push (`pushDevSchema`, via
@@ -60,7 +61,8 @@ function parseExpectedArg(argv: string[]): Environment {
 }
 
 async function main(): Promise<void> {
-  const expected = parseExpectedArg(process.argv.slice(2));
+  const argv = process.argv.slice(2);
+  const expected = parseExpectedArg(argv);
 
   const deploymentEnv = process.env.DEPLOYMENT_ENV;
   if (deploymentEnv !== expected) {
@@ -72,6 +74,17 @@ async function main(): Promise<void> {
     process.exitCode = 1;
     return;
   }
+
+  // DEPLOYMENT_ENV/--expected only agree on the label. Require the matching
+  // target confirmation before opening Payload, so a correctly labelled but
+  // wrong managed DATABASE_URL cannot be stamped silently.
+  assertWritableDatabaseUrl({
+    raw: process.env.DATABASE_URL,
+    callerFile: 'scripts/stamp-environment.mts',
+    confirmedProduction: expected === 'production' && argv.includes('--i-know-this-is-production'),
+    confirmedPreview: expected === 'preview' && argv.includes('--i-know-this-is-preview'),
+    confirmedPersistentLocalDatabase: argv.includes('--i-know-this-is-a-persistent-local-database'),
+  });
 
   const payload = await getPayload({ config });
   try {
