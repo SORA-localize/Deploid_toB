@@ -1999,6 +1999,14 @@ git commit -m "feat: add least-privilege Codex content access"
 
 ### Task 9: 本番cutoverと旧TS撤去
 
+> **2026-08-27 現在地（実行状況の正本）**: Task 9の実装前提となる安全ゲートはPR #39でmainへ反映済み。
+> `verify`、`content-e2e`、main CI、main Content platform E2E、Vercel deploymentはいずれも成功している。
+> Production cutoverと旧TS撤去については、`docs/reference/task9-production-cutover-preflight-v1.md`に
+> 2026-08-25の実施記録があるが、このセッションではProduction DB/Blobの再確認をしていないため、本文の
+> Step 1〜9を「このブランチでこれから再実行する」状態とは扱わない。まず同preflightの実施記録と
+> Production read-only identityを突合し、実施済みStepと未実施Stepを確定する。Productionへの
+> migration/import/export、Vercel環境変数変更、旧TS削除の再実行は禁止する。
+
 **Task 9着手前の外部監査で見つかった、対応済み事項（Remediation Group 1〜5）**: fail-closed
 publish gate/RBAC/route registry/version保持、SiteSettings本移行/snapshot一貫性/signed restore
 強制、Blob・OIDC/import・parity/media復元/identity transfer、import/restore全経路のDB書き込み
