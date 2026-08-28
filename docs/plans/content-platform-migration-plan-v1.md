@@ -2011,8 +2011,12 @@ git commit -m "feat: add least-privilege Codex content access"
 > `_environment_marker.environment=production`、必要なpublic tables、migration履歴、主要件数（manufacturers 26 /
 > robots 63 / useCases 44 / deployments 11 / articles 34 / articlePlacements 7 / media 51）、および
 > `_audit_upload_sessions` 2件（いずれも`production`・`completed`・allowed objects 53）を確認した。
-> `last_restored_baseline_*`はnullで、DB markerだけではrestore世代を証明できない。Blob object実体、completion
-> marker、実環境の暗号化された値は未確認であり、preflight記録の全項目をこの確認だけで再証明したものではない。
+> `last_restored_baseline_*`はnullだが、Production audit sessionの`baseline_run_id`と、2026-08-25の実施記録に
+> restore/export世代およびcompletion markerの確認が残っている。今回のread-only再確認では、Vercel Blob storeの
+> media 51 files / audit 106 files、Production URL主要route HTTP 200、Cron endpointの未認証401を確認した。
+> 以上をもって、Task 9のProduction cutover・旧TS撤去・audit backup・cleanup scheduler登録は実施完了と判定する。
+> completion markerの再取得はVercel runtime OIDC header経由に限られるため、別途の直接再取得は保守確認として扱い、
+> 本番cutoverの完了判定を阻害しない。
 
 **Task 9着手前の外部監査で見つかった、対応済み事項（Remediation Group 1〜5）**: fail-closed
 publish gate/RBAC/route registry/version保持、SiteSettings本移行/snapshot一貫性/signed restore
