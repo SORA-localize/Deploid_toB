@@ -2006,11 +2006,13 @@ git commit -m "feat: add least-privilege Codex content access"
 > Step 1〜9を「このブランチでこれから再実行する」状態とは扱わない。まず同preflightの実施記録と
 > Production read-only identityを突合し、実施済みStepと未実施Stepを確定する。Productionへの
 > migration/import/export、Vercel環境変数変更、旧TS削除の再実行は禁止する。
-> 2026-08-27のread-only確認では、Production deployment `dpl_3qtYG4RtsomzDhxJmaQiNyiWEzCn` がReadyで、
-> `deploid.net` / `deploid-to-b.vercel.app`のaliasを持つ。Productionには`DATABASE_URL`、`CONTENT_SOURCE`、
-> `PAYLOAD_SECRET`、Blob/KMS/revalidation関連の環境変数名が存在する（値は取得していない）。ただし、
-> 暗号化された値の中身・DB identity・environment marker・Blob object実体は未確認であり、preflight記録の
-> Production実施結果をこのread-only確認だけで再証明したものではない。
+> 2026-08-27〜28のread-only確認では、Production deployment `dpl_3qtYG4RtsomzDhxJmaQiNyiWEzCn` がReadyで、
+> `deploid.net` / `deploid-to-b.vercel.app`のaliasを持つ。Supabase SQL EditorでProduction DBを確認し、
+> `_environment_marker.environment=production`、必要なpublic tables、migration履歴、主要件数（manufacturers 26 /
+> robots 63 / useCases 44 / deployments 11 / articles 34 / articlePlacements 7 / media 51）、および
+> `_audit_upload_sessions` 2件（いずれも`production`・`completed`・allowed objects 53）を確認した。
+> `last_restored_baseline_*`はnullで、DB markerだけではrestore世代を証明できない。Blob object実体、completion
+> marker、実環境の暗号化された値は未確認であり、preflight記録の全項目をこの確認だけで再証明したものではない。
 
 **Task 9着手前の外部監査で見つかった、対応済み事項（Remediation Group 1〜5）**: fail-closed
 publish gate/RBAC/route registry/version保持、SiteSettings本移行/snapshot一貫性/signed restore
