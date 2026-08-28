@@ -2084,11 +2084,11 @@ publish gate/RBAC/route registry/version保持、SiteSettings本移行/snapshot�
 - Consumes: parity 0差分、Payload production DB、export snapshot
 - Produces: Payload-only content runtime
 
-- [ ] **Step 1: 変更凍結とrollback windowを宣言する**
+- [x] **Step 1: 変更凍結とrollback windowを宣言する**
 
 本番import開始から24時間はコンテンツ更新を凍結する。cutover後24時間はlocal sourceを残し、障害時に環境変数だけで戻せるrollback windowとする。この間にPostgresだけで新規公開を行わない。
 
-- [ ] **Step 2: cutover直前exportを保存する**
+- [x] **Step 2: cutover直前exportを保存する**
 
 Run: `npm run content:export -- --source local --upload`
 
@@ -2105,7 +2105,7 @@ provider / bucket / objectKey / versionId、全recordCounts、sha256を持つman
 ②開始時には現在DBから別世代の`pre-robot-import-manifest.json`を生成・復元試験するため、
 この古いbaselineを②の直接の復元対象として使わない。
 
-- [ ] **Step 3: production importとparityを実行する**
+- [x] **Step 3: production importとparityを実行する**
 
 Run: `npm run content:import`
 
@@ -2115,7 +2115,7 @@ Run: `npm run content:compare -- --source local --target payload`
 
 Expected: `missing=0 extra=0 changed=0 brokenReferences=0`
 
-- [ ] **Step 4: Vercel PreviewでPayload sourceを有効にする**
+- [x] **Step 4: Vercel PreviewでPayload sourceを有効にする**
 
 Set: `CONTENT_SOURCE=payload`
 
@@ -2127,7 +2127,7 @@ Run: `npm run test:e2e -- tests/e2e/content-routes.spec.ts`
 
 Expected: 全route PASS
 
-- [ ] **Step 5: 主要画面を目視確認する**
+- [x] **Step 5: 主要画面を目視確認する**
 
 対象:
 
@@ -2142,11 +2142,11 @@ Expected: 全route PASS
 
 desktop 1440pxとmobile 390pxで、公開内容、画像、関連リンク、slug redirect、横幅を確認する。
 
-- [ ] **Step 6: productionをPayload sourceへ切り替える**
+- [x] **Step 6: productionをPayload sourceへ切り替える**
 
 Vercel production環境へ `CONTENT_SOURCE=payload` を設定してdeployする。公開後に主要route、sitemap、robots、OG imageを確認する。
 
-- [ ] **Step 7: rollback window終了後にlocal sourceを削除する**
+- [x] **Step 7: rollback window終了後にlocal sourceを削除する**
 
 24時間の安定化、監視、主要route確認が完了してから、旧TS配列、local adapter、local/payload切替分岐を削除する。`CONTENT_SOURCE` は廃止し、Payload sourceを唯一の実装にする。
 
@@ -2162,7 +2162,7 @@ Expected: 0件。Task 6 fix round 1時点では `lib/data/contentSnapshot.ts` �
 `scripts/validate-data.mjs`）を本Taskで削除するかPayload snapshot検証へ作り替えるまで
 解消しない残存依存。それ以外の箇所で1件でも出る場合は、新たな回帰としてTask 6へ戻って調査する。
 
-- [ ] **Step 8: 最終検証を実行する**
+- [x] **Step 8: 最終検証を実行する**
 
 Run: `npm run check`
 
@@ -2176,7 +2176,7 @@ Run: `git diff --check`
 
 Expected: outputなし、exit 0
 
-- [ ] **Step 9: commit**
+- [x] **Step 9: commit**
 
 ```bash
 git add -A
