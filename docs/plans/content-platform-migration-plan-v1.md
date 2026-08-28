@@ -2014,9 +2014,10 @@ git commit -m "feat: add least-privilege Codex content access"
 > `last_restored_baseline_*`はnullだが、Production audit sessionの`baseline_run_id`と、2026-08-25の実施記録に
 > restore/export世代およびcompletion markerの確認が残っている。今回のread-only再確認では、Vercel Blob storeの
 > media 51 files / audit 106 files、Production URL主要route HTTP 200、Cron endpointの未認証401を確認した。
-> 以上をもって、Task 9のProduction cutover・旧TS撤去・audit backup・cleanup scheduler登録は実施完了と判定する。
-> completion markerの再取得はVercel runtime OIDC header経由に限られるため、別途の直接再取得は保守確認として扱い、
-> 本番cutoverの完了判定を阻害しない。
+> Production cutover・旧TS撤去・audit backup・cleanup scheduler登録は、既存の実施記録上は完了している。
+> ただし、completion markerの再取得はVercel runtime OIDC header経由に限られ、今回のread-only確認では直接再取得
+> できていない。また、全UI E2E 32件をrelease gateへ含めるかの承認も未取得であるため、Task 9全体の最終完了判定は
+> 保留とする。次はruntime経由のmarker確認と、UI E2E gate方針の明文化・承認を行う。
 
 **Task 9着手前の外部監査で見つかった、対応済み事項（Remediation Group 1〜5）**: fail-closed
 publish gate/RBAC/route registry/version保持、SiteSettings本移行/snapshot一貫性/signed restore
