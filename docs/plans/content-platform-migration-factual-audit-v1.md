@@ -816,3 +816,64 @@ audit upload session の happy path、一時ファイル衛生。全体の 6.8%�
 - 実 AWS KMS を使った37テストの実走行（意図的に CI 同条件＝資格情報なしで測定した）
 - Vercel Cron の実行履歴（成功/503 の実績ログ）
 - Payload Admin UI からの実際の編集操作
+
+---
+
+## 6. 追加発見（runbook 作成中にコードを読んで判明した事実）
+
+### F-15（運用上の罠）: restore の公開鍵は `VERCEL_ENV` で選ばれる
+
+`lib/content/cosignVerification.ts` の `verifyBlobWithCosign()`:
+
+```ts
+if (!override) await writeFile(keyPath, process.env.VERCEL_ENV === 'production' ? PRODUCTION_KEY : PREVIEW_KEY, 'utf8');
+```
+
+復旧作業はオペレーターの端末から実行するため `VERCEL_ENV` は未設定になる。
+その場合 **Preview 用の公開鍵が選ばれ、Production の baseline は `manifestSignature` で必ず失敗する。**
+症状が「署名が壊れている」ではなく「正しい artifact なのに検証失敗」として現れるため、
+artifact 側を疑って時間を溶かす種類の罠。
+
+回避には `VERCEL_ENV=production` か `SNAPSHOT_SIGNING_PUBLIC_KEY_PATH` の明示が要る。
+これは **`docs/reference/content-restore-runbook-v1.md` §2 に最重要の落とし穴として記載した。**
+
+（`SNAPSHOT_SIGNING_PUBLIC_KEY_PATH` による override が実装されているので、
+コードの欠陥ではなく手順書の欠落だった。runbook が無かったこと＝A-1 の実害の一例。）
+
+---
+
+## 7. 是正の実施状況（2026-08-28）
+
+ブランチ `docs/task9-followup-doc-integrity` で、ドキュメント整合のみを対象に是正した。
+コードの振る舞いは変更していない。
+
+| ID | 内容 | 状態 |
+|---|---|---|
+| **A-1** | `docs/reference/content-restore-runbook-v1.md` を作成 | ✅ **閉じた** |
+| **A-5** | 是正計画書に §11 を追記し、5項目を再判定（2つは閉、3つは未解決と明記） | ✅ **閉じた** |
+| **A-8** | `ai/rules/10-workflow.md` の Data 正本を実在ファイルへ差し替え | ✅ **閉じた** |
+| **A-9** | `.env.example` から `ALLOW_LOCAL_CONTENT_ROLLBACK` を削除。計画書 Rollback 節に撤去済みの注記。`content-routes.spec.ts` の docblock を実行可能な手順へ修正 | ✅ **閉じた** |
+| **A-10** | 計画書の Step チェックボックス72個を `[x]` にし、**遡ってチェックしたものである旨と根拠**を冒頭に明記 | ✅ **閉じた** |
+| **A-2** | UI E2E の CI 実行範囲 | ❌ **未着手**（別ブランチ。32本の failure 分類が先） |
+| **A-3** | cron 成功経路の実機検証 | ❌ **未着手**（コード変更ではなく Production への確認作業） |
+| **A-4** | 実署名37テストの CI 実行経路 | ❌ **未着手**（A-2 と同じブランチで扱う） |
+| **A-6** | Production 実データの parity 再確認 | ❌ **未着手** |
+| **A-7** | `check:plan-snippets` が無効 | ❌ **未着手** |
+| **A-11** | `lint --max-warnings 4` の margin ゼロ | ❌ **未着手** |
+
+### A-2 に着手する際の必須の順序（事故防止）
+
+**`content-e2e` は required check である。** 32本が失敗している状態で
+E2E の実行範囲を21本へ広げると、`content-e2e` が赤のまま固定され、
+**その後の全PRがマージ不能になる。**
+
+したがって順序は必ず次のとおり:
+
+1. 32本の failure を分類し、**fixture 差か実退行かを確定させる**
+   （是正計画書 §10 は「アプリ退行でないことをリポジトリ全体で証明したわけではない」と明記している）
+2. 実退行があれば直す
+3. 緑になってから CI の対象へ加える
+
+A-4（実署名テスト）も同様に、AWS 資格情報を required check の前提にすると
+**資格情報の障害がそのままマージ不能に直結する。** 専用の手動 workflow
+（`workflow_dispatch`）に置く方が運用リスクが低い。

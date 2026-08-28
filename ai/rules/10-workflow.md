@@ -137,7 +137,8 @@ AIは局所最適な修正を作りやすいため、以下を禁止または強
 
 実コードの正本として確認するファイル:
 
-- Data: `data/types.ts`, `data/*.ts`, `lib/data.ts`, `lib/validate.ts`
+- Data: `collections/*.ts`, `globals/*.ts`, `lib/payload/contentSchema.ts`, `lib/content/domainTypes.ts`, `lib/content/createContentRepository.ts`, `migrations/`
+  （旧 `data/types.ts` / `data/*.ts` / `lib/data.ts` / `lib/validate.ts` は Task 9 で撤去済み。存在しない）
 - Labels/display/tags/specs: `lib/labels.ts`, `lib/display.ts`, `lib/tagRegistry.ts`, `lib/specSchema.ts`
 - UI text/theme: `lib/uiText.ts`, `src/app/globals.css`, `lib/visualSemantics.ts`
 - Search/filter/state: `lib/searchIndex.ts`, `lib/catalog/search.ts`, `lib/catalog/matchSearch.ts`, `lib/*Filters.ts`, `lib/catalog/urlState.ts`

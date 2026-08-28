@@ -188,3 +188,39 @@ Task 1〜9 の実装について、コード、設定、履歴、CI、テスト�
 - 期限切れcleanup関数は実装済みだが、cron/Vercel Cron/GitHub Actions/手動ジョブへの登録はまだ行っていない。scheduler登録は外部運用設計・設定変更として別承認が必要。
 
 DB側restore transaction、Blob/DB更新失敗時の補償、publish revalidationのcommit順序、admin同時実行保護は実装済み。throwaway DBでmigration/status/seed/restore enforcement、integration、production build、CI対象E2Eを検証済み。BlobとDBを跨ぐ完全な原子性、scheduler実装の外部登録、全UI E2Eの既存baseline整合、Preview/Production/GitHub required checksの外部検証は未完了であり、Task 9の本番承認条件はまだ満たしていない。
+
+---
+
+## 11. 2026-08-28 事実監査による現在地の更新
+
+§9 と §10 末尾の「Task 9の本番承認条件はまだ満たしていない」は **2026-08-26 時点の記述**であり、
+その後に状況が変わった項目がある。事実監査
+（[content-platform-migration-factual-audit-v1.md](content-platform-migration-factual-audit-v1.md)）
+の結果に基づき、§10 末尾が挙げた5つの未完了項目を再判定する。
+
+| §10末尾が挙げた未完了項目 | 2026-08-28 の実体 | 根拠 |
+|---|---|---|
+| scheduler実装の外部登録 | ✅ **閉じた** | `vercel.json` に `crons: [{ path: "/api/internal/cron/audit-upload-cleanup", schedule: "0 3 * * *" }]`、route も実在（監査 L16） |
+| Preview/Production/GitHub required checksの外部検証 | ✅ **閉じた** | ruleset `task9-main-protection`（active）が `verify` / `content-e2e` を required に登録済み。直近の run は全て success。Production 全主要route 200（監査 L8・L15） |
+| 全UI E2Eの既存baseline整合 | ❌ **未解決** | 94本中32本が失敗したまま。判断が「release gate 保留」から「non-blocking 保守課題」へ変わっただけで、技術的には解消していない（監査 A-2） |
+| BlobとDBを跨ぐ完全な原子性 | ❌ **未解決** | 補償削除までは実装済み。完全な原子性は未達 |
+| 実Payload複数collection書き込みの途中失敗統合テスト | ❌ **未完了** | §10 の記述どおり。その後に完了した記録は見当たらない |
+
+**したがって §9 の判定基準（「required checks が未確認の場合は『本番安全』と報告しない」）は
+満たされたが、UI E2E・原子性・統合テストの3点は依然として未解決である。**
+
+現在の正確な判定は次のとおり。
+
+> 中核実装と Production 切替は完了している。
+> ただし計画書の Completion Criteria 全12項目は未達（実証7 / 部分3 / 未達1 / 未検証1）。
+> **Task 9 を「完全完了」とはまだ言えない。**
+
+事実監査が新たに見つけた、本書に無かった項目:
+
+- **A-1**: 計画書が必須成果物として指定した `docs/reference/content-restore-runbook-v1.md` が
+  未作成だった（2026-08-28 に作成し、この穴は閉じた）
+- **A-3**: cron endpoint の**成功経路**が未検証。記録にあるのは「未認証401を確認した」のみで、
+  Vercel Cron が `x-vercel-oidc-token` を実際に送るかは未確認。送らなければ毎日 03:00 UTC に
+  503 を返し続け、期限切れ session と孤児 Blob が回収されない
+- **A-4**: 実 cosign + 実 AWS KMS を要する37テストが CI で一度も実行されていない
+  （`ci.yml` / `content-e2e.yml` のどちらの env にも AWS 資格情報が無い）
