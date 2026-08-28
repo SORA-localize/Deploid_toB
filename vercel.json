@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/internal/cron/audit-upload-cleanup",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}
