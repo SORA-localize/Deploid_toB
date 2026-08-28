@@ -877,3 +877,44 @@ E2E の実行範囲を21本へ広げると、`content-e2e` が赤のまま固定
 A-4（実署名テスト）も同様に、AWS 資格情報を required check の前提にすると
 **資格情報の障害がそのままマージ不能に直結する。** 専用の手動 workflow
 （`workflow_dispatch`）に置く方が運用リスクが低い。
+
+---
+
+## 8. A-3（cron）の追加調査 —— 「まだ一度も実行されていない」ことが判明
+
+読み取りのみで確定した事実。
+
+```
+$ git log -1 --format='%H %ci %s' -- vercel.json
+6f2dcdbefed3968b4bdc7fa733a18e4b3bccf5a5 2026-08-28 15:16:15 +0900 feat(task9): schedule expired audit session cleanup
+
+$ date -u '+%Y-%m-%d %H:%M UTC'
+2026-08-28 08:17 UTC
+
+$ cat vercel.json
+{ "crons": [ { "path": "/api/internal/cron/audit-upload-cleanup", "schedule": "0 3 * * *" } ] }
+```
+
+- cron が登録されたのは **2026-08-28 06:16 UTC**（15:16 JST）
+- schedule は毎日 **03:00 UTC**
+- **その日の 03:00 UTC は登録より前に過ぎている**
+
+**⇒ この cron は本調査時点（2026-08-28 08:17 UTC）で一度も実行されていない。**
+初回実行は **2026-08-29 03:00 UTC** の見込み。
+
+つまり A-3 は「動いているが未確認」ではなく **「実行機会がまだ来ていない」** が正しい。
+`x-vercel-oidc-token` が実際に届くかどうかは、初回実行まで原理的に確認できない。
+
+### 初回実行後に確認すべきこと
+
+初回実行の翌日に、Vercel の Function ログで当該 route の応答を確認する。
+
+| 応答 | 意味 | 対応 |
+|---|---|---|
+| 200 | 正常。回収0件でも 200 | 対応不要 |
+| 207 | 一部の回収に失敗（`failed[]` に残る） | 失敗行を調査 |
+| **503** `oidc-token-header-missing` | **Vercel Cron が OIDC ヘッダを送っていない** | route の認証方式の作り直しが必要。毎日黙って失敗し続ける状態 |
+| **401** `unauthorized` | `CRON_SECRET` が Production に未設定か不一致 | 環境変数を確認 |
+
+503 と 401 はどちらも **HTTP としては正常応答**なので、
+Vercel の cron 実行履歴は「成功」に見える可能性がある。**ステータスコードまで見ること。**
