@@ -7,6 +7,19 @@ updated: 2026-08-09
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **2026-08-28 チェックボックスの由来（読む前に）**: Task 0〜8 の Step チェックボックスは、
+> 実行中に逐次チェックされていなかった（2026-08-28 時点で Task 1 と Task 9 以外の72個が
+> `- [ ]` のまま残っていた）。これらは実装完了後に**遡って**チェックしたものであり、
+> 根拠は (a) Tasks 0-8 を含む PR #34 が main へ merge 済みであること、(b) 事実監査
+> [content-platform-migration-factual-audit-v1.md](content-platform-migration-factual-audit-v1.md)
+> が各Taskの成果物の実体（collection 12個、migration 8世代、MCP plugin 組み込み、
+> repository 分離、旧TS撤去、CI ゲート群）を確認したこと、の2点。
+> **チェックボックスは Step 単位で個別検証された記録ではない。**
+> Step 単位の根拠が必要な場合は事実監査の方を参照すること。
+>
+> **完了判定**: 中核実装と Production 切替は完了。ただし Completion Criteria 全12項目は未達
+> （実証7 / 部分3 / 未達1 / 未検証1）。残課題は事実監査 §3 を正本とする。
+
 **Goal:** `data/*.ts` を正本とする現行構成を、Payload CMS + managed Postgres へ移行する。①の
 保存先変更では公開URL、`slug`、`previousSlugs`を維持する。`id`（stableId）はcollection内・
 collection横断の参照整合性に使うため不変。
@@ -262,7 +275,7 @@ Task 1は移行用envを追加する前のbaselineを固定するTaskなので�
 未確定5件に、本計画で追加したsnapshot署名方式とaudit outbox暗号化を加えた7件を、ここで閉じる。
 **Task 2 の前に終わらせる。**
 
-- [ ] **Step 1: provider を確定する**
+- [x] **Step 1: provider を確定する**
 
 | 項目 | 初期値 | 決めること |
 |---|---|---|
@@ -273,7 +286,7 @@ Task 1は移行用envを追加する前のbaselineを固定するTaskなので�
 | snapshot署名 | cosign + KMS管理鍵 | key ID、検証用公開鍵、署名実行者 |
 | audit outbox暗号化 | KMS envelope encryption | 署名鍵と別のkey ID、rotation、復号担当、旧version保持 |
 
-- [ ] **Step 2: 環境ごとにDBを分ける（②の G-6 の前提）**
+- [x] **Step 2: 環境ごとにDBを分ける（②の G-6 の前提）**
 
 **Git はブランチで分かれるが DB は分かれない。** Preview の編集が本番に出る事故を防ぐ。
 
@@ -297,7 +310,7 @@ object storageもDBと同じ環境境界で分離する。**次の5つは論理�
 Production private credentialはPreview / CIへ設定しない。Preview credentialでProductionのobject keyを
 read/write/delete/restoreしようとしてすべて拒否される負テストをG-6相当の環境境界testに含める。
 
-- [ ] **Step 3: 環境変数を洗い出して `.env.example` へ書く**
+- [x] **Step 3: 環境変数を洗い出して `.env.example` へ書く**
 
 ```dotenv
 DATABASE_URL=
@@ -321,7 +334,7 @@ AUDIT_OUTBOX_KMS_KEY_ID=
 共通read/write tokenを共有しない。
 **実値はここに書かない。** Vercel の Environment Variables で設定する。
 
-- [ ] **Step 4: 接続を確認し、環境ごとの fingerprint を記録する**
+- [x] **Step 4: 接続を確認し、環境ごとの fingerprint を記録する**
 
 **`current_database()` 単体では分離を証明できない。** 別 provider の別プロジェクトでも
 標準DB名（`postgres` 等）が一致することがあり、逆に同じ server 上の別DB名だけでは
@@ -354,7 +367,7 @@ Task完了時点では(a) provider resource IDが異なること、(b)5つのsto
 あること、(c)Production credentialがPreviewに未設定であることを資源表へ記録する。DB markerの
 実データ検証はTask 3.5完了条件と② G-6で行う。
 
-- [ ] **Step 5: 資源表を書いてcommit**
+- [x] **Step 5: 資源表を書いてcommit**
 
 provider・環境別の接続先・5 storageのprovider resource ID / access mode / CORS / retention / credential
 owner / delete権限 / restore権限・snapshot署名鍵IDと公開鍵・audit outbox KMS key ID / rotation / 復号担当・
@@ -387,13 +400,13 @@ Task 1のbaseline確認とTask 0の外部resource払い出しも本Taskの承認
 
 **cutover 後（Task 9）に回さない。** 回すと Task 3〜8 の間ずっと矛盾したまま作業することになる。
 
-- [ ] **Step 1: 上位2文書、checklist、AI ruleを更新して `updated` を上げる**
-- [ ] **Step 2: architecture ownerとcontent ownerがURL waiver・role enum・Robot必須fieldを承認する**
+- [x] **Step 1: 上位2文書、checklist、AI ruleを更新して `updated` を上げる**
+- [x] **Step 2: architecture ownerとcontent ownerがURL waiver・role enum・Robot必須fieldを承認する**
 
 承認者、commit SHA、承認日時を `docs/reference/content-platform-resources-v1.md` のdecision logへ残す。
 口頭確認だけ、または未承認の文書差分ではgate通過にしない。
 
-- [ ] **Step 3: 旧契約が残っていないことを機械確認する**
+- [x] **Step 3: 旧契約が残っていないことを機械確認する**
 
 ```bash
 rg -n '公開URLの維持は不要|slug・previousSlugsの維持は要件外|id と slug を変更しない' \
@@ -407,8 +420,8 @@ rg -n "'editor'|'publisher'|'admin'|editor/adminロール" \
 Expected: 包括URL waiver 0件、RobotのbuyerReadiness必須要件0件、旧roleをenum値として使う箇所0件。
 履歴説明や明示的な旧称対応表だけは許可し、該当行を人が1件ずつ確認する。
 
-- [ ] **Step 4: `npm run check:docs` が緑であることを確認**
-- [ ] **Step 5: commit**
+- [x] **Step 4: `npm run check:docs` が緑であることを確認**
+- [x] **Step 5: commit**
 
 **完了条件:** 4文書が新schemaを反映し、上位2文書の承認記録と矛盾検索0件が揃う。未承認または
 1件でも意味上の矛盾が残れば①のTask 1へ進まない。
@@ -499,7 +512,7 @@ git commit -m "docs: confirm content migration start gates"
 - Consumes: `DATABASE_URL`、`PAYLOAD_SECRET`
 - Produces: `/admin`、`/api`、`payload.config.ts`、Payload Local API
 
-- [ ] **Step 1: admin routeのE2E testを書く**
+- [x] **Step 1: admin routeのE2E testを書く**
 
 ```ts
 import { expect, test } from '@playwright/test';
@@ -511,13 +524,13 @@ test('Payload admin login is mounted', async ({ page }) => {
 });
 ```
 
-- [ ] **Step 2: testが404で失敗することを確認する**
+- [x] **Step 2: testが404で失敗することを確認する**
 
 Run: `npm run test:e2e -- tests/e2e/payload-admin.spec.ts`
 
 Expected: `/admin` のheadingが見つからずFAIL
 
-- [ ] **Step 3: Payload・Postgres・storage adapter・`tsx` を追加する**
+- [x] **Step 3: Payload・Postgres・storage adapter・`tsx` を追加する**
 
 `tsx` は Task 5 の import / compare / export script が使う。**transitive dependency に依存しない。**
 
@@ -535,7 +548,7 @@ npm ls tsx --depth=0
 ```
 Expected: `devDependencies` に解決される。
 
-- [ ] **Step 4: Next.js configをPayloadでwrapする**
+- [x] **Step 4: Next.js configをPayloadでwrapする**
 
 **現行 `next.config.ts` を置き換えない。`withPayload()` で包むだけにする。**
 
@@ -560,7 +573,7 @@ export default withPayload(nextConfig);   // ← 変更はこの1行だけ
 
 **ファイル名は `next.config.ts`。** `next.config.mjs` ではない（突合結果 §C）。
 
-- [ ] **Step 5: 環境変数契約を追加する**
+- [x] **Step 5: 環境変数契約を追加する**
 
 `.env.example`:
 
@@ -582,7 +595,7 @@ SNAPSHOT_SIGNING_KEY=
 storage providerをS3互換へ変更した場合は、Task 0の資源表で確定したbucket・region・endpoint・
 access key用の変数名へ置き換える。選んでいないproviderのadapterと環境変数を併存させない。
 
-- [ ] **Step 6: admin collectionとPayload configを追加する**
+- [x] **Step 6: admin collectionとPayload configを追加する**
 
 `collections/Admins.ts`:
 
@@ -635,7 +648,7 @@ admin削除、last-admin降格を拒否し、first-user bootstrap 1回とplatfor
 
 CIにはPostgreSQL service containerとtest用 `DATABASE_URL` / `PAYLOAD_SECRET` を追加し、ローカルでは専用の開発DBを使う。本番DBをE2Eへ接続しない。
 
-- [ ] **Step 7: admin routeと既存公開routeを確認する**
+- [x] **Step 7: admin routeと既存公開routeを確認する**
 
 Run: `npm run test:e2e -- tests/e2e/payload-admin.spec.ts`
 
@@ -647,7 +660,7 @@ Run: `npm run build`
 
 Expected: 現行157ページ相当とPayload routesがbuildされ、exit 0
 
-- [ ] **Step 8: commit**
+- [x] **Step 8: commit**
 
 ```bash
 git add payload.config.ts collections/Admins.ts src/app/'(payload)' tests/e2e/payload-admin.spec.ts tests/content/admin-access.test.ts next.config.ts tsconfig.json .env.example package.json package-lock.json .github/workflows/ci.yml
@@ -735,7 +748,7 @@ Payload 由来（4フィールド無し）に変わるため、そこで消費�
 local / CIでcloudへ書かない場合も、adapterを無かったことにせず `enabled` を環境変数で切り替え、
 schemaへ注入されるfield差分が環境間で変わらない設定にする。
 
-- [ ] **Step 1: schema contract testを書く**
+- [x] **Step 1: schema contract testを書く**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -784,13 +797,13 @@ describe('Payload content schema', () => {
 });
 ```
 
-- [ ] **Step 2: 未定義collectionによりFAILすることを確認する**
+- [x] **Step 2: 未定義collectionによりFAILすることを確認する**
 
 Run: `npm run test -- tests/content/payload-schema.test.ts`
 
 Expected: `manufacturers` / `robot-series` / `distributors` が不足してFAIL
 
-- [ ] **Step 3: collectionを一つずつ追加する**
+- [x] **Step 3: collectionを一つずつ追加する**
 
 Mediaについては、テスト用の小さな画像を upload → read → delete し、(a) object storageに保存される、
 (b)未認証readがaccess policyどおりになる、(c)delete後にobjectが残らない、の3点を
@@ -850,7 +863,7 @@ canonical hashとversion chainが承認対象と一致することを返す。Ta
 
 現行 `ArticlePlacement` だけはidを持たないため、import時に `surface:slot:articleId` を決定的な `stableId` として生成する。同じsurface / slot内のorder重複と、同じ記事の重複配置はdomain validatorで拒否する。Mediaは正規化した既存srcを基に決定的なstableIdを生成し、再importで重複させない。
 
-- [ ] **Step 4: publish gateをcollection hookへ接続する**
+- [x] **Step 4: publish gateをcollection hookへ接続する**
 
 公開時だけdomain validatorを呼び、draftでは不完全レコードを保存可能にする。
 
@@ -883,7 +896,7 @@ hooks: {
 各collectionで「必須field以外は既存値のまま、`_status` だけをpublishedへ変更する」回帰テストを
 追加し、partial updateでも公開gateが完全なdocを検証することを固定する。
 
-- [ ] **Step 5: schema testと型生成を実行する**
+- [x] **Step 5: schema testと型生成を実行する**
 
 Run: `npx payload generate:types`
 
@@ -895,7 +908,7 @@ Expected: schema testに加え、上の5 actor × 6操作の権限表、draft wr
 update時published拒否、publisherのpublish/unpublish、adminのみdelete、承認versionの内容一致、
 承認後draft競合拒否、Robot/Series slugのDB一意制約がPASS
 
-- [ ] **Step 6: commit**
+- [x] **Step 6: commit**
 
 ```bash
 git add collections globals lib/payload payload.config.ts payload-types.ts tests/content/payload-schema.test.ts tests/content/publish-gates.test.ts tests/content/route-registry.test.ts tests/content/publish-approved-version.test.ts
@@ -920,7 +933,7 @@ git commit -m "feat: define Payload content collections"
 **`_environment_marker`、`content_route_registry`を含むすべてのDDLをmigrationへ入れる。** 手動SQLで作ったtableは
 「全migrationをGit管理」と矛盾する。Postgresではcollection / field追加ごとにmigrationが要る。
 
-- [ ] **Step 1: migration script を package.json へ追加する**
+- [x] **Step 1: migration script を package.json へ追加する**
 
 ```json
 {
@@ -930,7 +943,7 @@ git commit -m "feat: define Payload content collections"
 }
 ```
 
-- [ ] **Step 2: 空DBへ適用できることを確認する**
+- [x] **Step 2: 空DBへ適用できることを確認する**
 
 新しい空のデータベースを作り、そこへ流す。
 
@@ -951,7 +964,7 @@ npm run environment:stamp -- --expected preview
 
 Expected: Previewは`preview` 1行だけ、Productionは`production` 1行だけ。marker DDLを手動実行しない。
 
-- [ ] **Step 3: 既存schemaを持つDBへ適用できることを確認する**
+- [x] **Step 3: 既存schemaを持つDBへ適用できることを確認する**
 
 **Production / Previewと資格情報を共有しない隔離DB**へinitial migrationを適用し、次にTask 8で
 実際に採用するMCP API key schema migration fixtureを適用する。任意フィールドをcollectionへ足して
@@ -960,7 +973,7 @@ test終了時に隔離DBと生成物を破棄する。
 
 Expected: 実採用schema差分だけのmigrationが生成され、seedした既存データが消えない。
 
-- [ ] **Step 4: 巻き戻せることを確認する**
+- [x] **Step 4: 巻き戻せることを確認する**
 
 package lockで固定したPayload版のdownコマンドを`docs/reference/database-migration-runbook-v1.md`へ
 具体的に記載し、隔離DBで直前migrationをdown→upする。空migrationもfixtureで生成し、
@@ -969,7 +982,7 @@ package lockで固定したPayload版のdownコマンドを`docs/reference/datab
 Expected: 直前の migration が取り消され、そのテーブル・カラムが消える。**down が動かない場合は、
 `content:export` からの復元手順を Task 5 で確立するまで先へ進まない。**
 
-- [ ] **Step 5: schema drift を検出する負テストを書く**
+- [x] **Step 5: schema drift を検出する負テストを書く**
 
 **`payload:migrate:status` は「生成済みmigrationファイルの適用状態」しか見ない。**
 「`collections/Robots.ts` にフィールドを足したのに migration を生成し忘れた」という
@@ -995,24 +1008,24 @@ fi
 **`--skip-empty` を先に単体で確認する。** drift が無い状態でこのコマンドだけを実行し、
 プロンプトが出ずにexit 0で終わることを、Step 6 でCIへ組み込む前に手元で確認する。
 
-- [ ] **Step 6: CI へ組み込む**
+- [x] **Step 6: CI へ組み込む**
 
 `.github/workflows/ci.yml` に Step 5 の drift check と `payload:migrate:status` の両方を追加する。
 drift check は「migration ファイルの生成漏れ」を、`migrate:status` は「生成したが適用し忘れた
 migration」を検出する。**両方無いと片方の不備を見逃す。**
 
-- [ ] **Step 7: ゲートが赤くなることを確認する（Global Constraints）**
+- [x] **Step 7: ゲートが赤くなることを確認する（Global Constraints）**
 
 fixture configにだけfieldを1つ足し、migrationを生成せずCI相当checkを回す。
 Expected: Step 5のdrift checkが **exit 1**。確認後はfixture差分と一時migrationを破棄し、
 production config / migrationsに試験fieldが0件であることを`git diff --check`と`rg`で確認する。
 
-- [ ] **Step 8: production 適用の手順を書く**
+- [x] **Step 8: production 適用の手順を書く**
 
 deploy pipeline で `npm run payload:migrate` を build の前段に置く。失敗したら deploy を止める。
 migration はスキーマ変更であり、アプリコードより先に適用されている必要がある。
 
-- [ ] **Step 9: commit**
+- [x] **Step 9: commit**
 
 ```bash
 git add migrations scripts/stamp-environment.mts package.json .github/workflows/ci.yml tests/content/migration.test.ts docs/reference/database-migration-runbook-v1.md
@@ -1039,7 +1052,7 @@ git commit -m "feat(db): Postgres migration の生成・適用・検証を追加
 - Consumes: local arraysまたはPayload Local API
 - Produces: `getContentRepository(): Promise<ContentRepository>`、query単位のruntime取得、管理処理専用snapshot
 
-- [ ] **Step 1: repository contract testを書く**
+- [x] **Step 1: repository contract testを書く**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -1057,13 +1070,13 @@ describe('ContentRepository contract', () => {
 });
 ```
 
-- [ ] **Step 2: module未作成によるFAILを確認する**
+- [x] **Step 2: module未作成によるFAILを確認する**
 
 Run: `npm run test -- tests/content/repository.contract.test.ts`
 
 Expected: `Cannot find module '@/lib/content/createContentRepository'`
 
-- [ ] **Step 3: runtime queryとsnapshot contractを分離する**
+- [x] **Step 3: runtime queryとsnapshot contractを分離する**
 
 ```ts
 import type {
@@ -1114,11 +1127,11 @@ export interface ContentSnapshotSource {
 
 `ContentSource` は公開runtime用、`ContentSnapshotSource` はimport / export / parity / 横断validation用とする。ページ処理から `readSnapshot()` を呼べない依存方向にする。
 
-- [ ] **Step 4: local sourceを実装する**
+- [x] **Step 4: local sourceを実装する**
 
 `localSource.ts` は現行配列をメモリ上でqueryし、同時に管理処理向け `readSnapshot()` を提供する。`lib/site.ts` の `dataAsOf` もsnapshotへ含める。移行完了後に削除できるよう、local importはこのファイルだけに限定する。
 
-- [ ] **Step 5: pure repositoryを実装する**
+- [x] **Step 5: pure repositoryを実装する**
 
 `createContentRepository(source)` は現行 `lib/data.ts` のpublished filter、archived detail、slug redirect、ID解決、関連解決を移す。呼び出し側は物理sourceを知らず、一覧queryにはlimit / page / filters / sortを明示する。
 
@@ -1130,7 +1143,7 @@ export interface ContentSnapshotSource {
 （`robots` と `robotSeries` を横断した slug 解決が要る。②の Task 4 が
 `/robots/[slug]` を両方で描き分けるため）。
 
-- [ ] **Step 6: Payload sourceを実装する**
+- [x] **Step 6: Payload sourceを実装する**
 
 Payloadの各collectionへ `where`、`limit`、`page`、`sort`、`depth: 0` を明示してqueryする。Payload relationshipとdraft状態はcollection別mapperでcanonical domain型へ変換し、暗黙の型castだけで済ませない。Payloadの `_status` + `lifecycleStatus` は上記3状態のdomain `publishStatus`へ、書き込み時は逆向きに変換する。`limit: 500` の全件取得は `readSnapshot()` を使う管理処理だけに限定する。
 
@@ -1153,7 +1166,7 @@ Payloadの各collectionへ `where`、`limit`、`page`、`sort`、`depth: 0` を�
 認証用collectionであり、`ai/rules/20-data.md` / `21-data-maintenance-workflow.md`
 （Task 0.5 で更新）の対象は9コレクション（`admins` を除く）と明記する。
 
-- [ ] **Step 7: source選択を実装する**
+- [x] **Step 7: source選択を実装する**
 
 ```ts
 export async function getContentRepository() {
@@ -1180,7 +1193,7 @@ export async function getContentRepository() {
 終了時に変数自体を削除する。export / restoreはruntime envを暗黙利用せず`--source local|payload|snapshot`
 を必須にし、manifestへsource kind、environment marker、provider resource IDを記録する。
 
-- [ ] **Step 8: local / Payloadの同一contract testを通す**
+- [x] **Step 8: local / Payloadの同一contract testを通す**
 
 Run: `npm run test -- tests/content/repository.contract.test.ts`
 
@@ -1188,7 +1201,7 @@ Expected: 同じcontract suiteをlocal sourceとPayload sourceへparameterizeし
 特にRobotは両sourceとも削除4フィールドを持たず、`publishStatus` が同じ値になることを確認する。
 未設定、未知値、Production local（rollback flag無し）がすべて起動時にFAILすることも確認する。
 
-- [ ] **Step 9: commit**
+- [x] **Step 9: commit**
 
 ```bash
 git add lib/content lib/data.ts tests/content/repository.contract.test.ts
@@ -1214,7 +1227,7 @@ git commit -m "refactor: introduce content repository boundary"
 - Consumes: `ContentSnapshot`、Payload Local API
 - Produces: 冪等upsert、JSON parity report、rollback snapshot
 
-- [ ] **Step 1: parity testを書く**
+- [x] **Step 1: parity testを書く**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -1232,13 +1245,13 @@ describe('content source parity', () => {
 });
 ```
 
-- [ ] **Step 2: compare module不足のFAILを確認する**
+- [x] **Step 2: compare module不足のFAILを確認する**
 
 Run: `npm run test -- tests/content/import-parity.test.ts`
 
 Expected: module not foundでFAIL
 
-- [ ] **Step 3: importerをstableId upsertで実装する**
+- [x] **Step 3: importerをstableId upsertで実装する**
 
 collectionごとに `stableId` を検索し、存在すればupdate、なければcreateする。relationshipは参照先collectionを先にimportし、stableIdからPayload内部IDへ変換する。`site-settings` はGlobalなので `updateGlobal` を使い、stableId upsertの対象にしない。
 
@@ -1266,7 +1279,7 @@ site-settings
 **`robotSeries` は `robots` より先。** `Robot.seriesId` が `robotSeries` を参照するため、
 先に import しないと relationship の解決先が無い。
 
-- [ ] **Step 4: parity比較を実装する**
+- [x] **Step 4: parity比較を実装する**
 
 比較対象:
 
@@ -1284,7 +1297,7 @@ site-settings
 各collectionの`slug`、`previousSlugs`、そこから導出した公開URLに1件でも差があれば
 `changed`としてexit 1にし、Task 9へ進まない。
 
-- [ ] **Step 5: scriptを追加する**
+- [x] **Step 5: scriptを追加する**
 
 ```json
 {
@@ -1318,7 +1331,7 @@ npm ls tsx --depth=0
 ```
 Expected: `devDependencies` に解決される。transitive のみなら Task 2 へ戻る。
 
-- [ ] **Step 6: 開発DBへimportして再実行する**
+- [x] **Step 6: 開発DBへimportして再実行する**
 
 Run: `npm run content:import`
 
@@ -1330,7 +1343,7 @@ Expected: 重複を作らず、同じstable ID集合でexit 0
 
 Run: `npm run content:compare`
 
-- [ ] **Step 6.5: export→restore の round-trip を確認する**
+- [x] **Step 6.5: export→restore の round-trip を確認する**
 
 ```bash
 npm run content:export -- --source payload --out /tmp/rt.json
@@ -1344,7 +1357,7 @@ G-7（復旧手順が動く）の実証になる。**
 
 Expected: `missing=0 extra=0 changed=0 brokenReferences=0`
 
-- [ ] **Step 7: cutover baseline snapshot を固定する**
+- [x] **Step 7: cutover baseline snapshot を固定する**
 
 **`content:compare` は Task 9 で local TS を撤去したあと実行できなくなる。**
 「local vs payload」の比較なので、比較元が消えるため。
@@ -1423,7 +1436,7 @@ artifactはcompare / restoreの入力として受け付けない。
 検証する入力になる。** ②開始時の実復元対象は、② G-3で新規生成する
 `pre-robot-import-manifest.json`である。古いcutover baselineを②開始時点の完全復元へ流用しない。
 
-- [ ] **Step 8: commit**
+- [x] **Step 8: commit**
 
 ```bash
 git add scripts/import-content-to-payload.mts scripts/compare-content-sources.mts scripts/export-content-snapshot.mts scripts/verify-content-snapshot.mts scripts/verify-content-conservation.mts tests/fixtures/contentSnapshot.ts tests/content/import-parity.test.ts package.json package-lock.json
@@ -1467,7 +1480,7 @@ git commit -m "feat: add idempotent content migration tooling"
 - Consumes: `getContentRepository()`
 - Produces: local/payload両sourceで同じ公開URLと主要表示
 
-- [ ] **Step 1: 主要route回帰testを書く**
+- [x] **Step 1: 主要route回帰testを書く**
 
 ```ts
 import { expect, test } from '@playwright/test';
@@ -1493,7 +1506,7 @@ for (const route of [
 }
 ```
 
-- [ ] **Step 2: 各Server Componentでrepositoryをawaitする**
+- [x] **Step 2: 各Server Componentでrepositoryをawaitする**
 
 ```ts
 const repository = await getContentRepository();
@@ -1530,11 +1543,11 @@ Expected: 0件。現状46ファイルあるため、Task 9で `data/types.ts` �
 （`lib/data/contentSnapshot.ts` の残存importは対象外。Task 9のcutoverでlegacy検証パイプライン
 （`lib/validate.ts` 一式）ごと削除・作り替えするまで残る想定で、Task 9本文にその手順がある）。
 
-- [ ] **Step 3: Client Component propsをview modelへ縮小する**
+- [x] **Step 3: Client Component propsをview modelへ縮小する**
 
 一覧Browserへ渡す値は、ID、slug、表示名、カード情報、filter facetに必要な値へ限定する。記事本文、全sources、詳細spec、未使用relationshipを一覧client propsへ含めない。
 
-- [ ] **Step 4: local sourceで回帰確認する**
+- [x] **Step 4: local sourceで回帰確認する**
 
 Run: `CONTENT_SOURCE=local npm run build`
 
@@ -1544,7 +1557,7 @@ Run: `CONTENT_SOURCE=local npm run test:e2e -- tests/e2e/content-routes.spec.ts`
 
 Expected: 全route PASS
 
-- [ ] **Step 5: payload sourceで同じ回帰確認をする**
+- [x] **Step 5: payload sourceで同じ回帰確認をする**
 
 Run: `CONTENT_SOURCE=payload npm run build`
 
@@ -1554,7 +1567,7 @@ Run: `CONTENT_SOURCE=payload npm run test:e2e -- tests/e2e/content-routes.spec.t
 
 Expected: 全route PASS
 
-- [ ] **Step 6: commit**
+- [x] **Step 6: commit**
 
 ```bash
 git add src/app components lib scripts tests data/types.ts
@@ -1584,7 +1597,7 @@ git commit -m "refactor: read public routes through the content repository"
 - Consumes: Payload publish hook、signed webhook
 - Produces: collection単位cache tags、draft preview、publish後revalidation
 
-- [ ] **Step 1: webhook署名拒否testを書く**
+- [x] **Step 1: webhook署名拒否testを書く**
 
 ```ts
 import { expect, test } from 'vitest';
@@ -1599,11 +1612,11 @@ test('rejects unsigned revalidation requests', async () => {
 });
 ```
 
-- [ ] **Step 2: 署名なしrequestが拒否される実装を追加する**
+- [x] **Step 2: 署名なしrequestが拒否される実装を追加する**
 
 `REVALIDATION_SECRET` とconstant-time比較し、collection名をallowlist検証した後だけ `revalidateTag` を呼ぶ。
 
-- [ ] **Step 3: cache tagを定義する**
+- [x] **Step 3: cache tagを定義する**
 
 ```ts
 export const contentTags = {
@@ -1678,7 +1691,7 @@ export async function getRobotById(id: string) {
 publish後に埋め込み表示まで更新される。統合テストではRobot名の変更後にRobot詳細だけでなく、
 そのRobotを埋め込むUseCaseとArticleも最終的に新しい名前になることを確認する。
 
-- [ ] **Step 4: Draft Mode enable routeを認証し、通常cacheから分離する**
+- [x] **Step 4: Draft Mode enable routeを認証し、通常cacheから分離する**
 
 `/api/draft-mode/enable`は次のどちらかだけを受け付ける。
 
@@ -1703,7 +1716,7 @@ draft modeではdraftを含め、published modeではpublished/archived policy�
 出力（5分token）、nonce失効、漏えい時のsecret rotation、403時の停止条件を記載する。tokenやcookie値を
 監査artifact・Git・チャットへ保存しない。
 
-- [ ] **Step 5: 更新前後の値を統合テストで確認する**
+- [x] **Step 5: 更新前後の値を統合テストで確認する**
 
 HTTP status だけでは「revalidate が呼ばれたこと」しか分からず、「表示が実際に新しい値へ
 変わったこと」は確認できない。**`revalidateTag(tag, 'max')` の第2引数 `'max'` は
@@ -1730,14 +1743,14 @@ test('publish後に古い値ではなく新しい値が返る（stale-while-reva
 Manufacturer詳細・Article・UseCase、UseCase更新後のUseCase詳細・Manufacturer・Article、
 Report更新後のReport詳細・UseCase、UseCase更新後のHomeを最低ケースとする。
 
-- [ ] **Step 5.5: dependency tableと実装の差分を検査する**
+- [x] **Step 5.5: dependency tableと実装の差分を検査する**
 
 `cacheDependencies.ts`を唯一の依存表とし、repositoryの各cached queryが宣言したtag集合と、
 publish hookがcollection更新時に無効化するview/tag集合を同じ表から導出する。
 `tests/content/cache-dependencies.test.ts`は全cached queryが表に1回だけ登録され、source code中の
 `cacheTag()`実測集合と表が一致し、全9collection + settingsに少なくとも1 consumerがあることをassertする。
 
-- [ ] **Step 6: testとbuildを実行する**
+- [x] **Step 6: testとbuildを実行する**
 
 Run: `npm run test -- tests/content/revalidation.test.ts tests/content/draft-mode-security.test.ts tests/content/cache-dependencies.test.ts`
 
@@ -1748,7 +1761,7 @@ Run: `npm run build`
 
 Expected: exit 0
 
-- [ ] **Step 7: commit**
+- [x] **Step 7: commit**
 
 ```bash
 git add lib/content/cacheTags.ts lib/content/cacheDependencies.ts lib/content/previewTokens.ts src/app/api payload.config.ts lib/content/payloadSource.ts migrations tests/content/revalidation.test.ts tests/content/draft-mode-security.test.ts tests/content/cache-dependencies.test.ts docs/reference/content-preview-runbook-v1.md
@@ -1778,7 +1791,7 @@ API key 用の collection をスキーマに追加するため、その migratio
 - Test: `tests/content/admin-access.test.ts`
 - Test: `tests/integration/mcp-endpoint.test.ts`
 
-- [ ] **Step 0: パッケージを導入する**
+- [x] **Step 0: パッケージを導入する**
 
 ```bash
 npm install @payloadcms/plugin-mcp
@@ -1809,7 +1822,7 @@ Expected: migration fileが1本生成され、適用済みになる。続けてT
 
 collection の access / hook で **draft → published の遷移そのものを拒否する**。
 
-- [ ] **Step 1: MCP権限testを書く**
+- [x] **Step 1: MCP権限testを書く**
 
 `resolveMcpCapabilities()` のような自前 resolver を作って `publish: false` を assert する
 テストは**権限制御の証明にならない**。Payload MCP に独立した publish capability は無く、
@@ -1928,7 +1941,7 @@ Local API testだけでは実MCP経路のcredential bindingを証明できない
 find/create/update/publish相当/unpublish相当/delete/admins findを呼ぶ。通常MCP API keyが
 `content-draft-writer`へ結び付き、Task 3の権限表どおりになることを自動検証する。
 
-- [ ] **Step 2: 権限をcollection access/hookへ実装する**
+- [x] **Step 2: 権限をcollection access/hookへ実装する**
 
 `collections/Robots.ts`（他9コレクション共通）の `access.update` で、`_status` を
 `published` へ変更するリクエストを `content-draft-writer` ロールから拒否する。
@@ -1936,7 +1949,7 @@ find/create/update/publish相当/unpublish相当/delete/admins findを呼ぶ。�
 
 MCP plugin は公開collectionだけをexposeし、`admins`、API key、schema管理を通常profileから除外する。Mediaのbinary uploadは別toolとして明示的に許可したときだけ有効にする。
 
-- [ ] **Step 3: Codex workflowを文書化する**
+- [x] **Step 3: Codex workflowを文書化する**
 
 `.codex/content-workflow.md` に次の順序を固定する。
 
@@ -1950,7 +1963,7 @@ schema取得
 → content-publisherが公開
 ```
 
-- [ ] **Step 4: MCP access testを実行する**
+- [x] **Step 4: MCP access testを実行する**
 
 Run: `npm run test -- tests/content/mcp-access.test.ts`
 
@@ -1958,7 +1971,7 @@ Expected: 正式4 role + MCPの権限表がすべてPASS（draft作成・draft�
 admins拒否を含む）。
 **実際の Payload Local API に対して実行され、fake resolver のモックではないこと。**
 
-- [ ] **Step 5: 実MCP endpointのread/write制約を自動・手動で確認する**
+- [x] **Step 5: 実MCP endpointのread/write制約を自動・手動で確認する**
 
 ```bash
 npm run test:integration -- tests/integration/mcp-endpoint.test.ts
@@ -1988,7 +2001,7 @@ Expected: Payload MCP serverがenabledとして表示される
 `docs/reference/payload-mcp-integration-check-<日付>.md` へ記録する。Local APIテストだけで
 このStepを代替しない。
 
-- [ ] **Step 6: commit**
+- [x] **Step 6: commit**
 
 ```bash
 git add package.json package-lock.json payload.config.ts migrations lib/payload/mcp.ts .codex/content-workflow.md ai/rules/20-data.md ai/rules/21-data-maintenance-workflow.md .env.example tests/content/mcp-access.test.ts tests/content/admin-access.test.ts tests/integration/mcp-endpoint.test.ts docs/reference/payload-mcp-integration-check-*.md
@@ -2187,15 +2200,24 @@ git commit -m "refactor: make Payload the content source of truth"
 
 ## Rollback
 
-cutover後に公開障害が起きた場合は、コードを巻き戻さず、24時間のrollback window内だけVercel環境変数を
+> **2026-08-28 追記（実装後の現在地）**: 下記の「24時間rollback window」は**もう存在しない**。
+> Task 9 Step 7 で local source と `CONTENT_SOURCE` 分岐を撤去した結果、
+> `lib/content/getContentRepository.ts` は `CONTENT_SOURCE !== 'payload'` で必ずthrowする。
+> `ALLOW_LOCAL_CONTENT_ROLLBACK` はコード上どこからも読まれていない。
+> **したがって現行の唯一のrollback手段は、下段の「署名済みbaselineから新しいDBへrestoreする」経路である。**
+> 手順の正本は `docs/reference/content-restore-runbook-v1.md`。
+
+~~cutover後に公開障害が起きた場合は、コードを巻き戻さず、24時間のrollback window内だけVercel環境変数を
 `CONTENT_SOURCE=local`、`ALLOW_LOCAL_CONTENT_ROLLBACK=true`にしてredeployする。この期間は公開コンテンツを
 凍結するため、local / Postgres間に新しいpublished差分を作らない。Postgresのdraftは保持するが、local TSへ
-逆同期しない。rollback window終了時に`ALLOW_LOCAL_CONTENT_ROLLBACK`をProductionから削除する。
+逆同期しない。rollback window終了時に`ALLOW_LOCAL_CONTENT_ROLLBACK`をProductionから削除する。~~
+（↑ 撤去済み経路。歴史的経緯として残す）
 
 旧TS削除後のrollbackは、cutover直前exportを新しいPostgres環境へimportし、同じmigration versionのアプリをdeployする。SQL手修正で復旧しない。
-`docs/reference/content-restore-runbook-v1.md`へ、実行role=`platform-admin`、Production private storeからの
-署名検証、空DB migration、restore、parity、DNS/deploy切替、停止条件を記載する。署名・hash・
-environment marker・provider resource IDのどれかが一致しなければrestoreを開始しない。
+実行role=`platform-admin`、Production private storeからの署名検証、空DB migration、restore、parity、
+DNS/deploy切替、停止条件は **[`docs/reference/content-restore-runbook-v1.md`](../reference/content-restore-runbook-v1.md)**
+に記載済み（2026-08-28作成）。署名・hash・environment marker・provider resource IDのどれかが
+一致しなければrestoreを開始しない。
 
 ---
 

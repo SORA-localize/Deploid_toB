@@ -3,11 +3,22 @@ import { expect, test } from '@playwright/test';
 /**
  * content-platform-migration-plan-v1 Task 6 Step 1.
  *
- * ページがrepository（local / payload 両source）経由でcontentを読むようになった後も、
- * 主要な公開routeが両sourceで同じ形にレンダリングされることを確かめる回帰test。
- * `CONTENT_SOURCE=local` と `CONTENT_SOURCE=payload` それぞれで
- * `npm run build && npm run test:e2e -- tests/e2e/content-routes.spec.ts` を実行する
- * （両方PASSすることがTask 6の受け入れ条件）。
+ * ページがrepository経由でcontentを読むようになった後も、主要な公開routeが同じ形に
+ * レンダリングされることを確かめる回帰test。
+ *
+ * **2026-08-28 更新**: Task 9 Step 7 で local source を撤去したため、`CONTENT_SOURCE=local`
+ * での実行はできない（`lib/content/getContentRepository.ts` が起動時にthrowする）。
+ * 実行方法は payload source のみ:
+ *
+ *   CONTENT_SOURCE=payload npm run build
+ *   CONTENT_SOURCE=payload npm run test:e2e -- tests/e2e/content-routes.spec.ts
+ *
+ * **注意**: このspecは現在どのCI workflowからも実行されていない
+ * （`npm run check` から `test:e2e` が外れており、`content-e2e.yml` は
+ * `cache-revalidation` と `draft-mode-wiring` の2本しか実行しない）。
+ * 計画書がTask 6 / Task 9 Step 4の受け入れ条件として指定したspecなので、
+ * CI実行範囲の是正は未解決課題として
+ * `docs/plans/content-platform-migration-factual-audit-v1.md` A-2 に記録している。
  *
  * fix round 2（reviewer High指摘への対応）: 横スクロール無しと`<main>`の可視性だけでは、
  * 対象routeが全て404（`src/app/global-not-found.tsx`にも`<main>`がある）でもテストが
