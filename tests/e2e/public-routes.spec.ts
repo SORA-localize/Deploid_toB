@@ -2,12 +2,16 @@ import { expect, test } from '@playwright/test';
 
 const NOT_FOUND_TEXT = 'ページが見つかりません';
 
-// 期待H1は2026-07-26時点のuiText/dataに固定する。データ変更を伴う別作業で
+// 期待H1はuiTextと`tests/fixtures/contentSnapshot.ts`に固定する。データ変更を伴う別作業で
 // タイトルや機種名が正式変更された場合だけ、同じcommitでここも更新する。
+//
+// 機種名は`nameJa`を期待する。カードも詳細見出しも`nameJa ?? name`で描画するため、
+// fixtureが両方を持つ場合に実際に出るのは日本語側（`name: 'Alpha One'` ではなく
+// `nameJa: 'アルファワン'`）。英語側を期待していたのは、実データ由来の値を写した名残。
 const routes = [
   { path: '/', expectedH1: 'ヒューマノイド' },
   { path: '/robots', expectedH1: 'ロボット' },
-  { path: '/robots/fixture-robot-a', expectedH1: 'Alpha One', canonical: '/robots/fixture-robot-a' },
+  { path: '/robots/fixture-robot-a', expectedH1: 'アルファワン', canonical: '/robots/fixture-robot-a' },
   { path: '/manufacturers', expectedH1: 'メーカー' },
   { path: '/use-cases', expectedH1: '用途から探す' },
   { path: '/reports', expectedH1: '記事' },
