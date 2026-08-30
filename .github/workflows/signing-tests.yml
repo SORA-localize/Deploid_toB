@@ -1,0 +1,147 @@
+# .github/workflows/signing-tests.yml
+#
+# 実cosign + 実AWS KMS を要する検証群だけを、**手動実行**で回すworkflow。
+#
+# ## なぜ別workflowなのか（`ci.yml`の`verify`に足さない理由）
+#
+# `tests/content/` の6ファイルは `describe.skipIf(!canSignForReal)` /
+# `it.skipIf(!canSignForReal)` を持つ:
+#
+#   const canSignForReal = cosignAvailable() && Boolean(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY);
+#
+# `ci.yml` / `content-e2e.yml` のどちらのenvにもAWS credentialが無いため、これらは
+# **CIで一度も実行されていない**（37テスト、`docs/plans/content-platform-migration-factual-audit-v1.md`
+# のA-4）。内容は署名付きrestoreの強制・identity transfer承認署名・media復元・
+# audit upload sessionのhappy path・一時ファイル衛生で、「本番データの復旧と改ざん防止」の中核。
+#
+# ただしこれを`verify`（required check）へ足すと、**AWS credentialの障害・失効・
+# ローテーションがそのままPRのマージ不能に直結する**。復旧経路の検証は重要だが、
+# 日常のマージを外部credentialの可用性へ従属させる理由は無い。そこで
+# `workflow_dispatch`専用にし、required status checksへは登録しない。
+# （required checkは`verify`と`content-e2e`の2つ。ruleset `task9-main-protection`）
+#
+# ## 実行するタイミング
+#
+# - 署名・restore・audit upload まわりのコードを変更したPRの前後
+# - 復旧手順（`docs/reference/content-restore-runbook-v1.md`）を更新したとき
+# - 定期確認（署名鍵のローテーション後など）
+#
+# ## 必要なGitHub Secrets（未設定だとこのworkflowは**明示的に失敗する**）
+#
+# - `SNAPSHOT_SIGNING_AWS_ACCESS_KEY_ID`
+# - `SNAPSHOT_SIGNING_AWS_SECRET_ACCESS_KEY`
+#
+# 署名鍵は**Preview鍵**を使う。`signingKeyArn()`は`SNAPSHOT_SIGNING_KMS_KEY_ARN`未設定かつ
+# `VERCEL_ENV !== 'production'`のときPreview鍵ARNを返す。このworkflowは両方とも設定しないので、
+# Production署名鍵には**構造的に到達しない**。credentialにもProduction鍵へのkms:Sign権限を
+# 与えないこと。
+name: Signing tests (manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  signing-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: signing_tests_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      # DB名に"test"を含めることが必須（`lib/content/databaseSafety.ts`のthrowaway判定）。
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/signing_tests_test
+      # CI専用のダミー値。外部アカウントに紐づかず、この使い捨てDBの署名にのみ使う。
+      PAYLOAD_SECRET: 51f0a3c8d29b47e6a1c5f8b3d7e0a2c4f6b8d0e2a4c6f8b0d2e4a6c8f0b2d4e6
+      CONTENT_SOURCE: payload
+      AWS_REGION: ap-northeast-1
+      AWS_ACCESS_KEY_ID: ${{ secrets.SNAPSHOT_SIGNING_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SNAPSHOT_SIGNING_AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.12.0
+          cache: npm
+      - run: npm ci
+
+      # このworkflowが存在する理由そのものが「credentialが無いと黙ってskipされる」ことなので、
+      # 無いまま緑になる経路を先に塞ぐ。値は出力しない（存在の有無だけを見る）。
+      - name: Fail closed if the signing credentials are missing
+        run: |
+          missing=0
+          [ -n "$AWS_ACCESS_KEY_ID" ] || { echo "::error::SNAPSHOT_SIGNING_AWS_ACCESS_KEY_ID is not set"; missing=1; }
+          [ -n "$AWS_SECRET_ACCESS_KEY" ] || { echo "::error::SNAPSHOT_SIGNING_AWS_SECRET_ACCESS_KEY is not set"; missing=1; }
+          if [ "$missing" = "1" ]; then
+            echo "::error::Without these secrets every suite in this workflow silently skips and the job goes green — which is the exact failure mode this workflow exists to remove."
+            exit 1
+          fi
+          echo "signing credentials: present"
+
+      # `cosignAvailable()` は PATH の `cosign version` を実行して判定する。
+      # `scripts/fetch-cosign-binary.mjs` は linux-amd64 の binary を checksum 検証つきで
+      # `.cosign-bin/` へ置く（ubuntu runner と一致）。
+      - name: Install cosign
+        run: |
+          node scripts/fetch-cosign-binary.mjs
+          echo "$PWD/.cosign-bin" >> "$GITHUB_PATH"
+
+      - name: Verify cosign is actually on PATH
+        run: cosign version
+
+      - run: npm run payload:migrate
+
+      # 対象は `canSignForReal` を持つ6ファイルだけ。ここを広げると実行時間と
+      # 外部依存が増えるだけで、このworkflowの目的（実署名経路の検証）から外れる。
+      - name: Run the real-signature suites
+        run: |
+          npx vitest run \
+            tests/content/restore-enforcement.test.ts \
+            tests/content/temp-file-hygiene.test.ts \
+            tests/content/approval-signature-enforcement.test.ts \
+            tests/content/auditUploadSession.test.ts \
+            tests/content/media-baseline-recovery.test.ts \
+            tests/content/import-parity.test.ts \
+            --reporter=verbose 2>&1 | tee /tmp/signing-tests.log
+
+      # credentialがあってもcosignの起動に失敗すれば `canSignForReal` は false になり、
+      # 全部skipのまま緑になりうる。上のstepが通っている以上その可能性は低いが、
+      # 「skipされた事実」を目視に頼らず機械で落とす。
+      #
+      # 実測（credential無し・2026-08-29）: この6ファイルは `125 passed | 37 skipped (162)` になる。
+      # 37 が `canSignForReal` 由来のskip数と一致することは確認済み。
+      #
+      # **未検証の前提**: credentialがある状態でこの6ファイルを実行したことがまだ無いため、
+      # 「skipが0になる」ことは実測できていない。`canSignForReal` 以外の理由でskipするテストが
+      # 1つでもあれば、このstepは正常な実行を誤って落とす。初回の実実行でそれが起きた場合は、
+      # このstepを消すのではなく **skip理由を確認したうえで対象を絞る**こと
+      # （例: `Tests` 行のskip数が0であることだけを見る形へ変える）。
+      # 黙ってskipされるのを防ぐのがこのstepの唯一の存在理由なので、無効化はしない。
+      - name: Fail if the signature-gated suites were skipped anyway
+        run: |
+          if grep -qE '[0-9]+ skipped' /tmp/signing-tests.log; then
+            echo "::error::Some suites skipped despite credentials being present — canSignForReal evaluated false. Check cosign and the KMS key permissions."
+            grep -E '[0-9]+ (passed|skipped|failed)' /tmp/signing-tests.log || true
+            exit 1
+          fi
+          echo "no skipped suites: the real-signature paths actually ran"
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: signing-tests-log
+          path: /tmp/signing-tests.log
+          retention-days: 7

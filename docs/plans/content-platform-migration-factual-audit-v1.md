@@ -856,7 +856,7 @@ artifact 側を疑って時間を溶かす種類の罠。
 | **A-10** | 計画書の Step チェックボックス72個を `[x]` にし、**遡ってチェックしたものである旨と根拠**を冒頭に明記 | ✅ **閉じた** |
 | **A-2** | UI E2E の CI 実行範囲 | ❌ **未着手**（別ブランチ。32本の failure 分類が先） |
 | **A-3** | cron 成功経路の実機検証 | ❌ **未着手**（コード変更ではなく Production への確認作業） |
-| **A-4** | 実署名37テストの CI 実行経路 | ❌ **未着手**（A-2 と同じブランチで扱う） |
+| **A-4** | 実署名37テストの CI 実行経路 | ⚠️ **workflow 作成済・secret 未設定**（`.github/workflows/signing-tests.yml`、`workflow_dispatch` 専用。下記 §9） |
 | **A-6** | Production 実データの parity 再確認 | ❌ **未着手** |
 | **A-7** | `check:plan-snippets` が無効 | ❌ **未着手** |
 | **A-11** | `lint --max-warnings 4` の margin ゼロ | ❌ **未着手** |
@@ -918,3 +918,81 @@ $ cat vercel.json
 
 503 と 401 はどちらも **HTTP としては正常応答**なので、
 Vercel の cron 実行履歴は「成功」に見える可能性がある。**ステータスコードまで見ること。**
+
+---
+
+## 9. A-4 の実装（2026-08-29）と、A-2 に対する追加の設計条件
+
+### A-4: `.github/workflows/signing-tests.yml`（`workflow_dispatch` 専用）
+
+実署名（実cosign + 実AWS KMS）を要する6ファイルだけを手動実行する workflow を追加した。
+
+**required check にはしない。** 理由は、これを `verify` へ足すと
+**AWS credential の障害・失効・ローテーションがそのまま PR のマージ不能へ直結する**ため。
+復旧経路の検証は重要だが、日常のマージを外部 credential の可用性へ従属させる理由が無い。
+
+**このworkflowの要点は「credentialが無いまま緑になる経路を塞ぐ」こと。**
+A-4 の本質は「テストが無い」ことではなく「**あるのに黙ってskipされ、緑に見える**」ことなので、
+2つのゲートを置いた。
+
+1. secret が空なら、テスト実行前に明示的に fail する
+2. 実行後、skip が1件でもあれば fail する（`canSignForReal` が false のまま走った場合の検出）
+
+実測（credential 無し、2026-08-29）:
+
+```
+$ npx vitest run tests/content/{restore-enforcement,temp-file-hygiene,approval-signature-enforcement,auditUploadSession,media-baseline-recovery,import-parity}.test.ts
+ Test Files  5 passed | 1 skipped (6)
+      Tests  125 passed | 37 skipped (162)
+```
+
+**37 という数が、監査 L7-訂正 で報告した skip 数と完全に一致する**ことを確認した。
+つまりこの6ファイルが skip 分の全てを占めている。
+
+**未検証**: credential がある状態でこの6ファイルを実行した記録はまだ無い。
+したがって「skip が 0 になる」ことは実測していない。`canSignForReal` 以外の理由で skip する
+テストがあれば、上記ゲート2が正常な実行を誤って落とす。初回の実実行でそれが起きた場合は、
+**ゲートを消すのではなく skip 理由を確認して対象を絞る**こと。
+
+**必要な GitHub Secrets**（未設定だと workflow は上記ゲート1で失敗する）:
+
+- `SNAPSHOT_SIGNING_AWS_ACCESS_KEY_ID`
+- `SNAPSHOT_SIGNING_AWS_SECRET_ACCESS_KEY`
+
+署名鍵は **Preview 鍵**を使う。`signingKeyArn()` は `SNAPSHOT_SIGNING_KMS_KEY_ARN` 未設定かつ
+`VERCEL_ENV !== 'production'` のとき Preview 鍵 ARN を返す。この workflow は両方とも設定しないので、
+**Production 署名鍵には構造的に到達しない**。credential 側にも Production 鍵への `kms:Sign` 権限を
+与えないこと。
+
+### F-16: 共有 fixture DB は「正しいDB名」でも相互破壊する（A-2 の前提条件）
+
+2026-08-29 の作業中に、共有 fixture DB が壊れる経路を **2つとも実際に踏んだ**。
+
+1. **変異系 e2e が後続を壊す**: `cache-revalidation.spec.ts` / `draft-mode-wiring.spec.ts` は
+   `fixture-robot-a` を書き換えて復元しない。全21本を通しで実行した際、後続の read-only spec が
+   `Expected: "Alpha One"` に対し `Received: "E2E List Update 1787977037355"` を見た。
+2. **vitest が e2e fixture を消す**: `npm run test` を e2e と同じ DB へ向けたところ、
+   `version-retention` / `revalidation` 等の破壊的スイートが fixture の manufacturer を消し、
+   次の `npm run build` が
+   `deployment-missing-manufacturer: deployment "fixture-deployment-one" has no resolvable manufacturerId`
+   で落ちた（fixture の manufacturer が `Retention Robotics` / `Revalidation Test Manufacturer` に
+   置き換わっていた）。
+
+**どちらも `lib/content/databaseSafety.ts` の throwaway ガードを正しく通過する。**
+ガードは「**誤った**DBへ書く」ことを防ぐ仕組みであって、
+「**正しい**DBを2つの用途で共有したことによる相互破壊」は対象外。
+
+現状の CI は `verify`(vitest) と `content-e2e`(playwright) が別 job・別 DB なので安全。
+ただし **A-2 で E2E を21本へ広げる際は、fixture のサイズより先に
+「変異系と読み取り系の間で re-seed する」設計が必要**。これは推測ではなく、
+同日に2回とも実際に踏んだ事実に基づく。
+
+### A-2 の残件（2026-08-29 時点の実測）
+
+| 分類 | 件数 | 状態 |
+|---|---|---|
+| 実バグ（`/compare` の Radix Select 空値） | 3 | ✅ PR #46 で修正 |
+| spec の期待値が実描画と不一致 | 6 | ✅ PR #47 で修正 |
+| fixture サイズ不足 | 21（visual baseline 16 / world map 4 / pagination 1） | ❌ 未着手（fixture 設計の判断が必要） |
+
+29件 → 21件。**残りは全て fixture サイズに帰着し、実バグは残っていない**（実測範囲において）。
