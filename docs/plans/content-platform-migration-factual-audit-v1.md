@@ -996,3 +996,68 @@ $ npx vitest run tests/content/{restore-enforcement,temp-file-hygiene,approval-s
 | fixture サイズ不足 | 21（visual baseline 16 / world map 4 / pagination 1） | ❌ 未着手（fixture 設計の判断が必要） |
 
 29件 → 21件。**残りは全て fixture サイズに帰着し、実バグは残っていない**（実測範囲において）。
+
+---
+
+## 10. F-17: Payload へ接続する script 3本に schema push ガードが無かった（2026-09-01 修正）
+
+A-6（Production parity の実行）に着手しようとしたところ、**使う予定だったコマンド自体が
+本番 schema を書き換え得る**ことが判明し、実行を中止した。
+
+`getPayload()` は次の条件で dev-mode schema push（実DDL）を走らせる
+（`node_modules/@payloadcms/db-postgres/dist/connect.js:110`）:
+
+```js
+if (process.env.NODE_ENV !== 'production' && process.env.PAYLOAD_MIGRATING !== 'true' && this.push !== false) {
+  await pushDevSchema(...)
+}
+```
+
+`payload.config.ts` に `push:` の指定は無い。つまり `PAYLOAD_MIGRATING` だけが歯止め。
+
+**ガードの有無を全 script で調べた結果**:
+
+| script | ガード |
+|---|---|
+| `export-content-snapshot.mts` | ✅ 3箇所 |
+| `import-content-to-payload.mts` | ✅ |
+| `stamp-environment.mts` | ✅ 2箇所 |
+| `seed-ci-site-settings.mts` | ✅ |
+| `run-payload-migration-cli.mts` | ✅ |
+| **`verify-content-snapshot.mts`** | ❌ **無し** |
+| **`verify-content-conservation.mts`** | ❌ **無し** |
+| **`compare-content-sources.mts`** | ❌ **無し** |
+
+**実害の射程**: 前2本は `docs/reference/content-restore-runbook-v1.md` Step 4 が
+**本番に対して実行するよう案内していた**。つまり復旧作業の最中に本番 schema が
+書き換わり得る状態だった。runbook は 2026-08-28 に私が書いたもので、
+このガードの有無を確認していなかった。
+
+### 副次的に判明したこと
+
+**`stamp-environment.mts` の docblock は機構の説明が誤っている。** `:40` の代入は
+静的 import（`:26`, `:42`）より後に実行される（ESM の巻き上げ）。docblock は
+「config を import する前に立てるから効く」と主張しているが、実際に効いているのは
+**フラグが config 評価時ではなく `connect()` 時に読まれる**ため。
+結果は同じだが、この説明を手本にすると誤った実装を生む。
+正しい手本は `seed-ci-site-settings.mts:8`（`:22-23` に巻き上げの危険を正しく記述）と
+`run-payload-migration-cli.mts:94`。
+
+### 修正（2026-09-01）
+
+1. 3本へガードを追加（動的 import の直前。3本とも動的 import なので実行順で確実に効く）
+2. `scripts/check-payload-migration-guard.mjs` を追加。`scripts/**` が Payload へ到達するのに
+   ガードを持たない場合に fail する。`check-publish-authorization-boundaries.mjs` と同じ
+   純粋関数 + `.d.mts` + 単体テストの構成
+3. `npm run check` の boundary 群へ配線
+4. runbook へ「なぜ安全か」を追記
+
+**ゲートが赤くなることを確認済み**: 1本からガードを外すと
+`[payload-migration-guard] scripts/verify-content-snapshot.mts reaches Payload ... without setting
+process.env.PAYLOAD_MIGRATING` で exit 1。戻すと OK。
+
+### 学び
+
+`deploid_dev` 誤削除インシデントと同じ形をしている——**安全ガードが「人が気をつけて各所へ書く」
+方式だったため、一部の実装漏れが残った**。今回は機械検査を足したので、次に script を追加した人が
+忘れても CI が止める。

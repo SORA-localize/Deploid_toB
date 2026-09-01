@@ -213,6 +213,15 @@ npm run content:verify-conservation -- \
 `content:verify-conservation` は完全 parity を見ない（責務が別）。
 全collectionの一致が要るときは `content:verify-snapshot` の方を根拠にする。
 
+> **2026-09-01 追記（この Step が本番へ接続しても安全な理由）**: この2本は Payload へ接続する。
+> `getPayload()` は `PAYLOAD_MIGRATING=true` が立っていないと dev-mode schema push を走らせ、
+> **実際に DDL を実行する**（`@payloadcms/db-postgres` の `connect.js`）。`payload.config.ts` は
+> `push:` を指定していないので、このフラグだけが歯止めになる。
+> 2026-09-01 の監査時点でこの2本にはフラグが**無く**、本手順を本番に対して実行すると
+> 本番 schema が書き換わり得た。同日に両方へフラグを追加し、あわせて
+> `npm run check:payload-migration-guard` が `scripts/**` 全体を機械検査するようにしたため、
+> 同じ抜けが再発すると CI が赤になる。
+
 ### Step 5. アプリの deploy を切り替える
 
 **コードは巻き戻さない。** restore した artifact と**同じ migration 世代**のアプリを deploy する。

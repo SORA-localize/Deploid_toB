@@ -885,6 +885,15 @@ async function main(): Promise<void> {
       throw new Error('content:compare local TS source was retired after the Production cutover; use content:verify-snapshot.');
     },
   });
+  // `getPayload()` は `NODE_ENV !== 'production'` かつ adapter が `push: false` でない限り
+  // dev-mode schema push を走らせ、**実際に DDL を実行する**
+  // （`@payloadcms/db-postgres` の `connect.js`: `PAYLOAD_MIGRATING !== 'true'` のとき `pushDevSchema`）。
+  // `payload.config.ts` は `push:` を指定していないので、このフラグだけが歯止め。
+  // この script は読み取り専用で schema を変える権限を持たないため、接続前に必ず止める。
+  // 同じ理由の canonical な docblock は `export-content-snapshot.mts` の `runRestore` にある。
+  // フラグは config 評価時ではなく `connect()` 時に読まれるので、動的 import の直前で足りる。
+  process.env.PAYLOAD_MIGRATING = 'true';
+
   const { createPayloadContentSource } = await import('../lib/content/payloadSource.ts');
 
   const localSource = createLocalContentSource();
