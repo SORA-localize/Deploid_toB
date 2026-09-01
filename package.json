@@ -26,7 +26,7 @@
     "check:client-budgets": "node scripts/check-client-budgets.mjs",
     "check:audit-upload-traces": "node scripts/check-audit-upload-traces.mjs",
     "typecheck": "tsc --noEmit --incremental false",
-    "lint": "eslint . --max-warnings 4",
+    "lint": "eslint . --max-warnings 0",
     "payload:migrate": "tsx scripts/run-payload-migration-cli.mts -- migrate",
     "payload:migrate:create": "tsx scripts/run-payload-migration-cli.mts -- migrate:create",
     "payload:migrate:status": "tsx scripts/run-payload-migration-cli.mts -- migrate:status",
