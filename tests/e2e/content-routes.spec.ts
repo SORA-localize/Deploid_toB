@@ -22,12 +22,27 @@ import { expect, test } from '@playwright/test';
  *
  * fix round 2（reviewer High指摘への対応）: 横スクロール無しと`<main>`の可視性だけでは、
  * 対象routeが全て404（`src/app/global-not-found.tsx`にも`<main>`がある）でもテストが
- * 通ってしまう。HTTP statusを明示的に検証し、さらに`data/*.ts`由来の既知の実コンテンツ
- * （既知のrobot/manufacturer名、既知のuse case/article見出し、実データへのlink）が
- * 実際にrepository経由で描画されていることを確認する。既知の値の由来:
- * - Robot `unitree-g1`（`data/robots.ts`）: name `G1`, manufacturer `Unitree Robotics`
- * - UseCase `warehouse-tote-material-handling`（`data/useCases.ts`）: titleJa `倉庫内トート・軽量搬送`
- * - Article `surgie-unitree-g1-preclinical-surgery`（`data/articles.ts`）: titleJa に `Surgie` を含む
+ * 通ってしまう。HTTP statusを明示的に検証し、さらに既知の実コンテンツ
+ * （既知のrobot/manufacturer名、既知のuse case見出し、実データへのlink）が
+ * 実際にrepository経由で描画されていることを確認する。
+ *
+ * **2026-08-29 更新**: 既知の値の由来は`data/*.ts`（Task 9で削除済み）ではなく
+ * `tests/fixtures/contentSnapshot.ts`。
+ *
+ * 旧`data/*.ts`のrobotは`nameJa`を持たず`name`（`G1`等）がそのまま出ていたため英語期待値で
+ * 通っていた。fixtureは`name`と`nameJa`を**両方**持つので、同じ書き方だと落ちる。
+ * - Robot `fixture-robot-a`: name `Alpha One` / nameJa `アルファワン`
+ * - Manufacturer `fixture-mfr-alpha`: name `Alpha Robotics` / nameJa `アルファロボティクス`
+ * - UseCase `fixture-usecase-one`: titleJa `倉庫内トート搬送`
+ *
+ * **ただし「日本語側へ一括で書き換える」は誤り。** 同じレコードでもsurfaceごとに使うfieldが
+ * 違うことを実測で確認した:
+ * - 一覧（`/robots`・`/manufacturers`）: メーカーは`nameJa`（`アルファロボティクス`）
+ * - **詳細（`/robots/[slug]`）: メーカーは英語`name`（`Alpha Robotics`）**
+ * - `/compare`: 初期表示はロボット未選択なので**ロボット名は出ない**。左メニューの
+ *   メーカー名で到達を確認する
+ * 期待値はsurfaceごとに実描画へ合わせること。ここを一律にすると、通っているように見えて
+ * 実は別のsurfaceを検証していない状態になる。
  *
  * `main.textContent()`（`innerText()`ではない）を使うのは、メーカー名の一部
  * （`ManufacturerLogoName`の`hideName`）が視覚的にはロゴへ置き換わりsr-onlyテキストとして
@@ -46,12 +61,17 @@ const ROUTE_CHECKS: RouteCheck[] = [
   // Home: featured robots / use cases / reports の各セクションが実データから描画されている
   // ことを、rankingに依存しない形（link件数）で確認する。
   { route: '/', linkPrefixes: ['/robots/', '/use-cases/', '/reports/'] },
-  { route: '/robots', linkPrefixes: ['/robots/'], contains: ['Alpha One'] },
-  { route: '/manufacturers', linkPrefixes: ['/manufacturers/'], contains: ['Alpha Robotics'] },
+  { route: '/robots', linkPrefixes: ['/robots/'], contains: ['アルファワン'] },
+  { route: '/manufacturers', linkPrefixes: ['/manufacturers/'], contains: ['アルファロボティクス'] },
   { route: '/use-cases', linkPrefixes: ['/use-cases/'], contains: ['倉庫内トート搬送'] },
   { route: '/reports', linkPrefixes: ['/reports/'], contains: ['フィクスチャ分析記事'] },
-  { route: '/compare', contains: ['Alpha One'] },
-  { route: '/robots/fixture-robot-a', contains: ['Alpha One', 'Alpha Robotics'] },
+  // `/compare` は初期表示ではロボットが1台も選択されていない（「比較シートにロボットが
+  // ありません」）。したがってロボット名は出ない。DOMまでデータが届いていることは、
+  // 左メニューのメーカー一覧に出るメーカー名で確認する。
+  { route: '/compare', contains: ['アルファロボティクス'] },
+  // 詳細ページはメーカー名を英語 `name` で描画する（一覧は `nameJa`）。同じレコードでも
+  // surfaceごとに使うfieldが違うので、期待値もsurfaceごとに実描画へ合わせる。
+  { route: '/robots/fixture-robot-a', contains: ['アルファワン', 'Alpha Robotics'] },
 ];
 
 for (const { route, linkPrefixes, contains } of ROUTE_CHECKS) {
