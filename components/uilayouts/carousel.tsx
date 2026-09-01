@@ -625,6 +625,7 @@ export const ThumbsSlider = forwardRef<HTMLDivElement, ThumbsSliderProps>(
                   : "opacity-30 border-transparent",
                 thumbsSliderClassName,
               )}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- vendored UI kit。`src` は呼び出し側が渡す任意の文字列で、ホストを事前に確定できないため next/image の `remotePatterns` を書けない */}
               <img
                 src={src}
                 alt={`Thumbnail ${index + 1}`}

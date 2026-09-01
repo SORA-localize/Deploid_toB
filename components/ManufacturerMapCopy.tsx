@@ -52,6 +52,7 @@ export function ManufacturerMapCopy({
 
   return (
     <div data-world-map-canvas className="relative h-full w-full shrink-0">
+      {/* eslint-disable-next-line @next/next/no-img-element -- `/generated/world-map.svg`。next/image は既定で SVG を最適化せず（`dangerouslyAllowSVG` は off）、width/height も要求する。この img は親の比率へ `object-cover` で合わせ `mask-image` を当てる設計で、下のコメントに実測根拠がある。`ManufacturerMapStage.tsx` も同じ理由で同じ例外を持つ */}
       <img
         src={mapAssetSrc}
         alt=""

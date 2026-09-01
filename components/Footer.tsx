@@ -19,6 +19,7 @@ export async function Footer() {
             className="inline-flex w-fit items-center transition-opacity hover:opacity-75"
             aria-label="Deploid ホームへ"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element -- ブランドロゴ。intrinsic 760x306 を宣言済みで CLS は起きず、`dark:brightness-0 dark:invert` の CSS フィルタを当てている。next/image の wrapper と srcset はこの用途に利益が無い */}
             <img
               src="/brand/deploid-logo.png"
               alt="Deploid"
