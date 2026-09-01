@@ -83,7 +83,18 @@ export async function resolveRelationshipToStableId(
   }
   const cacheKey = `${collection}:${value}`;
   if (cache?.entries.has(cacheKey)) return cache.entries.get(cacheKey);
-  const doc = await payload.findByID({ collection: collection as never, id: value, depth: 0, overrideAccess: true });
+  const doc = await payload.findByID({
+    collection: collection as never,
+    id: value,
+    depth: 0,
+    overrideAccess: true,
+    // `stableId` しか読まないので、その1列だけを射影する。`select` を省くと Payload は
+    // 全カラムに加えて `_texts` / `_numbers` / `_rels` のサブテーブルまで JOIN する
+    // （`@payloadcms/drizzle` の `buildFindManyArgs`: `select ? {} : { numbers, rels, texts }`）。
+    // `previousSlugs` が hasMany text なので、全 content collection がこの JOIN に該当していた。
+    // `select` 指定時は `id` が無条件で射影へ入るため、明示は不要。
+    select: { stableId: true } as never,
+  });
   const stableId = (doc as unknown as { stableId?: string })?.stableId;
   cache?.entries.set(cacheKey, stableId);
   return stableId;
@@ -141,6 +152,12 @@ export async function resolveStableIdToRelationshipId(
     limit: 1,
     depth: 0,
     overrideAccess: true,
+    // 読むのは `docs[0].id` だけ。射影の理由は `resolveRelationshipToStableId` と同じ。
+    select: { stableId: true } as never,
+    // `pagination` を切らないと `findMany` が `count(*)` を別途発行する
+    // （`@payloadcms/drizzle` の `findMany`: `if (pagination !== false ...)`）。
+    // ここは常に `limit: 1` の存在確認で、総件数を読まないので無駄になる。
+    pagination: false,
   })) as unknown as { docs: Array<{ id: string | number }> };
   const id = result.docs[0]?.id;
   if (id !== undefined) rememberRelationshipId(cache, collection, stableId, id);
