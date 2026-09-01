@@ -29,6 +29,24 @@ export interface SelectControlOption {
  */
 const SEARCHABLE_MIN_OPTIONS = 12;
 
+/**
+ * Radix の `Select.Item` は空文字の `value` を禁止する（空文字は「選択をクリアする」ために
+ * `Select` 側が予約しているため）。一方 React のフォーム慣習では「未選択」は空文字で表す。
+ * この2つの規約の変換がこのコンポーネントの責務なので、Radix 経路に入る直前だけ空文字を
+ * この内部 sentinel へ写し、`onChange` で空文字へ戻す。呼び出し側は空文字のまま扱ってよい。
+ *
+ * これが無いと、空文字 option を渡した呼び出し側は**ページ全体がクライアント側で落ちる**
+ * （error boundary の「ページを表示できませんでした」になる）。しかも Radix 経路へ入るのは
+ * `options.length < SEARCHABLE_MIN_OPTIONS` のときだけなので、選択肢が多い環境では再現せず、
+ * 少ない環境でだけ落ちるというデータ依存の不具合になる。実際 `/compare` は本番（メーカー26件）
+ * では動き、CI fixture（メーカー2件）でだけ落ちていた。
+ * 値そのものを持たない sentinel なので、呼び出し側の値空間とは衝突しない。
+ */
+const EMPTY_VALUE_SENTINEL = '__select-control-empty__';
+
+const toRadixValue = (value: string) => (value === '' ? EMPTY_VALUE_SENTINEL : value);
+const fromRadixValue = (value: string) => (value === EMPTY_VALUE_SENTINEL ? '' : value);
+
 interface SelectControlProps {
   id: string;
   label: string;
@@ -74,7 +92,11 @@ export function SelectControl({
           clearSearchLabel={uiText.controls.clearSearch}
         />
       ) : (
-        <Select value={value} onValueChange={onChange} required={required}>
+        <Select
+          value={toRadixValue(value)}
+          onValueChange={(next) => onChange(fromRadixValue(next))}
+          required={required}
+        >
           <SelectTrigger
             id={`${id}-trigger`}
             className="min-h-11 h-auto w-full px-3 py-2 text-sm"
@@ -86,7 +108,11 @@ export function SelectControl({
             className="w-(--radix-select-trigger-width) min-w-0"
           >
             {options.map((option) => (
-              <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+              <SelectItem
+                key={option.value}
+                value={toRadixValue(option.value)}
+                disabled={option.disabled}
+              >
                 {withCount(option)}
               </SelectItem>
             ))}
