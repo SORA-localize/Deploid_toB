@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import type { Access, CollectionBeforeOperationHook, Field, FieldAccess, PayloadRequest, Where } from 'payload';
-import { adminPublishIntentField, clearUnclaimedAdminPublishIntent } from './adminPublishIntent';
+import { adminPublishIntentField } from './adminPublishIntent';
 import {
   clearDraftIntents,
   readApprovedPublishAuthorization,
