@@ -126,18 +126,46 @@ HTTP 経由の書き込みは `createPayloadRequest.js:55` が `context: {}` を
 
 ```ts
 await submit({
-  action: `${api}/${collectionSlug}/${id}?depth=0&draft=true&fallback-locale=null&locale=${locale}`,
+  action: `${api}/${collectionSlug}/${id}?depth=0&draft=true&fallback-locale=null`
+        + `&locale=${locale}&adminPublishIntent=${publishIntentToken}`,
   method: 'PATCH',
-  overrides: { _status: 'draft', adminPublishIntentToken: publishIntentToken },
+  overrides: { _status: 'draft' },
   skipValidation: true,
   disableSuccessStatus: true,
 })
 ```
 
-`adminPublishIntentToken` はUI表示しない運用メタデータfieldで、全7 collectionとversionへ保存する。
-値は公開クリックごとに生成するUUID。通常のSave Draft・autosave・別利用者の更新では共通hookが
-tokenを `null` にし、別のPublishクリックでは別tokenへ置き換える。APIの認可境界ではなく、
-**「どの保存要求が作ったversionか」を識別する競合制御用marker**である。
+**tokenは form data ではなく query param で送る。これは必須。**
+
+`overrides` で送る案は**実装を読んで却下した**。`fieldSchemasToFormState/addFieldStatePromise.js:80-88`
+は hidden field を「描画しないだけ」で、値は `fieldState.value` として form state に載せる:
+
+```js
+if (passesCondition === false && field.type !== 'tab' && !isPresentationalWithSubFields) {
+  if (fieldAffectsData(field) && data?.[field.name] !== undefined) {
+    fieldState.value = data[field.name];   // 値は載る
+  }
+  state[path] = fieldState;
+  return;                                   // 描画だけ止める
+}
+```
+
+したがって `overrides` 方式だと、一度 Publish した後の form state が token T を保持し、
+**その後の通常の Save Draft が T を再送する**（`Form/index.js:293-297` の overrides は
+Publish 側だけに効き、通常保存は form state をそのまま送る）。結果
+「Save Draft しただけの版が公開可能になる」となり、token の前提が崩れる。
+
+query param なら token は form state に一切入らないため、この経路が**原理的に消える**。
+
+`beforeChange` hook は `req.searchParams.get('adminPublishIntent')` を読み、
+無ければ `null` を書く。`PayloadRequest` は URL 由来の `searchParams` を持ち
+（`payload/dist/types/index.d.ts:71`）、`createPayloadRequest.js:20` が実 URL から投入する。
+通常の Save Draft・autosave・別利用者の更新には param が無いので、確実に `null` になる。
+
+`adminPublishIntentToken` field は `admin: { hidden: true }` に加えて
+**`access: { create: () => false, update: () => false }`** を付ける。
+値を書けるのは hook だけになり、API client から直接 token を差し込む経路が閉じる。
+APIの認可境界ではなく、**「どの保存要求が作ったversionか」を識別する競合制御用marker**である。
 
 routeは「最新versionを取ったから正しい」と仮定しない。最新versionの
 `version.adminPublishIntentToken === publishIntentToken` を確認し、不一致なら409
@@ -318,26 +346,19 @@ Next route を選ぶ理由は**既存前例に揃えるため**。`src/app/api/a
 - Produces: `clearUnclaimedAdminPublishIntent: CollectionBeforeChangeHook`
 - Produces: `assertLatestVersionMatchesPublishIntent(version, expectedToken): void`
 
-- [ ] **Step 0: `admin.hidden` field が form state に載るかを実測する（前提確認）**
+- [x] **Step 0: `admin.hidden` の挙動を実測した（結論のみ。再実行不要）**
 
-**この Task 全体が未検証の Payload 挙動に依存している。** hook の規則
-「data 自身が token property を持つときだけ保存し、無ければ null」は、
-`admin: { hidden: true }` の field が **admin の form state に載らない**
-（＝通常の Save Draft の PATCH body に token key が現れない）ことを前提にしている。
+**結果: hidden field は描画されないだけで、値は form state に載る。**
+`@payloadcms/ui/dist/forms/fieldSchemasToFormState/addFieldStatePromise.js:74-88` に
+「Short-circuit hidden fields to prevent recursing and **rendering**」とあり、
+`fieldState.value = data[field.name]` を設定してから `return` する。
 
-もし載るなら: ①一度 Publish した後の form state が token T を保持 → ②その後の
-普通の Save Draft が T を再送 → hook が T を保存、となり
-「A の token を通常保存が引き継がない」という前提が崩れる。
-実害は「Save Draft しただけの版が、T を持つ POST で公開できてしまう」。
-権限昇格ではない（route が publisher を要求する）が、token は競合制御の要なので前提のまま進めない。
+したがって当初案（`overrides` で token を送る）は
+**一度 Publish した後の通常 Save Draft が token を再送する**ため成立しない。
+D-1 を query param 方式へ変更済み。この Step の目的は達成されたので実装時の作業は無い。
 
-`npm run dev` で admin を開き、既存 collection に hidden field を一時的に足して
-DevTools の Network で PATCH body を確認する。または `buildFormState` の実装を読む。
-
-**載る場合**: `data` だけでは「明示送信か引き継ぎか」を区別できないため、hook の規則を変える。
-代替は「`req.context` に publish 意図フラグを立てて hook がそれを見る」だが、
-`createPayloadRequest.js:55` が `context: {}` を固定するため HTTP 経由では渡せない。
-その場合は D-1b の案A（route が Local API で保存）へ切り替える判断になる。
+**hook が読むのは `req.searchParams` であって `data` ではない。**
+Step 1 以降のテストはこの前提で書くこと。
 
 - [ ] **Step 1: 失敗するtoken単体テストを書く**
 
@@ -366,9 +387,27 @@ Expected: moduleまたはexport未定義でFAIL。
 
 - [ ] **Step 3: field・hook・照合関数を最小実装する**
 
-tokenは認可情報ではないのでupdate accessの代用にしない。公開APIからの不要な露出を避けるため、
-fieldの `access.read` は認証済みadminに限定する。照合は空文字・null・不一致をすべて
-`publish-candidate-replaced` としてfail-closedにする。
+**hook は `req.searchParams.get('adminPublishIntent')` を読む。`data` は見ない**（Step 0）。
+
+```ts
+// 全 content collection 共通の beforeChange hook
+({ data, req }) => ({
+  ...data,
+  adminPublishIntentToken: req.searchParams?.get('adminPublishIntent') ?? null,
+})
+```
+
+param が無い保存（通常のSave Draft・autosave・別利用者の更新・import/restore）は必ず `null` になる。
+
+field は次を満たす。
+
+- `admin: { hidden: true }` — 編集画面に出さない
+- **`access: { create: () => false, update: () => false }`** — 値を書けるのは hook だけ。
+  API client から直接 token を差し込む経路を閉じる
+- `access.read` は認証済みadminに限定（公開APIへ露出させない）
+
+tokenは認可情報ではないので update access の代用にしない。
+照合は空文字・null・不一致をすべて `publish-candidate-replaced` としてfail-closedにする。
 
 - [ ] **Step 4: 7 collectionへfieldとhookを配線する**
 
