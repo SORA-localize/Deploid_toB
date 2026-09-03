@@ -190,7 +190,7 @@ token照合と `assertApprovedVersionIsStillLatest` が担う。将来「承認�
 
 ### D-1b. なぜ2リクエストのままにするか（DB schema を触る判断の根拠）
 
-**この計画は7 collection + version tableへ列を足す。** その代償を払う理由を明記する。
+**この計画は8 collection + version tableへ列を足す（計16列）。** その代償を払う理由を明記する。
 
 token が要るのは「draft保存」と「公開」が**別のHTTPリクエスト**だからである。
 検討した代替は3つ。
@@ -444,18 +444,20 @@ Expected: PASS。
 
 ### Task 2: token列のmigrationを追加する
 
-**Files:** `migrations/20260903_000000_admin_publish_intent_token.ts`,
-`migrations/20260903_000000_admin_publish_intent_token.json`, `migrations/index.ts`,
+**Files:** `migrations/20260903_074709_admin_publish_intent_token.ts`,
+`migrations/20260903_074709_admin_publish_intent_token.json`, `migrations/index.ts`,
 `tests/content/migration.test.ts`
 
 **Interfaces:**
 - Consumes: Task 1の `adminPublishIntentToken` field
-- Produces: main/version table双方のnullable `admin_publish_intent_token` 列
+- Produces: main/version table双方のnullable `admin_publish_intent_token` 列（計16）
 
 - [ ] **Step 1: migration未適用を検出するテストを書く**
 
-既存migration testへ、7つのmain tableと対応する`_versions` tableの双方に
-`admin_publish_intent_token` が存在することを追加する。対象は合計14列。
+既存migration testへ、**8つ**のmain tableと対応する`_v` tableの双方に
+`admin_publish_intent_token` / `version_admin_publish_intent_token` が存在することを追加する。
+**対象は合計16列**（Task 1 で `baseContentFields()` へ入れたため7ではなく8 collection。
+実測で確認済み: main 8列 + version 8列）。
 
 - [ ] **Step 2: テストが列不足で落ちることを確認する**
 
@@ -468,7 +470,7 @@ Expected: 最初の対象tableでcolumn not found。
 Run: `npm run payload:migrate:create -- admin_publish_intent_token`
 
 生成名が異なる場合も、この計画の参照と `migrations/index.ts` を実際の生成名へ同じcommitで揃える。
-upは14列をnullable varcharとして追加し、downは同じ14列だけを削除することを目視確認する。
+upは16列をnullable varcharとして追加し、downは同じ16列だけを削除することを目視確認する。
 既存列・tableのdropや型変更が混ざった場合は採用せず、schema差分の原因を先に直す。
 
 - [ ] **Step 4: 空のthrowaway DBで往復検証する**
@@ -925,7 +927,7 @@ Preview で往復を確認してから本番へ適用する。
 |---|---|
 | **tokenがsnapshot/parity/公開サイトへ漏れる** | mapper（`mapPayloadRobotToDomain` 等）は**field を明示列挙**する方式なので、Payload に列を足しても domain へ自動的に入らない。加えて snapshot schema が未知fieldを `unknown field is not allowed` で拒否する（`scripts/snapshotSchema.mts:153`、必須修正6-5）。**mapper と `domainTypes.ts` を触らないこと**が条件。Task 1 Step 5 で明示的に検証する |
 | **`SYSTEM_FIELDS` 変更の波及** | `computeCanonicalHash` の利用者は `publishApprovedVersion.ts` 内の2箇所（`:137`, `:195`）とテストのみで、外部消費者は無いことを確認済み。export/restore 系は別系統の hash を使う |
-| **DB schema 変更を伴う**（7 collection + version tables） | migration をコミットし CI の schema drift check（`ci.yml`）で検証。Rollback節のとおり列は残す判断を既定にする |
+| **DB schema 変更を伴う**（8 collection + version tables = 16列） | migration をコミットし CI の schema drift check（`ci.yml`）で検証。Rollback節のとおり列は残す判断を既定にする |
 | tokenのhookが正常なSave Draftを壊す | Task 1 でhookの単体テスト。「tokenを持たない保存は `null` になる」「別tokenで上書きされる」を固定 |
 | **MCP に token field が露出する** | `lib/payload/mcp.ts:27-35` の `MCP_EDITABLE_COLLECTIONS` はまさにこの7 collection で、tool schema は collection の fields から生成される（`:113`）。`admin.hidden` は MCP/REST を隠さない。**権限昇格にはならない**（route が publisher を要求し、MCP から publish はできない）が、Codex が意味の分からない field を見ることになる。description で運用メタデータと明記する |
 | **version が公開1回につき2件増える** | `createVersionRetentionGuardBeforeChangeHook`（`access.ts:636-658`）は現状 pruning 無効で素通りだが、**有効化した瞬間に `maxPerDoc` 到達が倍速になり**、`audit-archive-not-configured` で書き込みごと block される。version archive を構築する際はこの計画を前提に上限を再計算する |

@@ -6,6 +6,7 @@ import * as migration_20260814_122137_restore_baseline_generation_ledger from '.
 import * as migration_20260818_090053_add_preview_nonces from './20260818_090053_add_preview_nonces';
 import * as migration_20260819_154647_add_payload_mcp_api_keys from './20260819_154647_add_payload_mcp_api_keys';
 import * as migration_20260823_030559_add_audit_upload_sessions from './20260823_030559_add_audit_upload_sessions';
+import * as migration_20260903_074709_admin_publish_intent_token from './20260903_074709_admin_publish_intent_token';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20260823_030559_add_audit_upload_sessions.up,
     down: migration_20260823_030559_add_audit_upload_sessions.down,
-    name: '20260823_030559_add_audit_upload_sessions'
+    name: '20260823_030559_add_audit_upload_sessions',
+  },
+  {
+    up: migration_20260903_074709_admin_publish_intent_token.up,
+    down: migration_20260903_074709_admin_publish_intent_token.down,
+    name: '20260903_074709_admin_publish_intent_token'
   },
 ];
