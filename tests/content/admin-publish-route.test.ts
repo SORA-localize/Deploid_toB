@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { PublishValidationError } from '@/lib/payload/access';
 import { mapPublishError } from '@/lib/payload/adminPublishErrors';
 
@@ -97,5 +97,44 @@ describe('レスポンス本文の方針', () => {
 
     expect(serialized).not.toMatch(/[ぁ-んァ-ヶ一-龠]/);
     expect(Object.keys(body).sort()).toEqual(['error', 'fields', 'ok']);
+  });
+});
+
+/**
+ * 2026-09-03、`tests/e2e/payload-admin-publish.spec.ts` が実ビルドのNextサーバー上で
+ * 検出した不具合の回帰テスト。
+ *
+ * 必須項目を空にして公開すると、サーバーは正しく `PublishValidationError` をthrowしていたのに、
+ * `mapPublishError` が **500 / `publish-internal-error`** を返していた。原因は
+ * `error instanceof PublishValidationError` —— Next.jsは `access.ts` をサーバー側の複数chunkへ
+ * 重複して束ねるため、hookがthrowした側とここが参照する側でconstructorが別objectになる。
+ *
+ * つまり**この写像を作った目的（原因が分かるようにする）が、最も多い失敗ケースで失われていた**。
+ * 上のsuiteが緑だったのは、vitestが単一module graphで動くため。
+ *
+ * `vi.resetModules()` で2つ目のmodule instanceを作ると、その状況をそのまま再現できる。
+ */
+describe('module instanceをまたいだ例外の写像', () => {
+  it('別instanceの PublishValidationError でも422で不足field名を返す', async () => {
+    vi.resetModules();
+    const other = await import('@/lib/payload/access');
+    expect(other.PublishValidationError).not.toBe(PublishValidationError);
+
+    const [status, body] = mapPublishError(new other.PublishValidationError(['website'], 'manufacturers'));
+
+    expect(status).toBe(422);
+    expect(body.error).toBe('publish-validation-failed');
+    expect(body.fields).toEqual(['website']);
+  });
+
+  it('`name` を騙るだけで `fields` を持たないobjectは422にしない', () => {
+    // 形で判定する以上、形が揃っていないものを通してはいけない。
+    const [status] = mapPublishError(Object.assign(new Error('x'), { name: 'PublishValidationError' }));
+    expect(status).toBe(500);
+  });
+
+  it('`fields` に文字列以外が混ざっていれば422にしない', () => {
+    const fake = Object.assign(new Error('x'), { name: 'PublishValidationError', fields: ['ok', 42] });
+    expect(mapPublishError(fake)[0]).toBe(500);
   });
 });
