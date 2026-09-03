@@ -381,7 +381,7 @@ D-1 を query param 方式へ変更済み。この Step の目的は達成され
 **hook が読むのは `req.searchParams` であって `data` ではない。**
 Step 1 以降のテストはこの前提で書くこと。
 
-- [ ] **Step 1: 失敗するtoken単体テストを書く**
+- [x] **Step 1: 失敗するtoken単体テストを書く**
 
 次を固定する。
 
@@ -410,13 +410,13 @@ expect(clearUnclaimedAdminPublishIntent({ data: { adminPublishIntentToken: 'stal
   .toMatchObject({ adminPublishIntentToken: null });   // form state の再送を無視する
 ```
 
-- [ ] **Step 2: テストが未実装で落ちることを確認する**
+- [x] **Step 2: テストが未実装で落ちることを確認する**
 
 Run: `npx vitest run tests/content/admin-publish-intent.test.ts`
 
 Expected: moduleまたはexport未定義でFAIL。
 
-- [ ] **Step 3: field・hook・照合関数を最小実装する**
+- [x] **Step 3: field・hook・照合関数を最小実装する**
 
 **hook は `req.searchParams.get('adminPublishIntent')` を読む。`data` は見ない**（Step 0）。
 
@@ -440,13 +440,13 @@ field は次を満たす。
 tokenは認可情報ではないので update access の代用にしない。
 照合は空文字・null・不一致をすべて `publish-candidate-replaced` としてfail-closedにする。
 
-- [ ] **Step 4: 7 collectionへfieldとhookを配線する**
+- [x] **Step 4: 7 collectionへfieldとhookを配線する**
 
 各collectionのfieldsへ `adminPublishIntentField()` を1回だけ追加する。
 `clearUnclaimedAdminPublishIntent` は既存の `beforeChange` を置き換えず配列へ追加し、
 publishクリックの明示tokenは保持し、それ以外の書き込みではnullへする。
 
-- [ ] **Step 5: tokenをcanonical contentと公開dataから除外する**
+- [x] **Step 5: tokenをcanonical contentと公開dataから除外する**
 
 `publishApprovedVersion.ts` の `SYSTEM_FIELDS` に `adminPublishIntentToken` を追加し、次をテストする。
 
@@ -455,7 +455,7 @@ expect(computeCanonicalHash({ name: 'A', adminPublishIntentToken: 'x' }))
   .toBe(computeCanonicalHash({ name: 'A', adminPublishIntentToken: 'y' }))
 ```
 
-- [ ] **Step 6: Task 1テストを緑にする**
+- [x] **Step 6: Task 1テストを緑にする**
 
 Run: `npx vitest run tests/content/admin-publish-intent.test.ts tests/content/publish-approved-version.test.ts tests/content/publish-gates.test.ts`
 
@@ -473,20 +473,20 @@ Expected: PASS。
 - Consumes: Task 1の `adminPublishIntentToken` field
 - Produces: main/version table双方のnullable `admin_publish_intent_token` 列（計16）
 
-- [ ] **Step 1: migration未適用を検出するテストを書く**
+- [x] **Step 1: migration未適用を検出するテストを書く**
 
 既存migration testへ、**8つ**のmain tableと対応する`_v` tableの双方に
 `admin_publish_intent_token` / `version_admin_publish_intent_token` が存在することを追加する。
 **対象は合計16列**（Task 1 で `baseContentFields()` へ入れたため7ではなく8 collection。
 実測で確認済み: main 8列 + version 8列）。
 
-- [ ] **Step 2: テストが列不足で落ちることを確認する**
+- [x] **Step 2: テストが列不足で落ちることを確認する**
 
 Run: `npx vitest run tests/content/migration.test.ts`
 
 Expected: 最初の対象tableでcolumn not found。
 
-- [ ] **Step 3: migrationを生成・監査してindexへ登録する**
+- [x] **Step 3: migrationを生成・監査してindexへ登録する**
 
 Run: `npm run payload:migrate:create -- admin_publish_intent_token`
 
@@ -494,7 +494,7 @@ Run: `npm run payload:migrate:create -- admin_publish_intent_token`
 upは16列をnullable varcharとして追加し、downは同じ16列だけを削除することを目視確認する。
 既存列・tableのdropや型変更が混ざった場合は採用せず、schema差分の原因を先に直す。
 
-- [ ] **Step 4: 空のthrowaway DBで往復検証する**
+- [x] **Step 4: 空のthrowaway DBで往復検証する**
 
 Run: `npm run payload:migrate && npx vitest run tests/content/migration.test.ts`
 
@@ -595,21 +595,21 @@ type PublisherAuthResult =
   | { ok: false; status: 403; error: 'insufficient-role' }
 ```
 
-- [ ] **Step 1: 合成Requestとauth stubで失敗するテストを書く**
+- [x] **Step 1: 合成Requestとauth stubで失敗するテストを書く**
 
 同一origin許可、`Sec-Fetch-Site` 欠落/cross-site/same-site拒否、OriginとHost不一致拒否、
 `x-forwarded-host` 優先を固定する。認証はuser無しを401、draft-writerを403、publisher以上をokにする。
 
-- [ ] **Step 2: テストが未実装で落ちることを確認する**
+- [x] **Step 2: テストが未実装で落ちることを確認する**
 
 Run: `npx vitest run tests/content/publish-request-auth.test.ts`
 
-- [ ] **Step 3: 純粋関数を実装する**
+- [x] **Step 3: 純粋関数を実装する**
 
 `payload.auth({ headers: request.headers })` の結果を先に認証有無、次に
 `isContentPublisherOrAboveUser` でrole判定する。nullへ畳み込まない。
 
-- [ ] **Step 4: テストを緑にし、origin判定のmutationで赤転を確認する**
+- [x] **Step 4: テストを緑にし、origin判定のmutationで赤転を確認する**
 
 Run: `npx vitest run tests/content/publish-request-auth.test.ts`
 
@@ -635,13 +635,13 @@ interface AdminPublishBody {
 }
 ```
 
-- [ ] **Step 1: service/routeの失敗テストを書く**
+- [x] **Step 1: service/routeの失敗テストを書く**
 
 最低限、body不正400、未認証401、role不足403、origin不正403、document不在404、version不在404、
 token不一致409、ValidationError 422、lock/transaction unavailable 503、未知例外500を固定する。
 `findByID` 不在は例外任せにせず `disableErrors: true` で404にする。
 
-- [ ] **Step 2: 競合とmain row保全の統合テストを書く**
+- [x] **Step 2: 競合とmain row保全の統合テストを書く**
 
 実Postgresで次を決定的に再現する。
 
@@ -666,11 +666,11 @@ mutation 確認があるのに、中核である token だけ抜けているの�
 **実 Postgres 上で一致すること**を1件確認する。ここがズレると
 **全ての公開が409になり、しかも利用者には「別の人が保存しました」と表示される**。
 
-- [ ] **Step 3: テストが未実装で落ちることを確認する**
+- [x] **Step 3: テストが未実装で落ちることを確認する**
 
 Run: `npx vitest run tests/content/admin-publish-route.test.ts`
 
-- [ ] **Step 4: serviceを実装する**
+- [x] **Step 4: serviceを実装する**
 
 処理順を固定する。
 
@@ -680,7 +680,7 @@ Run: `npx vitest run tests/content/admin-publish-route.test.ts`
 4. `computeCanonicalHash(latest.version)`
 5. 最新version idを `approvedVersionId` として `publishApprovedVersion()` へ渡す
 
-- [ ] **Step 5: `publish-validation-failed` を構造化する**
+- [x] **Step 5: `publish-validation-failed` を構造化する**
 
 **現状は route が正規表現でメッセージを割るしかない。** 実測した throw は9箇所・2書式:
 
@@ -712,7 +712,7 @@ gate の**判定ロジックは一切変えない**。Global Constraints の「p
 
 route は `err instanceof PublishValidationError` で `err.fields` を直接使う。
 
-- [ ] **Step 6: routeを実装する**
+- [x] **Step 6: routeを実装する**
 
 request body上限: `Content-Length` があれば読込前に早期拒否し、
 無い場合（`Content-Length` は任意 header）は実読込で 8 KiB を超えた時点で打ち切る。
@@ -739,7 +739,7 @@ type AdminPublishErrorResponse = {
 | `publish-lock-unavailable` / `publish-transaction-unavailable` | 503 | `publish-temporarily-unavailable` |
 | `publish-approval-required` / 未知例外 | 500 | `publish-internal-error`。詳細はlogだけ |
 
-- [ ] **Step 7: route/serviceテストと境界checkを緑にする**
+- [x] **Step 7: route/serviceテストと境界checkを緑にする**
 
 Run: `npx vitest run tests/content/admin-publish-route.test.ts && npm run check:publish-authorization-boundaries`
 
@@ -756,7 +756,7 @@ Expected: PASS。route/serviceは承認contextを直接importしない。revalid
 - Consumes: Task 1のfield名、Task 4の `POST /api/admin/publish`
 - Produces: `PublishFromApproval(): ReactNode`
 
-- [ ] **Step 1: hookをmockした失敗テストを書く**
+- [x] **Step 1: hookをmockした失敗テストを書く**
 
 **ファイル先頭に `// @vitest-environment jsdom` を書く。** `vitest.config.ts` は
 `environment: 'node'` 固定で、DOM が要るテストは docblock で opt-in する規約
@@ -773,17 +773,17 @@ Expected: PASS。route/serviceは承認contextを直接importしない。revalid
 - 409、422、503、network errorを別の翻訳keyへ写像する
 - publish成功後にstate setters、`incrementVersionCount()`、`router.refresh()`を呼ぶ
 
-- [ ] **Step 2: テストが未実装で落ちることを確認する**
+- [x] **Step 2: テストが未実装で落ちることを確認する**
 
 Run: `npx vitest run tests/components/publish-from-approval.test.tsx`
 
-- [ ] **Step 3: Payload標準と同じ表示・無効条件を実装する**
+- [x] **Step 3: Payload標準と同じ表示・無効条件を実装する**
 
 `useOperation()` はupdateのみ、`useFormModified()`、`unpublishedVersionCount`、`hasPublishedDoc`、
 `uploadStatus`、`useFormProcessing()` を使う。roleは `useAuth().user.role` でpublisher以上を要求する。
 buttonは標準と同じ `FormSubmit`、`buttonId="action-publish"`、`type="button"` を使う。
 
-- [ ] **Step 4: `draft=true` 保存と成功判定を実装する**
+- [x] **Step 4: `draft=true` 保存と成功判定を実装する**
 
 `formatAdminURL` と `qs.stringify` を使い、D-1のactionを標準実装と同じ方法で組み立てる。
 
@@ -800,20 +800,20 @@ if (!saved?.res.ok) return
 
 この条件を通過した場合だけrouteを呼ぶ。route成功前に公開成功toastやstate同期を行わない。
 
-- [ ] **Step 5: 成功時の状態同期を実装する**
+- [x] **Step 5: 成功時の状態同期を実装する**
 
 フェーズ1のversion countはPayloadの `onSave` が増やす。フェーズ2でも公開versionが1件増えるため、
 route成功後に `incrementVersionCount()` を1回呼ぶ。併せて `setHasPublishedDoc(true)`、
 `setUnpublishedVersionCount(0)`、`setMostRecentVersionIsAutosaved(false)`、`router.refresh()` を行う。
 
-- [ ] **Step 6: client側i18nを実装する**
+- [x] **Step 6: client側i18nを実装する**
 
 `payload.config.ts` の `i18n.translations` に `{ ja: { custom: {...} }, en: {...} }`。
 routeの `error` と `fields` をclientで翻訳する。7 collectionの公開validatorが返し得るfield keyを
 ja/en両方へ定義し、未知fieldは生のkeyではなく共通の「入力内容を確認」へfallbackする。
 `lib/uiText.ts` には入れない。
 
-- [ ] **Step 7: componentテストを緑にする**
+- [x] **Step 7: componentテストを緑にする**
 
 Run: `npx vitest run tests/components/publish-from-approval.test.tsx`
 
@@ -831,31 +831,31 @@ Expected: PASS。
 - Consumes: Task 5の `PublishFromApproval`
 - Produces: 7 collection全てのcustom PublishButton importMap entry
 
-- [ ] **Step 1: importMap欠落で落ちるテストを書く**
+- [x] **Step 1: importMap欠落で落ちるテストを書く**
 
 checkerは対象7ファイルを固定allowlistとして読み、各configの
 `admin.components.edit.PublishButton` 指定子が正確に1件あり、全て
 `@/components/admin/PublishFromApproval#PublishFromApproval` であり、importMapに同じkeyがあることを検査する。
 コメント中の文字列だけでは通らないよう、config blockとimportMap objectの実コードを対象にする。
 
-- [ ] **Step 2: 7 collectionへ指定子を追加する**
+- [x] **Step 2: 7 collectionへ指定子を追加する**
 
 `admin.components.edit.PublishButton` に
 `@/components/admin/PublishFromApproval#PublishFromApproval` を指定する。既存のadmin設定を上書きしない。
 
-- [ ] **Step 3: importMapを再生成する**
+- [x] **Step 3: importMapを再生成する**
 
 Run: `npx payload generate:importmap`
 
 既知のworker-thread loader競合で動かない場合だけ手書き追記し、生成utilityがエイリアス指定子を
 そのままkeyへ使う形式に合わせる。既存2entryを削除しない。
 
-- [ ] **Step 4: checkerと型宣言を実装する**
+- [x] **Step 4: checkerと型宣言を実装する**
 
 キーが無い場合のsilent fallbackを防ぐ。構成は
 `scripts/check-publish-authorization-boundaries.mjs` に倣い、純粋関数export、`.d.mts`、単体testを揃える。
 
-- [ ] **Step 5: knipとcheckへ配線する**
+- [x] **Step 5: knipとcheckへ配線する**
 
 **`entry` に足すだけでは効かない可能性がある。** `knip.json` の `project` は
 `["components/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}", "src/**/*.{ts,tsx}", "scripts/**/*.mjs"]` で
@@ -869,13 +869,13 @@ component が unused に出ないことを確認する**。既存の
 `package.json` の `check:admin-import-map` を `check` のboundary群へ追加する。
 `knip.json` のentryへ `src/app/(payload)/admin/importMap.js` を追加し、componentをignoreしない。
 
-- [ ] **Step 6: dependency lockfileを更新する**
+- [x] **Step 6: dependency lockfileを更新する**
 
 Run: `npm install @payloadcms/ui@^3.87.1`
 
 Expected: `package.json` と `package-lock.json` が同時に更新され、他の `@payloadcms/*` とversionが揃う。
 
-- [ ] **Step 7: checkerの赤転と緑を確認する**
+- [x] **Step 7: checkerの赤転と緑を確認する**
 
 Run: `npm run check:admin-import-map`
 
@@ -892,7 +892,7 @@ Expected: PASS。その後importMap keyを一時的に削除してFAILを確認�
 - Consumes: Task 1〜6の完成したAdmin公開経路
 - Produces: throwaway DB上の実browser release gate
 
-- [ ] **Step 1: fixture投入scriptを書く**
+- [x] **Step 1: fixture投入scriptを書く**
 
 固定のCI専用email/passwordで `content-publisher` と `content-draft-writer` を冪等作成する。
 `DATABASE_URL` に `test` を含むthrowaway判定を必須にし、本番/Preview DBでは即時拒否する。
@@ -906,7 +906,7 @@ Expected: PASS。その後importMap keyを一時的に削除してFAILを確認�
 admin 作成分岐がスキップされる。robot fixture 自体は既存 seed の `restoreContentSnapshot` が
 入れるので、**本 script の責務は admins 2件だけ**（既知パスワード）。
 
-- [ ] **Step 2: 専用specを書く**
+- [x] **Step 2: 専用specを書く**
 
 `tests/e2e/payload-admin-publish.spec.ts` を新規作成し、`test.describe.configure({ mode: 'serial' })` を指定する。
 既存 `payload-admin.spec.ts` へ混在させない。
@@ -921,7 +921,7 @@ admin 作成分岐がスキップされる。robot fixture 自体は既存 seed 
 3. draft-writerにはPublishが表示されない
 4. 必須fieldを空にすると422のfield案内が表示され、公開ページは旧内容のまま
 
-- [ ] **Step 3: 既存content-e2e workflowへ直列追加する**
+- [x] **Step 3: 既存content-e2e workflowへ直列追加する**
 
 fixture投入をbuild前に実行する。既存Playwright stepへ新specを追加し、共有fixture DB上の競合を避けるため
 引き続き `--workers=1` とする。step名・失敗artifact・最終failure gateにもAdmin publishを含むことを明記する。
@@ -934,7 +934,7 @@ npx playwright test \
   --workers=1
 ```
 
-- [ ] **Step 4: ローカルthrowaway DBでE2Eを実行する**
+- [x] **Step 4: ローカルthrowaway DBでE2Eを実行する**
 
 Run: `npx playwright test tests/e2e/payload-admin-publish.spec.ts --workers=1`
 
@@ -1062,3 +1062,78 @@ Preview で往復を確認してから本番へ適用する。
 
 承認フローの新設（二者承認）/ `article-placements` の publish 経路 / 一括公開UI /
 公開予約 / `csrf` の全体適用 / `Admins` の cookie `secure` 修正
+
+---
+
+## 実施記録（2026-09-03）
+
+計画からの逸脱と、実装中に**実測で判明した事実**だけを記す。推測は書かない。
+
+### 最重要: 実ビルドのNextサーバーで初めて出た2つの不具合
+
+どちらも「Nextがサーバー側で `lib/payload/*` を**複数chunkへ重複して束ねる**」ことに起因する。
+CLI scriptもvitestも単一module graphなので、**Task 7のe2eを実際に走らせるまで一度も表面化しなかった**。
+`publishApprovedVersion()` がNextサーバーの中で実行されたのは、この作業が初めてだった。
+
+| # | 症状 | 原因 | 修正 | 回帰テスト |
+|---|---|---|---|---|
+| 1 | 公開が必ず `publish-approval-required` で失敗 | `publishAuthorization.ts` のWeakSetがmodule scopeにあり、発行側instanceと検証側instanceが別物 | registryを `Symbol.for()` 経由の processグローバルへ移す | `publish-authorization-identity.test.ts`（`vi.resetModules()` で2 instanceを作る） |
+| 2 | 必須項目不足が **422+field名ではなく500の汎用エラー**になる | `error instanceof PublishValidationError` がchunk跨ぎでfalse | `name` + `fields` の形で判定 | `admin-publish-route.test.ts` |
+
+計測の実際（`readApprovedPublishAuthorization` へ一時計装を入れて取得）:
+
+```
+[issue]        moduleInstance: 1, documentId: '1'
+[readApproved] moduleInstance: 2, hasValue: true, inWeakSet: false,
+               valueCollection === wantCollection, valueDocId === wantDocId
+```
+
+**2は特に重い。** 「`Something went wrong.` をやめて原因が分かるようにする」というこの計画の
+主目的が、**最も頻度の高い失敗ケース（必須項目の不足）でだけ失われていた**。
+しかも単体テストは緑のままだった。
+
+同種の `instanceof` は他に無いことを確認済み（`lib/` / `src/app/api` / `scripts/*.mts` を検索）。
+
+### 設計上の判断（計画に無かったもの）
+
+- **文言の網羅を型で保証した。** `t()` はキーが無くてもthrowせず**キー文字列をそのまま返す**
+  （`@payloadcms/translations` の `getTranslationString`）ので、訳し忘れは編集者に
+  `deploidPublish:publish-stale-approval` を見せる形で表面化する。
+  `AdminPublishErrorBody.error` を `AdminPublishErrorCode` に縛り、各localeを
+  `Record<AdminPublishMessageKey, string>` にしたので、**未訳のcodeがあると `npm run typecheck` が落ちる**。
+  実測で両方向の赤転を確認した。
+- **Payload REST の base path は `useConfig().config.routes.api` から取る。** ハードコードすると
+  `routes.api` を変えた瞬間に**保存だけが静かに失敗する**。
+- **`locale` / `fallback-locale` は付けない。** `payload.config.ts` にlocalizationの設定が無い。
+- **7 collectionへ手書きせず共有定数 `contentPublishAdminComponents` に集約した。**
+  書き忘れの症状が「標準ボタンへ静かに戻る」なので、1箇所にまとめたうえで
+  `check:admin-import-map` が機械検査する。
+
+### 計画のリスク想定と実際
+
+- **`generate:importmap` は動いた。** `payload/bin.js` のworker-thread競合で動かない可能性を
+  挙げていたが、`PAYLOAD_MIGRATING=true` を付けた1回の実行で成功した。手書きは不要だった。
+- **`@testing-library/user-event` は導入しなかった。** 未インストールだったため、既存
+  `tests/components/page-tab-bar.test.tsx` と同じ `fireEvent` を使った。依存は増やしていない。
+
+### e2eを書く過程で判明したPayloadの挙動（実測）
+
+- **`find` に `draft=true` を付けて `where[stableId]` で絞ると 0 件が返る。** version table
+  （`_manufacturers_v`）を引くためfield pathが噛み合わない。エラーにはならず**静かに空**。
+- **`getByRole('button', { name: /publish/i })` はPayloadの `Revert to published` にも一致する。**
+- `seed:ci-site-settings` が作るCI adminはパスワードを捨てるのでログインできない。
+  e2e用に `tests/e2e/createAdminUserForE2E.mts` を追加した。
+
+### componentテストのmutation検証
+
+`components/admin/PublishFromApproval.tsx` へ7種の改変を入れ、**すべてテストが赤くなること**を確認した。
+
+| 改変 | 落ちたテスト数 |
+|---|---|
+| 保存失敗ガード `if (!saved?.res?.ok) return;` を外す | 2 |
+| `draft=true` を落とす | 1 |
+| role判定を無条件trueに | 2 |
+| tokenを固定値に（使い回し） | 1 |
+| 失敗時も状態同期する | 1 |
+| 送信中 `disabled` を外す | 1 |
+| `overrides` を `_status: 'published'` に | 1 |

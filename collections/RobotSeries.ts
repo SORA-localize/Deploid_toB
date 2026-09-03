@@ -13,6 +13,7 @@ import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { RobotSeries } from '../lib/content/domainTypes';
+import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
 import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface RobotSeriesCandidate {
@@ -58,7 +59,7 @@ const routeRegistryHooks = createRouteRegistryHooks('robot-series');
  */
 export const RobotSeriesCollection: CollectionConfig = {
   slug: 'robot-series',
-  admin: { useAsTitle: 'name' },
+  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
   fields: [

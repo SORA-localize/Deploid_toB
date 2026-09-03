@@ -3,7 +3,8 @@
   "entry": [
     "src/app/**/{page,layout,route,loading,not-found,error,global-error,sitemap,robots,manifest,opengraph-image}.{ts,tsx}",
     "scripts/*.mjs",
-    "tests/**/*.{ts,tsx}"
+    "tests/**/*.{ts,tsx}",
+    "src/app/(payload)/admin/importMap.js"
   ],
   "project": [
     "components/**/*.{ts,tsx}",

@@ -12,6 +12,7 @@ import {
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipsToStableIds } from '../lib/content/payloadMappers';
 import type { Distributor } from '../lib/content/domainTypes';
+import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
 import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface DistributorCandidate {
@@ -56,7 +57,7 @@ function validateDistributorForPublish(distributor: Partial<Distributor>): void 
 
 export const Distributors: CollectionConfig = {
   slug: 'distributors',
-  admin: { useAsTitle: 'name' },
+  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
   fields: [

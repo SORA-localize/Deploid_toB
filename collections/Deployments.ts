@@ -12,6 +12,7 @@ import {
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { DeploymentSite } from '../lib/content/domainTypes';
+import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
 import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface DeploymentCandidate {
@@ -60,7 +61,7 @@ function validateDeploymentForPublish(deployment: Partial<DeploymentSite>): void
 /** Homeワールドマップの arc（manufacturer HQ → 導入拠点）根拠データ。 */
 export const Deployments: CollectionConfig = {
   slug: 'deployments',
-  admin: { useAsTitle: 'customer' },
+  admin: { useAsTitle: 'customer', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
   fields: [

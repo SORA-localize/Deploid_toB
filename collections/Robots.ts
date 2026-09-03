@@ -13,6 +13,7 @@ import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { mapPayloadRobotToDomain } from '../lib/content/payloadMappers';
 import type { Robot } from '../lib/content/domainTypes';
+import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
 import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 function validateRobotForPublish(robot: Robot): void {
@@ -38,7 +39,7 @@ const routeRegistryHooks = createRouteRegistryHooks('robots');
  */
 export const Robots: CollectionConfig = {
   slug: 'robots',
-  admin: { useAsTitle: 'name' },
+  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
   fields: [

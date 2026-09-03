@@ -12,6 +12,7 @@ import {
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { mapPayloadManufacturerToDomain } from '../lib/content/payloadMappers';
 import type { Manufacturer } from '../lib/content/domainTypes';
+import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
 import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 function validateManufacturerForPublish(manufacturer: Manufacturer): void {
@@ -30,7 +31,7 @@ function validateManufacturerForPublish(manufacturer: Manufacturer): void {
 
 export const Manufacturers: CollectionConfig = {
   slug: 'manufacturers',
-  admin: { useAsTitle: 'name' },
+  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
   fields: [

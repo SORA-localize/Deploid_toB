@@ -12,6 +12,7 @@ import {
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { UseCase } from '../lib/content/domainTypes';
+import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
 import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface UseCaseCandidate {
@@ -65,7 +66,7 @@ function validateUseCaseForPublish(useCase: Partial<UseCase>): void {
 
 export const UseCases: CollectionConfig = {
   slug: 'use-cases',
-  admin: { useAsTitle: 'title' },
+  admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
   fields: [

@@ -110,13 +110,19 @@ jobs:
       # `--workers=1`で2ファイルまとめて渡すと安定して4/4 passすることを確認した。
       # `playwright.config.ts`自体は変更しない（既存`test:e2e`は単一fileずつ実行される用途が
       # 中心で、このworkflowだけの制約のため、ここでCLI引数として上書きする）。
-      - name: Run cache-revalidation / draft-mode-wiring e2e specs
+      # `payload-admin-publish.spec.ts`（admin公開UI、admin-publish-ui-plan-v1 Task 7）も
+      # ここへ入れる。`verify` jobではこのspecは丸ごとskipされる —— 実`next start` + admin UIの
+      # 実操作 + `CONTENT_SOURCE=payload` の実Postgresが揃わないと動かないため。
+      # このspecの主眼は「編集した内容そのものが公開されること」で、これが壊れたときの
+      # 症状は**沈黙**（古い内容が公開され、エラーは出ない）なので、他のどのテストも捕まえられない。
+      - name: Run cache-revalidation / draft-mode-wiring / admin-publish e2e specs
         id: e2e_specs
         continue-on-error: true
         run: |
           npx playwright test \
             tests/e2e/cache-revalidation.spec.ts \
             tests/e2e/draft-mode-wiring.spec.ts \
+            tests/e2e/payload-admin-publish.spec.ts \
             --workers=1
 
       # Task 8のMCP transport e2e。`vitest.integration.config.ts`経由で実`next dev`を子processと

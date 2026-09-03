@@ -4,6 +4,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { buildConfig } from 'payload';
 import { Admins } from './collections/Admins';
+import { adminPublishTranslations } from './lib/payload/adminPublishMessages';
 import { contentCollections, contentGlobals } from './lib/payload/contentSchema';
 import { createMcpPlugin } from './lib/payload/mcp';
 import { createMediaStoragePlugin } from './lib/payload/mediaStoragePlugin';
@@ -43,6 +44,11 @@ export default buildConfig({
     },
   },
   collections: contentCollections,
+  // Admin公開ボタンの文言。`lib/uiText.ts`（公開サイト用）には入れない —— adminはPayload独自の
+  // i18nで、言語はブラウザ設定で `ja`/`en` が切り替わる。公開サイト用の表に混ぜると
+  // 英語ロケールのadminに日本語が出る。キーの網羅は型で保証している
+  // （`lib/payload/adminPublishMessages.ts` 参照）。
+  i18n: { translations: adminPublishTranslations },
   globals: contentGlobals,
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),

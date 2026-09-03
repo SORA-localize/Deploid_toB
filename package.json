@@ -43,8 +43,9 @@
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:e2e": "playwright test",
     "check:local": "node scripts/run-local-check.mjs",
-    "check": "npm run check:data-boundaries && npm run check:publish-authorization-boundaries && npm run check:payload-migration-guard && npm run check:client-imports && npm run check:world-map-asset && npm run typecheck && npm run lint && npm run check:plan-snippets && npm run check:dead-code && npm run check:docs && npm run build && npm run check:home-payload && npm run check:bundle-content && npm run check:client-budgets && npm run test",
-    "check:payload-migration-guard": "node scripts/check-payload-migration-guard.mjs"
+    "check": "npm run check:data-boundaries && npm run check:publish-authorization-boundaries && npm run check:payload-migration-guard && npm run check:admin-import-map && npm run check:client-imports && npm run check:world-map-asset && npm run typecheck && npm run lint && npm run check:plan-snippets && npm run check:dead-code && npm run check:docs && npm run build && npm run check:home-payload && npm run check:bundle-content && npm run check:client-budgets && npm run test",
+    "check:payload-migration-guard": "node scripts/check-payload-migration-guard.mjs",
+    "check:admin-import-map": "node scripts/check-admin-import-map.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -57,6 +58,7 @@
     "@payloadcms/plugin-mcp": "^3.87.1",
     "@payloadcms/richtext-lexical": "^3.87.1",
     "@payloadcms/storage-vercel-blob": "^3.87.1",
+    "@payloadcms/ui": "^3.87.1",
     "@radix-ui/colors": "^3.0.0",
     "@vercel/analytics": "^2.0.1",
     "budoux": "^0.8.4",
