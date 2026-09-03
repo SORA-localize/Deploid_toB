@@ -177,6 +177,29 @@ export const contentVersionsConfig: { drafts: true; maxPerDoc: number } = {
  * 不変 `id` をそのまま保持する（Payload内部idを公開参照に使わない）。`lifecycleStatus` は
  * Payload `_status`（draft|published）だけでは表せない `archived` を表現するための追加軸。
  */
+/**
+ * 公開要件の不足を、**不足field名を構造として保持したまま**投げる。
+ *
+ * 従来は9箇所すべてが素の `Error` で、message は2書式あった:
+ *   `publish-validation-failed: missing a, b`            （base検査 / この直下）
+ *   `publish-validation-failed: <slug> missing a, b`     （collection固有検査）
+ *
+ * routeがこれを利用者へ「不足項目」として見せるには正規表現でmessageを割るしかなく、
+ * 書式が2つあるうえ将来変わりうる。`fields` を持たせて parse を不要にする。
+ *
+ * **message は従来と1文字も変えない。** 既存テスト（`publish-gates.test.ts` の
+ * `/publish-validation-failed/` 等）と、gateの判定ロジックはそのまま。
+ */
+export class PublishValidationError extends Error {
+  readonly fields: string[];
+
+  constructor(fields: string[], scope?: string) {
+    super(`publish-validation-failed: ${scope ? `${scope} ` : ''}missing ${fields.join(', ')}`);
+    this.name = 'PublishValidationError';
+    this.fields = fields;
+  }
+}
+
 export function baseContentFields(): Field[] {
   return [
     // Admin公開UIの競合制御marker（`lib/payload/adminPublishIntent.ts`）。
@@ -611,7 +634,7 @@ export function assertBaseRecordPublishable(domain: {
   if (!domain.summary) missing.push('summary');
   if (!domain.sources || domain.sources.length === 0) missing.push('sources');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing);
   }
 }
 

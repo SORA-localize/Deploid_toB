@@ -8,7 +8,7 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipsToStableIds } from '../lib/content/payloadMappers';
 import type { Distributor } from '../lib/content/domainTypes';
@@ -50,7 +50,7 @@ function validateDistributorForPublish(distributor: Partial<Distributor>): void 
   if (!distributor.handledManufacturerIds || distributor.handledManufacturerIds.length === 0) missing.push('handledManufacturerIds');
   if (!distributor.acquisitionMethods || distributor.acquisitionMethods.length === 0) missing.push('acquisitionMethods');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: distributors missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'distributors');
   }
 }
 

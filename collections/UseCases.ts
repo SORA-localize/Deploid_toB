@@ -8,7 +8,7 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { UseCase } from '../lib/content/domainTypes';
@@ -59,7 +59,7 @@ function validateUseCaseForPublish(useCase: Partial<UseCase>): void {
   if (!useCase.overview) missing.push('overview');
   if (!useCase.whyItMatters) missing.push('whyItMatters');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: use-cases missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'use-cases');
   }
 }
 

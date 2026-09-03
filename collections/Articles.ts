@@ -8,7 +8,7 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { Article } from '../lib/content/domainTypes';
@@ -80,7 +80,7 @@ function validateArticleForPublish(article: ArticlePublishCandidate): void {
     missing.push('manufacturerGuideContent');
   }
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: articles missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'articles');
   }
 }
 

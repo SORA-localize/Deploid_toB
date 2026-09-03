@@ -8,7 +8,7 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { mapPayloadManufacturerToDomain } from '../lib/content/payloadMappers';
 import type { Manufacturer } from '../lib/content/domainTypes';
@@ -24,7 +24,7 @@ function validateManufacturerForPublish(manufacturer: Manufacturer): void {
   if (!manufacturer.website) missing.push('website');
   if (!manufacturer.description) missing.push('description');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: manufacturers missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'manufacturers');
   }
 }
 

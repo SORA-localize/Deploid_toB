@@ -8,7 +8,7 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
 import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { mapPayloadRobotToDomain } from '../lib/content/payloadMappers';
@@ -24,7 +24,7 @@ function validateRobotForPublish(robot: Robot): void {
   if (!robot.deploymentStage) missing.push('deploymentStage');
   if (!robot.japanAvailability) missing.push('japanAvailability');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: robots missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'robots');
   }
 }
 

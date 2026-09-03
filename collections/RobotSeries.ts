@@ -8,7 +8,7 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
 import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
@@ -45,7 +45,7 @@ function validateRobotSeriesForPublish(series: Partial<RobotSeries>): void {
   if (!series.name) missing.push('name');
   if (!series.manufacturerId) missing.push('manufacturerId');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: robot-series missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'robot-series');
   }
 }
 

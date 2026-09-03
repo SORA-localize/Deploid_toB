@@ -8,7 +8,7 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { DeploymentSite } from '../lib/content/domainTypes';
@@ -53,7 +53,7 @@ function validateDeploymentForPublish(deployment: Partial<DeploymentSite>): void
   if (!deployment.location) missing.push('location');
   if (!deployment.status) missing.push('status');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: deployments missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'deployments');
   }
 }
 

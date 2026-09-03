@@ -6,7 +6,7 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { ArticlePlacement } from '../lib/content/domainTypes';
@@ -43,7 +43,7 @@ function validatePlacementForPublish(placement: Partial<ArticlePlacement>): void
   if (!placement.articleId) missing.push('articleId');
   if (placement.order === undefined || placement.order === null) missing.push('order');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: article-placements missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'article-placements');
   }
 }
 
