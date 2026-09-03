@@ -479,6 +479,84 @@ Run: `npm run payload:migrate && npx vitest run tests/content/migration.test.ts`
 
 Expected: migrationとtestがPASS。
 
+- [x] **Step 5: Preview DB へ適用する（2026-09-03 完了）**
+
+**これを飛ばすとPreview deploymentが必ず失敗する。** 実際にPR #53で踏んだ:
+
+```
+column manufacturers.admin_publish_intent_token does not exist
+Error: Failed to collect page data for /manufacturers/[slug]
+Command "npm run vercel-build" exited with 1
+```
+
+`verify` と `content-e2e` は使い捨てPostgresへ自分でmigrateするので緑になるが、
+**Vercel Preview buildは Preview Supabase を読む**。列が無ければ全ページのdata収集で落ちる。
+
+Vercelのbuild pipelineがmigrationを自動適用する仕組みは**無い**
+（`vercel-build` は `fetch-cosign-binary` → `next build` → `check:audit-upload-traces` のみ）。
+`docs/reference/database-migration-runbook-v1.md` §2 のとおり**人が事前に適用する**。
+
+```bash
+# runbook §2。Vercelの環境変数DATABASE_URL（transaction pooler:6543）は使わない。
+# migrationにはsession pooler（port 5432）を明示exportする。
+DATABASE_URL="<preview session pooler URL:5432>" npm run payload:migrate
+DATABASE_URL="<preview session pooler URL:5432>" npm run payload:migrate:status
+```
+
+接続文字列は `~/secrets/deploid-supabase-connections.txt` の `pooler` 行
+（`?sslmode=require&uselibpqcompat=true` 必須）。`PAYLOAD_SECRET` も要る
+（`~/secrets/deploid-payload-secret-preview.txt`。無いと config 評価で fail-closed する）。
+
+**適用してからPreview deploymentをredeployする。**
+
+#### `payload:migrate` が固まる場合（2026-09-03 実際に踏んだ）
+
+`scripts/run-payload-migration-cli.mts:1-40` が記録している **`payload/bin.js` の
+worker-thread race** を踏むと、CLI が **DBへ接続する前に無反応のまま止まる**。
+実測: プロセス `SN`、TCP接続0本、DB側クエリ0件、8分経過。
+`migrate:status` は同じCLIで完走するので、接続やcredentialの問題と誤診しないこと。
+
+race は確率的なので数回試して通ることもあるが、CI では3回連続で踏んだ記録がある。
+通らない場合は **psql で直接適用する**。以下は実際に成功した手順。
+
+1. **SQL を機械抽出して検証**（手打ちしない）。migration の `up()` から文を取り出し、
+   16文すべてが `ALTER TABLE ... ADD COLUMN ... varchar` で
+   `NOT NULL` / `DROP` / `DEFAULT` を含まないことをプログラムで確認する
+2. **列追加と記録行を単一トランザクションにする**。Payload自身も `commitTransaction` で
+   同じ構造。片方だけ入る状態を作らない
+3. **batch 番号は実装から決める**。`payload/dist/database/migrations/getMigrations.js` は
+   `where: { batch: { not_equals: -1 } }` で **dev-push が残す `batch: -1` 行を除外**し、
+   `latestBatch + 1` を使う。適用直前に
+   `select max(batch) from payload_migrations where batch <> -1` で確認する
+4. `name` は **migration のファイル名（拡張子なし）と完全一致**させる。
+   ずれると `migrate:status` が未適用と誤表示し、次回 `migrate` が二重適用を試みて
+   `column already exists` で失敗する
+
+```sql
+BEGIN;
+  ALTER TABLE "manufacturers" ADD COLUMN "admin_publish_intent_token" varchar;
+  -- ...（up() の16文）
+  INSERT INTO payload_migrations (name, batch) VALUES ('<migration file name>', <latestBatch+1>);
+COMMIT;
+```
+
+**検証は `migrate:status` が `Yes` を返すことで行う。** Payload 自身に読ませて
+「適用済み」と認識させられれば、手書きの記録行が正しい形だと確認できる。
+
+**2026-09-03 Preview 適用済み**: 16列（全て nullable varchar）、`batch=3`、
+`migrate:status` が `Yes`、marker `preview` 不変、データ件数不変
+（robots 63 / manufacturers 26 / articles 34）、Preview build 成功。
+
+**列がnullableなので、この順序は安全**: 先に列を足しても既存の古いコードは列を知らないだけで壊れない
+（backward compatible）。逆順（コードを先にdeploy）は今回踏んだとおり壊れる。
+
+- [ ] **Step 6: Production への適用は本番cutover時に行う**
+
+同じ手順をProduction session poolerに対して実行する。**mainへmergeする前に適用しておく**
+（mergeするとProduction deploymentが走り、列が無ければ本番サイトのbuildが落ちる）。
+Rollback節のとおり、列は残す判断が既定。
+
+
 ---
 
 ### Task 3: 同一オリジン判定と401/403を区別する認証を実装する
