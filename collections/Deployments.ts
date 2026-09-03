@@ -12,6 +12,7 @@ import {
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { DeploymentSite } from '../lib/content/domainTypes';
+import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface DeploymentCandidate {
   stableId?: string;
@@ -98,6 +99,8 @@ export const Deployments: CollectionConfig = {
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
+      // 他のhookより先に置く: 以降のhookが正規化済みのtokenを見るようにする。
+      clearUnclaimedAdminPublishIntent,
       createPublishGateHook({
         collectionSlug: 'deployments',
         mapToDomain: (candidate, req) => mapDeploymentCandidateToDomain(candidate as DeploymentCandidate, req.payload),

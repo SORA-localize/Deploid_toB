@@ -12,6 +12,7 @@ import {
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { Article } from '../lib/content/domainTypes';
+import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface ArticleCandidate {
   stableId?: string;
@@ -173,6 +174,8 @@ export const Articles: CollectionConfig = {
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
+      // 他のhookより先に置く: 以降のhookが正規化済みのtokenを見るようにする。
+      clearUnclaimedAdminPublishIntent,
       createPublishGateHook({
         collectionSlug: 'articles',
         mapToDomain: async (candidate) => mapArticleCandidateToDomain(candidate as ArticleCandidate),

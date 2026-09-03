@@ -13,6 +13,7 @@ import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { RobotSeries } from '../lib/content/domainTypes';
+import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface RobotSeriesCandidate {
   stableId?: string;
@@ -82,6 +83,8 @@ export const RobotSeriesCollection: CollectionConfig = {
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
+      // 他のhookより先に置く: 以降のhookが正規化済みのtokenを見るようにする。
+      clearUnclaimedAdminPublishIntent,
       createPublishGateHook({
         collectionSlug: 'robot-series',
         mapToDomain: (candidate, req) => mapRobotSeriesCandidateToDomain(candidate as RobotSeriesCandidate, req.payload),

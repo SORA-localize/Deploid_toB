@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import type { Access, CollectionBeforeOperationHook, Field, FieldAccess, PayloadRequest, Where } from 'payload';
+import { adminPublishIntentField, clearUnclaimedAdminPublishIntent } from './adminPublishIntent';
 import {
   clearDraftIntents,
   readApprovedPublishAuthorization,
@@ -178,6 +179,13 @@ export const contentVersionsConfig: { drafts: true; maxPerDoc: number } = {
  */
 export function baseContentFields(): Field[] {
   return [
+    // Admin公開UIの競合制御marker（`lib/payload/adminPublishIntent.ts`）。
+    // コンテンツではなく運用メタデータで、値を書けるのは同ファイルのhookだけ。
+    // `baseContentFields()` を使う全collection（publish gateを持つ8つ）へ一括で入れる:
+    // `article-placements` は現状 `ApprovableCollectionSlug` 外だが、同じpublish gateを持ち
+    // 将来公開経路が付く可能性があるため、ここだけ除外して不整合を作らない。
+    // 未使用のcollectionでは常に `null` になるだけで、公開系・snapshotへは現れない。
+    adminPublishIntentField(),
     {
       name: 'stableId',
       type: 'text',

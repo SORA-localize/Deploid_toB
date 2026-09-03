@@ -4,6 +4,7 @@ import { type AuthenticatedAdminUser, asAdminUser, isContentPublisherOrAboveUser
 import { approvedPublishContext } from './publishAuthorization';
 import { acquireDocumentWriteLock } from './publishLock';
 import { notifyRevalidationAfterCommit } from './revalidationHook';
+import { ADMIN_PUBLISH_INTENT_FIELD } from './adminPublishIntent';
 
 /**
  * 承認済みdraftの公開を1箇所へ集約する（brief）。Task 6〜9.5は独自のpublish updateを作らず、
@@ -49,7 +50,17 @@ export function computeCanonicalHash(data: Record<string, unknown>): string {
   return createHash('sha256').update(JSON.stringify(sorted)).digest('hex');
 }
 
-const SYSTEM_FIELDS = new Set(['id', 'createdAt', 'updatedAt', '_status', 'updatedBy']);
+const SYSTEM_FIELDS = new Set([
+  'id',
+  'createdAt',
+  'updatedAt',
+  '_status',
+  'updatedBy',
+  // Admin公開UIの競合制御marker（`lib/payload/adminPublishIntent.ts`）。versionごとに変わる
+  // 運用メタデータなので、canonical contentへ入れるとhashが内容と無関係に変動する。
+  // 公開されるmain rowへもコピーしない。
+  ADMIN_PUBLISH_INTENT_FIELD,
+]);
 
 function stripSystemFields(data: Record<string, unknown>): Record<string, unknown> {
   const result: Record<string, unknown> = {};

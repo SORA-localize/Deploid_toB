@@ -12,6 +12,7 @@ import {
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { UseCase } from '../lib/content/domainTypes';
+import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface UseCaseCandidate {
   stableId?: string;
@@ -149,6 +150,8 @@ export const UseCases: CollectionConfig = {
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
+      // 他のhookより先に置く: 以降のhookが正規化済みのtokenを見るようにする。
+      clearUnclaimedAdminPublishIntent,
       createPublishGateHook({
         collectionSlug: 'use-cases',
         mapToDomain: async (candidate) => mapUseCaseCandidateToDomain(candidate as UseCaseCandidate),

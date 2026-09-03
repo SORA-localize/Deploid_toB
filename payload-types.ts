@@ -196,6 +196,10 @@ export interface Admin {
  */
 export interface Manufacturer {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
@@ -316,6 +320,10 @@ export interface Manufacturer {
  */
 export interface Distributor {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
@@ -397,6 +405,10 @@ export interface Distributor {
  */
 export interface Robot {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
@@ -557,6 +569,10 @@ export interface Robot {
  */
 export interface RobotSery {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
@@ -647,6 +663,10 @@ export interface RobotSery {
  */
 export interface UseCase {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
@@ -773,6 +793,10 @@ export interface UseCase {
  */
 export interface Deployment {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
@@ -857,6 +881,10 @@ export interface Deployment {
  */
 export interface Article {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
@@ -980,6 +1008,10 @@ export interface Article {
  */
 export interface ArticlePlacement {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
@@ -1458,6 +1490,7 @@ export interface AdminsSelect<T extends boolean = true> {
  * via the `definition` "manufacturers_select".
  */
 export interface ManufacturersSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -1545,6 +1578,7 @@ export interface ManufacturersSelect<T extends boolean = true> {
  * via the `definition` "distributors_select".
  */
 export interface DistributorsSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -1608,6 +1642,7 @@ export interface DistributorsSelect<T extends boolean = true> {
  * via the `definition` "robot-series_select".
  */
 export interface RobotSeriesSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -1669,6 +1704,7 @@ export interface RobotSeriesSelect<T extends boolean = true> {
  * via the `definition` "robots_select".
  */
 export interface RobotsSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -1774,6 +1810,7 @@ export interface RobotsSelect<T extends boolean = true> {
  * via the `definition` "use-cases_select".
  */
 export interface UseCasesSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -1872,6 +1909,7 @@ export interface UseCasesSelect<T extends boolean = true> {
  * via the `definition` "deployments_select".
  */
 export interface DeploymentsSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -1940,6 +1978,7 @@ export interface DeploymentsSelect<T extends boolean = true> {
  * via the `definition` "articles_select".
  */
 export interface ArticlesSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -2013,6 +2052,7 @@ export interface ArticlesSelect<T extends boolean = true> {
  * via the `definition` "article-placements_select".
  */
 export interface ArticlePlacementsSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;

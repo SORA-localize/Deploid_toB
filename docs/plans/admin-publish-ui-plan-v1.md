@@ -376,8 +376,18 @@ expect(() => assertLatestVersionMatchesPublishIntent(
 )).toThrow('publish-candidate-replaced')
 ```
 
-hookは `data` 自身がtoken propertyを持つときだけ値を保存し、propertyが無い通常保存では
-`adminPublishIntentToken: null` を返す。これによりAのtokenをBの通常保存が引き継がない。
+hookは **`req.searchParams` の `adminPublishIntent`** を読み、無ければ `null` を書く（Step 0）。
+`data` は見ない。これによりAのtokenをBの通常保存が引き継がない。
+
+```ts
+const withParam = { searchParams: new URLSearchParams('adminPublishIntent=tok') };
+const withoutParam = { searchParams: new URLSearchParams() };
+
+expect(clearUnclaimedAdminPublishIntent({ data: {}, req: withParam }))
+  .toMatchObject({ adminPublishIntentToken: 'tok' });
+expect(clearUnclaimedAdminPublishIntent({ data: { adminPublishIntentToken: 'stale' }, req: withoutParam }))
+  .toMatchObject({ adminPublishIntentToken: null });   // form state の再送を無視する
+```
 
 - [ ] **Step 2: テストが未実装で落ちることを確認する**
 

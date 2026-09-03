@@ -13,6 +13,7 @@ import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { mapPayloadRobotToDomain } from '../lib/content/payloadMappers';
 import type { Robot } from '../lib/content/domainTypes';
+import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 function validateRobotForPublish(robot: Robot): void {
   assertBaseRecordPublishable(robot);
@@ -157,6 +158,8 @@ export const Robots: CollectionConfig = {
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
+      // 他のhookより先に置く: 以降のhookが正規化済みのtokenを見るようにする。
+      clearUnclaimedAdminPublishIntent,
       createPublishGateHook({
         collectionSlug: 'robots',
         mapToDomain: (candidate, req) => mapPayloadRobotToDomain(candidate as never, req.payload),

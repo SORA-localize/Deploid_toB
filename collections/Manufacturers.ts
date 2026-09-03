@@ -12,6 +12,7 @@ import {
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { mapPayloadManufacturerToDomain } from '../lib/content/payloadMappers';
 import type { Manufacturer } from '../lib/content/domainTypes';
+import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 function validateManufacturerForPublish(manufacturer: Manufacturer): void {
   assertBaseRecordPublishable(manufacturer);
@@ -96,6 +97,8 @@ export const Manufacturers: CollectionConfig = {
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
+      // 他のhookより先に置く: 以降のhookが正規化済みのtokenを見るようにする。
+      clearUnclaimedAdminPublishIntent,
       createPublishGateHook({
         collectionSlug: 'manufacturers',
         mapToDomain: async (candidate) => mapPayloadManufacturerToDomain(candidate as never),
