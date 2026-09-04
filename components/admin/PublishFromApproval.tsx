@@ -14,6 +14,7 @@ import {
   useRouteCache,
   useTranslation,
 } from '@payloadcms/ui';
+import { PUBLISH_BUTTON_ID } from '@/lib/payload/adminPublishComponents';
 import {
   type AdminPublishMessageKey,
   adminPublishMessageKey,
@@ -154,7 +155,17 @@ export function PublishFromApproval() {
   if (!canPublish) return null;
 
   return (
-    <Button buttonStyle="primary" disabled={processing || inFlight} onClick={publish} size="medium" type="button">
+    // `id` は消さないこと。e2e（`tests/e2e/payload-admin-publish.spec.ts`）はこのidでボタンを掴む。
+    // 文言で掴むと、adminの言語が `ja` のとき Payload の「公開時の内容に戻す」と衝突する。
+    // Payload自身も `action-revert-to-published` など同じ規約でidを振っている。
+    <Button
+      buttonStyle="primary"
+      disabled={processing || inFlight}
+      id={PUBLISH_BUTTON_ID}
+      onClick={publish}
+      size="medium"
+      type="button"
+    >
       {modified ? t('version:publishChanges') : t('version:publish')}
     </Button>
   );

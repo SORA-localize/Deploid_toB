@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
+import { PUBLISH_BUTTON_ID } from '@/lib/payload/adminPublishComponents';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -58,13 +59,17 @@ async function login(page: import('@playwright/test').Page, email: string, passw
   await page.goto('/admin/login');
   await page.locator('#field-email').fill(email);
   await page.locator('#field-password').fill(password);
-  await page.getByRole('button', { name: /login/i }).click();
+  await page.getByRole('button', { name: /login|ログイン/i }).click();
   // ログイン後のリダイレクト先はPayloadのバージョンで変わりうる。`/admin/login` から
   // 離れたことだけを見る。
   await page.waitForURL((url) => !url.pathname.endsWith('/login'), { timeout: 30_000 });
 }
 
-/** admin cookieを持つpage contextから、**公開済み**（draftではない）の値を読む。 */
+/**
+ * **公開済み**の値を読む。`page.request` はauth cookieを運ばないので、これは
+ * 匿名読み取り —— つまり「実際の読者に見えるか」を検証していることになり、
+ * 公開が反映されたことの証明としてはむしろ強い。認証を要する検証にこの関数を使ってはいけない。
+ */
 async function readPublishedName(page: import('@playwright/test').Page): Promise<string | undefined> {
   const response = await page.request.get(
     `/api/manufacturers?where[stableId][equals]=${MANUFACTURER_STABLE_ID}&depth=0&limit=1`,
@@ -75,18 +80,21 @@ async function readPublishedName(page: import('@playwright/test').Page): Promise
 }
 
 /**
- * 公開ボタンのlocator。`^` で始めるのは、Payloadの `Revert to published` が
- * `/publish/i` に一致して strict mode violation になるため（実測）。
- * adminの言語はブラウザ設定で切り替わるので、英語（`Publish` / `Publish changes`）と
- * 日本語（`公開` / `変更を公開`）の両方に一致させる。
+ * 公開ボタンのlocator。**文言では掴まない。**
+ *
+ * `/publish/i` はPayloadの `Revert to published` にも一致して strict mode violation になり、
+ * admin言語が `ja` のときは「公開時の内容に戻す」と「変更内容を公開」が両方 `公開` を含むため
+ * 文言ベースの正規表現はどう書いても壊れやすい（どちらも実測で踏んだ）。
+ * componentが振る安定したid（`PUBLISH_BUTTON_ID`）で掴む。
  */
 function publishButton(page: import('@playwright/test').Page) {
-  return page.getByRole('button', { name: /^(publish|(変更を)?公開)/i });
+  return page.locator(`#${PUBLISH_BUTTON_ID}`);
 }
 
 /**
- * `draft=true` は**付けない**。付けるとPayloadはversion table（`_manufacturers_v`）を引き、
- * `where[stableId]` はそのtableのfield pathと噛み合わずに **0件を静かに返す**（実測）。
+ * `draft=true` は**付けない**。`page.request` はPayloadのauth cookieを運ばないため
+ * （実測: 同じcontextで `/api/admins/me` が `user: null` を返す）この読み取りは**匿名**であり、
+ * 匿名 + `draft=true` は「最新versionがdraftのdocument」を正しく除外して0件になる。
  * ここで欲しいのはdocumentのidだけで、idはdraftでもpublishedでも同じ。
  */
 async function openEditPage(
@@ -163,5 +171,48 @@ test.describe('Admin publish UI', () => {
     // 下書き保存は出来るが、公開は出来ない。
     await expect(page.getByRole('button', { name: /save|保存/i }).first()).toBeVisible();
     await expect(publishButton(page)).toHaveCount(0);
+  });
+});
+
+/**
+ * 日本語メッセージが**実際に描画されること**を証明する（2026-09-04の自己監査で追加）。
+ *
+ * ## なぜ型検査だけでは足りないのか
+ *
+ * `lib/payload/adminPublishMessages.ts` の `Record<AdminPublishMessageKey, string>` は
+ * 「キーが揃っていること」しか保証しない。**その表がPayloadに届いているか**は別問題で、
+ * 実際 2026-09-03 の実装では `supportedLanguages` を省いたために既定の `{ en }` のままになり、
+ * 書いた日本語訳が一度も表示されていなかった。型検査もe2eも緑だった。
+ *
+ * ## なぜ `Accept-Language` を明示するのか
+ *
+ * `getRequestLanguage`（`payload/dist/utilities/getRequestLanguage.js`）は
+ * cookie → `Accept-Language` → `fallbackLanguage` の順に解決する。Playwrightの既定は
+ * `en-US` で、`en` はsupportedなのでadminは**英語で描画される**。つまり通常のspecは
+ * 日本語側を一度も通らない。ここだけ明示的に `ja` のcontextで開く。
+ */
+test.describe('Admin publish UI（日本語ロケール）', () => {
+  test.use({ locale: 'ja-JP', extraHTTPHeaders: { 'Accept-Language': 'ja' } });
+
+  test.skip(
+    process.env.CONTENT_SOURCE !== 'payload',
+    'requires CONTENT_SOURCE=payload against a seeded throwaway Postgres — see file docblock',
+  );
+
+  test('公開エラーが日本語で表示される（翻訳表がPayloadへ届いている）', async ({ page }) => {
+    await login(page, PUBLISHER.email, PUBLISHER.password);
+    await openEditPage(page, VALIDATION_STABLE_ID);
+
+    await page.locator('#field-website').fill('');
+    await publishButton(page).click();
+
+    // 英語版に一致してはいけない。ここを英語も許す正規表現にすると、
+    // `supportedLanguages` を落としても緑のままになり、このテストの意味が消える。
+    await expect(page.getByText(/公開に必要な項目が未入力です[:：].*website/).first()).toBeVisible({
+      timeout: 30_000,
+    });
+
+    // Payload組み込みの文言も日本語になっていること（＝言語解決そのものが効いている）。
+    await expect(page.getByRole('button', { name: /公開/ }).first()).toBeVisible();
   });
 });

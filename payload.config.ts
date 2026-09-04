@@ -1,6 +1,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { postgresAdapter } from '@payloadcms/db-postgres';
+import { en } from '@payloadcms/translations/languages/en';
+import { ja } from '@payloadcms/translations/languages/ja';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { buildConfig } from 'payload';
 import { Admins } from './collections/Admins';
@@ -45,10 +47,19 @@ export default buildConfig({
   },
   collections: contentCollections,
   // Admin公開ボタンの文言。`lib/uiText.ts`（公開サイト用）には入れない —— adminはPayload独自の
-  // i18nで、言語はブラウザ設定で `ja`/`en` が切り替わる。公開サイト用の表に混ぜると
-  // 英語ロケールのadminに日本語が出る。キーの網羅は型で保証している
+  // i18nで、公開サイト用の表に混ぜるとSoCが崩れる。キーの網羅は型で保証している
   // （`lib/payload/adminPublishMessages.ts` 参照）。
-  i18n: { translations: adminPublishTranslations },
+  //
+  // **`supportedLanguages` を明示しないと英語しか使えない。** Payloadの既定は `{ en }` だけで
+  // （`payload/dist/config/sanitize.js`）、`i18n.translations` を足しても supported は増えない。
+  // 2026-09-03の実装では `ja` の翻訳表を書いたのに `supportedLanguages` を省いていたため、
+  // **その表は一度も表示されなかった**（2026-09-04の自己監査で実行時dumpして判明）。
+  // 日本語B2Bサイトの運用画面なので既定を `ja` にし、`en` も選べるようにしておく。
+  i18n: {
+    fallbackLanguage: 'ja',
+    supportedLanguages: { en, ja },
+    translations: adminPublishTranslations,
+  },
   globals: contentGlobals,
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),

@@ -42,13 +42,24 @@ vi.mock('@payloadcms/ui', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
   // 標準の `Button` は最終的に `<button>` を描画する。ここでは「無効なら押しても
   // 何も起きない」というDOMの挙動だけ再現できればよい。
-  Button: ({ children, onClick, disabled }: { children: ReactNode; onClick: () => void; disabled: boolean }) => (
-    <button disabled={disabled} onClick={onClick} type="button">
+  Button: ({
+    children,
+    onClick,
+    disabled,
+    id,
+  }: {
+    children: ReactNode;
+    onClick: () => void;
+    disabled: boolean;
+    id?: string;
+  }) => (
+    <button disabled={disabled} id={id} onClick={onClick} type="button">
       {children}
     </button>
   ),
 }));
 
+const { PUBLISH_BUTTON_ID } = await import('@/lib/payload/adminPublishComponents');
 const { PublishFromApproval } = await import('@/components/admin/PublishFromApproval');
 
 const ok = (body: unknown = { ok: true, documentId: 1 }) =>
@@ -92,6 +103,13 @@ describe('表示条件', () => {
     authUser = { id: 1, role };
     render(<PublishFromApproval />);
     expect(screen.getByRole('button')).toBeInTheDocument();
+  });
+
+  it('安定したidを振る（e2eがこのidでボタンを掴む）', () => {
+    // 文言で掴むとadmin言語が `ja` のとき Payload の「公開時の内容に戻す」と衝突する。
+    // idを消すとe2eが「ボタンが無い」という分かりにくい形で落ちるので、ここで固定する。
+    render(<PublishFromApproval />);
+    expect(screen.getByRole('button')).toHaveAttribute('id', PUBLISH_BUTTON_ID);
   });
 
   it('未ログインでは表示しない', () => {

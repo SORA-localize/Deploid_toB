@@ -20,27 +20,46 @@ import { fileURLToPath } from 'node:url';
  * 型検査もテストもこの2つを捕まえられないので、専用の検査を `npm run check` に入れている。
  */
 
-/** 公開ボタンを配線すべきcollectionのファイル。`article-placements` はpublish経路自体が無いので除く。 */
-export const PUBLISHABLE_COLLECTION_FILES = [
-  'collections/Manufacturers.ts',
-  'collections/Distributors.ts',
-  'collections/RobotSeries.ts',
-  'collections/Robots.ts',
-  'collections/UseCases.ts',
-  'collections/Deployments.ts',
-  'collections/Articles.ts',
-];
-
 const COMPONENTS_MODULE = 'lib/payload/adminPublishComponents.ts';
 const IMPORT_MAP = 'src/app/(payload)/admin/importMap.js';
+const APPROVABLE_MODULE = 'lib/payload/publishApprovedVersion.ts';
 const SHARED_CONST = 'contentPublishAdminComponents';
 
 /**
- * @param {{ componentsModule: string, importMap: string, collections: Record<string, string> }} sources
+ * 配線すべきcollectionを**ハードコードせず `ApprovableCollectionSlug` から導出する。**
+ *
+ * ここに一覧を書き写すと、公開できるcollectionを増やしたときに書き忘れても検査が緑のままになり、
+ * 「公開できるはずなのにボタンが出ない」を素通しする。型が正本、これは派生。
+ * `article-placements` は `ApprovableCollectionSlug` の外なので自動的に対象外になる。
+ */
+export function publishableCollectionFiles(approvableSource) {
+  const match = approvableSource.match(/type\s+ApprovableCollectionSlug\s*=([^;]+);/);
+  if (!match) return null;
+  const slugs = [...match[1].matchAll(/'([a-z0-9-]+)'/g)].map((m) => m[1]);
+  if (slugs.length === 0) return null;
+  return slugs.map((slug) => {
+    const pascal = slug.split('-').map((part) => part[0].toUpperCase() + part.slice(1)).join('');
+    return { slug, path: `collections/${pascal}.ts` };
+  });
+}
+
+/**
+ * @param {{ componentsModule: string, importMap: string, approvableSource: string, collections: Record<string, string | null> }} sources
  * @returns {{ path: string, problem: string }[]}
  */
 export function findAdminImportMapViolations(sources) {
   const violations = [];
+
+  // 0. 正本（`ApprovableCollectionSlug`）を読めること。読めないまま先へ進むと
+  //    「対象0件なので全部OK」という最悪の緑になる。
+  const expected = publishableCollectionFiles(sources.approvableSource);
+  if (!expected) {
+    violations.push({
+      path: APPROVABLE_MODULE,
+      problem: 'ApprovableCollectionSlug のunionを読み取れない（対象collectionを導出できない）',
+    });
+    return violations;
+  }
 
   // 1. 共有定数が指すcomponent path（`path#exportName`）を取り出す。
   const pathMatch = sources.componentsModule.match(
@@ -75,8 +94,16 @@ export function findAdminImportMapViolations(sources) {
     });
   }
 
-  // 4. 各collectionが共有定数を admin.components へ渡しているか。
-  for (const [file, source] of Object.entries(sources.collections)) {
+  // 4. 公開できる各collectionが共有定数を admin.components へ渡しているか。
+  for (const { slug, path: file } of expected) {
+    const source = sources.collections[file];
+    if (source === undefined || source === null) {
+      violations.push({
+        path: file,
+        problem: `"${slug}" は公開できる想定だが、対応するcollectionファイルが見つからない`,
+      });
+      continue;
+    }
     if (!new RegExp(`components:\\s*${SHARED_CONST}`).test(source)) {
       violations.push({
         path: file,
@@ -90,13 +117,17 @@ export function findAdminImportMapViolations(sources) {
 
 export async function checkAdminImportMap(root = process.cwd()) {
   const read = (relative) => readFile(path.join(root, relative), 'utf8');
+  const readOrNull = (relative) => read(relative).catch(() => null);
+
+  const approvableSource = await read(APPROVABLE_MODULE);
   const collections = {};
-  for (const file of PUBLISHABLE_COLLECTION_FILES) {
-    collections[file] = await read(file);
+  for (const { path: file } of publishableCollectionFiles(approvableSource) ?? []) {
+    collections[file] = await readOrNull(file);
   }
   return findAdminImportMapViolations({
     componentsModule: await read(COMPONENTS_MODULE),
     importMap: await read(IMPORT_MAP),
+    approvableSource,
     collections,
   });
 }

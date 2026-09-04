@@ -16,8 +16,10 @@
  *
  * ## localeについて
  *
- * `payload.config.ts` は `supportedLanguages` を絞っていないため、adminの言語はブラウザ設定で
- * `ja` にも `en` にもなる。両方を必ず用意する（`fallbackLanguage` の既定は `en`）。
+ * `payload.config.ts` が `supportedLanguages: { en, ja }` / `fallbackLanguage: 'ja'` を明示しており、
+ * adminの言語スイッチャーで切り替えられる。**両方を必ず用意すること。**
+ * 片方しか無いlocaleでは `t()` がキー文字列をそのまま表示する（fallbackは効かない ——
+ * `initTFunction` は `config.translations[language]` だけをmergeする）。
  */
 
 /** namespace。Payloadの組み込みキーと衝突しないようプロジェクト名を冠する。 */

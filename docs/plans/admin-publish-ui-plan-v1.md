@@ -1118,8 +1118,26 @@ CLI scriptもvitestも単一module graphなので、**Task 7のe2eを実際に�
 
 ### e2eを書く過程で判明したPayloadの挙動（実測）
 
-- **`find` に `draft=true` を付けて `where[stableId]` で絞ると 0 件が返る。** version table
-  （`_manufacturers_v`）を引くためfield pathが噛み合わない。エラーにはならず**静かに空**。
+- **`find` + `draft=true` + `where` が 0 件になる条件は「匿名読み取り」。** 当初これを
+  「version tableのfield pathが噛み合わない」と記録したが、**それは誤りだった**（2026-09-04の
+  自己監査で訂正）。Local APIで4条件を実測した結果:
+
+  | 条件 | 結果 |
+  |---|---|
+  | `draft=true` / `overrideAccess=true` | 1件 |
+  | `draft=true` / `overrideAccess=false`・user無し・**最新versionがdraft** | **0件** |
+  | `draft=false` / `overrideAccess=false` | 1件 |
+
+  `publishedOrAuthenticated` の匿名分岐が `_status: 'published'` を要求するので、
+  最新versionがdraftのdocumentは正しく除外される —— **Payloadの想定どおりの挙動**で、バグではない。
+  `publishApprovedVersion` の `find({ where: { stableId }, draft: true })` が動くのは
+  `overrideAccess: true` だから。
+
+- **Playwrightの `page.request` はPayloadのauth cookieを運ばない。** 実測: 同じログイン済み
+  contextから `/api/admins/me` を叩くと `page.request` は `user: null`、
+  ページ内の `window.fetch` は `user` を返す（cookie `payload-token` はcontextに存在する）。
+  上の0件はこれが原因で匿名読み取りになっていた。**e2eで `page.request` を使うと、
+  意図せず匿名の権限で検証してしまう。**
 - **`getByRole('button', { name: /publish/i })` はPayloadの `Revert to published` にも一致する。**
 - `seed:ci-site-settings` が作るCI adminはパスワードを捨てるのでログインできない。
   e2e用に `tests/e2e/createAdminUserForE2E.mts` を追加した。
@@ -1137,3 +1155,71 @@ CLI scriptもvitestも単一module graphなので、**Task 7のe2eを実際に�
 | 失敗時も状態同期する | 1 |
 | 送信中 `disabled` を外す | 1 |
 | `overrides` を `_status: 'published'` に | 1 |
+
+---
+
+## 自己監査（2026-09-04）
+
+`npm run check` と e2e が緑になった後で、実装を読み直して実測した結果。
+**上の「実施記録」に書いた事実のうち1件が誤っていたので訂正した**（該当箇所に追記済み）。
+
+### 訂正
+
+| 当初の記述 | 実際 |
+|---|---|
+| `find` + `draft=true` + `where` は version table の field path が噛み合わず0件 | **誤り。** 原因はアクセス制御。匿名 + 最新versionがdraft のときだけ0件で、Payloadの想定どおりの挙動。Local APIで4条件を実測して確認 |
+
+さらに、その0件を引き起こしていた本当の原因も特定した。
+
+- **Playwrightの `page.request` はPayloadのauth cookieを運ばない。** 同一ログイン済みcontextで
+  `/api/admins/me` を叩くと `page.request` は `user: null`、ページ内の `window.fetch` は
+  `user` を返す（cookie `payload-token` はcontextに存在する）。
+  つまり **e2eで `page.request` を使うと意図せず匿名の権限で検証してしまう。**
+  `readPublishedName()` はこの性質のおかげで「実際の読者に見えるか」を検証しており、
+  公開反映の証明としてはむしろ強い —— が、認証を要する検証には使えない。
+
+### 見つけて塞いだ穴
+
+| # | 内容 | 対応 |
+|---|---|---|
+| A | **`ja` 翻訳表が一度も表示されていなかった。** Payloadの `supportedLanguages` 既定は `{ en }` だけで、`i18n.translations` を足しても supported は増えない（`payload/dist/config/sanitize.js`）。実行時dumpで `['en']` を確認 | `supportedLanguages: { en, ja }` / `fallbackLanguage: 'ja'` を明示。3ファイルの誤ったコメントも訂正。**日本語が実際に描画されることをe2eで固定**（下記） |
+| B | **routeのcollection一覧が部分集合を許していた。** `readonly ApprovableCollectionSlug[]` なので `'articles'` を消しても `typecheck` が通る（実測）。公開できるcollectionを増やしたとき、型は通るのにrouteが400を返す | `satisfies Record<ApprovableCollectionSlug, true>` へ変更。1件消すと落ちることを確認 |
+| B' | checkerの対象collection一覧も手書きで、型と独立していた | `ApprovableCollectionSlug` から導出するよう変更（kebab→PascalCase）。unionにslugを足してcollectionを作り忘れると赤くなる |
+| C | **7 collectionのうち6が公開経路を一度も通っていなかった。** serviceテストもe2eも `manufacturers` のみ。`findVersions` ↔ `findVersionByID` のhash往復はfieldの種類に依存しうるのに、richTextを持つ `articles` が未検証 | `tests/content/admin-publish-all-collections.test.ts` を追加し、fixtureで全7件を実DB上で公開。**結果は全件成功（hash不一致なし）** |
+
+### Aを「直したつもり」で終わらせないための追加検証
+
+型検査（`Record<AdminPublishMessageKey, string>`）が保証するのは**キーが揃っていること**だけで、
+**その表がPayloadへ届いているか**は何も言わない。実際Aは、型検査もe2eも緑のまま起きていた。
+
+さらに `getRequestLanguage`（`payload/dist/utilities/getRequestLanguage.js`）は
+cookie → `Accept-Language` → `fallbackLanguage` の順で解決し、Playwrightの既定は `en-US`。
+`en` はsupportedなので、**通常のspecはadminを英語で描画しており日本語側を一度も通らない**。
+
+そこで `Accept-Language: ja` のcontextで開くspecを1本足し、
+日本語の文言そのもの（`公開に必要な項目が未入力です: …`）が描画されることを固定した。
+英語にも一致する正規表現にはしていない —— そうすると `supportedLanguages` を落としても
+緑のままになり、このテストの意味が消えるため。
+
+Aの副作用として、admin言語が `ja` になると Payload の「公開時の内容に戻す」が
+「変更内容を公開」と同じく `公開` を含み、文言ベースのlocatorがどう書いても壊れる。
+componentに `PUBLISH_BUTTON_ID` を振り、e2eはidで掴むようにした。
+
+### 読み直して問題が無かったもの（記録）
+
+- `useDocumentInfo()` は `setHasPublishedDoc` / `setUnpublishedVersionCount` /
+  `setMostRecentVersionIsAutosaved` / `incrementVersionCount` を実際に公開している（silent no-opではない）
+- `disableSuccessStatus` は正しいoption名（`disableToast` はその内部別名）。draft保存で成功toastは出ない
+- draft保存が失敗したとき Payload は必ずerror toastを出して `undefined` を返す。
+  componentが黙って早期returnするのは正しい（二重に出さない）
+- `stableId` は `immutableStableId` で更新不可なので、`findByID({ draft: true })` で
+  draft側のstableIdを拾う心配は無い
+- 公開後の main row に公開意図tokenは残らない（NULLを実DBで確認）。
+  version側はdraft versionにのみ残る
+- `check:admin-import-map` は配線を1つ外すと実際に赤くなる
+
+### 反省
+
+この作業では subagent-driven-development のループ（実装 → タスクレビュー → 修正ラウンド）を
+回さず、自分で書いて自分で緑を確認しただけだった。上の A・B・C と誤記録は、
+いずれも**独立したレビュー役がいれば実装直後に出ていた**種類のもの。

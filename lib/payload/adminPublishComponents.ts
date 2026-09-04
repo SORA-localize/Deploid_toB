@@ -20,6 +20,15 @@ import type { CollectionConfig } from 'payload';
  * `importMap.js` のキーと一致させる文字列。**ここを変えたら importMap を再生成すること。**
  * ズレると importMap 参照が外れ、やはり標準ボタンへ静かに戻る。
  */
+/**
+ * 公開ボタンのDOM id。**componentではなくここに置く。**
+ * e2e（`tests/e2e/payload-admin-publish.spec.ts`）がこの定数を参照するが、component側から
+ * importすると `@payloadcms/ui` 経由で `.css` を読み込もうとしてPlaywrightのloaderが落ちる
+ * （実測: `Unknown file extension ".css"` でspecが1件も収集されなくなる）。
+ * このmoduleは型importしか持たないので、テストから安全に読める。
+ */
+export const PUBLISH_BUTTON_ID = 'action-publish-from-approval';
+
 export const PUBLISH_BUTTON_COMPONENT_PATH =
   '@/components/admin/PublishFromApproval#PublishFromApproval';
 

@@ -3,8 +3,10 @@ export interface AdminImportMapSources {
   componentsModule: string;
   /** `src/app/(payload)/admin/importMap.js` の中身。 */
   importMap: string;
-  /** collectionファイルの相対パス → 中身。 */
-  collections: Record<string, string>;
+  /** `lib/payload/publishApprovedVersion.ts` の中身（`ApprovableCollectionSlug` の正本）。 */
+  approvableSource: string;
+  /** collectionファイルの相対パス → 中身（読めなければ null）。 */
+  collections: Record<string, string | null>;
 }
 
 export interface AdminImportMapViolation {
@@ -12,7 +14,14 @@ export interface AdminImportMapViolation {
   problem: string;
 }
 
-export const PUBLISHABLE_COLLECTION_FILES: string[];
+export interface PublishableCollectionFile {
+  slug: string;
+  path: string;
+}
+
+export function publishableCollectionFiles(
+  approvableSource: string,
+): PublishableCollectionFile[] | null;
 
 export function findAdminImportMapViolations(
   sources: AdminImportMapSources,

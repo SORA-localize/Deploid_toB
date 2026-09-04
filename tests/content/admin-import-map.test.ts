@@ -1,8 +1,9 @@
+import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 import {
-  PUBLISHABLE_COLLECTION_FILES,
   checkAdminImportMap,
   findAdminImportMapViolations,
+  publishableCollectionFiles,
 } from '../../scripts/check-admin-import-map.mjs';
 
 /**
@@ -16,7 +17,11 @@ import {
  * 検査が唯一の歯止めなので、**検査が本当に赤くなること**をここで固定する。
  */
 
+const APPROVABLE_SOURCE =
+  "export type ApprovableCollectionSlug = 'manufacturers' | 'robot-series' | 'articles';";
+
 const HEALTHY = {
+  approvableSource: APPROVABLE_SOURCE,
   componentsModule: [
     "export const PUBLISH_BUTTON_COMPONENT_PATH =",
     "  '@/components/admin/PublishFromApproval#PublishFromApproval';",
@@ -28,6 +33,10 @@ const HEALTHY = {
   collections: {
     'collections/Manufacturers.ts':
       "  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },",
+    'collections/RobotSeries.ts':
+      "  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },",
+    'collections/Articles.ts':
+      "  admin: { useAsTitle: 'title', components: contentPublishAdminComponents },",
   },
 };
 
@@ -39,7 +48,7 @@ describe('壊れ方を検出できること', () => {
   it('collectionが共有定数を渡していなければ、そのファイルを名指しで報告する', () => {
     const violations = findAdminImportMapViolations({
       ...HEALTHY,
-      collections: { 'collections/Articles.ts': "  admin: { useAsTitle: 'title' }," },
+      collections: { ...HEALTHY.collections, 'collections/Articles.ts': "  admin: { useAsTitle: 'title' }," },
     });
     expect(violations).toHaveLength(1);
     expect(violations[0]?.path).toBe('collections/Articles.ts');
@@ -80,12 +89,39 @@ describe('壊れ方を検出できること', () => {
   });
 });
 
+describe('対象collectionを型から導出すること', () => {
+  it('slugをcollectionファイル名へ写す（kebab-case → PascalCase）', () => {
+    expect(publishableCollectionFiles(APPROVABLE_SOURCE)).toEqual([
+      { slug: 'manufacturers', path: 'collections/Manufacturers.ts' },
+      { slug: 'robot-series', path: 'collections/RobotSeries.ts' },
+      { slug: 'articles', path: 'collections/Articles.ts' },
+    ]);
+  });
+
+  it('unionを読み取れなければ null を返す（0件で緑にしない）', () => {
+    // 読めないまま「対象0件」として先へ進むと、検査が常に緑になる最悪の壊れ方をする。
+    expect(publishableCollectionFiles('export type Something = string;')).toBeNull();
+    const violations = findAdminImportMapViolations({ ...HEALTHY, approvableSource: 'nope' });
+    expect(violations).toHaveLength(1);
+    expect(violations[0]?.path).toBe('lib/payload/publishApprovedVersion.ts');
+  });
+
+  it('unionにslugを足してcollectionを作り忘れたら報告する', () => {
+    const violations = findAdminImportMapViolations({
+      ...HEALTHY,
+      approvableSource: APPROVABLE_SOURCE.replace("'articles';", "'articles' | 'new-thing';"),
+    });
+    expect(violations).toHaveLength(1);
+    expect(violations[0]?.path).toBe('collections/NewThing.ts');
+  });
+});
+
 describe('実際のrepositoryに対して', () => {
-  it('公開できる7つのcollectionを対象にしている（article-placementsは除く）', () => {
-    // `article-placements` は `ApprovableCollectionSlug` の外で publish 経路自体が無い。
-    // 誤って足すと、押しても必ず失敗するボタンが出る。
-    expect(PUBLISHABLE_COLLECTION_FILES).toHaveLength(7);
-    expect(PUBLISHABLE_COLLECTION_FILES).not.toContain('collections/ArticlePlacements.ts');
+  it('ApprovableCollectionSlug から7件を導出でき、article-placementsは含まれない', async () => {
+    const source = await readFile('lib/payload/publishApprovedVersion.ts', 'utf8');
+    const files = publishableCollectionFiles(source);
+    expect(files).toHaveLength(7);
+    expect(files?.map((f) => f.path)).not.toContain('collections/ArticlePlacements.ts');
   });
 
   it('配線が今この時点で成立している', async () => {

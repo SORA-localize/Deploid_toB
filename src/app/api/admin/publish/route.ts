@@ -21,16 +21,26 @@ import { type AdminPublishErrorBody, mapPublishError } from '@/lib/payload/admin
 /**
  * `ApprovableCollectionSlug` の実行時allowlist。型だけでは任意のslugが素通りするため、
  * `payload.find({ collection })` へ渡す前にここで閉じる。
+ *
+ * **配列ではなく `Record` にしてある。** `readonly ApprovableCollectionSlug[]` は
+ * *部分集合*も受け付けるので、`ApprovableCollectionSlug` に新しいslugを足しても
+ * ここへ書き忘れたことを型が検出できない（実測: `'articles'` を消しても `typecheck` は通った）。
+ * その状態では、公開できるはずのcollectionが `unsupported-collection` で400になる。
+ * `satisfies Record<ApprovableCollectionSlug, true>` なら**1件でも欠けるとtypecheckが落ちる**。
  */
-const PUBLISHABLE_COLLECTIONS: readonly ApprovableCollectionSlug[] = [
-  'manufacturers',
-  'distributors',
-  'robot-series',
-  'robots',
-  'use-cases',
-  'deployments',
-  'articles',
-];
+const PUBLISHABLE_COLLECTIONS = {
+  manufacturers: true,
+  distributors: true,
+  'robot-series': true,
+  robots: true,
+  'use-cases': true,
+  deployments: true,
+  articles: true,
+} satisfies Record<ApprovableCollectionSlug, true>;
+
+function isPublishableCollection(value: unknown): value is ApprovableCollectionSlug {
+  return typeof value === 'string' && Object.hasOwn(PUBLISHABLE_COLLECTIONS, value);
+}
 
 /** body は `{ collection, id, publishIntentToken }` だけ。UUID + slug + id で十分収まる。 */
 const MAX_BODY_BYTES = 8 * 1024;
@@ -76,7 +86,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const collection = body.collection;
-  if (typeof collection !== 'string' || !PUBLISHABLE_COLLECTIONS.includes(collection as ApprovableCollectionSlug)) {
+  if (!isPublishableCollection(collection)) {
     return json(400, { ok: false, error: 'unsupported-collection' });
   }
   const id = body.id;
@@ -91,7 +101,7 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const result = await publishFromAdmin({
       payload,
-      collection: collection as ApprovableCollectionSlug,
+      collection,
       id,
       publishIntentToken,
       publisherUser: auth.user,

@@ -58,6 +58,7 @@
     "@payloadcms/plugin-mcp": "^3.87.1",
     "@payloadcms/richtext-lexical": "^3.87.1",
     "@payloadcms/storage-vercel-blob": "^3.87.1",
+    "@payloadcms/translations": "^3.87.1",
     "@payloadcms/ui": "^3.87.1",
     "@radix-ui/colors": "^3.0.0",
     "@vercel/analytics": "^2.0.1",
