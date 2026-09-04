@@ -999,10 +999,10 @@ export interface ArticlePlacement {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  surface?: 'reports-index' | null;
-  slot?: ('hero' | 'feature') | null;
-  articleId?: (number | null) | Article;
-  order?: number | null;
+  surface: 'reports-index';
+  slot: 'hero' | 'feature';
+  articleId: number | Article;
+  order: number;
   kind?: ('editorial' | 'sample' | 'sponsored' | 'house') | null;
   sponsor?: {
     name?: string | null;

@@ -110,15 +110,17 @@ export const ArticlePlacements: CollectionConfig = {
     {
       name: 'surface',
       type: 'select',
+      required: true,
       options: ['reports-index'],
     },
     {
       name: 'slot',
       type: 'select',
+      required: true,
       options: ['hero', 'feature'],
     },
-    { name: 'articleId', type: 'relationship', relationTo: 'articles' },
-    { name: 'order', type: 'number' },
+    { name: 'articleId', type: 'relationship', relationTo: 'articles', required: true },
+    { name: 'order', type: 'number', required: true },
     {
       name: 'kind',
       type: 'select',
