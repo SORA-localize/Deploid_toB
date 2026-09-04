@@ -67,11 +67,11 @@ export const Deployments: CollectionConfig = {
   fields: [
     ...baseContentFields(),
     ...baseRecordContentFields(),
-    { name: 'manufacturerId', type: 'relationship', relationTo: 'manufacturers' },
+    { name: 'manufacturerId', type: 'relationship', relationTo: 'manufacturers', required: true },
     { name: 'robotId', type: 'relationship', relationTo: 'robots' },
-    { name: 'customer', type: 'text' },
+    { name: 'customer', type: 'text', required: true },
     { name: 'siteName', type: 'text' },
-    { name: 'country', type: 'text' },
+    { name: 'country', type: 'text', required: true },
     {
       name: 'location',
       type: 'group',
@@ -83,6 +83,7 @@ export const Deployments: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
+      required: true,
       options: ['announced', 'pilot', 'production', 'ended', 'unknown'],
       // `enumName` は必須（Task 4で発見したTask 3のschema欠陥の修正）。
       // postgres adapterはenum型名を `enum_<table>_<field>` で決めるため、drafts機構の

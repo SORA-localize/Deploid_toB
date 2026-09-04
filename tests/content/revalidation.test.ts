@@ -26,6 +26,7 @@ import {
   REVALIDATE_SIGNATURE_HEADER,
 } from '../../lib/content/cacheTags';
 import { POST } from '../../src/app/api/revalidate-content/route';
+import { buildNotifyHeaders } from '../../lib/payload/revalidationHook';
 
 vi.mock('next/cache', () => ({ revalidateTag: vi.fn() }));
 
@@ -306,3 +307,43 @@ describe('publish → signed revalidate-content webhook → repository reflects 
     );
   });
 });
+
+/**
+ * 2026-09-04、admin公開UIの受け入れ確認がここで詰まった件の回帰テスト。
+ *
+ * 公開自体は成功しているのに、Preview のページがいつまでも古いままだった。原因は
+ * **Vercelの Deployment Protection が、サーバーが自分自身へ送る再検証POSTを弾いていた**こと。
+ * 実測した応答は我々のrouteの `{"error":"unauthorized"}` ではなく Vercel 自身の
+ * `{"error":{"message":"Protected deployment"},"protection":{"vercel_auth_enabled":true}}` だった。
+ *
+ * このhookはfail-openなので公開はブロックされず、**キャッシュだけが静かに古くなる**。
+ * 本番（`deploid.net`）は保護が無いので同じPOSTが我々のrouteへ届く（実測で確認済み）。
+ * つまりPreview限定の問題だが、その結果「公開がページに反映されることをPreviewで確認できない」
+ * という検証上の穴になっていた。
+ */
+describe('再検証POSTのheader', () => {
+  const ORIGINAL = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+  afterEach(() => {
+    if (ORIGINAL === undefined) delete process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+    else process.env.VERCEL_AUTOMATION_BYPASS_SECRET = ORIGINAL;
+  });
+
+  it('bypass secretが無ければ署名headerだけを送る（本番はこちら）', () => {
+    delete process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+    const headers = buildNotifyHeaders('sig-1');
+    expect(headers['content-type']).toBe('application/json');
+    expect(headers[REVALIDATE_SIGNATURE_HEADER]).toBe('sig-1');
+    expect(headers['x-vercel-protection-bypass']).toBeUndefined();
+  });
+
+  it('bypass secretがあればprotection bypass headerを添える（Preview）', () => {
+    process.env.VERCEL_AUTOMATION_BYPASS_SECRET = 'bypass-secret-value';
+    const headers = buildNotifyHeaders('sig-2');
+    expect(headers['x-vercel-protection-bypass']).toBe('bypass-secret-value');
+    // bypass用cookieを残さない。残すとこのserver間POSTの副作用が後続へ漏れる。
+    expect(headers['x-vercel-set-bypass-cookie']).toBe('false');
+    // 署名は依然として必須。bypassはあくまでVercelの前段を通すためのもので、
+    // routeの認可を置き換えるものではない。
+    expect(headers[REVALIDATE_SIGNATURE_HEADER]).toBe('sig-2');
+  });
+})

@@ -204,26 +204,24 @@ export interface Manufacturer {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     */
+    publishedAt?: string | null;
+    /**
+     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
    * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
    */
@@ -262,18 +260,18 @@ export interface Manufacturer {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  name?: string | null;
+  name: string;
   nameJa?: string | null;
-  companyType?: ('manufacturer' | 'distributor' | 'integrator' | 'ai-os' | 'research') | null;
+  companyType: 'manufacturer' | 'distributor' | 'integrator' | 'ai-os' | 'research';
   companyStatus?: ('active' | 'stealth' | 'acquired' | 'inactive') | null;
-  country?: string | null;
+  country: string;
   hqCity?: string | null;
   headquarters?: {
     lat?: number | null;
     lng?: number | null;
   };
   foundedYear?: number | null;
-  website?: string | null;
+  website: string;
   /**
    * ManufacturerLogos（symbol/wordmark/combined、それぞれImageAsset形）。
    */
@@ -287,8 +285,8 @@ export interface Manufacturer {
     | boolean
     | null;
   contactUrl?: string | null;
-  description?: string | null;
-  japanPresence?: ('office' | 'distributor' | 'partner' | 'remote' | 'none' | 'unknown') | null;
+  description: string;
+  japanPresence: 'office' | 'distributor' | 'partner' | 'remote' | 'none' | 'unknown';
   /**
    * 移行完了後に削除予定（data-architecture-redesign-v1.md §11: distributors collectionへ移す）。当面は表示互換のため残す。
    */
@@ -328,26 +326,24 @@ export interface Distributor {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     */
+    publishedAt?: string | null;
+    /**
+     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
    * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
    */
@@ -386,13 +382,13 @@ export interface Distributor {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  name?: string | null;
+  name: string;
   nameJa?: string | null;
   website?: string | null;
-  providerType?: ('maker-direct' | 'reseller' | 'other') | null;
-  handledManufacturerIds?: (number | Manufacturer)[] | null;
+  providerType: 'maker-direct' | 'reseller' | 'other';
+  handledManufacturerIds: (number | Manufacturer)[];
   handledRobotIds?: (number | Robot)[] | null;
-  acquisitionMethods?: ('purchase' | 'lease' | 'raas' | 'subscription' | 'inquiry')[] | null;
+  acquisitionMethods: ('purchase' | 'lease' | 'raas' | 'subscription' | 'inquiry')[];
   inquiryUrl?: string | null;
   note?: string | null;
   updatedAt: string;
@@ -413,26 +409,24 @@ export interface Robot {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     */
+    publishedAt?: string | null;
+    /**
+     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
    * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
    */
@@ -471,15 +465,15 @@ export interface Robot {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  name?: string | null;
+  name: string;
   nameJa?: string | null;
-  manufacturerId?: (number | null) | Manufacturer;
+  manufacturerId: number | Manufacturer;
   seriesId?: (number | null) | RobotSery;
-  category?: ('humanoid' | 'general-purpose-robot' | 'upper-body-humanoid' | 'mobile-manipulator' | 'other') | null;
+  category: 'humanoid' | 'general-purpose-robot' | 'upper-body-humanoid' | 'mobile-manipulator' | 'other';
   description?: string | null;
   featuredRank?: number | null;
-  deploymentStage?:
-    ('concept' | 'prototype' | 'pilot' | 'limited-production' | 'production' | 'internal-use' | 'discontinued') | null;
+  deploymentStage:
+    'concept' | 'prototype' | 'pilot' | 'limited-production' | 'production' | 'internal-use' | 'discontinued';
   supersededById?: (number | null) | Robot;
   /**
    * RobotSpecs。項目定義（単位・ラベル・グループ）の正本は lib/specSchema.ts。
@@ -532,8 +526,8 @@ export interface Robot {
     | boolean
     | null;
   usageExampleSourceUrls?: string[] | null;
-  japanAvailability?:
-    ('official-japan' | 'distributor-japan' | 'inquiry-required' | 'import-only' | 'unavailable' | 'unknown') | null;
+  japanAvailability:
+    'official-japan' | 'distributor-japan' | 'inquiry-required' | 'import-only' | 'unavailable' | 'unknown';
   distributorJapan?: string | null;
   supportNote?: string | null;
   /**
@@ -577,26 +571,24 @@ export interface RobotSery {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     */
+    publishedAt?: string | null;
+    /**
+     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
    * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
    */
@@ -635,9 +627,9 @@ export interface RobotSery {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  name?: string | null;
+  name: string;
   nameJa?: string | null;
-  manufacturerId?: (number | null) | Manufacturer;
+  manufacturerId: number | Manufacturer;
   description?: string | null;
   /**
    * Partial<Record<ImageRole, ImageAsset>>。
@@ -671,26 +663,24 @@ export interface UseCase {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     */
+    publishedAt?: string | null;
+    /**
+     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
    * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
    */
@@ -729,19 +719,19 @@ export interface UseCase {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  title?: string | null;
+  title: string;
   titleJa?: string | null;
   subtitle?: string | null;
-  maturityLevel?: ('early-stage' | 'pilot-phase' | 'production-ready') | null;
+  maturityLevel: 'early-stage' | 'pilot-phase' | 'production-ready';
   /**
    * Robotsからは削除済み（DEC-S05）。UseCaseには残す。
    */
   buyerReadiness?: ('initial-adoption' | 'requires-poc' | 'limited-today') | null;
-  environment?: ('indoor-controlled' | 'indoor-semi-controlled' | 'outdoor' | 'mixed' | 'hazardous') | null;
-  requiredCapabilities?:
-    | ('mobility' | 'manipulation' | 'perception' | 'autonomy' | 'communication' | 'data-capture' | 'integration')[]
-    | null;
-  primaryIndustry?: string | null;
+  environment: 'indoor-controlled' | 'indoor-semi-controlled' | 'outdoor' | 'mixed' | 'hazardous';
+  requiredCapabilities: (
+    'mobility' | 'manipulation' | 'perception' | 'autonomy' | 'communication' | 'data-capture' | 'integration'
+  )[];
+  primaryIndustry: string;
   industryTags?: string[] | null;
   taskTags?: string[] | null;
   atAGlance?: {
@@ -749,8 +739,8 @@ export interface UseCase {
     whereDoesNotFit?: string | null;
     mustBeTrue?: string | null;
   };
-  overview?: string | null;
-  whyItMatters?: string | null;
+  overview: string;
+  whyItMatters: string;
   capabilityNotes?: {
     mobility?: string | null;
     manipulation?: string | null;
@@ -801,26 +791,24 @@ export interface Deployment {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     */
+    publishedAt?: string | null;
+    /**
+     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
    * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
    */
@@ -859,16 +847,16 @@ export interface Deployment {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  manufacturerId?: (number | null) | Manufacturer;
+  manufacturerId: number | Manufacturer;
   robotId?: (number | null) | Robot;
-  customer?: string | null;
+  customer: string;
   siteName?: string | null;
-  country?: string | null;
+  country: string;
   location: {
     lat: number;
     lng: number;
   };
-  status?: ('announced' | 'pilot' | 'production' | 'ended' | 'unknown') | null;
+  status: 'announced' | 'pilot' | 'production' | 'ended' | 'unknown';
   startedAt?: string | null;
   relatedUseCaseIds?: (number | UseCase)[] | null;
   updatedAt: string;
@@ -889,26 +877,24 @@ export interface Article {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     */
+    publishedAt?: string | null;
+    /**
+     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
    * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
    */
@@ -947,36 +933,33 @@ export interface Article {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  title?: string | null;
+  title: string;
   titleJa?: string | null;
-  category?: ('news' | 'interview' | 'company-report' | 'analysis' | 'policy') | null;
-  type?:
-    | (
-        | 'analysis'
-        | 'deployment-report'
-        | 'interview'
-        | 'event-report'
-        | 'policy-update'
-        | 'case-study'
-        | 'news-brief'
-        | 'tech-update'
-        | 'market-analysis'
-        | 'manufacturer-guide'
-        | 'robot-guide'
-        | 'basics-guide'
-      )
-    | null;
-  section?: ('digest' | 'deployment' | 'business' | 'tech' | 'policy' | 'entertainment') | null;
+  category: 'news' | 'interview' | 'company-report' | 'analysis' | 'policy';
+  type:
+    | 'analysis'
+    | 'deployment-report'
+    | 'interview'
+    | 'event-report'
+    | 'policy-update'
+    | 'case-study'
+    | 'news-brief'
+    | 'tech-update'
+    | 'market-analysis'
+    | 'manufacturer-guide'
+    | 'robot-guide'
+    | 'basics-guide';
+  section: 'digest' | 'deployment' | 'business' | 'tech' | 'policy' | 'entertainment';
   contentKind?: ('editorial' | 'sample' | 'sponsored') | null;
   /**
    * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
    */
-  publishedAt?: string | null;
+  publishedAt: string;
   author?: string | null;
   industryTags?: string[] | null;
   regionTags?: string[] | null;
   themeTags?: string[] | null;
-  whyItMatters?: string | null;
+  whyItMatters: string;
   keyTakeaways?: string[] | null;
   featured?: boolean | null;
   relatedRobotIds?: (number | Robot)[] | null;

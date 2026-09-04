@@ -258,6 +258,7 @@ export function sourcesField(): Field {
   return {
     name: 'sources',
     type: 'array',
+    required: true,
     fields: [
       { name: 'title', type: 'text', required: true },
       { name: 'url', type: 'text', required: true },
@@ -358,7 +359,7 @@ export function seoField(): Field {
  */
 export function baseRecordContentFields(): Field[] {
   return [
-    { name: 'summary', type: 'textarea' },
+    { name: 'summary', type: 'textarea', required: true },
     {
       name: 'reliability',
       type: 'select',

@@ -45,13 +45,17 @@ export const Robots: CollectionConfig = {
   fields: [
     ...baseContentFields(),
     ...baseRecordContentFields(),
-    { name: 'name', type: 'text' },
+    { name: 'name', type: 'text', required: true },
     { name: 'nameJa', type: 'text' },
     {
       name: 'manufacturerId',
       type: 'relationship',
+      // `validateRobotForPublish` が公開時に必須としている。元の定義は relationship 一律で
+      // `required: false` を明示していたが（`seriesId` / `supersededById` と同じ書き方）、
+      // それだと編集画面に必須の印が出ず、公開して初めて不足を知らされる。
+      // 下書き保存は `versions.drafts.validate: false` により検証を飛ばすので影響しない。
+      required: true,
       relationTo: 'manufacturers',
-      required: false,
     },
     {
       name: 'seriesId',
@@ -62,6 +66,7 @@ export const Robots: CollectionConfig = {
     {
       name: 'category',
       type: 'select',
+      required: true,
       options: ['humanoid', 'general-purpose-robot', 'upper-body-humanoid', 'mobile-manipulator', 'other'],
     },
     { name: 'description', type: 'textarea' },
@@ -69,6 +74,7 @@ export const Robots: CollectionConfig = {
     {
       name: 'deploymentStage',
       type: 'select',
+      required: true,
       options: ['concept', 'prototype', 'pilot', 'limited-production', 'production', 'internal-use', 'discontinued'],
     },
     {
@@ -133,6 +139,7 @@ export const Robots: CollectionConfig = {
     {
       name: 'japanAvailability',
       type: 'select',
+      required: true,
       options: ['official-japan', 'distributor-japan', 'inquiry-required', 'import-only', 'unavailable', 'unknown'],
     },
     { name: 'distributorJapan', type: 'text' },

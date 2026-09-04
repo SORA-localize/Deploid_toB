@@ -65,11 +65,12 @@ export const RobotSeriesCollection: CollectionConfig = {
   fields: [
     ...baseContentFields(),
     ...baseRecordContentFields(),
-    { name: 'name', type: 'text' },
+    { name: 'name', type: 'text', required: true },
     { name: 'nameJa', type: 'text' },
     {
       name: 'manufacturerId',
       type: 'relationship',
+      required: true,
       relationTo: 'manufacturers',
     },
     { name: 'description', type: 'textarea' },

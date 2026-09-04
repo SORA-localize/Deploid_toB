@@ -37,11 +37,12 @@ export const Manufacturers: CollectionConfig = {
   fields: [
     ...baseContentFields(),
     ...baseRecordContentFields(),
-    { name: 'name', type: 'text' },
+    { name: 'name', type: 'text', required: true },
     { name: 'nameJa', type: 'text' },
     {
       name: 'companyType',
       type: 'select',
+      required: true,
       options: ['manufacturer', 'distributor', 'integrator', 'ai-os', 'research'],
     },
     {
@@ -50,7 +51,7 @@ export const Manufacturers: CollectionConfig = {
       defaultValue: 'active',
       options: ['active', 'stealth', 'acquired', 'inactive'],
     },
-    { name: 'country', type: 'text' },
+    { name: 'country', type: 'text', required: true },
     { name: 'hqCity', type: 'text' },
     {
       name: 'headquarters',
@@ -61,17 +62,18 @@ export const Manufacturers: CollectionConfig = {
       ],
     },
     { name: 'foundedYear', type: 'number' },
-    { name: 'website', type: 'text' },
+    { name: 'website', type: 'text', required: true },
     {
       name: 'logos',
       type: 'json',
       admin: { description: 'ManufacturerLogos（symbol/wordmark/combined、それぞれImageAsset形）。' },
     },
     { name: 'contactUrl', type: 'text' },
-    { name: 'description', type: 'textarea' },
+    { name: 'description', type: 'textarea', required: true },
     {
       name: 'japanPresence',
       type: 'select',
+      required: true,
       options: ['office', 'distributor', 'partner', 'remote', 'none', 'unknown'],
     },
     {

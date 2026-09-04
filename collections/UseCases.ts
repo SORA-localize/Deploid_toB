@@ -72,12 +72,13 @@ export const UseCases: CollectionConfig = {
   fields: [
     ...baseContentFields(),
     ...baseRecordContentFields(),
-    { name: 'title', type: 'text' },
+    { name: 'title', type: 'text', required: true },
     { name: 'titleJa', type: 'text' },
     { name: 'subtitle', type: 'text' },
     {
       name: 'maturityLevel',
       type: 'select',
+      required: true,
       options: ['early-stage', 'pilot-phase', 'production-ready'],
     },
     {
@@ -89,15 +90,17 @@ export const UseCases: CollectionConfig = {
     {
       name: 'environment',
       type: 'select',
+      required: true,
       options: ['indoor-controlled', 'indoor-semi-controlled', 'outdoor', 'mixed', 'hazardous'],
     },
     {
       name: 'requiredCapabilities',
       type: 'select',
+      required: true,
       hasMany: true,
       options: ['mobility', 'manipulation', 'perception', 'autonomy', 'communication', 'data-capture', 'integration'],
     },
-    { name: 'primaryIndustry', type: 'text' },
+    { name: 'primaryIndustry', type: 'text', required: true },
     { name: 'industryTags', type: 'text', hasMany: true },
     { name: 'taskTags', type: 'text', hasMany: true },
     {
@@ -109,8 +112,8 @@ export const UseCases: CollectionConfig = {
         { name: 'mustBeTrue', type: 'textarea' },
       ],
     },
-    { name: 'overview', type: 'textarea' },
-    { name: 'whyItMatters', type: 'textarea' },
+    { name: 'overview', type: 'textarea', required: true },
+    { name: 'whyItMatters', type: 'textarea', required: true },
     {
       name: 'capabilityNotes',
       type: 'group',

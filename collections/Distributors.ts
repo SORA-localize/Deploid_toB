@@ -63,17 +63,19 @@ export const Distributors: CollectionConfig = {
   fields: [
     ...baseContentFields(),
     ...baseRecordContentFields(),
-    { name: 'name', type: 'text' },
+    { name: 'name', type: 'text', required: true },
     { name: 'nameJa', type: 'text' },
     { name: 'website', type: 'text' },
     {
       name: 'providerType',
       type: 'select',
+      required: true,
       options: ['maker-direct', 'reseller', 'other'],
     },
     {
       name: 'handledManufacturerIds',
       type: 'relationship',
+      required: true,
       relationTo: 'manufacturers',
       hasMany: true,
     },
@@ -86,6 +88,7 @@ export const Distributors: CollectionConfig = {
     {
       name: 'acquisitionMethods',
       type: 'select',
+      required: true,
       hasMany: true,
       options: ['purchase', 'lease', 'raas', 'subscription', 'inquiry'],
     },

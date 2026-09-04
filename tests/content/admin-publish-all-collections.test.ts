@@ -99,6 +99,16 @@ beforeAll(async () => {
   });
   publisher = p.user as never;
 
+  // 先に空にしてから復元する。前のsuiteが残したcontentの上に重ねると
+  // `article-placement-order-conflict`（placementのorder一意制約）で beforeAll ごと落ち、
+  // このsuite全体が静かにskipされる（実測）。FKの向きに合わせて子から消す。
+  for (const slug of [
+    'article-placements', 'articles', 'deployments', 'use-cases',
+    'robots', 'robot-series', 'distributors', 'manufacturers',
+  ] as const) {
+    await payload.delete({ collection: slug, where: {}, overrideAccess: true });
+  }
+
   await restoreContentSnapshot({
     payload,
     snapshot: contentSnapshotFixture,

@@ -94,16 +94,18 @@ export const Articles: CollectionConfig = {
   fields: [
     ...baseContentFields(),
     ...baseRecordContentFields(),
-    { name: 'title', type: 'text' },
+    { name: 'title', type: 'text', required: true },
     { name: 'titleJa', type: 'text' },
     {
       name: 'category',
       type: 'select',
+      required: true,
       options: ['news', 'interview', 'company-report', 'analysis', 'policy'],
     },
     {
       name: 'type',
       type: 'select',
+      required: true,
       options: [
         'analysis',
         'deployment-report',
@@ -122,6 +124,7 @@ export const Articles: CollectionConfig = {
     {
       name: 'section',
       type: 'select',
+      required: true,
       options: ['digest', 'deployment', 'business', 'tech', 'policy', 'entertainment'],
     },
     {
@@ -129,12 +132,12 @@ export const Articles: CollectionConfig = {
       type: 'select',
       options: ['editorial', 'sample', 'sponsored'],
     },
-    { name: 'publishedAt', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
+    { name: 'publishedAt', type: 'text', required: true, admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
     { name: 'author', type: 'text' },
     { name: 'industryTags', type: 'text', hasMany: true },
     { name: 'regionTags', type: 'text', hasMany: true },
     { name: 'themeTags', type: 'text', hasMany: true },
-    { name: 'whyItMatters', type: 'textarea' },
+    { name: 'whyItMatters', type: 'textarea', required: true },
     { name: 'keyTakeaways', type: 'text', hasMany: true },
     { name: 'featured', type: 'checkbox' },
     {

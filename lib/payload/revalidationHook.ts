@@ -21,6 +21,40 @@ import { resolvePublicServerUrl } from './resolvePublicServerUrl';
 
 const NOTIFY_TIMEOUT_MS = 5000;
 
+/**
+ * この通知は**サーバーが自分自身のpublic URLへ送るHTTPリクエスト**なので、
+ * Vercelの Deployment Protection がかかっている環境では route へ届かない。
+ *
+ * 2026-09-04にPreviewで実測した応答（我々のrouteの `{"error":"unauthorized"}` ではなく
+ * **Vercelが返している**ことに注意）:
+ *
+ * ```
+ * {"error":{"message":"Protected deployment","code":"401"},
+ *  "protection":{"vercel_auth_enabled":true, ...}}
+ * ```
+ *
+ * このhookはfail-openなので公開自体は成功し、**キャッシュだけが古いまま残る**。
+ * 本番（`deploid.net`）は保護が無く同じPOSTが我々のrouteへ届くので、この問題は
+ * **Preview限定**だが、その結果「公開がページへ反映されることをPreviewで確認できない」
+ * という検証上の穴になる。実際、admin公開UIの受け入れ確認がここで詰まった。
+ *
+ * `VERCEL_AUTOMATION_BYPASS_SECRET` はProtection Bypass for Automationを有効にすると
+ * Vercelが自動注入するsystem env。保護が無い本番では未設定なのでheaderは付かず、無害。
+ * `x-vercel-set-bypass-cookie: false` を併せて送り、bypass用cookieを残さない。
+ */
+export function buildNotifyHeaders(signature: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    'content-type': 'application/json',
+    [REVALIDATE_SIGNATURE_HEADER]: signature,
+  };
+  const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+  if (bypass) {
+    headers['x-vercel-protection-bypass'] = bypass;
+    headers['x-vercel-set-bypass-cookie'] = 'false';
+  }
+  return headers;
+}
+
 async function notifyRevalidation(collectionSlug: RevalidatableCollectionSlug, req: PayloadRequest): Promise<void> {
   const secret = process.env.REVALIDATION_SECRET;
   if (!secret) {
@@ -39,7 +73,7 @@ async function notifyRevalidation(collectionSlug: RevalidatableCollectionSlug, r
   try {
     const response = await fetch(new URL('/api/revalidate-content', baseUrl), {
       method: 'POST',
-      headers: { 'content-type': 'application/json', [REVALIDATE_SIGNATURE_HEADER]: signature },
+      headers: buildNotifyHeaders(signature),
       body,
       signal: AbortSignal.timeout(NOTIFY_TIMEOUT_MS),
     });
