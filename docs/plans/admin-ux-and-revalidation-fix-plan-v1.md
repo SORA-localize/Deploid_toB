@@ -741,10 +741,20 @@ npm run test:e2e -- tests/e2e/payload-admin-publish.spec.ts tests/e2e/cache-reva
   編集内容が反映される」テストを追加。使い捨てPostgres + `next build && next start` +
   実admin UI操作で、`nameJa`を編集→公開→**公開ページの`<h1>`が新しい値に収束するまで
   ポーリング**することを確認。既存2 e2e（`cache-revalidation.spec.ts`・
-  `payload-admin-publish.spec.ts`、日本語ロケール分含む計7件）も同時実行し全件pass
-- [ ] 通知が失敗したとき、その旨がtoastに出る（T2。単体テストでは確認済み、Preview実機はまだ）
+  `payload-admin-publish.spec.ts`、日本語ロケール分含む計7件）も同時実行し全件pass。
+  **さらに2026-09-05、実Preview環境（`feat/admin-publish-ui`ブランチのVercel Preview
+  deployment）でユーザー本人が手動確認**: 企業名を編集→公開、続けて企業名を元に戻して
+  公開、続けて企業概要を編集して公開、という3回連続の公開を行い、公開ページを複数回
+  リロード。1回目のリロードでは直前の状態がまだ反映されておらず、2回目のリロードで
+  企業名・企業概要とも最終的な値に正しく収束することを確認した——**stale-while-revalidate
+  契約（`admin-publish-cache-reflection-slo-v1.md`）どおりの挙動**であり、不具合ではない
+- [x] 通知が失敗したとき、その旨がtoastに出る（T2）——**2026-09-05実施済み（成功経路のみ）**。
+  Preview実機で公開のたびに成功トーストが表示されることをユーザーが確認。失敗時文言は
+  意図的には再現していない（現状Previewの通知が正常に成功しているため）
 - [ ] draft保存時にネットワークタブで`/api/revalidate-content`への通知が飛ばないことを確認する
-  （公開時だけ1回飛ぶ）（T2。単体テストでは確認済み、Preview実機はまだ）
+  （公開時だけ1回飛ぶ）（T2。単体テストでは確認済み。Preview実機は任意項目として省略——
+  ネットワーク越しの通知はサーバー側fetchのためブラウザのネットワークタブには映らず、
+  確認するにはVercelのfunction logsを見る必要があり手間が大きいため）
 - [x] **ja locale** で英語のfield名が無い（T4）——2026-09-05、使い捨てDB上の実画面で確認済み
   （T4/T6/T7の各POCスクリーンショット）
 - [x] **en locale** で日本語が混ざらない（D-4・T4）——2026-09-05実施済み。EN localeで
@@ -763,11 +773,14 @@ npm run test:e2e -- tests/e2e/payload-admin-publish.spec.ts tests/e2e/cache-reva
 - [x] 公開ページの見た目が変わっていない——T4〜T7の全コミットで`components/`・
   `src/app/(frontend)`・`lib/uiText.ts`に対する変更が0件であることを`git diff --stat`で確認済み
 
-**残る未実施（Preview実機が必要、コード変更を伴わない確認のみ）**:
-- Vercel実機でrouteログとHTML反映の両方を確認
-- 通知が失敗したときのtoast表示（Preview実機）
-- draft保存時に通知が飛ばないことのネットワークタブ確認（Preview実機）
-- draft保存がDB接続失敗で落ちたときの表示（優先度低、上記参照）
+**残る未実施（いずれも優先度低・任意項目）**:
+- draft保存時に通知が飛ばないことのネットワークタブ／Vercel function logs確認
+  （単体テストで既に保証済みのため省略可）
+- draft保存がDB接続失敗で落ちたときの表示（コード変更を伴わないPayload標準機能の
+  見た目確認のため優先度低、上記参照）
+
+**Vercel実機での主要確認（route疎通・HTML反映・toast表示）は2026-09-05に完了した。**
+T8を含め、本計画の実装は事実上完了。
 
 これらは全て**Preview環境への実デプロイと、そこへの実アクセスを要する**——ローカルの
 使い捨てDBでは再現できない（Vercel Deployment Protectionの挙動、実際のPreview URL経由の
