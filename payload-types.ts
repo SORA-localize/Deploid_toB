@@ -196,34 +196,35 @@ export interface Admin {
  */
 export interface Manufacturer {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
-  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  featuredRank?: number | null;
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
+  name: string;
+  nameJa?: string | null;
+  summary: string;
+  description: string;
+  country: string;
+  hqCity?: string | null;
+  headquarters?: {
+    lat?: number | null;
+    lng?: number | null;
+  };
+  foundedYear?: number | null;
+  companyType: 'manufacturer' | 'distributor' | 'integrator' | 'ai-os' | 'research';
+  companyStatus?: ('active' | 'stealth' | 'acquired' | 'inactive') | null;
+  japanPresence: 'office' | 'distributor' | 'partner' | 'remote' | 'none' | 'unknown';
+  website: string;
+  contactUrl?: string | null;
   heroImage?: {
     src?: string | null;
     alt?: string | null;
@@ -244,7 +245,7 @@ export interface Manufacturer {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -253,25 +254,8 @@ export interface Manufacturer {
     };
     aspectRatio?: number | null;
   };
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    noindex?: boolean | null;
-  };
-  name?: string | null;
-  nameJa?: string | null;
-  companyType?: ('manufacturer' | 'distributor' | 'integrator' | 'ai-os' | 'research') | null;
-  companyStatus?: ('active' | 'stealth' | 'acquired' | 'inactive') | null;
-  country?: string | null;
-  hqCity?: string | null;
-  headquarters?: {
-    lat?: number | null;
-    lng?: number | null;
-  };
-  foundedYear?: number | null;
-  website?: string | null;
   /**
-   * ManufacturerLogos（symbol/wordmark/combined、それぞれImageAsset形）。
+   * Logo images (symbol / wordmark / combined variants, each optional). Shown at the top of the manufacturer detail page.
    */
   logos?:
     | {
@@ -282,11 +266,30 @@ export interface Manufacturer {
     | number
     | boolean
     | null;
-  contactUrl?: string | null;
-  description?: string | null;
-  japanPresence?: ('office' | 'distributor' | 'partner' | 'remote' | 'none' | 'unknown') | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
+     */
+    publishedAt?: string | null;
+    /**
+     * The date this source was last checked. Shown on the public source list as "Checked …".
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    noindex?: boolean | null;
+  };
   /**
-   * 移行完了後に削除予定（data-architecture-redesign-v1.md §11: distributors collectionへ移す）。当面は表示互換のため残す。
+   * Domestic distributors. Shown in the "Domestic distributors" section of the manufacturer detail page.
    */
   domesticDistributors?:
     | {
@@ -294,7 +297,7 @@ export interface Manufacturer {
         website?: string | null;
         sourceUrl?: string | null;
         /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+         * The date this distributor listing was last checked. Not shown publicly — kept for internal reference.
          */
         checkedAt?: string | null;
         note?: string | null;
@@ -305,7 +308,6 @@ export interface Manufacturer {
   supportNote?: string | null;
   procurementNote?: string | null;
   vendorRiskNote?: string | null;
-  featuredRank?: number | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -316,32 +318,34 @@ export interface Manufacturer {
  */
 export interface Distributor {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
+     */
+    publishedAt?: string | null;
+    /**
+     * The date this source was last checked. Shown on the public source list as "Checked …".
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -364,7 +368,7 @@ export interface Distributor {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -378,13 +382,13 @@ export interface Distributor {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  name?: string | null;
+  name: string;
   nameJa?: string | null;
   website?: string | null;
-  providerType?: ('maker-direct' | 'reseller' | 'other') | null;
-  handledManufacturerIds?: (number | Manufacturer)[] | null;
+  providerType: 'maker-direct' | 'reseller' | 'other';
+  handledManufacturerIds: (number | Manufacturer)[];
   handledRobotIds?: (number | Robot)[] | null;
-  acquisitionMethods?: ('purchase' | 'lease' | 'raas' | 'subscription' | 'inquiry')[] | null;
+  acquisitionMethods: ('purchase' | 'lease' | 'raas' | 'subscription' | 'inquiry')[];
   inquiryUrl?: string | null;
   note?: string | null;
   updatedAt: string;
@@ -397,32 +401,34 @@ export interface Distributor {
  */
 export interface Robot {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
+     */
+    publishedAt?: string | null;
+    /**
+     * The date this source was last checked. Shown on the public source list as "Checked …".
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -445,7 +451,7 @@ export interface Robot {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -459,18 +465,18 @@ export interface Robot {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  name?: string | null;
+  name: string;
   nameJa?: string | null;
-  manufacturerId?: (number | null) | Manufacturer;
+  manufacturerId: number | Manufacturer;
   seriesId?: (number | null) | RobotSery;
-  category?: ('humanoid' | 'general-purpose-robot' | 'upper-body-humanoid' | 'mobile-manipulator' | 'other') | null;
+  category: 'humanoid' | 'general-purpose-robot' | 'upper-body-humanoid' | 'mobile-manipulator' | 'other';
   description?: string | null;
   featuredRank?: number | null;
-  deploymentStage?:
-    ('concept' | 'prototype' | 'pilot' | 'limited-production' | 'production' | 'internal-use' | 'discontinued') | null;
+  deploymentStage:
+    'concept' | 'prototype' | 'pilot' | 'limited-production' | 'production' | 'internal-use' | 'discontinued';
   supersededById?: (number | null) | Robot;
   /**
-   * RobotSpecs。項目定義（単位・ラベル・グループ）の正本は lib/specSchema.ts。
+   * Spec values, keyed by item name. Shown in the "Specifications" sections of the robot detail page.
    */
   specs?:
     | {
@@ -508,7 +514,7 @@ export interface Robot {
       }[]
     | null;
   /**
-   * RobotFieldEvidence。specSchemaのkey / priceOffers / loadRatings → sourceUrl[]。
+   * Source URLs backing each spec value. Shown as the citation links attached to each spec row on the robot detail page.
    */
   fieldEvidence?:
     | {
@@ -520,12 +526,12 @@ export interface Robot {
     | boolean
     | null;
   usageExampleSourceUrls?: string[] | null;
-  japanAvailability?:
-    ('official-japan' | 'distributor-japan' | 'inquiry-required' | 'import-only' | 'unavailable' | 'unknown') | null;
+  japanAvailability:
+    'official-japan' | 'distributor-japan' | 'inquiry-required' | 'import-only' | 'unavailable' | 'unknown';
   distributorJapan?: string | null;
   supportNote?: string | null;
   /**
-   * Partial<Record<ImageRole, ImageAsset>>。
+   * Images by role (all optional). Shown in the image gallery on the robot detail page.
    */
   images?:
     | {
@@ -539,7 +545,7 @@ export interface Robot {
   industryTags?: string[] | null;
   taskTags?: string[] | null;
   /**
-   * @deprecated。/compare の作り替えが決まるまで維持する（削除しない）。
+   * Comparison info (strengths / constraints / fit). Shown on the /compare page, not the robot detail page. Scheduled for a future rework, but should still be filled in for now.
    */
   comparison?: {
     strengths?: string[] | null;
@@ -557,32 +563,34 @@ export interface Robot {
  */
 export interface RobotSery {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
+     */
+    publishedAt?: string | null;
+    /**
+     * The date this source was last checked. Shown on the public source list as "Checked …".
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -605,7 +613,7 @@ export interface RobotSery {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -619,12 +627,12 @@ export interface RobotSery {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  name?: string | null;
+  name: string;
   nameJa?: string | null;
-  manufacturerId?: (number | null) | Manufacturer;
+  manufacturerId: number | Manufacturer;
   description?: string | null;
   /**
-   * Partial<Record<ImageRole, ImageAsset>>。
+   * Images by role (all optional). Not shown on any public page yet — there is currently no dedicated page for a robot series on its own.
    */
   images?:
     | {
@@ -647,32 +655,34 @@ export interface RobotSery {
  */
 export interface UseCase {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
+     */
+    publishedAt?: string | null;
+    /**
+     * The date this source was last checked. Shown on the public source list as "Checked …".
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -695,7 +705,7 @@ export interface UseCase {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -709,19 +719,19 @@ export interface UseCase {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  title?: string | null;
+  title: string;
   titleJa?: string | null;
   subtitle?: string | null;
-  maturityLevel?: ('early-stage' | 'pilot-phase' | 'production-ready') | null;
+  maturityLevel: 'early-stage' | 'pilot-phase' | 'production-ready';
   /**
-   * Robotsからは削除済み（DEC-S05）。UseCaseには残す。
+   * Buyer readiness. Not currently shown anywhere on the public site — used for internal classification only.
    */
   buyerReadiness?: ('initial-adoption' | 'requires-poc' | 'limited-today') | null;
-  environment?: ('indoor-controlled' | 'indoor-semi-controlled' | 'outdoor' | 'mixed' | 'hazardous') | null;
-  requiredCapabilities?:
-    | ('mobility' | 'manipulation' | 'perception' | 'autonomy' | 'communication' | 'data-capture' | 'integration')[]
-    | null;
-  primaryIndustry?: string | null;
+  environment: 'indoor-controlled' | 'indoor-semi-controlled' | 'outdoor' | 'mixed' | 'hazardous';
+  requiredCapabilities: (
+    'mobility' | 'manipulation' | 'perception' | 'autonomy' | 'communication' | 'data-capture' | 'integration'
+  )[];
+  primaryIndustry: string;
   industryTags?: string[] | null;
   taskTags?: string[] | null;
   atAGlance?: {
@@ -729,8 +739,8 @@ export interface UseCase {
     whereDoesNotFit?: string | null;
     mustBeTrue?: string | null;
   };
-  overview?: string | null;
-  whyItMatters?: string | null;
+  overview: string;
+  whyItMatters: string;
   capabilityNotes?: {
     mobility?: string | null;
     manipulation?: string | null;
@@ -743,7 +753,7 @@ export interface UseCase {
   whyHardToday?: string | null;
   japanDeploymentConditions?: string | null;
   /**
-   * `robotId` または `seriesId` のどちらか一方だけを持つ（DEC-S08）。両方入力しても保存を止めない（domain validatorはTask 4以降で拡張）。
+   * Candidate robots. Shown in the "Candidate robots" section of the use case detail page — but currently **only rows with a specific robot render; series-only rows do not appear yet**.
    */
   candidateRobots?:
     | {
@@ -773,32 +783,34 @@ export interface UseCase {
  */
 export interface Deployment {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
+     */
+    publishedAt?: string | null;
+    /**
+     * The date this source was last checked. Shown on the public source list as "Checked …".
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -821,7 +833,7 @@ export interface Deployment {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -835,16 +847,16 @@ export interface Deployment {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  manufacturerId?: (number | null) | Manufacturer;
+  manufacturerId: number | Manufacturer;
   robotId?: (number | null) | Robot;
-  customer?: string | null;
+  customer: string;
   siteName?: string | null;
-  country?: string | null;
+  country: string;
   location: {
     lat: number;
     lng: number;
   };
-  status?: ('announced' | 'pilot' | 'production' | 'ended' | 'unknown') | null;
+  status: 'announced' | 'pilot' | 'production' | 'ended' | 'unknown';
   startedAt?: string | null;
   relatedUseCaseIds?: (number | UseCase)[] | null;
   updatedAt: string;
@@ -857,32 +869,34 @@ export interface Deployment {
  */
 export interface Article {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary?: string | null;
+  summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources?:
-    | {
-        title: string;
-        url: string;
-        publisher?: string | null;
-        /**
-         * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-         */
-        publishedAt?: string | null;
-        /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-         */
-        checkedAt: string;
-        reliability: 'verified' | 'official' | 'reported' | 'estimated';
-        note?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
+     */
+    publishedAt?: string | null;
+    /**
+     * The date this source was last checked. Shown on the public source list as "Checked …".
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -905,7 +919,7 @@ export interface Article {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -919,47 +933,44 @@ export interface Article {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  title?: string | null;
+  title: string;
   titleJa?: string | null;
-  category?: ('news' | 'interview' | 'company-report' | 'analysis' | 'policy') | null;
-  type?:
-    | (
-        | 'analysis'
-        | 'deployment-report'
-        | 'interview'
-        | 'event-report'
-        | 'policy-update'
-        | 'case-study'
-        | 'news-brief'
-        | 'tech-update'
-        | 'market-analysis'
-        | 'manufacturer-guide'
-        | 'robot-guide'
-        | 'basics-guide'
-      )
-    | null;
-  section?: ('digest' | 'deployment' | 'business' | 'tech' | 'policy' | 'entertainment') | null;
+  category: 'news' | 'interview' | 'company-report' | 'analysis' | 'policy';
+  type:
+    | 'analysis'
+    | 'deployment-report'
+    | 'interview'
+    | 'event-report'
+    | 'policy-update'
+    | 'case-study'
+    | 'news-brief'
+    | 'tech-update'
+    | 'market-analysis'
+    | 'manufacturer-guide'
+    | 'robot-guide'
+    | 'basics-guide';
+  section: 'digest' | 'deployment' | 'business' | 'tech' | 'policy' | 'entertainment';
   contentKind?: ('editorial' | 'sample' | 'sponsored') | null;
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The article's publish date. Shown on the article card and detail page.
    */
-  publishedAt?: string | null;
+  publishedAt: string;
   author?: string | null;
   industryTags?: string[] | null;
   regionTags?: string[] | null;
   themeTags?: string[] | null;
-  whyItMatters?: string | null;
+  whyItMatters: string;
   keyTakeaways?: string[] | null;
   featured?: boolean | null;
   relatedRobotIds?: (number | Robot)[] | null;
   relatedManufacturerIds?: (number | Manufacturer)[] | null;
   relatedUseCaseIds?: (number | UseCase)[] | null;
   /**
-   * Markdown本文。type === manufacturer-guide の記事では使わない（manufacturerGuideContentを使う）。
+   * Article body (Markdown). When the article type is "Manufacturer guide", use the dedicated field below (manufacturerGuideContent) instead of this one.
    */
   body?: string | null;
   /**
-   * ManufacturerGuideContent（companyOverview / lineup / deploymentStatus / procurementChannels / faq 等）。type === manufacturer-guide の記事だけ使う。
+   * Manufacturer-guide-only content (company overview, lineup, deployment status, procurement channels, FAQ, etc.). Used only when the article type is "Manufacturer guide" — rendered as the corresponding sections on the article detail page.
    */
   manufacturerGuideContent?:
     | {
@@ -980,14 +991,18 @@ export interface Article {
  */
 export interface ArticlePlacement {
   id: number;
+  /**
+   * Admin公開UIの競合制御marker（lib/payload/adminPublishIntent.ts）。運用メタデータで、コンテンツではない。値はhookだけが書き、公開時にcanonical contentから除外される。
+   */
+  adminPublishIntentToken?: string | null;
   stableId: string;
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  surface?: 'reports-index' | null;
-  slot?: ('hero' | 'feature') | null;
-  articleId?: (number | null) | Article;
-  order?: number | null;
+  surface: 'reports-index';
+  slot: 'hero' | 'feature';
+  articleId: number | Article;
+  order: number;
   kind?: ('editorial' | 'sample' | 'sponsored' | 'house') | null;
   sponsor?: {
     name?: string | null;
@@ -1018,7 +1033,7 @@ export interface Media {
       | 'blocked';
     sourceType: 'own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown';
     /**
-     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     * The date this file's rights status was last confirmed. Not shown publicly — for internal rights tracking.
      */
     checkedAt: string;
     rightsHolder?: string | null;
@@ -1458,25 +1473,31 @@ export interface AdminsSelect<T extends boolean = true> {
  * via the `definition` "manufacturers_select".
  */
 export interface ManufacturersSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
   lifecycleStatus?: T;
+  featuredRank?: T;
+  nextReviewBy?: T;
+  name?: T;
+  nameJa?: T;
   summary?: T;
-  reliability?: T;
-  sources?:
+  description?: T;
+  country?: T;
+  hqCity?: T;
+  headquarters?:
     | T
     | {
-        title?: T;
-        url?: T;
-        publisher?: T;
-        publishedAt?: T;
-        checkedAt?: T;
-        reliability?: T;
-        note?: T;
-        id?: T;
+        lat?: T;
+        lng?: T;
       };
-  nextReviewBy?: T;
+  foundedYear?: T;
+  companyType?: T;
+  companyStatus?: T;
+  japanPresence?: T;
+  website?: T;
+  contactUrl?: T;
   heroImage?:
     | T
     | {
@@ -1496,6 +1517,20 @@ export interface ManufacturersSelect<T extends boolean = true> {
             };
         aspectRatio?: T;
       };
+  logos?: T;
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  reliability?: T;
   seo?:
     | T
     | {
@@ -1503,24 +1538,6 @@ export interface ManufacturersSelect<T extends boolean = true> {
         metaDescription?: T;
         noindex?: T;
       };
-  name?: T;
-  nameJa?: T;
-  companyType?: T;
-  companyStatus?: T;
-  country?: T;
-  hqCity?: T;
-  headquarters?:
-    | T
-    | {
-        lat?: T;
-        lng?: T;
-      };
-  foundedYear?: T;
-  website?: T;
-  logos?: T;
-  contactUrl?: T;
-  description?: T;
-  japanPresence?: T;
   domesticDistributors?:
     | T
     | {
@@ -1535,7 +1552,6 @@ export interface ManufacturersSelect<T extends boolean = true> {
   supportNote?: T;
   procurementNote?: T;
   vendorRiskNote?: T;
-  featuredRank?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1545,6 +1561,7 @@ export interface ManufacturersSelect<T extends boolean = true> {
  * via the `definition` "distributors_select".
  */
 export interface DistributorsSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -1608,6 +1625,7 @@ export interface DistributorsSelect<T extends boolean = true> {
  * via the `definition` "robot-series_select".
  */
 export interface RobotSeriesSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -1669,6 +1687,7 @@ export interface RobotSeriesSelect<T extends boolean = true> {
  * via the `definition` "robots_select".
  */
 export interface RobotsSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -1774,6 +1793,7 @@ export interface RobotsSelect<T extends boolean = true> {
  * via the `definition` "use-cases_select".
  */
 export interface UseCasesSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -1872,6 +1892,7 @@ export interface UseCasesSelect<T extends boolean = true> {
  * via the `definition` "deployments_select".
  */
 export interface DeploymentsSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -1940,6 +1961,7 @@ export interface DeploymentsSelect<T extends boolean = true> {
  * via the `definition` "articles_select".
  */
 export interface ArticlesSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -2013,6 +2035,7 @@ export interface ArticlesSelect<T extends boolean = true> {
  * via the `definition` "article-placements_select".
  */
 export interface ArticlePlacementsSelect<T extends boolean = true> {
+  adminPublishIntentToken?: T;
   stableId?: T;
   slug?: T;
   previousSlugs?: T;
@@ -2245,11 +2268,11 @@ export interface SiteSetting {
     url?: string | null;
   };
   /**
-   * 掲載件数が正しい時点（例: 2026年7月）。日精度とは限らないためtext。Payloadが正本で、ローカル定数へのfallbackは無い。
+   * The point in time the listing counts are accurate as of (e.g. "July 2026"). Day-level precision is not required. **Not shown anywhere on the public site yet** — used only for export/import consistency checks.
    */
   dataAsOf?: string | null;
   /**
-   * reports index の hero / feature 掲載上限。
+   * Maximum number of articles shown in the hero/feature slots on the article index page. Affects how many items appear on the home page and the article index page.
    */
   articleIndexPlacementLimits?: {
     hero?: number | null;

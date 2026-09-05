@@ -780,3 +780,37 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
     });
   });
 });
+
+/**
+ * 2026-09-04追加。公開必須の項目に `required: true` を付けたこと（編集画面に必須の印を出すため）で
+ * **下書き保存が壊れていないこと**を守る。
+ *
+ * ここが壊れると「書きかけを保存しておく」という編集作業の基本が成立しなくなる。
+ * 成立している根拠は `versions.drafts.validate: false` —— Payloadがdraft保存時に
+ * field検証を飛ばす設定で、実測でも必須項目が空のままdraftの作成・更新ができることを確認した。
+ *
+ * **実際にdraftを書くテストはここには置かない。** 同じファイルの上のsuiteが同じcollectionに対して
+ * documentロックを取るため、同一fileで別のPayload instanceからdraftを書くと待ち合わせで固まる
+ * （60秒でもタイムアウトすることを実測）。draft保存が `required: true` の下でも通ることは
+ * `admin-publish-service.test.ts` と `admin-publish-all-collections.test.ts` が
+ * 実Postgres上で実際に行っており、そちらが本来の証明になっている。
+ * ここが守るのは、その前提である**設定値そのもの**が変わっていないこと。
+ */
+describe('required: true が下書き保存を壊さないこと', () => {
+  it('全content collectionで draft検証が無効になっている', async () => {
+    const { default: resolvedConfig } = await import('@/payload.config');
+    const resolved = (await resolvedConfig) as unknown as {
+      collections: Array<{ slug: string; versions?: { drafts?: { validate?: boolean } } }>;
+    };
+    const publishable = [
+      'manufacturers', 'distributors', 'robot-series', 'robots',
+      'use-cases', 'deployments', 'articles',
+    ];
+    for (const slug of publishable) {
+      const collection = resolved.collections.find((c) => c.slug === slug);
+      expect(collection?.versions?.drafts, slug).toBeTruthy();
+      // `validate: true` にすると、必須項目が埋まるまで下書き保存すらできなくなる。
+      expect((collection?.versions?.drafts as { validate?: boolean })?.validate, slug).toBe(false);
+    }
+  });
+});

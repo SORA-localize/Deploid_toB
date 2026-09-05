@@ -8,10 +8,19 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
+import { applyAdminFieldLabels, articlesFieldLabels } from '../lib/payload/adminFieldLabels';
+import {
+  articleCategorySelectOptions,
+  articleContentKindSelectOptions,
+  articleSectionSelectOptions,
+  articleTypeSelectOptions,
+} from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { Article } from '../lib/content/domainTypes';
+import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
+import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface ArticleCandidate {
   stableId?: string;
@@ -79,100 +88,116 @@ function validateArticleForPublish(article: ArticlePublishCandidate): void {
     missing.push('manufacturerGuideContent');
   }
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: articles missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'articles');
   }
 }
 
 /** 旧 `reports` を改称・拡張したニュースメディア collection（`data-architecture-redesign-v1.md` §7）。 */
 export const Articles: CollectionConfig = {
   slug: 'articles',
-  admin: { useAsTitle: 'title' },
+  admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
-  fields: [
-    ...baseContentFields(),
-    ...baseRecordContentFields(),
-    { name: 'title', type: 'text' },
-    { name: 'titleJa', type: 'text' },
-    {
-      name: 'category',
-      type: 'select',
-      options: ['news', 'interview', 'company-report', 'analysis', 'policy'],
-    },
-    {
-      name: 'type',
-      type: 'select',
-      options: [
-        'analysis',
-        'deployment-report',
-        'interview',
-        'event-report',
-        'policy-update',
-        'case-study',
-        'news-brief',
-        'tech-update',
-        'market-analysis',
-        'manufacturer-guide',
-        'robot-guide',
-        'basics-guide',
-      ],
-    },
-    {
-      name: 'section',
-      type: 'select',
-      options: ['digest', 'deployment', 'business', 'tech', 'policy', 'entertainment'],
-    },
-    {
-      name: 'contentKind',
-      type: 'select',
-      options: ['editorial', 'sample', 'sponsored'],
-    },
-    { name: 'publishedAt', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
-    { name: 'author', type: 'text' },
-    { name: 'industryTags', type: 'text', hasMany: true },
-    { name: 'regionTags', type: 'text', hasMany: true },
-    { name: 'themeTags', type: 'text', hasMany: true },
-    { name: 'whyItMatters', type: 'textarea' },
-    { name: 'keyTakeaways', type: 'text', hasMany: true },
-    { name: 'featured', type: 'checkbox' },
-    {
-      name: 'relatedRobotIds',
-      type: 'relationship',
-      relationTo: 'robots',
-      hasMany: true,
-    },
-    {
-      name: 'relatedManufacturerIds',
-      type: 'relationship',
-      relationTo: 'manufacturers',
-      hasMany: true,
-    },
-    {
-      name: 'relatedUseCaseIds',
-      type: 'relationship',
-      relationTo: 'use-cases',
-      hasMany: true,
-    },
-    {
-      name: 'body',
-      type: 'textarea',
-      admin: {
-        description: 'Markdown本文。type === manufacturer-guide の記事では使わない（manufacturerGuideContentを使う）。',
-        condition: (_, siblingData) => siblingData?.type !== 'manufacturer-guide',
+  fields: applyAdminFieldLabels(
+    [
+      ...baseContentFields(),
+      ...baseRecordContentFields(),
+      { name: 'title', type: 'text', required: true },
+      { name: 'titleJa', type: 'text' },
+      {
+        name: 'category',
+        type: 'select',
+        required: true,
+        options: articleCategorySelectOptions,
       },
-    },
-    {
-      name: 'manufacturerGuideContent',
-      type: 'json',
-      admin: {
-        description: 'ManufacturerGuideContent（companyOverview / lineup / deploymentStatus / procurementChannels / faq 等）。type === manufacturer-guide の記事だけ使う。',
-        condition: (_, siblingData) => siblingData?.type === 'manufacturer-guide',
+      {
+        name: 'type',
+        type: 'select',
+        required: true,
+        options: articleTypeSelectOptions,
       },
-    },
-  ],
+      {
+        name: 'section',
+        type: 'select',
+        required: true,
+        options: articleSectionSelectOptions,
+      },
+      {
+        name: 'contentKind',
+        type: 'select',
+        options: articleContentKindSelectOptions,
+      },
+      {
+        name: 'publishedAt',
+        type: 'text',
+        required: true,
+        // text型の理由: lib/payload/access.ts の sourcesField 冒頭コメント参照
+        // （日付のみの値をtimestamptzにするとimport時のserver TZで日付がずれるため）。
+        admin: {
+          description: {
+            ja: '記事の公開日。記事カード・記事詳細ページに表示されます。',
+            en: "The article's publish date. Shown on the article card and detail page.",
+          },
+        },
+      },
+      { name: 'author', type: 'text' },
+      { name: 'industryTags', type: 'text', hasMany: true },
+      { name: 'regionTags', type: 'text', hasMany: true },
+      { name: 'themeTags', type: 'text', hasMany: true },
+      { name: 'whyItMatters', type: 'textarea', required: true },
+      { name: 'keyTakeaways', type: 'text', hasMany: true },
+      { name: 'featured', type: 'checkbox' },
+      {
+        name: 'relatedRobotIds',
+        type: 'relationship',
+        relationTo: 'robots',
+        hasMany: true,
+      },
+      {
+        name: 'relatedManufacturerIds',
+        type: 'relationship',
+        relationTo: 'manufacturers',
+        hasMany: true,
+      },
+      {
+        name: 'relatedUseCaseIds',
+        type: 'relationship',
+        relationTo: 'use-cases',
+        hasMany: true,
+      },
+      {
+        name: 'body',
+        type: 'textarea',
+        admin: {
+          description: {
+            ja: '記事本文（Markdown）。記事タイプが「メーカー解説」の場合はこちらではなく下の専用欄（manufacturerGuideContent）を使います。',
+            en: 'Article body (Markdown). When the article type is "Manufacturer guide", use the dedicated field below (manufacturerGuideContent) instead of this one.',
+          },
+          condition: (_, siblingData) => siblingData?.type !== 'manufacturer-guide',
+        },
+      },
+      {
+        name: 'manufacturerGuideContent',
+        type: 'json',
+        // JSON形の内訳（`docs/decisions/editorial_style_guide_v1.md` §6のテンプレートに対応）:
+        // `companyOverview`（企業概要）/`lineup`（機体ラインアップ）/`deploymentStatus`（導入実績）/
+        // `procurementChannels`（購入・相談チャネル）/`faq`（よくある質問）等。
+        admin: {
+          description: {
+            ja: 'メーカー解説の専用コンテンツ（企業概要・機体ラインアップ・導入実績・購入/相談チャネル・FAQ等）。記事タイプが「メーカー解説」の記事だけで使い、記事詳細ページの各セクションに表示されます。',
+            en: 'Manufacturer-guide-only content (company overview, lineup, deployment status, procurement channels, FAQ, etc.). Used only when the article type is "Manufacturer guide" — rendered as the corresponding sections on the article detail page.',
+          },
+          condition: (_, siblingData) => siblingData?.type === 'manufacturer-guide',
+        },
+      },
+    ],
+    articlesFieldLabels,
+  ),
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
+      // 他のhookより先に置く: 以降のhookが正規化済みのtokenを見るようにする。
+      clearUnclaimedAdminPublishIntent,
       createPublishGateHook({
         collectionSlug: 'articles',
         mapToDomain: async (candidate) => mapArticleCandidateToDomain(candidate as ArticleCandidate),

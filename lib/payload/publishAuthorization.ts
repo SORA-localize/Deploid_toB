@@ -21,10 +21,40 @@ const APPROVED_PUBLISH_KEY = '__deploidApprovedPublish';
 const PRIVILEGED_PUBLISH_KEY = '__deploidPrivilegedPublish';
 const DRAFT_INTENT_KEY = '__deploidDraftIntent';
 
-// Context のfield形だけではauthorizationにしない。Payloadがoperation間で行うshallow copyは
-// object identityを保つ一方、JSON/structured cloneや手書きの自己申告objectはregistryに無い。
-const issuedApprovedAuthorizations = new WeakSet<object>();
-const issuedPrivilegedAuthorizations = new WeakSet<object>();
+/**
+ * Context のfield形だけではauthorizationにしない。Payloadがoperation間で行うshallow copyは
+ * object identityを保つ一方、JSON/structured cloneや手書きの自己申告objectはregistryに無い。
+ *
+ * ## registryをmodule scopeに置けない理由（2026-09-03、実測で判明）
+ *
+ * Next.jsはこのfileをサーバー側の**複数のchunkへ重複して**束ねる。その結果、
+ * `approvedPublishContext()` を実行したmodule instanceと、collection hookが
+ * `readApprovedPublishAuthorization()` を呼ぶmodule instanceが別物になり、
+ * module scopeのWeakSetでは `has()` が常にfalseになる ——
+ * **正規の公開が全て `publish-approval-required` で落ちる**。
+ * `tests/e2e/payload-admin-publish.spec.ts` が実ビルドのNextサーバー上でこれを検出し、
+ * 一時計装で「issuer=instance 1 / verifier=instance 2、collectionもdocument idも一致、
+ * WeakSetだけが別物」まで確認した。CLI scriptとvitestは単一module graphなので露見しなかった。
+ *
+ * `Symbol.for()` はprocess内で共有されるsymbol registryを引くので、chunkが分かれても
+ * 同じ1つのWeakSetに到達する。**同一性の保証は落ちない** —— registryは相変わらず
+ * `approvedPublishContext()` が実際に発行したobjectしか含まず、structuredCloneや
+ * 手書きのobjectは弾かれる（下のテスト `publish-authorization-identity.test.ts` が両方を固定）。
+ * 脅威modelも変わらない: ここが守るのは「HTTP経由の呼び出し側がcontextを注入できないこと」で、
+ * process内でこのregistryへ到達できるcodeは元々このmoduleをimportできる。
+ */
+const REGISTRY_KEY = Symbol.for('deploid.payload.publishAuthorization.registries');
+
+interface AuthorizationRegistries {
+  approved: WeakSet<object>;
+  privileged: WeakSet<object>;
+}
+
+function registries(): AuthorizationRegistries {
+  const holder = globalThis as typeof globalThis & { [REGISTRY_KEY]?: AuthorizationRegistries };
+  holder[REGISTRY_KEY] ??= { approved: new WeakSet<object>(), privileged: new WeakSet<object>() };
+  return holder[REGISTRY_KEY];
+}
 
 /** 承認済みversionの公開（`publishApprovedVersion()` だけが作る）。 */
 export interface ApprovedPublishAuthorization {
@@ -49,13 +79,13 @@ export interface PrivilegedPublishAuthorization {
 
 /** `publishApprovedVersion()` が Local API 呼び出しへ渡す `context`。 */
 export function approvedPublishContext(auth: ApprovedPublishAuthorization): Record<string, unknown> {
-  issuedApprovedAuthorizations.add(auth);
+  registries().approved.add(auth);
   return { [APPROVED_PUBLISH_KEY]: auth };
 }
 
 /** import / restore が Local API 呼び出しへ渡す `context`。 */
 export function privilegedPublishContext(auth: PrivilegedPublishAuthorization): Record<string, unknown> {
-  issuedPrivilegedAuthorizations.add(auth);
+  registries().privileged.add(auth);
   return { [PRIVILEGED_PUBLISH_KEY]: auth };
 }
 
@@ -74,7 +104,7 @@ export function readApprovedPublishAuthorization(
   documentId: string | number | undefined,
 ): ApprovedPublishAuthorization | null {
   const value = contextOf(req)[APPROVED_PUBLISH_KEY] as ApprovedPublishAuthorization | undefined;
-  if (!value || !issuedApprovedAuthorizations.has(value)) return null;
+  if (!value || !registries().approved.has(value)) return null;
   if (value.collection !== collectionSlug) return null;
   if (documentId === undefined || String(value.documentId) !== String(documentId)) return null;
   return value;
@@ -86,7 +116,7 @@ export function readPrivilegedPublishAuthorization(
   collectionSlug: string,
 ): PrivilegedPublishAuthorization | null {
   const value = contextOf(req)[PRIVILEGED_PUBLISH_KEY] as PrivilegedPublishAuthorization | undefined;
-  if (!value || !issuedPrivilegedAuthorizations.has(value)) return null;
+  if (!value || !registries().privileged.has(value)) return null;
   if (value.collections && !value.collections.includes(collectionSlug)) return null;
   return value;
 }

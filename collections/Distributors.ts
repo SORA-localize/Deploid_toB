@@ -8,10 +8,17 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
+import { applyAdminFieldLabels, distributorsFieldLabels } from '../lib/payload/adminFieldLabels';
+import {
+  distributorAcquisitionMethodSelectOptions,
+  distributorProviderTypeSelectOptions,
+} from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipsToStableIds } from '../lib/content/payloadMappers';
 import type { Distributor } from '../lib/content/domainTypes';
+import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
+import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface DistributorCandidate {
   stableId?: string;
@@ -49,50 +56,58 @@ function validateDistributorForPublish(distributor: Partial<Distributor>): void 
   if (!distributor.handledManufacturerIds || distributor.handledManufacturerIds.length === 0) missing.push('handledManufacturerIds');
   if (!distributor.acquisitionMethods || distributor.acquisitionMethods.length === 0) missing.push('acquisitionMethods');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: distributors missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'distributors');
   }
 }
 
 export const Distributors: CollectionConfig = {
   slug: 'distributors',
-  admin: { useAsTitle: 'name' },
+  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
-  fields: [
-    ...baseContentFields(),
-    ...baseRecordContentFields(),
-    { name: 'name', type: 'text' },
-    { name: 'nameJa', type: 'text' },
-    { name: 'website', type: 'text' },
-    {
-      name: 'providerType',
-      type: 'select',
-      options: ['maker-direct', 'reseller', 'other'],
-    },
-    {
-      name: 'handledManufacturerIds',
-      type: 'relationship',
-      relationTo: 'manufacturers',
-      hasMany: true,
-    },
-    {
-      name: 'handledRobotIds',
-      type: 'relationship',
-      relationTo: 'robots',
-      hasMany: true,
-    },
-    {
-      name: 'acquisitionMethods',
-      type: 'select',
-      hasMany: true,
-      options: ['purchase', 'lease', 'raas', 'subscription', 'inquiry'],
-    },
-    { name: 'inquiryUrl', type: 'text' },
-    { name: 'note', type: 'textarea' },
-  ],
+  fields: applyAdminFieldLabels(
+    [
+      ...baseContentFields(),
+      ...baseRecordContentFields(),
+      { name: 'name', type: 'text', required: true },
+      { name: 'nameJa', type: 'text' },
+      { name: 'website', type: 'text' },
+      {
+        name: 'providerType',
+        type: 'select',
+        required: true,
+        options: distributorProviderTypeSelectOptions,
+      },
+      {
+        name: 'handledManufacturerIds',
+        type: 'relationship',
+        required: true,
+        relationTo: 'manufacturers',
+        hasMany: true,
+      },
+      {
+        name: 'handledRobotIds',
+        type: 'relationship',
+        relationTo: 'robots',
+        hasMany: true,
+      },
+      {
+        name: 'acquisitionMethods',
+        type: 'select',
+        required: true,
+        hasMany: true,
+        options: distributorAcquisitionMethodSelectOptions,
+      },
+      { name: 'inquiryUrl', type: 'text' },
+      { name: 'note', type: 'textarea' },
+    ],
+    distributorsFieldLabels,
+  ),
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
+      // 他のhookより先に置く: 以降のhookが正規化済みのtokenを見るようにする。
+      clearUnclaimedAdminPublishIntent,
       createPublishGateHook({
         collectionSlug: 'distributors',
         mapToDomain: (candidate, req) => mapDistributorCandidateToDomain(candidate as DistributorCandidate, req.payload),

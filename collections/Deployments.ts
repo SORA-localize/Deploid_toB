@@ -8,10 +8,14 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
+import { applyAdminFieldLabels, deploymentsFieldLabels, deploymentsLocationFieldLabels } from '../lib/payload/adminFieldLabels';
+import { deploymentStatusSelectOptions } from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { DeploymentSite } from '../lib/content/domainTypes';
+import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
+import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface DeploymentCandidate {
   stableId?: string;
@@ -52,52 +56,61 @@ function validateDeploymentForPublish(deployment: Partial<DeploymentSite>): void
   if (!deployment.location) missing.push('location');
   if (!deployment.status) missing.push('status');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: deployments missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'deployments');
   }
 }
 
 /** Homeワールドマップの arc（manufacturer HQ → 導入拠点）根拠データ。 */
 export const Deployments: CollectionConfig = {
   slug: 'deployments',
-  admin: { useAsTitle: 'customer' },
+  admin: { useAsTitle: 'customer', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
-  fields: [
-    ...baseContentFields(),
-    ...baseRecordContentFields(),
-    { name: 'manufacturerId', type: 'relationship', relationTo: 'manufacturers' },
-    { name: 'robotId', type: 'relationship', relationTo: 'robots' },
-    { name: 'customer', type: 'text' },
-    { name: 'siteName', type: 'text' },
-    { name: 'country', type: 'text' },
-    {
-      name: 'location',
-      type: 'group',
-      fields: [
-        { name: 'lat', type: 'number', required: true },
-        { name: 'lng', type: 'number', required: true },
-      ],
-    },
-    {
-      name: 'status',
-      type: 'select',
-      options: ['announced', 'pilot', 'production', 'ended', 'unknown'],
-      // `enumName` は必須（Task 4で発見したTask 3のschema欠陥の修正）。
-      // postgres adapterはenum型名を `enum_<table>_<field>` で決めるため、drafts機構の
-      // `_status`（先頭のアンダースコアが落ちて `enum_deployments_status`）と、この
-      // 独自field `status` の enum名が衝突する。衝突時は片方（draft|published）だけが
-      // 生成され、`status` 列までその型になるため、`announced` / `pilot` 等の実値が
-      // Postgresのenum制約で拒否される（`invalid input value for enum
-      // enum_deployments_status: "pilot"`）。domain・API上のfield名 `status` と
-      // `DeploymentSite.status` の意味は変えず、DB上のenum型名だけを分離する。
-      enumName: 'enum_deployments_site_status',
-    },
-    { name: 'startedAt', type: 'text' },
-    { name: 'relatedUseCaseIds', type: 'relationship', relationTo: 'use-cases', hasMany: true },
-  ],
+  fields: applyAdminFieldLabels(
+    [
+      ...baseContentFields(),
+      ...baseRecordContentFields(),
+      { name: 'manufacturerId', type: 'relationship', relationTo: 'manufacturers', required: true },
+      { name: 'robotId', type: 'relationship', relationTo: 'robots' },
+      { name: 'customer', type: 'text', required: true },
+      { name: 'siteName', type: 'text' },
+      { name: 'country', type: 'text', required: true },
+      {
+        name: 'location',
+        type: 'group',
+        fields: applyAdminFieldLabels(
+          [
+            { name: 'lat', type: 'number', required: true },
+            { name: 'lng', type: 'number', required: true },
+          ],
+          deploymentsLocationFieldLabels,
+        ),
+      },
+      {
+        name: 'status',
+        type: 'select',
+        required: true,
+        options: deploymentStatusSelectOptions,
+        // `enumName` は必須（Task 4で発見したTask 3のschema欠陥の修正）。
+        // postgres adapterはenum型名を `enum_<table>_<field>` で決めるため、drafts機構の
+        // `_status`（先頭のアンダースコアが落ちて `enum_deployments_status`）と、この
+        // 独自field `status` の enum名が衝突する。衝突時は片方（draft|published）だけが
+        // 生成され、`status` 列までその型になるため、`announced` / `pilot` 等の実値が
+        // Postgresのenum制約で拒否される（`invalid input value for enum
+        // enum_deployments_status: "pilot"`）。domain・API上のfield名 `status` と
+        // `DeploymentSite.status` の意味は変えず、DB上のenum型名だけを分離する。
+        enumName: 'enum_deployments_site_status',
+      },
+      { name: 'startedAt', type: 'text' },
+      { name: 'relatedUseCaseIds', type: 'relationship', relationTo: 'use-cases', hasMany: true },
+    ],
+    deploymentsFieldLabels,
+  ),
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
+      // 他のhookより先に置く: 以降のhookが正規化済みのtokenを見るようにする。
+      clearUnclaimedAdminPublishIntent,
       createPublishGateHook({
         collectionSlug: 'deployments',
         mapToDomain: (candidate, req) => mapDeploymentCandidateToDomain(candidate as DeploymentCandidate, req.payload),

@@ -6,10 +6,21 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-} from '../lib/payload/access';
+  PublishValidationError, } from '../lib/payload/access';
+import {
+  applyAdminFieldLabels,
+  articlePlacementsFieldLabels,
+  articlePlacementsSponsorFieldLabels,
+} from '../lib/payload/adminFieldLabels';
+import {
+  articlePlacementKindSelectOptions,
+  articlePlacementSlotSelectOptions,
+  articlePlacementSurfaceSelectOptions,
+} from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { ArticlePlacement } from '../lib/content/domainTypes';
+import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface ArticlePlacementCandidate {
   id?: string | number;
@@ -42,7 +53,7 @@ function validatePlacementForPublish(placement: Partial<ArticlePlacement>): void
   if (!placement.articleId) missing.push('articleId');
   if (placement.order === undefined || placement.order === null) missing.push('order');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: article-placements missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing, 'article-placements');
   }
 }
 
@@ -104,39 +115,49 @@ export const ArticlePlacements: CollectionConfig = {
   admin: { useAsTitle: 'stableId' },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
-  fields: [
-    ...baseContentFields(),
-    {
-      name: 'surface',
-      type: 'select',
-      options: ['reports-index'],
-    },
-    {
-      name: 'slot',
-      type: 'select',
-      options: ['hero', 'feature'],
-    },
-    { name: 'articleId', type: 'relationship', relationTo: 'articles' },
-    { name: 'order', type: 'number' },
-    {
-      name: 'kind',
-      type: 'select',
-      options: ['editorial', 'sample', 'sponsored', 'house'],
-    },
-    {
-      name: 'sponsor',
-      type: 'group',
-      fields: [
-        { name: 'name', type: 'text' },
-        { name: 'url', type: 'text' },
-        { name: 'disclosure', type: 'text' },
-        { name: 'campaignId', type: 'text' },
-      ],
-    },
-  ],
+  fields: applyAdminFieldLabels(
+    [
+      ...baseContentFields(),
+      {
+        name: 'surface',
+        type: 'select',
+        required: true,
+        options: articlePlacementSurfaceSelectOptions,
+      },
+      {
+        name: 'slot',
+        type: 'select',
+        required: true,
+        options: articlePlacementSlotSelectOptions,
+      },
+      { name: 'articleId', type: 'relationship', relationTo: 'articles', required: true },
+      { name: 'order', type: 'number', required: true },
+      {
+        name: 'kind',
+        type: 'select',
+        options: articlePlacementKindSelectOptions,
+      },
+      {
+        name: 'sponsor',
+        type: 'group',
+        fields: applyAdminFieldLabels(
+          [
+            { name: 'name', type: 'text' },
+            { name: 'url', type: 'text' },
+            { name: 'disclosure', type: 'text' },
+            { name: 'campaignId', type: 'text' },
+          ],
+          articlePlacementsSponsorFieldLabels,
+        ),
+      },
+    ],
+    articlePlacementsFieldLabels,
+  ),
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
+      // 他のhookより先に置く: 以降のhookが正規化済みのtokenを見るようにする。
+      clearUnclaimedAdminPublishIntent,
       validateUniqueness,
       createPublishGateHook({
         collectionSlug: 'article-placements',

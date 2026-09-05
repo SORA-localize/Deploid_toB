@@ -1,5 +1,21 @@
 import { createHash } from 'node:crypto';
 import type { Access, CollectionBeforeOperationHook, Field, FieldAccess, PayloadRequest, Where } from 'payload';
+import { adminPublishIntentField } from './adminPublishIntent';
+import {
+  applyAdminFieldLabels,
+  baseContentFieldLabels,
+  baseRecordContentFieldLabels,
+  imageAssetFieldLabels,
+  rightsMetaFieldLabels,
+  seoFieldLabels,
+  sourcesItemFieldLabels,
+} from './adminFieldLabels';
+import {
+  lifecycleStatusSelectOptions,
+  reliabilitySelectOptions,
+  rightsSourceTypeSelectOptions,
+  rightsStatusSelectOptions,
+} from './adminSelectLabels';
 import {
   clearDraftIntents,
   readApprovedPublishAuthorization,
@@ -176,29 +192,59 @@ export const contentVersionsConfig: { drafts: true; maxPerDoc: number } = {
  * 不変 `id` をそのまま保持する（Payload内部idを公開参照に使わない）。`lifecycleStatus` は
  * Payload `_status`（draft|published）だけでは表せない `archived` を表現するための追加軸。
  */
+/**
+ * 公開要件の不足を、**不足field名を構造として保持したまま**投げる。
+ *
+ * 従来は9箇所すべてが素の `Error` で、message は2書式あった:
+ *   `publish-validation-failed: missing a, b`            （base検査 / この直下）
+ *   `publish-validation-failed: <slug> missing a, b`     （collection固有検査）
+ *
+ * routeがこれを利用者へ「不足項目」として見せるには正規表現でmessageを割るしかなく、
+ * 書式が2つあるうえ将来変わりうる。`fields` を持たせて parse を不要にする。
+ *
+ * **message は従来と1文字も変えない。** 既存テスト（`publish-gates.test.ts` の
+ * `/publish-validation-failed/` 等）と、gateの判定ロジックはそのまま。
+ */
+export class PublishValidationError extends Error {
+  readonly fields: string[];
+
+  constructor(fields: string[], scope?: string) {
+    super(`publish-validation-failed: ${scope ? `${scope} ` : ''}missing ${fields.join(', ')}`);
+    this.name = 'PublishValidationError';
+    this.fields = fields;
+  }
+}
+
 export function baseContentFields(): Field[] {
-  return [
-    {
-      name: 'stableId',
-      type: 'text',
-      required: true,
-      unique: true,
-      index: true,
-      access: { update: immutableStableId },
-    },
-    { name: 'slug', type: 'text', required: true, unique: true, index: true },
-    { name: 'previousSlugs', type: 'text', hasMany: true },
-    {
-      name: 'lifecycleStatus',
-      type: 'select',
-      required: true,
-      defaultValue: 'active',
-      options: [
-        { label: 'Active', value: 'active' },
-        { label: 'Archived', value: 'archived' },
-      ],
-    },
-  ];
+  return applyAdminFieldLabels(
+    [
+      // Admin公開UIの競合制御marker（`lib/payload/adminPublishIntent.ts`）。
+      // コンテンツではなく運用メタデータで、値を書けるのは同ファイルのhookだけ。
+      // `baseContentFields()` を使う全collection（publish gateを持つ8つ）へ一括で入れる:
+      // `article-placements` は現状 `ApprovableCollectionSlug` 外だが、同じpublish gateを持ち
+      // 将来公開経路が付く可能性があるため、ここだけ除外して不整合を作らない。
+      // 未使用のcollectionでは常に `null` になるだけで、公開系・snapshotへは現れない。
+      adminPublishIntentField(),
+      {
+        name: 'stableId',
+        type: 'text',
+        required: true,
+        unique: true,
+        index: true,
+        access: { update: immutableStableId },
+      },
+      { name: 'slug', type: 'text', required: true, unique: true, index: true },
+      { name: 'previousSlugs', type: 'text', hasMany: true },
+      {
+        name: 'lifecycleStatus',
+        type: 'select',
+        required: true,
+        defaultValue: 'active',
+        options: lifecycleStatusSelectOptions,
+      },
+    ],
+    baseContentFieldLabels,
+  );
 }
 
 /** Public identity is immutable once a record exists; changing it would orphan
@@ -222,32 +268,60 @@ export const immutableStableId: FieldAccess = ({ data, doc }) => {
  * `Date.parse('2025-05') === Date.parse('2025-05-01')` のため差分として出ず、**損失が
  * 検出できない形**になる。`collections/Deployments.ts` の `startedAt`（`'2024-01'` を持つため
  * Task 3時点で `text`）と同じ判断をここにも適用する。
+ *
+ * **`checkedAt`（この関数の下）・`rightsMetaField()`の`checkedAt`・
+ * `baseRecordContentFields()`の`nextReviewBy`・`Manufacturers.domesticDistributors[].checkedAt`・
+ * `Articles.publishedAt` も同じ理由で `date` ではなく `text`。** これらは日付のみの値で、
+ * `timestamptz` にすると import 時の server TZ 変換で日付がずれる（Task 5で発見）。
+ * この一箇所にまとめて書き、各field定義側では繰り返さない（Task 7: 以前は
+ * `admin.description` にこの実装理由をそのまま書いていたため、編集者向け画面に
+ * `timestamptz` 等の実装用語がそのまま出ていた。ここへ移し、`admin.description` 側は
+ * 編集者向けの文言だけにする）。
  */
 export function sourcesField(): Field {
   return {
     name: 'sources',
     type: 'array',
-    fields: [
-      { name: 'title', type: 'text', required: true },
-      { name: 'url', type: 'text', required: true },
-      { name: 'publisher', type: 'text' },
-      {
-        name: 'publishedAt',
-        type: 'text',
-        admin: {
-          description:
-            '出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。',
+    required: true,
+    fields: applyAdminFieldLabels(
+      [
+        { name: 'title', type: 'text', required: true },
+        { name: 'url', type: 'text', required: true },
+        { name: 'publisher', type: 'text' },
+        {
+          name: 'publishedAt',
+          type: 'text',
+          // ロボット詳細ページの「活用事例」欄（usageExampleSourceUrls）でも参照される
+          // （lib/robotCatalog.ts の resolveRobotUsageExamples()）。出典一覧（SourceList）
+          // 自体には出ないが「表示されない」は正しくない——外部監査で指摘・修正（2026-09-05）。
+          admin: {
+            description: {
+              ja: '出典が公開された日付。日が分からない場合は月または年だけでも構いません（例: 2025-05）。出典一覧には表示されませんが、このURLが「活用事例」欄で参照されている場合はそちらに表示されます。',
+              en: "The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a \"Usage examples\" section.",
+            },
+          },
         },
-      },
-      { name: 'checkedAt', type: 'text', required: true, admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
-      {
-        name: 'reliability',
-        type: 'select',
-        required: true,
-        options: ['verified', 'official', 'reported', 'estimated'],
-      },
-      { name: 'note', type: 'textarea' },
-    ],
+        {
+          name: 'checkedAt',
+          type: 'text',
+          required: true,
+          admin: {
+            description: {
+              ja: 'この出典を確認した日付。出典欄に「確認 ○○」として表示されます。',
+              en: 'The date this source was last checked. Shown on the public source list as "Checked …".',
+            },
+          },
+        },
+        {
+          name: 'reliability',
+          type: 'select',
+          required: true,
+          options: reliabilitySelectOptions,
+        },
+        { name: 'note', type: 'textarea' },
+      ],
+      sourcesItemFieldLabels,
+    ),
   };
 }
 
@@ -264,30 +338,34 @@ function rightsMetaField(name: string): Field {
   return {
     name,
     type: 'group',
-    fields: [
-      {
-        name: 'status',
-        type: 'select',
-        options: [
-          'own',
-          'licensed',
-          'commercial-permitted',
-          'reference-attributed',
-          'permission-requested',
-          'prototype-only',
-          'blocked',
-        ],
-      },
-      {
-        name: 'sourceType',
-        type: 'select',
-        options: ['own', 'manufacturer-official', 'partner-official', 'press-release', 'third-party', 'unknown'],
-      },
-      { name: 'checkedAt', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
-      { name: 'rightsHolder', type: 'text' },
-      { name: 'licenseUrl', type: 'text' },
-      { name: 'permissionNote', type: 'textarea' },
-    ],
+    fields: applyAdminFieldLabels(
+      [
+        {
+          name: 'status',
+          type: 'select',
+          options: rightsStatusSelectOptions,
+        },
+        {
+          name: 'sourceType',
+          type: 'select',
+          options: rightsSourceTypeSelectOptions,
+        },
+        {
+          name: 'checkedAt',
+          type: 'text',
+          admin: {
+            description: {
+              ja: '画像の権利状況を確認した日付。ページには表示されません（社内の権利管理用）。',
+              en: "The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.",
+            },
+          },
+        },
+        { name: 'rightsHolder', type: 'text' },
+        { name: 'licenseUrl', type: 'text' },
+        { name: 'permissionNote', type: 'textarea' },
+      ],
+      rightsMetaFieldLabels,
+    ),
   };
 }
 
@@ -296,14 +374,17 @@ export function imageAssetField(name: string): Field {
   return {
     name,
     type: 'group',
-    fields: [
-      { name: 'src', type: 'text' },
-      { name: 'alt', type: 'text' },
-      { name: 'credit', type: 'text' },
-      { name: 'sourceUrl', type: 'text' },
-      rightsMetaField('rights'),
-      { name: 'aspectRatio', type: 'number' },
-    ],
+    fields: applyAdminFieldLabels(
+      [
+        { name: 'src', type: 'text' },
+        { name: 'alt', type: 'text' },
+        { name: 'credit', type: 'text' },
+        { name: 'sourceUrl', type: 'text' },
+        rightsMetaField('rights'),
+        { name: 'aspectRatio', type: 'number' },
+      ],
+      imageAssetFieldLabels,
+    ),
   };
 }
 
@@ -312,11 +393,14 @@ export function seoField(): Field {
   return {
     name: 'seo',
     type: 'group',
-    fields: [
-      { name: 'metaTitle', type: 'text' },
-      { name: 'metaDescription', type: 'textarea' },
-      { name: 'noindex', type: 'checkbox' },
-    ],
+    fields: applyAdminFieldLabels(
+      [
+        { name: 'metaTitle', type: 'text' },
+        { name: 'metaDescription', type: 'textarea' },
+        { name: 'noindex', type: 'checkbox' },
+      ],
+      seoFieldLabels,
+    ),
   };
 }
 
@@ -326,18 +410,30 @@ export function seoField(): Field {
  * 個別collectionの `fields` へ `...baseRecordContentFields()` で展開する。
  */
 export function baseRecordContentFields(): Field[] {
-  return [
-    { name: 'summary', type: 'textarea' },
-    {
-      name: 'reliability',
-      type: 'select',
-      options: ['verified', 'official', 'reported', 'estimated'],
-    },
-    sourcesField(),
-    { name: 'nextReviewBy', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
-    imageAssetField('heroImage'),
-    seoField(),
-  ];
+  return applyAdminFieldLabels(
+    [
+      { name: 'summary', type: 'textarea', required: true },
+      {
+        name: 'reliability',
+        type: 'select',
+        options: reliabilitySelectOptions,
+      },
+      sourcesField(),
+      {
+        name: 'nextReviewBy',
+        type: 'text',
+        admin: {
+          description: {
+            ja: 'この項目の内容を次に見直すべき期限。ページには表示されません（社内のファクトチェック管理用）。',
+            en: "The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.",
+          },
+        },
+      },
+      imageAssetField('heroImage'),
+      seoField(),
+    ],
+    baseRecordContentFieldLabels,
+  );
 }
 
 interface PublishTransitionCandidate {
@@ -603,7 +699,7 @@ export function assertBaseRecordPublishable(domain: {
   if (!domain.summary) missing.push('summary');
   if (!domain.sources || domain.sources.length === 0) missing.push('sources');
   if (missing.length > 0) {
-    throw new Error(`publish-validation-failed: missing ${missing.join(', ')}`);
+    throw new PublishValidationError(missing);
   }
 }
 

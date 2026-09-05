@@ -82,10 +82,16 @@ describe('Route registry (Robots ⇄ RobotSeries slug namespace, real Payload Lo
     });
     const robotDoc = robot.docs[0];
 
+    // `draft: true` を付ける。この robot は下書きとしてのみ存在する最小fixtureで、
+    // 2026-09-04に公開必須項目へ `required: true` を入れて以降、draft指定の無いupdateは
+    // field検証に掛かって落ちる（`versions.drafts.validate: false` が効くのはdraft保存だけ）。
+    // adminで下書きのslugを変えるときも Save Draft を通るので、これが実際の経路でもある。
+    // registry hook は `afterChange` で draft を区別しないため、検証内容は変わらない。
     await payload.update({
       collection: 'robots',
       id: robotDoc.id,
       overrideAccess: true,
+      draft: true,
       data: { slug: 'route-slug-a-renamed', previousSlugs: ['route-slug-a'] },
     });
 

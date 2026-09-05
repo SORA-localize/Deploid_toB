@@ -10,6 +10,8 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 計画 | 一言 | branch | 開始日 |
 |---|---|---|---|
+| [Admin公開UI](plans/admin-publish-ui-plan-v1.md) | Payload Admin の Publish ボタンから公開できるようにする。実装・自己監査・2回の外部レビュー対応まで完了。Preview実機で残るのは接続/反映まわりの是正（下記2件） | `feat/admin-publish-ui` | 2026-09-03 |
+| [Admin運用UX・再検証の是正](plans/admin-ux-and-revalidation-fix-plan-v1.md) | Preview運用で見つかった5症状（反映されない・CMSが落ちる・field名が英語 等）の調査と修正計画。**T0〜T8完了、実質完了**。Vercel Preview実機でユーザー本人が公開→反映・トースト表示を確認済み。残るのは優先度低の任意確認2件のみ | `feat/admin-publish-ui` | 2026-09-04 |
 | [ロボットデータ投入](plans/robot-data-import-plan-v1.md) | 原本HTMLから177機・59社・28シリーズを **Payload へ**投入。**§0 の前提ゲート7項目（コンテンツ基盤移行の完了）を満たすまで着手しない**。Task 9 のみ原本への `deploymentStage` 記入134行が前提 | 未定 | 2026-08-08 |
 | [積み残し登録簿フォローアップ](plans/deferred-work-register-followup-v1.md) | 登録簿#4/#5/#6/#10の実行計画。**#4・#5・#6は解消済み**。残るのは#10のバッテリー23機（CSVのvariant名とレコードの対応を人が決める） | `main`（専用branchなし） | 2026-08-05 |
 | [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | Payload CMS + managed PostgreSQLへの移行後監査・是正。現在は安全ゲート是正ブランチで実装中 | `remediation/task9-safety-gates` | 2026-08-26 |
@@ -25,11 +27,12 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 日付 | 文書 | 内容 |
 |---|---|---|
+| 2026-09-05 | [Admin field→公開ページ対応表](decisions/admin-field-to-page-section-map-v1.md) | 各fieldが実際に公開ページのどこへ出るか（出ないか）を実コード確認して整理 |
+| 2026-09-05 | [Admin編集画面のfield配置](decisions/admin-field-layout-v1.md) | tabs/sidebarでの表示専用レイアウト整理。ManufacturersでPOC実施済み、他6 collectionは設計のみ |
+| 2026-09-05 | [Admin公開→反映SLO](decisions/admin-publish-cache-reflection-slo-v1.md) | 「公開してからいつ反映されるか」をNext.jsの契約・このプロジェクトの目標・超過時の手順に分けて定義 |
 | 2026-07-26 | [コンテンツ基盤・DBアーキテクチャ](decisions/content-platform-and-database-architecture-v2.md) | Payload CMS + managed PostgreSQLを採用。GitHub、管理画面、Codex MCP、公開サイトの責務を確定 |
 | 2026-07-26 | [データアーキテクチャ再設計](decisions/data-architecture-redesign-v1.md) | id / slug設計は維持し、旧Git型CMS移行案を新しいPayload移行計画へ置換 |
-| 2026-07-26 | [技術スタック](decisions/humanoid_platform_tech_stack_v1.md) | CMS候補とDB不要判断を、Payload + PostgreSQLの確定構成へ更新 |
 | 2026-07-26 | [アーキテクチャ将来対応リスト](decisions/architecture_future_considerations_v1.md) | コンテンツ基盤移行の確定判断と移行後の見直し条件を追加 |
-| 2026-07-26 | [Deploid Data Work Guide](decisions/data/README.md) | Payload移行後のデータ保守と出典・権利ゲート |
 
 ---
 
@@ -63,6 +66,9 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 ### decisions の主要文書
 
+- [`admin-field-layout-v1.md`](decisions/admin-field-layout-v1.md) — Admin編集画面のtabs/sidebar配置。Manufacturers POC結果と他collectionへの展開案
+- [`admin-field-to-page-section-map-v1.md`](decisions/admin-field-to-page-section-map-v1.md) — Admin fieldが実際に公開ページのどこへ出るか（出ないか）の対応表。実コード確認済み
+- [`admin-publish-cache-reflection-slo-v1.md`](decisions/admin-publish-cache-reflection-slo-v1.md) — Admin公開から公開ページ反映までのSLOと超過時の手順
 - [`content-platform-and-database-architecture-v2.md`](decisions/content-platform-and-database-architecture-v2.md) — Payload CMS、PostgreSQL、GitHub、公開サイト、Codex MCPの役割を定める移行後アーキテクチャ
 - [`data-architecture-redesign-v1.md`](decisions/data-architecture-redesign-v1.md) — id/slug分離、参照設計、正本管理、CMS移行を見据えたデータ設計
 - [`data-maintenance-checklist-v1.md`](decisions/data-maintenance-checklist-v1.md) — データ追加、slug変更、公開前確認、鮮度レビューの実行チェックリスト

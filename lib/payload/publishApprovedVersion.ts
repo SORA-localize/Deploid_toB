@@ -3,7 +3,8 @@ import type { Payload, PayloadRequest } from 'payload';
 import { type AuthenticatedAdminUser, asAdminUser, isContentPublisherOrAboveUser } from './access';
 import { approvedPublishContext } from './publishAuthorization';
 import { acquireDocumentWriteLock } from './publishLock';
-import { notifyRevalidationAfterCommit } from './revalidationHook';
+import { notifyRevalidationAfterCommit, type RevalidationNotifyResult } from './revalidationHook';
+import { ADMIN_PUBLISH_INTENT_FIELD } from './adminPublishIntent';
 
 /**
  * 承認済みdraftの公開を1箇所へ集約する（brief）。Task 6〜9.5は独自のpublish updateを作らず、
@@ -40,6 +41,10 @@ export interface PublishApprovedVersionResult {
   canonicalHash: string;
   versionChainHeadId: string | number;
   documentId: string | number;
+  /** Admin UIが「反映されたか分からない」を編集者へ伝えるための、再検証通知の結果。
+   * `ok`は「タグ無効化を受理した」であって「ページに反映済み」ではない
+   * （`RevalidationNotifyResult`のコメント参照）。 */
+  revalidation: RevalidationNotifyResult;
 }
 
 /** 承認manifest hashと同じ計算式。versionのcanonical field（system field除く）をsorted-key JSONにしてsha256。 */
@@ -49,7 +54,17 @@ export function computeCanonicalHash(data: Record<string, unknown>): string {
   return createHash('sha256').update(JSON.stringify(sorted)).digest('hex');
 }
 
-const SYSTEM_FIELDS = new Set(['id', 'createdAt', 'updatedAt', '_status', 'updatedBy']);
+const SYSTEM_FIELDS = new Set([
+  'id',
+  'createdAt',
+  'updatedAt',
+  '_status',
+  'updatedBy',
+  // Admin公開UIの競合制御marker（`lib/payload/adminPublishIntent.ts`）。versionごとに変わる
+  // 運用メタデータなので、canonical contentへ入れるとhashが内容と無関係に変動する。
+  // 公開されるmain rowへもコピーしない。
+  ADMIN_PUBLISH_INTENT_FIELD,
+]);
 
 function stripSystemFields(data: Record<string, unknown>): Record<string, unknown> {
   const result: Record<string, unknown> = {};
@@ -179,7 +194,7 @@ export async function publishApprovedVersion(args: PublishApprovedVersionArgs): 
     await payload.db.commitTransaction(transactionID);
     committed = true;
 
-    await notifyRevalidationAfterCommit(collection, payload);
+    const revalidation = await notifyRevalidationAfterCommit(collection, payload);
 
     payload.logger.info({
       msg: 'publish-approved-version',
@@ -195,6 +210,7 @@ export async function publishApprovedVersion(args: PublishApprovedVersionArgs): 
       canonicalHash: computeCanonicalHash(published as unknown as Record<string, unknown>),
       versionChainHeadId: chainHead[0]?.id ?? approvedVersionId,
       documentId: doc.id,
+      revalidation,
     };
   } catch (error) {
     // commit後（= 公開は成立済み）にログ等で落ちた場合まで rollback を呼ぶと、解決済みsessionを
