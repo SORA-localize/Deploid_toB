@@ -204,28 +204,27 @@ export interface Manufacturer {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  summary: string;
-  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources: {
-    title: string;
-    url: string;
-    publisher?: string | null;
-    /**
-     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
-     */
-    publishedAt?: string | null;
-    /**
-     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
-     */
-    checkedAt: string;
-    reliability: 'verified' | 'official' | 'reported' | 'estimated';
-    note?: string | null;
-    id?: string | null;
-  }[];
+  featuredRank?: number | null;
   /**
    * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
    */
   nextReviewBy?: string | null;
+  name: string;
+  nameJa?: string | null;
+  summary: string;
+  description: string;
+  country: string;
+  hqCity?: string | null;
+  headquarters?: {
+    lat?: number | null;
+    lng?: number | null;
+  };
+  foundedYear?: number | null;
+  companyType: 'manufacturer' | 'distributor' | 'integrator' | 'ai-os' | 'research';
+  companyStatus?: ('active' | 'stealth' | 'acquired' | 'inactive') | null;
+  japanPresence: 'office' | 'distributor' | 'partner' | 'remote' | 'none' | 'unknown';
+  website: string;
+  contactUrl?: string | null;
   heroImage?: {
     src?: string | null;
     alt?: string | null;
@@ -255,23 +254,6 @@ export interface Manufacturer {
     };
     aspectRatio?: number | null;
   };
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    noindex?: boolean | null;
-  };
-  name: string;
-  nameJa?: string | null;
-  companyType: 'manufacturer' | 'distributor' | 'integrator' | 'ai-os' | 'research';
-  companyStatus?: ('active' | 'stealth' | 'acquired' | 'inactive') | null;
-  country: string;
-  hqCity?: string | null;
-  headquarters?: {
-    lat?: number | null;
-    lng?: number | null;
-  };
-  foundedYear?: number | null;
-  website: string;
   /**
    * ManufacturerLogos（symbol/wordmark/combined、それぞれImageAsset形）。
    */
@@ -284,9 +266,28 @@ export interface Manufacturer {
     | number
     | boolean
     | null;
-  contactUrl?: string | null;
-  description: string;
-  japanPresence: 'office' | 'distributor' | 'partner' | 'remote' | 'none' | 'unknown';
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     */
+    publishedAt?: string | null;
+    /**
+     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    noindex?: boolean | null;
+  };
   /**
    * 移行完了後に削除予定（data-architecture-redesign-v1.md §11: distributors collectionへ移す）。当面は表示互換のため残す。
    */
@@ -307,7 +308,6 @@ export interface Manufacturer {
   supportNote?: string | null;
   procurementNote?: string | null;
   vendorRiskNote?: string | null;
-  featuredRank?: number | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1478,21 +1478,26 @@ export interface ManufacturersSelect<T extends boolean = true> {
   slug?: T;
   previousSlugs?: T;
   lifecycleStatus?: T;
+  featuredRank?: T;
+  nextReviewBy?: T;
+  name?: T;
+  nameJa?: T;
   summary?: T;
-  reliability?: T;
-  sources?:
+  description?: T;
+  country?: T;
+  hqCity?: T;
+  headquarters?:
     | T
     | {
-        title?: T;
-        url?: T;
-        publisher?: T;
-        publishedAt?: T;
-        checkedAt?: T;
-        reliability?: T;
-        note?: T;
-        id?: T;
+        lat?: T;
+        lng?: T;
       };
-  nextReviewBy?: T;
+  foundedYear?: T;
+  companyType?: T;
+  companyStatus?: T;
+  japanPresence?: T;
+  website?: T;
+  contactUrl?: T;
   heroImage?:
     | T
     | {
@@ -1512,6 +1517,20 @@ export interface ManufacturersSelect<T extends boolean = true> {
             };
         aspectRatio?: T;
       };
+  logos?: T;
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  reliability?: T;
   seo?:
     | T
     | {
@@ -1519,24 +1538,6 @@ export interface ManufacturersSelect<T extends boolean = true> {
         metaDescription?: T;
         noindex?: T;
       };
-  name?: T;
-  nameJa?: T;
-  companyType?: T;
-  companyStatus?: T;
-  country?: T;
-  hqCity?: T;
-  headquarters?:
-    | T
-    | {
-        lat?: T;
-        lng?: T;
-      };
-  foundedYear?: T;
-  website?: T;
-  logos?: T;
-  contactUrl?: T;
-  description?: T;
-  japanPresence?: T;
   domesticDistributors?:
     | T
     | {
@@ -1551,7 +1552,6 @@ export interface ManufacturersSelect<T extends boolean = true> {
   supportNote?: T;
   procurementNote?: T;
   vendorRiskNote?: T;
-  featuredRank?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

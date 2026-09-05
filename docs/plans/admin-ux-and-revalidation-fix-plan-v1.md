@@ -604,9 +604,22 @@ select値は増える（`surface`/`slot`/`kind`が追加）。**正確な値は�
 - 運用頻度で3層に分け、collection別の配置表を同ファイルへ作る
 - **`type: 'group'` を新規に追加しない**（data構造が変わりmigrationが必要になる）
 
-**完了条件**:
-- POCの結果が`docs/decisions/admin-field-layout-v1.md`に記録されている
-- `npm run payload:migrate:create -- structure-check --skip-empty` が**新しいmigrationを生成しない**
+**完了条件**: ✅ **2026-09-05実装済み**。
+
+- `lib/payload/adminFieldLayout.ts`を新設（`partitionFieldsByName()`/`withSidebarPosition()`）。
+  `access.ts`側の共有field生成関数は変更せず、振り分けは`Manufacturers.ts`内で完結させた
+- `Manufacturers.ts`をsidebar 6field + tab3枚（基本情報13/画像・出典5/国内取引レガシー5）へ
+  再構成。どのグループにも入らないfieldが残っていたら起動時に例外を投げる安全網を実装
+- 使い捨てDB上で実際に`getPayload()`を起動し、Playwrightで実画面を確認（tabの切り替え、
+  sidebarがtab切り替えを跨いで常時表示されること、nested groupのlabelがtab内でも
+  正しく見出しとして出ることを確認）。確認後、DB・screenshotとも削除済み
+- 同じ使い捨てDB上で`payload:migrate:create -- structure-check --skip-empty`を実行し、
+  既存10件のmigrationを適用した状態から**新しいmigrationファイルが生成されないこと**を確認
+  （実行前後で`migrations/*.ts`の件数が10件のまま）
+- `payload-types.ts`は`Manufacturer`interfaceのプロパティ順序だけが変わり、型・フィールド
+  集合は1件も変わっていないことをsortして比較し確認済み（自動再生成分としてコミットに含める）
+- POC結果と、他6 collection分の3層配置設計案（未実装・次task向け）を
+  `docs/decisions/admin-field-layout-v1.md`に記録した
 
 ---
 
