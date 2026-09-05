@@ -379,3 +379,22 @@ runtimeではOIDC tokenは`process.env`ではなく`x-vercel-oidc-token` request
   接続数設計（Payloadの`pool.max`調整、Vercel Fluid Compute側の同時実行数制御等）が要る。
 - `PAYLOAD_PUBLIC_SERVER_URL`をPreview Vercel project環境変数へ実際に設定するかどうかは
   未決定のまま（現状は未設定でも動く設計だが、Step 6実行時に確定する）。
+
+### 追記（2026-09-05）: Preview DATABASE_URLがsession poolerへ退行していたことを確認・特定
+
+`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 0。上記「未実施・未検証事項」の
+2番目の項目を、この日に一時debug route（`src/app/api/admin/debug-db-pool/route.ts`、
+`process.env.DATABASE_URL`をparseしてport・host種別だけ返す。Postgresへは接続しない）で確認した。
+
+**結果: `{"hasDatabaseUrl":true,"port":"5432","hostKind":"pooler","poolerMode":"session","vercelEnv":"preview"}`。
+Preview実行時のDATABASE_URLはsession pooler（5432）だった。**
+
+Vercel Activity Log（read-only API）で追跡すると、Preview `DATABASE_URL`の変更はこの日まで
+2026-08-25 22:43:24（削除）→22:43:27（再追加）の1回きりで、以後一度も変更されていない
+（`GET /v9/projects/:id/env`の`updatedAt`で確認）。同時刻のcommit `67b90e8`は
+「Preview環境変数を最新のtransaction-pooler接続文字列へ更新した」と記録しているが、
+**実際に入力された値はsession pooler（5432）だった。** 意図（6543）と実際の入力値が
+食い違っていたことになる。
+
+これにより「8/25 22:43の再追加が退行点」と確定した。以後の対応
+（transaction poolerへ戻す）は`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 1参照。
