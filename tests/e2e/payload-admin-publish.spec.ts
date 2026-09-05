@@ -145,6 +145,61 @@ test.describe('Admin publish UI', () => {
       .toBe(editedName);
   });
 
+  /**
+   * Task 8（`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md`）。
+   *
+   * 上のテストの`readPublishedName()`はPayload REST（`/api/manufacturers`）を読む——
+   * これはPayloadのdrizzleクエリを直接叩くため、公開処理が`main row`さえ更新していれば
+   * 必ず最新値を返す。つまり上のテストは「公開処理の内部状態」しか証明しておらず、
+   * **読者が実際に見る、Next.jsの`'use cache'`でcacheされた公開ページのHTML**が
+   * 追従することは一切証明していなかった（初版計画の誤り）。
+   *
+   * このテストは`tests/e2e/cache-revalidation.spec.ts`と同じ方式（`revalidateTag(tag,
+   * 'max')`のstale-while-revalidate契約に従い、1回の読み取りではなくポーリングで収束を
+   * 待つ）で、admin UIでの実際の編集・公開のあとに**公開ページのレンダリング結果**が
+   * 追従することを直接確認する。
+   *
+   * `nameJa`を編集する（`name`ではない）。メーカー詳細ページの見出しは
+   * `manufacturer.nameJa ?? manufacturer.name`（`src/app/(frontend)/manufacturers/[slug]/
+   * page.tsx`）で、fixtureの`nameJa`（「アルファロボティクス」）が常に`name`より優先されるため、
+   * `name`だけ書き換えても画面には一切反映されない。
+   */
+  test('publisher: 公開後、公開ページ（cached HTML）にも編集内容が反映される', async ({ page }) => {
+    await login(page, PUBLISHER.email, PUBLISHER.password);
+    await openEditPage(page);
+
+    const editedNameJa = `E2E反映確認 ${Date.now()}`;
+    await page.locator('#field-nameJa').fill(editedNameJa);
+    await publishButton(page).click();
+
+    // 公開処理自体の完了は、上のテストと同じ理由でREST側のpollingで先に確認しておく
+    // （でないと、下のcached HTML pollingが「公開がまだ終わっていないだけ」なのか
+    // 「反映機構が壊れている」のか区別できない）。
+    await expect
+      .poll(
+        async () => {
+          const response = await page.request.get(
+            `/api/manufacturers?where[stableId][equals]=${MANUFACTURER_STABLE_ID}&depth=0&limit=1`,
+          );
+          const body = (await response.json()) as { docs?: Array<{ nameJa?: string }> };
+          return body.docs?.[0]?.nameJa;
+        },
+        { timeout: 30_000 },
+      )
+      .toBe(editedNameJa);
+
+    // ここからが本題: 公開ページ自体のHTMLがstale-while-revalidateを経て収束することを見る。
+    await expect
+      .poll(
+        async () => {
+          await page.goto(`/manufacturers/${MANUFACTURER_STABLE_ID}`);
+          return page.locator('h1').first().textContent();
+        },
+        { timeout: 30_000, intervals: [500, 1000, 2000] },
+      )
+      .toContain(editedNameJa);
+  });
+
   test('publisher: 必須項目を空にすると、不足項目が名指しで表示される', async ({ page }) => {
     await login(page, PUBLISHER.email, PUBLISHER.password);
     await openEditPage(page, VALIDATION_STABLE_ID);

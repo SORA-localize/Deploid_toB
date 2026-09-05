@@ -732,18 +732,45 @@ npm run test:e2e -- tests/e2e/payload-admin-publish.spec.ts tests/e2e/cache-reva
 - [x] 並行負荷後（各route12リクエスト、計24）、直後5分間 `EMAXCONNSESSION` が0（T1・T8）——**2026-09-05実機確認済み。24/24が200、EMAXCONNSESSION 0件**
 - [ ] draft保存（フェーズ①、`PublishFromApproval.tsx:90-91`のPayload標準REST）がDB接続失敗で
   落ちたとき、admin画面の表示が編集者にとって分かる内容になっているか確認する。
-  **我々のroute外（Payload自身のREST handler）のため、コードは変更しない**（T1）
-- [ ] 公開 → **公開ページのHTML**が SLO 内に変わる（T8）
+  **我々のroute外（Payload自身のREST handler）のため、コードは変更しない**（T1）。
+  **未実施**——優先度低（コード変更が無いため退行リスクが低い）と判断し、Preview実機確認の
+  対象から意図的に外した
+- [x] 公開 → **公開ページのHTML**が SLO 内に変わる（T8）——**2026-09-05実施済み**。
+  `tests/e2e/payload-admin-publish.spec.ts`に「公開後、公開ページ（cached HTML）にも
+  編集内容が反映される」テストを追加。使い捨てPostgres + `next build && next start` +
+  実admin UI操作で、`nameJa`を編集→公開→**公開ページの`<h1>`が新しい値に収束するまで
+  ポーリング**することを確認。既存2 e2e（`cache-revalidation.spec.ts`・
+  `payload-admin-publish.spec.ts`、日本語ロケール分含む計7件）も同時実行し全件pass
 - [ ] 通知が失敗したとき、その旨がtoastに出る（T2。単体テストでは確認済み、Preview実機はまだ）
 - [ ] draft保存時にネットワークタブで`/api/revalidate-content`への通知が飛ばないことを確認する
   （公開時だけ1回飛ぶ）（T2。単体テストでは確認済み、Preview実機はまだ）
-- [ ] **ja locale** で英語のfield名が無い（T4）
-- [ ] **en locale** で日本語が混ざらない（D-4・T4）
-- [ ] 選択肢の表記が公開ページと一致（T5）
-- [ ] 最初に見える項目が日常編集の項目だけ（T6）
-- [ ] 説明文が編集者向け（T7）
-- [ ] モバイル幅・キーボード操作
-- [ ] 公開ページの見た目が変わっていない
+- [x] **ja locale** で英語のfield名が無い（T4）——2026-09-05、使い捨てDB上の実画面で確認済み
+  （T4/T6/T7の各POCスクリーンショット）
+- [x] **en locale** で日本語が混ざらない（D-4・T4）——2026-09-05実施済み。EN localeで
+  Manufacturers編集画面を開き、本文中の日本語文字（データ値を除くUIラベル・説明文）が
+  0件であることを確認
+- [x] 選択肢の表記が公開ページと一致（T5）——既存Record（`lib/labels.ts`）がある値は
+  ja文言を転記せず直接参照する設計のため、構造的に一致する。`tests/content/
+  admin-select-labels.test.ts`が値集合の一致も固定
+- [x] 最初に見える項目が日常編集の項目だけ（T6）——Manufacturersで実画面確認済み
+  （`docs/decisions/admin-field-layout-v1.md`参照）
+- [x] 説明文が編集者向け（T7）——実画面で新しい説明文が実装用語無しで表示されることを確認済み
+  （`docs/decisions/admin-field-to-page-section-map-v1.md`参照）
+- [x] モバイル幅・キーボード操作——2026-09-05実施済み。390px幅でManufacturers編集画面の
+  レイアウト崩れ無し（sidebarが本文の下に積まれる標準の反応的挙動）。`#field-name`から
+  Tabキーで次field（`#field-nameJa`）へ正しく移動することを確認
+- [x] 公開ページの見た目が変わっていない——T4〜T7の全コミットで`components/`・
+  `src/app/(frontend)`・`lib/uiText.ts`に対する変更が0件であることを`git diff --stat`で確認済み
+
+**残る未実施（Preview実機が必要、コード変更を伴わない確認のみ）**:
+- Vercel実機でrouteログとHTML反映の両方を確認
+- 通知が失敗したときのtoast表示（Preview実機）
+- draft保存時に通知が飛ばないことのネットワークタブ確認（Preview実機）
+- draft保存がDB接続失敗で落ちたときの表示（優先度低、上記参照）
+
+これらは全て**Preview環境への実デプロイと、そこへの実アクセスを要する**——ローカルの
+使い捨てDBでは再現できない（Vercel Deployment Protectionの挙動、実際のPreview URL経由の
+自己POST等）。ユーザーの明示的な承認を得てから着手する。
 
 ---
 
