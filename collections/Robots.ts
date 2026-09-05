@@ -104,7 +104,14 @@ export const Robots: CollectionConfig = {
       {
         name: 'specs',
         type: 'json',
-        admin: { description: 'RobotSpecs。項目定義（単位・ラベル・グループ）の正本は lib/specSchema.ts。' },
+        // JSON形はspec項目keyをキーにした値のRecord。項目定義（単位・ラベル・グループ分け）の
+        // 正本は lib/specSchema.ts の specSchema 配列——新しい項目を追加する場合はそちらを編集する。
+        admin: {
+          description: {
+            ja: 'スペック値（項目名ごとのオブジェクト）。ロボット詳細ページの「仕様」「技術仕様」「詳細仕様」欄に表示されます。',
+            en: 'Spec values, keyed by item name. Shown in the "Specifications" sections of the robot detail page.',
+          },
+        },
       },
       {
         name: 'procurementModels',
@@ -157,7 +164,14 @@ export const Robots: CollectionConfig = {
       {
         name: 'fieldEvidence',
         type: 'json',
-        admin: { description: 'RobotFieldEvidence。specSchemaのkey / priceOffers / loadRatings → sourceUrl[]。' },
+        // JSON形はspec項目key（lib/specSchema.ts）または`priceOffers`/`loadRatings`のkeyを
+        // キーにした、出典URL配列のRecord。
+        admin: {
+          description: {
+            ja: '各スペック項目の根拠となる出典URL。ロボット詳細ページの仕様欄で、各項目に付く出典リンクとして表示されます。',
+            en: 'Source URLs backing each spec value. Shown as the citation links attached to each spec row on the robot detail page.',
+          },
+        },
       },
       { name: 'usageExampleSourceUrls', type: 'text', hasMany: true },
       {
@@ -171,14 +185,28 @@ export const Robots: CollectionConfig = {
       {
         name: 'images',
         type: 'json',
-        admin: { description: 'Partial<Record<ImageRole, ImageAsset>>。' },
+        // JSON形の内訳: role名（hero/transparent/side/inOperation/scale/endEffector/mobility）を
+        // キーに、それぞれ`heroImage`と同じ形のImageAssetオブジェクトを持つ（省略可）。
+        // `lib/robotMedia.ts`の`ROBOT_IMAGE_ROLE_ORDER`と対応。
+        admin: {
+          description: {
+            ja: '画像（role別、いずれも任意）。ロボット詳細ページの画像ギャラリーに表示されます。',
+            en: 'Images by role (all optional). Shown in the image gallery on the robot detail page.',
+          },
+        },
       },
       { name: 'industryTags', type: 'text', hasMany: true },
       { name: 'taskTags', type: 'text', hasMany: true },
       {
         name: 'comparison',
         type: 'group',
-        admin: { description: '@deprecated。/compare の作り替えが決まるまで維持する（削除しない）。' },
+        // 非推奨: /compare の作り替えが決まるまで維持する（削除しない）。
+        admin: {
+          description: {
+            ja: '比較情報（強み・制約・向く/向かない用途）。/robots/[slug]ではなく「/compare」ページに表示されます。今後作り替え予定ですが、現時点では入力してください。',
+            en: 'Comparison info (strengths / constraints / fit). Shown on the /compare page, not the robot detail page. Scheduled for a future rework, but should still be filled in for now.',
+          },
+        },
         fields: applyAdminFieldLabels(
           [
             { name: 'strengths', type: 'text', hasMany: true },

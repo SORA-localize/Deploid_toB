@@ -75,14 +75,21 @@ export const SiteSettings: GlobalConfig = {
         name: 'dataAsOf',
         type: 'text',
         admin: {
-          description:
-            '掲載件数が正しい時点（例: 2026年7月）。日精度とは限らないためtext。Payloadが正本で、ローカル定数へのfallbackは無い。',
+          description: {
+            ja: '掲載件数が正しい時点（例: 2026年7月）。日精度とは限りません。「/for-manufacturers」ページのデータ基準時点として表示されます。',
+            en: 'The point in time the listing counts are accurate as of (e.g. "July 2026"). Day-level precision is not required. Shown as the "data as of" note on the /for-manufacturers page.',
+          },
         },
       },
       {
         name: 'articleIndexPlacementLimits',
         type: 'group',
-        admin: { description: 'reports index の hero / feature 掲載上限。' },
+        admin: {
+          description: {
+            ja: '記事一覧ページのhero/feature枠に掲載する件数の上限。トップページ・記事一覧ページの表示件数に影響します。',
+            en: 'Maximum number of articles shown in the hero/feature slots on the article index page. Affects how many items appear on the home page and the article index page.',
+          },
+        },
         fields: applyAdminFieldLabels(
           [
             { name: 'hero', type: 'number' },

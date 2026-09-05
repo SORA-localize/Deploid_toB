@@ -79,7 +79,15 @@ export const RobotSeriesCollection: CollectionConfig = {
       {
         name: 'images',
         type: 'json',
-        admin: { description: 'Partial<Record<ImageRole, ImageAsset>>。' },
+        // JSON形の内訳: role名（hero/transparent/side/inOperation/scale/endEffector/mobility）を
+        // キーに、それぞれ`heroImage`と同じ形のImageAssetオブジェクトを持つ（省略可）。
+        // `lib/robotMedia.ts`の`ROBOT_IMAGE_ROLE_ORDER`と対応（Robots.imagesと同じ形式）。
+        admin: {
+          description: {
+            ja: '画像（role別、いずれも任意）。現状、robot-seriesを単体で表示するページが無いため、公開ページには表示されません。',
+            en: 'Images by role (all optional). Not shown on any public page yet — there is currently no dedicated page for a robot series on its own.',
+          },
+        },
       },
       { name: 'industryTags', type: 'text', hasMany: true },
       { name: 'taskTags', type: 'text', hasMany: true },

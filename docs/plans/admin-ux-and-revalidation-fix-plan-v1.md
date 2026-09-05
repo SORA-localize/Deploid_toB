@@ -635,8 +635,29 @@ select値は増える（`surface`/`slot`/`kind`が追加）。**正確な値は�
 - 実装理由はコードコメントへ移す（消さない）
 - **D-4 に従い ja/en 両方**
 
-**完了条件**: `admin.description` に実装用語（`timestamptz` / `Task 5` / ファイルパス）が残っていない。
-対応表が`docs/decisions/admin-field-to-page-section-map-v1.md`に存在する
+**完了条件**: ✅ **2026-09-05実装済み**。
+
+- `docs/decisions/admin-field-to-page-section-map-v1.md`を新規作成。実コード
+  （`components/SourceList.tsx`・`lib/robotMedia.ts`・`lib/robotCatalog.ts`・
+  `lib/media.ts`・各`[slug]/page.tsx`等）を読んで、field→公開ページ表示箇所を確定した。
+  推測はしていない——「表示されない」と書いた項目は該当componentに参照が無いことを
+  grepで確認済み。副産物として、`heroImage`が`Articles`以外の5 collectionでは
+  現状どこにも読まれていないこと、`RobotSeries`は単体表示ページ自体が存在しないこと、
+  `UseCases.buyerReadiness`が公開UIで未消費であることを確認した
+  （いずれも`lib/content/cacheDependencies.ts`の`KNOWN_GAPS`と整合する既知の状態）
+- 対象16箇所の`admin.description`を書き換え（`access.ts`4 + `Manufacturers.ts`3 +
+  `RobotSeries.ts`1 + `Robots.ts`4 + `UseCases.ts`2 + `Articles.ts`3 +
+  `SiteSettings.ts`2、`Media.ts`の同一パターン1箇所も一貫性のため合わせて修正）。
+  全てD-4に従い`{ja, en}`形
+- 実装理由（`timestamptz`によるTZずれ、Task番号、ファイルパス）は削除せず、
+  `lib/payload/access.ts`の`sourcesField()`冒頭docblockへ集約するか、各field定義の
+  直上に`//`コメントとして残した
+- `grep`で`admin.description`の値そのもの（コードコメントを除く）に
+  `timestamptz`/`Task [0-9]`/ファイルパスが1件も残っていないことを確認済み
+- 使い捨てDBで`payload:migrate:create -- structure-check --skip-empty`を実行し、
+  新しいmigrationが生成されないことを確認（説明文のみの変更のため当然だが実測した）。
+  同じ使い捨てDB上でPlaywrightにより実画面を確認し、書き換え後の文言が
+  実装用語無しで正しく表示されることを確認した
 
 ---
 

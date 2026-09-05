@@ -268,6 +268,15 @@ export const immutableStableId: FieldAccess = ({ data, doc }) => {
  * `Date.parse('2025-05') === Date.parse('2025-05-01')` のため差分として出ず、**損失が
  * 検出できない形**になる。`collections/Deployments.ts` の `startedAt`（`'2024-01'` を持つため
  * Task 3時点で `text`）と同じ判断をここにも適用する。
+ *
+ * **`checkedAt`（この関数の下）・`rightsMetaField()`の`checkedAt`・
+ * `baseRecordContentFields()`の`nextReviewBy`・`Manufacturers.domesticDistributors[].checkedAt`・
+ * `Articles.publishedAt` も同じ理由で `date` ではなく `text`。** これらは日付のみの値で、
+ * `timestamptz` にすると import 時の server TZ 変換で日付がずれる（Task 5で発見）。
+ * この一箇所にまとめて書き、各field定義側では繰り返さない（Task 7: 以前は
+ * `admin.description` にこの実装理由をそのまま書いていたため、編集者向け画面に
+ * `timestamptz` 等の実装用語がそのまま出ていた。ここへ移し、`admin.description` 側は
+ * 編集者向けの文言だけにする）。
  */
 export function sourcesField(): Field {
   return {
@@ -283,11 +292,23 @@ export function sourcesField(): Field {
           name: 'publishedAt',
           type: 'text',
           admin: {
-            description:
-              '出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。',
+            description: {
+              ja: '出典が公開された日付。日が分からない場合は月または年だけでも構いません（例: 2025-05）。出典欄には表示されない社内記録用の項目です。',
+              en: 'The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.',
+            },
           },
         },
-        { name: 'checkedAt', type: 'text', required: true, admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
+        {
+          name: 'checkedAt',
+          type: 'text',
+          required: true,
+          admin: {
+            description: {
+              ja: 'この出典を確認した日付。出典欄に「確認 ○○」として表示されます。',
+              en: 'The date this source was last checked. Shown on the public source list as "Checked …".',
+            },
+          },
+        },
         {
           name: 'reliability',
           type: 'select',
@@ -326,7 +347,16 @@ function rightsMetaField(name: string): Field {
           type: 'select',
           options: rightsSourceTypeSelectOptions,
         },
-        { name: 'checkedAt', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
+        {
+          name: 'checkedAt',
+          type: 'text',
+          admin: {
+            description: {
+              ja: '画像の権利状況を確認した日付。ページには表示されません（社内の権利管理用）。',
+              en: "The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.",
+            },
+          },
+        },
         { name: 'rightsHolder', type: 'text' },
         { name: 'licenseUrl', type: 'text' },
         { name: 'permissionNote', type: 'textarea' },
@@ -386,7 +416,16 @@ export function baseRecordContentFields(): Field[] {
         options: reliabilitySelectOptions,
       },
       sourcesField(),
-      { name: 'nextReviewBy', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
+      {
+        name: 'nextReviewBy',
+        type: 'text',
+        admin: {
+          description: {
+            ja: 'この項目の内容を次に見直すべき期限。ページには表示されません（社内のファクトチェック管理用）。',
+            en: "The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.",
+          },
+        },
+      },
       imageAssetField('heroImage'),
       seoField(),
     ],

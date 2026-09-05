@@ -101,7 +101,14 @@ export const UseCases: CollectionConfig = {
         name: 'buyerReadiness',
         type: 'select',
         options: useCaseBuyerReadinessSelectOptions,
-        admin: { description: 'Robotsからは削除済み（DEC-S05）。UseCaseには残す。' },
+        // Robotsからは削除済み（DEC-S05）。UseCaseにはこのfield自体は残すが、
+        // 公開UI側の消費箇所が無い状態（下記description参照）。
+        admin: {
+          description: {
+            ja: '導入検討度。現状、公開ページのどこにも表示されていません（社内の分類用）。',
+            en: 'Buyer readiness. Not currently shown anywhere on the public site — used for internal classification only.',
+          },
+        },
       },
       {
         name: 'environment',
@@ -154,8 +161,13 @@ export const UseCases: CollectionConfig = {
       {
         name: 'candidateRobots',
         type: 'array',
+        // DEC-S08: `robotId`/`seriesId`はどちらか一方だけを想定した設計だが、両方入力しても
+        // 現状の保存処理は止めない（domain validator側での強制はTask 4以降の拡張候補）。
         admin: {
-          description: '`robotId` または `seriesId` のどちらか一方だけを持つ（DEC-S08）。両方入力しても保存を止めない（domain validatorはTask 4以降で拡張）。',
+          description: {
+            ja: '候補ロボット。用途詳細ページの「候補ロボット」欄に表示されます。ロボット本体か、シリーズかのどちらか一方を選んでください。',
+            en: 'Candidate robots. Shown in the "Candidate robots" section of the use case detail page. Choose either a specific robot or a series, not both.',
+          },
         },
         fields: applyAdminFieldLabels(
           [

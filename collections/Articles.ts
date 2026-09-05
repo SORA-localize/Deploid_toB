@@ -127,7 +127,19 @@ export const Articles: CollectionConfig = {
         type: 'select',
         options: articleContentKindSelectOptions,
       },
-      { name: 'publishedAt', type: 'text', required: true, admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
+      {
+        name: 'publishedAt',
+        type: 'text',
+        required: true,
+        // text型の理由: lib/payload/access.ts の sourcesField 冒頭コメント参照
+        // （日付のみの値をtimestamptzにするとimport時のserver TZで日付がずれるため）。
+        admin: {
+          description: {
+            ja: '記事の公開日。記事カード・記事詳細ページに表示されます。',
+            en: "The article's publish date. Shown on the article card and detail page.",
+          },
+        },
+      },
       { name: 'author', type: 'text' },
       { name: 'industryTags', type: 'text', hasMany: true },
       { name: 'regionTags', type: 'text', hasMany: true },
@@ -157,15 +169,24 @@ export const Articles: CollectionConfig = {
         name: 'body',
         type: 'textarea',
         admin: {
-          description: 'Markdown本文。type === manufacturer-guide の記事では使わない（manufacturerGuideContentを使う）。',
+          description: {
+            ja: '記事本文（Markdown）。記事タイプが「メーカー解説」の場合はこちらではなく下の専用欄（manufacturerGuideContent）を使います。',
+            en: 'Article body (Markdown). When the article type is "Manufacturer guide", use the dedicated field below (manufacturerGuideContent) instead of this one.',
+          },
           condition: (_, siblingData) => siblingData?.type !== 'manufacturer-guide',
         },
       },
       {
         name: 'manufacturerGuideContent',
         type: 'json',
+        // JSON形の内訳（`docs/decisions/editorial_style_guide_v1.md` §6のテンプレートに対応）:
+        // `companyOverview`（企業概要）/`lineup`（機体ラインアップ）/`deploymentStatus`（導入実績）/
+        // `procurementChannels`（購入・相談チャネル）/`faq`（よくある質問）等。
         admin: {
-          description: 'ManufacturerGuideContent（companyOverview / lineup / deploymentStatus / procurementChannels / faq 等）。type === manufacturer-guide の記事だけ使う。',
+          description: {
+            ja: 'メーカー解説の専用コンテンツ（企業概要・機体ラインアップ・導入実績・購入/相談チャネル・FAQ等）。記事タイプが「メーカー解説」の記事だけで使い、記事詳細ページの各セクションに表示されます。',
+            en: 'Manufacturer-guide-only content (company overview, lineup, deployment status, procurement channels, FAQ, etc.). Used only when the article type is "Manufacturer guide" — rendered as the corresponding sections on the article detail page.',
+          },
           condition: (_, siblingData) => siblingData?.type === 'manufacturer-guide',
         },
       },

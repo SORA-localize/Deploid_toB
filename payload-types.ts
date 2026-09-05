@@ -206,7 +206,7 @@ export interface Manufacturer {
   lifecycleStatus: 'active' | 'archived';
   featuredRank?: number | null;
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   name: string;
@@ -245,7 +245,7 @@ export interface Manufacturer {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -255,7 +255,7 @@ export interface Manufacturer {
     aspectRatio?: number | null;
   };
   /**
-   * ManufacturerLogos（symbol/wordmark/combined、それぞれImageAsset形）。
+   * Logo images (symbol / wordmark / combined variants, each optional). Shown at the top of the manufacturer detail page.
    */
   logos?:
     | {
@@ -271,11 +271,11 @@ export interface Manufacturer {
     url: string;
     publisher?: string | null;
     /**
-     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
      */
     publishedAt?: string | null;
     /**
-     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     * The date this source was last checked. Shown on the public source list as "Checked …".
      */
     checkedAt: string;
     reliability: 'verified' | 'official' | 'reported' | 'estimated';
@@ -289,7 +289,7 @@ export interface Manufacturer {
     noindex?: boolean | null;
   };
   /**
-   * 移行完了後に削除予定（data-architecture-redesign-v1.md §11: distributors collectionへ移す）。当面は表示互換のため残す。
+   * Domestic distributors. Shown in the "Domestic distributors" section of the manufacturer detail page.
    */
   domesticDistributors?:
     | {
@@ -297,7 +297,7 @@ export interface Manufacturer {
         website?: string | null;
         sourceUrl?: string | null;
         /**
-         * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+         * The date this distributor listing was last checked. Not shown publicly — kept for internal reference.
          */
         checkedAt?: string | null;
         note?: string | null;
@@ -333,11 +333,11 @@ export interface Distributor {
     url: string;
     publisher?: string | null;
     /**
-     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
      */
     publishedAt?: string | null;
     /**
-     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     * The date this source was last checked. Shown on the public source list as "Checked …".
      */
     checkedAt: string;
     reliability: 'verified' | 'official' | 'reported' | 'estimated';
@@ -345,7 +345,7 @@ export interface Distributor {
     id?: string | null;
   }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -368,7 +368,7 @@ export interface Distributor {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -416,11 +416,11 @@ export interface Robot {
     url: string;
     publisher?: string | null;
     /**
-     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
      */
     publishedAt?: string | null;
     /**
-     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     * The date this source was last checked. Shown on the public source list as "Checked …".
      */
     checkedAt: string;
     reliability: 'verified' | 'official' | 'reported' | 'estimated';
@@ -428,7 +428,7 @@ export interface Robot {
     id?: string | null;
   }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -451,7 +451,7 @@ export interface Robot {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -476,7 +476,7 @@ export interface Robot {
     'concept' | 'prototype' | 'pilot' | 'limited-production' | 'production' | 'internal-use' | 'discontinued';
   supersededById?: (number | null) | Robot;
   /**
-   * RobotSpecs。項目定義（単位・ラベル・グループ）の正本は lib/specSchema.ts。
+   * Spec values, keyed by item name. Shown in the "Specifications" sections of the robot detail page.
    */
   specs?:
     | {
@@ -514,7 +514,7 @@ export interface Robot {
       }[]
     | null;
   /**
-   * RobotFieldEvidence。specSchemaのkey / priceOffers / loadRatings → sourceUrl[]。
+   * Source URLs backing each spec value. Shown as the citation links attached to each spec row on the robot detail page.
    */
   fieldEvidence?:
     | {
@@ -531,7 +531,7 @@ export interface Robot {
   distributorJapan?: string | null;
   supportNote?: string | null;
   /**
-   * Partial<Record<ImageRole, ImageAsset>>。
+   * Images by role (all optional). Shown in the image gallery on the robot detail page.
    */
   images?:
     | {
@@ -545,7 +545,7 @@ export interface Robot {
   industryTags?: string[] | null;
   taskTags?: string[] | null;
   /**
-   * @deprecated。/compare の作り替えが決まるまで維持する（削除しない）。
+   * Comparison info (strengths / constraints / fit). Shown on the /compare page, not the robot detail page. Scheduled for a future rework, but should still be filled in for now.
    */
   comparison?: {
     strengths?: string[] | null;
@@ -578,11 +578,11 @@ export interface RobotSery {
     url: string;
     publisher?: string | null;
     /**
-     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
      */
     publishedAt?: string | null;
     /**
-     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     * The date this source was last checked. Shown on the public source list as "Checked …".
      */
     checkedAt: string;
     reliability: 'verified' | 'official' | 'reported' | 'estimated';
@@ -590,7 +590,7 @@ export interface RobotSery {
     id?: string | null;
   }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -613,7 +613,7 @@ export interface RobotSery {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -632,7 +632,7 @@ export interface RobotSery {
   manufacturerId: number | Manufacturer;
   description?: string | null;
   /**
-   * Partial<Record<ImageRole, ImageAsset>>。
+   * Images by role (all optional). Not shown on any public page yet — there is currently no dedicated page for a robot series on its own.
    */
   images?:
     | {
@@ -670,11 +670,11 @@ export interface UseCase {
     url: string;
     publisher?: string | null;
     /**
-     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
      */
     publishedAt?: string | null;
     /**
-     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     * The date this source was last checked. Shown on the public source list as "Checked …".
      */
     checkedAt: string;
     reliability: 'verified' | 'official' | 'reported' | 'estimated';
@@ -682,7 +682,7 @@ export interface UseCase {
     id?: string | null;
   }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -705,7 +705,7 @@ export interface UseCase {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -724,7 +724,7 @@ export interface UseCase {
   subtitle?: string | null;
   maturityLevel: 'early-stage' | 'pilot-phase' | 'production-ready';
   /**
-   * Robotsからは削除済み（DEC-S05）。UseCaseには残す。
+   * Buyer readiness. Not currently shown anywhere on the public site — used for internal classification only.
    */
   buyerReadiness?: ('initial-adoption' | 'requires-poc' | 'limited-today') | null;
   environment: 'indoor-controlled' | 'indoor-semi-controlled' | 'outdoor' | 'mixed' | 'hazardous';
@@ -753,7 +753,7 @@ export interface UseCase {
   whyHardToday?: string | null;
   japanDeploymentConditions?: string | null;
   /**
-   * `robotId` または `seriesId` のどちらか一方だけを持つ（DEC-S08）。両方入力しても保存を止めない（domain validatorはTask 4以降で拡張）。
+   * Candidate robots. Shown in the "Candidate robots" section of the use case detail page. Choose either a specific robot or a series, not both.
    */
   candidateRobots?:
     | {
@@ -798,11 +798,11 @@ export interface Deployment {
     url: string;
     publisher?: string | null;
     /**
-     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
      */
     publishedAt?: string | null;
     /**
-     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     * The date this source was last checked. Shown on the public source list as "Checked …".
      */
     checkedAt: string;
     reliability: 'verified' | 'official' | 'reported' | 'estimated';
@@ -810,7 +810,7 @@ export interface Deployment {
     id?: string | null;
   }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -833,7 +833,7 @@ export interface Deployment {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -884,11 +884,11 @@ export interface Article {
     url: string;
     publisher?: string | null;
     /**
-     * 出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
      */
     publishedAt?: string | null;
     /**
-     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     * The date this source was last checked. Shown on the public source list as "Checked …".
      */
     checkedAt: string;
     reliability: 'verified' | 'official' | 'reported' | 'estimated';
@@ -896,7 +896,7 @@ export interface Article {
     id?: string | null;
   }[];
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
   heroImage?: {
@@ -919,7 +919,7 @@ export interface Article {
       sourceType?:
         ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
       /**
-       * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
        */
       checkedAt?: string | null;
       rightsHolder?: string | null;
@@ -952,7 +952,7 @@ export interface Article {
   section: 'digest' | 'deployment' | 'business' | 'tech' | 'policy' | 'entertainment';
   contentKind?: ('editorial' | 'sample' | 'sponsored') | null;
   /**
-   * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+   * The article's publish date. Shown on the article card and detail page.
    */
   publishedAt: string;
   author?: string | null;
@@ -966,11 +966,11 @@ export interface Article {
   relatedManufacturerIds?: (number | Manufacturer)[] | null;
   relatedUseCaseIds?: (number | UseCase)[] | null;
   /**
-   * Markdown本文。type === manufacturer-guide の記事では使わない（manufacturerGuideContentを使う）。
+   * Article body (Markdown). When the article type is "Manufacturer guide", use the dedicated field below (manufacturerGuideContent) instead of this one.
    */
   body?: string | null;
   /**
-   * ManufacturerGuideContent（companyOverview / lineup / deploymentStatus / procurementChannels / faq 等）。type === manufacturer-guide の記事だけ使う。
+   * Manufacturer-guide-only content (company overview, lineup, deployment status, procurement channels, FAQ, etc.). Used only when the article type is "Manufacturer guide" — rendered as the corresponding sections on the article detail page.
    */
   manufacturerGuideContent?:
     | {
@@ -1033,7 +1033,7 @@ export interface Media {
       | 'blocked';
     sourceType: 'own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown';
     /**
-     * 日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。
+     * The date this file's rights status was last confirmed. Not shown publicly — for internal rights tracking.
      */
     checkedAt: string;
     rightsHolder?: string | null;
@@ -2268,11 +2268,11 @@ export interface SiteSetting {
     url?: string | null;
   };
   /**
-   * 掲載件数が正しい時点（例: 2026年7月）。日精度とは限らないためtext。Payloadが正本で、ローカル定数へのfallbackは無い。
+   * The point in time the listing counts are accurate as of (e.g. "July 2026"). Day-level precision is not required. Shown as the "data as of" note on the /for-manufacturers page.
    */
   dataAsOf?: string | null;
   /**
-   * reports index の hero / feature 掲載上限。
+   * Maximum number of articles shown in the hero/feature slots on the article index page. Affects how many items appear on the home page and the article index page.
    */
   articleIndexPlacementLimits?: {
     hero?: number | null;

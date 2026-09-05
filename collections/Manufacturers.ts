@@ -109,7 +109,15 @@ const manufacturersAllFields = applyAdminFieldLabels(
     {
       name: 'logos',
       type: 'json',
-      admin: { description: 'ManufacturerLogos（symbol/wordmark/combined、それぞれImageAsset形）。' },
+      // JSON形の内訳: `symbol`/`wordmark`/`combined`（いずれも省略可）。各値は
+      // `heroImage`と同じ形（`src`/`alt`/`credit`/`sourceUrl`/`rights`/`aspectRatio`）を持つ
+      // オブジェクト（`lib/content/domainTypes.ts`の`ManufacturerLogos`）。
+      admin: {
+        description: {
+          ja: 'ロゴ画像（symbol/wordmark/combinedの3種、それぞれ任意）。メーカー詳細ページ上部に表示されます。',
+          en: 'Logo images (symbol / wordmark / combined variants, each optional). Shown at the top of the manufacturer detail page.',
+        },
+      },
     },
     { name: 'contactUrl', type: 'text' },
     { name: 'description', type: 'textarea', required: true },
@@ -122,16 +130,31 @@ const manufacturersAllFields = applyAdminFieldLabels(
     {
       name: 'domesticDistributors',
       type: 'array',
+      // `distributors` collectionへ移行完了後に削除予定（data-architecture-redesign-v1.md §11）。
+      // 移行完了まではこちらが表示の正本のため、当面は表示互換のため残す。
       admin: {
-        description:
-          '移行完了後に削除予定（data-architecture-redesign-v1.md §11: distributors collectionへ移す）。当面は表示互換のため残す。',
+        description: {
+          ja: '国内代理店。メーカー詳細ページの「国内代理店」欄に表示されます。',
+          en: 'Domestic distributors. Shown in the "Domestic distributors" section of the manufacturer detail page.',
+        },
       },
       fields: applyAdminFieldLabels(
         [
           { name: 'name', type: 'text', required: true },
           { name: 'website', type: 'text' },
           { name: 'sourceUrl', type: 'text' },
-          { name: 'checkedAt', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
+          {
+            name: 'checkedAt',
+            type: 'text',
+            // text型の理由: lib/payload/access.ts の sourcesField 冒頭コメント参照
+            // （日付のみの値をtimestamptzにするとimport時のserver TZで日付がずれるため）。
+            admin: {
+              description: {
+                ja: 'この代理店情報を確認した日付。ページには表示されません（社内記録用）。',
+                en: 'The date this distributor listing was last checked. Not shown publicly — kept for internal reference.',
+              },
+            },
+          },
           { name: 'note', type: 'textarea' },
         ],
         manufacturersDomesticDistributorsFieldLabels,
