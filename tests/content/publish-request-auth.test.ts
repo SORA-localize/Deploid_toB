@@ -150,4 +150,22 @@ describe('authenticatePublisher', () => {
       error: 'unauthenticated',
     });
   });
+
+  it.each([
+    ['cannot connect to Postgres: (EMAXCONNSESSION) max clients reached in session mode'],
+    ['connect ECONNREFUSED 127.0.0.1:5432'],
+  ])(
+    // 2026-09-04にPreviewで実際に観測した失敗（`docs/reference/task9-preview-rehearsal-preflight-v1.md`）。
+    // DB接続そのものが枯渇しているのに401「unauthenticated」を返すと、編集者は再ログインしても
+    // 直らず混乱する。この場合だけ401ではなく503にする。
+    'payload.authがDB接続エラー（%s）でthrowしたら503 publish-temporarily-unavailable',
+    async (message) => {
+      const throwing = { auth: async () => { throw new Error(message); } } as never;
+      expect(await authenticatePublisher(req({}), throwing)).toEqual({
+        ok: false,
+        status: 503,
+        error: 'publish-temporarily-unavailable',
+      });
+    },
+  );
 });

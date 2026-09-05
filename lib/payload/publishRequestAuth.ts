@@ -1,5 +1,6 @@
 import type { Payload } from 'payload';
 import { type AuthenticatedAdminUser, isContentPublisherOrAboveUser } from './access';
+import { isDatabaseConnectionError } from './adminPublishErrors';
 
 /**
  * Admin公開UIのrequest受け入れ判定（`docs/plans/admin-publish-ui-plan-v1.md` Task 3）。
@@ -25,7 +26,8 @@ import { type AuthenticatedAdminUser, isContentPublisherOrAboveUser } from './ac
 export type PublisherAuthResult =
   | { ok: true; user: AuthenticatedAdminUser }
   | { ok: false; status: 401; error: 'unauthenticated' }
-  | { ok: false; status: 403; error: 'insufficient-role' };
+  | { ok: false; status: 403; error: 'insufficient-role' }
+  | { ok: false; status: 503; error: 'publish-temporarily-unavailable' };
 
 /** `x-forwarded-host` があればそちらを使う（Vercelでは `host` がinternal値になりうる）。 */
 function externalHost(request: Request): string | null {
@@ -60,8 +62,12 @@ export function isSameOriginRequest(request: Request): boolean {
  * どちらも `null` へ畳み込んでいる。それを踏襲すると「ログインしていない」と
  * 「権限が足りない」を利用者へ出し分けられないので、ここでは区別する。
  *
- * `payload.auth()` がthrowした場合も401へ倒す。session storeの不調で500を返すより、
- * 「認証できなかった」として扱うほうが呼び出し側の分岐が単純になる。
+ * `payload.auth()` がthrowした場合、DB接続失敗（`isDatabaseConnectionError`）だけは503
+ * `publish-temporarily-unavailable`へ倒す。**2026-09-05追加**: DB接続が枯渇している場合も
+ * 従来は401にしていたため、編集者には「ログインし直しても直らない」誤表示になっていた
+ * （`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 1）。
+ * それ以外の例外（session storeの一時的な不調等）は従来どおり401——「認証できなかった」として
+ * 扱うほうが呼び出し側の分岐が単純になるという既存の判断は変えない。
  */
 export async function authenticatePublisher(
   request: Request,
@@ -71,7 +77,10 @@ export async function authenticatePublisher(
   try {
     const result = await payload.auth({ headers: request.headers });
     user = (result?.user ?? null) as AuthenticatedAdminUser | null;
-  } catch {
+  } catch (error) {
+    if (isDatabaseConnectionError(error)) {
+      return { ok: false, status: 503, error: 'publish-temporarily-unavailable' };
+    }
     return { ok: false, status: 401, error: 'unauthenticated' };
   }
 

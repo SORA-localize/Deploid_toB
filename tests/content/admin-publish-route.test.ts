@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PublishValidationError } from '@/lib/payload/access';
 import { mapPublishError } from '@/lib/payload/adminPublishErrors';
 
@@ -82,6 +82,21 @@ describe('公開失敗の写像', () => {
     expect(JSON.stringify(body)).not.toContain('10.0.0.5');
   });
 
+  it.each([
+    ['cannot connect to Postgres: (EMAXCONNSESSION) max clients reached in session mode - max clients are limited to pool_size: 15'],
+    ['connect ECONNREFUSED 127.0.0.1:5432'],
+  ])(
+    // 2026-09-04にPreviewで実際に観測した文言。`getPayload()`初期化失敗がここを通る。
+    // 生の`digest`エラーではなく、既存の`publish-temporarily-unavailable`（ja/en文言あり）へ
+    // 写像されることを固定する。
+    'DB接続エラー（%s）は503 publish-temporarily-unavailableへ写像する',
+    (message) => {
+      const [status, body] = mapPublishError(new Error(message));
+      expect(status).toBe(503);
+      expect(body.error).toBe('publish-temporarily-unavailable');
+    },
+  );
+
   it('Error以外がthrowされても落ちない', () => {
     expect(mapPublishError('publish-not-found')[0]).toBe(404);
     expect(mapPublishError(null)[0]).toBe(500);
@@ -136,5 +151,66 @@ describe('module instanceをまたいだ例外の写像', () => {
   it('`fields` に文字列以外が混ざっていれば422にしない', () => {
     const fake = Object.assign(new Error('x'), { name: 'PublishValidationError', fields: ['ok', 42] });
     expect(mapPublishError(fake)[0]).toBe(500);
+  });
+});
+
+/**
+ * route自体（`src/app/api/admin/publish/route.ts`）を実際に組み立てて `POST` を呼ぶ。
+ * これまで「`getPayload()` を呼ぶため単体で組み立てられない」としていた判断を、
+ * `payload` / `@/payload.config` をモジュールモックすることで覆す
+ * （`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 1 完了条件）。
+ *
+ * 検証したいのは「`getPayload()` がPreviewの`EMAXCONNSESSION`のように失敗したとき、
+ * routeが生の例外を投げずに、`mapPublishError`経由で構造化された応答を返すか」だけなので、
+ * `getPayload`と`authenticatePublisher`をモックし、公開の中身（`publishFromAdmin`）や
+ * origin判定の実装には触れない。
+ */
+describe('route: getPayload()失敗のroute-level検証', () => {
+  const sameOriginRequest = () =>
+    new Request('https://deploid.net/api/admin/publish', {
+      method: 'POST',
+      headers: {
+        'sec-fetch-site': 'same-origin',
+        origin: 'https://deploid.net',
+        host: 'deploid.net',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ collection: 'manufacturers', id: 1, publishIntentToken: 'x' }),
+    });
+
+  afterEach(() => {
+    vi.doUnmock('payload');
+    vi.doUnmock('@/payload.config');
+    vi.resetModules();
+  });
+
+  it('getPayload()が失敗したら、生のdigestではなく503 publish-temporarily-unavailableを返す', async () => {
+    vi.doMock('payload', () => ({
+      getPayload: vi
+        .fn()
+        .mockRejectedValue(new Error('cannot connect to Postgres: (EMAXCONNSESSION) max clients reached in session mode')),
+    }));
+    vi.doMock('@/payload.config', () => ({ default: {} }));
+
+    const { POST } = await import('@/src/app/api/admin/publish/route');
+    const response = await POST(sameOriginRequest());
+    const body = (await response.json()) as { ok: false; error: string };
+
+    expect(response.status).toBe(503);
+    expect(body.error).toBe('publish-temporarily-unavailable');
+  });
+
+  it('getPayload()が成功すればroute本来の処理（同一origin判定・認証）まで進む', async () => {
+    // getPayload自体は成功させ、その先（authenticatePublisher）で401になることを見る。
+    // これにより「getPayload失敗時だけ早期returnし、成功時は従来どおり後続へ進む」ことを固定する。
+    vi.doMock('payload', () => ({ getPayload: vi.fn().mockResolvedValue({ auth: async () => ({ user: null }) }) }));
+    vi.doMock('@/payload.config', () => ({ default: {} }));
+
+    const { POST } = await import('@/src/app/api/admin/publish/route');
+    const response = await POST(sameOriginRequest());
+    const body = (await response.json()) as { ok: false; error: string };
+
+    expect(response.status).toBe(401);
+    expect(body.error).toBe('unauthenticated');
   });
 });

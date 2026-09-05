@@ -359,15 +359,20 @@ Activity Logで8/25 22:43以降DATABASE_URLの変更が無いことを確認済�
   （ユーザー承認済み、更新前に`psql`で接続確認）。並行負荷試験（各route12リクエスト、計24）で
   全て200・`EMAXCONNSESSION`0件、デプロイ後40秒のログ監視でも0件を確認
   （`task9-preview-rehearsal-preflight-v1.md`に追記済み）
-- [ ] ①②のDB接続失敗時、編集者に`publish-temporarily-unavailable`（既存コード）が出る
-  （生の`digest`ではない、かつ「ログイン切れ」と誤表示されない）——**未着手**
-- [ ] 上記をroute-levelで固定するテストがある（`getPayload`・`payload.auth`をモックし、
-  実際に`POST`を呼ぶ）——**未着手**
-- [ ] ③はT8のチェックリストに追加されている——**未着手**
+- [x] ①②のDB接続失敗時、編集者に`publish-temporarily-unavailable`（既存コード）が出る
+  （生の`digest`ではない、かつ「ログイン切れ」と誤表示されない）——**2026-09-05実装済み**。
+  `mapPublishError`と`authenticatePublisher`の両方に`isDatabaseConnectionError`判定を追加し、
+  既存の`publish-temporarily-unavailable`（503、ja/en文言あり）へ写像する。新規エラーコードは作らず、
+  既存の「payload.authがthrowしても401へ倒す」テストはそのまま緑（判定文字列を実際に観測した
+  `cannot connect to Postgres`/`EMAXCONNSESSION`/`ECONNREFUSED`/`ETIMEDOUT`に絞ったため衝突しない）
+- [x] 上記をroute-levelで固定するテストがある（`getPayload`・`payload.auth`をモックし、
+  実際に`POST`を呼ぶ）——**2026-09-05実装済み**。`vi.doMock('payload', ...)` +
+  `vi.doMock('@/payload.config', ...)`で`route.ts`のtry/catchを外すと実際に赤転することを確認
+- [x] ③はT8のチェックリストに追加されている——**2026-09-05追加済み**（§7参照。コードは変更しない）
 
-**T1は部分完了。** pooler mode是正（1点目）は完了し実機で効果を確認したが、
-エラー境界②（`authenticatePublisher`のDB失敗を`publish-temporarily-unavailable`へ写像する）
-はまだ手を付けていない。
+**T1は完了。** pooler mode是正・エラー境界①②の実装・route-levelテストの3点とも完了。
+③（draft PATCH失敗）はPayload自身のREST機構のため意図的にコード変更せず、
+手動確認項目としてT8へ記録した。
 
 **検証**:
 - `npx vitest run tests/content/admin-publish-route.test.ts`
@@ -638,6 +643,9 @@ npm run test:e2e -- tests/e2e/payload-admin-publish.spec.ts tests/e2e/cache-reva
 ## 7. 手動確認チェックリスト
 
 - [x] 並行負荷後（各route12リクエスト、計24）、直後5分間 `EMAXCONNSESSION` が0（T1・T8）——**2026-09-05実機確認済み。24/24が200、EMAXCONNSESSION 0件**
+- [ ] draft保存（フェーズ①、`PublishFromApproval.tsx:90-91`のPayload標準REST）がDB接続失敗で
+  落ちたとき、admin画面の表示が編集者にとって分かる内容になっているか確認する。
+  **我々のroute外（Payload自身のREST handler）のため、コードは変更しない**（T1）
 - [ ] 公開 → **公開ページのHTML**が SLO 内に変わる（T8）
 - [ ] 通知が失敗したとき、その旨がtoastに出る（T2）
 - [ ] 5状態（ok / non-ok / unreachable / missing-secret / missing-base-url）が区別できる（T2）

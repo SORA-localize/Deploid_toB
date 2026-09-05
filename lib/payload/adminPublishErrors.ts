@@ -39,7 +39,37 @@ function isPublishValidationError(error: unknown): error is PublishValidationErr
   );
 }
 
+/**
+ * Postgresへ接続できない失敗を検出する（`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md`
+ * Task 1）。`getPayload()`初期化失敗と`payload.auth()`内のDB失敗の両方がここを通る。
+ *
+ * 2026-09-04にPreviewで実際に観測した文言（`cannot connect to Postgres`、`EMAXCONNSESSION`）と、
+ * Node.jsの接続エラーcodeに対応する定型文言だけに絞る。`instanceof`ではなくmessage文字列で
+ * 見ているのは、`mapPublishError`の他の分岐と同じ理由——ここを通る例外はNode/pgが投げる
+ * 生のエラーで、独自classを持たない。
+ *
+ * **意図的に広い文言（"connection terminated"等）は含めない。** 下の
+ * 「未知の例外は500だが、内部messageを本文へ載せない」テストが示すとおり、
+ * このrepoは接続エラーらしき未知のメッセージを既定で500へ倒す設計を選んでいる。
+ * ここを広げすぎると、その設計判断と衝突して意図せず503へ振り替えてしまう。
+ */
+export function isDatabaseConnectionError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes('cannot connect to Postgres') ||
+    message.includes('EMAXCONNSESSION') ||
+    message.includes('ECONNREFUSED') ||
+    message.includes('ETIMEDOUT')
+  );
+}
+
 export function mapPublishError(error: unknown): [number, AdminPublishErrorBody] {
+  // DB接続失敗（`getPayload()`初期化失敗を含む）。他の判定より先に見る——生のPostgres/pg
+  // エラーは`name`も`fields`も持たないため、後段の判定に混ざって500へ落ちる前にここで拾う。
+  if (isDatabaseConnectionError(error)) {
+    return [503, { ok: false, error: 'publish-temporarily-unavailable' }];
+  }
+
   // 公開要件の不足（このrepo独自）。`fields` を構造として持つのでmessageをparseしない。
   //
   // **`instanceof` は使えない。** Next.jsは `access.ts` をサーバー側の複数chunkへ重複して

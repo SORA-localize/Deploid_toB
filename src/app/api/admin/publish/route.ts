@@ -11,7 +11,7 @@
  * `export const runtime` は書かない。`next.config.ts` の `cacheComponents: true` と
  * route segment config の `runtime` は非互換（`audit-upload/session/route.ts:11-16` に実測記録）。
  */
-import { getPayload } from 'payload';
+import { getPayload, type Payload } from 'payload';
 import payloadConfig from '@/payload.config';
 import type { ApprovableCollectionSlug } from '@/lib/payload/publishApprovedVersion';
 import { publishFromAdmin } from '@/lib/payload/publishFromAdmin';
@@ -70,7 +70,15 @@ export async function POST(request: Request): Promise<Response> {
     return json(403, { ok: false, error: 'cross-origin-request-rejected' });
   }
 
-  const payload = await getPayload({ config: payloadConfig });
+  // `getPayload()`はDB接続を初期化する。Preview実機で`EMAXCONNSESSION`により失敗する事例を
+  // 2026-09-04に観測済み——ここをtry/catchしていないと生の`digest`エラーがそのまま編集者に
+  // 出る（`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 1）。
+  let payload: Payload;
+  try {
+    payload = await getPayload({ config: payloadConfig });
+  } catch (error) {
+    return json(...mapPublishError(error));
+  }
 
   const auth = await authenticatePublisher(request, payload);
   if (!auth.ok) return json(auth.status, { ok: false, error: auth.error });
