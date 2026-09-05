@@ -436,9 +436,29 @@ component は固定toastを出す。**失敗が編集者に一切伝わらない
   **両方**に、draft保存時は通知をスキップする判定を追加する
   （`deferRevalidationUntilCommit`と同様に、`_status !== 'published'`のPATCH/updateかどうかを見る）
 
-**完了条件**: 5状態が区別でき、それぞれ異なる文言が ja/en で出る。
-**上記表の8ケース全てを個別にテストで固定する**（`ArticlePlacements`・`Media`・
-`SiteSettings`を含む。既存の7 collectionのみのテストでは不十分）
+**完了条件**: ✅ **2026-09-05実装済み**。
+
+- `RevalidationNotifyResult`型（`ok`/`non-ok`/`unreachable`/`missing-secret`/`missing-base-url`）を
+  `revalidationHook.ts`に新設し、`notifyRevalidation`/`notifyRevalidationAfterCommit`の戻り値へ。
+  `PublishApprovedVersionResult.revalidation`経由でroute応答・componentまで到達する
+- **5状態は型・ログでは区別するが、編集者向け文言は2つにまとめた**（当初「5状態それぞれ
+  異なる文言」としていたが実装時に見直した）。`non-ok`/`unreachable`は編集者から見れば
+  同じ対応（再読み込みして確認する）なので`publish-succeeded-reflection-failed`へ、
+  `missing-secret`/`missing-base-url`は「この環境では未設定」という同じ意味なので
+  `publish-succeeded-reflection-not-configured`へ。5状態別の文言をそのまま実装すると、
+  編集者にとって意味の無い区別を増やすだけになる（guardrails「過剰な実装を避ける」）
+- `isDraftSave(doc)`を純粋関数として`revalidationHook.ts`に実装し、export。
+  `_status`フィールドが無いdocument（`Media`）は常にfalse（従来どおり毎回通知）、
+  `_status !== 'published'`ならdraft保存とみなして通知しない
+- **上記表の8ケースを`tests/content/revalidation.test.ts`に実装**
+  （`isDraftSave`の単体テスト4件 + フック経由の統合テスト8件 + `notifyRevalidationAfterCommit`の
+  5状態テスト5件、計17件追加）。`ArticlePlacements`/`Media`/`SiteSettings`相当は実DBを介さず
+  フックへ直接`doc`/`req`を渡す形で検証（`RevalidatableCollectionSlug`に無いslugでも
+  ロジックは同じため`'robots'`で代用、`Media`は非versioned形状の`doc`で代用）
+- ミューテーションで両フックとも個別に赤転することを確認済み
+
+**検証**: `npx vitest run tests/content/revalidation.test.ts tests/components/publish-from-approval.test.tsx`
+（30件・21件、既存の`admin-publish-service.test.ts`等への副作用なしを確認済み）
 
 **注意**: fail-open の設計は変えない。公開をブロックすると重大度の判断が逆転する。
 
@@ -647,8 +667,9 @@ npm run test:e2e -- tests/e2e/payload-admin-publish.spec.ts tests/e2e/cache-reva
   落ちたとき、admin画面の表示が編集者にとって分かる内容になっているか確認する。
   **我々のroute外（Payload自身のREST handler）のため、コードは変更しない**（T1）
 - [ ] 公開 → **公開ページのHTML**が SLO 内に変わる（T8）
-- [ ] 通知が失敗したとき、その旨がtoastに出る（T2）
-- [ ] 5状態（ok / non-ok / unreachable / missing-secret / missing-base-url）が区別できる（T2）
+- [ ] 通知が失敗したとき、その旨がtoastに出る（T2。単体テストでは確認済み、Preview実機はまだ）
+- [ ] draft保存時にネットワークタブで`/api/revalidate-content`への通知が飛ばないことを確認する
+  （公開時だけ1回飛ぶ）（T2。単体テストでは確認済み、Preview実機はまだ）
 - [ ] **ja locale** で英語のfield名が無い（T4）
 - [ ] **en locale** で日本語が混ざらない（D-4・T4）
 - [ ] 選択肢の表記が公開ページと一致（T5）

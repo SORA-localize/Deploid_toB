@@ -3,7 +3,7 @@ import type { Payload, PayloadRequest } from 'payload';
 import { type AuthenticatedAdminUser, asAdminUser, isContentPublisherOrAboveUser } from './access';
 import { approvedPublishContext } from './publishAuthorization';
 import { acquireDocumentWriteLock } from './publishLock';
-import { notifyRevalidationAfterCommit } from './revalidationHook';
+import { notifyRevalidationAfterCommit, type RevalidationNotifyResult } from './revalidationHook';
 import { ADMIN_PUBLISH_INTENT_FIELD } from './adminPublishIntent';
 
 /**
@@ -41,6 +41,10 @@ export interface PublishApprovedVersionResult {
   canonicalHash: string;
   versionChainHeadId: string | number;
   documentId: string | number;
+  /** Admin UIが「反映されたか分からない」を編集者へ伝えるための、再検証通知の結果。
+   * `ok`は「タグ無効化を受理した」であって「ページに反映済み」ではない
+   * （`RevalidationNotifyResult`のコメント参照）。 */
+  revalidation: RevalidationNotifyResult;
 }
 
 /** 承認manifest hashと同じ計算式。versionのcanonical field（system field除く）をsorted-key JSONにしてsha256。 */
@@ -190,7 +194,7 @@ export async function publishApprovedVersion(args: PublishApprovedVersionArgs): 
     await payload.db.commitTransaction(transactionID);
     committed = true;
 
-    await notifyRevalidationAfterCommit(collection, payload);
+    const revalidation = await notifyRevalidationAfterCommit(collection, payload);
 
     payload.logger.info({
       msg: 'publish-approved-version',
@@ -206,6 +210,7 @@ export async function publishApprovedVersion(args: PublishApprovedVersionArgs): 
       canonicalHash: computeCanonicalHash(published as unknown as Record<string, unknown>),
       versionChainHeadId: chainHead[0]?.id ?? approvedVersionId,
       documentId: doc.id,
+      revalidation,
     };
   } catch (error) {
     // commit後（= 公開は成立済み）にログ等で落ちた場合まで rollback を呼ぶと、解決済みsessionを

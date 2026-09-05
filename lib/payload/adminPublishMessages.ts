@@ -61,6 +61,18 @@ export const ADMIN_PUBLISH_NOTICE_CODES = [
   'publish-unknown-outcome',
   /** 検証エラーだが `fields` が空。`{{fields}}` を空欄で見せないための代替。 */
   'publish-missing-fields-unknown',
+  /**
+   * 公開は成功したが、ページへの反映通知（`RevalidationNotifyResult`）が失敗した
+   * （`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 2）。
+   *
+   * 型・ログでは `ok`/`non-ok`/`unreachable`/`missing-secret`/`missing-base-url` の
+   * 5状態を区別するが、**編集者向けの文言は2つにまとめる**。`non-ok`と`unreachable`は
+   * 編集者から見れば同じ対応（再読み込みして確認する）なのでここへ。
+   */
+  'publish-succeeded-reflection-failed',
+  /** `missing-secret`/`missing-base-url`。この環境で自動反映webhookがまだ配線されていない
+   * （ローカル開発等）。編集者へは「設定されていない」とだけ伝え、詳細はログに委ねる。 */
+  'publish-succeeded-reflection-not-configured',
 ] as const;
 
 export type AdminPublishNoticeCode = (typeof ADMIN_PUBLISH_NOTICE_CODES)[number];
@@ -102,6 +114,10 @@ const ja: Record<AdminPublishMessageKey, string> = {
   'publish-succeeded': '公開しました。',
   'publish-unknown-outcome':
     '通信が中断したため、公開できたかどうか確認できませんでした。ページを再読み込みして状態を確認してください。',
+  'publish-succeeded-reflection-failed':
+    '公開はできましたが、ページの更新通知が届きませんでした。しばらくしてもページの内容が変わらない場合は、再読み込みして確認してください。',
+  'publish-succeeded-reflection-not-configured':
+    '公開はできましたが、この環境ではページの自動更新が設定されていません。反映まで時間がかかる場合があります。',
 };
 
 const en: Record<AdminPublishMessageKey, string> = {
@@ -130,6 +146,10 @@ const en: Record<AdminPublishMessageKey, string> = {
   'publish-succeeded': 'Published.',
   'publish-unknown-outcome':
     'The connection was interrupted, so we could not confirm whether publishing succeeded. Reload the page to check.',
+  'publish-succeeded-reflection-failed':
+    'Published, but the page-update notification did not go through. If the page still shows the old content after a while, reload to check.',
+  'publish-succeeded-reflection-not-configured':
+    'Published, but this environment has no automatic page refresh configured. It may take longer to show up.',
 };
 
 /** `payload.config.ts` の `i18n.translations` へそのまま渡す。 */

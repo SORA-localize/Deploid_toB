@@ -14,7 +14,7 @@
  * 決定的にassertする）。
  */
 import { revalidateTag } from 'next/cache';
-import { getPayload, type Payload } from 'payload';
+import { getPayload, type Payload, type PayloadRequest } from 'payload';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import config from '../../payload.config';
 import { assertLocalThrowawayDatabase } from './testDbGuard';
@@ -26,7 +26,13 @@ import {
   REVALIDATE_SIGNATURE_HEADER,
 } from '../../lib/content/cacheTags';
 import { POST } from '../../src/app/api/revalidate-content/route';
-import { buildNotifyHeaders } from '../../lib/payload/revalidationHook';
+import {
+  buildNotifyHeaders,
+  createRevalidationAfterChangeHook,
+  createSettingsRevalidationAfterChangeHook,
+  isDraftSave,
+  notifyRevalidationAfterCommit,
+} from '../../lib/payload/revalidationHook';
 
 vi.mock('next/cache', () => ({ revalidateTag: vi.fn() }));
 
@@ -347,3 +353,194 @@ describe('再検証POSTのheader', () => {
     expect(headers[REVALIDATE_SIGNATURE_HEADER]).toBe('sig-2');
   });
 })
+
+/**
+ * 2026-09-05、admin公開UIの受け入れ確認中に見つかった不具合の回帰テスト
+ * （`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 2）。
+ *
+ * 公開UIは「①draft保存（`_status: 'draft'`のHTTP PATCH）→②公開（Local API経由）」の
+ * 2段構え。`createRevalidationAfterChangeHook`は`req.context?.deferRevalidationUntilCommit`
+ * だけを見ており、これはLocal API経由の公開処理（`publishApprovedVersion.ts:176`）でしか
+ * 設定されない。①のdraft保存はHTTP PATCHなのでこの値を持たず、**1公開クリックで通知が
+ * 2回**（draft保存時・公開時）発生していた。1回目は非公開contentに対する無駄な通知であるだけで
+ * なく、同じcollectionのタグを**公開前に**無効化してしまう。
+ *
+ * `isDraftSave`は純粋関数（`doc`の`_status`だけを見る）なので、実DB・実Payloadを使わず
+ * 単体でテストできる。
+ */
+describe('isDraftSave（draft保存では再検証通知を送らないための判定）', () => {
+  it.each([
+    ['draft', false, false],
+    ['published', true, false],
+  ])('_status=%sのとき、isDraftSaveは%sを返す', (status, expectedNotify) => {
+    // `expectedNotify`は「通知すべきか」なので、isDraftSaveの期待値はその否定。
+    expect(isDraftSave({ _status: status })).toBe(!expectedNotify);
+  });
+
+  it('_statusフィールドが無いdocument（Mediaのような非versioned collection）は常にfalse', () => {
+    // draftの概念自体が無いので、これまでどおり毎回通知する。
+    expect(isDraftSave({ name: 'a.png' })).toBe(false);
+  });
+
+  it('null/非objectのdocでも例外を投げずfalseを返す', () => {
+    expect(isDraftSave(null)).toBe(false);
+    expect(isDraftSave(undefined)).toBe(false);
+    expect(isDraftSave('not-an-object')).toBe(false);
+  });
+});
+
+describe('afterChangeフックのdraft抑制（8ケース、実Postgres不要）', () => {
+  // `notifyRevalidation`はモジュール内部関数でexportされていないため、実際に`fetch`が
+  // 呼ばれたかどうかで間接的に検証する。`REVALIDATION_SECRET`/`PAYLOAD_PUBLIC_SERVER_URL`を
+  // 有効な値にしておかないと、`notifyRevalidation`は`fetch`へ到達する前に
+  // `missing-secret`/`missing-base-url`でreturnしてしまい、「draft保存だから0回」なのか
+  // 「そもそも設定が無いから0回」なのか区別できなくなる。
+  const originalSecret = process.env.REVALIDATION_SECRET;
+  const originalUrl = process.env.PAYLOAD_PUBLIC_SERVER_URL;
+
+  beforeAll(() => {
+    process.env.REVALIDATION_SECRET = 'hook-draft-suppress-test-secret';
+    process.env.PAYLOAD_PUBLIC_SERVER_URL = 'http://localhost:3399';
+  });
+
+  afterAll(() => {
+    if (originalSecret === undefined) delete process.env.REVALIDATION_SECRET;
+    else process.env.REVALIDATION_SECRET = originalSecret;
+    if (originalUrl === undefined) delete process.env.PAYLOAD_PUBLIC_SERVER_URL;
+    else process.env.PAYLOAD_PUBLIC_SERVER_URL = originalUrl;
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const fakeReq = () =>
+    ({ context: {}, payload: { logger: { warn: vi.fn(), info: vi.fn() } } }) as unknown as PayloadRequest;
+
+  function stubFetchOk() {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200 } as Response));
+  }
+
+  it('7 content collection相当: draft保存では通知しない（0回）', async () => {
+    stubFetchOk();
+    const hook = createRevalidationAfterChangeHook('manufacturers');
+    const req = fakeReq();
+    await hook({ doc: { _status: 'draft' }, req, operation: 'update' } as never);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('7 content collection相当: Admin公開（published）では通知する（1回）', async () => {
+    stubFetchOk();
+    const hook = createRevalidationAfterChangeHook('manufacturers');
+    const req = fakeReq();
+    await hook({ doc: { _status: 'published' }, req, operation: 'update' } as never);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('ArticlePlacements相当: draft保存では通知しない（0回）', async () => {
+    stubFetchOk();
+    // `RevalidatableCollectionSlug`に'article-placements'相当が無ければcastで通す。
+    const hook = createRevalidationAfterChangeHook('robots');
+    const req = fakeReq();
+    await hook({ doc: { _status: 'draft' }, req, operation: 'update' } as never);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('ArticlePlacements相当: published書き込みでは通知する（1回）', async () => {
+    stubFetchOk();
+    const hook = createRevalidationAfterChangeHook('robots');
+    const req = fakeReq();
+    await hook({ doc: { _status: 'published' }, req, operation: 'update' } as never);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('Media相当（非versioned、_statusフィールド自体が無い）: 変更のたび通知する（1回）', async () => {
+    stubFetchOk();
+    const hook = createRevalidationAfterChangeHook('robots');
+    const req = fakeReq();
+    await hook({ doc: { filename: 'a.png' }, req, operation: 'update' } as never);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('SiteSettings相当: draft保存では通知しない（0回）', async () => {
+    stubFetchOk();
+    const hook = createSettingsRevalidationAfterChangeHook();
+    const req = fakeReq();
+    await hook({ doc: { _status: 'draft' }, req } as never);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('SiteSettings相当: published保存では通知する（1回）', async () => {
+    stubFetchOk();
+    const hook = createSettingsRevalidationAfterChangeHook();
+    const req = fakeReq();
+    await hook({ doc: { _status: 'published' }, req } as never);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('deferRevalidationUntilCommitがtrueなら、_statusに関わらず通知しない（既存の公開経路優先）', async () => {
+    stubFetchOk();
+    const hook = createRevalidationAfterChangeHook('manufacturers');
+    const req = { ...fakeReq(), context: { deferRevalidationUntilCommit: true } } as unknown as PayloadRequest;
+    await hook({ doc: { _status: 'published' }, req, operation: 'update' } as never);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe('notifyRevalidationAfterCommit（結果の型、公開UIがtoastを出し分けるために必要）', () => {
+  const originalSecret = process.env.REVALIDATION_SECRET;
+  const originalUrl = process.env.PAYLOAD_PUBLIC_SERVER_URL;
+  const fakePayload = { logger: { warn: vi.fn(), info: vi.fn() } } as unknown as Payload;
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    if (originalSecret === undefined) delete process.env.REVALIDATION_SECRET;
+    else process.env.REVALIDATION_SECRET = originalSecret;
+    if (originalUrl === undefined) delete process.env.PAYLOAD_PUBLIC_SERVER_URL;
+    else process.env.PAYLOAD_PUBLIC_SERVER_URL = originalUrl;
+  });
+
+  it('secret未設定ならmissing-secretを返す（fetchは呼ばない）', async () => {
+    delete process.env.REVALIDATION_SECRET;
+    process.env.PAYLOAD_PUBLIC_SERVER_URL = 'http://localhost:3399';
+    vi.stubGlobal('fetch', vi.fn());
+    const result = await notifyRevalidationAfterCommit('manufacturers', fakePayload);
+    expect(result).toEqual({ status: 'missing-secret' });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('base URLが解決できないならmissing-base-urlを返す', async () => {
+    process.env.REVALIDATION_SECRET = 'x';
+    delete process.env.PAYLOAD_PUBLIC_SERVER_URL;
+    delete process.env.VERCEL_BRANCH_URL;
+    delete process.env.VERCEL_URL;
+    vi.stubGlobal('fetch', vi.fn());
+    const result = await notifyRevalidationAfterCommit('manufacturers', fakePayload);
+    expect(result).toEqual({ status: 'missing-base-url' });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('応答が200ならokを返す', async () => {
+    process.env.REVALIDATION_SECRET = 'x';
+    process.env.PAYLOAD_PUBLIC_SERVER_URL = 'http://localhost:3399';
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200 } as Response));
+    const result = await notifyRevalidationAfterCommit('manufacturers', fakePayload);
+    expect(result).toEqual({ status: 'ok' });
+  });
+
+  it('応答が非2xxならnon-okとhttpStatusを返す', async () => {
+    process.env.REVALIDATION_SECRET = 'x';
+    process.env.PAYLOAD_PUBLIC_SERVER_URL = 'http://localhost:3399';
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 401 } as Response));
+    const result = await notifyRevalidationAfterCommit('manufacturers', fakePayload);
+    expect(result).toEqual({ status: 'non-ok', httpStatus: 401 });
+  });
+
+  it('fetch自体が失敗したらunreachableとerrorを返す', async () => {
+    process.env.REVALIDATION_SECRET = 'x';
+    process.env.PAYLOAD_PUBLIC_SERVER_URL = 'http://localhost:3399';
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')));
+    const result = await notifyRevalidationAfterCommit('manufacturers', fakePayload);
+    expect(result).toEqual({ status: 'unreachable', error: 'network down' });
+  });
+});

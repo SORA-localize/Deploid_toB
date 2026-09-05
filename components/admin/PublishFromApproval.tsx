@@ -127,7 +127,22 @@ export function PublishFromApproval() {
       setMostRecentVersionIsAutosaved?.(false);
       incrementVersionCount?.();
       clearRouteCache?.();
-      toast.success(message('publish-succeeded'));
+
+      // 公開自体は成功している。反映通知（`RevalidationNotifyResult`）の結果だけを見て
+      // 文言を出し分ける——`ok`は「タグ無効化を受理した」であって「ページに反映済み」では
+      // ないため、`ok`のときも含め常に「公開しました」だけを出し、反映通知が失敗した場合
+      // だけ追加で注意を促す（`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 2）。
+      const body = (await response.json().catch(() => null)) as {
+        revalidation?: { status: 'ok' | 'non-ok' | 'unreachable' | 'missing-secret' | 'missing-base-url' };
+      } | null;
+      const revalidationStatus = body?.revalidation?.status;
+      if (revalidationStatus === 'non-ok' || revalidationStatus === 'unreachable') {
+        toast.error(message('publish-succeeded-reflection-failed'));
+      } else if (revalidationStatus === 'missing-secret' || revalidationStatus === 'missing-base-url') {
+        toast.error(message('publish-succeeded-reflection-not-configured'));
+      } else {
+        toast.success(message('publish-succeeded'));
+      }
     } catch {
       // ネットワーク断は409（他の人が保存した）と区別する。公開できたか不明なので再読込を促す。
       toast.error(message('publish-unknown-outcome'));

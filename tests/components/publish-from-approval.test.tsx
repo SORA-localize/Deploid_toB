@@ -22,6 +22,8 @@ const setUnpublishedVersionCount = vi.fn();
 const setMostRecentVersionIsAutosaved = vi.fn();
 const incrementVersionCount = vi.fn();
 const clearRouteCache = vi.fn();
+const toastSuccess = vi.fn();
+const toastError = vi.fn();
 
 let docInfo: Record<string, unknown>;
 let authUser: Record<string, unknown> | null;
@@ -39,7 +41,7 @@ vi.mock('@payloadcms/ui', () => ({
   useOperation: () => operation,
   useRouteCache: () => ({ clearRouteCache }),
   useTranslation: () => ({ t: (key: string) => key }),
-  toast: { success: vi.fn(), error: vi.fn() },
+  toast: { success: toastSuccess, error: toastError },
   // 標準の `Button` は最終的に `<button>` を描画する。ここでは「無効なら押しても
   // 何も起きない」というDOMの挙動だけ再現できればよい。
   Button: ({
@@ -62,7 +64,7 @@ vi.mock('@payloadcms/ui', () => ({
 const { PUBLISH_BUTTON_ID } = await import('@/lib/payload/adminPublishComponents');
 const { PublishFromApproval } = await import('@/components/admin/PublishFromApproval');
 
-const ok = (body: unknown = { ok: true, documentId: 1 }) =>
+const ok = (body: unknown = { ok: true, documentId: 1, revalidation: { status: 'ok' } }) =>
   ({ ok: true, status: 200, json: async () => body }) as Response;
 const fail = (status: number, body: unknown) =>
   ({ ok: false, status, json: async () => body }) as Response;
@@ -209,6 +211,59 @@ describe('成功後の状態同期', () => {
     await waitFor(() => expect(fetch).toHaveBeenCalled());
     expect(setHasPublishedDoc).not.toHaveBeenCalled();
     expect(clearRouteCache).not.toHaveBeenCalled();
+  });
+});
+
+describe('反映通知（revalidation）の結果に応じた文言', () => {
+  // 公開自体は成功しているので、`revalidation`の結果に関わらず状態同期（setHasPublishedDoc等）は
+  // 行う。ここで見るのはtoastの出し分けだけ（`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md`
+  // Task 2）。`ok`は「タグ無効化を受理した」であって「ページに反映済み」ではないが、
+  // 編集者へは通常の成功文言のままでよい——反映通知そのものが失敗したときだけ追加で知らせる。
+  it('revalidation.status=okなら通常の成功文言だけ出す', async () => {
+    vi.mocked(fetch).mockResolvedValue(ok({ ok: true, documentId: 1, revalidation: { status: 'ok' } }));
+    render(<PublishFromApproval />);
+    fireEvent.click(screen.getByRole('button'));
+
+    await waitFor(() => expect(toastSuccess).toHaveBeenCalledWith('deploidPublish:publish-succeeded'));
+    expect(toastError).not.toHaveBeenCalled();
+  });
+
+  it.each([['non-ok'], ['unreachable']])(
+    'revalidation.status=%sなら公開成功のまま反映失敗を知らせる',
+    async (status) => {
+      vi.mocked(fetch).mockResolvedValue(ok({ ok: true, documentId: 1, revalidation: { status } }));
+      render(<PublishFromApproval />);
+      fireEvent.click(screen.getByRole('button'));
+
+      await waitFor(() => expect(toastError).toHaveBeenCalledWith('deploidPublish:publish-succeeded-reflection-failed'));
+      // 公開自体は成功しているので、状態同期は行う（toast.errorだが公開は失敗していない）。
+      expect(setHasPublishedDoc).toHaveBeenCalledWith(true);
+      expect(toastSuccess).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([['missing-secret'], ['missing-base-url']])(
+    'revalidation.status=%sなら未設定であることを知らせる',
+    async (status) => {
+      vi.mocked(fetch).mockResolvedValue(ok({ ok: true, documentId: 1, revalidation: { status } }));
+      render(<PublishFromApproval />);
+      fireEvent.click(screen.getByRole('button'));
+
+      await waitFor(() =>
+        expect(toastError).toHaveBeenCalledWith('deploidPublish:publish-succeeded-reflection-not-configured'),
+      );
+      expect(setHasPublishedDoc).toHaveBeenCalledWith(true);
+    },
+  );
+
+  it('応答bodyの読み取りに失敗しても、公開成功として扱う（読み取り不能を反映失敗と誤認しない）', async () => {
+    vi.mocked(fetch).mockResolvedValue({ ok: true, status: 200, json: async () => { throw new Error('boom'); } } as never);
+    render(<PublishFromApproval />);
+    fireEvent.click(screen.getByRole('button'));
+
+    await waitFor(() => expect(setHasPublishedDoc).toHaveBeenCalledWith(true));
+    expect(toastSuccess).toHaveBeenCalledWith('deploidPublish:publish-succeeded');
+    expect(toastError).not.toHaveBeenCalled();
   });
 });
 

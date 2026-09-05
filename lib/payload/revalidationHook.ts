@@ -22,6 +22,25 @@ import { resolvePublicServerUrl } from './resolvePublicServerUrl';
 const NOTIFY_TIMEOUT_MS = 5000;
 
 /**
+ * 通知の結果（`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 2）。
+ *
+ * 従来 `notifyRevalidation` は `Promise<void>` で、成功/失敗はログにしか残らなかった。
+ * Admin公開UIはこの結果を見て編集者へ「反映されたか分からない」を伝える必要があるため、
+ * `publishApprovedVersion()` が直接呼ぶ経路（`notifyRevalidationAfterCommit`）だけは
+ * 結果を返すようにする。**`ok`は「タグ無効化の要求を受理した」であって
+ * 「ページに反映済み」ではない**——`revalidateTag(tag,'max')`はstale-while-revalidateで、
+ * 次のアクセスで再生成が始まる印にすぎない（詳細はrevalidate-content/route.tsのコメント参照）。
+ */
+export type RevalidationNotifyResult =
+  | { status: 'ok' }
+  | { status: 'non-ok'; httpStatus: number }
+  | { status: 'unreachable'; error: string }
+  /** `REVALIDATION_SECRET`が未設定。ローカル開発・一部テスト環境で意図的に起こりうる。 */
+  | { status: 'missing-secret' }
+  /** `resolvePublicServerUrl()`がundefinedを返した。 */
+  | { status: 'missing-base-url' };
+
+/**
  * この通知は**サーバーが自分自身のpublic URLへ送るHTTPリクエスト**なので、
  * Vercelの Deployment Protection がかかっている環境では route へ届かない。
  *
@@ -55,17 +74,20 @@ export function buildNotifyHeaders(signature: string): Record<string, string> {
   return headers;
 }
 
-async function notifyRevalidation(collectionSlug: RevalidatableCollectionSlug, req: PayloadRequest): Promise<void> {
+async function notifyRevalidation(
+  collectionSlug: RevalidatableCollectionSlug,
+  req: PayloadRequest,
+): Promise<RevalidationNotifyResult> {
   const secret = process.env.REVALIDATION_SECRET;
   if (!secret) {
     // secret未設定は「このデプロイではrevalidation webhookをまだ配線していない」状態
     // （ローカル開発・一部テスト環境等）。afterChangeを失敗させない——書き込み自体は
     // 既に成功しており、通知できないことはdata正しさの問題ではないため。
-    return;
+    return { status: 'missing-secret' };
   }
 
   const baseUrl = resolvePublicServerUrl();
-  if (!baseUrl) return;
+  if (!baseUrl) return { status: 'missing-base-url' };
 
   const body = JSON.stringify({ collection: collectionSlug });
   const signature = computeRevalidationSignature(body, secret);
@@ -83,38 +105,62 @@ async function notifyRevalidation(collectionSlug: RevalidatableCollectionSlug, r
         collection: collectionSlug,
         status: response.status,
       });
-    } else {
-      // 成功パスのログ。必須修正1（remediation group 5）: 失敗時のwarnしか無いと、
-      // 「revalidationが正常に動いているのか、そもそも一度も呼ばれていないのか」を
-      // ログだけから区別できない。fail-open設計自体は変えず、可観測性だけを上げる。
-      req.payload.logger.info({
-        msg: 'revalidation-webhook-notified',
-        collection: collectionSlug,
-        status: response.status,
-      });
+      return { status: 'non-ok', httpStatus: response.status };
     }
+    // 成功パスのログ。必須修正1（remediation group 5）: 失敗時のwarnしか無いと、
+    // 「revalidationが正常に動いているのか、そもそも一度も呼ばれていないのか」を
+    // ログだけから区別できない。fail-open設計自体は変えず、可観測性だけを上げる。
+    req.payload.logger.info({
+      msg: 'revalidation-webhook-notified',
+      collection: collectionSlug,
+      status: response.status,
+    });
+    return { status: 'ok' };
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
     req.payload.logger.warn({
       msg: 'revalidation-webhook-unreachable',
       collection: collectionSlug,
-      error: error instanceof Error ? error.message : String(error),
+      error: message,
     });
+    return { status: 'unreachable', error: message };
   }
 }
 
 /** Publish transaction向け。DB commit後にだけ呼び出し、通知が未commit状態を
- * キャッシュへ反映しないようにする。 */
+ * キャッシュへ反映しないようにする。結果は `publishApprovedVersion()` の戻り値経由で
+ * admin UIまで届く（`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 2）。 */
 export async function notifyRevalidationAfterCommit(
   collectionSlug: RevalidatableCollectionSlug,
   payload: Payload,
-): Promise<void> {
-  await notifyRevalidation(collectionSlug, { payload } as unknown as PayloadRequest);
+): Promise<RevalidationNotifyResult> {
+  return notifyRevalidation(collectionSlug, { payload } as unknown as PayloadRequest);
+}
+
+/**
+ * `doc`がdraft保存の結果か判定する。**`_status`フィールドが無いdocument（`Media`のような
+ * 非versioned collection）は常に`false`を返す**——判定できないのではなく、draftの概念自体が
+ * 無いのでこれまでどおり毎回通知する。
+ *
+ * `_status`があるのに`'published'`でなければdraft保存とみなす。既存の`createPublishGateHook`の
+ * `isDraftSave`判定（`lib/payload/access.ts:493`）と近いが、あちらは`beforeChange`で
+ * `readDraftIntent`（requestの`draft`引数）を見る。ここは`afterChange`で確定済みの`doc`を
+ * 見るだけなので、より単純な`doc._status !== 'published'`で足りる。
+ */
+export function isDraftSave(doc: unknown): boolean {
+  if (doc === null || typeof doc !== 'object' || !('_status' in doc)) return false;
+  return (doc as { _status?: unknown })._status !== 'published';
 }
 
 /** 各content collectionの既存 `hooks.afterChange` 配列へ追加する1エントリ。 */
 export function createRevalidationAfterChangeHook(collectionSlug: RevalidatableCollectionSlug): CollectionAfterChangeHook {
   return async ({ doc, req }) => {
     if (req.context?.deferRevalidationUntilCommit) return doc;
+    // draft保存では公開ページの内容は変わらないので通知しない。1公開クリックあたり
+    // 通知が2回（draft保存時・公開時）飛んでいた無駄と、非公開contentのタグを
+    // 公開前に無効化してしまう問題の両方をここで止める
+    // （`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 2）。
+    if (isDraftSave(doc)) return doc;
     await notifyRevalidation(collectionSlug, req);
     return doc;
   };
@@ -124,6 +170,7 @@ export function createRevalidationAfterChangeHook(collectionSlug: RevalidatableC
 export function createSettingsRevalidationAfterChangeHook(): GlobalAfterChangeHook {
   return async ({ doc, req }) => {
     if (req.context?.deferRevalidationUntilCommit) return doc;
+    if (isDraftSave(doc)) return doc;
     await notifyRevalidation('site-settings', req);
     return doc;
   };

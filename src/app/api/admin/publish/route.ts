@@ -17,6 +17,7 @@ import type { ApprovableCollectionSlug } from '@/lib/payload/publishApprovedVers
 import { publishFromAdmin } from '@/lib/payload/publishFromAdmin';
 import { authenticatePublisher, isSameOriginRequest } from '@/lib/payload/publishRequestAuth';
 import { type AdminPublishErrorBody, mapPublishError } from '@/lib/payload/adminPublishErrors';
+import type { RevalidationNotifyResult } from '@/lib/payload/revalidationHook';
 
 /**
  * `ApprovableCollectionSlug` の実行時allowlist。型だけでは任意のslugが素通りするため、
@@ -45,7 +46,10 @@ function isPublishableCollection(value: unknown): value is ApprovableCollectionS
 /** body は `{ collection, id, publishIntentToken }` だけ。UUID + slug + id で十分収まる。 */
 const MAX_BODY_BYTES = 8 * 1024;
 
-function json(status: number, body: AdminPublishErrorBody | { ok: true; documentId: string | number }): Response {
+function json(
+  status: number,
+  body: AdminPublishErrorBody | { ok: true; documentId: string | number; revalidation: RevalidationNotifyResult },
+): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: { 'content-type': 'application/json', 'cache-control': 'private, no-store' },
@@ -115,7 +119,7 @@ export async function POST(request: Request): Promise<Response> {
       publisherUser: auth.user,
     });
     // revalidationは `publishApprovedVersion` がcommit後に自分で通知する（`:182`）。ここでは何もしない。
-    return json(200, { ok: true, documentId: result.documentId });
+    return json(200, { ok: true, documentId: result.documentId, revalidation: result.revalidation });
   } catch (error) {
     return json(...mapPublishError(error));
   }
