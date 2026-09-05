@@ -30,7 +30,7 @@ import {
   robotLoadRatingLabels,
   robotLoadScopeLabels,
   robotPriceChannelLabels,
-} from '@/lib/labels';
+} from '../labels';
 
 function opt(value: string, ja: string, en: string): Option {
   return { value, label: { ja, en } };

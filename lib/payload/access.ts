@@ -291,10 +291,13 @@ export function sourcesField(): Field {
         {
           name: 'publishedAt',
           type: 'text',
+          // ロボット詳細ページの「活用事例」欄（usageExampleSourceUrls）でも参照される
+          // （lib/robotCatalog.ts の resolveRobotUsageExamples()）。出典一覧（SourceList）
+          // 自体には出ないが「表示されない」は正しくない——外部監査で指摘・修正（2026-09-05）。
           admin: {
             description: {
-              ja: '出典が公開された日付。日が分からない場合は月または年だけでも構いません（例: 2025-05）。出典欄には表示されない社内記録用の項目です。',
-              en: 'The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.',
+              ja: '出典が公開された日付。日が分からない場合は月または年だけでも構いません（例: 2025-05）。出典一覧には表示されませんが、このURLが「活用事例」欄で参照されている場合はそちらに表示されます。',
+              en: "The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a \"Usage examples\" section.",
             },
           },
         },

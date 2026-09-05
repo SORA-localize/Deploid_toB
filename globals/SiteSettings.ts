@@ -74,10 +74,14 @@ export const SiteSettings: GlobalConfig = {
       {
         name: 'dataAsOf',
         type: 'text',
+        // 現状、公開ページはこの値を読まない。`/for-manufacturers`の「データ基準時点」表記は
+        // lib/site.ts の siteMeta.dataAsOf（静的定数）を直接importしており、この値とは無関係
+        // （外部監査で発覚・2026-09-05訂正）。この値自体は`content:export`/`content:import`の
+        // ContentSnapshot（lib/content/contracts.ts）専用で、parityの整合検証に使われる。
         admin: {
           description: {
-            ja: '掲載件数が正しい時点（例: 2026年7月）。日精度とは限りません。「/for-manufacturers」ページのデータ基準時点として表示されます。',
-            en: 'The point in time the listing counts are accurate as of (e.g. "July 2026"). Day-level precision is not required. Shown as the "data as of" note on the /for-manufacturers page.',
+            ja: '掲載件数が正しい時点（例: 2026年7月）。日精度とは限りません。**現状、公開ページのどこにも表示されません**——エクスポート・インポート時の整合性チェック専用です。',
+            en: 'The point in time the listing counts are accurate as of (e.g. "July 2026"). Day-level precision is not required. **Not shown anywhere on the public site yet** — used only for export/import consistency checks.',
           },
         },
       },

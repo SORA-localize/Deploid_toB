@@ -163,10 +163,14 @@ export const UseCases: CollectionConfig = {
         type: 'array',
         // DEC-S08: `robotId`/`seriesId`はどちらか一方だけを想定した設計だが、両方入力しても
         // 現状の保存処理は止めない（domain validator側での強制はTask 4以降の拡張候補）。
+        // `src/app/(frontend)/use-cases/[slug]/page.tsx`の`buildUseCaseDetailData()`は
+        // 「seriesId候補はrobotId単位のこのpageではまだ描画対象外」と明記しており、
+        // `robotId`を持つ行だけを解決する。`seriesId`だけの行は現状ページに出ない
+        // （外部監査で発覚・2026-09-05訂正）。
         admin: {
           description: {
-            ja: '候補ロボット。用途詳細ページの「候補ロボット」欄に表示されます。ロボット本体か、シリーズかのどちらか一方を選んでください。',
-            en: 'Candidate robots. Shown in the "Candidate robots" section of the use case detail page. Choose either a specific robot or a series, not both.',
+            ja: '候補ロボット。用途詳細ページの「候補ロボット」欄に表示されますが、**現状「ロボット本体」を選んだ行だけが表示され、「シリーズ」だけを選んだ行は表示されません**。',
+            en: 'Candidate robots. Shown in the "Candidate robots" section of the use case detail page — but currently **only rows with a specific robot render; series-only rows do not appear yet**.',
           },
         },
         fields: applyAdminFieldLabels(

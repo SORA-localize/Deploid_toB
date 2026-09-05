@@ -573,8 +573,8 @@ select値は増える（`surface`/`slot`/`kind`が追加）。**正確な値は�
   Manufacturers 3+Distributors 2+Robots 8+UseCases 6+Deployments 1+Articles 4+
   ArticlePlacements 3、`RobotSeries`/`SiteSettings`はselect無し）を全て
   `{value, label:{ja,en}}`形の`Option[]`へ置換。既存Record（`reliabilityLabels`/
-  `articleCategoryLabels`/`companyTypeLabels`等13個）がある値はjaをそこから直接参照
-  （転記しない）、英語は新設ファイルだけが正本
+  `articleCategoryLabels`/`companyTypeLabels`等19個。2026-09-05外部監査で「13個」の
+  集計誤りを訂正）がある値はjaをそこから直接参照（転記しない）、英語は新設ファイルだけが正本
 - `ArticlePlacements.slot`は対応表どおり`imageRoleLabels.hero`を再利用せず、
   別の日本語（「最上段（トップ）」）を独自定義
 - `Articles.contentKind`と`ArticlePlacements.kind`は値が一部重複するが別selectとして
@@ -645,9 +645,10 @@ select値は増える（`surface`/`slot`/`kind`が追加）。**正確な値は�
   現状どこにも読まれていないこと、`RobotSeries`は単体表示ページ自体が存在しないこと、
   `UseCases.buyerReadiness`が公開UIで未消費であることを確認した
   （いずれも`lib/content/cacheDependencies.ts`の`KNOWN_GAPS`と整合する既知の状態）
-- 対象16箇所の`admin.description`を書き換え（`access.ts`4 + `Manufacturers.ts`3 +
+- 対象20箇所の`admin.description`を書き換え（`access.ts`4 + `Manufacturers.ts`3 +
   `RobotSeries.ts`1 + `Robots.ts`4 + `UseCases.ts`2 + `Articles.ts`3 +
-  `SiteSettings.ts`2、`Media.ts`の同一パターン1箇所も一貫性のため合わせて修正）。
+  `SiteSettings.ts`2、`Media.ts`の同一パターン1箇所も一貫性のため合わせて修正。
+  2026-09-05外部監査で「16箇所」の集計誤りを訂正——内訳の合計は元から20だった）。
   全てD-4に従い`{ja, en}`形
 - 実装理由（`timestamptz`によるTZずれ、Task番号、ファイルパス）は削除せず、
   `lib/payload/access.ts`の`sourcesField()`冒頭docblockへ集約するか、各field定義の
@@ -771,6 +772,26 @@ npm run test:e2e -- tests/e2e/payload-admin-publish.spec.ts tests/e2e/cache-reva
 これらは全て**Preview環境への実デプロイと、そこへの実アクセスを要する**——ローカルの
 使い捨てDBでは再現できない（Vercel Deployment Protectionの挙動、実際のPreview URL経由の
 自己POST等）。ユーザーの明示的な承認を得てから着手する。
+
+---
+
+## 7.5. 実装後の外部監査（2026-09-05、T4〜T8対象）
+
+T4〜T8（コミット `09cba9b..772ad05`）を外部監査にかけた。**Blocker 1件・High 2件・
+Medium 1件・Low 2件**を受け、全件を実コードで再検証したうえで反映した。却下した指摘は無い。
+
+| # | 指摘 | 検証結果 | 反映先 |
+|---|---|---|---|
+| 1（Blocker） | `lib/payload/adminSelectLabels.ts` が `@/lib/labels`（tsconfig pathエイリアス）でimportしており、`npm run check:dead-code`（knip）がPayload config読み込み時にモジュール解決できず失敗する | **再現確認済み**。`npm run check:dead-code` が実際に `Cannot find module '@/lib/labels'` で終了コード2になることを確認 | `../labels`（相対import、`lib/payload/`配下の他ファイルと同じ流儀）へ変更。修正後`check:dead-code`が通ることを確認 |
+| 2（High） | `sources[].publishedAt` の説明文が「出典欄には表示されない」としているが、`lib/robotCatalog.ts`の`resolveRobotUsageExamples()`経由でロボット詳細ページの「活用事例」欄に表示される経路がある | **再現確認済み**。`robots/[slug]/page.tsx`が`{publisher} · {publishedAt}`を描画するコードを確認 | `access.ts`の`sourcesField().publishedAt`descriptionを条件付き表示の説明へ訂正。`admin-field-to-page-section-map-v1.md`も同様に訂正 |
+| 3（High） | `SiteSettings.dataAsOf` の説明文が「`/for-manufacturers`ページに表示される」としているが、実際のページは`lib/site.ts`の静的定数`siteMeta.dataAsOf`を直接importしており無関係 | **再現確認済み**。`for-manufacturers/page.tsx`のimport元、および`lib/content/payloadSource.ts`の`requireSiteSettings()`がCLI専用の`ContentSnapshot`用途でしか使われていないことを確認 | `globals/SiteSettings.ts`のdescriptionを「現状どこにも表示されない（export/import専用）」へ訂正。対応表も同様 |
+| 4（Medium） | `UseCases.candidateRobots` の説明文が「ロボット本体かシリーズかを選ぶ」としているが、公開ページは`robotId`を持つ行しか解決しない（既存コードコメントに明記あり） | **再現確認済み**。`use-cases/[slug]/page.tsx`の`buildUseCaseDetailData()`の既存コメントで確認 | descriptionを「`robotId`を持つ行だけ表示される」へ訂正。対応表も同様 |
+| 5（Low） | T7の対象件数「16箇所」が、直後の内訳の合計（20）と食い違う | **確認済み**（単純な集計ミス、実装漏れではない） | 「16箇所」を「20箇所」へ訂正 |
+| 6（Low） | `heroImage`が`Articles`のどこに表示されるかの一覧が、記事詳細ページ自体のヒーロー画像を含んでいない | **再現確認済み**。`reports/[slug]/page.tsx`の`#report-article-header`で確認 | 対応表のheroImage行に記事詳細ページを追記 |
+
+（付随して、T5の「既存Record 13個」も実際は19個であることが指摘・確認され、併せて訂正した）
+
+**確認できたこと**: T4（label付け）・T6（tabs/sidebar化）・T8（e2e追加）の実装自体には指摘が無かった。指摘は全てT5・T7の**文書・説明文の事実誤認**（公開ページの挙動を誤認していた）と、T5の**import経路のミス**に集中していた。
 
 ---
 

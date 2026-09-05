@@ -271,7 +271,7 @@ export interface Manufacturer {
     url: string;
     publisher?: string | null;
     /**
-     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
      */
     publishedAt?: string | null;
     /**
@@ -333,7 +333,7 @@ export interface Distributor {
     url: string;
     publisher?: string | null;
     /**
-     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
      */
     publishedAt?: string | null;
     /**
@@ -416,7 +416,7 @@ export interface Robot {
     url: string;
     publisher?: string | null;
     /**
-     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
      */
     publishedAt?: string | null;
     /**
@@ -578,7 +578,7 @@ export interface RobotSery {
     url: string;
     publisher?: string | null;
     /**
-     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
      */
     publishedAt?: string | null;
     /**
@@ -670,7 +670,7 @@ export interface UseCase {
     url: string;
     publisher?: string | null;
     /**
-     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
      */
     publishedAt?: string | null;
     /**
@@ -753,7 +753,7 @@ export interface UseCase {
   whyHardToday?: string | null;
   japanDeploymentConditions?: string | null;
   /**
-   * Candidate robots. Shown in the "Candidate robots" section of the use case detail page. Choose either a specific robot or a series, not both.
+   * Candidate robots. Shown in the "Candidate robots" section of the use case detail page — but currently **only rows with a specific robot render; series-only rows do not appear yet**.
    */
   candidateRobots?:
     | {
@@ -798,7 +798,7 @@ export interface Deployment {
     url: string;
     publisher?: string | null;
     /**
-     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
      */
     publishedAt?: string | null;
     /**
@@ -884,7 +884,7 @@ export interface Article {
     url: string;
     publisher?: string | null;
     /**
-     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown on the public source list — kept for internal reference.
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
      */
     publishedAt?: string | null;
     /**
@@ -2268,7 +2268,7 @@ export interface SiteSetting {
     url?: string | null;
   };
   /**
-   * The point in time the listing counts are accurate as of (e.g. "July 2026"). Day-level precision is not required. Shown as the "data as of" note on the /for-manufacturers page.
+   * The point in time the listing counts are accurate as of (e.g. "July 2026"). Day-level precision is not required. **Not shown anywhere on the public site yet** — used only for export/import consistency checks.
    */
   dataAsOf?: string | null;
   /**
