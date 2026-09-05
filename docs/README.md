@@ -27,11 +27,11 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 日付 | 文書 | 内容 |
 |---|---|---|
+| 2026-09-05 | [Admin公開→反映SLO](decisions/admin-publish-cache-reflection-slo-v1.md) | 「公開してからいつ反映されるか」をNext.jsの契約・このプロジェクトの目標・超過時の手順に分けて定義 |
 | 2026-07-26 | [コンテンツ基盤・DBアーキテクチャ](decisions/content-platform-and-database-architecture-v2.md) | Payload CMS + managed PostgreSQLを採用。GitHub、管理画面、Codex MCP、公開サイトの責務を確定 |
 | 2026-07-26 | [データアーキテクチャ再設計](decisions/data-architecture-redesign-v1.md) | id / slug設計は維持し、旧Git型CMS移行案を新しいPayload移行計画へ置換 |
 | 2026-07-26 | [技術スタック](decisions/humanoid_platform_tech_stack_v1.md) | CMS候補とDB不要判断を、Payload + PostgreSQLの確定構成へ更新 |
 | 2026-07-26 | [アーキテクチャ将来対応リスト](decisions/architecture_future_considerations_v1.md) | コンテンツ基盤移行の確定判断と移行後の見直し条件を追加 |
-| 2026-07-26 | [Deploid Data Work Guide](decisions/data/README.md) | Payload移行後のデータ保守と出典・権利ゲート |
 
 ---
 
@@ -65,6 +65,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 ### decisions の主要文書
 
+- [`admin-publish-cache-reflection-slo-v1.md`](decisions/admin-publish-cache-reflection-slo-v1.md) — Admin公開から公開ページ反映までのSLOと超過時の手順
 - [`content-platform-and-database-architecture-v2.md`](decisions/content-platform-and-database-architecture-v2.md) — Payload CMS、PostgreSQL、GitHub、公開サイト、Codex MCPの役割を定める移行後アーキテクチャ
 - [`data-architecture-redesign-v1.md`](decisions/data-architecture-redesign-v1.md) — id/slug分離、参照設計、正本管理、CMS移行を見据えたデータ設計
 - [`data-maintenance-checklist-v1.md`](decisions/data-maintenance-checklist-v1.md) — データ追加、slug変更、公開前確認、鮮度レビューの実行チェックリスト
