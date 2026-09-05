@@ -9,6 +9,7 @@ import {
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
+import { applyAdminFieldLabels, distributorsFieldLabels } from '../lib/payload/adminFieldLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipsToStableIds } from '../lib/content/payloadMappers';
 import type { Distributor } from '../lib/content/domainTypes';
@@ -60,41 +61,44 @@ export const Distributors: CollectionConfig = {
   admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
-  fields: [
-    ...baseContentFields(),
-    ...baseRecordContentFields(),
-    { name: 'name', type: 'text', required: true },
-    { name: 'nameJa', type: 'text' },
-    { name: 'website', type: 'text' },
-    {
-      name: 'providerType',
-      type: 'select',
-      required: true,
-      options: ['maker-direct', 'reseller', 'other'],
-    },
-    {
-      name: 'handledManufacturerIds',
-      type: 'relationship',
-      required: true,
-      relationTo: 'manufacturers',
-      hasMany: true,
-    },
-    {
-      name: 'handledRobotIds',
-      type: 'relationship',
-      relationTo: 'robots',
-      hasMany: true,
-    },
-    {
-      name: 'acquisitionMethods',
-      type: 'select',
-      required: true,
-      hasMany: true,
-      options: ['purchase', 'lease', 'raas', 'subscription', 'inquiry'],
-    },
-    { name: 'inquiryUrl', type: 'text' },
-    { name: 'note', type: 'textarea' },
-  ],
+  fields: applyAdminFieldLabels(
+    [
+      ...baseContentFields(),
+      ...baseRecordContentFields(),
+      { name: 'name', type: 'text', required: true },
+      { name: 'nameJa', type: 'text' },
+      { name: 'website', type: 'text' },
+      {
+        name: 'providerType',
+        type: 'select',
+        required: true,
+        options: ['maker-direct', 'reseller', 'other'],
+      },
+      {
+        name: 'handledManufacturerIds',
+        type: 'relationship',
+        required: true,
+        relationTo: 'manufacturers',
+        hasMany: true,
+      },
+      {
+        name: 'handledRobotIds',
+        type: 'relationship',
+        relationTo: 'robots',
+        hasMany: true,
+      },
+      {
+        name: 'acquisitionMethods',
+        type: 'select',
+        required: true,
+        hasMany: true,
+        options: ['purchase', 'lease', 'raas', 'subscription', 'inquiry'],
+      },
+      { name: 'inquiryUrl', type: 'text' },
+      { name: 'note', type: 'textarea' },
+    ],
+    distributorsFieldLabels,
+  ),
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [

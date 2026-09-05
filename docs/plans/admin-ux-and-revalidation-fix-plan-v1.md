@@ -508,10 +508,27 @@ component は固定toastを出す。**失敗が編集者に一切伝わらない
   ではなく、field path または入れ子構造でnested fieldのラベルも保持する）
 - **D-4の決定に従い ja/en 両方**を持つ
 
-**完了条件**:
-- 上記で確定した対象範囲（nested/array含む）に未ラベルのfieldが無い
-- 未ラベルを機械検出するテストがあり、1件消すと落ちる（対象範囲を明示的にホワイトリストとして持つ）
-- **hidden fieldを誤って対象に含めていないこと**もテストで確認する（除外条件も検証対象）
+**完了条件**: ✅ **2026-09-05実装済み**。
+
+- `lib/payload/adminFieldLabels.ts` を新設。`AdminFieldLabelMap`（field名→`{ja, en}`の
+  flat map）、`applyAdminFieldLabels(fields, labels)`（直下1階層だけにlabelを付ける。
+  同名field衝突を避けるため階層ごとに個別呼び出しする設計）、
+  `collectUnlabeledAdminFieldPaths(fields)`（nested/array/tabs/blocksまで再帰的に未ラベルを
+  検出する、テスト専用の読み取り専用関数）を実装
+- 共有field（`stableId`/`sources`/`heroImage`/`seo`等）は`access.ts`の各field生成関数
+  （`baseContentFields()`/`sourcesField()`/`rightsMetaField()`/`imageAssetField()`/
+  `seoField()`/`baseRecordContentFields()`）が自分自身の直下fieldへ`applyAdminFieldLabels`を
+  呼ぶ形で1回だけ付ける。collection側は複製しない
+- 9つの対象（7 collection + `ArticlePlacements` + `SiteSettings`）それぞれの固有fieldへ、
+  nested group/arrayの中身も含めて`applyAdminFieldLabels`を適用。ja/en両方を持つ
+  （D-4）ため`payload.config.ts`の`supportedLanguages: {en, ja}`と整合する
+- `tests/content/admin-field-labels.test.ts`を新設。9対象それぞれで
+  `collectUnlabeledAdminFieldPaths()`が空配列であることを検証（12件）。
+  `admin.hidden`なfield（`adminPublishIntentField`）が誤って対象に含まれないこと、
+  および安全網自体が機能すること（意図的に未ラベルのfieldを渡すと検出される）も検証
+- **実際に1件消すと落ちることを確認済み**: `manufacturersFieldLabels`から
+  `vendorRiskNote`を一時的に削除して実行したところ、`'manufacturers'`のテストだけが
+  期待どおり赤転した。確認後に復元し、再度全12件が緑であることを確認した
 
 ---
 

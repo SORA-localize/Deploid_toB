@@ -9,6 +9,7 @@ import {
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
+import { applyAdminFieldLabels, robotSeriesFieldLabels } from '../lib/payload/adminFieldLabels';
 import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
@@ -62,26 +63,29 @@ export const RobotSeriesCollection: CollectionConfig = {
   admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
-  fields: [
-    ...baseContentFields(),
-    ...baseRecordContentFields(),
-    { name: 'name', type: 'text', required: true },
-    { name: 'nameJa', type: 'text' },
-    {
-      name: 'manufacturerId',
-      type: 'relationship',
-      required: true,
-      relationTo: 'manufacturers',
-    },
-    { name: 'description', type: 'textarea' },
-    {
-      name: 'images',
-      type: 'json',
-      admin: { description: 'Partial<Record<ImageRole, ImageAsset>>。' },
-    },
-    { name: 'industryTags', type: 'text', hasMany: true },
-    { name: 'taskTags', type: 'text', hasMany: true },
-  ],
+  fields: applyAdminFieldLabels(
+    [
+      ...baseContentFields(),
+      ...baseRecordContentFields(),
+      { name: 'name', type: 'text', required: true },
+      { name: 'nameJa', type: 'text' },
+      {
+        name: 'manufacturerId',
+        type: 'relationship',
+        required: true,
+        relationTo: 'manufacturers',
+      },
+      { name: 'description', type: 'textarea' },
+      {
+        name: 'images',
+        type: 'json',
+        admin: { description: 'Partial<Record<ImageRole, ImageAsset>>。' },
+      },
+      { name: 'industryTags', type: 'text', hasMany: true },
+      { name: 'taskTags', type: 'text', hasMany: true },
+    ],
+    robotSeriesFieldLabels,
+  ),
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [

@@ -7,6 +7,11 @@ import {
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
+import {
+  applyAdminFieldLabels,
+  articlePlacementsFieldLabels,
+  articlePlacementsSponsorFieldLabels,
+} from '../lib/payload/adminFieldLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { ArticlePlacement } from '../lib/content/domainTypes';
@@ -105,38 +110,44 @@ export const ArticlePlacements: CollectionConfig = {
   admin: { useAsTitle: 'stableId' },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
-  fields: [
-    ...baseContentFields(),
-    {
-      name: 'surface',
-      type: 'select',
-      required: true,
-      options: ['reports-index'],
-    },
-    {
-      name: 'slot',
-      type: 'select',
-      required: true,
-      options: ['hero', 'feature'],
-    },
-    { name: 'articleId', type: 'relationship', relationTo: 'articles', required: true },
-    { name: 'order', type: 'number', required: true },
-    {
-      name: 'kind',
-      type: 'select',
-      options: ['editorial', 'sample', 'sponsored', 'house'],
-    },
-    {
-      name: 'sponsor',
-      type: 'group',
-      fields: [
-        { name: 'name', type: 'text' },
-        { name: 'url', type: 'text' },
-        { name: 'disclosure', type: 'text' },
-        { name: 'campaignId', type: 'text' },
-      ],
-    },
-  ],
+  fields: applyAdminFieldLabels(
+    [
+      ...baseContentFields(),
+      {
+        name: 'surface',
+        type: 'select',
+        required: true,
+        options: ['reports-index'],
+      },
+      {
+        name: 'slot',
+        type: 'select',
+        required: true,
+        options: ['hero', 'feature'],
+      },
+      { name: 'articleId', type: 'relationship', relationTo: 'articles', required: true },
+      { name: 'order', type: 'number', required: true },
+      {
+        name: 'kind',
+        type: 'select',
+        options: ['editorial', 'sample', 'sponsored', 'house'],
+      },
+      {
+        name: 'sponsor',
+        type: 'group',
+        fields: applyAdminFieldLabels(
+          [
+            { name: 'name', type: 'text' },
+            { name: 'url', type: 'text' },
+            { name: 'disclosure', type: 'text' },
+            { name: 'campaignId', type: 'text' },
+          ],
+          articlePlacementsSponsorFieldLabels,
+        ),
+      },
+    ],
+    articlePlacementsFieldLabels,
+  ),
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [

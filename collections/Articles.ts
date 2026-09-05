@@ -9,6 +9,7 @@ import {
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
+import { applyAdminFieldLabels, articlesFieldLabels } from '../lib/payload/adminFieldLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { Article } from '../lib/content/domainTypes';
@@ -91,90 +92,93 @@ export const Articles: CollectionConfig = {
   admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
-  fields: [
-    ...baseContentFields(),
-    ...baseRecordContentFields(),
-    { name: 'title', type: 'text', required: true },
-    { name: 'titleJa', type: 'text' },
-    {
-      name: 'category',
-      type: 'select',
-      required: true,
-      options: ['news', 'interview', 'company-report', 'analysis', 'policy'],
-    },
-    {
-      name: 'type',
-      type: 'select',
-      required: true,
-      options: [
-        'analysis',
-        'deployment-report',
-        'interview',
-        'event-report',
-        'policy-update',
-        'case-study',
-        'news-brief',
-        'tech-update',
-        'market-analysis',
-        'manufacturer-guide',
-        'robot-guide',
-        'basics-guide',
-      ],
-    },
-    {
-      name: 'section',
-      type: 'select',
-      required: true,
-      options: ['digest', 'deployment', 'business', 'tech', 'policy', 'entertainment'],
-    },
-    {
-      name: 'contentKind',
-      type: 'select',
-      options: ['editorial', 'sample', 'sponsored'],
-    },
-    { name: 'publishedAt', type: 'text', required: true, admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
-    { name: 'author', type: 'text' },
-    { name: 'industryTags', type: 'text', hasMany: true },
-    { name: 'regionTags', type: 'text', hasMany: true },
-    { name: 'themeTags', type: 'text', hasMany: true },
-    { name: 'whyItMatters', type: 'textarea', required: true },
-    { name: 'keyTakeaways', type: 'text', hasMany: true },
-    { name: 'featured', type: 'checkbox' },
-    {
-      name: 'relatedRobotIds',
-      type: 'relationship',
-      relationTo: 'robots',
-      hasMany: true,
-    },
-    {
-      name: 'relatedManufacturerIds',
-      type: 'relationship',
-      relationTo: 'manufacturers',
-      hasMany: true,
-    },
-    {
-      name: 'relatedUseCaseIds',
-      type: 'relationship',
-      relationTo: 'use-cases',
-      hasMany: true,
-    },
-    {
-      name: 'body',
-      type: 'textarea',
-      admin: {
-        description: 'Markdown本文。type === manufacturer-guide の記事では使わない（manufacturerGuideContentを使う）。',
-        condition: (_, siblingData) => siblingData?.type !== 'manufacturer-guide',
+  fields: applyAdminFieldLabels(
+    [
+      ...baseContentFields(),
+      ...baseRecordContentFields(),
+      { name: 'title', type: 'text', required: true },
+      { name: 'titleJa', type: 'text' },
+      {
+        name: 'category',
+        type: 'select',
+        required: true,
+        options: ['news', 'interview', 'company-report', 'analysis', 'policy'],
       },
-    },
-    {
-      name: 'manufacturerGuideContent',
-      type: 'json',
-      admin: {
-        description: 'ManufacturerGuideContent（companyOverview / lineup / deploymentStatus / procurementChannels / faq 等）。type === manufacturer-guide の記事だけ使う。',
-        condition: (_, siblingData) => siblingData?.type === 'manufacturer-guide',
+      {
+        name: 'type',
+        type: 'select',
+        required: true,
+        options: [
+          'analysis',
+          'deployment-report',
+          'interview',
+          'event-report',
+          'policy-update',
+          'case-study',
+          'news-brief',
+          'tech-update',
+          'market-analysis',
+          'manufacturer-guide',
+          'robot-guide',
+          'basics-guide',
+        ],
       },
-    },
-  ],
+      {
+        name: 'section',
+        type: 'select',
+        required: true,
+        options: ['digest', 'deployment', 'business', 'tech', 'policy', 'entertainment'],
+      },
+      {
+        name: 'contentKind',
+        type: 'select',
+        options: ['editorial', 'sample', 'sponsored'],
+      },
+      { name: 'publishedAt', type: 'text', required: true, admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
+      { name: 'author', type: 'text' },
+      { name: 'industryTags', type: 'text', hasMany: true },
+      { name: 'regionTags', type: 'text', hasMany: true },
+      { name: 'themeTags', type: 'text', hasMany: true },
+      { name: 'whyItMatters', type: 'textarea', required: true },
+      { name: 'keyTakeaways', type: 'text', hasMany: true },
+      { name: 'featured', type: 'checkbox' },
+      {
+        name: 'relatedRobotIds',
+        type: 'relationship',
+        relationTo: 'robots',
+        hasMany: true,
+      },
+      {
+        name: 'relatedManufacturerIds',
+        type: 'relationship',
+        relationTo: 'manufacturers',
+        hasMany: true,
+      },
+      {
+        name: 'relatedUseCaseIds',
+        type: 'relationship',
+        relationTo: 'use-cases',
+        hasMany: true,
+      },
+      {
+        name: 'body',
+        type: 'textarea',
+        admin: {
+          description: 'Markdown本文。type === manufacturer-guide の記事では使わない（manufacturerGuideContentを使う）。',
+          condition: (_, siblingData) => siblingData?.type !== 'manufacturer-guide',
+        },
+      },
+      {
+        name: 'manufacturerGuideContent',
+        type: 'json',
+        admin: {
+          description: 'ManufacturerGuideContent（companyOverview / lineup / deploymentStatus / procurementChannels / faq 等）。type === manufacturer-guide の記事だけ使う。',
+          condition: (_, siblingData) => siblingData?.type === 'manufacturer-guide',
+        },
+      },
+    ],
+    articlesFieldLabels,
+  ),
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [

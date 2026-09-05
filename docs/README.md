@@ -11,7 +11,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 | 計画 | 一言 | branch | 開始日 |
 |---|---|---|---|
 | [Admin公開UI](plans/admin-publish-ui-plan-v1.md) | Payload Admin の Publish ボタンから公開できるようにする。実装・自己監査・2回の外部レビュー対応まで完了。Preview実機で残るのは接続/反映まわりの是正（下記2件） | `feat/admin-publish-ui` | 2026-09-03 |
-| [Admin運用UX・再検証の是正](plans/admin-ux-and-revalidation-fix-plan-v1.md) | Preview運用で見つかった5症状（反映されない・CMSが落ちる・field名が英語 等）の調査と修正計画。**未実装、外部レビュー4回でRequest changes中**。T0（pooler mode確定、debug routeパスを修正済み）から着手予定 | `feat/admin-publish-ui` | 2026-09-04 |
+| [Admin運用UX・再検証の是正](plans/admin-ux-and-revalidation-fix-plan-v1.md) | Preview運用で見つかった5症状（反映されない・CMSが落ちる・field名が英語 等）の調査と修正計画。**T0〜T4完了**（pooler mode是正、DB接続失敗の分岐、再検証結果のtoast通知、反映SLO文書化、全fieldへのja/enラベル付け）。残るT5（select選択肢ラベル）〜T8（実機総合確認）は未着手 | `feat/admin-publish-ui` | 2026-09-04 |
 | [ロボットデータ投入](plans/robot-data-import-plan-v1.md) | 原本HTMLから177機・59社・28シリーズを **Payload へ**投入。**§0 の前提ゲート7項目（コンテンツ基盤移行の完了）を満たすまで着手しない**。Task 9 のみ原本への `deploymentStage` 記入134行が前提 | 未定 | 2026-08-08 |
 | [積み残し登録簿フォローアップ](plans/deferred-work-register-followup-v1.md) | 登録簿#4/#5/#6/#10の実行計画。**#4・#5・#6は解消済み**。残るのは#10のバッテリー23機（CSVのvariant名とレコードの対応を人が決める） | `main`（専用branchなし） | 2026-08-05 |
 | [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | Payload CMS + managed PostgreSQLへの移行後監査・是正。現在は安全ゲート是正ブランチで実装中 | `remediation/task9-safety-gates` | 2026-08-26 |

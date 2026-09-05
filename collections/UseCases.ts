@@ -9,6 +9,13 @@ import {
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
+import {
+  applyAdminFieldLabels,
+  useCasesAtAGlanceFieldLabels,
+  useCasesCandidateRobotsFieldLabels,
+  useCasesCapabilityNotesFieldLabels,
+  useCasesFieldLabels,
+} from '../lib/payload/adminFieldLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { UseCase } from '../lib/content/domainTypes';
@@ -69,88 +76,100 @@ export const UseCases: CollectionConfig = {
   admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
-  fields: [
-    ...baseContentFields(),
-    ...baseRecordContentFields(),
-    { name: 'title', type: 'text', required: true },
-    { name: 'titleJa', type: 'text' },
-    { name: 'subtitle', type: 'text' },
-    {
-      name: 'maturityLevel',
-      type: 'select',
-      required: true,
-      options: ['early-stage', 'pilot-phase', 'production-ready'],
-    },
-    {
-      name: 'buyerReadiness',
-      type: 'select',
-      options: ['initial-adoption', 'requires-poc', 'limited-today'],
-      admin: { description: 'Robotsからは削除済み（DEC-S05）。UseCaseには残す。' },
-    },
-    {
-      name: 'environment',
-      type: 'select',
-      required: true,
-      options: ['indoor-controlled', 'indoor-semi-controlled', 'outdoor', 'mixed', 'hazardous'],
-    },
-    {
-      name: 'requiredCapabilities',
-      type: 'select',
-      required: true,
-      hasMany: true,
-      options: ['mobility', 'manipulation', 'perception', 'autonomy', 'communication', 'data-capture', 'integration'],
-    },
-    { name: 'primaryIndustry', type: 'text', required: true },
-    { name: 'industryTags', type: 'text', hasMany: true },
-    { name: 'taskTags', type: 'text', hasMany: true },
-    {
-      name: 'atAGlance',
-      type: 'group',
-      fields: [
-        { name: 'whereFits', type: 'textarea' },
-        { name: 'whereDoesNotFit', type: 'textarea' },
-        { name: 'mustBeTrue', type: 'textarea' },
-      ],
-    },
-    { name: 'overview', type: 'textarea', required: true },
-    { name: 'whyItMatters', type: 'textarea', required: true },
-    {
-      name: 'capabilityNotes',
-      type: 'group',
-      fields: [
-        { name: 'mobility', type: 'textarea' },
-        { name: 'manipulation', type: 'textarea' },
-        { name: 'perception', type: 'textarea' },
-        { name: 'autonomy', type: 'textarea' },
-        { name: 'communication', type: 'textarea' },
-        { name: 'integration', type: 'textarea' },
-      ],
-    },
-    { name: 'environmentRequirements', type: 'textarea' },
-    { name: 'whyHardToday', type: 'textarea' },
-    { name: 'japanDeploymentConditions', type: 'textarea' },
-    {
-      name: 'candidateRobots',
-      type: 'array',
-      admin: {
-        description: '`robotId` または `seriesId` のどちらか一方だけを持つ（DEC-S08）。両方入力しても保存を止めない（domain validatorはTask 4以降で拡張）。',
+  fields: applyAdminFieldLabels(
+    [
+      ...baseContentFields(),
+      ...baseRecordContentFields(),
+      { name: 'title', type: 'text', required: true },
+      { name: 'titleJa', type: 'text' },
+      { name: 'subtitle', type: 'text' },
+      {
+        name: 'maturityLevel',
+        type: 'select',
+        required: true,
+        options: ['early-stage', 'pilot-phase', 'production-ready'],
       },
-      fields: [
-        { name: 'robotId', type: 'relationship', relationTo: 'robots' },
-        { name: 'seriesId', type: 'relationship', relationTo: 'robot-series' },
-        { name: 'fit', type: 'select', required: true, options: ['strong', 'possible', 'watch'] },
-        {
-          name: 'basis',
-          type: 'select',
-          required: true,
-          options: ['deployment', 'adjacent-deployment', 'official-use-case', 'product-capability', 'market-signal', 'editorial-watch'],
+      {
+        name: 'buyerReadiness',
+        type: 'select',
+        options: ['initial-adoption', 'requires-poc', 'limited-today'],
+        admin: { description: 'Robotsからは削除済み（DEC-S05）。UseCaseには残す。' },
+      },
+      {
+        name: 'environment',
+        type: 'select',
+        required: true,
+        options: ['indoor-controlled', 'indoor-semi-controlled', 'outdoor', 'mixed', 'hazardous'],
+      },
+      {
+        name: 'requiredCapabilities',
+        type: 'select',
+        required: true,
+        hasMany: true,
+        options: ['mobility', 'manipulation', 'perception', 'autonomy', 'communication', 'data-capture', 'integration'],
+      },
+      { name: 'primaryIndustry', type: 'text', required: true },
+      { name: 'industryTags', type: 'text', hasMany: true },
+      { name: 'taskTags', type: 'text', hasMany: true },
+      {
+        name: 'atAGlance',
+        type: 'group',
+        fields: applyAdminFieldLabels(
+          [
+            { name: 'whereFits', type: 'textarea' },
+            { name: 'whereDoesNotFit', type: 'textarea' },
+            { name: 'mustBeTrue', type: 'textarea' },
+          ],
+          useCasesAtAGlanceFieldLabels,
+        ),
+      },
+      { name: 'overview', type: 'textarea', required: true },
+      { name: 'whyItMatters', type: 'textarea', required: true },
+      {
+        name: 'capabilityNotes',
+        type: 'group',
+        fields: applyAdminFieldLabels(
+          [
+            { name: 'mobility', type: 'textarea' },
+            { name: 'manipulation', type: 'textarea' },
+            { name: 'perception', type: 'textarea' },
+            { name: 'autonomy', type: 'textarea' },
+            { name: 'communication', type: 'textarea' },
+            { name: 'integration', type: 'textarea' },
+          ],
+          useCasesCapabilityNotesFieldLabels,
+        ),
+      },
+      { name: 'environmentRequirements', type: 'textarea' },
+      { name: 'whyHardToday', type: 'textarea' },
+      { name: 'japanDeploymentConditions', type: 'textarea' },
+      {
+        name: 'candidateRobots',
+        type: 'array',
+        admin: {
+          description: '`robotId` または `seriesId` のどちらか一方だけを持つ（DEC-S08）。両方入力しても保存を止めない（domain validatorはTask 4以降で拡張）。',
         },
-        { name: 'evidenceDeploymentIds', type: 'relationship', relationTo: 'deployments', hasMany: true },
-        { name: 'evidenceSourceUrls', type: 'text', hasMany: true },
-        { name: 'reason', type: 'textarea', required: true },
-      ],
-    },
-  ],
+        fields: applyAdminFieldLabels(
+          [
+            { name: 'robotId', type: 'relationship', relationTo: 'robots' },
+            { name: 'seriesId', type: 'relationship', relationTo: 'robot-series' },
+            { name: 'fit', type: 'select', required: true, options: ['strong', 'possible', 'watch'] },
+            {
+              name: 'basis',
+              type: 'select',
+              required: true,
+              options: ['deployment', 'adjacent-deployment', 'official-use-case', 'product-capability', 'market-signal', 'editorial-watch'],
+            },
+            { name: 'evidenceDeploymentIds', type: 'relationship', relationTo: 'deployments', hasMany: true },
+            { name: 'evidenceSourceUrls', type: 'text', hasMany: true },
+            { name: 'reason', type: 'textarea', required: true },
+          ],
+          useCasesCandidateRobotsFieldLabels,
+        ),
+      },
+    ],
+    useCasesFieldLabels,
+  ),
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [

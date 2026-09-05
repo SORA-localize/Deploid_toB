@@ -2,6 +2,15 @@ import { createHash } from 'node:crypto';
 import type { Access, CollectionBeforeOperationHook, Field, FieldAccess, PayloadRequest, Where } from 'payload';
 import { adminPublishIntentField } from './adminPublishIntent';
 import {
+  applyAdminFieldLabels,
+  baseContentFieldLabels,
+  baseRecordContentFieldLabels,
+  imageAssetFieldLabels,
+  rightsMetaFieldLabels,
+  seoFieldLabels,
+  sourcesItemFieldLabels,
+} from './adminFieldLabels';
+import {
   clearDraftIntents,
   readApprovedPublishAuthorization,
   readDraftIntent,
@@ -201,35 +210,38 @@ export class PublishValidationError extends Error {
 }
 
 export function baseContentFields(): Field[] {
-  return [
-    // Admin公開UIの競合制御marker（`lib/payload/adminPublishIntent.ts`）。
-    // コンテンツではなく運用メタデータで、値を書けるのは同ファイルのhookだけ。
-    // `baseContentFields()` を使う全collection（publish gateを持つ8つ）へ一括で入れる:
-    // `article-placements` は現状 `ApprovableCollectionSlug` 外だが、同じpublish gateを持ち
-    // 将来公開経路が付く可能性があるため、ここだけ除外して不整合を作らない。
-    // 未使用のcollectionでは常に `null` になるだけで、公開系・snapshotへは現れない。
-    adminPublishIntentField(),
-    {
-      name: 'stableId',
-      type: 'text',
-      required: true,
-      unique: true,
-      index: true,
-      access: { update: immutableStableId },
-    },
-    { name: 'slug', type: 'text', required: true, unique: true, index: true },
-    { name: 'previousSlugs', type: 'text', hasMany: true },
-    {
-      name: 'lifecycleStatus',
-      type: 'select',
-      required: true,
-      defaultValue: 'active',
-      options: [
-        { label: 'Active', value: 'active' },
-        { label: 'Archived', value: 'archived' },
-      ],
-    },
-  ];
+  return applyAdminFieldLabels(
+    [
+      // Admin公開UIの競合制御marker（`lib/payload/adminPublishIntent.ts`）。
+      // コンテンツではなく運用メタデータで、値を書けるのは同ファイルのhookだけ。
+      // `baseContentFields()` を使う全collection（publish gateを持つ8つ）へ一括で入れる:
+      // `article-placements` は現状 `ApprovableCollectionSlug` 外だが、同じpublish gateを持ち
+      // 将来公開経路が付く可能性があるため、ここだけ除外して不整合を作らない。
+      // 未使用のcollectionでは常に `null` になるだけで、公開系・snapshotへは現れない。
+      adminPublishIntentField(),
+      {
+        name: 'stableId',
+        type: 'text',
+        required: true,
+        unique: true,
+        index: true,
+        access: { update: immutableStableId },
+      },
+      { name: 'slug', type: 'text', required: true, unique: true, index: true },
+      { name: 'previousSlugs', type: 'text', hasMany: true },
+      {
+        name: 'lifecycleStatus',
+        type: 'select',
+        required: true,
+        defaultValue: 'active',
+        options: [
+          { label: 'Active', value: 'active' },
+          { label: 'Archived', value: 'archived' },
+        ],
+      },
+    ],
+    baseContentFieldLabels,
+  );
 }
 
 /** Public identity is immutable once a record exists; changing it would orphan
@@ -259,27 +271,30 @@ export function sourcesField(): Field {
     name: 'sources',
     type: 'array',
     required: true,
-    fields: [
-      { name: 'title', type: 'text', required: true },
-      { name: 'url', type: 'text', required: true },
-      { name: 'publisher', type: 'text' },
-      {
-        name: 'publishedAt',
-        type: 'text',
-        admin: {
-          description:
-            '出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。',
+    fields: applyAdminFieldLabels(
+      [
+        { name: 'title', type: 'text', required: true },
+        { name: 'url', type: 'text', required: true },
+        { name: 'publisher', type: 'text' },
+        {
+          name: 'publishedAt',
+          type: 'text',
+          admin: {
+            description:
+              '出典の公開日。ISO日付（2026-07-16）だけでなく、月精度（2025-05）や年精度も取りうるため text。',
+          },
         },
-      },
-      { name: 'checkedAt', type: 'text', required: true, admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
-      {
-        name: 'reliability',
-        type: 'select',
-        required: true,
-        options: ['verified', 'official', 'reported', 'estimated'],
-      },
-      { name: 'note', type: 'textarea' },
-    ],
+        { name: 'checkedAt', type: 'text', required: true, admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
+        {
+          name: 'reliability',
+          type: 'select',
+          required: true,
+          options: ['verified', 'official', 'reported', 'estimated'],
+        },
+        { name: 'note', type: 'textarea' },
+      ],
+      sourcesItemFieldLabels,
+    ),
   };
 }
 
@@ -296,30 +311,33 @@ function rightsMetaField(name: string): Field {
   return {
     name,
     type: 'group',
-    fields: [
-      {
-        name: 'status',
-        type: 'select',
-        options: [
-          'own',
-          'licensed',
-          'commercial-permitted',
-          'reference-attributed',
-          'permission-requested',
-          'prototype-only',
-          'blocked',
-        ],
-      },
-      {
-        name: 'sourceType',
-        type: 'select',
-        options: ['own', 'manufacturer-official', 'partner-official', 'press-release', 'third-party', 'unknown'],
-      },
-      { name: 'checkedAt', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
-      { name: 'rightsHolder', type: 'text' },
-      { name: 'licenseUrl', type: 'text' },
-      { name: 'permissionNote', type: 'textarea' },
-    ],
+    fields: applyAdminFieldLabels(
+      [
+        {
+          name: 'status',
+          type: 'select',
+          options: [
+            'own',
+            'licensed',
+            'commercial-permitted',
+            'reference-attributed',
+            'permission-requested',
+            'prototype-only',
+            'blocked',
+          ],
+        },
+        {
+          name: 'sourceType',
+          type: 'select',
+          options: ['own', 'manufacturer-official', 'partner-official', 'press-release', 'third-party', 'unknown'],
+        },
+        { name: 'checkedAt', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
+        { name: 'rightsHolder', type: 'text' },
+        { name: 'licenseUrl', type: 'text' },
+        { name: 'permissionNote', type: 'textarea' },
+      ],
+      rightsMetaFieldLabels,
+    ),
   };
 }
 
@@ -328,14 +346,17 @@ export function imageAssetField(name: string): Field {
   return {
     name,
     type: 'group',
-    fields: [
-      { name: 'src', type: 'text' },
-      { name: 'alt', type: 'text' },
-      { name: 'credit', type: 'text' },
-      { name: 'sourceUrl', type: 'text' },
-      rightsMetaField('rights'),
-      { name: 'aspectRatio', type: 'number' },
-    ],
+    fields: applyAdminFieldLabels(
+      [
+        { name: 'src', type: 'text' },
+        { name: 'alt', type: 'text' },
+        { name: 'credit', type: 'text' },
+        { name: 'sourceUrl', type: 'text' },
+        rightsMetaField('rights'),
+        { name: 'aspectRatio', type: 'number' },
+      ],
+      imageAssetFieldLabels,
+    ),
   };
 }
 
@@ -344,11 +365,14 @@ export function seoField(): Field {
   return {
     name: 'seo',
     type: 'group',
-    fields: [
-      { name: 'metaTitle', type: 'text' },
-      { name: 'metaDescription', type: 'textarea' },
-      { name: 'noindex', type: 'checkbox' },
-    ],
+    fields: applyAdminFieldLabels(
+      [
+        { name: 'metaTitle', type: 'text' },
+        { name: 'metaDescription', type: 'textarea' },
+        { name: 'noindex', type: 'checkbox' },
+      ],
+      seoFieldLabels,
+    ),
   };
 }
 
@@ -358,18 +382,21 @@ export function seoField(): Field {
  * 個別collectionの `fields` へ `...baseRecordContentFields()` で展開する。
  */
 export function baseRecordContentFields(): Field[] {
-  return [
-    { name: 'summary', type: 'textarea', required: true },
-    {
-      name: 'reliability',
-      type: 'select',
-      options: ['verified', 'official', 'reported', 'estimated'],
-    },
-    sourcesField(),
-    { name: 'nextReviewBy', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
-    imageAssetField('heroImage'),
-    seoField(),
-  ];
+  return applyAdminFieldLabels(
+    [
+      { name: 'summary', type: 'textarea', required: true },
+      {
+        name: 'reliability',
+        type: 'select',
+        options: ['verified', 'official', 'reported', 'estimated'],
+      },
+      sourcesField(),
+      { name: 'nextReviewBy', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
+      imageAssetField('heroImage'),
+      seoField(),
+    ],
+    baseRecordContentFieldLabels,
+  );
 }
 
 interface PublishTransitionCandidate {

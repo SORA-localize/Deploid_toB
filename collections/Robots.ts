@@ -9,6 +9,13 @@ import {
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
+import {
+  applyAdminFieldLabels,
+  robotsComparisonFieldLabels,
+  robotsFieldLabels,
+  robotsLoadRatingsFieldLabels,
+  robotsPriceOffersFieldLabels,
+} from '../lib/payload/adminFieldLabels';
 import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { mapPayloadRobotToDomain } from '../lib/content/payloadMappers';
@@ -42,127 +49,139 @@ export const Robots: CollectionConfig = {
   admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
-  fields: [
-    ...baseContentFields(),
-    ...baseRecordContentFields(),
-    { name: 'name', type: 'text', required: true },
-    { name: 'nameJa', type: 'text' },
-    {
-      name: 'manufacturerId',
-      type: 'relationship',
-      // `validateRobotForPublish` が公開時に必須としている。元の定義は relationship 一律で
-      // `required: false` を明示していたが（`seriesId` / `supersededById` と同じ書き方）、
-      // それだと編集画面に必須の印が出ず、公開して初めて不足を知らされる。
-      // 下書き保存は `versions.drafts.validate: false` により検証を飛ばすので影響しない。
-      required: true,
-      relationTo: 'manufacturers',
-    },
-    {
-      name: 'seriesId',
-      type: 'relationship',
-      relationTo: 'robot-series',
-      required: false,
-    },
-    {
-      name: 'category',
-      type: 'select',
-      required: true,
-      options: ['humanoid', 'general-purpose-robot', 'upper-body-humanoid', 'mobile-manipulator', 'other'],
-    },
-    { name: 'description', type: 'textarea' },
-    { name: 'featuredRank', type: 'number' },
-    {
-      name: 'deploymentStage',
-      type: 'select',
-      required: true,
-      options: ['concept', 'prototype', 'pilot', 'limited-production', 'production', 'internal-use', 'discontinued'],
-    },
-    {
-      name: 'supersededById',
-      type: 'relationship',
-      relationTo: 'robots',
-      required: false,
-    },
-    {
-      name: 'specs',
-      type: 'json',
-      admin: { description: 'RobotSpecs。項目定義（単位・ラベル・グループ）の正本は lib/specSchema.ts。' },
-    },
-    {
-      name: 'procurementModels',
-      type: 'select',
-      hasMany: true,
-      options: ['purchase', 'lease', 'raas', 'subscription', 'partner-program', 'not-for-sale', 'inquiry'],
-    },
-    {
-      name: 'priceOffers',
-      type: 'array',
-      fields: [
-        {
-          name: 'channel',
-          type: 'select',
-          required: true,
-          options: ['manufacturer-public', 'authorized-distributor-public'],
-        },
-        { name: 'display', type: 'text', required: true },
-        { name: 'amount', type: 'number' },
-        { name: 'currency', type: 'text' },
-        { name: 'taxStatus', type: 'select', options: ['included', 'excluded', 'unknown'] },
-        { name: 'variant', type: 'text' },
-        { name: 'sellerName', type: 'text' },
-        { name: 'sourceUrl', type: 'text', required: true },
-      ],
-    },
-    {
-      name: 'loadRatings',
-      type: 'array',
-      fields: [
-        {
-          name: 'scope',
-          type: 'select',
-          required: true,
-          options: ['single-arm', 'dual-arm', 'whole-body', 'carrier', 'manufacturer-wording'],
-        },
-        { name: 'rating', type: 'select', required: true, options: ['rated', 'maximum', 'unspecified'] },
-        { name: 'kg', type: 'number', required: true },
-        { name: 'condition', type: 'text' },
-        { name: 'variant', type: 'text' },
-        { name: 'sourceUrl', type: 'text', required: true },
-      ],
-    },
-    {
-      name: 'fieldEvidence',
-      type: 'json',
-      admin: { description: 'RobotFieldEvidence。specSchemaのkey / priceOffers / loadRatings → sourceUrl[]。' },
-    },
-    { name: 'usageExampleSourceUrls', type: 'text', hasMany: true },
-    {
-      name: 'japanAvailability',
-      type: 'select',
-      required: true,
-      options: ['official-japan', 'distributor-japan', 'inquiry-required', 'import-only', 'unavailable', 'unknown'],
-    },
-    { name: 'distributorJapan', type: 'text' },
-    { name: 'supportNote', type: 'textarea' },
-    {
-      name: 'images',
-      type: 'json',
-      admin: { description: 'Partial<Record<ImageRole, ImageAsset>>。' },
-    },
-    { name: 'industryTags', type: 'text', hasMany: true },
-    { name: 'taskTags', type: 'text', hasMany: true },
-    {
-      name: 'comparison',
-      type: 'group',
-      admin: { description: '@deprecated。/compare の作り替えが決まるまで維持する（削除しない）。' },
-      fields: [
-        { name: 'strengths', type: 'text', hasMany: true },
-        { name: 'constraints', type: 'text', hasMany: true },
-        { name: 'bestFit', type: 'text', hasMany: true },
-        { name: 'notFit', type: 'text', hasMany: true },
-      ],
-    },
-  ],
+  fields: applyAdminFieldLabels(
+    [
+      ...baseContentFields(),
+      ...baseRecordContentFields(),
+      { name: 'name', type: 'text', required: true },
+      { name: 'nameJa', type: 'text' },
+      {
+        name: 'manufacturerId',
+        type: 'relationship',
+        // `validateRobotForPublish` が公開時に必須としている。元の定義は relationship 一律で
+        // `required: false` を明示していたが（`seriesId` / `supersededById` と同じ書き方）、
+        // それだと編集画面に必須の印が出ず、公開して初めて不足を知らされる。
+        // 下書き保存は `versions.drafts.validate: false` により検証を飛ばすので影響しない。
+        required: true,
+        relationTo: 'manufacturers',
+      },
+      {
+        name: 'seriesId',
+        type: 'relationship',
+        relationTo: 'robot-series',
+        required: false,
+      },
+      {
+        name: 'category',
+        type: 'select',
+        required: true,
+        options: ['humanoid', 'general-purpose-robot', 'upper-body-humanoid', 'mobile-manipulator', 'other'],
+      },
+      { name: 'description', type: 'textarea' },
+      { name: 'featuredRank', type: 'number' },
+      {
+        name: 'deploymentStage',
+        type: 'select',
+        required: true,
+        options: ['concept', 'prototype', 'pilot', 'limited-production', 'production', 'internal-use', 'discontinued'],
+      },
+      {
+        name: 'supersededById',
+        type: 'relationship',
+        relationTo: 'robots',
+        required: false,
+      },
+      {
+        name: 'specs',
+        type: 'json',
+        admin: { description: 'RobotSpecs。項目定義（単位・ラベル・グループ）の正本は lib/specSchema.ts。' },
+      },
+      {
+        name: 'procurementModels',
+        type: 'select',
+        hasMany: true,
+        options: ['purchase', 'lease', 'raas', 'subscription', 'partner-program', 'not-for-sale', 'inquiry'],
+      },
+      {
+        name: 'priceOffers',
+        type: 'array',
+        fields: applyAdminFieldLabels(
+          [
+            {
+              name: 'channel',
+              type: 'select',
+              required: true,
+              options: ['manufacturer-public', 'authorized-distributor-public'],
+            },
+            { name: 'display', type: 'text', required: true },
+            { name: 'amount', type: 'number' },
+            { name: 'currency', type: 'text' },
+            { name: 'taxStatus', type: 'select', options: ['included', 'excluded', 'unknown'] },
+            { name: 'variant', type: 'text' },
+            { name: 'sellerName', type: 'text' },
+            { name: 'sourceUrl', type: 'text', required: true },
+          ],
+          robotsPriceOffersFieldLabels,
+        ),
+      },
+      {
+        name: 'loadRatings',
+        type: 'array',
+        fields: applyAdminFieldLabels(
+          [
+            {
+              name: 'scope',
+              type: 'select',
+              required: true,
+              options: ['single-arm', 'dual-arm', 'whole-body', 'carrier', 'manufacturer-wording'],
+            },
+            { name: 'rating', type: 'select', required: true, options: ['rated', 'maximum', 'unspecified'] },
+            { name: 'kg', type: 'number', required: true },
+            { name: 'condition', type: 'text' },
+            { name: 'variant', type: 'text' },
+            { name: 'sourceUrl', type: 'text', required: true },
+          ],
+          robotsLoadRatingsFieldLabels,
+        ),
+      },
+      {
+        name: 'fieldEvidence',
+        type: 'json',
+        admin: { description: 'RobotFieldEvidence。specSchemaのkey / priceOffers / loadRatings → sourceUrl[]。' },
+      },
+      { name: 'usageExampleSourceUrls', type: 'text', hasMany: true },
+      {
+        name: 'japanAvailability',
+        type: 'select',
+        required: true,
+        options: ['official-japan', 'distributor-japan', 'inquiry-required', 'import-only', 'unavailable', 'unknown'],
+      },
+      { name: 'distributorJapan', type: 'text' },
+      { name: 'supportNote', type: 'textarea' },
+      {
+        name: 'images',
+        type: 'json',
+        admin: { description: 'Partial<Record<ImageRole, ImageAsset>>。' },
+      },
+      { name: 'industryTags', type: 'text', hasMany: true },
+      { name: 'taskTags', type: 'text', hasMany: true },
+      {
+        name: 'comparison',
+        type: 'group',
+        admin: { description: '@deprecated。/compare の作り替えが決まるまで維持する（削除しない）。' },
+        fields: applyAdminFieldLabels(
+          [
+            { name: 'strengths', type: 'text', hasMany: true },
+            { name: 'constraints', type: 'text', hasMany: true },
+            { name: 'bestFit', type: 'text', hasMany: true },
+            { name: 'notFit', type: 'text', hasMany: true },
+          ],
+          robotsComparisonFieldLabels,
+        ),
+      },
+    ],
+    robotsFieldLabels,
+  ),
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
