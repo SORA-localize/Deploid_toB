@@ -11,6 +11,12 @@ import {
   sourcesItemFieldLabels,
 } from './adminFieldLabels';
 import {
+  lifecycleStatusSelectOptions,
+  reliabilitySelectOptions,
+  rightsSourceTypeSelectOptions,
+  rightsStatusSelectOptions,
+} from './adminSelectLabels';
+import {
   clearDraftIntents,
   readApprovedPublishAuthorization,
   readDraftIntent,
@@ -234,10 +240,7 @@ export function baseContentFields(): Field[] {
         type: 'select',
         required: true,
         defaultValue: 'active',
-        options: [
-          { label: 'Active', value: 'active' },
-          { label: 'Archived', value: 'archived' },
-        ],
+        options: lifecycleStatusSelectOptions,
       },
     ],
     baseContentFieldLabels,
@@ -289,7 +292,7 @@ export function sourcesField(): Field {
           name: 'reliability',
           type: 'select',
           required: true,
-          options: ['verified', 'official', 'reported', 'estimated'],
+          options: reliabilitySelectOptions,
         },
         { name: 'note', type: 'textarea' },
       ],
@@ -316,20 +319,12 @@ function rightsMetaField(name: string): Field {
         {
           name: 'status',
           type: 'select',
-          options: [
-            'own',
-            'licensed',
-            'commercial-permitted',
-            'reference-attributed',
-            'permission-requested',
-            'prototype-only',
-            'blocked',
-          ],
+          options: rightsStatusSelectOptions,
         },
         {
           name: 'sourceType',
           type: 'select',
-          options: ['own', 'manufacturer-official', 'partner-official', 'press-release', 'third-party', 'unknown'],
+          options: rightsSourceTypeSelectOptions,
         },
         { name: 'checkedAt', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
         { name: 'rightsHolder', type: 'text' },
@@ -388,7 +383,7 @@ export function baseRecordContentFields(): Field[] {
       {
         name: 'reliability',
         type: 'select',
-        options: ['verified', 'official', 'reported', 'estimated'],
+        options: reliabilitySelectOptions,
       },
       sourcesField(),
       { name: 'nextReviewBy', type: 'text', admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },

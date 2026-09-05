@@ -15,6 +15,11 @@ import {
   manufacturersFieldLabels,
   manufacturersHeadquartersFieldLabels,
 } from '../lib/payload/adminFieldLabels';
+import {
+  manufacturerCompanyStatusSelectOptions,
+  manufacturerCompanyTypeSelectOptions,
+  manufacturerJapanPresenceSelectOptions,
+} from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { mapPayloadManufacturerToDomain } from '../lib/content/payloadMappers';
 import type { Manufacturer } from '../lib/content/domainTypes';
@@ -50,13 +55,13 @@ export const Manufacturers: CollectionConfig = {
         name: 'companyType',
         type: 'select',
         required: true,
-        options: ['manufacturer', 'distributor', 'integrator', 'ai-os', 'research'],
+        options: manufacturerCompanyTypeSelectOptions,
       },
       {
         name: 'companyStatus',
         type: 'select',
         defaultValue: 'active',
-        options: ['active', 'stealth', 'acquired', 'inactive'],
+        options: manufacturerCompanyStatusSelectOptions,
       },
       { name: 'country', type: 'text', required: true },
       { name: 'hqCity', type: 'text' },
@@ -84,7 +89,7 @@ export const Manufacturers: CollectionConfig = {
         name: 'japanPresence',
         type: 'select',
         required: true,
-        options: ['office', 'distributor', 'partner', 'remote', 'none', 'unknown'],
+        options: manufacturerJapanPresenceSelectOptions,
       },
       {
         name: 'domesticDistributors',

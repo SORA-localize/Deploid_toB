@@ -10,6 +10,12 @@ import {
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
 import { applyAdminFieldLabels, articlesFieldLabels } from '../lib/payload/adminFieldLabels';
+import {
+  articleCategorySelectOptions,
+  articleContentKindSelectOptions,
+  articleSectionSelectOptions,
+  articleTypeSelectOptions,
+} from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { Article } from '../lib/content/domainTypes';
@@ -102,37 +108,24 @@ export const Articles: CollectionConfig = {
         name: 'category',
         type: 'select',
         required: true,
-        options: ['news', 'interview', 'company-report', 'analysis', 'policy'],
+        options: articleCategorySelectOptions,
       },
       {
         name: 'type',
         type: 'select',
         required: true,
-        options: [
-          'analysis',
-          'deployment-report',
-          'interview',
-          'event-report',
-          'policy-update',
-          'case-study',
-          'news-brief',
-          'tech-update',
-          'market-analysis',
-          'manufacturer-guide',
-          'robot-guide',
-          'basics-guide',
-        ],
+        options: articleTypeSelectOptions,
       },
       {
         name: 'section',
         type: 'select',
         required: true,
-        options: ['digest', 'deployment', 'business', 'tech', 'policy', 'entertainment'],
+        options: articleSectionSelectOptions,
       },
       {
         name: 'contentKind',
         type: 'select',
-        options: ['editorial', 'sample', 'sponsored'],
+        options: articleContentKindSelectOptions,
       },
       { name: 'publishedAt', type: 'text', required: true, admin: { description: '日付のみの値。timestamptz にすると import 時の server TZ で日付がずれるため text（Task 5、詳細は lib/payload/access.ts の sourcesField）。' } },
       { name: 'author', type: 'text' },

@@ -10,6 +10,7 @@ import {
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
 import { applyAdminFieldLabels, deploymentsFieldLabels, deploymentsLocationFieldLabels } from '../lib/payload/adminFieldLabels';
+import { deploymentStatusSelectOptions } from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { DeploymentSite } from '../lib/content/domainTypes';
@@ -89,7 +90,7 @@ export const Deployments: CollectionConfig = {
         name: 'status',
         type: 'select',
         required: true,
-        options: ['announced', 'pilot', 'production', 'ended', 'unknown'],
+        options: deploymentStatusSelectOptions,
         // `enumName` は必須（Task 4で発見したTask 3のschema欠陥の修正）。
         // postgres adapterはenum型名を `enum_<table>_<field>` で決めるため、drafts機構の
         // `_status`（先頭のアンダースコアが落ちて `enum_deployments_status`）と、この

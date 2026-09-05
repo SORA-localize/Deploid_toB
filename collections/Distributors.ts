@@ -10,6 +10,10 @@ import {
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
 import { applyAdminFieldLabels, distributorsFieldLabels } from '../lib/payload/adminFieldLabels';
+import {
+  distributorAcquisitionMethodSelectOptions,
+  distributorProviderTypeSelectOptions,
+} from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipsToStableIds } from '../lib/content/payloadMappers';
 import type { Distributor } from '../lib/content/domainTypes';
@@ -72,7 +76,7 @@ export const Distributors: CollectionConfig = {
         name: 'providerType',
         type: 'select',
         required: true,
-        options: ['maker-direct', 'reseller', 'other'],
+        options: distributorProviderTypeSelectOptions,
       },
       {
         name: 'handledManufacturerIds',
@@ -92,7 +96,7 @@ export const Distributors: CollectionConfig = {
         type: 'select',
         required: true,
         hasMany: true,
-        options: ['purchase', 'lease', 'raas', 'subscription', 'inquiry'],
+        options: distributorAcquisitionMethodSelectOptions,
       },
       { name: 'inquiryUrl', type: 'text' },
       { name: 'note', type: 'textarea' },

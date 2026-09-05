@@ -567,13 +567,26 @@ select値は増える（`surface`/`slot`/`kind`が追加）。**正確な値は�
 - `_status`（draft/published）は対象外——Payload自身の翻訳に任せる
 - **`options` の value 集合は変更前後で完全一致**させる
 
-**完了条件**:
-- 対象selectすべて（`ArticlePlacements`含む）にja/en両方のラベルがある
-- **全Recordのキー集合ではなく、select field ごとに対応Recordと値集合を比較**するテスト
-- value集合が変わっていないことを固定するテスト
-- `_status`系フィールドは対象から明示的に除外されている
-- **`ArticlePlacements.slot`が`imageRoleLabels.hero`を参照していない**ことを明示的にテストする
-  （意味の異なるラベルの誤流用を機械的に防ぐ）
+**完了条件**: ✅ **2026-09-05実装済み**。
+
+- `lib/payload/adminSelectLabels.ts`を新設。対象32個のselect（access.ts共有5+
+  Manufacturers 3+Distributors 2+Robots 8+UseCases 6+Deployments 1+Articles 4+
+  ArticlePlacements 3、`RobotSeries`/`SiteSettings`はselect無し）を全て
+  `{value, label:{ja,en}}`形の`Option[]`へ置換。既存Record（`reliabilityLabels`/
+  `articleCategoryLabels`/`companyTypeLabels`等13個）がある値はjaをそこから直接参照
+  （転記しない）、英語は新設ファイルだけが正本
+- `ArticlePlacements.slot`は対応表どおり`imageRoleLabels.hero`を再利用せず、
+  別の日本語（「最上段（トップ）」）を独自定義
+- `Articles.contentKind`と`ArticlePlacements.kind`は値が一部重複するが別selectとして
+  個別に定義（`house`は後者のみ）
+- `tests/content/admin-select-labels.test.ts`を新設。9対象それぞれで
+  `collectSelectFieldSnapshots()`が返す全selectについて (1) 全optionにja/en非空labelがある、
+  (2) 値集合がrefactor前と完全一致することを検証。加えて`slot`が`imageRoleLabels.hero`を
+  再利用していないことの専用テスト、安全網自体が機能することの確認を含め計20件
+- **実際に1件消すと落ちることを確認済み**: `manufacturerCompanyStatusSelectOptions`から
+  `acquired`を一時的に削除して実行したところ、値集合比較テストが期待どおり赤転した。
+  確認後に復元し、再度全20件が緑であることを確認した
+- `_status`（draft/published）はPayload組み込みのため対象外（selectとして定義していない）
 
 ---
 

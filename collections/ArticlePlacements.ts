@@ -12,6 +12,11 @@ import {
   articlePlacementsFieldLabels,
   articlePlacementsSponsorFieldLabels,
 } from '../lib/payload/adminFieldLabels';
+import {
+  articlePlacementKindSelectOptions,
+  articlePlacementSlotSelectOptions,
+  articlePlacementSurfaceSelectOptions,
+} from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { ArticlePlacement } from '../lib/content/domainTypes';
@@ -117,20 +122,20 @@ export const ArticlePlacements: CollectionConfig = {
         name: 'surface',
         type: 'select',
         required: true,
-        options: ['reports-index'],
+        options: articlePlacementSurfaceSelectOptions,
       },
       {
         name: 'slot',
         type: 'select',
         required: true,
-        options: ['hero', 'feature'],
+        options: articlePlacementSlotSelectOptions,
       },
       { name: 'articleId', type: 'relationship', relationTo: 'articles', required: true },
       { name: 'order', type: 'number', required: true },
       {
         name: 'kind',
         type: 'select',
-        options: ['editorial', 'sample', 'sponsored', 'house'],
+        options: articlePlacementKindSelectOptions,
       },
       {
         name: 'sponsor',

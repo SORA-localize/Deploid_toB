@@ -16,6 +16,14 @@ import {
   useCasesCapabilityNotesFieldLabels,
   useCasesFieldLabels,
 } from '../lib/payload/adminFieldLabels';
+import {
+  useCaseBuyerReadinessSelectOptions,
+  useCaseCandidateRobotBasisSelectOptions,
+  useCaseCandidateRobotFitSelectOptions,
+  useCaseEnvironmentSelectOptions,
+  useCaseMaturityLevelSelectOptions,
+  useCaseRequiredCapabilitySelectOptions,
+} from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { UseCase } from '../lib/content/domainTypes';
@@ -87,26 +95,26 @@ export const UseCases: CollectionConfig = {
         name: 'maturityLevel',
         type: 'select',
         required: true,
-        options: ['early-stage', 'pilot-phase', 'production-ready'],
+        options: useCaseMaturityLevelSelectOptions,
       },
       {
         name: 'buyerReadiness',
         type: 'select',
-        options: ['initial-adoption', 'requires-poc', 'limited-today'],
+        options: useCaseBuyerReadinessSelectOptions,
         admin: { description: 'Robotsからは削除済み（DEC-S05）。UseCaseには残す。' },
       },
       {
         name: 'environment',
         type: 'select',
         required: true,
-        options: ['indoor-controlled', 'indoor-semi-controlled', 'outdoor', 'mixed', 'hazardous'],
+        options: useCaseEnvironmentSelectOptions,
       },
       {
         name: 'requiredCapabilities',
         type: 'select',
         required: true,
         hasMany: true,
-        options: ['mobility', 'manipulation', 'perception', 'autonomy', 'communication', 'data-capture', 'integration'],
+        options: useCaseRequiredCapabilitySelectOptions,
       },
       { name: 'primaryIndustry', type: 'text', required: true },
       { name: 'industryTags', type: 'text', hasMany: true },
@@ -153,12 +161,12 @@ export const UseCases: CollectionConfig = {
           [
             { name: 'robotId', type: 'relationship', relationTo: 'robots' },
             { name: 'seriesId', type: 'relationship', relationTo: 'robot-series' },
-            { name: 'fit', type: 'select', required: true, options: ['strong', 'possible', 'watch'] },
+            { name: 'fit', type: 'select', required: true, options: useCaseCandidateRobotFitSelectOptions },
             {
               name: 'basis',
               type: 'select',
               required: true,
-              options: ['deployment', 'adjacent-deployment', 'official-use-case', 'product-capability', 'market-signal', 'editorial-watch'],
+              options: useCaseCandidateRobotBasisSelectOptions,
             },
             { name: 'evidenceDeploymentIds', type: 'relationship', relationTo: 'deployments', hasMany: true },
             { name: 'evidenceSourceUrls', type: 'text', hasMany: true },
