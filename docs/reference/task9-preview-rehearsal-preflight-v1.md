@@ -398,3 +398,22 @@ Vercel Activity Log（read-only API）で追跡すると、Preview `DATABASE_URL
 
 これにより「8/25 22:43の再追加が退行点」と確定した。以後の対応
 （transaction poolerへ戻す）は`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 1参照。
+
+### 追記（2026-09-05）: transaction poolerへ復旧・実機確認
+
+上記のsession pooler確認を受け、ユーザー承認のもとPreviewの`DATABASE_URL`を
+transaction pooler（6543、`?sslmode=require&uselibpqcompat=true`）へ更新した
+（`vercel env rm` + `vercel env add`、値は一切表示・ログ出力していない）。
+更新前に、同じ接続情報のportだけ6543に変えた値で`psql`から`select 1`が通ることを確認済み
+（8/25の値が現在も有効なcredentialであることの裏付け）。
+
+空commitでredeployをtrigger、新しいPreview deployment（`Ready`確認済み）に対して:
+
+- **通常アクセス**: `/robots/unitree-g1`・`/manufacturers` とも200
+- **並行負荷試験**（8/23と同条件）: 両routeへ各12リクエスト、計24を並列発行——
+  **全て200、`EMAXCONNSESSION`0件**
+- **デプロイ後40秒のログ監視**: `EMAXCONNSESSION`・`digest: 4073397010`とも0件
+
+8/23の実績（transaction poolerなら24並列でも安定）が再現された。
+`docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 1（session/transaction分岐）は
+sessionだった側の対応（transaction poolerへ戻す）で完了。

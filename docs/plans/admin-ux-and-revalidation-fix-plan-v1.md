@@ -279,8 +279,13 @@ adminには`{ja, en}`両方が要るが、それをそのまま`lib/labels.ts`�
 
 **完了条件**: 現在のPreview実行時DATABASE_URLのポートが判明し、debug routeが削除されている
 
+**✅ 2026-09-05実施済み**: debug routeで確認した結果 `poolerMode: "session"`（5432）。
+Activity Logで8/25 22:43以降DATABASE_URLの変更が無いことを確認済みのため、
+「8/25 22:43の再追加が退行点」と確定。debug routeは削除済み
+（`task9-preview-rehearsal-preflight-v1.md`に結果追記済み）。
+
 **分岐（2026-09-05 5回目改訂で明確化）**:
-- **session(5432)だった場合**: 「8/25 22:43の再追加が退行点」と**確定する**
+- **session(5432)だった場合（実際にこちら）**: 「8/25 22:43の再追加が退行点」と**確定する**
   （それ以外に変更イベントが無いことをActivity Logで確認済みのため、消去法で確定できる）。
   T1は**transaction poolerへ戻す**（8/25の意図どおりの値へ、今度こそ正しく設定する）
 - **transaction(6543)だった場合**: **「pool.max未指定 × 負荷」という仮説を、
@@ -349,12 +354,20 @@ adminには`{ja, en}`両方が要るが、それをそのまま`lib/labels.ts`�
    出た」経路が実在するかを確認する。原因を素通りして対症療法だけ実装しない
 
 **完了条件**:
-- T0の分岐に応じてpooler modeが是正されている（またはtransactionと確定し、再照合が完了している）
-- ①②のDB接続失敗時、編集者に`publish-temporarily-unavailable`（既存コード）が出る
-  （生の`digest`ではない、かつ「ログイン切れ」と誤表示されない）
-- 上記をroute-levelで固定するテストがある（`getPayload`・`payload.auth`をモックし、
-  実際に`POST`を呼ぶ）
-- ③はT8のチェックリストに追加されている
+- [x] T0の分岐に応じてpooler modeが是正されている（またはtransactionと確定し、再照合が完了している）
+  ——**2026-09-05実施済み**。Preview `DATABASE_URL`をtransaction pooler(6543)へ更新
+  （ユーザー承認済み、更新前に`psql`で接続確認）。並行負荷試験（各route12リクエスト、計24）で
+  全て200・`EMAXCONNSESSION`0件、デプロイ後40秒のログ監視でも0件を確認
+  （`task9-preview-rehearsal-preflight-v1.md`に追記済み）
+- [ ] ①②のDB接続失敗時、編集者に`publish-temporarily-unavailable`（既存コード）が出る
+  （生の`digest`ではない、かつ「ログイン切れ」と誤表示されない）——**未着手**
+- [ ] 上記をroute-levelで固定するテストがある（`getPayload`・`payload.auth`をモックし、
+  実際に`POST`を呼ぶ）——**未着手**
+- [ ] ③はT8のチェックリストに追加されている——**未着手**
+
+**T1は部分完了。** pooler mode是正（1点目）は完了し実機で効果を確認したが、
+エラー境界②（`authenticatePublisher`のDB失敗を`publish-temporarily-unavailable`へ写像する）
+はまだ手を付けていない。
 
 **検証**:
 - `npx vitest run tests/content/admin-publish-route.test.ts`
@@ -624,7 +637,7 @@ npm run test:e2e -- tests/e2e/payload-admin-publish.spec.ts tests/e2e/cache-reva
 
 ## 7. 手動確認チェックリスト
 
-- [ ] 並行負荷後（各route12リクエスト、計24）、直後5分間 `EMAXCONNSESSION` が0（T1・T8）
+- [x] 並行負荷後（各route12リクエスト、計24）、直後5分間 `EMAXCONNSESSION` が0（T1・T8）——**2026-09-05実機確認済み。24/24が200、EMAXCONNSESSION 0件**
 - [ ] 公開 → **公開ページのHTML**が SLO 内に変わる（T8）
 - [ ] 通知が失敗したとき、その旨がtoastに出る（T2）
 - [ ] 5状態（ok / non-ok / unreachable / missing-secret / missing-base-url）が区別できる（T2）
