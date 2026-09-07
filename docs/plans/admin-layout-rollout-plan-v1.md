@@ -60,8 +60,9 @@ T1〜T3を優先する: field総数がManufacturers（実装済み・29）以上
 `globals/SiteSettings.ts`の実体を確認した結果、**SiteSettingsには運用メタfieldが
 そもそも存在しない**（`stableId`/`slug`/`lifecycleStatus`は個別collection専用の概念で、
 globalは常に単一documentのためglobal定義コメントにも明記されている——他collectionと
-同じ「sidebar=運用メタ」パターンを適用する対象が無い）。field自体も`defaultSeo`・
-`announcementBanner`・`dataAsOf`・`articleIndexPlacementLimits`の4つの直下groupのみで、
+同じ「sidebar=運用メタ」パターンを適用する対象が無い）。field自体も`defaultSeo`（group）・
+`announcementBanner`（group）・`dataAsOf`（text）・`articleIndexPlacementLimits`（group）の
+4つの直下fieldのみで（レビュー指摘#4: 全てgroupではなく`dataAsOf`はtext）、
 tabsで分割するほどの縦の長さも無い。
 
 **結論: T8は実装しない。** sidebar化する対象fieldが無く、tabs化が必要な量でもないため、
@@ -199,47 +200,59 @@ labels: {
 
 ### 対象範囲の確定（レビュー指摘#4——当初「全collection横断」は範囲が曖昧だった）
 
-**対象は`tests/content/admin-field-labels.test.ts`の`TARGETS`に含まれる、Admin上で
-編集可能なarray fieldのみ**とする。`TARGETS`は`ArticlePlacements`・`Articles`・
-`Deployments`・`Distributors`・`Manufacturers`・`Media`・`Robots`・`RobotSeries`・
-`UseCases`（+ globalとして`SiteSettings`相当）——`admin.hidden: true`の
+**対象は`tests/content/admin-field-labels.test.ts`の`TARGETS`と同じ集合に含まれる、
+Admin上で編集可能なarray fieldのみ**とする。`TARGETS`自体は`ArticlePlacements`・
+`Articles`・`Deployments`・`Distributors`・`Manufacturers`・`Media`・`Robots`・
+`RobotSeries`・`UseCases`（+ globalとして`SiteSettings`相当）を指し、`admin.hidden: true`の
 `AuditUploadSessions`・`EnvironmentMarker`は最初から除外されている（labelテストの
 既存方針と一致させる。ボタン日本語化はエンドユーザーがAdminで実際に見る画面が
 目的で、内部専用collectionは対象外というのが自然な線引き）。
 
-2026-09-07時点で実コードを走査して確認した対象（5件、全て`TARGETS`内）:
+**「定義箇所の数」と「実際にAdmin画面へ現れる箇所の数」を区別する**
+（レビュー指摘#1）。`sources`は`lib/payload/access.ts`の`sourcesField()`という
+**1つの共有定義**だが、`baseRecordContentFields()`経由で7 collection
+（Articles・Deployments・Distributors・Manufacturers・RobotSeries・Robots・UseCases）
+の画面へ展開される。したがって:
 
-| collection | field | 備考 |
+| 区分 | 件数 | 内訳 |
 |---|---|---|
-| 複数（`lib/payload/access.ts`の`sourcesField()`を共有利用） | `sources` | shared field定義。1箇所直せば全collectionへ反映 |
-| Manufacturers | `domesticDistributors` | |
-| Robots | `priceOffers` | |
-| Robots | `loadRatings` | |
-| UseCases | `candidateRobots` | |
+| **コード上の定義箇所**（実際に編集する場所） | 5 | `sourcesField()`（1箇所、7 collectionで共有）／`Manufacturers.domesticDistributors`／`Robots.priceOffers`／`Robots.loadRatings`／`UseCases.candidateRobots` |
+| **Admin画面上の出現箇所**（テストが検査すべき件数） | 11 | `sources`×7 collection ＋ `domesticDistributors`×1 ＋ `priceOffers`×1 ＋ `loadRatings`×1 ＋ `candidateRobots`×1 |
 
 `AuditUploadSessions.allowedObjects`（array field）は`admin.hidden: true`の
 collectionに属するため対象外——確認済み。
 
-**将来追加されるarray fieldも同じ機構で検出する**: 下記テストは`TARGETS`を走査して
-array fieldを再帰的に見つける実装にし、対象一覧をハードコードしない（新しいarray field
-が追加されたときに人手の洗い出しへ戻らないようにする）。
+**将来追加されるarray fieldも同じ機構で検出する**: 下記テストは対象collectionのfield定義を
+再帰的に走査してarray fieldを見つける実装にし、**「検出された全arrayが`labels.singular`・
+`labels.plural`のja/enを共に持つこと」を条件にする**（固定11件という数へ依存すると、
+新しいarray fieldが増えた・減った場合にテストの意図と実装がずれる。レビュー指摘#1の
+「固定件数ではなく検出ベースにする」を反映）。
 
 ### Files
 
-- Modify: `lib/payload/access.ts`（`sourcesField()`へ`labels`追加）
+- Modify: `lib/payload/access.ts`（`sourcesField()`へ`labels`追加。7 collection分へ一括反映）
 - Modify: `collections/Manufacturers.ts`（`domesticDistributors`）
 - Modify: `collections/Robots.ts`（`priceOffers`・`loadRatings`）
 - Modify: `collections/UseCases.ts`（`candidateRobots`）
 - New: `tests/content/admin-array-field-labels.test.ts`
-  （`TARGETS`を再利用してarray fieldを再帰的に検出し、`labels.singular`/`labels.plural`の
-  ja/en非空を検査する。既存の`admin-field-labels.test.ts`へ追加するとファイルの責務が
-  「field label」と「配列行label」で混ざるため、新規ファイルに分離する）
+
+**TARGETSの再利用方法（レビュー指摘#1の実装可能性の修正）**: `admin-field-labels.test.ts`の
+`TARGETS`は`export`されていない非公開定数のため、新規テストファイルから直接importできない。
+既存の`tests/content/admin-select-labels.test.ts`が`admin-field-labels.test.ts`と同じ
+collection群を**それぞれ独自に`import`してTARGETSを再構築している**（2ファイル間でモジュールを
+共有していない、既存の実際のパターン）。この新規テストファイルも同じ流儀に合わせ、
+対象collection（`ArticlePlacements`・`Articles`・`Deployments`・`Distributors`・
+`Manufacturers`・`Media`・`Robots`・`RobotSeries`・`UseCases`・`SiteSettings`）を直接importして
+自前のTARGETS相当の配列を構築する。共有moduleへの切り出しはこの計画のスコープ外とする
+（3つ目の重複が発生した時点で切り出しを検討すれば良く、今回はrepoの既存流儀を踏襲するだけで
+十分——早すぎる抽象化を避ける）。
 
 ### 完了条件
 
-- 対象5箇所全てに`labels: { singular: {ja, en}, plural: {ja, en} }`が付く
-- `tests/content/admin-array-field-labels.test.ts`が、対象5箇所を検出し、
-  未対応のarray fieldが今後追加されたら機械的に検出してfailする
+- コード上の5箇所全てに`labels: { singular: {ja, en}, plural: {ja, en} }`が付く
+- `tests/content/admin-array-field-labels.test.ts`が、Admin画面上の11箇所（表参照）を
+  実際に検出し、labelsが揃っていることを確認する。かつ、今後array fieldが追加・削除
+  されても固定件数に依存せず追従する
 - `npm run typecheck` / `npm run lint`が通る（`labels`の型を正しく満たしていることの確認）
 - 実画面で「〇〇を追加」ボタンが日本語表示されることを目視確認する
 
@@ -249,17 +262,39 @@ T9は他タスクと違いtabs/sidebarを一切触らないため、`payload:mig
 ## T10: 完了後の文書整理（レビュー指摘#8——当初計画に無かった）
 
 T1〜T9が全て完了した後の最終タスク。実装のみで終わらせず、文書側を実態に合わせる。
+`ai/rules/80-doc-governance.md`「Moving Documents」が「棚移動は path change であって
+内容変更ではない。両方必要なら別commitに分け、移動を先・内容変更を後にする」と定めているため
+（レビュー指摘#3）、3つのcommitへ分ける。
+
+### T10a: 移動のみ（path changeのみ、本文は無変更）
+
+`docs/plans/admin-layout-rollout-plan-v1.md`を`docs/archive/`へ`git mv`する。
+このcommitでは本文を一切編集しない（`docs/archive/`配下は凍結対象——移動後に
+このファイル自体を編集しない、という原則をここでも守る）。
+
+### T10b: 他docの内容更新（T10aの後、別commit）
 
 1. `docs/decisions/admin-field-layout-v1.md`の§3（「設計のみ、未実装」）を、実装結果へ
    書き換える。各collectionの実画面確認結果（tabsの切り替え確認・sidebar常時表示確認など、
    Manufacturers POCの§2と同じ形式）を追記する
 2. 同docのT8（SiteSettings）の判断（本書の「T8の判断」節）を転記する——同docの現行§3には
    SiteSettingsのsidebar fieldの記載が無く、これが今回のレビューで指摘された不備そのもの
-3. `docs/README.md`の進行中一覧からこのロールアウト計画への言及を外す
-4. 本計画書（`docs/plans/admin-layout-rollout-plan-v1.md`）を`docs/archive/`へ移動する
-   （`ai/rules/80-doc-governance.md`のreference/plan運用に従う）
-5. 移動後、`rg --no-ignore admin-layout-rollout-plan-v1` 等で、移動前のパスを指す
-   live参照（`docs/README.md`・他の計画doc・コード内コメント等）が残っていないことを確認する
+3. 1・2の内容変更に伴い、`docs/decisions/admin-field-layout-v1.md`のfrontmatter
+   `updated`を実施日へ更新する（`ai/rules/80-doc-governance.md`「Frontmatter」:
+   「`updated`は内容が実質的に変わった時だけ更新する」に該当するケース）
+4. `docs/README.md`の進行中一覧からこのロールアウト計画への言及を外す
+   （移動先が`docs/archive/`になったため、旧パスへのリンクも修正する）
+
+### T10c: 最終検証（T10bの後）
+
+1. `rg --no-ignore admin-layout-rollout-plan-v1` 等で、移動前のパス
+   （`docs/plans/admin-layout-rollout-plan-v1.md`）を指すlive参照
+   （`docs/README.md`・他の計画doc・コード内コメント等）が残っていないことを確認する
+   （`docs/archive/`配下からの参照は対象外——凍結済みのため直さない）
+2. `npm run check`を実行し、通ることを確認する（レビュー指摘#2）。T10は`build`・
+   `check:docs`・全Vitest・`check:dead-code`等、各タスクの部分テストではカバーしない
+   repo標準ゲート一式を通す最終防波堤のため、個別タスクのtypecheck/lint/該当テストだけでは
+   代替しない
 
 ## 実装しないこと
 
