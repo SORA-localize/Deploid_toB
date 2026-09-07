@@ -1,3 +1,4 @@
+import type { Field } from 'payload';
 import { describe, expect, it } from 'vitest';
 import config from '../../payload.config';
 
@@ -6,6 +7,32 @@ import config from '../../payload.config';
  * そのまま使う。`buildConfig()` の sanitize結果を検査するだけで実DB接続を要しないため、
  * `admin-access.test.ts` のような throwaway DB guard は不要。
  */
+
+/**
+ * `docs/plans/admin-layout-rollout-plan-v1.md`（tabs/sidebar化）により、field名で検索する
+ * 既存collectionは`type: 'tabs'`の中へfieldが移動し得る。`collection.fields`をトップレベルの
+ * 配列として扱うと見つからなくなるため、tabs/group/blocksを再帰的に展開してから検索する
+ * （`lib/payload/adminFieldLabels.ts`の再帰walkと同じ考え方）。
+ */
+function flattenFields(fields: Field[]): Field[] {
+  const flat: Field[] = [];
+  for (const field of fields) {
+    flat.push(field);
+    const withNested = field as Field & {
+      fields?: Field[];
+      tabs?: { fields: Field[] }[];
+      blocks?: { fields: Field[] }[];
+    };
+    if (withNested.fields) flat.push(...flattenFields(withNested.fields));
+    if (withNested.tabs) {
+      for (const tab of withNested.tabs) flat.push(...flattenFields(tab.fields));
+    }
+    if (withNested.blocks) {
+      for (const block of withNested.blocks) flat.push(...flattenFields(block.fields));
+    }
+  }
+  return flat;
+}
 describe('Payload content schema', () => {
   it('registers every content collection', async () => {
     const resolved = await config;
@@ -29,7 +56,7 @@ describe('Payload content schema', () => {
   it('does not carry the removed Robot fields', async () => {
     const resolved = await config;
     const robots = resolved.collections.find((collection) => collection.slug === 'robots')!;
-    const names = robots.fields.flatMap((field) => ('name' in field ? [field.name] : []));
+    const names = flattenFields(robots.fields).flatMap((field) => ('name' in field ? [field.name] : []));
 
     for (const removed of ['buyerReadiness', 'marketAvailability', 'safetyNote', 'vendorRiskNote']) {
       expect(names).not.toContain(removed);
@@ -41,7 +68,7 @@ describe('Payload content schema', () => {
   it('links robots to their series', async () => {
     const resolved = await config;
     const robots = resolved.collections.find((collection) => collection.slug === 'robots')!;
-    const seriesId = robots.fields.find((field) => 'name' in field && field.name === 'seriesId');
+    const seriesId = flattenFields(robots.fields).find((field) => 'name' in field && field.name === 'seriesId');
 
     expect(seriesId).toBeDefined();
     expect(seriesId).toMatchObject({ type: 'relationship', relationTo: 'robot-series', required: false });

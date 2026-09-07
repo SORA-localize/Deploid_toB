@@ -415,75 +415,27 @@ export interface Robot {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  /**
-   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
-   */
-  summary: string;
-  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources: {
-    title: string;
-    url: string;
-    publisher?: string | null;
-    /**
-     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
-     */
-    publishedAt?: string | null;
-    /**
-     * The date this source was last checked. Shown on the public source list as "Checked …".
-     */
-    checkedAt: string;
-    reliability: 'verified' | 'official' | 'reported' | 'estimated';
-    note?: string | null;
-    id?: string | null;
-  }[];
+  featuredRank?: number | null;
   /**
    * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
-  heroImage?: {
-    src?: string | null;
-    alt?: string | null;
-    credit?: string | null;
-    sourceUrl?: string | null;
-    rights?: {
-      status?:
-        | (
-            | 'own'
-            | 'licensed'
-            | 'commercial-permitted'
-            | 'reference-attributed'
-            | 'permission-requested'
-            | 'prototype-only'
-            | 'blocked'
-          )
-        | null;
-      sourceType?:
-        ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
-      /**
-       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
-       */
-      checkedAt?: string | null;
-      rightsHolder?: string | null;
-      licenseUrl?: string | null;
-      permissionNote?: string | null;
-    };
-    aspectRatio?: number | null;
-  };
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-    noindex?: boolean | null;
-  };
+  supersededById?: (number | null) | Robot;
   name: string;
   nameJa?: string | null;
   manufacturerId: number | Manufacturer;
   seriesId?: (number | null) | RobotSery;
   category: 'humanoid' | 'general-purpose-robot' | 'upper-body-humanoid' | 'mobile-manipulator' | 'other';
   description?: string | null;
-  featuredRank?: number | null;
   deploymentStage:
     'concept' | 'prototype' | 'pilot' | 'limited-production' | 'production' | 'internal-use' | 'discontinued';
-  supersededById?: (number | null) | Robot;
+  japanAvailability:
+    'official-japan' | 'distributor-japan' | 'inquiry-required' | 'import-only' | 'unavailable' | 'unknown';
+  distributorJapan?: string | null;
+  /**
+   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
+   */
+  summary: string;
   /**
    * Spec values, keyed by item name. Shown in the "Specifications" sections of the robot detail page.
    */
@@ -535,9 +487,6 @@ export interface Robot {
     | boolean
     | null;
   usageExampleSourceUrls?: string[] | null;
-  japanAvailability:
-    'official-japan' | 'distributor-japan' | 'inquiry-required' | 'import-only' | 'unavailable' | 'unknown';
-  distributorJapan?: string | null;
   supportNote?: string | null;
   /**
    * Images by role (all optional). Shown in the image gallery on the robot detail page.
@@ -553,6 +502,57 @@ export interface Robot {
     | null;
   industryTags?: string[] | null;
   taskTags?: string[] | null;
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
+     */
+    publishedAt?: string | null;
+    /**
+     * The date this source was last checked. Shown on the public source list as "Checked …".
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  heroImage?: {
+    src?: string | null;
+    alt?: string | null;
+    credit?: string | null;
+    sourceUrl?: string | null;
+    rights?: {
+      status?:
+        | (
+            | 'own'
+            | 'licensed'
+            | 'commercial-permitted'
+            | 'reference-attributed'
+            | 'permission-requested'
+            | 'prototype-only'
+            | 'blocked'
+          )
+        | null;
+      sourceType?:
+        ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+      /**
+       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+       */
+      checkedAt?: string | null;
+      rightsHolder?: string | null;
+      licenseUrl?: string | null;
+      permissionNote?: string | null;
+    };
+    aspectRatio?: number | null;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+    noindex?: boolean | null;
+  };
   /**
    * Comparison info (strengths / constraints / fit). Shown on the /compare page, not the robot detail page. Scheduled for a future rework, but should still be filled in for now.
    */
@@ -1718,56 +1718,19 @@ export interface RobotsSelect<T extends boolean = true> {
   slug?: T;
   previousSlugs?: T;
   lifecycleStatus?: T;
-  summary?: T;
-  reliability?: T;
-  sources?:
-    | T
-    | {
-        title?: T;
-        url?: T;
-        publisher?: T;
-        publishedAt?: T;
-        checkedAt?: T;
-        reliability?: T;
-        note?: T;
-        id?: T;
-      };
+  featuredRank?: T;
   nextReviewBy?: T;
-  heroImage?:
-    | T
-    | {
-        src?: T;
-        alt?: T;
-        credit?: T;
-        sourceUrl?: T;
-        rights?:
-          | T
-          | {
-              status?: T;
-              sourceType?: T;
-              checkedAt?: T;
-              rightsHolder?: T;
-              licenseUrl?: T;
-              permissionNote?: T;
-            };
-        aspectRatio?: T;
-      };
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-        noindex?: T;
-      };
+  supersededById?: T;
   name?: T;
   nameJa?: T;
   manufacturerId?: T;
   seriesId?: T;
   category?: T;
   description?: T;
-  featuredRank?: T;
   deploymentStage?: T;
-  supersededById?: T;
+  japanAvailability?: T;
+  distributorJapan?: T;
+  summary?: T;
   specs?: T;
   procurementModels?: T;
   priceOffers?:
@@ -1796,12 +1759,49 @@ export interface RobotsSelect<T extends boolean = true> {
       };
   fieldEvidence?: T;
   usageExampleSourceUrls?: T;
-  japanAvailability?: T;
-  distributorJapan?: T;
   supportNote?: T;
   images?: T;
   industryTags?: T;
   taskTags?: T;
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  reliability?: T;
+  heroImage?:
+    | T
+    | {
+        src?: T;
+        alt?: T;
+        credit?: T;
+        sourceUrl?: T;
+        rights?:
+          | T
+          | {
+              status?: T;
+              sourceType?: T;
+              checkedAt?: T;
+              rightsHolder?: T;
+              licenseUrl?: T;
+              permissionNote?: T;
+            };
+        aspectRatio?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        noindex?: T;
+      };
   comparison?:
     | T
     | {
