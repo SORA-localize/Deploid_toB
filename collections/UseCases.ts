@@ -13,6 +13,7 @@ import {
   applyAdminFieldLabels,
   useCasesAtAGlanceFieldLabels,
   useCasesCandidateRobotsFieldLabels,
+  useCasesCandidateRobotsRowLabels,
   useCasesCapabilityNotesFieldLabels,
   useCasesFieldLabels,
 } from '../lib/payload/adminFieldLabels';
@@ -169,6 +170,7 @@ export const UseCases: CollectionConfig = {
         // 「seriesId候補はrobotId単位のこのpageではまだ描画対象外」と明記しており、
         // `robotId`を持つ行だけを解決する。`seriesId`だけの行は現状ページに出ない
         // （外部監査で発覚・2026-09-05訂正）。
+        labels: useCasesCandidateRobotsRowLabels,
         admin: {
           description: {
             ja: '候補ロボット。用途詳細ページの「候補ロボット」欄に表示されますが、**現状「ロボット本体」を選んだ行だけが表示され、「シリーズ」だけを選んだ行は表示されません**。',

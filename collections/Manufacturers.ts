@@ -12,6 +12,7 @@ import {
 import {
   applyAdminFieldLabels,
   manufacturersDomesticDistributorsFieldLabels,
+  manufacturersDomesticDistributorsRowLabels,
   manufacturersFieldLabels,
   manufacturersHeadquartersFieldLabels,
 } from '../lib/payload/adminFieldLabels';
@@ -132,6 +133,7 @@ const manufacturersAllFields = applyAdminFieldLabels(
       type: 'array',
       // `distributors` collectionへ移行完了後に削除予定（data-architecture-redesign-v1.md §11）。
       // 移行完了まではこちらが表示の正本のため、当面は表示互換のため残す。
+      labels: manufacturersDomesticDistributorsRowLabels,
       admin: {
         description: {
           ja: '国内代理店。メーカー詳細ページの「国内代理店」欄に表示されます。',

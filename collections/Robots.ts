@@ -14,7 +14,9 @@ import {
   robotsComparisonFieldLabels,
   robotsFieldLabels,
   robotsLoadRatingsFieldLabels,
+  robotsLoadRatingsRowLabels,
   robotsPriceOffersFieldLabels,
+  robotsPriceOffersRowLabels,
 } from '../lib/payload/adminFieldLabels';
 import {
   robotCategorySelectOptions,
@@ -124,6 +126,7 @@ export const Robots: CollectionConfig = {
       {
         name: 'priceOffers',
         type: 'array',
+        labels: robotsPriceOffersRowLabels,
         fields: applyAdminFieldLabels(
           [
             {
@@ -146,6 +149,7 @@ export const Robots: CollectionConfig = {
       {
         name: 'loadRatings',
         type: 'array',
+        labels: robotsLoadRatingsRowLabels,
         fields: applyAdminFieldLabels(
           [
             {
