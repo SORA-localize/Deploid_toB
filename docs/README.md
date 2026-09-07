@@ -10,11 +10,11 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 計画 | 一言 | branch | 開始日 |
 |---|---|---|---|
-| [Admin公開UI](plans/admin-publish-ui-plan-v1.md) | Payload Admin の Publish ボタンから公開できるようにする。実装・自己監査・2回の外部レビュー対応まで完了。Preview実機で残るのは接続/反映まわりの是正（下記2件） | `feat/admin-publish-ui` | 2026-09-03 |
-| [Admin運用UX・再検証の是正](plans/admin-ux-and-revalidation-fix-plan-v1.md) | Preview運用で見つかった5症状（反映されない・CMSが落ちる・field名が英語 等）の調査と修正計画。**T0〜T8完了、実質完了**。Vercel Preview実機でユーザー本人が公開→反映・トースト表示を確認済み。残るのは優先度低の任意確認2件のみ | `feat/admin-publish-ui` | 2026-09-04 |
+| [Admin公開UI](plans/admin-publish-ui-plan-v1.md) | Payload Admin の Publish ボタンから公開できるようにする。**2026-09-05 mainへマージ済み（PR #53）**。本番デプロイ・動作確認済み | `feat/admin-publish-ui`（マージ済み） | 2026-09-03 |
+| [Admin運用UX・再検証の是正](plans/admin-ux-and-revalidation-fix-plan-v1.md) | Preview運用で見つかった5症状（反映されない・CMSが落ちる・field名が英語 等）の調査と修正計画。**2026-09-05 mainへマージ済み（PR #53、admin公開UIと同時）**。残るのは優先度低の任意確認2件のみ | `feat/admin-publish-ui`（マージ済み） | 2026-09-04 |
 | [ロボットデータ投入](plans/robot-data-import-plan-v1.md) | 原本HTMLから177機・59社・28シリーズを **Payload へ**投入。**§0 の前提ゲート7項目（コンテンツ基盤移行の完了）を満たすまで着手しない**。Task 9 のみ原本への `deploymentStage` 記入134行が前提 | 未定 | 2026-08-08 |
 | [積み残し登録簿フォローアップ](plans/deferred-work-register-followup-v1.md) | 登録簿#4/#5/#6/#10の実行計画。**#4・#5・#6は解消済み**。残るのは#10のバッテリー23機（CSVのvariant名とレコードの対応を人が決める） | `main`（専用branchなし） | 2026-08-05 |
-| [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | Payload CMS + managed PostgreSQLへの移行後監査・是正。現在は安全ゲート是正ブランチで実装中 | `remediation/task9-safety-gates` | 2026-08-26 |
+| [コンテンツ基盤移行](plans/content-platform-migration-plan-v1.md) | Payload CMS + managed PostgreSQLへの移行後監査・是正。**Task 9（本番cutover・旧TS撤去）は2026-08-27〜28に完了・mainへマージ済み**。`remediation/task9-safety-gates`ブランチは削除済みで現存しない | `main`（専用branchなし） | 2026-08-26 |
 | [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | 上位ロードマップ。**Phase番号は移行前リファクタの1〜7とは別体系**（本書のPhase 1はCMS/DB移行を指す）。移行前スコープは実装インデックス側が正本 | phaseごとに分割 | 2026-07-26 |
 | [レスポンシブ対応](plans/responsive-phase-1-static-audit-v1.md) | Phase 1のコード実装は完了。R-06（実機スクリーンショットでの最終確認）が未実施 | 専用branchなし（mainへ直接実装） | 2026-07-03 |
 | [ロボット画像・メーカーロゴ調達](plans/robot-image-sourcing-plan-v1.md) | Robot B1〜B6の読み取り専用調査は完了。台帳・許諾SSOTの実装が調査開始gateとして未着手 | 未定 | 2026-07-08 |
