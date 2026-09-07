@@ -135,6 +135,23 @@ export const baseRecordContentFieldLabels: AdminFieldLabelMap = {
 };
 
 // ==========================================================================
+// Media
+// ==========================================================================
+
+/**
+ * `stableId`は`baseContentFieldLabels`、`alt`/`credit`/`sourceUrl`/`rights`は
+ * `imageAssetFieldLabels`と同じ意味のfieldなので、既存Recordをそのまま参照する
+ * （表記ゆれ防止。ここで文言を複製しない）。
+ */
+export const mediaFieldLabels: AdminFieldLabelMap = {
+  stableId: baseContentFieldLabels.stableId,
+  alt: imageAssetFieldLabels.alt,
+  rights: imageAssetFieldLabels.rights,
+  credit: imageAssetFieldLabels.credit,
+  sourceUrl: imageAssetFieldLabels.sourceUrl,
+};
+
+// ==========================================================================
 // Manufacturers
 // ==========================================================================
 

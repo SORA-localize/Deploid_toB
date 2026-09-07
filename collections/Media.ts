@@ -1,5 +1,7 @@
 import type { Access, CollectionConfig } from 'payload';
 import { asAdminUser, isContentDraftWriterOrAboveUser, isPlatformAdmin } from '../lib/payload/access';
+import { applyAdminFieldLabels, mediaFieldLabels, rightsMetaFieldLabels } from '../lib/payload/adminFieldLabels';
+import { rightsSourceTypeSelectOptions, rightsStatusSelectOptions } from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 
 const canWriteMedia: Access = ({ req }) => isContentDraftWriterOrAboveUser(asAdminUser(req.user));
@@ -17,7 +19,13 @@ const canWriteMedia: Access = ({ req }) => isContentDraftWriterOrAboveUser(asAdm
 export const Media: CollectionConfig = {
   slug: 'media',
   upload: true,
-  admin: { useAsTitle: 'alt' },
+  admin: {
+    useAsTitle: 'alt',
+    description: {
+      ja: 'ここでアップロードすると公開URLが発行されます。そのURLを他collection（Manufacturers.logos、Robots.images、heroImage等）の画像fieldへ手動で貼り付けて使います。このcollection自体をURL以外の形で参照している箇所はありません。',
+      en: 'Uploading here issues a public URL. Paste that URL into another collection’s image field (Manufacturers.logos, Robots.images, heroImage, etc.) to use it. Nothing references this collection except by copying that URL.',
+    },
+  },
   access: {
     read: () => true,
     create: canWriteMedia,
@@ -30,52 +38,56 @@ export const Media: CollectionConfig = {
     // 影響するため、同じ通知を足す。
     afterChange: [createRevalidationAfterChangeHook('media')],
   },
-  fields: [
-    { name: 'stableId', type: 'text', required: true, unique: true, index: true },
-    { name: 'alt', type: 'text', required: true },
-    {
-      name: 'rights',
-      type: 'group',
-      fields: [
-        {
-          name: 'status',
-          type: 'select',
-          required: true,
-          options: [
-            'own',
-            'licensed',
-            'commercial-permitted',
-            'reference-attributed',
-            'permission-requested',
-            'prototype-only',
-            'blocked',
-          ],
-        },
-        {
-          name: 'sourceType',
-          type: 'select',
-          required: true,
-          options: ['own', 'manufacturer-official', 'partner-official', 'press-release', 'third-party', 'unknown'],
-        },
-        {
-          name: 'checkedAt',
-          type: 'text',
-          required: true,
-          // text型の理由: lib/payload/access.ts の sourcesField 冒頭コメント参照
-          // （日付のみの値をtimestamptzにするとimport時のserver TZで日付がずれるため）。
-          admin: {
-            description: {
-              ja: 'この画像の権利状況を確認した日付。ページには表示されません（社内の権利管理用）。',
-              en: "The date this file's rights status was last confirmed. Not shown publicly — for internal rights tracking.",
-            },
+  fields: applyAdminFieldLabels(
+    [
+      { name: 'stableId', type: 'text', required: true, unique: true, index: true },
+      { name: 'alt', type: 'text', required: true },
+      {
+        name: 'rights',
+        type: 'group',
+        admin: {
+          description: {
+            ja: 'この権利情報はこのMediaレコード自身にのみ保存され、貼り付け先の画像field（heroImage.rights等）へは自動連携されません。表示可否は貼り付け先に入力した rights.status で判定されるため、貼り付け先でも同じ内容を入力してください。',
+            en: 'This rights info is stored only on this Media record and is not copied automatically into the image field where the URL gets pasted (e.g. heroImage.rights). Display eligibility is judged from the rights.status entered at the paste destination, so enter the same info there too.',
           },
         },
-        { name: 'rightsHolder', type: 'text' },
-        { name: 'licenseUrl', type: 'text' },
-        { name: 'permissionNote', type: 'textarea' },
-      ],
-    },
-    { name: 'credit', type: 'text' },
-    { name: 'sourceUrl', type: 'text' },
-  ],
+        fields: applyAdminFieldLabels(
+          [
+            {
+              name: 'status',
+              type: 'select',
+              required: true,
+              options: rightsStatusSelectOptions,
+            },
+            {
+              name: 'sourceType',
+              type: 'select',
+              required: true,
+              options: rightsSourceTypeSelectOptions,
+            },
+            {
+              name: 'checkedAt',
+              type: 'text',
+              required: true,
+              // text型の理由: lib/payload/access.ts の sourcesField 冒頭コメント参照
+              // （日付のみの値をtimestamptzにするとimport時のserver TZで日付がずれるため）。
+              admin: {
+                description: {
+                  ja: 'この画像の権利状況を確認した日付。ページには表示されません（社内の権利管理用）。',
+                  en: "The date this file's rights status was last confirmed. Not shown publicly — for internal rights tracking.",
+                },
+              },
+            },
+            { name: 'rightsHolder', type: 'text' },
+            { name: 'licenseUrl', type: 'text' },
+            { name: 'permissionNote', type: 'textarea' },
+          ],
+          rightsMetaFieldLabels,
+        ),
+      },
+      { name: 'credit', type: 'text' },
+      { name: 'sourceUrl', type: 'text' },
+    ],
+    mediaFieldLabels,
+  ),
 };

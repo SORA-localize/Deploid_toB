@@ -970,7 +970,7 @@ export interface Article {
    */
   body?: string | null;
   /**
-   * Manufacturer-guide-only content (company overview, lineup, deployment status, procurement channels, FAQ, etc.). Used only when the article type is "Manufacturer guide" — rendered as the corresponding sections on the article detail page.
+   * [Required when article type is "Manufacturer guide"] Manufacturer-guide-only content (company overview, lineup, deployment status, procurement channels, FAQ, etc.). Used only when the article type is "Manufacturer guide" — rendered as the corresponding sections on the article detail page. No required-field mark (*) shows here, but publishing without it will fail.
    */
   manufacturerGuideContent?:
     | {
@@ -1015,6 +1015,8 @@ export interface ArticlePlacement {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Uploading here issues a public URL. Paste that URL into another collection’s image field (Manufacturers.logos, Robots.images, heroImage, etc.) to use it. Nothing references this collection except by copying that URL.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -1022,6 +1024,9 @@ export interface Media {
   id: number;
   stableId: string;
   alt: string;
+  /**
+   * This rights info is stored only on this Media record and is not copied automatically into the image field where the URL gets pasted (e.g. heroImage.rights). Display eligibility is judged from the rights.status entered at the paste destination, so enter the same info there too.
+   */
   rights: {
     status:
       | 'own'
