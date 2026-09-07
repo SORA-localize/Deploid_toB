@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-09-05
+updated: 2026-09-07
 ---
 
 # Admin編集画面のfield配置 v1
@@ -122,11 +122,22 @@ tabsで内容を分割）を他collectionへ広げる場合の設計案。実装
 | tab「分類・関連」 | Tier2 | `category` `type` `section` `contentKind` `publishedAt` `author` `industryTags` `regionTags` `themeTags` `relatedRobotIds` `relatedManufacturerIds` `relatedUseCaseIds` |
 | tab「画像・出典・特殊コンテンツ」 | Tier2〜3 | `heroImage` `sources` `reliability` `seo` `manufacturerGuideContent`（`type === manufacturer-guide`専用） |
 
-### ArticlePlacements / SiteSettings
+### ArticlePlacements
 
-fieldが少なく（それぞれ7個・4個の直下field）、tabsで分割するほどの量ではない。
-sidebarで運用メタ（`ArticlePlacements`の`stableId`/`slug`/`previousSlugs`/
-`lifecycleStatus`）だけ分離すれば十分——tabs化は不要と判断する。
+visible field 10個（hiddenな`adminPublishIntentToken`を除く。共有4個
+`stableId`/`slug`/`previousSlugs`/`lifecycleStatus` ＋ 固有6個
+`surface`/`slot`/`articleId`/`order`/`kind`/`sponsor`。2026-09-07に実コードを
+数え直して訂正——旧記載の「7個」は誤りだった）。tabsで分割するほどの量ではないため、
+sidebarで運用メタ（共有4個）だけ分離すれば十分——tabs化は不要と判断する。
+
+### SiteSettings（global）
+
+直下field 4個（`defaultSeo`・`announcementBanner`は`type: 'group'`、`dataAsOf`は
+`type: 'text'`、`articleIndexPlacementLimits`は`type: 'group'`）。**変更不要と判断する
+（2026-09-07確定）**——globalは常に単一documentのため`stableId`/`slug`/`lifecycleStatus`
+のような運用メタfieldの概念がそもそも無く、sidebar化する対象が無い。tabsで分割するほどの
+縦の長さも無い。他collectionと同じ「sidebar=運用メタ」パターンを適用する余地が無いため、
+このcollectionだけ例外として「実装しない」ことを設計判断として記録する。
 
 ## 4. 実装しないこと
 
