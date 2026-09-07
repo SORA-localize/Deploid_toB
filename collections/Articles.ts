@@ -184,10 +184,16 @@ export const Articles: CollectionConfig = {
         // JSON形の内訳（`docs/decisions/editorial_style_guide_v1.md` §6のテンプレートに対応）:
         // `companyOverview`（企業概要）/`lineup`（機体ラインアップ）/`deploymentStatus`（導入実績）/
         // `procurementChannels`（購入・相談チャネル）/`faq`（よくある質問）等。
+        //
+        // `required: true` を付けられない: Payloadの`required`は条件付き必須を表現できず、
+        // 常時必須にすると記事タイプが「メーカー解説」以外のときも保存できなくなる
+        // （`admin.condition`でこのfield自体が非表示になるだけで、必須検証は別軸のため）。
+        // 実際の必須判定は`validateArticleForPublish`（このファイル冒頭）が公開時に行う——
+        // つまり画面には`*`が出ないが、記事タイプが「メーカー解説」なら公開に必須。
         admin: {
           description: {
-            ja: 'メーカー解説の専用コンテンツ（企業概要・機体ラインアップ・導入実績・購入/相談チャネル・FAQ等）。記事タイプが「メーカー解説」の記事だけで使い、記事詳細ページの各セクションに表示されます。',
-            en: 'Manufacturer-guide-only content (company overview, lineup, deployment status, procurement channels, FAQ, etc.). Used only when the article type is "Manufacturer guide" — rendered as the corresponding sections on the article detail page.',
+            ja: '【記事タイプが「メーカー解説」のときは必須】メーカー解説の専用コンテンツ（企業概要・機体ラインアップ・導入実績・購入/相談チャネル・FAQ等）。記事タイプが「メーカー解説」の記事だけで使い、記事詳細ページの各セクションに表示されます。画面には必須マーク（*）が付きませんが、未入力のまま公開しようとするとエラーになります。',
+            en: '[Required when article type is "Manufacturer guide"] Manufacturer-guide-only content (company overview, lineup, deployment status, procurement channels, FAQ, etc.). Used only when the article type is "Manufacturer guide" — rendered as the corresponding sections on the article detail page. No required-field mark (*) shows here, but publishing without it will fail.',
           },
           condition: (_, siblingData) => siblingData?.type === 'manufacturer-guide',
         },

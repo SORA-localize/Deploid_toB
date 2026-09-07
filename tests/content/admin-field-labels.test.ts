@@ -5,6 +5,7 @@ import { Articles } from '@/collections/Articles';
 import { Deployments } from '@/collections/Deployments';
 import { Distributors } from '@/collections/Distributors';
 import { Manufacturers } from '@/collections/Manufacturers';
+import { Media } from '@/collections/Media';
 import { Robots } from '@/collections/Robots';
 import { RobotSeriesCollection } from '@/collections/RobotSeries';
 import { UseCases } from '@/collections/UseCases';
@@ -25,6 +26,7 @@ const TARGETS: ReadonlyArray<{ name: string; fields: Field[] }> = [
   { name: 'deployments', fields: Deployments.fields },
   { name: 'articles', fields: Articles.fields },
   { name: 'article-placements', fields: ArticlePlacements.fields },
+  { name: 'media', fields: Media.fields },
   { name: 'site-settings', fields: SiteSettings.fields },
 ];
 

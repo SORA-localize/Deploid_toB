@@ -5,6 +5,7 @@ import { Articles } from '@/collections/Articles';
 import { Deployments } from '@/collections/Deployments';
 import { Distributors } from '@/collections/Distributors';
 import { Manufacturers } from '@/collections/Manufacturers';
+import { Media } from '@/collections/Media';
 import { Robots } from '@/collections/Robots';
 import { RobotSeriesCollection } from '@/collections/RobotSeries';
 import { UseCases } from '@/collections/UseCases';
@@ -27,6 +28,7 @@ const TARGETS: ReadonlyArray<{ name: string; fields: Field[] }> = [
   { name: 'deployments', fields: Deployments.fields },
   { name: 'articles', fields: Articles.fields },
   { name: 'article-placements', fields: ArticlePlacements.fields },
+  { name: 'media', fields: Media.fields },
   { name: 'site-settings', fields: SiteSettings.fields },
 ];
 
@@ -111,6 +113,18 @@ const EXPECTED_VALUES: Record<string, string[]> = {
   surface: ['reports-index'],
   slot: ['hero', 'feature'],
   kind: ['editorial', 'sample', 'sponsored', 'house'],
+
+  // Media
+  'rights.status': [
+    'own',
+    'licensed',
+    'commercial-permitted',
+    'reference-attributed',
+    'permission-requested',
+    'prototype-only',
+    'blocked',
+  ],
+  'rights.sourceType': ['own', 'manufacturer-official', 'partner-official', 'press-release', 'third-party', 'unknown'],
 };
 
 describe('adminSelectLabels: 対象selectのoptionsが機械検出できる範囲で健全であること', () => {
