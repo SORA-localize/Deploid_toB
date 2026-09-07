@@ -63,6 +63,8 @@ function validateDeploymentForPublish(deployment: Partial<DeploymentSite>): void
 /** Homeワールドマップの arc（manufacturer HQ → 導入拠点）根拠データ。 */
 export const Deployments: CollectionConfig = {
   slug: 'deployments',
+  // 公開サイトの表記に合わせる（lib/uiText.ts の useCases.deployments = '導入事例'）。
+  labels: { singular: { ja: '導入事例', en: 'Deployment' }, plural: { ja: '導入事例', en: 'Deployments' } },
   admin: { useAsTitle: 'customer', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,

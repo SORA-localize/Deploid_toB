@@ -122,6 +122,7 @@ export const canSetRoleOnBootstrapOrPlatformAdmin: FieldAccess = async ({ req })
 export const Admins: CollectionConfig = {
   slug: 'admins',
   auth: true,
+  labels: { singular: { ja: '管理者', en: 'Admin' }, plural: { ja: '管理者', en: 'Admins' } },
   admin: { useAsTitle: 'email' },
   access: {
     // bootstrap時はadmins=0件の場合だけ1人目を作成可能。以後はplatform-adminだけ。

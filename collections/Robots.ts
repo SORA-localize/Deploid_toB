@@ -56,6 +56,8 @@ const routeRegistryHooks = createRouteRegistryHooks('robots');
  */
 export const Robots: CollectionConfig = {
   slug: 'robots',
+  // 公開サイトの表記に合わせる（lib/uiText.ts の robots.title = 'ロボット'）。
+  labels: { singular: { ja: 'ロボット', en: 'Robot' }, plural: { ja: 'ロボット', en: 'Robots' } },
   admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,

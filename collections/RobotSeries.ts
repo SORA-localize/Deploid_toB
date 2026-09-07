@@ -60,6 +60,9 @@ const routeRegistryHooks = createRouteRegistryHooks('robot-series');
  */
 export const RobotSeriesCollection: CollectionConfig = {
   slug: 'robot-series',
+  // 本番サイトに単体表示ページが無いため(field-to-page-section-map-v1.md参照)、
+  // `robotSeriesFieldLabels`内で使われている「シリーズ」表記に合わせた admin専用の名称。
+  labels: { singular: { ja: 'シリーズ', en: 'Robot series' }, plural: { ja: 'シリーズ', en: 'Robot series' } },
   admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,

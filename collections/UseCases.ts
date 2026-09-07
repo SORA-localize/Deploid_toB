@@ -81,6 +81,8 @@ function validateUseCaseForPublish(useCase: Partial<UseCase>): void {
 
 export const UseCases: CollectionConfig = {
   slug: 'use-cases',
+  // 公開サイトの表記に合わせる（lib/uiText.ts の useCases.title/breadcrumb = '用途'）。
+  labels: { singular: { ja: '用途', en: 'Use case' }, plural: { ja: '用途', en: 'Use cases' } },
   admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
