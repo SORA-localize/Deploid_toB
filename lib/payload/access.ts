@@ -412,7 +412,17 @@ export function seoField(): Field {
 export function baseRecordContentFields(): Field[] {
   return applyAdminFieldLabels(
     [
-      { name: 'summary', type: 'textarea', required: true },
+      {
+        name: 'summary',
+        type: 'textarea',
+        required: true,
+        admin: {
+          description: {
+            ja: '概要。表示箇所はcollectionによって異なります——UseCasesはカードと詳細ページ、Articlesはトップページの注目記事に選ばれたときだけ、Robotsは検索結果のスニペットのみ、Deploymentsは用途詳細ページの導入事例欄。Manufacturers・Distributors・RobotSeriesは現状どこにも表示されません。',
+            en: 'Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.',
+          },
+        },
+      },
       {
         name: 'reliability',
         type: 'select',

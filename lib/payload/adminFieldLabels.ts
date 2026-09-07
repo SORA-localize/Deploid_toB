@@ -126,7 +126,16 @@ export const seoFieldLabels: AdminFieldLabelMap = {
 };
 
 export const baseRecordContentFieldLabels: AdminFieldLabelMap = {
-  summary: { ja: '概要（一覧・カード表示用）', en: 'Summary (for list/card display)' },
+  // 「一覧・カード表示用」という説明は誤りだった（2026-09-06、ユーザーからの質問で発覚）。
+  // 全collectionで実際にどこへ出るかを確認した結果:
+  //   - UseCases: カード・詳細ページ両方に表示
+  //   - Articles: トップページの注目記事（hero/feature）に選ばれた記事だけ表示。
+  //     通常の一覧カード（NewsCard）は表示しない
+  //   - Robots: <meta description>のfallbackとしてのみ使用。本文には出ない
+  //   - Deployments: 自分のページは無いが、use-cases詳細ページの導入事例欄に表示
+  //   - Manufacturers / Distributors / RobotSeries: 現状どこにも表示されない
+  // 詳細はadmin.descriptionへ移し、labelは断定を避ける。
+  summary: { ja: '概要', en: 'Summary' },
   reliability: { ja: '総合信頼度', en: 'Overall reliability' },
   sources: { ja: '出典', en: 'Sources' },
   nextReviewBy: { ja: '次回レビュー期限', en: 'Next review due date' },
