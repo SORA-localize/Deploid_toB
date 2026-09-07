@@ -66,9 +66,10 @@ globalは常に単一documentのためglobal定義コメントにも明記され
 tabsで分割するほどの縦の長さも無い。
 
 **結論: T8は実装しない。** sidebar化する対象fieldが無く、tabs化が必要な量でもないため、
-「変更不要」と判定する。この判断は`docs/decisions/admin-field-layout-v1.md`へT10で
-記録する（同docの現行§3はSiteSettingsのsidebar fieldを明記していなかった——これが
-レビューで指摘された不備そのもの）。
+「変更不要」と判定する。この判断は`docs/decisions/admin-field-layout-v1.md`へ
+**2026-09-07・実装着手前に記録済み**（同docの旧§3はSiteSettingsのsidebar fieldを明記して
+おらず、ArticlePlacementsのfield数も誤っていた——レビュー指摘#4で見つかった不備。
+`docs/plans/`側ではなく正本の決定文書を直接修正した。詳細はT10bの節を参照）。
 
 ## T1〜T6: 各collectionのtabs/sidebar化（tabsあり）
 
@@ -78,7 +79,9 @@ tabsで分割するほどの縦の長さも無い。
 
 - Modify: `collections/<Slug>.ts`（`partitionFieldsByName()`/`withSidebarPosition()`を
   `lib/payload/adminFieldLayout.ts`から使う。Manufacturers.tsと同じ構成）
-- Modify（生成物）: `payload-types.ts`（レビュー指摘#5。下記「payload-types.tsの扱い」参照）
+- Modify（生成物）: `payload-types.ts`（レビュー指摘#5。下記「payload-types.tsの扱い」参照。
+  再生成には後述の`npm run payload:generate-types`を使う——`getPayload()`起動時の
+  自動生成には頼らない）
 - New/Modify: `tests/content/admin-field-layout.test.ts`（レビュー指摘#3。下記「データ駆動
   テスト」参照。1タスク＝このファイルへ1エントリを追加する形にし、既存エントリは変更しない）
 - `access.ts`側のshared field自体・data構造は変更しない
@@ -99,13 +102,15 @@ tabsで分割するほどの縦の長さも無い。
    - 変更前後でvisible field集合が一致すること（tabs/sidebarへ振り分けても
      フィールドの追加・削除が起きていないことの機械証明）
    - hiddenな`adminPublishIntent`フィールドが保持されること
-4. `npm run payload:migrate:create -- <slug>-layout --skip-empty`を使い捨てDBで実行し、
-   既存migrationを全適用した状態から**新しいmigrationが生成されないこと**を確認する
-   （tabs/sidebarは表示専用でdata構造に影響しないことの実証。レビュー指摘#6でコマンドを
-   repoの正規形へ修正済み——`npm run`が抜けていた）
-5. `payload-types.ts`が再生成されたら、変更前後のinterfaceのfield集合が同一であることを
-   機械比較する（下記「payload-types.tsの扱い」）。順序以外の差分が出たら、表示専用の変更
-   ではなくなっているということなので、そこでコミットを止めて原因を調査する
+4. `npm run payload:migrate:create -- <slug>-layout --skip-empty`を実行し、
+   `migrations/`内の最新JSON snapshotと現在のPayload schemaに差分がなく、
+   **新しい`.ts`/`.json`が生成されないこと**を確認する（tabs/sidebarは表示専用でdata構造に
+   影響しないことの実証）。**この確認はDBへ接続しない**（下記「migration検証の実際の仕組み」
+   参照。レビュー指摘#2で誤った説明を訂正済み）
+5. `npm run payload:generate-types`（下記「payload-types.tsの扱い」で新設）を実行し、
+   再生成された`payload-types.ts`の変更前後で、interfaceのfield集合が同一であることを
+   機械比較する。順序以外の差分が出たら、表示専用の変更ではなくなっているということなので、
+   そこでコミットを止めて原因を調査する
 6. 実dev server + Playwrightで、tabsの切り替え・sidebarの常時表示・nested groupの
    label表示を目視確認する（確認用DB・screenshotは確認後に削除）
 7. `npm run typecheck` / `npm run lint` / 次のテストが通ることを確認する
@@ -116,14 +121,54 @@ tabsで分割するほどの縦の長さも無い。
      tests/content/admin-select-labels.test.ts
    ```
 
-### payload-types.tsの扱い（レビュー指摘#5への対応）
+### migration検証の実際の仕組み（レビュー指摘#2——当初の説明は実装と不一致だった）
+
+当初案は「使い捨てDBに既存migrationを全適用した状態から、新migrationが生成されないことを
+確認する」としていたが、これは実装と一致しない。`scripts/run-payload-migration-cli.mts:114`
+（既存の migration wrapper）は`migrate:create`実行時に`disableDBConnect: true`を渡しており、
+**`migrate:create`はDBへ接続しない**。実際の比較は次の2つの間で行われる
+（`node_modules/@payloadcms/drizzle/dist/utilities/buildCreateMigration.js`）:
+
+- `migrations/`内の最新JSON snapshot（ファイル）
+- 現在のPayload configから生成したDrizzle schema（メモリ上、live DBを読まない）
+
+したがって「使い捨てDBへmigrationを適用したこと」自体は、この検査結果に影響しない。
+コマンド起動には`DATABASE_URL`を何か設定する必要があるため誤操作防止のためlocal throwaway名の
+URLを明示する、という運用は変わらないが、**それは接続防止のための形式的な要件であって、
+`migrate:create`自体がそのDBへ接続するわけではない**、と正確に理解しておく。
+
+（DB適用そのものを検証したい場合は`npm run payload:migrate`の検証として別途行う。今回の
+表示専用変更ではその検証は通常不要——`migrate:create`が新規migrationを生成しないことの
+確認だけで十分）。
+
+### payload-types.tsの扱い（レビュー指摘#5——`getPayload()`起動時の自動生成に頼らない）
 
 Manufacturers POCの実績（`admin-field-layout-v1.md` §2）どおり、tabs/sidebar化は
-field集合を変えなくても`payload-types.ts`の生成順序を変える。各タスクで:
+field集合を変えなくても`payload-types.ts`の生成順序を変える。
 
-1. `getPayload()`実行後に再生成された`payload-types.ts`をコミット対象に含める
-2. 変更前のinterfaceと変更後のinterfaceで、field名の集合をソートして比較する
-   （Manufacturers POCで実際に行った手順と同じ）
+**`getPayload()`実行後の型生成完了を完了条件に使わない**——インストール済み
+Payload 3.87.1（`node_modules/payload/dist/index.js:359`）は起動時の型生成を
+`void this.bin({ args: ['generate:types'], log: false })`という**fire-and-forgetで
+実行しており、awaitしていない**。したがって`getPayload()`が返った時点で型生成がまだ
+進行中の可能性があり、直後に`payload-types.ts`を読むと古い内容を比較してしまう
+（さらに`migrate:create`はコマンド完了時に`process.exit(0)`するため、バックグラウンドの
+型生成がファイル書き込み前に打ち切られるケースもある——タスクごとに結果が不安定になる）。
+
+**対策**: 既存のmigration wrapper（`scripts/run-payload-migration-cli.mts`）と同じ流儀で、
+`payload/node`が公開する`generateTypes()`（`node_modules/payload/dist/exports/node.js`）を
+明示的にawaitするtsx scriptを新設する。
+
+- New: `scripts/generate-payload-types.mts`（configをimportし、`generateTypes(config)`を
+  awaitしてから終了する。`run-payload-migration-cli.mts`と同じ構成——config読み込み方法・
+  エラー処理を揃える）
+- Modify: `package.json`（`"payload:generate-types": "tsx scripts/generate-payload-types.mts"`
+  相当のscriptを追加）
+
+各タスクでの使い方:
+
+1. `npm run payload:generate-types`を実行し、型生成の完了を待つ
+2. 完了後の`payload-types.ts`を`git diff -- payload-types.ts`で確認し、変更前後で
+   interfaceのfield名集合をソートして比較する（Manufacturers POCで実際に行った手順と同じ）
 3. 順序以外の型変更（field追加・削除・型変更）が1件でもあれば、それは表示専用の変更では
    ないので、そこで作業を止めて原因を調査する。コミットしない
 
@@ -309,15 +354,21 @@ T1〜T9が全て完了した後の最終タスク。実装のみで終わらせ�
 
 ### T10b: 他docの内容更新（T10aの後、別commit）
 
-1. `docs/decisions/admin-field-layout-v1.md`の§3（「設計のみ、未実装」）を、実装結果へ
-   書き換える。各collectionの実画面確認結果（tabsの切り替え確認・sidebar常時表示確認など、
-   Manufacturers POCの§2と同じ形式）を追記する
-2. 同docのT8（SiteSettings）の判断（本書の「T8の判断」節）を転記する——同docの現行§3には
-   SiteSettingsのsidebar fieldの記載が無く、これが今回のレビューで指摘された不備そのもの
-3. 1・2の内容変更に伴い、`docs/decisions/admin-field-layout-v1.md`のfrontmatter
-   `updated`を実施日へ更新する（`ai/rules/80-doc-governance.md`「Frontmatter」:
-   「`updated`は内容が実質的に変わった時だけ更新する」に該当するケース）
-4. `docs/README.md`の進行中一覧からこのロールアウト計画への言及を外す
+**ArticlePlacementsのfield数訂正とSiteSettingsの「変更不要」判断は、レビュー指摘#4を受けて
+2026-09-07・実装着手前に`docs/decisions/admin-field-layout-v1.md`（frontmatter`updated`も
+更新済み）へ反映済み。** `docs/plans/`は正本の決定文書を上書きできないため、この訂正は
+T10まで待たず先に済ませてある（当初案はここをT10へ含めていたが、それは「決定文書の既知の
+誤りを実装完了まで放置する」ことになり不適切だった）。
+
+T10bで行うのは、T1〜T9の**実装結果**に関する更新のみ:
+
+1. `docs/decisions/admin-field-layout-v1.md`の§3（T1〜T6の各collectionの設計案）を、
+   実装結果へ書き換える。各collectionの実画面確認結果（tabsの切り替え確認・sidebar常時
+   表示確認など、Manufacturers POCの§2と同じ形式）を追記する
+2. 1の内容変更に伴い、`docs/decisions/admin-field-layout-v1.md`のfrontmatter`updated`を
+   実施日へ更新する（`ai/rules/80-doc-governance.md`「Frontmatter」:「`updated`は内容が
+   実質的に変わった時だけ更新する」に該当するケース）
+3. `docs/README.md`の進行中一覧からこのロールアウト計画への言及を外す
    （移動先が`docs/archive/`になったため、旧パスへのリンクも修正する）
 
 ### T10c: 最終検証（T10bの後）
@@ -334,8 +385,14 @@ T1〜T9が全て完了した後の最終タスク。実装のみで終わらせ�
 ## 実装しないこと
 
 - `collapsible`型の採用（Manufacturers POCでtabsのみで要件を満たせたため）
-- field自体の並び替え・削除・data構造の変更（表示専用の整理に限定する）
+- fieldの追加・削除・名前・型・data pathの変更（レビュー指摘#3で訂正——「並び替えをしない」
+  ではない。`partitionFieldsByName()`は`names`配列の順序でfieldを返す
+  （`lib/payload/adminFieldLayout.ts:37`実装通り）ため、**Admin上の表示順は
+  `docs/decisions/admin-field-layout-v1.md` §3のsidebar/tab配置順へ意図的に変更する**
+  ——Manufacturers POCでも実際に表示順・生成型のプロパティ順が変わっている。変更しないのは
+  field自体（名前・型・data path・DB上の列）であって、画面上の見た目の並びではない）
 - `docs/decisions/admin-field-layout-v1.md` §3の設計内容そのものの見直し
-  （実装時に不整合が見つかった場合のみ、その場で改訂する。ただしT8のsidebar fieldの
-  記載漏れはT10で必ず埋める）
+  （実装時に不整合が見つかった場合のみ、その場で改訂する。ArticlePlacements/SiteSettingsの
+  記載漏れはレビュー指摘#4を受けて2026-09-07に修正済み——実装開始前に済ませてあるため、
+  T10では扱わない）
 - T8（SiteSettings）のsidebar/tabs化——運用メタfieldが存在せず、対象が無いため
