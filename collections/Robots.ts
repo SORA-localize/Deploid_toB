@@ -18,6 +18,8 @@ import {
   robotsPriceOffersFieldLabels,
   robotsPriceOffersRowLabels,
 } from '../lib/payload/adminFieldLabels';
+import { partitionFieldsByName, withSidebarPosition } from '../lib/payload/adminFieldLayout';
+import { ADMIN_PUBLISH_INTENT_FIELD } from '../lib/payload/adminPublishIntent';
 import {
   robotCategorySelectOptions,
   robotDeploymentStageSelectOptions,
@@ -51,20 +53,61 @@ function validateRobotForPublish(robot: Robot): void {
 const routeRegistryHooks = createRouteRegistryHooks('robots');
 
 /**
+ * T1（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * `docs/decisions/admin-field-layout-v1.md` §3 Robots）: 運用頻度で3層に分けた配置。
+ * `sidebar`はTier3（滅多に触らない運用メタ）、tabはTier1（基本情報）→Tier2（スペック・価格）→
+ * Tier2〜3（画像・出典・比較）の順。Manufacturers POCと同じ構成——名前の集合はこのファイル内で
+ * 閉じており、抜けがあれば起動時にthrowする。
+ */
+const SIDEBAR_FIELD_NAMES = [
+  'stableId',
+  'slug',
+  'previousSlugs',
+  'lifecycleStatus',
+  'featuredRank',
+  'nextReviewBy',
+  'supersededById',
+] as const;
+const BASIC_INFO_TAB_FIELD_NAMES = [
+  'name',
+  'nameJa',
+  'manufacturerId',
+  'seriesId',
+  'category',
+  'description',
+  'deploymentStage',
+  'japanAvailability',
+  'distributorJapan',
+  'summary',
+] as const;
+const SPEC_AND_PRICING_TAB_FIELD_NAMES = [
+  'specs',
+  'procurementModels',
+  'priceOffers',
+  'loadRatings',
+  'fieldEvidence',
+  'usageExampleSourceUrls',
+  'supportNote',
+] as const;
+const MEDIA_SOURCES_COMPARISON_TAB_FIELD_NAMES = [
+  'images',
+  'industryTags',
+  'taskTags',
+  'sources',
+  'reliability',
+  'heroImage',
+  'seo',
+  'comparison',
+] as const;
+
+/**
  * `data/types.ts` の旧 `Robot` interfaceをimportせず独立schemaとして書く（brief）。
  * 2026-08-09に削除された4フィールド（DEC-S05・S06、`robot-data-import-plan-v1.md`）:
  * `buyerReadiness` / `marketAvailability` / `safetyNote` / `vendorRiskNote` は含めない。
  * `comparison` は `/compare` が実表示に使うため維持する。
  */
-export const Robots: CollectionConfig = {
-  slug: 'robots',
-  // 公開サイトの表記に合わせる（lib/uiText.ts の robots.title = 'ロボット'）。
-  labels: { singular: { ja: 'ロボット', en: 'Robot' }, plural: { ja: 'ロボット', en: 'Robots' } },
-  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
-  access: contentCollectionAccess,
-  versions: contentVersionsConfig,
-  fields: applyAdminFieldLabels(
-    [
+const robotsAllFields = applyAdminFieldLabels(
+  [
       ...baseContentFields(),
       ...baseRecordContentFields(),
       { name: 'name', type: 'text', required: true },
@@ -224,8 +267,55 @@ export const Robots: CollectionConfig = {
         ),
       },
     ],
-    robotsFieldLabels,
-  ),
+  robotsFieldLabels,
+);
+
+const { matched: sidebarFields, rest: afterSidebar } = partitionFieldsByName(robotsAllFields, SIDEBAR_FIELD_NAMES);
+const { matched: basicInfoTabFields, rest: afterBasicInfo } = partitionFieldsByName(afterSidebar, BASIC_INFO_TAB_FIELD_NAMES);
+const { matched: specAndPricingTabFields, rest: afterSpecAndPricing } = partitionFieldsByName(
+  afterBasicInfo,
+  SPEC_AND_PRICING_TAB_FIELD_NAMES,
+);
+const { matched: mediaSourcesComparisonTabFields, rest: unplacedFields } = partitionFieldsByName(
+  afterSpecAndPricing,
+  MEDIA_SOURCES_COMPARISON_TAB_FIELD_NAMES,
+);
+
+/**
+ * `unplacedFields`は`admin.hidden`な`adminPublishIntentField()`だけのはず
+ * （表示場所を持たない）。それ以外が残っていたら、上記4つの名前リストへの追加漏れ——
+ * 編集画面のどこにも表示されない field が生まれるので、起動時に気づけるようにする。
+ */
+const unexpectedlyUnplacedFields = unplacedFields.filter(
+  (field) => (field as { name?: string }).name !== ADMIN_PUBLISH_INTENT_FIELD,
+);
+if (unexpectedlyUnplacedFields.length > 0) {
+  throw new Error(
+    `Robots admin field layout: unplaced field(s) — add to a tab/sidebar name list: ${unexpectedlyUnplacedFields
+      .map((f) => (f as { name?: string }).name)
+      .join(', ')}`,
+  );
+}
+
+export const Robots: CollectionConfig = {
+  slug: 'robots',
+  // 公開サイトの表記に合わせる（lib/uiText.ts の robots.title = 'ロボット'）。
+  labels: { singular: { ja: 'ロボット', en: 'Robot' }, plural: { ja: 'ロボット', en: 'Robots' } },
+  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
+  access: contentCollectionAccess,
+  versions: contentVersionsConfig,
+  fields: [
+    ...unplacedFields,
+    ...withSidebarPosition(sidebarFields),
+    {
+      type: 'tabs',
+      tabs: [
+        { label: { ja: '基本情報', en: 'Basic info' }, fields: basicInfoTabFields },
+        { label: { ja: 'スペック・価格', en: 'Specs & pricing' }, fields: specAndPricingTabFields },
+        { label: { ja: '画像・出典・比較', en: 'Media, sources & comparison' }, fields: mediaSourcesComparisonTabFields },
+      ],
+    },
+  ],
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [

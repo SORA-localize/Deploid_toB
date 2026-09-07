@@ -31,6 +31,7 @@
     "payload:migrate:create": "tsx scripts/run-payload-migration-cli.mts -- migrate:create",
     "payload:migrate:status": "tsx scripts/run-payload-migration-cli.mts -- migrate:status",
     "payload:migrate:down": "tsx scripts/run-payload-migration-cli.mts -- migrate:down",
+    "payload:generate-types": "tsx scripts/generate-payload-types.mts",
     "environment:stamp": "tsx scripts/stamp-environment.mts",
     "seed:ci-site-settings": "tsx scripts/seed-ci-site-settings.mts",
     "content:import": "tsx scripts/import-content-to-payload.mts",
