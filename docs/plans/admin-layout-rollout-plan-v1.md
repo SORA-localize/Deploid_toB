@@ -186,17 +186,42 @@ export type Labels = {
 ```
 
 当初案の`labels: { singular: { ja, en } }`（`plural`無し）は型エラーになる。
-正しい指定は次の形（`sources`の例）:
-
-```ts
-labels: {
-  singular: { ja: '出典', en: 'Source' },
-  plural: { ja: '出典', en: 'Sources' },
-},
-```
+正しい指定は`labels: { singular: {ja, en}, plural: {ja, en} }`の形。
 
 テストも「`singular.ja`/`singular.en`が非空」だけでなく、**`singular`・`plural`
 両方が非空であること**を検査する。
+
+### labelsの正本と具体的な翻訳値（レビュー指摘#2——当初案は値を決めていなかった）
+
+このrepoではAdmin labelの正本は`lib/payload/adminFieldLabels.ts`に集約する方針
+（同ファイル冒頭のD-3「ラベルは`collections/*.ts`に直接書かず、ここへ集約する」）。
+`labels.singular`/`labels.plural`もfield定義へ直接文字列を書かず、同ファイルへ追加する
+（推奨されたとおり後者を採用）。
+
+`AdminFieldLabelMap`（`{name: {ja, en}}`、field単位のsingle labelを想定した既存の型）とは
+別に、array行のsingular/plural両方を持つ新しい型を追加する:
+
+```ts
+export interface AdminArrayRowLabel {
+  singular: AdminFieldLabel;
+  plural: AdminFieldLabel;
+}
+```
+
+対象5箇所の具体的な翻訳値（既存のfield単位label——例えば`sources: {ja: '出典', en: 'Sources'}`
+——と表記を揃え、en singularは末尾の`s`を落とす、ja は単複同形のためsingular/pluralで
+同じ文字列を使う）:
+
+| 定義箇所 | export名 | singular | plural |
+|---|---|---|---|
+| `sourcesField()` | `sourcesRowLabels` | `{ja: '出典', en: 'Source'}` | `{ja: '出典', en: 'Sources'}` |
+| `Manufacturers.domesticDistributors` | `manufacturersDomesticDistributorsRowLabels` | `{ja: '代理店', en: 'Distributor'}` | `{ja: '代理店', en: 'Distributors'}` |
+| `Robots.priceOffers` | `robotsPriceOffersRowLabels` | `{ja: '価格情報', en: 'Price offer'}` | `{ja: '価格情報', en: 'Price offers'}` |
+| `Robots.loadRatings` | `robotsLoadRatingsRowLabels` | `{ja: '可搬重量', en: 'Load rating'}` | `{ja: '可搬重量', en: 'Load ratings'}` |
+| `UseCases.candidateRobots` | `useCasesCandidateRobotsRowLabels` | `{ja: '候補ロボット', en: 'Candidate robot'}` | `{ja: '候補ロボット', en: 'Candidate robots'}` |
+
+各field定義側では`labels: sourcesRowLabels`のように定数をそのまま渡す（値をfield定義へ
+直接書かない）。
 
 ### 対象範囲の確定（レビュー指摘#4——当初「全collection横断」は範囲が曖昧だった）
 
@@ -230,29 +255,37 @@ collectionに属するため対象外——確認済み。
 
 ### Files
 
-- Modify: `lib/payload/access.ts`（`sourcesField()`へ`labels`追加。7 collection分へ一括反映）
-- Modify: `collections/Manufacturers.ts`（`domesticDistributors`）
-- Modify: `collections/Robots.ts`（`priceOffers`・`loadRatings`）
-- Modify: `collections/UseCases.ts`（`candidateRobots`）
-- New: `tests/content/admin-array-field-labels.test.ts`
+- Modify: `lib/payload/adminFieldLabels.ts`（`AdminArrayRowLabel`型と対象5箇所の
+  row label定数を追加。上表の翻訳値をそのまま定義する）
+- Modify: `lib/payload/access.ts`（`sourcesField()`に`labels: sourcesRowLabels`を追加。
+  7 collection分へ一括反映）
+- Modify: `collections/Manufacturers.ts`（`domesticDistributors`に
+  `labels: manufacturersDomesticDistributorsRowLabels`）
+- Modify: `collections/Robots.ts`（`priceOffers`・`loadRatings`にそれぞれ対応するrow labels）
+- Modify: `collections/UseCases.ts`（`candidateRobots`に`labels: useCasesCandidateRobotsRowLabels`）
+- Modify: `tests/content/admin-field-labels.test.ts`（新規ファイルは作らない。理由は次項）
 
-**TARGETSの再利用方法（レビュー指摘#1の実装可能性の修正）**: `admin-field-labels.test.ts`の
-`TARGETS`は`export`されていない非公開定数のため、新規テストファイルから直接importできない。
-既存の`tests/content/admin-select-labels.test.ts`が`admin-field-labels.test.ts`と同じ
-collection群を**それぞれ独自に`import`してTARGETSを再構築している**（2ファイル間でモジュールを
-共有していない、既存の実際のパターン）。この新規テストファイルも同じ流儀に合わせ、
-対象collection（`ArticlePlacements`・`Articles`・`Deployments`・`Distributors`・
-`Manufacturers`・`Media`・`Robots`・`RobotSeries`・`UseCases`・`SiteSettings`）を直接importして
-自前のTARGETS相当の配列を構築する。共有moduleへの切り出しはこの計画のスコープ外とする
-（3つ目の重複が発生した時点で切り出しを検討すれば良く、今回はrepoの既存流儀を踏襲するだけで
-十分——早すぎる抽象化を避ける）。
+**新規テストファイルを作らない理由（レビュー指摘#1の再修正）**: 前回案は
+`tests/content/admin-array-field-labels.test.ts`という新規ファイルで`TARGETS`相当を
+再構築する設計だったが、これは`admin-field-labels.test.ts`・`admin-select-labels.test.ts`に
+続く**3つ目の同一対象リストの複製**になり、「3つ目の重複が発生した時点で切り出しを検討する」
+という前回自身の記述と矛盾していた。
+
+「field label」と「配列行label」はどちらも同じ関心事（Admin fieldの翻訳完全性）であり
+責務は離れていないため、**`tests/content/admin-field-labels.test.ts`へ検査を追加する**
+（最小の変更で済み、新しいTARGETS複製を作らない）。具体的には、同ファイルが`TARGETS`を
+再帰的に走査している既存ロジック（`collectUnlabeledAdminFieldPaths`と同じ考え方）に、
+「array fieldを見つけたら`labels.singular`・`labels.plural`のja/en非空を検査する」
+分岐を追加する形にする。
 
 ### 完了条件
 
-- コード上の5箇所全てに`labels: { singular: {ja, en}, plural: {ja, en} }`が付く
-- `tests/content/admin-array-field-labels.test.ts`が、Admin画面上の11箇所（表参照）を
-  実際に検出し、labelsが揃っていることを確認する。かつ、今後array fieldが追加・削除
-  されても固定件数に依存せず追従する
+- コード上の5箇所全てに、`lib/payload/adminFieldLabels.ts`で定義した対応するrow label定数が
+  `labels`として付く（値を直接field定義へ書かない）
+- `tests/content/admin-field-labels.test.ts`が、Admin画面上の11箇所（上表参照）を
+  実際に検出し、`labels.singular`/`labels.plural`のja/enが揃っていることを確認する。
+  かつ、今後array fieldが追加・削除されても固定件数に依存せず追従する
+  （検出ベースの条件——上の「対象範囲の確定」節を参照）
 - `npm run typecheck` / `npm run lint`が通る（`labels`の型を正しく満たしていることの確認）
 - 実画面で「〇〇を追加」ボタンが日本語表示されることを目視確認する
 
@@ -264,7 +297,9 @@ T9は他タスクと違いtabs/sidebarを一切触らないため、`payload:mig
 T1〜T9が全て完了した後の最終タスク。実装のみで終わらせず、文書側を実態に合わせる。
 `ai/rules/80-doc-governance.md`「Moving Documents」が「棚移動は path change であって
 内容変更ではない。両方必要なら別commitに分け、移動を先・内容変更を後にする」と定めているため
-（レビュー指摘#3）、3つのcommitへ分ける。
+（レビュー指摘#3）、**2つのcommit（T10a・T10b）＋最終検証（T10c）**へ分ける。T10cは
+確認のみでcommitを作らない（`rg`・`npm run check`が失敗した場合のみ、そこで見つかった
+問題を直す追加commitが必要になる）。
 
 ### T10a: 移動のみ（path changeのみ、本文は無変更）
 
