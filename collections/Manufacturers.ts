@@ -192,6 +192,7 @@ if (unexpectedlyUnplacedFields.length > 0) {
 
 export const Manufacturers: CollectionConfig = {
   slug: 'manufacturers',
+  labels: { singular: { ja: 'メーカー', en: 'Manufacturer' }, plural: { ja: 'メーカー', en: 'Manufacturers' } },
   admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,

@@ -95,6 +95,8 @@ function validateArticleForPublish(article: ArticlePublishCandidate): void {
 /** 旧 `reports` を改称・拡張したニュースメディア collection（`data-architecture-redesign-v1.md` §7）。 */
 export const Articles: CollectionConfig = {
   slug: 'articles',
+  // 公開サイトの表記に合わせる（lib/uiText.ts の reports.title/breadcrumb = '記事'）。
+  labels: { singular: { ja: '記事', en: 'Article' }, plural: { ja: '記事', en: 'Articles' } },
   admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,

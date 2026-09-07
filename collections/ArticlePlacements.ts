@@ -112,6 +112,9 @@ async function validateUniqueness({
  */
 export const ArticlePlacements: CollectionConfig = {
   slug: 'article-placements',
+  // 本番サイトに対応する単一の名称は無い内部運用concept（記事をどの枠に置くかの設定）。
+  // 既存field label（surface=「掲載面」、slot=「掲載枠」）に合わせた admin専用の名称。
+  labels: { singular: { ja: '記事掲載枠', en: 'Article placement' }, plural: { ja: '記事掲載枠', en: 'Article placements' } },
   admin: { useAsTitle: 'stableId' },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,

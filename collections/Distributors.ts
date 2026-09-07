@@ -62,6 +62,9 @@ function validateDistributorForPublish(distributor: Partial<Distributor>): void 
 
 export const Distributors: CollectionConfig = {
   slug: 'distributors',
+  // 本番サイトに対応するページ・呼称が無いため(公開側からは未参照。field-to-page-section-map-v1.md参照)、
+  // `Manufacturers.domesticDistributors`内で使われている「代理店」表記に合わせた admin専用の名称。
+  labels: { singular: { ja: '代理店', en: 'Distributor' }, plural: { ja: '代理店', en: 'Distributors' } },
   admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
