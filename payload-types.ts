@@ -211,6 +211,9 @@ export interface Manufacturer {
   nextReviewBy?: string | null;
   name: string;
   nameJa?: string | null;
+  /**
+   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
+   */
   summary: string;
   description: string;
   country: string;
@@ -326,6 +329,9 @@ export interface Distributor {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
+  /**
+   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
+   */
   summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   sources: {
@@ -409,6 +415,9 @@ export interface Robot {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
+  /**
+   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
+   */
   summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   sources: {
@@ -571,6 +580,9 @@ export interface RobotSery {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
+  /**
+   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
+   */
   summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   sources: {
@@ -663,6 +675,9 @@ export interface UseCase {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
+  /**
+   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
+   */
   summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   sources: {
@@ -791,6 +806,9 @@ export interface Deployment {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
+  /**
+   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
+   */
   summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   sources: {
@@ -877,6 +895,9 @@ export interface Article {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
+  /**
+   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
+   */
   summary: string;
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   sources: {
