@@ -9,6 +9,7 @@ import {
   rightsMetaFieldLabels,
   seoFieldLabels,
   sourcesItemFieldLabels,
+  sourcesRowLabels,
 } from './adminFieldLabels';
 import {
   lifecycleStatusSelectOptions,
@@ -283,6 +284,7 @@ export function sourcesField(): Field {
     name: 'sources',
     type: 'array',
     required: true,
+    labels: sourcesRowLabels,
     fields: applyAdminFieldLabels(
       [
         { name: 'title', type: 'text', required: true },

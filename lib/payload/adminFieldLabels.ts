@@ -12,9 +12,22 @@ import type { Field } from 'payload';
 export interface AdminFieldLabel {
   ja: string;
   en: string;
+  // Payloadの`StaticLabel`（`Record<string,string> | string`）へ構造的に代入できるよう、
+  // 明示的なindex signatureを持たせる（`labels.singular`/`labels.plural`への直接代入で必要。
+  // `ja`/`en`以外のキーを増やす意図ではない）。
+  [locale: string]: string;
 }
 
 export type AdminFieldLabelMap = Record<string, AdminFieldLabel>;
+
+/**
+ * 配列fieldの行（`labels.singular`/`labels.plural`、field単位の`label`とは別設定）。
+ * Payloadの`Labels`型はsingular/plural両方が必須（`node_modules/payload/dist/fields/config/types.d.ts`）。
+ */
+export interface AdminArrayRowLabel {
+  singular: AdminFieldLabel;
+  plural: AdminFieldLabel;
+}
 
 /** Payload組み込みfield。個別にラベルを持たせる対象ではない。 */
 const BUILTIN_FIELD_NAMES = new Set(['id', 'createdAt', 'updatedAt', '_status']);
@@ -79,6 +92,51 @@ export function collectUnlabeledAdminFieldPaths(fields: Field[], prefix = ''): s
   return gaps;
 }
 
+function hasNonEmptyLabel(label: unknown): label is AdminFieldLabel {
+  const candidate = label as Partial<AdminFieldLabel> | undefined;
+  return Boolean(candidate?.ja && candidate?.en);
+}
+
+/**
+ * `type: 'array'`のfieldを再帰的に検出し、`labels.singular`/`labels.plural`の
+ * ja/enが両方揃っていないものをdot区切りpathで返す（T9完了条件のテスト専用）。
+ * 追加ボタンの行labelはPayloadが`labels.singular`から自動生成するため、
+ * field単位の`label`（`collectUnlabeledAdminFieldPaths`が検査する対象）とは別に検査する。
+ */
+export function collectArrayFieldsMissingRowLabels(fields: Field[], prefix = ''): string[] {
+  const gaps: string[] = [];
+  for (const field of fields) {
+    if (isFieldHidden(field)) continue;
+    const withMeta = field as Field & {
+      name?: string;
+      type?: string;
+      labels?: { singular?: unknown; plural?: unknown };
+      fields?: Field[];
+      tabs?: { name?: string; fields: Field[] }[];
+      blocks?: { fields: Field[] }[];
+    };
+    const name = withMeta.name;
+    const path = name ? (prefix ? `${prefix}.${name}` : name) : prefix;
+    if (withMeta.type === 'array' && name) {
+      const ok = hasNonEmptyLabel(withMeta.labels?.singular) && hasNonEmptyLabel(withMeta.labels?.plural);
+      if (!ok) gaps.push(path);
+    }
+    if (withMeta.fields) gaps.push(...collectArrayFieldsMissingRowLabels(withMeta.fields, path));
+    if (withMeta.tabs) {
+      for (const tab of withMeta.tabs) {
+        const tabPath = tab.name ? (path ? `${path}.${tab.name}` : tab.name) : path;
+        gaps.push(...collectArrayFieldsMissingRowLabels(tab.fields, tabPath));
+      }
+    }
+    if (withMeta.blocks) {
+      for (const block of withMeta.blocks) {
+        gaps.push(...collectArrayFieldsMissingRowLabels(block.fields, path));
+      }
+    }
+  }
+  return gaps;
+}
+
 // ==========================================================================
 // 共有field（`lib/payload/access.ts`）。ここで1回だけ定義し、access.ts側の
 // 各field生成関数がここを参照してlabelを付ける（collection側での複製はしない）。
@@ -89,6 +147,11 @@ export const baseContentFieldLabels: AdminFieldLabelMap = {
   slug: { ja: 'URLスラッグ', en: 'URL slug' },
   previousSlugs: { ja: '旧URLスラッグ', en: 'Previous URL slugs' },
   lifecycleStatus: { ja: '掲載状態', en: 'Lifecycle status' },
+};
+
+export const sourcesRowLabels: AdminArrayRowLabel = {
+  singular: { ja: '出典', en: 'Source' },
+  plural: { ja: '出典', en: 'Sources' },
 };
 
 export const sourcesItemFieldLabels: AdminFieldLabelMap = {
@@ -191,6 +254,11 @@ export const manufacturersHeadquartersFieldLabels: AdminFieldLabelMap = {
   lng: { ja: '経度', en: 'Longitude' },
 };
 
+export const manufacturersDomesticDistributorsRowLabels: AdminArrayRowLabel = {
+  singular: { ja: '代理店', en: 'Distributor' },
+  plural: { ja: '代理店', en: 'Distributors' },
+};
+
 export const manufacturersDomesticDistributorsFieldLabels: AdminFieldLabelMap = {
   name: { ja: '代理店名', en: 'Distributor name' },
   website: { ja: 'ウェブサイトURL', en: 'Website URL' },
@@ -258,6 +326,11 @@ export const robotsFieldLabels: AdminFieldLabelMap = {
   comparison: { ja: '比較情報（非推奨・/compare用に維持）', en: 'Comparison info (deprecated, kept for /compare)' },
 };
 
+export const robotsPriceOffersRowLabels: AdminArrayRowLabel = {
+  singular: { ja: '価格情報', en: 'Price offer' },
+  plural: { ja: '価格情報', en: 'Price offers' },
+};
+
 export const robotsPriceOffersFieldLabels: AdminFieldLabelMap = {
   channel: { ja: '販売チャネル', en: 'Sales channel' },
   display: { ja: '表示用価格', en: 'Display price' },
@@ -267,6 +340,11 @@ export const robotsPriceOffersFieldLabels: AdminFieldLabelMap = {
   variant: { ja: '型番・バリアント', en: 'Variant' },
   sellerName: { ja: '販売元名', en: 'Seller name' },
   sourceUrl: { ja: '出典URL', en: 'Source URL' },
+};
+
+export const robotsLoadRatingsRowLabels: AdminArrayRowLabel = {
+  singular: { ja: '可搬重量', en: 'Load rating' },
+  plural: { ja: '可搬重量', en: 'Load ratings' },
 };
 
 export const robotsLoadRatingsFieldLabels: AdminFieldLabelMap = {
@@ -323,6 +401,11 @@ export const useCasesCapabilityNotesFieldLabels: AdminFieldLabelMap = {
   autonomy: { ja: '自律 / 遠隔操作', en: 'Autonomy / teleoperation' },
   communication: { ja: 'コミュニケーション', en: 'Communication' },
   integration: { ja: '連携', en: 'Integration' },
+};
+
+export const useCasesCandidateRobotsRowLabels: AdminArrayRowLabel = {
+  singular: { ja: '候補ロボット', en: 'Candidate robot' },
+  plural: { ja: '候補ロボット', en: 'Candidate robots' },
 };
 
 export const useCasesCandidateRobotsFieldLabels: AdminFieldLabelMap = {
