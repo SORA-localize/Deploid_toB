@@ -20,6 +20,7 @@ updated: 2026-09-05
 
 | field | 公開ページでの扱い | 根拠 |
 |---|---|---|
+| `summary` | **collectionによって扱いが大きく異なる**（2026-09-06、ユーザーからの質問で発覚し追記）。`UseCases`はカード・詳細ページ両方に表示。`Articles`はトップページの注目記事（hero/feature）に選ばれた記事だけ表示——通常の一覧カード（`NewsCard`）は表示しない。`Robots`は`<meta description>`のfallbackとしてのみ使用され本文には出ない。`Deployments`は自分の詳細ページを持たないが、`use-cases`詳細ページの導入事例欄に表示される。`Manufacturers`/`Distributors`/`RobotSeries`は**現状どこにも表示されない** | `components/ManufacturerCard.tsx`（summary参照なし）、`lib/viewModels/articles.ts`（NewsCardはsummaryを描画しないという既存コメントあり）、`components/NewsHeroCarousel.tsx`・`NewsFeatureCard.tsx`、`src/app/(frontend)/robots/[slug]/page.tsx`のmetadata、`src/app/(frontend)/use-cases/[slug]/page.tsx`（`d.summary`） |
 | `sources[].title` / `.url` / `.publisher` | **表示される**。出典欄（`uiText.common.resources`＝「出典」）のリンクテキストとリンク先 | `components/SourceList.tsx` |
 | `sources[].checkedAt` | **表示される**。同じ出典欄に「確認 {日付}」として付記される | `components/SourceList.tsx`（`確認 {source.checkedAt}`） |
 | `sources[].publishedAt` | **条件付きで表示される**（2026-09-05外部監査で訂正）。`SourceList.tsx`（出典一覧）には出ないが、この出典の`url`が同じdocumentの`usageExampleSourceUrls`（Robotsのみ）から参照されている場合、ロボット詳細ページの「活用事例」欄に`{publisher} · {publishedAt}`として表示される | `SourceList.tsx`のJSXに参照は無いが、`lib/robotCatalog.ts`の`resolveRobotUsageExamples()`が`source.publishedAt`を返し、`src/app/(frontend)/robots/[slug]/page.tsx`がそれを描画している |

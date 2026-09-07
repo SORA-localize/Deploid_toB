@@ -17,6 +17,8 @@ import { createSettingsRevalidationAfterChangeHook } from '../lib/payload/revali
  */
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
+  // 本番サイトに対応するページが無いglobal設定画面。admin専用の名称。
+  label: { ja: 'サイト設定', en: 'Site settings' },
   access: {
     read: publishedGlobalOrAuthenticated,
     update: canWriteDraft,

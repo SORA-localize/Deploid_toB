@@ -19,6 +19,9 @@ const canWriteMedia: Access = ({ req }) => isContentDraftWriterOrAboveUser(asAdm
 export const Media: CollectionConfig = {
   slug: 'media',
   upload: true,
+  // 本番サイトに対応する画面が無いアップロード専用の道具（アップロードすると発行される
+  // URLを他collectionの画像fieldへ貼り付けて使う）。
+  labels: { singular: { ja: 'メディア', en: 'Media' }, plural: { ja: 'メディア', en: 'Media' } },
   admin: {
     useAsTitle: 'alt',
     description: {
