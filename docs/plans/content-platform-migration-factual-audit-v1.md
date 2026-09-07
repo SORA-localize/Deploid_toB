@@ -855,11 +855,11 @@ artifact 側を疑って時間を溶かす種類の罠。
 | **A-9** | `.env.example` から `ALLOW_LOCAL_CONTENT_ROLLBACK` を削除。計画書 Rollback 節に撤去済みの注記。`content-routes.spec.ts` の docblock を実行可能な手順へ修正 | ✅ **閉じた** |
 | **A-10** | 計画書の Step チェックボックス72個を `[x]` にし、**遡ってチェックしたものである旨と根拠**を冒頭に明記 | ✅ **閉じた** |
 | **A-2** | UI E2E の CI 実行範囲 | ❌ **未着手**（別ブランチ。32本の failure 分類が先） |
-| **A-3** | cron 成功経路の実機検証 | ❌ **未着手**（コード変更ではなく Production への確認作業） |
+| **A-3** | cron 成功経路の実機検証 | ✅ **閉じた**（2026-09-07、下記 §11） |
 | **A-4** | 実署名37テストの CI 実行経路 | ⚠️ **workflow 作成済・secret 未設定**（`.github/workflows/signing-tests.yml`、`workflow_dispatch` 専用。下記 §9） |
 | **A-6** | Production 実データの parity 再確認 | ❌ **未着手** |
 | **A-7** | `check:plan-snippets` が無効 | ❌ **未着手** |
-| **A-11** | `lint --max-warnings 4` の margin ゼロ | ❌ **未着手** |
+| **A-11** | `lint --max-warnings 4` の margin ゼロ | ⚠️ **本調査後のどこかの時点で解消**（2026-09-07時点で`package.json`は`--max-warnings 0`。どのcommitで変わったかは未特定） |
 
 ### A-2 に着手する際の必須の順序（事故防止）
 
@@ -1061,3 +1061,32 @@ process.env.PAYLOAD_MIGRATING` で exit 1。戻すと OK。
 `deploid_dev` 誤削除インシデントと同じ形をしている——**安全ガードが「人が気をつけて各所へ書く」
 方式だったため、一部の実装漏れが残った**。今回は機械検査を足したので、次に script を追加した人が
 忘れても CI が止める。
+
+---
+
+## 11. A-3 解決確認（2026-09-07）——cron の成功経路が実際に確認された
+
+§8（2026-08-28時点）では「初回実行機会がまだ来ていない」段階で止まっていた。
+2026-09-07、ユーザーがVercelダッシュボードのObservability/Logsで
+`/api/internal/cron/audit-upload-cleanup` のログを直接確認し、以下を提示した。
+
+```
+GET /api/internal/cron/audit-upload-cleanup
+Status: 200
+User Agent: vercel-cron/1.0
+Function Invocation: Execution Duration 2.71s
+```
+
+**判定根拠**: `src/app/api/internal/cron/audit-upload-cleanup/route.ts` の実装上、200が返るのは
+`CRON_SECRET`一致 **かつ** `x-vercel-oidc-token`ヘッダ存在の両方を満たした場合のみ
+（不一致なら401、ヘッダ欠落なら503）。User Agentが`vercel-cron/1.0`であることから、
+これは本物のVercel Cronによる実行であり、なりすましや手動アクセスではない。
+
+**⇒ A-3は解決したと判断する。** Vercel Cronは実際に`x-vercel-oidc-token`ヘッダを送っており、
+毎晩静かに503で失敗し続ける、という懸念は該当しなかった。
+
+**本調査の限界（§5）からの訂正**: 「Vercel Cronの実行履歴（成功/503の実績ログ）」は
+未検証としていたが、これで検証済みに変わった。ただし今回確認できたのは特定日時点の1回分の
+ログのみで、**継続的な監視の仕組みではない**。今後同様の懸念が出た場合は同じ手順
+（Vercelダッシュボード → Observability/Logs → path `audit-upload-cleanup` でフィルタ）で
+都度確認する必要がある。
