@@ -394,13 +394,22 @@ describe('Postgres migrations (Task 3.5) — isolated throwaway databases only',
       30_000,
     );
 
-    it('Step 5b / Step 4 (no drift, empty migration): a second migrate:create --skip-empty now produces no file and exits 0 non-interactively', () => {
-      const before = listMigrationFiles(TMP_SEEDED_DB_MIGRATIONS_DIR).length;
-      const result = runPayloadCli(['migrate:create', 'driftcheck2', '--skip-empty'], fixtureEnv());
-      expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
-      const after = listMigrationFiles(TMP_SEEDED_DB_MIGRATIONS_DIR).length;
-      expect(after, 'no new file should be written once the fixture matches its last migration snapshot').toBe(before);
-    });
+    it(
+      'Step 5b / Step 4 (no drift, empty migration): a second migrate:create --skip-empty now produces no file and exits 0 non-interactively',
+      () => {
+        const before = listMigrationFiles(TMP_SEEDED_DB_MIGRATIONS_DIR).length;
+        const result = runPayloadCli(['migrate:create', 'driftcheck2', '--skip-empty'], fixtureEnv());
+        expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+        const after = listMigrationFiles(TMP_SEEDED_DB_MIGRATIONS_DIR).length;
+        expect(after, 'no new file should be written once the fixture matches its last migration snapshot').toBe(before);
+      },
+      // Same tsx worker-thread startup race documented in run-payload-migration-cli.mts's
+      // header comment — this spawns that same CLI path and can lose the race against Node's
+      // event-loop-idle detection on GitHub Actions' shared runners, past vitest's 5s default.
+      // The neighboring migrate-apply test already carries an explicit 30s override for the
+      // same reason; this one lacked it and timed out in CI (unrelated to any content change).
+      30_000,
+    );
 
     it(
       'Step 3 (apply): applying the generated MCP api-keys migration keeps the pre-existing seeded row intact',
