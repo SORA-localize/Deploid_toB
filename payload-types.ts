@@ -330,30 +330,22 @@ export interface Distributor {
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
   /**
-   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
-   */
-  summary: string;
-  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources: {
-    title: string;
-    url: string;
-    publisher?: string | null;
-    /**
-     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
-     */
-    publishedAt?: string | null;
-    /**
-     * The date this source was last checked. Shown on the public source list as "Checked …".
-     */
-    checkedAt: string;
-    reliability: 'verified' | 'official' | 'reported' | 'estimated';
-    note?: string | null;
-    id?: string | null;
-  }[];
-  /**
    * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
+  name: string;
+  nameJa?: string | null;
+  website?: string | null;
+  providerType: 'maker-direct' | 'reseller' | 'other';
+  handledManufacturerIds: (number | Manufacturer)[];
+  handledRobotIds?: (number | Robot)[] | null;
+  acquisitionMethods: ('purchase' | 'lease' | 'raas' | 'subscription' | 'inquiry')[];
+  inquiryUrl?: string | null;
+  /**
+   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
+   */
+  summary: string;
+  note?: string | null;
   heroImage?: {
     src?: string | null;
     alt?: string | null;
@@ -383,20 +375,28 @@ export interface Distributor {
     };
     aspectRatio?: number | null;
   };
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
+     */
+    publishedAt?: string | null;
+    /**
+     * The date this source was last checked. Shown on the public source list as "Checked …".
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  name: string;
-  nameJa?: string | null;
-  website?: string | null;
-  providerType: 'maker-direct' | 'reseller' | 'other';
-  handledManufacturerIds: (number | Manufacturer)[];
-  handledRobotIds?: (number | Robot)[] | null;
-  acquisitionMethods: ('purchase' | 'lease' | 'raas' | 'subscription' | 'inquiry')[];
-  inquiryUrl?: string | null;
-  note?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1592,21 +1592,17 @@ export interface DistributorsSelect<T extends boolean = true> {
   slug?: T;
   previousSlugs?: T;
   lifecycleStatus?: T;
-  summary?: T;
-  reliability?: T;
-  sources?:
-    | T
-    | {
-        title?: T;
-        url?: T;
-        publisher?: T;
-        publishedAt?: T;
-        checkedAt?: T;
-        reliability?: T;
-        note?: T;
-        id?: T;
-      };
   nextReviewBy?: T;
+  name?: T;
+  nameJa?: T;
+  website?: T;
+  providerType?: T;
+  handledManufacturerIds?: T;
+  handledRobotIds?: T;
+  acquisitionMethods?: T;
+  inquiryUrl?: T;
+  summary?: T;
+  note?: T;
   heroImage?:
     | T
     | {
@@ -1626,6 +1622,19 @@ export interface DistributorsSelect<T extends boolean = true> {
             };
         aspectRatio?: T;
       };
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  reliability?: T;
   seo?:
     | T
     | {
@@ -1633,15 +1642,6 @@ export interface DistributorsSelect<T extends boolean = true> {
         metaDescription?: T;
         noindex?: T;
       };
-  name?: T;
-  nameJa?: T;
-  website?: T;
-  providerType?: T;
-  handledManufacturerIds?: T;
-  handledRobotIds?: T;
-  acquisitionMethods?: T;
-  inquiryUrl?: T;
-  note?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
