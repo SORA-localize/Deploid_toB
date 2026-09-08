@@ -20,7 +20,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 | [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | 上位ロードマップ。**Phase番号は移行前リファクタの1〜7とは別体系**（本書のPhase 1はCMS/DB移行を指す）。移行前スコープは実装インデックス側が正本 | phaseごとに分割 | 2026-07-26 |
 | [レスポンシブ対応](plans/responsive-phase-1-static-audit-v1.md) | Phase 1のコード実装は完了。R-06（実機スクリーンショットでの最終確認）が未実施 | 専用branchなし（mainへ直接実装） | 2026-07-03 |
 | [ロボット画像・メーカーロゴ調達](plans/robot-image-sourcing-plan-v1.md) | Robot B1〜B6の読み取り専用調査は完了。台帳・許諾SSOTの実装が調査開始gateとして未着手 | 未定 | 2026-07-08 |
-| [Admin編集画面レイアウト整理のロールアウト](plans/admin-layout-rollout-plan-v1.md) | Manufacturersのみtabs/sidebar化済み（Task 6 POC）。残り7 collectionへの展開＋配列fieldの追加ボタン日本語化を計画化（SiteSettingsは運用メタfieldが無く変更不要と確定）。**未着手** | 専用branchなし（未定） | 2026-09-07 |
+| [Admin編集画面レイアウト整理のロールアウト](archive/admin-layout-rollout-plan-v1.md) | Manufacturersのみtabs/sidebar化済み（Task 6 POC）。残り7 collectionへの展開＋配列fieldの追加ボタン日本語化を計画化（SiteSettingsは運用メタfieldが無く変更不要と確定）。**未着手** | 専用branchなし（未定） | 2026-09-07 |
 
 ---
 
