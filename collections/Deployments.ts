@@ -10,6 +10,8 @@ import {
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
 import { applyAdminFieldLabels, deploymentsFieldLabels, deploymentsLocationFieldLabels } from '../lib/payload/adminFieldLabels';
+import { partitionFieldsByName, withSidebarPosition } from '../lib/payload/adminFieldLayout';
+import { ADMIN_PUBLISH_INTENT_FIELD } from '../lib/payload/adminPublishIntent';
 import { deploymentStatusSelectOptions } from '../lib/payload/adminSelectLabels';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
@@ -60,16 +62,30 @@ function validateDeploymentForPublish(deployment: Partial<DeploymentSite>): void
   }
 }
 
+/**
+ * T5（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * `docs/decisions/admin-field-layout-v1.md` §3 Deployments）: 運用頻度で2層に分けた配置
+ * （fieldが少ないため2 tab構成——Distributorsと同じ形）。名前の集合はこのファイル内で
+ * 閉じており、抜けがあれば起動時にthrowする。
+ */
+const SIDEBAR_FIELD_NAMES = ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy'] as const;
+const BASIC_INFO_TAB_FIELD_NAMES = [
+  'manufacturerId',
+  'robotId',
+  'customer',
+  'siteName',
+  'country',
+  'location',
+  'status',
+  'startedAt',
+  'relatedUseCaseIds',
+  'summary',
+] as const;
+const SOURCES_SEO_TAB_FIELD_NAMES = ['sources', 'reliability', 'heroImage', 'seo'] as const;
+
 /** Homeワールドマップの arc（manufacturer HQ → 導入拠点）根拠データ。 */
-export const Deployments: CollectionConfig = {
-  slug: 'deployments',
-  // 公開サイトの表記に合わせる（lib/uiText.ts の useCases.deployments = '導入事例'）。
-  labels: { singular: { ja: '導入事例', en: 'Deployment' }, plural: { ja: '導入事例', en: 'Deployments' } },
-  admin: { useAsTitle: 'customer', components: contentPublishAdminComponents },
-  access: contentCollectionAccess,
-  versions: contentVersionsConfig,
-  fields: applyAdminFieldLabels(
-    [
+const deploymentsAllFields = applyAdminFieldLabels(
+  [
       ...baseContentFields(),
       ...baseRecordContentFields(),
       { name: 'manufacturerId', type: 'relationship', relationTo: 'manufacturers', required: true },
@@ -106,8 +122,47 @@ export const Deployments: CollectionConfig = {
       { name: 'startedAt', type: 'text' },
       { name: 'relatedUseCaseIds', type: 'relationship', relationTo: 'use-cases', hasMany: true },
     ],
-    deploymentsFieldLabels,
-  ),
+  deploymentsFieldLabels,
+);
+
+const { matched: sidebarFields, rest: afterSidebar } = partitionFieldsByName(deploymentsAllFields, SIDEBAR_FIELD_NAMES);
+const { matched: basicInfoTabFields, rest: afterBasicInfo } = partitionFieldsByName(afterSidebar, BASIC_INFO_TAB_FIELD_NAMES);
+const { matched: sourcesSeoTabFields, rest: unplacedFields } = partitionFieldsByName(afterBasicInfo, SOURCES_SEO_TAB_FIELD_NAMES);
+
+/**
+ * `unplacedFields`は`admin.hidden`な`adminPublishIntentField()`だけのはず
+ * （表示場所を持たない）。それ以外が残っていたら、上記3つの名前リストへの追加漏れ——
+ * 編集画面のどこにも表示されない field が生まれるので、起動時に気づけるようにする。
+ */
+const unexpectedlyUnplacedFields = unplacedFields.filter(
+  (field) => (field as { name?: string }).name !== ADMIN_PUBLISH_INTENT_FIELD,
+);
+if (unexpectedlyUnplacedFields.length > 0) {
+  throw new Error(
+    `Deployments admin field layout: unplaced field(s) — add to a tab/sidebar name list: ${unexpectedlyUnplacedFields
+      .map((f) => (f as { name?: string }).name)
+      .join(', ')}`,
+  );
+}
+
+export const Deployments: CollectionConfig = {
+  slug: 'deployments',
+  // 公開サイトの表記に合わせる（lib/uiText.ts の useCases.deployments = '導入事例'）。
+  labels: { singular: { ja: '導入事例', en: 'Deployment' }, plural: { ja: '導入事例', en: 'Deployments' } },
+  admin: { useAsTitle: 'customer', components: contentPublishAdminComponents },
+  access: contentCollectionAccess,
+  versions: contentVersionsConfig,
+  fields: [
+    ...unplacedFields,
+    ...withSidebarPosition(sidebarFields),
+    {
+      type: 'tabs',
+      tabs: [
+        { label: { ja: '基本情報', en: 'Basic info' }, fields: basicInfoTabFields },
+        { label: { ja: '出典・SEO', en: 'Sources & SEO' }, fields: sourcesSeoTabFields },
+      ],
+    },
+  ],
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [

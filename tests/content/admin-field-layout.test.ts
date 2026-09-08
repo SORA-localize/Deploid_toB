@@ -1,6 +1,7 @@
 import type { Field } from 'payload';
 import { describe, expect, it } from 'vitest';
 import { Articles } from '@/collections/Articles';
+import { Deployments } from '@/collections/Deployments';
 import { Distributors } from '@/collections/Distributors';
 import { Robots } from '@/collections/Robots';
 import { UseCases } from '@/collections/UseCases';
@@ -182,6 +183,23 @@ const LAYOUT_FIXTURES: readonly LayoutFixture[] = [
         labelJa: '画像・出典',
         labelEn: 'Media & sources',
         fieldNames: ['heroImage', 'sources', 'reliability', 'seo'],
+      },
+    ],
+  },
+  {
+    name: 'deployments',
+    fields: Deployments.fields,
+    sidebarFieldNames: ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy'],
+    tabs: [
+      {
+        labelJa: '基本情報',
+        labelEn: 'Basic info',
+        fieldNames: ['manufacturerId', 'robotId', 'customer', 'siteName', 'country', 'location', 'status', 'startedAt', 'relatedUseCaseIds', 'summary'],
+      },
+      {
+        labelJa: '出典・SEO',
+        labelEn: 'Sources & SEO',
+        fieldNames: ['sources', 'reliability', 'heroImage', 'seo'],
       },
     ],
   },
