@@ -807,10 +807,25 @@ export interface Deployment {
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
   /**
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
+   */
+  nextReviewBy?: string | null;
+  manufacturerId: number | Manufacturer;
+  robotId?: (number | null) | Robot;
+  customer: string;
+  siteName?: string | null;
+  country: string;
+  location: {
+    lat: number;
+    lng: number;
+  };
+  status: 'announced' | 'pilot' | 'production' | 'ended' | 'unknown';
+  startedAt?: string | null;
+  relatedUseCaseIds?: (number | UseCase)[] | null;
+  /**
    * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
    */
   summary: string;
-  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   sources: {
     title: string;
     url: string;
@@ -827,10 +842,7 @@ export interface Deployment {
     note?: string | null;
     id?: string | null;
   }[];
-  /**
-   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
-   */
-  nextReviewBy?: string | null;
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   heroImage?: {
     src?: string | null;
     alt?: string | null;
@@ -865,18 +877,6 @@ export interface Deployment {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  manufacturerId: number | Manufacturer;
-  robotId?: (number | null) | Robot;
-  customer: string;
-  siteName?: string | null;
-  country: string;
-  location: {
-    lat: number;
-    lng: number;
-  };
-  status: 'announced' | 'pilot' | 'production' | 'ended' | 'unknown';
-  startedAt?: string | null;
-  relatedUseCaseIds?: (number | UseCase)[] | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1923,8 +1923,22 @@ export interface DeploymentsSelect<T extends boolean = true> {
   slug?: T;
   previousSlugs?: T;
   lifecycleStatus?: T;
+  nextReviewBy?: T;
+  manufacturerId?: T;
+  robotId?: T;
+  customer?: T;
+  siteName?: T;
+  country?: T;
+  location?:
+    | T
+    | {
+        lat?: T;
+        lng?: T;
+      };
+  status?: T;
+  startedAt?: T;
+  relatedUseCaseIds?: T;
   summary?: T;
-  reliability?: T;
   sources?:
     | T
     | {
@@ -1937,7 +1951,7 @@ export interface DeploymentsSelect<T extends boolean = true> {
         note?: T;
         id?: T;
       };
-  nextReviewBy?: T;
+  reliability?: T;
   heroImage?:
     | T
     | {
@@ -1964,20 +1978,6 @@ export interface DeploymentsSelect<T extends boolean = true> {
         metaDescription?: T;
         noindex?: T;
       };
-  manufacturerId?: T;
-  robotId?: T;
-  customer?: T;
-  siteName?: T;
-  country?: T;
-  location?:
-    | T
-    | {
-        lat?: T;
-        lng?: T;
-      };
-  status?: T;
-  startedAt?: T;
-  relatedUseCaseIds?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
