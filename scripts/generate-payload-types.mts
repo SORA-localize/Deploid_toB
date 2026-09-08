@@ -1,7 +1,7 @@
 /**
  * `payload generate:types`の等価物を、明示的に`await`する形で直接呼ぶラッパー。
  *
- * 背景（`docs/plans/admin-layout-rollout-plan-v1.md` T1〜T7）: インストール済み
+ * 背景（`docs/archive/admin-layout-rollout-plan-v1.md` T1〜T7）: インストール済み
  * Payload 3.87.1は、`getPayload()`起動時に型生成を`void this.bin({ args: ['generate:types'],
  * log: false })`というfire-and-forgetで実行しており、awaitしていない
  * （`node_modules/payload/dist/index.js:359`）。そのため`getPayload()`が返った時点で

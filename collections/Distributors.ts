@@ -63,7 +63,7 @@ function validateDistributorForPublish(distributor: Partial<Distributor>): void 
 }
 
 /**
- * T4（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * T4（`docs/archive/admin-layout-rollout-plan-v1.md`、設計は
  * `docs/decisions/admin-field-layout-v1.md` §3 Distributors）: 運用頻度で2層に分けた配置。
  * `sidebar`はTier3（滅多に触らない運用メタ）、tabはTier1（基本情報）→Tier2（画像・出典）の順
  * （fieldが少ないため2 tab構成——Manufacturers/Robots/Articles/UseCasesと違い3つ目のtabは無い）。

@@ -10,7 +10,7 @@ import { UseCases } from '@/collections/UseCases';
 import { ADMIN_PUBLISH_INTENT_FIELD } from '@/lib/payload/adminPublishIntent';
 
 /**
- * `docs/plans/admin-layout-rollout-plan-v1.md` T1〜T7完了条件（レビュー指摘#3）:
+ * `docs/archive/admin-layout-rollout-plan-v1.md` T1〜T7完了条件（レビュー指摘#3）:
  * 起動時の「振り分け漏れ」throw（`unplacedFields`が空であること）は
  * 「置き場所がゼロ」しか検出できない。誤配置・重複登録・順序違い・sidebar付け忘れは
  * 検出できないため、実際のcollection定義（`Robots.fields`等）を直接読み、設計

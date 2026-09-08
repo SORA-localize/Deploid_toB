@@ -95,7 +95,7 @@ function validateArticleForPublish(article: ArticlePublishCandidate): void {
 }
 
 /**
- * T2（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * T2（`docs/archive/admin-layout-rollout-plan-v1.md`、設計は
  * `docs/decisions/admin-field-layout-v1.md` §3 Articles）: 運用頻度で3層に分けた配置。
  * `sidebar`はTier3（滅多に触らない運用メタ）、tabはTier1（本文）→Tier2（分類・関連）→
  * Tier2〜3（画像・出典・特殊コンテンツ）の順。Manufacturers/Robots POCと同じ構成——
