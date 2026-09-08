@@ -10,6 +10,8 @@ import {
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
 import { applyAdminFieldLabels, robotSeriesFieldLabels } from '../lib/payload/adminFieldLabels';
+import { partitionFieldsByName, withSidebarPosition } from '../lib/payload/adminFieldLayout';
+import { ADMIN_PUBLISH_INTENT_FIELD } from '../lib/payload/adminPublishIntent';
 import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
@@ -54,20 +56,17 @@ function validateRobotSeriesForPublish(series: Partial<RobotSeries>): void {
 const routeRegistryHooks = createRouteRegistryHooks('robot-series');
 
 /**
- * スペックも価格も持たない（brief: `deploymentStage` と `specs` に答えが存在しないため）。
- * `/robots/[slug]` namespaceを `Robots` と共有するため、`lib/payload/routeRegistry.ts` の
- * hookをclaim/move/release全てに接続する。
+ * T6（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * `docs/decisions/admin-field-layout-v1.md` §3 RobotSeries）: 運用頻度で2層に分けた配置
+ * （fieldが少ないため2 tab構成——Distributors/Deploymentsと同じ形）。名前の集合はこの
+ * ファイル内で閉じており、抜けがあれば起動時にthrowする。
  */
-export const RobotSeriesCollection: CollectionConfig = {
-  slug: 'robot-series',
-  // 本番サイトに単体表示ページが無いため(field-to-page-section-map-v1.md参照)、
-  // `robotSeriesFieldLabels`内で使われている「シリーズ」表記に合わせた admin専用の名称。
-  labels: { singular: { ja: 'シリーズ', en: 'Robot series' }, plural: { ja: 'シリーズ', en: 'Robot series' } },
-  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
-  access: contentCollectionAccess,
-  versions: contentVersionsConfig,
-  fields: applyAdminFieldLabels(
-    [
+const SIDEBAR_FIELD_NAMES = ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy'] as const;
+const BASIC_INFO_TAB_FIELD_NAMES = ['name', 'nameJa', 'manufacturerId', 'description', 'industryTags', 'taskTags', 'summary'] as const;
+const MEDIA_AND_SOURCES_TAB_FIELD_NAMES = ['images', 'sources', 'reliability', 'heroImage', 'seo'] as const;
+
+const robotSeriesAllFields = applyAdminFieldLabels(
+  [
       ...baseContentFields(),
       ...baseRecordContentFields(),
       { name: 'name', type: 'text', required: true },
@@ -95,8 +94,53 @@ export const RobotSeriesCollection: CollectionConfig = {
       { name: 'industryTags', type: 'text', hasMany: true },
       { name: 'taskTags', type: 'text', hasMany: true },
     ],
-    robotSeriesFieldLabels,
-  ),
+  robotSeriesFieldLabels,
+);
+
+const { matched: sidebarFields, rest: afterSidebar } = partitionFieldsByName(robotSeriesAllFields, SIDEBAR_FIELD_NAMES);
+const { matched: basicInfoTabFields, rest: afterBasicInfo } = partitionFieldsByName(afterSidebar, BASIC_INFO_TAB_FIELD_NAMES);
+const { matched: mediaTabFields, rest: unplacedFields } = partitionFieldsByName(afterBasicInfo, MEDIA_AND_SOURCES_TAB_FIELD_NAMES);
+
+/**
+ * `unplacedFields`は`admin.hidden`な`adminPublishIntentField()`だけのはず
+ * （表示場所を持たない）。それ以外が残っていたら、上記3つの名前リストへの追加漏れ——
+ * 編集画面のどこにも表示されない field が生まれるので、起動時に気づけるようにする。
+ */
+const unexpectedlyUnplacedFields = unplacedFields.filter(
+  (field) => (field as { name?: string }).name !== ADMIN_PUBLISH_INTENT_FIELD,
+);
+if (unexpectedlyUnplacedFields.length > 0) {
+  throw new Error(
+    `RobotSeries admin field layout: unplaced field(s) — add to a tab/sidebar name list: ${unexpectedlyUnplacedFields
+      .map((f) => (f as { name?: string }).name)
+      .join(', ')}`,
+  );
+}
+
+/**
+ * スペックも価格も持たない（brief: `deploymentStage` と `specs` に答えが存在しないため）。
+ * `/robots/[slug]` namespaceを `Robots` と共有するため、`lib/payload/routeRegistry.ts` の
+ * hookをclaim/move/release全てに接続する。
+ */
+export const RobotSeriesCollection: CollectionConfig = {
+  slug: 'robot-series',
+  // 本番サイトに単体表示ページが無いため(field-to-page-section-map-v1.md参照)、
+  // `robotSeriesFieldLabels`内で使われている「シリーズ」表記に合わせた admin専用の名称。
+  labels: { singular: { ja: 'シリーズ', en: 'Robot series' }, plural: { ja: 'シリーズ', en: 'Robot series' } },
+  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
+  access: contentCollectionAccess,
+  versions: contentVersionsConfig,
+  fields: [
+    ...unplacedFields,
+    ...withSidebarPosition(sidebarFields),
+    {
+      type: 'tabs',
+      tabs: [
+        { label: { ja: '基本情報', en: 'Basic info' }, fields: basicInfoTabFields },
+        { label: { ja: '画像・出典', en: 'Media & sources' }, fields: mediaTabFields },
+      ],
+    },
+  ],
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [

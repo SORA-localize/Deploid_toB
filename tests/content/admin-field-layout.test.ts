@@ -4,6 +4,7 @@ import { Articles } from '@/collections/Articles';
 import { Deployments } from '@/collections/Deployments';
 import { Distributors } from '@/collections/Distributors';
 import { Robots } from '@/collections/Robots';
+import { RobotSeriesCollection } from '@/collections/RobotSeries';
 import { UseCases } from '@/collections/UseCases';
 import { ADMIN_PUBLISH_INTENT_FIELD } from '@/lib/payload/adminPublishIntent';
 
@@ -200,6 +201,23 @@ const LAYOUT_FIXTURES: readonly LayoutFixture[] = [
         labelJa: '出典・SEO',
         labelEn: 'Sources & SEO',
         fieldNames: ['sources', 'reliability', 'heroImage', 'seo'],
+      },
+    ],
+  },
+  {
+    name: 'robot-series',
+    fields: RobotSeriesCollection.fields,
+    sidebarFieldNames: ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy'],
+    tabs: [
+      {
+        labelJa: '基本情報',
+        labelEn: 'Basic info',
+        fieldNames: ['name', 'nameJa', 'manufacturerId', 'description', 'industryTags', 'taskTags', 'summary'],
+      },
+      {
+        labelJa: '画像・出典',
+        labelEn: 'Media & sources',
+        fieldNames: ['images', 'sources', 'reliability', 'heroImage', 'seo'],
       },
     ],
   },
