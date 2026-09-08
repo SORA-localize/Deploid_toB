@@ -20,7 +20,6 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 | [プロジェクト全体リファクタリング](plans/project-wide-refactor-roadmap-v2.md) | 上位ロードマップ。**Phase番号は移行前リファクタの1〜7とは別体系**（本書のPhase 1はCMS/DB移行を指す）。移行前スコープは実装インデックス側が正本 | phaseごとに分割 | 2026-07-26 |
 | [レスポンシブ対応](plans/responsive-phase-1-static-audit-v1.md) | Phase 1のコード実装は完了。R-06（実機スクリーンショットでの最終確認）が未実施 | 専用branchなし（mainへ直接実装） | 2026-07-03 |
 | [ロボット画像・メーカーロゴ調達](plans/robot-image-sourcing-plan-v1.md) | Robot B1〜B6の読み取り専用調査は完了。台帳・許諾SSOTの実装が調査開始gateとして未着手 | 未定 | 2026-07-08 |
-| [Admin編集画面レイアウト整理のロールアウト](archive/admin-layout-rollout-plan-v1.md) | Manufacturersのみtabs/sidebar化済み（Task 6 POC）。残り7 collectionへの展開＋配列fieldの追加ボタン日本語化を計画化（SiteSettingsは運用メタfieldが無く変更不要と確定）。**未着手** | 専用branchなし（未定） | 2026-09-07 |
 
 ---
 
@@ -30,8 +29,8 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 | 日付 | 文書 | 内容 |
 |---|---|---|
+| 2026-09-08 | [Admin編集画面のfield配置](decisions/admin-field-layout-v1.md) | tabs/sidebarでの表示専用レイアウト整理。全8 collection（Manufacturers POC＋残り7）で完了。SiteSettingsは対象外と確定 |
 | 2026-09-05 | [Admin field→公開ページ対応表](decisions/admin-field-to-page-section-map-v1.md) | 各fieldが実際に公開ページのどこへ出るか（出ないか）を実コード確認して整理 |
-| 2026-09-05 | [Admin編集画面のfield配置](decisions/admin-field-layout-v1.md) | tabs/sidebarでの表示専用レイアウト整理。ManufacturersでPOC実施済み、他6 collectionは設計のみ |
 | 2026-09-05 | [Admin公開→反映SLO](decisions/admin-publish-cache-reflection-slo-v1.md) | 「公開してからいつ反映されるか」をNext.jsの契約・このプロジェクトの目標・超過時の手順に分けて定義 |
 | 2026-07-26 | [コンテンツ基盤・DBアーキテクチャ](decisions/content-platform-and-database-architecture-v2.md) | Payload CMS + managed PostgreSQLを採用。GitHub、管理画面、Codex MCP、公開サイトの責務を確定 |
 | 2026-07-26 | [データアーキテクチャ再設計](decisions/data-architecture-redesign-v1.md) | id / slug設計は維持し、旧Git型CMS移行案を新しいPayload移行計画へ置換 |
@@ -50,6 +49,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 | 2026-08-06 | 積み残し登録簿の `#4`（color-contrast 219件→0件、axe gateを`serious`へ）・`#5`（/reportsタブ到達性）・`#6`（Reports H1）・`#9`（e2e hydration race）・`#11`（Linuxベースライン自動再生成） |
 
 | 2026-08-08 | 完了・吸収済みの計画9件を `docs/archive/` へ移動。`refactor-phase-01`〜`07` と `pre-migration-refactor-safety-design` は完了済みなのに `docs/plans/` に残っていた（Phase 05 だけ移されており移し忘れ）。`robot-data-r02-integration` と `robot-data-factcheck-impl` は新しいデータ投入計画へ吸収 |
+| 2026-09-08 | [Admin編集画面レイアウト整理のロールアウト](archive/admin-layout-rollout-plan-v1.md)。Manufacturers POC後の残り7 collection（Robots・Articles・UseCases・Distributors・Deployments・RobotSeries・ArticlePlacements）と配列fieldの追加ボタン日本語化が完了。SiteSettingsは対象外と確定 |
 
 残る積み残しは [登録簿](decisions/deferred-work-register-v1.md) が正本。
 
@@ -69,7 +69,7 @@ md を覗くだけで「今何が動いているか」「あの内容はどう�
 
 ### decisions の主要文書
 
-- [`admin-field-layout-v1.md`](decisions/admin-field-layout-v1.md) — Admin編集画面のtabs/sidebar配置。Manufacturers POC結果と他collectionへの展開案
+- [`admin-field-layout-v1.md`](decisions/admin-field-layout-v1.md) — Admin編集画面のtabs/sidebar配置。全8 collectionで実装完了（Manufacturers POC＋残り7）
 - [`admin-field-to-page-section-map-v1.md`](decisions/admin-field-to-page-section-map-v1.md) — Admin fieldが実際に公開ページのどこへ出るか（出ないか）の対応表。実コード確認済み
 - [`admin-publish-cache-reflection-slo-v1.md`](decisions/admin-publish-cache-reflection-slo-v1.md) — Admin公開から公開ページ反映までのSLOと超過時の手順
 - [`content-platform-and-database-architecture-v2.md`](decisions/content-platform-and-database-architecture-v2.md) — Payload CMS、PostgreSQL、GitHub、公開サイト、Codex MCPの役割を定める移行後アーキテクチャ
