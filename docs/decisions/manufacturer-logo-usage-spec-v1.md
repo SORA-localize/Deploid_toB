@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-07-09
+updated: 2026-09-08
 ---
 
 # メーカーロゴ利用仕様 v1
@@ -163,11 +163,10 @@ Home「注目ロボット」と比較D&D中の小型カードは今回変更し�
 
 必須確認:
 
-```bash
-npm run validate:data
-npm run build
-git diff --check
-```
+- 上記チェック項目をPayloadのレコード（`heroImage`/`logos`等）に対して手動で自己点検する
+  （`npm run validate:data`はPayload移行時に廃止済みで、代替の機械検証は無い）
+- コード変更を伴う場合のみ `npm run build`
+- ローカルファイルを変更した場合は `git diff --check`
 
 ## 2026-07-14レビューで修正した問題
 

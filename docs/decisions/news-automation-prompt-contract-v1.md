@@ -1,11 +1,24 @@
 ---
 status: current
-updated: 2026-07-10
+updated: 2026-09-08
 ---
 
 # ニュース収集・記事化自動化データ契約 v1
 
 Last reviewed: 2026-07-10
+
+> **2026-09-08時点の重大な注記**: この文書は全編にわたり編集対象を`data/articles.ts`と
+> 書いているが、この**ファイルはPayload cutover（Task 9）で撤去済み**（`git log`で
+> `refactor(task9): remove legacy TS content pipeline`にて削除を確認）。現在の編集先は
+> Payloadの`articles`collection（MCPの`findArticles`/`createArticles`/`updateArticles`、
+> または Admin UI）であり、この文書内の`data/articles.ts`への言及は本来
+> `articles`collection（Payload）と読み替える必要があるが、**JSON→field変換の具体的手順
+> （§1・§3等）はPayload移行後にまだ書き直されていない**。`ai/rules/22-article-sourcing.md`
+> は既にこの前提（Payloadのarticles repositoryで重複確認する）で書かれており、本契約書との
+> 間に矛盾がある。この日次自動化ワークフローが現在も実際に運用されているなら、本契約書を
+> Payload/MCP前提で書き直す作業が別途必要——今回のPayload MCP試行の範囲では現状把握のみ
+> 行い、書き直しはしていない。`npm run validate:data`への言及も同じ理由に加えて
+> スクリプト自体が廃止済みのため無効（詳細は`.codex/content-workflow.md`）。
 
 この文書は、ChatGPT Scheduled Tasks の日次出力を CLI 側AIが機械的に Deploid の公開記事データへ変換するための契約を定める。
 

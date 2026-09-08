@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-07-26
+updated: 2026-09-08
 ---
 
 # Deploid Data Work Guide
@@ -143,26 +143,27 @@ robots=A / manufacturers=B / articles=C / slug変更=D / 既存更新=D2 / useCa
 - URLを作るときだけ `slug` を使う。例: `/robots/${robot.slug}`
 - 新しいタグが必要な場合は、先に `lib/tagRegistry.ts` へ `value` と `label` を追加する
 - `value` は安定キーなので後から気軽に変えない。表示を変えたいだけなら `label` を変える
-- 未登録タグ、存在しない `id` 参照、slug衝突は `npm run validate:data` / `npm run build` で失敗させる
+- 未登録タグ、存在しない `id` 参照、slug衝突は publish時の `validateForPublish`（Payload側）で失敗させる。draft時点で機械検証する手段は無い（下記「検証コマンド」参照）
 
 ## AIに渡す作業手順
 
+> **2026-09-08時点の注記**: 以下は`data/*.ts`直接編集時代の手順。**cutoverが完了した現在、`data/*.ts`は撤去済みで編集対象ではない**（`ai/rules/21-data-maintenance-workflow.md`参照）。実際の編集先はPayload（Admin UI / Local API / REST / MCP）で、標準手順は`.codex/content-workflow.md`を参照すること。この節のうち手順1〜5（対象決定・出典優先順位・既存id確認・更新/新規判断・画像配置規則）は編集先が変わっても引き続き有効な考え方だが、手順6〜8（`data/*.ts`編集・`validate:data`・`build`）はそのままでは実行できない。
+
 1. 対象データと目的を決める。例: 「Unitree G1 の価格・日本入手性・公式出典を更新」
 2. 公式/一次情報を優先して出典候補を列挙する
-3. 既存の `id`、関連先ID、登録済みタグ、スペックキーを確認する
+3. 既存の `id`、関連先ID、登録済みタグ、スペックキーを確認する（Payload経由なら`find<Collection>`）
 4. 更新か新規追加かを判断する。迷う場合は新規作成せず、既存レコード更新案と新規案を並べて確認する
-5. 画像素材がある場合は上記の配置規則で `public/images/` に置き、該当データの `ImageAsset` を更新する
-6. `data/*.ts` を最小差分で更新する
-7. `npm run validate:data` を実行する
-8. UI表示に影響する変更なら `npm run build` まで通す
+5. 画像素材がある場合は上記の配置規則を参考に、Payload Media（Vercel Blob）アップロードURLか外部の公開URLを`heroImage.src`等に設定する（`public/images/`への直接配置はこの運用に切り替わって以降は非推奨。詳細は`.codex/content-workflow.md`と`ai/rules/40-content-rights.md`）
+6. Payloadの`create<Collection>`/`update<Collection>`を`draft: true`で呼ぶ（`.codex/content-workflow.md`のstep3）
+7. 必須fieldが埋まっているかスキーマと照合して手動で自己点検する（`npm run validate:data`は現在`package.json`に存在せず、代替の機械検証手段は無い。詳細は`.codex/content-workflow.md`のstep4）
+8. UI表示に影響する変更で、かつコード変更を伴う場合のみ `npm run build` まで通す（contentのみの変更ではbuildは不要）
 
 ## 検証コマンド
 
-```bash
-npm run build:data-r01-manifest
-npm run validate:data
-npm run build
-```
-
-`validate:data` は id重複、参照切れ、未知タグ、slug衝突、公開必須項目を検出します。
-warning は鮮度切れや画像ローカル化推奨で、error は公開前に必ず直します。
+`npm run validate:data`はPayload移行時に廃止済みで、現在`package.json`に存在しない
+（`docs/plans/content-platform-migration-factual-audit-v1.md`参照）。`content:verify-snapshot` /
+`content:verify-conservation`は署名済みsnapshot/baseline manifestを前提にした本番運用向け
+コマンドで、日常のcontent編集後に都度回す粒度のものではない。id重複・参照切れ・未知タグ・
+slug衝突・公開必須項目のチェックは、現状**publish時の`validateForPublish`（Payload側、人間の
+`content-publisher`がAdmin UI経由で公開する際にのみ走る）でしか機械的に検出されない**。
+draft作成・更新の時点では、この節の各手順で挙げた項目を手動で自己点検すること。

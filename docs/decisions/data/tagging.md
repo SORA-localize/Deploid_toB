@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-07-20
+updated: 2026-09-08
 ---
 
 # タグ運用メモ
@@ -28,9 +28,11 @@ Last reviewed: 2026-07-20
 ## 追加手順
 
 1. `lib/tagRegistry.ts` に `kind`、正規化済み `value`、表示用 `label` を追加する。
-2. `data/*.ts` の該当フィールドにタグを追加する。
-3. `npm run validate:data` を実行し、未知タグ・重複・参照漏れがないことを確認する。
-4. `npm run build` を実行する。
+2. Payloadの該当collection（`update<Collection>`、`draft: true`）でタグfieldに追加する
+   （`data/*.ts`はcutoverで撤去済み。`.codex/content-workflow.md`参照）。
+3. 未知タグ・重複・参照漏れの機械検証手段は無い（`npm run validate:data`は廃止済み）。
+   `lib/tagRegistry.ts`に実際に登録されているかを目視で確認する。
+4. コード（`lib/tagRegistry.ts`等）を変更した場合のみ `npm run build` を実行する。
 
 ## 方針
 
