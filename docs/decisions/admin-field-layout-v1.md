@@ -1,13 +1,15 @@
 ---
 status: current
-updated: 2026-09-07
+updated: 2026-09-08
 ---
 
 # Admin編集画面のfield配置 v1
 
 > `docs/plans/admin-ux-and-revalidation-fix-plan-v1.md` Task 6。「fieldが多すぎて分かりにくい」
 > を、**data構造を変えずに**（`payload:migrate:create`が新しいmigrationを生成しない範囲で）
-> 表示だけ整理する。
+> 表示だけ整理する。ManufacturersでのPOC（§2）後、`docs/archive/admin-layout-rollout-plan-v1.md`
+> （旧`docs/plans/`、2026-09-08完了によりarchive）が残り7 collectionへの展開を実施し、
+> 全て完了した（§3）。
 
 ---
 
@@ -66,28 +68,26 @@ tab/sidebarにも書き忘れると、開発サーバー起動時点で気づけ
   プロパティ**順序**だけが新しいfield配置順に変わった（型・フィールド集合は1件も変わって
   いないことをsortして比較し確認済み）。生成物として正しい変化のためそのままコミットする
 
-## 3. 他6 collectionへの展開案（設計のみ、未実装）
+## 3. 他collectionへの展開結果（実装済み、2026-09-08完了）
 
-**このTask 6ではManufacturersのみ実装する。** 以下は同じ考え方（sidebar=Tier3運用メタ、
-tabsで内容を分割）を他collectionへ広げる場合の設計案。実装は別task。
+`docs/archive/admin-layout-rollout-plan-v1.md`（T1〜T7）が、Manufacturers POCと同じ考え方
+（sidebar=運用メタ、tabsで内容を分割。fieldが少ないcollectionはtabsを作らない）を
+残り7 collectionへ展開した。全タスクで共通して確認したこと:
 
-### Distributors
+- Manufacturers POCと同じ`unplacedFields`機械検出（起動時throw）に加えて、
+  `tests/content/admin-field-layout.test.ts`にsidebar集合・tab label/順序・
+  各tab内field順序・visible field集合の不変性を固定するデータ駆動テストを追加した
+  （振り分け漏れthrowだけでは誤配置・重複登録・順序違いを検出できないため）
+- 各タスクで`payload:migrate:create --skip-empty`が新規migrationを生成しないことを確認
+  （表示専用の変更であることの実証）
+- `payload-types.ts`は`getPayload()`起動時の自動生成（fire-and-forgetで信頼できない）
+  に頼らず、明示的に`generateTypes()`をawaitする`npm run payload:generate-types`
+  （`scripts/generate-payload-types.mts`）で再生成し、field集合が変更前後で同一であることを
+  ソートして比較した
+- 使い捨てDB + 実dev server + Playwrightで、各collectionの編集画面を実際に開き、
+  tabsの切り替え・sidebarの常時表示・field配置を目視確認した（確認後にDB・screenshotとも削除）
 
-| 層 | 置き場所 | fields |
-|---|---|---|
-| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
-| tab「基本情報」 | Tier1 | `name` `nameJa` `website` `providerType` `handledManufacturerIds` `handledRobotIds` `acquisitionMethods` `inquiryUrl` `summary` `note` |
-| tab「画像・出典」 | Tier2 | `heroImage` `sources` `reliability` `seo` |
-
-### RobotSeries
-
-| 層 | 置き場所 | fields |
-|---|---|---|
-| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
-| tab「基本情報」 | Tier1 | `name` `nameJa` `manufacturerId` `description` `industryTags` `taskTags` `summary` |
-| tab「画像・出典」 | Tier2 | `images` `sources` `reliability` `heroImage` `seo` |
-
-### Robots（fieldが多いため3 tab構成）
+### T1: Robots（fieldが多いため3 tab構成）
 
 | 層 | 置き場所 | fields |
 |---|---|---|
@@ -96,24 +96,11 @@ tabsで内容を分割）を他collectionへ広げる場合の設計案。実装
 | tab「スペック・価格」 | Tier2 | `specs` `procurementModels` `priceOffers` `loadRatings` `fieldEvidence` `usageExampleSourceUrls` `supportNote` |
 | tab「画像・出典・比較」 | Tier2〜3 | `images` `industryTags` `taskTags` `sources` `reliability` `heroImage` `seo` `comparison`（`@deprecated`） |
 
-### UseCases
+実画面確認（2026-09-08）: 3タブとも設計通りに表示・切り替え。サイドバーは常時表示。
+`priceOffers`/`loadRatings`/`sources`の追加ボタンが「価格情報を追加」「可搬重量を追加」
+「出典を追加」と日本語表示されること（T9）も同時に確認できた。
 
-| 層 | 置き場所 | fields |
-|---|---|---|
-| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
-| tab「基本情報」 | Tier1 | `title` `titleJa` `subtitle` `maturityLevel` `buyerReadiness` `environment` `requiredCapabilities` `primaryIndustry` `industryTags` `taskTags` `summary` `overview` `whyItMatters` |
-| tab「詳細分析」 | Tier2 | `atAGlance` `capabilityNotes` `environmentRequirements` `whyHardToday` `japanDeploymentConditions` `candidateRobots` |
-| tab「出典・SEO」 | Tier3 | `sources` `reliability` `heroImage` `seo` |
-
-### Deployments
-
-| 層 | 置き場所 | fields |
-|---|---|---|
-| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
-| tab「基本情報」 | Tier1 | `manufacturerId` `robotId` `customer` `siteName` `country` `location` `status` `startedAt` `relatedUseCaseIds` `summary` |
-| tab「出典・SEO」 | Tier3 | `sources` `reliability` `heroImage` `seo` |
-
-### Articles
+### T2: Articles
 
 | 層 | 置き場所 | fields |
 |---|---|---|
@@ -122,15 +109,89 @@ tabsで内容を分割）を他collectionへ広げる場合の設計案。実装
 | tab「分類・関連」 | Tier2 | `category` `type` `section` `contentKind` `publishedAt` `author` `industryTags` `regionTags` `themeTags` `relatedRobotIds` `relatedManufacturerIds` `relatedUseCaseIds` |
 | tab「画像・出典・特殊コンテンツ」 | Tier2〜3 | `heroImage` `sources` `reliability` `seo` `manufacturerGuideContent`（`type === manufacturer-guide`専用） |
 
-### ArticlePlacements
+実画面確認（2026-09-08）: 3タブとも設計通り。`manufacturerGuideContent`は
+`admin.condition`により記事タイプが「メーカー解説」以外では非表示のまま——tabs化後も
+条件付き表示が正しく機能することを確認。
+
+**このタスクで実際に踏んだ事故**: `npx vitest run`をpayload-types.ts再生成より前に
+実行したところ、`getPayload()`のfire-and-forget型生成が裏でコミット済みファイルを
+書き換え、`tests/content/migration.test.ts`のbyte-identityガードが赤くなった。
+migrate:create確認 → 明示的な型生成 → テスト、の順に直したところ再現しなくなった。
+T3以降はこの順序を最初から守っている。
+
+### T3: UseCases
+
+| 層 | 置き場所 | fields |
+|---|---|---|
+| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
+| tab「基本情報」 | Tier1 | `title` `titleJa` `subtitle` `maturityLevel` `buyerReadiness` `environment` `requiredCapabilities` `primaryIndustry` `industryTags` `taskTags` `summary` `overview` `whyItMatters` |
+| tab「詳細分析」 | Tier2 | `atAGlance` `capabilityNotes` `environmentRequirements` `whyHardToday` `japanDeploymentConditions` `candidateRobots` |
+| tab「出典・SEO」 | Tier3 | `sources` `reliability` `heroImage` `seo` |
+
+実画面確認（2026-09-08）: 3タブとも設計通り。`candidateRobots`の追加ボタンが
+「候補ロボットを追加」と日本語表示されること（T9）も確認。
+
+### T4: Distributors（fieldが少ないため2 tab構成）
+
+| 層 | 置き場所 | fields |
+|---|---|---|
+| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
+| tab「基本情報」 | Tier1 | `name` `nameJa` `website` `providerType` `handledManufacturerIds` `handledRobotIds` `acquisitionMethods` `inquiryUrl` `summary` `note` |
+| tab「画像・出典」 | Tier2 | `heroImage` `sources` `reliability` `seo` |
+
+実画面確認（2026-09-08）: 2タブとも設計通り。
+
+**副産物**: このタスクのCIで、PR #55（summary field説明追加）の内容が
+`payload-types.ts`へ一度も反映されていなかった既存drift（型生成の信頼性問題の実例）を
+発見し、別PRで是正した（本タスクとは無関係な内容のため分離）。
+
+### T5: Deployments（fieldが少ないため2 tab構成）
+
+| 層 | 置き場所 | fields |
+|---|---|---|
+| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
+| tab「基本情報」 | Tier1 | `manufacturerId` `robotId` `customer` `siteName` `country` `location` `status` `startedAt` `relatedUseCaseIds` `summary` |
+| tab「出典・SEO」 | Tier3 | `sources` `reliability` `heroImage` `seo` |
+
+実画面確認（2026-09-08）: 2タブとも設計通り。
+
+**副産物**: このタスクのCIで、`tests/content/migration.test.ts`の1テストだけ
+`runPayloadCli()`呼び出しに明示的なtimeout指定が漏れていた（他の全同種テストは
+30秒/60秒を明示）ため、GitHub Actions共有runner上でvitestの既定5秒に間に合わず
+timeoutした。本タスクの内容変更とは無関係と確認し、別PRでtimeoutを追加した。
+
+### T6: RobotSeries（fieldが少ないため2 tab構成）
+
+| 層 | 置き場所 | fields |
+|---|---|---|
+| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
+| tab「基本情報」 | Tier1 | `name` `nameJa` `manufacturerId` `description` `industryTags` `taskTags` `summary` |
+| tab「画像・出典」 | Tier2 | `images` `sources` `reliability` `heroImage` `seo` |
+
+実画面確認（2026-09-08）: 2タブとも設計通り。
+
+### T7: ArticlePlacements（tabsを作らない）
 
 visible field 10個（hiddenな`adminPublishIntentToken`を除く。共有4個
 `stableId`/`slug`/`previousSlugs`/`lifecycleStatus` ＋ 固有6個
 `surface`/`slot`/`articleId`/`order`/`kind`/`sponsor`。2026-09-07に実コードを
-数え直して訂正——旧記載の「7個」は誤りだった）。tabsで分割するほどの量ではないため、
-sidebarで運用メタ（共有4個）だけ分離すれば十分——tabs化は不要と判断する。
+数え直して訂正——旧記載の「7個」は誤りだった）。
 
-### SiteSettings（global）
+| 層 | 置き場所 | fields |
+|---|---|---|
+| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` |
+| 通常領域（tabsで囲わない） | — | `surface` `slot` `articleId` `order` `kind` `sponsor` |
+
+fieldが少ないためtabs化せず、sidebar以外は通常領域にそのまま縦並びで残した。
+`unplacedFields`の機械検出は、sidebarとは別に通常領域のfield名リストも明示することで、
+tabsが無いcollectionでも他タスクと同じ「振り分け漏れをthrowで検出する」保証を維持している。
+`tests/content/admin-field-layout.test.ts`にも「tabsを持たない設計ではtabsフィールドが
+存在しないこと」を確認する分岐を追加した（このcollectionが最初のtabsなし実例）。
+
+実画面確認（2026-09-08）: tabsが1つも存在しないこと、sidebar（4field）が常時表示、
+通常領域（6field、`sponsor`groupを含む）が設計順に縦並びで表示されることを確認。
+
+### SiteSettings（global、実装しない）
 
 直下field 4個（`defaultSeo`・`announcementBanner`は`type: 'group'`、`dataAsOf`は
 `type: 'text'`、`articleIndexPlacementLimits`は`type: 'group'`）。**変更不要と判断する
@@ -141,7 +202,5 @@ sidebarで運用メタ（共有4個）だけ分離すれば十分——tabs化�
 
 ## 4. 実装しないこと
 
-- 他6 collectionへの実際の展開（設計のみ。実装は別task・別PR）
-- 配列fieldの行ラベル（`Source`/`Domestic Distributor`等の英語表記）の日本語化——
-  Task 4/6のどちらのスコープにも入っていない。次のiterationの積み残しとして記録
-- `collapsible`の採用——tabsのみで要件を満たせたため、今回は使わない
+- SiteSettings（global）のsidebar/tabs化——運用メタfieldが存在せず、対象が無いため（§3参照）
+- `collapsible`の採用——tabsのみで全collectionの要件を満たせたため使わない
