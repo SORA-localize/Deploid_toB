@@ -83,7 +83,7 @@ function validateUseCaseForPublish(useCase: Partial<UseCase>): void {
 }
 
 /**
- * T3（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * T3（`docs/archive/admin-layout-rollout-plan-v1.md`、設計は
  * `docs/decisions/admin-field-layout-v1.md` §3 UseCases）: 運用頻度で3層に分けた配置。
  * `sidebar`はTier3（滅多に触らない運用メタ）、tabはTier1（基本情報）→Tier2（詳細分析）→
  * Tier3（出典・SEO）の順。Manufacturers/Robots/Articles POCと同じ構成——

@@ -53,7 +53,7 @@ function validateRobotForPublish(robot: Robot): void {
 const routeRegistryHooks = createRouteRegistryHooks('robots');
 
 /**
- * T1（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * T1（`docs/archive/admin-layout-rollout-plan-v1.md`、設計は
  * `docs/decisions/admin-field-layout-v1.md` §3 Robots）: 運用頻度で3層に分けた配置。
  * `sidebar`はTier3（滅多に触らない運用メタ）、tabはTier1（基本情報）→Tier2（スペック・価格）→
  * Tier2〜3（画像・出典・比較）の順。Manufacturers POCと同じ構成——名前の集合はこのファイル内で

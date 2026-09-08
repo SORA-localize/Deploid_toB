@@ -46,7 +46,7 @@ Payload Admin管理画面のfield監査から始まり、4件のPRを個別にme
 
 ## 2. 今すぐ手が付けられる、計画済みだが未実装のもの
 
-### `docs/plans/admin-layout-rollout-plan-v1.md`（2026-09-07新規、コード変更ゼロ）
+### `docs/archive/admin-layout-rollout-plan-v1.md`（2026-09-07新規、コード変更ゼロ）
 
 Manufacturersだけ`tabs`/`sidebar`で画面整理済み（Task 6 POC、`docs/decisions/admin-field-layout-v1.md`）。
 残り8 collection/globalは設計だけあって未実装。優先順位はfield総数（実際に数えて算出、目視の概算ではない）:
@@ -136,7 +136,7 @@ role権限境界は実装通り、`npm run check`のゲート群は名ばかり�
 | 今動いている計画の一覧 | `docs/README.md`（ただし§2参照——PR #54未mergeで一部古い） |
 | Admin field labelの正本 | `lib/payload/adminFieldLabels.ts` / `lib/payload/adminSelectLabels.ts`（機械テストは`tests/content/admin-field-labels.test.ts`/`admin-select-labels.test.ts`） |
 | Admin fieldが公開ページのどこに出るか | `docs/decisions/admin-field-to-page-section-map-v1.md`（実コード確認済み。断定を避け「出ない」は検索して確認したもののみ記載） |
-| Admin画面のtabs/sidebar配置 | `docs/decisions/admin-field-layout-v1.md`（設計）+ `docs/plans/admin-layout-rollout-plan-v1.md`（実装計画） |
+| Admin画面のtabs/sidebar配置 | `docs/decisions/admin-field-layout-v1.md`（設計）+ `docs/archive/admin-layout-rollout-plan-v1.md`（実装計画） |
 | 移行の実態（何が終わって何が残っているか） | `docs/plans/content-platform-migration-factual-audit-v1.md` |
 | 「今はやらない」と判断した項目の唯一の一覧 | `docs/decisions/deferred-work-register-v1.md` |
 | AIエージェント向けルール・ガードレール | `AGENTS.md` → `ai/rules/00-index.md` |

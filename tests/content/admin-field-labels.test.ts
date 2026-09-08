@@ -71,7 +71,7 @@ describe('adminFieldLabels: 未ラベルfieldの機械検出', () => {
 });
 
 /**
- * T9完了条件（`docs/plans/admin-layout-rollout-plan-v1.md`）: 配列fieldの追加ボタンは
+ * T9完了条件（`docs/archive/admin-layout-rollout-plan-v1.md`）: 配列fieldの追加ボタンは
  * Payloadが`labels.singular`から自動生成するため、field単位の`label`とは別に
  * `labels.singular`/`labels.plural`のja/enが揃っていることを検査する。固定件数ではなく
  * 検出ベース——対象collection内のarray fieldが増減しても追従する。

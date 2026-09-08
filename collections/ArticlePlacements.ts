@@ -107,7 +107,7 @@ async function validateUniqueness({
 }
 
 /**
- * T7（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * T7（`docs/archive/admin-layout-rollout-plan-v1.md`、設計は
  * `docs/decisions/admin-field-layout-v1.md` §3 ArticlePlacements）: fieldが少ないため
  * tabsは作らない——sidebar（運用メタ）とそれ以外（通常領域、縦並びのまま）の2層のみ。
  * 名前の集合はこのファイル内で閉じており、抜けがあれば起動時にthrowする。

@@ -9,7 +9,7 @@ import config from '../../payload.config';
  */
 
 /**
- * `docs/plans/admin-layout-rollout-plan-v1.md`（tabs/sidebar化）により、field名で検索する
+ * `docs/archive/admin-layout-rollout-plan-v1.md`（tabs/sidebar化）により、field名で検索する
  * 既存collectionは`type: 'tabs'`の中へfieldが移動し得る。`collection.fields`をトップレベルの
  * 配列として扱うと見つからなくなるため、tabs/group/blocksを再帰的に展開してから検索する
  * （`lib/payload/adminFieldLabels.ts`の再帰walkと同じ考え方）。

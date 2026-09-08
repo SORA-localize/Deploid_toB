@@ -56,7 +56,7 @@ function validateRobotSeriesForPublish(series: Partial<RobotSeries>): void {
 const routeRegistryHooks = createRouteRegistryHooks('robot-series');
 
 /**
- * T6（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * T6（`docs/archive/admin-layout-rollout-plan-v1.md`、設計は
  * `docs/decisions/admin-field-layout-v1.md` §3 RobotSeries）: 運用頻度で2層に分けた配置
  * （fieldが少ないため2 tab構成——Distributors/Deploymentsと同じ形）。名前の集合はこの
  * ファイル内で閉じており、抜けがあれば起動時にthrowする。

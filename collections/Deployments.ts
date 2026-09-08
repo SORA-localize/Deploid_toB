@@ -63,7 +63,7 @@ function validateDeploymentForPublish(deployment: Partial<DeploymentSite>): void
 }
 
 /**
- * T5（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * T5（`docs/archive/admin-layout-rollout-plan-v1.md`、設計は
  * `docs/decisions/admin-field-layout-v1.md` §3 Deployments）: 運用頻度で2層に分けた配置
  * （fieldが少ないため2 tab構成——Distributorsと同じ形）。名前の集合はこのファイル内で
  * 閉じており、抜けがあれば起動時にthrowする。
