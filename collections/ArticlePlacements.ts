@@ -12,6 +12,8 @@ import {
   articlePlacementsFieldLabels,
   articlePlacementsSponsorFieldLabels,
 } from '../lib/payload/adminFieldLabels';
+import { partitionFieldsByName, withSidebarPosition } from '../lib/payload/adminFieldLayout';
+import { ADMIN_PUBLISH_INTENT_FIELD } from '../lib/payload/adminPublishIntent';
 import {
   articlePlacementKindSelectOptions,
   articlePlacementSlotSelectOptions,
@@ -105,21 +107,22 @@ async function validateUniqueness({
 }
 
 /**
+ * T7（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * `docs/decisions/admin-field-layout-v1.md` §3 ArticlePlacements）: fieldが少ないため
+ * tabsは作らない——sidebar（運用メタ）とそれ以外（通常領域、縦並びのまま）の2層のみ。
+ * 名前の集合はこのファイル内で閉じており、抜けがあれば起動時にthrowする。
+ */
+const SIDEBAR_FIELD_NAMES = ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus'] as const;
+const PLAIN_FIELD_NAMES = ['surface', 'slot', 'articleId', 'order', 'kind', 'sponsor'] as const;
+
+/**
  * `ArticlePlacement`（現行）はidを持たない。`stableId` は import時に `surface:slot:articleId` から
  * 決定的に生成する（brief）。`slug` / `previousSlugs` はこのcollectionに公開URLの概念が無いため
  * 意味を持たないが、他content collectionとのschema一貫性のため `baseContentFields()` をそのまま
  * 再利用し、`slug` には `stableId` と同じ値を書く（importer側の責務。ここでは強制しない）。
  */
-export const ArticlePlacements: CollectionConfig = {
-  slug: 'article-placements',
-  // 本番サイトに対応する単一の名称は無い内部運用concept（記事をどの枠に置くかの設定）。
-  // 既存field label（surface=「掲載面」、slot=「掲載枠」）に合わせた admin専用の名称。
-  labels: { singular: { ja: '記事掲載枠', en: 'Article placement' }, plural: { ja: '記事掲載枠', en: 'Article placements' } },
-  admin: { useAsTitle: 'stableId' },
-  access: contentCollectionAccess,
-  versions: contentVersionsConfig,
-  fields: applyAdminFieldLabels(
-    [
+const articlePlacementsAllFields = applyAdminFieldLabels(
+  [
       ...baseContentFields(),
       {
         name: 'surface',
@@ -154,8 +157,39 @@ export const ArticlePlacements: CollectionConfig = {
         ),
       },
     ],
-    articlePlacementsFieldLabels,
-  ),
+  articlePlacementsFieldLabels,
+);
+
+const { matched: sidebarFields, rest: afterSidebar } = partitionFieldsByName(articlePlacementsAllFields, SIDEBAR_FIELD_NAMES);
+const { matched: plainFields, rest: unplacedFields } = partitionFieldsByName(afterSidebar, PLAIN_FIELD_NAMES);
+
+/**
+ * `unplacedFields`は`admin.hidden`な`adminPublishIntentField()`だけのはず
+ * （表示場所を持たない）。それ以外が残っていたら、上記2つの名前リストへの追加漏れ——
+ * 編集画面のどこにも表示されない field が生まれるので、起動時に気づけるようにする
+ * （T1〜T6と同じ機械検出。ここではtabsを作らないため、2つ目の分類先が「通常領域」になる）。
+ */
+const unexpectedlyUnplacedFields = unplacedFields.filter(
+  (field) => (field as { name?: string }).name !== ADMIN_PUBLISH_INTENT_FIELD,
+);
+if (unexpectedlyUnplacedFields.length > 0) {
+  throw new Error(
+    `ArticlePlacements admin field layout: unplaced field(s) — add to a sidebar/plain name list: ${unexpectedlyUnplacedFields
+      .map((f) => (f as { name?: string }).name)
+      .join(', ')}`,
+  );
+}
+
+export const ArticlePlacements: CollectionConfig = {
+  slug: 'article-placements',
+  // 本番サイトに対応する単一の名称は無い内部運用concept（記事をどの枠に置くかの設定）。
+  // 既存field label（surface=「掲載面」、slot=「掲載枠」）に合わせた admin専用の名称。
+  labels: { singular: { ja: '記事掲載枠', en: 'Article placement' }, plural: { ja: '記事掲載枠', en: 'Article placements' } },
+  admin: { useAsTitle: 'stableId' },
+  access: contentCollectionAccess,
+  versions: contentVersionsConfig,
+  // tabsは作らない（fieldが少ないため）——sidebar以外はplainFieldsとして通常領域に縦並びのまま残す。
+  fields: [...unplacedFields, ...withSidebarPosition(sidebarFields), ...plainFields],
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
