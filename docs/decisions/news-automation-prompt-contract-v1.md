@@ -5,22 +5,19 @@ updated: 2026-09-08
 
 # ニュース収集・記事化自動化データ契約 v1
 
-Last reviewed: 2026-07-10
+Last reviewed: 2026-09-08（Payload/MCP移行に合わせて全面改訂。ChatGPT側のJSON出力契約・文体基準は無変更、CLI側の保存先と公開手順のみ書き直した）
 
-> **2026-09-08時点の重大な注記**: この文書は全編にわたり編集対象を`data/articles.ts`と
-> 書いているが、この**ファイルはPayload cutover（Task 9）で撤去済み**（`git log`で
-> `refactor(task9): remove legacy TS content pipeline`にて削除を確認）。現在の編集先は
-> Payloadの`articles`collection（MCPの`findArticles`/`createArticles`/`updateArticles`、
-> または Admin UI）であり、この文書内の`data/articles.ts`への言及は本来
-> `articles`collection（Payload）と読み替える必要があるが、**JSON→field変換の具体的手順
-> （§1・§3等）はPayload移行後にまだ書き直されていない**。`ai/rules/22-article-sourcing.md`
-> は既にこの前提（Payloadのarticles repositoryで重複確認する）で書かれており、本契約書との
-> 間に矛盾がある。この日次自動化ワークフローが現在も実際に運用されているなら、本契約書を
-> Payload/MCP前提で書き直す作業が別途必要——今回のPayload MCP試行の範囲では現状把握のみ
-> 行い、書き直しはしていない。`npm run validate:data`への言及も同じ理由に加えて
-> スクリプト自体が廃止済みのため無効（詳細は`.codex/content-workflow.md`）。
+> **2026-09-08の改訂点（変更履歴）**: 旧版は編集対象を`data/articles.ts`と書いていたが、この
+> ファイルはPayload cutover（Task 9、`refactor(task9): remove legacy TS content pipeline`）で
+> 撤去済み。本版から編集先をPayloadの`articles`collection（MCPの`findArticles`/
+> `createArticles`/`updateArticles`）に統一した。**最大の変更点は公開の扱い**: 旧版はCLI側AIが
+> 変換した記事をそのまま`publishStatus: "published"`として確定していたが、MCP経由の書き込みは
+> `content-draft-writer`権限に限定され、**draft作成までしかできず、publishは人間の
+> `content-publisher`が別途行う設計**になった（`.codex/content-workflow.md`参照）。つまりこの
+> 自動化は「日次で公開まで自動で終わる」ものから「日次で下書きが自動で溜まり、人間が確認して
+> 公開する」ものに変わっている。この運用変更を前提に使い始めること。
 
-この文書は、ChatGPT Scheduled Tasks の日次出力を CLI 側AIが機械的に Deploid の公開記事データへ変換するための契約を定める。
+この文書は、ChatGPT Scheduled Tasks の日次出力を CLI 側AIが機械的にPayloadの`articles`collectionへ変換するための契約を定める。
 
 この文書に、ChatGPTへ登録する日次プロンプト本文は固定しない。プロンプト本文はタスク設定側で管理し、ここでは以下だけを正本にする。
 
@@ -34,11 +31,11 @@ Last reviewed: 2026-07-10
 
 日次タスクの目的は「今日のニュースを1本のダイジェストにすること」ではない。記事化する価値のある公開ニュースを最大3本選び、それぞれを Deploid の通常ニュース記事として公開できる本文データまで作る。
 
-週次ニュースレターは ChatGPT Scheduled Tasks の外部検索タスクとして実行しない。原則として、その週に Deploid で公開済みの日次ニュース記事を CLI 側AIが読み、ニュースレター本文へ編集する。週次で新規検索を始めると日次との重複・抜け・品質差が出るため、週次はローカル記事データからの配信用編集に限定する。
+週次ニュースレターは ChatGPT Scheduled Tasks の外部検索タスクとして実行しない。原則として、その週に Deploid で公開済みの日次ニュース記事を CLI 側AIが読み、ニュースレター本文へ編集する。週次で新規検索を始めると日次との重複・抜け・品質差が出るため、週次はPayloadの公開済み記事データからの配信用編集に限定する。
 
-CLI 側AIは日次記事について補足検索をしない。CLI 側AIがしてよいのは、現行リポジトリ上の既存ID照合、型変換、重複確認、URL形式確認、指定済み画像候補の保存可否確認、`npm run validate:data` 実行だけである。ChatGPT 出力に本文・出典・画像候補・タグ候補が不足している場合、CLI 側AIは検索で補わず、該当記事を作成しない。
+CLI 側AIは日次記事について補足検索をしない。CLI 側AIがしてよいのは、Payload `articles` collectionへの既存ID照合（`findArticles`）、型変換、重複確認、URL形式確認、指定済み画像候補の保存可否確認、必須fieldがスキーマ通り埋まっているかの手動自己点検だけである（`npm run validate:data`はPayload移行時に廃止済みで存在しない。draft時点の機械検証手段は無い）。ChatGPT 出力に本文・出典・画像候補・タグ候補が不足している場合、CLI 側AIは検索で補わず、該当記事を作成しない。
 
-重複が疑われる記事は新規作成しない。CLI 側AIは `data/articles.ts` の既存記事を読み、同じニュースなら既存記事の更新候補として扱うか、編集せず重複理由を報告する。
+重複が疑われる記事は新規作成しない。CLI 側AIは `findArticles`（`draft: true`を含めて検索）で既存記事を読み、同じニュースなら既存記事の更新候補として扱うか、編集せず重複理由を報告する。
 
 ## 1. 日次ニュース記事バッチ
 
@@ -60,14 +57,29 @@ CLI 側AIは日次記事について補足検索をしない。CLI 側AIがし�
 
 日次タスクは、各記事に必ず `heroImagePlan` を入れる。画像なしの記事を作る前提にしない。
 
+> **2026-09-08時点の画像運用**: Payloadの`heroImage.src`は単なるURL文字列で、Payload Media
+> （Vercel Blobアップロード）URLか、Wikimedia Commonsなど許可済み外部ホストの公開URLを直接
+> 指定する運用に切り替わっている（`next.config.ts`の`images.remotePatterns`が
+> `*.public.blob.vercel-storage.com`と`upload.wikimedia.org`のみ許可）。MCPには画像
+> アップロード機能が無いため（`.codex/content-workflow.md`「権限モデル」参照）、CLI側AIが
+> 新しい画像ファイルをPayload Mediaへアップロードすることはできない。したがって
+> `download_from_candidate`（Unsplash/Pexels等から新規ダウンロードして`public/`へ配置する
+> 想定だった旧モード）は**実行できない**。
+
 優先順位:
 
-1. 既存の汎用ライセンス素材で代替できる場合は `reuse_existing_generic` を指定する
-2. 既存のロボット/メーカー素材が権利上使える場合だけ `reuse_existing_robot_or_article_image` を指定する
-3. 既存素材がない場合は、Unsplash / Pexels など商用Web利用可能な汎用素材を調査し、`download_from_candidate` を指定する
-4. 権利が不明な公式画像、報道画像、SNS画像、動画スクリーンショットは使わない
+1. 既存の汎用ライセンス素材（下記リストの`public/images/article-generic/`資産、または
+   ローカル`public/`配下に既にある画像）で代替できる場合は `reuse_existing_generic` を指定する。
+   ローカル`public/`配下の画像は`remotePatterns`の対象外でそのまま表示できる
+2. 既存のロボット/メーカー/記事の`heroImage.src`が権利上使い回せる場合だけ
+   `reuse_existing_robot_or_article_image` を指定する
+3. 上記どちらも無い場合、Wikimedia Commonsで権利確認済みの画像が見つかれば、その
+   `upload.wikimedia.org`のURLをそのまま`candidate.imageUrl`に指定する
+   （`download_from_candidate`は使わず、hotlink候補として提示する）
+4. 権利が不明な公式画像、報道画像、SNS画像、動画スクリーンショット、Unsplash/Pexels等
+   許可ホスト外の素材は使わない
 
-`heroImagePlan.mode: "leave_empty"` は例外である。使う場合は `mechanicalConversionNotes` に、なぜ既存素材・汎用素材で代替できないかを書く。
+`heroImagePlan.mode: "leave_empty"` は例外である。使う場合は `mechanicalConversionNotes` に、なぜ既存素材・汎用素材・Wikimedia候補のいずれでも代替できないかを書く。
 
 既存汎用素材の例:
 
@@ -181,7 +193,6 @@ ChatGPT Scheduled Tasks は、必ず JSON コードブロック1つだけを返�
         "category": "news|company-report|analysis|policy|interview",
         "section": "deployment|business|tech|policy|entertainment",
         "summary": "記事カード用の日本語要約。何が起き、導入判断のどの変数が動いたかを2〜3文で書く。",
-        "publishStatus": "published",
         "reliability": "official|reported",
         "publishedAt": "YYYY-MM-DD",
         "author": "Deploid Research",
@@ -190,7 +201,6 @@ ChatGPT Scheduled Tasks は、必ず JSON コードブロック1つだけを返�
         "themeTags": [],
         "whyItMatters": "導入検討者向けの核心。1〜2文。",
         "keyTakeaways": [],
-        "readingTimeMin": 5,
           "body": "公開記事に近い完成稿。Markdown。見出しは具体的にし、汎用ラベルを使わない。本文中に媒体名を不用意に出さない。"
       },
       "writingChecks": {
@@ -235,12 +245,12 @@ ChatGPT Scheduled Tasks は、必ず JSON コードブロック1つだけを返�
         "possibleUseCaseIds": []
       },
       "heroImagePlan": {
-        "mode": "reuse_existing_generic|reuse_existing_robot_or_article_image|download_from_candidate|leave_empty",
+        "mode": "reuse_existing_generic|reuse_existing_robot_or_article_image|wikimedia_hotlink_candidate|leave_empty",
         "existingAssetPath": "",
         "candidate": {
           "title": "",
           "pageUrl": "",
-          "imageUrl": "",
+          "imageUrl": "https://upload.wikimedia.org/... のみ有効。他ホストのURLはCLI側で採用しない",
           "credit": "",
           "rightsStatus": "commercial-permitted|reference-attributed|unknown",
           "rightsNote": "",
@@ -269,7 +279,7 @@ ChatGPT Scheduled Tasks は、必ず JSON コードブロック1つだけを返�
 
 ## 2. 週次ニュースレター
 
-週次ニュースレターは ChatGPT Scheduled Tasks に登録しない。Deploid のローカル記事データを読む必要があるため、CLI 側AIまたは将来のサイト内ジョブで実行する。
+週次ニュースレターは ChatGPT Scheduled Tasks に登録しない。Payloadの`articles`collectionを読む必要があるため、CLI 側AIまたは将来のサイト内ジョブで実行する。
 
 週次処理は、原則として Deploid で直近7日間に公開されたニュース記事を材料にする。新規ニュース検索で記事候補を作らない。
 
@@ -286,9 +296,10 @@ ChatGPT Scheduled Tasks は、必ず JSON コードブロック1つだけを返�
 CLI 側AIに渡す週次依頼の例:
 
 ````text
-週刊ニュースレター 2026-07-10
+週刊ニュースレター 2026-09-08
 
-直近7日間の published な news 記事を `data/articles.ts` から読み、ニュースレター本文を作成してください。
+直近7日間の published な news 記事を Payload の articles collection（findArticles）から読み、
+ニュースレター本文を作成してください。
 新規外部検索はしないでください。
 主役ニュース3本、補足ニュース2〜4本、今週の読み筋、来週以降に見るポイント、X投稿案3〜5本を出してください。
 ````
@@ -298,7 +309,7 @@ CLI 側AIに渡す週次依頼の例:
 ユーザーが CLI に次のような形で投げたら、CLI 側AIはこの文書を読んで処理する。ユーザーは別途CLI用プロンプトを貼らなくてよい。
 
 ````text
-日次ニュース 2026-07-10
+日次ニュース 2026-09-08
 
 ```json
 { ...ChatGPT Scheduled Tasks の出力... }
@@ -308,26 +319,55 @@ CLI 側AIに渡す週次依頼の例:
 日次処理:
 
 1. `schema` が `deploid_daily_article_batch_v1` であることを確認する。
-2. `data/articles.ts` の既存記事を読み、各 `articles[]` item について重複判定を先に行う。
-3. 次のいずれかに該当する場合は、新規 `Article` を作らない。
-   - `idHint` または `slugHint` が既存記事の `id` / `slug` / `previousSlugs` と一致する
+2. `findArticles`（`draft: true`を含める。下書きだけの重複や、公開前の重複を見落とさないため）で
+   既存記事を検索し、各 `articles[]` item について重複判定を先に行う。
+3. 次のいずれかに該当する場合は、新規記事を作らない。
+   - `idHint` または `slugHint` が既存記事の `stableId` / `slug` / `previousSlugs` と一致する
    - `sources[].url` または `dedupeKey.primarySourceUrls[]` が既存記事の `sources[].url` と一致する
    - `dedupeKey.eventType`、`eventDate`、`primaryEntityNames`、`primaryRobotNames`、`canonicalClaimJa` が既存記事の主題と実質的に同じ
    - 同じ会社・同じ機体・同じ発表日・同じ発表内容を扱っている
-4. 重複時は、既存記事の更新が明確に必要な場合だけ同じ `id` で更新する。判断できない場合は編集せず、重複候補の既存 `id` と理由を報告する。
-5. 重複しない場合だけ、`articles[].article` を `data/articles.ts` の `Article` に変換する。
+4. 重複時は、既存記事の更新が明確に必要な場合だけ同じ記事（`updateArticles`、`draft: true`）を
+   更新する。判断できない場合は編集せず、重複候補の既存`stableId`と理由を報告する。
+5. 重複しない場合だけ、`articles[].article` を `createArticles` の引数に変換して**`draft: true`
+   で作成する**（`_status: 'published'`は指定できない・指定しても拒否される。公開は下記「公開に
+   ついて」を参照）。`idHint`→`stableId`、`slugHint`→`slug`（新規は原則同値、`ai/rules/21-data-
+   maintenance-workflow.md` G3）。`lifecycleStatus`はChatGPT出力に含まれないため、CLI側で
+   固定で`"active"`を設定する。
 6. CLI 側AIは本文生成・追加検索をしない。不足があれば該当記事を作成しない。
-7. `relatedManufacturerIds`, `relatedRobotIds`, `relatedUseCaseIds` は既存IDだけを使う。ChatGPT 出力の ID は候補扱いにし、CLI 側で現行データと照合する。
+7. `relatedManufacturerIds`, `relatedRobotIds`, `relatedUseCaseIds` は、ChatGPT出力の
+   `relatedHints`（企業名・機種名・用途名）を手がかりに `findManufacturers` / `findRobots` /
+   `findUseCases` で検索し、一致した既存レコードのPayload内部id（数値）だけを使う。見つからない
+   候補は無視し、無理に新規作成しない。
 8. `industryTags`, `regionTags`, `themeTags` は `lib/tagRegistry.ts` の登録値だけを使う。
-9. `heroImagePlan.mode` に従って画像を設定する。`reuse_existing_generic` は既存の `public/images/article-generic/` 素材を使う。`download_from_candidate` は候補URLと権利メモが十分な場合だけローカル保存する。CLI 側AIは新たな画像検索をしない。判断できなければ該当記事を作成しないか、ユーザーに不足を報告する。
-10. `publishStatus: "published"` として追加する。
-11. 変更後に `npm run validate:data` を実行する。UIや型に影響する変更をした場合は `npm run build` も実行する。
+9. `heroImagePlan.mode` に従って画像を設定する。`reuse_existing_generic`は既存の
+   `public/images/article-generic/`素材のパスをそのまま`heroImage.src`に入れる。
+   `reuse_existing_robot_or_article_image`は参照元レコードの`heroImage.src`をそのままコピーする
+   （権利者・クレジット情報も合わせてコピーする）。`wikimedia_hotlink_candidate`は
+   `candidate.imageUrl`が`https://upload.wikimedia.org/`で始まる場合だけ採用し、`heroImage.rights`
+   に`sourceType: "third-party"`、`status`は権利確認状況に応じて設定する。それ以外のホストの
+   URLはCLI側で拒否し、`leave_empty`扱いにする。CLI 側AIは新たな画像検索・ダウンロードを
+   しない（MCPには画像アップロード機能が無い）。判断できなければ該当記事を作成しないか、
+   ユーザーに不足を報告する。
+10. draft作成後、必須field（`stableId`/`slug`/`lifecycleStatus`/`title`/`summary`/
+    `whyItMatters`/`category`/`type`/`section`/`publishedAt`/`sources`）が埋まっているかを
+    スキーマと照合して手動で自己点検する（`npm run validate:data`は存在せず、代替の機械検証も
+    無い。詳細は`.codex/content-workflow.md`）。
+
+公開について（2026-09-08時点の運用変更）:
+
+CLI 側AI（`content-draft-writer`）はここまでで全ての新規記事をdraftとして作成する。
+**公開は行わない・行えない。** 1日分のdraftが溜まったら、その日の変換結果一覧
+（`stableId`・タイトル・`summary`・出典）を人間へ提示し、`content-publisher`役割の人間が
+Admin UI経由で内容を確認したうえで`publishApprovedVersion()`を呼んで個別に公開する
+（`.codex/content-workflow.md`の標準ワークフローと同じ）。この日次自動化を「即日公開」の
+つもりで運用する場合は、この人間承認ステップを毎日のオペレーションに組み込むこと。
 
 週次処理:
 
 1. ChatGPT Scheduled Tasks の出力は期待しない。
-2. CLI 側AIが `data/articles.ts` の直近7日間の published な news 記事を読む。
-3. 週次ニュースレターは `data/articles.ts` の新規 `Article` にしない。
+2. CLI 側AIが `findArticles`（`_status: 'published'`のみ、`category: 'news'`等で絞り込み）で
+   直近7日間の published な news 記事を読む。
+3. 週次ニュースレターは新規記事として`createArticles`しない。
 4. 現時点でニュースレター専用の保存先データ構造はないため、CLI 側AIは本文を報告または、ユーザー指定の保存先がある場合だけ保存する。
 5. 週次出力を根拠に新規ニュース記事を作らない。
 
