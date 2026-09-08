@@ -2,6 +2,7 @@ import type { Field } from 'payload';
 import { describe, expect, it } from 'vitest';
 import { Articles } from '@/collections/Articles';
 import { Robots } from '@/collections/Robots';
+import { UseCases } from '@/collections/UseCases';
 import { ADMIN_PUBLISH_INTENT_FIELD } from '@/lib/payload/adminPublishIntent';
 
 /**
@@ -116,6 +117,42 @@ const LAYOUT_FIXTURES: readonly LayoutFixture[] = [
         labelJa: '画像・出典・特殊コンテンツ',
         labelEn: 'Media, sources & special content',
         fieldNames: ['heroImage', 'sources', 'reliability', 'seo', 'manufacturerGuideContent'],
+      },
+    ],
+  },
+  {
+    name: 'use-cases',
+    fields: UseCases.fields,
+    sidebarFieldNames: ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy'],
+    tabs: [
+      {
+        labelJa: '基本情報',
+        labelEn: 'Basic info',
+        fieldNames: [
+          'title',
+          'titleJa',
+          'subtitle',
+          'maturityLevel',
+          'buyerReadiness',
+          'environment',
+          'requiredCapabilities',
+          'primaryIndustry',
+          'industryTags',
+          'taskTags',
+          'summary',
+          'overview',
+          'whyItMatters',
+        ],
+      },
+      {
+        labelJa: '詳細分析',
+        labelEn: 'Detailed analysis',
+        fieldNames: ['atAGlance', 'capabilityNotes', 'environmentRequirements', 'whyHardToday', 'japanDeploymentConditions', 'candidateRobots'],
+      },
+      {
+        labelJa: '出典・SEO',
+        labelEn: 'Sources & SEO',
+        fieldNames: ['sources', 'reliability', 'heroImage', 'seo'],
       },
     ],
   },
