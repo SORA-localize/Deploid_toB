@@ -9,6 +9,8 @@ updated: 2026-09-08
 
 一区切りついたら（各collectionで安定して運用できると分かったら）、得られた知見を`.codex/content-workflow.md`や`ai/rules/21-data-maintenance-workflow.md`側の正式なルールへ反映し、このログ自体は`docs/archive/`へ移すか役目を終える。
 
+**試す前に**[`docs/reference/payload-field-usage-audit-2026-09-08.md`](./payload-field-usage-audit-2026-09-08.md)を読むこと。「入れたのに公開ページに反映されない」fieldの多くは、MCPの不具合ではなくそもそも表示先が実装されていない（①分類）。特に`robot-series`/`distributors`はcollection全体がこれに該当する。
+
 ## 書き方
 
 1件の試行につき、以下の形式で追記する。
