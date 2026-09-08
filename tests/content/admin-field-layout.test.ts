@@ -1,5 +1,6 @@
 import type { Field } from 'payload';
 import { describe, expect, it } from 'vitest';
+import { ArticlePlacements } from '@/collections/ArticlePlacements';
 import { Articles } from '@/collections/Articles';
 import { Deployments } from '@/collections/Deployments';
 import { Distributors } from '@/collections/Distributors';
@@ -35,10 +36,17 @@ interface RawTab {
   fields: Field[];
 }
 
+function isTabsField(field: Field): boolean {
+  return (field as Field & { type?: string }).type === 'tabs';
+}
+
 function findTabsField(fields: Field[]): { tabs: RawTab[] } | undefined {
-  return fields.find((f) => (f as Field & { type?: string }).type === 'tabs') as
-    | { tabs: RawTab[] }
-    | undefined;
+  return fields.find(isTabsField) as { tabs: RawTab[] } | undefined;
+}
+
+/** sidebarでもtabsでもhiddenでもない、通常領域にそのまま残るfield（T7のような設計）。 */
+function plainFieldNamesOf(fields: Field[]): (string | undefined)[] {
+  return fields.filter((f) => !isSidebarPositioned(f) && !isTabsField(f) && !isHidden(f)).map(fieldName);
 }
 
 interface ExpectedTab {
@@ -47,11 +55,17 @@ interface ExpectedTab {
   fieldNames: readonly string[];
 }
 
+/**
+ * `tabs`が空配列の場合はT7（ArticlePlacements）のような「tabsを作らない」設計
+ * （レビュー指摘#3の「T7・T8がtabsを持たないこと」の固定）。その場合`plainFieldNames`に
+ * 通常領域（sidebarでもtabsでもない、縦並びのまま残るfield）の期待順序を指定する。
+ */
 interface LayoutFixture {
   name: string;
   fields: Field[];
   sidebarFieldNames: readonly string[];
   tabs: readonly ExpectedTab[];
+  plainFieldNames?: readonly string[];
 }
 
 const LAYOUT_FIXTURES: readonly LayoutFixture[] = [
@@ -221,6 +235,13 @@ const LAYOUT_FIXTURES: readonly LayoutFixture[] = [
       },
     ],
   },
+  {
+    name: 'article-placements',
+    fields: ArticlePlacements.fields,
+    sidebarFieldNames: ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus'],
+    tabs: [],
+    plainFieldNames: ['surface', 'slot', 'articleId', 'order', 'kind', 'sponsor'],
+  },
 ];
 
 describe('adminFieldLayout: sidebar/tabsへの振り分けが設計通りで、漏れ・重複・順序違いが無い', () => {
@@ -230,28 +251,51 @@ describe('adminFieldLayout: sidebar/tabsへの振り分けが設計通りで、�
     expect(sidebarNames.length).toBe(sidebarFieldNames.length);
   });
 
+  it.each(LAYOUT_FIXTURES)(
+    '$name: tabsが設計通りに存在する、またはtabsを持たない設計ならtabsが存在しないことを確認する',
+    ({ fields, tabs }) => {
+      const tabsField = findTabsField(fields);
+      if (tabs.length === 0) {
+        expect(tabsField, 'this collection is designed with no tabs (sidebar + plain fields only)').toBeUndefined();
+        return;
+      }
+      expect(tabsField).toBeDefined();
+    },
+  );
+
   it.each(LAYOUT_FIXTURES)('$name: tabのja/en labelと順序が設計と一致する', ({ fields, tabs }) => {
+    if (tabs.length === 0) return; // tabsを持たない設計。前のテストでtabs不在を確認済み。
     const tabsField = findTabsField(fields);
-    expect(tabsField).toBeDefined();
     expect(tabsField?.tabs.map((t) => ({ ja: t.label?.ja, en: t.label?.en }))).toEqual(
       tabs.map((t) => ({ ja: t.labelJa, en: t.labelEn })),
     );
   });
 
   it.each(LAYOUT_FIXTURES)('$name: 各tabのfield名と順序が設計と一致する', ({ fields, tabs }) => {
+    if (tabs.length === 0) return; // tabsを持たない設計。次のテストで通常領域の順序を検査する。
     const tabsField = findTabsField(fields);
     const actual = tabsField?.tabs.map((t) => t.fields.map(fieldName));
     expect(actual).toEqual(tabs.map((t) => [...t.fieldNames]));
   });
 
   it.each(LAYOUT_FIXTURES)(
-    '$name: visible field集合（sidebar+tabs）に漏れ・重複が無い',
-    ({ fields, sidebarFieldNames, tabs }) => {
+    '$name: tabsを持たない設計では、通常領域のfield名と順序が設計と一致する',
+    ({ fields, tabs, plainFieldNames }) => {
+      if (tabs.length > 0) return; // tabsを持つ設計はここでは対象外。
+      expect(plainFieldNames, 'a no-tabs fixture must declare plainFieldNames').toBeDefined();
+      expect(plainFieldNamesOf(fields)).toEqual([...(plainFieldNames ?? [])]);
+    },
+  );
+
+  it.each(LAYOUT_FIXTURES)(
+    '$name: visible field集合（sidebar+tabsまたはsidebar+通常領域）に漏れ・重複が無い',
+    ({ fields, sidebarFieldNames, tabs, plainFieldNames }) => {
       const sidebarNames = fields.filter(isSidebarPositioned).map(fieldName);
       const tabsField = findTabsField(fields);
       const tabFieldNames = tabsField?.tabs.flatMap((t) => t.fields.map(fieldName)) ?? [];
-      const combined = [...sidebarNames, ...tabFieldNames];
-      const expectedCombined = [...sidebarFieldNames, ...tabs.flatMap((t) => t.fieldNames)];
+      const plainNames = tabs.length === 0 ? plainFieldNamesOf(fields) : [];
+      const combined = [...sidebarNames, ...tabFieldNames, ...plainNames];
+      const expectedCombined = [...sidebarFieldNames, ...tabs.flatMap((t) => t.fieldNames), ...(plainFieldNames ?? [])];
       expect(new Set(combined)).toEqual(new Set(expectedCombined));
       expect(combined.length).toBe(expectedCombined.length);
     },
