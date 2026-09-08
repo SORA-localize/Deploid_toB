@@ -1,5 +1,6 @@
 import type { Field } from 'payload';
 import { describe, expect, it } from 'vitest';
+import { Articles } from '@/collections/Articles';
 import { Robots } from '@/collections/Robots';
 import { ADMIN_PUBLISH_INTENT_FIELD } from '@/lib/payload/adminPublishIntent';
 
@@ -80,6 +81,41 @@ const LAYOUT_FIXTURES: readonly LayoutFixture[] = [
         labelJa: '画像・出典・比較',
         labelEn: 'Media, sources & comparison',
         fieldNames: ['images', 'industryTags', 'taskTags', 'sources', 'reliability', 'heroImage', 'seo', 'comparison'],
+      },
+    ],
+  },
+  {
+    name: 'articles',
+    fields: Articles.fields,
+    sidebarFieldNames: ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy', 'featured'],
+    tabs: [
+      {
+        labelJa: '本文',
+        labelEn: 'Body',
+        fieldNames: ['title', 'titleJa', 'summary', 'whyItMatters', 'keyTakeaways', 'body'],
+      },
+      {
+        labelJa: '分類・関連',
+        labelEn: 'Classification & related',
+        fieldNames: [
+          'category',
+          'type',
+          'section',
+          'contentKind',
+          'publishedAt',
+          'author',
+          'industryTags',
+          'regionTags',
+          'themeTags',
+          'relatedRobotIds',
+          'relatedManufacturerIds',
+          'relatedUseCaseIds',
+        ],
+      },
+      {
+        labelJa: '画像・出典・特殊コンテンツ',
+        labelEn: 'Media, sources & special content',
+        fieldNames: ['heroImage', 'sources', 'reliability', 'seo', 'manufacturerGuideContent'],
       },
     ],
   },

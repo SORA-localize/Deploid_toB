@@ -10,6 +10,8 @@ import {
   createVersionRetentionGuardBeforeChangeHook,
   PublishValidationError, } from '../lib/payload/access';
 import { applyAdminFieldLabels, articlesFieldLabels } from '../lib/payload/adminFieldLabels';
+import { partitionFieldsByName, withSidebarPosition } from '../lib/payload/adminFieldLayout';
+import { ADMIN_PUBLISH_INTENT_FIELD } from '../lib/payload/adminPublishIntent';
 import {
   articleCategorySelectOptions,
   articleContentKindSelectOptions,
@@ -92,16 +94,34 @@ function validateArticleForPublish(article: ArticlePublishCandidate): void {
   }
 }
 
+/**
+ * T2（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * `docs/decisions/admin-field-layout-v1.md` §3 Articles）: 運用頻度で3層に分けた配置。
+ * `sidebar`はTier3（滅多に触らない運用メタ）、tabはTier1（本文）→Tier2（分類・関連）→
+ * Tier2〜3（画像・出典・特殊コンテンツ）の順。Manufacturers/Robots POCと同じ構成——
+ * 名前の集合はこのファイル内で閉じており、抜けがあれば起動時にthrowする。
+ */
+const SIDEBAR_FIELD_NAMES = ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy', 'featured'] as const;
+const BODY_TAB_FIELD_NAMES = ['title', 'titleJa', 'summary', 'whyItMatters', 'keyTakeaways', 'body'] as const;
+const CLASSIFICATION_TAB_FIELD_NAMES = [
+  'category',
+  'type',
+  'section',
+  'contentKind',
+  'publishedAt',
+  'author',
+  'industryTags',
+  'regionTags',
+  'themeTags',
+  'relatedRobotIds',
+  'relatedManufacturerIds',
+  'relatedUseCaseIds',
+] as const;
+const MEDIA_SOURCES_SPECIAL_CONTENT_TAB_FIELD_NAMES = ['heroImage', 'sources', 'reliability', 'seo', 'manufacturerGuideContent'] as const;
+
 /** 旧 `reports` を改称・拡張したニュースメディア collection（`data-architecture-redesign-v1.md` §7）。 */
-export const Articles: CollectionConfig = {
-  slug: 'articles',
-  // 公開サイトの表記に合わせる（lib/uiText.ts の reports.title/breadcrumb = '記事'）。
-  labels: { singular: { ja: '記事', en: 'Article' }, plural: { ja: '記事', en: 'Articles' } },
-  admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
-  access: contentCollectionAccess,
-  versions: contentVersionsConfig,
-  fields: applyAdminFieldLabels(
-    [
+const articlesAllFields = applyAdminFieldLabels(
+  [
       ...baseContentFields(),
       ...baseRecordContentFields(),
       { name: 'title', type: 'text', required: true },
@@ -199,8 +219,55 @@ export const Articles: CollectionConfig = {
         },
       },
     ],
-    articlesFieldLabels,
-  ),
+  articlesFieldLabels,
+);
+
+const { matched: sidebarFields, rest: afterSidebar } = partitionFieldsByName(articlesAllFields, SIDEBAR_FIELD_NAMES);
+const { matched: bodyTabFields, rest: afterBody } = partitionFieldsByName(afterSidebar, BODY_TAB_FIELD_NAMES);
+const { matched: classificationTabFields, rest: afterClassification } = partitionFieldsByName(
+  afterBody,
+  CLASSIFICATION_TAB_FIELD_NAMES,
+);
+const { matched: mediaSourcesSpecialContentTabFields, rest: unplacedFields } = partitionFieldsByName(
+  afterClassification,
+  MEDIA_SOURCES_SPECIAL_CONTENT_TAB_FIELD_NAMES,
+);
+
+/**
+ * `unplacedFields`は`admin.hidden`な`adminPublishIntentField()`だけのはず
+ * （表示場所を持たない）。それ以外が残っていたら、上記4つの名前リストへの追加漏れ——
+ * 編集画面のどこにも表示されない field が生まれるので、起動時に気づけるようにする。
+ */
+const unexpectedlyUnplacedFields = unplacedFields.filter(
+  (field) => (field as { name?: string }).name !== ADMIN_PUBLISH_INTENT_FIELD,
+);
+if (unexpectedlyUnplacedFields.length > 0) {
+  throw new Error(
+    `Articles admin field layout: unplaced field(s) — add to a tab/sidebar name list: ${unexpectedlyUnplacedFields
+      .map((f) => (f as { name?: string }).name)
+      .join(', ')}`,
+  );
+}
+
+export const Articles: CollectionConfig = {
+  slug: 'articles',
+  // 公開サイトの表記に合わせる（lib/uiText.ts の reports.title/breadcrumb = '記事'）。
+  labels: { singular: { ja: '記事', en: 'Article' }, plural: { ja: '記事', en: 'Articles' } },
+  admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
+  access: contentCollectionAccess,
+  versions: contentVersionsConfig,
+  fields: [
+    ...unplacedFields,
+    ...withSidebarPosition(sidebarFields),
+    {
+      type: 'tabs',
+      tabs: [
+        { label: { ja: '本文', en: 'Body' }, fields: bodyTabFields },
+        { label: { ja: '分類・関連', en: 'Classification & related' }, fields: classificationTabFields },
+        { label: { ja: '画像・出典・特殊コンテンツ', en: 'Media, sources & special content' }, fields: mediaSourcesSpecialContentTabFields },
+      ],
+    },
+  ],
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [
