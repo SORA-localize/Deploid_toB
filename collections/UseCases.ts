@@ -17,6 +17,8 @@ import {
   useCasesCapabilityNotesFieldLabels,
   useCasesFieldLabels,
 } from '../lib/payload/adminFieldLabels';
+import { partitionFieldsByName, withSidebarPosition } from '../lib/payload/adminFieldLayout';
+import { ADMIN_PUBLISH_INTENT_FIELD } from '../lib/payload/adminPublishIntent';
 import {
   useCaseBuyerReadinessSelectOptions,
   useCaseCandidateRobotBasisSelectOptions,
@@ -80,15 +82,41 @@ function validateUseCaseForPublish(useCase: Partial<UseCase>): void {
   }
 }
 
-export const UseCases: CollectionConfig = {
-  slug: 'use-cases',
-  // 公開サイトの表記に合わせる（lib/uiText.ts の useCases.title/breadcrumb = '用途'）。
-  labels: { singular: { ja: '用途', en: 'Use case' }, plural: { ja: '用途', en: 'Use cases' } },
-  admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
-  access: contentCollectionAccess,
-  versions: contentVersionsConfig,
-  fields: applyAdminFieldLabels(
-    [
+/**
+ * T3（`docs/plans/admin-layout-rollout-plan-v1.md`、設計は
+ * `docs/decisions/admin-field-layout-v1.md` §3 UseCases）: 運用頻度で3層に分けた配置。
+ * `sidebar`はTier3（滅多に触らない運用メタ）、tabはTier1（基本情報）→Tier2（詳細分析）→
+ * Tier3（出典・SEO）の順。Manufacturers/Robots/Articles POCと同じ構成——
+ * 名前の集合はこのファイル内で閉じており、抜けがあれば起動時にthrowする。
+ */
+const SIDEBAR_FIELD_NAMES = ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy'] as const;
+const BASIC_INFO_TAB_FIELD_NAMES = [
+  'title',
+  'titleJa',
+  'subtitle',
+  'maturityLevel',
+  'buyerReadiness',
+  'environment',
+  'requiredCapabilities',
+  'primaryIndustry',
+  'industryTags',
+  'taskTags',
+  'summary',
+  'overview',
+  'whyItMatters',
+] as const;
+const DETAILED_ANALYSIS_TAB_FIELD_NAMES = [
+  'atAGlance',
+  'capabilityNotes',
+  'environmentRequirements',
+  'whyHardToday',
+  'japanDeploymentConditions',
+  'candidateRobots',
+] as const;
+const SOURCES_SEO_TAB_FIELD_NAMES = ['sources', 'reliability', 'heroImage', 'seo'] as const;
+
+const useCasesAllFields = applyAdminFieldLabels(
+  [
       ...baseContentFields(),
       ...baseRecordContentFields(),
       { name: 'title', type: 'text', required: true },
@@ -196,8 +224,52 @@ export const UseCases: CollectionConfig = {
         ),
       },
     ],
-    useCasesFieldLabels,
-  ),
+  useCasesFieldLabels,
+);
+
+const { matched: sidebarFields, rest: afterSidebar } = partitionFieldsByName(useCasesAllFields, SIDEBAR_FIELD_NAMES);
+const { matched: basicInfoTabFields, rest: afterBasicInfo } = partitionFieldsByName(afterSidebar, BASIC_INFO_TAB_FIELD_NAMES);
+const { matched: detailedAnalysisTabFields, rest: afterDetailedAnalysis } = partitionFieldsByName(
+  afterBasicInfo,
+  DETAILED_ANALYSIS_TAB_FIELD_NAMES,
+);
+const { matched: sourcesSeoTabFields, rest: unplacedFields } = partitionFieldsByName(afterDetailedAnalysis, SOURCES_SEO_TAB_FIELD_NAMES);
+
+/**
+ * `unplacedFields`は`admin.hidden`な`adminPublishIntentField()`だけのはず
+ * （表示場所を持たない）。それ以外が残っていたら、上記4つの名前リストへの追加漏れ——
+ * 編集画面のどこにも表示されない field が生まれるので、起動時に気づけるようにする。
+ */
+const unexpectedlyUnplacedFields = unplacedFields.filter(
+  (field) => (field as { name?: string }).name !== ADMIN_PUBLISH_INTENT_FIELD,
+);
+if (unexpectedlyUnplacedFields.length > 0) {
+  throw new Error(
+    `UseCases admin field layout: unplaced field(s) — add to a tab/sidebar name list: ${unexpectedlyUnplacedFields
+      .map((f) => (f as { name?: string }).name)
+      .join(', ')}`,
+  );
+}
+
+export const UseCases: CollectionConfig = {
+  slug: 'use-cases',
+  // 公開サイトの表記に合わせる（lib/uiText.ts の useCases.title/breadcrumb = '用途'）。
+  labels: { singular: { ja: '用途', en: 'Use case' }, plural: { ja: '用途', en: 'Use cases' } },
+  admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
+  access: contentCollectionAccess,
+  versions: contentVersionsConfig,
+  fields: [
+    ...unplacedFields,
+    ...withSidebarPosition(sidebarFields),
+    {
+      type: 'tabs',
+      tabs: [
+        { label: { ja: '基本情報', en: 'Basic info' }, fields: basicInfoTabFields },
+        { label: { ja: '詳細分析', en: 'Detailed analysis' }, fields: detailedAnalysisTabFields },
+        { label: { ja: '出典・SEO', en: 'Sources & SEO' }, fields: sourcesSeoTabFields },
+      ],
+    },
+  ],
   hooks: {
     beforeOperation: contentCollectionBeforeOperationHooks,
     beforeChange: [

@@ -676,10 +676,67 @@ export interface UseCase {
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
   /**
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
+   */
+  nextReviewBy?: string | null;
+  title: string;
+  titleJa?: string | null;
+  subtitle?: string | null;
+  maturityLevel: 'early-stage' | 'pilot-phase' | 'production-ready';
+  /**
+   * Buyer readiness. Not currently shown anywhere on the public site — used for internal classification only.
+   */
+  buyerReadiness?: ('initial-adoption' | 'requires-poc' | 'limited-today') | null;
+  environment: 'indoor-controlled' | 'indoor-semi-controlled' | 'outdoor' | 'mixed' | 'hazardous';
+  requiredCapabilities: (
+    'mobility' | 'manipulation' | 'perception' | 'autonomy' | 'communication' | 'data-capture' | 'integration'
+  )[];
+  primaryIndustry: string;
+  industryTags?: string[] | null;
+  taskTags?: string[] | null;
+  /**
    * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
    */
   summary: string;
-  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  overview: string;
+  whyItMatters: string;
+  atAGlance?: {
+    whereFits?: string | null;
+    whereDoesNotFit?: string | null;
+    mustBeTrue?: string | null;
+  };
+  capabilityNotes?: {
+    mobility?: string | null;
+    manipulation?: string | null;
+    perception?: string | null;
+    autonomy?: string | null;
+    communication?: string | null;
+    integration?: string | null;
+  };
+  environmentRequirements?: string | null;
+  whyHardToday?: string | null;
+  japanDeploymentConditions?: string | null;
+  /**
+   * Candidate robots. Shown in the "Candidate robots" section of the use case detail page — but currently **only rows with a specific robot render; series-only rows do not appear yet**.
+   */
+  candidateRobots?:
+    | {
+        robotId?: (number | null) | Robot;
+        seriesId?: (number | null) | RobotSery;
+        fit: 'strong' | 'possible' | 'watch';
+        basis:
+          | 'deployment'
+          | 'adjacent-deployment'
+          | 'official-use-case'
+          | 'product-capability'
+          | 'market-signal'
+          | 'editorial-watch';
+        evidenceDeploymentIds?: (number | Deployment)[] | null;
+        evidenceSourceUrls?: string[] | null;
+        reason: string;
+        id?: string | null;
+      }[]
+    | null;
   sources: {
     title: string;
     url: string;
@@ -696,10 +753,7 @@ export interface UseCase {
     note?: string | null;
     id?: string | null;
   }[];
-  /**
-   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
-   */
-  nextReviewBy?: string | null;
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   heroImage?: {
     src?: string | null;
     alt?: string | null;
@@ -734,60 +788,6 @@ export interface UseCase {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  title: string;
-  titleJa?: string | null;
-  subtitle?: string | null;
-  maturityLevel: 'early-stage' | 'pilot-phase' | 'production-ready';
-  /**
-   * Buyer readiness. Not currently shown anywhere on the public site — used for internal classification only.
-   */
-  buyerReadiness?: ('initial-adoption' | 'requires-poc' | 'limited-today') | null;
-  environment: 'indoor-controlled' | 'indoor-semi-controlled' | 'outdoor' | 'mixed' | 'hazardous';
-  requiredCapabilities: (
-    'mobility' | 'manipulation' | 'perception' | 'autonomy' | 'communication' | 'data-capture' | 'integration'
-  )[];
-  primaryIndustry: string;
-  industryTags?: string[] | null;
-  taskTags?: string[] | null;
-  atAGlance?: {
-    whereFits?: string | null;
-    whereDoesNotFit?: string | null;
-    mustBeTrue?: string | null;
-  };
-  overview: string;
-  whyItMatters: string;
-  capabilityNotes?: {
-    mobility?: string | null;
-    manipulation?: string | null;
-    perception?: string | null;
-    autonomy?: string | null;
-    communication?: string | null;
-    integration?: string | null;
-  };
-  environmentRequirements?: string | null;
-  whyHardToday?: string | null;
-  japanDeploymentConditions?: string | null;
-  /**
-   * Candidate robots. Shown in the "Candidate robots" section of the use case detail page — but currently **only rows with a specific robot render; series-only rows do not appear yet**.
-   */
-  candidateRobots?:
-    | {
-        robotId?: (number | null) | Robot;
-        seriesId?: (number | null) | RobotSery;
-        fit: 'strong' | 'possible' | 'watch';
-        basis:
-          | 'deployment'
-          | 'adjacent-deployment'
-          | 'official-use-case'
-          | 'product-capability'
-          | 'market-signal'
-          | 'editorial-watch';
-        evidenceDeploymentIds?: (number | Deployment)[] | null;
-        evidenceSourceUrls?: string[] | null;
-        reason: string;
-        id?: string | null;
-      }[]
-    | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1824,8 +1824,52 @@ export interface UseCasesSelect<T extends boolean = true> {
   slug?: T;
   previousSlugs?: T;
   lifecycleStatus?: T;
+  nextReviewBy?: T;
+  title?: T;
+  titleJa?: T;
+  subtitle?: T;
+  maturityLevel?: T;
+  buyerReadiness?: T;
+  environment?: T;
+  requiredCapabilities?: T;
+  primaryIndustry?: T;
+  industryTags?: T;
+  taskTags?: T;
   summary?: T;
-  reliability?: T;
+  overview?: T;
+  whyItMatters?: T;
+  atAGlance?:
+    | T
+    | {
+        whereFits?: T;
+        whereDoesNotFit?: T;
+        mustBeTrue?: T;
+      };
+  capabilityNotes?:
+    | T
+    | {
+        mobility?: T;
+        manipulation?: T;
+        perception?: T;
+        autonomy?: T;
+        communication?: T;
+        integration?: T;
+      };
+  environmentRequirements?: T;
+  whyHardToday?: T;
+  japanDeploymentConditions?: T;
+  candidateRobots?:
+    | T
+    | {
+        robotId?: T;
+        seriesId?: T;
+        fit?: T;
+        basis?: T;
+        evidenceDeploymentIds?: T;
+        evidenceSourceUrls?: T;
+        reason?: T;
+        id?: T;
+      };
   sources?:
     | T
     | {
@@ -1838,7 +1882,7 @@ export interface UseCasesSelect<T extends boolean = true> {
         note?: T;
         id?: T;
       };
-  nextReviewBy?: T;
+  reliability?: T;
   heroImage?:
     | T
     | {
@@ -1864,50 +1908,6 @@ export interface UseCasesSelect<T extends boolean = true> {
         metaTitle?: T;
         metaDescription?: T;
         noindex?: T;
-      };
-  title?: T;
-  titleJa?: T;
-  subtitle?: T;
-  maturityLevel?: T;
-  buyerReadiness?: T;
-  environment?: T;
-  requiredCapabilities?: T;
-  primaryIndustry?: T;
-  industryTags?: T;
-  taskTags?: T;
-  atAGlance?:
-    | T
-    | {
-        whereFits?: T;
-        whereDoesNotFit?: T;
-        mustBeTrue?: T;
-      };
-  overview?: T;
-  whyItMatters?: T;
-  capabilityNotes?:
-    | T
-    | {
-        mobility?: T;
-        manipulation?: T;
-        perception?: T;
-        autonomy?: T;
-        communication?: T;
-        integration?: T;
-      };
-  environmentRequirements?: T;
-  whyHardToday?: T;
-  japanDeploymentConditions?: T;
-  candidateRobots?:
-    | T
-    | {
-        robotId?: T;
-        seriesId?: T;
-        fit?: T;
-        basis?: T;
-        evidenceDeploymentIds?: T;
-        evidenceSourceUrls?: T;
-        reason?: T;
-        id?: T;
       };
   updatedAt?: T;
   createdAt?: T;
