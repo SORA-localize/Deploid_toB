@@ -581,10 +581,31 @@ export interface RobotSery {
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
   /**
+   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
+   */
+  nextReviewBy?: string | null;
+  name: string;
+  nameJa?: string | null;
+  manufacturerId: number | Manufacturer;
+  description?: string | null;
+  industryTags?: string[] | null;
+  taskTags?: string[] | null;
+  /**
    * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
    */
   summary: string;
-  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
+  /**
+   * Images by role (all optional). Not shown on any public page yet — there is currently no dedicated page for a robot series on its own.
+   */
+  images?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   sources: {
     title: string;
     url: string;
@@ -601,10 +622,7 @@ export interface RobotSery {
     note?: string | null;
     id?: string | null;
   }[];
-  /**
-   * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
-   */
-  nextReviewBy?: string | null;
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   heroImage?: {
     src?: string | null;
     alt?: string | null;
@@ -639,24 +657,6 @@ export interface RobotSery {
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  name: string;
-  nameJa?: string | null;
-  manufacturerId: number | Manufacturer;
-  description?: string | null;
-  /**
-   * Images by role (all optional). Not shown on any public page yet — there is currently no dedicated page for a robot series on its own.
-   */
-  images?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  industryTags?: string[] | null;
-  taskTags?: string[] | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1656,8 +1656,15 @@ export interface RobotSeriesSelect<T extends boolean = true> {
   slug?: T;
   previousSlugs?: T;
   lifecycleStatus?: T;
+  nextReviewBy?: T;
+  name?: T;
+  nameJa?: T;
+  manufacturerId?: T;
+  description?: T;
+  industryTags?: T;
+  taskTags?: T;
   summary?: T;
-  reliability?: T;
+  images?: T;
   sources?:
     | T
     | {
@@ -1670,7 +1677,7 @@ export interface RobotSeriesSelect<T extends boolean = true> {
         note?: T;
         id?: T;
       };
-  nextReviewBy?: T;
+  reliability?: T;
   heroImage?:
     | T
     | {
@@ -1697,13 +1704,6 @@ export interface RobotSeriesSelect<T extends boolean = true> {
         metaDescription?: T;
         noindex?: T;
       };
-  name?: T;
-  nameJa?: T;
-  manufacturerId?: T;
-  description?: T;
-  images?: T;
-  industryTags?: T;
-  taskTags?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
