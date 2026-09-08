@@ -41,6 +41,16 @@ const nextConfig: NextConfig = {
   // deploymentにて動作確認済みの構成（`task9-audit-upload-endpoint-design-v1.md`「POC結果」）。
   images: {
     formats: ['image/avif', 'image/webp'],
+    // `heroImage.src`等（`lib/payload/access.ts`の`imageAssetField()`）はただのtext fieldで、
+    // Payload Media（Vercel Blob）へアップロードして発行されたURL、またはWikimedia Commonsの
+    // ようなCC画像の外部URLを直接貼れる設計（`collections/Media.ts`参照）。next/imageは
+    // 同一origin外のhostnameをここで明示許可しないと最適化を拒否するため、その2つを追加した。
+    // 現行データは全て`/public/images/...`のローカルパス（同一origin）のみで、このリストが
+    // 無くても動いていたが、外部URL運用へ切り替えるとこの許可が無いと画像最適化が失敗する。
+    remotePatterns: [
+      { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
+      { protocol: 'https', hostname: 'upload.wikimedia.org' },
+    ],
   },
   experimental: {
     // `(frontend)` と `(payload)` の2つの独立 root layout に分割した（Task 2）ため、どちらの
