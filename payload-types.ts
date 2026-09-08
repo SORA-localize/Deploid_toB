@@ -896,30 +896,49 @@ export interface Article {
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
   /**
-   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
-   */
-  summary: string;
-  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  sources: {
-    title: string;
-    url: string;
-    publisher?: string | null;
-    /**
-     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
-     */
-    publishedAt?: string | null;
-    /**
-     * The date this source was last checked. Shown on the public source list as "Checked …".
-     */
-    checkedAt: string;
-    reliability: 'verified' | 'official' | 'reported' | 'estimated';
-    note?: string | null;
-    id?: string | null;
-  }[];
-  /**
    * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
+  featured?: boolean | null;
+  title: string;
+  titleJa?: string | null;
+  /**
+   * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
+   */
+  summary: string;
+  whyItMatters: string;
+  keyTakeaways?: string[] | null;
+  /**
+   * Article body (Markdown). When the article type is "Manufacturer guide", use the dedicated field below (manufacturerGuideContent) instead of this one.
+   */
+  body?: string | null;
+  category: 'news' | 'interview' | 'company-report' | 'analysis' | 'policy';
+  type:
+    | 'analysis'
+    | 'deployment-report'
+    | 'interview'
+    | 'event-report'
+    | 'policy-update'
+    | 'case-study'
+    | 'news-brief'
+    | 'tech-update'
+    | 'market-analysis'
+    | 'manufacturer-guide'
+    | 'robot-guide'
+    | 'basics-guide';
+  section: 'digest' | 'deployment' | 'business' | 'tech' | 'policy' | 'entertainment';
+  contentKind?: ('editorial' | 'sample' | 'sponsored') | null;
+  /**
+   * The article's publish date. Shown on the article card and detail page.
+   */
+  publishedAt: string;
+  author?: string | null;
+  industryTags?: string[] | null;
+  regionTags?: string[] | null;
+  themeTags?: string[] | null;
+  relatedRobotIds?: (number | Robot)[] | null;
+  relatedManufacturerIds?: (number | Manufacturer)[] | null;
+  relatedUseCaseIds?: (number | UseCase)[] | null;
   heroImage?: {
     src?: string | null;
     alt?: string | null;
@@ -949,47 +968,28 @@ export interface Article {
     };
     aspectRatio?: number | null;
   };
+  sources: {
+    title: string;
+    url: string;
+    publisher?: string | null;
+    /**
+     * The date this source was published. Month- or year-only is fine when the exact day is unknown (e.g. 2025-05). Not shown in the general source list, but shown if this source's URL is also referenced in a "Usage examples" section.
+     */
+    publishedAt?: string | null;
+    /**
+     * The date this source was last checked. Shown on the public source list as "Checked …".
+     */
+    checkedAt: string;
+    reliability: 'verified' | 'official' | 'reported' | 'estimated';
+    note?: string | null;
+    id?: string | null;
+  }[];
+  reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
     noindex?: boolean | null;
   };
-  title: string;
-  titleJa?: string | null;
-  category: 'news' | 'interview' | 'company-report' | 'analysis' | 'policy';
-  type:
-    | 'analysis'
-    | 'deployment-report'
-    | 'interview'
-    | 'event-report'
-    | 'policy-update'
-    | 'case-study'
-    | 'news-brief'
-    | 'tech-update'
-    | 'market-analysis'
-    | 'manufacturer-guide'
-    | 'robot-guide'
-    | 'basics-guide';
-  section: 'digest' | 'deployment' | 'business' | 'tech' | 'policy' | 'entertainment';
-  contentKind?: ('editorial' | 'sample' | 'sponsored') | null;
-  /**
-   * The article's publish date. Shown on the article card and detail page.
-   */
-  publishedAt: string;
-  author?: string | null;
-  industryTags?: string[] | null;
-  regionTags?: string[] | null;
-  themeTags?: string[] | null;
-  whyItMatters: string;
-  keyTakeaways?: string[] | null;
-  featured?: boolean | null;
-  relatedRobotIds?: (number | Robot)[] | null;
-  relatedManufacturerIds?: (number | Manufacturer)[] | null;
-  relatedUseCaseIds?: (number | UseCase)[] | null;
-  /**
-   * Article body (Markdown). When the article type is "Manufacturer guide", use the dedicated field below (manufacturerGuideContent) instead of this one.
-   */
-  body?: string | null;
   /**
    * [Required when article type is "Manufacturer guide"] Manufacturer-guide-only content (company overview, lineup, deployment status, procurement channels, FAQ, etc.). Used only when the article type is "Manufacturer guide" — rendered as the corresponding sections on the article detail page. No required-field mark (*) shows here, but publishing without it will fail.
    */
@@ -1992,21 +1992,26 @@ export interface ArticlesSelect<T extends boolean = true> {
   slug?: T;
   previousSlugs?: T;
   lifecycleStatus?: T;
-  summary?: T;
-  reliability?: T;
-  sources?:
-    | T
-    | {
-        title?: T;
-        url?: T;
-        publisher?: T;
-        publishedAt?: T;
-        checkedAt?: T;
-        reliability?: T;
-        note?: T;
-        id?: T;
-      };
   nextReviewBy?: T;
+  featured?: T;
+  title?: T;
+  titleJa?: T;
+  summary?: T;
+  whyItMatters?: T;
+  keyTakeaways?: T;
+  body?: T;
+  category?: T;
+  type?: T;
+  section?: T;
+  contentKind?: T;
+  publishedAt?: T;
+  author?: T;
+  industryTags?: T;
+  regionTags?: T;
+  themeTags?: T;
+  relatedRobotIds?: T;
+  relatedManufacturerIds?: T;
+  relatedUseCaseIds?: T;
   heroImage?:
     | T
     | {
@@ -2026,6 +2031,19 @@ export interface ArticlesSelect<T extends boolean = true> {
             };
         aspectRatio?: T;
       };
+  sources?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        publisher?: T;
+        publishedAt?: T;
+        checkedAt?: T;
+        reliability?: T;
+        note?: T;
+        id?: T;
+      };
+  reliability?: T;
   seo?:
     | T
     | {
@@ -2033,24 +2051,6 @@ export interface ArticlesSelect<T extends boolean = true> {
         metaDescription?: T;
         noindex?: T;
       };
-  title?: T;
-  titleJa?: T;
-  category?: T;
-  type?: T;
-  section?: T;
-  contentKind?: T;
-  publishedAt?: T;
-  author?: T;
-  industryTags?: T;
-  regionTags?: T;
-  themeTags?: T;
-  whyItMatters?: T;
-  keyTakeaways?: T;
-  featured?: T;
-  relatedRobotIds?: T;
-  relatedManufacturerIds?: T;
-  relatedUseCaseIds?: T;
-  body?: T;
   manufacturerGuideContent?: T;
   updatedAt?: T;
   createdAt?: T;
