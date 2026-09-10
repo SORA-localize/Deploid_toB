@@ -89,7 +89,13 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'www.robotis.com' },
       { protocol: 'https', hostname: 'www.rainbow-robotics.com' },
       { protocol: 'https', hostname: 'www.roboforce.ai' },
-      { protocol: 'http', hostname: 'robot.com' },
+      // 「Robot.com」社は元々 `http://robot.com` として抽出していたが誤り
+      // （実サイトは `https://www.robot.com/`）。加えてNext.jsは`remotePatterns`を
+      // 50件までしか許可せず（超えるとbuild自体が`Fatal next config errors`で落ちる——
+      // 2026-09-10にPR#76再pushで実際に踏んだ）、48件の速報的な追加でちょうど51件になり
+      // 上限を超えていた。他社と違いこの1件はどのロボットデータにもまだ使われていないため、
+      // 誤った形のまま残すより削除して上限内に収める。実際にRobot.com社の画像を貼る時が来たら
+      // この直後のエントリのすぐ上に、正しい形（`https`, `www.robot.com`）で入れ直すこと。
       { protocol: 'https', hostname: 'www.robotera.com' },
       { protocol: 'https', hostname: 'sanctuary.ai' },
       { protocol: 'https', hostname: 'www.sunday.ai' },
