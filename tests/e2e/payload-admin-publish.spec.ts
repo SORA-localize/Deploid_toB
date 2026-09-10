@@ -227,6 +227,35 @@ test.describe('Admin publish UI', () => {
     await expect(page.getByRole('button', { name: /save|保存/i }).first()).toBeVisible();
     await expect(publishButton(page)).toHaveCount(0);
   });
+
+  /**
+   * `lib/payload/adminPreview.ts`（`admin.preview` 配線）のe2e。
+   *
+   * ユニットテスト（`tests/content/admin-preview.test.ts`）は`createAdminPreview()`が
+   * 正しいURL文字列を返すことしか証明できない。**Payload標準の`PreviewButton`
+   * （`@payloadcms/ui`）が実際にそのURLを描画し、`target="_blank"`で開いた先が
+   * 本当に本番同様のfrontendページとしてレンダリングされる**ことは、実admin UI +
+   * 実Payload + 実Next.jsが揃って初めて確かめられる。
+   *
+   * draft内容の可視性やcookie/nonceのセキュリティ検証は`tests/e2e/draft-mode-wiring.spec.ts`と
+   * `tests/content/draft-mode-security.test.ts`が既に持っているため、ここでは重複させない。
+   * ここで見るのは「ボタンが出て、正しいURLへ本当に遷移できるか」だけ。
+   */
+  test('draft-writer: Previewボタンから下書き内容を確認できる', async ({ page }) => {
+    await login(page, DRAFT_WRITER.email, DRAFT_WRITER.password);
+    await openEditPage(page);
+
+    const preview = page.locator('#preview-button');
+    await expect(preview).toBeVisible();
+    const href = await preview.getAttribute('href');
+    expect(href).toMatch(/^\/api\/draft-mode\/enable\?redirect=/);
+
+    // `target="_blank"` は新規タブを開くので、同じタブでURLへ直接遷移して確認する。
+    await page.goto(href!);
+    await expect(page).toHaveURL(`/manufacturers/${MANUFACTURER_STABLE_ID}`);
+    // 401のraw JSON（`{"error":"unauthenticated"}`等）ではなく、実ページが描画されたことを示す。
+    await expect(page.locator('h1').first()).toBeVisible();
+  });
 });
 
 /**

@@ -1,6 +1,6 @@
 ---
 status: reference
-updated: 2026-08-18
+updated: 2026-09-10
 ---
 
 # Content preview / Draft Mode runbook v1
@@ -8,7 +8,8 @@ updated: 2026-08-18
 Task 7（`.superpowers/sdd/content-platform-migration-plan-v1/task-7-brief.md`）が実装した
 Draft Mode preview（`/api/draft-mode/enable` / `/api/draft-mode/disable`）と、publish後の
 cache revalidation（`/api/revalidate-content`）の運用手順。実装の正本は
-`lib/content/previewTokens.ts` / `lib/content/cacheTags.ts` / `lib/payload/revalidationHook.ts`。
+`lib/content/previewTokens.ts` / `lib/content/cacheTags.ts` / `lib/payload/revalidationHook.ts` /
+`lib/payload/adminPreview.ts`（経路1をAdmin UIから起動するPreviewボタンの配線）。
 
 **この文書、監査artifact、Git、チャットのいずれにも実際のtoken文字列・cookie値・secret値を
 書かない。** 手順の説明にはプレースホルダ（`<token>` 等）だけを使う。
@@ -27,6 +28,21 @@ cache revalidation（`/api/revalidate-content`）の運用手順。実装の正�
 **毎request** `getActivePreviewSession()` で再検証する——cookieが存在するだけでは
 draftを返さない。`kind: 'user'` のsessionは毎回 `admins` collectionから現在roleを読み直すため、
 token発行後にroleが失効すれば次のrequestから即座に拒否される（`role-revoked-or-insufficient`）。
+
+### 1.1 経路1の起動方法（Admin UI）
+
+`content-draft-writer`以上であれば、`/api/draft-mode/enable?redirect=...`を手打ちする必要は
+もう無い。`manufacturers` / `robots` / `use-cases` / `articles`（`/reports`配下として表示）の
+編集画面には、Payload標準の「Preview」ボタン（`admin.preview`、実装は
+`lib/payload/adminPreview.ts`）が表示される。クリックすると新しいタブでこのURLを開き、
+経路1の認証（`authenticateDraftWriter()`）を通ったうえで、実際のfrontendページを
+下書き内容込みで表示する。
+
+`content-reader`など権限が足りないuserがこのボタンを押した場合は、`/api/draft-mode/enable`
+自体を叩かず、生の公開済みページへそのまま遷移する（`role-revoked-or-insufficient`のような
+401 JSONを見せない安全側の分岐）。`distributors` / `robot-series` / `deployments`は
+publish可能なcollectionだが対応するfrontendページが存在しないため、これら3つには
+`admin.preview`を意図的に配線していない。
 
 ## 2. token発行（経路2）
 
@@ -160,3 +176,4 @@ Vercelのcache purge機能を使う。
 - `.superpowers/sdd/content-platform-migration-plan-v1/task-7-brief.md`
 - `docs/reference/database-migration-runbook-v1.md`（`preview_nonces` migration）
 - `lib/content/cacheDependencies.ts`（cache tag依存表）
+- `lib/payload/adminPreview.ts`（admin.preview 実装。経路1のAdmin UIボタン配線）

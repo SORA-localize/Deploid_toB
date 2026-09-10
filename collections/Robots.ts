@@ -35,6 +35,7 @@ import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHo
 import { mapPayloadRobotToDomain } from '../lib/content/payloadMappers';
 import type { Robot } from '../lib/content/domainTypes';
 import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
+import { createAdminPreview } from '../lib/payload/adminPreview';
 import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 function validateRobotForPublish(robot: Robot): void {
@@ -301,7 +302,11 @@ export const Robots: CollectionConfig = {
   slug: 'robots',
   // 公開サイトの表記に合わせる（lib/uiText.ts の robots.title = 'ロボット'）。
   labels: { singular: { ja: 'ロボット', en: 'Robot' }, plural: { ja: 'ロボット', en: 'Robots' } },
-  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
+  admin: {
+    useAsTitle: 'name',
+    components: contentPublishAdminComponents,
+    preview: createAdminPreview('robots'),
+  },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
   fields: [

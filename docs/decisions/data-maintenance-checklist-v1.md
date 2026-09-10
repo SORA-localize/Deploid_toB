@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-08-26
+updated: 2026-09-08
 ---
 
 # データ保守運用チェックリスト v1
@@ -183,7 +183,7 @@ updated: 2026-08-26
 - **タグ追加** → `lib/tagRegistry.ts` に1行 → 該当レコードに付与（未登録は build 失敗）。`value` は安定キー、`label` はUI表示用なので略称・自然な短縮表記でよい
 - **enum値追加** → 型 ＋ `lib/labels.ts`（ラベル）＋ `lib/display.ts`（順序）を更新（自動：順序網羅チェックあり）
 - **スペック項目追加** → `lib/specSchema.ts` に1行 → 該当ロボットの `specs` に値（型・スペック表・比較表が自動追従）
-- **スペック項目削除** → 先に充足件数を数える → `lib/specSchema.ts` から1行削除 → 全レコードの該当値と `fieldEvidence` も削除（`RobotSpecs` は `specSchema` 由来のため、残すと `tsc` が落ちる）。**値は全項目 optional なので、消えても `tsc` / `validate:data` / `build` はすべて成功する。ゲートは減少を検出しない**
+- **スペック項目削除** → 先に充足件数を数える → `lib/specSchema.ts` から1行削除 → 全レコードの該当値と `fieldEvidence` も削除（`RobotSpecs` は `specSchema` 由来のため、残すと `tsc` が落ちる）。**値は全項目 optional なので、消えても `tsc` / `build` はすべて成功する（`validate:data`はPayload移行時に廃止済みで、代替の機械検証も無い）。ゲートは減少を検出しない**
 
 > 原則：**正本は1箇所**。直書きで増やさない（§設計5）。
 > 削除は「1行消す」作業に見えて全機分のデータ削除を伴う。件数と削除理由をcommit messageに残す。

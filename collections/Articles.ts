@@ -22,6 +22,7 @@ import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHo
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { Article } from '../lib/content/domainTypes';
 import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
+import { createAdminPreview } from '../lib/payload/adminPreview';
 import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface ArticleCandidate {
@@ -253,7 +254,11 @@ export const Articles: CollectionConfig = {
   slug: 'articles',
   // 公開サイトの表記に合わせる（lib/uiText.ts の reports.title/breadcrumb = '記事'）。
   labels: { singular: { ja: '記事', en: 'Article' }, plural: { ja: '記事', en: 'Articles' } },
-  admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
+  admin: {
+    useAsTitle: 'title',
+    components: contentPublishAdminComponents,
+    preview: createAdminPreview('articles'),
+  },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
   fields: [

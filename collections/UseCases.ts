@@ -31,6 +31,7 @@ import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHo
 import { payloadStatusToDomain } from '../lib/content/payloadMappers';
 import type { UseCase } from '../lib/content/domainTypes';
 import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
+import { createAdminPreview } from '../lib/payload/adminPreview';
 import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 interface UseCaseCandidate {
@@ -255,7 +256,11 @@ export const UseCases: CollectionConfig = {
   slug: 'use-cases',
   // 公開サイトの表記に合わせる（lib/uiText.ts の useCases.title/breadcrumb = '用途'）。
   labels: { singular: { ja: '用途', en: 'Use case' }, plural: { ja: '用途', en: 'Use cases' } },
-  admin: { useAsTitle: 'title', components: contentPublishAdminComponents },
+  admin: {
+    useAsTitle: 'title',
+    components: contentPublishAdminComponents,
+    preview: createAdminPreview('use-cases'),
+  },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
   fields: [
