@@ -27,6 +27,7 @@ import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHo
 import { mapPayloadManufacturerToDomain } from '../lib/content/payloadMappers';
 import type { Manufacturer } from '../lib/content/domainTypes';
 import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';
+import { createAdminPreview } from '../lib/payload/adminPreview';
 import { clearUnclaimedAdminPublishIntent } from '../lib/payload/adminPublishIntent';
 
 function validateManufacturerForPublish(manufacturer: Manufacturer): void {
@@ -195,7 +196,11 @@ if (unexpectedlyUnplacedFields.length > 0) {
 export const Manufacturers: CollectionConfig = {
   slug: 'manufacturers',
   labels: { singular: { ja: 'メーカー', en: 'Manufacturer' }, plural: { ja: 'メーカー', en: 'Manufacturers' } },
-  admin: { useAsTitle: 'name', components: contentPublishAdminComponents },
+  admin: {
+    useAsTitle: 'name',
+    components: contentPublishAdminComponents,
+    preview: createAdminPreview('manufacturers'),
+  },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
   fields: [
