@@ -242,11 +242,6 @@ export const manufacturersFieldLabels: AdminFieldLabelMap = {
   description: { ja: '企業説明', en: 'Description' },
   japanPresence: { ja: '日本国内展開', en: 'Japan presence' },
   domesticDistributors: { ja: '国内代理店（移行前の互換フィールド）', en: 'Domestic distributors (legacy, pre-migration)' },
-  distributorNote: { ja: '代理店に関する備考', en: 'Distributor note' },
-  supportNote: { ja: 'サポートに関する備考', en: 'Support note' },
-  procurementNote: { ja: '調達に関する備考', en: 'Procurement note' },
-  vendorRiskNote: { ja: 'ベンダーリスクに関する備考', en: 'Vendor risk note' },
-  featuredRank: { ja: '注目度順位（小さいほど上位表示）', en: 'Featured rank (lower = higher priority)' },
 };
 
 export const manufacturersHeadquartersFieldLabels: AdminFieldLabelMap = {
@@ -372,7 +367,6 @@ export const useCasesFieldLabels: AdminFieldLabelMap = {
   titleJa: { ja: 'タイトル（日本語表記）', en: 'Title (Japanese)' },
   subtitle: { ja: 'サブタイトル', en: 'Subtitle' },
   maturityLevel: { ja: '実用化段階', en: 'Maturity level' },
-  buyerReadiness: { ja: '導入検討度（Robotsからは廃止済み）', en: 'Buyer readiness (removed from Robots)' },
   environment: { ja: '稼働環境', en: 'Environment' },
   requiredCapabilities: { ja: '必要な能力', en: 'Required capabilities' },
   primaryIndustry: { ja: '主な業種', en: 'Primary industry' },
@@ -424,13 +418,11 @@ export const useCasesCandidateRobotsFieldLabels: AdminFieldLabelMap = {
 
 export const deploymentsFieldLabels: AdminFieldLabelMap = {
   manufacturerId: { ja: 'メーカー', en: 'Manufacturer' },
-  robotId: { ja: 'ロボット', en: 'Robot' },
   customer: { ja: '導入先', en: 'Customer' },
   siteName: { ja: '拠点名', en: 'Site name' },
   country: { ja: '導入国', en: 'Country' },
   location: { ja: '所在地（座標）', en: 'Location (coordinates)' },
   status: { ja: '導入状況', en: 'Status' },
-  startedAt: { ja: '導入開始時期', en: 'Started at' },
   relatedUseCaseIds: { ja: '関連ユースケース', en: 'Related use cases' },
 };
 
@@ -455,9 +447,7 @@ export const articlesFieldLabels: AdminFieldLabelMap = {
   industryTags: { ja: '業種タグ', en: 'Industry tags' },
   regionTags: { ja: '地域タグ', en: 'Region tags' },
   themeTags: { ja: 'テーマタグ', en: 'Theme tags' },
-  whyItMatters: { ja: '注目すべき理由', en: 'Why it matters' },
   keyTakeaways: { ja: '要点', en: 'Key takeaways' },
-  featured: { ja: '注目記事にする', en: 'Featured' },
   relatedRobotIds: { ja: '関連ロボット', en: 'Related robots' },
   relatedManufacturerIds: { ja: '関連メーカー', en: 'Related manufacturers' },
   relatedUseCaseIds: { ja: '関連ユースケース', en: 'Related use cases' },

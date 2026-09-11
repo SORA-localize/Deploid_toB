@@ -71,13 +71,11 @@ function validateDeploymentForPublish(deployment: Partial<DeploymentSite>): void
 const SIDEBAR_FIELD_NAMES = ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy'] as const;
 const BASIC_INFO_TAB_FIELD_NAMES = [
   'manufacturerId',
-  'robotId',
   'customer',
   'siteName',
   'country',
   'location',
   'status',
-  'startedAt',
   'relatedUseCaseIds',
   'summary',
 ] as const;
@@ -89,7 +87,6 @@ const deploymentsAllFields = applyAdminFieldLabels(
       ...baseContentFields(),
       ...baseRecordContentFields(),
       { name: 'manufacturerId', type: 'relationship', relationTo: 'manufacturers', required: true },
-      { name: 'robotId', type: 'relationship', relationTo: 'robots' },
       { name: 'customer', type: 'text', required: true },
       { name: 'siteName', type: 'text' },
       { name: 'country', type: 'text', required: true },
@@ -119,7 +116,6 @@ const deploymentsAllFields = applyAdminFieldLabels(
         // `DeploymentSite.status` の意味は変えず、DB上のenum型名だけを分離する。
         enumName: 'enum_deployments_site_status',
       },
-      { name: 'startedAt', type: 'text' },
       { name: 'relatedUseCaseIds', type: 'relationship', relationTo: 'use-cases', hasMany: true },
     ],
   deploymentsFieldLabels,

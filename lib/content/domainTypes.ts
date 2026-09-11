@@ -133,11 +133,6 @@ export interface Manufacturer extends BaseRecord {
   description: string;
   japanPresence: JapanPresence;
   domesticDistributors?: DomesticDistributor[];
-  distributorNote?: string;
-  supportNote?: string;
-  procurementNote?: string;
-  vendorRiskNote?: string;
-  featuredRank?: number;
 }
 
 /**
@@ -190,9 +185,6 @@ export type DeploymentStage =
   | 'production'
   | 'internal-use'
   | 'discontinued';
-
-/** `Robot` からは削除済み（DEC-S05）。`UseCase.buyerReadiness` はこの値を引き続き使う。 */
-export type BuyerReadiness = 'initial-adoption' | 'requires-poc' | 'limited-today';
 
 export type JapanAvailability =
   | 'official-japan'
@@ -329,12 +321,11 @@ export interface UseCaseCandidateRobot {
   reason: string;
 }
 
-export interface UseCase extends BaseRecord {
+export interface UseCase extends Omit<BaseRecord, 'heroImage'> {
   title: string;
   titleJa?: string;
   subtitle?: string;
   maturityLevel: UseCaseMaturity;
-  buyerReadiness: BuyerReadiness;
   environment: OperatingEnvironment;
   requiredCapabilities: Capability[];
   primaryIndustry: TagValue<'industry'>;
@@ -380,9 +371,7 @@ interface ArticleCommon extends BaseRecord {
   industryTags?: TagValue<'industry'>[];
   regionTags?: TagValue<'region'>[];
   themeTags?: TagValue<'theme'>[];
-  whyItMatters: string;
   keyTakeaways?: string[];
-  featured?: boolean;
   section: ArticleSection;
   relatedRobotIds: Id[];
   relatedManufacturerIds: Id[];
@@ -490,13 +479,11 @@ export type DeploymentStatus = 'announced' | 'pilot' | 'production' | 'ended' | 
 
 export interface DeploymentSite extends BaseRecord {
   manufacturerId: Id;
-  robotId?: Id;
   customer: string;
   siteName?: string;
   country: string;
   location: { lat: number; lng: number };
   status: DeploymentStatus;
-  startedAt?: ISODate;
   relatedUseCaseIds?: Id[];
 }
 

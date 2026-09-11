@@ -1,5 +1,4 @@
 import type {
-  BuyerReadiness,
   Capability,
   CompanyStatus,
   CompanyType,
@@ -84,12 +83,6 @@ export const robotLoadRatingLabels: Record<RobotLoadRatingKind, string> = {
   rated: '定格',
   maximum: '最大',
   unspecified: '区分非公表',
-};
-
-export const buyerReadinessLabels: Record<BuyerReadiness, string> = {
-  'initial-adoption': '初期導入向き',
-  'requires-poc': '要PoC',
-  'limited-today': '現時点では限定的',
 };
 
 export const deploymentStageLabels: Record<DeploymentStage, string> = {

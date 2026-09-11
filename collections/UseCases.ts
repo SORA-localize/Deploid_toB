@@ -20,7 +20,6 @@ import {
 import { partitionFieldsByName, withSidebarPosition } from '../lib/payload/adminFieldLayout';
 import { ADMIN_PUBLISH_INTENT_FIELD } from '../lib/payload/adminPublishIntent';
 import {
-  useCaseBuyerReadinessSelectOptions,
   useCaseCandidateRobotBasisSelectOptions,
   useCaseCandidateRobotFitSelectOptions,
   useCaseEnvironmentSelectOptions,
@@ -96,7 +95,6 @@ const BASIC_INFO_TAB_FIELD_NAMES = [
   'titleJa',
   'subtitle',
   'maturityLevel',
-  'buyerReadiness',
   'environment',
   'requiredCapabilities',
   'primaryIndustry',
@@ -114,12 +112,12 @@ const DETAILED_ANALYSIS_TAB_FIELD_NAMES = [
   'japanDeploymentConditions',
   'candidateRobots',
 ] as const;
-const SOURCES_SEO_TAB_FIELD_NAMES = ['sources', 'reliability', 'heroImage', 'seo'] as const;
+const SOURCES_SEO_TAB_FIELD_NAMES = ['sources', 'reliability', 'seo'] as const;
 
 const useCasesAllFields = applyAdminFieldLabels(
   [
       ...baseContentFields(),
-      ...baseRecordContentFields(),
+      ...baseRecordContentFields({ heroImage: false }),
       { name: 'title', type: 'text', required: true },
       { name: 'titleJa', type: 'text' },
       { name: 'subtitle', type: 'text' },
@@ -128,19 +126,6 @@ const useCasesAllFields = applyAdminFieldLabels(
         type: 'select',
         required: true,
         options: useCaseMaturityLevelSelectOptions,
-      },
-      {
-        name: 'buyerReadiness',
-        type: 'select',
-        options: useCaseBuyerReadinessSelectOptions,
-        // Robotsからは削除済み（DEC-S05）。UseCaseにはこのfield自体は残すが、
-        // 公開UI側の消費箇所が無い状態（下記description参照）。
-        admin: {
-          description: {
-            ja: '導入検討度。現状、公開ページのどこにも表示されていません（社内の分類用）。',
-            en: 'Buyer readiness. Not currently shown anywhere on the public site — used for internal classification only.',
-          },
-        },
       },
       {
         name: 'environment',

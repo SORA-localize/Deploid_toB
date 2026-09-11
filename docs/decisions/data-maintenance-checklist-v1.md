@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-09-08
+updated: 2026-09-11
 ---
 
 # データ保守運用チェックリスト v1
@@ -60,23 +60,22 @@ updated: 2026-09-08
 1. [ ] id 発番、`slug = id`
 2. [ ] **`category` を1つ選択**（news / interview / company-report / analysis / policy）
 3. [ ] **`type` を ArticleType の有効値から選択**（analysis / deployment-report / interview / event-report / policy-update / case-study / news-brief / tech-update / market-analysis / manufacturer-guide / robot-guide / basics-guide）。`category` と混同しない。公開棚は `lib/articleShelves.ts` が `type` から判定する
-4. [ ] **`whyItMatters` を必ず書く**（速報でも省略不可＝メディアの付加価値）
-5. [ ] **`publishedAt` = Deploidがこの記事を公開した日**（元ニュースの発生日ではない）。元ニュースの日付は `sources[].publishedAt` に書く。昨日のニュースを今日書いたなら `publishedAt` は今日の日付になる。`updatedAt` はデータレコードを最後に編集した日
-6. [ ] **`sources` に `checkedAt` と `reliability` を記入**（自動：published かつ非 sample の空 sources は build 失敗）
-7. [ ] **`sources[].url` にHTTPアクセスして 404/403 でないことを確認**（公開前の必須チェック。アクセス不可 URL を published 記事に入れない）
-8. [ ] **出典は原則2件以上**。単一ソースのみの場合はその理由を記録し、可能なら追加出典を探してから published にする
-9. [ ] hero画像がある場合は `public/images/articles/<id>/hero.<ext>` に置く（外部ホットリンク禁止）。画像が取れない場合は `src: ''` のままでよい（カードにプレースホルダーが出る。`src: ''` は valid）
+4. [ ] **`publishedAt` = Deploidがこの記事を公開した日**（元ニュースの発生日ではない）。元ニュースの日付は `sources[].publishedAt` に書く。昨日のニュースを今日書いたなら `publishedAt` は今日の日付になる。`updatedAt` はデータレコードを最後に編集した日
+5. [ ] **`sources` に `checkedAt` と `reliability` を記入**（自動：published かつ非 sample の空 sources は build 失敗）
+6. [ ] **`sources[].url` にHTTPアクセスして 404/403 でないことを確認**（公開前の必須チェック。アクセス不可 URL を published 記事に入れない）
+7. [ ] **出典は原則2件以上**。単一ソースのみの場合はその理由を記録し、可能なら追加出典を探してから published にする
+8. [ ] hero画像がある場合は `public/images/articles/<id>/hero.<ext>` に置く（外部ホットリンク禁止）。画像が取れない場合は `src: ''` のままでよい（カードにプレースホルダーが出る。`src: ''` は valid）
     - フォーマット：**WebP 推奨**。JPG/PNG 可
     - ファイルサイズ：**300KB 以下**（[Squoosh](https://squoosh.app/) で圧縮）
     - 最大解像度：**1920px 幅**
-10. [ ] hero画像の `ImageAsset.rights` を記入する（`commercial-permitted` または `reference-attributed` のみ公開可。権利が確認できない画像は `src: ''` のまま公開する。詳細は `docs/decisions/copyright_and_media_rights_policy_v1.md`）（自動：空src以外は検証対象）
-11. [ ] `related*Ids` は **id で**結ぶ（自動：参照切れ・重複は build 失敗）。配列順は関連欄の表示順として保持されるため、重要度順に並べる。用途詳細の「関連記事」に出す記事は、タグ一致ではなく `relatedUseCaseIds` で明示する
-12. [ ] 記事タグは軸別に入れる。`section` が主題（必須・タブ）、`themeTags` は `kind:'theme'` から任意0〜4個（論点）、`industryTags` は `kind:'industry'`、`regionTags` は `kind:'region'` を使う。自動の日次記事候補は、複数トピックを1本にまとめず個別記事ごとに該当 section を選ぶ。導入・政策など単一主題の記事は該当 section が正本で theme に入れない。UIの空タブや件数都合で `section` / `themeTags` を選ばない。企業名・機種名はタグにせず `relatedManufacturerIds` / `relatedRobotIds` で結ぶ。用途との関連もタグから自動生成せず `relatedUseCaseIds` で結ぶ
-13. [ ] **本文量を確認**：速報（news-brief）でも800文字以上、分析・レポートは1,500文字以上を目安にする
-14. [ ] **型の確認**：`requiredCapabilities` は `Capability` 型の値のみ。`lib/tagRegistry.ts` のタグ value を誤って入れない
-15. [ ] **既存記事を全削除して置き換えない**。更新は同じ `id` で行い、url 変更が必要なら `previousSlugs` に旧 slug を追記する
-16. [ ] `contentKind: 'sample'` の場合は noindex・本番除外を確認（§設計11.9）
-17. [ ] build 通過 → `published`
+9. [ ] hero画像の `ImageAsset.rights` を記入する（`commercial-permitted` または `reference-attributed` のみ公開可。権利が確認できない画像は `src: ''` のまま公開する。詳細は `docs/decisions/copyright_and_media_rights_policy_v1.md`）（自動：空src以外は検証対象）
+10. [ ] `related*Ids` は **id で**結ぶ（自動：参照切れ・重複は build 失敗）。配列順は関連欄の表示順として保持されるため、重要度順に並べる。用途詳細の「関連記事」に出す記事は、タグ一致ではなく `relatedUseCaseIds` で明示する
+11. [ ] 記事タグは軸別に入れる。`section` が主題（必須・タブ）、`themeTags` は `kind:'theme'` から任意0〜4個（論点）、`industryTags` は `kind:'industry'`、`regionTags` は `kind:'region'` を使う。自動の日次記事候補は、複数トピックを1本にまとめず個別記事ごとに該当 section を選ぶ。導入・政策など単一主題の記事は該当 section が正本で theme に入れない。UIの空タブや件数都合で `section` / `themeTags` を選ばない。企業名・機種名はタグにせず `relatedManufacturerIds` / `relatedRobotIds` で結ぶ。用途との関連もタグから自動生成せず `relatedUseCaseIds` で結ぶ
+12. [ ] **本文量を確認**：速報（news-brief）でも800文字以上、分析・レポートは1,500文字以上を目安にする
+13. [ ] **型の確認**：`requiredCapabilities` は `Capability` 型の値のみ。`lib/tagRegistry.ts` のタグ value を誤って入れない
+14. [ ] **既存記事を全削除して置き換えない**。更新は同じ `id` で行い、url 変更が必要なら `previousSlugs` に旧 slug を追記する
+15. [ ] `contentKind: 'sample'` の場合は noindex・本番除外を確認（§設計11.9）
+16. [ ] build 通過 → `published`
 
 ---
 
@@ -126,19 +125,19 @@ updated: 2026-09-08
 - [ ] sources が空でない（自動：常時必須）
 - [ ] 画像が未ローカル化なら warning（推奨：ローカル化）
 
-> 2026-08-09 に `buyerReadiness` を Robot の公開ゲート必須項目から外した（[`data-architecture-redesign-v1.md`](data-architecture-redesign-v1.md) §11 / `../plans/robot-data-import-plan-v1.md` DEC-S05・S06）。`buyerReadiness` は UseCase 側の必須項目としては残る。
+> 2026-08-09 に `buyerReadiness` を Robot の公開ゲート必須項目から外した（[`data-architecture-redesign-v1.md`](data-architecture-redesign-v1.md) §11 / `../plans/robot-data-import-plan-v1.md` DEC-S05・S06）。`buyerReadiness` はその後 UseCase 側でも公開ページのどこにも消費されないまま残っていたため、2026-09-11 にフィールド自体を削除した（未使用の社内分類フィールドは実装から外す方針、[`deleted-field-snapshot-2026-09-11.json`](../archive/deleted-field-snapshot-2026-09-11.json) に削除前の値を保存）。
 
 **Manufacturer**
 - [ ] id / slug / name / country / companyType / japanPresence
 - [ ] sources が空でない（自動：常時必須）
 
 **Article**
-- [ ] id / slug / title / category / publishedAt / whyItMatters
+- [ ] id / slug / title / category / publishedAt
 - [ ] sources が空でない（自動：published かつ `contentKind:'sample'` 以外で必須）
 - [ ] 用途詳細の「関連記事」に出す場合は `relatedUseCaseIds` に useCase の id を明示する。`industryTags` / `taskTags` の一致だけでは関連記事扱いにしない
 
 **UseCase**
-- [ ] 型必須：id / slug / title / maturityLevel / buyerReadiness / environment / requiredCapabilities / primaryDomain / atAGlance{3} / overview / whyItMatters / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots
+- [ ] 型必須：id / slug / title / maturityLevel / environment / requiredCapabilities / primaryDomain / atAGlance{3} / overview / whyItMatters / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots
 - [ ] industryTags・taskTags・primaryDomain・secondaryDomains は登録タグ（自動） / candidateRobots[]は`robotId`または`seriesId`のどちらか一方を持ち、id 参照（自動）
 - [ ] published の sources は空不可（自動）
 - [ ] published の candidateRobots は空不可（自動）
@@ -254,7 +253,7 @@ AI側の実装手順:
 > 一次情報が薄い間は薄いページを量産しない（`ai/rules/00-index.md` の Current Work Posture / 現在の作業方針）。`UseCase`の役割は「業界紹介ではなく作業・タスク起点の逆引き」（`humanoid_media_IA_v1.md` §7）。深い判断基準（コスト・安全・調達等）も含め、その役割を超えて書きすぎない。
 
 1. [ ] id 発番（不変）、`slug = id`、`publishStatus: 'draft'`
-2. [ ] 型必須：title / maturityLevel / buyerReadiness / environment / requiredCapabilities / **primaryDomain** / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots
+2. [ ] 型必須：title / maturityLevel / environment / requiredCapabilities / **primaryDomain** / atAGlance{whereFits,whereDoesNotFit,mustBeTrue} / overview / **whyItMatters** / capabilityNotes / environmentRequirements / whyHardToday / japanDeploymentConditions / candidateRobots
 3. [ ] `primaryDomain`（必須・単一）と`secondaryDomains`（任意・配列）は`lib/tagRegistry.ts`の`use-case-domain`から選ぶ（自動：未登録は build 失敗）。これが「ロボットが何をするのが得意か」というMECEな動作軸の正本（UI上のラベルは「得意分野」）。`industryTags`/`taskTags`は検索ファセット用で、MECEを意図しない（manufacturing/plantのように粒度が混在してよい）。新しい値を追加する場合は「ロボットの動作」を表す軸に揃え、「導入目的」（集客・人材育成等）を表す値は持ち込まない（過去に`demo-entertainment`/`research-education`が目的軸混入で`demonstrate-capability`/`validate-new-tech`に直された経緯がある）
 4. [ ] 実証事例が複数ドメインに渡る場合（例：搬送＋組立＋検査が同じユースケースに混在）は、最も比重の大きいドメインを`primaryDomain`にし、残りを`secondaryDomains`に入れる。**物理的にユースケースを分割しない**。各ドメインが独立して実証件数を積んだ時点で初めて分割を検討する
 5. [ ] `candidateRobots`は`{robotId? | seriesId?, fit, basis, evidenceDeploymentIds?, evidenceSourceUrls?, reason}[]`。`robotId`と`seriesId`はどちらか一方だけを持ち、robot / robotSeries の **id** 参照（自動）。特定構成の実証があるときだけ`robotId`を使い、根拠がシリーズ粒度にしかないときは`seriesId`を使う（[`data-architecture-redesign-v1.md`](data-architecture-redesign-v1.md) §11）。`reason`は空不可（自動）

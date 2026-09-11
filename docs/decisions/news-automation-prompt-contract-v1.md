@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-09-08
+updated: 2026-09-11
 ---
 
 # ニュース収集・記事化自動化データ契約 v1
@@ -199,7 +199,6 @@ ChatGPT Scheduled Tasks は、必ず JSON コードブロック1つだけを返�
         "industryTags": [],
         "regionTags": [],
         "themeTags": [],
-        "whyItMatters": "導入検討者向けの核心。1〜2文。",
         "keyTakeaways": [],
           "body": "公開記事に近い完成稿。Markdown。見出しは具体的にし、汎用ラベルを使わない。本文中に媒体名を不用意に出さない。"
       },
@@ -349,7 +348,7 @@ CLI 側AIに渡す週次依頼の例:
    しない（MCPには画像アップロード機能が無い）。判断できなければ該当記事を作成しないか、
    ユーザーに不足を報告する。
 10. draft作成後、必須field（`stableId`/`slug`/`lifecycleStatus`/`title`/`summary`/
-    `whyItMatters`/`category`/`type`/`section`/`publishedAt`/`sources`）が埋まっているかを
+    `category`/`type`/`section`/`publishedAt`/`sources`）が埋まっているかを
     スキーマと照合して手動で自己点検する（`npm run validate:data`は存在せず、代替の機械検証も
     無い。詳細は`.codex/content-workflow.md`）。
 

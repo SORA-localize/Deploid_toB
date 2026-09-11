@@ -50,7 +50,7 @@ function validateManufacturerForPublish(manufacturer: Manufacturer): void {
  * Tier3（国内取引・レガシー）の順。**名前の集合はこのファイル内で閉じており、
  * 抜けがあれば`assertAllManufacturersFieldsArePlaced`が起動時に検出する**。
  */
-const SIDEBAR_FIELD_NAMES = ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'featuredRank', 'nextReviewBy'] as const;
+const SIDEBAR_FIELD_NAMES = ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy'] as const;
 const BASIC_INFO_TAB_FIELD_NAMES = [
   'name',
   'nameJa',
@@ -67,13 +67,7 @@ const BASIC_INFO_TAB_FIELD_NAMES = [
   'contactUrl',
 ] as const;
 const MEDIA_AND_SOURCES_TAB_FIELD_NAMES = ['heroImage', 'logos', 'sources', 'reliability', 'seo'] as const;
-const LEGACY_DISTRIBUTION_TAB_FIELD_NAMES = [
-  'domesticDistributors',
-  'distributorNote',
-  'supportNote',
-  'procurementNote',
-  'vendorRiskNote',
-] as const;
+const LEGACY_DISTRIBUTION_TAB_FIELD_NAMES = ['domesticDistributors'] as const;
 
 const manufacturersAllFields = applyAdminFieldLabels(
   [
@@ -163,11 +157,6 @@ const manufacturersAllFields = applyAdminFieldLabels(
         manufacturersDomesticDistributorsFieldLabels,
       ),
     },
-    { name: 'distributorNote', type: 'textarea' },
-    { name: 'supportNote', type: 'textarea' },
-    { name: 'procurementNote', type: 'textarea' },
-    { name: 'vendorRiskNote', type: 'textarea' },
-    { name: 'featuredRank', type: 'number' },
   ],
   manufacturersFieldLabels,
 );

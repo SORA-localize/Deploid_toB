@@ -14,7 +14,6 @@ import {
   articleCategoryLabels,
   articleSectionLabels,
   articleTypeLabels,
-  buyerReadinessLabels,
   capabilityLabels,
   companyStatusLabels,
   companyTypeLabels,
@@ -364,15 +363,6 @@ export const useCaseMaturityLevelSelectOptions: Option[] = (
   }[v]),
 );
 
-export const useCaseBuyerReadinessSelectOptions: Option[] = (
-  ['initial-adoption', 'requires-poc', 'limited-today'] as const
-).map((v) =>
-  opt(v, buyerReadinessLabels[v], {
-    'initial-adoption': 'Ready for initial adoption',
-    'requires-poc': 'Requires PoC',
-    'limited-today': 'Limited today',
-  }[v]),
-);
 
 export const useCaseEnvironmentSelectOptions: Option[] = (
   ['indoor-controlled', 'indoor-semi-controlled', 'outdoor', 'mixed', 'hazardous'] as const

@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-09-08
+updated: 2026-09-11
 ---
 
 # Admin編集画面のfield配置 v1
@@ -43,10 +43,12 @@ tab/sidebarにも書き忘れると、開発サーバー起動時点で気づけ
 
 | 層 | 置き場所 | fields |
 |---|---|---|
-| Tier 3（運用メタ、常時表示） | sidebar | `stableId` `slug` `previousSlugs` `lifecycleStatus` `featuredRank` `nextReviewBy` |
+| Tier 3（運用メタ、常時表示） | sidebar | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
 | Tier 1（毎回触る） | tab「基本情報」 | `name` `nameJa` `summary` `description` `country` `hqCity` `headquarters` `foundedYear` `companyType` `companyStatus` `japanPresence` `website` `contactUrl` |
 | Tier 2（時々触る） | tab「画像・出典」 | `heroImage` `logos` `sources` `reliability` `seo` |
-| Tier 3（稀・レガシー） | tab「国内取引（レガシー）」 | `domesticDistributors` `distributorNote` `supportNote` `procurementNote` `vendorRiskNote` |
+| Tier 3（稀・レガシー） | tab「国内取引（レガシー）」 | `domesticDistributors` |
+
+> 2026-09-11: `distributorNote` / `supportNote` / `procurementNote` / `vendorRiskNote` / `featuredRank` はフロント参照ゼロが確定したため削除した。削除前の値は [`deleted-field-snapshot-2026-09-11.json`](../archive/deleted-field-snapshot-2026-09-11.json) に保存。以下の「実画面での確認結果」節は削除前時点の記録のため書き換えていない。
 
 ### 実画面での確認結果（2026-09-05、使い捨てDB上でPlaywright + 実dev serverで確認。確認後にDB・screenshotとも削除済み）
 
@@ -91,7 +93,7 @@ tab/sidebarにも書き忘れると、開発サーバー起動時点で気づけ
 
 | 層 | 置き場所 | fields |
 |---|---|---|
-| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `featuredRank` `nextReviewBy` `supersededById` |
+| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `featuredRank`（Robot固有・現役） `nextReviewBy` `supersededById` |
 | tab「基本情報」 | Tier1 | `name` `nameJa` `manufacturerId` `seriesId` `category` `description` `deploymentStage` `japanAvailability` `distributorJapan` `summary` |
 | tab「スペック・価格」 | Tier2 | `specs` `procurementModels` `priceOffers` `loadRatings` `fieldEvidence` `usageExampleSourceUrls` `supportNote` |
 | tab「画像・出典・比較」 | Tier2〜3 | `images` `industryTags` `taskTags` `sources` `reliability` `heroImage` `seo` `comparison`（`@deprecated`） |
@@ -104,10 +106,12 @@ tab/sidebarにも書き忘れると、開発サーバー起動時点で気づけ
 
 | 層 | 置き場所 | fields |
 |---|---|---|
-| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` `featured` |
-| tab「本文」 | Tier1 | `title` `titleJa` `summary` `whyItMatters` `keyTakeaways` `body` |
+| sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
+| tab「本文」 | Tier1 | `title` `titleJa` `summary` `keyTakeaways` `body` |
 | tab「分類・関連」 | Tier2 | `category` `type` `section` `contentKind` `publishedAt` `author` `industryTags` `regionTags` `themeTags` `relatedRobotIds` `relatedManufacturerIds` `relatedUseCaseIds` |
 | tab「画像・出典・特殊コンテンツ」 | Tier2〜3 | `heroImage` `sources` `reliability` `seo` `manufacturerGuideContent`（`type === manufacturer-guide`専用） |
+
+> 2026-09-11: `featured` / `whyItMatters` はフロント参照ゼロが確定したため削除した（`whyItMatters`は公開ページ上「なぜ重要か」ボックスとして表示されていたが2026-06-11に表示側のみ削除され、以後データだけが宙に浮いていた）。削除前の値は [`deleted-field-snapshot-2026-09-11.json`](../archive/deleted-field-snapshot-2026-09-11.json) に保存。以下の実画面確認は削除前時点の記録。
 
 実画面確認（2026-09-08）: 3タブとも設計通り。`manufacturerGuideContent`は
 `admin.condition`により記事タイプが「メーカー解説」以外では非表示のまま——tabs化後も
@@ -124,9 +128,11 @@ T3以降はこの順序を最初から守っている。
 | 層 | 置き場所 | fields |
 |---|---|---|
 | sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
-| tab「基本情報」 | Tier1 | `title` `titleJa` `subtitle` `maturityLevel` `buyerReadiness` `environment` `requiredCapabilities` `primaryIndustry` `industryTags` `taskTags` `summary` `overview` `whyItMatters` |
+| tab「基本情報」 | Tier1 | `title` `titleJa` `subtitle` `maturityLevel` `environment` `requiredCapabilities` `primaryIndustry` `industryTags` `taskTags` `summary` `overview` `whyItMatters` |
 | tab「詳細分析」 | Tier2 | `atAGlance` `capabilityNotes` `environmentRequirements` `whyHardToday` `japanDeploymentConditions` `candidateRobots` |
-| tab「出典・SEO」 | Tier3 | `sources` `reliability` `heroImage` `seo` |
+| tab「出典・SEO」 | Tier3 | `sources` `reliability` `seo` |
+
+> 2026-09-11: `buyerReadiness`（公開ページ上どこにも表示されない社内分類フィールドだった）/ `heroImage`（全44件未設定）はフロント参照ゼロが確定したため削除した。削除前の値は [`deleted-field-snapshot-2026-09-11.json`](../archive/deleted-field-snapshot-2026-09-11.json) に保存。以下の実画面確認は削除前時点の記録。
 
 実画面確認（2026-09-08）: 3タブとも設計通り。`candidateRobots`の追加ボタンが
 「候補ロボットを追加」と日本語表示されること（T9）も確認。
@@ -150,8 +156,10 @@ T3以降はこの順序を最初から守っている。
 | 層 | 置き場所 | fields |
 |---|---|---|
 | sidebar | 運用メタ | `stableId` `slug` `previousSlugs` `lifecycleStatus` `nextReviewBy` |
-| tab「基本情報」 | Tier1 | `manufacturerId` `robotId` `customer` `siteName` `country` `location` `status` `startedAt` `relatedUseCaseIds` `summary` |
+| tab「基本情報」 | Tier1 | `manufacturerId` `customer` `siteName` `country` `location` `status` `relatedUseCaseIds` `summary` |
 | tab「出典・SEO」 | Tier3 | `sources` `reliability` `heroImage` `seo` |
+
+> 2026-09-11: `robotId` / `startedAt` はフロント参照ゼロが確定したため削除した。削除前の値は [`deleted-field-snapshot-2026-09-11.json`](../archive/deleted-field-snapshot-2026-09-11.json) に保存。上表以外の実画面確認は削除前時点の記録。
 
 実画面確認（2026-09-08）: 2タブとも設計通り。
 
