@@ -1,0 +1,40 @@
+diff --git a/node_modules/drizzle-kit/api.js b/node_modules/drizzle-kit/api.js
+index 0000000..0000000 100644
+--- a/node_modules/drizzle-kit/api.js
++++ b/node_modules/drizzle-kit/api.js
+@@ -42357,7 +42357,7 @@
+       };
+     };
+     promptColumnsConflicts = async (tableName, newColumns, missingColumns) => {
+-      if (newColumns.length === 0 || missingColumns.length === 0) {
++      if (newColumns.length === 0 || missingColumns.length === 0 || !process.stdout.isTTY) {
+         return { created: newColumns, renamed: [], deleted: missingColumns };
+       }
+       const result = {
+@@ -42407,7 +42407,7 @@
+       return result;
+     };
+     promptNamedConflict = async (newItems, missingItems, entity) => {
+-      if (missingItems.length === 0 || newItems.length === 0) {
++      if (missingItems.length === 0 || newItems.length === 0 || !process.stdout.isTTY) {
+         return {
+           created: newItems,
+           renamed: [],
+@@ -42457,7 +42457,7 @@
+       return result;
+     };
+     promptNamedWithSchemasConflict = async (newItems, missingItems, entity) => {
+-      if (missingItems.length === 0 || newItems.length === 0) {
++      if (missingItems.length === 0 || newItems.length === 0 || !process.stdout.isTTY) {
+         return {
+           created: newItems,
+           renamed: [],
+@@ -42517,7 +42517,7 @@
+       return result;
+     };
+     promptSchemasConflict = async (newSchemas, missingSchemas) => {
+-      if (missingSchemas.length === 0 || newSchemas.length === 0) {
++      if (missingSchemas.length === 0 || newSchemas.length === 0 || !process.stdout.isTTY) {
+         return { created: newSchemas, renamed: [], deleted: missingSchemas };
+       }
+       const result = {
