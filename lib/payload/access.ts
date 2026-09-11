@@ -411,7 +411,8 @@ export function seoField(): Field {
  * （`summary` / `reliability` / `sources` / `nextReviewBy` / `heroImage` / `seo`）。
  * 個別collectionの `fields` へ `...baseRecordContentFields()` で展開する。
  */
-export function baseRecordContentFields(): Field[] {
+export function baseRecordContentFields(options?: { heroImage?: boolean }): Field[] {
+  const includeHeroImage = options?.heroImage ?? true;
   return applyAdminFieldLabels(
     [
       {
@@ -441,7 +442,7 @@ export function baseRecordContentFields(): Field[] {
           },
         },
       },
-      imageAssetField('heroImage'),
+      ...(includeHeroImage ? [imageAssetField('heroImage')] : []),
       seoField(),
     ],
     baseRecordContentFieldLabels,

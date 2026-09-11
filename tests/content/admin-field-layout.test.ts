@@ -105,12 +105,12 @@ const LAYOUT_FIXTURES: readonly LayoutFixture[] = [
   {
     name: 'articles',
     fields: Articles.fields,
-    sidebarFieldNames: ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy', 'featured'],
+    sidebarFieldNames: ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy'],
     tabs: [
       {
         labelJa: '本文',
         labelEn: 'Body',
-        fieldNames: ['title', 'titleJa', 'summary', 'whyItMatters', 'keyTakeaways', 'body'],
+        fieldNames: ['title', 'titleJa', 'summary', 'keyTakeaways', 'body'],
       },
       {
         labelJa: '分類・関連',
@@ -150,7 +150,6 @@ const LAYOUT_FIXTURES: readonly LayoutFixture[] = [
           'titleJa',
           'subtitle',
           'maturityLevel',
-          'buyerReadiness',
           'environment',
           'requiredCapabilities',
           'primaryIndustry',
@@ -169,7 +168,7 @@ const LAYOUT_FIXTURES: readonly LayoutFixture[] = [
       {
         labelJa: '出典・SEO',
         labelEn: 'Sources & SEO',
-        fieldNames: ['sources', 'reliability', 'heroImage', 'seo'],
+        fieldNames: ['sources', 'reliability', 'seo'],
       },
     ],
   },
@@ -209,7 +208,7 @@ const LAYOUT_FIXTURES: readonly LayoutFixture[] = [
       {
         labelJa: '基本情報',
         labelEn: 'Basic info',
-        fieldNames: ['manufacturerId', 'robotId', 'customer', 'siteName', 'country', 'location', 'status', 'startedAt', 'relatedUseCaseIds', 'summary'],
+        fieldNames: ['manufacturerId', 'customer', 'siteName', 'country', 'location', 'status', 'relatedUseCaseIds', 'summary'],
       },
       {
         labelJa: '出典・SEO',

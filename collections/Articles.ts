@@ -35,7 +35,6 @@ interface ArticleCandidate {
   type?: string;
   section?: Article['section'];
   publishedAt?: string;
-  whyItMatters?: string;
   manufacturerGuideContent?: unknown;
   _status?: 'draft' | 'published';
   lifecycleStatus?: 'active' | 'archived';
@@ -57,7 +56,6 @@ interface ArticlePublishCandidate {
   type?: string;
   section?: Article['section'];
   publishedAt?: string;
-  whyItMatters?: string;
   manufacturerGuideContent?: unknown;
 }
 
@@ -73,7 +71,6 @@ function mapArticleCandidateToDomain(candidate: ArticleCandidate): ArticlePublis
     type: candidate.type,
     section: candidate.section,
     publishedAt: candidate.publishedAt,
-    whyItMatters: candidate.whyItMatters,
     manufacturerGuideContent: candidate.manufacturerGuideContent,
   };
 }
@@ -86,7 +83,6 @@ function validateArticleForPublish(article: ArticlePublishCandidate): void {
   if (!article.type) missing.push('type');
   if (!article.section) missing.push('section');
   if (!article.publishedAt) missing.push('publishedAt');
-  if (!article.whyItMatters) missing.push('whyItMatters');
   if (article.type === 'manufacturer-guide' && !article.manufacturerGuideContent) {
     missing.push('manufacturerGuideContent');
   }
@@ -102,8 +98,8 @@ function validateArticleForPublish(article: ArticlePublishCandidate): void {
  * Tier2〜3（画像・出典・特殊コンテンツ）の順。Manufacturers/Robots POCと同じ構成——
  * 名前の集合はこのファイル内で閉じており、抜けがあれば起動時にthrowする。
  */
-const SIDEBAR_FIELD_NAMES = ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy', 'featured'] as const;
-const BODY_TAB_FIELD_NAMES = ['title', 'titleJa', 'summary', 'whyItMatters', 'keyTakeaways', 'body'] as const;
+const SIDEBAR_FIELD_NAMES = ['stableId', 'slug', 'previousSlugs', 'lifecycleStatus', 'nextReviewBy'] as const;
+const BODY_TAB_FIELD_NAMES = ['title', 'titleJa', 'summary', 'keyTakeaways', 'body'] as const;
 const CLASSIFICATION_TAB_FIELD_NAMES = [
   'category',
   'type',
@@ -167,9 +163,7 @@ const articlesAllFields = applyAdminFieldLabels(
       { name: 'industryTags', type: 'text', hasMany: true },
       { name: 'regionTags', type: 'text', hasMany: true },
       { name: 'themeTags', type: 'text', hasMany: true },
-      { name: 'whyItMatters', type: 'textarea', required: true },
       { name: 'keyTakeaways', type: 'text', hasMany: true },
-      { name: 'featured', type: 'checkbox' },
       {
         name: 'relatedRobotIds',
         type: 'relationship',

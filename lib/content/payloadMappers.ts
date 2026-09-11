@@ -475,11 +475,6 @@ export function mapPayloadManufacturerToDomain(doc: ManufacturerPayloadDoc): Man
     description: (doc.description as string) ?? '',
     japanPresence: (doc.japanPresence as Manufacturer['japanPresence']) ?? 'unknown',
     domesticDistributors: mapArrayRows<NonNullable<Manufacturer['domesticDistributors']>[number]>(doc.domesticDistributors),
-    distributorNote: doc.distributorNote as string | undefined,
-    supportNote: doc.supportNote as string | undefined,
-    procurementNote: doc.procurementNote as string | undefined,
-    vendorRiskNote: doc.vendorRiskNote as string | undefined,
-    featuredRank: doc.featuredRank as number | undefined,
   };
 }
 
@@ -598,7 +593,6 @@ interface UseCasePayloadDoc extends BaseRecordPayloadDoc {
   titleJa?: string;
   subtitle?: string;
   maturityLevel?: UseCase['maturityLevel'];
-  buyerReadiness?: UseCase['buyerReadiness'];
   environment?: UseCase['environment'];
   requiredCapabilities?: UseCase['requiredCapabilities'];
   primaryIndustry?: UseCase['primaryIndustry'];
@@ -638,13 +632,14 @@ export async function mapPayloadUseCaseToDomain(
     }),
   );
 
+  const baseRecord = mapBaseRecord(doc);
+  delete (baseRecord as { heroImage?: unknown }).heroImage;
   return {
-    ...mapBaseRecord(doc),
+    ...baseRecord,
     title: doc.title ?? '',
     titleJa: doc.titleJa,
     subtitle: doc.subtitle,
     maturityLevel: doc.maturityLevel ?? 'early-stage',
-    buyerReadiness: doc.buyerReadiness ?? 'requires-poc',
     environment: doc.environment ?? 'mixed',
     requiredCapabilities: doc.requiredCapabilities ?? [],
     primaryIndustry: doc.primaryIndustry as UseCase['primaryIndustry'],
@@ -663,13 +658,11 @@ export async function mapPayloadUseCaseToDomain(
 
 interface DeploymentPayloadDoc extends BaseRecordPayloadDoc {
   manufacturerId?: RelationshipValue;
-  robotId?: RelationshipValue;
   customer?: string;
   siteName?: string;
   country?: string;
   location?: DeploymentSite['location'];
   status?: DeploymentSite['status'];
-  startedAt?: string;
   relatedUseCaseIds?: RelationshipValue[];
 }
 
@@ -678,9 +671,8 @@ export async function mapPayloadDeploymentToDomain(
   payload: Payload,
   cache?: RelationshipResolutionCache,
 ): Promise<DeploymentSite> {
-  const [manufacturerId, robotId, relatedUseCaseIds] = await Promise.all([
+  const [manufacturerId, relatedUseCaseIds] = await Promise.all([
     resolveRelationshipToStableId(payload, 'manufacturers', doc.manufacturerId, cache),
-    resolveRelationshipToStableId(payload, 'robots', doc.robotId, cache),
     resolveRelationshipsToStableIds(payload, 'use-cases', doc.relatedUseCaseIds, cache),
   ]);
   if (!manufacturerId) {
@@ -689,13 +681,11 @@ export async function mapPayloadDeploymentToDomain(
   return {
     ...mapBaseRecord(doc),
     manufacturerId,
-    robotId,
     customer: doc.customer ?? '',
     siteName: doc.siteName,
     country: doc.country ?? '',
     location: optionalGroup<DeploymentSite['location']>(doc.location) ?? { lat: 0, lng: 0 },
     status: doc.status ?? 'unknown',
-    startedAt: doc.startedAt,
     relatedUseCaseIds: optionalArray(relatedUseCaseIds),
   };
 }
@@ -712,9 +702,7 @@ interface ArticlePayloadDoc extends BaseRecordPayloadDoc {
   industryTags?: Article['industryTags'];
   regionTags?: Article['regionTags'];
   themeTags?: Article['themeTags'];
-  whyItMatters?: string;
   keyTakeaways?: string[];
-  featured?: boolean;
   relatedRobotIds?: RelationshipValue[];
   relatedManufacturerIds?: RelationshipValue[];
   relatedUseCaseIds?: RelationshipValue[];
@@ -744,9 +732,7 @@ export async function mapPayloadArticleToDomain(
     industryTags: optionalArray(doc.industryTags),
     regionTags: optionalArray(doc.regionTags),
     themeTags: optionalArray(doc.themeTags),
-    whyItMatters: doc.whyItMatters ?? '',
     keyTakeaways: optionalArray(doc.keyTakeaways),
-    featured: doc.featured,
     section: doc.section ?? 'digest',
     relatedRobotIds,
     relatedManufacturerIds,
@@ -877,11 +863,6 @@ export function mapDomainManufacturerToPayload(manufacturer: Manufacturer): Reco
     description: manufacturer.description,
     japanPresence: manufacturer.japanPresence,
     domesticDistributors: manufacturer.domesticDistributors,
-    distributorNote: manufacturer.distributorNote,
-    supportNote: manufacturer.supportNote,
-    procurementNote: manufacturer.procurementNote,
-    vendorRiskNote: manufacturer.vendorRiskNote,
-    featuredRank: manufacturer.featuredRank,
   };
 }
 
@@ -990,7 +971,6 @@ export async function mapDomainUseCaseToPayload(
     titleJa: useCase.titleJa,
     subtitle: useCase.subtitle,
     maturityLevel: useCase.maturityLevel,
-    buyerReadiness: useCase.buyerReadiness,
     environment: useCase.environment,
     requiredCapabilities: useCase.requiredCapabilities,
     primaryIndustry: useCase.primaryIndustry,
@@ -1013,9 +993,8 @@ export async function mapDomainDeploymentToPayload(
   cache?: RelationshipIdCache,
 ): Promise<Record<string, unknown>> {
   const context = { collection: 'deployments', stableId: deployment.id };
-  const [manufacturerId, robotId, relatedUseCaseIds] = await Promise.all([
+  const [manufacturerId, relatedUseCaseIds] = await Promise.all([
     resolveRequired(payload, 'manufacturers', deployment.manufacturerId, cache, { ...context, field: 'manufacturerId' }),
-    resolveRequired(payload, 'robots', deployment.robotId, cache, { ...context, field: 'robotId' }),
     resolveAllRequired(payload, 'use-cases', deployment.relatedUseCaseIds, cache, {
       ...context,
       field: 'relatedUseCaseIds',
@@ -1024,13 +1003,11 @@ export async function mapDomainDeploymentToPayload(
   return {
     ...baseRecordToPayload(deployment),
     manufacturerId,
-    robotId,
     customer: deployment.customer,
     siteName: deployment.siteName,
     country: deployment.country,
     location: deployment.location,
     status: deployment.status,
-    startedAt: deployment.startedAt,
     relatedUseCaseIds,
   };
 }
@@ -1066,9 +1043,7 @@ export async function mapDomainArticleToPayload(
     industryTags: article.industryTags,
     regionTags: article.regionTags,
     themeTags: article.themeTags,
-    whyItMatters: article.whyItMatters,
     keyTakeaways: article.keyTakeaways,
-    featured: article.featured,
     relatedRobotIds,
     relatedManufacturerIds,
     relatedUseCaseIds,

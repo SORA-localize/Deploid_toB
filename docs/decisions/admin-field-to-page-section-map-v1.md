@@ -1,6 +1,6 @@
 ---
 status: current
-updated: 2026-09-05
+updated: 2026-09-11
 ---
 
 # Admin field → 公開ページ表示箇所 対応表 v1
@@ -53,7 +53,8 @@ updated: 2026-09-05
 | field | 公開ページでの扱い |
 |---|---|
 | `candidateRobots` | **`robotId`を持つ行だけ表示される**（2026-09-05外部監査で訂正）。用途詳細ページの「候補ロボット」欄。`seriesId`だけの行は現状描画対象外——既存コードコメントが明記している | `use-cases/[slug]/page.tsx`の`buildUseCaseDetailData()`（「seriesId候補（DEC-S08）はrobotId単位のこのpageではまだ描画対象外」） |
-| `buyerReadiness` | **表示されない**。`Robots`からは既に削除済み（DEC-S05）の軸で、`UseCases`側にも公開UIの消費箇所は無い | `domainTypes.ts`/`payloadMappers.ts`のみで参照、componentに無し |
+
+> 2026-09-11: `buyerReadiness`（表示されない社内分類フィールドだった。`Robots`からは既にDEC-S05で削除済み）はフィールド自体を削除した。削除前の値は[`deleted-field-snapshot-2026-09-11.json`](../archive/deleted-field-snapshot-2026-09-11.json)に保存。
 
 ## SiteSettings
 
