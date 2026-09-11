@@ -204,7 +204,6 @@ export interface Manufacturer {
   slug: string;
   previousSlugs?: string[] | null;
   lifecycleStatus: 'active' | 'archived';
-  featuredRank?: number | null;
   /**
    * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
@@ -307,10 +306,6 @@ export interface Manufacturer {
         id?: string | null;
       }[]
     | null;
-  distributorNote?: string | null;
-  supportNote?: string | null;
-  procurementNote?: string | null;
-  vendorRiskNote?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -683,10 +678,6 @@ export interface UseCase {
   titleJa?: string | null;
   subtitle?: string | null;
   maturityLevel: 'early-stage' | 'pilot-phase' | 'production-ready';
-  /**
-   * Buyer readiness. Not currently shown anywhere on the public site — used for internal classification only.
-   */
-  buyerReadiness?: ('initial-adoption' | 'requires-poc' | 'limited-today') | null;
   environment: 'indoor-controlled' | 'indoor-semi-controlled' | 'outdoor' | 'mixed' | 'hazardous';
   requiredCapabilities: (
     'mobility' | 'manipulation' | 'perception' | 'autonomy' | 'communication' | 'data-capture' | 'integration'
@@ -754,35 +745,6 @@ export interface UseCase {
     id?: string | null;
   }[];
   reliability?: ('verified' | 'official' | 'reported' | 'estimated') | null;
-  heroImage?: {
-    src?: string | null;
-    alt?: string | null;
-    credit?: string | null;
-    sourceUrl?: string | null;
-    rights?: {
-      status?:
-        | (
-            | 'own'
-            | 'licensed'
-            | 'commercial-permitted'
-            | 'reference-attributed'
-            | 'permission-requested'
-            | 'prototype-only'
-            | 'blocked'
-          )
-        | null;
-      sourceType?:
-        ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
-      /**
-       * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
-       */
-      checkedAt?: string | null;
-      rightsHolder?: string | null;
-      licenseUrl?: string | null;
-      permissionNote?: string | null;
-    };
-    aspectRatio?: number | null;
-  };
   seo?: {
     metaTitle?: string | null;
     metaDescription?: string | null;
@@ -811,7 +773,6 @@ export interface Deployment {
    */
   nextReviewBy?: string | null;
   manufacturerId: number | Manufacturer;
-  robotId?: (number | null) | Robot;
   customer: string;
   siteName?: string | null;
   country: string;
@@ -820,7 +781,6 @@ export interface Deployment {
     lng: number;
   };
   status: 'announced' | 'pilot' | 'production' | 'ended' | 'unknown';
-  startedAt?: string | null;
   relatedUseCaseIds?: (number | UseCase)[] | null;
   /**
    * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
@@ -899,14 +859,12 @@ export interface Article {
    * The date this record's content should next be reviewed. Not shown publicly — used to schedule internal fact-checks.
    */
   nextReviewBy?: string | null;
-  featured?: boolean | null;
   title: string;
   titleJa?: string | null;
   /**
    * Summary. Where it shows varies by collection — UseCases: card and detail page. Articles: only when featured on the home page. Robots: search-result snippet only. Deployments: the "deployments" section of a use case detail page. Manufacturers, Distributors, and RobotSeries: not shown anywhere yet.
    */
   summary: string;
-  whyItMatters: string;
   keyTakeaways?: string[] | null;
   /**
    * Article body (Markdown). When the article type is "Manufacturer guide", use the dedicated field below (manufacturerGuideContent) instead of this one.
@@ -1504,7 +1462,6 @@ export interface ManufacturersSelect<T extends boolean = true> {
   slug?: T;
   previousSlugs?: T;
   lifecycleStatus?: T;
-  featuredRank?: T;
   nextReviewBy?: T;
   name?: T;
   nameJa?: T;
@@ -1574,10 +1531,6 @@ export interface ManufacturersSelect<T extends boolean = true> {
         note?: T;
         id?: T;
       };
-  distributorNote?: T;
-  supportNote?: T;
-  procurementNote?: T;
-  vendorRiskNote?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1829,7 +1782,6 @@ export interface UseCasesSelect<T extends boolean = true> {
   titleJa?: T;
   subtitle?: T;
   maturityLevel?: T;
-  buyerReadiness?: T;
   environment?: T;
   requiredCapabilities?: T;
   primaryIndustry?: T;
@@ -1883,25 +1835,6 @@ export interface UseCasesSelect<T extends boolean = true> {
         id?: T;
       };
   reliability?: T;
-  heroImage?:
-    | T
-    | {
-        src?: T;
-        alt?: T;
-        credit?: T;
-        sourceUrl?: T;
-        rights?:
-          | T
-          | {
-              status?: T;
-              sourceType?: T;
-              checkedAt?: T;
-              rightsHolder?: T;
-              licenseUrl?: T;
-              permissionNote?: T;
-            };
-        aspectRatio?: T;
-      };
   seo?:
     | T
     | {
@@ -1925,7 +1858,6 @@ export interface DeploymentsSelect<T extends boolean = true> {
   lifecycleStatus?: T;
   nextReviewBy?: T;
   manufacturerId?: T;
-  robotId?: T;
   customer?: T;
   siteName?: T;
   country?: T;
@@ -1936,7 +1868,6 @@ export interface DeploymentsSelect<T extends boolean = true> {
         lng?: T;
       };
   status?: T;
-  startedAt?: T;
   relatedUseCaseIds?: T;
   summary?: T;
   sources?:
@@ -1993,11 +1924,9 @@ export interface ArticlesSelect<T extends boolean = true> {
   previousSlugs?: T;
   lifecycleStatus?: T;
   nextReviewBy?: T;
-  featured?: T;
   title?: T;
   titleJa?: T;
   summary?: T;
-  whyItMatters?: T;
   keyTakeaways?: T;
   body?: T;
   category?: T;
