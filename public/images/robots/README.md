@@ -53,9 +53,11 @@ Next.js の `<Image>` コンポーネントが自動で WebP/AVIF に変換・�
 
 ## サイトに反映する手順
 
-`data/robots.ts` の該当ロボットに `images` フィールドを追加します。すべてのroleを揃える必要はなく、用意できたものから入れていけば構いません。表示可能画像が0枚なら単一placeholder、1枚なら静止表示、2枚以上なら実画像だけのカルーセルになります。
-`ImageAsset.rights` は型上必須です。`reference-attributed` や `permission-requested` の画像は、validator が `credit` / `sourceUrl` / `rights.rightsHolder` も要求します。
+Payload（Admin UI または `.codex/content-workflow.md` のMCPワークフロー）で、該当Robotレコードの `images` フィールドに登録します。旧 `data/robots.ts` を直接編集する運用はPayload移行（Task 9）で廃止済みです。すべてのroleを揃える必要はなく、用意できたものから入れていけば構いません。表示可能画像が0枚なら単一placeholder、1枚なら静止表示、2枚以上なら実画像だけのカルーセルになります。
+`ImageAsset.rights` は型上必須です。`reference-attributed` や `permission-requested` の画像は、公開ゲート（`validateForPublish`）が `credit` / `sourceUrl` / `rights.rightsHolder` も要求します。
 背景除去やトリミングなど、配布時点から姿を変える加工をした画像は、公開用ではライセンスや許諾で改変可否を確認してください。未確認の背景透過画像は `prototype-only` としてローカル確認に限定します。
+
+以下は `images` フィールドに登録する値の形（MCPのdraft作成/更新、またはAdmin UIの該当フィールドに入力する内容）です:
 
 ```ts
 images: {
