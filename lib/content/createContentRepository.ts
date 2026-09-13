@@ -600,14 +600,20 @@ export function createContentRepository(source: ContentSource) {
     /**
      * `/reports` とHomeの注目記事、sitemap.tsが使う全件published articles（安全なpagination-walk）。
      * 既定は公開日の新しい順（`listArticles` と同じ意味）。
+     *
+     * `contentKind: 'sample'` はここで除外する（`data-maintenance-checklist-v1.md` C-16:
+     * 「本番除外を確認」）。個別記事を直接slugで開く経路（`resolveArticleDetailBySlug`等）はここを
+     * 経由しないため、sample記事自体は直接URLでは引き続き閲覧できる（noindexで検索露出のみ防ぐ）。
      */
-    listAllPublishedArticles: (): Promise<Article[]> =>
-      listAllPublished(
+    listAllPublishedArticles: async (): Promise<Article[]> => {
+      const articles = await listAllPublished(
         'articles',
-        (article) => article.id,
+        (article: Article) => article.id,
         (page, limit) =>
           source.listArticlesPage({ sort: '-publishedAt', publishStatuses: PUBLISHED_ONLY, page, limit }),
-      ),
+      );
+      return articles.filter((article) => article.contentKind !== 'sample');
+    },
 
     // ── articlePlacements ─────────────────────────────────────────────────
     listArticlePlacements: (query: ArticlePlacementListQuery = {}) =>

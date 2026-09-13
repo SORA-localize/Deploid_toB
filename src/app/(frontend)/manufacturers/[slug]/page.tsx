@@ -124,18 +124,14 @@ async function buildManufacturerDetailData(
   if (!manufacturerRaw) return { kind: 'not-found' };
   const manufacturer = withMeasuredLogoAspect(manufacturerRaw);
 
-  const [robotsRaw, reports, allArticles, useCases] = await Promise.all([
+  const [robotsRaw, reports, useCases] = await Promise.all([
     repository.listRobotsByManufacturerId(manufacturer.id),
     repository.listArticlesForManufacturerId(manufacturer.id),
-    repository.listAllPublishedArticles(),
     repository.listAllPublishedUseCases(),
   ]);
   const robots = sortRobots(robotsRaw, 'name', [manufacturer]);
   const robotItems = createRobotCatalogItems(robots, [manufacturer], useCases);
-  const sampleReports = allArticles
-    .filter((report) => report.contentKind === 'sample')
-    .slice(0, 3);
-  const displayedReports = reports.length > 0 ? reports : sampleReports;
+  const displayedReports = reports;
   const sections: ManufacturerDetailSectionLink[] = [
     { label: uiText.common.overview, href: '#overview' },
     { label: uiText.manufacturers.factSheet, href: '#facts' },
