@@ -144,7 +144,13 @@ if (unexpectedlyUnplacedFields.length > 0) {
 export const Deployments: CollectionConfig = {
   slug: 'deployments',
   // 公開サイトの表記に合わせる（lib/uiText.ts の useCases.deployments = '導入事例'）。
-  labels: { singular: { ja: '導入事例', en: 'Deployment' }, plural: { ja: '導入事例', en: 'Deployments' } },
+  // 単体の詳細ページを持たない（lib/payload/adminPreview.ts参照）。Homeワールドマップの弧と
+  // 用途詳細ページの「実際の導入事例」欄に埋め込み表示されるだけのデータであることが
+  // Admin UI上でも分かるよう、ラベルに用途を明記する。
+  labels: {
+    singular: { ja: '導入事例（世界地図用）', en: 'Deployment (World Map)' },
+    plural: { ja: '導入事例（世界地図用）', en: 'Deployments (World Map)' },
+  },
   admin: { useAsTitle: 'customer', components: contentPublishAdminComponents },
   access: contentCollectionAccess,
   versions: contentVersionsConfig,
