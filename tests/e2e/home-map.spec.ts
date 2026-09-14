@@ -1,9 +1,14 @@
 import { expect, test } from '@playwright/test';
 
-test('home renders one cacheable world map', async ({ page }) => {
+test('home renders a cacheable world map track with exactly one accessible tile', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('[data-world-map-canvas]')).toHaveCount(1);
-  await expect(page.locator('img[src="/generated/world-map.svg"]')).toHaveCount(1);
+  // 自動パン用に複数タイルが並ぶが、AT/キーボードに晒すのは先頭の1枚だけ
+  // （他は aria-hidden + tabIndex=-1）。画像は静的アセットの複製のみで、
+  // インラインの data: SVG は生成しない。
+  const canvasCount = await page.locator('[data-world-map-canvas]').count();
+  expect(canvasCount).toBeGreaterThanOrEqual(1);
+  await expect(page.locator('[data-world-map-canvas]:not([aria-hidden="true"])')).toHaveCount(1);
+  await expect(page.locator('img[src="/generated/world-map.svg"]')).toHaveCount(canvasCount);
   await expect(page.locator('img[src^="data:image/svg+xml"]')).toHaveCount(0);
 });
 
@@ -56,6 +61,9 @@ test('hero heading paints above manufacturer points regardless of overlapping hi
 
 for (const viewport of VIEWPORTS) {
   test(`manufacturer points stay within the map stage bounds at ${viewport.name}`, async ({ page }) => {
+    // 自動パンは常時 translateX が動くため、位置の厳密チェックはモーション停止下で行う
+    // （prefers-reduced-motion はコンポーネント側で自動パン自体を止める）。
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await page.goto('/');
 
@@ -63,7 +71,11 @@ for (const viewport of VIEWPORTS) {
     const stageBox = await stage.boundingBox();
     expect(stageBox).not.toBeNull();
 
-    const points = page.locator('[data-world-map-point]');
+    // 自動パン用の複製タイル（aria-hidden）は、シームレスループのため意図的に
+    // ステージ幅の外側にもはみ出す。境界チェックは AT に見える先頭タイルの点だけに絞る。
+    const points = page.locator(
+      '[data-world-map-canvas]:not([aria-hidden="true"]) [data-world-map-point]',
+    );
     const count = await points.count();
     expect(count).toBeGreaterThan(0);
 
