@@ -45,6 +45,9 @@ vi.mock('@payloadcms/ui', () => ({
     </button>
   ),
   Link: ({ children, href }: { children: ReactNode; href: string }) => <a href={href}>{children}</a>,
+  ChevronIcon: ({ direction }: { direction?: string }) => (
+    <span data-testid="chevron" data-direction={direction ?? 'down'} aria-hidden="true" />
+  ),
 }));
 
 const { DraftListTable } = await import('@/components/admin/DraftListTable');
@@ -133,6 +136,28 @@ describe('コレクションごとのカスケード', () => {
     fireEvent.click(mfrGroupCheckbox);
     expect(screen.getByLabelText('Mfr One')).not.toBeChecked();
     expect(screen.getByLabelText('Mfr Two')).not.toBeChecked();
+  });
+
+  it('チェブロンはセクションの開閉状態を表し、開閉のtoggleイベントで向きが変わる', () => {
+    // jsdomは`<summary>`クリックの既定動作（`<details>`のopen切り替え）自体は実装しないため、
+    // 実際のブラウザ操作の結果として起きる`toggle`イベントを直接発火させ、
+    // `onToggle`ハンドラがstateへ正しく同期するかだけを確認する
+    // （`<details>`自体の開閉挙動はネイティブ機能でありこのコンポーネントの責務ではない）。
+    render(<DraftListTable initialItems={[item()]} canPublish={true} />);
+
+    const details = screen.getByText('メーカー').closest('details') as HTMLDetailsElement;
+
+    // 既定は開（down）。
+    expect(screen.getByTestId('chevron')).toHaveAttribute('data-direction', 'down');
+    expect(details.open).toBe(true);
+
+    details.open = false;
+    fireEvent(details, new Event('toggle'));
+    expect(screen.getByTestId('chevron')).toHaveAttribute('data-direction', 'right');
+
+    details.open = true;
+    fireEvent(details, new Event('toggle'));
+    expect(screen.getByTestId('chevron')).toHaveAttribute('data-direction', 'down');
   });
 
   it('グループ内の行を個別に全部選ぶと、グループチェックボックスも選択済みになる', () => {
