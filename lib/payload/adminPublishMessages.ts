@@ -94,6 +94,9 @@ export const DRAFT_LIST_LABEL_CODES = [
   'draft-list-no-permission',
   'draft-list-empty',
   'draft-list-results-heading',
+  'draft-list-group-count',
+  'draft-list-group-select-all',
+  'draft-list-selected-count',
 ] as const;
 
 export type DraftListLabelCode = (typeof DRAFT_LIST_LABEL_CODES)[number];
@@ -152,6 +155,9 @@ const ja: Record<AdminPublishMessageKey, string> = {
   'draft-list-no-permission': 'この画面を見る権限がありません。',
   'draft-list-empty': '現在draft状態のレコードはありません。',
   'draft-list-results-heading': '公開結果',
+  'draft-list-group-count': '{{count}}件',
+  'draft-list-group-select-all': '{{collection}}をすべて選択',
+  'draft-list-selected-count': '{{count}}件選択中',
 };
 
 const en: Record<AdminPublishMessageKey, string> = {
@@ -197,6 +203,9 @@ const en: Record<AdminPublishMessageKey, string> = {
   'draft-list-no-permission': 'You do not have permission to view this page.',
   'draft-list-empty': 'There are no draft records right now.',
   'draft-list-results-heading': 'Publish results',
+  'draft-list-group-count': '{{count}}',
+  'draft-list-group-select-all': 'Select all {{collection}}',
+  'draft-list-selected-count': '{{count}} selected',
 };
 
 /** `payload.config.ts` の `i18n.translations` へそのまま渡す。 */

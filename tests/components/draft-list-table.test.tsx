@@ -12,18 +12,25 @@ import type { DraftListItem } from '@/lib/payload/listDraftDocumentsForAdmin';
  * - `canPublish=false`（content-draft-writer）ではチェックボックス・公開ボタンを
  *   一切描画しない（`tests/components/publish-from-approval.test.tsx`と同じ、
  *   「使えないボタンを見せない」というroleゲートの考え方）。
+ * - コレクションごとのカスケード（`<details>`）に分かれ、各セクションの「すべて選択」
+ *   チェックボックスが自分のグループの行だけを選択/解除する（他グループへ波及しない）。
  * - 「選択したN件を公開」は選択したitemだけを`/admin/publish/bulk`へ送る。
  * - 部分成功時、成功したitemだけを一覧から消し、失敗したitemは残す
  *   （`bulkPublishFromAdmin`が保証する「1件の失敗が他へ波及しない」を、
  *   このコンポーネントが正しく表示に反映しているかの確認）。
  *
  * `@payloadcms/ui`はmockする。ここで確かめたいのは選択状態とfetch呼び出しの形であって
- * Payloadの描画そのものではない。
+ * Payloadの描画そのものではない。ネイティブ`<summary>`はaria上role="button"を持つため、
+ * 公開ボタンは常に`{ name: /draft-list-publish-selected/ }`で名前指定して掴む
+ * （素の`getByRole('button')`はグループ見出しと衝突して曖昧になる）。
  */
 
 vi.mock('@payloadcms/ui', () => ({
   useConfig: () => ({ config: { routes: { api: '/api', admin: '/admin' } } }),
-  useTranslation: () => ({ t: (key: string, vars?: Record<string, unknown>) => (vars ? `${key}:${JSON.stringify(vars)}` : key) }),
+  useTranslation: () => ({
+    t: (key: string, vars?: Record<string, unknown>) => (vars ? `${key}:${JSON.stringify(vars)}` : key),
+    i18n: { language: 'ja' },
+  }),
   Button: ({
     children,
     onClick,
@@ -41,6 +48,8 @@ vi.mock('@payloadcms/ui', () => ({
 }));
 
 const { DraftListTable } = await import('@/components/admin/DraftListTable');
+
+const publishButton = () => screen.getByRole('button', { name: /draft-list-publish-selected/ });
 
 const item = (overrides: Partial<DraftListItem> = {}): DraftListItem => ({
   collection: 'manufacturers',
@@ -67,19 +76,73 @@ describe('canPublishによる表示切り替え', () => {
   it('canPublish=falseではチェックボックスと公開ボタンを出さない（一覧のみ）', () => {
     render(<DraftListTable initialItems={[item()]} canPublish={false} />);
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /draft-list-publish-selected/ })).not.toBeInTheDocument();
     expect(screen.getByText('Alpha Robotics')).toBeInTheDocument();
   });
 
-  it('canPublish=trueではチェックボックスと公開ボタンを出す', () => {
+  it('canPublish=trueでは行チェックボックス・グループチェックボックス・公開ボタンを出す', () => {
     render(<DraftListTable initialItems={[item()]} canPublish={true} />);
-    expect(screen.getByRole('checkbox')).toBeInTheDocument();
-    expect(screen.getByRole('button')).toBeInTheDocument();
+    // グループの「すべて選択」+ 行のチェックボックスで2つ。
+    expect(screen.getAllByRole('checkbox')).toHaveLength(2);
+    expect(publishButton()).toBeInTheDocument();
   });
 
   it('一覧が空ならdraft-list-emptyを表示する', () => {
     render(<DraftListTable initialItems={[]} canPublish={true} />);
     expect(screen.getByText(/draft-list-empty/)).toBeInTheDocument();
+  });
+});
+
+describe('コレクションごとのカスケード', () => {
+  it('コレクションごとにセクションが分かれ、件数を表示する', () => {
+    const items = [
+      item({ id: 1, stableId: 'm1', title: 'Mfr One' }),
+      item({ id: 2, stableId: 'm2', title: 'Mfr Two' }),
+      item({ collection: 'articles', id: 3, stableId: 'a1', title: 'Article One' }),
+    ];
+    render(<DraftListTable initialItems={items} canPublish={true} />);
+
+    expect(screen.getByText('メーカー')).toBeInTheDocument();
+    expect(screen.getByText('記事')).toBeInTheDocument();
+    expect(screen.getByText(/draft-list-group-count:\{"count":"2"\}/)).toBeInTheDocument();
+    expect(screen.getByText(/draft-list-group-count:\{"count":"1"\}/)).toBeInTheDocument();
+  });
+
+  it('件数が0のコレクションのセクションは出さない', () => {
+    render(<DraftListTable initialItems={[item()]} canPublish={true} />);
+    expect(screen.queryByText('記事')).not.toBeInTheDocument();
+    expect(screen.queryByText('代理店')).not.toBeInTheDocument();
+  });
+
+  it('グループの「すべて選択」は自分のグループの行だけを選択し、他グループには波及しない', () => {
+    const items = [
+      item({ id: 1, stableId: 'm1', title: 'Mfr One' }),
+      item({ id: 2, stableId: 'm2', title: 'Mfr Two' }),
+      item({ collection: 'articles', id: 3, stableId: 'a1', title: 'Article One' }),
+    ];
+    render(<DraftListTable initialItems={items} canPublish={true} />);
+
+    const mfrGroupCheckbox = screen.getByLabelText(/draft-list-group-select-all:\{"collection":"メーカー"\}/);
+    fireEvent.click(mfrGroupCheckbox);
+
+    expect(screen.getByLabelText('Mfr One')).toBeChecked();
+    expect(screen.getByLabelText('Mfr Two')).toBeChecked();
+    expect(screen.getByLabelText('Article One')).not.toBeChecked();
+
+    // もう一度クリックすると解除される。
+    fireEvent.click(mfrGroupCheckbox);
+    expect(screen.getByLabelText('Mfr One')).not.toBeChecked();
+    expect(screen.getByLabelText('Mfr Two')).not.toBeChecked();
+  });
+
+  it('グループ内の行を個別に全部選ぶと、グループチェックボックスも選択済みになる', () => {
+    const items = [item({ id: 1, stableId: 'm1', title: 'Mfr One' }), item({ id: 2, stableId: 'm2', title: 'Mfr Two' })];
+    render(<DraftListTable initialItems={items} canPublish={true} />);
+
+    fireEvent.click(screen.getByLabelText('Mfr One'));
+    fireEvent.click(screen.getByLabelText('Mfr Two'));
+
+    expect(screen.getByLabelText(/draft-list-group-select-all/)).toBeChecked();
   });
 });
 
@@ -89,8 +152,8 @@ describe('選択と公開', () => {
     vi.mocked(fetch).mockResolvedValue(ok({ results: [{ collection: 'manufacturers', id: 1, ok: true }] }));
     render(<DraftListTable initialItems={items} canPublish={true} />);
 
-    fireEvent.click(screen.getAllByRole('checkbox')[0]);
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByLabelText('One'));
+    fireEvent.click(publishButton());
 
     await waitFor(() => expect(fetch).toHaveBeenCalled());
     const [url, init] = vi.mocked(fetch).mock.calls[0];
@@ -101,7 +164,7 @@ describe('選択と公開', () => {
 
   it('公開ボタンは未選択のときは押せない', () => {
     render(<DraftListTable initialItems={[item()]} canPublish={true} />);
-    expect(screen.getByRole('button')).toBeDisabled();
+    expect(publishButton()).toBeDisabled();
   });
 
   it('部分成功時、成功したitemだけ一覧から消え、失敗したitemは残る', async () => {
@@ -116,9 +179,9 @@ describe('選択と公開', () => {
     );
     render(<DraftListTable initialItems={items} canPublish={true} />);
 
-    fireEvent.click(screen.getAllByRole('checkbox')[0]);
-    fireEvent.click(screen.getAllByRole('checkbox')[1]);
-    fireEvent.click(screen.getByRole('button', { name: /draft-list-publish-selected/ }));
+    fireEvent.click(screen.getByLabelText('Succeeds'));
+    fireEvent.click(screen.getByLabelText('Fails'));
+    fireEvent.click(publishButton());
 
     await waitFor(() => expect(screen.queryByText('Succeeds')).not.toBeInTheDocument());
     expect(screen.getByText('Fails')).toBeInTheDocument();
@@ -130,8 +193,8 @@ describe('選択と公開', () => {
     vi.mocked(fetch).mockResolvedValue(fail(403, { error: 'insufficient-role' }));
     render(<DraftListTable initialItems={items} canPublish={true} />);
 
-    fireEvent.click(screen.getByRole('checkbox'));
-    fireEvent.click(screen.getByRole('button', { name: /draft-list-publish-selected/ }));
+    fireEvent.click(screen.getByLabelText('One'));
+    fireEvent.click(publishButton());
 
     await waitFor(() => expect(screen.getByText(/draft-list-results-heading/)).toBeInTheDocument());
     const resultsHeading = screen.getByText(/draft-list-results-heading/);
@@ -145,8 +208,8 @@ describe('選択と公開', () => {
     vi.mocked(fetch).mockRejectedValue(new Error('network down'));
     render(<DraftListTable initialItems={items} canPublish={true} />);
 
-    fireEvent.click(screen.getByRole('checkbox'));
-    fireEvent.click(screen.getByRole('button', { name: /draft-list-publish-selected/ }));
+    fireEvent.click(screen.getByLabelText('One'));
+    fireEvent.click(publishButton());
 
     await waitFor(() => expect(screen.getByText(/draft-list-results-heading/)).toBeInTheDocument());
     expect(screen.getByText(/publish-internal-error/)).toBeInTheDocument();
