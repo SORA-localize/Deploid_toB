@@ -1,5 +1,6 @@
 'use client';
 
+import type { MouseEvent as ReactMouseEvent } from 'react';
 import Link from 'next/link';
 import { getCountryDisplay } from '@/lib/countryRegistry';
 import { createArcPath } from '@/lib/worldMap';
@@ -35,24 +36,34 @@ interface ManufacturerMapCopyProps {
   mapAssetSrc: string;
   points: MapPoint[];
   activeId: string | null;
+  /** タイル複製（自動パン用）のうち非表示用コピーか。AT/キーボードから隠す。 */
+  ariaHidden?: boolean;
   reduceMotion: boolean;
   onActivate: (id: string) => void;
   onClear: () => void;
+  /** ドラッグ後のクリックでリンク遷移してしまうのを止める（ManufacturerMapStage 側で判定）。 */
+  onLinkClick?: (event: ReactMouseEvent) => void;
 }
 
 export function ManufacturerMapCopy({
   mapAssetSrc,
   points,
   activeId,
+  ariaHidden,
   reduceMotion,
   onActivate,
   onClear,
+  onLinkClick,
 }: ManufacturerMapCopyProps) {
   const active = points.find((p) => p.id === activeId) ?? null;
 
   return (
-    <div data-world-map-canvas className="relative h-full w-full shrink-0">
-      {/* eslint-disable-next-line @next/next/no-img-element -- `/generated/world-map.svg`。next/image は既定で SVG を最適化せず（`dangerouslyAllowSVG` は off）、width/height も要求する。この img は親の比率へ `object-cover` で合わせ `mask-image` を当てる設計で、下のコメントに実測根拠がある。`ManufacturerMapStage.tsx` も同じ理由で同じ例外を持つ */}
+    <div
+      data-world-map-canvas
+      aria-hidden={ariaHidden || undefined}
+      className="relative h-full aspect-[2/1] shrink-0"
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- `/generated/world-map.svg`。next/image は既定で SVG を最適化せず（`dangerouslyAllowSVG` は off）、width/height も要求する。この img は親の比率へ `object-cover` で合わせる設計で、下のコメントに実測根拠がある。`ManufacturerMapStage.tsx` も同じ理由で同じ例外を持つ */}
       <img
         src={mapAssetSrc}
         alt=""
@@ -62,7 +73,10 @@ export function ManufacturerMapCopy({
         // （実測: 390px で -17.9%、768px で -33.7%、1440px で +24.3%）。
         // アセットは viewBox="0 0 198 100" の固定比率なので object-cover で比率を保ち、
         // 余った分は stage 側の overflow-hidden で切る。
-        className="pointer-events-none h-full w-full object-cover opacity-90 [mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]"
+        // 上下の縁を背景色へ溶かすフェードは `mask-image` ではなく ManufacturerMapStage の
+        // 静止オーバーレイで行う。自動パン中に mask-image を動かすとラスタライズが継続発生し
+        // 重くなるため（このタイルは複数枚並んで常時 translateX される）。
+        className="pointer-events-none h-full w-full object-cover opacity-90"
       />
 
       {/* 導入事例の弧（アクティブ点のみ） */}
@@ -133,6 +147,7 @@ export function ManufacturerMapCopy({
             key={p.id}
             href={href}
             data-world-map-point
+            tabIndex={ariaHidden ? -1 : 0}
             aria-label={label}
             draggable={false}
             className="group absolute z-[6] -translate-x-1/2 -translate-y-1/2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
@@ -141,6 +156,7 @@ export function ManufacturerMapCopy({
             onPointerLeave={onClear}
             onFocus={() => onActivate(p.id)}
             onBlur={onClear}
+            onClick={onLinkClick}
           >
             <span className="relative flex h-8 w-8 items-center justify-center">
               <span

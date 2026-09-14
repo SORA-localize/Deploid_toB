@@ -45,12 +45,23 @@ export function ThemeModeToggle({
 
     // クリックしたアイコンの中心を起点に、画面の四隅まで届く半径を求める。
     const rect = event.currentTarget.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height / 2;
     const endRadius = Math.hypot(
-      Math.max(x, window.innerWidth - x),
-      Math.max(y, window.innerHeight - y),
+      Math.max(x, viewportWidth - x),
+      Math.max(y, viewportHeight - y),
     );
+
+    // 座標・半径は px 絶対値ではなく viewport 比の % で渡す。Chrome には fractional
+    // display scale（例: Windows 150%）環境で ::view-transition-new(root) への px 指定
+    // clip-path が正しくスケールされず初回遷移がズレるバグがある（px指定はスケール前提が
+    // 崩れる）。% はスナップショット参照ボックスに対して解決されるため影響を受けない。
+    const toXPct = (px: number) => `${(px / viewportWidth) * 100}%`;
+    const toYPct = (px: number) => `${(px / viewportHeight) * 100}%`;
+    const toRadiusPct = (px: number) =>
+      `${(px / (Math.hypot(viewportWidth, viewportHeight) / Math.SQRT2)) * 100}%`;
 
     const transition = doc.startViewTransition(() => {
       flushSync(() => setTheme(next));
@@ -60,8 +71,8 @@ export function ThemeModeToggle({
       document.documentElement.animate(
         {
           clipPath: [
-            `circle(0px at ${x}px ${y}px)`,
-            `circle(${endRadius}px at ${x}px ${y}px)`,
+            `circle(0% at ${toXPct(x)} ${toYPct(y)})`,
+            `circle(${toRadiusPct(endRadius)} at ${toXPct(x)} ${toYPct(y)})`,
           ],
         },
         {
