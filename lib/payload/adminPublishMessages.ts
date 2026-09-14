@@ -50,6 +50,10 @@ export const ADMIN_PUBLISH_ERROR_CODES = [
   'publish-not-found',
   'publish-temporarily-unavailable',
   'publish-internal-error',
+  // `/api/admin/publish/bulk` 前段（`lib/payload/parseBulkPublishRequest.ts`）
+  'empty-items',
+  'too-many-items',
+  'invalid-item',
 ] as const;
 
 export type AdminPublishErrorCode = (typeof ADMIN_PUBLISH_ERROR_CODES)[number];
@@ -77,7 +81,24 @@ export const ADMIN_PUBLISH_NOTICE_CODES = [
 
 export type AdminPublishNoticeCode = (typeof ADMIN_PUBLISH_NOTICE_CODES)[number];
 
-export type AdminPublishMessageKey = AdminPublishErrorCode | AdminPublishNoticeCode;
+/** `/admin/draft-list`（一括公開画面）の固定UI文言。エラー/通知コードとは別枠だが、
+ *  同じ「型で網羅性を強制する」仕組みに乗せるため`AdminPublishMessageKey`へ合流させる。 */
+export const DRAFT_LIST_LABEL_CODES = [
+  'draft-list-nav-label',
+  'draft-list-heading',
+  'draft-list-column-collection',
+  'draft-list-column-title',
+  'draft-list-column-updated-at',
+  'draft-list-edit-link',
+  'draft-list-publish-selected',
+  'draft-list-no-permission',
+  'draft-list-empty',
+  'draft-list-results-heading',
+] as const;
+
+export type DraftListLabelCode = (typeof DRAFT_LIST_LABEL_CODES)[number];
+
+export type AdminPublishMessageKey = AdminPublishErrorCode | AdminPublishNoticeCode | DraftListLabelCode;
 
 /** `t()` に渡す完全修飾キー。 */
 export function adminPublishMessageKey(code: AdminPublishMessageKey): string {
@@ -118,6 +139,19 @@ const ja: Record<AdminPublishMessageKey, string> = {
     '公開はできましたが、ページの更新通知が届きませんでした。しばらくしてもページの内容が変わらない場合は、再読み込みして確認してください。',
   'publish-succeeded-reflection-not-configured':
     '公開はできましたが、この環境ではページの自動更新が設定されていません。反映まで時間がかかる場合があります。',
+  'empty-items': '公開対象が選択されていません。一覧からチェックしてから実行してください。',
+  'too-many-items': '一度に公開できる件数の上限を超えています。件数を減らしてください。',
+  'invalid-item': '選択内容の一部を認識できませんでした。ページを再読み込みしてもう一度お試しください。',
+  'draft-list-nav-label': 'Draft一覧',
+  'draft-list-heading': 'Draft一覧（全コレクション横断）',
+  'draft-list-column-collection': 'コレクション',
+  'draft-list-column-title': 'タイトル',
+  'draft-list-column-updated-at': '最終更新日',
+  'draft-list-edit-link': '編集へ',
+  'draft-list-publish-selected': '選択した{{count}}件を公開',
+  'draft-list-no-permission': 'この画面を見る権限がありません。',
+  'draft-list-empty': '現在draft状態のレコードはありません。',
+  'draft-list-results-heading': '公開結果',
 };
 
 const en: Record<AdminPublishMessageKey, string> = {
@@ -150,6 +184,19 @@ const en: Record<AdminPublishMessageKey, string> = {
     'Published, but the page-update notification did not go through. If the page still shows the old content after a while, reload to check.',
   'publish-succeeded-reflection-not-configured':
     'Published, but this environment has no automatic page refresh configured. It may take longer to show up.',
+  'empty-items': 'No items were selected. Check some rows in the list before running this.',
+  'too-many-items': 'That is more items than can be published at once. Select fewer items.',
+  'invalid-item': 'Some of the selected items could not be recognized. Reload the page and try again.',
+  'draft-list-nav-label': 'Drafts',
+  'draft-list-heading': 'Drafts (all collections)',
+  'draft-list-column-collection': 'Collection',
+  'draft-list-column-title': 'Title',
+  'draft-list-column-updated-at': 'Last updated',
+  'draft-list-edit-link': 'Edit',
+  'draft-list-publish-selected': 'Publish {{count}} selected',
+  'draft-list-no-permission': 'You do not have permission to view this page.',
+  'draft-list-empty': 'There are no draft records right now.',
+  'draft-list-results-heading': 'Publish results',
 };
 
 /** `payload.config.ts` の `i18n.translations` へそのまま渡す。 */
