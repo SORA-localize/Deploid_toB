@@ -93,8 +93,13 @@ export default buildConfig({
     // repeatedly against throwaway databases) — it redirects generated migration *output* to a
     // temp directory so repeated test runs never write timestamped files into the real, committed
     // `migrations/` directory. Never set in a real deploy environment.
+    // turbopackIgnore: このpath.resolveの動的引数はNext 16.3のtracerに「プロジェクト全体を
+    // トレース対象にする」と判定され、audit-uploadルートのビルド出力を肥大化させていた
+    // （実測 297.8 MiB、既存のサイズゲートに抵触）。PAYLOAD_TEST_MIGRATION_DIRは上記の通り
+    // テスト専用でデプロイ環境では常にundefinedのため、tracerへの申告を静的に外しても
+    // 実行時の分岐そのものは変えない。
     migrationDir: process.env.PAYLOAD_TEST_MIGRATION_DIR
-      ? path.resolve(process.cwd(), process.env.PAYLOAD_TEST_MIGRATION_DIR)
+      ? path.resolve(/* turbopackIgnore: true */ process.cwd(), process.env.PAYLOAD_TEST_MIGRATION_DIR)
       : path.resolve(dirname, 'migrations'),
   }),
   // MCP pluginはcreateMediaStoragePlugin()の後ろに置く（順序自体に意味は無いが、
