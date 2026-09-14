@@ -629,6 +629,44 @@ describe('Content collection publish gate (real Payload Local API, manufacturers
       expect(mainRow._status).toBe('draft');
     });
 
+    it('rejects Payload native bulk edit/publish (where指定・idなし) with a distinct, editor-facing message pointing at /admin/draft-list', async () => {
+      // Payload標準の管理画面「複数選択→一括編集/一括公開」は `PATCH /api/{collection}?where=...`
+      // という、idを指定しない `where` 指定のupdateを送る（`markBulkWriteWithoutId` 参照）。
+      // 判定（拒否すること）はid指定と同じだが、文言だけ変わることを確認する。
+      const publisher = await loginAs(payload, 'gate-publisher@example.com');
+      const writer = await loginAs(payload, 'gate-writer@example.com');
+
+      const draft = await payload.create({
+        collection: 'manufacturers',
+        overrideAccess: false,
+        draft: true,
+        user: writer,
+        data: {
+          stableId: 'gate-mfr-bulk-no-id',
+          slug: 'gate-mfr-bulk-no-id',
+          ...COMPLETE_MANUFACTURER_DATA,
+        },
+      });
+
+      // `where`指定のbulk updateはid指定と違い、失敗しても**reject しない**
+      // （Payloadは1件ずつ処理し、失敗を `result.errors[]` に積んで200を返す設計 ——
+      // `node_modules/payload/dist/collections/operations/update.js` 実測）。
+      const result = await payload.update({
+        collection: 'manufacturers',
+        where: { id: { equals: draft.id } },
+        overrideAccess: false,
+        user: publisher,
+        data: { _status: 'published' },
+      });
+
+      expect(result.docs).toHaveLength(0);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0]?.message).toMatch(/Draft一覧/);
+
+      const mainRow = await payload.findByID({ collection: 'manufacturers', id: draft.id, overrideAccess: true });
+      expect(mainRow._status).toBe('draft');
+    });
+
     it('rejects a publish attempt that only bypasses access control with overrideAccess', async () => {
       const writer = await loginAs(payload, 'gate-writer@example.com');
       const draft = await payload.create({

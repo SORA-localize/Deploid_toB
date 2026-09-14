@@ -231,3 +231,33 @@ export function readDraftIntent(req: PayloadRequest, collectionSlug: string, doc
   map.delete(key);
   return intent === true;
 }
+
+/**
+ * `where`指定のbulk update（Payload純正の複数選択→一括編集/一括公開/一括非公開。
+ * `args.id`が無いupdate operation）の入口で立てる、**表示文言だけを変えるための**マーカー。
+ *
+ * `readDraftIntent`と違い、1回の操作で複数documentのgate hookから参照されるため
+ * **読んでも消費しない**（peek）。`clearDraftIntents()`が次のoperationの入口で
+ * まとめて掃除するので、取り消し忘れの心配はない。
+ *
+ * セキュリティ判定そのものには一切関わらない —— `createPublishGateHook`は
+ * このマーカーの有無に関係なく同じ理由（承認contextが無い）で常に拒否する。
+ * 違いは投げるエラーの文言だけで、bulk操作から迷い込んだ編集者に
+ * 「Draft一覧を使ってください」と案内するためだけに存在する。
+ */
+export function markBulkWriteWithoutId(req: PayloadRequest, collectionSlug: string): void {
+  const context = contextOf(req);
+  const map = draftIntentStore(context) ?? new Map<string, boolean>();
+  map.set(bulkWriteMarkerKey(collectionSlug), true);
+  context[DRAFT_INTENT_KEY] = map;
+}
+
+export function isBulkWriteWithoutId(req: PayloadRequest, collectionSlug: string): boolean {
+  const map = draftIntentStore(contextOf(req));
+  return map?.get(bulkWriteMarkerKey(collectionSlug)) === true;
+}
+
+/** 実在のdocId（数値/UUID文字列）とは重ならない予約語。 */
+function bulkWriteMarkerKey(collectionSlug: string): string {
+  return draftIntentKey(collectionSlug, '__bulk_write_without_id__');
+}
