@@ -19,6 +19,8 @@ import {
 } from './adminSelectLabels';
 import {
   clearDraftIntents,
+  isBulkWriteWithoutId,
+  markBulkWriteWithoutId,
   readApprovedPublishAuthorization,
   readDraftIntent,
   readPrivilegedPublishAuthorization,
@@ -486,12 +488,17 @@ export const capturePublishIntentBeforeOperation = (({ args, collection, operati
 }) => {
   if (DRAFT_INTENT_CLEARING_OPERATIONS.has(operation)) {
     // 直前のoperationがaccess拒否等で `beforeChange` へ到達せず残した孤児tokenを、
-    // このoperationが拾えないようにする（`restoreVersion` や `where` 指定のbulk updateは
-    // 自分ではintentを記録しないため、捨てないと拾えてしまう）。
+    // このoperationが拾えないようにする（`restoreVersion` は自分ではintentを記録しない
+    // ため、捨てないと拾えてしまう）。
     clearDraftIntents(req, collection.slug);
   }
   if (operation === 'update' && args?.id !== undefined) {
     recordDraftIntent(req, collection.slug, args.id, args.draft === true);
+  } else if (operation === 'update' && args?.id === undefined) {
+    // `where` 指定のbulk update（Payload純正の複数選択→編集/公開/非公開）。判定そのものは
+    // 変えない —— 承認contextが無ければ従来通り拒否する。付けるのは表示文言の分岐用マーカーだけ
+    // （`markBulkWriteWithoutId` のdocコメント参照）。
+    markBulkWriteWithoutId(req, collection.slug);
   }
   return args;
 }) as unknown as CollectionBeforeOperationHook;
@@ -595,6 +602,19 @@ export function createPublishGateHook<TDoc extends PublishTransitionCandidate>(o
         });
       } else if (!readApprovedPublishAuthorization(req, options.collectionSlug, docId)) {
         // 必須修正1-4: 承認済み公開の唯一の経路は `publishApprovedVersion()`。
+        //
+        // Payload純正の複数選択（一括編集/一括公開）から来た書き込みだけ、文言を分ける。
+        // 判定は変えない——理由（承認contextが無い）もfail-closedな結論も同じ。
+        // 違うのは編集者に見える文字列だけ:「公開する」は常にここへ来る設計上、
+        // 生の`publish-approval-required`のままだと原因が伝わらず、native bulk toolbarの
+        // PublishMany/EditManyは（`node_modules/@payloadcms/ui/dist/elements/PublishMany/
+        // DrawerContent.js`実測）このErrorの`message`をそのままtoastへ出すため、
+        // ここを直せば編集者に届く文言を直接変えられる。
+        if (isBulkWriteWithoutId(req, options.collectionSlug)) {
+          throw new Error(
+            '複数選択からの公開・編集はできません。管理画面左メニューの「Draft一覧」から選んで公開してください。',
+          );
+        }
         throw new Error('publish-approval-required');
       }
     }
