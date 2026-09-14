@@ -44,6 +44,18 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    // 一括公開画面（`/admin/draft-list`）。ネイティブの一覧画面には一切手を入れず、
+    // 完全に独立したroot viewとして追加する（詳細は`components/admin/DraftListView.tsx`）。
+    components: {
+      afterNavLinks: ['@/components/admin/DraftListNavLink#DraftListNavLink'],
+      views: {
+        draftList: {
+          Component: '@/components/admin/DraftListView#DraftListView',
+          path: '/draft-list',
+          exact: true,
+        },
+      },
+    },
   },
   collections: contentCollections,
   // Admin公開ボタンの文言。`lib/uiText.ts`（公開サイト用）には入れない —— adminはPayload独自の
