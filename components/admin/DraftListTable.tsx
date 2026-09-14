@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Link, useConfig, useTranslation } from '@payloadcms/ui';
+import { Button, ChevronIcon, Link, useConfig, useTranslation } from '@payloadcms/ui';
 import {
   type AdminPublishErrorCode,
   type AdminPublishMessageKey,
@@ -76,6 +76,11 @@ export function DraftListTable({ initialItems, canPublish }: DraftListTableProps
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [results, setResults] = useState<BulkPublishItemResult[] | null>(null);
   const [inFlight, setInFlight] = useState(false);
+  // 各セクションの開閉状態。既定は全開（従来の`<details open>`と同じ）——チェブロンの向きを
+  // 実際の開閉と一致させるため、`<details>`をuncontrolledのままにせず、ここで持つ。
+  const [openGroups, setOpenGroups] = useState<Set<ApprovableCollectionSlug>>(
+    () => new Set(Object.keys(PUBLISHABLE_COLLECTIONS) as ApprovableCollectionSlug[]),
+  );
 
   const locale = i18n.language === 'ja' ? 'ja' : 'en';
 
@@ -215,9 +220,26 @@ export function DraftListTable({ initialItems, canPublish }: DraftListTableProps
         const groupKeys = groupItems.map((item) => rowKey(item.collection, item.id));
         const selectedInGroup = groupKeys.filter((key) => selected.has(key)).length;
         const collectionLabel = DRAFT_LIST_COLLECTION_LABELS[collection][locale];
+        const isOpen = openGroups.has(collection);
 
         return (
-          <details key={collection} open style={{ marginBottom: '1rem' }}>
+          <details
+            key={collection}
+            open={isOpen}
+            onToggle={(event) => {
+              // ネイティブの開閉（クリック/キーボード操作）が先に起き、この時点で
+              // `event.target.open` は既にその結果を反映している。チェブロンの向きを
+              // 実際の状態と一致させるためstateへ同期するだけで、開閉の挙動自体は変えない。
+              const nowOpen = (event.target as HTMLDetailsElement).open;
+              setOpenGroups((prev) => {
+                const next = new Set(prev);
+                if (nowOpen) next.add(collection);
+                else next.delete(collection);
+                return next;
+              });
+            }}
+            style={{ marginBottom: '1rem' }}
+          >
             <summary
               style={{
                 display: 'flex',
@@ -228,6 +250,9 @@ export function DraftListTable({ initialItems, canPublish }: DraftListTableProps
                 fontWeight: 600,
               }}
             >
+              <span aria-hidden="true" style={{ display: 'inline-flex', width: '1rem', height: '1rem', flexShrink: 0 }}>
+                <ChevronIcon direction={isOpen ? undefined : 'right'} size="small" />
+              </span>
               {canPublish && (
                 <TriStateCheckbox
                   checked={selectedInGroup === groupKeys.length}
