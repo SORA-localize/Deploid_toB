@@ -9,6 +9,14 @@ updates:
       timezone: Asia/Tokyo
     open-pull-requests-limit: 5
     versioning-strategy: increase-if-necessary
+    ignore:
+      # knip@5.88.1 は typescript>=5.0.4 <7 しか許容せず、5.88.1が現時点の最新版
+      # （TypeScript 7系対応版は未リリース）。7系が来ると npm ci が ERESOLVE で
+      # 落ちる（PR #32で実際に確認済み）。knip/typescript-eslint がTS7に追従したら
+      # このignoreを外し、明示的なアップグレードタスクとして対応する。
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
     groups:
       next-runtime:
         patterns:
@@ -18,6 +26,12 @@ updates:
           - eslint-config-next
       testing:
         dependency-type: development
+        # major更新は個別PRに分離する。eslint@10.10.0はNode ^22.13.0以上を要求し、
+        # CI（ci.yml、node-version: 22.12.0）はそれを満たさない（PR #52で確認済み）。
+        # minor/patchだけをこのグループでまとめ、major（eslint 10等）は個別に検討する。
+        update-types:
+          - minor
+          - patch
         patterns:
           - vitest
           - "@playwright/test"
