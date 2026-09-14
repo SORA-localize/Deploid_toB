@@ -21,8 +21,13 @@ const MAX_TRACE_BYTES = 220 * 1024 * 1024;
 for (const [name, trace] of Object.entries(routes)) {
   const tracePath = path.join(root, '.next', trace);
   const payload = JSON.parse(fs.readFileSync(tracePath, 'utf8'));
-  const bytes = payload.files.reduce((sum, file) => {
-    try { return sum + fs.statSync(path.resolve(path.dirname(tracePath), file)).size; } catch { return sum; }
+  // Next 16.3のtracerは同じ依存（.cosign-bin/cosignなど）を`files`に複数回列挙することがある
+  // （実測: audit-upload/complete で.cosign-binが2件、Next 16.2.12では発生していなかった）。
+  // 実際にVercelへ配置されるのは重複排除された実体ファイルなので、サイズも重複排除して数える
+  // ——さもないと同じ135MBのバイナリを2回分カウントして予算を偽って超過させる。
+  const uniqueFiles = new Set(payload.files.map((file) => path.resolve(path.dirname(tracePath), file)));
+  const bytes = [...uniqueFiles].reduce((sum, resolved) => {
+    try { return sum + fs.statSync(resolved).size; } catch { return sum; }
   }, 0);
   if (bytes > MAX_TRACE_BYTES) throw new Error(`audit-upload trace too large for ${name}: ${(bytes / 1048576).toFixed(1)} MiB`);
   const actual = hasCosign(trace);
