@@ -76,6 +76,15 @@ export default buildConfig({
   editor: lexicalEditor(),
   secret: requireEnv('PAYLOAD_SECRET'),
   db: postgresAdapter({
+    // dev-mode schema auto-push（`pushDevSchema`）を明示的に無効化する。既定では
+    // `NODE_ENV !== 'production' && PAYLOAD_MIGRATING !== 'true'` の間ずっと有効で、
+    // ローカルdevをPreview/Production DBへ向けたときに実DDLを実行してしまう
+    // （実際にPreview DBの`payload_migrations`に`{name:"dev",batch:-1}`という
+    // 野良pushの痕跡が複数回残っていたことを確認済み）。schema変更は必ず
+    // `payload:migrate:create` → 生成物をレビュー → `payload:migrate` を経由させる
+    // （`docs/reference/database-migration-runbook-v1.md`）。これらのCLIコマンドは
+    // 別経路（`payload.db.migrate()`等）を直接呼ぶため`push: false`の影響を受けない。
+    push: false,
     pool: {
       connectionString: requireEnv('DATABASE_URL'),
     },
