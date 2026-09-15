@@ -86,7 +86,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: 22.12.0
+          # 固定パッチではなく22系最新を使う理由: ci.yml のコメント参照(npm10/11 lock file 非互換)。
+          node-version: '22'
           cache: npm
       - run: npm ci
 
