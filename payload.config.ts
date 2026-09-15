@@ -7,6 +7,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { buildConfig } from 'payload';
 import { Admins } from './collections/Admins';
 import { adminPublishTranslations } from './lib/payload/adminPublishMessages';
+import { createLivePreviewUrl, PREVIEW_ROOT_BY_COLLECTION } from './lib/payload/adminPreview';
 import { contentCollections, contentGlobals } from './lib/payload/contentSchema';
 import { createMcpPlugin } from './lib/payload/mcp';
 import { createMediaStoragePlugin } from './lib/payload/mediaStoragePlugin';
@@ -55,6 +56,18 @@ export default buildConfig({
           exact: true,
         },
       },
+    },
+    // フロントエンドの詳細ページを持つ4 collection（`adminPreview.ts`の
+    // `PREVIEW_ROOT_BY_COLLECTION`）だけで、編集画面の横に実ページをiframeで表示する。
+    // URL生成・draft-mode有効化ロジックは既存の`admin.preview`（別タブで開く方）と共有する
+    // （`createLivePreviewUrl()`のコメント参照）。
+    livePreview: {
+      url: createLivePreviewUrl(),
+      collections: Object.keys(PREVIEW_ROOT_BY_COLLECTION),
+      breakpoints: [
+        { name: 'mobile', label: 'モバイル', width: 390, height: 844 },
+        { name: 'desktop', label: 'デスクトップ', width: 1440, height: 900 },
+      ],
     },
   },
   collections: contentCollections,

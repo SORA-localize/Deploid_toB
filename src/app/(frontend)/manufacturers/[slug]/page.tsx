@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -23,6 +24,11 @@ import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { breadcrumbJsonLd, manufacturerJsonLd } from '@/lib/jsonLd';
 import { createPageMetadata } from '@/lib/metadata';
 import { uiText } from '@/lib/uiText';
+
+// Live Preview中(draft mode)のときだけ必要。動的importで通常訪問者のbundleから外す。
+const LivePreviewRefresher = dynamic(() =>
+  import('@/components/LivePreviewRefresher').then((mod) => mod.LivePreviewRefresher),
+);
 import { createRobotCatalogItems, type RobotCatalogItem } from '@/lib/viewModels/robots';
 
 export async function generateStaticParams() {
@@ -156,13 +162,14 @@ async function buildManufacturerDetailData(
 
 export default async function ManufacturerDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { data } = await resolveDraftAwarePageData(slug, getCachedManufacturerDetailData, getDraftManufacturerDetailData);
+  const { data, isDraftPreview } = await resolveDraftAwarePageData(slug, getCachedManufacturerDetailData, getDraftManufacturerDetailData);
   if (data.kind === 'redirect') permanentRedirect(`/manufacturers/${data.redirectTo}`);
   if (data.kind === 'not-found') notFound();
   const { manufacturer, robotCount, robotItems, displayedReportItems, sections, manufacturerName } = data;
 
   return (
     <div className="min-h-screen bg-background">
+      {isDraftPreview ? <LivePreviewRefresher /> : null}
       <JsonLd data={manufacturerJsonLd(manufacturer)} />
       <JsonLd
         data={breadcrumbJsonLd([

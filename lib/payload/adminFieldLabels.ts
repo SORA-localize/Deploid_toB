@@ -182,6 +182,24 @@ export const imageAssetFieldLabels: AdminFieldLabelMap = {
   aspectRatio: { ja: 'アスペクト比', en: 'Aspect ratio' },
 };
 
+/** ロボット/ロボットシリーズの`images`（role別画像group）で共有するroleラベル。`lib/robotMedia.ts`の`ROBOT_IMAGE_ROLE_ORDER`と対応。 */
+export const robotImageRoleFieldLabels: AdminFieldLabelMap = {
+  hero: { ja: '全身正面', en: 'Main image (front)' },
+  transparent: { ja: '背景透過', en: 'Transparent background' },
+  side: { ja: '側面', en: 'Side view' },
+  inOperation: { ja: '稼働中', en: 'In operation' },
+  scale: { ja: '人物との比較', en: 'Scale reference' },
+  endEffector: { ja: 'ハンド', en: 'End effector' },
+  mobility: { ja: '脚・足・車輪', en: 'Mobility detail' },
+};
+
+/** メーカーの`logos`（symbol/wordmark/combined）のroleラベル。 */
+export const manufacturerLogoRoleFieldLabels: AdminFieldLabelMap = {
+  symbol: { ja: 'シンボルマーク', en: 'Symbol mark' },
+  wordmark: { ja: 'ワードマーク', en: 'Wordmark' },
+  combined: { ja: 'シンボル+文字の組み合わせ', en: 'Combined logo' },
+};
+
 export const seoFieldLabels: AdminFieldLabelMap = {
   metaTitle: { ja: 'SEOタイトル', en: 'SEO title' },
   metaDescription: { ja: 'SEO説明文', en: 'SEO description' },
@@ -237,7 +255,7 @@ export const manufacturersFieldLabels: AdminFieldLabelMap = {
   headquarters: { ja: '本社所在地（座標）', en: 'Headquarters (coordinates)' },
   foundedYear: { ja: '設立年', en: 'Founded year' },
   website: { ja: '公式サイトURL', en: 'Website URL' },
-  logos: { ja: 'ロゴ（JSON）', en: 'Logos (JSON)' },
+  logos: { ja: 'ロゴ', en: 'Logos' },
   contactUrl: { ja: '問い合わせ先URL', en: 'Contact URL' },
   description: { ja: '企業説明', en: 'Description' },
   japanPresence: { ja: '日本国内展開', en: 'Japan presence' },
@@ -287,7 +305,7 @@ export const robotSeriesFieldLabels: AdminFieldLabelMap = {
   nameJa: { ja: 'シリーズ名（日本語表記）', en: 'Series name (Japanese)' },
   manufacturerId: { ja: 'メーカー', en: 'Manufacturer' },
   description: { ja: 'シリーズ説明', en: 'Description' },
-  images: { ja: '画像（JSON）', en: 'Images (JSON)' },
+  images: { ja: '画像', en: 'Images' },
   industryTags: { ja: '業種タグ', en: 'Industry tags' },
   taskTags: { ja: 'タスクタグ', en: 'Task tags' },
 };
@@ -315,7 +333,7 @@ export const robotsFieldLabels: AdminFieldLabelMap = {
   japanAvailability: { ja: '国内入手性', en: 'Japan availability' },
   distributorJapan: { ja: '国内代理店名', en: 'Japan distributor name' },
   supportNote: { ja: 'サポートに関する備考', en: 'Support note' },
-  images: { ja: '画像（JSON）', en: 'Images (JSON)' },
+  images: { ja: '画像', en: 'Images' },
   industryTags: { ja: '業種タグ', en: 'Industry tags' },
   taskTags: { ja: 'タスクタグ', en: 'Task tags' },
   comparison: { ja: '比較情報（非推奨・/compare用に維持）', en: 'Comparison info (deprecated, kept for /compare)' },

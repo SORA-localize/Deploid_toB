@@ -8,9 +8,13 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-  PublishValidationError, } from '../lib/payload/access';
+  namedImageSetField,
+  PublishValidationError,
+  ROBOT_IMAGE_ROLE_ORDER,
+} from '../lib/payload/access';
 import {
   applyAdminFieldLabels,
+  robotImageRoleFieldLabels,
   robotsComparisonFieldLabels,
   robotsFieldLabels,
   robotsLoadRatingsFieldLabels,
@@ -232,19 +236,12 @@ const robotsAllFields = applyAdminFieldLabels(
       },
       { name: 'distributorJapan', type: 'text' },
       { name: 'supportNote', type: 'textarea' },
-      {
-        name: 'images',
-        type: 'json',
-        // JSON形の内訳: role名（hero/transparent/side/inOperation/scale/endEffector/mobility）を
-        // キーに、それぞれ`heroImage`と同じ形のImageAssetオブジェクトを持つ（省略可）。
-        // `lib/robotMedia.ts`の`ROBOT_IMAGE_ROLE_ORDER`と対応。
-        admin: {
-          description: {
-            ja: '画像（role別、いずれも任意）。ロボット詳細ページの画像ギャラリーに表示されます。',
-            en: 'Images by role (all optional). Shown in the image gallery on the robot detail page.',
-          },
+      namedImageSetField('images', ROBOT_IMAGE_ROLE_ORDER, robotImageRoleFieldLabels, {
+        description: {
+          ja: '画像（role別、いずれも任意）。ロボット詳細ページの画像ギャラリーに表示されます。',
+          en: 'Images by role (all optional). Shown in the image gallery on the robot detail page.',
         },
-      },
+      }),
       { name: 'industryTags', type: 'text', hasMany: true },
       { name: 'taskTags', type: 'text', hasMany: true },
       {

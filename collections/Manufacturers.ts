@@ -8,9 +8,11 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
+  namedImageSetField,
   PublishValidationError, } from '../lib/payload/access';
 import {
   applyAdminFieldLabels,
+  manufacturerLogoRoleFieldLabels,
   manufacturersDomesticDistributorsFieldLabels,
   manufacturersDomesticDistributorsRowLabels,
   manufacturersFieldLabels,
@@ -102,19 +104,12 @@ const manufacturersAllFields = applyAdminFieldLabels(
     },
     { name: 'foundedYear', type: 'number' },
     { name: 'website', type: 'text', required: true },
-    {
-      name: 'logos',
-      type: 'json',
-      // JSON形の内訳: `symbol`/`wordmark`/`combined`（いずれも省略可）。各値は
-      // `heroImage`と同じ形（`src`/`alt`/`credit`/`sourceUrl`/`rights`/`aspectRatio`）を持つ
-      // オブジェクト（`lib/content/domainTypes.ts`の`ManufacturerLogos`）。
-      admin: {
-        description: {
-          ja: 'ロゴ画像（symbol/wordmark/combinedの3種、それぞれ任意）。メーカー詳細ページ上部に表示されます。',
-          en: 'Logo images (symbol / wordmark / combined variants, each optional). Shown at the top of the manufacturer detail page.',
-        },
+    namedImageSetField('logos', ['symbol', 'wordmark', 'combined'], manufacturerLogoRoleFieldLabels, {
+      description: {
+        ja: 'ロゴ画像（symbol/wordmark/combinedの3種、それぞれ任意）。メーカー詳細ページ上部に表示されます。',
+        en: 'Logo images (symbol / wordmark / combined variants, each optional). Shown at the top of the manufacturer detail page.',
       },
-    },
+    }),
     { name: 'contactUrl', type: 'text' },
     { name: 'description', type: 'textarea', required: true },
     {

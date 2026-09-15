@@ -8,8 +8,11 @@ import {
   contentVersionsConfig,
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
-  PublishValidationError, } from '../lib/payload/access';
-import { applyAdminFieldLabels, robotSeriesFieldLabels } from '../lib/payload/adminFieldLabels';
+  namedImageSetField,
+  PublishValidationError,
+  ROBOT_IMAGE_ROLE_ORDER,
+} from '../lib/payload/access';
+import { applyAdminFieldLabels, robotImageRoleFieldLabels, robotSeriesFieldLabels } from '../lib/payload/adminFieldLabels';
 import { partitionFieldsByName, withSidebarPosition } from '../lib/payload/adminFieldLayout';
 import { ADMIN_PUBLISH_INTENT_FIELD } from '../lib/payload/adminPublishIntent';
 import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
@@ -78,19 +81,12 @@ const robotSeriesAllFields = applyAdminFieldLabels(
         relationTo: 'manufacturers',
       },
       { name: 'description', type: 'textarea' },
-      {
-        name: 'images',
-        type: 'json',
-        // JSON形の内訳: role名（hero/transparent/side/inOperation/scale/endEffector/mobility）を
-        // キーに、それぞれ`heroImage`と同じ形のImageAssetオブジェクトを持つ（省略可）。
-        // `lib/robotMedia.ts`の`ROBOT_IMAGE_ROLE_ORDER`と対応（Robots.imagesと同じ形式）。
-        admin: {
-          description: {
-            ja: '画像（role別、いずれも任意）。現状、robot-seriesを単体で表示するページが無いため、公開ページには表示されません。',
-            en: 'Images by role (all optional). Not shown on any public page yet — there is currently no dedicated page for a robot series on its own.',
-          },
+      namedImageSetField('images', ROBOT_IMAGE_ROLE_ORDER, robotImageRoleFieldLabels, {
+        description: {
+          ja: '画像（role別、いずれも任意）。現状、robot-seriesを単体で表示するページが無いため、公開ページには表示されません。',
+          en: 'Images by role (all optional). Not shown on any public page yet — there is currently no dedicated page for a robot series on its own.',
         },
-      },
+      }),
       { name: 'industryTags', type: 'text', hasMany: true },
       { name: 'taskTags', type: 'text', hasMany: true },
     ],

@@ -1,4 +1,4 @@
-import type { GeneratePreviewURL } from 'payload';
+import type { GeneratePreviewURL, LivePreviewConfig } from 'payload';
 import { asAdminUser, isContentDraftWriterOrAboveUser } from './access';
 
 /**
@@ -21,7 +21,7 @@ export const PREVIEW_ROOT_BY_COLLECTION = {
 
 export type PreviewableCollectionSlug = keyof typeof PREVIEW_ROOT_BY_COLLECTION;
 
-function buildFrontendPath(collection: PreviewableCollectionSlug, doc: Record<string, unknown>): string {
+export function buildFrontendPath(collection: PreviewableCollectionSlug, doc: Record<string, unknown>): string {
   const root = PREVIEW_ROOT_BY_COLLECTION[collection];
   const slug = typeof doc.slug === 'string' ? doc.slug.trim() : '';
   return slug.length > 0 ? `${root}/${slug}` : root;
@@ -39,6 +39,30 @@ function buildFrontendPath(collection: PreviewableCollectionSlug, doc: Record<st
 export function createAdminPreview(collection: PreviewableCollectionSlug): GeneratePreviewURL {
   return (doc, { req }) => {
     const frontendPath = buildFrontendPath(collection, doc);
+    const user = asAdminUser(req.user);
+    if (isContentDraftWriterOrAboveUser(user)) {
+      return `/api/draft-mode/enable?redirect=${encodeURIComponent(frontendPath)}`;
+    }
+    return frontendPath;
+  };
+}
+
+function isPreviewableCollectionSlug(slug: string | undefined): slug is PreviewableCollectionSlug {
+  return slug !== undefined && slug in PREVIEW_ROOT_BY_COLLECTION;
+}
+
+/**
+ * Live Previewの`url`は`admin.preview`の`GeneratePreviewURL`と引数の形が異なる
+ * （`(doc, {req})`ではなく`({collectionConfig, data, req})`の単一object）ため、
+ * `createAdminPreview()`をそのまま渡すことはできない。ロジック自体
+ * （`buildFrontendPath` + draft-mode-enable経由のredirect）は共有し、この4
+ * collection（`PREVIEW_ROOT_BY_COLLECTION`）分をこの1関数だけで賄う——
+ * collection側の`admin`ブロックへ個別配線しない。
+ */
+export function createLivePreviewUrl(): NonNullable<LivePreviewConfig['url']> {
+  return ({ collectionConfig, data, req }) => {
+    if (!isPreviewableCollectionSlug(collectionConfig?.slug)) return null;
+    const frontendPath = buildFrontendPath(collectionConfig.slug, data);
     const user = asAdminUser(req.user);
     if (isContentDraftWriterOrAboveUser(user)) {
       return `/api/draft-mode/enable?redirect=${encodeURIComponent(frontendPath)}`;

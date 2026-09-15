@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { ArrowRight, Calendar, User } from 'lucide-react';
@@ -40,6 +41,11 @@ import { createPageMetadata } from '@/lib/metadata';
 import { uiText } from '@/lib/uiText';
 import { getArticleTypeTone } from '@/lib/visualSemantics';
 import { ManufacturerGuideArticleBody } from '@/components/ManufacturerGuideArticleBody';
+
+// Live Preview中(draft mode)のときだけ必要。動的importで通常訪問者のbundleから外す。
+const LivePreviewRefresher = dynamic(() =>
+  import('@/components/LivePreviewRefresher').then((mod) => mod.LivePreviewRefresher),
+);
 
 export async function generateStaticParams() {
   const repository = await getContentRepository();
@@ -238,7 +244,7 @@ async function buildReportDetailData(repository: ContentRepository, resolution: 
 
 export default async function ReportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { data } = await resolveDraftAwarePageData(slug, getCachedReportDetailData, getDraftReportDetailData);
+  const { data, isDraftPreview } = await resolveDraftAwarePageData(slug, getCachedReportDetailData, getDraftReportDetailData);
   if (data.kind === 'redirect') permanentRedirect(`/reports/${data.redirectTo}`);
   if (data.kind === 'not-found') notFound();
   const {
@@ -265,6 +271,7 @@ export default async function ReportDetailPage({ params }: { params: Promise<{ s
 
   return (
     <div className="min-h-screen bg-background">
+      {isDraftPreview ? <LivePreviewRefresher /> : null}
       <JsonLd data={articleJsonLd(report)} />
       {guideContent && guideContent.faq.length > 0 && (
         <JsonLd data={faqPageJsonLd(guideContent.faq)} />
