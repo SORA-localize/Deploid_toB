@@ -428,6 +428,7 @@ export function namedImageSetField(
     fields: roleFields.map((field, index) => ({
       type: 'collapsible' as const,
       label: roleLabels[roles[index]],
+      admin: { initCollapsed: true },
       fields: [field],
     })),
   };
