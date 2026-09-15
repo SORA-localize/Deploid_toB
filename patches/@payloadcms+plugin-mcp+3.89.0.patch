@@ -1,8 +1,8 @@
 diff --git a/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js b/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js
-index 1a81ee7..08aad56 100644
+index 37fe574..ec1d3b5 100644
 --- a/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js
 +++ b/node_modules/@payloadcms/plugin-mcp/dist/mcp/tools/resource/update.js
-@@ -225,8 +225,21 @@ ${JSON.stringify(errors)}
+@@ -213,8 +213,21 @@ ${JSON.stringify(errors)}
          const convertedFields = convertCollectionSchemaToZod(schema);
          // Create a new schema that combines the converted fields with update-specific parameters
          // Use .partial() to make all fields optional for partial updates

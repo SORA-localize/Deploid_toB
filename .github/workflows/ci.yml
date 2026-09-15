@@ -45,7 +45,12 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: 22.12.0
+          # 固定パッチ(22.12.0, npm 10.9.0同梱)ではなく22系の最新を使う。Dependabot/Vercel/
+          # ローカルはnpm 11系で、npm10はnpm11が生成したlock file(optional peerの記録が
+          # 一部無い)を「同期してない」と拒否する一方通行の非互換がある(複数のDependabot PRで
+          # 実際に踏んだ)。npm11はnpm10製lock fileを問題なく読めるため、CI側をnpm11系へ
+          # 揃えれば解消する。
+          node-version: '22'
           cache: npm
       - run: npm ci
       # Task 3.5: schema drift check. Detects "a collections/*.ts (or globals/, or

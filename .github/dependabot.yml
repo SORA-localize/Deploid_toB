@@ -18,6 +18,13 @@ updates:
         update-types:
           - version-update:semver-major
     groups:
+      payloadcms:
+        # payload本体と@payloadcms/*は相互にpeer依存でバージョンを固定し合っているため、
+        # 個別PRに分かれると必ずERESOLVEで衝突する（PR #93/#94で実際に確認済み）。
+        # 常に全パッケージを1つのPRでロックステップに更新する。
+        patterns:
+          - payload
+          - "@payloadcms/*"
       next-runtime:
         patterns:
           - next
