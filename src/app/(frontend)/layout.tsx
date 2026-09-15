@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
+import { draftMode } from 'next/headers';
 import { Analytics } from '@vercel/analytics/next';
 import { Header } from '@/components/Header';
 import { HeaderChromeProvider } from '@/components/HeaderChrome';
 import { Footer } from '@/components/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AnalyticsScripts } from '@/components/AnalyticsScripts';
+import { LivePreviewRefresher } from '@/components/LivePreviewRefresher';
 import { env } from '@/lib/env';
 import {
   defaultSiteDescription,
@@ -48,7 +50,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { isEnabled: isDraftMode } = await draftMode();
   return (
     <html lang="ja" suppressHydrationWarning className={cn("font-sans", geist.variable)}>
       <body>
@@ -73,6 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           enabled={env.analyticsEnabled}
         />
         {env.vercelAnalyticsEnabled ? <Analytics /> : null}
+        {isDraftMode ? <LivePreviewRefresher /> : null}
       </body>
     </html>
   );

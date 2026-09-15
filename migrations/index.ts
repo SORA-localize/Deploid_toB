@@ -8,6 +8,7 @@ import * as migration_20260819_154647_add_payload_mcp_api_keys from './20260819_
 import * as migration_20260823_030559_add_audit_upload_sessions from './20260823_030559_add_audit_upload_sessions';
 import * as migration_20260903_074709_admin_publish_intent_token from './20260903_074709_admin_publish_intent_token';
 import * as migration_20260911_094909_remove_unused_fields from './20260911_094909_remove_unused_fields';
+import * as migration_20260914_075432_image_fields_structured from './20260914_075432_image_fields_structured';
 
 export const migrations = [
   {
@@ -58,6 +59,11 @@ export const migrations = [
   {
     up: migration_20260911_094909_remove_unused_fields.up,
     down: migration_20260911_094909_remove_unused_fields.down,
-    name: '20260911_094909_remove_unused_fields'
+    name: '20260911_094909_remove_unused_fields',
+  },
+  {
+    up: migration_20260914_075432_image_fields_structured.up,
+    down: migration_20260914_075432_image_fields_structured.down,
+    name: '20260914_075432_image_fields_structured'
   },
 ];

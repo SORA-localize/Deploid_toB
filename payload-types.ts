@@ -259,15 +259,95 @@ export interface Manufacturer {
   /**
    * Logo images (symbol / wordmark / combined variants, each optional). Shown at the top of the manufacturer detail page.
    */
-  logos?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+  logos?: {
+    symbol?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    wordmark?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    combined?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+  };
   sources: {
     title: string;
     url: string;
@@ -486,15 +566,211 @@ export interface Robot {
   /**
    * Images by role (all optional). Shown in the image gallery on the robot detail page.
    */
-  images?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+  images?: {
+    hero?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    transparent?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    side?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    inOperation?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    scale?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    endEffector?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    mobility?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+  };
   industryTags?: string[] | null;
   taskTags?: string[] | null;
   sources: {
@@ -592,15 +868,211 @@ export interface RobotSery {
   /**
    * Images by role (all optional). Not shown on any public page yet — there is currently no dedicated page for a robot series on its own.
    */
-  images?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+  images?: {
+    hero?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    transparent?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    side?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    inOperation?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    scale?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    endEffector?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+    mobility?: {
+      src?: string | null;
+      alt?: string | null;
+      credit?: string | null;
+      sourceUrl?: string | null;
+      rights?: {
+        status?:
+          | (
+              | 'own'
+              | 'licensed'
+              | 'commercial-permitted'
+              | 'reference-attributed'
+              | 'permission-requested'
+              | 'prototype-only'
+              | 'blocked'
+            )
+          | null;
+        sourceType?:
+          ('own' | 'manufacturer-official' | 'partner-official' | 'press-release' | 'third-party' | 'unknown') | null;
+        /**
+         * The date this image's rights status was last confirmed. Not shown publicly — for internal rights tracking.
+         */
+        checkedAt?: string | null;
+        rightsHolder?: string | null;
+        licenseUrl?: string | null;
+        permissionNote?: string | null;
+      };
+      aspectRatio?: number | null;
+    };
+  };
   sources: {
     title: string;
     url: string;
@@ -1026,7 +1498,6 @@ export interface Media {
   };
   credit?: string | null;
   sourceUrl?: string | null;
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1500,7 +1971,67 @@ export interface ManufacturersSelect<T extends boolean = true> {
             };
         aspectRatio?: T;
       };
-  logos?: T;
+  logos?:
+    | T
+    | {
+        symbol?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        wordmark?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        combined?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+      };
   sources?:
     | T
     | {
@@ -1617,7 +2148,143 @@ export interface RobotSeriesSelect<T extends boolean = true> {
   industryTags?: T;
   taskTags?: T;
   summary?: T;
-  images?: T;
+  images?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        transparent?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        side?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        inOperation?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        scale?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        endEffector?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        mobility?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+      };
   sources?:
     | T
     | {
@@ -1713,7 +2380,143 @@ export interface RobotsSelect<T extends boolean = true> {
   fieldEvidence?: T;
   usageExampleSourceUrls?: T;
   supportNote?: T;
-  images?: T;
+  images?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        transparent?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        side?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        inOperation?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        scale?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        endEffector?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+        mobility?:
+          | T
+          | {
+              src?: T;
+              alt?: T;
+              credit?: T;
+              sourceUrl?: T;
+              rights?:
+                | T
+                | {
+                    status?: T;
+                    sourceType?: T;
+                    checkedAt?: T;
+                    rightsHolder?: T;
+                    licenseUrl?: T;
+                    permissionNote?: T;
+                  };
+              aspectRatio?: T;
+            };
+      };
   industryTags?: T;
   taskTags?: T;
   sources?:
@@ -2031,7 +2834,6 @@ export interface MediaSelect<T extends boolean = true> {
       };
   credit?: T;
   sourceUrl?: T;
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

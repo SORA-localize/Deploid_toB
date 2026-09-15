@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import type { Access, CollectionBeforeOperationHook, Field, FieldAccess, PayloadRequest, Where } from 'payload';
 import { adminPublishIntentField } from './adminPublishIntent';
+import type { AdminFieldLabelMap } from './adminFieldLabels';
 import {
   applyAdminFieldLabels,
   baseContentFieldLabels,
@@ -348,11 +349,19 @@ function rightsMetaField(name: string): Field {
           name: 'status',
           type: 'select',
           options: rightsStatusSelectOptions,
+          // 明示指定が無いと、field pathを連結した名前（collection名＋versionsテーブル接頭辞＋
+          // group nestingを含む）でPostgres enum型を作る。`namedImageSetField()`のような
+          // 深いnestingではPostgresの識別子上限63文字を超える
+          // （実測: `enum__robot_series_v_version_images_transparent_rights_source_type`）。
+          // 値集合は`rightsMetaField`の全利用箇所（heroImage.rights / Media.rights / 各role）で
+          // 共通なので、1つの共有enum型名に固定する。
+          enumName: 'rights_status',
         },
         {
           name: 'sourceType',
           type: 'select',
           options: rightsSourceTypeSelectOptions,
+          enumName: 'rights_source_type',
         },
         {
           name: 'checkedAt',
@@ -389,6 +398,38 @@ export function imageAssetField(name: string): Field {
       ],
       imageAssetFieldLabels,
     ),
+  };
+}
+
+/**
+ * `Robots.images` / `RobotSeries.images`（7 role） / `Manufacturers.logos`（3 role）のような、
+ * 「決まった名前のキーごとに`ImageAsset`を1つ持つ」固定roleの画像集合group field。
+ * 各roleは`imageAssetField()`をそのまま使い（可変長ではないため`array`ではなく`group`の
+ * 入れ子にする）、Payloadが返すJSON形状（`{ hero: {...}, side: {...} }`）は元の
+ * `type: 'json'`定義と変わらないため、`lib/content/payloadMappers.ts`・
+ * `lib/robotMedia.ts`・`lib/manufacturerLogo.ts`・フロントエンドコンポーネントは無改修で済む。
+ * 各roleは`type: 'collapsible'`で包み、role数が多いRobots/RobotSeriesの編集画面を
+ * 折りたためるようにする。
+ */
+export function namedImageSetField(
+  name: string,
+  roles: readonly string[],
+  roleLabels: AdminFieldLabelMap,
+  admin?: { description: { ja: string; en: string } },
+): Field {
+  const roleFields = applyAdminFieldLabels(
+    roles.map((role) => imageAssetField(role)),
+    roleLabels,
+  );
+  return {
+    name,
+    type: 'group',
+    admin,
+    fields: roleFields.map((field, index) => ({
+      type: 'collapsible' as const,
+      label: roleLabels[roles[index]],
+      fields: [field],
+    })),
   };
 }
 

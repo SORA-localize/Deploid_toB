@@ -36,6 +36,29 @@ const TARGETS: ReadonlyArray<{ name: string; fields: Field[] }> = [
  * refactor前（2026-09-05時点、plain string配列だった頃）の値集合。1件でも増減したら
  * 気づけるように、path単位で固定する（T5完了条件）。
  */
+/** `namedImageSetField()`のrole別`rights`は全て`rightsMetaField('rights')`由来で値集合は共通。 */
+const RIGHTS_STATUS_VALUES = [
+  'own',
+  'licensed',
+  'commercial-permitted',
+  'reference-attributed',
+  'permission-requested',
+  'prototype-only',
+  'blocked',
+];
+const RIGHTS_SOURCE_TYPE_VALUES = ['own', 'manufacturer-official', 'partner-official', 'press-release', 'third-party', 'unknown'];
+const ROBOT_IMAGE_ROLES = ['hero', 'transparent', 'side', 'inOperation', 'scale', 'endEffector', 'mobility'];
+const MANUFACTURER_LOGO_ROLES = ['symbol', 'wordmark', 'combined'];
+
+function namedImageSetExpectedValues(fieldName: string, roles: string[]): Record<string, string[]> {
+  const entries: Record<string, string[]> = {};
+  for (const role of roles) {
+    entries[`${fieldName}.${role}.rights.status`] = RIGHTS_STATUS_VALUES;
+    entries[`${fieldName}.${role}.rights.sourceType`] = RIGHTS_SOURCE_TYPE_VALUES;
+  }
+  return entries;
+}
+
 const EXPECTED_VALUES: Record<string, string[]> = {
   // 共有field（access.ts）。全collectionへ`...baseContentFields()`/`...baseRecordContentFields()`
   // で展開されるため、9対象それぞれのpathの下に同じ値集合で現れる。
@@ -57,6 +80,7 @@ const EXPECTED_VALUES: Record<string, string[]> = {
   companyType: ['manufacturer', 'distributor', 'integrator', 'ai-os', 'research'],
   companyStatus: ['active', 'stealth', 'acquired', 'inactive'],
   japanPresence: ['office', 'distributor', 'partner', 'remote', 'none', 'unknown'],
+  ...namedImageSetExpectedValues('logos', MANUFACTURER_LOGO_ROLES),
 
   // Distributors
   providerType: ['maker-direct', 'reseller', 'other'],
@@ -74,6 +98,9 @@ const EXPECTED_VALUES: Record<string, string[]> = {
   'loadRatings.scope': ['single-arm', 'dual-arm', 'whole-body', 'carrier', 'manufacturer-wording'],
   'loadRatings.rating': ['rated', 'maximum', 'unspecified'],
   japanAvailability: ['official-japan', 'distributor-japan', 'inquiry-required', 'import-only', 'unavailable', 'unknown'],
+  // `robots.images`と`robot-series.images`は同じ`namedImageSetField('images', ROBOT_IMAGE_ROLE_ORDER, ...)`
+  // なので、path（collection名を含まない）は両方に共通して1回で効く。
+  ...namedImageSetExpectedValues('images', ROBOT_IMAGE_ROLES),
 
   // UseCases
   maturityLevel: ['early-stage', 'pilot-phase', 'production-ready'],
