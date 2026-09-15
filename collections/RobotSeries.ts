@@ -9,13 +9,14 @@ import {
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
   namedImageSetField,
-  PublishValidationError, } from '../lib/payload/access';
+  PublishValidationError,
+  ROBOT_IMAGE_ROLE_ORDER,
+} from '../lib/payload/access';
 import { applyAdminFieldLabels, robotImageRoleFieldLabels, robotSeriesFieldLabels } from '../lib/payload/adminFieldLabels';
 import { partitionFieldsByName, withSidebarPosition } from '../lib/payload/adminFieldLayout';
 import { ADMIN_PUBLISH_INTENT_FIELD } from '../lib/payload/adminPublishIntent';
 import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
-import { ROBOT_IMAGE_ROLE_ORDER } from '../lib/robotMedia';
 import { payloadStatusToDomain, resolveRelationshipToStableId } from '../lib/content/payloadMappers';
 import type { RobotSeries } from '../lib/content/domainTypes';
 import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';

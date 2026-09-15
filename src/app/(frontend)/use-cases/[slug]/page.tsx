@@ -1,3 +1,4 @@
+import dynamic from 'next/dynamic';
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { AlertCircle, Building2, CheckCircle2, MapPin } from 'lucide-react';
@@ -28,6 +29,11 @@ import { shouldIndexPublishedRecord } from '@/lib/indexing';
 import { createPageMetadata } from '@/lib/metadata';
 import { uiText } from '@/lib/uiText';
 import { getUseCaseCandidateEvidenceByRobotId } from '@/lib/useCaseEvidence';
+
+// Live Preview中(draft mode)のときだけ必要。動的importで通常訪問者のbundleから外す。
+const LivePreviewRefresher = dynamic(() =>
+  import('@/components/LivePreviewRefresher').then((mod) => mod.LivePreviewRefresher),
+);
 
 export async function generateStaticParams() {
   const repository = await getContentRepository();
@@ -151,13 +157,14 @@ async function buildUseCaseDetailData(repository: ContentRepository, resolution:
 
 export default async function UseCaseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { data } = await resolveDraftAwarePageData(slug, getCachedUseCaseDetailData, getDraftUseCaseDetailData);
+  const { data, isDraftPreview } = await resolveDraftAwarePageData(slug, getCachedUseCaseDetailData, getDraftUseCaseDetailData);
   if (data.kind === 'redirect') permanentRedirect(`/use-cases/${data.redirectTo}`);
   if (data.kind === 'not-found') notFound();
   const { useCase, deployments, sections, candidateRobots, candidateAnnotations, reports } = data;
 
   return (
     <div className="min-h-screen bg-background">
+      {isDraftPreview ? <LivePreviewRefresher /> : null}
       <JsonLd data={buildUseCaseJsonLd(useCase)} />
       <JsonLd
         data={breadcrumbJsonLd([

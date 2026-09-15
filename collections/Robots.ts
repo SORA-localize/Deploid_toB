@@ -9,7 +9,9 @@ import {
   createPublishGateHook,
   createVersionRetentionGuardBeforeChangeHook,
   namedImageSetField,
-  PublishValidationError, } from '../lib/payload/access';
+  PublishValidationError,
+  ROBOT_IMAGE_ROLE_ORDER,
+} from '../lib/payload/access';
 import {
   applyAdminFieldLabels,
   robotImageRoleFieldLabels,
@@ -34,7 +36,6 @@ import {
 } from '../lib/payload/adminSelectLabels';
 import { createRouteRegistryHooks } from '../lib/payload/routeRegistry';
 import { createRevalidationAfterChangeHook } from '../lib/payload/revalidationHook';
-import { ROBOT_IMAGE_ROLE_ORDER } from '../lib/robotMedia';
 import { mapPayloadRobotToDomain } from '../lib/content/payloadMappers';
 import type { Robot } from '../lib/content/domainTypes';
 import { contentPublishAdminComponents } from '../lib/payload/adminPublishComponents';

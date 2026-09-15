@@ -382,6 +382,15 @@ function rightsMetaField(name: string): Field {
   };
 }
 
+/**
+ * `Robots.images` / `RobotSeries.images`のrole一覧。`lib/robotMedia.ts`の
+ * `ROBOT_IMAGE_ROLE_ORDER`と同じ値を保つ（そちらを直接importしないのは、`lib/robotMedia.ts`が
+ * `@/lib/media`というNext.js側のpath aliasに依存しており、`payload.config.ts`の
+ * module graphからplainなNode解決（knipのdead-code検出等）で辿ると解決できないため。
+ * `lib/payload/`配下は相対importのみに閉じる、という既存の境界に合わせてここへ複製する）。
+ */
+export const ROBOT_IMAGE_ROLE_ORDER = ['hero', 'transparent', 'side', 'inOperation', 'scale', 'endEffector', 'mobility'] as const;
+
 /** `ImageAsset`（`lib/content/domainTypes.ts`）に対応するgroup field。 */
 export function imageAssetField(name: string): Field {
   return {

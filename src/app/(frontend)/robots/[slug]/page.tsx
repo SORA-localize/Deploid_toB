@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -30,6 +31,11 @@ import {
 } from '@/lib/robotCatalog';
 import { getRobotPrimaryImage } from '@/lib/robotMedia';
 import { uiText } from '@/lib/uiText';
+
+// Live Preview中(draft mode)のときだけ必要。動的importで通常訪問者のbundleから外す。
+const LivePreviewRefresher = dynamic(() =>
+  import('@/components/LivePreviewRefresher').then((mod) => mod.LivePreviewRefresher),
+);
 
 export async function generateStaticParams() {
   // archived も詳細ページは残す（「提供終了」表示。一覧・比較には出ない）
@@ -173,7 +179,7 @@ async function getDraftRobotDetailData(slug: string) {
 
 export default async function RobotDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { data } = await resolveDraftAwarePageData(slug, getCachedRobotDetailData, getDraftRobotDetailData);
+  const { data, isDraftPreview } = await resolveDraftAwarePageData(slug, getCachedRobotDetailData, getDraftRobotDetailData);
   if (data.kind === 'redirect') permanentRedirect(`/robots/${data.redirectTo}`);
   if (data.kind === 'not-found') notFound();
   const {
@@ -192,6 +198,7 @@ export default async function RobotDetailPage({ params }: { params: Promise<{ sl
 
   return (
     <div className="min-h-screen bg-background">
+      {isDraftPreview ? <LivePreviewRefresher /> : null}
       <JsonLd data={robotJsonLd(robot, manufacturer ?? undefined)} />
       <JsonLd
         data={breadcrumbJsonLd(
